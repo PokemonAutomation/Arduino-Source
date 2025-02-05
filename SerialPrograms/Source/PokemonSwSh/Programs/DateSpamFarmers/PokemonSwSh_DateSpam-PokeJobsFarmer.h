@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -39,7 +39,7 @@ private:
 
     SectionDividerOption m_advanced_options;
 
-    TimeExpressionOption<uint16_t> MASH_B_DURATION;
+    MillisecondsOption MASH_B_DURATION0;
 
     EventNotificationsOption NOTIFICATIONS;
 };

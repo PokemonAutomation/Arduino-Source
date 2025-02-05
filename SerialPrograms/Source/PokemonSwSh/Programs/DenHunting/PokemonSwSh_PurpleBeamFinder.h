@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -47,7 +47,7 @@ private:
 
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption SAVE_SCREENSHOT;
-    TimeExpressionOption<uint16_t> TIMEOUT_DELAY;
+    MillisecondsOption TIMEOUT_DELAY0;
 //    FloatingPoint MAX_STDDEV;
     FloatingPointOption MIN_BRIGHTNESS;
     FloatingPointOption MIN_EUCLIDEAN;

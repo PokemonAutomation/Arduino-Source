@@ -86,11 +86,10 @@ PurpleBeamFinder::PurpleBeamFinder()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
-    , TIMEOUT_DELAY(
+    , TIMEOUT_DELAY0(
         "<b>Timeout Delay:</b><br>Reset if no beam is detected after this long.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "2 * TICKS_PER_SECOND"
+        "2000 ms"
     )
 //    , MAX_STDDEV(
 //        "<b>Maximum Standard Deviation:</b><br>Range: 0 - 768",
@@ -121,7 +120,7 @@ PurpleBeamFinder::PurpleBeamFinder()
     PA_ADD_OPTION(NOTIFICATIONS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_STATIC(m_advanced_options);
-        PA_ADD_OPTION(TIMEOUT_DELAY);
+        PA_ADD_OPTION(TIMEOUT_DELAY0);
         PA_ADD_OPTION(MIN_BRIGHTNESS);
         PA_ADD_OPTION(MIN_EUCLIDEAN);
         PA_ADD_OPTION(MIN_DELTA_STDDEV_RATIO);
@@ -173,7 +172,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, SwitchController
         BeamSetter setter(env, env.console, context);
         detection = setter.run(
             SAVE_SCREENSHOT,
-            TIMEOUT_DELAY,
+            TIMEOUT_DELAY0,
             MIN_BRIGHTNESS,
             MIN_EUCLIDEAN,
             MIN_DELTA_STDDEV_RATIO,

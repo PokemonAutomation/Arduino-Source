@@ -51,11 +51,10 @@ std::unique_ptr<StatsTracker> CurryHunter_Descriptor::make_stats() const{
 
 
 CurryHunter::CurryHunter()
-    : WALK_UP_DELAY(
+    : WALK_UP_DELAY0(
         "<b>Walk up Delay:</b><br>Wait this long for the " + STRING_POKEMON + " to walk up to you.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "2 * TICKS_PER_SECOND"
+        "2000 ms"
     )
     , SMALL_POKEMON(
         "<b>Small " + STRING_POKEMON + ":</b><br>If there are small " + STRING_POKEMON + ", increase this number by 30. You may have to adjust the number and check what works best for your area.",
@@ -73,7 +72,7 @@ CurryHunter::CurryHunter()
         999
     )
 {
-    PA_ADD_OPTION(WALK_UP_DELAY);
+    PA_ADD_OPTION(WALK_UP_DELAY0);
     PA_ADD_OPTION(SMALL_POKEMON);
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TAKE_VIDEO);
@@ -215,7 +214,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
             }
 
             //  Give the pokemon the time to come to us.
-            pbf_wait(context, WALK_UP_DELAY);
+            pbf_wait(context, WALK_UP_DELAY0);
 
             //  Record the encounter.
             if (TAKE_VIDEO){

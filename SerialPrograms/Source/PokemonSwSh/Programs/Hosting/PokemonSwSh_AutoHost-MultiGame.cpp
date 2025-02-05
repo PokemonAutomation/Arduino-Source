@@ -70,28 +70,25 @@ AutoHostMultiGame::AutoHostMultiGame()
         LockMode::LOCK_WHILE_RUNNING,
         "20000 ms"
     )
-    , ENTER_ONLINE_DEN_DELAY(
+    , ENTER_ONLINE_DEN_DELAY0(
         "<b>Enter Online Den Delay:</b><br>\"Communicating\" when entering den while online.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000 ms"
     )
     , OPEN_ONLINE_DEN_LOBBY_DELAY0(
         "<b>Open Online Den Delay:</b><br>Delay from \"Invite Others\" to when the clock starts ticking.",
         LockMode::LOCK_WHILE_RUNNING,
         "8000 ms"
     )
-    , RAID_START_TO_EXIT_DELAY(
+    , RAID_START_TO_EXIT_DELAY0(
         "<b>Raid Start to Exit Delay:</b><br>Time from start raid to reset. (when not selecting move)",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "15 * TICKS_PER_SECOND"
+        "15 s"
     )
-    , DELAY_TO_SELECT_MOVE(
+    , DELAY_TO_SELECT_MOVE0(
         "<b>Delay to Select Move:</b><br>This + above = time from start raid to select move.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "32 * TICKS_PER_SECOND"
+        "32 s"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -107,10 +104,10 @@ AutoHostMultiGame::AutoHostMultiGame()
 
     PA_ADD_OPTION(m_internet_settings);
     PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY0);
-    PA_ADD_OPTION(ENTER_ONLINE_DEN_DELAY);
+    PA_ADD_OPTION(ENTER_ONLINE_DEN_DELAY0);
     PA_ADD_OPTION(OPEN_ONLINE_DEN_LOBBY_DELAY0);
-    PA_ADD_OPTION(RAID_START_TO_EXIT_DELAY);
-    PA_ADD_OPTION(DELAY_TO_SELECT_MOVE);
+    PA_ADD_OPTION(RAID_START_TO_EXIT_DELAY0);
+    PA_ADD_OPTION(DELAY_TO_SELECT_MOVE0);
 }
 
 
@@ -217,10 +214,10 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, SwitchContr
                 game.move_slot, game.dynamax, 0,
                 HOSTING_NOTIFICATIONS,
                 CONNECT_TO_INTERNET_DELAY0,
-                ENTER_ONLINE_DEN_DELAY,
+                ENTER_ONLINE_DEN_DELAY0,
                 OPEN_ONLINE_DEN_LOBBY_DELAY0,
-                RAID_START_TO_EXIT_DELAY,
-                DELAY_TO_SELECT_MOVE
+                RAID_START_TO_EXIT_DELAY0,
+                DELAY_TO_SELECT_MOVE0
             );
 
             //  Exit game.

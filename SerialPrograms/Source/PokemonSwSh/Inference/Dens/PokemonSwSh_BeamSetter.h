@@ -38,7 +38,7 @@ public:
 
     Detection run(
         bool save_screenshot,
-        uint16_t timeout_ticks,
+        Milliseconds timeout,
         double min_brightness,
         double min_euclidean,
         double min_delta_ratio,

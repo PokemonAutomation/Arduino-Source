@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -44,13 +44,13 @@ private:
     DenMonSelectOption FILTER;
 
     CatchabilitySelectorOption CATCHABILITY;
-    TimeExpressionOption<uint16_t> VIEW_TIME;
+    MillisecondsOption VIEW_TIME0;
 
     EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> READ_DELAY;
+    MillisecondsOption READ_DELAY0;
 };
 
 

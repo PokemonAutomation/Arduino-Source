@@ -32,11 +32,10 @@ BeamReset_Descriptor::BeamReset_Descriptor()
 
 
 BeamReset::BeamReset()
-    : DELAY_BEFORE_RESET(
+    : DELAY_BEFORE_RESET0(
         "<b>Delay before Reset:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000 ms"
     )
     , EXTRA_LINE(
         "<b>Extra Line:</b><br>(German has an extra line of text.)",
@@ -45,7 +44,7 @@ BeamReset::BeamReset()
     )
 {
     PA_ADD_OPTION(START_LOCATION);
-    PA_ADD_OPTION(DELAY_BEFORE_RESET);
+    PA_ADD_OPTION(DELAY_BEFORE_RESET0);
     PA_ADD_OPTION(EXTRA_LINE);
 }
 
@@ -73,7 +72,7 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCon
             pbf_press_button(context, BUTTON_HOME, 10, 10);
             pbf_press_button(context, BUTTON_HOME, 10, 220);
         }
-        pbf_wait(context, DELAY_BEFORE_RESET);
+        pbf_wait(context, DELAY_BEFORE_RESET0);
 
         reset_game_from_home(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }

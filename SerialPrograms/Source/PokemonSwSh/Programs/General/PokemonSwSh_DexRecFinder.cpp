@@ -95,11 +95,10 @@ DexRecFilters::DexRecFilters()
 
 DexRecFinder::DexRecFinder()
     : GO_HOME_WHEN_DONE(false)
-    , VIEW_TIME(
+    , VIEW_TIME0(
         "<b>View Time:</b><br>View the " + STRING_POKEDEX + " for this long before continuing.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "2 * TICKS_PER_SECOND"
+        "2000 ms"
     )
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
@@ -109,29 +108,27 @@ DexRecFinder::DexRecFinder()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , ENTER_POKEDEX_TIME(
+    , ENTER_POKEDEX_TIME0(
         "<b>Enter " + STRING_POKEDEX + " Time:</b><br>Wait this long for the " + STRING_POKEDEX + " to open.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000 ms"
     )
-    , BACK_OUT_TIME(
+    , BACK_OUT_TIME0(
         "<b>Back Out Time:</b><br>Mash B for this long to return to the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
     PA_ADD_OPTION(FILTERS);
-    PA_ADD_OPTION(VIEW_TIME);
+    PA_ADD_OPTION(VIEW_TIME0);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(ENTER_POKEDEX_TIME);
-    PA_ADD_OPTION(BACK_OUT_TIME);
+    PA_ADD_OPTION(ENTER_POKEDEX_TIME0);
+    PA_ADD_OPTION(BACK_OUT_TIME0);
 }
 
 
@@ -196,7 +193,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchController
             OverlayBoxScope box1(env.console, ImageFloatBox(0.75, 0.531 + 1 * 0.1115, 0.18, 0.059));
             OverlayBoxScope box2(env.console, ImageFloatBox(0.75, 0.531 + 2 * 0.1115, 0.18, 0.059));
             OverlayBoxScope box3(env.console, ImageFloatBox(0.75, 0.531 + 3 * 0.1115, 0.18, 0.059));
-            pbf_press_button(context, BUTTON_A, 10, ENTER_POKEDEX_TIME);
+            pbf_press_button(context, BUTTON_A, 80ms, ENTER_POKEDEX_TIME0);
             context.wait_for_all_requests();
 
             VideoSnapshot frame = env.console.video().snapshot();
@@ -226,17 +223,17 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchController
             if (bad_read){
                 env.log("Read Errors. Pausing for user to see.", COLOR_RED);
                 stats.errors++;
-                pbf_wait(context, VIEW_TIME);
+                pbf_wait(context, VIEW_TIME0);
             }
         }else{
             stats.attempts++;
 //            stats.errors++;
-            pbf_press_button(context, BUTTON_A, 10, ENTER_POKEDEX_TIME);
-            pbf_wait(context, VIEW_TIME);
+            pbf_press_button(context, BUTTON_A, 80ms, ENTER_POKEDEX_TIME0);
+            pbf_wait(context, VIEW_TIME0);
         }
         env.update_stats();
 
-        pbf_mash_button(context, BUTTON_B, BACK_OUT_TIME);
+        pbf_mash_button(context, BUTTON_B, BACK_OUT_TIME0);
         pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     }
 

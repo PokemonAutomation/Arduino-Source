@@ -16,8 +16,8 @@ namespace NintendoSwitch{
 
 
 void eggfetcher_loop        (SwitchControllerContext& context);
-void move_while_mashing_B   (SwitchControllerContext& context, uint16_t duration);
-void spin_and_mash_A        (SwitchControllerContext& context, uint16_t duration);
+void move_while_mashing_B   (SwitchControllerContext& context, Milliseconds duration);
+void spin_and_mash_A        (SwitchControllerContext& context, Milliseconds duration);
 void travel_to_spin_location(SwitchControllerContext& context);
 void travel_back_to_lady    (SwitchControllerContext& context);
 

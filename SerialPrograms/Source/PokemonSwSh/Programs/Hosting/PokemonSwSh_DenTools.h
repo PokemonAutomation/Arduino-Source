@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 void enter_den(
     SwitchControllerContext& context,
-    uint16_t ENTER_ONLINE_DEN_DELAY,
+    Milliseconds ENTER_ONLINE_DEN_DELAY,
     bool watts,
     bool online
 );
@@ -31,7 +31,7 @@ void enter_lobby(
 
 void roll_den(
     VideoStream& stream, SwitchControllerContext& context,
-    uint16_t ENTER_ONLINE_DEN_DELAY,
+    Milliseconds ENTER_ONLINE_DEN_DELAY,
     Milliseconds OPEN_ONLINE_DEN_LOBBY_DELAY,
     uint8_t skips, Catchability catchability
 );

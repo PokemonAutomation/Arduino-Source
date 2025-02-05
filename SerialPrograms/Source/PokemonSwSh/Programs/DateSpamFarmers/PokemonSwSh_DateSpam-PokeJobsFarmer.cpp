@@ -50,11 +50,10 @@ PokeJobsFarmer::PokeJobsFarmer()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , MASH_B_DURATION(
+    , MASH_B_DURATION0(
         "<b>Mash B for this long upon completion of " + STRING_POKEJOB + ":</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000 ms"
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -64,7 +63,7 @@ PokeJobsFarmer::PokeJobsFarmer()
     PA_ADD_OPTION(CONCURRENCY);
     PA_ADD_OPTION(MENU_INDEX);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(MASH_B_DURATION);
+    PA_ADD_OPTION(MASH_B_DURATION0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -84,7 +83,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControll
     uint8_t year = MAX_YEAR;
 
     // Play it safe in case some menu is open
-    pbf_mash_button(context, BUTTON_B, MASH_B_DURATION);
+    pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);
 
     for (uint32_t c = 0; c < SKIPS; c++)
     {
@@ -95,7 +94,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControll
             pbf_press_button(context, BUTTON_B, 5, 5);
             pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
             home_roll_date_enter_game_autorollback(env.console, context, year);
-            pbf_mash_button(context, BUTTON_B, MASH_B_DURATION);
+            pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);
 
             // Get rid of new jobs notification by entering Poke Jobs and leaving immediately
             enter_jobs(context, MENU_INDEX);
@@ -161,7 +160,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControll
 
             // Skip through wall of text and exit
             env.log("#### Exit " + STRING_POKEJOB + "s");
-            pbf_mash_button(context, BUTTON_B, MASH_B_DURATION);
+            pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);
         }
     }
 

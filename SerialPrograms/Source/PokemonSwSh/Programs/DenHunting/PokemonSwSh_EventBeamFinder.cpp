@@ -33,15 +33,14 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
 
 
 EventBeamFinder::EventBeamFinder()
-    : WAIT_TIME_IN_DEN(
+    : WAIT_TIME_IN_DEN0(
         "<b>Wait time in Den:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5800 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
-    PA_ADD_OPTION(WAIT_TIME_IN_DEN);
+    PA_ADD_OPTION(WAIT_TIME_IN_DEN0);
 }
 
 
@@ -64,11 +63,11 @@ void EventBeamFinder::goto_far_den(SwitchControllerContext& context) const{
     ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 300);
 }
 void EventBeamFinder::drop_wishing_piece(SwitchControllerContext& context) const{
-    ssf_press_button2(context, BUTTON_A, 200, 10);
-    ssf_press_button2(context, BUTTON_A, 150, 10);
-    ssf_press_button1(context, BUTTON_A, 5);
+    ssf_press_button(context, BUTTON_A, 200, 10);
+    ssf_press_button(context, BUTTON_A, 150, 10);
+    ssf_press_button(context, BUTTON_A, 5);
     pbf_mash_button(context, BUTTON_B, 500);
-    ssf_press_button2(context, BUTTON_A, WAIT_TIME_IN_DEN + 100, 10);
+    ssf_press_button(context, BUTTON_A, WAIT_TIME_IN_DEN0, 80ms);
     pbf_mash_button(context, BUTTON_B, 600);
 }
 void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){

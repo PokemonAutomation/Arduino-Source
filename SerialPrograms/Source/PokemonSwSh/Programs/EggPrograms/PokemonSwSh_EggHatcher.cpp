@@ -92,17 +92,15 @@ EggHatcher::EggHatcher()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , SAFETY_TIME0(
+    , SAFETY_TIME1(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "12 * TICKS_PER_SECOND"
+        "12 s"
     )
-    , HATCH_DELAY(
+    , HATCH_DELAY0(
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "88 * TICKS_PER_SECOND"
+        "88 s"
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -112,14 +110,14 @@ EggHatcher::EggHatcher()
     PA_ADD_OPTION(BOXES_TO_HATCH);
     PA_ADD_OPTION(STEPS_TO_HATCH);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(SAFETY_TIME0);
-    PA_ADD_OPTION(HATCH_DELAY);
+    PA_ADD_OPTION(SAFETY_TIME1);
+    PA_ADD_OPTION(HATCH_DELAY0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     //  Calculate upper bounds for incubation time.
-    uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * 2 * (uint32_t)103180 >> 16);
-    uint16_t TOTAL_DELAY = INCUBATION_DELAY_UPPER + HATCH_DELAY + SAFETY_TIME0 - TRAVEL_RIGHT_DURATION;
+    Milliseconds INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * 2 * (uint32_t)103180 >> 16) * 8ms;
+    Milliseconds TOTAL_DELAY = INCUBATION_DELAY_UPPER + HATCH_DELAY0.get() + SAFETY_TIME1.get() - TRAVEL_RIGHT_DURATION;
 
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
@@ -145,7 +143,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
             fly_home(context, false);
 
             //  Travel to spin location.
-            pbf_move_left_joystick(context, STICK_MAX, STICK_CENTER, TRAVEL_RIGHT_DURATION, 0);
+            pbf_move_left_joystick(context, STICK_MAX, STICK_CENTER, TRAVEL_RIGHT_DURATION, 0ms);
 
             //  Spin
 #if 0

@@ -25,15 +25,15 @@ void eggfetcher_loop(SwitchControllerContext& context){
     ssf_press_left_joystick(context, 192, STICK_MIN, 120, 120);
     ssf_press_left_joystick(context, STICK_MAX, STICK_MIN, 120, 120);
 }
-void move_while_mashing_B(SwitchControllerContext& context, uint16_t duration){
+void move_while_mashing_B(SwitchControllerContext& context, Milliseconds duration){
     //  Hold the joystick to the right for the entire duration.
-    ssf_press_left_joystick(context, STICK_MAX, STICK_CENTER, 0, duration);
+    ssf_press_left_joystick(context, STICK_MAX, STICK_CENTER, 0ms, duration);
 
     //  While the above is running, spam B.
     ssf_mash1_button(context, BUTTON_B, duration);
 }
-void spin_and_mash_A(SwitchControllerContext& context, uint16_t duration){
-    for (uint16_t c = 0; c < duration; c += 128){
+void spin_and_mash_A(SwitchControllerContext& context, Milliseconds duration){
+    for (Milliseconds c = 0ms; c < duration; c += 1024ms){
         ssf_press_left_joystick(context, STICK_CENTER, STICK_MAX, 0, 32);
         ssf_press_button(context, BUTTON_A, 16);
         ssf_press_button(context, BUTTON_A, 16);

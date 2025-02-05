@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_BeamReset_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -33,7 +33,7 @@ public:
 private:
     StartInGripOrGameOption START_LOCATION;
 
-    TimeExpressionOption<uint16_t> DELAY_BEFORE_RESET;
+    MillisecondsOption DELAY_BEFORE_RESET0;
     BooleanCheckBoxOption EXTRA_LINE;
 };
 

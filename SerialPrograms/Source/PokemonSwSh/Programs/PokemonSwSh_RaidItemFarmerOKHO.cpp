@@ -143,7 +143,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
             scope,
             [&](ConsoleHandle& console, SwitchControllerContext& context){
                 if (console.index() == 0){
-                    enter_den(context, 0, false, false);
+                    enter_den(context, 0ms, false, false);
                 }else{
                     pbf_press_button(context, BUTTON_Y, 80ms, GameSettings::instance().OPEN_YCOMM_DELAY0);
                     pbf_press_dpad(context, DPAD_UP, 5, 0);

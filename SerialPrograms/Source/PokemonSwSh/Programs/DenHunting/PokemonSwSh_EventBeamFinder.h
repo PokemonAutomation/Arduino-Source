@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_EventBeamFinder_H
 #define PokemonAutomation_PokemonSwSh_EventBeamFinder_H
 
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -36,7 +36,7 @@ public:
 private:
     StartInGripOrGameOption START_LOCATION;
 
-    TimeExpressionOption<uint16_t> WAIT_TIME_IN_DEN;
+    MillisecondsOption WAIT_TIME_IN_DEN0;
 };
 
 

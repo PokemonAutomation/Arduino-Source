@@ -47,10 +47,10 @@ void run_autohost(
     uint8_t move_slot, bool dynamax, uint8_t troll_hosting,
     AutoHostNotificationOption& notifications,
     Milliseconds connect_to_internet_delay,
-    uint16_t enter_online_den_delay,
+    Milliseconds enter_online_den_delay,
     Milliseconds open_online_den_lobby_delay,
-    uint16_t raid_start_to_exit_delay,
-    uint16_t delay_to_select_move
+    Milliseconds raid_start_to_exit_delay,
+    Milliseconds delay_to_select_move
 );
 
 

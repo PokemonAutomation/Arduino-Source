@@ -39,11 +39,10 @@ LotoFarmer::LotoFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         100000
     )
-    , MASH_B_DURATION(
+    , MASH_B_DURATION0(
         "<b>Mash B for this long to exit the dialog:</b><br>(Some languages like German need to increase this.)",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "9 * TICKS_PER_SECOND"
+        "9000 ms"
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -51,7 +50,7 @@ LotoFarmer::LotoFarmer()
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(SKIPS);
-    PA_ADD_OPTION(MASH_B_DURATION);
+    PA_ADD_OPTION(MASH_B_DURATION0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -73,7 +72,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         pbf_press_button(context, BUTTON_B, 10, 70);
         pbf_press_dpad(context, DPAD_DOWN, 10, 5);
         pbf_mash_button(context, BUTTON_ZL, 490);
-        pbf_mash_button(context, BUTTON_B, MASH_B_DURATION);
+        pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);
 
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't
         //  accidentally update the system if the system update window pops up.

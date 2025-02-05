@@ -33,12 +33,11 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
 
 
 WattFarmer::WattFarmer()
-    : GRIP_MENU_WAIT(
+    : GRIP_MENU_WAIT0(
         "<b>Exit Grip Menu Delay:</b> "
         "Wait this long after leaving the grip menu to allow for the Switch to reestablish local connection.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000 ms"
     )
     , EXIT_DEN_WAIT(
         "<b>Exit Den Wait Time:</b> "
@@ -70,7 +69,7 @@ WattFarmer::WattFarmer()
 void WattFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
-        pbf_wait(context, GRIP_MENU_WAIT);
+        pbf_wait(context, GRIP_MENU_WAIT0);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
         pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);

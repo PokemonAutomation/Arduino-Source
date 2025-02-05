@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -38,10 +38,10 @@ private:
     StartInGripOrGameOption START_LOCATION;
 
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
-    TimeExpressionOption<uint16_t> INITIAL_WAIT;
+    MillisecondsOption INITIAL_WAIT0;
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> TRADE_ANIMATION;
-    TimeExpressionOption<uint16_t> EVOLVE_DELAY;
+    MillisecondsOption TRADE_ANIMATION0;
+    MillisecondsOption EVOLVE_DELAY0;
 };
 
 

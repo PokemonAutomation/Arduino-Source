@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_LotoFarmer_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -35,7 +35,7 @@ private:
     StartInGripOrGameOption START_LOCATION;
 
     SimpleIntegerOption<uint32_t> SKIPS;
-    TimeExpressionOption<uint16_t> MASH_B_DURATION;
+    MillisecondsOption MASH_B_DURATION0;
 
     EventNotificationsOption NOTIFICATIONS;
 };

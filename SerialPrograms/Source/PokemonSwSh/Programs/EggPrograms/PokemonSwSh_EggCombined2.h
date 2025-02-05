@@ -10,13 +10,12 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EggStepOption.h"
-#include "PokemonSwSh_EggHelpers.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -47,9 +46,9 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> SAFETY_TIME;
-    TimeExpressionOption<uint16_t> EARLY_HATCH_SAFETY;
-    TimeExpressionOption<uint16_t> HATCH_DELAY;
+    MillisecondsOption SAFETY_TIME0;
+    MillisecondsOption EARLY_HATCH_SAFETY0;
+    MillisecondsOption HATCH_DELAY0;
 };
 
 

@@ -49,44 +49,38 @@ TradeBot::TradeBot()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
-    , SEARCH_DELAY(
+    , SEARCH_DELAY0(
         "<b>Time to wait for a Trade Partner:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "20 s"
     )
-    , CONFIRM_DELAY(
+    , CONFIRM_DELAY0(
         "<b>Time to wait for Partner to Confirm:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
-    , TRADE_START(
+    , TRADE_START0(
         "<b>Time for Trade to Start:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
-    , TRADE_COMMUNICATION(
+    , TRADE_COMMUNICATION0(
         "<b>Communication Window:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "20 s"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , TRADE_ANIMATION(
+    , TRADE_ANIMATION0(
         "<b>Trade Animation Time:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "23 * TICKS_PER_SECOND"
+        "23 s"
     )
-    , EVOLVE_DELAY(
+    , EVOLVE_DELAY0(
         "<b>Evolve Delay:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "30 * TICKS_PER_SECOND"
+        "30 s"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -94,13 +88,13 @@ TradeBot::TradeBot()
     PA_ADD_OPTION(TRADE_CODE);
     PA_ADD_OPTION(BOXES_TO_TRADE);
     PA_ADD_OPTION(LINK_TRADE_EXTRA_LINE);
-    PA_ADD_OPTION(SEARCH_DELAY);
-    PA_ADD_OPTION(CONFIRM_DELAY);
-    PA_ADD_OPTION(TRADE_START);
-    PA_ADD_OPTION(TRADE_COMMUNICATION);
+    PA_ADD_OPTION(SEARCH_DELAY0);
+    PA_ADD_OPTION(CONFIRM_DELAY0);
+    PA_ADD_OPTION(TRADE_START0);
+    PA_ADD_OPTION(TRADE_COMMUNICATION0);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(TRADE_ANIMATION);
-    PA_ADD_OPTION(EVOLVE_DELAY);
+    PA_ADD_OPTION(TRADE_ANIMATION0);
+    PA_ADD_OPTION(EVOLVE_DELAY0);
 }
 
 
@@ -123,7 +117,7 @@ void TradeBot::trade_slot(SwitchControllerContext& context, const uint8_t code[8
     ssf_press_button2(context, BUTTON_A, 50, 10);
     pbf_mash_button(context, BUTTON_B, 400);
 
-    pbf_wait(context, SEARCH_DELAY);
+    pbf_wait(context, SEARCH_DELAY0);
 
     //  If we're not in a trade, enter Y-COMM to avoid a connection at this point.
     ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 400ms);
@@ -142,16 +136,16 @@ void TradeBot::trade_slot(SwitchControllerContext& context, const uint8_t code[8
 
     //  Select Pokemon
     ssf_press_button1(context, BUTTON_A, 100);
-    ssf_press_button1(context, BUTTON_A, CONFIRM_DELAY);
+    ssf_press_button(context, BUTTON_A, CONFIRM_DELAY0);
 
     //  Start Trade
-    ssf_press_button1(context, BUTTON_A, TRADE_START);
+    ssf_press_button(context, BUTTON_A, TRADE_START0);
 
     //  Cancel out
-    for (uint16_t c = 0; c < TRADE_COMMUNICATION + TRADE_ANIMATION; c += 300){
-        ssf_press_button1(context, BUTTON_B, 100);
-        ssf_press_button1(context, BUTTON_B, 100);
-        ssf_press_button1(context, BUTTON_A, 100);
+    for (Milliseconds c = 0ms; c < TRADE_COMMUNICATION0.get() + TRADE_ANIMATION0.get(); c += 2400ms){
+        ssf_press_button(context, BUTTON_B, 800ms);
+        ssf_press_button(context, BUTTON_B, 800ms);
+        ssf_press_button(context, BUTTON_A, 800ms);
     }
 }
 
@@ -185,11 +179,11 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env, SwitchControllerCont
             ssf_press_button1(context, BUTTON_B, 280);
             ssf_press_button1(context, BUTTON_B, 200);
             ssf_press_button1(context, BUTTON_A, 100);
-            pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
+            pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION0);
         }
 
         //  Wait out any new pokedex entries or trade evolutions.
-        pbf_mash_button(context, BUTTON_B, EVOLVE_DELAY);
+        pbf_mash_button(context, BUTTON_B, EVOLVE_DELAY0);
 
         //  Change boxes.
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_FastCodeEntry_H
 
 #include "Common/Cpp/Options/FixedCodeOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -31,7 +31,7 @@ public:
 
 private:
     FixedCodeOption RAID_CODE;
-    TimeExpressionOption<uint16_t> INITIAL_DELAY;
+    MillisecondsOption INITIAL_DELAY0;
 };
 
 
