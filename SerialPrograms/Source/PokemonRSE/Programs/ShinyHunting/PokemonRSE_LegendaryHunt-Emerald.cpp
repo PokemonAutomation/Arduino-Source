@@ -77,65 +77,69 @@ LegendaryHuntEmerald::LegendaryHuntEmerald()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void LegendaryHuntEmerald::reset_room(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
-    switch (TARGET) {
-    case Target::regis:
-        //turn around, walk down 4
+void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    //Turn around, 5 steps down
+    ssf_press_button(context, BUTTON_B, 0, 90);
+    pbf_press_dpad(context, DPAD_DOWN, 90, 20);
 
-        //black screen over
-
-        //turn around, up one
-
-        //black screen over
-
-        //reverse the above
-
-        break;
-    case Target::hooh:
-        //Turn around
-
-        //10 steps down
-
-        //Turn right
-
-        //Take one step
-
-        //Wait for black screen over
-
-        //Turn left and take a step
-
-        //now turn right and take a step
-
-        //wait for black screen over
-
-        //now reverse the above, but only take 9 steps up
-        break;
-    case Target::lugia:
-        //Turn around
-
-        //5 steps down
-
-        //Turn right
-
-        //3 steps right
-
-
-        //Wait for black screen over
-
-        //turn up, take one step
-
-        //now turn back down and take a step
-
-        //wait for black screen over
-
-        //reverse above steps
-        break;
-    case Target::latis:
-
-        break;
-    default:
-        break;
+    //Turn right, 3 steps right. Wait for black screen over.
+    int ret = run_until<SwitchControllerContext>(
+        env.console, context,
+        [](SwitchControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0, 90);
+            pbf_press_dpad(context, DPAD_RIGHT, 90, 20);
+            pbf_wait(context, 300);
+        },
+        {exit_area}
+    );
+    context.wait_for_all_requests();
+    if (ret != 0){
+        env.log("Failed to exit area.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to exit area.",
+            env.console
+        );
     }
+    else {
+        env.log("Left area.");
+    }
+
+    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    //turn up, take one step. then turn back down and take a step. wait for black screen over.
+    int ret2 = run_until<SwitchControllerContext>(
+        env.console, context,
+        [](SwitchControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0, 40);
+            pbf_press_dpad(context, DPAD_UP, 40, 20);
+
+            ssf_press_button(context, BUTTON_B, 0, 40);
+            pbf_press_dpad(context, DPAD_DOWN, 40, 20);
+            pbf_wait(context, 300);
+        },
+        {enter_area}
+    );
+    context.wait_for_all_requests();
+    if (ret2 != 0){
+        env.log("Failed to enter area.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to enter area.",
+            env.console
+        );
+    }
+    else {
+        env.log("Entered area.");
+    }
+
+    //reverse above steps
+    ssf_press_button(context, BUTTON_B, 0, 70);
+    pbf_press_dpad(context, DPAD_LEFT, 70, 20);
+
+    ssf_press_button(context, BUTTON_B, 0, 90);
+    pbf_press_dpad(context, DPAD_UP, 90, 20);
+
     context.wait_for_all_requests();
 }
 
@@ -176,8 +180,53 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
         pbf_mash_button(context, BUTTON_B, 250);
         context.wait_for_all_requests();
         
-        //Exit and reenter
-        reset_room(env, context);
+        //Exit and re-enter the room
+        switch (TARGET) {
+        case Target::regis:
+            //turn around, walk down 4
+
+            //black screen over
+
+            //turn around, up one
+
+            //black screen over
+
+            //reverse the above
+
+            break;
+        case Target::hooh:
+            //Turn around
+
+            //10 steps down
+
+            //Turn right
+
+            //Take one step
+
+            //Wait for black screen over
+
+            //Turn left and take a step
+
+            //now turn right and take a step
+
+            //wait for black screen over
+
+            //now reverse the above, but only take 9 steps up
+            break;
+        case Target::lugia:
+            reset_lugia(env, context);
+            break;
+        case Target::latis:
+            //TODO
+            break;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Invalid target!",
+                env.console
+            );
+            break;
+        }
 
         stats.resets++;
         env.update_stats();

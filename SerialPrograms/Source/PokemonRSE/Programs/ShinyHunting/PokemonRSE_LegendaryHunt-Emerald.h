@@ -41,7 +41,7 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void reset_room(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void reset_lugia(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 };
 
 }
