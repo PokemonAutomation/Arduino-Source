@@ -31,16 +31,16 @@ void take_video(SwitchControllerContext& context){
 }
 void run_away(
     VideoStream& stream, SwitchControllerContext& context,
-    uint16_t exit_battle_time
+    Milliseconds exit_battle_time
 ){
     BlackScreenOverWatcher black_screen_detector;
     run_until<SwitchControllerContext>(
         stream, context,
         [exit_battle_time](SwitchControllerContext& context){
             pbf_press_dpad(context, DPAD_UP, 10, 0);
-            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
-            if (exit_battle_time > TICKS_PER_SECOND){
-                pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
+            if (exit_battle_time > 1000ms){
+                pbf_mash_button(context, BUTTON_B, exit_battle_time - 1000ms);
             }
         },
         {{black_screen_detector}}
@@ -76,7 +76,7 @@ void StandardEncounterHandler::update_frequencies(StandardEncounterDetection& en
 }
 void StandardEncounterHandler::run_away_and_update_stats(
     StandardEncounterDetection& encounter,
-    uint16_t exit_battle_time,
+    Milliseconds exit_battle_time,
     const ShinyDetectionResult& result
 ){
     //  Read the name.
@@ -106,9 +106,9 @@ void StandardEncounterHandler::run_away_and_update_stats(
     int ret = run_until<SwitchControllerContext>(
         m_stream, m_context,
         [exit_battle_time](SwitchControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
-            if (exit_battle_time > TICKS_PER_SECOND){
-                pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
+            if (exit_battle_time > 1000ms){
+                pbf_mash_button(context, BUTTON_B, exit_battle_time - 1000ms);
             }
         },
         {{black_screen_detector}}
@@ -174,7 +174,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
 }
 bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     const ShinyDetectionResult& result,
-    uint16_t exit_battle_time
+    Milliseconds exit_battle_time
 ){
     if (result.shiny_type == ShinyType::UNKNOWN){
         m_stream.log("Unable to determine result of battle.", COLOR_RED);

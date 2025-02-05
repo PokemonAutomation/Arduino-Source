@@ -15,13 +15,13 @@ namespace PokemonSwSh{
 
 void move_to_corner(
     Logger& logger, SwitchControllerContext& context,
-    bool correction, uint16_t TRANSITION_DELAY
+    bool correction, Milliseconds TRANSITION_DELAY
 ){
     if (correction){
         logger.log("Performing auto-correction.");
         //  Move down to building exit and exit.
-        pbf_move_left_joystick(context, 128, 255, 500, TRANSITION_DELAY);
-        pbf_move_left_joystick(context, 128, 255, 300, TRANSITION_DELAY);
+        pbf_move_left_joystick(context, 128, 255, 4000ms, TRANSITION_DELAY);
+        pbf_move_left_joystick(context, 128, 255, 2400ms, TRANSITION_DELAY);
 
         //  Navigate back into the corner.
         pbf_move_left_joystick(context, 255, 64, 200, 0);

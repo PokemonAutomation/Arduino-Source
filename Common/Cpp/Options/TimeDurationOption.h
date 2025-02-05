@@ -48,6 +48,7 @@ public:
     std::string current_text() const;
 
     operator Type() const;
+    operator WallDuration() const;
     Type get() const;
     std::string set(std::string text);
 

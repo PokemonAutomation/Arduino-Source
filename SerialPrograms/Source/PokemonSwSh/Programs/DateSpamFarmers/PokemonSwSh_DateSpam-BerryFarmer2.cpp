@@ -89,11 +89,10 @@ BerryFarmer2::BerryFarmer2()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
 //    , START_BATTLE_TIMEOUT(
 //        "<b>Start Battle Timeout:</b><br>After a battle is detected, wait this long to flee in seconds.",
@@ -105,17 +104,15 @@ BerryFarmer2::BerryFarmer2()
         LockMode::UNLOCK_WHILE_RUNNING,
         1350
     )
-    , RUSTLING_TIMEOUT(
+    , RUSTLING_TIMEOUT0(
         "<b>Rustling Timeout:</b><br>Wait this many ticks to detect rustling.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "400"
+        "3200 ms"
     )
-    , SECONDARY_ATTEMPT_MASH_TIME(
+    , SECONDARY_ATTEMPT_MASH_TIME0(
         "<b>Secondary attempt mash time:</b><br>Mash ZL this many ticks for secondary fetch attempts.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "240"
+        "1920 ms"
     )
     , SOUND_THRESHOLD(
         "<b>Maximum Sound Error Coefficient",
@@ -133,11 +130,11 @@ BerryFarmer2::BerryFarmer2()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 //    PA_ADD_OPTION(START_BATTLE_TIMEOUT);
     PA_ADD_OPTION(RUSTLING_INTERVAL);
-    PA_ADD_OPTION(RUSTLING_TIMEOUT);
-    PA_ADD_OPTION(SECONDARY_ATTEMPT_MASH_TIME);
+    PA_ADD_OPTION(RUSTLING_TIMEOUT0);
+    PA_ADD_OPTION(SECONDARY_ATTEMPT_MASH_TIME0);
     PA_ADD_OPTION(SOUND_THRESHOLD);
 }
 
@@ -172,7 +169,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
     int ret = run_until<SwitchControllerContext>(
         env.console, context,
         [&](SwitchControllerContext& context){
-            pbf_wait(context, RUSTLING_TIMEOUT);
+            pbf_wait(context, RUSTLING_TIMEOUT0);
             context.wait_for_all_requests();
         },
         { {initial_rustling_detector}, {battle_menu_detector}, {start_battle_detector} }
@@ -186,7 +183,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
         int ret1 = run_until<SwitchControllerContext>(
             env.console, context,
             [&](SwitchControllerContext& context){
-                pbf_wait(context, RUSTLING_TIMEOUT);
+                pbf_wait(context, RUSTLING_TIMEOUT0);
                 context.wait_for_all_requests();
             },
             { {secondary_rustling_detector} }
@@ -206,7 +203,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
         stats.add_error();
         env.update_stats();
         pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-        run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
+        run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
         result = Rustling::Battle;
         break;
     case 2:{
@@ -227,7 +224,7 @@ BerryFarmer2::Rustling BerryFarmer2::check_rustling(SingleSwitchProgramEnvironme
             stats
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(encounter_result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(encounter_result, EXIT_BATTLE_TIMEOUT0);
         if (stop){
             throw ProgramFinishedException();
         }
@@ -269,7 +266,7 @@ uint16_t BerryFarmer2::do_secondary_attempts(SingleSwitchProgramEnvironment& env
     }
     if (current_rustling == Rustling::Fast){
         // this is the last tree interaction for this time skip
-        pbf_mash_button(context, BUTTON_ZL, SECONDARY_ATTEMPT_MASH_TIME);
+        pbf_mash_button(context, BUTTON_ZL, SECONDARY_ATTEMPT_MASH_TIME0);
         pbf_mash_button(context, BUTTON_B, 10);
         attempts++;
         stats.shakes++;
@@ -315,7 +312,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchController
         switch (current_rustling){
         case Rustling::Battle:
             pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
-            run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
+            run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
             break;
         case Rustling::Fast:
             // Do nothing -> stop current tree session

@@ -97,12 +97,11 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
         LockMode::LOCK_WHILE_RUNNING,
         TriggerMethod::Whistle3Circle1
     )
-    , MAX_MOVE_DURATION(
+    , MAX_MOVE_DURATION0(
         "<b>Maximum Move Duration:</b><br>Do not move in the same direction for more than this long."
         " If you set this too high, you may wander too far from the grassy area.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "200"
+        "1600 ms"
     )
     , MAX_TARGET_ALPHA(
         "<b>Max Target Alpha:</b><br>Ignore all targets with alpha larger than this. Set to zero to ignore all marks.",
@@ -121,17 +120,15 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , WATCHDOG_TIMER(
+    , WATCHDOG_TIMER0(
         "<b>Watchdog Timer:</b><br>Reset the game if you go this long without any encounters.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "60 * TICKS_PER_SECOND"
+        "60 s"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
     , TARGET_CIRCLING(
         "<b>Target Circling:</b><br>After moving towards a " + STRING_POKEMON + ", make a circle."
@@ -148,15 +145,15 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     PA_ADD_OPTION(MARK_OFFSET);
     PA_ADD_OPTION(MARK_PRIORITY);
     PA_ADD_OPTION(TRIGGER_METHOD);
-    PA_ADD_OPTION(MAX_MOVE_DURATION);
+    PA_ADD_OPTION(MAX_MOVE_DURATION0);
     PA_ADD_OPTION(MAX_TARGET_ALPHA);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(WATCHDOG_TIMER);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(WATCHDOG_TIMER0);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
     PA_ADD_OPTION(TARGET_CIRCLING);
 }
 
@@ -310,10 +307,8 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         ", Direction = " + tostr_default(-angle) + " degrees"
     );
 
-    int duration = trajectory.distance_in_ticks + 16;
-    if (duration > (int)MAX_MOVE_DURATION){
-        duration = MAX_MOVE_DURATION;
-    }
+    Milliseconds duration = (trajectory.distance_in_ticks + 16) * 8ms;
+    duration = std::min<Milliseconds>(duration, MAX_MOVE_DURATION0);
 
 
     StandardBattleMenuWatcher battle_menu_detector(false);
@@ -334,7 +329,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
                 context,
                 trajectory.joystick_x,
                 trajectory.joystick_y,
-                (uint16_t)duration, 0
+                duration, 0ms
             );
 
             //  Circle Maneuver
@@ -383,7 +378,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
     }
     pbf_move_right_joystick(context, 128, 255, TICKS_PER_SECOND, 0);
 
-    WallDuration TIMEOUT = std::chrono::milliseconds((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
+    WallDuration TIMEOUT = WATCHDOG_TIMER0;
     WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
     WallClock last_touch = current_time();
 //    const std::chrono::milliseconds TIMEOUT((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
@@ -441,7 +436,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
         );
 //        shininess = ShinyDetection::SQUARE_SHINY;
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT0);
         if (stop){
             break;
         }

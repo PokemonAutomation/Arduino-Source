@@ -53,11 +53,33 @@ struct TimeDurationCell<Type>::Data{
 
         static const std::map<std::string, int64_t> SYMBOLS{
             {"ms", std::chrono::duration_cast<Type>(std::chrono::milliseconds(1)).count()},
+            {"millisecond", std::chrono::duration_cast<Type>(std::chrono::milliseconds(1)).count()},
+            {"milliseconds", std::chrono::duration_cast<Type>(std::chrono::milliseconds(1)).count()},
+
             {"s", std::chrono::duration_cast<Type>(std::chrono::seconds(1)).count()},
+            {"secs", std::chrono::duration_cast<Type>(std::chrono::seconds(1)).count()},
+            {"second", std::chrono::duration_cast<Type>(std::chrono::seconds(1)).count()},
+            {"seconds", std::chrono::duration_cast<Type>(std::chrono::seconds(1)).count()},
+
             {"min", std::chrono::duration_cast<Type>(std::chrono::minutes(1)).count()},
+            {"minute", std::chrono::duration_cast<Type>(std::chrono::minutes(1)).count()},
+            {"minutes", std::chrono::duration_cast<Type>(std::chrono::minutes(1)).count()},
+
             {"h", std::chrono::duration_cast<Type>(std::chrono::hours(1)).count()},
+            {"hour", std::chrono::duration_cast<Type>(std::chrono::hours(1)).count()},
+            {"hours", std::chrono::duration_cast<Type>(std::chrono::hours(1)).count()},
+
             {"d", std::chrono::duration_cast<Type>(std::chrono::days(1)).count()},
+            {"day", std::chrono::duration_cast<Type>(std::chrono::days(1)).count()},
+            {"days", std::chrono::duration_cast<Type>(std::chrono::days(1)).count()},
+
+            {"w", std::chrono::duration_cast<Type>(std::chrono::days(7)).count()},
+            {"week", std::chrono::duration_cast<Type>(std::chrono::days(7)).count()},
+            {"weeks", std::chrono::duration_cast<Type>(std::chrono::days(7)).count()},
+
             {"y", std::chrono::duration_cast<Type>(std::chrono::years(1)).count()},
+            {"year", std::chrono::duration_cast<Type>(std::chrono::years(1)).count()},
+            {"years", std::chrono::duration_cast<Type>(std::chrono::years(1)).count()},
         };
 
         using Rep = typename Type::rep;
@@ -160,6 +182,10 @@ TimeDurationCell<Type>::operator Type() const{
     const Data& data = *m_data;
     ReadSpinLock lg(data.m_lock);
     return data.m_value;
+}
+template <typename Type>
+TimeDurationCell<Type>::operator WallDuration() const{
+    return get();
 }
 template <typename Type>
 Type TimeDurationCell<Type>::get() const{

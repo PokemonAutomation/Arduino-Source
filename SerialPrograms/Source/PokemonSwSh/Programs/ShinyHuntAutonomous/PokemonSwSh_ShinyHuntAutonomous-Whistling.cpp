@@ -64,11 +64,10 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -80,7 +79,7 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 }
 
 
@@ -143,7 +142,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
                 stats.m_unexpected_battles++;
                 env.update_stats();
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-                run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
+                run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
                 continue;
             case 1:
                 env.log("Battle started!");
@@ -158,7 +157,9 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
             std::chrono::seconds(30)
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(
+            result, EXIT_BATTLE_TIMEOUT0
+        );
         if (stop){
             break;
         }

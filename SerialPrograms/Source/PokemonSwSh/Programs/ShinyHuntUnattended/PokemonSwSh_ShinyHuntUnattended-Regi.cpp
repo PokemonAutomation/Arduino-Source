@@ -35,11 +35,10 @@ ShinyHuntUnattendedRegi_Descriptor::ShinyHuntUnattendedRegi_Descriptor()
 
 
 ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi()
-    : START_TO_RUN_DELAY(
+    : START_TO_RUN_DELAY0(
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1990"
+        "15920 ms"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -49,21 +48,20 @@ ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi()
         LockMode::LOCK_WHILE_RUNNING,
         20
     )
-    , TRANSITION_DELAY(
+    , TRANSITION_DELAY0(
         "<b>Transition Delay:</b><br>Time to enter/exit the building.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
-    PA_ADD_OPTION(START_TO_RUN_DELAY);
+    PA_ADD_OPTION(START_TO_RUN_DELAY0);
     PA_ADD_OPTION(REGI_NAME);
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(CORRECTION_INTERVAL);
-    PA_ADD_OPTION(TRANSITION_DELAY);
+    PA_ADD_OPTION(TRANSITION_DELAY0);
 }
 
 
@@ -80,7 +78,7 @@ void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env, Switc
     for (uint32_t c = 0; ; c++){
         //  Auto-correction.
         bool correct = CORRECTION_INTERVAL > 0 && correct_count >= CORRECTION_INTERVAL;
-        move_to_corner(env.console, context, correct, TRANSITION_DELAY);
+        move_to_corner(env.console, context, correct, TRANSITION_DELAY0);
         if (correct){
             correct_count = 0;
         }
@@ -99,12 +97,13 @@ void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env, Switc
 
         pbf_press_button(context, BUTTON_A, 10, 100);
         pbf_press_button(context, BUTTON_A, 10, 100);
-        if (START_TO_RUN_DELAY >= 500){
+        Milliseconds start_to_run_delay = START_TO_RUN_DELAY0;
+        if (start_to_run_delay >= 4000ms){
             //  Extra A press to fix A parity if the lights were messed up.
-            pbf_press_button(context, BUTTON_A, 10, 500);
-            pbf_press_button(context, BUTTON_A, 10, START_TO_RUN_DELAY - 500);
+            pbf_press_button(context, BUTTON_A, 80ms, 4000ms);
+            pbf_press_button(context, BUTTON_A, 80ms, start_to_run_delay - 4000ms);
         }else{
-            pbf_press_button(context, BUTTON_A, 10, START_TO_RUN_DELAY);
+            pbf_press_button(context, BUTTON_A, 80ms, start_to_run_delay);
         }
 
         //  Run away if not shiny.

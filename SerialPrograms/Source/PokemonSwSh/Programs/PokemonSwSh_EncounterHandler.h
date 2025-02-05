@@ -31,14 +31,17 @@ public:
 
     //  Return true if program should stop.
     bool handle_standard_encounter(const ShinyDetectionResult& result);
-    bool handle_standard_encounter_end_battle(const ShinyDetectionResult& result, uint16_t exit_battle_time);
+    bool handle_standard_encounter_end_battle(
+        const ShinyDetectionResult& result,
+        Milliseconds exit_battle_time
+    );
 
 
 private:
     void update_frequencies(StandardEncounterDetection& encounter);
     void run_away_and_update_stats(
         StandardEncounterDetection& encounter,
-        uint16_t exit_battle_time,
+        Milliseconds exit_battle_time,
         const ShinyDetectionResult& result
     );
 
@@ -60,7 +63,7 @@ private:
 void take_video(SwitchControllerContext& context);
 void run_away(
     VideoStream& stream, SwitchControllerContext& context,
-    uint16_t exit_battle_time
+    Milliseconds exit_battle_time
 );
 
 

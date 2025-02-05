@@ -63,23 +63,20 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
-    , POST_BATTLE_MASH_TIME(
+    , POST_BATTLE_MASH_TIME0(
         "<b>Post-Battle Mash:</b><br>After each battle, mash B for this long before entering the camp.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1 * TICKS_PER_SECOND"
+        "1000 ms"
     )
-    , ENTER_CAMP_DELAY(
+    , ENTER_CAMP_DELAY0(
         "<b>Enter Camp Delay:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -92,9 +89,9 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
-    PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
-    PA_ADD_OPTION(ENTER_CAMP_DELAY);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
+    PA_ADD_OPTION(POST_BATTLE_MASH_TIME0);
+    PA_ADD_OPTION(ENTER_CAMP_DELAY0);
 }
 
 
@@ -133,9 +130,9 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         }
 
         //  Trigger encounter.
-        pbf_mash_button(context, BUTTON_B, POST_BATTLE_MASH_TIME);
+        pbf_mash_button(context, BUTTON_B, POST_BATTLE_MASH_TIME0);
         pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-        pbf_press_button(context, BUTTON_A, 10, ENTER_CAMP_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, ENTER_CAMP_DELAY0);
         if (AIRPLANE_MODE){
             pbf_press_button(context, BUTTON_A, 10, 100);
             pbf_press_button(context, BUTTON_A, 10, 100);
@@ -168,7 +165,9 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         );
 //        shininess = ShinyDetection::SQUARE_SHINY;
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(
+            result, EXIT_BATTLE_TIMEOUT0
+        );
         if (stop){
             break;
         }

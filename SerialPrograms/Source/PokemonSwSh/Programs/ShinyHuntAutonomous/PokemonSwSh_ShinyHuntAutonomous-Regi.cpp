@@ -54,23 +54,20 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
-    , POST_BATTLE_MASH_TIME(
+    , POST_BATTLE_MASH_TIME0(
         "<b>Post-Battle Mash:</b><br>After each battle, mash B for this long to clear the dialogs.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1 * TICKS_PER_SECOND"
+        "1000 ms"
     )
-    , TRANSITION_DELAY(
+    , TRANSITION_DELAY0(
         "<b>Transition Delay:</b><br>Time to enter/exit the building.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -84,9 +81,9 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
-    PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
-    PA_ADD_OPTION(TRANSITION_DELAY);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
+    PA_ADD_OPTION(POST_BATTLE_MASH_TIME0);
+    PA_ADD_OPTION(TRANSITION_DELAY0);
 }
 
 
@@ -112,8 +109,8 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, Switc
 
     bool error = false;
     while (true){
-        pbf_mash_button(context, BUTTON_B, POST_BATTLE_MASH_TIME);
-        move_to_corner(env.console, context, error, TRANSITION_DELAY);
+        pbf_mash_button(context, BUTTON_B, POST_BATTLE_MASH_TIME0);
+        move_to_corner(env.console, context, error, TRANSITION_DELAY0);
         if (error){
             env.update_stats();
             error = false;
@@ -144,12 +141,14 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, Switc
         if (result.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-            run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
+            run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
             error = true;
             continue;
         }
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(
+            result, EXIT_BATTLE_TIMEOUT0
+        );
         if (stop){
             break;
         }

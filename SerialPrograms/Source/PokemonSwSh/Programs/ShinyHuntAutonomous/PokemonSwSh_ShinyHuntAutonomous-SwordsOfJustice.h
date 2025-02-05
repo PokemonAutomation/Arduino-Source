@@ -9,8 +9,7 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -22,6 +21,9 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+
+using namespace Pokemon;
 
 
 class ShinyHuntAutonomousSwordsOfJustice_Descriptor : public SingleSwitchProgramDescriptor{
@@ -51,9 +53,9 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;
-    TimeExpressionOption<uint16_t> POST_BATTLE_MASH_TIME;
-    TimeExpressionOption<uint16_t> ENTER_CAMP_DELAY;
+    MillisecondsOption EXIT_BATTLE_TIMEOUT0;
+    MillisecondsOption POST_BATTLE_MASH_TIME0;
+    MillisecondsOption ENTER_CAMP_DELAY0;
 };
 
 }
