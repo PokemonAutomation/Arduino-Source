@@ -63,11 +63,10 @@ DoublesLeveling::DoublesLeveling()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -81,8 +80,8 @@ DoublesLeveling::DoublesLeveling()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-//    PA_ADD_OPTION(WATCHDOG_TIMER);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+//    PA_ADD_OPTION(WATCHDOG_TIMER0);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 }
 
 
@@ -179,7 +178,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, SwitchControl
         if (!battle){
             // Unexpected battle: detect battle menu but not battle starting animation.
             stats.add_error();
-            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
             continue;
         }
 

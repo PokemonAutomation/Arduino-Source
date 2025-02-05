@@ -15,8 +15,8 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-void egg_spin(SwitchControllerContext& context, uint16_t duration){
-    for (uint16_t c = 0; c < duration; c += 42){
+void egg_spin(SwitchControllerContext& context, Milliseconds duration){
+    for (Milliseconds c = 0ms; c < duration; c += 42*8ms){
         pbf_move_left_joystick(context, 0, 0, 5, 0);
         pbf_move_left_joystick(context, 128, 0, 5, 0);
         pbf_move_left_joystick(context, 255, 0, 5, 0);
@@ -27,8 +27,8 @@ void egg_spin(SwitchControllerContext& context, uint16_t duration){
         pbf_move_left_joystick(context, 0, 128, 6, 0);
     }
 }
-void egg_spin_with_A(SwitchControllerContext& context, uint16_t duration){
-    for (uint16_t c = 0; c < duration; c += 42){
+void egg_spin_with_A(SwitchControllerContext& context, Milliseconds duration){
+    for (Milliseconds c = 0ms; c < duration; c += 42*8ms){
         ssf_press_button(context, BUTTON_ZL, 0, 10);
         pbf_move_left_joystick(context, 0, 0, 5, 0);
         pbf_move_left_joystick(context, 128, 0, 5, 0);

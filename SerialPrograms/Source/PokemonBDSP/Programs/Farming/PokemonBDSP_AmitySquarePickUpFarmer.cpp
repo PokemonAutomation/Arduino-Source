@@ -48,22 +48,20 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         100
     )
-    , ONE_WAY_MOVING_TIME(
+    , ONE_WAY_MOVING_TIME0(
         "<b>One Way walking Time:</b><br>Walk this amount of time in one direction before going back to finish one round of walking.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000ms"
     )
     , ROUNDS_PER_FETCH(
         "<b>Rounds per fetch:</b><br>How many rounds of walking before doing a berry fetch attempt.",
         LockMode::LOCK_WHILE_RUNNING,
         3
     )
-    , WAIT_TIME_FOR_POKEMON(
+    , WAIT_TIME_FOR_POKEMON0(
         "<b>Wait Time for Pokemon:</b><br>Wait this time for pokemon to catch up to you before you ask for a berry.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000ms"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -74,9 +72,9 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(MAX_FETCH_ATTEMPTS);
-    PA_ADD_OPTION(ONE_WAY_MOVING_TIME);
+    PA_ADD_OPTION(ONE_WAY_MOVING_TIME0);
     PA_ADD_OPTION(ROUNDS_PER_FETCH);
-    PA_ADD_OPTION(WAIT_TIME_FOR_POKEMON);
+    PA_ADD_OPTION(WAIT_TIME_FOR_POKEMON0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -96,13 +94,13 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, Switc
 
         for (uint16_t i = 0; i < ROUNDS_PER_FETCH; i++){
             //  Move right
-            pbf_move_left_joystick(context, 255, 128, ONE_WAY_MOVING_TIME, 0);
+            pbf_move_left_joystick(context, 255, 128, ONE_WAY_MOVING_TIME0, 0ms);
             // Move left
-            pbf_move_left_joystick(context, 0, 128, ONE_WAY_MOVING_TIME, 0);
+            pbf_move_left_joystick(context, 0, 128, ONE_WAY_MOVING_TIME0, 0ms);
         }
 
         // Wait for your pokemon to catch up to you
-        pbf_wait(context, WAIT_TIME_FOR_POKEMON);
+        pbf_wait(context, WAIT_TIME_FOR_POKEMON0);
 
         // Face toward your pokemon.
         pbf_press_dpad(context, DPAD_RIGHT, 1, 0);

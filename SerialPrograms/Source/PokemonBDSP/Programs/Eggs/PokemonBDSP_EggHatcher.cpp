@@ -67,17 +67,15 @@ EggHatcher::EggHatcher()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , SAFETY_TIME0(
+    , SAFETY_TIME1(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10000ms"
     )
-    , HATCH_DELAY(
+    , HATCH_DELAY0(
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "105 * TICKS_PER_SECOND"
+        "105s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -86,8 +84,8 @@ EggHatcher::EggHatcher()
     PA_ADD_OPTION(STEPS_TO_HATCH);
     PA_ADD_OPTION(SAVE_AND_RESET);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(SAFETY_TIME0);
-    PA_ADD_OPTION(HATCH_DELAY);
+    PA_ADD_OPTION(SAFETY_TIME1);
+    PA_ADD_OPTION(HATCH_DELAY0);
 }
 
 
@@ -96,8 +94,8 @@ EggHatcher::EggHatcher()
 void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
 
-    uint16_t INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05);
-    uint16_t TOTAL_DELAY = INCUBATION_TIME + SAFETY_TIME0 + HATCH_DELAY;
+    Milliseconds INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05) * 8ms;
+    Milliseconds TOTAL_DELAY = INCUBATION_TIME + SAFETY_TIME1.get() + HATCH_DELAY0.get();
 
     //  Connect the controller.
     pbf_move_right_joystick(context, 0, 255, 10, 0);

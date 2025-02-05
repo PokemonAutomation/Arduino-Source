@@ -21,7 +21,7 @@ namespace PokemonBDSP{
 // `exit_battle_time` of ticks have passed. 
 bool run_from_battle(
     VideoStream& stream, SwitchControllerContext& context,
-    uint16_t exit_battle_time
+    Milliseconds exit_battle_time
 );
 
 

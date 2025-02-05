@@ -57,11 +57,10 @@ EggAutonomous::EggAutonomous()
         LockMode::LOCK_WHILE_RUNNING,
         10, 1, 30
     )
-    , TRAVEL_TIME_PER_FETCH(
+    , TRAVEL_TIME_PER_FETCH0(
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "20s"
     )
     , NUM_EGGS_IN_COLUMN(
         "<b>Num Eggs in Column:</b><br>How many eggs already deposited in the first column in Box 1.",
@@ -121,25 +120,24 @@ EggAutonomous::EggAutonomous()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , SCROLL_TO_READ_DELAY(
+    , SCROLL_TO_READ_DELAY0(
         "<b>Scroll to Read Delay:</b><br>Wait this long after scrolling in the box to read the " + STRING_POKEMON + "'s stats. "
         "Increase this if your video has high latency.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "125"
+        "1000ms"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SHORTCUT);
     PA_ADD_OPTION(MAX_KEEPERS);
-    PA_ADD_OPTION(TRAVEL_TIME_PER_FETCH);
+    PA_ADD_OPTION(TRAVEL_TIME_PER_FETCH0);
     PA_ADD_OPTION(NUM_EGGS_IN_COLUMN);
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(NOTIFICATIONS);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(SCROLL_TO_READ_DELAY);
+    PA_ADD_OPTION(SCROLL_TO_READ_DELAY0);
 }
 
 
@@ -192,10 +190,10 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, SwitchControlle
         stats,
         NOTIFICATION_NONSHINY_KEEP,
         NOTIFICATION_SHINY,
-        SCROLL_TO_READ_DELAY,
+        SCROLL_TO_READ_DELAY0,
         LANGUAGE,
         SHORTCUT,
-        TRAVEL_TIME_PER_FETCH,
+        TRAVEL_TIME_PER_FETCH0,
         FILTERS0,
         MAX_KEEPERS,
         static_cast<uint8_t>(NUM_EGGS_IN_COLUMN.current_value())

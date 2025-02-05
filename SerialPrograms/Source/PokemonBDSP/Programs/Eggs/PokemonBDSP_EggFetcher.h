@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_EggFetcher_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -42,7 +42,7 @@ private:
 
     ShortcutDirectionOption SHORTCUT;
     SimpleIntegerOption<uint16_t> MAX_FETCH_ATTEMPTS;
-    TimeExpressionOption<uint16_t> TRAVEL_TIME_PER_FETCH;
+    MillisecondsOption TRAVEL_TIME_PER_FETCH0;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

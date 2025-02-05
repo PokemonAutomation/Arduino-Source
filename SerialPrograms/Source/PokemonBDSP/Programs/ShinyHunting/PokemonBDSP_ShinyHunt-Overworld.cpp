@@ -69,11 +69,10 @@ ShinyHuntOverworld::ShinyHuntOverworld()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -87,8 +86,8 @@ ShinyHuntOverworld::ShinyHuntOverworld()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-//    PA_ADD_OPTION(WATCHDOG_TIMER);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+//    PA_ADD_OPTION(WATCHDOG_TIMER0);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 }
 
 
@@ -119,7 +118,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, SwitchCont
             bool battle = TRIGGER_METHOD.find_encounter(env.console, context);
             if (!battle){
                 stats.add_error();
-                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
                 continue;
             }
             env.console.overlay().add_log("Battle started", COLOR_GREEN);
@@ -140,7 +139,9 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, SwitchCont
     //        result_wild.left_is_shiny = false;
     //        result_wild.right_is_shiny = true;
 
-            bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
+            bool stop = handler.handle_standard_encounter_end_battle(
+                result_wild, EXIT_BATTLE_TIMEOUT0
+            );
 
             if (stop){
                 break;

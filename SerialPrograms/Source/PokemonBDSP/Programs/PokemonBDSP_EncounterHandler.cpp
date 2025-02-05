@@ -61,9 +61,9 @@ std::vector<PokemonDetection> get_mon_list(StandardEncounterDetection& encounter
     return mon_list;
 }
 
-void StandardEncounterHandler::run_away_due_to_error(uint16_t exit_battle_time){
-    pbf_mash_button(m_context, BUTTON_B, 3 * TICKS_PER_SECOND);
-    pbf_press_dpad(m_context, DPAD_DOWN, 3 * TICKS_PER_SECOND, 0);
+void StandardEncounterHandler::run_away_due_to_error(Milliseconds exit_battle_time){
+    pbf_mash_button(m_context, BUTTON_B, 3000ms);
+    pbf_press_dpad(m_context, DPAD_DOWN, 3000ms, 0ms);
     m_context.wait_for_all_requests();
 
     run_from_battle(m_stream, m_context, exit_battle_time);
@@ -161,7 +161,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
 }
 bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     const DoublesShinyDetection& result,
-    uint16_t exit_battle_time
+    Milliseconds exit_battle_time
 ){
     if (result.shiny_type == ShinyType::UNKNOWN){
         m_stream.log("Unable to determine result of battle.", COLOR_RED);

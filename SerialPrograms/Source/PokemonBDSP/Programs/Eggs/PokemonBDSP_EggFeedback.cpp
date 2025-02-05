@@ -35,7 +35,7 @@ void hatch_egg(VideoStream& stream, SwitchControllerContext& context){
         int ret = run_until<SwitchControllerContext>(
             stream, context,
             [](SwitchControllerContext& context){
-                egg_spin(context, 480 * TICKS_PER_SECOND);
+                egg_spin(context, 8min);
             },
             {
                 {dialog},

@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
@@ -45,7 +45,7 @@ public:
     };
 
     EnumDropdownOption<TriggerMethod> TRIGGER_METHOD;
-    TimeExpressionOption<uint16_t> MOVE_DURATION;
+    MillisecondsOption MOVE_DURATION0;
     IntegerEnumDropdownOption SWEET_SCENT_POKEMON_LOCATION;
 };
 

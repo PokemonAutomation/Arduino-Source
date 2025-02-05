@@ -65,11 +65,10 @@ ShinyHuntFishing::ShinyHuntFishing()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -82,8 +81,7 @@ ShinyHuntFishing::ShinyHuntFishing()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-//    PA_ADD_OPTION(WATCHDOG_TIMER);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 }
 
 
@@ -139,7 +137,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchContro
             case 2:
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
-                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
                 continue;
             default:
                 env.log("Timed out.", COLOR_RED);
@@ -163,7 +161,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchContro
             case 1:
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
-                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
                 continue;
             default:
                 env.log("Timed out.", COLOR_RED);
@@ -187,7 +185,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchContro
             case 1:
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
-                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
                 continue;
             default:
                 env.log("Missed the hook.", COLOR_ORANGE);
@@ -208,7 +206,9 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchContro
             ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(
+            result_wild, EXIT_BATTLE_TIMEOUT0
+        );
         if (stop){
             break;
         }

@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -50,7 +50,7 @@ private:
 
     ShortcutDirectionOption SHORTCUT;
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
-    TimeExpressionOption<uint16_t> TRAVEL_TIME_PER_FETCH;
+    MillisecondsOption TRAVEL_TIME_PER_FETCH0;
     IntegerEnumDropdownOption NUM_EGGS_IN_COLUMN;
 
     enum class AutoSave{
@@ -68,7 +68,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> SCROLL_TO_READ_DELAY;
+    MillisecondsOption SCROLL_TO_READ_DELAY0;
 };
 
 

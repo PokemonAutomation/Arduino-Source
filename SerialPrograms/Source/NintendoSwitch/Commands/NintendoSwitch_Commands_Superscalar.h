@@ -62,7 +62,7 @@ void ssf_press_left_joystick(
 void ssf_press_left_joystick(
     SwitchControllerContext& context,
     uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
+    Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
 );
 void ssf_press_right_joystick(
     SwitchControllerContext& context,
@@ -72,7 +72,7 @@ void ssf_press_right_joystick(
 void ssf_press_right_joystick(
     SwitchControllerContext& context,
     uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
+    Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
 );
 
 

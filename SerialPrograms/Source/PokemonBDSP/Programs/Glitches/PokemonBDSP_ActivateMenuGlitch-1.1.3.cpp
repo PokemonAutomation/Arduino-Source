@@ -35,15 +35,14 @@ ActivateMenuGlitch113_Descriptor::ActivateMenuGlitch113_Descriptor()
 {}
 
 ActivateMenuGlitch113::ActivateMenuGlitch113()
-    : FLY_A_TO_X_DELAY(
+    : FLY_A_TO_X_DELAY0(
         "<b>Fly Menu A-to-X Delay:</b><br>The delay between the A and X presses to overlap the menu with the fly option.<br>"
         "(German players may need to increase this to 90.)",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        20, "50"
+        160ms, "400ms"
     )
 {
-    PA_ADD_OPTION(FLY_A_TO_X_DELAY);
+    PA_ADD_OPTION(FLY_A_TO_X_DELAY0);
 }
 
 
@@ -81,7 +80,7 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, SwitchC
     pbf_press_dpad(context, DPAD_RIGHT, 30, 95);
 
     //  Bring up menu
-    pbf_press_button(context, BUTTON_ZL, 20, FLY_A_TO_X_DELAY - 20);
+    pbf_press_button(context, BUTTON_ZL, 160ms, FLY_A_TO_X_DELAY0.get() - 160ms);
     pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
 
     //  Fly

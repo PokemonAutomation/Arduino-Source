@@ -14,8 +14,8 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-void egg_spin(SwitchControllerContext& context, uint16_t duration);
-void egg_spin_with_A(SwitchControllerContext& context, uint16_t duration);
+void egg_spin(SwitchControllerContext& context, Milliseconds duration);
+void egg_spin_with_A(SwitchControllerContext& context, Milliseconds duration);
 
 void pickup_column(SwitchControllerContext& context);
 void party_to_column(SwitchControllerContext& context, uint8_t column);

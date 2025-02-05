@@ -51,11 +51,10 @@ ShinyHuntShaymin::ShinyHuntShaymin()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -66,7 +65,7 @@ ShinyHuntShaymin::ShinyHuntShaymin()
 
     PA_ADD_STATIC(m_advanced_options);
 //    PA_ADD_OPTION(WATCHDOG_TIMER);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 }
 
 
@@ -151,7 +150,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, SwitchContro
         bool battle = start_encounter(env, context);
         if (!battle){
             stats.add_error();
-            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
             continue;
         }
 
@@ -167,7 +166,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, SwitchContro
             ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT0);
         if (stop){
             break;
         }

@@ -98,10 +98,10 @@ EggAutonomousState::EggAutonomousState(
     EggAutonomousStats& stats,
     EventNotificationOption& notification_nonshiny_keep,
     EventNotificationOption& notification_shiny,
-    uint16_t scroll_to_read_delay,
+    Milliseconds scroll_to_read_delay,
     Language language,
     ShortcutDirectionOption& shortcut,
-    uint16_t travel_time_per_fetch,
+    Milliseconds travel_time_per_fetch,
     const StatsHuntIvJudgeFilterTable& filters,
     uint8_t max_keepers,
     uint8_t existing_eggs_in_columns
@@ -454,8 +454,7 @@ void EggAutonomousState::hatch_rest_of_party(){
         int ret = run_until<SwitchControllerContext>(
             m_stream, m_context,
             [&](SwitchControllerContext& context){
-                egg_spin(context, 480 * TICKS_PER_SECOND);
-//                egg_spin(context, 5 * TICKS_PER_SECOND);
+                egg_spin(context, 8min);
             },
             {
                 {dialog},

@@ -51,11 +51,10 @@ EggFetcher::EggFetcher()
         LockMode::LOCK_WHILE_RUNNING,
         2000
     )
-    , TRAVEL_TIME_PER_FETCH(
+    , TRAVEL_TIME_PER_FETCH0(
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "15 * TICKS_PER_SECOND"
+        "15s"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -67,7 +66,7 @@ EggFetcher::EggFetcher()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(SHORTCUT);
     PA_ADD_OPTION(MAX_FETCH_ATTEMPTS);
-    PA_ADD_OPTION(TRAVEL_TIME_PER_FETCH);
+    PA_ADD_OPTION(TRAVEL_TIME_PER_FETCH0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -86,7 +85,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
-        egg_spin_with_A(context, TRAVEL_TIME_PER_FETCH);
+        egg_spin_with_A(context, TRAVEL_TIME_PER_FETCH0);
         SHORTCUT.run(context, 100);
 
         //  Move to man.

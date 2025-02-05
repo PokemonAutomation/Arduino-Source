@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_AmitySquarePickUpFarmer_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -36,9 +36,9 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     SimpleIntegerOption<uint16_t> MAX_FETCH_ATTEMPTS;
-    TimeExpressionOption<uint16_t> ONE_WAY_MOVING_TIME;
+    MillisecondsOption ONE_WAY_MOVING_TIME0;
     SimpleIntegerOption<uint16_t> ROUNDS_PER_FETCH;
-    TimeExpressionOption<uint16_t> WAIT_TIME_FOR_POKEMON;
+    MillisecondsOption WAIT_TIME_FOR_POKEMON0;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
