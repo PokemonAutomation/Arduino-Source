@@ -83,11 +83,10 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
         "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, false
     )
-    , ADDITIONAL_BATTLE_WAIT_TIME(
+    , ADDITIONAL_BATTLE_WAIT_TIME0(
         "<b>Additional Battle Wait Time:</b><br>Increase this if you are timing out when entering battle.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1250"
+        "10000ms"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -100,7 +99,7 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
-    PA_ADD_OPTION(ADDITIONAL_BATTLE_WAIT_TIME);
+    PA_ADD_OPTION(ADDITIONAL_BATTLE_WAIT_TIME0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -179,7 +178,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, SwitchC
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret = wait_until(
                 env.console, context,
-                std::chrono::milliseconds(ADDITIONAL_BATTLE_WAIT_TIME * (1000 / TICKS_PER_SECOND)),
+                ADDITIONAL_BATTLE_WAIT_TIME0,
                 { battle_menu }
             );
 

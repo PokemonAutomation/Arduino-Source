@@ -42,15 +42,14 @@ GenerateNameOCRData::GenerateNameOCRData()
         PokemonNameReader::instance().languages(),
         LockMode::LOCK_WHILE_RUNNING
     )
-    , DELAY(
+    , DELAY0(
         "<b>Delay Between Each Iteration:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "30"
+        "240ms"
     )
 {
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(DELAY);
+    PA_ADD_OPTION(DELAY0);
 
 }
 
@@ -91,7 +90,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, SwitchCon
         path += ".png";
         image.save(path);
 
-        pbf_press_dpad(context, DPAD_RIGHT, 10, DELAY);
+        pbf_press_dpad(context, DPAD_RIGHT, 80ms, DELAY0);
 
         OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
             env.console, LANGUAGE, image,

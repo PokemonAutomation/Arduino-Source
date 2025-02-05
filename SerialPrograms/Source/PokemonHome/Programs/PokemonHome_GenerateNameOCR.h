@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonHome_GenerateNameOCR_H
 #define PokemonAutomation_PokemonHome_GenerateNameOCR_H
 
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -32,7 +32,7 @@ public:
 
 private:
     OCR::LanguageOCROption LANGUAGE;
-    TimeExpressionOption<uint16_t> DELAY;
+    MillisecondsOption DELAY0;
 };
 
 

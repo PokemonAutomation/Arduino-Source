@@ -84,7 +84,7 @@ RamanasCombeeFinder:: RamanasCombeeFinder()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while traveling in the overworld.",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

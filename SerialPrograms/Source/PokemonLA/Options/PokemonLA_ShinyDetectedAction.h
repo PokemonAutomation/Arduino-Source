@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
@@ -52,7 +52,7 @@ class ShinyDetectedActionOption : public GroupOption{
 public:
     ShinyDetectedActionOption(
         std::string label, std::string description,
-        std::string default_delay_ticks,
+        std::string default_delay,
         ShinyDetectedAction default_action = ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM
     );
 
@@ -62,7 +62,7 @@ public:
     EnumDropdownOption<ShinyDetectedAction> ACTION;
 //    BooleanCheckBoxOption STOP_PROGRAM;
 //    BooleanCheckBoxOption TAKE_VIDEO;
-    TimeExpressionOption<uint16_t> SCREENSHOT_DELAY;
+    MillisecondsOption SCREENSHOT_DELAY0;
     EventNotificationOption NOTIFICATIONS;
 };
 

@@ -123,19 +123,18 @@ NavigatePlatformSettings::NavigatePlatformSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         1
     )
-    , MIDAIR_PAUSE_TIME(
+    , MIDAIR_PAUSE_TIME0(
         "<b>Mid-Air Pause Time:</b><br>Pause for this long before final approach to the platform. "
         "Too small and you may crash into the wall above the platform or have reduced spawns. "
         "Too large and you may undershoot the platform.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "50"
+        "400ms"
     )
 {
     PA_ADD_STATIC(m_description);
     PA_ADD_OPTION(HEAL_AT_STATION);
     PA_ADD_OPTION(STATION_ARRIVE_PAUSE_SECONDS);
-    PA_ADD_OPTION(MIDAIR_PAUSE_TIME);
+    PA_ADD_OPTION(MIDAIR_PAUSE_TIME0);
 }
 
 
@@ -218,12 +217,12 @@ void inside_zero_gate_to_platform(
     if (!flying_unlocked){
 //        ssf_press_left_joystick(context, 128, 0, 375, 875);
         pbf_move_left_joystick(context, 144, 0, 700, 0);
-        pbf_move_left_joystick(context, 128, 0, 125, settings.MIDAIR_PAUSE_TIME);
+        pbf_move_left_joystick(context, 128, 0, 1000ms, settings.MIDAIR_PAUSE_TIME0);
         pbf_move_left_joystick(context, 128, 0, 875, 250);
     }else{
 //        ssf_press_button(context, BUTTON_B, 0, 20);
 //        pbf_move_left_joystick(context, 128, 0, 375, 250);
-        pbf_move_left_joystick(context, 164, 0, 125, settings.MIDAIR_PAUSE_TIME);
+        pbf_move_left_joystick(context, 164, 0, 1000ms, settings.MIDAIR_PAUSE_TIME0);
         pbf_press_button(context, BUTTON_LCLICK, 50, 0);
         ssf_press_right_joystick(context, 128, 255, 0, 1500);
         pbf_move_left_joystick(context, 128, 255, 1600, 125);

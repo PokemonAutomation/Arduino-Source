@@ -112,12 +112,12 @@ LeapGrinder::LeapGrinder()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to destination.",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , MATCH_DETECTED_OPTIONS(
         "Match Action",
         "What to do when the leaping Pokemon matches the *Stop On*.",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

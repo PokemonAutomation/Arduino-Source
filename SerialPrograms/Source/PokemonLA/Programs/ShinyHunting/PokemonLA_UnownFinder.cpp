@@ -68,12 +68,12 @@ UnownFinder::UnownFinder()
     : SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to the ruins.",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if a shiny is detected inside the ruins.",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

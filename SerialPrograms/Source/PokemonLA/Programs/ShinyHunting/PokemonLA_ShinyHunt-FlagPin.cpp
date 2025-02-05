@@ -73,12 +73,12 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to the flag. (defined as being more than the \"Enroute Distance\" specified above)",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if a shiny is detected at or near the flag. (defined as being less than the \"Enroute Distance\" specified above)",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

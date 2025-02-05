@@ -59,25 +59,22 @@ std::unique_ptr<StatsTracker> PostMMOSpawnReset_Descriptor::make_stats() const{
 
 
 PostMMOSpawnReset::PostMMOSpawnReset()
-    : TURN_DURATION(
+    : TURN_DURATION0(
         "<b>Camera Turn:</b><br>How many ticks to turn the camera. <br>Positive values for right turns. Negative values for left turns.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "0"
+        "0ms"
     )
-    , FORWARD_DURATION(
+    , FORWARD_DURATION0(
         "<b>Move Forward:</b><br>After turning the camera, how many ticks to move forward.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "0"
+        "0ms"
     )
-    , WAIT_DURATION(
+    , WAIT_DURATION0(
         "<b>Wait Time:</b><br> Wait time after movement.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000ms"
     )
-    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "", "0ms")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -88,9 +85,9 @@ PostMMOSpawnReset::PostMMOSpawnReset()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_OPTION(TURN_DURATION);
-    PA_ADD_OPTION(FORWARD_DURATION);
-    PA_ADD_OPTION(WAIT_DURATION);
+    PA_ADD_OPTION(TURN_DURATION0);
+    PA_ADD_OPTION(FORWARD_DURATION0);
+    PA_ADD_OPTION(WAIT_DURATION0);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -118,15 +115,15 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, Switc
                 env.console.log("Entered game! Checking shiny sound...");
 
                 // forward portion
-                if (TURN_DURATION > 0){
-                    pbf_move_right_joystick(context, 255, 128, uint16_t(TURN_DURATION), 0);
-                }else if (TURN_DURATION < 0){
-                    pbf_move_right_joystick(context, 0, 128, uint16_t(-TURN_DURATION), 0);
+                if (TURN_DURATION0.get() > 0ms){
+                    pbf_move_right_joystick(context, 255, 128, TURN_DURATION0, 0ms);
+                }else if (TURN_DURATION0.get() < 0ms){
+                    pbf_move_right_joystick(context, 0, 128, -TURN_DURATION0.get(), 0ms);
                 }
                 
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, FORWARD_DURATION);
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, FORWARD_DURATION0);
 
-                pbf_wait(context, WAIT_DURATION);
+                pbf_wait(context, WAIT_DURATION0);
 
                 context.wait_for_all_requests();
             },

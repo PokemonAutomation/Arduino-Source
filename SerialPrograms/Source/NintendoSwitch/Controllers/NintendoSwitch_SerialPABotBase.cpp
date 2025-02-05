@@ -70,7 +70,7 @@ std::string SwitchController_SerialPABotBase_Descriptor::display_name() const{
         return "";
     }
     return m_port.portName().toStdString() + " - " + m_port.description().toStdString();
-//    return "Serial (PABotBase): " + m_port.portName().toStdString() + " - " + m_port.description().toStdString();;
+//    return "Wired Controller - Serial (PABotBase): " + m_port.portName().toStdString() + " - " + m_port.description().toStdString();;
 }
 void SwitchController_SerialPABotBase_Descriptor::load_json(const JsonValue& json){
     const std::string* name = json.to_string();

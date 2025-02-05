@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_RideCloner_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -66,7 +66,7 @@ private:
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     BooleanCheckBoxOption FIX_TIME_ON_CATCH;
 
-    TimeExpressionOption<uint16_t> A_TO_B_DELAY;
+    MillisecondsOption A_TO_B_DELAY0;
     TeraAIOption BATTLE_AI;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

@@ -63,22 +63,21 @@ std::unique_ptr<StatsTracker> FroslassFinder_Descriptor::make_stats() const{
 
 
 FroslassFinder::FroslassFinder()
-    : DASH_DURATION(
+    : DASH_DURATION0(
         "<b>Braviary dash duration:</b><br>"
         "How many ticks for Braviary to dash to reach the hole.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "986"
+        "7888"
     )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to the cave. (Does not ignore Misdreavus and Glalie)",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if a shiny is detected at or near Froslass.",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -91,7 +90,7 @@ FroslassFinder::FroslassFinder()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_OPTION(DASH_DURATION);
+    PA_ADD_OPTION(DASH_DURATION0);
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(SHINY_DETECTED_DESTINATION);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -133,7 +132,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchCo
                 //  Route to cave entrance
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10);  //Get some distance from the moutain
                 pbf_press_button(context, BUTTON_Y, (uint16_t)(4 * TICKS_PER_SECOND), 10);  //Descend
-                pbf_press_button(context, BUTTON_B, DASH_DURATION, 10); //Reach to the cave entrance
+                pbf_press_button(context, BUTTON_B, DASH_DURATION0, 80ms);  //Reach to the cave entrance
                 pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_PLUS, 10,10);
                 pbf_wait(context, (uint16_t)(1.1 * TICKS_PER_SECOND));

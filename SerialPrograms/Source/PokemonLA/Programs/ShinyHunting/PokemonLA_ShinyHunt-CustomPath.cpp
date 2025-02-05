@@ -82,12 +82,12 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while you are ignoring shinies.",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if a shiny is detected while you are listening for shinies.",
-        "0 * TICKS_PER_SECOND"
+        "0ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

@@ -124,11 +124,10 @@ RideCloner101::RideCloner101()
         "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
         LockMode::UNLOCK_WHILE_RUNNING, false
     )
-    , A_TO_B_DELAY(
+    , A_TO_B_DELAY0(
         "<b>A-to-B Delay:</b><br>The delay between the critical A-to-B press that activates the glitch.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8"
+        "64ms"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY(
@@ -158,7 +157,7 @@ RideCloner101::RideCloner101()
     PA_ADD_OPTION(MAX_STARS);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(FIX_TIME_ON_CATCH);
-    PA_ADD_OPTION(A_TO_B_DELAY);
+    PA_ADD_OPTION(A_TO_B_DELAY0);
     PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -383,7 +382,7 @@ bool RideCloner101::run_post_win(
 //            context.wait_for(std::chrono::milliseconds(150));
             try{
                 if (main_menu.move_cursor(env.program_info(), stream, context, MenuSide::LEFT, 5, false)){
-                    ssf_press_button(context, BUTTON_A, A_TO_B_DELAY, 20);
+                    ssf_press_button(context, BUTTON_A, A_TO_B_DELAY0, 160ms);
                     pbf_press_button(context, BUTTON_B, 20, 230);
                 }
             }catch (OperationFailedException& e){
