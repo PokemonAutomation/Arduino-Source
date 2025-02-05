@@ -15,7 +15,7 @@
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
-//#include "ClientSource/Connection/SerialConnection.h"
+#include "ClientSource/Connection/SerialConnection.h"
 //#include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Globals.h"
