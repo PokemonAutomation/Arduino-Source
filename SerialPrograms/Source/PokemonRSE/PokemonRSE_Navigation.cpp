@@ -10,7 +10,6 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h"
 #include "PokemonRSE/PokemonRSE_Settings.h"
@@ -25,7 +24,7 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, SwitchControllerCo
     // A + B + Select + Start
     pbf_press_button(context, BUTTON_B | BUTTON_Y | BUTTON_MINUS | BUTTON_PLUS, 10, 180);
 
-    pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH);
+    pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH0);
     context.wait_for_all_requests();
 
     pbf_press_button(context, BUTTON_A, 20, 40);
@@ -34,8 +33,8 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, SwitchControllerCo
     BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret = wait_until(
         stream, context,
-        std::chrono::milliseconds(GameSettings::instance().ENTER_GAME_WAIT * (1000 / TICKS_PER_SECOND)),
-        {{detector}}
+        GameSettings::instance().ENTER_GAME_WAIT0,
+        {detector}
     );
     if (ret == 0){
         stream.log("Entered game!");

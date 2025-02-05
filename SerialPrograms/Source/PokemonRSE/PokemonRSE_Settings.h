@@ -8,9 +8,8 @@
 #define PokemonAutomation_PokemonRSE_Settings_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 
 namespace PokemonAutomation{
@@ -24,8 +23,8 @@ public:
     static GameSettings& instance();
 
     SectionDividerOption m_soft_reset_timings;
-    TimeExpressionOption<uint16_t> START_BUTTON_MASH;
-    TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
+    MillisecondsOption START_BUTTON_MASH0;
+    MillisecondsOption ENTER_GAME_WAIT0;
 
     SectionDividerOption m_shiny_audio_settings;
     FloatingPointOption SHINY_SOUND_THRESHOLD;

@@ -60,12 +60,11 @@ StarterReset::StarterReset()
         LockMode::LOCK_WHILE_RUNNING,
         Target::treecko
     )
-    , STARTER_WAIT(
-        "<b>Send out starter wait:</b><br>After pressing A to send out your selected starter, wait this long for the animation. Make sure to add extra time in case it is shiny.",
-        LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "6 * TICKS_PER_SECOND"
-    )
+//    , STARTER_WAIT0(
+//        "<b>Send out starter wait:</b><br>After pressing A to send out your selected starter, wait this long for the animation. Make sure to add extra time in case it is shiny.",
+//        LockMode::LOCK_WHILE_RUNNING,
+//        "6000ms"
+//    )
     , NOTIFICATION_SHINY_STARTER(
         "Shiny Starter",
         true, true, ImageAttachmentMode::JPG,
@@ -76,7 +75,7 @@ StarterReset::StarterReset()
         &NOTIFICATION_SHINY_STARTER,
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
-        })
+    })
 {
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(NOTIFICATIONS);

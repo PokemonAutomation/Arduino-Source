@@ -7,8 +7,7 @@
 #ifndef PokemonAutomation_PokemonRSE_ShinyHuntDeoxys_H
 #define PokemonAutomation_PokemonRSE_ShinyHuntDeoxys_H
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -29,7 +28,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
 
 private:
-    TimeExpressionOption<uint16_t> WALK_UP_DOWN_TIME;
+    MillisecondsOption WALK_UP_DOWN_TIME0;
 
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

@@ -24,17 +24,15 @@ GameSettings& GameSettings::instance(){
 GameSettings::GameSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , m_soft_reset_timings("<font size=4><b>Soft Reset Timings:</b></font>")
-    , START_BUTTON_MASH(
+    , START_BUTTON_MASH0(
         "<b>Start Button Mash:</b><br>Mash Start for this long after a soft reset to get to the main menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000ms"
     )
-    , ENTER_GAME_WAIT(
+    , ENTER_GAME_WAIT0(
         "<b>Enter Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000ms"
     )
     , m_shiny_audio_settings("<font size=4><b>Shiny Audio Settings:</b></font>")
     , SHINY_SOUND_THRESHOLD(
@@ -49,8 +47,8 @@ GameSettings::GameSettings()
     )
 {
     PA_ADD_STATIC(m_soft_reset_timings);
-    PA_ADD_OPTION(START_BUTTON_MASH);
-    PA_ADD_OPTION(ENTER_GAME_WAIT);
+    PA_ADD_OPTION(START_BUTTON_MASH0);
+    PA_ADD_OPTION(ENTER_GAME_WAIT0);
     PA_ADD_STATIC(m_shiny_audio_settings);
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
     PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
