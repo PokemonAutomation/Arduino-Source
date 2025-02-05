@@ -44,7 +44,7 @@ WattFarmer::WattFarmer()
         "<b>Exit Den Wait Time:</b> "
         "Wait this long after backing out of the den before date skipping.",
         LockMode::LOCK_WHILE_RUNNING,
-        "1720ms"
+        "1720 ms"
     )
     , SKIPS(
         "<b>Number of Fetch Attempts:</b>",

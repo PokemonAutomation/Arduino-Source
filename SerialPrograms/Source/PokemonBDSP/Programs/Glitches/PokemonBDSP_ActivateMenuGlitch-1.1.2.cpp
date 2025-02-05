@@ -40,7 +40,7 @@ ActivateMenuGlitch112::ActivateMenuGlitch112()
         "<b>Fly Menu A-to-X Delay:</b><br>The delay between the A and X presses to overlap the menu with the fly option.<br>"
         "(German players may need to increase this to 90.)",
         LockMode::LOCK_WHILE_RUNNING,
-        160ms, "400ms"
+        160ms, "400 ms"
     )
 {
     PA_ADD_OPTION(FLY_A_TO_X_DELAY0);

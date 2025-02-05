@@ -53,7 +53,7 @@ ShinyHuntDeoxys::ShinyHuntDeoxys()
     : WALK_UP_DOWN_TIME0(
         "<b>Walk up/down time</b><br>Spend this long to run up to the triangle rock.",
         LockMode::LOCK_WHILE_RUNNING,
-        "3520ms"
+        "3520 ms"
     )
     , NOTIFICATION_SHINY(
         "Shiny Found",

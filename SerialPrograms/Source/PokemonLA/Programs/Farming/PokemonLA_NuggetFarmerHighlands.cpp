@@ -74,7 +74,7 @@ std::unique_ptr<StatsTracker> NuggetFarmerHighlands_Descriptor::make_stats() con
 
 
 NuggetFarmerHighlands::NuggetFarmerHighlands()
-    : SHINY_DETECTED("Shiny Detected Action", "", "2000ms")
+    : SHINY_DETECTED("Shiny Detected Action", "", "2000 ms")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,

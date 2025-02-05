@@ -25,74 +25,74 @@ GameSettings::GameSettings()
     , OVERWORLD_TO_MENU_DELAY0(
         "<b>Overworld to Menu Delay:</b><br>Delay to bring up the menu when pressing X in the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , MENU_TO_OVERWORLD_DELAY0(
         "<b>Menu to Overworld Delay:</b><br>Delay to go from menu back to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , GAME_TO_HOME_DELAY0(
         "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "1000ms"
+        "1000 ms"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH0(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , START_GAME_WAIT0(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        "300s"
+        "300 s"
     )
     , ENTER_GAME_MASH0(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        "5000ms"
+        "5000 ms"
     )
     , ENTER_GAME_WAIT0(
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        "300s"
+        "300 s"
     )
     , m_box_timings("<font size=4><b>Box Timings:</b></font> (for egg programs)")
     , BOX_SCROLL_DELAY0(
         "<b>Box Scroll Delay:</b><br>Delay to move the cursor.",
         LockMode::LOCK_WHILE_RUNNING,
-        "240ms"
+        "240 ms"
     )
     , BOX_CHANGE_DELAY0(
         "<b>Box Change Delay:</b><br>Delay to change boxes.",
         LockMode::LOCK_WHILE_RUNNING,
-        "1600ms"
+        "1600 ms"
     )
     , BOX_PICKUP_DROP_DELAY0(
         "<b>Box Pickup/Drop Delay:</b><br>Delay to pickup/drop " + STRING_POKEMON + ".",
         LockMode::LOCK_WHILE_RUNNING,
-        "400ms"
+        "400 ms"
     )
     , MENU_TO_POKEMON_DELAY0(
         "<b>Menu To " + STRING_POKEMON + " Delay:</b><br>Delay to enter " + STRING_POKEMON + " menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2400ms"
+        "2400 ms"
     )
     , POKEMON_TO_BOX_DELAY1(
         "<b>" + STRING_POKEMON + " to Box Delay:</b><br>Delay to enter box system.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2560ms"
+        "2560 ms"
     )
     , BOX_TO_POKEMON_DELAY0(
         "<b>Box to " + STRING_POKEMON + " Delay:</b><br>Delay to exit box system.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , POKEMON_TO_MENU_DELAY0(
         "<b>" + STRING_POKEMON + " to Menu Delay:</b><br>Delay to return to menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"

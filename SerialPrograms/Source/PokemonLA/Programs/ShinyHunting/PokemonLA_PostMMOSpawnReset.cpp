@@ -62,19 +62,19 @@ PostMMOSpawnReset::PostMMOSpawnReset()
     : TURN_DURATION0(
         "<b>Camera Turn:</b><br>How many ticks to turn the camera. <br>Positive values for right turns. Negative values for left turns.",
         LockMode::LOCK_WHILE_RUNNING,
-        "0ms"
+        "0 ms"
     )
     , FORWARD_DURATION0(
         "<b>Move Forward:</b><br>After turning the camera, how many ticks to move forward.",
         LockMode::LOCK_WHILE_RUNNING,
-        "0ms"
+        "0 ms"
     )
     , WAIT_DURATION0(
         "<b>Wait Time:</b><br> Wait time after movement.",
         LockMode::LOCK_WHILE_RUNNING,
-        "5000ms"
+        "5000 ms"
     )
-    , SHINY_DETECTED("Shiny Detected Action", "", "0ms")
+    , SHINY_DETECTED("Shiny Detected Action", "", "0 ms")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,

@@ -21,42 +21,42 @@ GameSettings& GameSettings::instance(){
 GameSettings::GameSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , m_general("<font size=4><b>General Settings:</b></font>")
-    , POST_WARP_DELAY(
+    , POST_WARP_DELAY0(
         "<b>Post-Warp Delay:</b><br>After warping, wait this many seconds before continuing.",
         LockMode::LOCK_WHILE_RUNNING,
-        1.0, 0, 100
+        "1000 ms"
     )
     , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
     , GAME_TO_HOME_DELAY0(
         "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "1000ms"
+        "1000 ms"
     )
     , LOAD_REGION_TIMEOUT0(
         "<b>Load Region Timeout:</b><br>Wait at most this long to enter a region before giving up.",
         LockMode::LOCK_WHILE_RUNNING,
-        "30s"
+        "30 s"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH0(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , START_GAME_WAIT1(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        "40s"
+        "40 s"
     )
     , ENTER_GAME_MASH0(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        "5000ms"
+        "5000 ms"
     )
     , ENTER_GAME_WAIT0(
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        "15s"
+        "15 s"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -93,7 +93,7 @@ GameSettings::GameSettings()
     )
 {
     PA_ADD_STATIC(m_general);
-    PA_ADD_OPTION(POST_WARP_DELAY);
+    PA_ADD_OPTION(POST_WARP_DELAY0);
 
     PA_ADD_STATIC(m_menu_navigation);
     PA_ADD_OPTION(GAME_TO_HOME_DELAY0);

@@ -45,7 +45,7 @@ GenerateNameOCRData::GenerateNameOCRData()
     , DELAY0(
         "<b>Delay Between Each Iteration:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        "240ms"
+        "240 ms"
     )
 {
     PA_ADD_OPTION(LANGUAGE);

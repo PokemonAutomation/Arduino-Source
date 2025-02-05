@@ -70,12 +70,12 @@ EggHatcher::EggHatcher()
     , SAFETY_TIME1(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
         LockMode::LOCK_WHILE_RUNNING,
-        "10000ms"
+        "10000 ms"
     )
     , HATCH_DELAY0(
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
         LockMode::LOCK_WHILE_RUNNING,
-        "105s"
+        "105 s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);

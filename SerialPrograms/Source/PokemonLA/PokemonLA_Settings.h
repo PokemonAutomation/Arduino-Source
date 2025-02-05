@@ -23,7 +23,7 @@ public:
     static GameSettings& instance();
 
     SectionDividerOption m_general;
-    FloatingPointOption POST_WARP_DELAY;
+    MillisecondsOption POST_WARP_DELAY0;
 
     SectionDividerOption m_menu_navigation;
     MillisecondsOption GAME_TO_HOME_DELAY0;

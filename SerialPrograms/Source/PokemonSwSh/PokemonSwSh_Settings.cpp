@@ -36,7 +36,7 @@ GameSettings::GameSettings()
     , FETCH_EGG_MASH_DELAY0(
         "<b>Fetch Egg Mash Delay:</b><br>Time needed to mash B to fetch an egg and return to overworld when auto-deposit is on.",
         LockMode::LOCK_WHILE_RUNNING,
-        "6400ms"
+        "6400 ms"
     )
     , m_den_options("<font size=4><b>Den Options:</b></font>")
     , DODGE_UNCATCHABLE_PROMPT_FAST(
@@ -49,148 +49,148 @@ GameSettings::GameSettings()
     , AUTO_FR_DURATION0(
         "<b>Auto-FR Duration:</b><br>Time to accept FRs before returning to den lobby.",
         LockMode::LOCK_WHILE_RUNNING,
-        "8000ms"
+        "8000 ms"
     )
     , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
     , OVERWORLD_TO_MENU_DELAY0(
         "<b>Overworld to Menu Delay:</b><br>Delay to bring up the menu when pressing X in the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        "960ms"
+        "960 ms"
     )
     , MENU_TO_OVERWORLD_DELAY0(
         "<b>Menu to Overworld Delay:</b><br>Delay to go from menu back to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , GAME_TO_HOME_DELAY_FAST0(
         "<b>Game to Home Delay (fast):</b><br>"
         "Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
         LockMode::LOCK_WHILE_RUNNING,
-        "800ms"
+        "800 ms"
     )
     , GAME_TO_HOME_DELAY_SAFE0(
         "<b>Game to Home Delay (safe):</b><br>"
         "Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
         LockMode::LOCK_WHILE_RUNNING,
-        "1000ms"
+        "1000 ms"
     )
     , HOME_TO_GAME_DELAY0(
         "<b>Home to Game Delay:</b><br>Delay to enter game from home menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "3000ms"
+        "3000 ms"
     )
     , OPEN_YCOMM_DELAY0(
         "<b>Open Y-COMM Delay:</b><br>Time needed to open Y-COMM.",
         LockMode::LOCK_WHILE_RUNNING,
-        "1600ms"
+        "1600 ms"
     )
     , ENTER_PROFILE_DELAY0(
         "<b>Enter Profile Delay:</b><br>Delay to enter your Switch profile.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH0(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , START_GAME_WAIT0(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        "20000ms"
+        "20000 ms"
     )
     , ENTER_GAME_MASH0(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        "3000ms"
+        "3000 ms"
     )
     , ENTER_GAME_WAIT0(
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        "11000ms"
+        "11000 ms"
     )
     , m_den_timings("<font size=4><b>Den Timings:</b></font>")
     , ENTER_OFFLINE_DEN_DELAY0(
         "<b>Enter Offline Game Delay:</b><br>Time needed to enter a den on final button press.",
         LockMode::LOCK_WHILE_RUNNING,
-        "1000ms"
+        "1000 ms"
     )
     , REENTER_DEN_DELAY0(
         "<b>Re-enter Den Delay:</b><br>Time from exiting den after a day-skip to when you can collect watts and re-enter it.",
         LockMode::LOCK_WHILE_RUNNING,
-        "5000ms"
+        "5000 ms"
     )
     , COLLECT_WATTS_OFFLINE_DELAY0(
         "<b>Collect Watts Delay (offline):</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        "640ms"
+        "640 ms"
     )
     , COLLECT_WATTS_ONLINE_DELAY0(
         "<b>Collect Watts Delay (online):</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        "3000ms"
+        "3000 ms"
     )
     , UNCATCHABLE_PROMPT_DELAY0(
         "<b>Uncatchable Prompt Delay:</b><br>Time needed to bypass uncatchable pokemon prompt.",
         LockMode::LOCK_WHILE_RUNNING,
-        "880ms"
+        "880 ms"
     )
     , OPEN_LOCAL_DEN_LOBBY_DELAY0(
         "<b>Open Local Den Lobby Delay:</b><br>Time needed to open a den lobby on local connection.",
         LockMode::LOCK_WHILE_RUNNING,
-        "3000ms"
+        "3000 ms"
     )
     , ENTER_SWITCH_POKEMON0(
         "<b>Enter Switch " + STRING_POKEMON + ":</b><br>Time needed to enter Switch " + STRING_POKEMON + ".",
         LockMode::LOCK_WHILE_RUNNING,
-        "4000ms"
+        "4000 ms"
     )
     , EXIT_SWITCH_POKEMON0(
         "<b>Exit Switch " + STRING_POKEMON + ":</b><br>Time needed to exit Switch " + STRING_POKEMON + " back to den lobby.",
         LockMode::LOCK_WHILE_RUNNING,
-        "3000ms"
+        "3000 ms"
     )
     , FULL_LOBBY_TIMER0(
         "<b>Full Lobby Timer:</b><br>Always 3 minutes.",
         LockMode::LOCK_WHILE_RUNNING,
-        "180s"
+        "180 s"
     )
     , m_box_timings("<font size=4><b>Box Timings:</b></font> (for egg programs)")
     , BOX_SCROLL_DELAY0(
         "<b>Box Scroll Delay:</b><br>Delay to move the cursor.",
         LockMode::LOCK_WHILE_RUNNING,
-        "160ms"
+        "160 ms"
     )
     , BOX_CHANGE_DELAY0(
         "<b>Box Change Delay:</b><br>Delay to change boxes.",
         LockMode::LOCK_WHILE_RUNNING,
-        "640ms"
+        "640 ms"
     )
     , BOX_PICKUP_DROP_DELAY0(
         "<b>Box Pickup/Drop Delay:</b><br>Delay to pickup/drop " + STRING_POKEMON + ".",
         LockMode::LOCK_WHILE_RUNNING,
-        "720ms"
+        "720 ms"
     )
     , MENU_TO_POKEMON_DELAY0(
         "<b>Menu To " + STRING_POKEMON + " Delay:</b><br>Delay to enter " + STRING_POKEMON + " menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2400ms"
+        "2400 ms"
     )
     , POKEMON_TO_BOX_DELAY0(
         "<b>" + STRING_POKEMON + " to Box Delay:</b><br>Delay to enter box system.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2400ms"
+        "2400 ms"
     )
     , BOX_TO_POKEMON_DELAY0(
         "<b>Box to " + STRING_POKEMON + " Delay:</b><br>Delay to exit box system.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , POKEMON_TO_MENU_DELAY0(
         "<b>" + STRING_POKEMON + " to Menu Delay:</b><br>Delay to return to menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "2000ms"
+        "2000 ms"
     )
     , m_shiny_detection("<font size=4><b>Shiny Detection:</b></font>")
     , SHINY_ALPHA_THRESHOLD(

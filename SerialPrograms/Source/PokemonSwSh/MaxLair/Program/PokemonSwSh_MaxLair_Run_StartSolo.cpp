@@ -168,7 +168,7 @@ bool start_raid_host_solo(
     GlobalState& state = state_tracker[0];
 
     //  Start delay.
-    context.wait_for(std::chrono::milliseconds(settings.START_DELAY * 1000 / TICKS_PER_SECOND));
+    context.wait_for(settings.START_DELAY0);
 
     //  Enter lobby.
     entrance = enter_lobby(
@@ -207,8 +207,7 @@ bool start_raid_host_solo(
     pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     context.wait_for_all_requests();
 
-    auto time_limit = current_time() +
-        std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
+    auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
 
     if (!wait_for_a_player(stream, context, *entrance, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);

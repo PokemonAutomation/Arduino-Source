@@ -64,12 +64,12 @@ CrobatFinder::CrobatFinder()
     : SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if you are still traveling to the Crobat.",
-        "2000ms"
+        "2000 ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if you are near the Crobat.",
-        "2000ms"
+        "2000 ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

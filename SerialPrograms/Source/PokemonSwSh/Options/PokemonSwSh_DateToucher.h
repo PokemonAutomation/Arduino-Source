@@ -21,18 +21,6 @@ public:
     TimeRollbackHoursOption();
 };
 
-#if 0
-class TouchDateIntervalOptionTicks : public TimeExpressionOption<uint32_t>{
-public:
-    TouchDateIntervalOptionTicks()
-        : TimeExpressionOption<uint32_t>(
-            "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-            "4 * 3600 * TICKS_PER_SECOND"
-        )
-    {}
-};
-#endif
-
 class TouchDateIntervalOption : public ConfigOption{
 public:
     TouchDateIntervalOption();

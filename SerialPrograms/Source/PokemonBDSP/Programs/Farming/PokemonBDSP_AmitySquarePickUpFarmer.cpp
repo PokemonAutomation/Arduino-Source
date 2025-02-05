@@ -51,7 +51,7 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
     , ONE_WAY_MOVING_TIME0(
         "<b>One Way walking Time:</b><br>Walk this amount of time in one direction before going back to finish one round of walking.",
         LockMode::LOCK_WHILE_RUNNING,
-        "5000ms"
+        "5000 ms"
     )
     , ROUNDS_PER_FETCH(
         "<b>Rounds per fetch:</b><br>How many rounds of walking before doing a berry fetch attempt.",
@@ -61,7 +61,7 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer()
     , WAIT_TIME_FOR_POKEMON0(
         "<b>Wait Time for Pokemon:</b><br>Wait this time for pokemon to catch up to you before you ask for a berry.",
         LockMode::LOCK_WHILE_RUNNING,
-        "3000ms"
+        "3000 ms"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

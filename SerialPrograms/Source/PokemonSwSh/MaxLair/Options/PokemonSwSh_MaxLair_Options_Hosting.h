@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/RandomCodeOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 
 namespace PokemonAutomation{
@@ -37,9 +37,9 @@ public:
 
     EnumDropdownOption<HostingMode> MODE;
     RandomCodeOption RAID_CODE;
-    TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;
-    TimeExpressionOption<uint16_t> START_DELAY;
-    TimeExpressionOption<uint16_t> LOBBY_WAIT_DELAY;
+    MillisecondsOption CONNECT_TO_INTERNET_DELAY0;
+    MillisecondsOption START_DELAY0;
+    MillisecondsOption LOBBY_WAIT_DELAY0;
 
     AutoHostNotificationOption NOTIFICATIONS;
 };

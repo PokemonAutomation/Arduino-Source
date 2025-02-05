@@ -49,7 +49,7 @@ ParaglideItemDuper::ParaglideItemDuper()
         "<b>Loading time:</b><br>Adjustable delay for the load screen after warping. "
         "Adjust this to match the loading time of your game.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        "25s"
+        "25 s"
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

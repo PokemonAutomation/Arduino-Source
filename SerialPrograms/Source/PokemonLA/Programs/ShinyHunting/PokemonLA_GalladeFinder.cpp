@@ -62,12 +62,12 @@ GalladeFinder::GalladeFinder()
     : SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if you are still traveling to the Gallade.",
-        "0ms"
+        "0 ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if you are near the Gallade.",
-        "0ms"
+        "0 ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

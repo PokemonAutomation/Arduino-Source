@@ -11,7 +11,6 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 
 namespace PokemonAutomation{

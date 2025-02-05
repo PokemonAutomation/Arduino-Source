@@ -63,7 +63,7 @@ StarterReset::StarterReset()
 //    , STARTER_WAIT0(
 //        "<b>Send out starter wait:</b><br>After pressing A to send out your selected starter, wait this long for the animation. Make sure to add extra time in case it is shiny.",
 //        LockMode::LOCK_WHILE_RUNNING,
-//        "6000ms"
+//        "6000 ms"
 //    )
     , NOTIFICATION_SHINY_STARTER(
         "Shiny Starter",

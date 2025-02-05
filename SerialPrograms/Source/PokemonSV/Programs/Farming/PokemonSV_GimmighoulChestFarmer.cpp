@@ -86,7 +86,7 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
     , ADDITIONAL_BATTLE_WAIT_TIME0(
         "<b>Additional Battle Wait Time:</b><br>Increase this if you are timing out when entering battle.",
         LockMode::LOCK_WHILE_RUNNING,
-        "10000ms"
+        "10000 ms"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

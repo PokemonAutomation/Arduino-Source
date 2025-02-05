@@ -128,7 +128,7 @@ NavigatePlatformSettings::NavigatePlatformSettings()
         "Too small and you may crash into the wall above the platform or have reduced spawns. "
         "Too large and you may undershoot the platform.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        "400ms"
+        "400 ms"
     )
 {
     PA_ADD_STATIC(m_description);

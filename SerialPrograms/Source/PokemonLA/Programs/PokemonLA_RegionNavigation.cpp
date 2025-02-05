@@ -213,7 +213,7 @@ void mash_A_to_change_region(
     }
 
     stream.log("Loaded into map...");
-    context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
+    context.wait_for(GameSettings::instance().POST_WARP_DELAY0);
 }
 
 
@@ -353,7 +353,7 @@ void goto_camp_from_jubilife(
         );
     }
     stream.log("Arrived at sub-camp...");
-    context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
+    context.wait_for(GameSettings::instance().POST_WARP_DELAY0);
 
     if (location.post_arrival_maneuver == nullptr){
         return;
@@ -449,7 +449,7 @@ void goto_camp_from_overworld(
         );
     }
     stream.log("Arrived at camp...");
-    context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
+    context.wait_for(GameSettings::instance().POST_WARP_DELAY0);
 }
 
 void goto_any_camp_from_overworld(
@@ -544,7 +544,7 @@ void goto_any_camp_from_overworld(
         );
     }
     stream.log("Arrived at camp...");
-    context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
+    context.wait_for(GameSettings::instance().POST_WARP_DELAY0);
     context.wait_for_all_requests();
 }
 

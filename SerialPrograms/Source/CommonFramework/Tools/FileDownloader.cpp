@@ -48,7 +48,7 @@ std::string download_file(Logger& logger, const std::string& url){
     timer.singleShot(
         5000, [&downloaded_data, &url](){
         if (downloaded_data.isEmpty()){
-            throw ConnectionException(nullptr, "Couldn't retrieved file from url : " + url + " after 5s");
+            throw ConnectionException(nullptr, "Couldn't retrieved file from url : " + url + " after 5 seconds.");
         }
     });
     timer.stop();

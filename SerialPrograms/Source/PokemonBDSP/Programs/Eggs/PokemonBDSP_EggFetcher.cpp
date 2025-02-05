@@ -54,7 +54,7 @@ EggFetcher::EggFetcher()
     , TRAVEL_TIME_PER_FETCH0(
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
         LockMode::LOCK_WHILE_RUNNING,
-        "15s"
+        "15 s"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

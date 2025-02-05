@@ -27,12 +27,12 @@ GameSettings::GameSettings()
     , START_BUTTON_MASH0(
         "<b>Start Button Mash:</b><br>Mash Start for this long after a soft reset to get to the main menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "5000ms"
+        "5000 ms"
     )
     , ENTER_GAME_WAIT0(
         "<b>Enter Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        "3000ms"
+        "3000 ms"
     )
     , m_shiny_audio_settings("<font size=4><b>Shiny Audio Settings:</b></font>")
     , SHINY_SOUND_THRESHOLD(

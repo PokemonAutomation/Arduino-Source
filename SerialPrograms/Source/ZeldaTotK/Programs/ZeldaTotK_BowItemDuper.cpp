@@ -52,7 +52,7 @@ BowItemDuper::BowItemDuper()
         "Too low and the game will eat inputs and put the program in an irrecoverable state."
         "Too high and the dupes will not be successful.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        "120ms"
+        "120 ms"
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))

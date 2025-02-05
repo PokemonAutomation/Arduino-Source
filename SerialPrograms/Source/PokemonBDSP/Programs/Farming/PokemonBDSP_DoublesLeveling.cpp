@@ -66,7 +66,7 @@ DoublesLeveling::DoublesLeveling()
     , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        "10s"
+        "10 s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);

@@ -26,7 +26,7 @@ ConsoleSettings::ConsoleSettings()
     , SETTINGS_TO_HOME_DELAY0(
         "<b>Settings to Home Delay:</b><br>Delay from pressing home anywhere in the settings to return to the home menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "960ms"
+        "960 ms"
     )
     , START_GAME_REQUIRES_INTERNET(
         "<b>Start Game Requires Internet:</b><br>"
@@ -39,7 +39,7 @@ ConsoleSettings::ConsoleSettings()
         "<b>Start Game Internet Check Delay:</b><br>"
         "If starting the game requires checking the internet, wait this long for it.",
         LockMode::LOCK_WHILE_RUNNING,
-        "3000ms"
+        "3000 ms"
     )
     , TOLERATE_SYSTEM_UPDATE_MENU_FAST(
         "<b>Tolerate System Update Menu (fast):</b><br>"

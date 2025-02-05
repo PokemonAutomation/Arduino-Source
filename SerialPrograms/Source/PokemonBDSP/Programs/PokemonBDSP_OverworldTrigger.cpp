@@ -39,7 +39,7 @@ OverworldTrigger::OverworldTrigger()
     , MOVE_DURATION0(
         "<b>Move Duration:</b><br>Move in each direction for this long before turning around.",
         LockMode::LOCK_WHILE_RUNNING,
-        "1000ms"
+        "1000 ms"
     )
     , SWEET_SCENT_POKEMON_LOCATION(
         "<b>Sweet Scent Pokemon Location:</b><br>Which Pokemon in the party knows Sweet Scent.",

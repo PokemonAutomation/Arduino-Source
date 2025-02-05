@@ -60,7 +60,7 @@ EggAutonomous::EggAutonomous()
     , TRAVEL_TIME_PER_FETCH0(
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
         LockMode::LOCK_WHILE_RUNNING,
-        "20s"
+        "20 s"
     )
     , NUM_EGGS_IN_COLUMN(
         "<b>Num Eggs in Column:</b><br>How many eggs already deposited in the first column in Box 1.",
@@ -124,7 +124,7 @@ EggAutonomous::EggAutonomous()
         "<b>Scroll to Read Delay:</b><br>Wait this long after scrolling in the box to read the " + STRING_POKEMON + "'s stats. "
         "Increase this if your video has high latency.",
         LockMode::LOCK_WHILE_RUNNING,
-        "1000ms"
+        "1000 ms"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);

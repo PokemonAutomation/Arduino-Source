@@ -49,7 +49,7 @@ AutoHostMultiGame::AutoHostMultiGame()
     , LOBBY_WAIT_DELAY0(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         LockMode::LOCK_WHILE_RUNNING,
-        "60s"
+        "60 s"
     )
     , GAME_LIST(true)
     , FR_FORWARD_ACCEPT(
@@ -68,7 +68,7 @@ AutoHostMultiGame::AutoHostMultiGame()
     , CONNECT_TO_INTERNET_DELAY0(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to enter den.",
         LockMode::LOCK_WHILE_RUNNING,
-        "20000ms"
+        "20000 ms"
     )
     , ENTER_ONLINE_DEN_DELAY(
         "<b>Enter Online Den Delay:</b><br>\"Communicating\" when entering den while online.",
@@ -79,7 +79,7 @@ AutoHostMultiGame::AutoHostMultiGame()
     , OPEN_ONLINE_DEN_LOBBY_DELAY0(
         "<b>Open Online Den Delay:</b><br>Delay from \"Invite Others\" to when the clock starts ticking.",
         LockMode::LOCK_WHILE_RUNNING,
-        "8000ms"
+        "8000 ms"
     )
     , RAID_START_TO_EXIT_DELAY(
         "<b>Raid Start to Exit Delay:</b><br>Time from start raid to reset. (when not selecting move)",

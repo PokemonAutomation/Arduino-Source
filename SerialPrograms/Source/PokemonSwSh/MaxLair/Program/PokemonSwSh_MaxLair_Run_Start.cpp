@@ -193,8 +193,7 @@ bool start_raid_local(
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     });
 
-    auto time_limit = current_time() +
-        std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
+    auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
 
     AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);
 
@@ -342,7 +341,7 @@ bool start_raid_host(
     });
 
     //  Start delay.
-    scope.wait_for(std::chrono::milliseconds(settings.START_DELAY * 1000 / TICKS_PER_SECOND));
+    scope.wait_for(settings.START_DELAY0);
 
     //  Open lobby.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
@@ -353,8 +352,7 @@ bool start_raid_host(
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     });
 
-    auto time_limit = current_time() +
-        std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
+    auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
 
     AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);
 
