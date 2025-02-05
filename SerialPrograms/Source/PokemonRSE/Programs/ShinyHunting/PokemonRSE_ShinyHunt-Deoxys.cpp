@@ -207,7 +207,7 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
         //Start battle.
         pbf_press_button(context, BUTTON_A, 20, 40);
 
-        bool legendary_shiny = handle_encounter(env.console, context);
+        bool legendary_shiny = handle_encounter(env.console, context, true);
         if (legendary_shiny) {
             stats.shinies++;
             env.update_stats();
