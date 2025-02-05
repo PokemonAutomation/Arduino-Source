@@ -12,13 +12,16 @@
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 
 namespace PokemonAutomation{
     class Logger;
 namespace NintendoSwitch{
+
+
+using namespace std::chrono_literals;
 
 
 
@@ -37,8 +40,8 @@ public:
 
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption DIGIT_REORDERING;
-    TimeExpressionOption<uint8_t> SCROLL_DELAY;
-    TimeExpressionOption<uint8_t> WRAP_DELAY;
+    MillisecondsOption SCROLL_DELAY0;
+    MillisecondsOption WRAP_DELAY0;
 };
 
 
@@ -52,7 +55,7 @@ struct CodeboardPosition{
 };
 struct CodeboardScroll{
     DpadPosition direction;
-    uint8_t delay;
+    Milliseconds delay;
 };
 //static_assert(sizeof(CodeboardScroll) == sizeof(uint8_t));
 struct DigitPath{
@@ -73,8 +76,8 @@ void move_codeboard(SwitchControllerContext& context, const DigitPath& path);
 struct FastCodeEntrySettings{
     KeyboardLayout keyboard_layout = KeyboardLayout::QWERTY;
     bool include_plus = true;
-    uint8_t scroll_delay = 8;
-    uint8_t wrap_delay = 8;
+    Milliseconds scroll_delay = 64ms;
+    Milliseconds wrap_delay = 64ms;
     bool digit_reordering = false;
 
     FastCodeEntrySettings() = default;

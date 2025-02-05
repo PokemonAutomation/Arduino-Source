@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -31,9 +31,9 @@ public:
 private:
     SimpleIntegerOption<uint16_t> FRIENDS_TO_DELETE;
     BooleanCheckBoxOption BLOCK_FRIENDS;
-    TimeExpressionOption<uint16_t> VIEW_FRIEND_DELAY;
-    TimeExpressionOption<uint16_t> DELETE_FRIEND_DELAY;
-    TimeExpressionOption<uint16_t> FINISH_DELETE_DELAY;
+    MillisecondsOption VIEW_FRIEND_DELAY0;
+    MillisecondsOption DELETE_FRIEND_DELAY0;
+    MillisecondsOption FINISH_DELETE_DELAY0;
 };
 
 

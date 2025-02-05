@@ -48,17 +48,15 @@ TurboButton::TurboButton()
         LockMode::LOCK_WHILE_RUNNING,
         BUTTON_A
     )
-    , PRESS_DURATION(
+    , PRESS_DURATION0(
         "<b>Press Duration:</b><br>Hold the button down for this long.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        5, "5"
+        "40 ms"
     )
-    , RELEASE_DURATION(
+    , RELEASE_DURATION0(
         "<b>Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        3, "3"
+        "24 ms"
     )
     , TOTAL_PRESSES(
         "<b>Total Presses:</b><br>Stop the program after this many presses. If zero, run forever.",
@@ -67,18 +65,18 @@ TurboButton::TurboButton()
     )
 {
     PA_ADD_OPTION(BUTTON);
-    PA_ADD_OPTION(PRESS_DURATION);
-    PA_ADD_OPTION(RELEASE_DURATION);
+    PA_ADD_OPTION(PRESS_DURATION0);
+    PA_ADD_OPTION(RELEASE_DURATION0);
     PA_ADD_OPTION(TOTAL_PRESSES);
 }
 void TurboButton::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
     if (TOTAL_PRESSES == 0){
         while (true){
-            pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION, RELEASE_DURATION);
+            pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION0, RELEASE_DURATION0);
         }
     }else{
         for (uint64_t c = 0; c < TOTAL_PRESSES; c++){
-            pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION, RELEASE_DURATION);
+            pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION0, RELEASE_DURATION0);
         }
     }
     context.wait_for_all_requests();

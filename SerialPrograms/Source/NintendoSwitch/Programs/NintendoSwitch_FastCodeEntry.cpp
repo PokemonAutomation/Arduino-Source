@@ -51,19 +51,15 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockMode lock_while_pro
         LockMode::UNLOCK_WHILE_RUNNING,
         PreloadSettings::instance().DEVELOPER_MODE
     )
-    , SCROLL_DELAY(
+    , SCROLL_DELAY0(
         "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        3, 15,
-        PreloadSettings::instance().DEVELOPER_MODE ? "5" : "6"
+        PreloadSettings::instance().DEVELOPER_MODE ? "40 ms" : "48 ms"
     )
-    , WRAP_DELAY(
+    , WRAP_DELAY0(
         "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        3, 15,
-        "6"
+        "48 ms"
     )
 {
     PA_ADD_OPTION(KEYBOARD_LAYOUT);
@@ -71,8 +67,8 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockMode lock_while_pro
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
         PA_ADD_OPTION(DIGIT_REORDERING);
-        PA_ADD_OPTION(SCROLL_DELAY);
-        PA_ADD_OPTION(WRAP_DELAY);
+        PA_ADD_OPTION(SCROLL_DELAY0);
+        PA_ADD_OPTION(WRAP_DELAY0);
     }
 }
 
@@ -168,7 +164,8 @@ const std::map<char, CodeboardPosition>& CODEBOARD_POSITIONS_AZERTY(){
 
 DigitPath get_codeboard_digit_path(
     CodeboardPosition source, CodeboardPosition destination,
-    uint8_t scroll_delay, uint8_t wrap_delay
+    Milliseconds scroll_delay,
+    Milliseconds wrap_delay
 ){
 //    cout << (size_t)scroll_delay << ", " << (size_t)wrap_delay << endl;
     DigitPath path;
@@ -215,7 +212,7 @@ DigitPath get_codeboard_digit_path(
             }
         }
 
-        uint8_t delay = scroll_delay;
+        Milliseconds delay = scroll_delay;
         if (col == (uint8_t)-1){
             col = 11;
             delay = wrap_delay;
@@ -236,21 +233,21 @@ DigitPath get_codeboard_digit_path(
 
     return path;
 }
-size_t get_codeboard_path_cost(const DigitPath& path){
-    size_t total_cost = 0;
+Milliseconds get_codeboard_path_cost(const DigitPath& path){
+    Milliseconds total_cost = 0ms;
     for (uint8_t c = 0; c < path.length; c++){
         total_cost += path.path[c].delay;
     }
     return total_cost;
 }
-size_t get_codeboard_path_cost(const std::vector<DigitPath>& path){
-    size_t total_cost = 0;
+Milliseconds get_codeboard_path_cost(const std::vector<DigitPath>& path){
+    Milliseconds total_cost = 0ms;
     for (const DigitPath& digit : path){
-        size_t cost = get_codeboard_path_cost(digit);
+        Milliseconds cost = get_codeboard_path_cost(digit);
         if (digit.left_cursor){
             cost++;
         }
-        cost = std::max<size_t>(cost, 8);
+        cost = std::max<Milliseconds>(cost, 64ms);
         total_cost += cost;
     }
     return total_cost;
@@ -260,7 +257,9 @@ std::vector<DigitPath> get_codeboard_path(
     KeyboardLayout keyboard_layout,
     const std::vector<CodeboardPosition>& positions, size_t s, size_t e,
     CodeboardPosition start,
-    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
+    Milliseconds scroll_delay,
+    Milliseconds wrap_delay,
+    bool reordering
 ){
     if (e - s == 1){
         return {get_codeboard_digit_path(start, positions[s], scroll_delay, wrap_delay)};
@@ -305,7 +304,9 @@ std::vector<DigitPath> get_codeboard_path(
 std::vector<DigitPath> get_codeboard_path(
     Logger& logger,
     KeyboardLayout keyboard_layout, const std::string& code,
-    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering,
+    Milliseconds scroll_delay,
+    Milliseconds wrap_delay,
+    bool reordering,
     CodeboardPosition start = {0, 0}
 ){
     auto get_keyboard_layout = [](KeyboardLayout keyboard_layout){
@@ -334,13 +335,15 @@ std::vector<DigitPath> get_codeboard_path(
         keyboard_layout,
         positions, 0, positions.size(),
         start,
-        scroll_delay, wrap_delay, reordering
+        scroll_delay,
+        wrap_delay,
+        reordering
     );
 }
 
 
 void move_codeboard(SwitchControllerContext& context, const DigitPath& path){
-    uint16_t delay = 3;
+    Milliseconds delay = 24ms;
     if (path.length > 0){
         size_t last = (size_t)path.length - 1;
         for (size_t c = 0; c < last; c++){
@@ -348,14 +351,14 @@ void move_codeboard(SwitchControllerContext& context, const DigitPath& path){
                 context,
                 path.path[c].direction,
                 path.path[c].delay,
-                6
+                48ms
             );
         }
         ssf_issue_scroll(
             context,
             path.path[last].direction,
-            0,
-            6
+            0ms,
+            48ms
         );
         delay = path.path[last].delay;
     }
@@ -376,8 +379,8 @@ void run_codeboard_path(SwitchControllerContext& context, const std::vector<Digi
 FastCodeEntrySettings::FastCodeEntrySettings(const FastCodeEntrySettingsOption& option)
     : keyboard_layout(option.KEYBOARD_LAYOUT)
     , include_plus(!option.SKIP_PLUS)
-    , scroll_delay(option.SCROLL_DELAY)
-    , wrap_delay(option.WRAP_DELAY)
+    , scroll_delay(option.SCROLL_DELAY0)
+    , wrap_delay(option.WRAP_DELAY0)
     , digit_reordering(option.DIGIT_REORDERING)
 {}
 
