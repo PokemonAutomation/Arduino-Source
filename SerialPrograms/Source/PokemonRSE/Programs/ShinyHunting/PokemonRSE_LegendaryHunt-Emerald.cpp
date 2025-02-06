@@ -77,6 +77,73 @@ LegendaryHuntEmerald::LegendaryHuntEmerald()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    //Turn around, 10 steps down
+    ssf_press_button(context, BUTTON_B, 0, 180);
+    pbf_press_dpad(context, DPAD_DOWN, 180, 20);
+
+    //Turn right, take 1 step. Wait for black screen over.
+    int ret = run_until<SwitchControllerContext>(
+        env.console, context,
+        [](SwitchControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0, 30);
+            pbf_press_dpad(context, DPAD_RIGHT, 30, 20);
+            pbf_wait(context, 300);
+        },
+        {exit_area}
+    );
+    context.wait_for_all_requests();
+    if (ret != 0){
+        env.log("Failed to exit area.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to exit area.",
+            env.console
+        );
+    }
+    else {
+        env.log("Left area.");
+    }
+
+    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    //turn left, take one step. now turn back right and take a step. wait for black screen over.
+    int ret2 = run_until<SwitchControllerContext>(
+        env.console, context,
+        [](SwitchControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0, 40);
+            pbf_press_dpad(context, DPAD_LEFT, 40, 20);
+
+            ssf_press_button(context, BUTTON_B, 0, 40);
+            pbf_press_dpad(context, DPAD_RIGHT, 40, 20);
+            pbf_wait(context, 300);
+        },
+        {enter_area}
+    );
+    context.wait_for_all_requests();
+    if (ret2 != 0){
+        env.log("Failed to enter area.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to enter area.",
+            env.console
+        );
+    }
+    else {
+        env.log("Entered area.");
+    }
+
+    //reverse above steps, but only take 9 steps up
+    //doesn't really matter since we want to trigger the encounter anyway
+    ssf_press_button(context, BUTTON_B, 0, 30);
+    pbf_press_dpad(context, DPAD_LEFT, 30, 20);
+
+    ssf_press_button(context, BUTTON_B, 0, 170);
+    pbf_press_dpad(context, DPAD_UP, 170, 20);
+
+    context.wait_for_all_requests();
+}
+
 void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 5 steps down
@@ -195,23 +262,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
 
             break;
         case Target::hooh:
-            //Turn around
-
-            //10 steps down
-
-            //Turn right
-
-            //Take one step
-
-            //Wait for black screen over
-
-            //Turn left and take a step
-
-            //now turn right and take a step
-
-            //wait for black screen over
-
-            //now reverse the above, but only take 9 steps up
+            reset_hooh(env, context);
             break;
         case Target::lugia:
             reset_lugia(env, context);
