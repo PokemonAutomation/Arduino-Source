@@ -35,42 +35,38 @@ ShinyHuntUnattendedIoATrade_Descriptor::ShinyHuntUnattendedIoATrade_Descriptor()
 
 
 ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
-    : START_TO_RUN_DELAY(
+    : START_TO_RUN_DELAY0(
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1260"
+        "10080 ms"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , FLY_DURATION(
+    , FLY_DURATION0(
         "<b>Fly Duration:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "800"
+        "6400 ms"
     )
-    , MOVE_DURATION(
+    , MOVE_DURATION0(
         "<b>Move to Beartic Duration:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "300"
+        "2400 ms"
     )
-    , MASH_TO_TRADE_DELAY(
+    , MASH_TO_TRADE_DELAY0(
         "<b>Mash to Trade Delay:</b><br>Time to perform the trade.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "30 * TICKS_PER_SECOND"
+        "30 s"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
-    PA_ADD_OPTION(START_TO_RUN_DELAY);
+    PA_ADD_OPTION(START_TO_RUN_DELAY0);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(FLY_DURATION);
-    PA_ADD_OPTION(MOVE_DURATION);
-    PA_ADD_OPTION(MASH_TO_TRADE_DELAY);
+    PA_ADD_OPTION(FLY_DURATION0);
+    PA_ADD_OPTION(MOVE_DURATION0);
+    PA_ADD_OPTION(MASH_TO_TRADE_DELAY0);
 }
 
 void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
@@ -90,7 +86,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, S
         pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
         pbf_press_dpad(context, DPAD_LEFT, 10, 10);
-        pbf_mash_button(context, BUTTON_A, MASH_TO_TRADE_DELAY);
+        pbf_mash_button(context, BUTTON_A, MASH_TO_TRADE_DELAY0);
 
         if (true){
             //  Enter box system.
@@ -123,12 +119,12 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, S
         pbf_press_button(context, BUTTON_L, 10, 100);
         pbf_press_dpad(context, DPAD_RIGHT, 15, 10);
         pbf_press_dpad(context, DPAD_DOWN, 30, 10);
-        pbf_mash_button(context, BUTTON_A, FLY_DURATION);
+        pbf_mash_button(context, BUTTON_A, FLY_DURATION0);
 
         //  Move to Beartic.
-        pbf_move_left_joystick(context, 240, 0, MOVE_DURATION, 0);
+        pbf_move_left_joystick(context, 240, 0, MOVE_DURATION0, 0ms);
 
-        pbf_wait(context, START_TO_RUN_DELAY);
+        pbf_wait(context, START_TO_RUN_DELAY0);
 
         //  Run away.
         run_away_with_lights(context);

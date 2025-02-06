@@ -34,24 +34,22 @@ ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descri
 
 
 ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn()
-    : ENTER_GAME_TO_RUN_DELAY(
+    : ENTER_GAME_TO_RUN_DELAY0(
         "<b>Enter Game to Run Delay:</b><br>This needs to be carefully calibrated.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "2280"
+        "18240 ms"
     )
-    , START_GAME_WAIT_DELAY(
+    , START_GAME_WAIT_DELAY0(
         "<b>Start Game Wait Delay:</b><br>Decrease this if your game starts quickly.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "20 s"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TIME_ROLLBACK_HOURS);
 
-    PA_ADD_OPTION(ENTER_GAME_TO_RUN_DELAY);
-    PA_ADD_OPTION(START_GAME_WAIT_DELAY);
+    PA_ADD_OPTION(ENTER_GAME_TO_RUN_DELAY0);
+    PA_ADD_OPTION(START_GAME_WAIT_DELAY0);
 }
 
 
@@ -90,11 +88,11 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
         pbf_mash_button(context, BUTTON_ZR, duration);
 
         //  Wait for game to start.
-        pbf_wait(context, START_GAME_WAIT_DELAY);
+        pbf_wait(context, START_GAME_WAIT_DELAY0);
 
         //  Enter game.
         env.log("Starting Encounter: " + tostr_u_commas(c + 1));
-        pbf_press_button(context, BUTTON_A, 10, ENTER_GAME_TO_RUN_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, ENTER_GAME_TO_RUN_DELAY0);
 
         //  Run away.
         run_away_with_lights(context);

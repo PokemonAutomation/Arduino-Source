@@ -9,6 +9,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
@@ -19,6 +20,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+using namespace Pokemon;
 
 
 ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
@@ -66,11 +69,10 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , MASH_TO_TRADE_DELAY(
+    , MASH_TO_TRADE_DELAY0(
         "<b>Mash to Trade Delay:</b><br>Time to perform the trade.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "30 * TICKS_PER_SECOND"
+        "30 s"
     )
     , RUN_FROM_EVERYTHING(
         "<b>Run from Everything:</b><br>Run from everything - even if it is shiny. (For testing only.)",
@@ -86,7 +88,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(MASH_TO_TRADE_DELAY);
+    PA_ADD_OPTION(MASH_TO_TRADE_DELAY0);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(RUN_FROM_EVERYTHING);
     }
@@ -112,7 +114,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, S
         pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
         pbf_press_dpad(context, DPAD_LEFT, 10, 10);
-        pbf_mash_button(context, BUTTON_A, MASH_TO_TRADE_DELAY);
+        pbf_mash_button(context, BUTTON_A, MASH_TO_TRADE_DELAY0);
 
         //  Enter box system.
         pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_RaidItemFarmerOHKO_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -32,13 +32,13 @@ public:
 private:
     BooleanCheckBoxOption BACKUP_SAVE;
 //    SectionDivider m_advanced_options;
-    TimeExpressionOption<uint16_t> WAIT_FOR_STAMP_DELAY;
-    TimeExpressionOption<uint16_t> ENTER_STAMP_MASH_DURATION;
-    TimeExpressionOption<uint16_t> RAID_START_MASH_DURATION;
-    TimeExpressionOption<uint16_t> RAID_START_TO_ATTACK_DELAY;
-    TimeExpressionOption<uint16_t> ATTACK_TO_CATCH_DELAY;
-    TimeExpressionOption<uint16_t> RETURN_TO_OVERWORLD_DELAY;
-    TimeExpressionOption<uint32_t> TOUCH_DATE_INTERVAL;
+    MillisecondsOption WAIT_FOR_STAMP_DELAY0;
+    MillisecondsOption ENTER_STAMP_MASH_DURATION0;
+    MillisecondsOption RAID_START_MASH_DURATION0;
+    MillisecondsOption RAID_START_TO_ATTACK_DELAY0;
+    MillisecondsOption ATTACK_TO_CATCH_DELAY0;
+    MillisecondsOption RETURN_TO_OVERWORLD_DELAY0;
+    MillisecondsOption TOUCH_DATE_INTERVAL0;
 };
 
 

@@ -9,11 +9,9 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,7 +36,7 @@ public:
     BooleanCheckBoxCell accept_FRs;
     SimpleIntegerCell<uint8_t> move_slot;
     BooleanCheckBoxCell dynamax;
-    TimeExpressionCell<uint16_t> post_raid_delay;
+    MillisecondsCell post_raid_delay;
 };
 
 

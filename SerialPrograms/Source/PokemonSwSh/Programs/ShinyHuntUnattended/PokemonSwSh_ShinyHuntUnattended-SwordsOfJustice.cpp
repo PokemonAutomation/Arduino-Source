@@ -35,11 +35,10 @@ ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustic
 
 
 ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
-    : EXIT_CAMP_TO_RUN_DELAY(
+    : EXIT_CAMP_TO_RUN_DELAY0(
         "<b>Exit Camp to Run Delay:</b><br>This needs to be carefully calibrated.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1890"
+        "15120 ms"
     )
     , AIRPLANE_MODE(
         "<b>Airplane Mode:</b><br>Enable if airplane mode is on.",
@@ -49,20 +48,19 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , ENTER_CAMP_DELAY(
+    , ENTER_CAMP_DELAY0(
         "<b>Enter Camp Delay:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TIME_ROLLBACK_HOURS);
 
-    PA_ADD_OPTION(EXIT_CAMP_TO_RUN_DELAY);
+    PA_ADD_OPTION(EXIT_CAMP_TO_RUN_DELAY0);
     PA_ADD_OPTION(AIRPLANE_MODE);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(ENTER_CAMP_DELAY);
+    PA_ADD_OPTION(ENTER_CAMP_DELAY0);
 }
 
 
@@ -91,7 +89,7 @@ void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment&
 
         //  Trigger encounter.
         pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-        pbf_press_button(context, BUTTON_A, 10, ENTER_CAMP_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, ENTER_CAMP_DELAY0);
         if (AIRPLANE_MODE){
             pbf_press_button(context, BUTTON_A, 10, 100);
             pbf_press_button(context, BUTTON_A, 10, 100);
@@ -99,7 +97,7 @@ void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         pbf_press_button(context, BUTTON_X, 10, 50);
         pbf_press_dpad(context, DPAD_LEFT, 10, 10);
         env.log("Starting Encounter: " + tostr_u_commas(c + 1));
-        pbf_press_button(context, BUTTON_A, 10, EXIT_CAMP_TO_RUN_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, EXIT_CAMP_TO_RUN_DELAY0);
 
         //  Run away if not shiny.
         run_away_with_lights(context);

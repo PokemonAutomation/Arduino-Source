@@ -62,11 +62,10 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , CATCH_TO_OVERWORLD_DELAY(
+    , CATCH_TO_OVERWORLD_DELAY0(
         "<b>Catch to Overworld Delay:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -78,7 +77,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
+    PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY0);
 }
 
 
@@ -95,7 +94,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, SwitchC
     switch (result){
     case 0:
         pbf_press_dpad(context, DPAD_DOWN, 10, 0);
-        pbf_press_button(context, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
+        pbf_press_button(context, BUTTON_A, 80ms, CATCH_TO_OVERWORLD_DELAY0);
         return true;
     default:
         stream.log("Raid Catch Menu not found.", COLOR_RED);
