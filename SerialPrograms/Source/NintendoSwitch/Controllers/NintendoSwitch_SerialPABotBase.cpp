@@ -96,6 +96,9 @@ std::unique_ptr<ControllerConnection> SwitchController_SerialPABotBase_Descripto
 
 
 
+SwitchController_SerialPABotBase::~SwitchController_SerialPABotBase(){
+    m_handle.disconnect();
+}
 SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     Logger& logger,
     const SwitchController_SerialPABotBase_Descriptor& descriptor,
@@ -124,9 +127,9 @@ SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
         }
     )
     , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
+    , m_logging_suppress(0)
     , m_handle(m_logger, &descriptor.port(), requirements)
     , m_serial(*m_handle.botbase())
-    , m_logging_suppress(0)
 {
     m_handle.connect(
         &m_handle, &BotBaseHandle::on_not_connected,

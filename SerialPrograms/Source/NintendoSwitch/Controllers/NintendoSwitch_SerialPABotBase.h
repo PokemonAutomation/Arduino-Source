@@ -92,6 +92,7 @@ public:
     using ContextType = SwitchControllerContext;
 
 public:
+    ~SwitchController_SerialPABotBase();
     SwitchController_SerialPABotBase(
         Logger& logger,
         const SwitchController_SerialPABotBase_Descriptor& descriptor,
@@ -203,15 +204,16 @@ private:
 
 private:
     SerialLogger m_logger;
-    BotBaseHandle m_handle;
 
     std::string m_status;
     std::string m_uptime;
 
-    BotBaseController& m_serial;
 
     std::atomic<size_t> m_logging_suppress;
     SpinLock m_lock;
+
+    BotBaseHandle m_handle;
+    BotBaseController& m_serial;
 };
 
 
