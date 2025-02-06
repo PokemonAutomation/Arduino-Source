@@ -33,7 +33,6 @@ private:
         regis,
         hooh,
         lugia,
-        latis,
     };
     EnumDropdownOption<Target> TARGET;
 

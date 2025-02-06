@@ -56,7 +56,6 @@ LegendaryHuntEmerald::LegendaryHuntEmerald()
             {Target::regis, "regis", "Regirock/Regice/Registeel"},
             {Target::hooh, "hooh", "Ho-Oh"},
             {Target::lugia, "lugia", "Lugia"},
-            {Target::latis, "latis", "Latias/Latios (Southern Island)"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Target::hooh
@@ -308,9 +307,6 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
             break;
         case Target::lugia:
             reset_lugia(env, context);
-            break;
-        case Target::latis:
-            //TODO
             break;
         default:
             OperationFailedException::fire(
