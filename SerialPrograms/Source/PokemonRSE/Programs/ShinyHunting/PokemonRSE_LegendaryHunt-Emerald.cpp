@@ -51,7 +51,7 @@ std::unique_ptr<StatsTracker> LegendaryHuntEmerald_Descriptor::make_stats() cons
 
 LegendaryHuntEmerald::LegendaryHuntEmerald()
     : TARGET(
-        "<b>Starter:</b><br>",
+        "<b>Target:</b><br>",
         {
             {Target::regis, "regis", "Regirock/Regice/Registeel"},
             {Target::hooh, "hooh", "Ho-Oh"},
@@ -75,6 +75,61 @@ LegendaryHuntEmerald::LegendaryHuntEmerald()
 {
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(NOTIFICATIONS);
+}
+
+void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+    //turn around, walk down 4/until black screen over
+    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    int ret = run_until<SwitchControllerContext>(
+        env.console, context,
+        [](SwitchControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0, 120);
+            pbf_press_dpad(context, DPAD_DOWN, 120, 20);
+            pbf_wait(context, 300);
+        },
+        {exit_area}
+    );
+    context.wait_for_all_requests();
+    if (ret != 0){
+        env.log("Failed to exit area.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to exit area.",
+            env.console
+        );
+    }
+    else {
+        env.log("Left area.");
+    }
+    pbf_wait(context, 50);
+    context.wait_for_all_requests();
+
+    //turn around, up one/black screen over
+    int ret2 = run_until<SwitchControllerContext>(
+        env.console, context,
+        [](SwitchControllerContext& context){
+            pbf_press_dpad(context, DPAD_UP, 120, 20);
+            pbf_wait(context, 300);
+        },
+        {enter_area}
+    );
+    context.wait_for_all_requests();
+    if (ret2 != 0){
+        env.log("Failed to enter area.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to enter area.",
+            env.console
+        );
+    }
+    else {
+        env.log("Entered area.");
+    }
+
+    //walk back up to the regi
+    ssf_press_button(context, BUTTON_B, 0, 60);
+    pbf_press_dpad(context, DPAD_UP, 60, 20);
 }
 
 void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
@@ -228,11 +283,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
             //Step forward to start the encounter.
             pbf_press_dpad(context, DPAD_UP, 10, 50);
         }
-        else {
-            //All other legendaries.
-            pbf_press_button(context, BUTTON_A, 20, 40);
-        }
-
+        
         bool legendary_shiny = handle_encounter(env.console, context, true);
         if (legendary_shiny) {
             stats.shinies++;
@@ -242,7 +293,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
         }
         env.log("No shiny found.");
         flee_battle(env.console, context);
-
+        
         //Close out dialog box
         pbf_mash_button(context, BUTTON_B, 250);
         context.wait_for_all_requests();
@@ -250,16 +301,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
         //Exit and re-enter the room
         switch (TARGET) {
         case Target::regis:
-            //turn around, walk down 4
-
-            //black screen over
-
-            //turn around, up one
-
-            //black screen over
-
-            //reverse the above
-
+            reset_regi(env, context);
             break;
         case Target::hooh:
             reset_hooh(env, context);
