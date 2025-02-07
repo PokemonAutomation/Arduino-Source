@@ -17,6 +17,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
@@ -138,7 +139,18 @@ DailyHighlightRNG::DailyHighlightRNG()
 void DailyHighlightRNG::move_to_trader(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
     pbf_move_left_joystick(context, 207, 1, 160, 10); // Magic numbers to barely reach the trader
     pbf_press_button(context, BUTTON_A, 20, 20);
-    // TODO: check if NPC was reached -> DialogArrow
+    
+    //Check if NPC was reached
+    DialogTriangleDetector dialog_detector(env.console, ImageFloatBox(0.465, 0.195, 0.054, 0.57));
+    dialog_detector.make_overlays(boxes);
+
+    int ret = wait_until(env.console, context, Milliseconds(3000), { dialog_detector });
+    if (ret < 0) {
+        OperationFailedException::fire(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Failed to talk to the trader."
+        );
+    }
 }
 
 void DailyHighlightRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
