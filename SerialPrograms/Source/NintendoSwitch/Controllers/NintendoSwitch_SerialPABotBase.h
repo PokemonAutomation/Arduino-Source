@@ -100,7 +100,7 @@ public:
     );
 
     virtual Logger& logger() override{
-        return m_serial.logger();
+        return m_logger;
     }
 
 
@@ -213,7 +213,7 @@ private:
     SpinLock m_lock;
 
     BotBaseHandle m_handle;
-    BotBaseController& m_serial;
+    BotBaseController* m_serial;
 };
 
 

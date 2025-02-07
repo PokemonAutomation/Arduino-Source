@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Controllers/ControllerDescriptor.h"
@@ -129,7 +130,7 @@ SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
     , m_logging_suppress(0)
     , m_handle(m_logger, &descriptor.port(), requirements)
-    , m_serial(*m_handle.botbase())
+    , m_serial(m_handle.botbase())
 {
     m_handle.connect(
         &m_handle, &BotBaseHandle::on_not_connected,
@@ -236,19 +237,28 @@ void SwitchController_SerialPABotBase::update_status_string(){
 
 void SwitchController_SerialPABotBase::wait_for_all(const Cancellable* cancellable){
 //    cout << "wait_for_all() - enter" << endl;
+    if (!m_serial){
+        throw InvalidConnectionStateException();
+    }
     {
         WriteSpinLock lg(m_lock);
         this->issue_wait_for_all(cancellable);
     }
-    m_serial.wait_for_all_requests(cancellable);
+    m_serial->wait_for_all_requests(cancellable);
 //    cout << "wait_for_all() - exit" << endl;
 }
 void SwitchController_SerialPABotBase::cancel_all(const Cancellable* cancellable){
-    m_serial.stop_all_commands();
+    if (!m_serial){
+        throw InvalidConnectionStateException();
+    }
+    m_serial->stop_all_commands();
     this->clear_on_next();
 }
 void SwitchController_SerialPABotBase::replace_on_next_command(const Cancellable* cancellable){
-    m_serial.next_command_interrupt();
+    if (!m_serial){
+        throw InvalidConnectionStateException();
+    }
+    m_serial->next_command_interrupt();
     this->clear_on_next();
 }
 void SwitchController_SerialPABotBase::issue_controller_state(
@@ -259,11 +269,14 @@ void SwitchController_SerialPABotBase::issue_controller_state(
     uint8_t right_x, uint8_t right_y,
     Milliseconds duration
 ){
+    if (!m_serial){
+        throw InvalidConnectionStateException();
+    }
     uint32_t ticks = milliseconds_to_ticks_8ms(duration.count());
     //  Divide the controller state into smaller chunks of 255 ticks.
     while (ticks > 0){
         uint16_t curr_ticks = (uint16_t)std::min(ticks, (uint32_t)255);
-        m_serial.issue_request(
+        m_serial->issue_request(
             DeviceRequest_controller_state(button, position, left_x, left_y, right_x, right_y, (uint8_t)curr_ticks),
             cancellable
         );
@@ -274,13 +287,19 @@ void SwitchController_SerialPABotBase::send_botbase_request(
     const Cancellable* cancellable,
     const BotBaseRequest& request
 ){
-    m_serial.issue_request(request, cancellable);
+    if (!m_serial){
+        throw InvalidConnectionStateException();
+    }
+    m_serial->issue_request(request, cancellable);
 }
 BotBaseMessage SwitchController_SerialPABotBase::send_botbase_request_and_wait(
     const Cancellable* cancellable,
     const BotBaseRequest& request
 ){
-    return m_serial.issue_request_and_wait(request, cancellable);
+    if (!m_serial){
+        throw InvalidConnectionStateException();
+    }
+    return m_serial->issue_request_and_wait(request, cancellable);
 }
 
 void SwitchController_SerialPABotBase::issue_barrier(const Cancellable* cancellable){
