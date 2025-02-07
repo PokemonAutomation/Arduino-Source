@@ -114,7 +114,6 @@ long WINAPI crash_handler(EXCEPTION_POINTERS* e){
 
 //    _wmkdir(utf8_to_wstr(ERROR_PATH_UNSENT).c_str());
     program_dump(nullptr, report.directory() + ERROR_DUMP_NAME, e);
-    report.add_file(ERROR_DUMP_NAME);
     report.save(nullptr);
 
     Sleep(1000);
