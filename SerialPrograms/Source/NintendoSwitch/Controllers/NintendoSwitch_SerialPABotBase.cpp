@@ -96,7 +96,6 @@ std::unique_ptr<ControllerConnection> SwitchController_SerialPABotBase_Descripto
 
 
 
-
 SwitchController_SerialPABotBase::~SwitchController_SerialPABotBase(){
     m_handle.disconnect();
 }
@@ -105,30 +104,8 @@ SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     const SwitchController_SerialPABotBase_Descriptor& descriptor,
     const ControllerRequirements& requirements
 )
-    : SuperscalarScheduler(
-        logger, Milliseconds(4),
-        {
-            &m_buttons[ 0],
-            &m_buttons[ 1],
-            &m_buttons[ 2],
-            &m_buttons[ 3],
-            &m_buttons[ 4],
-            &m_buttons[ 5],
-            &m_buttons[ 6],
-            &m_buttons[ 7],
-            &m_buttons[ 8],
-            &m_buttons[ 9],
-            &m_buttons[10],
-            &m_buttons[11],
-            &m_buttons[12],
-            &m_buttons[13],
-            &m_dpad,
-            &m_left_joystick,
-            &m_right_joystick,
-        }
-    )
+    : SwitchControllerWithScheduler(logger)
     , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
-    , m_logging_suppress(0)
     , m_handle(m_logger, &descriptor.port(), requirements)
     , m_serial(m_handle.botbase())
 {
@@ -183,36 +160,6 @@ SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     m_status_text = m_handle.label();
 }
 
-void SwitchController_SerialPABotBase::push_state(const Cancellable* cancellable, WallDuration duration){
-    Button buttons = BUTTON_NONE;
-    for (size_t c = 0; c < 14; c++){
-        buttons |= m_buttons[c].is_busy()
-            ? (Button)((uint16_t)1 << c)
-            : BUTTON_NONE;
-    }
-
-    uint8_t left_x = 128;
-    uint8_t left_y = 128;
-    uint8_t right_x = 128;
-    uint8_t right_y = 128;
-    if (m_left_joystick.is_busy()){
-        left_x = m_left_joystick.x;
-        left_y = m_left_joystick.y;
-    }
-    if (m_right_joystick.is_busy()){
-        right_x = m_right_joystick.x;
-        right_y = m_right_joystick.y;
-    }
-
-    issue_controller_state(
-        cancellable,
-        buttons,
-        m_dpad.is_busy() ? m_dpad.position : DPAD_NONE,
-        left_x, left_y,
-        right_x, right_y,
-        std::chrono::duration_cast<Milliseconds>(duration)
-    );
-}
 
 
 void SwitchController_SerialPABotBase::update_status_string(){
@@ -234,16 +181,12 @@ void SwitchController_SerialPABotBase::update_status_string(){
 
 
 
-
 void SwitchController_SerialPABotBase::wait_for_all(const Cancellable* cancellable){
 //    cout << "wait_for_all() - enter" << endl;
     if (!m_serial){
         throw InvalidConnectionStateException();
     }
-    {
-        WriteSpinLock lg(m_lock);
-        this->issue_wait_for_all(cancellable);
-    }
+    issue_barrier(cancellable);
     m_serial->wait_for_all_requests(cancellable);
 //    cout << "wait_for_all() - exit" << endl;
 }
@@ -261,6 +204,9 @@ void SwitchController_SerialPABotBase::replace_on_next_command(const Cancellable
     m_serial->next_command_interrupt();
     this->clear_on_next();
 }
+
+
+
 void SwitchController_SerialPABotBase::issue_controller_state(
     const Cancellable* cancellable,
     Button button,
@@ -272,17 +218,21 @@ void SwitchController_SerialPABotBase::issue_controller_state(
     if (!m_serial){
         throw InvalidConnectionStateException();
     }
-    uint32_t ticks = milliseconds_to_ticks_8ms(duration.count());
+
     //  Divide the controller state into smaller chunks of 255 ticks.
-    while (ticks > 0){
-        uint16_t curr_ticks = (uint16_t)std::min(ticks, (uint32_t)255);
+    while (duration > Milliseconds::zero()){
+        Milliseconds current_ms = std::min(duration, 255 * 8ms);
+        uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_8ms(current_ms.count());
         m_serial->issue_request(
-            DeviceRequest_controller_state(button, position, left_x, left_y, right_x, right_y, (uint8_t)curr_ticks),
+            DeviceRequest_controller_state(button, position, left_x, left_y, right_x, right_y, current_ticks),
             cancellable
         );
-        ticks -= curr_ticks;
-    } // end while loop, and function
+        duration -= current_ms;
+    }
 }
+
+
+
 void SwitchController_SerialPABotBase::send_botbase_request(
     const Cancellable* cancellable,
     const BotBaseRequest& request
@@ -302,291 +252,8 @@ BotBaseMessage SwitchController_SerialPABotBase::send_botbase_request_and_wait(
     return m_serial->issue_request_and_wait(request, cancellable);
 }
 
-void SwitchController_SerialPABotBase::issue_barrier(const Cancellable* cancellable){
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log("issue_barrier()", COLOR_DARKGREEN);
-    }
-    WriteSpinLock lg(m_lock);
-    this->issue_wait_for_all(cancellable);
-}
-void SwitchController_SerialPABotBase::issue_nop(const Cancellable* cancellable, Milliseconds duration){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log(
-            "issue_nop(): duration = " + std::to_string(duration.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-    WriteSpinLock lg(m_lock);
-    this->SuperscalarScheduler::issue_nop(cancellable, WallDuration(duration));
-}
-void SwitchController_SerialPABotBase::issue_buttons(
-    const Cancellable* cancellable,
-    Button button,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log(
-            "issue_buttons(): " + button_to_string(button) +
-            ", delay = " + std::to_string(delay.count()) + "ms" +
-            ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-    WriteSpinLock lg(m_lock);
-    for (size_t c = 0; c < 14; c++){
-        uint16_t mask = (uint16_t)1 << c;
-        if (button & mask){
-            this->wait_for_resource(cancellable, m_buttons[c]);
-        }
-    }
-    for (size_t c = 0; c < 14; c++){
-        uint16_t mask = (uint16_t)1 << c;
-        if (button & mask){
-            this->issue_to_resource(
-                cancellable, m_buttons[c],
-                WallDuration::zero(), hold, cooldown
-            );
-        }
-    }
-    this->SuperscalarScheduler::issue_nop(cancellable, delay);
-}
-void SwitchController_SerialPABotBase::issue_dpad(
-    const Cancellable* cancellable,
-    DpadPosition position,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log(
-            "issue_dpad(): " + dpad_to_string(position) +
-            ", delay = " + std::to_string(delay.count()) + "ms" +
-            ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-    WriteSpinLock lg(m_lock);
-    this->wait_for_resource(cancellable, m_dpad);
-    m_dpad.position = position;
-    this->issue_to_resource(cancellable, m_dpad, delay, hold, cooldown);
-}
-void SwitchController_SerialPABotBase::issue_left_joystick(
-    const Cancellable* cancellable,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log(
-            "issue_left_joystick(): (" + std::to_string(x) + "," + std::to_string(y) + ")" +
-            ", delay = " + std::to_string(delay.count()) + "ms" +
-            ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-    WriteSpinLock lg(m_lock);
-    this->wait_for_resource(cancellable, m_left_joystick);
-    m_left_joystick.x = x;
-    m_left_joystick.y = y;
-    this->issue_to_resource(cancellable, m_left_joystick, delay, hold, cooldown);
-//    cout << "(" << (unsigned)x << "," << (unsigned)y << "), hold = " << hold / 8 << endl;
-}
-void SwitchController_SerialPABotBase::issue_right_joystick(
-    const Cancellable* cancellable,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log(
-            "issue_right_joystick(): (" + std::to_string(x) + "," + std::to_string(y) + ")" +
-            ", delay = " + std::to_string(delay.count()) + "ms" +
-            ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-    WriteSpinLock lg(m_lock);
-    this->wait_for_resource(cancellable, m_right_joystick);
-    m_right_joystick.x = x;
-    m_right_joystick.y = y;
-    this->issue_to_resource(cancellable, m_right_joystick, delay, hold, cooldown);
-}
 
 
-void SwitchController_SerialPABotBase::issue_mash_button(
-    const Cancellable* cancellable,
-    Button button, Milliseconds duration
-){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log(
-            "issue_mash_button(): " + button_to_string(button) +
-            ", duration = " + std::to_string(duration.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-    LoggingSuppressScope scope(m_logging_suppress);
-
-    while (duration > Milliseconds::zero()){
-        issue_buttons(cancellable, button, 8*8ms, 5*8ms, 3*8ms);
-        duration = duration >= 8*8ms
-            ? duration - 8*8ms
-            : Milliseconds::zero();
-    }
-}
-void SwitchController_SerialPABotBase::issue_mash_button(
-    const Cancellable* cancellable,
-    Button button0, Button button1, Milliseconds duration
-){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log(
-            "issue_mash_button(): (" + button_to_string(button0) +
-            "), (" + button_to_string(button1) +
-            "), duration = " + std::to_string(duration.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-    LoggingSuppressScope scope(m_logging_suppress);
-
-    while (duration > Milliseconds::zero()){
-        issue_buttons(cancellable, button0, Milliseconds(4*8), 5*8ms, 3*8ms);
-        issue_buttons(cancellable, button1, Milliseconds(4*8), 5*8ms, 3*8ms);
-        duration = duration >= 8*8ms
-            ? duration - 8*8ms
-            : Milliseconds::zero();
-    }
-}
-void SwitchController_SerialPABotBase::issue_mash_AZs(
-    const Cancellable* cancellable,
-    Milliseconds duration
-){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log(
-            "issue_mash_AZs(): duration = " + std::to_string(duration.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-    LoggingSuppressScope scope(m_logging_suppress);
-
-    while (duration > Milliseconds::zero()){
-        issue_buttons(cancellable, BUTTON_A, 3*8ms, 5*8ms, 3*8ms);
-        issue_buttons(cancellable, BUTTON_ZL, 3*8ms, 5*8ms, 3*8ms);
-        issue_buttons(cancellable, BUTTON_ZR, 3*8ms, 5*8ms, 3*8ms);
-        duration = duration >= Milliseconds(9*8)
-            ? duration - Milliseconds(9*8)
-            : Milliseconds::zero();
-    }
-}
-void SwitchController_SerialPABotBase::issue_system_scroll(
-    const Cancellable* cancellable,
-    DpadPosition direction, //  Diagonals not allowed.
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
-        m_logger.log(
-            "issue_system_scroll(): " + dpad_to_string(direction) +
-            ", delay = " + std::to_string(delay.count()) + "ms" +
-            ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-    LoggingSuppressScope scope(m_logging_suppress);
-
-    WallClock dpad = m_dpad.free_time();
-    WallClock left_joystick = m_left_joystick.free_time();
-    WallClock right_joystick = m_right_joystick.free_time();
-
-    if (dpad <= left_joystick && dpad <= right_joystick){
-        issue_dpad(
-            cancellable, direction,
-            Milliseconds(delay), Milliseconds(hold), Milliseconds(cooldown)
-        );
-        return;
-    }
-
-    uint8_t x = 128;
-    uint8_t y = 128;
-    switch (direction){
-    case DPAD_NONE:
-        x = 128;
-        y = 128;
-        break;
-    case DPAD_UP:
-        x = 128;
-        y = 0;
-        break;
-    case DPAD_RIGHT:
-        x = 255;
-        y = 128;
-        break;
-    case DPAD_DOWN:
-        x = 128;
-        y = 255;
-        break;
-    case DPAD_LEFT:
-        x = 0;
-        y = 128;
-        break;
-
-    //  These diagonal ones probably don't work.
-    case DPAD_UP_RIGHT:
-        x = 255;
-        y = 0;
-        break;
-    case DPAD_DOWN_RIGHT:
-        x = 255;
-        y = 255;
-        break;
-    case DPAD_DOWN_LEFT:
-        x = 0;
-        y = 255;
-        break;
-    case DPAD_UP_LEFT:
-        x = 0;
-        y = 0;
-        break;
-    }
-
-    if (left_joystick <= dpad && left_joystick <= right_joystick){
-        issue_left_joystick(
-            cancellable, x, y,
-            Milliseconds(delay), Milliseconds(hold), Milliseconds(cooldown)
-        );
-        return;
-    }
-
-    issue_right_joystick(
-        cancellable, x, y,
-        Milliseconds(delay), Milliseconds(hold), Milliseconds(cooldown)
-    );
-}
 
 
 

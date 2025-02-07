@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *  This is the raw (full) controller API that is exposed to programs.
+ *
  */
 
 #ifndef PokemonAutomation_NintendoSwitch_Controller_H

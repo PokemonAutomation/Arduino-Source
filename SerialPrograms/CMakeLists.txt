@@ -817,6 +817,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
