@@ -58,7 +58,7 @@ LegendaryHuntEmerald::LegendaryHuntEmerald()
             {Target::lugia, "lugia", "Lugia"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        Target::hooh
+        Target::regis
     )
     , NOTIFICATION_SHINY(
         "Shiny Found",
@@ -269,7 +269,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
 
     /*
     * Text speed fast, battle animations off
-    * smoke ball or fast pokemon req.
+    * smoke ball or fast pokemon req. no entry effects.
     * 
     * Don't need to worry about PokeNav or random encounters for any of these targets.
     * 
@@ -277,11 +277,11 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
     */
 
     while (true) {
-        //Start battle.
         if (TARGET == Target::hooh) {
             //Step forward to start the encounter.
             pbf_press_dpad(context, DPAD_UP, 10, 50);
         }
+        //handle_encounter presses A already for everything else
         
         bool legendary_shiny = handle_encounter(env.console, context, true);
         if (legendary_shiny) {
