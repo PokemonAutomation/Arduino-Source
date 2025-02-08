@@ -97,7 +97,7 @@ std::unique_ptr<ControllerConnection> SwitchController_SerialPABotBase_Descripto
 
 
 SwitchController_SerialPABotBase::~SwitchController_SerialPABotBase(){
-    m_handle.disconnect();
+    m_handle.remove_listener(*this);
 }
 SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     Logger& logger,
@@ -109,76 +109,25 @@ SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     , m_handle(m_logger, &descriptor.port(), requirements)
     , m_serial(m_handle.botbase())
 {
-    m_handle.connect(
-        &m_handle, &BotBaseHandle::on_not_connected,
-        &m_handle, [this](std::string error){
-//            cout << "BotBaseHandle::on_not_connected: " << error << endl;
-            m_status = std::move(error);
-            m_ready.store(false, std::memory_order_release);
-            update_status_string();
-            signal_ready_changed(false);
-        }
-    );
-    m_handle.connect(
-        &m_handle, &BotBaseHandle::on_connecting,
-        &m_handle, [this](const std::string& port_name){
-//            cout << "BotBaseHandle::on_connecting" << endl;
-            m_status = "<font color=\"green\">Connecting...</font>";
-            m_ready.store(false, std::memory_order_release);
-            update_status_string();
-            signal_ready_changed(false);
-        }
-    );
-    m_handle.connect(
-        &m_handle, &BotBaseHandle::on_ready,
-        &m_handle, [this](std::string description){
-//            cout << "BotBaseHandle::on_ready: " << description << endl;
-            m_status = std::move(description);
-            m_ready.store(true, std::memory_order_release);
-            update_status_string();
-            signal_ready_changed(true);
-        }
-    );
-    m_handle.connect(
-        &m_handle, &BotBaseHandle::on_stopped,
-        &m_handle, [this](std::string error){
-//            cout << "BotBaseHandle::on_stopped: " << error << endl;
-            m_status = std::move(error);
-            m_ready.store(false, std::memory_order_release);
-            update_status_string();
-            signal_ready_changed(false);
-        }
-    );
-    m_handle.connect(
-        &m_handle, &BotBaseHandle::uptime_status,
-        &m_handle, [this](std::string status){
-            m_uptime = std::move(status);
-            update_status_string();
-        }
-    );
-
-    m_status_text = m_handle.label();
+    m_status_text = m_handle.status_text();
+    m_handle.add_listener(*this);
 }
 
 
 
-void SwitchController_SerialPABotBase::update_status_string(){
-    std::string str;
-    str += m_status;
-    if (!str.empty() && !m_uptime.empty()){
-        str += "<br>";
-    }
-    str += m_uptime;
-    {
-        SpinLockGuard lg(m_status_text_lock);
-        m_status_text = str;
-    }
 
-//    cout << "status: " << str << endl;
-
-    signal_status_text_changed(str);
+void SwitchController_SerialPABotBase::pre_not_ready(){
+    m_ready.store(false, std::memory_order_release);
+    signal_ready_changed(false);
 }
-
+void SwitchController_SerialPABotBase::post_ready(const std::set<std::string>& capabilities){
+    m_ready.store(true, std::memory_order_release);
+    signal_ready_changed(true);
+}
+void SwitchController_SerialPABotBase::post_status_text_changed(const std::string& text){
+    m_status_text = text;
+    signal_status_text_changed(text);
+}
 
 
 void SwitchController_SerialPABotBase::wait_for_all(const Cancellable* cancellable){

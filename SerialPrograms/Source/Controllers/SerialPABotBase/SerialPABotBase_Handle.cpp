@@ -24,9 +24,10 @@
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Handle.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -34,73 +35,15 @@ using namespace SerialPABotBase;
 
 
 
-void BotBaseHandle::process_device_protocol(uint32_t& version, uint8_t& program_id){
-    static const std::set<uint32_t> COMPATIBLE_PROTOCOLS{
-        20210526,   //  Old version
-        20231219,   //  Fewer RPCs, has queue size.
-    };
 
-    Logger& logger = m_logger;
-
-
-    logger.log("Checking device protocol compatibility...");
-    uint32_t protocol = Microcontroller::protocol_version(*m_botbase);
-    logger.log("Checking device protocol compatibility... Protocol = " + std::to_string(protocol));
-    if (!COMPATIBLE_PROTOCOLS.contains(protocol / 100)){
-        throw SerialProtocolException(
-            logger, PA_CURRENT_FUNCTION,
-            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
-            "Please install the .hex that came with this version of the program."
-        );
-    }
-
-    //  PABotBase Level
-    logger.log("Checking Program ID...");
-    program_id = Microcontroller::program_id(*m_botbase);
-    logger.log("Checking Program ID... Program ID = " + std::to_string(program_id));
-//    PABotBaseLevel level = program_id_to_botbase_level(program_id);
-//    for (uint8_t c = 0; c <= (uint8_t)level; c++){
-//        m_capabilities.insert(program_id_to_string(c));
-//    }
-    m_capabilities = program_id_to_features(program_id);
-
-//    cout << "m_requirements.size() = " << m_requirements.map().size() << endl;
-
-    std::string missing_feature = m_requirements.check_compatibility(
-        SerialPABotBase::NintendoSwitch_Basic,
-        m_capabilities
-    );
-    if (!missing_feature.empty()){
-        throw SerialProtocolException(
-            logger, PA_CURRENT_FUNCTION,
-            "Missing Feature: " + missing_feature
-        );
-    }
-//    if (!m_requirements.is_compatible_with(SerialPABotBase::INTERFACE_NAME, m_capabilities)){
-//        throw SerialProtocolException(
-//            logger, PA_CURRENT_FUNCTION,
-//            "PABotBase level not met. (" + program_name(program_id) + ")"
-//        );
-//    }
-
-    //  Program Version
-    logger.log("Checking Firmware Version...");
-    version = Microcontroller::program_version(*m_botbase);
-    logger.log("Checking Firmware Version... Version = " + std::to_string(version));
-
-    //  Queue Size
-    if ((protocol / 100 == 20210526 && version == 2023121900) ||
-        (protocol / 100 == 20231219)
-    ){
-        logger.log("Device supports queue size. Requesting queue size...", COLOR_BLUE);
-        uint8_t queue_limit = Microcontroller::device_queue_size(*m_botbase);
-        logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
-        m_botbase->set_queue_limit(queue_limit);
-    }else{
-        logger.log("Queue size not supported. Defaulting to size 4.", COLOR_RED);
-    }
-
+void BotBaseHandle::add_listener(Listener& listener){
+    m_listeners.add(listener);
 }
+void BotBaseHandle::remove_listener(Listener& listener){
+    m_listeners.remove(listener);
+}
+
+
 
 
 
@@ -114,16 +57,14 @@ BotBaseHandle::BotBaseHandle(
     , m_port(port)
     , m_requirements(requirements)
     , m_state(State::NOT_CONNECTED)
-    , m_allow_user_commands(true)
-    , m_label("<font color=\"red\">Not Connected</font>")
 {
+    set_label_text("Not Connected", COLOR_RED);
     reset(port);
 }
 BotBaseHandle::~BotBaseHandle(){
     stop();
     m_botbase.reset();
     m_state.store(State::NOT_CONNECTED, std::memory_order_release);
-    emit on_not_connected("<font color=\"orange\">Disconnecting...</font>");
 }
 
 BotBaseController* BotBaseHandle::botbase(){
@@ -137,28 +78,11 @@ BotBaseController* BotBaseHandle::botbase(){
 BotBaseHandle::State BotBaseHandle::state() const{
     return m_state.load(std::memory_order_acquire);
 }
-bool BotBaseHandle::accepting_commands() const{
-    return state() == State::READY;
-}
-std::string BotBaseHandle::label() const{
+std::string BotBaseHandle::status_text() const{
     std::lock_guard<std::mutex> lg(m_lock);
-    return m_label;
+    return m_status_text;
 }
 
-void BotBaseHandle::set_allow_user_commands(bool allow){
-    m_allow_user_commands.store(allow, std::memory_order_release);
-}
-
-const char* BotBaseHandle::check_accepting_commands(){
-    //  Must call under the lock.
-    if (state() != State::READY){
-        return "Console is not accepting commands right now.";
-    }
-    if (!m_allow_user_commands.load(std::memory_order_acquire)){
-        return "Handle is not accepting commands right now.";
-    }
-    return nullptr;
-}
 const char* BotBaseHandle::try_reset(){
     std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
     if (!lg.try_lock()){
@@ -167,9 +91,6 @@ const char* BotBaseHandle::try_reset(){
     if (state() != State::READY){
         return "Console is not accepting commands right now.";
     }
-    if (!m_allow_user_commands.load(std::memory_order_acquire)){
-        return "Cannot reset while a program is running.";
-    }
     reset_unprotected(m_port);
     return nullptr;
 }
@@ -177,10 +98,6 @@ const char* BotBaseHandle::try_send_request(const BotBaseRequest& request){
     std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
     if (!lg.try_lock()){
         return "Console is busy.";
-    }
-    const char* error = check_accepting_commands();
-    if (error){
-        return error;
     }
     if (!botbase()->try_issue_request(request)){
         return "Command dropped.";
@@ -192,10 +109,6 @@ const char* BotBaseHandle::try_stop_commands(){
     if (!lg.try_lock()){
         return "Console is busy.";
     }
-    const char* error = check_accepting_commands();
-    if (error){
-        return error;
-    }
     if (!botbase()->try_stop_all_commands()){
         return "Command dropped.";
     }
@@ -205,10 +118,6 @@ const char* BotBaseHandle::try_next_interrupt(){
     std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
     if (!lg.try_lock()){
         return "Console is busy.";
-    }
-    const char* error = check_accepting_commands();
-    if (error){
-        return error;
     }
     if (!botbase()->try_next_command_interrupt()){
         return "Command dropped.";
@@ -232,7 +141,8 @@ void BotBaseHandle::stop_unprotected(){
         }
 
         m_state.store(State::SHUTDOWN, std::memory_order_release);
-        emit on_stopped("");
+        m_listeners.run_method_unique(&Listener::pre_not_ready);
+//        emit on_stopped("");
         m_botbase->stop();
 
         std::lock_guard<std::mutex> lg(m_sleep_lock);
@@ -244,8 +154,7 @@ void BotBaseHandle::stop_unprotected(){
     }
 
     m_state.store(State::NOT_CONNECTED, std::memory_order_release);
-    m_label = "<font color=\"red\">Not Connected</font>";
-    emit on_not_connected(m_label);
+    set_label_text("Not Connected", COLOR_RED);
 }
 void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
     using namespace PokemonAutomation;
@@ -270,12 +179,15 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
         );
         std::string text = "Cannot connect to Prolific controller.";
         m_logger.log(text, COLOR_RED);
-        m_label = html_color_text(text, COLOR_RED);
-        emit on_not_connected(m_label);
+        set_label_text(text, COLOR_RED);
         return;
     }
 
     try{
+        m_state.store(State::CONNECTING, std::memory_order_release);
+        set_label_text("Connecting...", COLOR_DARKGREEN);
+        m_listeners.run_method_unique(&Listener::pre_not_ready);
+
         std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
 //        m_capabilities.insert(program_id_to_string(0));
@@ -286,13 +198,10 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo* port){
     }catch (const ProgramCancelledException& e){
         error = e.message();
     }
-    if (error.empty()){
-        m_state.store(State::CONNECTING, std::memory_order_release);
-        m_label = "<font color=\"green\">Connecting...</font>";
-        emit on_connecting(name);
-    }else{
-        m_label = html_color_text("Unable to open port.", COLOR_RED);
-        emit on_not_connected(m_label);
+    if (!error.empty()){
+        m_state.store(State::NOT_CONNECTED, std::memory_order_release);
+        set_label_text("Unable to open port.", COLOR_RED);
+        m_listeners.run_method_unique(&Listener::pre_not_ready);
 //        m_logger.log(error, Color());
         return;
     }
@@ -310,6 +219,132 @@ void BotBaseHandle::reset(const QSerialPortInfo* port){
 }
 
 
+void BotBaseHandle::set_label_text(const std::string& text, Color color){
+    m_label = html_color_text(text, color);
+
+    std::string status = m_label;
+    if (!m_uptime.empty()){
+        if (!status.empty()){
+            status += "<br>";
+        }
+        status += m_uptime;
+    }
+    m_status_text = std::move(status);
+
+    m_listeners.run_method_unique(&Listener::post_status_text_changed, m_status_text);
+}
+void BotBaseHandle::set_uptime_text(const std::string& text, Color color){
+    m_uptime = html_color_text(text, color);
+
+    std::string status = m_label;
+    if (!m_uptime.empty()){
+        if (!status.empty()){
+            status += "<br>";
+        }
+        status += m_uptime;
+    }
+    m_status_text = std::move(status);
+
+    m_listeners.run_method_unique(&Listener::post_status_text_changed, m_status_text);
+}
+
+
+
+
+void BotBaseHandle::process_device_protocol(uint32_t& protocol, uint8_t& program_id){
+    Logger& logger = m_logger;
+    m_capabilities.clear();
+
+
+    //  Protocol
+    logger.log("Checking device protocol compatibility...");
+    protocol = Microcontroller::protocol_version(*m_botbase);
+    logger.log("Checking device protocol compatibility... Protocol = " + std::to_string(protocol));
+
+    //  (protocol_requested / 100) == (protocol_device / 100)
+    //  (protocol_requested % 100) <= (protocol_device / 100)
+    auto protocol_iter = SUPPORTED_VERSIONS.upper_bound(protocol);
+    if (protocol_iter == SUPPORTED_VERSIONS.begin()){
+        throw SerialProtocolException(
+            logger, PA_CURRENT_FUNCTION,
+            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
+            "Please install the .hex that came with this version of the program."
+        );
+    }
+    --protocol_iter;
+    if (protocol_iter->first < protocol / 100 * 100){
+        throw SerialProtocolException(
+            logger, PA_CURRENT_FUNCTION,
+            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
+            "Please install the .hex that came with this version of the program."
+        );
+    }
+    const std::map<uint32_t, std::set<Features>>& PROGRAM_IDS = protocol_iter->second;
+
+
+    //  Program ID
+    logger.log("Checking Program ID...");
+    program_id = Microcontroller::program_id(*m_botbase);
+    logger.log("Checking Program ID... Program ID = " + std::to_string(program_id));
+
+    auto program_iter = PROGRAM_IDS.find(program_id);
+    if (program_iter == PROGRAM_IDS.end()){
+        throw SerialProtocolException(
+            logger, PA_CURRENT_FUNCTION,
+            "Unrecognized Program ID: " + std::to_string(program_id) + "<br>"
+            "Please install the .hex that came with this version of the program."
+        );
+    }
+    const std::set<Features>& FEATURES = program_iter->second;
+
+
+    //  Program Version
+    logger.log("Checking Firmware Version...");
+    uint32_t version = Microcontroller::program_version(*m_botbase);
+    logger.log("Checking Firmware Version... Version = " + std::to_string(version));
+
+
+    //  REMOVE: Temporary for migration.
+    if (protocol / 100 == 20210526 && version == 2023121900){
+        m_capabilities.insert(to_string(Features::QueueSize));
+    }
+
+
+    //  Compile list of capabilities.
+    for (Features feature : program_iter->second){
+        m_capabilities.insert(to_string(feature));
+    }
+    if (FEATURES.contains(Features::QueueSize)){
+        m_capabilities.insert(to_string(Features::QueueSize));
+    }
+
+
+    //  Enable queue size (if available).
+    if (m_capabilities.contains(to_string(Features::QueueSize))){
+        logger.log("Device supports queue size. Requesting queue size...", COLOR_BLUE);
+        uint8_t queue_limit = Microcontroller::device_queue_size(*m_botbase);
+        logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
+        m_botbase->set_queue_limit(queue_limit);
+    }else{
+        logger.log("Queue size not supported. Defaulting to size 4.", COLOR_RED);
+    }
+
+
+    //  Check compatibility.
+    std::string missing_feature = m_requirements.check_compatibility(
+        SerialPABotBase::NintendoSwitch_Basic,
+        m_capabilities
+    );
+    if (!missing_feature.empty()){
+        throw SerialProtocolException(
+            logger, PA_CURRENT_FUNCTION,
+            "Missing Feature: " + missing_feature
+        );
+    }
+}
+
+
+
 void BotBaseHandle::thread_body(){
     using namespace PokemonAutomation;
 
@@ -322,8 +357,7 @@ void BotBaseHandle::thread_body(){
             m_botbase->connect();
         }catch (InvalidConnectionStateException&){
             m_botbase->stop();
-            m_label = "";
-            emit on_stopped("");
+            set_label_text("");
             return;
         }catch (SerialProtocolException& e){
             error = e.message();
@@ -332,19 +366,18 @@ void BotBaseHandle::thread_body(){
         }
         if (!error.empty()){
             m_botbase->stop();
-            m_label = html_color_text(error, COLOR_RED);
-            emit on_stopped(m_label);
+            set_label_text(error, COLOR_RED);
             return;
         }
     }
 
     //  Check protocol and version.
     {
-        uint32_t version = 0;
+        uint32_t protocol = 0;
         uint8_t program_id = 0;
         std::string error;
         try{
-            process_device_protocol(version, program_id);
+            process_device_protocol(protocol, program_id);
         }catch (InvalidConnectionStateException&){
             return;
         }catch (SerialProtocolException& e){
@@ -354,14 +387,13 @@ void BotBaseHandle::thread_body(){
         }
         if (error.empty()){
             m_state.store(State::READY, std::memory_order_release);
-            std::string text = "Program: " + program_name(program_id) + " (" + std::to_string(version) + ")";
-            m_label = html_color_text(text, theme_friendly_darkblue());
-//            cout << "on_ready(): " << m_label << endl;
-            emit on_ready(m_label);
+            std::string text = "Program: " + program_name(program_id) + " (" + std::to_string(protocol) + ")";
+            set_label_text(text, theme_friendly_darkblue());
+            m_listeners.run_method_unique(&Listener::post_ready, m_capabilities);
         }else{
             m_state.store(State::STOPPED, std::memory_order_release);
-            m_label = html_color_text(error, COLOR_RED);
-            emit on_stopped(m_label);
+            set_label_text(error, COLOR_RED);
+            m_listeners.run_method_unique(&Listener::pre_not_ready);
             m_botbase->stop();
             return;
         }
@@ -380,7 +412,7 @@ void BotBaseHandle::thread_body(){
             std::chrono::duration<double> seconds = last;
             if (last > 2 * SERIAL_REFRESH_RATE){
                 std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
-                emit uptime_status(html_color_text(text, COLOR_RED));
+                set_uptime_text(text, COLOR_RED);
 //                m_logger.log("Connection issue detected. Turning on all logging...");
 //                settings.log_everything.store(true, std::memory_order_release);
             }
@@ -422,9 +454,9 @@ void BotBaseHandle::thread_body(){
         }
         if (error.empty()){
             std::string text = "Up Time: " + str;
-            emit uptime_status(html_color_text(text, theme_friendly_darkblue()));
+            set_uptime_text(text, theme_friendly_darkblue());
         }else{
-            emit uptime_status(html_color_text(error, COLOR_RED));
+            set_uptime_text(error, COLOR_RED);
             error.clear();
             std::lock_guard<std::mutex> lg(m_lock);
             State state = m_state.load(std::memory_order_acquire);

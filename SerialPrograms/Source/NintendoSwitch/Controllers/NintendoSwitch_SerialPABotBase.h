@@ -21,7 +21,8 @@ namespace NintendoSwitch{
 
 
 
-class SwitchController_SerialPABotBase_Descriptor : public ControllerDescriptor{
+class SwitchController_SerialPABotBase_Descriptor : public ControllerDescriptor
+{
 public:
     static const char* TYPENAME;
 
@@ -69,7 +70,8 @@ PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
 
 class SwitchController_SerialPABotBase :
     public ControllerConnection,
-    public SwitchControllerWithScheduler
+    public SwitchControllerWithScheduler,
+    private BotBaseHandle::Listener
 {
 public:
     using ContextType = SwitchControllerContext;
@@ -116,20 +118,17 @@ public:
     ) override;
 
 
-
-
-
 private:
-    void update_status_string();
+    virtual void pre_not_ready() override;
+    virtual void post_ready(const std::set<std::string>& capabilities) override;
+    virtual void post_status_text_changed(const std::string& text) override;
 
 
 private:
     SerialLogger m_logger;
 
-    std::string m_status;
-    std::string m_uptime;
-
-
+//    std::string m_status;
+//    std::string m_uptime;
 
     BotBaseHandle m_handle;
     BotBaseController* m_serial;

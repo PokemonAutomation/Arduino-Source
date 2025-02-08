@@ -14,8 +14,8 @@
 #include <mutex>
 #include <condition_variable>
 #include <thread>
-#include <QObject>
 #include <QSerialPortInfo>
+#include "Common/Cpp/ListenerSet.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/MessageLogger.h"
 #include "Controllers/ControllerCapability.h"
@@ -26,8 +26,18 @@ class MessageSniffer;
 class PABotBase;
 
 
-class BotBaseHandle : public QObject{
-    Q_OBJECT
+class BotBaseHandle{
+public:
+    struct Listener{
+        virtual void pre_not_ready(){}
+        virtual void post_ready(const std::set<std::string>& capabilities){}
+        virtual void post_status_text_changed(const std::string& text){}
+    };
+
+    void add_listener(Listener& listener);
+    void remove_listener(Listener& listener);
+
+
 public:
     enum class State{
         NOT_CONNECTED,  //  Connection doesn't exist.
@@ -50,7 +60,7 @@ public:
     void stop();
     void reset(const QSerialPortInfo* port);
 
-    void set_allow_user_commands(bool allow);
+//    void set_allow_user_commands(bool allow);
 
 public:
     //  Not thread-safe with stop() or reset(). The returned pointer
@@ -60,12 +70,8 @@ public:
     //  Safe to call anywhere anytime. If called asynchronously with
     //  stop()/reset(), the result may be immediately out-of-date.
     State state() const;
-    bool accepting_commands() const;
 
-    std::string label() const;
-    const std::set<std::string>& capabilities() const{
-        return m_capabilities;
-    }
+    std::string status_text() const;
 
 
 public:
@@ -76,21 +82,15 @@ public:
     const char* try_stop_commands();
     const char* try_next_interrupt();
 
-signals:
-    void on_not_connected(std::string error);
-    void on_connecting(const std::string& port_name);
-    void on_ready(std::string description);
-    void on_stopped(std::string error);
-
-    void uptime_status(std::string status);
 
 private:
-    void process_device_protocol(uint32_t& version, uint8_t& program_id);
-
-    const char* check_accepting_commands();
+    void process_device_protocol(uint32_t& protocol, uint8_t& program_id);
 
     void stop_unprotected();
     void reset_unprotected(const QSerialPortInfo* port);
+
+    void set_label_text(const std::string& text, Color color = Color());
+    void set_uptime_text(const std::string& text, Color color);
 
     void thread_body();
 
@@ -103,15 +103,18 @@ private:
     std::set<std::string> m_capabilities;
 
     std::atomic<State> m_state;
-    std::atomic<bool> m_allow_user_commands;
 
     std::string m_label;
+    std::string m_uptime;
+    std::string m_status_text;
 
     std::thread m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;
     mutable std::mutex m_lock;
     std::mutex m_sleep_lock;
     std::condition_variable m_cv;
+
+    ListenerSet<Listener> m_listeners;
 };
 
 

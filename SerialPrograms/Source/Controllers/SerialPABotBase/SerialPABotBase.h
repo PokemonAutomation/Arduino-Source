@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include <string>
 #include <set>
+#include <map>
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
@@ -22,6 +23,7 @@ extern const char NintendoSwitch_Basic[];
 //  Feature List
 enum class Features{
     TickPrecise,
+    QueueSize,
     NintendoSwitch_Basic,
     NintendoSwitch_SSF,
     NintendoSwitch_Macros,
@@ -39,6 +41,15 @@ std::set<std::string> program_id_to_features(uint8_t id);
 
 
 
+
+
+extern const std::map<
+    uint32_t,   //  Protocol Version
+    std::map<
+        uint32_t,   //  Program ID
+        std::set<Features>
+    >
+> SUPPORTED_VERSIONS;
 
 
 

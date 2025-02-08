@@ -79,6 +79,9 @@ Color theme_friendly_darkblue(){
 }
 #endif
 std::string html_color_text(const std::string& text, Color color){
+    if (color == Color()){
+        return text;
+    }
     const char HEX[] = "0123456789abcdef";
     uint32_t rgb = (uint32_t)color;
     std::string str;
