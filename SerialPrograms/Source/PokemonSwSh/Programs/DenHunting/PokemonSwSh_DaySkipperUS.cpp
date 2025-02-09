@@ -29,9 +29,9 @@ DaySkipperUS_Descriptor::DaySkipperUS_Descriptor()
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {{
             SerialPABotBase::NintendoSwitch_Basic, {
-                to_string(SerialPABotBase::Features::TickPrecise),
-                to_string(SerialPABotBase::Features::NintendoSwitch_Basic),
-                to_string(SerialPABotBase::Features::NintendoSwitch_DateSkip),
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
             }
         }}
     )

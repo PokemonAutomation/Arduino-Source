@@ -16,6 +16,9 @@ namespace PokemonAutomation{
 
 void ControllerConnection::add_status_listener(StatusListener& listener){
     m_status_listeners.add(listener);
+    if (m_ready.load(std::memory_order_acquire)){
+        listener.post_ready(supported_controllers());
+    }
 }
 void ControllerConnection::remove_status_listener(StatusListener& listener){
     m_status_listeners.remove(listener);
@@ -39,8 +42,8 @@ void ControllerConnection::set_status(const std::string& text){
 void ControllerConnection::signal_pre_not_ready(){
     m_status_listeners.run_method_unique(&StatusListener::pre_not_ready);
 }
-void ControllerConnection::signal_post_ready(const std::set<std::string>& capabilities){
-    m_status_listeners.run_method_unique(&StatusListener::post_ready, capabilities);
+void ControllerConnection::signal_post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers){
+    m_status_listeners.run_method_unique(&StatusListener::post_ready, controllers);
 }
 void ControllerConnection::signal_status_text_changed(const std::string& text){
 //    cout << "m_status_listeners.size() = " << m_status_listeners.count_unique() << endl;

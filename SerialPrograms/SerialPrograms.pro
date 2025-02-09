@@ -310,6 +310,7 @@ SOURCES += \
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp \
+    Source/Controllers/ControllerCapability.cpp \
     Source/Controllers/ControllerConnection.cpp \
     Source/Controllers/ControllerSelectorWidget.cpp \
     Source/Controllers/ControllerSession.cpp \

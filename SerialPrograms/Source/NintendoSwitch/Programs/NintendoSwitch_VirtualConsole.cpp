@@ -24,7 +24,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
         "Play your Switch from your computer. Device logging is logged to the output window."
     )
     , m_requirements({
-        {SerialPABotBase::NintendoSwitch_Basic, {to_string(SerialPABotBase::Features::NintendoSwitch_Basic)}}
+        {SerialPABotBase::NintendoSwitch_Basic, {ControllerFeature::NintendoSwitch_ProController}}
     })
 {}
 

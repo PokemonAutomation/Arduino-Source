@@ -151,7 +151,7 @@ void CommandRow::on_key_press(const QKeyEvent& key){
         m_controller.logger().log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
         return;
     }
-    Controller* controller = m_controller.controller();
+    AbstractController* controller = m_controller.controller();
     if (controller == nullptr){
         m_controller.logger().log("Keyboard Command Suppressed: Controller is null.", COLOR_RED);
         return;
@@ -166,7 +166,7 @@ void CommandRow::on_key_release(const QKeyEvent& key){
     if (!m_last_known_focus){
         return;
     }
-    Controller* controller = m_controller.controller();
+    AbstractController* controller = m_controller.controller();
     if (controller == nullptr){
         return;
     }
@@ -174,7 +174,7 @@ void CommandRow::on_key_release(const QKeyEvent& key){
 }
 
 void CommandRow::set_focus(bool focused){
-    Controller* controller = m_controller.controller();
+    AbstractController* controller = m_controller.controller();
     if (!focused){
         if (controller != nullptr){
             controller->keyboard_release_all();
@@ -239,7 +239,7 @@ void CommandRow::update_ui(){
 void CommandRow::on_state_changed(ProgramState state){
     m_last_known_state = state;
     if (m_allow_commands_while_running || state == ProgramState::STOPPED){
-        Controller* controller = m_controller.controller();
+        AbstractController* controller = m_controller.controller();
         if (controller != nullptr){
             controller->keyboard_release_all();
         }

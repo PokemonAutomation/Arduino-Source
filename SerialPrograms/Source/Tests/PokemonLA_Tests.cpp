@@ -492,7 +492,8 @@ int test_pokemonLA_SaveScreenDetector(const ImageViewRGB32& image, const std::ve
 int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrums, bool target){
     auto& logger = global_logger_command_line();
     DummyBotBase botbase(logger);
-    SwitchController_SerialPABotBase controller(logger, QSerialPortInfo(), {});
+    BotBaseHandle connection(logger, nullptr);
+    SwitchController_SerialPABotBase controller(logger, connection, {});
     DummyVideoFeed video_feed;
     DummyVideoOverlay video_overlay;
     DummyAudioFeed audio_feed;

@@ -21,7 +21,7 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
         "",
         "Test box coordinates for development.",
         FeedbackType::NONE, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {{SerialPABotBase::NintendoSwitch_Basic, {to_string(SerialPABotBase::Features::NintendoSwitch_Basic)}}}
+        {{SerialPABotBase::NintendoSwitch_Basic, {ControllerFeature::NintendoSwitch_ProController}}}
     )
 {}
 

@@ -77,7 +77,7 @@ inline std::string dpad_to_string(DpadPosition dpad){
 //  Currently we only have one implementation (SerialPABotBase). But we expect
 //  to add more in the future.
 //
-class SwitchController : public Controller{
+class SwitchController : public AbstractController{
 public:
     using ContextType = SwitchControllerContext;
 

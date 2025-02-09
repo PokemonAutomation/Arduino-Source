@@ -15,11 +15,9 @@
 //#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h"
 #include "NintendoSwitch_SerialPABotBase.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
-
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -74,7 +72,7 @@ std::string SwitchController_SerialPABotBase_Descriptor::display_name() const{
         return "";
     }
     return m_port.portName().toStdString() + " - " + m_port.description().toStdString();
-//    return "Wired Controller - Serial (PABotBase): " + m_port.portName().toStdString() + " - " + m_port.description().toStdString();;
+//    return "Wired Controller - Serial (PABotBase): " + m_port.portName().toStdString() + " - " + m_port.description().toStdString();
 }
 void SwitchController_SerialPABotBase_Descriptor::load_json(const JsonValue& json){
     const std::string* name = json.to_string();
@@ -87,14 +85,27 @@ JsonValue SwitchController_SerialPABotBase_Descriptor::to_json() const{
     return m_port.isNull() ? "" : m_port.portName().toStdString();
 }
 
-std::unique_ptr<ControllerConnection> SwitchController_SerialPABotBase_Descriptor::open(Logger& logger) const{
-    return nullptr;
+std::unique_ptr<ControllerConnection> SwitchController_SerialPABotBase_Descriptor::open_connection(
+    Logger& logger
+) const{
+    return std::unique_ptr<ControllerConnection>(new BotBaseHandle(logger, &m_port));
 }
-std::unique_ptr<ControllerConnection> SwitchController_SerialPABotBase_Descriptor::open(
+std::unique_ptr<AbstractController> SwitchController_SerialPABotBase_Descriptor::make_controller(
     Logger& logger,
+    ControllerConnection& connection,
+    ControllerType controller_type,
     const ControllerRequirements& requirements
 ) const{
-    return std::unique_ptr<ControllerConnection>(new SwitchController_SerialPABotBase(logger, *this, requirements));
+    if (controller_type != ControllerType::NintendoSwitch_WiredProController){
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            std::string("Unsupported Controller Type: ") + to_string(controller_type)
+        );
+    }
+    BotBaseHandle& actual = static_cast<BotBaseHandle&>(connection);
+    return std::unique_ptr<AbstractController>(
+        new SwitchController_SerialPABotBase(logger, actual, requirements)
+    );
 }
 
 
@@ -103,75 +114,56 @@ std::unique_ptr<ControllerConnection> SwitchController_SerialPABotBase_Descripto
 
 
 SwitchController_SerialPABotBase::~SwitchController_SerialPABotBase(){
-    m_handle.remove_status_listener(*this);
+//    m_handle.remove_status_listener(*this);
 }
 SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     Logger& logger,
-    const SwitchController_SerialPABotBase_Descriptor& descriptor,
+    BotBaseHandle& connection,
     const ControllerRequirements& requirements
 )
     : SwitchControllerWithScheduler(logger)
-    , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
+    , m_logger(logger)
     , m_requirements(requirements)
-    , m_handle(m_logger, &descriptor.port())
+    , m_handle(connection)
     , m_serial(m_handle.botbase())
 {
-//    requirements.check_compatibility(
-//        SerialPABotBase::NintendoSwitch_Basic,
-//        m_handle.
-//    );
-
-    set_status(m_handle.status_text());
-    m_handle.add_status_listener(*this);
-//    cout << "m_ready.store()" << endl;
-    bool ready = m_handle.is_ready();
-    m_ready.store(ready, std::memory_order_release);
-    if (ready){
-        SwitchController_SerialPABotBase::post_ready(m_handle.capabilities());
-    }
-}
-
-
-
-void SwitchController_SerialPABotBase::pre_not_ready(){
-    m_ready.store(false, std::memory_order_release);
-    signal_pre_not_ready();
-}
-void SwitchController_SerialPABotBase::post_ready(const std::set<std::string>& capabilities){
-    //  Check compatibility.
-    std::string missing_feature = m_requirements.check_compatibility(
-        SerialPABotBase::NintendoSwitch_Basic,
-        capabilities
-    );
-
-
-//    cout << "asdf" << endl;
-//    cout << "Missing Feature: " << missing_feature << endl;
-//    for (const std::string& capability : capabilities){
-//        cout << "    " << capability << endl;
-//    }
-
-    if (missing_feature.empty()){
-        m_ready.store(true, std::memory_order_release);
-        signal_post_ready(capabilities);
+    if (!m_handle.is_ready()){
         return;
     }
 
-    m_ready.store(false, std::memory_order_release);
-    signal_pre_not_ready();
-    m_status_override = html_color_text("Missing Feature: " + missing_feature, COLOR_RED);
-    set_status(m_status_override);
+    //  Check compatibility.
+
+    const std::map<ControllerType, std::set<ControllerFeature>>& controllers = m_handle.supported_controllers();
+    auto iter = controllers.find(ControllerType::NintendoSwitch_WiredProController);
+
+    std::string missing_feature;
+    do{
+        if (iter == controllers.end()){
+            missing_feature = "NintendoSwitch_WiredProController";
+            break;
+        }
+
+        missing_feature = m_requirements.check_compatibility(
+            SerialPABotBase::NintendoSwitch_Basic,
+            iter->second
+        );
+
+        if (missing_feature.empty()){
+            m_handle.update_with_capabilities(iter->second);
+            return;
+        }
+
+    }while (false);
+
+    m_error_string = html_color_text("Missing Feature: " + missing_feature, COLOR_RED);
 }
-void SwitchController_SerialPABotBase::post_status_text_changed(const std::string& text){
-    if (m_status_override.empty()){
-        set_status(m_handle.status_text());
-    }
-}
+
+
 
 
 void SwitchController_SerialPABotBase::wait_for_all(const Cancellable* cancellable){
 //    cout << "wait_for_all() - enter" << endl;
-    if (!m_serial || !m_ready.load(std::memory_order_acquire)){
+    if (!is_ready()){
         throw InvalidConnectionStateException();
     }
     issue_barrier(cancellable);
@@ -179,14 +171,14 @@ void SwitchController_SerialPABotBase::wait_for_all(const Cancellable* cancellab
 //    cout << "wait_for_all() - exit" << endl;
 }
 void SwitchController_SerialPABotBase::cancel_all_commands(const Cancellable* cancellable){
-    if (!m_serial || !m_ready.load(std::memory_order_acquire)){
+    if (!is_ready()){
         throw InvalidConnectionStateException();
     }
     m_serial->stop_all_commands();
     this->clear_on_next();
 }
 void SwitchController_SerialPABotBase::replace_on_next_command(const Cancellable* cancellable){
-    if (!m_serial || !m_ready.load(std::memory_order_acquire)){
+    if (!is_ready()){
         throw InvalidConnectionStateException();
     }
     m_serial->next_command_interrupt();
@@ -203,7 +195,7 @@ void SwitchController_SerialPABotBase::issue_controller_state(
     uint8_t right_x, uint8_t right_y,
     Milliseconds duration
 ){
-    if (!m_serial || !m_ready.load(std::memory_order_acquire)){
+    if (!is_ready()){
         throw InvalidConnectionStateException();
     }
 
@@ -225,7 +217,7 @@ void SwitchController_SerialPABotBase::send_botbase_request(
     const Cancellable* cancellable,
     const BotBaseRequest& request
 ){
-    if (!m_serial || !m_ready.load(std::memory_order_acquire)){
+    if (!is_ready()){
         throw InvalidConnectionStateException();
     }
     m_serial->issue_request(request, cancellable);
@@ -234,7 +226,7 @@ BotBaseMessage SwitchController_SerialPABotBase::send_botbase_request_and_wait(
     const Cancellable* cancellable,
     const BotBaseRequest& request
 ){
-    if (!m_serial || !m_ready.load(std::memory_order_acquire)){
+    if (!is_ready()){
         throw InvalidConnectionStateException();
     }
     return m_serial->issue_request_and_wait(request, cancellable);

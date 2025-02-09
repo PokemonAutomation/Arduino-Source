@@ -27,26 +27,21 @@ class PABotBase;
 
 class BotBaseHandle : public ControllerConnection{
 public:
-    BotBaseHandle(SerialLogger& logger, const QSerialPortInfo* port);
+    BotBaseHandle(Logger& logger, const QSerialPortInfo* port);
     ~BotBaseHandle();
+
+    void update_with_capabilities(const std::set<ControllerFeature>& capabilities);
 
 
 public:
     BotBaseController* botbase();
 
-    //  Note that this is asynchronous. The returned value may be out-of-date
-    //  immediately.
-    bool is_ready() const;
-
 public:
-    std::set<std::string> capabilities() const{
-        std::lock_guard<std::mutex> lg(m_lock);
-        return m_capabilities;
-    }
+    virtual std::map<ControllerType, std::set<ControllerFeature>> supported_controllers() const override;
 
 
 private:
-    std::set<std::string> read_device_specs(uint32_t& protocol, uint8_t& program_id);
+    std::map<ControllerType, std::set<ControllerFeature>> read_device_specs();
 
     void set_label_text(const std::string& text, Color color = Color());
     void set_uptime_text(const std::string& text, Color color);
@@ -55,12 +50,12 @@ private:
 
 
 private:
-    SerialLogger& m_logger;
+    SerialLogger m_logger;
 
     const QSerialPortInfo* m_port;
-    std::set<std::string> m_capabilities;
-
-    std::atomic<bool> m_ready;
+    uint32_t m_protocol = 0;
+    uint8_t m_program_id = 0;
+    std::map<ControllerType, std::set<ControllerFeature>> m_controllers;
 
     std::string m_label;
     std::string m_uptime;

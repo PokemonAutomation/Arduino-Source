@@ -19,7 +19,7 @@ class ControllerConnection{
 public:
     struct StatusListener{
         virtual void pre_not_ready(){}
-        virtual void post_ready(const std::set<std::string>& capabilities){}
+        virtual void post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers){}
         virtual void post_status_text_changed(const std::string& text){}
     };
 
@@ -30,21 +30,22 @@ public:
 public:
     virtual ~ControllerConnection() = default;
 
-    bool ready() const{ return m_ready.load(std::memory_order_acquire); }
+    bool is_ready() const{ return m_ready.load(std::memory_order_acquire); }
     std::string status_text() const;
+
+    virtual std::map<ControllerType, std::set<ControllerFeature>> supported_controllers() const = 0;
 
 
 protected:
     void set_status(const std::string& text);
 
     void signal_pre_not_ready();
-    void signal_post_ready(const std::set<std::string>& capabilities);
+    void signal_post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);
     void signal_status_text_changed(const std::string& text);
 
 
 protected:
     std::atomic<bool> m_ready;
-
 
 private:
     mutable SpinLock m_status_text_lock;

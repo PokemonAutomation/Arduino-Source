@@ -11,6 +11,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include "Controllers/ControllerCapability.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
@@ -20,32 +21,22 @@ namespace SerialPABotBase{
 extern const char NintendoSwitch_Basic[];
 
 
-//  Feature List
-enum class Features{
-    TickPrecise,
-    QueueSize,
-    NintendoSwitch_Basic,
-    NintendoSwitch_SSF,
-    NintendoSwitch_Macros,
-    NintendoSwitch_DateSkip,
-};
-const char* to_string(Features feature);
-
 
 //  Defaults
-extern const std::pair<std::string, std::set<std::string>> OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS;
-
-
+extern const std::pair<std::string, std::set<ControllerFeature>> OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS;
 
 
 
 std::string program_name(uint8_t id);
 
+
+
+
 extern const std::map<
     uint32_t,   //  Protocol Version
     std::map<
         uint32_t,   //  Program ID
-        std::set<Features>
+        std::map<ControllerType, std::set<ControllerFeature>>
     >
 > SUPPORTED_VERSIONS;
 

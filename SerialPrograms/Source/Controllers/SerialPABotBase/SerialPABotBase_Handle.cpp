@@ -4,7 +4,6 @@
  *
  */
 
-#include <set>
 #include <QtGlobal>
 #include <QSerialPortInfo>
 #include <QMessageBox>
@@ -19,15 +18,15 @@
 //#include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Handle.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -37,10 +36,9 @@ using namespace SerialPABotBase;
 
 
 
-BotBaseHandle::BotBaseHandle(SerialLogger& logger, const QSerialPortInfo* port)
-    : m_logger(logger)
+BotBaseHandle::BotBaseHandle(Logger& logger, const QSerialPortInfo* port)
+    : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
     , m_port(port)
-    , m_ready(false)
 {
     set_label_text("Not Connected", COLOR_RED);
 
@@ -103,16 +101,43 @@ BotBaseHandle::~BotBaseHandle(){
     m_botbase.reset();
 }
 
+
+void BotBaseHandle::update_with_capabilities(const std::set<ControllerFeature>& capabilities){
+    Logger& logger = m_logger;
+
+    do{
+        if (capabilities.contains(ControllerFeature::QueryCommandQueueSize)){
+            break;
+        }
+
+        //  Program Version
+        logger.log("Checking Firmware Version...");
+        uint32_t version = Microcontroller::program_version(*m_botbase);
+        logger.log("Checking Firmware Version... Version = " + std::to_string(version));
+
+        //  REMOVE: Temporary for migration.
+        if (m_protocol / 100 == 20210526 && version == 2023121900){
+            break;
+        }
+
+        logger.log("Queue size not supported. Defaulting to size 4.", COLOR_RED);
+        return;
+    }while (false);
+
+    logger.log("Device supports queue size. Requesting queue size...", COLOR_BLUE);
+    uint8_t queue_limit = Microcontroller::device_queue_size(*m_botbase);
+    logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
+    m_botbase->set_queue_limit(queue_limit);
+}
+
+
+
 BotBaseController* BotBaseHandle::botbase(){
     BotBaseController* ret = m_botbase.get();
     if (ret == nullptr){
         m_logger.log("BotBaseHandle::botbase() called with null botbase...", COLOR_RED);
     }
     return ret;
-}
-
-bool BotBaseHandle::is_ready() const{
-    return m_ready.load(std::memory_order_relaxed);
 }
 
 
@@ -144,85 +169,58 @@ void BotBaseHandle::set_uptime_text(const std::string& text, Color color){
 
 
 
-std::set<std::string> BotBaseHandle::read_device_specs(uint32_t& protocol, uint8_t& program_id){
+
+std::map<ControllerType, std::set<ControllerFeature>> BotBaseHandle::supported_controllers() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_controllers;
+}
+
+
+std::map<ControllerType, std::set<ControllerFeature>> BotBaseHandle::read_device_specs(){
     Logger& logger = m_logger;
-    std::set<std::string> capabilities;
 
 
     //  Protocol
     logger.log("Checking device protocol compatibility...");
-    protocol = Microcontroller::protocol_version(*m_botbase);
-    logger.log("Checking device protocol compatibility... Protocol = " + std::to_string(protocol));
+    m_protocol = Microcontroller::protocol_version(*m_botbase);
+    logger.log("Checking device protocol compatibility... Protocol = " + std::to_string(m_protocol));
 
     //  (protocol_requested / 100) == (protocol_device / 100)
     //  (protocol_requested % 100) <= (protocol_device / 100)
-    auto protocol_iter = SUPPORTED_VERSIONS.upper_bound(protocol);
+    auto protocol_iter = SUPPORTED_VERSIONS.upper_bound(m_protocol);
     if (protocol_iter == SUPPORTED_VERSIONS.begin()){
         throw SerialProtocolException(
             logger, PA_CURRENT_FUNCTION,
-            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
+            "Incompatible protocol. Device: " + std::to_string(m_protocol) + "<br>"
             "Please install the .hex that came with this version of the program."
         );
     }
     --protocol_iter;
-    if (protocol_iter->first < protocol / 100 * 100){
+    if (protocol_iter->first < m_protocol / 100 * 100){
         throw SerialProtocolException(
             logger, PA_CURRENT_FUNCTION,
-            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
+            "Incompatible protocol. Device: " + std::to_string(m_protocol) + "<br>"
             "Please install the .hex that came with this version of the program."
         );
     }
-    const std::map<uint32_t, std::set<Features>>& PROGRAM_IDS = protocol_iter->second;
 
 
     //  Program ID
     logger.log("Checking Program ID...");
-    program_id = Microcontroller::program_id(*m_botbase);
-    logger.log("Checking Program ID... Program ID = " + std::to_string(program_id));
+    m_program_id = Microcontroller::program_id(*m_botbase);
+    logger.log("Checking Program ID... Program ID = " + std::to_string(m_program_id));
 
-    auto program_iter = PROGRAM_IDS.find(program_id);
+    const std::map<uint32_t, std::map<ControllerType, std::set<ControllerFeature>>>& PROGRAM_IDS = protocol_iter->second;
+    auto program_iter = PROGRAM_IDS.find(m_program_id);
     if (program_iter == PROGRAM_IDS.end()){
         throw SerialProtocolException(
             logger, PA_CURRENT_FUNCTION,
-            "Unrecognized Program ID: " + std::to_string(program_id) + "<br>"
+            "Unrecognized Program ID: " + std::to_string(m_program_id) + "<br>"
             "Please install the .hex that came with this version of the program."
         );
     }
-    const std::set<Features>& FEATURES = program_iter->second;
 
-
-    //  Program Version
-    logger.log("Checking Firmware Version...");
-    uint32_t version = Microcontroller::program_version(*m_botbase);
-    logger.log("Checking Firmware Version... Version = " + std::to_string(version));
-
-
-    //  REMOVE: Temporary for migration.
-    if (protocol / 100 == 20210526 && version == 2023121900){
-        capabilities.insert(to_string(Features::QueueSize));
-    }
-
-
-    //  Compile list of capabilities.
-    for (Features feature : program_iter->second){
-        capabilities.insert(to_string(feature));
-    }
-    if (FEATURES.contains(Features::QueueSize)){
-        capabilities.insert(to_string(Features::QueueSize));
-    }
-
-
-    //  Enable queue size (if available).
-    if (capabilities.contains(to_string(Features::QueueSize))){
-        logger.log("Device supports queue size. Requesting queue size...", COLOR_BLUE);
-        uint8_t queue_limit = Microcontroller::device_queue_size(*m_botbase);
-        logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
-        m_botbase->set_queue_limit(queue_limit);
-    }else{
-        logger.log("Queue size not supported. Defaulting to size 4.", COLOR_RED);
-    }
-
-    return capabilities;
+    return program_iter->second;
 }
 
 
@@ -255,14 +253,12 @@ void BotBaseHandle::thread_body(){
 
     //  Check protocol and version.
     {
-        uint32_t protocol = 0;
-        uint8_t program_id = 0;
-        std::set<std::string> capabilities;
+        std::map<ControllerType, std::set<ControllerFeature>> controllers;
         std::string error;
         try{
-            capabilities = read_device_specs(protocol, program_id);
+            controllers = read_device_specs();
             std::lock_guard<std::mutex> lg(m_lock);
-            m_capabilities = capabilities;
+            m_controllers = controllers;
         }catch (InvalidConnectionStateException&){
             return;
         }catch (SerialProtocolException& e){
@@ -272,9 +268,9 @@ void BotBaseHandle::thread_body(){
         }
         if (error.empty()){
             m_ready.store(true, std::memory_order_release);
-            std::string text = "Program: " + program_name(program_id) + " (" + std::to_string(protocol) + ")";
+            std::string text = "Program: " + program_name(m_program_id) + " (" + std::to_string(m_protocol) + ")";
             set_label_text(text, theme_friendly_darkblue());
-            signal_post_ready(capabilities);
+            signal_post_ready(controllers);
         }else{
             m_ready.store(false, std::memory_order_relaxed);
             set_label_text(error, COLOR_RED);

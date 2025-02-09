@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 
 
-class ControllerSession{
+class ControllerSession : private ControllerConnection::StatusListener{
 public:
     struct Listener : ControllerConnection::StatusListener{
         virtual void ready_changed(bool ready){}
@@ -58,8 +58,8 @@ public:
     const ControllerOption& option() const{
         return m_option;
     }
-    Controller* controller() const;
     ControllerConnection& connection() const;
+    AbstractController* controller() const;
 
 
 public:
@@ -108,6 +108,10 @@ public:
 
 
 private:
+    virtual void pre_not_ready() override;
+    virtual void post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers) override;
+    virtual void post_status_text_changed(const std::string& text) override;
+
     void signal_ready_changed(bool ready);
     void signal_controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor);
     void signal_status_text_changed(const std::string& text);
@@ -124,6 +128,7 @@ private:
     std::string m_user_input_disallow_reason;
     std::shared_ptr<const ControllerDescriptor> m_descriptor;
     std::unique_ptr<ControllerConnection> m_connection;
+    std::unique_ptr<AbstractController> m_controller;
 
     ListenerSet<Listener> m_listeners;
 };

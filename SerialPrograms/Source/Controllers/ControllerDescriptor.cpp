@@ -22,12 +22,12 @@ namespace PokemonAutomation{
 //
 //  Here we store a map of all controller types in the program.
 //
-std::map<std::string, std::unique_ptr<ControllerType>> CONTROLLER_TYPES;
+std::map<std::string, std::unique_ptr<AbstractControllerType>> CONTROLLER_TYPES;
 
 
-void ControllerType::register_factory(
+void AbstractControllerType::register_factory(
     const std::string& name,
-    std::unique_ptr<ControllerType> factory
+    std::unique_ptr<AbstractControllerType> factory
 ){
     auto ret = CONTROLLER_TYPES.emplace(name, std::move(factory));
     if (!ret.second){

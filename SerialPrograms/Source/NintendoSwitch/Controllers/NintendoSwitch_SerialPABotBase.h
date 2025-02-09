@@ -42,9 +42,13 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    virtual std::unique_ptr<ControllerConnection> open(Logger& logger) const override;
-    virtual std::unique_ptr<ControllerConnection> open(
+    virtual std::unique_ptr<ControllerConnection> open_connection(
+        Logger& logger
+    ) const override;
+    virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
+        ControllerConnection& connection,
+        ControllerType controller_type,
         const ControllerRequirements& requirements
     ) const override;
 
@@ -68,10 +72,7 @@ PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
 
 
 
-class SwitchController_SerialPABotBase :
-    public ControllerConnection,
-    public SwitchControllerWithScheduler,
-    private ControllerConnection::StatusListener
+class SwitchController_SerialPABotBase : public SwitchControllerWithScheduler
 {
 public:
     using ContextType = SwitchControllerContext;
@@ -80,12 +81,19 @@ public:
     ~SwitchController_SerialPABotBase();
     SwitchController_SerialPABotBase(
         Logger& logger,
-        const SwitchController_SerialPABotBase_Descriptor& descriptor,
+        BotBaseHandle& connection,
         const ControllerRequirements& requirements
     );
 
     virtual Logger& logger() override{
         return m_logger;
+    }
+
+    virtual bool is_ready() const override{
+        return m_serial && m_handle.is_ready() && m_error_string.empty();
+    }
+    virtual std::string error_string() const override{
+        return m_error_string;
     }
 
 
@@ -119,19 +127,13 @@ public:
 
 
 private:
-    virtual void pre_not_ready() override;
-    virtual void post_ready(const std::set<std::string>& capabilities) override;
-    virtual void post_status_text_changed(const std::string& text) override;
-
-
-private:
-    SerialLogger m_logger;
+    Logger& m_logger;
     const ControllerRequirements& m_requirements;
 
-    BotBaseHandle m_handle;
+    BotBaseHandle& m_handle;
     BotBaseController* m_serial;
 
-    std::string m_status_override;
+    std::string m_error_string;
 };
 
 

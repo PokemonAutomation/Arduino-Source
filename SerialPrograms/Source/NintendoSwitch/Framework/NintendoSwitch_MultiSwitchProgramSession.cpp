@@ -160,8 +160,8 @@ void MultiSwitchProgramSession::internal_run_program(){
             report_error("Cannot Start: The controller is not ready.");
             return;
         }
-        ControllerConnection& connection = session.controller_session().connection();
-        SwitchController& switch_controller = dynamic_cast<SwitchController&>(connection);
+        AbstractController* controller = session.controller_session().controller();
+        SwitchController& switch_controller = *dynamic_cast<SwitchController*>(controller);
         handles.emplace_back(
             c,
             session.logger(),

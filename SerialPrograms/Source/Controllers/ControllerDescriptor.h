@@ -10,12 +10,14 @@
 #include <string>
 #include <memory>
 #include "Common/Cpp/AbstractLogger.h"
+#include "ControllerCapability.h"
+#include "Controller.h"
 
 namespace PokemonAutomation{
 
 class JsonValue;
 class ControllerRequirements;
-class ControllerType;
+class AbstractControllerType;
 class ControllerDescriptor;
 class ControllerConnection;
 
@@ -25,14 +27,14 @@ class ControllerConnection;
 //
 //  For example:
 //      -   "Nintendo Switch via Serial PABotBase" is a type of controller.
-//      -   "Nintendo Switch via Joycon Emulatiion" is a type of controller. (hypothetical)
+//      -   "Nintendo Switch via Joycon Emulation" is a type of controller. (hypothetical)
 //      -   "Xbox One via whatever..." ...
 //
 //  One instance of this class exists for each type of controller.
 //
-class ControllerType{
+class AbstractControllerType{
 public:
-    virtual ~ControllerType() = default;
+    virtual ~AbstractControllerType() = default;
 
     //  Returns a list of all available instances for this controller type.
     virtual std::vector<std::shared_ptr<const ControllerDescriptor>> list() const = 0;
@@ -43,7 +45,7 @@ public:
 protected:
     static void register_factory(
         const std::string& name,
-        std::unique_ptr<ControllerType> factory
+        std::unique_ptr<AbstractControllerType> factory
     );
 };
 
@@ -52,7 +54,7 @@ protected:
 //  Subclass helper for ControllerType.
 //
 template <typename DescriptorType>
-class ControllerType_t : public ControllerType{
+class ControllerType_t : public AbstractControllerType{
 public:
     //  Subclasses must implement this function.
     virtual std::vector<std::shared_ptr<const ControllerDescriptor>> list() const override;
@@ -66,7 +68,7 @@ public:
 
 private:
     static int register_class(){
-        ControllerType::register_factory(
+        AbstractControllerType::register_factory(
             DescriptorType::TYPENAME,
             std::make_unique<ControllerType_t<DescriptorType>>()
         );
@@ -96,11 +98,17 @@ public:
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
 
-    virtual std::unique_ptr<ControllerConnection> open(Logger& logger) const = 0;
-    virtual std::unique_ptr<ControllerConnection> open(
-        Logger& logger,
-        const ControllerRequirements& requirements
+    virtual std::unique_ptr<ControllerConnection> open_connection(
+        Logger& logger
     ) const = 0;
+    virtual std::unique_ptr<AbstractController> make_controller(
+        Logger& logger,
+        ControllerConnection& connection,
+        ControllerType controller_type,
+        const ControllerRequirements& requirements
+    ) const{
+        return nullptr;
+    }
 };
 
 

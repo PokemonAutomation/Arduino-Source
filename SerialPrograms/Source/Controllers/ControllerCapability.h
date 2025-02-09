@@ -30,6 +30,34 @@
 namespace PokemonAutomation{
 
 
+
+enum class ControllerInterface{
+    SerialPABotBase,
+};
+
+
+enum class ControllerType{
+    None,
+    NintendoSwitch_WiredProController,
+    NintendoSwitch_WirelessProController,
+    NintendoSwitch_LeftJoycon,
+    NintendoSwitch_RightJoycon,
+};
+const char* to_string(ControllerType type);
+
+
+enum class ControllerFeature{
+    TickPrecise,
+    QueryTickSize,
+    QueryCommandQueueSize,
+    NintendoSwitch_ProController,
+    NintendoSwitch_DateSkip,
+};
+const char* to_string(ControllerFeature feature);
+
+
+
+
 //
 //  This class is a double map.
 //  The first level is keyed on a string representing the interface type. (serial, bluetooth, etc...)
@@ -44,12 +72,12 @@ namespace PokemonAutomation{
 //
 class ControllerRequirements{
 public:
-    ControllerRequirements(std::initializer_list<std::map<std::string, std::set<std::string>>::value_type> args)
+    ControllerRequirements(std::initializer_list<std::map<std::string, std::set<ControllerFeature>>::value_type> args)
         : m_map(std::move(args))
         , m_sanitizer("ControllerRequirements")
     {}
 
-    const std::map<std::string, std::set<std::string>>& map() const{
+    const std::map<std::string, std::set<ControllerFeature>>& map() const{
         auto scope_check = m_sanitizer.check_scope();
         return m_map;
     }
@@ -61,7 +89,7 @@ public:
 
     //  Check compatibility. If compatible, returns empty string.
     //  Otherwise returns one of the missing features.
-    std::string check_compatibility(const std::string& device, const std::set<std::string>& features) const{
+    std::string check_compatibility(const std::string& device, const std::set<ControllerFeature>& features) const{
         auto scope_check = m_sanitizer.check_scope();
 
         auto iter0 = m_map.find(device);
@@ -69,10 +97,10 @@ public:
             return device;
         }
 
-        const std::set<std::string>& required = iter0->second;
-        for (const std::string& feature : required){
+        const std::set<ControllerFeature>& required = iter0->second;
+        for (ControllerFeature feature : required){
             if (features.find(feature) == features.end()){
-                return feature;
+                return to_string(feature);
             }
         }
         return "";
@@ -80,7 +108,7 @@ public:
 
 
 private:
-    std::map<std::string, std::set<std::string>> m_map;
+    std::map<std::string, std::set<ControllerFeature>> m_map;
 
     LifetimeSanitizer m_sanitizer;
 };

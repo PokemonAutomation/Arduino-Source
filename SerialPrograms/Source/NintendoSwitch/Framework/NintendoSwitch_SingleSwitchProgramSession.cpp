@@ -112,8 +112,8 @@ void SingleSwitchProgramSession::internal_run_program(){
         timestamp()
     );
     CancellableHolder<CancellableScope> scope;
-    ControllerConnection& connection = m_system.controller_session().connection();
-    SwitchController& switch_controller = dynamic_cast<SwitchController&>(connection);
+    AbstractController* controller = m_system.controller_session().controller();
+    SwitchController& switch_controller = *dynamic_cast<SwitchController*>(controller);
     SingleSwitchProgramEnvironment env(
         program_info,
         scope,
