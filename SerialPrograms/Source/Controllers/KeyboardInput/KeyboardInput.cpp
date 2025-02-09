@@ -17,12 +17,10 @@ namespace PokemonAutomation{
 
 KeyboardInputController::~KeyboardInputController() = default;
 KeyboardInputController::KeyboardInputController(
-    bool allow_commands_while_running,
+    bool enabled,
     std::chrono::milliseconds retry_delay
 )
-    : m_allow_commands_while_running(allow_commands_while_running)
-    , m_retry_delay(retry_delay)
-    , m_last_known_state(ProgramState::STOPPED)
+    : m_retry_delay(retry_delay)
     , m_stop(false)
 {}
 
@@ -80,13 +78,6 @@ void KeyboardInputController::on_key_release(const QKeyEvent& key){
 
 
 
-ProgramState KeyboardInputController::last_known_state() const{
-    return m_last_known_state.load(std::memory_order_acquire);
-}
-void KeyboardInputController::on_state_changed(ProgramState state){
-    m_last_known_state.store(state, std::memory_order_release);
-}
-
 void KeyboardInputController::thread_loop(){
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
 
@@ -100,10 +91,9 @@ void KeyboardInputController::thread_loop(){
             return;
         }
 
+#if 0
         //  Not accepting commands.
-        if (!m_allow_commands_while_running &&
-            m_last_known_state.load(std::memory_order_acquire) != ProgramState::STOPPED
-        ){
+        if (!m_enabled){
             last->clear();
             std::unique_lock<std::mutex> lg(m_sleep_lock);
             if (m_stop.load(std::memory_order_acquire)){
@@ -112,6 +102,7 @@ void KeyboardInputController::thread_loop(){
             m_cv.wait(lg);
             continue;
         }
+#endif
 
         //  Get the raw keyboard state.
         std::set<uint32_t> pressed_native_keys;
@@ -130,6 +121,9 @@ void KeyboardInputController::thread_loop(){
         WallClock now;
         do{
             now = current_time();
+            if (neutral && last_neutral){
+                continue;
+            }
             try{
 //                current.print();
                 if (*current == *last && last_press + std::chrono::milliseconds(1000) > now){
@@ -139,28 +133,21 @@ void KeyboardInputController::thread_loop(){
 
                 //  If state is neutral, just issue a stop.
                 if (neutral){
-                    if (try_stop_commands()){
-                        last->clear();
-                        last_neutral = true;
-                        last_press = now;
-                    }else{
-                        next_wake = now + std::chrono::milliseconds(m_retry_delay);
-                    }
+                    cancel_all_commands();
+                    last->clear();
+                    last_neutral = true;
+                    last_press = now;
                     break;
                 }
 
                 //  If the new state is different, set next interrupt so the new
                 //  new command can replace the current one without gaps.
-                if (!last_neutral && current != last && !try_next_interrupt()){
-                    next_wake = now + std::chrono::milliseconds(m_retry_delay);
-                    break;
+                if (!last_neutral && current != last){
+                    replace_on_next_command();
                 }
 
                 //  Send the command.
-                if (!try_send_state(*current)){
-                    next_wake = now + std::chrono::milliseconds(m_retry_delay);
-                    break;
-                }
+                send_state(*current);
 
                 std::swap(last, current);
                 last_neutral = false;

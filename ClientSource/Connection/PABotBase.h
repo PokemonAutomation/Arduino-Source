@@ -155,6 +155,7 @@ private:
         const BotBaseRequest& request, bool silent_remove
     );
 
+public:
     virtual bool try_issue_request(
         const BotBaseRequest& request,
         const Cancellable* cancelled
@@ -168,6 +169,7 @@ private:
         const Cancellable* cancelled
     ) override;
 
+private:
     BotBaseMessage wait_for_request(uint64_t seqnum);
 
 private:

@@ -11,10 +11,12 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ListenerSet.h"
 //#include "Common/Cpp/Exceptions.h"
+#include "Controller.h"
 #include "ControllerDescriptor.h"
 #include "ControllerConnection.h"
 
 namespace PokemonAutomation{
+
 
 
 
@@ -56,6 +58,7 @@ public:
     const ControllerOption& option() const{
         return m_option;
     }
+    Controller* controller() const;
     ControllerConnection& connection() const;
 
 

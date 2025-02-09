@@ -13,7 +13,6 @@
 #include "Controllers/ControllerDescriptor.h"
 #include "Controllers/ControllerConnection.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
-#include "NintendoSwitch_Controller.h"
 #include "NintendoSwitch_ControllerWithScheduler.h"
 
 namespace PokemonAutomation{
@@ -93,7 +92,7 @@ public:
     //  General Control
 
     virtual void wait_for_all(const Cancellable* cancellable) override;
-    virtual void cancel_all(const Cancellable* cancellable) override;
+    virtual void cancel_all_commands(const Cancellable* cancellable) override;
     virtual void replace_on_next_command(const Cancellable* cancellable) override;
 
 
@@ -126,9 +125,6 @@ private:
 
 private:
     SerialLogger m_logger;
-
-//    std::string m_status;
-//    std::string m_uptime;
 
     BotBaseHandle m_handle;
     BotBaseController* m_serial;

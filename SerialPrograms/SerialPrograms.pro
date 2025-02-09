@@ -316,6 +316,7 @@ SOURCES += \
     Source/Controllers/ControllerDescriptor.cpp \
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp \
     Source/Controllers/KeyboardInput/KeyboardInput.cpp \
+    Source/Controllers/KeyboardInput/KeyboardStateTracker.cpp \
     Source/Controllers/NullController.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp \
@@ -399,14 +400,12 @@ SOURCES += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp \
@@ -1443,6 +1442,7 @@ HEADERS += \
     Source/ComputerPrograms/Framework/ComputerProgramOption.h \
     Source/ComputerPrograms/Framework/ComputerProgramSession.h \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h \
+    Source/Controllers/Controller.h \
     Source/Controllers/ControllerCapability.h \
     Source/Controllers/ControllerConnection.h \
     Source/Controllers/ControllerSelectorWidget.h \
@@ -1546,7 +1546,6 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h \
@@ -1556,7 +1555,6 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h \

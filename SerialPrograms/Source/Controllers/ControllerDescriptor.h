@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Controllers_Controller_H
-#define PokemonAutomation_Controllers_Controller_H
+#ifndef PokemonAutomation_Controllers_ControllerDescriptor_H
+#define PokemonAutomation_Controllers_ControllerDescriptor_H
 
 #include <string>
 #include <memory>

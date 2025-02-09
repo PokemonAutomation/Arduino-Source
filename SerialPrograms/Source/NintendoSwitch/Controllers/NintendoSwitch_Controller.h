@@ -11,8 +11,10 @@
 
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/CancellableScope.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "ClientSource/Connection/BotBaseMessage.h"
+#include "Controllers/Controller.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -75,9 +77,12 @@ inline std::string dpad_to_string(DpadPosition dpad){
 //  Currently we only have one implementation (SerialPABotBase). But we expect
 //  to add more in the future.
 //
-class SwitchController{
+class SwitchController : public Controller{
 public:
     using ContextType = SwitchControllerContext;
+
+    virtual ~SwitchController();
+    SwitchController();
 
     virtual Logger& logger() = 0;
 
@@ -90,7 +95,7 @@ public:
 
     //  Cancel all commands. This returns the controller to the neutral button
     //  state and clears the command queue.
-    virtual void cancel_all(const Cancellable* cancellable) = 0;
+    virtual void cancel_all_commands(const Cancellable* cancellable) = 0;
 
     //  Declare that the next command will replace the current command stream
     //  with no gaps.
@@ -295,6 +300,18 @@ public:
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) = 0;
 
+
+public:
+    //  Keyboard Input
+
+    virtual void keyboard_release_all() override;
+    virtual void keyboard_press(const QKeyEvent& event) override;
+    virtual void keyboard_release(const QKeyEvent& event) override;
+
+
+private:
+    class KeyboardManager;
+    Pimpl<KeyboardManager> m_keyboard_manager;
 };
 
 
@@ -339,7 +356,7 @@ public:
     void cancel_now(){
         m_lifetime_sanitizer.check_usage();
         CancellableScope::cancel(nullptr);
-        m_controller.cancel_all(this);
+        m_controller.cancel_all_commands(this);
     }
 
     //  Stop the commands in this context, but do it lazily.
@@ -362,7 +379,7 @@ public:
             return true;
         }
         try{
-            m_controller.cancel_all(this);
+            m_controller.cancel_all_commands(this);
         }catch (...){}
         return false;
     }

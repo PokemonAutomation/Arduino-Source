@@ -8,7 +8,6 @@
 #define PokemonAutomation_AbstractBotBase_H
 
 #include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/LifetimeSanitizer.h"
 
 namespace PokemonAutomation{
 
@@ -69,66 +68,6 @@ public:
         const Cancellable* cancelled = nullptr
     ) = 0;
 
-};
-
-
-
-class ControllerContext0 : public CancellableScope{
-public:
-    virtual void wait_for_all_requests() const = 0;
-    virtual void cancel_now() = 0;
-    virtual void cancel_lazy() = 0;
-};
-
-
-//  A wrapper for BotBase that allows for asynchronous cancelling.
-class BotBaseControllerContext final : public ControllerContext0{
-public:
-    using ControllerType = BotBaseController;
-
-public:
-    BotBaseControllerContext(BotBaseController& botbase)
-        : m_controller(botbase)
-    {}
-    BotBaseControllerContext(CancellableScope& parent, BotBaseController& botbase)
-        : m_controller(botbase)
-    {
-        attach(parent);
-    }
-    virtual ~BotBaseControllerContext(){
-        detach();
-    }
-
-
-    virtual void wait_for_all_requests() const override;
-
-    operator BotBaseController&() const{ return m_controller; }
-    BotBaseController& controller() const{ return m_controller; }
-
-    //  Stop all commands in this context now.
-    virtual void cancel_now() override;
-
-    //  Stop the commands in this context, but do it lazily.
-    //  Still will stop new commands from being issued to the device,
-    //  and will tell the device that the next command that is issued
-    //  should replace the command queue.
-    //  This cancel is used when you need continuity from an ongoing
-    //  sequence.
-    virtual void cancel_lazy() override;
-
-
-    virtual bool cancel(std::exception_ptr exception) noexcept override;
-
-
-public:
-    bool try_issue_request(const BotBaseRequest& request) const;
-    void issue_request(const BotBaseRequest& request) const;
-    BotBaseMessage issue_request_and_wait(const BotBaseRequest& request) const;
-
-
-private:
-    BotBaseController& m_controller;
-    LifetimeSanitizer m_lifetime_sanitizer;
 };
 
 

@@ -26,6 +26,7 @@ public:
         return BotBaseMessage(PABB_MSG_REQUEST_CLOCK, params);
     }
 };
+#if 0
 class DeviceRequest_set_leds : public BotBaseRequest{
 public:
     pabb_MsgCommandSetLeds params;
@@ -51,6 +52,7 @@ public:
         return BotBaseMessage(PABB_MSG_COMMAND_END_PROGRAM_CALLBACK, params);
     }
 };
+#endif
 
 
 

@@ -83,6 +83,9 @@ std::string ControllerSession::status_text() const{
     }
     return m_connection->status_text();
 }
+Controller* ControllerSession::controller() const{
+    return dynamic_cast<Controller*>(m_connection.get());
+}
 ControllerConnection& ControllerSession::connection() const{
     if (m_connection){
         return *m_connection;

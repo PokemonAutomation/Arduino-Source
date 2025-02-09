@@ -13,9 +13,10 @@
 //#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h"
 #include "NintendoSwitch_SerialPABotBase.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 
 namespace PokemonAutomation{
@@ -109,10 +110,16 @@ SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     , m_handle(m_logger, &descriptor.port(), requirements)
     , m_serial(m_handle.botbase())
 {
+//    requirements.check_compatibility(
+//        SerialPABotBase::NintendoSwitch_Basic,
+//        m_handle.
+//    );
+
+
     m_status_text = m_handle.status_text();
     m_handle.add_listener(*this);
+    m_ready.store(m_handle.state() == BotBaseHandle::State::READY, std::memory_order_release);
 }
-
 
 
 
@@ -139,7 +146,7 @@ void SwitchController_SerialPABotBase::wait_for_all(const Cancellable* cancellab
     m_serial->wait_for_all_requests(cancellable);
 //    cout << "wait_for_all() - exit" << endl;
 }
-void SwitchController_SerialPABotBase::cancel_all(const Cancellable* cancellable){
+void SwitchController_SerialPABotBase::cancel_all_commands(const Cancellable* cancellable){
     if (!m_serial){
         throw InvalidConnectionStateException();
     }
@@ -200,6 +207,11 @@ BotBaseMessage SwitchController_SerialPABotBase::send_botbase_request_and_wait(
     }
     return m_serial->issue_request_and_wait(request, cancellable);
 }
+
+
+
+
+
 
 
 

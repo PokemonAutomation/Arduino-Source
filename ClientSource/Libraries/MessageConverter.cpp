@@ -349,15 +349,6 @@ std::string message_to_string(const BotBaseMessage& message){
 }
 
 
-std::string program_name(uint8_t id){
-    switch (id){
-    case PABB_PID_UNSPECIFIED:              return "Microcontroller Program";
-    case PABB_PID_PABOTBASE_12KB:           return "PABotBase-12KB";
-    case PABB_PID_PABOTBASE_31KB:           return "PABotBase-31KB";
-    default: return "Unknown ID";
-    }
-}
-
 
 
 

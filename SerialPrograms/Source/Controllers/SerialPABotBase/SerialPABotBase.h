@@ -36,12 +36,10 @@ const char* to_string(Features feature);
 extern const std::pair<std::string, std::set<std::string>> OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS;
 
 
-//  Internal Parsing
-std::set<std::string> program_id_to_features(uint8_t id);
 
 
 
-
+std::string program_name(uint8_t id);
 
 extern const std::map<
     uint32_t,   //  Protocol Version

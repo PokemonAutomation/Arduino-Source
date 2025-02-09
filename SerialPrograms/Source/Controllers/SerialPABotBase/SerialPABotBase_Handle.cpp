@@ -425,7 +425,7 @@ void BotBaseHandle::thread_body(){
         }
     });
 
-    BotBaseControllerContext context(*m_botbase);
+    CancellableHolder<CancellableScope> scope;
 
     while (true){
         if (m_state.load(std::memory_order_acquire) != State::READY){
@@ -435,15 +435,12 @@ void BotBaseHandle::thread_body(){
         std::string str;
         std::string error;
         try{
-//            cout << "system_clock()" << endl;
             pabb_MsgAckRequestI32 response;
-            context.issue_request_and_wait(
-                NintendoSwitch::DeviceRequest_system_clock()
-            ).convert<PABB_MSG_ACK_REQUEST_I32>(context.controller().logger(), response);
+            m_botbase->issue_request_and_wait(
+                NintendoSwitch::DeviceRequest_system_clock(),
+                &scope
+            ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
             uint32_t wallclock = response.data;
-
-//            uint32_t wallclock = NintendoSwitch::system_clock(context);
-//            cout << "system_clock() - done" << endl;
             str = ticks_to_time(NintendoSwitch::TICKS_PER_SECOND, wallclock);
         }catch (InvalidConnectionStateException&){
             break;

@@ -6,7 +6,6 @@
 
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
-#include "NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_Commands_Superscalar.h"

@@ -9,9 +9,7 @@
 
 #include <thread>
 #include <condition_variable>
-#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "CommonFramework/Globals.h"
 #include "KeyboardStateTracker.h"
 
 class QKeyEvent;
@@ -43,7 +41,7 @@ public:
 class KeyboardInputController{
 public:
     KeyboardInputController(
-        bool allow_commands_while_running,
+        bool enabled,
         std::chrono::milliseconds retry_delay = std::chrono::milliseconds(10)
     );
     virtual ~KeyboardInputController();
@@ -56,35 +54,27 @@ public:
     void on_key_release(const QKeyEvent& key);
 
 
-public:
-    //  Call from any thread.
-    ProgramState last_known_state() const;
-    void on_state_changed(ProgramState state);
-
-
 protected:
     void start();   //  Child class must call this at end of constructor.
     void stop();    //  Child class must call this at start of destructor.
 
     virtual std::unique_ptr<ControllerState> make_state() const = 0;
     virtual void update_state(ControllerState& state, const std::set<uint32_t>& pressed_keys) = 0;
-    virtual bool try_stop_commands() = 0;
-    virtual bool try_next_interrupt() = 0;
-    virtual bool try_send_state(const ControllerState& state) = 0;
+    virtual void cancel_all_commands() = 0;
+    virtual void replace_on_next_command() = 0;
+    virtual void send_state(const ControllerState& state) = 0;
 
 private:
     void thread_loop();
 
 
 private:
-    const bool m_allow_commands_while_running;
     const std::chrono::milliseconds m_retry_delay;
 
     //  Controller State
     SpinLock m_state_lock;
     KeyboardStateTracker m_state_tracker;
 
-    std::atomic<ProgramState> m_last_known_state;
     std::atomic<bool> m_stop;
 
     std::mutex m_sleep_lock;

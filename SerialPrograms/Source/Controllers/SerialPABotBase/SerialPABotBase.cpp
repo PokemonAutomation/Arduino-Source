@@ -41,29 +41,20 @@ const std::pair<std::string, std::set<std::string>> OLD_NINTENDO_SWITCH_DEFAULT_
 };
 
 
-//  Internal Parsing
-std::set<std::string> program_id_to_features(uint8_t id){
-    switch (id){
-    case PABB_PID_PABOTBASE_12KB:
-        return {
-            to_string(Features::TickPrecise),
-            to_string(Features::NintendoSwitch_Basic),
-            to_string(Features::NintendoSwitch_SSF),
-            to_string(Features::NintendoSwitch_Macros),
-//            to_string(Features::NintendoSwitch_DateSkip),
-        };
-    case PABB_PID_PABOTBASE_31KB:
-        return {
-            to_string(Features::TickPrecise),
-            to_string(Features::NintendoSwitch_Basic),
-            to_string(Features::NintendoSwitch_SSF),
-            to_string(Features::NintendoSwitch_Macros),
-            to_string(Features::NintendoSwitch_DateSkip),
-        };
-    }
-    return {};
-}
 
+
+
+
+
+
+std::string program_name(uint8_t id){
+    switch (id){
+    case PABB_PID_UNSPECIFIED:      return "Microcontroller Program";
+    case PABB_PID_PABOTBASE_12KB:   return "PABotBase-AVR8-12KB";
+    case PABB_PID_PABOTBASE_31KB:   return "PABotBase-AVR8-31KB";
+    default: return "Unknown ID";
+    }
+}
 
 
 

@@ -609,6 +609,7 @@ file(GLOB MAIN_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
+    Source/Controllers/Controller.h
     Source/Controllers/ControllerCapability.h
     Source/Controllers/ControllerDescriptor.cpp
     Source/Controllers/ControllerDescriptor.h
@@ -622,6 +623,7 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
     Source/Controllers/KeyboardInput/KeyboardInput.cpp
     Source/Controllers/KeyboardInput/KeyboardInput.h
+    Source/Controllers/KeyboardInput/KeyboardStateTracker.cpp
     Source/Controllers/KeyboardInput/KeyboardStateTracker.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
@@ -802,8 +804,6 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp
@@ -819,8 +819,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.cpp
