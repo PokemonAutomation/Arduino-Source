@@ -26,12 +26,25 @@ std::string ControllerConnection::status_text() const{
     return m_status_text;
 }
 
-void ControllerConnection::signal_ready_changed(bool ready){
-    m_status_listeners.run_method_unique(&StatusListener::ready_changed, ready);
+
+void ControllerConnection::set_status(const std::string& text){
+    {
+        WriteSpinLock lg(m_status_text_lock);
+        m_status_text = text;
+    }
+    signal_status_text_changed(text);
+}
+
+
+void ControllerConnection::signal_pre_not_ready(){
+    m_status_listeners.run_method_unique(&StatusListener::pre_not_ready);
+}
+void ControllerConnection::signal_post_ready(const std::set<std::string>& capabilities){
+    m_status_listeners.run_method_unique(&StatusListener::post_ready, capabilities);
 }
 void ControllerConnection::signal_status_text_changed(const std::string& text){
 //    cout << "m_status_listeners.size() = " << m_status_listeners.count_unique() << endl;
-    m_status_listeners.run_method_unique(&StatusListener::status_text_changed, text);
+    m_status_listeners.run_method_unique(&StatusListener::post_status_text_changed, text);
 }
 
 

@@ -104,7 +104,7 @@ void ControllerSelectorWidget::controller_changed(const std::shared_ptr<const Co
         refresh();
     });
 }
-void ControllerSelectorWidget::status_text_changed(const std::string& text){
+void ControllerSelectorWidget::post_status_text_changed(const std::string& text){
 //    cout << "ControllerSelectorWidget::status_text_changed(): " << text << endl;
     QMetaObject::invokeMethod(this, [this, text]{
         m_status_text->setText(QString::fromStdString(text));

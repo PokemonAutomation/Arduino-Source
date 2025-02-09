@@ -32,7 +32,6 @@ public:
     virtual bool operator!=(const ControllerState& x) const{ return !(*this == x); }
 
     virtual bool is_neutral() const = 0;
-    virtual bool send_to_controller(ControllerSession& controller) const = 0;
 };
 
 

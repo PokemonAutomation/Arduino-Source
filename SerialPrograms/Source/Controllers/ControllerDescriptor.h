@@ -96,6 +96,7 @@ public:
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
 
+    virtual std::unique_ptr<ControllerConnection> open(Logger& logger) const = 0;
     virtual std::unique_ptr<ControllerConnection> open(
         Logger& logger,
         const ControllerRequirements& requirements

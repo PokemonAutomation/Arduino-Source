@@ -192,7 +192,7 @@ void ControllerSession::signal_controller_changed(const std::shared_ptr<const Co
     m_listeners.run_method_unique(&Listener::controller_changed, descriptor);
 }
 void ControllerSession::signal_status_text_changed(const std::string& text){
-    m_listeners.run_method_unique(&Listener::status_text_changed, text);
+    m_listeners.run_method_unique(&Listener::post_status_text_changed, text);
 }
 void ControllerSession::signal_options_locked(bool locked){
     m_listeners.run_method_unique(&Listener::options_locked, locked);

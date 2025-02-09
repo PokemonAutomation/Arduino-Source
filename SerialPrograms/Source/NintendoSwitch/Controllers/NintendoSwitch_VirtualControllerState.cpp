@@ -4,8 +4,6 @@
  *
  */
 
-#include "Controllers/ControllerSession.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch_VirtualControllerState.h"
 
 //#include <iostream>
@@ -65,28 +63,6 @@ bool SwitchControllerState::is_neutral() const{
         && left_y == 128
         && right_x == 128
         && right_y == 128;
-}
-bool SwitchControllerState::send_to_controller(ControllerSession& controller) const{
-    controller.logger().log(
-        "VirtualController: (" + button_to_string(buttons) +
-        "), dpad(" + dpad_to_string(dpad) +
-        "), LJ(" + std::to_string(left_x) + "," + std::to_string(left_y) +
-        "), RJ(" + std::to_string(right_x) + "," + std::to_string(right_y) +
-        ")",
-        COLOR_DARKGREEN
-    );
-    return controller.try_run<SwitchController>([this](SwitchController& controller){
-        controller.issue_controller_state(
-            nullptr,
-            buttons,
-            dpad,
-            left_x,
-            left_y,
-            right_x,
-            right_y,
-            255*8ms
-        );
-    }).empty();
 }
 
 

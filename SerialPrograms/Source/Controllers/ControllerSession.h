@@ -25,7 +25,7 @@ public:
     struct Listener : ControllerConnection::StatusListener{
         virtual void ready_changed(bool ready){}
         virtual void controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor){}
-        virtual void status_text_changed(const std::string& text){}
+        virtual void post_status_text_changed(const std::string& text){}
         virtual void options_locked(bool locked){}
     };
 

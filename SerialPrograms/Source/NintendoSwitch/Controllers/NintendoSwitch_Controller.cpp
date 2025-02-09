@@ -72,6 +72,14 @@ public:
     }
     virtual void send_state(const ControllerState& state) override{
         const SwitchControllerState& switch_state = static_cast<const SwitchControllerState&>(state);
+        m_controller.logger().log(
+            "VirtualController: (" + button_to_string(switch_state.buttons) +
+            "), dpad(" + dpad_to_string(switch_state.dpad) +
+            "), LJ(" + std::to_string(switch_state.left_x) + "," + std::to_string(switch_state.left_y) +
+            "), RJ(" + std::to_string(switch_state.right_x) + "," + std::to_string(switch_state.right_y) +
+            ")",
+            COLOR_DARKGREEN
+        );
         m_controller.issue_controller_state(
             nullptr,
             switch_state.buttons,

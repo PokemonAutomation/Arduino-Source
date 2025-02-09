@@ -23,6 +23,8 @@ public:
     virtual std::string display_name() const override;
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+
+    virtual std::unique_ptr<ControllerConnection> open(Logger& logger) const override;
     virtual std::unique_ptr<ControllerConnection> open(
         Logger& logger,
         const ControllerRequirements& requirements

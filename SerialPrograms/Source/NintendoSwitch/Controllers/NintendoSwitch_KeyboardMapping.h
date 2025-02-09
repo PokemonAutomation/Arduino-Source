@@ -46,8 +46,6 @@ private:
 
 public:
     StringCell label;
-//    SimpleIntegerCell<uint32_t> qt_key;
-//    StringCell key;
     KeyBindingCell key;
     SimpleIntegerCell<uint16_t> buttons;
     SimpleIntegerCell<int8_t> dpad_x;

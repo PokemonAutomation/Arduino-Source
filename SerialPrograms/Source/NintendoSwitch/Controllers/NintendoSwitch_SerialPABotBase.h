@@ -42,6 +42,7 @@ public:
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    virtual std::unique_ptr<ControllerConnection> open(Logger& logger) const override;
     virtual std::unique_ptr<ControllerConnection> open(
         Logger& logger,
         const ControllerRequirements& requirements
@@ -70,7 +71,7 @@ PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
 class SwitchController_SerialPABotBase :
     public ControllerConnection,
     public SwitchControllerWithScheduler,
-    private BotBaseHandle::Listener
+    private ControllerConnection::StatusListener
 {
 public:
     using ContextType = SwitchControllerContext;
@@ -125,9 +126,12 @@ private:
 
 private:
     SerialLogger m_logger;
+    const ControllerRequirements& m_requirements;
 
     BotBaseHandle m_handle;
     BotBaseController* m_serial;
+
+    std::string m_status_override;
 };
 
 

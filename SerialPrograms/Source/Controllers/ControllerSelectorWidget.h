@@ -25,7 +25,7 @@ public:
 
 public:
     virtual void controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor) override;
-    virtual void status_text_changed(const std::string& text) override;
+    virtual void post_status_text_changed(const std::string& text) override;
     virtual void options_locked(bool locked) override;
 
 private:

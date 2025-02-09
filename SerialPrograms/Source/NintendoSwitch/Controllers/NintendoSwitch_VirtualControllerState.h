@@ -11,7 +11,6 @@
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 
 namespace PokemonAutomation{
-    class ControllerSession;
 namespace NintendoSwitch{
 
 
@@ -22,7 +21,6 @@ public:
     virtual bool operator==(const ControllerState& x) const override;
 
     virtual bool is_neutral() const override;
-    virtual bool send_to_controller(ControllerSession& controller) const override;
 
 public:
     Button buttons = BUTTON_NONE;
