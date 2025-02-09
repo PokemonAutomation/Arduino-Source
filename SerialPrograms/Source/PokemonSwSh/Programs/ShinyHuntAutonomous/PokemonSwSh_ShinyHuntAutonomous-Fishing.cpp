@@ -7,7 +7,6 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -102,8 +101,6 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Sw
 
     WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
     WallClock last_touch = current_time();
-//    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-//    uint32_t last_touch = system_clock(context);
 
     ShinyHuntAutonomousFishing_Descriptor::Stats& stats = env.current_stats<ShinyHuntAutonomousFishing_Descriptor::Stats>();
     env.update_stats();
@@ -118,7 +115,6 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Sw
     while (true){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && current_time() - last_touch >= PERIOD){
-//        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
             pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
             rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

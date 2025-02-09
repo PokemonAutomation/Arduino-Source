@@ -110,11 +110,9 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
     );
 
     WallClock last_touch = current_time();
-//    uint32_t last_touch = 0;
     if (TOUCH_DATE_INTERVAL > 0ms){
         touch_date_from_home(host, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         last_touch = current_time();
-//        last_touch = system_clock(host);
     }
     env.run_in_parallel(
         scope,

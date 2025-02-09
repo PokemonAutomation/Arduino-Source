@@ -11,7 +11,6 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
@@ -37,7 +36,6 @@ static RaidLobbyState raid_lobby_wait(
     WallClock start = current_time();
     WallClock deadline_start_time = start + lobby_wait_delay;
     WallClock deadline_lobby_limit = start + FULL_LOBBY_TIMER;
-//    uint32_t start = system_clock(context);
     RaidLobbyReader inference(stream.logger(), stream.overlay());
     RaidLobbyState state;
 
@@ -51,9 +49,7 @@ static RaidLobbyState raid_lobby_wait(
         );
         context.wait_for_all_requests();
         WallDuration time_elapsed = current_time() - start;
-//        uint32_t time_elapsed = system_clock(context) - start;
         WallDuration delay = time_elapsed;
-//        uint32_t delay = time_elapsed;
 
         while (true){
             state = inference.read(stream.video().snapshot());
