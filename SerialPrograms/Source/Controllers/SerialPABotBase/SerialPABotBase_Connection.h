@@ -52,7 +52,6 @@ private:
 private:
     SerialLogger m_logger;
 
-    const QSerialPortInfo* m_port;
     uint32_t m_protocol = 0;
     uint8_t m_program_id = 0;
     std::map<ControllerType, std::set<ControllerFeature>> m_controllers;

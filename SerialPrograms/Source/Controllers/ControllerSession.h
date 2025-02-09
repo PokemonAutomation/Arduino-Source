@@ -84,12 +84,12 @@ public:
     template <typename ControllerType, typename Lambda>
     std::string try_run(Lambda&& function) noexcept{
         std::lock_guard<std::mutex> lg(m_state_lock);
-        if (!m_connection){
-            return "Connection is null.";
+        if (!m_controller){
+            return "Controller is null.";
         }
         try{
             //  This will be a cross-cast in most cases.
-            ControllerType* child = dynamic_cast<ControllerType*>(m_connection.get());
+            ControllerType* child = dynamic_cast<ControllerType*>(m_controller.get());
             if (child == nullptr){
                 m_logger.log("ControllerSession::try_run(): Incompatible controller type cast.", COLOR_RED);
                 return "Incompatible controller type cast.";
