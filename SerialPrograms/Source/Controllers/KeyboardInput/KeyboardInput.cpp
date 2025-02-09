@@ -16,12 +16,8 @@ namespace PokemonAutomation{
 
 
 KeyboardInputController::~KeyboardInputController() = default;
-KeyboardInputController::KeyboardInputController(
-    bool enabled,
-    std::chrono::milliseconds retry_delay
-)
-    : m_retry_delay(retry_delay)
-    , m_stop(false)
+KeyboardInputController::KeyboardInputController(bool enabled)
+    : m_stop(false)
 {}
 
 void KeyboardInputController::start(){

@@ -40,10 +40,7 @@ public:
 
 class KeyboardInputController{
 public:
-    KeyboardInputController(
-        bool enabled,
-        std::chrono::milliseconds retry_delay = std::chrono::milliseconds(10)
-    );
+    KeyboardInputController(bool enabled);
     virtual ~KeyboardInputController();
 
 
@@ -69,8 +66,6 @@ private:
 
 
 private:
-    const std::chrono::milliseconds m_retry_delay;
-
     //  Controller State
     SpinLock m_state_lock;
     KeyboardStateTracker m_state_tracker;
