@@ -23,7 +23,7 @@ extern const char NintendoSwitch_Basic[];
 
 
 //  Defaults
-extern const std::pair<std::string, std::set<ControllerFeature>> OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS;
+extern const ControllerRequirements OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS;
 
 
 

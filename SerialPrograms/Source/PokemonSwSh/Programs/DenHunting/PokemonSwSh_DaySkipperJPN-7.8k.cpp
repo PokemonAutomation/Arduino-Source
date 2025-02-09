@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -27,13 +26,11 @@ DaySkipperJPN7p8k_Descriptor::DaySkipperJPN7p8k_Descriptor()
         "A faster, but less reliable Japanese date skipper. (7800 skips/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {{
-            SerialPABotBase::NintendoSwitch_Basic, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }
-        }}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+            ControllerFeature::NintendoSwitch_DateSkip,
+        }
     )
 {}
 std::unique_ptr<StatsTracker> DaySkipperJPN7p8k_Descriptor::make_stats() const{

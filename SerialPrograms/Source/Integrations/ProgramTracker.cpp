@@ -8,7 +8,7 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Controllers/ControllerSession.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h"
 #include "ProgramTracker.h"

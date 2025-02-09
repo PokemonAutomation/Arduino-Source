@@ -12,7 +12,7 @@
 #include "ClientSource/Connection/BotBase.h"
 #include "Controllers/ControllerDescriptor.h"
 #include "Controllers/ControllerConnection.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
 #include "NintendoSwitch_ControllerWithScheduler.h"
 
 namespace PokemonAutomation{
@@ -81,7 +81,7 @@ public:
     ~SwitchController_SerialPABotBase();
     SwitchController_SerialPABotBase(
         Logger& logger,
-        BotBaseHandle& connection,
+        SerialPABotBase::SerialPABotBaseConnection& connection,
         const ControllerRequirements& requirements
     );
 
@@ -130,7 +130,7 @@ private:
     Logger& m_logger;
     const ControllerRequirements& m_requirements;
 
-    BotBaseHandle& m_handle;
+    SerialPABotBase::SerialPABotBaseConnection& m_handle;
     BotBaseController* m_serial;
 
     std::string m_error_string;

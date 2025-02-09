@@ -16,7 +16,6 @@
 namespace PokemonAutomation{
 
 class JsonValue;
-class ControllerRequirements;
 class AbstractControllerType;
 class ControllerDescriptor;
 class ControllerConnection;

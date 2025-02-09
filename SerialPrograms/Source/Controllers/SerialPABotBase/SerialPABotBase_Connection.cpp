@@ -22,21 +22,20 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
 #include "SerialPABotBase.h"
-#include "SerialPABotBase_Handle.h"
+#include "SerialPABotBase_Connection.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
-
-using namespace SerialPABotBase;
-
+namespace SerialPABotBase{
 
 
 
 
-BotBaseHandle::BotBaseHandle(Logger& logger, const QSerialPortInfo* port)
+
+SerialPABotBaseConnection::SerialPABotBaseConnection(Logger& logger, const QSerialPortInfo* port)
     : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
     , m_port(port)
 {
@@ -82,9 +81,9 @@ BotBaseHandle::BotBaseHandle(Logger& logger, const QSerialPortInfo* port)
         return;
     }
 
-    m_status_thread = std::thread(run_with_catch, "BotBaseHandle::thread_body()", [this]{ thread_body(); });
+    m_status_thread = std::thread(run_with_catch, "SerialPABotBaseConnection::thread_body()", [this]{ thread_body(); });
 }
-BotBaseHandle::~BotBaseHandle(){
+SerialPABotBaseConnection::~SerialPABotBaseConnection(){
     m_ready.store(false, std::memory_order_release);
     signal_pre_not_ready();
     if (m_botbase == nullptr){
@@ -102,7 +101,7 @@ BotBaseHandle::~BotBaseHandle(){
 }
 
 
-void BotBaseHandle::update_with_capabilities(const std::set<ControllerFeature>& capabilities){
+void SerialPABotBaseConnection::update_with_capabilities(const std::set<ControllerFeature>& capabilities){
     Logger& logger = m_logger;
 
     do{
@@ -132,16 +131,16 @@ void BotBaseHandle::update_with_capabilities(const std::set<ControllerFeature>& 
 
 
 
-BotBaseController* BotBaseHandle::botbase(){
+BotBaseController* SerialPABotBaseConnection::botbase(){
     BotBaseController* ret = m_botbase.get();
     if (ret == nullptr){
-        m_logger.log("BotBaseHandle::botbase() called with null botbase...", COLOR_RED);
+        m_logger.log("SerialPABotBaseConnection::botbase() called with null botbase...", COLOR_RED);
     }
     return ret;
 }
 
 
-void BotBaseHandle::set_label_text(const std::string& text, Color color){
+void SerialPABotBaseConnection::set_label_text(const std::string& text, Color color){
     m_label = html_color_text(text, color);
 
     std::string status = m_label;
@@ -153,7 +152,7 @@ void BotBaseHandle::set_label_text(const std::string& text, Color color){
     }
     set_status(status);
 }
-void BotBaseHandle::set_uptime_text(const std::string& text, Color color){
+void SerialPABotBaseConnection::set_uptime_text(const std::string& text, Color color){
     m_uptime = html_color_text(text, color);
 
     std::string status = m_label;
@@ -170,13 +169,13 @@ void BotBaseHandle::set_uptime_text(const std::string& text, Color color){
 
 
 
-std::map<ControllerType, std::set<ControllerFeature>> BotBaseHandle::supported_controllers() const{
+std::map<ControllerType, std::set<ControllerFeature>> SerialPABotBaseConnection::supported_controllers() const{
     std::lock_guard<std::mutex> lg(m_lock);
     return m_controllers;
 }
 
 
-std::map<ControllerType, std::set<ControllerFeature>> BotBaseHandle::read_device_specs(){
+std::map<ControllerType, std::set<ControllerFeature>> SerialPABotBaseConnection::read_device_specs(){
     Logger& logger = m_logger;
 
 
@@ -225,7 +224,7 @@ std::map<ControllerType, std::set<ControllerFeature>> BotBaseHandle::read_device
 
 
 
-void BotBaseHandle::thread_body(){
+void SerialPABotBaseConnection::thread_body(){
     using namespace PokemonAutomation;
 
     m_botbase->set_sniffer(&m_logger);
@@ -358,4 +357,5 @@ void BotBaseHandle::thread_body(){
 
 
 
+}
 }

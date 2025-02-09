@@ -16,12 +16,9 @@ const char NintendoSwitch_Basic[] = "NintendoSwitch-SerialPABotBase";
 
 
 //  Defaults
-const std::pair<std::string, std::set<ControllerFeature>> OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
-    NintendoSwitch_Basic,
-    {
-        ControllerFeature::TickPrecise,
-        ControllerFeature::NintendoSwitch_ProController,
-    }
+const ControllerRequirements OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
+    ControllerFeature::TickPrecise,
+    ControllerFeature::NintendoSwitch_ProController,
 };
 
 

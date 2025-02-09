@@ -21,14 +21,14 @@
 class QSerialPortInfo;
 
 namespace PokemonAutomation{
+    class PABotBase;
+namespace SerialPABotBase{
 
-class PABotBase;
 
-
-class BotBaseHandle : public ControllerConnection{
+class SerialPABotBaseConnection : public ControllerConnection{
 public:
-    BotBaseHandle(Logger& logger, const QSerialPortInfo* port);
-    ~BotBaseHandle();
+    SerialPABotBaseConnection(Logger& logger, const QSerialPortInfo* port);
+    ~SerialPABotBaseConnection();
 
     void update_with_capabilities(const std::set<ControllerFeature>& capabilities);
 
@@ -69,5 +69,6 @@ private:
 
 
 
+}
 }
 #endif

@@ -88,7 +88,7 @@ JsonValue SwitchController_SerialPABotBase_Descriptor::to_json() const{
 std::unique_ptr<ControllerConnection> SwitchController_SerialPABotBase_Descriptor::open_connection(
     Logger& logger
 ) const{
-    return std::unique_ptr<ControllerConnection>(new BotBaseHandle(logger, &m_port));
+    return std::unique_ptr<ControllerConnection>(new SerialPABotBase::SerialPABotBaseConnection(logger, &m_port));
 }
 std::unique_ptr<AbstractController> SwitchController_SerialPABotBase_Descriptor::make_controller(
     Logger& logger,
@@ -102,7 +102,7 @@ std::unique_ptr<AbstractController> SwitchController_SerialPABotBase_Descriptor:
             std::string("Unsupported Controller Type: ") + to_string(controller_type)
         );
     }
-    BotBaseHandle& actual = static_cast<BotBaseHandle&>(connection);
+    SerialPABotBase::SerialPABotBaseConnection& actual = static_cast<SerialPABotBase::SerialPABotBaseConnection&>(connection);
     return std::unique_ptr<AbstractController>(
         new SwitchController_SerialPABotBase(logger, actual, requirements)
     );
@@ -118,7 +118,7 @@ SwitchController_SerialPABotBase::~SwitchController_SerialPABotBase(){
 }
 SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     Logger& logger,
-    BotBaseHandle& connection,
+    SerialPABotBase::SerialPABotBaseConnection& connection,
     const ControllerRequirements& requirements
 )
     : SwitchControllerWithScheduler(logger)
@@ -143,10 +143,7 @@ SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
             break;
         }
 
-        missing_feature = m_requirements.check_compatibility(
-            SerialPABotBase::NintendoSwitch_Basic,
-            iter->second
-        );
+        missing_feature = m_requirements.check_compatibility(iter->second);
 
         if (missing_feature.empty()){
             m_handle.update_with_capabilities(iter->second);

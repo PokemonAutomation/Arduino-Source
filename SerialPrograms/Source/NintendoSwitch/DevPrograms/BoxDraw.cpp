@@ -6,7 +6,6 @@
 
 #include <mutex>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "BoxDraw.h"
 
 namespace PokemonAutomation{
@@ -21,7 +20,7 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
         "",
         "Test box coordinates for development.",
         FeedbackType::NONE, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {{SerialPABotBase::NintendoSwitch_Basic, {ControllerFeature::NintendoSwitch_ProController}}}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

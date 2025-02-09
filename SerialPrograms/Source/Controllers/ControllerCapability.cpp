@@ -11,6 +11,8 @@ namespace PokemonAutomation{
 
 const char* to_string(ControllerType type){
     switch (type){
+    case ControllerType::None:
+        return "None";
     case ControllerType::NintendoSwitch_WiredProController:
         return "NintendoSwitch_WiredProController";
     case ControllerType::NintendoSwitch_WirelessProController:
@@ -41,6 +43,26 @@ const char* to_string(ControllerFeature feature){
     return nullptr;
 }
 
+
+
+
+
+
+ControllerRequirements::ControllerRequirements(std::initializer_list<ControllerFeature> args)
+    : m_features(std::move(args))
+    , m_sanitizer("ControllerRequirements")
+{}
+
+std::string ControllerRequirements::check_compatibility(const std::set<ControllerFeature>& features) const{
+    auto scope_check = m_sanitizer.check_scope();
+
+    for (ControllerFeature feature : m_features){
+        if (features.find(feature) == features.end()){
+            return to_string(feature);
+        }
+    }
+    return "";
+}
 
 
 

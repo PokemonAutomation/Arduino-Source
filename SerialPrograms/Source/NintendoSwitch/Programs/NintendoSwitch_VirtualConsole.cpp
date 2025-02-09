@@ -8,7 +8,6 @@
 #include <QScrollArea>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_VirtualConsole.h"
 
@@ -23,9 +22,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/VirtualConsole.md",
         "Play your Switch from your computer. Device logging is logged to the output window."
     )
-    , m_requirements({
-        {SerialPABotBase::NintendoSwitch_Basic, {ControllerFeature::NintendoSwitch_ProController}}
-    })
+    , m_requirements({ControllerFeature::NintendoSwitch_ProController})
 {}
 
 

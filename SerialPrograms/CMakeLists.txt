@@ -632,9 +632,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SuperscalarScheduler.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp

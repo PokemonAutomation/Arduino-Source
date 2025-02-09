@@ -41,6 +41,12 @@ std::vector<std::shared_ptr<const ControllerDescriptor>>
 get_compatible_descriptors(const ControllerRequirements& requirements){
     std::vector<std::shared_ptr<const ControllerDescriptor>> ret;
 
+    for (const auto& controller_interface : CONTROLLER_TYPES){
+        std::vector<std::shared_ptr<const ControllerDescriptor>> list = controller_interface.second->list();
+        std::move(list.begin(), list.end(), std::back_inserter(ret));
+    }
+
+#if 0
     //  Find all the devices in common between the supported list and the
     //  required list. For each of those, enumerate all the descriptors and
     //  combine them into a single list.
@@ -51,6 +57,7 @@ get_compatible_descriptors(const ControllerRequirements& requirements){
             std::move(list.begin(), list.end(), std::back_inserter(ret));
         }
     }
+#endif
 
     return ret;
 }
