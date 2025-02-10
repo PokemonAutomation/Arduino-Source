@@ -17,11 +17,11 @@ namespace PokemonAutomation{
 
 
 struct IntegerEnumDropdownCell::Data{
-    const IntegerEnumDatabase& m_database;
+    const IntegerEnumDropdownDatabase& m_database;
     const size_t m_default;
     std::atomic<size_t> m_current;
 
-    Data(const IntegerEnumDatabase& database, size_t default_value, size_t current_value)
+    Data(const IntegerEnumDropdownDatabase& database, size_t default_value, size_t current_value)
         : m_database(database)
         , m_default(default_value)
         , m_current(current_value)
@@ -37,7 +37,7 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(const IntegerEnumDropdownCell& 
     , m_data(CONSTRUCT_TOKEN, x.database(), x.default_value(), x.current_value())
 {}
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(
-    const IntegerEnumDatabase& database,
+    const IntegerEnumDropdownDatabase& database,
     LockMode lock_while_running,
     size_t default_value, size_t current_value
 )
@@ -52,7 +52,7 @@ IntegerEnumDropdownCell::IntegerEnumDropdownCell(
     }
 }
 IntegerEnumDropdownCell::IntegerEnumDropdownCell(
-    const IntegerEnumDatabase& database,
+    const IntegerEnumDropdownDatabase& database,
     LockMode lock_while_running,
     size_t default_value
 )
@@ -80,7 +80,7 @@ bool IntegerEnumDropdownCell::set_value(size_t value){
     }
     return true;
 }
-const IntegerEnumDatabase& IntegerEnumDropdownCell::database() const{
+const IntegerEnumDropdownDatabase& IntegerEnumDropdownCell::database() const{
     return m_data->m_database;
 }
 void IntegerEnumDropdownCell::load_json(const JsonValue& json){

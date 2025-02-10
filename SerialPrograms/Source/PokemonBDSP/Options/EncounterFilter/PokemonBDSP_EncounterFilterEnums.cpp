@@ -12,8 +12,8 @@ namespace PokemonBDSP{
 
 
 
-const EnumDatabase<ShinyFilter>& ShinyFilter_Database(){
-    static const EnumDatabase<ShinyFilter> database({
+const EnumDropdownDatabase<ShinyFilter>& ShinyFilter_Database(){
+    static const EnumDropdownDatabase<ShinyFilter> database({
         {ShinyFilter::ANYTHING,     "anything",     "Anything"},
         {ShinyFilter::NOT_SHINY,    "not-shiny",    "Not Shiny"},
         {ShinyFilter::SHINY,        "shiny",        "Shiny"},

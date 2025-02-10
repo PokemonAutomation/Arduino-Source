@@ -37,7 +37,7 @@ const TravelLocations& TravelLocations::instance(){
     static const TravelLocations locations;
     return locations;
 }
-const IntegerEnumDatabase& TravelLocations::database() const{
+const IntegerEnumDropdownDatabase& TravelLocations::database() const{
     return m_database;
 }
 

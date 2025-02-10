@@ -25,24 +25,24 @@ std::string gender_to_string(StatsHuntGenderFilter gender){
 }
 
 
-const EnumDatabase<StatsHuntAction>& StatsHuntAction_Database(){
-    static const EnumDatabase<StatsHuntAction> database({
+const EnumDropdownDatabase<StatsHuntAction>& StatsHuntAction_Database(){
+    static const EnumDropdownDatabase<StatsHuntAction> database({
         {StatsHuntAction::StopProgram,   "stop",     "Stop Program"},
         {StatsHuntAction::Keep,          "keep",     "Keep"},
 //        {EggHatchAction::Release,       "release",  "Release"},
     });
     return database;
 }
-const EnumDatabase<StatsHuntShinyFilter>& StatsHuntShinyFilter_Database(){
-    static const EnumDatabase<StatsHuntShinyFilter> database({
+const EnumDropdownDatabase<StatsHuntShinyFilter>& StatsHuntShinyFilter_Database(){
+    static const EnumDropdownDatabase<StatsHuntShinyFilter> database({
         {StatsHuntShinyFilter::Anything, "anything",     "Anything"},
         {StatsHuntShinyFilter::NotShiny, "not-shiny",    "Not Shiny"},
         {StatsHuntShinyFilter::Shiny,    "shiny",        "Shiny"},
     });
     return database;
 }
-const EnumDatabase<StatsHuntGenderFilter>& StatsHuntGenderFilter_Database(){
-    static const EnumDatabase<StatsHuntGenderFilter> database({
+const EnumDropdownDatabase<StatsHuntGenderFilter>& StatsHuntGenderFilter_Database(){
+    static const EnumDropdownDatabase<StatsHuntGenderFilter> database({
         {StatsHuntGenderFilter::Any,         "any",          "Any"},
         {StatsHuntGenderFilter::Male,        "male",         "Male"},
         {StatsHuntGenderFilter::Female,      "female",       "Female"},

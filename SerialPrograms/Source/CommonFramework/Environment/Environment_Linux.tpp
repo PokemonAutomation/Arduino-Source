@@ -30,8 +30,8 @@ namespace PokemonAutomation{
 
 
 
-const EnumDatabase<ThreadPriority>& PRIORITY_DATABASE(){
-    static EnumDatabase<ThreadPriority> database({
+const EnumDropdownDatabase<ThreadPriority>& PRIORITY_DATABASE(){
+    static EnumDropdownDatabase<ThreadPriority> database({
         {ThreadPriority::Max, "max", "Max Priority"},
         {ThreadPriority::Min, "min", "Min Priority"},
     });

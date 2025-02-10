@@ -12,8 +12,8 @@ namespace PokemonSwSh{
 
 
 
-const EnumDatabase<EncounterAction>& EncounterAction_Database(){
-    static const EnumDatabase<EncounterAction> database({
+const EnumDropdownDatabase<EncounterAction>& EncounterAction_Database(){
+    static const EnumDropdownDatabase<EncounterAction> database({
         {EncounterAction::StopProgram,          "stop",                 "Stop Program"},
         {EncounterAction::RunAway,              "run",                  "Run Away"},
         {EncounterAction::ThrowBalls,           "throw-balls",          "Throw balls."},
@@ -24,8 +24,8 @@ const EnumDatabase<EncounterAction>& EncounterAction_Database(){
 
 
 
-const EnumDatabase<ShinyFilter>& ShinyFilter_Normal_Database(){
-    static const EnumDatabase<ShinyFilter> database({
+const EnumDropdownDatabase<ShinyFilter>& ShinyFilter_Normal_Database(){
+    static const EnumDropdownDatabase<ShinyFilter> database({
         {ShinyFilter::ANYTHING,     "anything",     "Anything"},
         {ShinyFilter::NOT_SHINY,    "not-shiny",    "Not Shiny"},
         {ShinyFilter::ANY_SHINY,    "any-shiny",    "Any Shiny"},
@@ -35,16 +35,16 @@ const EnumDatabase<ShinyFilter>& ShinyFilter_Normal_Database(){
     });
     return database;
 }
-const EnumDatabase<ShinyFilter>& ShinyFilter_StopRareStars_Database(){
-    static const EnumDatabase<ShinyFilter> database({
+const EnumDropdownDatabase<ShinyFilter>& ShinyFilter_StopRareStars_Database(){
+    static const EnumDropdownDatabase<ShinyFilter> database({
         {ShinyFilter::NOT_SHINY,    "not-shiny",    "Not Shiny"},
         {ShinyFilter::ANY_SHINY,    "any-shiny",    "Any Shiny"},
         {ShinyFilter::STAR_ONLY,    "star-shiny",   "Star Shiny"},
     });
     return database;
 }
-const EnumDatabase<ShinyFilter>& ShinyFilter_TableRareStars_Database(){
-    static const EnumDatabase<ShinyFilter> database({
+const EnumDropdownDatabase<ShinyFilter>& ShinyFilter_TableRareStars_Database(){
+    static const EnumDropdownDatabase<ShinyFilter> database({
         {ShinyFilter::NOT_SHINY,    "not-shiny",    "Not Shiny"},
         {ShinyFilter::SQUARE_ONLY,  "square-shiny", "Square Shiny"},
     });

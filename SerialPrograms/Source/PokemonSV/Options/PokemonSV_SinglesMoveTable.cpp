@@ -11,8 +11,8 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-const EnumDatabase<SinglesMoveType>& singles_move_enum_database_wild(){
-    static EnumDatabase<SinglesMoveType> database{
+const EnumDropdownDatabase<SinglesMoveType>& singles_move_enum_database_wild(){
+    static EnumDropdownDatabase<SinglesMoveType> database{
         {SinglesMoveType::Move1,    "move1",    "Move 1"},
         {SinglesMoveType::Move2,    "move2",    "Move 2"},
         {SinglesMoveType::Move3,    "move3",    "Move 3"},
@@ -21,8 +21,8 @@ const EnumDatabase<SinglesMoveType>& singles_move_enum_database_wild(){
     };
     return database;
 }
-const EnumDatabase<SinglesMoveType>& singles_move_enum_database_trainer(){
-    static EnumDatabase<SinglesMoveType> database{
+const EnumDropdownDatabase<SinglesMoveType>& singles_move_enum_database_trainer(){
+    static EnumDropdownDatabase<SinglesMoveType> database{
         {SinglesMoveType::Move1,    "move1",    "Move 1"},
         {SinglesMoveType::Move2,    "move2",    "Move 2"},
         {SinglesMoveType::Move3,    "move3",    "Move 3"},

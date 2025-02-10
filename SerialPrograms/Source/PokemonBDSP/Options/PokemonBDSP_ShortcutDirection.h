@@ -23,8 +23,8 @@ enum class ShortcutDirection{
     DOWN,
     LEFT,
 };
-const EnumDatabase<ShortcutDirection>& ShortcutDirection_Nullable();
-const EnumDatabase<ShortcutDirection>& ShortcutDirection_Required();
+const EnumDropdownDatabase<ShortcutDirection>& ShortcutDirection_Nullable();
+const EnumDropdownDatabase<ShortcutDirection>& ShortcutDirection_Required();
 
 
 

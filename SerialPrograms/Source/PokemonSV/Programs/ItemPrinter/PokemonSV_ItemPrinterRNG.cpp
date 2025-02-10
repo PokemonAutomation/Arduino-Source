@@ -792,7 +792,7 @@ std::vector<ItemPrinterRngRowSnapshot> ItemPrinterRNG::desired_print_table(
 
 
 ItemPrinter::PrebuiltOptions ItemPrinterRNG::get_bonus_type(ItemPrinter::PrebuiltOptions desired_item){
-    // EnumDatabase<ItemPrinter::PrebuiltOptions> database = ItemPrinter::PrebuiltOptions_AutoMode_Database();
+    // EnumDropdownDatabase<ItemPrinter::PrebuiltOptions> database = ItemPrinter::PrebuiltOptions_AutoMode_Database();
     // std::string slug = database.find(desired_item)->slug;
     std::string slug = ItemPrinter::PrebuiltOptions_AutoMode_Database().find(desired_item)->slug;
     // cout << slug << endl;

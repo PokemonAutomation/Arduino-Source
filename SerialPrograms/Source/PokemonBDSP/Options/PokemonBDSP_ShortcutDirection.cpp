@@ -13,8 +13,8 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-const EnumDatabase<ShortcutDirection>& ShortcutDirection_Nullable(){
-    static EnumDatabase<ShortcutDirection> database({
+const EnumDropdownDatabase<ShortcutDirection>& ShortcutDirection_Nullable(){
+    static EnumDropdownDatabase<ShortcutDirection> database({
         {ShortcutDirection::NONE,   "none", "None"},
         {ShortcutDirection::UP,     "up", "Up"},
         {ShortcutDirection::RIGHT,  "right", "Right"},
@@ -23,8 +23,8 @@ const EnumDatabase<ShortcutDirection>& ShortcutDirection_Nullable(){
     });
     return database;
 }
-const EnumDatabase<ShortcutDirection>& ShortcutDirection_Required(){
-    static EnumDatabase<ShortcutDirection> database({
+const EnumDropdownDatabase<ShortcutDirection>& ShortcutDirection_Required(){
+    static EnumDropdownDatabase<ShortcutDirection> database({
         {ShortcutDirection::UP,     "up", "Up"},
         {ShortcutDirection::RIGHT,  "right", "Right"},
         {ShortcutDirection::DOWN,   "down", "Down"},

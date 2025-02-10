@@ -12,15 +12,15 @@
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "EnumDropdownDatabase.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
 
 
-class IntegerEnumDatabaseImpl{
+class IntegerEnumDropdownDatabaseImpl{
 public:
     void add(EnumEntry entry){
         auto scope_check = m_sanitizer.check_scope();
@@ -89,15 +89,15 @@ private:
 
 
 
-IntegerEnumDatabase::IntegerEnumDatabase(IntegerEnumDatabase&& x) = default;
-IntegerEnumDatabase& IntegerEnumDatabase::operator=(IntegerEnumDatabase&& x) = default;
-IntegerEnumDatabase::~IntegerEnumDatabase() = default;
+IntegerEnumDropdownDatabase::IntegerEnumDropdownDatabase(IntegerEnumDropdownDatabase&& x) = default;
+IntegerEnumDropdownDatabase& IntegerEnumDropdownDatabase::operator=(IntegerEnumDropdownDatabase&& x) = default;
+IntegerEnumDropdownDatabase::~IntegerEnumDropdownDatabase() = default;
 
-IntegerEnumDatabase::IntegerEnumDatabase(void*){}
-IntegerEnumDatabase::IntegerEnumDatabase()
+IntegerEnumDropdownDatabase::IntegerEnumDropdownDatabase(void*){}
+IntegerEnumDropdownDatabase::IntegerEnumDropdownDatabase()
     : m_core(CONSTRUCT_TOKEN)
 {}
-IntegerEnumDatabase::IntegerEnumDatabase(std::initializer_list<EnumEntry> list)
+IntegerEnumDropdownDatabase::IntegerEnumDropdownDatabase(std::initializer_list<EnumEntry> list)
     : m_core(CONSTRUCT_TOKEN)
 {
     size_t index = 0;
@@ -105,19 +105,19 @@ IntegerEnumDatabase::IntegerEnumDatabase(std::initializer_list<EnumEntry> list)
         add(iter->enum_value, std::move(iter->slug), std::move(iter->display), iter->enabled);
     }
 }
-void IntegerEnumDatabase::add(EnumEntry entry){
+void IntegerEnumDropdownDatabase::add(EnumEntry entry){
     m_core->add(entry);
 }
-const EnumEntry* IntegerEnumDatabase::find(size_t value) const{
+const EnumEntry* IntegerEnumDropdownDatabase::find(size_t value) const{
     return m_core->find(value);
 }
-const EnumEntry* IntegerEnumDatabase::find_slug(const std::string& slug) const{
+const EnumEntry* IntegerEnumDropdownDatabase::find_slug(const std::string& slug) const{
     return m_core->find_slug(slug);
 }
-const EnumEntry* IntegerEnumDatabase::find_display(const std::string& display) const{
+const EnumEntry* IntegerEnumDropdownDatabase::find_display(const std::string& display) const{
     return m_core->find_display(display);
 }
-FixedLimitVector<size_t> IntegerEnumDatabase::all_values() const{
+FixedLimitVector<size_t> IntegerEnumDropdownDatabase::all_values() const{
     return m_core->all_values();
 }
 

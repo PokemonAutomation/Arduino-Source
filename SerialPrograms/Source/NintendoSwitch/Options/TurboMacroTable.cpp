@@ -27,8 +27,8 @@ namespace NintendoSwitch{
 
 
 
-const EnumDatabase<TurboMacroAction>& TurboMacroAction_Database(){
-    static const EnumDatabase<TurboMacroAction> database({
+const EnumDropdownDatabase<TurboMacroAction>& TurboMacroAction_Database(){
+    static const EnumDropdownDatabase<TurboMacroAction> database({
         {TurboMacroAction::NO_ACTION,         "no-action",        "No Action"},
         {TurboMacroAction::LEFT_JOYSTICK,     "left-joystick",    "Left Joystick"},
         {TurboMacroAction::RIGHT_JOYSTICK,    "right-joystick",   "Right Joystick"},

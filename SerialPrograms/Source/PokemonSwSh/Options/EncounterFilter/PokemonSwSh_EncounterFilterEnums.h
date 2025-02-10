@@ -24,7 +24,7 @@ enum class EncounterAction{
     ThrowBalls,
     ThrowBallsAndSave,
 };
-const EnumDatabase<EncounterAction>& EncounterAction_Database();
+const EnumDropdownDatabase<EncounterAction>& EncounterAction_Database();
 
 
 class EncounterActionCell : public EnumDropdownCell<EncounterAction>{
@@ -48,9 +48,9 @@ enum class ShinyFilter{
     SQUARE_ONLY,
     NOTHING,
 };
-const EnumDatabase<ShinyFilter>& ShinyFilter_Normal_Database();
-const EnumDatabase<ShinyFilter>& ShinyFilter_StopRareStars_Database();
-const EnumDatabase<ShinyFilter>& ShinyFilter_TableRareStars_Database();
+const EnumDropdownDatabase<ShinyFilter>& ShinyFilter_Normal_Database();
+const EnumDropdownDatabase<ShinyFilter>& ShinyFilter_StopRareStars_Database();
+const EnumDropdownDatabase<ShinyFilter>& ShinyFilter_TableRareStars_Database();
 
 class ShinyFilterCell : public EnumDropdownCell<ShinyFilter>{
 public:

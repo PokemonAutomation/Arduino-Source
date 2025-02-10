@@ -80,7 +80,7 @@ struct CameraBackends{
     }
 
     std::vector<CameraEntry> m_backends;
-    IntegerEnumDatabase m_database;
+    IntegerEnumDropdownDatabase m_database;
 };
 
 

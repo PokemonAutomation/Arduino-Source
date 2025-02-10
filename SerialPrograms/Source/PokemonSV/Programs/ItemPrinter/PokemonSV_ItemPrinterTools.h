@@ -24,7 +24,7 @@ enum class ItemPrinterJobs{
     Jobs_5      =   5,
     Jobs_10     =   10,
 };
-const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database();
+const EnumDropdownDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database();
 
 struct ItemPrinterPrizeResult{
     std::array<std::string, 10> prizes;

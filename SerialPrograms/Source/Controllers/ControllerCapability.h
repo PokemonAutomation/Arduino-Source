@@ -33,9 +33,6 @@ namespace PokemonAutomation{
 
 
 
-
-
-
 enum class ControllerInterface{
     SerialPABotBase,
 };

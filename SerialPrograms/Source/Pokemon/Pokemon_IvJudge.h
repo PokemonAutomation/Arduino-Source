@@ -24,7 +24,7 @@ enum class IvJudgeValue{
     Best,
     HyperTrained,
 };
-const EnumDatabase<IvJudgeValue>& IvJudgeValue_Database();
+const EnumDropdownDatabase<IvJudgeValue>& IvJudgeValue_Database();
 IvJudgeValue IvJudgeValue_string_to_enum(const std::string& token);
 
 
@@ -37,7 +37,7 @@ enum class IvJudgeFilter{
     Fantastic,
     Best,
 };
-const EnumDatabase<IvJudgeFilter>& IvJudgeFilter_Database();
+const EnumDropdownDatabase<IvJudgeFilter>& IvJudgeFilter_Database();
 bool IvJudge_filter_match(IvJudgeFilter filter, IvJudgeValue value);
 
 

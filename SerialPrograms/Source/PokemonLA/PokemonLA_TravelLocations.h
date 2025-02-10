@@ -50,7 +50,7 @@ public:
     const TravelLocation& operator[](size_t index) const{
         return *m_list[index];
     }
-    const IntegerEnumDatabase& database() const;
+    const IntegerEnumDropdownDatabase& database() const;
 
 
 public:
@@ -87,7 +87,7 @@ private:
     std::vector<const TravelLocation*> m_list;
     std::map<std::string, const TravelLocation*> m_map;
 
-    IntegerEnumDatabase m_database;
+    IntegerEnumDropdownDatabase m_database;
 };
 
 

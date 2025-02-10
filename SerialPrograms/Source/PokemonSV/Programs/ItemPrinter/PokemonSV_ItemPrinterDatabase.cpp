@@ -16,8 +16,8 @@ namespace PokemonSV{
 namespace ItemPrinter{
 
 
-const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database(){
-    static const EnumDatabase<PrebuiltOptions> database({
+const EnumDropdownDatabase<PrebuiltOptions>& PrebuiltOptions_Database(){
+    static const EnumDropdownDatabase<PrebuiltOptions> database({
         {PrebuiltOptions::NONE, "none", "---"},
         {PrebuiltOptions::ITEM_BONUS, "item-bonus", "Item Bonus"},
         {PrebuiltOptions::BALL_BONUS, "ball-bonus", "Ball Bonus"},
@@ -68,8 +68,8 @@ const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database(){
     return database;
 }
 
-const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_AutoMode_Database(){
-    static const EnumDatabase<PrebuiltOptions> database({
+const EnumDropdownDatabase<PrebuiltOptions>& PrebuiltOptions_AutoMode_Database(){
+    static const EnumDropdownDatabase<PrebuiltOptions> database({
 
         // ordered by category
         {PrebuiltOptions::ABILITY_PATCH, "ability-patch", "Ability Patch"},

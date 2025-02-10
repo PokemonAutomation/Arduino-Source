@@ -31,8 +31,8 @@ namespace PokemonLA{
 
 
 
-const EnumDatabase<PathAction>& PathAction_Database(){
-    static const EnumDatabase<PathAction> database({
+const EnumDropdownDatabase<PathAction>& PathAction_Database(){
+    static const EnumDropdownDatabase<PathAction> database({
         {PathAction::NO_ACTION,             "no-action",            "NO Action"},
         {PathAction::CHANGE_MOUNT,          "change-mount",         "Change Mount"},
         {PathAction::MOVE_FORWARD,          "move-forward",         "Move Forward"},
@@ -45,8 +45,8 @@ const EnumDatabase<PathAction>& PathAction_Database(){
     });
     return database;
 }
-const EnumDatabase<PathMount>& PathMount_Database(){
-    static const EnumDatabase<PathMount> database({
+const EnumDropdownDatabase<PathMount>& PathMount_Database(){
+    static const EnumDropdownDatabase<PathMount> database({
         {PathMount::NO_MOUNT,       "none",         "No Mount"},
         {PathMount::WYRDEER,        "wrydeer",      "Wrydeer"},
         {PathMount::URSALUNA,       "ursaluna",     "Ursaluna"},
@@ -56,8 +56,8 @@ const EnumDatabase<PathMount>& PathMount_Database(){
     });
     return database;
 }
-const EnumDatabase<PathSpeed>& PathSpeed_Database(){
-    static const EnumDatabase<PathSpeed> database({
+const EnumDropdownDatabase<PathSpeed>& PathSpeed_Database(){
+    static const EnumDropdownDatabase<PathSpeed> database({
         {PathSpeed::NORMAL_SPEED,   "normal",   "Normal Speed"},
         {PathSpeed::SLOW_SPEED,     "slow",     "Slow Speed"},
         {PathSpeed::RUN,            "run",      "Run on Foot"},

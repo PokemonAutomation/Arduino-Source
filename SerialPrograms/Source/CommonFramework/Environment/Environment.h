@@ -22,7 +22,7 @@
 namespace PokemonAutomation{
 
 
-const EnumDatabase<ThreadPriority>& PRIORITY_DATABASE();
+const EnumDropdownDatabase<ThreadPriority>& PRIORITY_DATABASE();
 
 bool set_thread_priority(ThreadPriority priority);
 

@@ -40,8 +40,8 @@ IvJudgeValue IvJudgeValue_string_to_enum(const std::string& token){
 }
 
 
-const EnumDatabase<IvJudgeValue>& IvJudgeValue_Database(){
-    static EnumDatabase<IvJudgeValue> database({
+const EnumDropdownDatabase<IvJudgeValue>& IvJudgeValue_Database(){
+    static EnumDropdownDatabase<IvJudgeValue> database({
         {IvJudgeValue::NoGood,       "no-good",       "No Good (0)"},
         {IvJudgeValue::Decent,       "decent",        "Decent (1-15)"},
         {IvJudgeValue::PrettyGood,   "pretty-good",   "Pretty Good (16-25)"},
@@ -58,8 +58,8 @@ const EnumDatabase<IvJudgeValue>& IvJudgeValue_Database(){
 
 
 
-const EnumDatabase<IvJudgeFilter>& IvJudgeFilter_Database(){
-    static EnumDatabase<IvJudgeFilter> database({
+const EnumDropdownDatabase<IvJudgeFilter>& IvJudgeFilter_Database(){
+    static EnumDropdownDatabase<IvJudgeFilter> database({
         {IvJudgeFilter::Anything,     "anything",     "Anything (0-31)"},
         {IvJudgeFilter::NoGood,       "no-good",      "No Good (0)"},
         {IvJudgeFilter::Decent,       "decent",       "Decent (1-15)"},

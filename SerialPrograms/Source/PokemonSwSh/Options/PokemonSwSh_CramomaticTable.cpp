@@ -11,8 +11,8 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-const EnumDatabase<CramomaticBallType>& BallType_Database(){
-    static const EnumDatabase<CramomaticBallType> database({
+const EnumDropdownDatabase<CramomaticBallType>& BallType_Database(){
+    static const EnumDropdownDatabase<CramomaticBallType> database({
         {CramomaticBallType::Poke,     "poke",     "Poké Ball"},
         {CramomaticBallType::Great,    "great",    "Great Ball"},
         {CramomaticBallType::Shop1,    "shop1",    "Shop 1 (Ultra Ball, Net Ball, Dusk Ball, Premier Ball)"},

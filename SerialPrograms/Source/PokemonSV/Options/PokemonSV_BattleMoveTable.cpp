@@ -10,8 +10,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-const EnumDatabase<BattleMoveType>& Battle_move_enum_database(){
-    static EnumDatabase<BattleMoveType> database{
+const EnumDropdownDatabase<BattleMoveType>& Battle_move_enum_database(){
+    static EnumDropdownDatabase<BattleMoveType> database{
         {BattleMoveType::Move1,           "move1",            "Move 1"},
         {BattleMoveType::Move2,           "move2",            "Move 2"},
         {BattleMoveType::Move3,           "move3",            "Move 3"},

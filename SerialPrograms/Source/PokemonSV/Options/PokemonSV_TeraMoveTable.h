@@ -28,7 +28,7 @@ enum class TeraMoveType{
     Cheer_HangTough,
     Cheer_HealUp,
 };
-const EnumDatabase<TeraMoveType>& tera_move_enum_database();
+const EnumDropdownDatabase<TeraMoveType>& tera_move_enum_database();
 
 enum class TeraTarget{
     Opponent,
@@ -37,7 +37,7 @@ enum class TeraTarget{
     Player2,
     Player3,
 };
-const EnumDatabase<TeraTarget>& tera_target_enum_database();
+const EnumDropdownDatabase<TeraTarget>& tera_target_enum_database();
 
 
 

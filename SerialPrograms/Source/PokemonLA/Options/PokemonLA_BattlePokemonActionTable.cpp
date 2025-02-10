@@ -23,8 +23,8 @@ namespace PokemonLA{
 
 
 
-const EnumDatabase<MoveStyle>& MoveStyle_Database(){
-    static const EnumDatabase<MoveStyle> database({
+const EnumDropdownDatabase<MoveStyle>& MoveStyle_Database(){
+    static const EnumDropdownDatabase<MoveStyle> database({
         {MoveStyle::NoStyle,    "none",     "No Style"},
         {MoveStyle::Agile,      "agile",    "Agile"},
         {MoveStyle::Strong,     "strong",   "Strong"},
@@ -180,8 +180,8 @@ MoveStyle OneMoveBattlePokemonActionTable::get_style(size_t pokemon){
 
 
 
-const IntegerEnumDatabase& PokemonIndex_Database(){
-    static const IntegerEnumDatabase database({
+const IntegerEnumDropdownDatabase& PokemonIndex_Database(){
+    static const IntegerEnumDropdownDatabase database({
         {0, "1st", "1st " + STRING_POKEMON},
         {1, "2nd", "2nd " + STRING_POKEMON},
         {2, "3rd", "3rd " + STRING_POKEMON},
@@ -189,8 +189,8 @@ const IntegerEnumDatabase& PokemonIndex_Database(){
     });
     return database;
 }
-const IntegerEnumDatabase& MoveIndex_Database(){
-    static const IntegerEnumDatabase database({
+const IntegerEnumDropdownDatabase& MoveIndex_Database(){
+    static const IntegerEnumDropdownDatabase database({
         {0, "1st", "1st Move"},
         {1, "2nd", "2nd Move"},
         {2, "3rd", "3rd Move"},

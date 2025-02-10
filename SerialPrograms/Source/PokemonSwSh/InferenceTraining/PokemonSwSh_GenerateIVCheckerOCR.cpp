@@ -82,7 +82,7 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, SwitchCo
 
     std::string now = now_to_filestring();
     
-    const EnumDatabase<IvJudgeValue>& database = IvJudgeValue_Database();
+    const EnumDropdownDatabase<IvJudgeValue>& database = IvJudgeValue_Database();
     images[0].save(path + database.find(HP)->display + "-" + now + "a.png");
     images[1].save(path + database.find(ATTACK)->display + "-" + now + "b.png");
     images[2].save(path + database.find(DEFENSE)->display + "-" + now + "c.png");

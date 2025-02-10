@@ -118,8 +118,8 @@ NatureCheckerValue NatureCheckerValue_helphinder_to_enum(const std::pair<int,int
 
 
 
-const EnumDatabase<NatureCheckerValue>& NatureCheckerValue_Database(){
-    static EnumDatabase<NatureCheckerValue> database({
+const EnumDropdownDatabase<NatureCheckerValue>& NatureCheckerValue_Database(){
+    static EnumDropdownDatabase<NatureCheckerValue> database({
         {NatureCheckerValue::Adamant,     "adamant",      "Adamant"},
         {NatureCheckerValue::Bashful,     "bashful",      "Bashful"},
         {NatureCheckerValue::Bold,        "bold",         "Bold"},
@@ -149,8 +149,8 @@ const EnumDatabase<NatureCheckerValue>& NatureCheckerValue_Database(){
     return database;
 }
 
-const EnumDatabase<NatureCheckerFilter>& NatureCheckerFilter_Database(){
-    static EnumDatabase<NatureCheckerFilter> database({
+const EnumDropdownDatabase<NatureCheckerFilter>& NatureCheckerFilter_Database(){
+    static EnumDropdownDatabase<NatureCheckerFilter> database({
         {NatureCheckerFilter::Any,         "any",          "Any"},
         {NatureCheckerFilter::Adamant,     "adamant",      "Adamant"},
         {NatureCheckerFilter::Bashful,     "bashful",      "Bashful"},

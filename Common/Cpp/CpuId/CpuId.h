@@ -67,7 +67,7 @@ struct CpuCapabilityOption{
 const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES();
 // An enum database to select `CpuCapabilityOption`.
 // This database is built by `AVAILABLE_CAPABILITIES()`, used for UI of choosing CPU instructions.
-const IntegerEnumDatabase& CAPABILITIES_DATABASE();
+const IntegerEnumDropdownDatabase& CAPABILITIES_DATABASE();
 
 
 

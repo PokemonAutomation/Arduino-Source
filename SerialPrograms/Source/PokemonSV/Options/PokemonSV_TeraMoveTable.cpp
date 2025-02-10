@@ -15,8 +15,8 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-const EnumDatabase<TeraMoveType>& tera_move_enum_database(){
-    static EnumDatabase<TeraMoveType> database{
+const EnumDropdownDatabase<TeraMoveType>& tera_move_enum_database(){
+    static EnumDropdownDatabase<TeraMoveType> database{
         {TeraMoveType::Wait,            "wait",             "Wait for X seconds."},
         {TeraMoveType::Move1,           "move1",            "Move 1"},
         {TeraMoveType::Move2,           "move2",            "Move 2"},
@@ -28,8 +28,8 @@ const EnumDatabase<TeraMoveType>& tera_move_enum_database(){
     };
     return database;
 }
-const EnumDatabase<TeraTarget>& tera_target_enum_database(){
-    static EnumDatabase<TeraTarget> database{
+const EnumDropdownDatabase<TeraTarget>& tera_target_enum_database(){
+    static EnumDropdownDatabase<TeraTarget> database{
         {TeraTarget::Opponent,  "opponent", "Opponent"},
         {TeraTarget::Player0,   "player0",  "Player 0 (yourself)"},
         {TeraTarget::Player1,   "player1",  "Player 1 (right of yourself)"},
