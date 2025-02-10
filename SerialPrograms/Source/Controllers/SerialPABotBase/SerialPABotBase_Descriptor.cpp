@@ -78,7 +78,7 @@ JsonValue SerialPABotBase_Descriptor::to_json() const{
 std::unique_ptr<ControllerConnection> SerialPABotBase_Descriptor::open_connection(
     Logger& logger
 ) const{
-    return std::unique_ptr<ControllerConnection>(new SerialPABotBase::SerialPABotBaseConnection(logger, &m_port));
+    return std::unique_ptr<ControllerConnection>(new SerialPABotBase::SerialPABotBase_Connection(logger, &m_port));
 }
 std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
     Logger& logger,
@@ -91,7 +91,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
         return std::unique_ptr<AbstractController>(
             new NintendoSwitch::SwitchController_SerialPABotBase(
                 logger,
-                static_cast<SerialPABotBase::SerialPABotBaseConnection&>(connection),
+                static_cast<SerialPABotBase::SerialPABotBase_Connection&>(connection),
                 requirements
             )
         );

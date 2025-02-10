@@ -5,14 +5,9 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-//#include "Common/Cpp/Json/JsonValue.h"
-//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerCapability.h"
-//#include "Controllers/ControllerDescriptor.h"
-//#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h"
 #include "NintendoSwitch_SerialPABotBase.h"
 
 //#include <iostream>
@@ -22,10 +17,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-
 using namespace std::chrono_literals;
-
-
 
 
 
@@ -38,14 +30,9 @@ PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
 
 
 
-
-
-SwitchController_SerialPABotBase::~SwitchController_SerialPABotBase(){
-//    m_handle.remove_status_listener(*this);
-}
 SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
     Logger& logger,
-    SerialPABotBase::SerialPABotBaseConnection& connection,
+    SerialPABotBase::SerialPABotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
     : SwitchControllerWithScheduler(logger)

@@ -22,10 +22,10 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
-class SerialPABotBaseConnection : public ControllerConnection{
+class SerialPABotBase_Connection : public ControllerConnection{
 public:
-    SerialPABotBaseConnection(Logger& logger, const QSerialPortInfo* port);
-    ~SerialPABotBaseConnection();
+    SerialPABotBase_Connection(Logger& logger, const QSerialPortInfo* port);
+    ~SerialPABotBase_Connection();
 
     void update_with_capabilities(const std::set<ControllerFeature>& capabilities);
 

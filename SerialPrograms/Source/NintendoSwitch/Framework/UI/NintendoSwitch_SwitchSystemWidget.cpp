@@ -57,19 +57,13 @@ SwitchSystemWidget::SwitchSystemWidget(
     QWidget* widget = new QWidget(m_group_box);
     m_group_box->set_widget(widget);
     {
-        QVBoxLayout* group_layout = new QVBoxLayout(widget);
-        group_layout->setAlignment(Qt::AlignTop);
-        group_layout->setContentsMargins(0, 0, 0, 0);
-
-        m_controller = new ControllerSelectorWidget(*this, m_session.controller_session());
-        group_layout->addWidget(m_controller);
-
         m_audio_display = new AudioDisplayWidget(*this, m_session.logger(), m_session.audio_session());
         layout->addWidget(m_audio_display);
 
         QVBoxLayout* video_holder = new QVBoxLayout();
         layout->addLayout(video_holder);
         video_holder->setContentsMargins(0, 0, 0, 0);
+
         m_video_display = new VideoDisplayWidget(
             *this, *video_holder,
             m_session.console_number(),
@@ -78,6 +72,14 @@ SwitchSystemWidget::SwitchSystemWidget(
             m_session.overlay_session()
         );
         video_holder->addWidget(m_video_display);
+    }
+    {
+        QVBoxLayout* group_layout = new QVBoxLayout(widget);
+        group_layout->setAlignment(Qt::AlignTop);
+        group_layout->setContentsMargins(0, 0, 0, 0);
+
+        m_controller = new ControllerSelectorWidget(*this, m_session.controller_session());
+        group_layout->addWidget(m_controller);
 
         m_camera_widget = new CameraSelectorWidget(
             m_session.camera_session(),
@@ -88,6 +90,20 @@ SwitchSystemWidget::SwitchSystemWidget(
 
         m_audio_widget = new AudioSelectorWidget(*widget, m_session.audio_session());
         group_layout->addWidget(m_audio_widget);
+
+#if 0
+        //  Experiment with multiple controller layouts.
+        m_controller = new ControllerSelectorWidget(*this, m_session.controller_session());
+        group_layout->addWidget(m_controller);
+
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
+        group_layout->addWidget(new ControllerSelectorWidget(*this, m_session.controller_session()));
+#endif
 
         m_command = new CommandRow(
             *widget,
