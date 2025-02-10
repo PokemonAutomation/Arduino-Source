@@ -109,7 +109,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Interface::make_controller(
 
     throw InternalProgramError(
         nullptr, PA_CURRENT_FUNCTION,
-        std::string("Unsupported Controller Type: ") + CONTROLLER_TYPE_STRINGS.get(controller_type)
+        std::string("Unsupported Controller Type: ") + CONTROLLER_TYPE_STRINGS.get_string(controller_type)
     );
 }
 

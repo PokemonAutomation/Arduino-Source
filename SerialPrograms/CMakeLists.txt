@@ -98,7 +98,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/CpuId/CpuId_x86.h
     ../Common/Cpp/CpuId/CpuId_x86.tpp
     ../Common/Cpp/DateTime.h
-    ../Common/Cpp/EnumStringMap.cpp
     ../Common/Cpp/EnumStringMap.h
     ../Common/Cpp/EventRateTracker.h
     ../Common/Cpp/Exceptions.cpp

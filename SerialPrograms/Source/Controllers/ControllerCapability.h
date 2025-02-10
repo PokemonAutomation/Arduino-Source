@@ -36,7 +36,7 @@ namespace PokemonAutomation{
 enum class ControllerInterface{
     SerialPABotBase,
 };
-extern EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
+extern const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
 
 
 enum class ControllerType{
@@ -46,7 +46,7 @@ enum class ControllerType{
     NintendoSwitch_LeftJoycon,
     NintendoSwitch_RightJoycon,
 };
-extern EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS;
+extern const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS;
 
 
 enum class ControllerFeature{
@@ -56,7 +56,7 @@ enum class ControllerFeature{
     NintendoSwitch_ProController,
     NintendoSwitch_DateSkip,
 };
-extern EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS;
+extern const EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS;
 
 
 

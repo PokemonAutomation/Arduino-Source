@@ -4,20 +4,17 @@
  *
  */
 
-#include "Common/Cpp/EnumStringMap.tpp"
 #include "ControllerCapability.h"
 
 namespace PokemonAutomation{
 
-template class EnumStringMap<ControllerType>;
 
 
-
-EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS{
+const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS{
     {ControllerInterface::SerialPABotBase,      "SerialPABotBase"},
 };
 
-EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
+const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
     {ControllerType::None,                                  "None"},
     {ControllerType::NintendoSwitch_WiredProController,     "NintendoSwitch_WiredProController"},
     {ControllerType::NintendoSwitch_WirelessProController,  "NintendoSwitch_WirelessProController"},
@@ -25,7 +22,7 @@ EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
     {ControllerType::NintendoSwitch_RightJoycon,            "NintendoSwitch_RightJoycon"},
 };
 
-EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS{
+const EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS{
     {ControllerFeature::TickPrecise,                        "TickPrecise"},
     {ControllerFeature::QueryTickSize,                      "QueryTickSize"},
     {ControllerFeature::QueryCommandQueueSize,              "QueryCommandQueueSize"},
@@ -48,7 +45,7 @@ std::string ControllerRequirements::check_compatibility(const std::set<Controlle
 
     for (ControllerFeature feature : m_features){
         if (features.find(feature) == features.end()){
-            return CONTROLLER_FEATURE_STRINGS.get(feature);
+            return CONTROLLER_FEATURE_STRINGS.get_string(feature);
         }
     }
     return "";

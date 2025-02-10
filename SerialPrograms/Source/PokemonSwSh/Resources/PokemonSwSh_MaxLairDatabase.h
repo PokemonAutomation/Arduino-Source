@@ -9,12 +9,16 @@
 
 #include <string>
 #include <set>
-#include "PokemonSwSh_TypeMatchup.h"
+#include <map>
+#include "Pokemon/Pokemon_Types.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
+
+using namespace Pokemon;
+
 
 
 //  Max Lair slug mappings with respect to name and sprite slugs.

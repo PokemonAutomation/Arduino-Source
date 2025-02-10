@@ -37,7 +37,7 @@ private:
 
         {
             JsonObject& obj = root.get_object_throw("rental_by_type", path);
-            for (const auto& type : TYPE_ENUM_TO_SLUG){
+            for (const auto& type : POKEMON_TYPE_SLUGS()){
                 if (type.first == PokemonType::NONE){
                     continue;
                 }
@@ -56,7 +56,7 @@ private:
 
             JsonObject& obj = item.second.to_object_throw(path).get_object_throw("hash_table", path);
 
-            for (const auto& type : TYPE_ENUM_TO_SLUG){
+            for (const auto& type : POKEMON_TYPE_SLUGS()){
                 if (type.first == PokemonType::NONE){
                     continue;
                 }

@@ -1163,7 +1163,6 @@ HEADERS += \
     ../Common/Cpp/CpuId/CpuId_x86.tpp \
     ../Common/Cpp/DateTime.h \
     ../Common/Cpp/EnumStringMap.h \
-    ../Common/Cpp/EnumStringMap.tpp \
     ../Common/Cpp/EventRateTracker.h \
     ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/ExpressionEvaluator.h \

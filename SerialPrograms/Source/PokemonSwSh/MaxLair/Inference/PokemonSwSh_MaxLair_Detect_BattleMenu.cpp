@@ -267,7 +267,7 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
 
         std::string type_str = "Type Read Result:\n";
         for (const auto& item : candidates){
-            type_str += "    " + get_type_slug(item.second.first) + " : " + tostr_default(item.first ) + "\n";
+            type_str += "    " + POKEMON_TYPE_SLUGS().get_string(item.second.first) + " : " + tostr_default(item.first ) + "\n";
         }
         logger.log(type_str);
 

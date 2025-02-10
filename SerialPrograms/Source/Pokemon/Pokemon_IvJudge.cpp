@@ -4,42 +4,26 @@
  *
  */
 
-#include <map>
-//#include "Common/Cpp/Exceptions.h"
 #include "Pokemon_IvJudge.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
 
 
-const std::map<std::string, IvJudgeValue> IVCheckerValue_TOKEN_TO_ENUM{
-    {"No Good",         IvJudgeValue::NoGood},
-    {"Decent",          IvJudgeValue::Decent},
-    {"Pretty Good",     IvJudgeValue::PrettyGood},
-    {"Very Good",       IvJudgeValue::VeryGood},
-    {"Fantastic",       IvJudgeValue::Fantastic},
-    {"Best",            IvJudgeValue::Best},
-    {"Hyper trained!",  IvJudgeValue::HyperTrained},
-};
-const std::map<IvJudgeValue, std::string> IVCheckerValue_ENUM_TO_TOKEN{
-    {IvJudgeValue::UnableToDetect,    "Unable to Detect"},
-    {IvJudgeValue::NoGood,            "No Good"},
-    {IvJudgeValue::Decent,            "Decent"},
-    {IvJudgeValue::PrettyGood,        "Pretty Good"},
-    {IvJudgeValue::VeryGood,          "Very Good"},
-    {IvJudgeValue::Fantastic,         "Fantastic"},
-    {IvJudgeValue::Best,              "Best"},
-    {IvJudgeValue::HyperTrained,      "Hyper trained!"},
-};
-IvJudgeValue IvJudgeValue_string_to_enum(const std::string& token){
-    auto iter = IVCheckerValue_TOKEN_TO_ENUM.find(token);
-    if (iter == IVCheckerValue_TOKEN_TO_ENUM.end()){
-        return IvJudgeValue::UnableToDetect;
-    }
-    return iter->second;
+
+const EnumStringMap<IvJudgeValue>& IV_JUDGE_VALUE_STRINGS(){
+    static EnumStringMap<IvJudgeValue> database{
+        {IvJudgeValue::UnableToDetect,    "Unable to Detect"},
+        {IvJudgeValue::NoGood,            "No Good"},
+        {IvJudgeValue::Decent,            "Decent"},
+        {IvJudgeValue::PrettyGood,        "Pretty Good"},
+        {IvJudgeValue::VeryGood,          "Very Good"},
+        {IvJudgeValue::Fantastic,         "Fantastic"},
+        {IvJudgeValue::Best,              "Best"},
+        {IvJudgeValue::HyperTrained,      "Hyper trained!"},
+    };
+    return database;
 }
-
-
 const EnumDropdownDatabase<IvJudgeValue>& IvJudgeValue_Database(){
     static EnumDropdownDatabase<IvJudgeValue> database({
         {IvJudgeValue::NoGood,       "no-good",       "No Good (0)"},

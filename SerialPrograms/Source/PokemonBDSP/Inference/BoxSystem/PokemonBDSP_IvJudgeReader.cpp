@@ -34,7 +34,7 @@ IvJudgeValue IvJudgeReaderScope::read(Logger& logger, const ImageViewRGB32& fram
     if (result.results.size() != 1){
         return IvJudgeValue::UnableToDetect;
     }
-    return IvJudgeValue_string_to_enum(result.results.begin()->second.token);
+    return IV_JUDGE_VALUE_STRINGS().get_enum(result.results.begin()->second.token);
 }
 IvJudgeReader::Results IvJudgeReaderScope::read(Logger& logger, const ImageViewRGB32& frame){
     IvJudgeReader::Results results;
