@@ -24,19 +24,30 @@ public:
     ControllerSelectorWidget(QWidget& parent, ControllerSession& session);
 
 public:
-    virtual void controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor) override;
+    virtual void descriptor_changed(
+        const std::shared_ptr<const ControllerDescriptor>& descriptor
+    ) override;
+    virtual void controller_changed(
+        ControllerType controller_type,
+        const std::vector<ControllerType>& available_controllers
+    ) override;
     virtual void post_status_text_changed(const std::string& text) override;
     virtual void options_locked(bool locked) override;
 
 private:
-    void refresh();
+    void refresh_devices();
+    void refresh_controllers(
+        ControllerType controller_type,
+        const std::vector<ControllerType>& available_controllers
+    );
 
 private:
     ControllerSession& m_session;
 
-    QComboBox* m_devices_dropdown;
-    QLabel* m_status_text;
-    QPushButton* m_reset_button;
+    QComboBox* m_devices_dropdown = nullptr;
+    QComboBox* m_controllers_dropdown = nullptr;
+    QLabel* m_status_text = nullptr;
+    QPushButton* m_reset_button = nullptr;
 
     std::vector<std::shared_ptr<const ControllerDescriptor>> m_device_list;
 };

@@ -17,10 +17,10 @@ const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS{
 
 const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
     {ControllerType::None,                                  "None"},
-    {ControllerType::NintendoSwitch_WiredProController,     "NintendoSwitch_WiredProController"},
-    {ControllerType::NintendoSwitch_WirelessProController,  "NintendoSwitch_WirelessProController"},
-    {ControllerType::NintendoSwitch_LeftJoycon,             "NintendoSwitch_LeftJoycon"},
-    {ControllerType::NintendoSwitch_RightJoycon,            "NintendoSwitch_RightJoycon"},
+    {ControllerType::NintendoSwitch_WiredProController,     "Switch: Wired Pro Controller"},
+    {ControllerType::NintendoSwitch_WirelessProController,  "Switch: Wireless Pro Controller"},
+    {ControllerType::NintendoSwitch_LeftJoycon,             "Switch: Left Joycon"},
+    {ControllerType::NintendoSwitch_RightJoycon,            "Switch: Right Joycon"},
 };
 
 const EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS{

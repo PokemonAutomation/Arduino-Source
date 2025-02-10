@@ -24,7 +24,13 @@ class ControllerSession : private ControllerConnection::StatusListener{
 public:
     struct Listener : ControllerConnection::StatusListener{
         virtual void ready_changed(bool ready){}
-        virtual void controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor){}
+        virtual void descriptor_changed(
+            const std::shared_ptr<const ControllerDescriptor>& descriptor
+        ){}
+        virtual void controller_changed(
+            ControllerType controller_type,
+            const std::vector<ControllerType>& available_controllers
+        ){}
         virtual void post_status_text_changed(const std::string& text){}
         virtual void options_locked(bool locked){}
     };
@@ -53,6 +59,7 @@ public:
 
     bool ready() const;
     std::shared_ptr<const ControllerDescriptor> descriptor() const;
+    ControllerType controller_type() const;
     std::string status_text() const;
 
     const ControllerOption& option() const{
@@ -73,6 +80,7 @@ public:
 
 public:
     bool set_device(const std::shared_ptr<const ControllerDescriptor>& device);
+    bool set_controller(ControllerType controller_type);
 
 
 public:
@@ -113,7 +121,13 @@ private:
     virtual void post_status_text_changed(const std::string& text) override;
 
     void signal_ready_changed(bool ready);
-    void signal_controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor);
+    void signal_descriptor_changed(
+        const std::shared_ptr<const ControllerDescriptor>& descriptor
+    );
+    void signal_controller_changed(
+        ControllerType controller_type,
+        const std::vector<ControllerType>& available_controllers
+    );
     void signal_status_text_changed(const std::string& text);
     void signal_options_locked(bool locked);
 
@@ -129,6 +143,8 @@ private:
     std::shared_ptr<const ControllerDescriptor> m_descriptor;
     std::unique_ptr<ControllerConnection> m_connection;
     std::unique_ptr<AbstractController> m_controller;
+
+    std::vector<ControllerType> m_available_controllers;
 
     ListenerSet<Listener> m_listeners;
 };

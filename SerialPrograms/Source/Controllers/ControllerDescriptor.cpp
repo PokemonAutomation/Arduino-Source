@@ -101,7 +101,7 @@ void ControllerOption::load_json(const JsonValue& json){
         }
         const std::string* controller = obj->get_string("Controller");
         if (controller != nullptr){
-            controller_type = CONTROLLER_TYPE_STRINGS.get_enum(*controller);
+            controller_type = CONTROLLER_TYPE_STRINGS.get_enum(*controller, ControllerType::None);
         }
         const JsonValue* params = obj->get_value("Parameters");
         if (params == nullptr){

@@ -6,6 +6,7 @@
 
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "ControllerSelectorWidget.h"
 
 //#include <iostream>
@@ -29,10 +30,19 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     serial_row->addWidget(new QLabel("<b>Controller:</b>", this), 1);
     serial_row->addSpacing(5);
 
-    m_devices_dropdown = new NoWheelComboBox(this);
-    serial_row->addWidget(m_devices_dropdown, 5);
-    refresh();
+    QHBoxLayout* dropdowns = new QHBoxLayout();
+    serial_row->addLayout(dropdowns, 5);
     serial_row->addSpacing(5);
+
+    m_devices_dropdown = new NoWheelComboBox(this);
+    dropdowns->addWidget(m_devices_dropdown, 3);
+    refresh_devices();
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        dropdowns->addSpacing(5);
+        m_controllers_dropdown = new NoWheelComboBox(this);
+        dropdowns->addWidget(m_controllers_dropdown, 2);
+    }
 
     m_status_text = new QLabel(this);
     serial_row->addWidget(m_status_text, 3);
@@ -60,9 +70,25 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
             }
 
             m_session.set_device(selected);
-            refresh();
+            refresh_devices();
         }
     );
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        connect(
+            m_controllers_dropdown, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
+            this, [this](int index){
+                index = std::max(index, 0);
+                ControllerType new_value = CONTROLLER_TYPE_STRINGS.get_enum(
+                    m_controllers_dropdown->itemText(index).toStdString(),
+                    ControllerType::None
+                );
+                if (new_value == m_session.controller_type()){
+                    return;
+                }
+                m_session.set_controller(new_value);
+            }
+        );
+    }
     connect(
         m_reset_button, &QPushButton::clicked,
         this, [this](bool){
@@ -75,7 +101,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
 
 
-void ControllerSelectorWidget::refresh(){
+void ControllerSelectorWidget::refresh_devices(){
     m_device_list.clear();
     m_devices_dropdown->clear();
 
@@ -100,13 +126,45 @@ void ControllerSelectorWidget::refresh(){
 //    cout << "items = " << m_devices_dropdown->count() << endl;
     m_devices_dropdown->setCurrentIndex((int)index);
 }
+void ControllerSelectorWidget::refresh_controllers(
+    ControllerType controller_type,
+    const std::vector<ControllerType>& available_controllers
+){
+    if (m_controllers_dropdown == nullptr){
+        return;
+    }
+//    cout << "refresh_controllers()" << endl;
+
+    m_controllers_dropdown->clear();
+
+    size_t index = 0;
+    for (size_t c = 0; c < available_controllers.size(); c++){
+        const std::string& name = CONTROLLER_TYPE_STRINGS.get_string(available_controllers[c]);
+        m_controllers_dropdown->addItem(QString::fromStdString(name));
+        if (controller_type == available_controllers[c]){
+            index = c;
+        }
+    }
+    m_controllers_dropdown->setCurrentIndex((int)index);
+}
 
 
 
-void ControllerSelectorWidget::controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor){
+void ControllerSelectorWidget::descriptor_changed(
+    const std::shared_ptr<const ControllerDescriptor>& descriptor
+){
     QMetaObject::invokeMethod(this, [this]{
-        refresh();
-    });
+        refresh_devices();
+    }, Qt::QueuedConnection);
+}
+void ControllerSelectorWidget::controller_changed(
+    ControllerType controller_type,
+    const std::vector<ControllerType>& available_controllers
+){
+//    cout << "ControllerSelectorWidget::controller_changed()" << endl;
+    QMetaObject::invokeMethod(this, [=, this]{
+        refresh_controllers(controller_type, available_controllers);
+    }, Qt::QueuedConnection);
 }
 void ControllerSelectorWidget::post_status_text_changed(const std::string& text){
 //    cout << "ControllerSelectorWidget::status_text_changed(): " << text << endl;

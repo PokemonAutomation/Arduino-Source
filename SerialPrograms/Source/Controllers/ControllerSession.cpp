@@ -15,11 +15,14 @@ namespace PokemonAutomation{
 
 
 void ControllerSession::add_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg0(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     m_listeners.add(listener);
+//    if (m_connection && m_connection->is_ready()){
+        signal_controller_changed(m_option.m_controller_type, m_available_controllers);
+//    }
 }
 void ControllerSession::remove_listener(Listener& listener){
-    std::lock_guard<std::mutex> lg0(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     m_listeners.remove(listener);
 }
 
@@ -72,6 +75,10 @@ bool ControllerSession::ready() const{
 std::shared_ptr<const ControllerDescriptor> ControllerSession::descriptor() const{
     std::lock_guard<std::mutex> lg(m_state_lock);
     return m_descriptor;
+}
+ControllerType ControllerSession::controller_type() const{
+    std::lock_guard<std::mutex> lg(m_state_lock);
+    return m_option.m_controller_type;
 }
 std::string ControllerSession::status_text() const{
     std::lock_guard<std::mutex> lg(m_state_lock);
@@ -157,7 +164,29 @@ bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescrip
         m_option.m_descriptor = device;
         m_descriptor = device;
     }
-    signal_controller_changed(device);
+    signal_descriptor_changed(device);
+    signal_status_text_changed(status_text());
+    return true;
+}
+bool ControllerSession::set_controller(ControllerType controller_type){
+//    cout << "set_controller()" << endl;
+    {
+        std::lock_guard<std::mutex> lg(m_state_lock);
+        if (m_option.m_controller_type == controller_type){
+            return true;
+        }
+        if (m_options_locked){
+            return false;
+        }
+        m_option.m_controller_type = controller_type;
+
+        m_controller.reset();
+        m_connection.reset();
+        m_connection = m_descriptor->open_connection(m_logger);
+        if (m_connection){
+            m_connection->add_status_listener(*this);
+        }
+    }
     signal_status_text_changed(status_text());
     return true;
 }
@@ -190,34 +219,58 @@ void ControllerSession::pre_not_ready(){
     m_listeners.run_method_unique(&Listener::pre_not_ready);
 }
 void ControllerSession::post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers){
-    if (controllers.empty()){
-        return;
+    std::vector<ControllerType> available_controllers;
+
+    if (controllers.size() > 1){
+        available_controllers.emplace_back(ControllerType::None);
     }
 
-    auto iter = controllers.begin();
+    ControllerType selected_controller = ControllerType::None;
+    bool ready = false;
+    {
+        std::lock_guard<std::mutex> lg(m_state_lock);
 
-    if (controllers.size() == 1){
-        //  Only one controller available. Force the option to it.
-        m_option.m_controller_type = iter->first;
-    }else{
-        //  Otherwise, try to use the option setting. If it's not valid,
-        //  clear it.
-        iter = controllers.find(m_option.m_controller_type);
-        if (iter == controllers.end()){
-            m_option.m_controller_type = ControllerType::None;
-            m_controller.reset();
+        for (const auto& item : controllers){
+            available_controllers.emplace_back(item.first);
+        }
+        m_available_controllers = available_controllers;
+        m_controller.reset();
+
+        if (controllers.empty()){
             return;
         }
+
+        auto iter = controllers.begin();
+
+        if (controllers.size() == 1){
+            //  Only one controller available. Force the option to it.
+            selected_controller = iter->first;
+        }else{
+            //  Keep the current controller only if it exists.
+            iter = controllers.find(m_option.m_controller_type);
+            if (iter != controllers.end()){
+                selected_controller = m_option.m_controller_type;
+            }
+        }
+
+//        cout << "post_ready()" << endl;
+
+        if (selected_controller != ControllerType::None){
+            m_controller = m_descriptor->make_controller(m_logger, *m_connection, selected_controller, m_requirements);
+        }
+        m_option.m_controller_type = selected_controller;
+
+        ready = m_controller && m_controller->is_ready();
+        signal_controller_changed(selected_controller, available_controllers);
     }
-
-//    cout << "post_ready()" << endl;
-
-    m_controller.reset();
-    m_controller = m_descriptor->make_controller(m_logger, *m_connection, iter->first, m_requirements);
-    m_listeners.run_method_unique(&Listener::post_ready, controllers);
-    signal_ready_changed(m_controller->is_ready());
+    if (ready){
+        m_listeners.run_method_unique(&Listener::post_ready, controllers);
+        signal_ready_changed(m_controller->is_ready());
+    }
 }
 void ControllerSession::post_status_text_changed(const std::string& text){
+    std::lock_guard<std::mutex> lg(m_state_lock);
+
     do{
         if (m_controller == nullptr){
             break;
@@ -239,8 +292,16 @@ void ControllerSession::post_status_text_changed(const std::string& text){
 void ControllerSession::signal_ready_changed(bool ready){
     m_listeners.run_method_unique(&Listener::ready_changed, ready);
 }
-void ControllerSession::signal_controller_changed(const std::shared_ptr<const ControllerDescriptor>& descriptor){
-    m_listeners.run_method_unique(&Listener::controller_changed, descriptor);
+void ControllerSession::signal_descriptor_changed(
+    const std::shared_ptr<const ControllerDescriptor>& descriptor
+){
+    m_listeners.run_method_unique(&Listener::descriptor_changed, descriptor);
+}
+void ControllerSession::signal_controller_changed(
+    ControllerType controller_type,
+    const std::vector<ControllerType>& available_controllers
+){
+    m_listeners.run_method_unique(&Listener::controller_changed, controller_type, available_controllers);
 }
 void ControllerSession::signal_status_text_changed(const std::string& text){
     m_listeners.run_method_unique(&Listener::post_status_text_changed, text);

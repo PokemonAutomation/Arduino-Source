@@ -73,6 +73,9 @@ const std::map<
                 ControllerFeature::NintendoSwitch_ProController,
                 ControllerFeature::NintendoSwitch_DateSkip,
             }},
+//            {ControllerType::NintendoSwitch_WirelessProController, {}},
+//            {ControllerType::NintendoSwitch_LeftJoycon, {}},
+//            {ControllerType::NintendoSwitch_RightJoycon, {}},
         }},
     }},
 };
