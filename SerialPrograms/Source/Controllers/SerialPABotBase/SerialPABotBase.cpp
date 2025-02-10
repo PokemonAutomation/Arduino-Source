@@ -24,10 +24,6 @@ const ControllerRequirements OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
 
 
 
-
-
-
-
 std::string program_name(uint8_t id){
     switch (id){
     case PABB_PID_UNSPECIFIED:      return "Microcontroller Program";
@@ -36,7 +32,6 @@ std::string program_name(uint8_t id){
     default: return "Unknown ID";
     }
 }
-
 
 
 
@@ -83,6 +78,11 @@ const std::map<
         }},
     }},
 };
+
+
+
+
+
 
 
 

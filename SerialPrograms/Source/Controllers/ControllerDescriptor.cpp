@@ -41,7 +41,14 @@ std::vector<std::shared_ptr<const ControllerDescriptor>>
 get_compatible_descriptors(const ControllerRequirements& requirements){
     std::vector<std::shared_ptr<const ControllerDescriptor>> ret;
 
+    //  Null controller goes first.
+    ret.emplace_back(new NullControllerDescriptor());
+
+    //  Add all other controllers. We don't filter them at this time.
     for (const auto& controller_interface : CONTROLLER_TYPES){
+        if (controller_interface.first == NullControllerDescriptor::TYPENAME){
+            continue;
+        }
         std::vector<std::shared_ptr<const ControllerDescriptor>> list = controller_interface.second->list();
         std::move(list.begin(), list.end(), std::back_inserter(ret));
     }

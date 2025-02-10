@@ -1,4 +1,4 @@
-/*  Serial Port (PABotBase) Handle
+/*  Serial Port (PABotBase) Connection
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

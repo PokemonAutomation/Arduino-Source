@@ -8,65 +8,14 @@
 #ifndef PokemonAutomation_NintendoSwitch_Controller_SerialPABotBase_H
 #define PokemonAutomation_NintendoSwitch_Controller_SerialPABotBase_H
 
-#include <QSerialPortInfo>
 #include "ClientSource/Connection/BotBase.h"
-#include "Controllers/ControllerDescriptor.h"
-#include "Controllers/ControllerConnection.h"
+//#include "Controllers/ControllerDescriptor.h"
+//#include "Controllers/ControllerConnection.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
 #include "NintendoSwitch_ControllerWithScheduler.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-
-
-class SwitchController_SerialPABotBase_Descriptor : public ControllerDescriptor
-{
-public:
-    static const char* TYPENAME;
-
-public:
-    SwitchController_SerialPABotBase_Descriptor() = default;
-    SwitchController_SerialPABotBase_Descriptor(const QSerialPortInfo& info)
-        : m_port(info)
-    {}
-
-    const QSerialPortInfo& port() const{
-        return m_port;
-    }
-
-    virtual bool operator==(const ControllerDescriptor& x) const override;
-    virtual const char* type_name() const override;
-    virtual std::string display_name() const override;
-
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-
-    virtual std::unique_ptr<ControllerConnection> open_connection(
-        Logger& logger
-    ) const override;
-    virtual std::unique_ptr<AbstractController> make_controller(
-        Logger& logger,
-        ControllerConnection& connection,
-        ControllerType controller_type,
-        const ControllerRequirements& requirements
-    ) const override;
-
-private:
-    QSerialPortInfo m_port;
-};
-
-
-
-
-template <typename Type>
-PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
-    return milliseconds / 8 + (milliseconds % 8 + 7) / 8;
-}
-
-
-
-
 
 
 

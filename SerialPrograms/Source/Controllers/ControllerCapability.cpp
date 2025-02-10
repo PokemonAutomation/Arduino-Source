@@ -4,44 +4,34 @@
  *
  */
 
+#include "Common/Cpp/EnumStringMap.tpp"
 #include "ControllerCapability.h"
 
 namespace PokemonAutomation{
 
-
-const char* to_string(ControllerType type){
-    switch (type){
-    case ControllerType::None:
-        return "None";
-    case ControllerType::NintendoSwitch_WiredProController:
-        return "NintendoSwitch_WiredProController";
-    case ControllerType::NintendoSwitch_WirelessProController:
-        return "NintendoSwitch_WirelessProController";
-    case ControllerType::NintendoSwitch_LeftJoycon:
-        return "NintendoSwitch_LeftJoycon";
-    case ControllerType::NintendoSwitch_RightJoycon:
-        return "NintendoSwitch_RightJoycon";
-    }
-    return nullptr;
-}
+template class EnumStringMap<ControllerType>;
 
 
 
-const char* to_string(ControllerFeature feature){
-    switch (feature){
-    case ControllerFeature::TickPrecise:
-        return "TickPrecise";
-    case ControllerFeature::QueryTickSize:
-        return "QueryTickSize";
-    case ControllerFeature::QueryCommandQueueSize:
-        return "QueryCommandQueueSize";
-    case ControllerFeature::NintendoSwitch_ProController:
-        return "NintendoSwitch_ProController";
-    case ControllerFeature::NintendoSwitch_DateSkip:
-        return "NintendoSwitch_DateSkip";
-    }
-    return nullptr;
-}
+EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS{
+    {ControllerInterface::SerialPABotBase,      "SerialPABotBase"},
+};
+
+EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
+    {ControllerType::None,                                  "None"},
+    {ControllerType::NintendoSwitch_WiredProController,     "NintendoSwitch_WiredProController"},
+    {ControllerType::NintendoSwitch_WirelessProController,  "NintendoSwitch_WirelessProController"},
+    {ControllerType::NintendoSwitch_LeftJoycon,             "NintendoSwitch_LeftJoycon"},
+    {ControllerType::NintendoSwitch_RightJoycon,            "NintendoSwitch_RightJoycon"},
+};
+
+EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS{
+    {ControllerFeature::TickPrecise,                        "TickPrecise"},
+    {ControllerFeature::QueryTickSize,                      "QueryTickSize"},
+    {ControllerFeature::QueryCommandQueueSize,              "QueryCommandQueueSize"},
+    {ControllerFeature::NintendoSwitch_ProController,       "NintendoSwitch_ProController"},
+    {ControllerFeature::NintendoSwitch_DateSkip,            "NintendoSwitch_DateSkip"},
+};
 
 
 
@@ -58,7 +48,7 @@ std::string ControllerRequirements::check_compatibility(const std::set<Controlle
 
     for (ControllerFeature feature : m_features){
         if (features.find(feature) == features.end()){
-            return to_string(feature);
+            return CONTROLLER_FEATURE_STRINGS.get(feature);
         }
     }
     return "";

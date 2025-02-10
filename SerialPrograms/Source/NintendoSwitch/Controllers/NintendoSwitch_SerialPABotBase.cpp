@@ -5,12 +5,12 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+//#include "Common/Cpp/Json/JsonValue.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerCapability.h"
-#include "Controllers/ControllerDescriptor.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
+//#include "Controllers/ControllerDescriptor.h"
+//#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h"
 #include "NintendoSwitch_SerialPABotBase.h"
@@ -20,93 +20,20 @@
 //using std::endl;
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
 
 
 using namespace std::chrono_literals;
 
 
 
-template <>
-std::vector<std::shared_ptr<const ControllerDescriptor>>
-ControllerType_t<NintendoSwitch::SwitchController_SerialPABotBase_Descriptor>::list() const{
-    std::vector<std::shared_ptr<const ControllerDescriptor>> ret;
-    for (QSerialPortInfo& port : QSerialPortInfo::availablePorts()){
-#ifdef _WIN32
-        //  COM1 is never the correct port on Windows.
-        if (port.portName() == "COM1"){
-            continue;
-        }
-#endif
-        ret.emplace_back(new NintendoSwitch::SwitchController_SerialPABotBase_Descriptor(port));
-    }
-    return ret;
-}
-template class ControllerType_t<NintendoSwitch::SwitchController_SerialPABotBase_Descriptor>;
 
 
-
-
-namespace NintendoSwitch{
-
-
-
-
-
-const char* SwitchController_SerialPABotBase_Descriptor::TYPENAME = SerialPABotBase::NintendoSwitch_Basic;
-
-
-
-bool SwitchController_SerialPABotBase_Descriptor::operator==(const ControllerDescriptor& x) const{
-    if (typeid(*this) != typeid(x)){
-        return false;
-    }
-    return m_port.portName() == static_cast<const SwitchController_SerialPABotBase_Descriptor&>(x).m_port.portName();
+template <typename Type>
+PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
+    return milliseconds / 8 + (milliseconds % 8 + 7) / 8;
 }
 
-
-const char* SwitchController_SerialPABotBase_Descriptor::type_name() const{
-    return TYPENAME;
-}
-std::string SwitchController_SerialPABotBase_Descriptor::display_name() const{
-    if (m_port.isNull()){
-        return "";
-    }
-    return m_port.portName().toStdString() + " - " + m_port.description().toStdString();
-//    return "Wired Controller - Serial (PABotBase): " + m_port.portName().toStdString() + " - " + m_port.description().toStdString();
-}
-void SwitchController_SerialPABotBase_Descriptor::load_json(const JsonValue& json){
-    const std::string* name = json.to_string();
-    if (name == nullptr || name->empty()){
-        return;
-    }
-    m_port = (QSerialPortInfo(QString::fromStdString(*name)));
-}
-JsonValue SwitchController_SerialPABotBase_Descriptor::to_json() const{
-    return m_port.isNull() ? "" : m_port.portName().toStdString();
-}
-
-std::unique_ptr<ControllerConnection> SwitchController_SerialPABotBase_Descriptor::open_connection(
-    Logger& logger
-) const{
-    return std::unique_ptr<ControllerConnection>(new SerialPABotBase::SerialPABotBaseConnection(logger, &m_port));
-}
-std::unique_ptr<AbstractController> SwitchController_SerialPABotBase_Descriptor::make_controller(
-    Logger& logger,
-    ControllerConnection& connection,
-    ControllerType controller_type,
-    const ControllerRequirements& requirements
-) const{
-    if (controller_type != ControllerType::NintendoSwitch_WiredProController){
-        throw InternalProgramError(
-            nullptr, PA_CURRENT_FUNCTION,
-            std::string("Unsupported Controller Type: ") + to_string(controller_type)
-        );
-    }
-    SerialPABotBase::SerialPABotBaseConnection& actual = static_cast<SerialPABotBase::SerialPABotBaseConnection&>(connection);
-    return std::unique_ptr<AbstractController>(
-        new SwitchController_SerialPABotBase(logger, actual, requirements)
-    );
-}
 
 
 

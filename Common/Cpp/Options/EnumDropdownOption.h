@@ -12,9 +12,9 @@
 #ifndef PokemonAutomation_Options_EnumDropdownOption_H
 #define PokemonAutomation_Options_EnumDropdownOption_H
 
-#include "Common/Cpp/EnumDatabase.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "ConfigOption.h"
+#include "EnumDropdownDatabase.h"
 
 namespace PokemonAutomation{
 

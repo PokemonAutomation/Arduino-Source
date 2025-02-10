@@ -8,8 +8,7 @@
 #define PokemonAutomation_Pokemon_NatureChecker_H
 
 #include <string>
-#include <vector>
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{

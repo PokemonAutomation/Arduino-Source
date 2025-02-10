@@ -1,14 +1,11 @@
-/*  Serial Port (PABotBase) Handle
+/*  Serial Port (PABotBase) Connection
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  This file was mostly kept intact through the connections refactor. But it
- *  really needs to be redone as it's a mess.
- *
  */
 
-#ifndef PokemonAutomation_Controllers_SerialPABotBase_Handle_H
-#define PokemonAutomation_Controllers_SerialPABotBase_Handle_H
+#ifndef PokemonAutomation_Controllers_SerialPABotBase_Connection_H
+#define PokemonAutomation_Controllers_SerialPABotBase_Connection_H
 
 #include <memory>
 #include <mutex>

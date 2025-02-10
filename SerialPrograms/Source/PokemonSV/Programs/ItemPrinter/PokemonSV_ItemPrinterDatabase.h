@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_ItemPrinterDatabase_H
 #define PokemonAutomation_PokemonSV_ItemPrinterDatabase_H
 
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "PokemonSV_ItemPrinterTools.h"
 
 namespace PokemonAutomation{

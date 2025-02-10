@@ -91,7 +91,6 @@ SOURCES += \
     ../Common/Cpp/Concurrency/Watchdog.cpp \
     ../Common/Cpp/Containers/AlignedMalloc.cpp \
     ../Common/Cpp/CpuId/CpuId.cpp \
-    ../Common/Cpp/EnumDatabase.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/ExpressionEvaluator.cpp \
     ../Common/Cpp/ImageResolution.cpp \
@@ -106,6 +105,7 @@ SOURCES += \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
     ../Common/Cpp/Options/EditableTableOption.cpp \
+    ../Common/Cpp/Options/EnumDropdownDatabase.cpp \
     ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
@@ -321,6 +321,7 @@ SOURCES += \
     Source/Controllers/NullController.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Interface.cpp \
     Source/Controllers/SuperscalarScheduler.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
     Source/Integrations/DiscordIntegrationTable.cpp \
@@ -1161,7 +1162,8 @@ HEADERS += \
     ../Common/Cpp/CpuId/CpuId_x86.h \
     ../Common/Cpp/CpuId/CpuId_x86.tpp \
     ../Common/Cpp/DateTime.h \
-    ../Common/Cpp/EnumDatabase.h \
+    ../Common/Cpp/EnumStringMap.h \
+    ../Common/Cpp/EnumStringMap.tpp \
     ../Common/Cpp/EventRateTracker.h \
     ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/ExpressionEvaluator.h \
@@ -1178,6 +1180,7 @@ HEADERS += \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
     ../Common/Cpp/Options/EditableTableOption.h \
+    ../Common/Cpp/Options/EnumDropdownDatabase.h \
     ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
@@ -1455,6 +1458,7 @@ HEADERS += \
     Source/Controllers/NullController.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Interface.h \
     Source/Controllers/SuperscalarScheduler.h \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \

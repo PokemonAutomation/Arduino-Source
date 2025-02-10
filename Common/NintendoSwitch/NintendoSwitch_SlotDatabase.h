@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SlotDatabase_H
 #define PokemonAutomation_NintendoSwitch_SlotDatabase_H
 
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

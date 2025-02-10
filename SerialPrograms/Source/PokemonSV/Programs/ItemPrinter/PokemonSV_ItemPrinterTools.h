@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_ItemPrinterTools_H
 
 #include <array>
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"

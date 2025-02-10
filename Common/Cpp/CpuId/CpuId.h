@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CpuId_H
 #define PokemonAutomation_CpuId_H
 
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 
 #if 0
 #elif _M_IX86 || _M_X64 || __i386__ || __x86_64__

@@ -8,10 +8,8 @@
 #define PokemonAutomation_Environment_H
 
 #include <string>
-#include <vector>
 #include <QThread>
-#include "Common/Cpp/EnumDatabase.h"
-#include "Common/Cpp/CpuId/CpuId.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 
 #if _WIN32
 #include "Environment_Windows.h"

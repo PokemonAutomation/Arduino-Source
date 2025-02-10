@@ -21,6 +21,7 @@
 #include <initializer_list>
 #include <string>
 #include <set>
+#include "Common/Cpp/EnumStringMap.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 
 //#include <iostream>
@@ -31,9 +32,14 @@ namespace PokemonAutomation{
 
 
 
+
+
+
+
 enum class ControllerInterface{
     SerialPABotBase,
 };
+extern EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
 
 
 enum class ControllerType{
@@ -43,7 +49,7 @@ enum class ControllerType{
     NintendoSwitch_LeftJoycon,
     NintendoSwitch_RightJoycon,
 };
-const char* to_string(ControllerType type);
+extern EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS;
 
 
 enum class ControllerFeature{
@@ -53,7 +59,7 @@ enum class ControllerFeature{
     NintendoSwitch_ProController,
     NintendoSwitch_DateSkip,
 };
-const char* to_string(ControllerFeature feature);
+extern EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS;
 
 
 

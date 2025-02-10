@@ -6,7 +6,6 @@
 
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "Controllers/NullController.h"
 #include "ControllerSelectorWidget.h"
 
 //#include <iostream>
@@ -82,7 +81,10 @@ void ControllerSelectorWidget::refresh(){
 
     //  Rebuild the device list.
     m_device_list = get_compatible_descriptors(m_session.requirements());
-    m_device_list.insert(m_device_list.begin(), std::make_unique<NullControllerDescriptor>());
+//    for (const auto& item : m_device_list){
+//        cout << item->display_name() << endl;
+//    }
+//    m_device_list.insert(m_device_list.begin(), std::make_unique<NullControllerDescriptor>());
 
     std::shared_ptr<const ControllerDescriptor> current = m_session.descriptor();
 
@@ -94,6 +96,8 @@ void ControllerSelectorWidget::refresh(){
             index = c;
         }
     }
+//    cout << "m_device_list = " << m_device_list.size() << endl;
+//    cout << "items = " << m_devices_dropdown->count() << endl;
     m_devices_dropdown->setCurrentIndex((int)index);
 }
 

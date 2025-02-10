@@ -98,8 +98,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/CpuId/CpuId_x86.h
     ../Common/Cpp/CpuId/CpuId_x86.tpp
     ../Common/Cpp/DateTime.h
-    ../Common/Cpp/EnumDatabase.cpp
-    ../Common/Cpp/EnumDatabase.h
+    ../Common/Cpp/EnumStringMap.cpp
+    ../Common/Cpp/EnumStringMap.h
     ../Common/Cpp/EventRateTracker.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
@@ -130,6 +130,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/DateOption.h
     ../Common/Cpp/Options/EditableTableOption.cpp
     ../Common/Cpp/Options/EditableTableOption.h
+    ../Common/Cpp/Options/EnumDropdownDatabase.cpp
+    ../Common/Cpp/Options/EnumDropdownDatabase.h
     ../Common/Cpp/Options/EnumDropdownOption.cpp
     ../Common/Cpp/Options/EnumDropdownOption.h
     ../Common/Cpp/Options/FixedCodeOption.cpp
@@ -634,6 +636,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Interface.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Interface.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp
