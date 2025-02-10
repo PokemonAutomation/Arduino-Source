@@ -12,8 +12,6 @@ namespace SerialPABotBase{
 
 
 
-const char NintendoSwitch_Basic[] = "NintendoSwitch-SerialPABotBase";
-
 
 //  Defaults
 const ControllerRequirements OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{

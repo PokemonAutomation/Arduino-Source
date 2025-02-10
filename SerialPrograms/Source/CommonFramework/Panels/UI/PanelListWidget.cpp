@@ -86,7 +86,9 @@ void PanelListWidget::handle_panel_clicked(const std::string& text){
     }
     try{
         std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
-        panel->from_json(PERSISTENT_SETTINGS().panels[descriptor->identifier()]);
+//        try{
+            panel->from_json(PERSISTENT_SETTINGS().panels[descriptor->identifier()]);
+//        }catch (ParseException&){}
         m_panel_holder.load_panel(descriptor, std::move(panel));
 
         PERSISTENT_SETTINGS().panels[JSON_PROGRAM_PANEL] = iter->first;

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Controllers_SerialPABotBase_Interface_H
-#define PokemonAutomation_Controllers_SerialPABotBase_Interface_H
+#ifndef PokemonAutomation_Controllers_SerialPABotBase_Descriptor_H
+#define PokemonAutomation_Controllers_SerialPABotBase_Descriptor_H
 
 #include <QSerialPortInfo>
 #include "Controllers/ControllerDescriptor.h"
@@ -15,15 +15,18 @@ namespace SerialPABotBase{
 
 
 
-class SerialPABotBase_Interface : public ControllerDescriptor
-{
+class SerialPABotBase_Descriptor : public ControllerDescriptor{
 public:
-    static const char* TYPENAME;
+    static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::SerialPABotBase;
+
 
 public:
-    SerialPABotBase_Interface() = default;
-    SerialPABotBase_Interface(const QSerialPortInfo& info)
-        : m_port(info)
+    SerialPABotBase_Descriptor()
+        : ControllerDescriptor(ControllerInterface::SerialPABotBase)
+    {}
+    SerialPABotBase_Descriptor(const QSerialPortInfo& info)
+        : ControllerDescriptor(ControllerInterface::SerialPABotBase)
+        , m_port(info)
     {}
 
     const QSerialPortInfo& port() const{
@@ -31,7 +34,6 @@ public:
     }
 
     virtual bool operator==(const ControllerDescriptor& x) const override;
-    virtual const char* type_name() const override;
     virtual std::string display_name() const override;
 
     virtual void load_json(const JsonValue& json) override;

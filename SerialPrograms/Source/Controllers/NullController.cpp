@@ -11,22 +11,18 @@
 namespace PokemonAutomation{
 
 template <>
-std::vector<std::shared_ptr<const ControllerDescriptor>> ControllerType_t<NullControllerDescriptor>::list() const{
+std::vector<std::shared_ptr<const ControllerDescriptor>> InterfaceType_t<NullControllerDescriptor>::list() const{
     std::vector<std::shared_ptr<const ControllerDescriptor>> ret;
     ret.emplace_back(new NullControllerDescriptor());
     return ret;
 }
 
 
-template class ControllerType_t<NullControllerDescriptor>;
-const char NullControllerDescriptor::TYPENAME[] = "None";
+template class InterfaceType_t<NullControllerDescriptor>;
 
 
 bool NullControllerDescriptor::operator==(const ControllerDescriptor& x) const{
     return typeid(*this) == typeid(x);
-}
-const char* NullControllerDescriptor::type_name() const{
-    return TYPENAME;
 }
 std::string NullControllerDescriptor::display_name() const{
     return "(none)";

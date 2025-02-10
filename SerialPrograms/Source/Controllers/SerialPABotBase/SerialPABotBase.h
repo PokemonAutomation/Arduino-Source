@@ -17,10 +17,6 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
-//  Supported Controllers
-extern const char NintendoSwitch_Basic[];
-
-
 
 //  Defaults
 extern const ControllerRequirements OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS;

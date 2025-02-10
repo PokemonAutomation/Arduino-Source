@@ -11,6 +11,7 @@ namespace PokemonAutomation{
 
 
 const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS{
+    {ControllerInterface::None,                 "None"},
     {ControllerInterface::SerialPABotBase,      "SerialPABotBase"},
 };
 

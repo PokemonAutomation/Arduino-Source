@@ -32,8 +32,8 @@ namespace PokemonAutomation{
 
 
 
-
 enum class ControllerInterface{
+    None,
     SerialPABotBase,
 };
 extern const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
@@ -57,6 +57,8 @@ enum class ControllerFeature{
     NintendoSwitch_DateSkip,
 };
 extern const EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS;
+
+
 
 
 

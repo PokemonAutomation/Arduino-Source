@@ -16,26 +16,26 @@
 namespace PokemonAutomation{
 
 class JsonValue;
-class AbstractControllerType;
+class InterfaceType;
 class ControllerDescriptor;
 class ControllerConnection;
 
 
 //
-//  Represents an entire type of controller.
+//  Represents an entire controller interface.
 //
 //  For example:
-//      -   "Nintendo Switch via Serial PABotBase" is a type of controller.
-//      -   "Nintendo Switch via Joycon Emulation" is a type of controller. (hypothetical)
-//      -   "Xbox One via whatever..." ...
+//      -   Serial PABotBase
+//      -   Direct USB to X (hypothetical)
+//      -   Emulator IPC (hypothetical)
 //
-//  One instance of this class exists for each type of controller.
+//  One instance of this class exists for each interface.
 //
-class AbstractControllerType{
+class InterfaceType{
 public:
-    virtual ~AbstractControllerType() = default;
+    virtual ~InterfaceType() = default;
 
-    //  Returns a list of all available instances for this controller type.
+    //  Returns a list of all available descriptors for this interface type.
     virtual std::vector<std::shared_ptr<const ControllerDescriptor>> list() const = 0;
 
     //  Construct a descriptor from a JSON config. (reloading saved controller settings)
@@ -43,8 +43,8 @@ public:
 
 protected:
     static void register_factory(
-        const std::string& name,
-        std::unique_ptr<AbstractControllerType> factory
+        ControllerInterface controller_interface,
+        std::unique_ptr<InterfaceType> factory
     );
 };
 
@@ -53,7 +53,7 @@ protected:
 //  Subclass helper for ControllerType.
 //
 template <typename DescriptorType>
-class ControllerType_t : public AbstractControllerType{
+class InterfaceType_t : public InterfaceType{
 public:
     //  Subclasses must implement this function.
     virtual std::vector<std::shared_ptr<const ControllerDescriptor>> list() const override;
@@ -67,16 +67,16 @@ public:
 
 private:
     static int register_class(){
-        AbstractControllerType::register_factory(
-            DescriptorType::TYPENAME,
-            std::make_unique<ControllerType_t<DescriptorType>>()
+        InterfaceType::register_factory(
+            DescriptorType::INTERFACE_NAME,
+            std::make_unique<InterfaceType_t<DescriptorType>>()
         );
         return 0;
     }
     static int initializer;
 };
 template <typename DescriptorType>
-int ControllerType_t<DescriptorType>::initializer = register_class();
+int InterfaceType_t<DescriptorType>::initializer = register_class();
 
 
 
@@ -88,10 +88,14 @@ int ControllerType_t<DescriptorType>::initializer = register_class();
 //
 class ControllerDescriptor{
 public:
+    const ControllerInterface interface_type;
+
+    ControllerDescriptor(ControllerInterface p_interface_type)
+        : interface_type(p_interface_type)
+    {}
     virtual ~ControllerDescriptor() = default;
     virtual bool operator==(const ControllerDescriptor& x) const = 0;
 
-    virtual const char* type_name() const = 0;
     virtual std::string display_name() const = 0;
 
     virtual void load_json(const JsonValue& json) = 0;
@@ -108,6 +112,7 @@ public:
     ) const{
         return nullptr;
     }
+
 };
 
 
@@ -128,8 +133,8 @@ class ControllerOption{
 public:
     ControllerOption();
 
-    std::shared_ptr<const ControllerDescriptor> current() const{
-        return m_current;
+    std::shared_ptr<const ControllerDescriptor> descriptor() const{
+        return m_descriptor;
     }
 
     void load_json(const JsonValue& json);
@@ -137,7 +142,8 @@ public:
 
 private:
     friend class ControllerSession;
-    std::shared_ptr<const ControllerDescriptor> m_current;
+    std::shared_ptr<const ControllerDescriptor> m_descriptor;
+    ControllerType m_controller_type;
 };
 
 

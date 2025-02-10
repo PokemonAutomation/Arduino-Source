@@ -321,7 +321,7 @@ SOURCES += \
     Source/Controllers/NullController.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Interface.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp \
     Source/Controllers/SuperscalarScheduler.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
     Source/Integrations/DiscordIntegrationTable.cpp \
@@ -1457,7 +1457,7 @@ HEADERS += \
     Source/Controllers/NullController.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Interface.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h \
     Source/Controllers/SuperscalarScheduler.h \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \

@@ -7,10 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "ControllerSession.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -42,7 +41,7 @@ ControllerSession::ControllerSession(
     , m_requirements(requirements)
     , m_option(option)
     , m_options_locked(false)
-    , m_descriptor(option.current())
+    , m_descriptor(option.descriptor())
     , m_connection(m_descriptor->open_connection(logger))
 {
 //    cout << "ControllerSession:ControllerSession(): " << m_descriptor->display_name() << endl;
@@ -58,7 +57,7 @@ void ControllerSession::get(ControllerOption& option){
     option = m_option;
 }
 void ControllerSession::set(const ControllerOption& option){
-    set_device(option.current());
+    set_device(option.descriptor());
 }
 
 
@@ -155,7 +154,7 @@ bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescrip
             m_connection->add_status_listener(*this);
         }
 
-        m_option.m_current = device;
+        m_option.m_descriptor = device;
         m_descriptor = device;
     }
     signal_controller_changed(device);
@@ -191,13 +190,25 @@ void ControllerSession::pre_not_ready(){
     m_listeners.run_method_unique(&Listener::pre_not_ready);
 }
 void ControllerSession::post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers){
-#if 1
     if (controllers.empty()){
         return;
     }
 
-    //  REMOVE: TODO: Pick the first controller for now.
     auto iter = controllers.begin();
+
+    if (controllers.size() == 1){
+        //  Only one controller available. Force the option to it.
+        m_option.m_controller_type = iter->first;
+    }else{
+        //  Otherwise, try to use the option setting. If it's not valid,
+        //  clear it.
+        iter = controllers.find(m_option.m_controller_type);
+        if (iter == controllers.end()){
+            m_option.m_controller_type = ControllerType::None;
+            m_controller.reset();
+            return;
+        }
+    }
 
 //    cout << "post_ready()" << endl;
 
@@ -205,7 +216,6 @@ void ControllerSession::post_ready(const std::map<ControllerType, std::set<Contr
     m_controller = m_descriptor->make_controller(m_logger, *m_connection, iter->first, m_requirements);
     m_listeners.run_method_unique(&Listener::post_ready, controllers);
     signal_ready_changed(m_controller->is_ready());
-#endif
 }
 void ControllerSession::post_status_text_changed(const std::string& text){
     do{

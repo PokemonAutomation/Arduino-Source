@@ -635,8 +635,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Interface.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Interface.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp

@@ -15,11 +15,13 @@ namespace PokemonAutomation{
 
 class NullControllerDescriptor : public ControllerDescriptor{
 public:
-    static const char TYPENAME[];
+    static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::None;
 
 public:
+    NullControllerDescriptor()
+        : ControllerDescriptor(ControllerInterface::None)
+    {}
     virtual bool operator==(const ControllerDescriptor& x) const override;
-    virtual const char* type_name() const override;
     virtual std::string display_name() const override;
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
