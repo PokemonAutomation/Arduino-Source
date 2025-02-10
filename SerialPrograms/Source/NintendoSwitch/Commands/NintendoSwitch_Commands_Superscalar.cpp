@@ -13,19 +13,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void ssf_flush_pipeline(SwitchControllerContext& context){
+void ssf_flush_pipeline(ProControllerContext& context){
     context->issue_barrier(&context);
 }
-void ssf_do_nothing(SwitchControllerContext& context, uint16_t ticks){
+void ssf_do_nothing(ProControllerContext& context, uint16_t ticks){
     context->issue_nop(&context, ticks*8ms);
 }
-void ssf_do_nothing(SwitchControllerContext& context, Milliseconds duration){
+void ssf_do_nothing(ProControllerContext& context, Milliseconds duration){
     context->issue_nop(&context, duration);
 }
 
 
 void ssf_press_button(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Button button,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
@@ -35,7 +35,7 @@ void ssf_press_button(
     );
 }
 void ssf_press_button(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Button button,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
@@ -43,7 +43,7 @@ void ssf_press_button(
 }
 
 void ssf_press_dpad(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     DpadPosition position,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
@@ -53,7 +53,7 @@ void ssf_press_dpad(
     );
 }
 void ssf_press_dpad(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     DpadPosition position,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
@@ -61,7 +61,7 @@ void ssf_press_dpad(
 }
 
 void ssf_press_left_joystick(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
@@ -71,14 +71,14 @@ void ssf_press_left_joystick(
     );
 }
 void ssf_press_left_joystick(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
     context->issue_left_joystick(&context, x, y, delay, hold, cool);
 }
 void ssf_press_right_joystick(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint8_t x, uint8_t y,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
@@ -88,7 +88,7 @@ void ssf_press_right_joystick(
     );
 }
 void ssf_press_right_joystick(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
@@ -97,26 +97,26 @@ void ssf_press_right_joystick(
 
 
 
-void ssf_mash1_button(SwitchControllerContext& context, Button button, uint16_t ticks){
+void ssf_mash1_button(ProControllerContext& context, Button button, uint16_t ticks){
     context->issue_mash_button(&context, button, ticks*8ms);
 }
-void ssf_mash1_button(SwitchControllerContext& context, Button button, Milliseconds duration){
+void ssf_mash1_button(ProControllerContext& context, Button button, Milliseconds duration){
     context->issue_mash_button(&context, button, duration);
 }
-void ssf_mash2_button(SwitchControllerContext& context, Button button0, Button button1, uint16_t ticks){
+void ssf_mash2_button(ProControllerContext& context, Button button0, Button button1, uint16_t ticks){
     context->issue_mash_button(&context, button0, button1, ticks*8ms);
 }
-void ssf_mash2_button(SwitchControllerContext& context, Button button0, Button button1, Milliseconds duration){
+void ssf_mash2_button(ProControllerContext& context, Button button0, Button button1, Milliseconds duration){
     context->issue_mash_button(&context, button0, button1, duration);
 }
-void ssf_mash_AZs(SwitchControllerContext& context, uint16_t ticks){
+void ssf_mash_AZs(ProControllerContext& context, uint16_t ticks){
     context->issue_mash_AZs(&context, ticks*8ms);
 }
-void ssf_mash_AZs(SwitchControllerContext& context, Milliseconds duration){
+void ssf_mash_AZs(ProControllerContext& context, Milliseconds duration){
     context->issue_mash_AZs(&context, duration);
 }
 void ssf_issue_scroll(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     DpadPosition direction,
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
@@ -126,7 +126,7 @@ void ssf_issue_scroll(
     );
 }
 void ssf_issue_scroll(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     DpadPosition direction,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){

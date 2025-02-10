@@ -11,7 +11,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/FailureWatchdog.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
@@ -96,7 +96,7 @@ struct AdventureRuntime{
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool save_path,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& boss_action,

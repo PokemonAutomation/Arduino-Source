@@ -110,16 +110,16 @@ MoneyFarmerRoute210::MoneyFarmerRoute210()
 
 
 
-bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     env.log("Starting battle!");
 
     {
         StartBattleDetector detector(env.console);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_press_button(context, BUTTON_ZL, 10, 10);
                 for (size_t c = 0; c < 17; c++){
                     pbf_press_dpad(context, DPAD_UP, 5, 10);
@@ -149,9 +149,9 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, SwitchCont
         BattleMenuWatcher battle_menu(BattleType::TRAINER);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
@@ -244,7 +244,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, SwitchCont
 }
 
 void MoneyFarmerRoute210::heal_at_center_and_return(
-    Logger& logger, SwitchControllerContext& context,
+    Logger& logger, ProControllerContext& context,
     uint8_t pp0[4], uint8_t pp1[4]
 ){
     logger.log("Healing " + STRING_POKEMON + " Celestic Town " + STRING_POKEMON + " Center.");
@@ -285,7 +285,7 @@ void MoneyFarmerRoute210::heal_at_center_and_return(
     pp1[3] = MON1_MOVE4_PP;
 }
 void MoneyFarmerRoute210::fly_to_center_heal_and_return(
-    Logger& logger, SwitchControllerContext& context,
+    Logger& logger, ProControllerContext& context,
     uint8_t pp0[4], uint8_t pp1[4]
 ){
     logger.log("Flying back to Hearthome City to heal.");
@@ -299,7 +299,7 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(
 
 bool MoneyFarmerRoute210::heal_after_battle_and_return(
     SingleSwitchProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint8_t pp0[4], uint8_t pp1[4])
 {
     if (HEALING_METHOD == HealMethod::CelesticTown){
@@ -335,7 +335,7 @@ bool MoneyFarmerRoute210::has_pp(uint8_t pp0[4], uint8_t pp1[4]){
 
 
 
-void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     MoneyFarmerRoute210_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute210_Descriptor::Stats>();
 
     uint8_t pp0[4] = {
@@ -387,9 +387,9 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, SwitchCon
         std::vector<ImagePixelBox> bubbles;
         {
             VSSeekerReactionTracker tracker(env.console, {0.20, 0.20, 0.60, 0.60});
-            run_until<SwitchControllerContext>(
+            run_until<ProControllerContext>(
                 env.console, context,
-                [this](SwitchControllerContext& context){
+                [this](ProControllerContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
                 },
                 {{tracker}}

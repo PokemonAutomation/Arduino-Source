@@ -113,7 +113,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
 
 
 void ShinyHuntCustomPath::do_non_listen_action(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const CustomPathTableRow2& row
 ){
     stream.log("Execute action " + row.action.current_display());
@@ -212,7 +212,7 @@ void ShinyHuntCustomPath::do_non_listen_action(
 }
 
 
-void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     std::vector<std::unique_ptr<CustomPathTableRow2>> table = PATH.PATH.copy_snapshot();
 
@@ -247,9 +247,9 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, SwitchCo
         return on_shiny_callback(env, env.console, *shiny_action, error_coefficient);
     });
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             for (const std::unique_ptr<CustomPathTableRow2>& row : table){
                 if (row->action == PathAction::START_LISTEN){
                     listen_for_shiny.store(true, std::memory_order_release);
@@ -272,7 +272,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, SwitchCo
 }
 
 
-void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntCustomPath_Descriptor::Stats& stats = env.current_stats<ShinyHuntCustomPath_Descriptor::Stats>();
 
     //  Connect the controller.

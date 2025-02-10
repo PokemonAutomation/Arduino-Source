@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_BoxRelease_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
@@ -24,7 +24,7 @@ namespace PokemonSV{
 //  presses that the function recovered from.
 void release_one_pokemon(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t& errors
 );
 
@@ -34,7 +34,7 @@ void release_one_pokemon(
 //  presses that the function recovered from.
 void release_box(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t& errors,
     uint8_t start_row = 0   //  Start from this row. (skip te first "start_row" rows)
 );

@@ -8,7 +8,7 @@
 //#include "SerialPABotBase.h"
 #include "SerialPABotBase_Descriptor.h"
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h"
 
 //#include <iostream>
 //using std::cout;
@@ -89,7 +89,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
     switch (controller_type){
     case ControllerType::NintendoSwitch_WiredProController:
         return std::unique_ptr<AbstractController>(
-            new NintendoSwitch::SwitchController_SerialPABotBase(
+            new NintendoSwitch::ProController_SerialPABotBase(
                 logger,
                 static_cast<SerialPABotBase::SerialPABotBase_Connection&>(connection),
                 requirements

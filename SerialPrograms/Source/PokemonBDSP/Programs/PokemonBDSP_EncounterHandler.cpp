@@ -25,7 +25,7 @@ namespace PokemonBDSP{
 
 
 
-void take_video(SwitchControllerContext& context){
+void take_video(ProControllerContext& context){
     pbf_wait(context, 5 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 //    context->wait_for_all_requests();
@@ -33,7 +33,7 @@ void take_video(SwitchControllerContext& context){
 
 
 StandardEncounterHandler::StandardEncounterHandler(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     Language language,
     EncounterBotCommonOptions& settings,
     PokemonSwSh::ShinyHuntTracker& session_stats

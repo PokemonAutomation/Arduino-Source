@@ -21,14 +21,14 @@ namespace PokemonSwSh{
 
 
 //  Collect egg.
-static void collect_egg(SwitchControllerContext& context){
+static void collect_egg(ProControllerContext& context){
     ssf_press_button1(context, BUTTON_A, 120);
     if (GameSettings::instance().EGG_FETCH_EXTRA_LINE){
         ssf_press_button1(context, BUTTON_A, 120);
     }
     ssf_press_button1(context, BUTTON_A, 10);
 }
-static void collect_egg_mash_out(SwitchControllerContext& context, bool deposit_automatically){
+static void collect_egg_mash_out(ProControllerContext& context, bool deposit_automatically){
     Milliseconds FETCH_EGG_MASH_DELAY = GameSettings::instance().FETCH_EGG_MASH_DELAY0;
     pbf_mash_button(
         context,
@@ -42,7 +42,7 @@ static void collect_egg_mash_out(SwitchControllerContext& context, bool deposit_
 
 //  Fly Home: Used by everything.
 //  Assume the selected app in the menu is Twon Map.
-static void fly_home(SwitchControllerContext& context, char from_overworld){
+static void fly_home(ProControllerContext& context, char from_overworld){
     if (from_overworld){
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
     }
@@ -52,7 +52,7 @@ static void fly_home(SwitchControllerContext& context, char from_overworld){
 }
 
 //  Assume the selected app in the menu is Twon Map.
-static void fly_home_goto_lady(SwitchControllerContext& context, char from_overworld){
+static void fly_home_goto_lady(ProControllerContext& context, char from_overworld){
     fly_home(context, from_overworld);
 
     //  Go to lady.
@@ -62,7 +62,7 @@ static void fly_home_goto_lady(SwitchControllerContext& context, char from_overw
 }
 
 //  Assume the selected app in the menu is Twon Map.
-static void fly_home_collect_egg(SwitchControllerContext& context, char from_overworld){
+static void fly_home_collect_egg(ProControllerContext& context, char from_overworld){
     fly_home_goto_lady(context, from_overworld);
     collect_egg(context);
 }
@@ -77,7 +77,7 @@ static const Milliseconds EGG_BUTTON_HOLD_DELAY = 80ms;
 // - From game menu to pokemon storage box
 // - Move cursor to the second pokemon in the party, aka first hatched pokemon in the party
 // - Press button Y two times to change pokemon selection to group selection
-static void menu_to_box(SwitchControllerContext& context, bool from_map){
+static void menu_to_box(ProControllerContext& context, bool from_map){
     Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
     if (from_map){
         ssf_press_dpad(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
@@ -90,7 +90,7 @@ static void menu_to_box(SwitchControllerContext& context, bool from_map){
     ssf_press_button(context, BUTTON_Y, 240ms, EGG_BUTTON_HOLD_DELAY);
     ssf_press_button(context, BUTTON_Y, 240ms, EGG_BUTTON_HOLD_DELAY);
 }
-static void box_to_menu(SwitchControllerContext& context){
+static void box_to_menu(ProControllerContext& context){
     //  There are two states here which need to be merged:
     //      1.  The depositing column was empty. The party has been swapped and
     //          it's sitting in the box with no held pokemon.
@@ -115,7 +115,7 @@ static void box_to_menu(SwitchControllerContext& context){
     ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 }
 
-static void party_to_column(SwitchControllerContext& context, uint8_t column){
+static void party_to_column(ProControllerContext& context, uint8_t column){
     Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
 
     ssf_press_dpad(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
@@ -130,7 +130,7 @@ static void party_to_column(SwitchControllerContext& context, uint8_t column){
         }
     }
 }
-static void column_to_party(SwitchControllerContext& context, uint8_t column){
+static void column_to_party(ProControllerContext& context, uint8_t column){
     Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
 
     column++;
@@ -146,7 +146,7 @@ static void column_to_party(SwitchControllerContext& context, uint8_t column){
     ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 }
 
-static void pickup_column(SwitchControllerContext& context, char party){
+static void pickup_column(ProControllerContext& context, char party){
     Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
 
     ssf_press_button(context, BUTTON_A, 160ms, EGG_BUTTON_HOLD_DELAY);

@@ -12,7 +12,7 @@
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -70,7 +70,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     m_scope.store(&scope, std::memory_order_release);
 
     try{
-        SwitchControllerContext context(scope, env.console.controller());
+        ProControllerContext context(scope, env.console.controller());
         m_option.instance().program(env, context);
         context.wait_for_all_requests();
     }catch (...){
@@ -113,7 +113,7 @@ void SingleSwitchProgramSession::internal_run_program(){
     );
     CancellableHolder<CancellableScope> scope;
     AbstractController* controller = m_system.controller_session().controller();
-    SwitchController& switch_controller = *dynamic_cast<SwitchController*>(controller);
+    ProController& switch_controller = *dynamic_cast<ProController*>(controller);
     SingleSwitchProgramEnvironment env(
         program_info,
         scope,

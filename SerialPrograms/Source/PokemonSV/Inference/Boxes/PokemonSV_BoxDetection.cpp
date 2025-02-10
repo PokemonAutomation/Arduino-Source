@@ -221,7 +221,7 @@ bool BoxDetector::to_coordinates(int& x, int& y, BoxCursorLocation side, uint8_t
     }
     return true;
 }
-void BoxDetector::move_vertical(SwitchControllerContext& context, int current, int desired) const{
+void BoxDetector::move_vertical(ProControllerContext& context, int current, int desired) const{
     int diff = (current - desired + 7) % 7;
 //    cout << "diff = " << diff << endl;
     if (diff <= 3){
@@ -234,7 +234,7 @@ void BoxDetector::move_vertical(SwitchControllerContext& context, int current, i
         }
     }
 }
-void BoxDetector::move_horizontal(SwitchControllerContext& context, int current, int desired) const{
+void BoxDetector::move_horizontal(ProControllerContext& context, int current, int desired) const{
     int diff = (current - desired + 7) % 7;
     if (diff <= 3){
         for (int c = 0; c < diff; c++){
@@ -249,7 +249,7 @@ void BoxDetector::move_horizontal(SwitchControllerContext& context, int current,
 
 
 void BoxDetector::move_cursor(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     BoxCursorLocation side, uint8_t row, uint8_t col
 ) const{
     int desired_x = 0, desired_y = 0;

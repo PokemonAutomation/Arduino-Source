@@ -41,31 +41,31 @@ public:
 class EggAutonomous : public SingleSwitchProgramInstance{
 public:
     EggAutonomous();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    int fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    int fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-    void hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, int num_eggs_in_party);
+    void hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int num_eggs_in_party);
 
-    void reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-    int picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    int picnic_party_to_hatch_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-    void process_one_baby(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t egg_index, uint8_t num_eggs_in_party);
+    void process_one_baby(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t egg_index, uint8_t num_eggs_in_party);
 
-    bool move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t pokemon_row_in_party);
+    bool move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pokemon_row_in_party);
 
-    void save_game(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, bool from_overworld);
+    void save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool from_overworld);
 
     void handle_recoverable_error(
-        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context,
         EventNotificationOption& notification,
         OperationFailedException& e,
         size_t& consecutive_failures
     );
 
-    // void call_with_debug_dump(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, std::function<void())
+    // void call_with_debug_dump(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::function<void())
 
 private:
     // Will need this to preserve raid den

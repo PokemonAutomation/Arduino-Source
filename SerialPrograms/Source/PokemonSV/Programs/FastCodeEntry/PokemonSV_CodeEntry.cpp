@@ -95,7 +95,7 @@ const char* normalize_code(std::string& normalized_code, const std::string& code
 }
 
 void enter_code(
-    Logger& logger, SwitchControllerContext& context,
+    Logger& logger, ProControllerContext& context,
     const FastCodeEntrySettings& settings, const std::string& normalized_code,
     bool connect_controller_press,
     bool override_mode
@@ -142,7 +142,7 @@ const char* enter_code(
         return error;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         if (connect_controller_press){
             //  Connect the controller.
             pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);

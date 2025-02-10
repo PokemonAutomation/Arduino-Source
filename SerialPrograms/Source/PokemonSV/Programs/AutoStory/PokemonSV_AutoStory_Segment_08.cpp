@@ -39,7 +39,7 @@ std::string AutoStory_Segment_08::end_text() const{
 
 void AutoStory_Segment_08::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -62,7 +62,7 @@ void AutoStory_Segment_08::run_segment(
 
 void checkpoint_13(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     // reset rate: 0%. 0 resets out of 70.
@@ -71,7 +71,7 @@ void checkpoint_13(
     while (true){
     try{
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
         
             if (first_attempt){
                 checkpoint_save(env, context, notif_status_update);
@@ -113,7 +113,7 @@ void checkpoint_13(
 
 void checkpoint_14(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -171,7 +171,7 @@ void checkpoint_14(
 
 void checkpoint_15(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

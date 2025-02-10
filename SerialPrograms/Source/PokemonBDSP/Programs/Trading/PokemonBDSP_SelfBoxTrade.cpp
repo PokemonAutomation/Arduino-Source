@@ -61,7 +61,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
-            env.run_in_parallel(scope, [](ConsoleHandle& console, SwitchControllerContext& context){
+            env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
                 pbf_press_button(context, BUTTON_R, 160ms, GameSettings::instance().BOX_CHANGE_DELAY0);
             });
         }

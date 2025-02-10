@@ -23,7 +23,7 @@ namespace PokemonSwSh{
 
 
 void resume_game_no_interact(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu
 ){
     bool video_available = (bool)stream.video().snapshot();
@@ -34,7 +34,7 @@ void resume_game_no_interact(
     }
 }
 void resume_game_back_out(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu, uint16_t mash_B_time
 ){
     bool video_available = (bool)stream.video().snapshot();
@@ -49,7 +49,7 @@ void resume_game_back_out(
 
 
 void enter_loading_game(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool backup_save,
     uint16_t post_wait_time
 ){
@@ -101,7 +101,7 @@ void enter_loading_game(
 }
 
 void start_game_from_home_with_inference(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -122,7 +122,7 @@ void start_game_from_home_with_inference(
 }
 
 void reset_game_from_home_with_inference(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu,
     bool backup_save,
     uint16_t post_wait_time

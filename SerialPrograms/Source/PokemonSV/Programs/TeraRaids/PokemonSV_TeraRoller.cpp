@@ -110,7 +110,7 @@ TeraRoller::TeraRoller()
 }
 
 
-void TeraRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     TeraRoller_Descriptor::Stats& stats = env.current_stats<TeraRoller_Descriptor::Stats>();

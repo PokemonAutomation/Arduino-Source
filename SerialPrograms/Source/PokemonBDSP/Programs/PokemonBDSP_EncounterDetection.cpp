@@ -25,7 +25,7 @@ namespace PokemonBDSP{
 
 
 StandardEncounterDetection::StandardEncounterDetection(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     const EncounterFilterOption2& filter,
     const DoublesShinyDetection& shininess,

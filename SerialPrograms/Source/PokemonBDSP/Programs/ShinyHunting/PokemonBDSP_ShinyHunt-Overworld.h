@@ -33,7 +33,7 @@ public:
 class ShinyHuntOverworld : public SingleSwitchProgramInstance{
 public:
     ShinyHuntOverworld();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 
 private:

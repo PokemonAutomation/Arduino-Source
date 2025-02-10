@@ -26,7 +26,7 @@ namespace PokemonBDSP{
 
 
 bool gamemenu_to_ingame(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Milliseconds mash_duration, Milliseconds enter_game_timeout
 ){
     stream.log("Mashing A to enter game...");
@@ -48,7 +48,7 @@ bool gamemenu_to_ingame(
     }
 }
 bool openedgame_to_ingame(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     Milliseconds load_game_timeout,
     Milliseconds mash_duration, Milliseconds enter_game_timeout,
     Milliseconds post_wait_time
@@ -69,7 +69,7 @@ bool openedgame_to_ingame(
 
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu,
     Milliseconds post_wait_time
 ){

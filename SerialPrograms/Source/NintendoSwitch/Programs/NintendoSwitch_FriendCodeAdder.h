@@ -27,7 +27,7 @@ class FriendCodeAdder : public SingleSwitchProgramInstance{
 public:
     FriendCodeAdder();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint8_t> USER_SLOT;

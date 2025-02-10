@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void home_to_date_time(SwitchControllerContext& context, bool to_date_change, bool fast){
+void home_to_date_time(ProControllerContext& context, bool to_date_change, bool fast){
     //  If (fast == true) this will run faster, but slightly less accurately.
 
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
@@ -69,7 +69,7 @@ void home_to_date_time(SwitchControllerContext& context, bool to_date_change, bo
 
 namespace PokemonSwSh{
 
-void neutral_date_skip(SwitchControllerContext& context){
+void neutral_date_skip(ProControllerContext& context){
     ssf_press_button(context, BUTTON_A, 20, 10);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
     ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
@@ -87,7 +87,7 @@ void neutral_date_skip(SwitchControllerContext& context){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
 }
-void roll_date_forward_1(SwitchControllerContext& context, bool fast){
+void roll_date_forward_1(ProControllerContext& context, bool fast){
     //  If (fast == true) this will run faster, but slightly less reliably.
     uint8_t scroll_delay = fast ? 3 : 4;
     uint8_t up_delay = fast ? 2 : 3;
@@ -105,7 +105,7 @@ void roll_date_forward_1(SwitchControllerContext& context, bool fast){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
     ssf_press_button(context, BUTTON_A, 20, 10);
 }
-void roll_date_backward_N(SwitchControllerContext& context, uint8_t skips, bool fast){
+void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fast){
     if (skips == 0){
         return;
     }
@@ -137,7 +137,7 @@ void roll_date_backward_N(SwitchControllerContext& context, uint8_t skips, bool 
     ssf_press_button(context, BUTTON_A, 20, 10);
 }
 void home_roll_date_enter_game_autorollback(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint8_t& year
 ){
     //  This version automatically handles the 2060 roll-back.
@@ -150,7 +150,7 @@ void home_roll_date_enter_game_autorollback(
     year++;
 }
 void home_roll_date_enter_game(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool rollback_year
 ){
     //  From the Switch home menu, roll the date, then re-enter the game.
@@ -176,7 +176,7 @@ void home_roll_date_enter_game(
 
     resume_game_from_home(stream, context, true);
 }
-void touch_date_from_home(SwitchControllerContext& context, Milliseconds settings_to_home_delay){
+void touch_date_from_home(ProControllerContext& context, Milliseconds settings_to_home_delay){
     //  Touch the date without changing it. This prevents unintentional rollovers.
 
     home_to_date_time(context, true, true);
@@ -200,7 +200,7 @@ void touch_date_from_home(SwitchControllerContext& context, Milliseconds setting
     ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
 }
 void rollback_hours_from_home(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint8_t hours,
     Milliseconds settings_to_home_delay
 ){

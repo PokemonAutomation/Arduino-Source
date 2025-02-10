@@ -131,13 +131,13 @@ PurpleBeamFinder::PurpleBeamFinder()
 
 
 
-bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PurpleBeamFinder_Descriptor::Stats& stats = env.current_stats<PurpleBeamFinder_Descriptor::Stats>();
 
     SelectionArrowFinder arrow_detector(env.console.overlay(), {0.5, 0.5, 0.3, 0.3});
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 1000);
         },
         { arrow_detector }
@@ -153,9 +153,9 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, SwitchController
     pbf_wait(context, 100);
     context.wait_for_all_requests();
 
-    ret = run_until<SwitchControllerContext>(
+    ret = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 10, 300);
         },
         { arrow_detector }
@@ -201,7 +201,7 @@ bool PurpleBeamFinder::run(SingleSwitchProgramEnvironment& env, SwitchController
     return false;
 }
 
-void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

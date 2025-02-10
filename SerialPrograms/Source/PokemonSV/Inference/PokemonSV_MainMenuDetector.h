@@ -12,7 +12,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -48,7 +48,7 @@ public:
     //  actually land on the desired slot if the capture card is slow.
     bool move_cursor(
         const ProgramInfo& info,
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         MenuSide side, int row, bool fast = false
     ) const;
 

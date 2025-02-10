@@ -94,7 +94,7 @@ StatsResetMoltres::StatsResetMoltres()
 
 
 
-void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -109,9 +109,9 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
         env.log("Wait for moltres to attack you.", COLOR_PURPLE);
         {
             StandardBattleMenuWatcher fight_detector(false);
-            int result = run_until<SwitchControllerContext>(
+            int result = run_until<ProControllerContext>(
                 env.console, context,
-                [](SwitchControllerContext& context){
+                [](ProControllerContext& context){
                     while (true){
                         pbf_wait(context, 1 * TICKS_PER_SECOND);
                     }
@@ -176,9 +176,9 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
             env.log("Wait for moltres to attack you.", COLOR_PURPLE);
             {
                 StandardBattleMenuWatcher fight_detector(false);
-                int ret = run_until<SwitchControllerContext>(
+                int ret = run_until<ProControllerContext>(
                     env.console, context,
-                    [](SwitchControllerContext& context){
+                    [](ProControllerContext& context){
                         while (true){
                             pbf_wait(context, 1 * TICKS_PER_SECOND);
                         }

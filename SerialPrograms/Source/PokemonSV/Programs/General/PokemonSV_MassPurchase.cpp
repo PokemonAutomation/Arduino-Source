@@ -83,7 +83,7 @@ MassPurchase::MassPurchase()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool MassPurchase::mass_purchase(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
+bool MassPurchase::mass_purchase(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 
     OverworldWatcher overworld(stream.logger(), COLOR_RED);
@@ -120,7 +120,7 @@ bool MassPurchase::mass_purchase(ProgramEnvironment& env, VideoStream& stream, S
     }
 };
     
-bool MassPurchase::extra_items(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
+bool MassPurchase::extra_items(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 
     OverworldWatcher overworld(stream.logger(), COLOR_RED);
@@ -155,7 +155,7 @@ bool MassPurchase::extra_items(ProgramEnvironment& env, VideoStream& stream, Swi
     }
 };
 
-void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void PokemonSV::MassPurchase::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     MassPurchase_Descriptor::Stats& stats = env.current_stats<MassPurchase_Descriptor::Stats>();
 

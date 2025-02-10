@@ -20,7 +20,7 @@ namespace PokemonSV{
 
 void release_one_pokemon(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t& errors
 ){
     bool release_attempted = false;
@@ -135,7 +135,7 @@ void release_one_pokemon(
 
 void release_box(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t& errors, uint8_t start_row
 ){
     context.wait_for_all_requests();

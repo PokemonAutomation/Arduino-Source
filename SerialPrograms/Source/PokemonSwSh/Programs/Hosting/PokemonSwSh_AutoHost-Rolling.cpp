@@ -100,7 +100,7 @@ AutoHostRolling::AutoHostRolling()
     , CONNECT_TO_INTERNET_DELAY0(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to enter den.",
         LockMode::LOCK_WHILE_RUNNING,
-        "20000 ms"
+        "60000 ms"
     )
     , ENTER_ONLINE_DEN_DELAY0(
         "<b>Enter Online Den Delay:</b><br>\"Communicating\" when entering den while online.",
@@ -151,7 +151,7 @@ AutoHostRolling::AutoHostRolling()
 
 
 
-void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     Milliseconds start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY0
         : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY0;

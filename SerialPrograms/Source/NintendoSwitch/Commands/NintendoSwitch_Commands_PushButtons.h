@@ -18,7 +18,7 @@
 #define PokemonAutomation_NintendoSwitch_Commands_PushButtons_H
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -28,20 +28,20 @@ using namespace std::chrono_literals;
 
 
 //  Wait for this many ticks on the Switch.
-void pbf_wait           (SwitchControllerContext& context, uint16_t ticks);
-void pbf_wait           (SwitchControllerContext& context, Milliseconds duration);
+void pbf_wait           (ProControllerContext& context, uint16_t ticks);
+void pbf_wait           (ProControllerContext& context, Milliseconds duration);
 
 //  Press a Switch controller button (excluding D-Pad). Hold the button for `hold_ticks`, then release it for `release_ticks`.
 //  The buttons are defined in Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h. Examples include BUTTON_A, BUTTON_ZL.
 //  The buttons also include clicking joysticks: BUTTON_LCLICK, BUTTON_RCLICK.
 //  D-Pad buttons and directional movements of joysticks are controlled by separate functions.
-void pbf_press_button   (SwitchControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks);
-void pbf_press_button   (SwitchControllerContext& context, Button button, Milliseconds hold, Milliseconds release);
+void pbf_press_button   (ProControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks);
+void pbf_press_button   (ProControllerContext& context, Button button, Milliseconds hold, Milliseconds release);
 
 //  Press a Switch controller D-Pad button. Hold the button for `hold_ticks`, then release it for `release_ticks`.
 //  The buttons are defined in Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h. Examples include DPAD_DOWN, DPAD_UP_RIGHT.
-void pbf_press_dpad     (SwitchControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks);
-void pbf_press_dpad     (SwitchControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release);
+void pbf_press_dpad     (ProControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks);
+void pbf_press_dpad     (ProControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release);
 
 //  Move left joystick towards a 2D direction. Hold the direction for `hold_ticks`, then release it for `release_ticks`.
 //  The direction is specified by (x, y):
@@ -53,8 +53,8 @@ void pbf_press_dpad     (SwitchControllerContext& context, DpadPosition position
 //  y = 255 : down
 //  Example: move the joystick fully left: (x, y) = (0, 128)
 //           move the joystick upper-right: (x, y) = (255, 0)
-void pbf_move_left_joystick (SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
-void pbf_move_left_joystick (SwitchControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
+void pbf_move_left_joystick (ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
+void pbf_move_left_joystick (ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
 
 //  Move right joystick towards a 2D direction. Hold the direction for `hold_ticks`, then release it for `release_ticks`.
 //  The direction is specified by (x, y):
@@ -66,17 +66,17 @@ void pbf_move_left_joystick (SwitchControllerContext& context, uint8_t x, uint8_
 //  y = 255 : down
 //  Example: move the joystick fully left: (x, y) = (0, 128)
 //           move the joystick upper-right: (x, y) = (255, 0)
-void pbf_move_right_joystick    (SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
-void pbf_move_right_joystick    (SwitchControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
+void pbf_move_right_joystick    (ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks);
+void pbf_move_right_joystick    (ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
 
 //  Mash a Switch controller button (excluding D-Pad) repeatedly for `ticks` ticks.
 //  The buttons are defined in Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h. Examples include BUTTON_A, BUTTON_ZL.
 //  The buttons also include clicking joysticks: BUTTON_LCLICK, BUTTON_RCLICK.
-void pbf_mash_button            (SwitchControllerContext& context, Button button, uint16_t ticks);
-void pbf_mash_button            (SwitchControllerContext& context, Button button, Milliseconds duration);
+void pbf_mash_button            (ProControllerContext& context, Button button, uint16_t ticks);
+void pbf_mash_button            (ProControllerContext& context, Button button, Milliseconds duration);
 
-//void start_program_flash        (SwitchControllerContext& context, uint16_t ticks);
-void grip_menu_connect_go_home  (SwitchControllerContext& context);
+//void start_program_flash        (ProControllerContext& context, uint16_t ticks);
+void grip_menu_connect_go_home  (ProControllerContext& context);
 
 
 
@@ -97,7 +97,7 @@ void grip_menu_connect_go_home  (SwitchControllerContext& context);
 //  programs already use this for overlapping)
 //
 void pbf_controller_state(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Button button,
     DpadPosition position,
     uint8_t left_x, uint8_t left_y,
@@ -105,7 +105,7 @@ void pbf_controller_state(
     uint16_t ticks
 );
 void pbf_controller_state(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Button button,
     DpadPosition position,
     uint8_t left_x, uint8_t left_y,

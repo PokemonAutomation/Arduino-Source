@@ -25,12 +25,12 @@ class TurboMacro : public SingleSwitchProgramInstance{
 public:
     TurboMacro();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void run_macro(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void run_macro(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void execute_action(
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         const TurboMacroRow& row
     );
 

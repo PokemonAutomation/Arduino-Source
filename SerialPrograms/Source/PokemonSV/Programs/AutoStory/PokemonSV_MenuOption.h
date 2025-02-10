@@ -11,7 +11,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV_MenuOptionDatabase.h"
 
@@ -26,7 +26,7 @@ class MenuOption{
 public:
     ~MenuOption();
     MenuOption(
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         Language language
     );
 
@@ -65,7 +65,7 @@ private:
 
 private:
     VideoStream& m_stream;
-    SwitchControllerContext& m_context;
+    ProControllerContext& m_context;
     Language m_language;
     VideoOverlaySet m_overlays;
     GradientArrowDetector m_arrow;

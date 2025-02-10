@@ -47,7 +47,7 @@ std::tuple<uint16_t, uint16_t, uint16_t> get_location(size_t index){
 // Move cursor from one location to another
 // The location is represented as a uint16_t, meaning the order of the location starting at the first box.
 // Decode this location into box ID and in-box 2D location by `get_location()`
-uint16_t move_to_location(Logger& logger, SwitchControllerContext& context, uint16_t from, uint16_t to){
+uint16_t move_to_location(Logger& logger, ProControllerContext& context, uint16_t from, uint16_t to){
     auto [from_box, from_row, from_column] = get_location(from);
     auto [to_box, to_row, to_column] = get_location(to);
 
@@ -91,7 +91,7 @@ uint16_t move_to_location(Logger& logger, SwitchControllerContext& context, uint
 // In most cases, a pokemon slug is the lower-case version of the Pokemon name, but there are some cases
 // like the slug of the Pokemon Mr. Mime is "mr-mime".
 std::string read_selected_pokemon(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language
 ){
     context.wait_for_all_requests();
@@ -117,7 +117,7 @@ std::string read_selected_pokemon(
 // Return a list of pokemon slugs.
 std::vector<std::string> read_all_pokemon(
     Logger& logger,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint16_t pokemon_count,
     Language language
 ){
@@ -170,7 +170,7 @@ BoxReorderNationalDex::BoxReorderNationalDex()
     PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
-void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);

@@ -36,21 +36,21 @@ public:
     ~AutoStory();
     AutoStory();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
-    void test_code(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void test_code(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     // test the checkpoints from start to end, inclusive
     // test each checkpoints "loop" number of times
     void test_checkpoints(
         SingleSwitchProgramEnvironment& env,
         VideoStream& stream,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         int start, int end, 
         int loop, int start_loop, int end_loop
     );
 
-    void run_autostory(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void run_autostory(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     virtual void value_changed(void* object) override;

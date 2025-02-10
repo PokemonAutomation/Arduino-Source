@@ -14,7 +14,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -67,7 +67,7 @@ DigitPath get_codeboard_digit_path(
     CodeboardPosition source, CodeboardPosition destination,
     uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
 );
-void move_codeboard(SwitchControllerContext& context, const DigitPath& path);
+void move_codeboard(ProControllerContext& context, const DigitPath& path);
 
 
 
@@ -85,7 +85,7 @@ struct FastCodeEntrySettings{
 };
 void enter_alphanumeric_code(
     Logger& logger,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     const FastCodeEntrySettings& settings,
     const std::string& code
 );

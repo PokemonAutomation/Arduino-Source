@@ -20,7 +20,7 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         AutoStoryOptions options) const override;
 };
 
@@ -29,7 +29,7 @@ public:
 // end: Met mom at gate. Received mom's sandwich.
 void checkpoint_05(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -37,7 +37,7 @@ void checkpoint_05(
 // end: Cleared catch tutorial.
 void checkpoint_06(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -45,7 +45,7 @@ void checkpoint_06(
 // end: Moved to cliff. Heard mystery cry.
 void checkpoint_07(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 

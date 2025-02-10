@@ -68,7 +68,7 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
     PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY0);
 }
 
-void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);

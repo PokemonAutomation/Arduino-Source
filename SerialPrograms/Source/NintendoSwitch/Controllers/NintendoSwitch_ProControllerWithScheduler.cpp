@@ -7,7 +7,7 @@
  *
  */
 
-#include "NintendoSwitch_ControllerWithScheduler.h"
+#include "NintendoSwitch_ProControllerWithScheduler.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -17,7 +17,7 @@ using namespace std::chrono_literals;
 
 
 
-SwitchControllerWithScheduler::SwitchControllerWithScheduler(Logger& logger)
+ProControllerWithScheduler::ProControllerWithScheduler(Logger& logger)
     : SuperscalarScheduler(
         logger, Milliseconds(4),
         {
@@ -46,7 +46,7 @@ SwitchControllerWithScheduler::SwitchControllerWithScheduler(Logger& logger)
 
 
 
-void SwitchControllerWithScheduler::push_state(const Cancellable* cancellable, WallDuration duration){
+void ProControllerWithScheduler::push_state(const Cancellable* cancellable, WallDuration duration){
     Button buttons = BUTTON_NONE;
     for (size_t c = 0; c < 14; c++){
         buttons |= m_buttons[c].is_busy()
@@ -79,14 +79,14 @@ void SwitchControllerWithScheduler::push_state(const Cancellable* cancellable, W
 
 
 
-void SwitchControllerWithScheduler::issue_barrier(const Cancellable* cancellable){
+void ProControllerWithScheduler::issue_barrier(const Cancellable* cancellable){
     if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
         m_logger.log("issue_barrier()", COLOR_DARKGREEN);
     }
     WriteSpinLock lg(m_lock);
     this->issue_wait_for_all(cancellable);
 }
-void SwitchControllerWithScheduler::issue_nop(const Cancellable* cancellable, Milliseconds duration){
+void ProControllerWithScheduler::issue_nop(const Cancellable* cancellable, Milliseconds duration){
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
@@ -99,7 +99,7 @@ void SwitchControllerWithScheduler::issue_nop(const Cancellable* cancellable, Mi
     WriteSpinLock lg(m_lock);
     this->SuperscalarScheduler::issue_nop(cancellable, WallDuration(duration));
 }
-void SwitchControllerWithScheduler::issue_buttons(
+void ProControllerWithScheduler::issue_buttons(
     const Cancellable* cancellable,
     Button button,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -134,7 +134,7 @@ void SwitchControllerWithScheduler::issue_buttons(
     }
     this->SuperscalarScheduler::issue_nop(cancellable, delay);
 }
-void SwitchControllerWithScheduler::issue_dpad(
+void ProControllerWithScheduler::issue_dpad(
     const Cancellable* cancellable,
     DpadPosition position,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -156,7 +156,7 @@ void SwitchControllerWithScheduler::issue_dpad(
     m_dpad.position = position;
     this->issue_to_resource(cancellable, m_dpad, delay, hold, cooldown);
 }
-void SwitchControllerWithScheduler::issue_left_joystick(
+void ProControllerWithScheduler::issue_left_joystick(
     const Cancellable* cancellable,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -180,7 +180,7 @@ void SwitchControllerWithScheduler::issue_left_joystick(
     this->issue_to_resource(cancellable, m_left_joystick, delay, hold, cooldown);
 //    cout << "(" << (unsigned)x << "," << (unsigned)y << "), hold = " << hold / 8 << endl;
 }
-void SwitchControllerWithScheduler::issue_right_joystick(
+void ProControllerWithScheduler::issue_right_joystick(
     const Cancellable* cancellable,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -205,7 +205,7 @@ void SwitchControllerWithScheduler::issue_right_joystick(
 }
 
 
-void SwitchControllerWithScheduler::issue_mash_button(
+void ProControllerWithScheduler::issue_mash_button(
     const Cancellable* cancellable,
     Button button, Milliseconds duration
 ){
@@ -228,7 +228,7 @@ void SwitchControllerWithScheduler::issue_mash_button(
             : Milliseconds::zero();
     }
 }
-void SwitchControllerWithScheduler::issue_mash_button(
+void ProControllerWithScheduler::issue_mash_button(
     const Cancellable* cancellable,
     Button button0, Button button1, Milliseconds duration
 ){
@@ -251,7 +251,7 @@ void SwitchControllerWithScheduler::issue_mash_button(
         duration -= std::min(8*8ms, duration);
     }
 }
-void SwitchControllerWithScheduler::issue_mash_AZs(
+void ProControllerWithScheduler::issue_mash_AZs(
     const Cancellable* cancellable,
     Milliseconds duration
 ){
@@ -286,7 +286,7 @@ void SwitchControllerWithScheduler::issue_mash_AZs(
         duration -= std::min(3*8ms, duration);
     }
 }
-void SwitchControllerWithScheduler::issue_system_scroll(
+void ProControllerWithScheduler::issue_system_scroll(
     const Cancellable* cancellable,
     DpadPosition direction, //  Diagonals not allowed.
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown

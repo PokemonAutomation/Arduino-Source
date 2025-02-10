@@ -47,7 +47,7 @@ ActivateMenuGlitch113::ActivateMenuGlitch113()
 
 
 
-void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     VideoStream& stream = env.console;
 
     //  Enable Strength

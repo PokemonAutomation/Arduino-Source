@@ -27,7 +27,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool host_online,
     Milliseconds connect_to_internet_delay
 ){
@@ -125,7 +125,7 @@ void send_raid_notification(
 
 
 void run_autohost(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     Catchability catchability, uint8_t skips,
     const RandomCodeOption* raid_code, Milliseconds lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,
@@ -219,9 +219,9 @@ void run_autohost(
     //  Mash A until it's time to close the game.
     if (stream.video().snapshot()){
         BlackScreenOverWatcher black_screen;
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, raid_start_to_exit_delay);
             },
             {black_screen}

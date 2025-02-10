@@ -29,7 +29,7 @@ namespace NintendoSwitch{
 
 
 void resume_game_from_home(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool skip_home_press
 ){
     if (!skip_home_press){
@@ -77,7 +77,7 @@ void resume_game_from_home(
 
 
 
-void move_to_user(SwitchControllerContext& context, uint8_t user_slot){
+void move_to_user(ProControllerContext& context, uint8_t user_slot){
     if (user_slot != 0){
         //  Move to correct user.
         for (uint8_t c = 0; c < 8; c++){
@@ -91,7 +91,7 @@ void move_to_user(SwitchControllerContext& context, uint8_t user_slot){
 
 
 void start_game_from_home_with_inference(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint8_t game_slot,
     uint8_t user_slot,
     Milliseconds start_game_wait
@@ -99,9 +99,9 @@ void start_game_from_home_with_inference(
     context.wait_for_all_requests();
     {
         HomeWatcher detector;
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             },
             { detector }
@@ -184,7 +184,7 @@ void start_game_from_home_with_inference(
 
 
 void start_game_from_home(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -277,7 +277,7 @@ private:
 
 
 bool openedgame_to_gamemenu(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Milliseconds timeout
 ){
     {

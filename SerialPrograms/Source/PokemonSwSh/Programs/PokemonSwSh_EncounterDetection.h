@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 
@@ -23,7 +23,7 @@ class StandardEncounterDetection{
 public:
     StandardEncounterDetection(
         ProgramEnvironment& env,
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         Language language,
         const EncounterFilterOption2& filter,
         ShinyType shininess,
@@ -42,7 +42,7 @@ public:
 private:
     ProgramEnvironment& m_env;
     VideoStream& m_stream;
-    SwitchControllerContext& m_context;
+    ProControllerContext& m_context;
 
     const Language m_language;
 

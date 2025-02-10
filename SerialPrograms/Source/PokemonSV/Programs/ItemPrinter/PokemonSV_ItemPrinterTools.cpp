@@ -32,7 +32,7 @@ const EnumDropdownDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
 
 void item_printer_start_print(
     AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language, ItemPrinterJobs jobs
 ){
     stream.log("Starting print...");
@@ -76,7 +76,7 @@ void item_printer_start_print(
 }
 ItemPrinterPrizeResult item_printer_finish_print(
     AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language
 ){
     stream.log("Finishing print...");

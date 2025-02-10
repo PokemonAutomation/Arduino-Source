@@ -41,7 +41,7 @@ MultiGameFossil::MultiGameFossil(){
 void run_fossil_batch(
     VideoStream& stream,
     Logger& logger,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     const FossilGame& batch,
     bool* game_slot_flipped,
     bool save_and_exit
@@ -139,7 +139,7 @@ void run_fossil_batch(
 }
 
 
-void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

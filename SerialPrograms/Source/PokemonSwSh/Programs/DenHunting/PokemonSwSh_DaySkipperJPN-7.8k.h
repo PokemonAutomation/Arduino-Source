@@ -30,7 +30,7 @@ public:
 class DaySkipperJPN7p8k : public SingleSwitchProgramInstance{
 public:
     DaySkipperJPN7p8k();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> SKIPS;

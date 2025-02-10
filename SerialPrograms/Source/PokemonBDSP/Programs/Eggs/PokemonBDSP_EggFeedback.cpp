@@ -23,7 +23,7 @@ namespace PokemonBDSP{
 
 
 
-void hatch_egg(VideoStream& stream, SwitchControllerContext& context){
+void hatch_egg(VideoStream& stream, ProControllerContext& context){
     //  Spin until egg starts hatching.
     do{
         ShortDialogWatcher dialog;
@@ -32,9 +32,9 @@ void hatch_egg(VideoStream& stream, SwitchControllerContext& context){
             break;
         }
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 egg_spin(context, 8min);
             },
             {
@@ -113,13 +113,13 @@ void hatch_egg(VideoStream& stream, SwitchControllerContext& context){
         }
     }
 }
-void hatch_party(VideoStream& stream, SwitchControllerContext& context, size_t eggs){
+void hatch_party(VideoStream& stream, ProControllerContext& context, size_t eggs){
     for (size_t c = 0; c < eggs; c++){
         hatch_egg(stream, context);
     }
 }
 
-void withdraw_1st_column_from_overworld(VideoStream& stream, SwitchControllerContext& context){
+void withdraw_1st_column_from_overworld(VideoStream& stream, ProControllerContext& context){
     const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
     overworld_to_box(stream, context);
@@ -134,7 +134,7 @@ void withdraw_1st_column_from_overworld(VideoStream& stream, SwitchControllerCon
 
 
 
-void release(VideoStream& stream, SwitchControllerContext& context){
+void release(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, 50);
     pbf_move_right_joystick(context, 128, 0, 20, 10);
     pbf_move_right_joystick(context, 128, 0, 20, 10);

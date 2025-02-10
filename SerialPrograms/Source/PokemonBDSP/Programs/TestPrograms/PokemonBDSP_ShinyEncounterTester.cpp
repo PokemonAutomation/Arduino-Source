@@ -53,7 +53,7 @@ ShinyEncounterTester::ShinyEncounterTester()
 }
 
 
-void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DoublesShinyDetection result_wild;
     ShinyDetectionResult result_own;
     detect_shiny_battle(

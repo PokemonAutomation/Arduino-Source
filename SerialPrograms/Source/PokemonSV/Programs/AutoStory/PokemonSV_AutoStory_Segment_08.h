@@ -20,7 +20,7 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         AutoStoryOptions options
     ) const override;
 };
@@ -29,7 +29,7 @@ public:
 // end: Battled Nemona at Mesagoza gate. Entered Mesagoza.
 void checkpoint_13(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -37,7 +37,7 @@ void checkpoint_13(
 // end: Battled Team Star at school entrance.
 void checkpoint_14(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -45,7 +45,7 @@ void checkpoint_14(
 // end: Talked to Jacq in classroom. Standing in classroom.
 void checkpoint_15(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 

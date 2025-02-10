@@ -20,7 +20,7 @@ TravelLocation::TravelLocation(
     const char* p_slug, const char* p_display,
     MapRegion p_region,
     uint8_t p_warp_slot, uint8_t p_warp_sub_slot,
-    std::function<void(VideoStream& stream, SwitchControllerContext& context)>&& p_post_arrival_maneuver,
+    std::function<void(VideoStream& stream, ProControllerContext& context)>&& p_post_arrival_maneuver,
     bool p_reverse_sub_menu_direction
 )
     : slug(p_slug)
@@ -108,7 +108,7 @@ TravelLocations::TravelLocations()
     , Coastlands_Arena_NW(
         "coastlands-arena-nw",
         "Cobalt Coastlands - Molten Arena (NW of Volcano)",
-        MapRegion::COASTLANDS, 0, 2, [](VideoStream& stream, SwitchControllerContext& context){
+        MapRegion::COASTLANDS, 0, 2, [](VideoStream& stream, ProControllerContext& context){
             change_mount(stream, context, MountState::BRAVIARY_ON);
             pbf_move_left_joystick(context, 160, 0, 160, 0);
             pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
@@ -154,7 +154,7 @@ TravelLocations::TravelLocations()
     , Icelands_PearlSettlement_SW(
         "icelands-settlement-sw",
         "Alabaster Icelands - Pearl Settlement (SW of landing spot)",
-        MapRegion::ICELANDS, 0, 2, [](VideoStream& stream, SwitchControllerContext& context){
+        MapRegion::ICELANDS, 0, 2, [](VideoStream& stream, ProControllerContext& context){
             change_mount(stream, context, MountState::BRAVIARY_ON);
             pbf_move_left_joystick(context, 192, 255, 160, 0);
             pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);

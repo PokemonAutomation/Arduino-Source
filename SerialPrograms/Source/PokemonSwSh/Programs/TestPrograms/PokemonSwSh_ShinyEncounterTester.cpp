@@ -42,7 +42,7 @@ ShinyEncounterTester::ShinyEncounterTester()
 }
 
 
-void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyDetectionResult result = detect_shiny_battle(
         env.console, context,
         ENCOUNTER_TYPE == EncounterType::Wild ? SHINY_BATTLE_REGULAR : SHINY_BATTLE_RAID,

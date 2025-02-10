@@ -1,29 +1,28 @@
-/*  Nintendo Switch Controller (Serial PABotBase)
+/*  Nintendo Switch Pro Controller (Serial PABotBase)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
 
-#ifndef PokemonAutomation_NintendoSwitch_Controller_SerialPABotBase_H
-#define PokemonAutomation_NintendoSwitch_Controller_SerialPABotBase_H
+#ifndef PokemonAutomation_NintendoSwitch_ProController_SerialPABotBase_H
+#define PokemonAutomation_NintendoSwitch_ProController_SerialPABotBase_H
 
 #include "ClientSource/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
-#include "NintendoSwitch_ControllerWithScheduler.h"
+#include "NintendoSwitch_ProControllerWithScheduler.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-
-class SwitchController_SerialPABotBase : public SwitchControllerWithScheduler
+class ProController_SerialPABotBase : public ProControllerWithScheduler
 {
 public:
-    using ContextType = SwitchControllerContext;
+    using ContextType = ProControllerContext;
 
 public:
-    SwitchController_SerialPABotBase(
+    ProController_SerialPABotBase(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         const ControllerRequirements& requirements

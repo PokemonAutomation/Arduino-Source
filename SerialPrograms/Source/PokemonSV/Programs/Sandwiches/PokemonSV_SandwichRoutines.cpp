@@ -43,7 +43,7 @@ namespace{
 
 void wait_for_initial_hand(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
      SandwichHandWatcher free_hand(SandwichHandType::FREE, HAND_INITIAL_BOX);
     int ret = wait_until(stream, context, std::chrono::seconds(30), {free_hand});
@@ -59,7 +59,7 @@ void wait_for_initial_hand(
 
 bool enter_sandwich_recipe_list(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     context.wait_for_all_requests();
     stream.log("Opening sandwich menu at picnic table.");
@@ -124,7 +124,7 @@ bool enter_sandwich_recipe_list(
 
 bool select_sandwich_recipe(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t target_sandwich_ID
 ){
     context.wait_for_all_requests();
@@ -286,10 +286,10 @@ update the location of the sandwich hand
 */
 bool move_then_recover_sandwich_hand_position(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     SandwichHandType& hand_type,
     SandwichHandWatcher& hand_watcher,
-    AsyncCommandSession<SwitchController>& move_session
+    AsyncCommandSession<ProController>& move_session
 ){
 
     stream.log("center the cursor: move towards bottom right, then left slightly.");
@@ -313,7 +313,7 @@ bool move_then_recover_sandwich_hand_position(
         uint16_t num_ticks_to_hold_A = num_ticks_to_wait + TICKS_PER_SECOND*10; // hold A for extra 10 seconds
         // the A button hold will be overwritten on the next move_session.dispatch, in the main function
         
-        move_session.dispatch([&](SwitchControllerContext& context){
+        move_session.dispatch([&](ProControllerContext& context){
             // move to bottom right corner, while holding A
             pbf_controller_state(context, BUTTON_A, DPAD_NONE, 255, 255, 128, 128, num_ticks_to_move_1);
 
@@ -358,7 +358,7 @@ ImageFloatBox move_sandwich_hand(
     const ProgramInfo& info,
     AsyncDispatcher& dispatcher,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     SandwichHandType hand_type,
     bool pressing_A,
     const ImageFloatBox& start_box,
@@ -374,7 +374,7 @@ ImageFloatBox move_sandwich_hand(
     SandwichHandWatcher hand_watcher(hand_type, start_box);
 
     // A session that creates a new thread to send button commands to controller
-    AsyncCommandSession<SwitchController> move_session(
+    AsyncCommandSession<ProController> move_session(
         context,
         stream.logger(),
         dispatcher,
@@ -382,7 +382,7 @@ ImageFloatBox move_sandwich_hand(
     );
     
     if (pressing_A){
-        move_session.dispatch([](SwitchControllerContext& context){
+        move_session.dispatch([](ProControllerContext& context){
             pbf_controller_state(context, BUTTON_A, DPAD_NONE, 128, 128, 128, 128, 3000);
         });
     }
@@ -432,7 +432,9 @@ ImageFloatBox move_sandwich_hand(
                 "Try moving the hand to the middle of the screen and try searching again."
             );
 
-            if(move_then_recover_sandwich_hand_position(info, stream, context, hand_type, hand_watcher, move_session)){
+            if(move_then_recover_sandwich_hand_position(
+                info, stream, context, hand_type, hand_watcher, move_session
+            )){
                 continue;
             }
 
@@ -498,7 +500,7 @@ ImageFloatBox move_sandwich_hand(
         // console.log("joystick push " + std::to_string(joystick_x) + ", " + std::to_string(joystick_y));
 
         // Dispatch a new series of commands that overwrites the last ones
-        move_session.dispatch([&](SwitchControllerContext& context){
+        move_session.dispatch([&](ProControllerContext& context){
             if (pressing_A){
                 // Note: joystick_x and joystick_y must be defined to outlive `move_session`.
 //                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 20);
@@ -519,13 +521,13 @@ ImageFloatBox move_sandwich_hand(
 
 void finish_sandwich_eating(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     stream.overlay().add_log("Eating", COLOR_WHITE);
     PicnicWatcher picnic_watcher;
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             for(int i = 0; i < 20; i++){
                 pbf_press_button(context, BUTTON_A, 20, 3*TICKS_PER_SECOND - 20);
             }
@@ -547,7 +549,7 @@ namespace{
 
 void repeat_press_until(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     std::function<void()> button_press,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
@@ -574,7 +576,7 @@ void repeat_press_until(
 
 void repeat_button_press_until(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Button button, uint16_t hold_ticks, uint16_t release_ticks,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
@@ -595,7 +597,7 @@ void repeat_button_press_until(
 }
 
 void repeat_dpad_press_until(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     DpadPosition dpad_position, uint16_t hold_ticks, uint16_t release_ticks,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     const std::string &error_name, const std::string &error_message,
@@ -619,7 +621,7 @@ void repeat_dpad_press_until(
 
 void enter_custom_sandwich_mode(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     context.wait_for_all_requests();
     stream.log("Entering custom sandwich mode.");
@@ -636,7 +638,7 @@ namespace{
 
 void finish_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     stream.log("Finish determining ingredients for two-sweet-herb sandwich.");
     stream.overlay().add_log("Finish picking ingredients", COLOR_WHITE);
@@ -655,7 +657,7 @@ void finish_two_herbs_sandwich(
 } // anonymous namesapce
 
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, ProControllerContext& context,
     EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last
 ){
     // The game has at most 5 herbs, in the order of sweet, salty, sour, bitter, spicy:
@@ -769,7 +771,7 @@ void make_two_herbs_sandwich(
 }
 
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, ProControllerContext& context,
     EggSandwichType sandwich_type, Language language
 ){
     std::map<std::string, uint8_t> fillings = {{"lettuce", (uint8_t)1}};
@@ -801,7 +803,7 @@ void make_two_herbs_sandwich(
     finish_two_herbs_sandwich(info, dispatcher, stream, context);
 }
 
-void make_sandwich_option(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
+void make_sandwich_option(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
     const Language language = SANDWICH_OPTIONS.LANGUAGE;
     if (language == Language::None){
         throw UserSetupError(stream.logger(), "Must set game language option to read ingredient lists.");
@@ -910,7 +912,7 @@ else if(SANDWICH_OPTIONS.BASE_RECIPE == BaseRecipe::non_shiny){
     make_sandwich_preset(env, stream, context, SANDWICH_OPTIONS.LANGUAGE, fillings, condiments);
 }
 
-void make_sandwich_preset(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments){
+void make_sandwich_preset(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::map<std::string, uint8_t>& condiments){
     //Sort the fillings by priority for building (ex. large items on bottom, cherry tomatoes on top)
     //std::vector<std::string> fillings_game_order = {"lettuce", "tomato", "cherry-tomatoes", "cucumber", "pickle", "onion", "red-onion", "green-bell-pepper", "red-bell-pepper",
     //    "yellow-bell-pepper", "avocado", "bacon", "ham", "prosciutto", "chorizo", "herbed-sausage", "hamburger", "klawf-stick", "smoked-fillet", "fried-fillet", "egg", "potato-tortilla",
@@ -992,7 +994,7 @@ void make_sandwich_preset(ProgramEnvironment& env, VideoStream& stream, SwitchCo
     run_sandwich_maker(env, stream, context, language, fillings, fillings_sorted, plates);
 }
 
-void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates){
+void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates){
 
     wait_for_initial_hand(env.program_info(), stream, context);
 

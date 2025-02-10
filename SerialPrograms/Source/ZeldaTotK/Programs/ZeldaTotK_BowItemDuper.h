@@ -27,7 +27,7 @@ public:
 class BowItemDuper : public SingleSwitchProgramInstance{
 public:
     BowItemDuper();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> ATTEMPTS;

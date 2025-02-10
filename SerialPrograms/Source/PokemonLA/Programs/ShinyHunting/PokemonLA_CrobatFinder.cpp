@@ -89,7 +89,7 @@ CrobatFinder::CrobatFinder()
 
 
 
-void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // NOTE: there's no "stunned by alpha" detection in case any of the close ones are alphas!
     CrobatFinder_Descriptor::Stats& stats = env.current_stats<CrobatFinder_Descriptor::Stats>();
 
@@ -141,9 +141,9 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchCont
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2.2 * TICKS_PER_SECOND), 80); // wyrdeer sprint
@@ -183,7 +183,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchCont
 }
 
 
-void CrobatFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void CrobatFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     CrobatFinder_Descriptor::Stats& stats = env.current_stats<CrobatFinder_Descriptor::Stats>();
 
     //  Connect the controller.

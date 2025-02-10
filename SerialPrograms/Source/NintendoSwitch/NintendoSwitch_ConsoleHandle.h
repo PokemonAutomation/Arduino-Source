@@ -9,7 +9,7 @@
 
 #include <memory>
 #include "CommonFramework/Tools/VideoStream.h"
-#include "Controllers/NintendoSwitch_Controller.h"
+#include "Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class ThreadHandle;
@@ -28,7 +28,7 @@ public:
     ConsoleHandle(
         size_t index,
         Logger& logger,
-        SwitchController& controller,
+        ProController& controller,
         VideoFeed& video,
         VideoOverlay& overlay,
         AudioFeed& audio,
@@ -37,7 +37,7 @@ public:
 
     size_t index() const{ return m_index; }
 
-    SwitchController& controller(){ return m_controller; }
+    ProController& controller(){ return m_controller; }
 
 
     operator Logger&(){ return logger(); }
@@ -49,7 +49,7 @@ public:
 
 private:
     size_t m_index;
-    SwitchController& m_controller;
+    ProController& m_controller;
 
     std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
 };

@@ -92,7 +92,7 @@ UnownFinder::UnownFinder()
 }
 
 
-void ruins_entrance_route(SwitchControllerContext& context){
+void ruins_entrance_route(ProControllerContext& context){
     pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 139, 120, 10, 10);
     pbf_wait(context, (uint16_t)(1.3 * TICKS_PER_SECOND));
@@ -105,7 +105,7 @@ void ruins_entrance_route(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_PLUS, 10, 10);
 }
 
-void enter_ruins(SwitchControllerContext& context){
+void enter_ruins(ProControllerContext& context){
     pbf_press_button(context, BUTTON_B, (uint16_t)(4 * TICKS_PER_SECOND), 10);
     pbf_wait(context, (uint16_t)(1.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 128, 255, 10, 0);
@@ -113,7 +113,7 @@ void enter_ruins(SwitchControllerContext& context){
 }
 
 
-void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     stats.attempts++;
@@ -136,9 +136,9 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 ruins_entrance_route(context);
 
                 context.wait_for_all_requests();
@@ -163,7 +163,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
 }
 
 
-void UnownFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void UnownFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     //  Connect the controller.

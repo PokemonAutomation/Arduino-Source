@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void resume_game_no_interact_old(SwitchControllerContext& context, bool tolerate_update_menu){
+void resume_game_no_interact_old(ProControllerContext& context, bool tolerate_update_menu){
     Milliseconds HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY0;
     if (tolerate_update_menu){
         pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
@@ -30,7 +30,7 @@ void resume_game_no_interact_old(SwitchControllerContext& context, bool tolerate
         pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
     }
 }
-void resume_game_back_out_old(SwitchControllerContext& context, bool tolerate_update_menu, uint16_t mash_B_time){
+void resume_game_back_out_old(ProControllerContext& context, bool tolerate_update_menu, uint16_t mash_B_time){
     Milliseconds HOME_TO_GAME_DELAY = GameSettings::instance().HOME_TO_GAME_DELAY0;
     if (tolerate_update_menu){
         pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
@@ -42,12 +42,12 @@ void resume_game_back_out_old(SwitchControllerContext& context, bool tolerate_up
         pbf_press_button(context, BUTTON_HOME, 80ms, HOME_TO_GAME_DELAY);
     }
 }
-void resume_game_front_of_den_nowatts(SwitchControllerContext& context, bool tolerate_update_menu){
+void resume_game_front_of_den_nowatts(ProControllerContext& context, bool tolerate_update_menu){
     resume_game_back_out_old(context, tolerate_update_menu, 400);
 }
 
 void fast_reset_game(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Milliseconds start_game_mash, Milliseconds start_game_wait,
     Milliseconds enter_game_mash, Milliseconds enter_game_wait
 ){
@@ -64,7 +64,7 @@ void fast_reset_game(
 }
 
 void reset_game_from_home(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu
 ){
     if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && !tolerate_update_menu){
@@ -81,7 +81,7 @@ void reset_game_from_home(
     close_game(stream, context);
     start_game_from_home(context, tolerate_update_menu, 0, 0, false);
 }
-void settings_to_enter_game(SwitchControllerContext& context, bool fast){
+void settings_to_enter_game(ProControllerContext& context, bool fast){
     if (fast){
         //  100 ticks for the first press isn't enough to finish the animation.
         //  But since the HOME button has delayed effect, we start pressing the 2nd
@@ -94,7 +94,7 @@ void settings_to_enter_game(SwitchControllerContext& context, bool fast){
     }
 }
 void settings_to_enter_game_den_lobby(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     bool tolerate_update_menu, bool fast,
     Milliseconds enter_switch_pokemon_delay,
     Milliseconds exit_switch_pokemon_delay
@@ -124,7 +124,7 @@ void settings_to_enter_game_den_lobby(
     }
 }
 void start_game_from_home(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -188,7 +188,7 @@ void start_game_from_home(
 }
 
 void enter_game(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     bool backup_save,
     Milliseconds enter_game_mash,
     Milliseconds enter_game_wait

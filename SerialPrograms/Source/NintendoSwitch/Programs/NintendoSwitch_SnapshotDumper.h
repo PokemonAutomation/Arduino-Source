@@ -25,7 +25,7 @@ class SnapshotDumper : public SingleSwitchProgramInstance{
 public:
     SnapshotDumper();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> PERIOD_MILLISECONDS;

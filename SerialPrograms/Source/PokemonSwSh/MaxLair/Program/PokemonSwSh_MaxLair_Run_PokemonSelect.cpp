@@ -18,7 +18,7 @@ namespace MaxLairInternal{
 
 void run_select_pokemon(
     size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     OcrFailureWatchdog& ocr_watchdog,
     const ConsoleSpecificOptions& settings

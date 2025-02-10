@@ -81,7 +81,7 @@ DistortionWaiter::DistortionWaiter()
 
 
 
-void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DistortionWaiter_Descriptor::Stats& stats = env.current_stats<DistortionWaiter_Descriptor::Stats>();
 
 
@@ -95,9 +95,9 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, SwitchContro
     while (true){
         env.update_stats();
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 for (size_t c = 0; c < 60; c++){
                     pbf_press_button(context, BUTTON_LCLICK, 20, 60 * TICKS_PER_SECOND - 20);
                     context.wait_for_all_requests();

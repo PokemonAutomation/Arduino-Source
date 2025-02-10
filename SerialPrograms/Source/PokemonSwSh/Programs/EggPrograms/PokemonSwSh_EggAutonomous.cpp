@@ -193,7 +193,7 @@ EggAutonomous::EggAutonomous()
     }
 }
 
-void EggAutonomous::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
     env.update_stats();
 
@@ -290,7 +290,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, SwitchControlle
 // Return true if the egg loop should stop.
 bool EggAutonomous::run_batch(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EggAutonomous_Descriptor::Stats& stats
 ){
     env.update_stats();
@@ -324,9 +324,9 @@ bool EggAutonomous::run_batch(
             }else{
                 env.console.overlay().add_log("Loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
             }
-            int ret = run_until<SwitchControllerContext>(
+            int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](SwitchControllerContext& context){
+                [](ProControllerContext& context){
                     travel_to_spin_location(context);
                     travel_back_to_lady(context);
                 },
@@ -350,9 +350,9 @@ bool EggAutonomous::run_batch(
                     break;
                 }
                 // Now we see if we can hatch one more egg.
-                ret = run_until<SwitchControllerContext>(
+                ret = run_until<ProControllerContext>(
                     env.console, context,
-                    [](SwitchControllerContext& context){
+                    [](ProControllerContext& context){
                         // Try move a little to hatch more:
                         // We move toward lower-left so that it wont hit the lady or enter the Nursory.
                         pbf_move_left_joystick(context, 0, 255, 100, 10);
@@ -446,7 +446,7 @@ bool EggAutonomous::run_batch(
     return false;
 }
 
-void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
     env.log("Save game.");
     env.console.overlay().add_log("Save game", COLOR_WHITE);
@@ -458,7 +458,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, SwitchControl
 
 void EggAutonomous::call_flying_taxi(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     bool fly_from_overworld
 ){
     context.wait_for_all_requests();
@@ -477,16 +477,16 @@ void EggAutonomous::call_flying_taxi(
 
 void EggAutonomous::wait_for_egg_hatched(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EggAutonomous_Descriptor::Stats& stats,
     size_t num_hatched_eggs
 ){
     env.console.overlay().add_log("Egg hatching " + std::to_string(num_hatched_eggs) + "/5", COLOR_GREEN);
     const bool y_comm_visible_at_end_of_egg_hatching = true;
     YCommIconDetector end_egg_hatching_detector(y_comm_visible_at_end_of_egg_hatching);
-    const int ret = run_until<SwitchControllerContext>(
+    const int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
         },
         {{end_egg_hatching_detector}}
@@ -502,7 +502,7 @@ void EggAutonomous::wait_for_egg_hatched(
 
 size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EggAutonomous_Descriptor::Stats& stats,
     size_t num_eggs_retrieved
 ){
@@ -513,9 +513,9 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     RetrieveEggArrowFinder egg_arrow_detector(env.console);
     CheckNurseryArrowFinder no_egg_arrow_detector(env.console);
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             for (size_t i_hatched = 0; i_hatched < 2; i_hatched++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
             }
@@ -538,9 +538,9 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
         // Press A to get the egg
         ssf_press_button1(context, BUTTON_A, 10);
 
-        ret = run_until<SwitchControllerContext>(
+        ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND * 30);
             },
             {{dialog_over_detector}}
@@ -548,9 +548,9 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
     }else if (ret == 1){
         env.log("No egg");
         env.console.overlay().add_log("No egg", COLOR_WHITE);
-        ret = run_until<SwitchControllerContext>(
+        ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND * 30);
             },
             {{dialog_over_detector}}
@@ -583,7 +583,7 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
 // Return true if the program should stop
 bool EggAutonomous::process_hatched_pokemon(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EggAutonomous_Descriptor::Stats& stats,
     bool need_taxi
 ){
@@ -828,9 +828,9 @@ bool EggAutonomous::process_hatched_pokemon(
         // Leave menu, go back to overworld
         const bool y_comm_visible = true;
         YCommIconDetector y_comm_detector(y_comm_visible);
-        const int ret = run_until<SwitchControllerContext>(
+        const int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
             },
             {{y_comm_detector}}
@@ -849,7 +849,7 @@ bool EggAutonomous::process_hatched_pokemon(
 
 void EggAutonomous::wait_for_y_comm_icon(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     const std::string& error_msg
 ){
     context.wait_for_all_requests();

@@ -1,4 +1,4 @@
-/*  Nintendo Switch Controller
+/*  Nintendo Switch Pro Controller
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 
 
 
-class SwitchControllerContext;
+class ProControllerContext;
 
 
 
@@ -68,21 +68,17 @@ inline std::string dpad_to_string(DpadPosition dpad){
 
 
 //
-//  This is the generic interface a Switch controller that encapsulates all
-//  Switch controllers.
-//
-//  Implementations must inherit from both this class ControllerConnection as
-//  the framework will cross-cast from ControllerConnection to SwitchController.
+//  This is the generic interface a Switch pro controller.
 //
 //  Currently we only have one implementation (SerialPABotBase). But we expect
 //  to add more in the future.
 //
-class SwitchController : public AbstractController{
+class ProController : public AbstractController{
 public:
-    using ContextType = SwitchControllerContext;
+    using ContextType = ProControllerContext;
 
-    virtual ~SwitchController();
-    SwitchController();
+    virtual ~ProController();
+    ProController();
 
     virtual Logger& logger() = 0;
 
@@ -320,30 +316,30 @@ private:
 //
 //  The context wrapper to support asynchronous cancel.
 //
-class SwitchControllerContext final : public CancellableScope{
+class ProControllerContext final : public CancellableScope{
 public:
-    using ControllerType = SwitchController;
+    using ControllerType = ProController;
 
 public:
-    SwitchControllerContext(SwitchController& botbase)
+    ProControllerContext(ProController& botbase)
         : m_controller(botbase)
     {}
-    SwitchControllerContext(CancellableScope& parent, SwitchController& botbase)
+    ProControllerContext(CancellableScope& parent, ProController& botbase)
         : m_controller(botbase)
     {
         attach(parent);
     }
-    virtual ~SwitchControllerContext(){
+    virtual ~ProControllerContext(){
         detach();
     }
 
-    SwitchController* operator->(){
+    ProController* operator->(){
         m_lifetime_sanitizer.check_usage();
         return &m_controller;
     }
 
-    operator SwitchController&() const{ return m_controller; }
-    SwitchController& controller() const{ return m_controller; }
+    operator ProController&() const{ return m_controller; }
+    ProController& controller() const{ return m_controller; }
 
 #if 1   //  REMOVE
     void wait_for_all_requests() const{
@@ -386,7 +382,7 @@ public:
 
 
 private:
-    SwitchController& m_controller;
+    ProController& m_controller;
     LifetimeSanitizer m_lifetime_sanitizer;
 };
 

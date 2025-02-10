@@ -30,10 +30,10 @@ public:
 class TenacityCandyFarmer : public SingleSwitchProgramInstance{
 public:
     TenacityCandyFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    bool run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     enum class FourthMoveOn{

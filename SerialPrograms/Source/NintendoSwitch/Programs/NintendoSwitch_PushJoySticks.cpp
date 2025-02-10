@@ -60,7 +60,7 @@ PushJoySticks::PushJoySticks()
     PA_ADD_OPTION(RIGHT_Y);
 }
 
-void PushJoySticks::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void PushJoySticks::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     while(true){
         pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE,
             LEFT_X, LEFT_Y, RIGHT_X, RIGHT_Y, TICKS_PER_SECOND);

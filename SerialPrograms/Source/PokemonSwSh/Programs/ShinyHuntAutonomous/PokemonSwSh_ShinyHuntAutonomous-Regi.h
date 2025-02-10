@@ -37,7 +37,7 @@ public:
 class ShinyHuntAutonomousRegi : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousRegi();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

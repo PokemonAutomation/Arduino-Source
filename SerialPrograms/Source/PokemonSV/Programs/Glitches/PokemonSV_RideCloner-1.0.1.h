@@ -38,14 +38,14 @@ public:
 class RideCloner101 : public SingleSwitchProgramInstance{
 public:
     RideCloner101();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void setup(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
+    void setup(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
     bool run_post_win(
         ProgramEnvironment& env,
         VideoStream& stream,
-        SwitchControllerContext& context
+        ProControllerContext& context
     );
 
 private:

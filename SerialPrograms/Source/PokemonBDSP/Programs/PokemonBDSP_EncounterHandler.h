@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_EncounterHandler_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h"
@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 class StandardEncounterHandler{
 public:
     StandardEncounterHandler(
-        ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+        ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
         Language language,
         EncounterBotCommonOptions& settings,
         PokemonSwSh::ShinyHuntTracker& session_stats
@@ -58,7 +58,7 @@ private:
 
 private:
     ProgramEnvironment& m_env;
-    SwitchControllerContext& m_context;
+    ProControllerContext& m_context;
     VideoStream& m_stream;
     const Language m_language;
     EncounterBotCommonOptions& m_settings;
@@ -69,7 +69,7 @@ private:
 };
 
 
-void take_video(SwitchControllerContext& context);
+void take_video(ProControllerContext& context);
 void run_away(
     ProgramEnvironment& env,
     VideoStream& stream,

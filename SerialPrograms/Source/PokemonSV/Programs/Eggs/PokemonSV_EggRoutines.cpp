@@ -38,7 +38,7 @@ namespace{
 
 void clear_mons_in_front(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     stream.log("Waiting for all " + STRING_POKEMON + " in front of you to get out of the way...");
     WhiteButtonWatcher button(
@@ -46,9 +46,9 @@ void clear_mons_in_front(
         {0.020, 0.590, 0.035, 0.060},
         WhiteButtonWatcher::FinderType::GONE
     );
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             for (size_t c = 0; c < 40; c++){
                 context.wait_for_all_requests();
                 context.wait_for(std::chrono::seconds(30));
@@ -81,7 +81,7 @@ void clear_mons_in_front(
 // egg_idx: currently which egg in the party is hatching. 0-indexed.
 void handle_egg_hatching(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint8_t num_eggs_in_party,
     uint8_t egg_idx,
     std::function<void(uint8_t)> egg_hatched_callback
@@ -89,9 +89,9 @@ void handle_egg_hatching(
     stream.log("Detect hatching dialog: " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party));
     stream.overlay().add_log("Hatched " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_GREEN);
     OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_right_joystick(context, 0, 128, 0, 95);
             for(int i = 0; i < 60; i++){
                 pbf_mash_button(context, BUTTON_A, 125);
@@ -118,12 +118,12 @@ void handle_egg_hatching(
 // Throw exception when no egg hatching detected after 10 minutes.
 void do_egg_cycle_motion(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     AdvanceDialogWatcher dialog(COLOR_RED);
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             // hatch circle:
             // Left joystick forward, right joystick right
             // click left joystick
@@ -145,7 +145,7 @@ void do_egg_cycle_motion(
 
 void order_compote_du_fils(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     // We start this function when we enter the restaurant without pressing any button.
 
@@ -206,9 +206,9 @@ void order_compote_du_fils(
 
     { // Now wait for eating animation to finish.
         AdvanceDialogWatcher dialog_watcher(COLOR_RED, std::chrono::milliseconds(100));
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 for(int i = 0; i < 60; i++){
                     pbf_press_button(context, BUTTON_A, 25, 100);
                 }
@@ -252,7 +252,7 @@ void order_compote_du_fils(
 
 void picnic_at_zero_gate(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
@@ -271,7 +271,7 @@ void picnic_at_zero_gate(
 
 bool eat_egg_sandwich_at_picnic(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     EggSandwichType sandwich_type,
     Language language
 ){
@@ -316,7 +316,7 @@ bool eat_egg_sandwich_at_picnic(
 
 void collect_eggs_after_sandwich(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t basket_wait_seconds,
     size_t max_eggs,
     size_t& num_eggs_collected,
@@ -401,7 +401,7 @@ void collect_eggs_after_sandwich(
 
 void check_basket_to_collect_eggs(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t max_eggs, size_t& num_eggs_collected
 ){
     bool checked = false;
@@ -510,7 +510,7 @@ void check_basket_to_collect_eggs(
 }
 
 
-std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     BoxEggPartyColumnWatcher egg_column_watcher;
     int ret = wait_until(
@@ -529,7 +529,7 @@ std::pair<uint8_t, uint8_t> check_egg_party_column(const ProgramInfo& info, Vide
 
 uint8_t check_non_eggs_count_in_party(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint8_t expected_non_eggs_count_in_party
 ){
     auto counts = check_egg_party_column(info, stream, context);
@@ -544,7 +544,7 @@ uint8_t check_non_eggs_count_in_party(
 
 void hatch_eggs_at_zero_gate(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback)
 {
@@ -563,9 +563,9 @@ void hatch_eggs_at_zero_gate(
         if (got_off_ramp == false){
             AdvanceDialogWatcher dialog(COLOR_RED);
             // first, get off ramp to the empty field for circling motions
-            int ret = run_until<SwitchControllerContext>(
+            int ret = run_until<ProControllerContext>(
                 stream, context,
-                [&](SwitchControllerContext& context){
+                [&](ProControllerContext& context){
                     if (egg_idx == 0){
                         // At beginning, ride on Koraidon/Miradon and go off ramp:
                         pbf_press_button(context, BUTTON_PLUS, 50, 100);
@@ -599,7 +599,7 @@ void hatch_eggs_at_zero_gate(
 
 void hatch_eggs_anywhere(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool already_on_ride,
     uint8_t num_eggs_in_party,
     std::function<void(uint8_t)> egg_hatched_callback
@@ -631,7 +631,7 @@ void hatch_eggs_anywhere(
 
 void reset_position_at_zero_gate(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     stream.log("Open map and reset location to Zero Gate.");
     // Use map to fly back to the flying spot
@@ -645,7 +645,7 @@ void reset_position_at_zero_gate(
 
 bool check_baby_info(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     OCR::LanguageOCROption& LANGUAGE,
     Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action

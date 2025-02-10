@@ -76,7 +76,7 @@ bool TeraRaidSearchDetector::detect_search_location(ImageFloatBox& box, const Im
 }
 bool TeraRaidSearchDetector::move_cursor_to_search(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ) const{
     GradientArrowDetector arrow(m_color, GradientArrowType::DOWN, {0, 0, 1, 1});
 

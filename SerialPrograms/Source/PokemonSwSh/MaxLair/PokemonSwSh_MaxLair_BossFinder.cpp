@@ -184,7 +184,7 @@ void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env, CancellableS
         throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         assert_16_9_720p_min(console, console);
         if (START_LOCATION.start_in_grip_menu()){
             grip_menu_connect_go_home(context);

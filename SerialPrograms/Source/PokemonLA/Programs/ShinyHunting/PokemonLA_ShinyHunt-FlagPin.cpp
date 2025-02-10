@@ -126,7 +126,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
 
 
 
-void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntFlagPin_Descriptor::Stats& stats = env.current_stats<ShinyHuntFlagPin_Descriptor::Stats>();
     stats.attempts++;
 
@@ -148,9 +148,9 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, Switch
             return on_shiny_callback(env, env.console, *shiny_action, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
                 FlagNavigationAir session(
                     env, env.console, context,
@@ -184,7 +184,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, Switch
 }
 
 
-void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntFlagPin_Descriptor::Stats& stats = env.current_stats<ShinyHuntFlagPin_Descriptor::Stats>();
 
     //  Connect the controller.

@@ -53,7 +53,7 @@ StowOnSideFarmer::StowOnSideFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

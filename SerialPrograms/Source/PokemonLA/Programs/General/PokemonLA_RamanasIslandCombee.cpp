@@ -109,7 +109,7 @@ RamanasCombeeFinder:: RamanasCombeeFinder()
 }
 
 
-void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
     disable_shiny_sound(context);
     // Throw pokemon
@@ -119,7 +119,7 @@ void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env
     env.update_stats();
 }
 
-bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
 
     disable_shiny_sound(context);
@@ -140,16 +140,16 @@ bool RamanasCombeeFinder::check_tree(SingleSwitchProgramEnvironment& env, Switch
 }
 
 
-void RamanasCombeeFinder::disable_shiny_sound(SwitchControllerContext& context){
+void RamanasCombeeFinder::disable_shiny_sound(ProControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(false, std::memory_order_release);
 }
-void RamanasCombeeFinder::enable_shiny_sound(SwitchControllerContext& context){
+void RamanasCombeeFinder::enable_shiny_sound(ProControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(true, std::memory_order_release);
 }
 
-bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
@@ -170,13 +170,13 @@ bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, Swi
     return true;
 }
 
-void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     BattleMenuDetector battle_menu_detector(env.console, env.console, true);
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
 
             env.console.log("Checking Tree 1");
             change_mount(env.console,context,MountState::BRAVIARY_ON);
@@ -242,7 +242,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, Swit
 
 }
 
-void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
     stats.attempts++;
     env.update_stats();
@@ -280,9 +280,9 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Swi
 
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             grouped_path(env, context);
             context.wait_for_all_requests();
             goto_camp_from_overworld(env, env.console, context);
@@ -313,7 +313,7 @@ void RamanasCombeeFinder::run_iteration(SingleSwitchProgramEnvironment& env, Swi
     from_professor_return_to_jubilife(env, env.console, context);
 }
 
-void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void RamanasCombeeFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     RamanasCombeeFinder_Descriptor::Stats& stats = env.current_stats<RamanasCombeeFinder_Descriptor::Stats>();
 
     //  Connect the controller.

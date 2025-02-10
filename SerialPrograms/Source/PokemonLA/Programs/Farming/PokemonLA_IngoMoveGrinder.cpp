@@ -81,7 +81,7 @@ IngoMoveGrinder::IngoMoveGrinder()
 }
 
 
-bool IngoMoveGrinder::start_dialog(VideoStream& stream, SwitchControllerContext& context){
+bool IngoMoveGrinder::start_dialog(VideoStream& stream, ProControllerContext& context){
     // First press A to start talking with Ingo.
     pbf_press_button(context, BUTTON_A, 20, 150);
     context.wait_for_all_requests();
@@ -108,9 +108,9 @@ bool IngoMoveGrinder::start_dialog(VideoStream& stream, SwitchControllerContext&
             std::chrono::milliseconds(100),
             true
         );
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 150);
                 }
@@ -150,9 +150,9 @@ bool IngoMoveGrinder::start_dialog(VideoStream& stream, SwitchControllerContext&
         std::chrono::milliseconds(100),
         true
     );
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             for (size_t c = 0; c < 5; c++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
             }
@@ -171,7 +171,7 @@ bool IngoMoveGrinder::start_dialog(VideoStream& stream, SwitchControllerContext&
     }
 }
 
-bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     IngoMoveGrinder_Descriptor::Stats& stats = env.current_stats<IngoMoveGrinder_Descriptor::Stats>();
 
     env.console.log("Starting battle...");
@@ -327,7 +327,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchC
 
 
 
-void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     IngoMoveGrinder_Descriptor::Stats& stats = env.current_stats<IngoMoveGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -357,7 +357,7 @@ void IngoMoveGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControl
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
-void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context)
+void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, ProControllerContext& context)
 {
     env.console.log("Switch to next move " + debug_current_info() + debug_move_attempts_info());
     pbf_press_button(context, BUTTON_A, 10, 125);
@@ -372,7 +372,7 @@ void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, Switc
     context.wait_for_all_requests();
 }
 
-void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context)
+void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, ProControllerContext& context)
 {
     if (cur_pokemon == 4){
         OperationFailedException::fire(

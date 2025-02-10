@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/FailureWatchdog.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 
@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 void run_select_pokemon(
     size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     OcrFailureWatchdog& ocr_watchdog,
     const ConsoleSpecificOptions& settings

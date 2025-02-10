@@ -12,7 +12,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
 #include "Controllers/ControllerCapability.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
@@ -493,7 +493,7 @@ int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrum
     auto& logger = global_logger_command_line();
     DummyBotBase botbase(logger);
     SerialPABotBase::SerialPABotBase_Connection connection(logger, nullptr);
-    SwitchController_SerialPABotBase controller(logger, connection, {});
+    ProController_SerialPABotBase controller(logger, connection, {});
     DummyVideoFeed video_feed;
     DummyVideoOverlay video_overlay;
     DummyAudioFeed audio_feed;

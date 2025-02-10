@@ -82,7 +82,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
 
 
 
-bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, SwitchControllerContext& context) const{
+bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, ProControllerContext& context) const{
     pbf_mash_button(context, BUTTON_A, 4 * TICKS_PER_SECOND);
 
     RaidCatchDetector detector(stream.overlay());
@@ -101,7 +101,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, SwitchC
         return false;
     }
 }
-void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);

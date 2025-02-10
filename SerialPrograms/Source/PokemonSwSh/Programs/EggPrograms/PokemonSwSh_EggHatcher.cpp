@@ -33,7 +33,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
 
 
 
-void withdraw_column(SwitchControllerContext& context, uint8_t column){
+void withdraw_column(ProControllerContext& context, uint8_t column){
     menu_to_box(context, false);
     party_to_column(context, column);
     pickup_column(context, false);
@@ -41,14 +41,14 @@ void withdraw_column(SwitchControllerContext& context, uint8_t column){
     ssf_press_button(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY0);
     box_to_menu(context);
 }
-void deposit_column(SwitchControllerContext& context, uint8_t column){
+void deposit_column(ProControllerContext& context, uint8_t column){
     menu_to_box(context, true);
     pickup_column(context, true);
     party_to_column(context, column);
     ssf_press_button(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY0);
     box_to_menu(context);
 }
-uint8_t swap_party(SwitchControllerContext& context, uint8_t column){
+uint8_t swap_party(ProControllerContext& context, uint8_t column){
     menu_to_box(context, true);
     pickup_column(context, true);
 
@@ -114,7 +114,7 @@ EggHatcher::EggHatcher()
     PA_ADD_OPTION(HATCH_DELAY0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Calculate upper bounds for incubation time.
     Milliseconds INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * 2 * (uint32_t)103180 >> 16) * 8ms;
     Milliseconds TOTAL_DELAY = INCUBATION_DELAY_UPPER + HATCH_DELAY0.get() + SAFETY_TIME1.get() - TRAVEL_RIGHT_DURATION;

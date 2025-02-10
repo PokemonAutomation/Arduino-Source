@@ -63,7 +63,7 @@ private:
 
 
 std::shared_ptr<const ImageRGB32> enter_lobby(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 ){

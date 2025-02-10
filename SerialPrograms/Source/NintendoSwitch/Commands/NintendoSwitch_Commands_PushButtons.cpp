@@ -15,13 +15,13 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void pbf_wait(SwitchControllerContext& context, uint16_t ticks){
+void pbf_wait(ProControllerContext& context, uint16_t ticks){
     ssf_do_nothing(context, ticks);
 }
-void pbf_wait(SwitchControllerContext& context, Milliseconds duration){
+void pbf_wait(ProControllerContext& context, Milliseconds duration){
     ssf_do_nothing(context, duration);
 }
-void pbf_press_button(SwitchControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_press_button(ProControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
         ssf_press_button(context, button, (uint16_t)delay, hold_ticks, 0);
@@ -30,10 +30,10 @@ void pbf_press_button(SwitchControllerContext& context, Button button, uint16_t 
         ssf_do_nothing(context, release_ticks);
     }
 }
-void pbf_press_button(SwitchControllerContext& context, Button button, Milliseconds hold, Milliseconds release){
+void pbf_press_button(ProControllerContext& context, Button button, Milliseconds hold, Milliseconds release){
     ssf_press_button(context, button, hold + release, hold, 0ms);
 }
-void pbf_press_dpad(SwitchControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_press_dpad(ProControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
         ssf_press_dpad(context, position, (uint16_t)delay, hold_ticks, 0);
@@ -42,10 +42,10 @@ void pbf_press_dpad(SwitchControllerContext& context, DpadPosition position, uin
         ssf_do_nothing(context, release_ticks);
     }
 }
-void pbf_press_dpad(SwitchControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release){
+void pbf_press_dpad(ProControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release){
     ssf_press_dpad(context, position, hold + release, hold, 0ms);
 }
-void pbf_move_left_joystick(SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_move_left_joystick(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
         ssf_press_left_joystick(context, x, y, (uint16_t)delay, hold_ticks, 0);
@@ -54,10 +54,10 @@ void pbf_move_left_joystick(SwitchControllerContext& context, uint8_t x, uint8_t
         ssf_do_nothing(context, release_ticks);
     }
 }
-void pbf_move_left_joystick (SwitchControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
+void pbf_move_left_joystick (ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
     ssf_press_left_joystick(context, x, y, hold + release, hold, 0ms);
 }
-void pbf_move_right_joystick(SwitchControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
+void pbf_move_right_joystick(ProControllerContext& context, uint8_t x, uint8_t y, uint16_t hold_ticks, uint16_t release_ticks){
     uint32_t delay = (uint32_t)hold_ticks + release_ticks;
     if ((uint16_t)delay == delay){
         ssf_press_right_joystick(context, x, y, (uint16_t)delay, hold_ticks, 0);
@@ -66,17 +66,17 @@ void pbf_move_right_joystick(SwitchControllerContext& context, uint8_t x, uint8_
         ssf_do_nothing(context, release_ticks);
     }
 }
-void pbf_move_right_joystick (SwitchControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
+void pbf_move_right_joystick (ProControllerContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
     ssf_press_right_joystick(context, x, y, hold + release, hold, 0ms);
 }
-void pbf_mash_button(SwitchControllerContext& context, Button button, uint16_t ticks){
+void pbf_mash_button(ProControllerContext& context, Button button, uint16_t ticks){
     ssf_mash1_button(context, button, ticks);
 }
-void pbf_mash_button(SwitchControllerContext& context, Button button, Milliseconds duration){
+void pbf_mash_button(ProControllerContext& context, Button button, Milliseconds duration){
     ssf_mash1_button(context, button, duration);
 }
 
-void grip_menu_connect_go_home(SwitchControllerContext& context){
+void grip_menu_connect_go_home(ProControllerContext& context){
     pbf_press_button(context, BUTTON_L | BUTTON_R, 10, 40);
     pbf_press_button(context, BUTTON_A, 10, 140);
     pbf_press_button(context, BUTTON_HOME, 80ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
@@ -84,7 +84,7 @@ void grip_menu_connect_go_home(SwitchControllerContext& context){
 
 
 void pbf_controller_state(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Button button,
     DpadPosition position,
     uint8_t left_x, uint8_t left_y,
@@ -100,7 +100,7 @@ void pbf_controller_state(
     );
 }
 void pbf_controller_state(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Button button,
     DpadPosition position,
     uint8_t left_x, uint8_t left_y,

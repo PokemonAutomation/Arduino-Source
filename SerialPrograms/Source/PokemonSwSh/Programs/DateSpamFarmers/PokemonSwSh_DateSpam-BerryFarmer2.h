@@ -38,7 +38,7 @@ class BerryFarmer2 : public SingleSwitchProgramInstance{
 public:
     BerryFarmer2();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     enum Rustling{
         No,
@@ -48,8 +48,8 @@ public:
     };
 
 private:
-    Rustling check_rustling(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-    uint16_t do_secondary_attempts(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, Rustling last_rustling);
+    Rustling check_rustling(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    uint16_t do_secondary_attempts(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Rustling last_rustling);
 
 private:
     StaticTextOption REQUIRES_AUDIO;

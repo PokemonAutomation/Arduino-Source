@@ -7,14 +7,14 @@
 #ifndef PokemonAutomation_NintendoSwitch_Commands_DigitEntry_H
 #define PokemonAutomation_NintendoSwitch_Commands_DigitEntry_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void enter_digits_str   (SwitchControllerContext& context, uint8_t count, const char* digits);
-void enter_digits       (SwitchControllerContext& context, uint8_t count, const uint8_t* digits);
+void enter_digits_str   (ProControllerContext& context, uint8_t count, const char* digits);
+void enter_digits       (ProControllerContext& context, uint8_t count, const uint8_t* digits);
 
 
 

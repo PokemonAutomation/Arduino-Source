@@ -26,11 +26,11 @@ class ApplyGrits : public SingleSwitchProgramInstance{
 public:
     ApplyGrits();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
 
-    void ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, size_t pokemon_index);
+    void ApplyGritsOnOnePokemon(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t pokemon_index);
 
     IntegerEnumDropdownOption NUM_POKEMON;
 

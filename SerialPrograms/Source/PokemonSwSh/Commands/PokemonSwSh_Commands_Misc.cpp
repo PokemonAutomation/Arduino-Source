@@ -12,7 +12,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void IoA_backout(SwitchControllerContext& context, Milliseconds pokemon_to_menu_delay){
+void IoA_backout(ProControllerContext& context, Milliseconds pokemon_to_menu_delay){
     //  Back out to menu.
     //  Prepend each B press by a DOWN press so that the B gets
     //  swallowed while in the summary.

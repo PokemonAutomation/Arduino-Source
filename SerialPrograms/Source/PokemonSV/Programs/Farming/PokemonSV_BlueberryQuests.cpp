@@ -139,11 +139,11 @@ BBQuests BBQuests_string_to_enum(const std::string& token){
     return iter->second;
 }
 
-int read_BP(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+int read_BP(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-    int result = run_until<SwitchControllerContext>(
+    int result = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
                 pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
                 pbf_wait(context, 200);
@@ -172,16 +172,16 @@ int read_BP(const ProgramInfo& info, VideoStream& stream, SwitchControllerContex
 
 std::vector<BBQuests> read_quests(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
     std::vector<BBQuests> quest_list;
 
     //Open quest list. Wait for it to open.
     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-    int result = run_until<SwitchControllerContext>(
+    int result = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             for (int i = 0; i < 6; i++) { //try 6 times
                 pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
                 pbf_wait(context, 200);
@@ -221,7 +221,7 @@ std::vector<BBQuests> read_quests(
 
 std::vector<BBQuests> process_quest_list(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     std::vector<BBQuests>& quest_list,
     uint8_t& eggs_hatched
@@ -245,9 +245,9 @@ std::vector<BBQuests> process_quest_list(
                     //stream.log("Warning: This does not handle/check being out of BP!", COLOR_RED);
 
                     WhiteButtonWatcher right_panel(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
-                    int result = run_until<SwitchControllerContext>(
+                    int result = run_until<ProControllerContext>(
                         stream, context,
-                        [&](SwitchControllerContext& context){
+                        [&](ProControllerContext& context){
                             for (int i = 0; i < 6; i++){
                                 pbf_press_dpad(context, DPAD_RIGHT, 50, 20);
                                 pbf_wait(context, 200);
@@ -327,7 +327,7 @@ std::vector<BBQuests> process_quest_list(
 
 bool process_and_do_quest(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     BBQOption& BBQ_OPTIONS,
     BBQuests current_quest,
     uint8_t& eggs_hatched
@@ -415,7 +415,7 @@ bool process_and_do_quest(
     return quest_completed;
 }
 
-void quest_make_tm(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void quest_make_tm(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     stream.log("Quest: Make TM");
 
     //Mount and then dismount in case you're crouched
@@ -430,9 +430,9 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, SwitchControlle
     pbf_move_left_joystick(context, 255, 0, 100, 20);
     pbf_press_button(context, BUTTON_L, 10, 50);
 
-    int enter_machine = run_until<SwitchControllerContext>(
+    int enter_machine = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             for (int i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_A, 20, 50);
                 pbf_wait(context, 200);
@@ -446,9 +446,9 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, SwitchControlle
     if (enter_machine == 0){
         stream.log("TM machine entered. Finding TM to make.");
 
-        int make_tm = run_until<SwitchControllerContext>(
+        int make_tm = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 for (int i = 0; i < 229; i++) { //229 is max number of TMs
                     //click on tm
                     pbf_press_button(context, BUTTON_A, 20, 50);
@@ -478,9 +478,9 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, SwitchControlle
         stream.log("Failed to enter TM machine!");
     }
     
-    int exit = run_until<SwitchControllerContext>(
+    int exit = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ overworld }}
@@ -496,7 +496,7 @@ void quest_make_tm(const ProgramInfo& info, VideoStream& stream, SwitchControlle
     context.wait_for_all_requests();
 }
 
-void quest_travel_500(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     stream.log("Quest: Travel 500 meters.");
 
     //Mount and then dismount in case you're crouched
@@ -524,15 +524,15 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, SwitchContro
 
 void quest_tera_self_defeat(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
     EncounterWatcher encounter_watcher(stream, COLOR_RED);
     stream.log("Quest: Tera-self and defeat any wild.");
     //Navigate to target and start battle
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             central_to_canyon_plaza(info, stream, context);
 
             pbf_move_left_joystick(context, 205, 64, 20, 105);
@@ -594,9 +594,9 @@ void quest_tera_self_defeat(
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
-    int exit = run_until<SwitchControllerContext>(
+    int exit = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
@@ -611,15 +611,15 @@ void quest_tera_self_defeat(
 
 void quest_sneak_up(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
     EncounterWatcher encounter_watcher(stream, COLOR_RED);
     stream.log("Quest: Sneak up.");
     //Navigate to target and start battle
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             //Savanna Plaza - Pride Rock
             central_to_savanna_plaza(info, stream, context);
 
@@ -671,9 +671,9 @@ void quest_sneak_up(
         }else{
             OverworldWatcher overworld(stream.logger(), COLOR_BLUE);
 
-            int ret2 = run_until<SwitchControllerContext>(
+            int ret2 = run_until<ProControllerContext>(
                 stream, context,
-                [&](SwitchControllerContext& context){
+                [&](ProControllerContext& context){
                     while (true){
                         //Flee immediately. Keep trying to flee.
                         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
@@ -726,15 +726,15 @@ void quest_sneak_up(
 
 void quest_wild_tera(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
     EncounterWatcher encounter_watcher(stream, COLOR_RED);
     stream.log("Quest: Defeat a wild tera.");
     //Navigate to target and start battle
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             //Canyon Rest Area
             central_to_canyon_rest(info, stream, context);
 
@@ -802,9 +802,9 @@ void quest_wild_tera(
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
-    int exit = run_until<SwitchControllerContext>(
+    int exit = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
@@ -817,7 +817,7 @@ void quest_wild_tera(
     fly_to_overworld_from_map(info, stream, context);
 }
 
-void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     stream.log("Quest: Give your pokemon a bath!");
 
     //Fly to savanna plaza
@@ -883,9 +883,9 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchCont
 
     WhiteButtonWatcher rinse_done(COLOR_BLUE, WhiteButton::ButtonY, {0.028, 0.923, 0.020, 0.034});
     WallClock start2 = current_time();
-    int ret3 = run_until<SwitchControllerContext>(
+    int ret3 = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             while (true){
                 if (current_time() - start2 > std::chrono::minutes(1)){
                     stream.log("Failed to finish rinse after 1 minute.", COLOR_RED);
@@ -921,7 +921,7 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchCont
 
 void quest_hatch_egg(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
     stream.log("Quest: Hatch an Egg");
@@ -1002,7 +1002,7 @@ void quest_hatch_egg(
 
 void quest_sandwich(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 ){
@@ -1074,7 +1074,7 @@ void quest_sandwich(
 
 void quest_tera_raid(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     BBQOption& BBQ_OPTIONS
 ){
     stream.log("Quest: Tera Raid");
@@ -1082,9 +1082,9 @@ void quest_tera_raid(
     bool started_tera_raid = false;
     while (!started_tera_raid){
         EncounterWatcher encounter_watcher(stream, COLOR_RED);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 //Target is a tera raid crystal near the canyon plaza
                 stream.log("Navigating to tera crystal.");
 
@@ -1184,7 +1184,7 @@ void quest_tera_raid(
 
 void quest_auto_battle(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 ){
@@ -1213,7 +1213,7 @@ void quest_auto_battle(
         pbf_move_left_joystick(context, 255, 128, 180, 50);
         pbf_press_button(context, BUTTON_L, 20, 50);
 
-        use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](SwitchControllerContext& context){
+        use_lets_go_to_clear_in_front(stream, context, tracker, false, [&](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 255, 180, 50);
             pbf_wait(context, 1500);
             context.wait_for_all_requests();
@@ -1228,9 +1228,9 @@ void quest_auto_battle(
         pbf_mash_button(context, BUTTON_A, 300);
         context.wait_for_all_requests();
 
-        int exit = run_until<SwitchControllerContext>(
+        int exit = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 2000);
             },
             { { done_healing } }

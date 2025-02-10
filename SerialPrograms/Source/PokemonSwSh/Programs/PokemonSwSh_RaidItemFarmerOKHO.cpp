@@ -97,14 +97,14 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO()
 }
 
 void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    SwitchControllerContext host(scope, env.consoles[0].controller());
+    ProControllerContext host(scope, env.consoles[0].controller());
     size_t switches = env.consoles.size();
 
     WallDuration TOUCH_DATE_INTERVAL = TOUCH_DATE_INTERVAL0;
 
     env.run_in_parallel(
         scope,
-        [](ConsoleHandle& console, SwitchControllerContext& context){
+        [](ConsoleHandle& console, ProControllerContext& context){
             grip_menu_connect_go_home(context);
         }
     );
@@ -116,7 +116,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
     }
     env.run_in_parallel(
         scope,
-        [](ConsoleHandle& console, SwitchControllerContext& context){
+        [](ConsoleHandle& console, ProControllerContext& context){
             if (console.index() == 0){
                 resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
             }else{
@@ -132,7 +132,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             scope,
-            [&](ConsoleHandle& console, SwitchControllerContext& context){
+            [&](ConsoleHandle& console, ProControllerContext& context){
                 if (console.index() == 0){
                     enter_den(context, 0ms, false, false);
                 }else{
@@ -149,7 +149,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             scope, 1, switches,
-            [&](ConsoleHandle& console, SwitchControllerContext& context){
+            [&](ConsoleHandle& console, ProControllerContext& context){
                 pbf_wait(context, WAIT_FOR_STAMP_DELAY0);
                 pbf_press_button(context, BUTTON_X, 10, 10);
                 pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
@@ -163,7 +163,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             scope,
-            [&](ConsoleHandle& console, SwitchControllerContext& context){
+            [&](ConsoleHandle& console, ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, RAID_START_MASH_DURATION0);
                 pbf_wait(context, RAID_START_TO_ATTACK_DELAY0);
                 pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);

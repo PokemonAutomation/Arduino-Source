@@ -69,7 +69,7 @@ ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
     PA_ADD_OPTION(MASH_TO_TRADE_DELAY0);
 }
 
-void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);

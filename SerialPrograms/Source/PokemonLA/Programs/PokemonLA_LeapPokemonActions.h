@@ -37,12 +37,12 @@ enum class LeapPokemon
     Bergimite
 };
 
-void setup(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context);
-void route(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, LeapPokemon pokemon);
-bool check_tree_or_ore_for_battle(VideoStream& stream, SwitchControllerContext& context);
-void exit_battle(VideoStream& stream, SwitchControllerContext& context, ExitBattleMethod exit_method);
-void return_to_jubilife(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, LeapPokemon pokemon);
-PokemonDetails get_pokemon_details(VideoStream& stream, SwitchControllerContext& context, Language language);
+void setup(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
+void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, LeapPokemon pokemon);
+bool check_tree_or_ore_for_battle(VideoStream& stream, ProControllerContext& context);
+void exit_battle(VideoStream& stream, ProControllerContext& context, ExitBattleMethod exit_method);
+void return_to_jubilife(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, LeapPokemon pokemon);
+PokemonDetails get_pokemon_details(VideoStream& stream, ProControllerContext& context, Language language);
 
 
 }

@@ -43,7 +43,7 @@ namespace PokemonSV{
 
 void run_battle_press_A(
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     BattleStopCondition stop_condition,
     std::vector<CallbackEnum> enum_optional_callbacks,
     bool detect_wipeout
@@ -175,7 +175,7 @@ void run_battle_press_A(
     }
 }
 
-void select_top_move(VideoStream& stream, SwitchControllerContext& context, size_t consecutive_move_select){
+void select_top_move(VideoStream& stream, ProControllerContext& context, size_t consecutive_move_select){
     if (consecutive_move_select > 3){
         // to handle case where move is disabled/out of PP/taunted
         stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
@@ -185,7 +185,7 @@ void select_top_move(VideoStream& stream, SwitchControllerContext& context, size
 
 }
 
-void clear_tutorial(VideoStream& stream, SwitchControllerContext& context, uint16_t seconds_timeout){
+void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t seconds_timeout){
     bool seen_tutorial = false;
     while (true){
         TutorialWatcher tutorial;
@@ -218,7 +218,7 @@ void clear_tutorial(VideoStream& stream, SwitchControllerContext& context, uint1
     }
 }
 
-void clear_dialog(VideoStream& stream, SwitchControllerContext& context,
+void clear_dialog(VideoStream& stream, ProControllerContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout,
     std::vector<CallbackEnum> enum_optional_callbacks
 ){
@@ -283,9 +283,9 @@ void clear_dialog(VideoStream& stream, SwitchControllerContext& context,
             std::chrono::seconds(seconds_timeout),
             callbacks
         );
-        // int ret = run_until<SwitchControllerContext>(
+        // int ret = run_until<ProControllerContext>(
         //     console, context,
-        //     [&](SwitchControllerContext& context){
+        //     [&](ProControllerContext& context){
         //         for (size_t j = 0; j < seconds_timeout/3; j++){
         //             pbf_press_button(context, BUTTON_A, 20, 3*TICKS_PER_SECOND-20);
         //         }
@@ -365,7 +365,7 @@ void clear_dialog(VideoStream& stream, SwitchControllerContext& context,
 bool confirm_marker_present(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context
+    ProControllerContext& context
 ){
     while (true){
         DestinationMarkerWatcher marker(COLOR_RED, {0.815, 0.645, 0.180, 0.320}, true);
@@ -397,7 +397,7 @@ bool confirm_marker_present(
 void overworld_navigation(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     NavigationStopCondition stop_condition,
     NavigationMovementMode movement_mode,
     uint8_t x, uint8_t y,
@@ -430,9 +430,9 @@ void overworld_navigation(
         // uint16_t ticks_passed = std::chrono::duration_cast<std::chrono::milliseconds>(current_time() - start).count() * TICKS_PER_SECOND / 1000;
         // forward_ticks = seconds_realign * TICKS_PER_SECOND - ticks_passed;
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
 
                 for (int i = 0; i < seconds_timeout / seconds_realign; i++){
                     if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
@@ -520,14 +520,14 @@ void overworld_navigation(
     }
 }
 
-void config_option(SwitchControllerContext& context, int change_option_value){
+void config_option(ProControllerContext& context, int change_option_value){
     for (int i = 0; i < change_option_value; i++){
         pbf_press_dpad(context, DPAD_RIGHT, 15, 20);
     }
     pbf_press_dpad(context, DPAD_DOWN,  15, 20);
 }
 
-void swap_starter_moves(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context, Language language){
+void swap_starter_moves(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, Language language){
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::minutes(3)){
@@ -578,7 +578,7 @@ void swap_starter_moves(const ProgramInfo& info, VideoStream& stream, SwitchCont
 
 
 void change_settings_prior_to_autostory(
-    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     size_t current_segment_num,
     Language language
 ){
@@ -612,7 +612,7 @@ void change_settings_prior_to_autostory(
 }
 
 
-void change_settings(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,  Language language, bool use_inference){
+void change_settings(SingleSwitchProgramEnvironment& env, ProControllerContext& context,  Language language, bool use_inference){
     env.console.log("Update settings.");
     if (use_inference){
         MenuOption session(env.console, context, language);
@@ -663,17 +663,17 @@ void change_settings(SingleSwitchProgramEnvironment& env, SwitchControllerContex
 void do_action_and_monitor_for_battles(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     std::function<
         void(const ProgramInfo& info, 
         VideoStream& stream,
-        SwitchControllerContext& context)
+        ProControllerContext& context)
     >&& action
 ){
     NormalBattleMenuWatcher battle_menu(COLOR_RED);
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             context.wait_for_all_requests();
             action(info, stream, context);
         },
@@ -693,11 +693,11 @@ void do_action_and_monitor_for_battles(
 void handle_unexpected_battles(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     std::function<
         void(const ProgramInfo& info, 
         VideoStream& stream,
-        SwitchControllerContext& context)
+        ProControllerContext& context)
     >&& action
 ){
     while (true){
@@ -714,16 +714,16 @@ void handle_unexpected_battles(
 void handle_when_stationary_in_overworld(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     std::function<
         void(const ProgramInfo& info, 
         VideoStream& stream,
-        SwitchControllerContext& context)
+        ProControllerContext& context)
     >&& action,
     std::function<
         void(const ProgramInfo& info, 
         VideoStream& stream,
-        SwitchControllerContext& context)
+        ProControllerContext& context)
     >&& recovery_action,
     size_t seconds_stationary,
     uint16_t minutes_timeout, 
@@ -742,9 +742,9 @@ void handle_when_stationary_in_overworld(
         }
         StationaryOverworldWatcher stationary_overworld(COLOR_RED, {0.865, 0.825, 0.08, 0.1}, seconds_stationary);
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 context.wait_for_all_requests();
                 action(info, stream, context);
             },
@@ -774,16 +774,16 @@ void handle_when_stationary_in_overworld(
 void handle_failed_action(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     std::function<
         void(const ProgramInfo& info, 
         VideoStream& stream,
-        SwitchControllerContext& context)
+        ProControllerContext& context)
     >&& action,
     std::function<
         void(const ProgramInfo& info, 
         VideoStream& stream,
-        SwitchControllerContext& context)
+        ProControllerContext& context)
     >&& recovery_action,
     size_t max_failures
 ){
@@ -807,7 +807,7 @@ void handle_failed_action(
 void wait_for_gradient_arrow(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     ImageFloatBox box_area_to_check,
     uint16_t seconds_timeout
 ){
@@ -832,7 +832,7 @@ void wait_for_gradient_arrow(
 void wait_for_overworld(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     uint16_t seconds_timeout
 ){
     context.wait_for_all_requests();
@@ -856,14 +856,14 @@ void wait_for_overworld(
 
 void press_A_until_dialog(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint16_t seconds_between_button_presses
 ){
     context.wait_for_all_requests();
     AdvanceDialogWatcher advance_dialog(COLOR_RED);
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [seconds_between_button_presses](SwitchControllerContext& context){
+        [seconds_between_button_presses](ProControllerContext& context){
             pbf_wait(context, seconds_between_button_presses * TICKS_PER_SECOND); // avoiding pressing A if dialog already present
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, BUTTON_A, 20, seconds_between_button_presses * TICKS_PER_SECOND);
@@ -882,7 +882,7 @@ void press_A_until_dialog(
     }
 }
 
-bool is_ride_active(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+bool is_ride_active(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     while (true){
         try {
             // open main menu
@@ -912,15 +912,15 @@ bool is_ride_active(const ProgramInfo& info, VideoStream& stream, SwitchControll
 
 }
 
-void get_on_ride(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void get_on_ride(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     get_on_or_off_ride(info, stream, context, true);
 }
 
-void get_off_ride(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void get_off_ride(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     get_on_or_off_ride(info, stream, context, false);
 }
 
-void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context, bool get_on){
+void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, bool get_on){
     pbf_press_button(context, BUTTON_PLUS, 20, 20);
 
     WallClock start = current_time();
@@ -936,7 +936,7 @@ void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, SwitchCont
     }
 }
 
-void checkpoint_save(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, EventNotificationOption& notif_status_update){
+void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
     save_game_from_overworld(env.program_info(), env.console, context);
     stats.m_checkpoint++;
@@ -948,7 +948,7 @@ void checkpoint_save(SingleSwitchProgramEnvironment& env, SwitchControllerContex
 void realign_player_from_landmark(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     MoveCursor move_cursor_near_landmark,
     MoveCursor move_cursor_to_target
 ){
@@ -1046,7 +1046,7 @@ void realign_player_from_landmark(
 }
 
 
-void confirm_cursor_centered_on_pokecenter(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void confirm_cursor_centered_on_pokecenter(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     context.wait_for(Milliseconds(500));
     ImageFloatBox center_cursor{0.484, 0.472, 0.030, 0.053};
@@ -1065,7 +1065,7 @@ void confirm_cursor_centered_on_pokecenter(const ProgramInfo& info, VideoStream&
 void move_cursor_towards_flypoint_and_go_there(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     MoveCursor move_cursor_near_flypoint
 ){
     WallClock start = current_time();
@@ -1129,7 +1129,7 @@ void move_cursor_towards_flypoint_and_go_there(
 
 
 
-void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, int expected_number){
+void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int expected_number){
     context.wait_for_all_requests();
     VideoSnapshot screen = env.console.video().snapshot();
     ImageFloatBox num_sunflora_box = {0.27, 0.02, 0.04, 0.055};

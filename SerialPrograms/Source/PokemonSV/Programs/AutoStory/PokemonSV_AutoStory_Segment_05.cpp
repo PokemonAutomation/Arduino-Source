@@ -41,7 +41,7 @@ std::string AutoStory_Segment_05::end_text() const{
 
 void AutoStory_Segment_05::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -64,7 +64,7 @@ void AutoStory_Segment_05::run_segment(
 
 void checkpoint_09(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -81,12 +81,12 @@ void checkpoint_09(
         env.console.log("overworld_navigation: Go to Arven at the tower.");
         
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 60, 30, true, true);
             }, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 128, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
@@ -114,7 +114,7 @@ void checkpoint_09(
 
 void checkpoint_10(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -129,7 +129,7 @@ void checkpoint_10(
         env.console.log("Lighthouse view");
         env.console.overlay().add_log("Lighthouse view", COLOR_WHITE);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 110, 100);
                 pbf_move_left_joystick(context, 128, 0, 6 * TICKS_PER_SECOND, 8 * TICKS_PER_SECOND);
                 pbf_move_left_joystick(context, 128, 0, 4 * TICKS_PER_SECOND, 20);

@@ -135,7 +135,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 uint16_t scroll_to(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint8_t start_digit, uint8_t end_digit, bool actually_scroll
 );
 
@@ -274,7 +274,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    [[maybe_unused]] BotBase& botbase = env.consoles[0];
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
-    SwitchControllerContext context(scope, console.controller());
+    ProControllerContext context(scope, console.controller());
     VideoOverlaySet overlays(overlay);
 
 
@@ -1119,9 +1119,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         AreaZeroSkyTracker sky_tracker(overlay);
         context.wait_for_all_requests();
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 while (true){
                     switch (count++ % 2){
                     case 0:
@@ -1206,7 +1206,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ConsoleHandle& host = env.consoles[host_index];
     BotBaseContext host_context(scope, host.botbase());
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         if (console.index() == host_index){
             open_raid(console, context);
         }else{
@@ -1225,7 +1225,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         OperationFailedException::fire(env.logger(), "Unable to read raid code.");
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         if (console.index() == host_index){
             return;
         }
@@ -1492,12 +1492,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 #if 0
     AsyncCommandSession session(scope, logger, env.realtime_dispatcher(), context.botbase());
-    session.dispatch([](SwitchControllerContext& context){
+    session.dispatch([](ProControllerContext& context){
 //        pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 255);
         pbf_press_button(context, BUTTON_A, 255, 0);
     });
     context.wait_for(std::chrono::seconds(2));
-    session.dispatch([](SwitchControllerContext& context){
+    session.dispatch([](ProControllerContext& context){
 //        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 255);
         pbf_press_button(context, BUTTON_B, 255, 0);
     });
@@ -1724,7 +1724,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     TradeStats stats;
     env.run_in_parallel(
         scope,
-        [&](ConsoleHandle& console, SwitchControllerContext& context){
+        [&](ConsoleHandle& console, ProControllerContext& context){
             trade_current_pokemon(console, context, state, stats);
         }
     );

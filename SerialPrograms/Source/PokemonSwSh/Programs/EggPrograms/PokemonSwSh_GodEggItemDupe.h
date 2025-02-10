@@ -30,9 +30,9 @@ class GodEggItemDupe : public SingleSwitchProgramInstance{
 public:
     GodEggItemDupe();
 
-    void collect_godegg(SwitchControllerContext& context, uint8_t party_slot, bool map_to_pokemon, bool pokemon_to_map) const;
-    void run_program(Logger& logger, SwitchControllerContext& context, uint16_t attempts) const;
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    void collect_godegg(ProControllerContext& context, uint8_t party_slot, bool map_to_pokemon, bool pokemon_to_map) const;
+    void run_program(Logger& logger, ProControllerContext& context, uint16_t attempts) const;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

@@ -33,10 +33,10 @@ public:
 class PurpleBeamFinder : public SingleSwitchProgramInstance{
 public:
     PurpleBeamFinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool run(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    bool run(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     StartInGripOrGameOption START_LOCATION;

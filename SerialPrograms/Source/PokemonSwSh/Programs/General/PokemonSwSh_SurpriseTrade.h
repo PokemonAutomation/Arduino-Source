@@ -29,10 +29,10 @@ class SurpriseTrade : public SingleSwitchProgramInstance{
 public:
     SurpriseTrade();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void trade_slot(SwitchControllerContext& context, uint8_t slot, bool next_box) const;
+    void trade_slot(ProControllerContext& context, uint8_t slot, bool next_box) const;
 
 private:
     StartInGripOrGameOption START_LOCATION;

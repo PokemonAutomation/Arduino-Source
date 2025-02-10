@@ -20,7 +20,7 @@ namespace PokemonSwSh{
 void navigate_to_menu_app(
     ProgramEnvironment& env,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     size_t target_app_index,
     EventNotificationOption& notification_option
 ){

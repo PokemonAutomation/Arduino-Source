@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet_with_inference(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Milliseconds post_wait_time,
     Milliseconds timeout_ticks
 ){
@@ -57,9 +57,9 @@ bool connect_to_internet_with_inference(
     //  Mash B until you leave Y-COMM.
     {
         YCommMenuDetector detector(false);
-        int result = run_until<SwitchControllerContext>(
+        int result = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, timeout_ticks);
             },
             {{detector}}

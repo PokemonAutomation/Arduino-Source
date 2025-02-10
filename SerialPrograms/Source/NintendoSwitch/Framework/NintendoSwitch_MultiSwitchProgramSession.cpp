@@ -13,7 +13,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
@@ -161,7 +161,7 @@ void MultiSwitchProgramSession::internal_run_program(){
             return;
         }
         AbstractController* controller = session.controller_session().controller();
-        SwitchController& switch_controller = *dynamic_cast<SwitchController*>(controller);
+        ProController& switch_controller = *dynamic_cast<ProController*>(controller);
         handles.emplace_back(
             c,
             session.logger(),

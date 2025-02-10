@@ -71,7 +71,7 @@ ShinyHuntDeoxys::ShinyHuntDeoxys()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     env.log("Step 1: Press A from below.");
     pbf_press_button(context, BUTTON_A, 20, 40);
 
@@ -175,7 +175,7 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, SwitchCo
     context.wait_for_all_requests();
 }
 
-void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntDeoxys_Descriptor::Stats& stats = env.current_stats<ShinyHuntDeoxys_Descriptor::Stats>();
 
     /*

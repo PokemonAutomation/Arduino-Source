@@ -160,7 +160,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
 
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
     WallClock expiration
 ) const{
@@ -230,9 +230,9 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_battle_detector;
 
-            int result = run_until<SwitchControllerContext>(
+            int result = run_until<ProControllerContext>(
                 stream, context,
-                [&](SwitchControllerContext& context){
+                [&](ProControllerContext& context){
                     trigger->run(context);
                 },
                 {
@@ -282,7 +282,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
 bool ShinyHuntAutonomousOverworld::charge_at_target(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const std::pair<double, OverworldTarget>& target
 ) const{
     OverlayBoxScope target_box(stream.overlay(), target.second.box, COLOR_YELLOW);
@@ -320,9 +320,9 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         MAX_TARGET_ALPHA
     );
 
-    int result = run_until<SwitchControllerContext>(
+    int result = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             //  Move to target.
             pbf_move_left_joystick(
                 context,
@@ -366,7 +366,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
 
 
-void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     srand((unsigned)time(nullptr));
 
     if (START_LOCATION.start_in_grip_menu()){

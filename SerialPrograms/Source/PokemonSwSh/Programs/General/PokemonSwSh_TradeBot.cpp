@@ -98,7 +98,7 @@ TradeBot::TradeBot()
 }
 
 
-void TradeBot::trade_slot(SwitchControllerContext& context, const uint8_t code[8], uint8_t slot) const{
+void TradeBot::trade_slot(ProControllerContext& context, const uint8_t code[8], uint8_t slot) const{
     ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 400ms);
     ssf_press_button2(context, BUTTON_A, 150, 20);
     ssf_press_dpad1(context, DPAD_DOWN, 10);
@@ -149,7 +149,7 @@ void TradeBot::trade_slot(SwitchControllerContext& context, const uint8_t code[8
     }
 }
 
-void TradeBot::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TradeBot::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     uint8_t code[8];
     TRADE_CODE.to_str(code);
 

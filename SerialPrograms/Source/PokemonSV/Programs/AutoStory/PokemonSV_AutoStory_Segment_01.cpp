@@ -47,7 +47,7 @@ std::string AutoStory_Segment_01::end_text() const{
 
 void AutoStory_Segment_01::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -71,7 +71,7 @@ void AutoStory_Segment_01::run_segment(
 
 void checkpoint_01(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update, 
     Language language
 ){
@@ -108,7 +108,7 @@ AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
 void checkpoint_02(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -198,7 +198,7 @@ void checkpoint_02(
 
 void checkpoint_03(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
     Language language,
     StarterChoice starter_choice
@@ -256,9 +256,9 @@ void checkpoint_03(
         env.console.log("Clear auto heal tutorial.");
         // Press X until Auto heal tutorial shows up
         TutorialWatcher tutorial;
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
                     pbf_press_button(context, BUTTON_X, 20, 250);
                 }

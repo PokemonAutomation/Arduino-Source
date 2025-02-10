@@ -42,7 +42,7 @@ std::string AutoStory_Segment_02::end_text() const{
 
 void AutoStory_Segment_02::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -64,7 +64,7 @@ void AutoStory_Segment_02::run_segment(
 
 void checkpoint_04(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

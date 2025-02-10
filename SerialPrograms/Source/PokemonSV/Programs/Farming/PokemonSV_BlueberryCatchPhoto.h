@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_BlueberryCatchPhoto_H
 #define PokemonAutomation_PokemonSV_BlueberryCatchPhoto_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV/Options/PokemonSV_BBQOption.h"
 
@@ -21,7 +21,7 @@ namespace PokemonSV{
 //Navigate to a photo target
 CameraAngle quest_photo_navi(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 );
@@ -29,7 +29,7 @@ CameraAngle quest_photo_navi(
 //Take picture of a pokemon/location
 void quest_photo(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 );
@@ -38,7 +38,7 @@ void quest_photo(
 //Navigate to a catch target
 void quest_catch_navi(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 );
@@ -46,7 +46,7 @@ void quest_catch_navi(
 //Select and throw ball
 void quest_catch_throw_ball(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     const std::string& selected_ball
 );
@@ -54,7 +54,7 @@ void quest_catch_throw_ball(
 //Handle catching the target
 void quest_catch_handle_battle(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 );
@@ -62,7 +62,7 @@ void quest_catch_handle_battle(
 //Catch a pokemon
 void quest_catch(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 );
@@ -71,7 +71,7 @@ void quest_catch(
 //Handle battles for tera-self/defeat-wild-tera. Use first attack until victory.
 void wild_battle_tera(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool& tera_self
 );
 

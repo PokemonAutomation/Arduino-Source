@@ -74,7 +74,7 @@ DaySkipperUS::DaySkipperUS()
 }
 
 
-void DaySkipperUS::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void DaySkipperUS::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;

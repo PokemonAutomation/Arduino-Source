@@ -33,7 +33,7 @@ public:
 class AutoItemPrinter : public SingleSwitchProgramInstance{
 public:
     AutoItemPrinter();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     OCR::LanguageOCROption LANGUAGE;
@@ -44,7 +44,7 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void enter_printing_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void enter_printing_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 };
 
 

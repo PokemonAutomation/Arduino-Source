@@ -9,7 +9,7 @@
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 
 
 static RaidLobbyState raid_lobby_wait(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool HOST_ONLINE,
     uint8_t accept_FR_slot,
     Milliseconds lobby_wait_delay

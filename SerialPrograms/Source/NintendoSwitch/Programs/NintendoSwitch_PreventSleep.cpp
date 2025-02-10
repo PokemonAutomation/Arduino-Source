@@ -27,7 +27,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
 
 PreventSleep::PreventSleep(){}
 
-void PreventSleep::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void PreventSleep::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     while (true){
         ssf_press_button2(context, BUTTON_B, 15 * TICKS_PER_SECOND, 10);
     }

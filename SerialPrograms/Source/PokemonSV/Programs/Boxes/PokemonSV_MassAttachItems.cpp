@@ -99,7 +99,7 @@ MassAttachItems::MassAttachItems()
 
 
 
-void MassAttachItems::attach_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MassAttachItems::attach_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     MassAttachItems_Descriptor::Stats& stats = env.current_stats<MassAttachItems_Descriptor::Stats>();
 
     env.log("Selecting " + STRING_POKEMON + "...");
@@ -133,7 +133,7 @@ void MassAttachItems::attach_one(BoxDetector& box_detector, SingleSwitchProgramE
         throw;
     }
 }
-void MassAttachItems::attach_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MassAttachItems::attach_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     for (uint8_t row = 0; row < 5; row++){
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             // Go through slots in a Z-shape pattern
@@ -147,7 +147,7 @@ void MassAttachItems::attach_box(BoxDetector& box_detector, SingleSwitchProgramE
 
 
 
-void MassAttachItems::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MassAttachItems::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     MassAttachItems_Descriptor::Stats& stats = env.current_stats<MassAttachItems_Descriptor::Stats>();

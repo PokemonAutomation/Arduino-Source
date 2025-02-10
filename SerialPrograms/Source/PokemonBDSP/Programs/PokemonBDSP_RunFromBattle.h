@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_RunFromBattle_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -20,7 +20,7 @@ namespace PokemonBDSP{
 // Return true if a black screen is detected, false if not detected after
 // `exit_battle_time` of ticks have passed. 
 bool run_from_battle(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Milliseconds exit_battle_time
 );
 

@@ -53,7 +53,7 @@ BerryFarmer::BerryFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void BerryFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BerryFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{

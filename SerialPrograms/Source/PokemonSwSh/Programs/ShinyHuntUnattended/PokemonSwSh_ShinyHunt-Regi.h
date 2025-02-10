@@ -13,17 +13,17 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-    class SwitchControllerContext;
+    class ProControllerContext;
 namespace PokemonSwSh{
 
 
 void move_to_corner(
-    Logger& logger, SwitchControllerContext& context,
+    Logger& logger, ProControllerContext& context,
     bool correction, Milliseconds TRANSITION_DELAY
 );
 
 void run_regi_light_puzzle(
-    Logger& logger, SwitchControllerContext& context,
+    Logger& logger, ProControllerContext& context,
     RegiGolem regi, uint64_t encounter
 );
 

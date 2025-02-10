@@ -36,7 +36,7 @@ TradeStats::TradeStats()
 
 
 void trade_current_pokemon(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
@@ -109,9 +109,9 @@ void trade_current_pokemon(
     //  Mash B until 2nd black screen.
     {
         BlackScreenWatcher black_screen;
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {{black_screen}}

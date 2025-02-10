@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 OverworldTrigger::OverworldTrigger(OverworldTargetTracker& target_tracker)
     : m_target_tracker(target_tracker)
 {}
-void OverworldTrigger::whistle(SwitchControllerContext& context, bool rotate){
+void OverworldTrigger::whistle(ProControllerContext& context, bool rotate){
     context.wait_for_all_requests();
     m_target_tracker.set_stop_on_target(false);
 
@@ -41,7 +41,7 @@ void OverworldTrigger::whistle(SwitchControllerContext& context, bool rotate){
 }
 
 
-void OverworldTrigger_Whistle::run(SwitchControllerContext& context){
+void OverworldTrigger_Whistle::run(ProControllerContext& context){
     whistle(context, !m_first_after_battle);
     m_first_after_battle = false;
 }
@@ -58,7 +58,7 @@ OverworldTrigger_WhistleStaticAction::OverworldTrigger_WhistleStaticAction(
     , m_whistle_count(whistle_count)
     , m_action_count(action_count)
 {}
-void OverworldTrigger_WhistleStaticAction::run(SwitchControllerContext& context){
+void OverworldTrigger_WhistleStaticAction::run(ProControllerContext& context){
     if (m_whistle_first){
         whistle_loop(context);
         action_loop(context);
@@ -67,13 +67,13 @@ void OverworldTrigger_WhistleStaticAction::run(SwitchControllerContext& context)
         whistle_loop(context);
     }
 }
-void OverworldTrigger_WhistleStaticAction::whistle_loop(SwitchControllerContext& context){
+void OverworldTrigger_WhistleStaticAction::whistle_loop(ProControllerContext& context){
     for (size_t c = 0; c < m_whistle_count; c++){
         whistle(context, !m_first_after_battle);
         m_first_after_battle = false;
     }
 }
-void OverworldTrigger_WhistleStaticAction::action_loop(SwitchControllerContext& context){
+void OverworldTrigger_WhistleStaticAction::action_loop(ProControllerContext& context){
     m_target_tracker.set_stop_on_target(true);
     context.wait_for_all_requests();
     for (size_t c = 0; c < m_action_count; c++){
@@ -85,13 +85,13 @@ void OverworldTrigger_WhistleStaticAction::action_loop(SwitchControllerContext& 
 }
 
 
-void OverworldTrigger_WhistleCircle::action(SwitchControllerContext& context){
+void OverworldTrigger_WhistleCircle::action(ProControllerContext& context){
     circle_in_place(context, rand() % 2);
 }
-void OverworldTrigger_WhistleHorizontal::action(SwitchControllerContext& context){
+void OverworldTrigger_WhistleHorizontal::action(ProControllerContext& context){
     move_in_line(context, true);
 }
-void OverworldTrigger_WhistleVertical::action(SwitchControllerContext& context){
+void OverworldTrigger_WhistleVertical::action(ProControllerContext& context){
     move_in_line(context, false);
 }
 

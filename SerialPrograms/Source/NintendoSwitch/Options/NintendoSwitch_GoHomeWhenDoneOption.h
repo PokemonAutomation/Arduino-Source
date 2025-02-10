@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_GoHomeWhenDone_H
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,7 +18,7 @@ class GoHomeWhenDoneOption : public BooleanCheckBoxOption{
 public:
     GoHomeWhenDoneOption(bool default_value);
 
-    void run_end_of_program(SwitchControllerContext& context);
+    void run_end_of_program(ProControllerContext& context);
 };
 
 

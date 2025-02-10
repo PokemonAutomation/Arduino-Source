@@ -115,7 +115,7 @@ WildItemFarmer::WildItemFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     try{
         run_program(env, context);
     }catch (...){
@@ -124,7 +124,7 @@ void WildItemFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControll
     }
 }
 
-void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     int move_overwrites = 0;
     bool move_selected = false;
     while (true){
@@ -192,7 +192,7 @@ void WildItemFarmer::refresh_pp(SingleSwitchProgramEnvironment& env, SwitchContr
     }
 }
 
-bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, NormalBattleMenuWatcher& battle_menu){
+bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, ProControllerContext& context, NormalBattleMenuWatcher& battle_menu){
     env.log("Verifying that item has been taken...");
 
     while (true){
@@ -233,9 +233,9 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, Switc
     bool item_held = !is_solid(stats, {0.550405, 0.449595, 0.}, 0.20);
 
     {
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 500);
             },
             {battle_menu}
@@ -253,7 +253,7 @@ bool WildItemFarmer::verify_item_held(SingleSwitchProgramEnvironment& env, Switc
 }
 
 
-void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void WildItemFarmer::run_program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     WildItemFarmer_Descriptor::Stats& stats = env.current_stats<WildItemFarmer_Descriptor::Stats>();
 

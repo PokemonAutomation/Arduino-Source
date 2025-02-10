@@ -33,7 +33,7 @@ public:
 class EggHatcher : public SingleSwitchProgramInstance{
 public:
     EggHatcher();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     // Start at box system, where party is empty, the program will:
@@ -41,7 +41,7 @@ private:
     // - hatch
     // - return to box system and offline paty
     // Repeat for all six columns of a box
-    void hatch_one_box(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void hatch_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

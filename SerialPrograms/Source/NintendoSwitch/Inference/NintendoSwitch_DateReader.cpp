@@ -164,7 +164,7 @@ int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) cons
 
 
 void DateReader::set_hours(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     uint8_t hour
 ) const{
     context.wait_for_all_requests();
@@ -400,7 +400,7 @@ DateTime DateReader::read_date_jp(Logger& logger, std::shared_ptr<const ImageRGB
 }
 
 
-void DateReader::move_cursor(SwitchControllerContext& context, int current, int desired){
+void DateReader::move_cursor(ProControllerContext& context, int current, int desired){
     while (current < desired){
         ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
         current++;
@@ -410,7 +410,7 @@ void DateReader::move_cursor(SwitchControllerContext& context, int current, int 
         current--;
     }
 }
-void DateReader::adjust_year(SwitchControllerContext& context, int current, int desired){
+void DateReader::adjust_year(ProControllerContext& context, int current, int desired){
     while (current < desired){
         ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
         current++;
@@ -420,7 +420,7 @@ void DateReader::adjust_year(SwitchControllerContext& context, int current, int 
         current--;
     }
 }
-void DateReader::adjust_month(SwitchControllerContext& context, int current, int desired){
+void DateReader::adjust_month(ProControllerContext& context, int current, int desired){
     int diff = desired - current;
     if ((diff >= 0 && diff <= 6) || (diff < 0 && diff < -6)){
         while (current != desired){
@@ -440,7 +440,7 @@ void DateReader::adjust_month(SwitchControllerContext& context, int current, int
         }
     }
 }
-void DateReader::adjust_hour_24(SwitchControllerContext& context, int current, int desired){
+void DateReader::adjust_hour_24(ProControllerContext& context, int current, int desired){
     int diff = desired - current;
     if ((diff >= 0 && diff <= 12) || (diff < 0 && diff < -12)){
         while (current != desired){
@@ -460,7 +460,7 @@ void DateReader::adjust_hour_24(SwitchControllerContext& context, int current, i
         }
     }
 }
-void DateReader::adjust_minute(SwitchControllerContext& context, int current, int desired){
+void DateReader::adjust_minute(ProControllerContext& context, int current, int desired){
     int diff = desired - current;
     if ((diff >= 0 && diff <= 30) || (diff < 0 && diff < -30)){
         while (current != desired){
@@ -482,7 +482,7 @@ void DateReader::adjust_minute(SwitchControllerContext& context, int current, in
 }
 
 void DateReader::set_date(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     const DateTime& date
 ) const{
     context.wait_for_all_requests();
@@ -595,7 +595,7 @@ void DateReader::set_date(
 }
 
 void change_date(
-    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     const DateTime& date
 ){
     while (true){

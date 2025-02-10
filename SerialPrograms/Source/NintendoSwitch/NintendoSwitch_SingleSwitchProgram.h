@@ -14,7 +14,7 @@
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "Controllers/ControllerCapability.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"    //  REMOVE
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
@@ -110,7 +110,7 @@ public:
         const std::vector<std::string>& error_notification_tags = {"Notifs"}
     );
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) = 0;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) = 0;
 
 
 public:

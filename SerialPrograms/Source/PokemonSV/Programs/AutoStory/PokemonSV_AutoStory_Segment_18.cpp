@@ -42,7 +42,7 @@ std::string AutoStory_Segment_18::end_text() const{
 
 void AutoStory_Segment_18::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -63,7 +63,7 @@ void AutoStory_Segment_18::run_segment(
 
 void checkpoint_39(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -88,7 +88,7 @@ void checkpoint_39(
         
         // section 1
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 4.677921);
                 pbf_move_left_joystick(context, 128, 0, 150, 100);
         });        
@@ -113,9 +113,9 @@ void checkpoint_39(
         DialogBoxWatcher        dialog(COLOR_RED, true);
 
         // section 4
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 // run around in circles until you run into the titan
                 WallClock start = current_time();
 
@@ -241,7 +241,7 @@ void checkpoint_39(
 
 void checkpoint_40(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -273,12 +273,12 @@ void checkpoint_40(
         // section 1
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 30, 10, false);
             }, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 255, 128, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
@@ -291,12 +291,12 @@ void checkpoint_40(
             {ZoomChange::ZOOM_IN, 255, 140, 100}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 30, 10, false);
             }, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 255, 128, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
@@ -309,12 +309,12 @@ void checkpoint_40(
             {ZoomChange::ZOOM_IN, 255, 90, 120}
         );  
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 30, 10, false);
             }, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 0, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
@@ -328,12 +328,12 @@ void checkpoint_40(
         );  
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 20, 10, false);
             }, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 255, 0, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
@@ -341,7 +341,7 @@ void checkpoint_40(
 
         // section 5. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 160, 40);
         });      
         overworld_navigation(env.program_info(), env.console, context, 

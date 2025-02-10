@@ -61,7 +61,7 @@ SoundListener::SoundListener()
 
 // void search_alpha_roar_from_audio_dump();
 
-void SoundListener::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SoundListener::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // search_alpha_roar_from_audio_dump();
     // return;
 

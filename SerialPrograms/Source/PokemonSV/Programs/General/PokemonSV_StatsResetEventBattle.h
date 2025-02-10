@@ -52,10 +52,10 @@ public:
 class StatsResetEventBattle : public SingleSwitchProgramInstance{
 public:
     StatsResetEventBattle();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool check_stats_after_win(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    bool check_stats_after_win(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     enum class Target{
@@ -77,10 +77,10 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-    void enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-    bool run_battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-    bool check_stats(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool check_stats(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 };
 
 }

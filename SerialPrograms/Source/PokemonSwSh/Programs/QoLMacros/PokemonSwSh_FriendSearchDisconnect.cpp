@@ -42,7 +42,7 @@ FriendSearchDisconnect::FriendSearchDisconnect()
     PA_ADD_OPTION(USER_SLOT);
 }
 
-void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
 
     home_to_add_friends(context, USER_SLOT - 1, 1, true);

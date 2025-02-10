@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MenuNavigation_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class EventNotificationOption;
@@ -24,7 +24,7 @@ namespace PokemonSwSh{
 void navigate_to_menu_app(
     ProgramEnvironment& env,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     size_t app_index,
     EventNotificationOption& notification_option
 );

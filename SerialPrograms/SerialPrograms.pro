@@ -406,10 +406,10 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
@@ -1557,10 +1557,10 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \

@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-OrbeetleAttackAnimationDetector::OrbeetleAttackAnimationDetector(VideoStream& stream, SwitchControllerContext& context)
+OrbeetleAttackAnimationDetector::OrbeetleAttackAnimationDetector(VideoStream& stream, ProControllerContext& context)
     : m_stream(stream)
     , m_context(context)
     , m_box(stream.overlay(), {0.86, 0.2, 0.1, 0.15})

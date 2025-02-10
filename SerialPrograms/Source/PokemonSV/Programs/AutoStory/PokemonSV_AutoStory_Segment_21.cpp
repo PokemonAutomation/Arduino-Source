@@ -40,7 +40,7 @@ std::string AutoStory_Segment_21::end_text() const{
 
 void AutoStory_Segment_21::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -59,7 +59,7 @@ void AutoStory_Segment_21::run_segment(
 
 void checkpoint_46(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -99,7 +99,7 @@ void checkpoint_46(
 
         // section 2. set marker past pokecenter
         handle_unexpected_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 180, 0, 30);
         });      
         overworld_navigation(env.program_info(), env.console, context, 

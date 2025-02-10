@@ -64,7 +64,7 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
 
 
 
-void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

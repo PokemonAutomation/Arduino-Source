@@ -12,7 +12,7 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -24,11 +24,11 @@ public:
 
     void make_overlays(VideoOverlaySet& items) const;
 
-    std::pair<double, double> olive_location(VideoStream& stream, SwitchControllerContext& context, ImageFloatBox box = {0, 0.15, 1, 0.7});
+    std::pair<double, double> olive_location(VideoStream& stream, ProControllerContext& context, ImageFloatBox box = {0, 0.15, 1, 0.7});
 
     ImageFloatBox get_olive_floatbox(
         const ImageViewRGB32& screen, 
-        SwitchControllerContext& context, 
+        ProControllerContext& context, 
         uint8_t rgb_gap,
         ImageFloatBox box
     );
@@ -36,7 +36,7 @@ public:
     // return ImageFloatBox of the of the Olive, based on the largest blob of green
     ImageFloatBox get_olive_floatbox(
         VideoStream& stream,
-        SwitchControllerContext& context, 
+        ProControllerContext& context, 
         uint8_t rgb_gap,
         ImageFloatBox box
     );
@@ -44,7 +44,7 @@ public:
     ImageFloatBox align_to_olive(
         const ProgramInfo& info, 
         VideoStream& stream,
-        SwitchControllerContext& context, 
+        ProControllerContext& context, 
         double direction_facing, 
         uint8_t rgb_gap = 20,
         ImageFloatBox area_to_check = {0, 0.3, 1.0, 0.40}
@@ -57,7 +57,7 @@ public:
     uint16_t push_olive_forward(
         const ProgramInfo& info, 
         VideoStream& stream,
-        SwitchControllerContext& context, 
+        ProControllerContext& context, 
         double direction_facing, 
         uint16_t total_forward_distance,
         uint16_t push_olive = 75,
@@ -68,7 +68,7 @@ public:
     uint16_t walk_up_to_olive(
         const ProgramInfo& info, 
         VideoStream& stream,
-        SwitchControllerContext& context, 
+        ProControllerContext& context, 
         double direction_facing, 
         uint8_t rgb_gap = 20,
         ImageFloatBox area_to_check = {0, 0.3, 1.0, 0.40}

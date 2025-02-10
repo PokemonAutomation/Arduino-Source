@@ -68,7 +68,7 @@ BowItemDuper::BowItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void BowItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // assert_16_9_720p_min(env.logger(), env.console);
 
     // just do a forever loop where we have to do stuff

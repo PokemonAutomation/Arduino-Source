@@ -48,12 +48,12 @@ ActivateMenuGlitch112::ActivateMenuGlitch112()
 
 
 
-void trigger_menu(VideoStream& stream, SwitchControllerContext& context){
+void trigger_menu(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     MapWatcher detector;
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             for (size_t i = 0; i < 12; i++){
                 for (size_t c = 0; c < 42; c++){
                     pbf_controller_state(context, BUTTON_ZL, DPAD_NONE, 128, 128, 128, 128, 1);
@@ -83,7 +83,7 @@ void trigger_menu(VideoStream& stream, SwitchControllerContext& context){
         context.wait_for_all_requests();
     }
 }
-void trigger_map_overlap(VideoStream& stream, SwitchControllerContext& context){
+void trigger_map_overlap(VideoStream& stream, ProControllerContext& context){
     for (size_t c = 0; c < 10; c++){
         trigger_menu(stream, context);
 
@@ -111,7 +111,7 @@ void trigger_map_overlap(VideoStream& stream, SwitchControllerContext& context){
 
 
 
-void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     VideoStream& stream = env.console;
 
     trigger_map_overlap(stream, context);
@@ -132,9 +132,9 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, SwitchC
     {
         context.wait_for_all_requests();
         BlackScreenWatcher detector;
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 for (size_t c = 0; c < 5; c++){
                     pbf_press_dpad(context, DPAD_LEFT, 20, 105);
                     pbf_press_dpad(context, DPAD_DOWN, 20, 105);

@@ -25,7 +25,7 @@ namespace PokemonLA{
 
 
 
-void goto_professor(Logger& logger, SwitchControllerContext& context, Camp camp){
+void goto_professor(Logger& logger, ProControllerContext& context, Camp camp){
     switch (camp){
     case Camp::FIELDLANDS_FIELDLANDS:
         pbf_move_left_joystick(context, 255, 0, 125, 0);
@@ -68,7 +68,7 @@ void goto_professor(Logger& logger, SwitchControllerContext& context, Camp camp)
     }
 }
 void from_professor_return_to_jubilife(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
 ){
     ButtonDetector button_detector0(
         stream.logger(), stream.overlay(),
@@ -87,9 +87,9 @@ void from_professor_return_to_jubilife(
     );
     while (true){
         context.wait_for_all_requests();
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 for (size_t c = 0; c < 20; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
                 }
@@ -126,12 +126,12 @@ void from_professor_return_to_jubilife(
 
 
 void mash_A_to_enter_sub_area(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
 ){
     BlackScreenOverWatcher black_screen0(COLOR_RED, {0.2, 0.2, 0.6, 0.6}, 100, 10);
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 7 * TICKS_PER_SECOND);
         },
         {{black_screen0}}
@@ -150,16 +150,16 @@ void mash_A_to_enter_sub_area(
 
 
 void mash_A_to_change_region(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
 ){
     context.wait_for_all_requests();
 
 #if 0
     stream.log("Waiting for loading screen...");
     BlackScreenOverWatcher black_screen0;
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
         },
         {{black_screen0}}
@@ -177,9 +177,9 @@ void mash_A_to_change_region(
         stream.log("Waiting for end of loading screen...");
         BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05});
         BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05});
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT0);
             },
             {
@@ -218,13 +218,13 @@ void mash_A_to_change_region(
 
 
 void open_travel_map_from_jubilife(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
 ){
     pbf_move_left_joystick(context, 128, 255, 200, 0);
     MapDetector detector;
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, BUTTON_A, 20, 105);
             }
@@ -243,7 +243,7 @@ void open_travel_map_from_jubilife(
 
 
 void goto_camp_from_jubilife(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     const TravelLocation& location
 ){
     // Move backwards and talk to guard to open the map.
@@ -367,7 +367,7 @@ void goto_camp_from_jubilife(
 
 
 void goto_camp_from_overworld(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
 ){
     auto start = current_time();
     std::chrono::seconds grace_period(0);
@@ -453,7 +453,7 @@ void goto_camp_from_overworld(
 }
 
 void goto_any_camp_from_overworld(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     const TravelLocation& location
 ){
 
@@ -550,7 +550,7 @@ void goto_any_camp_from_overworld(
 
 
 void goto_Mai_from_camp(
-    Logger& logger, SwitchControllerContext& context, Camp camp
+    Logger& logger, ProControllerContext& context, Camp camp
 ){
     switch (camp){
     case Camp::FIELDLANDS_FIELDLANDS:
@@ -579,7 +579,7 @@ void goto_Mai_from_camp(
     }
 }
 
-void goto_professor(Logger& logger, SwitchControllerContext& context, const TravelLocation& location){
+void goto_professor(Logger& logger, ProControllerContext& context, const TravelLocation& location){
     Camp camp = map_region_default_camp(location.region);
     goto_professor(logger, context, camp);
 }

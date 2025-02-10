@@ -61,7 +61,7 @@ OverworldTrigger::OverworldTrigger()
 }
 
 
-void OverworldTrigger::run_trigger(SwitchControllerContext& context) const{
+void OverworldTrigger::run_trigger(ProControllerContext& context) const{
     Milliseconds normal_duration = MOVE_DURATION0;
     Milliseconds biased_duration = MOVE_DURATION0.get() + 200ms;
     Milliseconds mash_duration = normal_duration - 64ms;
@@ -106,16 +106,16 @@ void OverworldTrigger::run_trigger(SwitchControllerContext& context) const{
     }
 }
 
-bool OverworldTrigger::find_encounter(VideoStream& stream, SwitchControllerContext& context) const{
+bool OverworldTrigger::find_encounter(VideoStream& stream, ProControllerContext& context) const{
     BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
     StartBattleDetector start_battle_detector(stream.overlay());
 
     int ret = 0;
     if (TRIGGER_METHOD != TriggerMethod::SWEET_SCENT){
         //  Move character back and forth to trigger encounter.
-        ret = run_until<SwitchControllerContext>(
+        ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 while (true){
                     run_trigger(context);
                 }

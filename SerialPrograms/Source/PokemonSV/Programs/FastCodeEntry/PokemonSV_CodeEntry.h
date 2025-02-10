@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_CodeEntry_H
 #define PokemonAutomation_PokemonSV_CodeEntry_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
 
 namespace PokemonAutomation{
@@ -21,7 +21,7 @@ namespace PokemonSV{
 const char* normalize_code(std::string& normalized_code, const std::string& code, bool override_mode = false);
 
 void enter_code(
-    Logger& logger, SwitchControllerContext& context,
+    Logger& logger, ProControllerContext& context,
     const FastCodeEntrySettings& settings, const std::string& normalized_code,
     bool connect_controller_press,
     bool override_mode = false

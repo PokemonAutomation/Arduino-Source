@@ -103,7 +103,7 @@ typedef struct{
 bool is_start(const DateSmall* date){
     return date->year != 0 || date->month != 1 || date->day != 1;
 }
-bool date_increment_day(SwitchControllerContext& context, DateSmall* date, bool press){
+bool date_increment_day(ProControllerContext& context, DateSmall* date, bool press){
     uint8_t days = days_in_month(date->year, date->month);
     if (date->day != days){
         if (press){
@@ -141,7 +141,7 @@ bool date_increment_day(SwitchControllerContext& context, DateSmall* date, bool 
     return false;
 }
 
-void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;

@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 //  Returns the # of slots scrolled. Returns -1 if not found.
 int move_to_ball(
     const BattleBallReader& reader,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const std::string& ball_slug,
     bool forward, int attempts, uint16_t delay
 ){
@@ -54,7 +54,7 @@ int move_to_ball(
 //  Returns the quantity of the ball.
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
-    const BattleBallReader& reader, VideoStream& stream, SwitchControllerContext& context,
+    const BattleBallReader& reader, VideoStream& stream, ProControllerContext& context,
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
@@ -86,7 +86,7 @@ int16_t move_to_ball(
 
 
 CatchResults throw_balls(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 ){
@@ -144,7 +144,7 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 ){
@@ -170,9 +170,9 @@ CatchResults basic_catcher(
     {
         stream.log("Waiting for black screen end...");
         BlackScreenOverWatcher black_screen_detector;
-        run_until<SwitchControllerContext>(
+        run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {{black_screen_detector}}
@@ -186,9 +186,9 @@ CatchResults basic_catcher(
     {
         ReceivePokemonDetector caught_detector(true);
 
-        int result = run_until<SwitchControllerContext>(
+        int result = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
             },
             {{caught_detector}}
@@ -210,9 +210,9 @@ CatchResults basic_catcher(
     {
         stream.log("Waiting for black screen end...");
         BlackScreenOverWatcher black_screen_detector;
-        run_until<SwitchControllerContext>(
+        run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             },
             {{black_screen_detector}}

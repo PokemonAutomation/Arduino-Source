@@ -21,7 +21,7 @@ namespace PokemonLA{
 
 
 void change_time_of_day_at_tent(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     TimeOfDay target_time,
     Camp camp
 ){

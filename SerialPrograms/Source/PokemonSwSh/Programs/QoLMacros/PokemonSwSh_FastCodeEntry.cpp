@@ -46,7 +46,7 @@ FastCodeEntry::FastCodeEntry()
     PA_ADD_OPTION(INITIAL_DELAY0);
 }
 
-void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     uint8_t code[8];
     RAID_CODE.to_str(code);
 

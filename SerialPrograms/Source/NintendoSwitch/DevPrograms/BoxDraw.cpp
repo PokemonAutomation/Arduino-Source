@@ -75,7 +75,7 @@ private:
     std::mutex m_lock;
 };
 
-void BoxDraw::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BoxDraw::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     Overlay overlay(*this, env.console.overlay());
     overlay.value_changed(this);
     context.wait_until_cancel();

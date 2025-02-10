@@ -66,7 +66,7 @@ class GenerateDexModelSession{
 
 public:
     GenerateDexModelSession(
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         size_t horizontal_frames = 10,
         size_t animation_frames = 2
     )
@@ -89,7 +89,7 @@ public:
 
 private:
     VideoStream& m_stream;
-    SwitchControllerContext& m_context;
+    ProControllerContext& m_context;
 
     std::string m_path;
 
@@ -228,7 +228,7 @@ void GenerateDexModelSession::iterate_dex(){
 
 
 
-void GeneratePokedexSprites::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void GeneratePokedexSprites::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     GenerateDexModelSession session(env.console, context);
     session.iterate_dex();
 }

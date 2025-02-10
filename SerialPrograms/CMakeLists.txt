@@ -818,14 +818,14 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
@@ -1271,6 +1271,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h
     Source/PokemonLA/Programs/PokemonLA_GameSave.cpp
+    Source/PokemonLA/Programs/PokemonLA_GameSave.h
     Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.cpp
     Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.h
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp

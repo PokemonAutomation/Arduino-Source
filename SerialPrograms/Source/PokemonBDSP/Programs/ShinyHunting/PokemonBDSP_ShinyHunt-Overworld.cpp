@@ -95,7 +95,7 @@ ShinyHuntOverworld::ShinyHuntOverworld()
 
 
 
-void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     OverlayLogTextScope overlay_log_text_scope(env.console.overlay());
     ShinyHuntOverworld_Descriptor::Stats& stats = env.current_stats<ShinyHuntOverworld_Descriptor::Stats>();
     env.update_stats();

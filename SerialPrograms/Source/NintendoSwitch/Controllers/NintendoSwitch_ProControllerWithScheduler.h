@@ -12,7 +12,7 @@
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Controllers/SuperscalarScheduler.h"
-#include "NintendoSwitch_Controller.h"
+#include "NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -29,7 +29,7 @@ struct SwitchButton_Joystick : public ExecutionResource{
     uint8_t x;
     uint8_t y;
 };
-struct SwitchControllerSchedulerState{
+struct ProControllerSchedulerState{
     ExecutionResource m_buttons[14];
     SwitchButton_Dpad m_dpad;
     SwitchButton_Joystick m_left_joystick;
@@ -41,13 +41,13 @@ struct SwitchControllerSchedulerState{
 
 
 
-class SwitchControllerWithScheduler :
-    public SwitchController,
-    private SwitchControllerSchedulerState,
+class ProControllerWithScheduler :
+    public ProController,
+    private ProControllerSchedulerState,
     protected SuperscalarScheduler
 {
 public:
-    SwitchControllerWithScheduler(Logger& logger);
+    ProControllerWithScheduler(Logger& logger);
 
 
 public:

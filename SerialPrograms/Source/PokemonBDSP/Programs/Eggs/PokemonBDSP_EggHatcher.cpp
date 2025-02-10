@@ -91,7 +91,7 @@ EggHatcher::EggHatcher()
 
 
 
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
 
     Milliseconds INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05) * 8ms;

@@ -20,14 +20,14 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         AutoStoryOptions options
     ) const override;
 };
 
 // start: after selecting character name, style and the cutscene has started
 // end: stood up from chair. Walked to left side of room.
-void checkpoint_00(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+void checkpoint_00(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 
 }

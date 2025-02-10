@@ -25,7 +25,7 @@ public:
 class ShinyHuntDeoxys : public SingleSwitchProgramInstance{
 public:
     ShinyHuntDeoxys();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     MillisecondsOption WALK_UP_DOWN_TIME0;
@@ -34,7 +34,7 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void solve_puzzle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void solve_puzzle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 };
 
 }

@@ -36,7 +36,7 @@ class EggAutonomous : public SingleSwitchProgramInstance{
 public:
     EggAutonomous();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     // Run one iteration of the egg loop:
@@ -46,18 +46,18 @@ private:
     // Return true if the egg loop should stop.
     bool run_batch(
         SingleSwitchProgramEnvironment& env,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         EggAutonomous_Descriptor::Stats& stats
     );
 
-    void save_game(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     // Call flying taxi to reset player character position to Nursery front door.
     // fly_from_overworld: if true, the game is in the overworld while calling this function. If false, the game is in the menu.
     // Note: the cursor in the menu must already be at Town Map.
     void call_flying_taxi(
         SingleSwitchProgramEnvironment& env,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         bool fly_from_overworld
     );
 
@@ -65,7 +65,7 @@ private:
     // num_hatched_eggs: how many eggs hatched (including the current hatching one)
     void wait_for_egg_hatched(
         SingleSwitchProgramEnvironment& env,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         EggAutonomous_Descriptor::Stats& stats,
         size_t num_hatched_eggs
     );
@@ -74,7 +74,7 @@ private:
     // Return updated `num_eggs_retrieved` to reflect change in fetched eggs.
     size_t talk_to_lady_to_fetch_egg(
         SingleSwitchProgramEnvironment& env,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         EggAutonomous_Descriptor::Stats& stats,
         size_t num_eggs_retrieved
     );
@@ -88,7 +88,7 @@ private:
     // Return true if the program should stop
     bool process_hatched_pokemon(
         SingleSwitchProgramEnvironment& env,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         EggAutonomous_Descriptor::Stats& stats,
         bool need_taxi
     );
@@ -97,7 +97,7 @@ private:
     // Throw error if it does not find it after 10 sec.
     void wait_for_y_comm_icon(
         SingleSwitchProgramEnvironment& env,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         const std::string& error_msg
     );
 

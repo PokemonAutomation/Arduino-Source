@@ -11,14 +11,14 @@
 #include "Controllers/KeyboardInput/GlobalQtKeyMap.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch_Controller.h"
+#include "NintendoSwitch_ProController.h"
 #include "NintendoSwitch_VirtualControllerState.h"
 
 namespace PokemonAutomation{
 
 //  Instantiate some template helper classes.
-template class AsyncCommandSession<NintendoSwitch::SwitchController>;
-template class SuperControlSession<NintendoSwitch::SwitchController>;
+template class AsyncCommandSession<NintendoSwitch::ProController>;
+template class SuperControlSession<NintendoSwitch::ProController>;
 
 namespace NintendoSwitch{
 
@@ -28,9 +28,9 @@ using namespace std::chrono_literals;
 
 
 
-class SwitchController::KeyboardManager : public KeyboardInputController{
+class ProController::KeyboardManager : public KeyboardInputController{
 public:
-    KeyboardManager(SwitchController& controller)
+    KeyboardManager(ProController& controller)
         : KeyboardInputController(true)
         , m_controller(controller)
     {
@@ -94,29 +94,29 @@ public:
 
 
 private:
-    SwitchController& m_controller;
+    ProController& m_controller;
     std::map<Qt::Key, ControllerDeltas> m_mapping;
 };
 
 
 
-SwitchController::~SwitchController(){
+ProController::~ProController(){
 
 }
-SwitchController::SwitchController()
+ProController::ProController()
     : m_keyboard_manager(CONSTRUCT_TOKEN, *this)
 {
 
 }
 
 
-void SwitchController::keyboard_release_all(){
+void ProController::keyboard_release_all(){
     m_keyboard_manager->clear_state();
 }
-void SwitchController::keyboard_press(const QKeyEvent& event){
+void ProController::keyboard_press(const QKeyEvent& event){
     m_keyboard_manager->on_key_press(event);
 }
-void SwitchController::keyboard_release(const QKeyEvent& event){
+void ProController::keyboard_release(const QKeyEvent& event){
     m_keyboard_manager->on_key_release(event);
 }
 

@@ -90,7 +90,7 @@ DoublesLeveling::DoublesLeveling()
 
 
 
-bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DoublesLeveling_Descriptor::Stats& stats = env.current_stats<DoublesLeveling_Descriptor::Stats>();
 
     env.log("Starting battle!");
@@ -103,9 +103,9 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, SwitchControll
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         FrozenImageDetector overworld(std::chrono::seconds(5), 10);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
@@ -157,7 +157,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, SwitchControll
 
 
 
-void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DoublesLeveling_Descriptor::Stats& stats = env.current_stats<DoublesLeveling_Descriptor::Stats>();
     env.update_stats();
 

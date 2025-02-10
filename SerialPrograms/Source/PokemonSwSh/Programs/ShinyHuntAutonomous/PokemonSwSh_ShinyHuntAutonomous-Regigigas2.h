@@ -35,10 +35,10 @@ public:
 class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousRegigigas2();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool kill_and_return(VideoStream& stream, SwitchControllerContext& context) const;
+    bool kill_and_return(VideoStream& stream, ProControllerContext& context) const;
 
 private:
     StartInGripOrGameOption START_LOCATION;

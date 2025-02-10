@@ -26,7 +26,7 @@ class ActivateMenuGlitch112 : public SingleSwitchProgramInstance{
 public:
     ActivateMenuGlitch112();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     MillisecondsOption FLY_A_TO_X_DELAY0;

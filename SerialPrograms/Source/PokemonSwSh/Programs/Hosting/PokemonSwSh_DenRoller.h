@@ -35,8 +35,8 @@ class DenRoller : public SingleSwitchProgramInstance{
 public:
     DenRoller();
 
-    void ring_bell(SwitchControllerContext& context, int count) const;
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    void ring_bell(ProControllerContext& context, int count) const;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

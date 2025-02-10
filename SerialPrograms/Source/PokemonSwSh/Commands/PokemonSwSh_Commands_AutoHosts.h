@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_Commands_AutoHosts_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -16,18 +16,18 @@ namespace PokemonSwSh{
 
 
 void connect_to_internet(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Milliseconds open_ycomm_delay,
     Milliseconds connect_to_internet_delay
 );
 void home_to_add_friends(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint8_t user_slot,
     uint8_t scroll_down,
     bool fix_cursor
 );
 void accept_FRs(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint8_t slot, bool fix_cursor,
     Milliseconds game_to_home_delay_safe,
     Milliseconds auto_fr_duration,

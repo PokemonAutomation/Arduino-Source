@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 // Release one pokemon in box
-static void release(SwitchControllerContext& context){
+static void release(ProControllerContext& context){
     ssf_press_button(context, BUTTON_A, 60, 10);
     ssf_press_dpad(context, DPAD_UP, 15);
     ssf_press_dpad(context, DPAD_UP, 15);
@@ -25,7 +25,7 @@ static void release(SwitchControllerContext& context){
 //    ssf_press_button(context, BUTTON_A, 40);
     ssf_mash_AZs(context, 180);
 }
-static void release_box(SwitchControllerContext& context, Milliseconds box_scroll_delay){
+static void release_box(ProControllerContext& context, Milliseconds box_scroll_delay){
     for (uint8_t row = 0; row < 5; row++){
         if (row != 0){
             ssf_press_dpad(context, DPAD_DOWN, box_scroll_delay);
@@ -41,7 +41,7 @@ static void release_box(SwitchControllerContext& context, Milliseconds box_scrol
     }
 }
 static void release_boxes(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint8_t boxes,
     Milliseconds box_scroll_delay,
     Milliseconds box_change_delay

@@ -54,7 +54,7 @@ SoundListener::SoundListener()
 
 // void search_alpha_roar_from_audio_dump();
 
-void SoundListener::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SoundListener::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
     // pbf_move_right_joystick(context, 0, 255, 10, 0);
 

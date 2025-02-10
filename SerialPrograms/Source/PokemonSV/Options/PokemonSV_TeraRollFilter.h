@@ -12,7 +12,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -55,7 +55,7 @@ public:
     };
 
     FilterResult run_filter(
-        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         TeraRaidData& data
     ) const;
 

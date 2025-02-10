@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_BattleRoutines_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 
 namespace PokemonAutomation{
@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-void mash_A_until_end_of_battle(VideoStream& stream, SwitchControllerContext& context);
+void mash_A_until_end_of_battle(VideoStream& stream, ProControllerContext& context);
 
 // Assuming the game is in the switching pokemon screen, select a pokemon to send to battle.
 // pokemon_to_switch_to: the index of the pokemon in the party to switch to.
@@ -25,7 +25,7 @@ void mash_A_until_end_of_battle(VideoStream& stream, SwitchControllerContext& co
 // Return the index of the party that is actually sent to battle.
 // max_num_pokemon: if the pokemon index to switch to is >= `max_num_pokemon`, throw an OperationFailedException.
 size_t switch_pokemon(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t pokemon_to_switch_to,
     size_t max_num_pokemon = SIZE_MAX
 );
@@ -37,7 +37,7 @@ size_t switch_pokemon(
 // menu after some ticks (need correct `cur_move` to do this). If `check_success` is false, always return true.
 // `wait_for_all_requests()` is called at the end of the function no matter `check_success` is true or false.
 bool use_move(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t cur_pokemon,
     size_t cur_move,
     MoveStyle style,
@@ -51,7 +51,7 @@ bool use_move(
 // When the function moves to using the next move, it also updates `cur_move`.
 // This function assumes it starts with the move selection menu, so it does not consider the case the pokemon has no PP and has to use Struggle.
 void use_next_move_with_pp(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t cur_pokemon,
     size_t& cur_move
 );

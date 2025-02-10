@@ -23,7 +23,7 @@ namespace MaxLairInternal{
 void run_professor_swap(
     size_t console_index,
     AdventureRuntime& runtime,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker
 ){
     GlobalState& state = state_tracker[console_index];
@@ -56,9 +56,9 @@ void run_professor_swap(
     //  Wait until we exit the window.
     {
         BlackScreenWatcher detector;
-        int result = run_until<SwitchControllerContext>(
+        int result = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
             },
             {{detector}}

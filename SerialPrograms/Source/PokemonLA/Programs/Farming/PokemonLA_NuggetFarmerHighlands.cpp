@@ -91,7 +91,7 @@ NuggetFarmerHighlands::NuggetFarmerHighlands()
 
 
 
-bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
@@ -117,9 +117,9 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, S
             return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 212, 50, 0);
                 pbf_press_button(context, BUTTON_B, 495, 80);
 
@@ -185,8 +185,8 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, S
             return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(env.console, context,
-            [&env](SwitchControllerContext& context){
+        int ret = run_until<ProControllerContext>(env.console, context,
+            [&env](ProControllerContext& context){
                 goto_camp_from_overworld(env, env.console, context);
                 goto_professor(env.console, context, Camp::HIGHLANDS_HIGHLANDS);
             },
@@ -210,7 +210,7 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, S
 
 
 
-void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Connect the controller.

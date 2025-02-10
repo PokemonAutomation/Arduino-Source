@@ -81,7 +81,7 @@ StarterReset::StarterReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     /*
@@ -129,9 +129,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, SwitchController
 
         //Now mash B until the battle menu appears
         BattleMenuWatcher battle_menu(COLOR_RED);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 1000);
             },
             {battle_menu}

@@ -13,7 +13,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
@@ -57,7 +57,7 @@ public:
 
 void inside_zero_gate_to_platform(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool flying_unlocked,
     NavigatePlatformSettings& settings
 );
@@ -77,7 +77,7 @@ bool read_platform_center(
 // battle encounters (turn-based battles).
 void area_zero_platform_run_path0(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );
@@ -86,7 +86,7 @@ void area_zero_platform_run_path0(
 // battle encounters (turn-based battles).
 void area_zero_platform_run_path1(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );
@@ -95,7 +95,7 @@ void area_zero_platform_run_path1(
 // battle encounters (turn-based battles).
 void area_zero_platform_run_path2(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     uint64_t iteration_count
 );

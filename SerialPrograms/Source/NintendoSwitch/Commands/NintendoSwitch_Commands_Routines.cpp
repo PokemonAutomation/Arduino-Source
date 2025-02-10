@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void close_game(VideoStream& stream, SwitchControllerContext& context){
+void close_game(VideoStream& stream, ProControllerContext& context){
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.
 

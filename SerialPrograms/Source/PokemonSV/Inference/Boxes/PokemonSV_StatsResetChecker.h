@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_StatsResetChecker_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
@@ -29,7 +29,7 @@ namespace PokemonSV{
 
 //This is a similar to check_baby_info, except for Stats Reset
 bool check_stats_reset_info(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 );

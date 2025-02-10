@@ -8,7 +8,7 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
-#include "NintendoSwitch_SerialPABotBase.h"
+#include "NintendoSwitch_ProController_SerialPABotBase.h"
 
 //#include <iostream>
 //using std::cout;
@@ -30,12 +30,12 @@ PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
 
 
 
-SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
+ProController_SerialPABotBase::ProController_SerialPABotBase(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
-    : SwitchControllerWithScheduler(logger)
+    : ProControllerWithScheduler(logger)
     , m_logger(logger)
     , m_requirements(requirements)
     , m_handle(connection)
@@ -72,7 +72,7 @@ SwitchController_SerialPABotBase::SwitchController_SerialPABotBase(
 
 
 
-void SwitchController_SerialPABotBase::wait_for_all(const Cancellable* cancellable){
+void ProController_SerialPABotBase::wait_for_all(const Cancellable* cancellable){
 //    cout << "wait_for_all() - enter" << endl;
     if (!is_ready()){
         throw InvalidConnectionStateException();
@@ -81,14 +81,14 @@ void SwitchController_SerialPABotBase::wait_for_all(const Cancellable* cancellab
     m_serial->wait_for_all_requests(cancellable);
 //    cout << "wait_for_all() - exit" << endl;
 }
-void SwitchController_SerialPABotBase::cancel_all_commands(const Cancellable* cancellable){
+void ProController_SerialPABotBase::cancel_all_commands(const Cancellable* cancellable){
     if (!is_ready()){
         throw InvalidConnectionStateException();
     }
     m_serial->stop_all_commands();
     this->clear_on_next();
 }
-void SwitchController_SerialPABotBase::replace_on_next_command(const Cancellable* cancellable){
+void ProController_SerialPABotBase::replace_on_next_command(const Cancellable* cancellable){
     if (!is_ready()){
         throw InvalidConnectionStateException();
     }
@@ -98,7 +98,7 @@ void SwitchController_SerialPABotBase::replace_on_next_command(const Cancellable
 
 
 
-void SwitchController_SerialPABotBase::issue_controller_state(
+void ProController_SerialPABotBase::issue_controller_state(
     const Cancellable* cancellable,
     Button button,
     DpadPosition position,
@@ -124,7 +124,7 @@ void SwitchController_SerialPABotBase::issue_controller_state(
 
 
 
-void SwitchController_SerialPABotBase::send_botbase_request(
+void ProController_SerialPABotBase::send_botbase_request(
     const Cancellable* cancellable,
     const BotBaseRequest& request
 ){
@@ -133,7 +133,7 @@ void SwitchController_SerialPABotBase::send_botbase_request(
     }
     m_serial->issue_request(request, cancellable);
 }
-BotBaseMessage SwitchController_SerialPABotBase::send_botbase_request_and_wait(
+BotBaseMessage ProController_SerialPABotBase::send_botbase_request_and_wait(
     const Cancellable* cancellable,
     const BotBaseRequest& request
 ){

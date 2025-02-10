@@ -38,7 +38,7 @@ ClothingBuyer::ClothingBuyer()
 }
 
 
-void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 

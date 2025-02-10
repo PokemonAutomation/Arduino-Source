@@ -25,7 +25,7 @@ public:
 class StarterReset : public SingleSwitchProgramInstance{
 public:
     StarterReset();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext &context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
 
 private:
     enum class Target{

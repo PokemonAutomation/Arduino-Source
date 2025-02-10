@@ -31,7 +31,7 @@ namespace PokemonSV{
 
 
 bool change_view_to_stats_or_judge(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool throw_exception
 ){
     ImageFloatBox name_bar(0.66, 0.08, 0.52, 0.04);
@@ -75,7 +75,7 @@ bool change_view_to_stats_or_judge(
 
 
 void change_view_to_judge(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language
 ){
     if (language == Language::None){
@@ -133,10 +133,10 @@ void change_view_to_judge(
 
 // Moving to left/right box is blind sequence. To prevent game dropping button inputs,
 // press the button longer.
-void move_to_left_box(SwitchControllerContext& context){
+void move_to_left_box(ProControllerContext& context){
     pbf_press_button(context, BUTTON_L, 60, 100);
 }
-void move_to_right_box(SwitchControllerContext& context){
+void move_to_right_box(ProControllerContext& context){
     pbf_press_button(context, BUTTON_R, 60, 100);
 }
 
@@ -149,7 +149,7 @@ namespace{
 // `button_operation()` repeatedly until the mode is observed.
 // If `enter_mode` is false, the program will assume it is in the mode, and leave the mode by calling
 // `button_operation()` repeatedly until it confirms to have left the mode.
-void change_held_mode(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+void change_held_mode(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     std::function<void()> button_operation, bool enter_mode,
     const char* time_out_error_name, const char* time_out_error_message)
 {
@@ -185,7 +185,7 @@ void change_held_mode(const ProgramInfo& info, VideoStream& stream, SwitchContro
 // Use box selection mode to hold one column of pokemon.
 // Use visual feedback to ensure button Minus is pressed to turn on box selection mode/
 // But no feedback on the button A press to make sure the selection is complete.
-void hold_one_column(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void hold_one_column(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     stream.log("Holding one column.");
     // Press Minus to draw selection box
@@ -211,7 +211,7 @@ void hold_one_column(const ProgramInfo& info, VideoStream& stream, SwitchControl
 }
 
 // Assuming already holding one or more pokemon, press A to drop them.
-void drop_held_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void drop_held_pokemon(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     stream.log("Drop held pokemon.");
     const bool to_enter_selection = false;
@@ -224,7 +224,7 @@ void drop_held_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchContr
 }
 
 // Assuming already holding one or more pokemon, press B to cancel the holding.
-void cancel_held_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void cancel_held_pokemon(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     stream.log("Cancel pokemon holding.");
     const bool to_enter_selection = false;
@@ -237,7 +237,7 @@ void cancel_held_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchCon
 }
 
 // Assuming the current slot is not empy, press button Y to hold the current pokemon
-void press_y_to_hold_pokemon(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void press_y_to_hold_pokemon(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     stream.log("Press button Y to hold pokemon for swapping.");
     const bool to_enter_selection = true;
@@ -251,7 +251,7 @@ void press_y_to_hold_pokemon(const ProgramInfo& info, VideoStream& stream, Switc
 
 
 
-uint8_t check_empty_slots_in_party(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+uint8_t check_empty_slots_in_party(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     BoxEmptyPartyWatcher watcher;
     int ret = wait_until(
@@ -269,7 +269,7 @@ uint8_t check_empty_slots_in_party(const ProgramInfo& info, VideoStream& stream,
 }
 
 void load_one_column_to_party(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     EventNotificationOption& notification,
     uint8_t column_index, bool has_clone_ride_pokemon
 ){
@@ -312,7 +312,7 @@ void load_one_column_to_party(
 }
 
 void unload_one_column_from_party(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     EventNotificationOption& notification,
     uint8_t column_index, bool has_clone_ride_pokemon
 ){
@@ -354,7 +354,7 @@ void unload_one_column_from_party(
     stream.log("Unloaded party to column " + std::to_string(column_index) + ".");
 }
 
-void move_box_cursor(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+void move_box_cursor(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     const BoxCursorLocation& side, uint8_t row, uint8_t col)
 {
     context.wait_for_all_requests();
@@ -367,7 +367,7 @@ void move_box_cursor(const ProgramInfo& info, VideoStream& stream, SwitchControl
 }
 
 void swap_two_box_slots(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     const BoxCursorLocation& source_side, uint8_t source_row, uint8_t source_col,
     const BoxCursorLocation& target_side, uint8_t target_row, uint8_t target_col
 )

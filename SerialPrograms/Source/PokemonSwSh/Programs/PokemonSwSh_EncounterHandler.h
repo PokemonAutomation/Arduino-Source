@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_EncounterHandler_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 class StandardEncounterHandler{
 public:
     StandardEncounterHandler(
-        ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+        ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
         Language language,
         EncounterBotCommonOptions& settings,
         ShinyHuntTracker& session_stats
@@ -47,7 +47,7 @@ private:
 
 private:
     ProgramEnvironment& m_env;
-    SwitchControllerContext& m_context;
+    ProControllerContext& m_context;
     VideoStream& m_stream;
     const Language m_language;
     EncounterBotCommonOptions& m_settings;
@@ -60,9 +60,9 @@ private:
 };
 
 
-void take_video(SwitchControllerContext& context);
+void take_video(ProControllerContext& context);
 void run_away(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Milliseconds exit_battle_time
 );
 

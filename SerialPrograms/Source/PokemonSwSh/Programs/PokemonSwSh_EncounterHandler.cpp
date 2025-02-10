@@ -24,19 +24,19 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void take_video(SwitchControllerContext& context){
+void take_video(ProControllerContext& context){
     pbf_wait(context, 5 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 //    context->wait_for_all_requests();
 }
 void run_away(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Milliseconds exit_battle_time
 ){
     BlackScreenOverWatcher black_screen_detector;
-    run_until<SwitchControllerContext>(
+    run_until<ProControllerContext>(
         stream, context,
-        [exit_battle_time](SwitchControllerContext& context){
+        [exit_battle_time](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_UP, 10, 0);
             pbf_mash_button(context, BUTTON_A, 1000ms);
             if (exit_battle_time > 1000ms){
@@ -52,7 +52,7 @@ void run_away(
 
 StandardEncounterHandler::StandardEncounterHandler(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     EncounterBotCommonOptions& settings,
     ShinyHuntTracker& session_stats
@@ -103,9 +103,9 @@ void StandardEncounterHandler::run_away_and_update_stats(
     );
 
     BlackScreenOverWatcher black_screen_detector;
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         m_stream, m_context,
-        [exit_battle_time](SwitchControllerContext& context){
+        [exit_battle_time](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 1000ms);
             if (exit_battle_time > 1000ms){
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - 1000ms);
