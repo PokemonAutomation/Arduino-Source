@@ -101,9 +101,6 @@ public:
 public:
     //  Basic Commands
 
-    //  Required Feature Flags:
-    //    - NintendoSwitch_Basic
-
     //
     //  All commands are enqueued into a FIFO that the controller will execute
     //  in order preserving the timing semantics as closely as possible
@@ -169,23 +166,20 @@ public:
 public:
     //  Superscalar Commands (the "ssf" framework)
 
-    //  Required Feature Flags:
-    //    - NintendoSwitch_SSF
-
     //  Tell the scheduler to wait for all pending commands to finish
     //  (including cooldowns) before executing further instructions.
     //  This is used to prevent hanging commands from overlapping with new
     //  commands issued after this barrier.
     virtual void issue_barrier(const Cancellable* cancellable) = 0;
 
-    //  Do nothing for this many ticks.
+    //  Do nothing for this much time.
     virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) = 0;
 
     //
-    //  delay       The # of ticks to wait before moving onto the next command.
-    //  hold        The # of ticks to hold the button/stick down for.
+    //  delay       Time to wait before moving onto the next command.
+    //  hold        Time to hold the button/stick down for.
     //  cooldown    After the button has been released, prevent it from being
-    //              used again for this many ticks.
+    //              used again for this much time.
     //
     //  For "normal" use, you should always set (delay == hold + cooldown).
     //  This is the easiest case to understand and is what the "pbf" interface
@@ -239,13 +233,7 @@ public:
 
 
 public:
-    //  High speed RPCs.
-
-    //  Required Feature Flags:
-    //    - NintendoSwitch_Macros
-    //
-    //  Almost everything uses these. So it might be worth moving these to
-    //  "NintendoSwitch_Basic" instead.
+    //  High speed Macros
 
     //
     //  It is currently unclear if these can be properly executed over wireless.
