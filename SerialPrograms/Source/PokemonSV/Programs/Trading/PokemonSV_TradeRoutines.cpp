@@ -173,6 +173,7 @@ void trade_current_pokemon(
             break;
         default:
             stats.m_errors++;
+
             tracker.report_unrecoverable_error(stream, "Failed to return to box after 2 minutes after a trade.");
         }
     }

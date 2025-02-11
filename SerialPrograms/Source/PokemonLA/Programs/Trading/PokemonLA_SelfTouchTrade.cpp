@@ -82,7 +82,7 @@ SelfTouchTrade::SelfTouchTrade()
 
 bool SelfTouchTrade::trade_one(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
-    std::map<std::string, uint8_t>& trades_left
+    std::map<std::string, SimpleIntegerCell<uint8_t>*>& trades_left
 ){
     TradeStats& stats = env.current_stats<TradeStats>();
 
@@ -99,7 +99,8 @@ bool SelfTouchTrade::trade_one(
         dump_image(host, env.program_info(), "ReadName", snapshot);
         return false;
     }
-    if (iter->second <= 0){
+    uint8_t current_trades_left = iter->second->current_value();
+    if (current_trades_left <= 0){
         host.log(STRING_POKEMON + " not needed anymore. Moving on...");
         return false;
     }
@@ -109,14 +110,14 @@ bool SelfTouchTrade::trade_one(
     }
 
     //  Perform trade.
-    host.log("\"" + slug + "\" - Trades Remaining: " + std::to_string(iter->second));
+    host.log("\"" + slug + "\" - Trades Remaining: " + std::to_string(current_trades_left));
 #if 1
     MultiConsoleErrorState error_state;
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         trade_current_pokemon(console, context, error_state, stats);
     });
     stats.m_trades++;
-    iter->second--;
+    iter->second->set(current_trades_left - 1);
 #else
     env.wait_for(std::chrono::milliseconds(5000));
     return false;
@@ -154,9 +155,9 @@ bool SelfTouchTrade::move_to_next(Logger& logger, ProControllerContext& host, ui
 
 void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     //  Build list of what's needed.
-    std::map<std::string, uint8_t> trades_left;
-    for (const StaticTableRow* item : TRADE_COUNTS.table()){
-        trades_left[item->slug()] = static_cast<const TradeCountTableRow&>(*item).count;
+    std::map<std::string, SimpleIntegerCell<uint8_t>*> trades_left;
+    for (StaticTableRow* item : TRADE_COUNTS.table()){
+        trades_left[item->slug()] = &static_cast<TradeCountTableRow&>(*item).count;
     }
 
     //  Connect both controllers.
