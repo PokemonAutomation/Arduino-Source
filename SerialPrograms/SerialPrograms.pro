@@ -1315,6 +1315,7 @@ HEADERS += \
     Source/CommonFramework/Notifications/ProgramInfo.h \
     Source/CommonFramework/Notifications/ProgramNotifications.h \
     Source/CommonFramework/Notifications/SenderNotificationTable.h \
+    Source/CommonFramework/Options/CheckForUpdatesOption.h \
     Source/CommonFramework/Options/Environment/PerformanceOptions.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \

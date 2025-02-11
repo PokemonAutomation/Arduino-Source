@@ -8,6 +8,7 @@
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Options/CheckForUpdatesOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Tools/FileDownloader.h"
 #include "CommonFramework/Globals.h"
@@ -66,18 +67,24 @@ bool compare_version(Logger& logger, const JsonObject* json){
     return false;
 }
 void check_new_version(Logger& logger){
-    if (!GlobalSettings::instance().CHECK_FOR_UPDATES){
+    bool check_release = GlobalSettings::instance().CHECK_FOR_UPDATES->RELEASE;
+    bool check_beta = GlobalSettings::instance().CHECK_FOR_UPDATES->BETA;
+    bool check_private_beta = GlobalSettings::instance().CHECK_FOR_UPDATES->PRIVATE_BETA;
+    bool updates_enabled = false;
+    updates_enabled |= check_release;
+    updates_enabled |= check_beta;
+    updates_enabled |= check_private_beta;
+
+    if (!updates_enabled){
         return;
     }
 
     static WallClock last_version_check = WallClock::min();
-//    static size_t check_count = 0;
     WallClock now = current_time();
     if (last_version_check != WallClock::min() && now - last_version_check < CHECK_FOR_UPDATES_PERIOD){
         return;
     }
     last_version_check = now;
-//    check_count++;
 
     logger.log("Checking for new version...");
     JsonValue json;
@@ -89,48 +96,62 @@ void check_new_version(Logger& logger){
     }catch (OperationFailedException&){
         return;
     }
-
-//    cout << json.dump() << endl;
-
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         logger.log("Invalid version JSON.", COLOR_RED);
         return;
     }
 
-    const JsonObject* release = obj->get_object("Release");
-    if (compare_version(logger, release)){
-        QMessageBox box;
-        box.setTextFormat(Qt::RichText);
-        box.information(
-            nullptr,
-            "New Version Available!",
-            QString::fromStdString(
-                "A new version is available!<br>" +
+
+    if (check_private_beta){
+        const JsonObject* node = obj->get_object("PrivateBeta");
+        if (compare_version(logger, node)){
+            QMessageBox box;
+            box.setTextFormat(Qt::RichText);
+            box.information(
+                nullptr,
+                "A new private beta is available!",
+                QString::fromStdString(
+                    "A new private beta is available!<br>" +
+                    make_text_url("https://discord.com/channels/695809740428673034/732736538965704726", "Download from our Discord!")
+                )
+            );
+            return;
+        }
+    }
+    if (check_beta){
+        const JsonObject* node = obj->get_object("Beta");
+        if (compare_version(logger, node)){
+            QMessageBox box;
+            box.setTextFormat(Qt::RichText);
+            box.information(
+                nullptr,
+                "A new beta is available!",
+                QString::fromStdString(
+                    "A new beta is available!<br>" +
                 make_text_url("https://github.com/PokemonAutomation/ComputerControl/releases", "Download here.")
-            )
-        );
-        return;
+                )
+            );
+            return;
+        }
+    }
+    if (check_release){
+        const JsonObject* node = obj->get_object("Release");
+        if (compare_version(logger, node)){
+            QMessageBox box;
+            box.setTextFormat(Qt::RichText);
+            box.information(
+                nullptr,
+                "New Version Available!",
+                QString::fromStdString(
+                    "A new version is available!<br>" +
+                    make_text_url("https://github.com/PokemonAutomation/ComputerControl/releases", "Download here.")
+                )
+            );
+            return;
+        }
     }
 
-    if (!IS_BETA_VERSION){
-        return;
-    }
-
-    const JsonObject* beta = obj->get_object("Beta");
-    if (compare_version(logger, beta)){
-        QMessageBox box;
-        box.setTextFormat(Qt::RichText);
-        box.information(
-            nullptr,
-            "New Beta Available!",
-            QString::fromStdString(
-                "A new beta is available!<br>" +
-                make_text_url("https://discord.com/channels/695809740428673034/732736538965704726", "Download from our Discord!")
-            )
-        );
-        return;
-    }
 }
 
 

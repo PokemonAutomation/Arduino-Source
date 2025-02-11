@@ -23,7 +23,7 @@
 
 namespace PokemonAutomation{
 
-
+class CheckForUpdatesOption;
 class ThemeSelectorOption;
 class ResolutionOption;
 class StreamHistoryOption;
@@ -37,6 +37,8 @@ class VideoPipelineOptions;
 class ErrorReportOption;
 
 
+
+
 class FolderInputOption : public StringOption{
 public:
     using StringOption::StringOption;
@@ -47,8 +49,6 @@ public:
         }
     }
 };
-
-
 
 
 struct DebugSettings{
@@ -89,7 +89,7 @@ private:
     virtual void value_changed(void* object) override;
 
 public:
-    BooleanCheckBoxOption CHECK_FOR_UPDATES;
+    Pimpl<CheckForUpdatesOption> CHECK_FOR_UPDATES;
 
     StringOption STATS_FILE;
     FolderInputOption TEMP_FOLDER;
