@@ -155,6 +155,7 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Sw
     //Turn left. Take 4 steps.
     ssf_press_button(context, BUTTON_B, 0, 80);
     pbf_press_dpad(context, DPAD_LEFT, 80, 20);
+    context.wait_for_all_requests();
 
     //Turn down. Exit. Black screen over.
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
@@ -222,7 +223,96 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Sw
 }
 
 void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+    //Turn down. Take 1 step.
+    ssf_press_button(context, BUTTON_B, 0, 20);
+    pbf_press_dpad(context, DPAD_DOWN, 20, 20);
 
+    //Turn right. Take 9 steps.
+    ssf_press_button(context, BUTTON_B, 0, 160);
+    pbf_press_dpad(context, DPAD_RIGHT, 160, 20);
+
+    //Turn up. 13 steps. Wall.
+    ssf_press_button(context, BUTTON_B, 0, 220);
+    pbf_press_dpad(context, DPAD_UP, 220, 20);
+
+    //Turn left. 4 steps. Wall.
+    ssf_press_button(context, BUTTON_B, 0, 80);
+    pbf_press_dpad(context, DPAD_LEFT, 80, 20);
+
+    //Turn up. 10 steps.
+    ssf_press_button(context, BUTTON_B, 0, 180);
+    pbf_press_dpad(context, DPAD_UP, 180, 20);
+
+    //Turn right. 6 steps.
+    ssf_press_button(context, BUTTON_B, 0, 110);
+    pbf_press_dpad(context, DPAD_RIGHT, 110, 20);
+
+    //Turn down. Exit. Black screen over.
+    BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    int ret = run_until<SwitchControllerContext>(
+        env.console, context,
+        [](SwitchControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0, 90);
+            pbf_press_dpad(context, DPAD_DOWN, 90, 20);
+            pbf_wait(context, 300);
+        },
+        {exit_area}
+    );
+    context.wait_for_all_requests();
+    if (ret != 0){
+        env.log("Failed to exit area.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to exit area.",
+            env.console
+        );
+    }
+    else {
+        env.log("Left area.");
+    }
+
+    BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
+    int ret2 = run_until<SwitchControllerContext>(
+        env.console, context,
+        [](SwitchControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0, 90);
+            pbf_press_dpad(context, DPAD_UP, 90, 20);
+            pbf_wait(context, 300);
+        },
+        {enter_area}
+    );
+    context.wait_for_all_requests();
+    if (ret2 != 0){
+        env.log("Failed to enter area.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to enter area.",
+            env.console
+        );
+    }
+    else {
+        env.log("Entered area.");
+    }
+
+    ssf_press_button(context, BUTTON_B, 0, 110);
+    pbf_press_dpad(context, DPAD_LEFT, 110, 20);
+
+    ssf_press_button(context, BUTTON_B, 0, 180);
+    pbf_press_dpad(context, DPAD_DOWN, 180, 20);
+
+    ssf_press_button(context, BUTTON_B, 0, 80);
+    pbf_press_dpad(context, DPAD_RIGHT, 80, 20);
+
+    ssf_press_button(context, BUTTON_B, 0, 220);
+    pbf_press_dpad(context, DPAD_DOWN, 220, 20);
+
+    ssf_press_button(context, BUTTON_B, 0, 160);
+    pbf_press_dpad(context, DPAD_LEFT, 160, 20);
+
+    ssf_press_button(context, BUTTON_B, 0, 20);
+    pbf_press_dpad(context, DPAD_UP, 20, 20);
+
+    context.wait_for_all_requests();
 }
 
 void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
@@ -373,15 +463,17 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
     while (true) {
         switch (TARGET) {
         case Target::hooh:
+        case Target::kyogre:
+        case Target::groudon:
             //Step forward to start the encounter.
             pbf_press_dpad(context, DPAD_UP, 20, 50);
             break;
-        case Target::groudon:
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-            break;
-        case Target::kyogre:
-            pbf_press_dpad(context, DPAD_LEFT, 20, 50);
-            break;
+        //case Target::groudon: //Step up is easier.
+        //    pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+        //    break;
+        //case Target::kyogre:
+        //    pbf_press_dpad(context, DPAD_LEFT, 20, 50);
+        //    break;
         }
         //handle_encounter presses A already for everything else
         
@@ -409,6 +501,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchCo
             break;
         case Target::kyogre:
             reset_kyogre(env, context);
+            break;
         case Target::hooh:
             reset_hooh(env, context);
             break;
