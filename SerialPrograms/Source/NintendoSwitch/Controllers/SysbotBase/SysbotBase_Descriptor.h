@@ -1,36 +1,35 @@
-/*  Serial Port (PABotBase) Interface
+/*  sys-botbase Descriptor
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Controllers_SerialPABotBase_Descriptor_H
-#define PokemonAutomation_Controllers_SerialPABotBase_Descriptor_H
+#ifndef PokemonAutomation_Controllers_SysbotBase_Descriptor_H
+#define PokemonAutomation_Controllers_SysbotBase_Descriptor_H
 
-#include <QSerialPortInfo>
 #include "Controllers/ControllerDescriptor.h"
 
 namespace PokemonAutomation{
-namespace SerialPABotBase{
+namespace SysbotBase{
 
 
 
-class SerialPABotBase_Descriptor : public ControllerDescriptor{
+class SysbotBaseNetwork_Descriptor : public ControllerDescriptor{
 public:
-    static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::SerialPABotBase;
+    static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::SysbotBaseNetwork;
 
 
 public:
-    SerialPABotBase_Descriptor()
+    SysbotBaseNetwork_Descriptor()
         : ControllerDescriptor(INTERFACE_NAME)
     {}
-    SerialPABotBase_Descriptor(const QSerialPortInfo& info)
+    SysbotBaseNetwork_Descriptor(std::string url)
         : ControllerDescriptor(INTERFACE_NAME)
-        , m_port(info)
+        , m_url(std::move(url))
     {}
 
-    const QSerialPortInfo& port() const{
-        return m_port;
+    const std::string& url() const{
+        return m_url;
     }
 
     virtual bool operator==(const ControllerDescriptor& x) const override;
@@ -52,8 +51,12 @@ public:
     virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const override;
 
 private:
-    QSerialPortInfo m_port;
+    std::string m_url;
 };
+
+
+
+
 
 
 

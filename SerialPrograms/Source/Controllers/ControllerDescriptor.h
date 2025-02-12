@@ -13,12 +13,15 @@
 #include "ControllerCapability.h"
 #include "Controller.h"
 
+class QWidget;
+
 namespace PokemonAutomation{
 
 class JsonValue;
 class InterfaceType;
 class ControllerDescriptor;
 class ControllerConnection;
+class ControllerSelectorWidget;
 
 
 //
@@ -34,9 +37,6 @@ class ControllerConnection;
 class InterfaceType{
 public:
     virtual ~InterfaceType() = default;
-
-    //  Returns a list of all available descriptors for this interface type.
-    virtual std::vector<std::shared_ptr<const ControllerDescriptor>> list() const = 0;
 
     //  Construct a descriptor from a JSON config. (reloading saved controller settings)
     virtual std::unique_ptr<ControllerDescriptor> make(const JsonValue& json) const = 0;
@@ -55,10 +55,6 @@ protected:
 template <typename DescriptorType>
 class InterfaceType_t : public InterfaceType{
 public:
-    //  Subclasses must implement this function.
-    virtual std::vector<std::shared_ptr<const ControllerDescriptor>> list() const override;
-
-    //  This function is provided for you.
     virtual std::unique_ptr<ControllerDescriptor> make(const JsonValue& json) const override{
         std::unique_ptr<DescriptorType> ptr(new DescriptorType());
         ptr->load_json(json);
@@ -102,7 +98,7 @@ public:
     virtual JsonValue to_json() const = 0;
 
     virtual std::unique_ptr<ControllerConnection> open_connection(
-        Logger& logger
+        uint64_t sequence_number, Logger& logger
     ) const = 0;
     virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
@@ -113,14 +109,15 @@ public:
         return nullptr;
     }
 
+    virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const = 0;
 };
 
 
 
-
+#if 0
 std::vector<std::shared_ptr<const ControllerDescriptor>>
 get_compatible_descriptors(const ControllerRequirements& requirements);
-
+#endif
 
 
 

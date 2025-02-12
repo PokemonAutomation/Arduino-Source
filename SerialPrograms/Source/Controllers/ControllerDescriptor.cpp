@@ -40,6 +40,7 @@ void InterfaceType::register_factory(
 
 
 
+#if 0
 std::vector<std::shared_ptr<const ControllerDescriptor>>
 get_compatible_descriptors(const ControllerRequirements& requirements){
     std::vector<std::shared_ptr<const ControllerDescriptor>> ret;
@@ -71,7 +72,7 @@ get_compatible_descriptors(const ControllerRequirements& requirements){
 
     return ret;
 }
-
+#endif
 
 
 

@@ -411,6 +411,8 @@ SOURCES += \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.cpp \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
@@ -1459,6 +1461,7 @@ HEADERS += \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h \
     Source/Controllers/SuperscalarScheduler.h \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \
@@ -1563,6 +1566,9 @@ HEADERS += \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \

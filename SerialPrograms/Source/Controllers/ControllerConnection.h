@@ -18,9 +18,17 @@ namespace PokemonAutomation{
 class ControllerConnection{
 public:
     struct StatusListener{
-        virtual void pre_not_ready(){}
-        virtual void post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers){}
-        virtual void post_status_text_changed(const std::string& text){}
+//        virtual void pre_connection_not_ready(ControllerConnection& connection){}
+        virtual void post_connection_ready(
+            ControllerConnection& connection,
+            const std::map<ControllerType, std::set<ControllerFeature>>& controllers
+        ){}
+        virtual void status_text_changed(
+            ControllerConnection& connection, const std::string& text
+        ){}
+        virtual void on_error(
+            ControllerConnection& connection, const std::string& text
+        ){};
     };
 
     void add_status_listener(StatusListener& listener);
@@ -28,8 +36,12 @@ public:
 
 
 public:
+    ControllerConnection(uint64_t sequence_number)
+        : m_sequence_number(sequence_number)
+    {}
     virtual ~ControllerConnection() = default;
 
+    uint64_t sequence_number() const{ return m_sequence_number; }
     bool is_ready() const{ return m_ready.load(std::memory_order_acquire); }
     std::string status_text() const;
 
@@ -38,13 +50,17 @@ public:
 
 protected:
     void set_status(const std::string& text);
+    void declare_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);
 
-    void signal_pre_not_ready();
+private:
+//    void signal_pre_not_ready();
     void signal_post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);
     void signal_status_text_changed(const std::string& text);
+    void signal_error(const std::string& text);
 
 
 protected:
+    const uint64_t m_sequence_number;
     std::atomic<bool> m_ready;
 
 private:

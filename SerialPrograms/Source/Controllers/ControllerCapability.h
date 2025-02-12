@@ -35,6 +35,8 @@ namespace PokemonAutomation{
 enum class ControllerInterface{
     None,
     SerialPABotBase,
+    SysbotBaseNetwork,
+    SysbotBaseUSB,
 };
 extern const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
 

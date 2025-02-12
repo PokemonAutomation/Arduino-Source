@@ -24,8 +24,12 @@ namespace SerialPABotBase{
 
 class SerialPABotBase_Connection : public ControllerConnection{
 public:
-    SerialPABotBase_Connection(Logger& logger, const QSerialPortInfo* port);
     ~SerialPABotBase_Connection();
+    SerialPABotBase_Connection(
+        uint64_t sequence_number,
+        Logger& logger,
+        const QSerialPortInfo* port
+    );
 
     void update_with_capabilities(const std::set<ControllerFeature>& capabilities);
 

@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 
 class ControllerSession : private ControllerConnection::StatusListener{
 public:
-    struct Listener : ControllerConnection::StatusListener{
+    struct Listener{
         virtual void ready_changed(bool ready){}
         virtual void descriptor_changed(
             const std::shared_ptr<const ControllerDescriptor>& descriptor
@@ -79,6 +79,7 @@ public:
     void set_options_locked(bool locked);
 
 public:
+
     bool set_device(const std::shared_ptr<const ControllerDescriptor>& device);
     bool set_controller(ControllerType controller_type);
 
@@ -91,7 +92,7 @@ public:
     //  Returns empty string if successful. Otherwise returns error message.
     template <typename ControllerType, typename Lambda>
     std::string try_run(Lambda&& function) noexcept{
-        std::lock_guard<std::mutex> lg(m_state_lock);
+        std::lock_guard<std::recursive_mutex> lg(m_state_lock);
         if (!m_controller){
             return "Controller is null.";
         }
@@ -116,9 +117,19 @@ public:
 
 
 private:
-    virtual void pre_not_ready() override;
-    virtual void post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers) override;
-    virtual void post_status_text_changed(const std::string& text) override;
+//    virtual void pre_connection_not_ready(ControllerConnection& connection) override;
+    virtual void post_connection_ready(
+        ControllerConnection& connection,
+        const std::map<ControllerType, std::set<ControllerFeature>>& controllers
+    ) override;
+    virtual void status_text_changed(
+        ControllerConnection& connection,
+        const std::string& text
+    ) override;
+    virtual void on_error(
+        ControllerConnection& connection,
+        const std::string& text
+    ) override;
 
     void signal_ready_changed(bool ready);
     void signal_descriptor_changed(
@@ -137,12 +148,19 @@ private:
     const ControllerRequirements& m_requirements;
     ControllerOption& m_option;
 
-    mutable std::mutex m_state_lock;
+    //  TODO: This is gross. Design it better.
+    std::atomic<uint64_t> m_sequence_number;
+    mutable std::recursive_mutex m_state_lock;
+
     bool m_options_locked;
+    std::atomic<bool> m_connection_is_shutting_down;
     std::string m_user_input_disallow_reason;
     std::shared_ptr<const ControllerDescriptor> m_descriptor;
     std::unique_ptr<ControllerConnection> m_connection;
     std::unique_ptr<AbstractController> m_controller;
+
+    SpinLock m_message_lock;
+    std::string m_controller_error;
 
     std::vector<ControllerType> m_available_controllers;
 

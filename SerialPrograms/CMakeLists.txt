@@ -638,6 +638,7 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp
@@ -829,6 +830,11 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.cpp
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp

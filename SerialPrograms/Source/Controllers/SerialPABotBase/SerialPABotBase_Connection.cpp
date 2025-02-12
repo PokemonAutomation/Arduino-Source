@@ -35,8 +35,13 @@ namespace SerialPABotBase{
 
 
 
-SerialPABotBase_Connection::SerialPABotBase_Connection(Logger& logger, const QSerialPortInfo* port)
-    : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
+SerialPABotBase_Connection::SerialPABotBase_Connection(
+    uint64_t sequence_number,
+    Logger& logger,
+    const QSerialPortInfo* port
+)
+    : ControllerConnection(sequence_number)
+    , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
 {
     set_label_text("Not Connected", COLOR_RED);
 
@@ -84,7 +89,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(Logger& logger, const QSe
 }
 SerialPABotBase_Connection::~SerialPABotBase_Connection(){
     m_ready.store(false, std::memory_order_release);
-    signal_pre_not_ready();
+//    signal_pre_not_ready();
     if (m_botbase == nullptr){
         return;
     }
@@ -265,15 +270,14 @@ void SerialPABotBase_Connection::thread_body(){
             error = e.message();
         }
         if (error.empty()){
-            m_ready.store(true, std::memory_order_release);
 //            std::string text = "Program: " + program_name(m_program_id) + " (" + std::to_string(m_protocol) + ")";
             std::string text = program_name(m_program_id) + " (" + std::to_string(m_protocol) + ")";
             set_label_text(text, theme_friendly_darkblue());
-            signal_post_ready(controllers);
+            declare_ready(controllers);
         }else{
             m_ready.store(false, std::memory_order_relaxed);
             set_label_text(error, COLOR_RED);
-            signal_pre_not_ready();
+//            signal_pre_not_ready();
             m_botbase->stop();
             return;
         }

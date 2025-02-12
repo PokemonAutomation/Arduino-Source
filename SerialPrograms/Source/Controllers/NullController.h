@@ -27,7 +27,7 @@ public:
     virtual JsonValue to_json() const override;
 
     virtual std::unique_ptr<ControllerConnection> open_connection(
-        Logger& logger
+        uint64_t sequence_number, Logger& logger
     ) const override;
     virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
@@ -35,6 +35,8 @@ public:
         ControllerType controller_type,
         const ControllerRequirements& requirements
     ) const override;
+
+    virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const override;
 };
 
 

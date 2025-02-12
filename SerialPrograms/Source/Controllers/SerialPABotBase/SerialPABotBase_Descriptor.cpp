@@ -4,9 +4,11 @@
  *
  */
 
+#include <QWidget>
 #include "Common/Cpp/Json/JsonValue.h"
-//#include "SerialPABotBase.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "SerialPABotBase_Descriptor.h"
+#include "SerialPABotBase_SelectorWidget.h"
 
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h"
 
@@ -16,33 +18,7 @@
 
 namespace PokemonAutomation{
 
-
-
-
-
-
-template <>
-std::vector<std::shared_ptr<const ControllerDescriptor>>
-InterfaceType_t<SerialPABotBase::SerialPABotBase_Descriptor>::list() const{
-    std::vector<std::shared_ptr<const ControllerDescriptor>> ret;
-    for (QSerialPortInfo& port : QSerialPortInfo::availablePorts()){
-#ifdef _WIN32
-        //  COM1 is never the correct port on Windows.
-        if (port.portName() == "COM1"){
-            continue;
-        }
-#endif
-//        cout << port.portName().toStdString() << endl;
-        ret.emplace_back(new SerialPABotBase::SerialPABotBase_Descriptor(port));
-    }
-    return ret;
-}
 template class InterfaceType_t<SerialPABotBase::SerialPABotBase_Descriptor>;
-
-
-
-
-
 
 namespace SerialPABotBase{
 
@@ -61,6 +37,9 @@ std::string SerialPABotBase_Descriptor::display_name() const{
     if (m_port.isNull()){
         return "";
     }
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        return m_port.portName().toStdString();
+    }
     return m_port.portName().toStdString() + " - " + m_port.description().toStdString();
 //    return "Serial (PABotBase): " + m_port.portName().toStdString() + " - " + m_port.description().toStdString();
 }
@@ -76,9 +55,11 @@ JsonValue SerialPABotBase_Descriptor::to_json() const{
 }
 
 std::unique_ptr<ControllerConnection> SerialPABotBase_Descriptor::open_connection(
-    Logger& logger
+    uint64_t sequence_number, Logger& logger
 ) const{
-    return std::unique_ptr<ControllerConnection>(new SerialPABotBase::SerialPABotBase_Connection(logger, &m_port));
+    return std::unique_ptr<ControllerConnection>(
+        new SerialPABotBase_Connection(sequence_number, logger, &m_port)
+    );
 }
 std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
     Logger& logger,
@@ -91,7 +72,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
         return std::unique_ptr<AbstractController>(
             new NintendoSwitch::ProController_SerialPABotBase(
                 logger,
-                static_cast<SerialPABotBase::SerialPABotBase_Connection&>(connection),
+                static_cast<SerialPABotBase_Connection&>(connection),
                 requirements
             )
         );
@@ -107,6 +88,10 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
 }
 
 
+
+QWidget* SerialPABotBase_Descriptor::make_selector_QtWidget(ControllerSelectorWidget& parent) const{
+    return new SerialPABotBase_SelectorWidget(parent, this);
+}
 
 
 
