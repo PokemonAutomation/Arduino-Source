@@ -31,6 +31,8 @@ public:
 private:
     enum class Target{
         regis,
+        groudon,
+        kyogre,
         hooh,
         lugia,
     };
@@ -41,6 +43,8 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     void reset_regi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void reset_groudon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void reset_kyogre(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
     void reset_hooh(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
     void reset_lugia(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
 };
