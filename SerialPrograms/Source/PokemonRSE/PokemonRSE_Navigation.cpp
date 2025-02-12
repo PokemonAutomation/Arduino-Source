@@ -35,7 +35,7 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerConte
     int ret = wait_until(
         stream, context,
         GameSettings::instance().ENTER_GAME_WAIT0,
-        {{detector}}
+        {detector}
     );
     if (ret == 0){
         stream.log("Entered game!");

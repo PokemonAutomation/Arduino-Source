@@ -26,7 +26,7 @@ public:
 class LegendaryHuntEmerald : public SingleSwitchProgramInstance{
 public:
     LegendaryHuntEmerald();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     enum class Target{
@@ -42,11 +42,11 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void reset_regi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-    void reset_groudon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-    void reset_kyogre(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-    void reset_hooh(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-    void reset_lugia(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void reset_regi(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void reset_groudon(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void reset_kyogre(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 };
 
 }

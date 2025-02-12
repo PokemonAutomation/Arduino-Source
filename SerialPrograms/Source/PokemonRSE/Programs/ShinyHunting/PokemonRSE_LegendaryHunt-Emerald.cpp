@@ -78,13 +78,13 @@ LegendaryHuntEmerald::LegendaryHuntEmerald()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //turn around, walk down 4/until black screen over
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0, 120);
             pbf_press_dpad(context, DPAD_DOWN, 120, 20);
             pbf_wait(context, 300);
@@ -107,9 +107,9 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, Switc
     context.wait_for_all_requests();
 
     //turn around, up one/black screen over
-    int ret2 = run_until<SwitchControllerContext>(
+    int ret2 = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_UP, 120, 20);
             pbf_wait(context, 300);
         },
@@ -135,7 +135,7 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, Switc
     context.wait_for_all_requests();
 }
 
-void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //Turn left. Take 10 steps.
     ssf_press_button(context, BUTTON_B, 0, 180);
     pbf_press_dpad(context, DPAD_LEFT, 180, 20);
@@ -159,9 +159,9 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Sw
 
     //Turn down. Exit. Black screen over.
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0, 90);
             pbf_press_dpad(context, DPAD_DOWN, 90, 20);
             pbf_wait(context, 300);
@@ -183,9 +183,9 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Sw
 
     //Reverse above steps.
     BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret2 = run_until<SwitchControllerContext>(
+    int ret2 = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0, 90);
             pbf_press_dpad(context, DPAD_UP, 90, 20);
             pbf_wait(context, 300);
@@ -222,7 +222,7 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Sw
     context.wait_for_all_requests();
 }
 
-void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //Turn down. Take 1 step.
     ssf_press_button(context, BUTTON_B, 0, 20);
     pbf_press_dpad(context, DPAD_DOWN, 20, 20);
@@ -249,9 +249,9 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Swi
 
     //Turn down. Exit. Black screen over.
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0, 90);
             pbf_press_dpad(context, DPAD_DOWN, 90, 20);
             pbf_wait(context, 300);
@@ -272,9 +272,9 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Swi
     }
 
     BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
-    int ret2 = run_until<SwitchControllerContext>(
+    int ret2 = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0, 90);
             pbf_press_dpad(context, DPAD_UP, 90, 20);
             pbf_wait(context, 300);
@@ -315,16 +315,16 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Swi
     context.wait_for_all_requests();
 }
 
-void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 10 steps down
     ssf_press_button(context, BUTTON_B, 0, 180);
     pbf_press_dpad(context, DPAD_DOWN, 180, 20);
 
     //Turn right, take 1 step. Wait for black screen over.
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0, 30);
             pbf_press_dpad(context, DPAD_RIGHT, 30, 20);
             pbf_wait(context, 300);
@@ -346,9 +346,9 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, Switc
 
     BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //turn left, take one step. now turn back right and take a step. wait for black screen over.
-    int ret2 = run_until<SwitchControllerContext>(
+    int ret2 = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0, 40);
             pbf_press_dpad(context, DPAD_LEFT, 40, 20);
 
@@ -382,16 +382,16 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, Switc
     context.wait_for_all_requests();
 }
 
-void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 5 steps down
     ssf_press_button(context, BUTTON_B, 0, 90);
     pbf_press_dpad(context, DPAD_DOWN, 90, 20);
 
     //Turn right, 3 steps right. Wait for black screen over.
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0, 90);
             pbf_press_dpad(context, DPAD_RIGHT, 90, 20);
             pbf_wait(context, 300);
@@ -413,9 +413,9 @@ void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, Swit
 
     BlackScreenOverWatcher enter_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //turn up, take one step. then turn back down and take a step. wait for black screen over.
-    int ret2 = run_until<SwitchControllerContext>(
+    int ret2 = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             ssf_press_button(context, BUTTON_B, 0, 40);
             pbf_press_dpad(context, DPAD_UP, 40, 20);
 
@@ -448,7 +448,7 @@ void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, Swit
     context.wait_for_all_requests();
 }
 
-void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LegendaryHuntEmerald_Descriptor::Stats& stats = env.current_stats<LegendaryHuntEmerald_Descriptor::Stats>();
 
     /*

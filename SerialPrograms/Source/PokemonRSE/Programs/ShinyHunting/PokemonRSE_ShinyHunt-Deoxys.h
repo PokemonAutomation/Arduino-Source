@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonRSE_ShinyHuntDeoxys_H
 #define PokemonAutomation_PokemonRSE_ShinyHuntDeoxys_H
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
