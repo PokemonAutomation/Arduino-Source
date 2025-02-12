@@ -60,11 +60,10 @@ ShinyHuntDeoxys::ShinyHuntDeoxys()
         LockMode::LOCK_WHILE_RUNNING,
         StartPos::rock_unsolved
     )
-    , WALK_UP_DOWN_TIME(
+    , WALK_UP_DOWN_TIME0(
         "<b>Walk up/down time</b><br>Spend this long to run up to the triangle rock.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "440"
+        "3520 ms"
     )
     , NOTIFICATION_SHINY(
         "Shiny Found",
@@ -79,11 +78,11 @@ ShinyHuntDeoxys::ShinyHuntDeoxys()
         })
 {
     PA_ADD_OPTION(STARTPOS);
-    PA_ADD_OPTION(WALK_UP_DOWN_TIME);
+    PA_ADD_OPTION(WALK_UP_DOWN_TIME0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     env.log("Step 1: Press A from below.");
     pbf_press_button(context, BUTTON_A, 20, 40);
 
@@ -187,7 +186,7 @@ void ShinyHuntDeoxys::solve_puzzle(SingleSwitchProgramEnvironment& env, SwitchCo
     context.wait_for_all_requests();
 }
 
-void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntDeoxys_Descriptor::Stats& stats = env.current_stats<ShinyHuntDeoxys_Descriptor::Stats>();
 
     /*
@@ -218,8 +217,8 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, SwitchControl
             case StartPos::boat:
                 env.log("StartPos: Walking up to Deoxys.");
                 //Walk up to the triangle rock from the ship. No bike allowed.
-                ssf_press_button(context, BUTTON_B, 0, WALK_UP_DOWN_TIME);
-                pbf_press_dpad(context, DPAD_UP, WALK_UP_DOWN_TIME, 20);
+                ssf_press_button(context, BUTTON_B, 0ms, WALK_UP_DOWN_TIME0);
+                pbf_press_dpad(context, DPAD_UP, WALK_UP_DOWN_TIME0, 160ms);
                 context.wait_for_all_requests();
             case StartPos::rock_unsolved:
                 env.log("StartPos: Solving puzzle.");
@@ -253,14 +252,14 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, SwitchControl
         
         //Walk down from the triangle rock to the ship.
         env.log("Walking down to ship.");
-        ssf_press_button(context, BUTTON_B, 0, WALK_UP_DOWN_TIME);
-        pbf_press_dpad(context, DPAD_DOWN, WALK_UP_DOWN_TIME, 20);
+        ssf_press_button(context, BUTTON_B, 0ms, WALK_UP_DOWN_TIME0);
+        pbf_press_dpad(context, DPAD_DOWN, WALK_UP_DOWN_TIME0, 160ms);
         context.wait_for_all_requests();
 
         env.log("Walking up to Deoxys rock.");
         //Walk up to the triangle rock from the ship. Bike is not allowed on Birth Island.
-        ssf_press_button(context, BUTTON_B, 0, WALK_UP_DOWN_TIME);
-        pbf_press_dpad(context, DPAD_UP, WALK_UP_DOWN_TIME, 20);
+        ssf_press_button(context, BUTTON_B, 0ms, WALK_UP_DOWN_TIME0);
+        pbf_press_dpad(context, DPAD_UP, WALK_UP_DOWN_TIME0, 160ms);
         context.wait_for_all_requests();
 
         env.log("Solving puzzle.");
