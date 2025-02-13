@@ -92,7 +92,7 @@ public:
     //  Returns empty string if successful. Otherwise returns error message.
     template <typename ControllerType, typename Lambda>
     std::string try_run(Lambda&& function) noexcept{
-        std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+        std::lock_guard<std::mutex> lg(m_state_lock);
         if (!m_controller){
             return "Controller is null.";
         }
@@ -117,6 +117,8 @@ public:
 
 
 private:
+    void make_controller();
+
 //    virtual void pre_connection_not_ready(ControllerConnection& connection) override;
     virtual void post_connection_ready(
         ControllerConnection& connection,
@@ -148,21 +150,21 @@ private:
     const ControllerRequirements& m_requirements;
     ControllerOption& m_option;
 
-    //  TODO: This is gross. Design it better.
-    std::atomic<uint64_t> m_sequence_number;
-    mutable std::recursive_mutex m_state_lock;
+    std::mutex m_reset_lock;
+    mutable std::mutex m_state_lock;
 
     bool m_options_locked;
     std::atomic<bool> m_connection_is_shutting_down;
     std::string m_user_input_disallow_reason;
-    std::shared_ptr<const ControllerDescriptor> m_descriptor;
-    std::unique_ptr<ControllerConnection> m_connection;
-    std::unique_ptr<AbstractController> m_controller;
 
     SpinLock m_message_lock;
     std::string m_controller_error;
 
     std::vector<ControllerType> m_available_controllers;
+
+    std::shared_ptr<const ControllerDescriptor> m_descriptor;
+    std::unique_ptr<ControllerConnection> m_connection;
+    std::unique_ptr<AbstractController> m_controller;
 
     ListenerSet<Listener> m_listeners;
 };

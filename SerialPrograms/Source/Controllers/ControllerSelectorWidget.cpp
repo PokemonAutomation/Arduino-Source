@@ -59,14 +59,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     interface_dropdown->setCurrentIndex((int)current->interface_type - 1);
     m_selector = current->make_selector_QtWidget(*this);
     m_dropdowns->insertWidget(1, m_selector);
-//    refresh_selection();
 
-
-#if 0
-    m_devices_dropdown = new NoWheelComboBox(this);
-    dropdowns->addWidget(m_devices_dropdown);
-    refresh_devices();
-#endif
 
     m_dropdowns->addSpacing(5);
     m_controllers_dropdown = new NoWheelComboBox(this);
@@ -88,7 +81,6 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     if (m_selector){
         m_selector->setEnabled(!options_locked);
     }
-//    m_devices_dropdown->setEnabled(!options_locked);
     m_reset_button->setEnabled(!options_locked);
 
     connect(
@@ -108,24 +100,6 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
             refresh_selection(incoming);
         }
     );
-#if 0
-    connect(
-        m_devices_dropdown, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-        this, [this](int index){
-            index = std::max(index, 0);
-            index = std::min(index, (int)m_device_list.size() - 1);
-            const std::shared_ptr<const ControllerDescriptor>& selected = m_device_list[index];
-
-            std::shared_ptr<const ControllerDescriptor> current = m_session.descriptor();
-            if (*current == *selected){
-                return;
-            }
-
-            m_session.set_device(selected);
-            refresh_devices();
-        }
-    );
-#endif
     if (PreloadSettings::instance().DEVELOPER_MODE){
         connect(
             m_controllers_dropdown, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),

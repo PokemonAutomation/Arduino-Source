@@ -262,6 +262,9 @@ void SerialPABotBase_Connection::thread_body(){
             controllers = read_device_specs();
             std::lock_guard<std::mutex> lg(m_lock);
             m_controllers = controllers;
+
+            //  Stop pending commands.
+            m_botbase->stop_all_commands();
         }catch (InvalidConnectionStateException&){
             return;
         }catch (SerialProtocolException& e){
@@ -283,8 +286,6 @@ void SerialPABotBase_Connection::thread_body(){
         }
     }
 
-    //  Stop pending commands.
-    m_botbase->stop_all_commands();
 
     std::thread watchdog([this]{
         while (true){

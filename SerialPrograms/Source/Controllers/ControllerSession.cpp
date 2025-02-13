@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Concurrency/SpinPause.h"
+//#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "ControllerSession.h"
 
 //#include <iostream>
@@ -16,25 +16,29 @@ namespace PokemonAutomation{
 
 
 void ControllerSession::add_listener(Listener& listener){
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     m_listeners.add(listener);
 //    if (m_connection && m_connection->is_ready()){
-        signal_controller_changed(m_option.m_controller_type, m_available_controllers);
+//        signal_controller_changed(m_option.m_controller_type, m_available_controllers);
 //    }
 }
 void ControllerSession::remove_listener(Listener& listener){
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     m_listeners.remove(listener);
 }
 
 
 
 ControllerSession::~ControllerSession(){
-    if (m_connection){
-//        m_listeners.run_lambda_with_duplicates([&](Listener& listener){
-//            m_connection->remove_status_listener(listener);
-//        });
+    std::unique_ptr<AbstractController> controller;
+    std::unique_ptr<ControllerConnection> connection;
+    {
+        std::lock_guard<std::mutex> lg(m_state_lock);
+        controller = std::move(m_controller);
+        connection = std::move(m_connection);
     }
+    controller.reset();
+    connection.reset();
 }
 ControllerSession::ControllerSession(
     Logger& logger,
@@ -44,22 +48,33 @@ ControllerSession::ControllerSession(
     : m_logger(logger)
     , m_requirements(requirements)
     , m_option(option)
-    , m_sequence_number(0)
     , m_options_locked(false)
     , m_connection_is_shutting_down(false)
     , m_descriptor(option.descriptor())
     , m_connection(m_descriptor->open_connection(0, logger))
 {
-//    cout << "ControllerSession:ControllerSession(): " << m_descriptor->display_name() << endl;
-//    cout << "ControllerSession:ControllerSession(): " << m_connection.get() << endl;
-    if (m_connection){
-        m_connection->add_status_listener(*this);
+    if (!m_connection){
+        return;
+    }
+
+    //  Add listener first so we don't miss the ready signal.
+    m_connection->add_status_listener(*this);
+    try{
+        //  If we already missed it, run it ourselves.
+        if (m_connection->is_ready()){
+            ControllerSession::post_connection_ready(
+                *m_connection, m_connection->supported_controllers()
+            );
+        }
+    }catch (...){
+        m_connection->remove_status_listener(*this);
+        throw;
     }
 }
 
 
 void ControllerSession::get(ControllerOption& option){
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     option = m_option;
 }
 void ControllerSession::set(const ControllerOption& option){
@@ -69,22 +84,22 @@ void ControllerSession::set(const ControllerOption& option){
 
 
 bool ControllerSession::ready() const{
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     if (!m_controller){
         return false;
     }
     return m_controller->is_ready();
 }
 std::shared_ptr<const ControllerDescriptor> ControllerSession::descriptor() const{
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     return m_descriptor;
 }
 ControllerType ControllerSession::controller_type() const{
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     return m_option.m_controller_type;
 }
 std::string ControllerSession::status_text() const{
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     if (!m_connection){
         return "<font color=\"red\">No controller selected.</font>";
     }
@@ -110,7 +125,7 @@ AbstractController* ControllerSession::controller() const{
 
 
 std::string ControllerSession::user_input_blocked() const{
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     if (!m_connection){
         return "<font color=\"red\">No controller selected.</font>";
     }
@@ -123,19 +138,19 @@ std::string ControllerSession::user_input_blocked() const{
     return m_user_input_disallow_reason;
 }
 void ControllerSession::set_user_input_blocked(std::string disallow_reason){
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
 //    cout << "set_user_input_blocked() = " << disallow_reason << endl;
     m_user_input_disallow_reason = std::move(disallow_reason);
 }
 
 bool ControllerSession::options_locked() const{
-    std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     return m_options_locked;
 }
 void ControllerSession::set_options_locked(bool locked){
     bool original_value;
     {
-        std::lock_guard<std::recursive_mutex> lg(m_state_lock);
+        std::lock_guard<std::mutex> lg(m_state_lock);
         original_value = m_options_locked;
         m_options_locked = locked;
     }
@@ -145,31 +160,60 @@ void ControllerSession::set_options_locked(bool locked){
 }
 
 
+void ControllerSession::make_controller(){
+    //  Must be called under "m_reset_lock".
+
+    bool ready = false;
+    {
+        std::lock_guard<std::mutex> lg(m_state_lock);
+        m_connection = m_descriptor->open_connection(0, m_logger);
+        if (m_connection){
+            m_connection->add_status_listener(*this);
+            ready = m_connection->is_ready();
+        }
+    }
+
+    //  If we already missed it, run it ourselves.
+    if (ready){
+        ControllerSession::post_connection_ready(
+            *m_connection, m_connection->supported_controllers()
+        );
+    }
+}
+
+
+
 bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescriptor>& device){
 //    cout << "set_device() = " << device->display_name() << endl;
     {
-        std::lock_guard<std::recursive_mutex> lg(m_state_lock);
-        if (*m_descriptor == *device){
-            return true;
+        std::lock_guard<std::mutex> lg0(m_reset_lock);
+
+        //  Destroy the current connection+controller.
+        std::unique_ptr<AbstractController> controller;
+        std::unique_ptr<ControllerConnection> connection;
+        {
+            std::lock_guard<std::mutex> lg1(m_state_lock);
+            if (m_options_locked){
+                return false;
+            }
+            if (*m_descriptor == *device){
+                return true;
+            }
+
+            //  Move these out to indicate that we should no longer access them.
+            controller = std::move(m_controller);
+            connection = std::move(m_connection);
+
+            m_descriptor = device;
         }
 
-        if (m_options_locked){
-            return false;
-        }
+        //  With the lock released, it is now safe to destroy them.
+        //  We cannot destroy these under (m_state_lock) due to their asynchronous
+        //  callbacks into this class which will also acquire the same lock.
+        controller.reset();
+        connection.reset();
 
-        uint64_t sequence_number = m_sequence_number.load(std::memory_order_relaxed);
-        sequence_number++;
-        m_sequence_number.store(sequence_number, std::memory_order_release);
-
-        m_controller.reset();
-        m_connection.reset();
-        m_connection = device->open_connection(sequence_number, m_logger);
-        if (m_connection){
-            m_connection->add_status_listener(*this);
-        }
-
-        m_option.m_descriptor = device;
-        m_descriptor = device;
+        make_controller();
     }
     signal_descriptor_changed(device);
     signal_status_text_changed(status_text());
@@ -177,27 +221,37 @@ bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescrip
 }
 bool ControllerSession::set_controller(ControllerType controller_type){
 //    cout << "set_controller()" << endl;
+    std::shared_ptr<const ControllerDescriptor> device;
     {
-        std::lock_guard<std::recursive_mutex> lg(m_state_lock);
-        if (m_option.m_controller_type == controller_type){
-            return true;
-        }
-        if (m_options_locked){
-            return false;
-        }
-        m_option.m_controller_type = controller_type;
+        std::lock_guard<std::mutex> lg0(m_reset_lock);
 
-        uint64_t sequence_number = m_sequence_number.load(std::memory_order_relaxed);
-        sequence_number++;
-        m_sequence_number.store(sequence_number, std::memory_order_release);
+        //  Destroy the current connection+controller.
+        std::unique_ptr<AbstractController> controller;
+        std::unique_ptr<ControllerConnection> connection;
+        {
+            std::lock_guard<std::mutex> lg1(m_state_lock);
+            if (m_options_locked){
+                return false;
+            }
+            if (m_option.m_controller_type == controller_type){
+                return true;
+            }
 
-        m_controller.reset();
-        m_connection.reset();
-        m_connection = m_descriptor->open_connection(sequence_number, m_logger);
-        if (m_connection){
-            m_connection->add_status_listener(*this);
+            //  Move these out to indicate that we should no longer access them.
+            controller = std::move(m_controller);
+            connection = std::move(m_connection);
         }
+
+        //  With the lock released, it is now safe to destroy them.
+        //  We cannot destroy these under (m_state_lock) due to their asynchronous
+        //  callbacks into this class which will also acquire the same lock.
+        controller.reset();
+        connection.reset();
+
+        make_controller();
+        device = m_descriptor;
     }
+    signal_descriptor_changed(device);
     signal_status_text_changed(status_text());
     return true;
 }
@@ -206,24 +260,32 @@ bool ControllerSession::set_controller(ControllerType controller_type){
 
 std::string ControllerSession::reset(){
     {
-        std::lock_guard<std::recursive_mutex> lg(m_state_lock);
-        if (!m_connection){
-            return "No connection set.";
-        }
-        if (m_options_locked){
-            return "Options are locked.";
+        std::lock_guard<std::mutex> lg0(m_reset_lock);
+
+        //  Destroy the current connection+controller.
+        std::unique_ptr<AbstractController> controller;
+        std::unique_ptr<ControllerConnection> connection;
+        {
+            std::lock_guard<std::mutex> lg1(m_state_lock);
+            if (m_options_locked){
+                return "Options are locked.";
+            }
+            if (!m_connection){
+                return "No connection set.";
+            }
+
+            //  Move these out to indicate that we should no longer access them.
+            controller = std::move(m_controller);
+            connection = std::move(m_connection);
         }
 
-        uint64_t sequence_number = m_sequence_number.load(std::memory_order_relaxed);
-        sequence_number++;
-        m_sequence_number.store(sequence_number, std::memory_order_release);
+        //  With the lock released, it is now safe to destroy them.
+        //  We cannot destroy these under (m_state_lock) due to their asynchronous
+        //  callbacks into this class which will also acquire the same lock.
+        controller.reset();
+        connection.reset();
 
-        m_controller.reset();
-        m_connection.reset();
-        m_connection = m_descriptor->open_connection(sequence_number, m_logger);
-        if (m_connection){
-            m_connection->add_status_listener(*this);
-        }
+        make_controller();
     }
     signal_status_text_changed(status_text());
     return "";
@@ -237,51 +299,44 @@ void ControllerSession::post_connection_ready(
     ControllerConnection& connection,
     const std::map<ControllerType, std::set<ControllerFeature>>& controllers
 ){
-    std::vector<ControllerType> available_controllers;
-
-    if (controllers.size() > 1){
-        available_controllers.emplace_back(ControllerType::None);
+    if (controllers.empty()){
+        return;
     }
 
+//    cout << "sleeping" << endl;
+//    Sleep(10000);
+
+
+    std::vector<ControllerType> available_controllers;
     ControllerType selected_controller = ControllerType::None;
-    bool ready = false;
-    while (true){
-        //  We need to be careful here. If the connection is simultaneously
-        //  being destructed, this will deadlock. Thus we cannot wait for the
-        //  lock to be acquired. Instead we try to acquire the lock, and if it
-        //  fails, we check to see if the sequence number has changed. If it
-        //  has then it means the connection has already been changed, thus we
-        //  should drop this event.
+    bool ready;
+    {
+        std::lock_guard<std::mutex> lg(m_state_lock);
 
-        //  Try to acquire the lock.
-        std::unique_lock<std::recursive_mutex> lg(m_state_lock, std::try_to_lock_t());
-
-        //  Regardless of whether we succeeded, check the sequence number.
-        //  If it has changed, we not even on the same connection anymore and
-        //  thus can drop this event.
-        uint64_t sequence_number = m_sequence_number.load(std::memory_order_acquire);
-        if (sequence_number != connection.sequence_number()){
+        //  Connection has already been closed.
+        if (m_connection == nullptr){
             return;
         }
 
-        //  Failed to acquire the lock, try again.
-        if (!lg.owns_lock()){
-            pause();
-            continue;
+        //  Controller already constructed.
+        if (m_controller){
+            return;
         }
 
-
+        //  We only show the "none" option when there are multiple controllers to choose from.
+        if (controllers.size() > 1){
+            available_controllers.emplace_back(ControllerType::None);
+        }
         for (const auto& item : controllers){
             available_controllers.emplace_back(item.first);
         }
+
+        //  Copy the list. One will be moved into "m_available_controllers".
+        //  The other will be stored locally for the callbacks.
         m_available_controllers = available_controllers;
 
-        if (controllers.empty()){
-            return;
-        }
 
         auto iter = controllers.begin();
-
         if (controllers.size() == 1){
             //  Only one controller available. Force the option to it.
             selected_controller = iter->first;
@@ -293,22 +348,23 @@ void ControllerSession::post_connection_ready(
             }
         }
 
-//        cout << "post_ready()" << endl;
-
+        //  Construct the controller.
         if (selected_controller != ControllerType::None){
-            m_controller = m_descriptor->make_controller(m_logger, *m_connection, selected_controller, m_requirements);
+            m_controller = m_descriptor->make_controller(
+                m_logger,
+                *m_connection,
+                selected_controller,
+                m_requirements
+            );
         }
+
+        //  Commit all changes.
         m_option.m_controller_type = selected_controller;
-
         ready = m_controller && m_controller->is_ready();
-        signal_controller_changed(selected_controller, available_controllers);
+    }
 
-        break;
-    }
-    if (ready){
-//        m_listeners.run_method_unique(&Listener::post_connection_ready, connection, controllers);
-        signal_ready_changed(m_controller->is_ready());
-    }
+    signal_controller_changed(selected_controller, available_controllers);
+    signal_ready_changed(ready);
 }
 void ControllerSession::status_text_changed(
     ControllerConnection& connection,
