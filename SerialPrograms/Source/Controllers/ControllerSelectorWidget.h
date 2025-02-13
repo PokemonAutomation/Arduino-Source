@@ -52,7 +52,7 @@ private:
     QHBoxLayout* m_dropdowns;
     QWidget* m_selector = nullptr;
     QComboBox* interface_dropdown = nullptr;
-    QComboBox* m_devices_dropdown = nullptr;
+//    QComboBox* m_devices_dropdown = nullptr;
     QComboBox* m_controllers_dropdown = nullptr;
     QLabel* m_status_text = nullptr;
     QPushButton* m_reset_button = nullptr;
