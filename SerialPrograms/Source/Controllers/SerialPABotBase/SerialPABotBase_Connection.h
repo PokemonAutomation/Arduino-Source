@@ -26,7 +26,6 @@ class SerialPABotBase_Connection : public ControllerConnection{
 public:
     ~SerialPABotBase_Connection();
     SerialPABotBase_Connection(
-        uint64_t sequence_number,
         Logger& logger,
         const QSerialPortInfo* port
     );

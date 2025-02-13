@@ -9,10 +9,9 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "SysbotBase_Connection.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace SysbotBase{
@@ -39,12 +38,9 @@ bool parse_ip_and_port(const std::string& str, QHostAddress& address, int& port)
 
 
 SysbotBaseNetwork_Connection::SysbotBaseNetwork_Connection(
-    uint64_t sequence_number,
     Logger& logger,
     const std::string& url
-)
-    : ControllerConnection(sequence_number)
-{
+){
     if (!parse_ip_and_port(url, m_address, m_port)){
         set_status(html_color_text("Invalid IP address + port.", COLOR_RED));
         return;
@@ -112,6 +108,18 @@ void SysbotBaseNetwork_Connection::thread_body_wrapper(){
     }
 }
 void SysbotBaseNetwork_Connection::thread_body_internal(){
+#if 0   //  REMOVE
+    m_socket->connect(
+        m_socket, &QTcpSocket::disconnected,
+        m_socket, [this]{
+            m_ready.store(false, std::memory_order_release);
+            m_stopping.store(true, std::memory_order_release);
+            m_cv.notify_all();
+            set_status(html_color_text("Disconnected by host.", COLOR_RED));
+        }
+    );
+#endif
+
     m_socket->connect(
         m_socket, &QTcpSocket::disconnected,
         m_socket, [this]{

@@ -51,7 +51,7 @@ ControllerSession::ControllerSession(
     , m_options_locked(false)
     , m_connection_is_shutting_down(false)
     , m_descriptor(option.descriptor())
-    , m_connection(m_descriptor->open_connection(0, logger))
+    , m_connection(m_descriptor->open_connection(logger))
 {
     if (!m_connection){
         return;
@@ -166,7 +166,7 @@ void ControllerSession::make_controller(){
     bool ready = false;
     {
         std::lock_guard<std::mutex> lg(m_state_lock);
-        m_connection = m_descriptor->open_connection(0, m_logger);
+        m_connection = m_descriptor->open_connection(m_logger);
         if (m_connection){
             m_connection->add_status_listener(*this);
             ready = m_connection->is_ready();
@@ -204,6 +204,8 @@ bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescrip
             controller = std::move(m_controller);
             connection = std::move(m_connection);
 
+//            cout << "setting..." << endl;
+            m_option.set_descriptor(device);
             m_descriptor = device;
         }
 
@@ -240,6 +242,8 @@ bool ControllerSession::set_controller(ControllerType controller_type){
             //  Move these out to indicate that we should no longer access them.
             controller = std::move(m_controller);
             connection = std::move(m_connection);
+
+            m_option.m_controller_type = controller_type;
         }
 
         //  With the lock released, it is now safe to destroy them.
@@ -323,7 +327,8 @@ void ControllerSession::post_connection_ready(
             return;
         }
 
-        //  We only show the "none" option when there are multiple controllers to choose from.
+        //  We only show the "none" option when there are multiple controllers
+        //  to choose from.
         if (controllers.size() > 1){
             available_controllers.emplace_back(ControllerType::None);
         }

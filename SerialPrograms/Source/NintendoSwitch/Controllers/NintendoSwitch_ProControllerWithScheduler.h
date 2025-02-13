@@ -49,6 +49,10 @@ class ProControllerWithScheduler :
 public:
     ProControllerWithScheduler(Logger& logger);
 
+    virtual Logger& logger() override{
+        return m_logger;
+    }
+
 
 public:
     //  Superscalar Commands (the "ssf" framework)

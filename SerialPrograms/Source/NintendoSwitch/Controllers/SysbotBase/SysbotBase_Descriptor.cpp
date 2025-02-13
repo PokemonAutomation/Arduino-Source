@@ -7,6 +7,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "SysbotBase_Descriptor.h"
 #include "SysbotBase_Connection.h"
+#include "SysbotBase_ProController.h"
 #include "SysbotBase_SelectorWidget.h"
 
 namespace PokemonAutomation{
@@ -41,11 +42,9 @@ JsonValue SysbotBaseNetwork_Descriptor::to_json() const{
 
 
 
-std::unique_ptr<ControllerConnection> SysbotBaseNetwork_Descriptor::open_connection(
-    uint64_t sequence_number, Logger& logger
-) const{
+std::unique_ptr<ControllerConnection> SysbotBaseNetwork_Descriptor::open_connection(Logger& logger) const{
     return std::unique_ptr<ControllerConnection>(
-        new SysbotBaseNetwork_Connection(sequence_number, logger, m_url)
+        new SysbotBaseNetwork_Connection(logger, m_url)
     );
 }
 std::unique_ptr<AbstractController> SysbotBaseNetwork_Descriptor::make_controller(
@@ -54,7 +53,13 @@ std::unique_ptr<AbstractController> SysbotBaseNetwork_Descriptor::make_controlle
     ControllerType controller_type,
     const ControllerRequirements& requirements
 ) const{
-    return nullptr;
+    return std::unique_ptr<AbstractController>(
+        new NintendoSwitch::ProController_SysbotBase(
+            logger,
+            static_cast<SysbotBaseNetwork_Connection&>(connection),
+            requirements
+        )
+    );
 }
 
 

@@ -22,7 +22,6 @@ namespace SysbotBase{
 class SysbotBaseNetwork_Connection : public ControllerConnection{
 public:
     SysbotBaseNetwork_Connection(
-        uint64_t sequence_number,
         Logger& logger,
         const std::string& url
     );

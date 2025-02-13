@@ -36,12 +36,10 @@ namespace SerialPABotBase{
 
 
 SerialPABotBase_Connection::SerialPABotBase_Connection(
-    uint64_t sequence_number,
     Logger& logger,
     const QSerialPortInfo* port
 )
-    : ControllerConnection(sequence_number)
-    , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
+    : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
 {
     set_label_text("Not Connected", COLOR_RED);
 

@@ -13,10 +13,9 @@
 #include "SerialPABotBase/SerialPABotBase_SelectorWidget.h"
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 

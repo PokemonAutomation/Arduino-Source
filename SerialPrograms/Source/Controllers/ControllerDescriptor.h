@@ -10,6 +10,7 @@
 #include <string>
 #include <memory>
 #include "Common/Cpp/AbstractLogger.h"
+//#include "Common/Cpp/Json/JsonObject.h"
 #include "ControllerCapability.h"
 #include "Controller.h"
 
@@ -97,9 +98,7 @@ public:
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
 
-    virtual std::unique_ptr<ControllerConnection> open_connection(
-        uint64_t sequence_number, Logger& logger
-    ) const = 0;
+    virtual std::unique_ptr<ControllerConnection> open_connection(Logger& logger) const = 0;
     virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
         ControllerConnection& connection,
@@ -133,14 +132,24 @@ public:
     std::shared_ptr<const ControllerDescriptor> descriptor() const{
         return m_descriptor;
     }
+    void set_descriptor(std::shared_ptr<const ControllerDescriptor> descriptor);
 
+
+    std::shared_ptr<const ControllerDescriptor> get_descriptor_from_cache(ControllerInterface interface_type) const;
+
+
+public:
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
 
-private:
-    friend class ControllerSession;
-    std::shared_ptr<const ControllerDescriptor> m_descriptor;
+
+public:
+//    friend class ControllerSession;
     ControllerType m_controller_type;
+private:
+    std::shared_ptr<const ControllerDescriptor> m_descriptor;
+
+    std::map<ControllerInterface, std::shared_ptr<const ControllerDescriptor>> m_descriptor_cache;
 };
 
 

@@ -12,10 +12,9 @@
 #include "Controllers/ControllerSelectorWidget.h"
 #include "SysbotBase_Descriptor.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace SysbotBase{
@@ -39,7 +38,12 @@ public:
         this->setPlaceholderText("192.168.0.100:5000");
 
         if (current == nullptr){
-            parent.session().set_device(std::make_shared<SysbotBaseNetwork_Descriptor>());
+            std::shared_ptr<const ControllerDescriptor> descriptor =
+                parent.session().option().get_descriptor_from_cache(ControllerInterface::SysbotBaseNetwork);
+            if (!descriptor){
+                descriptor.reset(new SysbotBaseNetwork_Descriptor());
+            }
+            parent.session().set_device(descriptor);
         }
         this->setText(QString::fromStdString(parent.session().descriptor()->display_name()));
 

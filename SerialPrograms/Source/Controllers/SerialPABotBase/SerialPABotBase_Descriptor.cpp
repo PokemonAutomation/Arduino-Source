@@ -54,11 +54,9 @@ JsonValue SerialPABotBase_Descriptor::to_json() const{
     return m_port.isNull() ? "" : m_port.portName().toStdString();
 }
 
-std::unique_ptr<ControllerConnection> SerialPABotBase_Descriptor::open_connection(
-    uint64_t sequence_number, Logger& logger
-) const{
+std::unique_ptr<ControllerConnection> SerialPABotBase_Descriptor::open_connection(Logger& logger) const{
     return std::unique_ptr<ControllerConnection>(
-        new SerialPABotBase_Connection(sequence_number, logger, &m_port)
+        new SerialPABotBase_Connection(logger, &m_port)
     );
 }
 std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(

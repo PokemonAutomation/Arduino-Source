@@ -13,10 +13,9 @@
 #include "Controllers/NullController.h"
 #include "SerialPABotBase_Descriptor.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
@@ -36,7 +35,12 @@ public:
 //        cout << "SerialPABotBase(): " << current << endl;
 
         if (current == nullptr){
-            parent.session().set_device(std::make_shared<SerialPABotBase_Descriptor>());
+            std::shared_ptr<const ControllerDescriptor> descriptor =
+                parent.session().option().get_descriptor_from_cache(ControllerInterface::SerialPABotBase);
+            if (!descriptor){
+                descriptor.reset(new SerialPABotBase_Descriptor());
+            }
+            parent.session().set_device(descriptor);
         }
 
         refresh_devices();

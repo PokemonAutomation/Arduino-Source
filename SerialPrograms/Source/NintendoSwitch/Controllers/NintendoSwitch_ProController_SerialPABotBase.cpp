@@ -36,18 +36,16 @@ ProController_SerialPABotBase::ProController_SerialPABotBase(
     const ControllerRequirements& requirements
 )
     : ProControllerWithScheduler(logger)
-    , m_logger(logger)
-    , m_requirements(requirements)
     , m_handle(connection)
-    , m_serial(m_handle.botbase())
+    , m_serial(connection.botbase())
 {
-    if (!m_handle.is_ready()){
+    if (!connection.is_ready()){
         return;
     }
 
     //  Check compatibility.
 
-    const std::map<ControllerType, std::set<ControllerFeature>>& controllers = m_handle.supported_controllers();
+    const std::map<ControllerType, std::set<ControllerFeature>>& controllers = connection.supported_controllers();
     auto iter = controllers.find(ControllerType::NintendoSwitch_WiredProController);
 
     std::string missing_feature;
@@ -57,10 +55,10 @@ ProController_SerialPABotBase::ProController_SerialPABotBase(
             break;
         }
 
-        missing_feature = m_requirements.check_compatibility(iter->second);
+        missing_feature = requirements.check_compatibility(iter->second);
 
         if (missing_feature.empty()){
-            m_handle.update_with_capabilities(iter->second);
+            connection.update_with_capabilities(iter->second);
             return;
         }
 

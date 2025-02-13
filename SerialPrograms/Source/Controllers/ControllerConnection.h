@@ -36,12 +36,8 @@ public:
 
 
 public:
-    ControllerConnection(uint64_t sequence_number)
-        : m_sequence_number(sequence_number)
-    {}
     virtual ~ControllerConnection() = default;
 
-    uint64_t sequence_number() const{ return m_sequence_number; }
     bool is_ready() const{ return m_ready.load(std::memory_order_acquire); }
     std::string status_text() const;
 
@@ -60,7 +56,6 @@ private:
 
 
 protected:
-    const uint64_t m_sequence_number;
     std::atomic<bool> m_ready;
 
 private:

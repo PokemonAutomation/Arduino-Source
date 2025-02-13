@@ -12,9 +12,10 @@
 #include "ControllerDescriptor.h"
 #include "NullController.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -80,12 +81,28 @@ get_compatible_descriptors(const ControllerRequirements& requirements){
 
 
 ControllerOption::ControllerOption()
-    : m_descriptor(new NullControllerDescriptor())
-    , m_controller_type(ControllerType::None)
+    : m_controller_type(ControllerType::None)
+    , m_descriptor(new NullControllerDescriptor())
 {}
 
+
+void ControllerOption::set_descriptor(std::shared_ptr<const ControllerDescriptor> descriptor){
+    m_descriptor_cache[descriptor->interface_type] = descriptor;
+    m_descriptor = std::move(descriptor);
+}
+
+std::shared_ptr<const ControllerDescriptor> ControllerOption::get_descriptor_from_cache(ControllerInterface interface_type) const{
+    auto iter = m_descriptor_cache.find(interface_type);
+    if (iter == m_descriptor_cache.end()){
+        return nullptr;
+    }
+    return iter->second;
+}
+
+
+
 void ControllerOption::load_json(const JsonValue& json){
-    std::unique_ptr<const ControllerDescriptor> descriptor;
+    std::shared_ptr<const ControllerDescriptor> descriptor;
     ControllerType controller_type = ControllerType::None;
     do{
         if (json.is_null()){
@@ -104,17 +121,26 @@ void ControllerOption::load_json(const JsonValue& json){
         if (controller != nullptr){
             controller_type = CONTROLLER_TYPE_STRINGS.get_enum(*controller, ControllerType::None);
         }
-        const JsonValue* params = obj->get_value("Parameters");
-        if (params == nullptr){
+
+        for (const auto& item : ALL_CONTROLLER_INTERFACES){
+            const JsonValue* params = obj->get_value(CONTROLLER_INTERFACE_STRINGS.get_string(item.first));
+            if (params == nullptr){
+                continue;
+            }
+            m_descriptor_cache[item.first] = item.second->make(*params);
+        }
+
+//        const JsonValue* params = obj->get_value("Parameters");
+//        if (params == nullptr){
+//            break;
+//        }
+
+        auto iter = m_descriptor_cache.find(CONTROLLER_INTERFACE_STRINGS.get_enum(*type, ControllerInterface::None));
+        if (iter == m_descriptor_cache.end()){
             break;
         }
 
-        auto iter = ALL_CONTROLLER_INTERFACES.find(CONTROLLER_INTERFACE_STRINGS.get_enum(*type, ControllerInterface::None));
-        if (iter == ALL_CONTROLLER_INTERFACES.end()){
-            break;
-        }
-
-        descriptor = iter->second->make(*params);
+        descriptor = iter->second;
 
     }while (false);
 
@@ -129,11 +155,16 @@ JsonValue ControllerOption::to_json() const{
     if (!m_descriptor){
         return JsonValue();
     }
-
     JsonObject obj;
     obj["Interface"] = CONTROLLER_INTERFACE_STRINGS.get_string(m_descriptor->interface_type);
     obj["Controller"] = CONTROLLER_TYPE_STRINGS.get_string(m_controller_type);
-    obj["Parameters"] = m_descriptor->to_json();
+//    obj["Parameters"] = m_descriptor->to_json();
+
+    for (const auto& item : m_descriptor_cache){
+        obj[CONTROLLER_INTERFACE_STRINGS.get_string(item.first)] = item.second->to_json();
+    }
+
+
     return obj;
 }
 
