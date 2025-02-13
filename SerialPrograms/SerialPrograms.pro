@@ -663,6 +663,7 @@ SOURCES += \
     Source/PokemonRSE/PokemonRSE_Panels.cpp \
     Source/PokemonRSE/PokemonRSE_Settings.cpp \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.cpp \
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.cpp \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.cpp \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.cpp \
     Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.cpp \
@@ -1825,6 +1826,7 @@ HEADERS += \
     Source/PokemonRSE/PokemonRSE_Panels.h \
     Source/PokemonRSE/PokemonRSE_Settings.h \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h \
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.h \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.h \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.h \
     Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.h \
