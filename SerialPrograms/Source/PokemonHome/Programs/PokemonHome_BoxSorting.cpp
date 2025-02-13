@@ -180,7 +180,8 @@ bool operator==(const Pokemon& lhs, const Pokemon& rhs){
            lhs.shiny == rhs.shiny &&
            lhs.gmax == rhs.gmax &&
            lhs.ball_slug == rhs.ball_slug &&
-           lhs.gender == rhs.gender;
+           lhs.gender == rhs.gender &&
+           lhs.ot_id == rhs.ot_id;
 }
 
 bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& rhs){
@@ -456,7 +457,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     BoxSorting_Descriptor::Stats& stats = env.current_stats< BoxSorting_Descriptor::Stats>();
 
     ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
-    ImageFloatBox national_dex_number_box(0.448, 0.245, 0.042, 0.04); //pokemon national dex number pos
+    ImageFloatBox national_dex_number_box(0.448, 0.245, 0.049, 0.04); //pokemon national dex number pos
     ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
     ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
     ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.05); // origin symbol pos
