@@ -21,6 +21,7 @@ const EnumStringMap<NatureCheckerValue>& NATURE_CHECKER_VALUE_STRINGS(){
         {NatureCheckerValue::Brave,             "Brave"},
         {NatureCheckerValue::Calm,              "Calm"},
         {NatureCheckerValue::Careful,           "Careful"},
+        {NatureCheckerValue::Docile,            "Docile"},
         {NatureCheckerValue::Gentle,            "Gentle"},
         {NatureCheckerValue::Hardy,             "Hardy"},
         {NatureCheckerValue::Hasty,             "Hasty"},
