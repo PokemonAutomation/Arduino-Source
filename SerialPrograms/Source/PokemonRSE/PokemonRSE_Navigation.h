@@ -26,8 +26,9 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerConte
 void flee_battle(VideoStream& stream, ProControllerContext& context);
 
 // After press A/walking up to enter a battle, run this handle the battle start and to check if opponent is shiny.
-// Use flee_battle or soft_reset after this, depending on game.
-bool handle_encounter(VideoStream& stream, ProControllerContext& context);
+// Set send_out_lead to true and then use flee_battle() after if game is Emerald.
+// For R/S, send_out_lead as false and then soft_reset() to save time.
+bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool send_out_lead);
 
 
 }

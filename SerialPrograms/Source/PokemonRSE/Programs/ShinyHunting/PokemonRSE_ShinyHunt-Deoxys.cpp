@@ -50,7 +50,17 @@ std::unique_ptr<StatsTracker> ShinyHuntDeoxys_Descriptor::make_stats() const{
 }
 
 ShinyHuntDeoxys::ShinyHuntDeoxys()
-    : WALK_UP_DOWN_TIME0(
+    : STARTPOS(
+        "<b>Starting Position:</b><br>",
+        {
+            {StartPos::boat, "boat", "Boat/Walk up"},
+            {StartPos::rock_unsolved, "rock_unsolved", "Triangle rock, puzzle is unsolved"},
+            {StartPos::rock_solved, "rock_solved", "Triangle rock, puzzle is already solved"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        StartPos::rock_unsolved
+    )
+    , WALK_UP_DOWN_TIME0(
         "<b>Walk up/down time</b><br>Spend this long to run up to the triangle rock.",
         LockMode::LOCK_WHILE_RUNNING,
         "3520 ms"
@@ -67,6 +77,7 @@ ShinyHuntDeoxys::ShinyHuntDeoxys()
         &NOTIFICATION_PROGRAM_FINISH,
         })
 {
+    PA_ADD_OPTION(STARTPOS);
     PA_ADD_OPTION(WALK_UP_DOWN_TIME0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -195,19 +206,37 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
     * Would have to handle both PokeNav and random encounters for ray/others? Why is PokeNav a thing???
     */
 
+    bool first_run = true;
+
     while (true) {
-        env.log("Walking up to Deoxys.");
-        //Walk up to the triangle rock from the ship. No bike allowed.
-        ssf_press_button(context, BUTTON_B, 0ms, WALK_UP_DOWN_TIME0);
-        pbf_press_dpad(context, DPAD_UP, WALK_UP_DOWN_TIME0, 160ms);
-        context.wait_for_all_requests();
+        if (first_run) {
+            switch (STARTPOS) {
+            case StartPos::rock_solved:
+                env.log("StartPos: Already in position.");
+                break;
+            case StartPos::boat:
+                env.log("StartPos: Walking up to Deoxys.");
+                //Walk up to the triangle rock from the ship. No bike allowed.
+                ssf_press_button(context, BUTTON_B, 0ms, WALK_UP_DOWN_TIME0);
+                pbf_press_dpad(context, DPAD_UP, WALK_UP_DOWN_TIME0, 160ms);
+                context.wait_for_all_requests();
+            case StartPos::rock_unsolved:
+                env.log("StartPos: Solving puzzle.");
+                solve_puzzle(env, context);
+                break;
+            default:
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Invalid starting position selected.",
+                    env.console
+                );
+                break;
+            }
+            first_run = false;
+        }
 
-        solve_puzzle(env, context);
-
-        //Start battle.
-        pbf_press_button(context, BUTTON_A, 20, 40);
-
-        bool legendary_shiny = handle_encounter(env.console, context);
+        //Start battle
+        bool legendary_shiny = handle_encounter(env.console, context, true);
         if (legendary_shiny) {
             stats.shinies++;
             env.update_stats();
@@ -222,9 +251,19 @@ void ShinyHuntDeoxys::program(SingleSwitchProgramEnvironment& env, ProController
         context.wait_for_all_requests();
         
         //Walk down from the triangle rock to the ship.
+        env.log("Walking down to ship.");
         ssf_press_button(context, BUTTON_B, 0ms, WALK_UP_DOWN_TIME0);
         pbf_press_dpad(context, DPAD_DOWN, WALK_UP_DOWN_TIME0, 160ms);
         context.wait_for_all_requests();
+
+        env.log("Walking up to Deoxys rock.");
+        //Walk up to the triangle rock from the ship. Bike is not allowed on Birth Island.
+        ssf_press_button(context, BUTTON_B, 0ms, WALK_UP_DOWN_TIME0);
+        pbf_press_dpad(context, DPAD_UP, WALK_UP_DOWN_TIME0, 160ms);
+        context.wait_for_all_requests();
+
+        env.log("Solving puzzle.");
+        solve_puzzle(env, context);
 
         stats.resets++;
         env.update_stats();

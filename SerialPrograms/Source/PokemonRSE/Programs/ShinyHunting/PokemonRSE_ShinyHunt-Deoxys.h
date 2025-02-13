@@ -28,6 +28,13 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+    enum class StartPos{
+        boat,
+        rock_unsolved,
+        rock_solved,
+    };
+    EnumDropdownOption<StartPos> STARTPOS;
+
     MillisecondsOption WALK_UP_DOWN_TIME0;
 
     EventNotificationOption NOTIFICATION_SHINY;

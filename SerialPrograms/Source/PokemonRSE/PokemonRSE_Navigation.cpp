@@ -10,6 +10,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
 #include "PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h"
 #include "PokemonRSE/PokemonRSE_Settings.h"
@@ -89,7 +90,7 @@ void flee_battle(VideoStream& stream, ProControllerContext& context) {
     }
 }
 
-bool handle_encounter(VideoStream& stream, ProControllerContext& context) {
+bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool send_out_lead) {
     float shiny_coefficient = 1.0;
     ShinySoundDetector shiny_detector(stream.logger(), [&](float error_coefficient) -> bool{
         shiny_coefficient = error_coefficient;
@@ -130,27 +131,30 @@ bool handle_encounter(VideoStream& stream, ProControllerContext& context) {
     }
     stream.log("Shiny not found.");
 
-    //Send out lead, no shiny detection needed.
-    BattleMenuWatcher battle_menu(COLOR_RED);
-    stream.log("Sending out lead Pokemon.");
-    pbf_press_button(context, BUTTON_A, 40, 40);
+    if (send_out_lead) {
+        //Send out lead, no shiny detection needed.
+        BattleMenuWatcher battle_menu(COLOR_RED);
+        stream.log("Sending out lead Pokemon.");
+        pbf_press_button(context, BUTTON_A, 40, 40);
 
-    int ret = wait_until(
-        stream, context,
-        std::chrono::seconds(15),
-        {{battle_menu}}
-    );
-    if (ret == 0) {
-        stream.log("Battle menu detecteed!");
-    } else {
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "handle_encounter(): Did not detect battle menu.",
-            stream
+        int ret = wait_until(
+            stream, context,
+            std::chrono::seconds(15),
+            { {battle_menu} }
         );
+        if (ret == 0) {
+            stream.log("Battle menu detecteed!");
+        }
+        else {
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "handle_encounter(): Did not detect battle menu.",
+                stream
+            );
+        }
+        pbf_wait(context, 125);
+        context.wait_for_all_requests();
     }
-    pbf_wait(context, 125);
-    context.wait_for_all_requests();
 
     return false;
 }
