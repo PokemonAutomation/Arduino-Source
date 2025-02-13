@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Controllers_SysbotBase_SelectorWidget_H
 #define PokemonAutomation_Controllers_SysbotBase_SelectorWidget_H
 
-#include <QLineEdit >
+#include <QLineEdit>
 #include "Controllers/ControllerDescriptor.h"
 #include "Controllers/ControllerSelectorWidget.h"
 #include "SysbotBase_Descriptor.h"
