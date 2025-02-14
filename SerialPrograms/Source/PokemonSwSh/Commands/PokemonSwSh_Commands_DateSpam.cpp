@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 void home_to_date_time(ProControllerContext& context, bool to_date_change, bool fast){
     //  If (fast == true) this will run faster, but slightly less accurately.
 
-    if (context->timing_variation() == 0ms && false){
+    if (context->timing_variation() == 0ms){
         //  Fast version for tick-precise.
 
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
