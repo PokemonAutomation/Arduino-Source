@@ -482,8 +482,8 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_B, 125, 30);
 
     // Fly 
-    pbf_press_button(context, BUTTON_B, 50, 10); 
-    pbf_press_button(context, BUTTON_B, 50, 10); // Double click in case of drop
+    pbf_press_button(context, BUTTON_B, 50, 10);
+    pbf_press_button(context, BUTTON_B, 50, 50); // Double click in case of drop
     pbf_press_button(context, BUTTON_LCLICK, 50, 0);
 
     // you automatically move forward  when flying without pressing any buttons. 
