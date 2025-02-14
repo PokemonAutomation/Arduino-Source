@@ -144,9 +144,12 @@ void SysbotBaseNetwork_Connection::thread_body_internal(){
     m_socket->connect(
         m_socket, &QTcpSocket::disconnected,
         m_socket, [this]{
-            m_ready.store(false, std::memory_order_release);
-            m_stopping.store(true, std::memory_order_release);
-            m_cv.notify_all();
+            {
+                std::unique_lock<std::mutex> lg(m_lock);
+                m_ready.store(false, std::memory_order_release);
+                m_stopping.store(true, std::memory_order_release);
+                m_cv.notify_all();
+            }
             set_status(html_color_text("Disconnected by host.", COLOR_RED));
         }
     );

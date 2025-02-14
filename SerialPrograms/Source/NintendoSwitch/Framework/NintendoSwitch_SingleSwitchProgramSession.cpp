@@ -69,6 +69,11 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 
     m_scope.store(&scope, std::memory_order_release);
 
+#if 0
+    ProControllerContext context(scope, env.console.controller());
+    m_option.instance().program(env, context);
+    context.wait_for_all_requests();
+#else
     try{
         ProControllerContext context(scope, env.console.controller());
         m_option.instance().program(env, context);
@@ -77,6 +82,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         m_scope.store(nullptr, std::memory_order_release);
         throw;
     }
+#endif
     m_scope.store(nullptr, std::memory_order_release);
 }
 void SingleSwitchProgramSession::internal_stop_program(){
@@ -157,7 +163,9 @@ void SingleSwitchProgramSession::internal_run_program(){
             env, m_option.instance().NOTIFICATION_ERROR_FATAL,
             message
         );
-    }catch (std::exception& e){
+    }
+#if 1
+    catch (std::exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.what();
         if (message.empty()){
@@ -176,6 +184,7 @@ void SingleSwitchProgramSession::internal_run_program(){
             "Unknown error."
         );
     }
+#endif
 }
 
 

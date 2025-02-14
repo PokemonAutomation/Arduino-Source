@@ -76,27 +76,31 @@ ProController_SysbotBase::~ProController_SysbotBase(){
 
 void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
 //    cout << "ProController_SysbotBase::wait_for_all()" << endl;
-    std::unique_lock<std::mutex> lg(m_lock);
     issue_barrier(cancellable);
+    std::unique_lock<std::mutex> lg(m_lock);
     m_cv.wait(lg, [this]{
         return m_command_queue.empty() || m_replace_on_next.load(std::memory_order_relaxed);
     });
 }
 void ProController_SysbotBase::cancel_all_commands(){
 //    cout << "ProController_SysbotBase::cancel_all_commands()" << endl;
-    std::lock_guard<std::mutex> lg(m_lock);
-    if (!m_command_queue.empty()){
-        m_command_queue.clear();
-        m_is_active = false;
-        m_cv.notify_all();
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (!m_command_queue.empty()){
+            m_command_queue.clear();
+            m_is_active = false;
+            m_cv.notify_all();
+        }
     }
     this->clear_on_next();
 }
 void ProController_SysbotBase::replace_on_next_command(){
 //    cout << "ProController_SysbotBase::replace_on_next_command()" << endl;
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_cv.notify_all();
-    m_replace_on_next.store(true, std::memory_order_relaxed);
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_cv.notify_all();
+        m_replace_on_next.store(true, std::memory_order_relaxed);
+    }
     this->clear_on_next();
 }
 
