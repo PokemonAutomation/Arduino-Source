@@ -72,11 +72,21 @@ TurboButton::TurboButton()
 void TurboButton::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (TOTAL_PRESSES == 0){
         while (true){
-            pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION0, RELEASE_DURATION0);
+            pbf_press_button(
+                context,
+                (Button)BUTTON.current_value(),
+                PRESS_DURATION0,
+                RELEASE_DURATION0
+            );
         }
     }else{
         for (uint64_t c = 0; c < TOTAL_PRESSES; c++){
-            pbf_press_button(context, (Button)BUTTON.current_value(), PRESS_DURATION0, RELEASE_DURATION0);
+            pbf_press_button(
+                context,
+                (Button)BUTTON.current_value(),
+                PRESS_DURATION0,
+                RELEASE_DURATION0
+            );
         }
     }
     context.wait_for_all_requests();

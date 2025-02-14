@@ -47,8 +47,11 @@ public:
     const std::string& default_value() const;
     std::string current_text() const;
 
-    operator Type() const;
-    operator WallDuration() const;
+    template <class Rep, class Period>
+    operator std::chrono::duration<Rep, Period>() const{
+        return std::chrono::duration_cast<std::chrono::duration<Rep, Period>>(get());
+    }
+
     Type get() const;
     std::string set(std::string text);
 

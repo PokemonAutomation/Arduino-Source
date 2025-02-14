@@ -190,16 +190,6 @@ std::string TimeDurationCell<Type>::current_text() const{
     return data.m_current;
 }
 template <typename Type>
-TimeDurationCell<Type>::operator Type() const{
-    const Data& data = *m_data;
-    ReadSpinLock lg(data.m_lock);
-    return data.m_value;
-}
-template <typename Type>
-TimeDurationCell<Type>::operator WallDuration() const{
-    return get();
-}
-template <typename Type>
 Type TimeDurationCell<Type>::get() const{
     const Data& data = *m_data;
     ReadSpinLock lg(data.m_lock);
