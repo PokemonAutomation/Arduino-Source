@@ -26,7 +26,7 @@ ProController_SysbotBase::ProController_SysbotBase(
     SysbotBase::SysbotBaseNetwork_Connection& connection,
     const ControllerRequirements& requirements
 )
-    : ProControllerWithScheduler(logger, std::chrono::milliseconds(40))
+    : ProControllerWithScheduler(logger, std::chrono::milliseconds(100))
     , m_connection(connection)
     , m_stopping(false)
     , m_replace_on_next(false)
