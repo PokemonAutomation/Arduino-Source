@@ -159,10 +159,8 @@ void AsyncCommandSession<ControllerType>::thread_loop(){
             current = m_current.get();
         }
         try{
-//            cout << "start" << endl;
             current->commands(current->context);
             current->context.wait_for_all_requests();
-//            cout << "stop" << endl;
         }catch (OperationCancelledException&){}
 
         //  Destroy the CommandSet outside the lock.

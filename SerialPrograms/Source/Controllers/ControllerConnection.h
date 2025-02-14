@@ -48,6 +48,7 @@ protected:
     void set_status(const std::string& text);
     void declare_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);
 
+
 private:
 //    void signal_pre_not_ready();
     void signal_post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);

@@ -375,6 +375,7 @@ void ControllerSession::post_connection_ready(
 
     signal_controller_changed(selected_controller, available_controllers);
     signal_ready_changed(ready);
+    signal_status_text_changed(status_text());
 }
 void ControllerSession::status_text_changed(
     ControllerConnection& connection,
