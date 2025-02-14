@@ -474,6 +474,7 @@ void LegendaryHuntEmerald::program(SingleSwitchProgramEnvironment& env, ProContr
         //case Target::kyogre:
         //    pbf_press_dpad(context, DPAD_LEFT, 20, 50);
         //    break;
+        default:;
         }
         //handle_encounter presses A already for everything else
         
