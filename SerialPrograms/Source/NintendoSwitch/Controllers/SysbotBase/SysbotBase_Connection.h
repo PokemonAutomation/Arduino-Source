@@ -36,6 +36,7 @@ private:
     void thread_body_internal();
 
 private:
+    Logger& m_logger;
     QHostAddress m_address;
     int m_port;
 

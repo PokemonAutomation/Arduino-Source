@@ -91,11 +91,11 @@ public:
 
     //  Cancel all commands. This returns the controller to the neutral button
     //  state and clears the command queue.
-    virtual void cancel_all_commands(const Cancellable* cancellable) = 0;
+    virtual void cancel_all_commands() = 0;
 
     //  Declare that the next command will replace the current command stream
     //  with no gaps.
-    virtual void replace_on_next_command(const Cancellable* cancellable) = 0;
+    virtual void replace_on_next_command() = 0;
 
 
 public:
@@ -340,7 +340,7 @@ public:
     void cancel_now(){
         m_lifetime_sanitizer.check_usage();
         CancellableScope::cancel(nullptr);
-        m_controller.cancel_all_commands(this);
+        m_controller.cancel_all_commands();
     }
 
     //  Stop the commands in this context, but do it lazily.
@@ -354,7 +354,7 @@ public:
     void cancel_lazy(){
         m_lifetime_sanitizer.check_usage();
         CancellableScope::cancel(nullptr);
-        m_controller.replace_on_next_command(this);
+        m_controller.replace_on_next_command();
     }
 
     virtual bool cancel(std::exception_ptr exception) noexcept override{
@@ -363,7 +363,7 @@ public:
             return true;
         }
         try{
-            m_controller.cancel_all_commands(this);
+            m_controller.cancel_all_commands();
         }catch (...){}
         return false;
     }

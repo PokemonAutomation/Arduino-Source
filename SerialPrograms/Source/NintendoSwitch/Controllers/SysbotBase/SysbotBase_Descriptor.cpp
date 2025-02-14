@@ -10,6 +10,10 @@
 #include "SysbotBase_ProController.h"
 #include "SysbotBase_SelectorWidget.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 template class InterfaceType_t<SysbotBase::SysbotBaseNetwork_Descriptor>;

@@ -79,14 +79,14 @@ void ProController_SerialPABotBase::wait_for_all(const Cancellable* cancellable)
     m_serial->wait_for_all_requests(cancellable);
 //    cout << "wait_for_all() - exit" << endl;
 }
-void ProController_SerialPABotBase::cancel_all_commands(const Cancellable* cancellable){
+void ProController_SerialPABotBase::cancel_all_commands(){
     if (!is_ready()){
         throw InvalidConnectionStateException();
     }
     m_serial->stop_all_commands();
     this->clear_on_next();
 }
-void ProController_SerialPABotBase::replace_on_next_command(const Cancellable* cancellable){
+void ProController_SerialPABotBase::replace_on_next_command(){
     if (!is_ready()){
         throw InvalidConnectionStateException();
     }

@@ -65,10 +65,10 @@ public:
         deltas.to_state(static_cast<SwitchControllerState&>(state));
     }
     virtual void cancel_all_commands() override{
-        m_controller.cancel_all_commands(nullptr);
+        m_controller.cancel_all_commands();
     }
     virtual void replace_on_next_command() override{
-        m_controller.replace_on_next_command(nullptr);
+        m_controller.replace_on_next_command();
     }
     virtual void send_state(const ControllerState& state) override{
         const SwitchControllerState& switch_state = static_cast<const SwitchControllerState&>(state);

@@ -12,29 +12,11 @@
 
 #include "Common/Cpp/Concurrency/SpinPause.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
-
-
-#if 0
-template <typename LockType, typename TimePoint>
-auto precise_wait_until(
-    std::condition_variable& cv,
-    std::unique_lock<LockType>& lock,
-    TimePoint wake_time
-){
-    cv.wait_until(lock, wake_time - std::chrono::microseconds(500));
-    while (std::chrono::system_clock::now() < wake_time){
-        pause();
-    }
-}
-#endif
-
-
 namespace NintendoSwitch{
 
 
@@ -48,6 +30,7 @@ ProController_SysbotBase::ProController_SysbotBase(
     , m_connection(connection)
     , m_stopping(false)
     , m_replace_on_next(false)
+    , m_is_active(false)
 {
     if (!connection.is_ready()){
         return;
@@ -75,6 +58,7 @@ ProController_SysbotBase::ProController_SysbotBase(
     }while (false);
 
     m_error_string = html_color_text("Missing Feature: " + missing_feature, COLOR_RED);
+
 }
 ProController_SysbotBase::~ProController_SysbotBase(){
     m_stopping.store(true, std::memory_order_release);
@@ -91,21 +75,29 @@ ProController_SysbotBase::~ProController_SysbotBase(){
 
 
 void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
+//    cout << "ProController_SysbotBase::wait_for_all()" << endl;
     std::unique_lock<std::mutex> lg(m_lock);
+    issue_barrier(cancellable);
     m_cv.wait(lg, [this]{
-        return m_command_queue.empty();
+        return m_command_queue.empty() || m_replace_on_next.load(std::memory_order_relaxed);
     });
 }
-void ProController_SysbotBase::cancel_all_commands(const Cancellable* cancellable){
+void ProController_SysbotBase::cancel_all_commands(){
+//    cout << "ProController_SysbotBase::cancel_all_commands()" << endl;
     std::lock_guard<std::mutex> lg(m_lock);
-    if (m_command_queue.empty()){
-        return;
+    if (!m_command_queue.empty()){
+        m_command_queue.clear();
+        m_is_active = false;
+        m_cv.notify_all();
     }
-    m_command_queue.clear();
-    m_cv.notify_all();
+    this->clear_on_next();
 }
-void ProController_SysbotBase::replace_on_next_command(const Cancellable* cancellable){
+void ProController_SysbotBase::replace_on_next_command(){
+//    cout << "ProController_SysbotBase::replace_on_next_command()" << endl;
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_cv.notify_all();
     m_replace_on_next.store(true, std::memory_order_relaxed);
+    this->clear_on_next();
 }
 
 
@@ -117,11 +109,15 @@ void ProController_SysbotBase::issue_controller_state(
     uint8_t right_x, uint8_t right_y,
     Milliseconds duration
 ){
+    if (cancellable){
+        cancellable->throw_if_cancelled();
+    }
+
     std::unique_lock<std::mutex> lg(m_lock);
-//    cout << "issue_controller_state()" << endl;
 
     if (m_replace_on_next.load(std::memory_order_acquire)){
         m_command_queue.clear();
+        m_is_active = false;
         m_replace_on_next.store(false, std::memory_order_relaxed);
     }
 
@@ -143,6 +139,18 @@ void ProController_SysbotBase::issue_controller_state(
     command.state.right_y = right_y;
 
     command.duration = duration;
+
+#if 0
+    cout << "issue_controller_state(): Returning" << endl;
+    m_logger.log(
+        "issue_controller_state(): (" + button_to_string(command.state.buttons) +
+        "), dpad(" + dpad_to_string(command.state.dpad) +
+        "), LJ(" + std::to_string(command.state.left_x) + "," + std::to_string(command.state.left_y) +
+        "), RJ(" + std::to_string(command.state.right_x) + "," + std::to_string(command.state.right_y) +
+        ")",
+        COLOR_DARKGREEN
+    );
+#endif
 }
 
 
@@ -166,25 +174,138 @@ BotBaseMessage ProController_SysbotBase::send_botbase_request_and_wait(
 }
 
 
+struct SplitDpad{
+    bool up = false;
+    bool right = false;
+    bool down = false;
+    bool left = false;
+};
+
+SplitDpad convert_unified_to_split_dpad(DpadPosition dpad){
+    switch (dpad){
+    case DpadPosition::DPAD_UP:
+        return {true, false, false, false};
+    case DpadPosition::DPAD_UP_RIGHT:
+        return {true, true, false, false};
+    case DpadPosition::DPAD_RIGHT:
+        return {false, true, false, false};
+    case DpadPosition::DPAD_DOWN_RIGHT:
+        return {false, true, true, false};
+    case DpadPosition::DPAD_DOWN:
+        return {false, false, true, false};
+    case DpadPosition::DPAD_DOWN_LEFT:
+        return {false, false, true, true};
+    case DpadPosition::DPAD_LEFT:
+        return {false, false, false, true};
+    case DpadPosition::DPAD_UP_LEFT:
+        return {true, false, false, true};
+    default:
+        return {false, false, false, false};
+    }
+}
+
 
 void ProController_SysbotBase::send_diff(
     const SwitchControllerState& old_state,
     const SwitchControllerState& new_state
 ){
-    //  TODO
+#if 0
+    m_logger.log(
+        "send_diff(): (" + button_to_string(new_state.buttons) +
+        "), dpad(" + dpad_to_string(new_state.dpad) +
+        "), LJ(" + std::to_string(new_state.left_x) + "," + std::to_string(new_state.left_y) +
+        "), RJ(" + std::to_string(new_state.right_x) + "," + std::to_string(new_state.right_y) +
+        ")",
+        COLOR_DARKGREEN
+    );
+#endif
+
+    //  These need to match:
+    //  https://github.com/olliz0r/sys-botbase/blob/master/sys-botbase/source/util.c#L145
+    static const std::string BUTTON_MAP[] = {
+        "Y", "B", "A", "X",
+        "L", "R", "ZL", "ZR",
+        "MINUS", "PLUS", "LSTICK", "RSTICK",
+        "HOME", "CAPTURE"
+    };
+
+    std::string message;
+
+    if (old_state.buttons != new_state.buttons){
+        for (size_t c = 0; c < 14; c++){
+            uint16_t mask = (uint16_t)1 << c;
+            bool before = (uint16_t)old_state.buttons & mask;
+            bool after = (uint16_t)new_state.buttons & mask;
+            if (before == after){
+                continue;
+            }
+            if (after){
+                message += "press " + BUTTON_MAP[c] + "\n";
+            }else{
+                message += "release " + BUTTON_MAP[c] + "\n";
+            }
+        }
+    }
+
+    if (old_state.dpad != new_state.dpad){
+        SplitDpad old_dpad = convert_unified_to_split_dpad(old_state.dpad);
+        SplitDpad new_dpad = convert_unified_to_split_dpad(new_state.dpad);
+        if (old_dpad.up != new_dpad.up){
+            message += new_dpad.up ? "press DU\n" : "release DU\n";
+        }
+        if (old_dpad.right != new_dpad.right){
+            message += new_dpad.right ? "press DR\n" : "release DR\n";
+        }
+        if (old_dpad.down != new_dpad.down){
+            message += new_dpad.down ? "press DD\n" : "release DD\n";
+        }
+        if (old_dpad.left != new_dpad.left){
+            message += new_dpad.left ? "press DL\n" : "release DL\n";
+        }
+    }
+
+    if (old_state.left_x != new_state.left_x ||
+        old_state.left_y != new_state.left_y
+    ){
+        message += "setStick LEFT ";
+        message += std::to_string(((uint16_t)new_state.left_x - 128) << 8);
+        message += " ";
+        message += std::to_string(((uint16_t)128 - new_state.left_y) << 8);
+        message += "\n";
+    }
+    if (old_state.right_x != new_state.right_x ||
+        old_state.right_y != new_state.right_y
+    ){
+        message += "setStick RIGHT ";
+        message += std::to_string(((uint16_t)new_state.right_x - 128) << 8);
+        message += " ";
+        message += std::to_string(((uint16_t)128 - new_state.right_y) << 8);
+        message += "\n";
+    }
+
+    if (message.empty()){
+        return;
+    }
+
+//    cout << message << endl;
+    m_connection.write_data(message);
+
+    if (GlobalSettings::instance().LOG_EVERYTHING){
+        m_logger.log("sys-botbase: " + message);
+    }
 }
 
 
 void ProController_SysbotBase::thread_body(){
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
+    std::chrono::microseconds EARLY_WAKE = GlobalSettings::instance().PERFORMANCE->PRECISE_WAKE_MARGIN;
 
-    bool is_active = false;
     SwitchControllerState current_state;
 
     std::unique_lock<std::mutex> lg(m_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
         if (m_command_queue.empty()){
-            is_active = false;
+            m_is_active = false;
             if (current_state.is_neutral()){
                 m_cv.wait(lg);
                 continue;
@@ -192,14 +313,6 @@ void ProController_SysbotBase::thread_body(){
 
             send_diff(current_state, SwitchControllerState());
             current_state.clear();
-            m_logger.log(
-                "sys-botbase: (" + button_to_string(current_state.buttons) +
-                "), dpad(" + dpad_to_string(current_state.dpad) +
-                "), LJ(" + std::to_string(current_state.left_x) + "," + std::to_string(current_state.left_y) +
-                "), RJ(" + std::to_string(current_state.right_x) + "," + std::to_string(current_state.right_y) +
-                ")",
-                COLOR_DARKGREEN
-            );
             continue;
         }
 
@@ -209,24 +322,16 @@ void ProController_SysbotBase::thread_body(){
         Command& command = m_command_queue.front();
 
         //  Waking up from idle.
-        if (!is_active){
+        if (!m_is_active){
             //  Waking up from idle.
-            is_active = true;
+            m_is_active = true;
             m_queue_start_time = now;
 
             send_diff(current_state, command.state);
             current_state = command.state;
-            m_logger.log(
-                "sys-botbase: (" + button_to_string(current_state.buttons) +
-                "), dpad(" + dpad_to_string(current_state.dpad) +
-                "), LJ(" + std::to_string(current_state.left_x) + "," + std::to_string(current_state.left_y) +
-                "), RJ(" + std::to_string(current_state.right_x) + "," + std::to_string(current_state.right_y) +
-                ")",
-                COLOR_DARKGREEN
-            );
 
             WallClock expiration = m_queue_start_time + command.duration;
-            m_cv.wait_until(lg, expiration - EARLY_WAKE_SPIN);
+            m_cv.wait_until(lg, expiration - EARLY_WAKE);
             pause();
             continue;
         }
@@ -236,12 +341,13 @@ void ProController_SysbotBase::thread_body(){
 
         //  Current command hasn't expired yet.
         if (now < expiration){
-            m_cv.wait_until(lg, expiration - EARLY_WAKE_SPIN);
+            m_cv.wait_until(lg, expiration - EARLY_WAKE);
             pause();
             continue;
         }
 
         //  Command has expired. We can pop it.
+        m_is_active = false;
         m_queue_start_time = expiration;
         m_command_queue.pop_front();
         m_cv.notify_all();

@@ -39,8 +39,8 @@ public:
     //  General Control
 
     virtual void wait_for_all(const Cancellable* cancellable) override;
-    virtual void cancel_all_commands(const Cancellable* cancellable) override;
-    virtual void replace_on_next_command(const Cancellable* cancellable) override;
+    virtual void cancel_all_commands() override;
+    virtual void replace_on_next_command() override;
 
 
 public:

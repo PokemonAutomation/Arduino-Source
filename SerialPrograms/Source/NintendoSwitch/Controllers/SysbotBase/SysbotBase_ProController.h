@@ -24,10 +24,6 @@ public:
     using ContextType = ProControllerContext;
 
     static constexpr size_t QUEUE_SIZE = 8;
-
-    //  The Windows scheduler is very imprecise with wake times.
-    //  So we will wake up this long before the scheduled time. Then spin the
-    //  rest of the way.
     static constexpr std::chrono::microseconds EARLY_WAKE_SPIN = std::chrono::microseconds(2000);
 
 
@@ -51,8 +47,8 @@ public:
     //  General Control
 
     virtual void wait_for_all(const Cancellable* cancellable) override;
-    virtual void cancel_all_commands(const Cancellable* cancellable) override;
-    virtual void replace_on_next_command(const Cancellable* cancellable) override;
+    virtual void cancel_all_commands() override;
+    virtual void replace_on_next_command() override;
 
 
 public:
@@ -98,6 +94,7 @@ private:
     };
     std::deque<Command> m_command_queue;
     WallClock m_queue_start_time;
+    bool m_is_active;
 
     std::mutex m_lock;
     std::condition_variable m_cv;
