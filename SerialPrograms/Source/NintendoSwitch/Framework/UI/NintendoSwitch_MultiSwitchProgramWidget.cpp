@@ -60,7 +60,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
         descriptor.display_name(),
         descriptor.doc_link(),
         descriptor.description(),
-        descriptor.feedback()
+        descriptor.requirements()
     );
     layout->addWidget(header);
 

@@ -24,10 +24,12 @@
 #include "Controllers/ControllerDescriptor.h"
 
 namespace PokemonAutomation{
+    class ControllerRequirements;
 namespace NintendoSwitch{
 
 
-Color pick_color(FeedbackType feedback);
+//Color pick_color(FeedbackType feedback);
+Color pick_color(const ControllerRequirements& requirements);
 
 
 class SwitchSystemOption{

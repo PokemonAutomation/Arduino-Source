@@ -79,7 +79,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     size_t default_switches
 )
     : ProgramDescriptor(
-        pick_color(feedback),
+        pick_color(requirements),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),

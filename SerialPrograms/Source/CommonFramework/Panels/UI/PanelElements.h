@@ -16,6 +16,8 @@ class QPushButton;
 
 namespace PokemonAutomation{
 
+class ControllerRequirements;
+
 
 
 CollapsibleGroupBox* make_panel_header(
@@ -24,12 +26,21 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& doc_link,
     const std::string& description
 );
+#if 0
 CollapsibleGroupBox* make_panel_header(
     QWidget& parent,
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
     FeedbackType feedback
+);
+#endif
+CollapsibleGroupBox* make_panel_header(
+    QWidget& parent,
+    const std::string& display_name,
+    const std::string& doc_link,
+    const std::string& description,
+    const ControllerRequirements& requirements
 );
 
 

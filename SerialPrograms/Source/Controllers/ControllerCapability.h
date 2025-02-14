@@ -69,6 +69,10 @@ class ControllerRequirements{
 public:
     ControllerRequirements(std::initializer_list<ControllerFeature> args);
 
+    bool contains(ControllerFeature feature) const{
+        return m_features.contains(feature);
+    }
+
     //  Check compatibility. If compatible, returns empty string.
     //  Otherwise returns one of the missing features.
     std::string check_compatibility(const std::set<ControllerFeature>& features) const;
