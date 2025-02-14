@@ -17,8 +17,9 @@ using namespace std::chrono_literals;
 
 
 
-ProControllerWithScheduler::ProControllerWithScheduler(Logger& logger)
-    : SuperscalarScheduler(
+ProControllerWithScheduler::ProControllerWithScheduler(Logger& logger, Milliseconds timing_variation)
+    : ProController(timing_variation)
+    , SuperscalarScheduler(
         logger, Milliseconds(4),
         {
             &m_buttons[ 0],

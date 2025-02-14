@@ -174,10 +174,10 @@ void SysbotBaseNetwork_Connection::thread_body_internal(){
     m_logger.log(message + " (Success)", COLOR_BLUE);
     set_status(html_color_text("Connected!", COLOR_BLUE));
 
-    declare_ready(supported_controllers());
-
     m_socket->write("configure mainLoopSleepTime 0\n");
     m_socket->flush();
+
+    declare_ready(supported_controllers());
 
     //
     //  This is stupid. Since we cannot block the constructor of this class to

@@ -35,7 +35,7 @@ ProController_SerialPABotBase::ProController_SerialPABotBase(
     SerialPABotBase::SerialPABotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
-    : ProControllerWithScheduler(logger)
+    : ProControllerWithScheduler(logger, 0ms)
     , m_handle(connection)
     , m_serial(connection.botbase())
 {

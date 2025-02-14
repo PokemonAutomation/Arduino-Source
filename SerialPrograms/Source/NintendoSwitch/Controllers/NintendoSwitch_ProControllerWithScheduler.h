@@ -47,7 +47,7 @@ class ProControllerWithScheduler :
     protected SuperscalarScheduler
 {
 public:
-    ProControllerWithScheduler(Logger& logger);
+    ProControllerWithScheduler(Logger& logger, Milliseconds timing_variation);
 
     virtual Logger& logger() override{
         return m_logger;
