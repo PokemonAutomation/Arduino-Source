@@ -113,7 +113,7 @@ void ProControllerWithScheduler::issue_buttons(
             "issue_buttons(): " + button_to_string(button) +
             ", delay = " + std::to_string(delay.count()) + "ms" +
             ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
+            ", cooldown = " + std::to_string(cooldown.count()) + "ms",
             COLOR_DARKGREEN
         );
     }
@@ -148,7 +148,7 @@ void ProControllerWithScheduler::issue_dpad(
             "issue_dpad(): " + dpad_to_string(position) +
             ", delay = " + std::to_string(delay.count()) + "ms" +
             ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
+            ", cooldown = " + std::to_string(cooldown.count()) + "ms",
             COLOR_DARKGREEN
         );
     }
@@ -170,7 +170,7 @@ void ProControllerWithScheduler::issue_left_joystick(
             "issue_left_joystick(): (" + std::to_string(x) + "," + std::to_string(y) + ")" +
             ", delay = " + std::to_string(delay.count()) + "ms" +
             ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
+            ", cooldown = " + std::to_string(cooldown.count()) + "ms",
             COLOR_DARKGREEN
         );
     }
@@ -194,7 +194,7 @@ void ProControllerWithScheduler::issue_right_joystick(
             "issue_right_joystick(): (" + std::to_string(x) + "," + std::to_string(y) + ")" +
             ", delay = " + std::to_string(delay.count()) + "ms" +
             ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
+            ", cooldown = " + std::to_string(cooldown.count()) + "ms",
             COLOR_DARKGREEN
         );
     }
@@ -300,7 +300,7 @@ void ProControllerWithScheduler::issue_system_scroll(
             "issue_system_scroll(): " + dpad_to_string(direction) +
             ", delay = " + std::to_string(delay.count()) + "ms" +
             ", hold = " + std::to_string(hold.count()) + "ms" +
-            ", cooldown = " + std::to_string(delay.count()) + "ms",
+            ", cooldown = " + std::to_string(cooldown.count()) + "ms",
             COLOR_DARKGREEN
         );
     }
