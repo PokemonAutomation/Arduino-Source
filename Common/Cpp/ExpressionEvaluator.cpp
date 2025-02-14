@@ -218,7 +218,7 @@ int64_t parse_expression(
             std::string symbol = parse_symbol(str);
             auto iter = variables.find(symbol);
             if (iter == variables.end()){
-                throw ParseException("Undefined symbol: " + symbol);
+                throw ParseException("Undefined Symbol: " + symbol);
             }
             num.emplace_back('\0', iter->second);
             continue;

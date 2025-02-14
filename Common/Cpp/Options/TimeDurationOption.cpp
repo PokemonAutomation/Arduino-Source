@@ -46,41 +46,53 @@ struct TimeDurationCell<Type>::Data{
         m_error = process(m_current, m_value);
     }
 
+    static std::map<std::string, int64_t> make_symbol_map(){
+        std::map<std::string, int64_t> map;
+
+        auto self = std::chrono::duration_cast<std::chrono::nanoseconds>(Type(1)).count();
+        auto microseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::microseconds(1)).count();
+        auto milliseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::milliseconds(1)).count();
+        auto seconds = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::seconds(1)).count();
+        auto minutes = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::minutes(1)).count();
+        auto hours = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::hours(1)).count();
+        auto days = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::days(1)).count();
+        auto weeks = days * 7;
+        auto years = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::years(1)).count();
+
+        if (self <= microseconds){
+            map["us"] = map["microsecond"] = map["microseconds"] = microseconds / self;
+        }
+        if (self <= milliseconds){
+            map["ms"] = map["millisecond"] = map["milliseconds"] = milliseconds / self;
+        }
+        if (self <= seconds){
+            map["s"] = map["secs"] = map["second"] = map["seconds"] = seconds / self;
+        }
+        if (self <= minutes){
+            map["min"] = map["minute"] = map["minutes"] = minutes / self;
+        }
+        if (self <= hours){
+            map["h"] = map["hour"] = map["hours"] = hours / self;
+        }
+        if (self <= days){
+            map["d"] = map["day"] = map["days"] = days / self;
+        }
+        if (self <= weeks){
+            map["w"] = map["week"] = map["weeks"] = weeks / self;
+        }
+        if (self <= years){
+            map["y"] = map["year"] = map["years"] = years / self;
+        }
+
+        return map;
+    }
+
     std::string process(const std::string& text, Type& value) const{
         if (text.empty()){
             return "Expression is empty.";
         }
 
-        static const std::map<std::string, int64_t> SYMBOLS{
-            {"ms", std::chrono::duration_cast<Type>(std::chrono::milliseconds(1)).count()},
-            {"millisecond", std::chrono::duration_cast<Type>(std::chrono::milliseconds(1)).count()},
-            {"milliseconds", std::chrono::duration_cast<Type>(std::chrono::milliseconds(1)).count()},
-
-            {"s", std::chrono::duration_cast<Type>(std::chrono::seconds(1)).count()},
-            {"secs", std::chrono::duration_cast<Type>(std::chrono::seconds(1)).count()},
-            {"second", std::chrono::duration_cast<Type>(std::chrono::seconds(1)).count()},
-            {"seconds", std::chrono::duration_cast<Type>(std::chrono::seconds(1)).count()},
-
-            {"min", std::chrono::duration_cast<Type>(std::chrono::minutes(1)).count()},
-            {"minute", std::chrono::duration_cast<Type>(std::chrono::minutes(1)).count()},
-            {"minutes", std::chrono::duration_cast<Type>(std::chrono::minutes(1)).count()},
-
-            {"h", std::chrono::duration_cast<Type>(std::chrono::hours(1)).count()},
-            {"hour", std::chrono::duration_cast<Type>(std::chrono::hours(1)).count()},
-            {"hours", std::chrono::duration_cast<Type>(std::chrono::hours(1)).count()},
-
-            {"d", std::chrono::duration_cast<Type>(std::chrono::days(1)).count()},
-            {"day", std::chrono::duration_cast<Type>(std::chrono::days(1)).count()},
-            {"days", std::chrono::duration_cast<Type>(std::chrono::days(1)).count()},
-
-            {"w", std::chrono::duration_cast<Type>(std::chrono::days(7)).count()},
-            {"week", std::chrono::duration_cast<Type>(std::chrono::days(7)).count()},
-            {"weeks", std::chrono::duration_cast<Type>(std::chrono::days(7)).count()},
-
-            {"y", std::chrono::duration_cast<Type>(std::chrono::years(1)).count()},
-            {"year", std::chrono::duration_cast<Type>(std::chrono::years(1)).count()},
-            {"years", std::chrono::duration_cast<Type>(std::chrono::years(1)).count()},
-        };
+        static const std::map<std::string, int64_t> SYMBOLS = make_symbol_map();
 
         using Rep = typename Type::rep;
         Rep parsed;
@@ -134,7 +146,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units),
-        Type(0), std::chrono::milliseconds::max(),
+        Type(0), Type::max(),
         std::move(default_value)
     )
 {}
@@ -149,7 +161,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     , m_data(
         CONSTRUCT_TOKEN,
         std::move(units),
-        min_value, std::chrono::milliseconds::max(),
+        min_value, Type::max(),
         std::move(default_value)
     )
 {}
@@ -219,17 +231,23 @@ std::string TimeDurationCell<Type>::time_string() const{
     if (!data.m_error.empty()){
         return "<font color=\"red\">" + data.m_error + "</font>";
     }
-    return duration_to_string(std::chrono::duration_cast<Milliseconds>(data.m_value));
+    return time_string(data.m_current);
 }
 template <typename Type>
 std::string TimeDurationCell<Type>::time_string(const std::string& text) const{
     const Data& data = *m_data;
     Type value;
     std::string error = data.process(text, value);
-    if (error.empty()){
+    if (!error.empty()){
+        return "<font color=\"red\">" + error + "</font>";
+    }
+
+    constexpr auto self = std::chrono::duration_cast<std::chrono::nanoseconds>(Type(1)).count();
+    constexpr auto milliseconds = std::chrono::duration_cast<std::chrono::nanoseconds>(std::chrono::milliseconds(1)).count();
+    if constexpr (self >= milliseconds){
         return duration_to_string(std::chrono::duration_cast<Milliseconds>(value));
     }else{
-        return "<font color=\"red\">" + error + "</font>";
+        return tostr_u_commas(value.count()) + " " + m_data->m_units;
     }
 }
 
@@ -294,7 +312,9 @@ ConfigWidget* TimeDurationOption<Type>::make_QtWidget(QWidget& parent){
 
 
 template class TimeDurationCell<std::chrono::milliseconds>;
+template class TimeDurationCell<std::chrono::microseconds>;
 template class TimeDurationOption<std::chrono::milliseconds>;
+template class TimeDurationOption<std::chrono::microseconds>;
 
 
 

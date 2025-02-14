@@ -120,6 +120,17 @@ public:
 
 
 
+class MicrosecondsOption : public TimeDurationOption<std::chrono::microseconds>{
+public:
+    template <class... Args>
+    MicrosecondsOption(std::string label, Args&&... args)
+        : TimeDurationOption<std::chrono::microseconds>(
+            std::move(label),
+            "microseconds",
+            std::forward<Args>(args)...
+        )
+    {}
+};
 
 
 

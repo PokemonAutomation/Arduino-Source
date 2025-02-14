@@ -144,7 +144,9 @@ void TimeDurationOptionWidget<Type>::value_changed(void* object){
 
 
 template class TimeDurationCellWidget<std::chrono::milliseconds>;
+template class TimeDurationCellWidget<std::chrono::microseconds>;
 template class TimeDurationOptionWidget<std::chrono::milliseconds>;
+template class TimeDurationOptionWidget<std::chrono::microseconds>;
 
 
 
