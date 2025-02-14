@@ -35,7 +35,10 @@ FlyingTrialFarmer_Descriptor::FlyingTrialFarmer_Descriptor()
         "Farm the flying trial for BP.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        }
     )
 {}
 struct FlyingTrialFarmer_Descriptor::Stats : public StatsTracker{

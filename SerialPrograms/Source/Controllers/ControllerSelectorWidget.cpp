@@ -187,9 +187,9 @@ void ControllerSelectorWidget::descriptor_changed(
     const std::shared_ptr<const ControllerDescriptor>& descriptor
 ){
 //    cout << "descriptor_changed()" << endl;
-//    QMetaObject::invokeMethod(this, [=, this]{
-//        refresh_selection(descriptor->interface_type);
-//    }, Qt::QueuedConnection);
+    QMetaObject::invokeMethod(this, [=, this]{
+        refresh_selection(descriptor->interface_type);
+    }, Qt::QueuedConnection);
 }
 void ControllerSelectorWidget::controller_changed(
     ControllerType controller_type,

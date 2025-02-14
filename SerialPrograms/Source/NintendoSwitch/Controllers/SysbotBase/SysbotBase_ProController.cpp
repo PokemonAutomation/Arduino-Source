@@ -50,6 +50,13 @@ ProController_SysbotBase::ProController_SysbotBase(
 
         missing_feature = requirements.check_compatibility(iter->second);
 
+        if (PreloadSettings::instance().DEVELOPER_MODE &&
+            missing_feature == CONTROLLER_FEATURE_STRINGS.get_string(ControllerFeature::TickPrecise)
+        ){
+            logger.log("Bypassing Missing Requirement: " + missing_feature, COLOR_RED);
+            missing_feature.clear();
+        }
+
         if (missing_feature.empty()){
             m_dispatch_thread = std::thread(&ProController_SysbotBase::thread_body, this);
             return;
