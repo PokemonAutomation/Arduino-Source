@@ -66,6 +66,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     if (!PreloadSettings::instance().DEVELOPER_MODE){
         m_controllers_dropdown->setHidden(true);
     }
+    refresh_controllers(session.controller_type(), session.available_controllers());
 
     m_status_text = new QLabel(this);
     serial_row->addWidget(m_status_text, 3);

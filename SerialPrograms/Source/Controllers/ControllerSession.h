@@ -53,6 +53,7 @@ public:
     const ControllerRequirements& requirements(){
         return m_requirements;
     }
+    std::vector<ControllerType> available_controllers() const;
 
     void get(ControllerOption& option);
     void set(const ControllerOption& option);

@@ -73,6 +73,11 @@ ControllerSession::ControllerSession(
 }
 
 
+std::vector<ControllerType> ControllerSession::available_controllers() const{
+    std::lock_guard<std::mutex> lg(m_state_lock);
+    return m_available_controllers;
+}
+
 void ControllerSession::get(ControllerOption& option){
     std::lock_guard<std::mutex> lg(m_state_lock);
     option = m_option;
