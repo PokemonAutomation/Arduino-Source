@@ -49,25 +49,42 @@ public:
 
 //  Internals for testing only.
 
+struct CodeboardDelays{
+    Milliseconds hold;
+    Milliseconds cool;
+    Milliseconds press_delay;
+    Milliseconds move_delay;
+    Milliseconds wrap_delay;
+};
+
 struct CodeboardPosition{
     uint8_t row;
     uint8_t col;
 };
-struct CodeboardScroll{
-    DpadPosition direction;
+
+enum class CodeboardAction : uint8_t{
+    ENTER_CHAR  = 0xf0,
+    SCROLL_LEFT = 0xf1,
+    NORM_MOVE_UP    =        (uint8_t)DpadPosition::DPAD_UP,
+    NORM_MOVE_RIGHT =        (uint8_t)DpadPosition::DPAD_RIGHT,
+    NORM_MOVE_DOWN  =        (uint8_t)DpadPosition::DPAD_DOWN,
+    NORM_MOVE_LEFT  =        (uint8_t)DpadPosition::DPAD_LEFT,
+    WRAP_MOVE_UP    = 0x80 | (uint8_t)DpadPosition::DPAD_UP,
+    WRAP_MOVE_RIGHT = 0x80 | (uint8_t)DpadPosition::DPAD_RIGHT,
+    WRAP_MOVE_DOWN  = 0x80 | (uint8_t)DpadPosition::DPAD_DOWN,
+    WRAP_MOVE_LEFT  = 0x80 | (uint8_t)DpadPosition::DPAD_LEFT,
+};
+
+struct CodeboardActionWithDelay{
+    CodeboardAction action;
     Milliseconds delay;
 };
-//static_assert(sizeof(CodeboardScroll) == sizeof(uint8_t));
-struct DigitPath{
-    uint8_t length = 0;
-    bool left_cursor = false;
-    CodeboardScroll path[14];
-};
-DigitPath get_codeboard_digit_path(
-    CodeboardPosition source, CodeboardPosition destination,
-    uint8_t scroll_delay, uint8_t wrap_delay, bool reordering
+
+void codeboard_enter_digits(
+    Logger& logger, ProControllerContext& context,
+    KeyboardLayout keyboard_layout, const std::string& code,
+    bool reordering, const CodeboardDelays& delays
 );
-void move_codeboard(ProControllerContext& context, const DigitPath& path);
 
 
 
@@ -89,10 +106,6 @@ void enter_alphanumeric_code(
     const FastCodeEntrySettings& settings,
     const std::string& code
 );
-
-
-
-
 
 
 

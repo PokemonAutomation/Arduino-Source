@@ -8,13 +8,14 @@
 #include <map>
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_FastCodeEntry.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -52,12 +53,14 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockMode lock_while_pro
         PreloadSettings::instance().DEVELOPER_MODE
     )
     , SCROLL_DELAY0(
-        "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.",
+        "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.<br>"
+        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
         PreloadSettings::instance().DEVELOPER_MODE ? "40 ms" : "48 ms"
     )
     , WRAP_DELAY0(
-        "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.",
+        "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.<br>"
+        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
         "48 ms"
     )
@@ -71,10 +74,6 @@ FastCodeEntrySettingsOption::FastCodeEntrySettingsOption(LockMode lock_while_pro
         PA_ADD_OPTION(WRAP_DELAY0);
     }
 }
-
-
-
-
 
 
 
@@ -119,7 +118,6 @@ const std::map<char, CodeboardPosition>& CODEBOARD_POSITIONS_QWERTY(){
     };
     return map;
 }
-
 const std::map<char, CodeboardPosition>& CODEBOARD_POSITIONS_AZERTY(){
     static const std::map<char, CodeboardPosition> map{
         {'1', {0, 0}},
@@ -162,24 +160,24 @@ const std::map<char, CodeboardPosition>& CODEBOARD_POSITIONS_AZERTY(){
     return map;
 }
 
-DigitPath get_codeboard_digit_path(
-    CodeboardPosition source, CodeboardPosition destination,
-    Milliseconds scroll_delay,
-    Milliseconds wrap_delay
+
+
+std::vector<CodeboardAction> codeboard_get_mode_path(
+    CodeboardPosition source,
+    CodeboardPosition destination
 ){
-//    cout << (size_t)scroll_delay << ", " << (size_t)wrap_delay << endl;
-    DigitPath path;
+    std::vector<CodeboardAction> path;
 
     //  Vertical is easy since there's no wrapping and no hazards.
     if (source.row < destination.row){
         size_t diff = destination.row - source.row;
         for (size_t c = 0; c < diff; c++){
-            path.path[path.length++] = {DPAD_DOWN, scroll_delay};
+            path.emplace_back(CodeboardAction::NORM_MOVE_DOWN);
         }
     }else{
         size_t diff = source.row - destination.row;
         for (size_t c = 0; c < diff; c++){
-            path.path[path.length++] = {DPAD_UP, scroll_delay};
+            path.emplace_back(CodeboardAction::NORM_MOVE_UP);
         }
     }
 
@@ -187,128 +185,189 @@ DigitPath get_codeboard_digit_path(
     uint8_t col = source.col;
     while (true){
         if (col == destination.col){
-//            if (path.length > 0){
-//                path.path[path.length - 1].delay = 0;
-//            }
             break;
         }
 
-        DpadPosition direction;
+        CodeboardAction action;
         if (destination.col > col){
             if (destination.col - col <= 6){
-                direction = DPAD_RIGHT;
+                action = CodeboardAction::NORM_MOVE_RIGHT;
                 col++;
             }else{
-                direction = DPAD_LEFT;
+                action = CodeboardAction::NORM_MOVE_LEFT;
                 col--;
             }
         }else{
             if (col - destination.col <= 6){
-                direction = DPAD_LEFT;
+                action = CodeboardAction::NORM_MOVE_LEFT;
                 col--;
             }else{
-                direction = DPAD_RIGHT;
+                action = CodeboardAction::NORM_MOVE_RIGHT;
                 col++;
             }
         }
 
-        Milliseconds delay = scroll_delay;
+        //  Wrap around the sides.
         if (col == (uint8_t)-1){
             col = 11;
-            delay = wrap_delay;
+            action = (CodeboardAction)((uint8_t)action | 0x80);
         }
         if (col == 12){
             col = 0;
-            delay = wrap_delay;
+            action = (CodeboardAction)((uint8_t)action | 0x80);
         }
 
-//        if (direction == DPAD_RIGHT && col == 11){
-//            delay = wrap_delay;
-//        }
-
-//        cout << "col = " << (int)col << ", length = " << (int)path.length << endl;
-
-        path.path[path.length++] = {direction, delay};
+        path.emplace_back(action);
     }
+
+    path.emplace_back(CodeboardAction::ENTER_CHAR);
 
     return path;
 }
-Milliseconds get_codeboard_path_cost(const DigitPath& path){
-    Milliseconds total_cost = 0ms;
-    for (uint8_t c = 0; c < path.length; c++){
-        total_cost += path.path[c].delay;
-    }
-    return total_cost;
-}
-Milliseconds get_codeboard_path_cost(const std::vector<DigitPath>& path){
-    Milliseconds total_cost = 0ms;
-    for (const DigitPath& digit : path){
-        Milliseconds cost = get_codeboard_path_cost(digit);
-        if (digit.left_cursor){
-            cost++;
-        }
-        cost = std::max<Milliseconds>(cost, 64ms);
-        total_cost += cost;
-    }
-    return total_cost;
-}
 
-std::vector<DigitPath> get_codeboard_path(
+std::vector<std::vector<CodeboardAction>> codeboard_get_all_paths(
     KeyboardLayout keyboard_layout,
-    const std::vector<CodeboardPosition>& positions, size_t s, size_t e,
     CodeboardPosition start,
-    Milliseconds scroll_delay,
-    Milliseconds wrap_delay,
+    const CodeboardPosition* positions, size_t length,
     bool reordering
 ){
-    if (e - s == 1){
-        return {get_codeboard_digit_path(start, positions[s], scroll_delay, wrap_delay)};
+    if (length == 1){
+        return {codeboard_get_mode_path(start, positions[0])};
     }
 
-    std::vector<DigitPath> forward;
+    std::vector<std::vector<CodeboardAction>> paths;
     {
-        CodeboardPosition position = positions[s];
-        forward.emplace_back(get_codeboard_digit_path(start, position, scroll_delay, wrap_delay));
-        std::vector<DigitPath> remaining = get_codeboard_path(
+        CodeboardPosition position = positions[0];
+        std::vector<CodeboardAction> current = codeboard_get_mode_path(start, position);
+        std::vector<std::vector<CodeboardAction>> subpaths = codeboard_get_all_paths(
             keyboard_layout,
-            positions, s + 1, e,
             position,
-            scroll_delay, wrap_delay, reordering
+            positions + 1, length - 1,
+            reordering
         );
-        forward.insert(forward.end(), remaining.begin(), remaining.end());
+        for (std::vector<CodeboardAction>& path : subpaths){
+            path.insert(path.begin(), current.begin(), current.end());
+            paths.emplace_back(std::move(path));
+        }
     }
-
-    std::vector<DigitPath> reverse;
     {
-        CodeboardPosition position = positions[e - 1];
-        reverse.emplace_back(get_codeboard_digit_path(start, position, scroll_delay, wrap_delay));
-        reverse.back().left_cursor = true;
-        std::vector<DigitPath> remaining = get_codeboard_path(
+        CodeboardPosition position = positions[length - 1];
+        std::vector<CodeboardAction> current = codeboard_get_mode_path(start, position);
+        current.emplace_back(CodeboardAction::SCROLL_LEFT);
+        std::vector<std::vector<CodeboardAction>> subpaths = codeboard_get_all_paths(
             keyboard_layout,
-            positions, s, e - 1, position,
-            scroll_delay, wrap_delay, reordering
+            position,
+            positions, length - 1,
+            reordering
         );
-        reverse.insert(reverse.end(), remaining.begin(), remaining.end());
+        for (std::vector<CodeboardAction>& path : subpaths){
+            path.insert(path.begin(), current.begin(), current.end());
+            paths.emplace_back(std::move(path));
+        }
     }
 
-    if (!reordering){
-        return forward;
+    return paths;
+}
+
+Milliseconds codeboard_populate_delays(
+    std::vector<CodeboardActionWithDelay>& path_with_delays,
+    const std::vector<CodeboardAction>& path,
+    const CodeboardDelays& delays,
+    bool optimize
+){
+    //  Populate and assign default delays first.
+    path_with_delays.resize(path.size());
+    for (size_t c = 0; c < path_with_delays.size(); c++){
+        CodeboardAction action = path[c];
+        Milliseconds delay = (uint8_t)action >= (uint8_t)CodeboardAction::ENTER_CHAR
+            ? delays.press_delay
+            : (uint8_t)action & 0x80
+                ? delays.wrap_delay
+                : delays.move_delay;
+
+        path_with_delays[c].action = action;
+        path_with_delays[c].delay = delay;
     }
 
-    if (get_codeboard_path_cost(forward) <= get_codeboard_path_cost(reverse)){
-        return forward;
-    }else{
-        return reverse;
+
+    //  Optimize
+
+    if (optimize){
+        for (size_t c = 1; c < path_with_delays.size(); c++){
+            //  Zero the delay for any L press.
+            CodeboardActionWithDelay& current = path_with_delays[c];
+            if (current.action == CodeboardAction::SCROLL_LEFT){
+                current.delay = 0ms;
+                continue;
+            }
+
+            //  Zero the delay for any scroll immediately preceding an A press.
+            CodeboardActionWithDelay& previous = path_with_delays[c - 1];
+            if (current.action == CodeboardAction::ENTER_CHAR &&
+                previous.action != CodeboardAction::ENTER_CHAR &&
+                previous.action != CodeboardAction::SCROLL_LEFT
+            ){
+                previous.delay = 0ms;
+            }
+        }
+    }
+
+    Milliseconds total = 0ms;
+    for (CodeboardActionWithDelay& action : path_with_delays){
+        total += action.delay;
+    }
+
+    return total;
+}
+
+std::vector<CodeboardActionWithDelay> codeboard_get_best_path(
+    const std::vector<std::vector<CodeboardAction>>& paths,
+    const CodeboardDelays& delays,
+    bool optimize
+){
+    std::vector<CodeboardActionWithDelay> best_path;
+    Milliseconds best_time = Milliseconds::max();
+    for (const std::vector<CodeboardAction>& path : paths){
+        std::vector<CodeboardActionWithDelay> current_path;
+        Milliseconds current_time = codeboard_populate_delays(current_path, path, delays, optimize);
+        if (best_time > current_time){
+            best_time = current_time;
+            best_path = std::move(current_path);
+        }
+    }
+    return best_path;
+}
+
+void codeboard_execute_path(
+    ProControllerContext& context,
+    const CodeboardDelays& delays,
+    const std::vector<CodeboardActionWithDelay>& path
+){
+    for (const CodeboardActionWithDelay& action : path){
+        switch (action.action){
+        case CodeboardAction::ENTER_CHAR:
+            ssf_press_button(context, BUTTON_A, action.delay, delays.hold, delays.cool);
+            break;
+        case CodeboardAction::SCROLL_LEFT:
+            ssf_press_button(context, BUTTON_L, action.delay, delays.hold, delays.cool);
+            break;
+        default:
+            ssf_issue_scroll(
+                context,
+                (DpadPosition)((uint8_t)action.action & 0x7f),
+                action.delay, delays.hold, delays.cool
+            );
+            break;
+        }
     }
 }
-std::vector<DigitPath> get_codeboard_path(
-    Logger& logger,
+
+void codeboard_enter_digits(
+    Logger& logger, ProControllerContext& context,
     KeyboardLayout keyboard_layout, const std::string& code,
-    Milliseconds scroll_delay,
-    Milliseconds wrap_delay,
-    bool reordering,
-    CodeboardPosition start = {0, 0}
+    bool reordering, const CodeboardDelays& delays
 ){
+    //  Calculate the coordinates.
     auto get_keyboard_layout = [](KeyboardLayout keyboard_layout){
         switch (keyboard_layout){
         case KeyboardLayout::QWERTY:
@@ -331,48 +390,25 @@ std::vector<DigitPath> get_codeboard_path(
         }
         positions.emplace_back(iter->second);
     }
-    return get_codeboard_path(
+
+    //  Get all the possible paths.
+    std::vector<std::vector<CodeboardAction>> all_paths = codeboard_get_all_paths(
         keyboard_layout,
-        positions, 0, positions.size(),
-        start,
-        scroll_delay,
-        wrap_delay,
+        {0, 0},
+        positions.data(), positions.size(),
         reordering
     );
+
+    //  Find best path.
+    std::vector<CodeboardActionWithDelay> best_path = codeboard_get_best_path(
+        all_paths,
+        delays,
+        context->timing_variation() == 0ms
+    );
+
+    codeboard_execute_path(context, delays, best_path);
 }
 
-
-void move_codeboard(ProControllerContext& context, const DigitPath& path){
-    Milliseconds delay = 24ms;
-    if (path.length > 0){
-        size_t last = (size_t)path.length - 1;
-        for (size_t c = 0; c < last; c++){
-            ssf_issue_scroll(
-                context,
-                path.path[c].direction,
-                path.path[c].delay,
-                48ms
-            );
-        }
-        ssf_issue_scroll(
-            context,
-            path.path[last].direction,
-            0ms,
-            48ms
-        );
-        delay = path.path[last].delay;
-    }
-    ssf_press_button(context, BUTTON_A, delay);
-}
-
-void run_codeboard_path(ProControllerContext& context, const std::vector<DigitPath>& path){
-    for (const DigitPath& digit : path){
-        move_codeboard(context, digit);
-        if (digit.left_cursor){
-            ssf_press_button(context, BUTTON_L, 1);
-        }
-    }
-}
 
 
 
@@ -384,25 +420,32 @@ FastCodeEntrySettings::FastCodeEntrySettings(const FastCodeEntrySettingsOption& 
     , digit_reordering(option.DIGIT_REORDERING)
 {}
 
-
 void enter_alphanumeric_code(
     Logger& logger,
     ProControllerContext& context,
     const FastCodeEntrySettings& settings,
     const std::string& code
 ){
-    run_codeboard_path(context, get_codeboard_path(
+    codeboard_enter_digits(
         logger,
-        settings.keyboard_layout, code,
-        settings.scroll_delay, settings.wrap_delay, settings.digit_reordering
-    ));
+        context,
+        settings.keyboard_layout,
+        code,
+        settings.digit_reordering,
+        CodeboardDelays{
+            .hold = 5 * 8ms + context->timing_variation(),
+            .cool = 3 * 8ms + context->timing_variation(),
+            .press_delay = 4 * 8ms + context->timing_variation(),
+            .move_delay = settings.scroll_delay + context->timing_variation(),
+            .wrap_delay = settings.wrap_delay + context->timing_variation(),
+        }
+    );
     if (settings.include_plus){
-        pbf_press_button(context, BUTTON_PLUS, 5, 3);
-        pbf_press_button(context, BUTTON_PLUS, 5, 3);
+        ssf_press_button(context, BUTTON_PLUS);
+        ssf_press_button(context, BUTTON_PLUS);
     }
+    ssf_flush_pipeline(context);
 }
-
-
 
 
 

@@ -126,7 +126,7 @@ VideoFastCodeEntry_Descriptor::VideoFastCodeEntry_Descriptor()
         "Read a 4, 6, or 8 digit link code from someone on your screen and enter it as quickly as possible.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {ControllerFeature::NintendoSwitch_ProController},
         FasterIfTickPrecise::MUCH_FASTER,
         1, 4, 1
     )

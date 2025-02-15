@@ -4,24 +4,10 @@
  * 
  */
 
-//#include <cstring>
-//#include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_Commands_DigitEntry.h"
-//#include "NintendoSwitch_Messages_DigitEntry.h"
-
-
-#if 0
-void enter_digits_str(uint8_t count, const char* digits){
-    enter_digits(count, (const uint8_t*)digits);
-}
-void enter_digits(uint8_t count, const uint8_t* digits){
-    enter_digits(*PokemonAutomation::global_connection, count, digits);
-}
-#endif
-
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -29,21 +15,25 @@ namespace NintendoSwitch{
 
 #define CODE_ENTRY_FAST
 
-//  3 seems to work maybe 95% of the time.
-#define CODE_DELAY      4
+//#define CODE_DELAY      4
 
 
 
 const uint8_t XCORD[] = {1, 0, 1, 2, 0, 1, 2, 0, 1, 2};
 const uint8_t YCORD[] = {3, 0, 0, 0, 1, 1, 1, 2, 2, 2};
 
-void code_entry_scroll(ProControllerContext& context, DpadPosition direction){
-    pbf_wait(context, CODE_DELAY);
+void code_entry_scroll(
+    ProControllerContext& context,
+    DpadPosition direction,
+    Milliseconds scroll_delay
+){
+    pbf_wait(context, scroll_delay);
     ssf_issue_scroll(context, direction, 0);
 }
-uint16_t scroll_to(
+Milliseconds scroll_to(
     ProControllerContext& context,
-    uint8_t start_digit, uint8_t end_digit, bool actually_scroll
+    uint8_t start_digit, uint8_t end_digit, bool actually_scroll,
+    Milliseconds scroll_delay
 ){
     //  Returns the # of ticks needed to scroll from "start_digit" to "end_digit".
     //  If "actually_scroll" is true, then it does the scrolling as well.
@@ -51,7 +41,7 @@ uint16_t scroll_to(
     uint8_t xcoord = XCORD[start_digit];
     uint8_t ycoord = YCORD[start_digit];
 
-    uint16_t cost = 0;
+    Milliseconds cost = 0ms;
 
     //  These shortcuts over the OK and backspace buttons aren't stable.
 //#ifdef CODE_ENTRY_FAST
@@ -63,7 +53,7 @@ uint16_t scroll_to(
 //            pbf_wait(1);
 //            code_entry_scroll(SSF_SCROLL_RIGHT);
 //        }
-//        cost += 3 * CODE_DELAY;
+//        cost += 3 * scroll_delay;
 //        xcoord = 0;
 //        ycoord = 0;
 //    }
@@ -76,7 +66,7 @@ uint16_t scroll_to(
 ////            pbf_wait(context, 1);
 //            code_entry_scroll(SSF_SCROLL_LEFT);
 //        }
-//        cost += 3 * CODE_DELAY;
+//        cost += 3 * scroll_delay;
 //        xcoord = 2;
 //        ycoord = 0;
 //    }
@@ -89,9 +79,9 @@ uint16_t scroll_to(
         //  If we need to move up, do it first since it's always safe to do so.
         if (ycoord > desired_y){
             if (actually_scroll){
-                code_entry_scroll(context, SSF_SCROLL_UP);
+                code_entry_scroll(context, SSF_SCROLL_UP, scroll_delay);
             }
-            cost += CODE_DELAY;
+            cost += scroll_delay;
             ycoord--;
             continue;
         }
@@ -101,9 +91,9 @@ uint16_t scroll_to(
         //  it will automatically move to zero even if the X-coordinate is wrong.
         if (ycoord < desired_y){
             if (actually_scroll){
-                code_entry_scroll(context, SSF_SCROLL_DOWN);
+                code_entry_scroll(context, SSF_SCROLL_DOWN, scroll_delay);
             }
-            cost += CODE_DELAY;
+            cost += scroll_delay;
             ycoord++;
 
             //  If we land on zero, the X-axis is set to 1.
@@ -117,17 +107,17 @@ uint16_t scroll_to(
         //  moved away from the bottom row if the digit is not zero.
         if (xcoord < desired_x){
             if (actually_scroll){
-                code_entry_scroll(context, SSF_SCROLL_RIGHT);
+                code_entry_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
             }
-            cost += CODE_DELAY;
+            cost += scroll_delay;
             xcoord++;
             continue;
         }
         if (xcoord > desired_x){
             if (actually_scroll){
-                code_entry_scroll(context, SSF_SCROLL_LEFT);
+                code_entry_scroll(context, SSF_SCROLL_LEFT, scroll_delay);
             }
-            cost += CODE_DELAY;
+            cost += scroll_delay;
             xcoord--;
             continue;
         }
@@ -143,9 +133,14 @@ uint16_t scroll_to(
 
 
 void enter_digits(ProControllerContext& context, uint8_t count, const uint8_t* digits){
-#if 0
-    context.issue_request(DeviceRequest_enter_digits(count, digits));
-#else
+    Milliseconds delay = 4 * 8ms;
+    Milliseconds hold = 5 * 8ms;
+    Milliseconds cool = 3 * 8ms;
+    Milliseconds timing_variation = context->timing_variation();
+    delay += timing_variation;
+    hold += timing_variation;
+    cool += timing_variation;
+
     //  Enter code.
     uint8_t last_digit = 1;
     uint8_t s = 0;
@@ -172,12 +167,12 @@ void enter_digits(ProControllerContext& context, uint8_t count, const uint8_t* d
         }
 
         //  Calculate costs to scroll to destination.
-        uint16_t cost0 = scroll_to(context, last_digit, front, false);
-        uint16_t cost1 = scroll_to(context, last_digit, back, false);
+        Milliseconds cost0 = scroll_to(context, last_digit, front, false, delay);
+        Milliseconds cost1 = scroll_to(context, last_digit, back, false, delay);
 
         //  Now actually scroll to the destination.
         uint8_t digit = cost0 <= cost1 ? front : back;
-        cost1 = scroll_to(context, last_digit, digit, true);
+        cost1 = scroll_to(context, last_digit, digit, true, delay);
 
         //  If no scrolling is needed, we still need to wait a non-zero time.
         //
@@ -185,15 +180,15 @@ void enter_digits(ProControllerContext& context, uint8_t count, const uint8_t* d
         //  needs to wait 8 cycles anyway. Instead, this wait delays the
         //  LB button so that it doesn't happen the same time as the A button
         //  from the previous iteration.
-        if (cost1 == 0){
-            pbf_wait(context, CODE_DELAY);
+        if (cost1 == 0ms){
+            pbf_wait(context, delay);
         }
         if (shift_left){
-            ssf_press_button(context, BUTTON_L, 0);
+            ssf_press_button(context, BUTTON_L, timing_variation, hold, cool);
         }
 
         //  Enter digit.
-        ssf_press_button(context, BUTTON_A, 0);
+        ssf_press_button(context, BUTTON_A, timing_variation, hold, cool);
 
         //  Update pointers.
         if (cost0 <= cost1){
@@ -216,16 +211,16 @@ void enter_digits(ProControllerContext& context, uint8_t count, const uint8_t* d
         scroll_to(context, last_digit, digit, true);
 
         //  Enter digit.
-        ssf_press_button(context, BUTTON_A, 0);
+        ssf_press_button(context, BUTTON_A, 0ms, hold, cool);
 
         s++;
         last_digit = digit;
     }
 #endif
-    pbf_wait(context, CODE_DELAY);
-    ssf_press_button(context, BUTTON_PLUS, CODE_DELAY);
-    ssf_press_button(context, BUTTON_PLUS, CODE_DELAY);
-#endif
+
+    pbf_wait(context, delay);
+    ssf_press_button(context, BUTTON_PLUS, delay);
+    ssf_press_button(context, BUTTON_PLUS, delay);
 }
 
 

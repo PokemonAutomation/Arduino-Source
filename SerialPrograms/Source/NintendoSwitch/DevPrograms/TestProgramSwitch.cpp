@@ -282,7 +282,29 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    return_to_academy_after_loss(env, console, context);
+//    ssf_issue_scroll(context, DPAD_LEFT, 0);
+//    ssf_press_button(context, BUTTON_A | BUTTON_L, 3);
+//    ssf_press_button(context, BUTTON_L, 0);
+
+#if 1
+    codeboard_enter_digits(
+        logger, context, KeyboardLayout::QWERTY,
+        "JRH5T9",
+        true,
+        CodeboardDelays{
+            .hold = 5 * 8ms,
+            .cool = 3 * 8ms,
+            .press_delay = 4 * 8ms * 1,
+            .move_delay = 5 * 8ms * 1,
+            .wrap_delay = 6 * 8ms * 1,
+        }
+    );
+#endif
+
+    ssf_flush_pipeline(context);
+
+
+//    return_to_academy_after_loss(env, console, context);
 
 
 

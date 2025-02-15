@@ -29,7 +29,7 @@ ClipboardFastCodeEntry_Descriptor::ClipboardFastCodeEntry_Descriptor()
         "Automatically enter a 4, 6, or 8 digit link code from your clipboard.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {ControllerFeature::NintendoSwitch_ProController},
         FasterIfTickPrecise::MUCH_FASTER,
         1, 4, 1
     )
