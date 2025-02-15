@@ -24,16 +24,6 @@ void ssf_do_nothing(ProControllerContext& context, Milliseconds duration){
 }
 
 
-void ssf_press_button(ProControllerContext& context, Button button){
-    Milliseconds delay = 3 * 8ms;
-    Milliseconds hold = 5 * 8ms;
-    Milliseconds cool = 3 * 8ms;
-    Milliseconds timing_variation = context->timing_variation();
-    delay += 2 * timing_variation;
-    hold += timing_variation;
-    cool += timing_variation;
-    ssf_press_button(context, button, delay, hold, cool);
-}
 void ssf_press_button(
     ProControllerContext& context,
     Button button,
@@ -142,6 +132,21 @@ void ssf_issue_scroll(
 ){
     context->issue_system_scroll(&context, direction, delay, hold, cool);
 }
+
+
+
+
+
+void ssf_press_button(ProControllerContext& context, Button button){
+    Milliseconds delay = 3 * 8ms;
+    Milliseconds hold = 5 * 8ms;
+    Milliseconds cool = 3 * 8ms;
+    Milliseconds timing_variation = context->timing_variation();
+    delay += 2 * timing_variation;
+    hold += timing_variation;
+    cool += timing_variation;
+    ssf_press_button(context, button, delay, hold, cool);
+}
 void ssf_issue_scroll(ProControllerContext& context, DpadPosition direction){
     Milliseconds delay = 3 * 8ms;
     Milliseconds hold = 5 * 8ms;
@@ -155,150 +160,7 @@ void ssf_issue_scroll(ProControllerContext& context, DpadPosition direction){
 
 
 
-#if 0
-int register_message_converters_ssf(){
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_FLUSH_PIPELINE,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_flush_pipeline() - ";
-            if (body.size() != sizeof(pabb_ssf_flush_pipeline)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_flush_pipeline*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_DO_NOTHING,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_do_nothing() - ";
-            if (body.size() != sizeof(pabb_ssf_do_nothing)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_do_nothing*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", ticks = " << params->ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_PRESS_BUTTON,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_press_button() - ";
-            if (body.size() != sizeof(pabb_ssf_press_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_press_button*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
-            ss << ", delay = " << params->delay;
-            ss << ", hold = " << params->hold;
-            ss << ", cool = " << (int)params->cool;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_PRESS_DPAD,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_press_dpad() - ";
-            if (body.size() != sizeof(pabb_ssf_press_dpad)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_press_dpad*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", dpad = " << (unsigned)params->position << "(" << dpad_to_string(params->position) << ")";
-            ss << ", delay = " << params->delay;
-            ss << ", hold = " << params->hold;
-            ss << ", cool = " << (int)params->cool;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_PRESS_JOYSTICK_L,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_press_joystick(left) - ";
-            if (body.size() != sizeof(pabb_ssf_press_joystick)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_press_joystick*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", x = " << (int)params->x;
-            ss << ", y = " << (int)params->y;
-            ss << ", delay = " << params->delay;
-            ss << ", hold = " << params->hold;
-            ss << ", cool = " << (int)params->cool;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_PRESS_JOYSTICK_R,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_press_joystick(right) - ";
-            if (body.size() != sizeof(pabb_ssf_press_joystick)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_press_joystick*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", x = " << (int)params->x;
-            ss << ", y = " << (int)params->y;
-            ss << ", delay = " << params->delay;
-            ss << ", hold = " << params->hold;
-            ss << ", cool = " << (int)params->cool;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_MASH1_BUTTON,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_mash1_button() - ";
-            if (body.size() != sizeof(pabb_ssf_mash1_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_mash1_button*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button << "(" << button_to_string(params->button) << ")";
-            ss << ", ticks = " << params->ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_MASH2_BUTTON,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_mash2_button() - ";
-            if (body.size() != sizeof(pabb_ssf_mash2_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_mash2_button*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button0 << "(" << button_to_string(params->button0) << ")";
-            ss << ", button = " << params->button1 << "(" << button_to_string(params->button1) << ")";
-            ss << ", ticks = " << params->ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_MASH_AZS,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_mash_AZs() - ";
-            if (body.size() != sizeof(pabb_ssf_mash_AZs)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_mash_AZs*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", ticks = " << params->ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_SSF_SCROLL,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "ssf_issue_scroll() - ";
-            if (body.size() != sizeof(pabb_ssf_issue_scroll)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_ssf_issue_scroll*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", delay = " << params->delay;
-            ss << ", hold = " << params->hold;
-            ss << ", cool = " << (int)params->cool;
-            return ss.str();
-        }
-    );
-    return 0;
-}
-int init_ssf = register_message_converters_ssf();
-#endif
+
 
 
 

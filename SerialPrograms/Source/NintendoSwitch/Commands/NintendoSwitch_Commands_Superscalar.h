@@ -31,7 +31,6 @@ void ssf_do_nothing     (ProControllerContext& context, Milliseconds duration);
 
 
 
-void ssf_press_button(ProControllerContext& context, Button button);
 void ssf_press_button(
     ProControllerContext& context,
     Button button,
@@ -93,7 +92,6 @@ void ssf_mash_AZs       (ProControllerContext& context, Milliseconds duration);
 #define SSF_SCROLL_RIGHT        DPAD_RIGHT
 #define SSF_SCROLL_DOWN         DPAD_DOWN
 #define SSF_SCROLL_LEFT         DPAD_LEFT
-void ssf_issue_scroll(ProControllerContext& context, DpadPosition direction);
 void ssf_issue_scroll(
     ProControllerContext& context,
     DpadPosition direction,
@@ -109,7 +107,13 @@ void ssf_issue_scroll(
 
 
 
-
+//
+//  These overloads without timing parameters are intended for navigation within
+//  the Switch settings. They will use "context->timing_variation()" to
+//  determine the fastest/safest timings to use.
+//
+void ssf_press_button(ProControllerContext& context, Button button);
+void ssf_issue_scroll(ProControllerContext& context, DpadPosition direction);
 
 
 
