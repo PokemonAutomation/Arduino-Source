@@ -97,7 +97,8 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         );
         m_option.instance().start_program_border_check(
             scope,
-            env.consoles[c], c
+            env.consoles[c], c,
+            m_option.descriptor().feedback()
         );
     }
 

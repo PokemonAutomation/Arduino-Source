@@ -130,7 +130,8 @@ public:
     );
     virtual void start_program_border_check(
         CancellableScope& scope,
-        VideoStream& stream
+        VideoStream& stream,
+        FeedbackType feedback_type
     );
 
 

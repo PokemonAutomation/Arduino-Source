@@ -89,9 +89,17 @@ void SingleSwitchProgramInstance::start_program_feedback_check(
 }
 void SingleSwitchProgramInstance::start_program_border_check(
     CancellableScope& scope,
-    VideoStream& stream
+    VideoStream& stream,
+    FeedbackType feedback_type
 ){
-    StartProgramChecks::check_border(stream);
+    switch (feedback_type){
+    case FeedbackType::NONE:
+    case FeedbackType::OPTIONAL_:
+        return;
+    case FeedbackType::REQUIRED:
+    case FeedbackType::VIDEO_AUDIO:
+        StartProgramChecks::check_border(stream);
+    }
 }
 
 

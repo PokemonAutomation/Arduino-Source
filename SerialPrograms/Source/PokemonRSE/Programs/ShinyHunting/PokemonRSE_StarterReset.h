@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonRSE_StarterReset_H
 #define PokemonAutomation_PokemonRSE_StarterReset_H
 
-#include "Common/Cpp/Options/TimeDurationOption.h"
+//#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -26,6 +26,12 @@ class StarterReset : public SingleSwitchProgramInstance{
 public:
     StarterReset();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
+
+    virtual void start_program_border_check(
+        CancellableScope& scope,
+        VideoStream& stream,
+        FeedbackType feedback_type
+    ) override{}
 
 private:
     enum class Target{

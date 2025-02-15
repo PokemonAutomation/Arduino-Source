@@ -144,9 +144,17 @@ void MultiSwitchProgramInstance::start_program_feedback_check(
 }
 void MultiSwitchProgramInstance::start_program_border_check(
     CancellableScope& scope,
-    VideoStream& stream, size_t console_index
+    VideoStream& stream, size_t console_index,
+    FeedbackType feedback_type
 ){
-    StartProgramChecks::check_border(stream);
+    switch (feedback_type){
+    case FeedbackType::NONE:
+    case FeedbackType::OPTIONAL_:
+        return;
+    case FeedbackType::REQUIRED:
+    case FeedbackType::VIDEO_AUDIO:
+        StartProgramChecks::check_border(stream);
+    }
 }
 
 
