@@ -19,11 +19,11 @@
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/OCR/OCR_StringNormalization.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
-#include "NintendoSwitch_DateReader.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 
 //#include <iostream>
 //using std::cout;
@@ -31,6 +31,10 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+
+using namespace std::chrono_literals;
+
 
 DateReader::DateReader()
     : m_background_top(0.50, 0.02, 0.45, 0.08)
@@ -111,56 +115,6 @@ bool DateReader::detect(const ImageViewRGB32& screen) const{
 
     return true;
 }
-#if 0
-int8_t DateReader::read_hours(Logger& logger, const ImageViewRGB32& screen) const{
-    if (!detect(screen)){
-        return -1;
-    }
-
-    ImageStats stats_window_top = image_stats(extract_box_reference(screen, m_window_top));
-//    cout << stats_window_top.average << stats_window_top.stddev << endl;
-    if (stats_window_top.stddev.sum() > 10){
-        return false;
-    }
-
-    bool white_theme = stats_window_top.average.sum() > 600;
-
-    ImageViewRGB32 us_hours = extract_box_reference(screen, m_us_hour);
-    ImageStats stats_us_hours = image_stats(us_hours);
-
-    double stddev = stats_us_hours.stddev.sum();
-    bool format_us = stddev > 30;
-    if (format_us){
-        int hours = read_box(logger, 1, 12, screen, m_us_hour, white_theme);
-        if (hours < 1 || hours > 12){
-            return -1;
-        }
-        if (hours == 12){
-            hours = 0;
-        }
-
-        ImageViewRGB32 us_ampm = extract_box_reference(screen, m_us_ampm);
-        ImageRGB32 us_ampm_filtered = filter_image(us_ampm, white_theme);
-
-        std::string ampm = to_utf8(OCR::normalize_utf32(OCR::ocr_read(Language::English, us_ampm_filtered)));
-        if (ampm == "am"){
-            //  Do nothing.
-        }else if (ampm == "pm"){
-            hours += 12;
-        }else{
-            return -1;
-        }
-        return (int8_t)hours;
-    }else{
-        int hours = read_box(logger, 0, 23, screen, m_24_hour, white_theme);
-        if (hours < 0 || hours > 23){
-            return -1;
-        }
-        return (int8_t)hours;
-    }
-
-}
-#endif
 
 
 void DateReader::set_hours(
@@ -402,21 +356,21 @@ DateTime DateReader::read_date_jp(Logger& logger, std::shared_ptr<const ImageRGB
 
 void DateReader::move_cursor(ProControllerContext& context, int current, int desired){
     while (current < desired){
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_UP);
         current++;
     }
     while (current > desired){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
         current--;
     }
 }
 void DateReader::adjust_year(ProControllerContext& context, int current, int desired){
     while (current < desired){
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_UP);
         current++;
     }
     while (current > desired){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
         current--;
     }
 }
@@ -424,7 +378,7 @@ void DateReader::adjust_month(ProControllerContext& context, int current, int de
     int diff = desired - current;
     if ((diff >= 0 && diff <= 6) || (diff < 0 && diff < -6)){
         while (current != desired){
-            ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_UP);
             current++;
             if (current > 12){
                 current -= 12;
@@ -432,7 +386,7 @@ void DateReader::adjust_month(ProControllerContext& context, int current, int de
         }
     }else{
         while (current != desired){
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN);
             current--;
             if (current < 1){
                 current += 12;
@@ -444,7 +398,7 @@ void DateReader::adjust_hour_24(ProControllerContext& context, int current, int 
     int diff = desired - current;
     if ((diff >= 0 && diff <= 12) || (diff < 0 && diff < -12)){
         while (current != desired){
-            ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_UP);
             current++;
             if (current > 23){
                 current -= 24;
@@ -452,7 +406,7 @@ void DateReader::adjust_hour_24(ProControllerContext& context, int current, int 
         }
     }else{
         while (current != desired){
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN);
             current--;
             if (current < 0){
                 current += 24;
@@ -464,7 +418,7 @@ void DateReader::adjust_minute(ProControllerContext& context, int current, int d
     int diff = desired - current;
     if ((diff >= 0 && diff <= 30) || (diff < 0 && diff < -30)){
         while (current != desired){
-            ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_UP);
             current++;
             if (current > 59){
                 current -= 60;
@@ -472,7 +426,7 @@ void DateReader::adjust_minute(ProControllerContext& context, int current, int d
         }
     }else{
         while (current != desired){
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN);
             current--;
             if (current < 0){
                 current += 60;
@@ -516,7 +470,7 @@ void DateReader::set_date(
         ){
             if (!cursor_on_right){
                 for (size_t c = 0; c < 7; c++){
-                    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+                    ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
                 }
             }
             return;
@@ -524,62 +478,62 @@ void DateReader::set_date(
 
         //  Move cursor to the left.
         for (size_t c = 0; c < 7; c++){
-            ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_LEFT);
         }
 
         switch (current.first){
         case DateFormat::US:{
             adjust_month(context, current.second.month, date.month);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_year(context, current.second.day, date.day);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_year(context, current.second.year, date.year);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
 
             uint8_t diff = (24 + date.hour - current.second.hour) % 12;
             if (diff < 6){
                 for (size_t c = 0; c < diff; c++){
-                    ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+                    ssf_issue_scroll(context, SSF_SCROLL_UP);
                 }
             }else{
                 for (size_t c = diff; c < 12; c++){
-                    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+                    ssf_issue_scroll(context, SSF_SCROLL_DOWN);
                 }
             }
 
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_minute(context, current.second.minute, date.minute);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             if ((date.hour < 12) != (current.second.hour < 12)){
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN);
             }
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
 
             break;
         }
         case DateFormat::EU:
             adjust_year(context, current.second.day, date.day);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_month(context, current.second.month, date.month);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_year(context, current.second.year, date.year);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_hour_24(context, current.second.hour, date.hour);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_minute(context, current.second.minute, date.minute);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             break;
         case DateFormat::JP:
             adjust_year(context, current.second.year, date.year);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_month(context, current.second.month, date.month);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_year(context, current.second.day, date.day);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_hour_24(context, current.second.hour, date.hour);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             adjust_minute(context, current.second.minute, date.minute);
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
             break;
         }
 
@@ -598,6 +552,7 @@ void change_date(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     const DateTime& date
 ){
+    Milliseconds timing_variation = context->timing_variation();
     while (true){
         context.wait_for_all_requests();
 
@@ -613,7 +568,7 @@ void change_date(
         switch (ret){
         case 0:
             home_to_date_time(context, true, false);
-            pbf_press_button(context, BUTTON_A, 10, 30);
+            pbf_press_button(context, BUTTON_A, 80ms + timing_variation, 240ms + timing_variation);
             context.wait_for_all_requests();
             continue;
         case 1:{
@@ -625,10 +580,10 @@ void change_date(
             date_reader.set_date(env.program_info(), env.console, context, date);
 
             //  Commit the date.
-            pbf_press_button(context, BUTTON_A, 20, 30);
+            pbf_press_button(context, BUTTON_A, 160ms + timing_variation, 340ms + timing_variation);
 
             //  Re-enter the game.
-            pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+            pbf_press_button(context, BUTTON_HOME, 160ms + timing_variation, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
             return;
         }

@@ -445,6 +445,7 @@ SOURCES += \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.cpp \
@@ -1604,6 +1605,7 @@ HEADERS += \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h \

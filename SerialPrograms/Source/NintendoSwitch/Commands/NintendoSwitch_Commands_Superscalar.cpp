@@ -24,6 +24,16 @@ void ssf_do_nothing(ProControllerContext& context, Milliseconds duration){
 }
 
 
+void ssf_press_button(ProControllerContext& context, Button button){
+    Milliseconds delay = 3 * 8ms;
+    Milliseconds hold = 5 * 8ms;
+    Milliseconds cool = 3 * 8ms;
+    Milliseconds timing_variation = context->timing_variation();
+    delay += 2 * timing_variation;
+    hold += timing_variation;
+    cool += timing_variation;
+    ssf_press_button(context, button, delay, hold, cool);
+}
 void ssf_press_button(
     ProControllerContext& context,
     Button button,
@@ -131,6 +141,16 @@ void ssf_issue_scroll(
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
     context->issue_system_scroll(&context, direction, delay, hold, cool);
+}
+void ssf_issue_scroll(ProControllerContext& context, DpadPosition direction){
+    Milliseconds delay = 3 * 8ms;
+    Milliseconds hold = 5 * 8ms;
+    Milliseconds cool = 3 * 8ms;
+    Milliseconds timing_variation = context->timing_variation();
+    delay += 2 * timing_variation;
+    hold += timing_variation;
+    cool += timing_variation;
+    ssf_issue_scroll(context, direction, delay, hold, cool);
 }
 
 

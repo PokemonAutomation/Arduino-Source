@@ -112,6 +112,7 @@ TeraMultiFarmer_Descriptor::TeraMultiFarmer_Descriptor()
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        FasterIfTickPrecise::NOT_FASTER,
         2, 4, 2
     )
 {}

@@ -17,8 +17,6 @@ namespace NintendoSwitch{
 constexpr uint8_t MAX_YEAR = 60;
 
 
-void home_to_date_time                      (ProControllerContext& context, bool to_date_change, bool fast);
-
 namespace PokemonSwSh{
 
 void neutral_date_skip                      (ProControllerContext& context);

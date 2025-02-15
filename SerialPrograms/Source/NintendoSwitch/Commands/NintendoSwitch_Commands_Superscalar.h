@@ -31,6 +31,7 @@ void ssf_do_nothing     (ProControllerContext& context, Milliseconds duration);
 
 
 
+void ssf_press_button(ProControllerContext& context, Button button);
 void ssf_press_button(
     ProControllerContext& context,
     Button button,
@@ -92,6 +93,7 @@ void ssf_mash_AZs       (ProControllerContext& context, Milliseconds duration);
 #define SSF_SCROLL_RIGHT        DPAD_RIGHT
 #define SSF_SCROLL_DOWN         DPAD_DOWN
 #define SSF_SCROLL_LEFT         DPAD_LEFT
+void ssf_issue_scroll(ProControllerContext& context, DpadPosition direction);
 void ssf_issue_scroll(
     ProControllerContext& context,
     DpadPosition direction,

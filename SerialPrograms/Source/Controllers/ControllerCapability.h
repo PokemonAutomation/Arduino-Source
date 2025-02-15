@@ -31,6 +31,13 @@
 namespace PokemonAutomation{
 
 
+enum class FasterIfTickPrecise{
+    NOT_FASTER,
+    FASTER,
+    MUCH_FASTER,
+};
+
+
 
 enum class ControllerInterface{
     None,

@@ -115,6 +115,8 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 
 
 #include <QPixmap>
@@ -169,6 +171,7 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        FasterIfTickPrecise::NOT_FASTER,
         1, 4, 1
     )
 {}
@@ -267,7 +270,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
-//    using namespace PokemonSV;
+    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -278,15 +281,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_do_nothing(context, 4);
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_do_nothing(context, 4);
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_do_nothing(context, 4);
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_do_nothing(context, 4);
+    fly_from_paldea_to_blueberry_entrance(env.program_info(), console, context);
 
+
+
+#if 0
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+#endif
 
 
 

@@ -900,6 +900,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp

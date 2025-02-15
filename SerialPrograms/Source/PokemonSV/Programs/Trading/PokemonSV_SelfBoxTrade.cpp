@@ -27,6 +27,7 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        FasterIfTickPrecise::NOT_FASTER,
         2, 2, 2
     )
 {}

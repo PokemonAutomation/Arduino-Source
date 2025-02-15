@@ -100,7 +100,8 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
-    const ControllerRequirements& requirements
+    const ControllerRequirements& requirements,
+    FasterIfTickPrecise faster_if_tick_precise
 ){
     CollapsibleGroupBox* header = make_panel_header(parent, display_name, doc_link, description);
     QLayout* layout = header->widget()->layout();
@@ -116,7 +117,26 @@ CollapsibleGroupBox* make_panel_header(
             break;
         }
 
-        text = html_color_text("(This program does not have any special requirements.)", COLOR_BLUE);
+        switch (faster_if_tick_precise){
+        case PokemonAutomation::FasterIfTickPrecise::MUCH_FASTER:
+            text = html_color_text(
+                "(This program does not have any special controller requirements. "
+                "However, it is strongly recommended to use a controller that is tick-precise since the program will run much faster.)",
+                COLOR_DARKGREEN
+            );
+            break;
+        case PokemonAutomation::FasterIfTickPrecise::FASTER:
+            text = html_color_text(
+                "(This program does not have any special controller requirements. "
+                "However, it runs faster if the controller is tick-precise.)",
+                COLOR_DARKGREEN
+            );
+            break;
+        case PokemonAutomation::FasterIfTickPrecise::NOT_FASTER:
+            text = html_color_text("(This program does not have any special controller requirements.)", COLOR_BLUE);
+            break;
+        }
+
     }while (false);
 
     QLabel* label = new QLabel(QString::fromStdString(text), header);

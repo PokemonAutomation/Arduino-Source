@@ -30,13 +30,24 @@ Color pick_color(FeedbackType feedback){
     return Color();
 }
 #endif
-Color pick_color(const ControllerRequirements& requirements){
+Color pick_color(
+    const ControllerRequirements& requirements,
+    FasterIfTickPrecise faster_if_tick_precise
+){
     if (requirements.contains(ControllerFeature::NintendoSwitch_DateSkip)){
         return COLOR_RED;
     }
     if (requirements.contains(ControllerFeature::TickPrecise)){
         return COLOR_PURPLE;
     }
+    switch (faster_if_tick_precise){
+    case FasterIfTickPrecise::MUCH_FASTER:
+    case FasterIfTickPrecise::FASTER:
+        return COLOR_DARKGREEN;
+    case FasterIfTickPrecise::NOT_FASTER:
+        return COLOR_BLUE;
+    }
+
     return COLOR_BLUE;
 }
 

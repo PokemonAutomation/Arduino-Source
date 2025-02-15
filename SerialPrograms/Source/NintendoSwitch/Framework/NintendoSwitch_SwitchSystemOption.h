@@ -29,7 +29,10 @@ namespace NintendoSwitch{
 
 
 //Color pick_color(FeedbackType feedback);
-Color pick_color(const ControllerRequirements& requirements);
+Color pick_color(
+    const ControllerRequirements& requirements,
+    FasterIfTickPrecise faster_if_tick_precise
+);
 
 
 class SwitchSystemOption{

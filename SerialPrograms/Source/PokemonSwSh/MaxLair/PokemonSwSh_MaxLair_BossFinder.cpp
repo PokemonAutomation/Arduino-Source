@@ -31,6 +31,7 @@ MaxLairBossFinder_Descriptor::MaxLairBossFinder_Descriptor()
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        FasterIfTickPrecise::NOT_FASTER,
         1, 4, 1
     )
 {}

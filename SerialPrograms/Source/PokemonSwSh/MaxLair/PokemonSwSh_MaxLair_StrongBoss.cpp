@@ -23,6 +23,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
 using namespace MaxLairInternal;
 
 
@@ -36,6 +37,7 @@ MaxLairStrongBoss_Descriptor::MaxLairStrongBoss_Descriptor()
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        FasterIfTickPrecise::NOT_FASTER,
         1, 4, 1
     )
 {}

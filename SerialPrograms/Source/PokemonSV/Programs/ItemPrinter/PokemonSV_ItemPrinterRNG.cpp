@@ -18,8 +18,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
@@ -32,9 +32,9 @@
 #include "PokemonSV_ItemPrinterDatabase.h"
 #include "PokemonSV_ItemPrinterRNG.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -50,7 +50,8 @@ ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
         "Farm the Item Printer using RNG Manipulation.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::FASTER
     )
 {}
 
@@ -1016,37 +1017,6 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, ProControllerC
             run_item_printer_rng(env, context, stats);
         }
 
-#if 0
-        if (!AUTO_MATERIAL_FARMING){
-            run_item_printer_rng(env, context, stats);
-        }else{
-            // Throw user setup errors early in program
-            // - Ensure language is set
-            const Language language = LANGUAGE;
-            if (language == Language::None) {
-                throw UserSetupError(env.console.logger(), "Must set game language option to read item printer rewards.");
-            }
-
-            // - Ensure audio input is enabled
-            LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
-            wait_until(
-                env.console, context,
-                std::chrono::milliseconds(1100),
-                {audio_detector}
-            );
-            audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
-
-            // Don't allow the material farmer stats to affect the Item Printer's stats.
-            MaterialFarmerStats mat_farm_stats;// = env.current_stats<MaterialFarmer_Descriptor::Stats>();
-            for (int i = 0; i < NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM; i++){
-                run_item_printer_rng(env, context, stats);
-                press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
-                move_from_item_printer_to_material_farming(env, context);
-                run_material_farmer(env, env.console, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
-                move_from_material_farming_to_item_printer(env, context);
-            }
-        }
-#endif
     }catch (ProgramFinishedException&){}
 
     if (FIX_TIME_WHEN_DONE){
