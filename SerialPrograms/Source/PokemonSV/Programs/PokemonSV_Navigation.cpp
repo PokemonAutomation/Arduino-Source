@@ -55,16 +55,32 @@ void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, Pr
 void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     home_to_date_time(context, true, true);
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_issue_scroll(context, DPAD_RIGHT, 0);
-    ssf_press_button(context, BUTTON_A, 2);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-    ssf_press_button(context, BUTTON_A, 20, 10);
+
+    Milliseconds timing_variation = context->timing_variation();
+    if (timing_variation == 0ms){
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, DPAD_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 2);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_press_button(context, BUTTON_A, 0);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+    }else{
+        ssf_press_button(context, BUTTON_A, 160ms + timing_variation, 80ms + timing_variation);
+        ssf_issue_scroll(context, DPAD_RIGHT);
+        ssf_press_button(context, BUTTON_A);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
+        ssf_press_button(context, BUTTON_A);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
+        ssf_press_button(context, BUTTON_A, 160ms + timing_variation, 80ms + timing_variation);
+    }
+
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(stream, context);
 }

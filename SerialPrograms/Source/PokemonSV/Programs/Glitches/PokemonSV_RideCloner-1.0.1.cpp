@@ -48,7 +48,10 @@ RideCloner101_Descriptor::RideCloner101_Descriptor()
         "Clone your ride legendary (and its item) using the add-to-party glitch.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        }
     )
 {}
 struct RideCloner101_Descriptor::Stats : public StatsTracker{

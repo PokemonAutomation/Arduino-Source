@@ -40,7 +40,10 @@ CloneItems101_Descriptor::CloneItems101_Descriptor()
         "Clone items using the add-to-party glitch.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        }
     )
 {}
 struct CloneItems101_Descriptor::Stats : public StatsTracker{
