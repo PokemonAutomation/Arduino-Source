@@ -95,7 +95,7 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
             return;
         }
 
-        ssf_press_button(context, BUTTON_A);
+        ssf_press_button(context, BUTTON_A, 1000ms, timing_variation, timing_variation);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN);
     }

@@ -317,7 +317,16 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
     ItemPrinterPrizeResult prize_result;
     bool printed = false;
     bool overworld_seen = false;
+    size_t failures = 0;
+    std::chrono::seconds next_wait_time = std::chrono::seconds(120);
     while (true){
+        if (failures >= 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to print after 5 attempts.",
+                env.console
+            );
+        }
         context.wait_for_all_requests();
 
         OverworldWatcher overworld(env.console, COLOR_BLUE);
@@ -326,7 +335,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
         DateChangeWatcher date_reader;
         WhiteButtonWatcher material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
         int ret = wait_until(
-            env.console, context, std::chrono::seconds(120),
+            env.console, context, next_wait_time,
             {
                 overworld,
                 dialog,
@@ -335,6 +344,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
                 material,
             }
         );
+        next_wait_time = std::chrono::seconds(120);
         switch (ret){
         case 0:
             overworld_seen = true;
@@ -357,6 +367,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             home_to_date_time(context, true, false);
             pbf_press_button(context, BUTTON_A, 10, 30);
             context.wait_for_all_requests();
+            next_wait_time = std::chrono::seconds(5);
             continue;
         }
         case 3:{
@@ -431,13 +442,17 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             continue;
         }
         default:
+            failures++;
             stats.errors++;
             env.update_stats();
+            env.console.log("No state detected after 2 minutes.", COLOR_RED);
+#if 0
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No state detected after 2 minutes.",
                 env.console
             );
+#endif
         }
     }
 }
