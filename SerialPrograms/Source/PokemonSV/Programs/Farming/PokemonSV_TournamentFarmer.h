@@ -21,10 +21,18 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+void return_to_academy_after_loss(
+    ProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context
+);
 
 // attempt to fly back to academy fly point from the West Mesogoza Pokecenter. Will attempt maxAttempts times.
-void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+void go_to_academy_fly_point(
+    ProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context
+);
 
 class TournamentFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:

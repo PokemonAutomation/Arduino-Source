@@ -38,7 +38,7 @@ TournamentFarmer_Descriptor::TournamentFarmer_Descriptor()
         "Farm the Academy Ace Tournament for money and prizes.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -552,9 +552,13 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
 
 
 //Fly to academy from west pokemon center after losing.
-void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void return_to_academy_after_loss(
+    ProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context
+){
     env.log("Tournament lost! Navigating back to academy.");
-    go_to_academy_fly_point(env, context);
+    go_to_academy_fly_point(env, stream, context);
 
 
     pbf_wait(context, 100);
@@ -572,7 +576,7 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, ProContro
 
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
     int ret_black_lost = run_until<ProControllerContext>(
-        env.console, context,
+        stream, context,
         [](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 5000, 0);
         },
@@ -584,8 +588,8 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, ProContro
     }
 
     //Wait for academy to load.
-    OverworldWatcher overworld(env.console, COLOR_CYAN);
-    int ret_academy = wait_until(env.console, context, Milliseconds(4000), { overworld });
+    OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
+    int ret_academy = wait_until(stream, context, Milliseconds(4000), { overworld });
     if (ret_academy == 0){
         env.log("Entered academy. Walking to tournament entry.");
     }
@@ -598,19 +602,19 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, ProContro
     context.wait_for_all_requests();
 }
 
-void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void go_to_academy_fly_point(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     int numAttempts = 0;
     int maxAttempts = 5;
 
     bool isFlySuccessful = false;
 
     while (!isFlySuccessful && numAttempts < maxAttempts ){
-        open_map_from_overworld(env.program_info(), env.console, context);
+        open_map_from_overworld(env.program_info(), stream, context);
         pbf_press_button(context, BUTTON_ZR, 50, 40);
         pbf_move_left_joystick(context, 200, 0, 47, 25);  
         // pbf_move_left_joystick(context, 187, 0, 50, 0);
         numAttempts++;
-        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), env.console, context, true);
+        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), stream, context, true);
         if (!isFlySuccessful){
             env.log("Unsuccessful fly attempt.");
         }
@@ -621,7 +625,7 @@ void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, ProControllerC
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to fly back to academy!",
-            env.console
+            stream
         );
     }
 
@@ -766,7 +770,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
             }
 
             if (battle_lost){
-                return_to_academy_after_loss(env, context);
+                return_to_academy_after_loss(env, env.console, context);
                 break;
             }
         }

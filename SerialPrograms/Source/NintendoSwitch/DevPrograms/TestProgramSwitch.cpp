@@ -117,6 +117,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
+#include "PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h"
 
 
 #include <QPixmap>
@@ -281,7 +282,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-    fly_from_paldea_to_blueberry_entrance(env.program_info(), console, context);
+    return_to_academy_after_loss(env, console, context);
+
+
+
+
+//    fly_from_paldea_to_blueberry_entrance(env.program_info(), console, context);
 
 
 

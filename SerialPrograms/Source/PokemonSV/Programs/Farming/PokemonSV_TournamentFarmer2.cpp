@@ -35,7 +35,7 @@ TournamentFarmer2_Descriptor::TournamentFarmer2_Descriptor()
         "Farm the Academy Ace Tournament for money and prizes. (version 2)",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -295,7 +295,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
 
 
             if (battle_lost){
-                return_to_academy_after_loss(env, context);
+                return_to_academy_after_loss(env, env.console, context);
                 break;
             }
         }

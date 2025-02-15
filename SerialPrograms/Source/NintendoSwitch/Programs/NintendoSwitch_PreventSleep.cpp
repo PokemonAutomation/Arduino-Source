@@ -19,7 +19,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
         "Press B every 15 seconds to keep the Switch from sleeping.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
