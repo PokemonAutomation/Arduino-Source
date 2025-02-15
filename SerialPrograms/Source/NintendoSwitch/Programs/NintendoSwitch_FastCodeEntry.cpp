@@ -250,7 +250,7 @@ std::vector<std::vector<CodeboardAction>> codeboard_get_all_paths(
             paths.emplace_back(std::move(path));
         }
     }
-    {
+    if (reordering){
         CodeboardPosition position = positions[length - 1];
         std::vector<CodeboardAction> current = codeboard_get_mode_path(start, position);
         current.emplace_back(CodeboardAction::SCROLL_LEFT);
