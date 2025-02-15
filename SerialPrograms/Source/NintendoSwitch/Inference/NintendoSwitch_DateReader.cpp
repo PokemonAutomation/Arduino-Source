@@ -136,7 +136,7 @@ void DateReader::set_hours(
     for (size_t attempts = 0; attempts < 10; attempts++){
         //  Move cursor out of the way.
         for (size_t c = 0; c < 7; c++){
-            pbf_press_dpad(context, DPAD_LEFT, 5, 3);
+            ssf_issue_scroll(context, DPAD_LEFT);
         }
         context.wait_for_all_requests();
         context.wait_for(std::chrono::milliseconds(250));
@@ -157,15 +157,15 @@ void DateReader::set_hours(
         //  We're done.
         if (current_hour == hour){
             for (size_t c = 0; c < 7; c++){
-                pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
+                ssf_issue_scroll(context, DPAD_RIGHT);
             }
             return;
         }
 
         //  Move the cursor to the hour.
-        pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
-        pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
-        pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
+        ssf_issue_scroll(context, DPAD_RIGHT);
+        ssf_issue_scroll(context, DPAD_RIGHT);
+        ssf_issue_scroll(context, DPAD_RIGHT);
 
         ImageViewRGB32 us_hours = extract_box_reference(snapshot, m_us_hour);
         ImageStats stats_us_hours = image_stats(us_hours);
@@ -175,27 +175,27 @@ void DateReader::set_hours(
             uint8_t diff = (24 + (uint8_t)hour - (uint8_t)current_hour) % 12;
             if (diff < 6){
                 for (size_t c = 0; c < diff; c++){
-                    pbf_press_dpad(context, DPAD_UP, 5, 3);
+                    ssf_issue_scroll(context, DPAD_UP);
                 }
             }else{
                 for (size_t c = diff; c < 12; c++){
-                    pbf_press_dpad(context, DPAD_DOWN, 5, 3);
+                    ssf_issue_scroll(context, DPAD_DOWN);
                 }
             }
             if ((hour < 12) != (current_hour < 12)){
-                pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
-                pbf_press_dpad(context, DPAD_RIGHT, 5, 3);
-                pbf_press_dpad(context, DPAD_DOWN, 5, 3);
+                ssf_issue_scroll(context, DPAD_RIGHT);
+                ssf_issue_scroll(context, DPAD_RIGHT);
+                ssf_issue_scroll(context, DPAD_DOWN);
             }
         }else{
             uint8_t diff = (24 + (uint8_t)hour - (uint8_t)current_hour) % 24;
             if (diff < 12){
                 for (size_t c = 0; c < diff; c++){
-                    pbf_press_dpad(context, DPAD_UP, 5, 3);
+                    ssf_issue_scroll(context, DPAD_UP);
                 }
             }else{
                 for (size_t c = diff; c < 24; c++){
-                    pbf_press_dpad(context, DPAD_DOWN, 5, 3);
+                    ssf_issue_scroll(context, DPAD_DOWN);
                 }
             }
         }

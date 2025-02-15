@@ -80,7 +80,7 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         //  Two A presses in case we drop the 1st one.
         ssf_mash1_button(context, BUTTON_A, 200ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3000ms, 3000ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 2500ms, 2500ms);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 500ms, 500ms);
 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN);
