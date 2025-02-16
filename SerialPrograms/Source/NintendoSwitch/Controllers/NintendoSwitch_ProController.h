@@ -337,14 +337,14 @@ public:
 
 #if 1   //  REMOVE
     void wait_for_all_requests() const{
-        m_lifetime_sanitizer.check_usage();
+        auto scope = m_lifetime_sanitizer.check_scope();
         m_controller.wait_for_all(this);
     }
 #endif
 
     //  Stop all commands in this context now.
     void cancel_now(){
-        m_lifetime_sanitizer.check_usage();
+        auto scope = m_lifetime_sanitizer.check_scope();
         CancellableScope::cancel(nullptr);
         m_controller.cancel_all_commands();
     }
@@ -358,13 +358,13 @@ public:
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
     void cancel_lazy(){
-        m_lifetime_sanitizer.check_usage();
+        auto scope = m_lifetime_sanitizer.check_scope();
         CancellableScope::cancel(nullptr);
         m_controller.replace_on_next_command();
     }
 
     virtual bool cancel(std::exception_ptr exception) noexcept override{
-        m_lifetime_sanitizer.check_usage();
+        auto scope = m_lifetime_sanitizer.check_scope();
         if (CancellableScope::cancel(std::move(exception))){
             return true;
         }

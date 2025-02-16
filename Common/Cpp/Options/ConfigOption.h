@@ -73,6 +73,9 @@ public:
     void check_usage() const{
         m_lifetime_sanitizer.check_usage();
     }
+    LifetimeSanitizer::CheckScope check_scope() const{
+        return m_lifetime_sanitizer.check_scope();
+    }
 
 public:
     LockMode lock_mode() const;

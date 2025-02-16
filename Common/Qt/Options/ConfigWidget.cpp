@@ -32,6 +32,7 @@ ConfigWidget::ConfigWidget(ConfigOption& m_value, QWidget& widget)
     m_value.add_listener(*this);
 }
 void ConfigWidget::update_visibility(){
+    auto scope = m_value.check_scope();
     m_value.check_usage();
     if (m_widget == nullptr){
         return;
@@ -59,24 +60,24 @@ void ConfigWidget::update_visibility(){
     }
 }
 void ConfigWidget::update_visibility(bool program_is_running){
-    m_value.check_usage();
+    auto scope = m_value.check_scope();
     m_program_is_running = program_is_running;
     update_visibility();
 }
 void ConfigWidget::update_all(bool program_is_running){
-    m_value.check_usage();
+    auto scope = m_value.check_scope();
     update_value();
     update_visibility(program_is_running);
 }
 
 void ConfigWidget::visibility_changed(){
-    m_value.check_usage();
+    auto scope = m_value.check_scope();
     QMetaObject::invokeMethod(m_widget, [this]{
         update_visibility();
     }, Qt::QueuedConnection);
 }
 void ConfigWidget::program_state_changed(bool program_is_running){
-    m_value.check_usage();
+    auto scope = m_value.check_scope();
     QMetaObject::invokeMethod(m_widget, [this, program_is_running]{
         update_visibility(program_is_running);
     }, Qt::QueuedConnection);

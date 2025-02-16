@@ -56,23 +56,26 @@ public:
     };
 
     void check_usage() const;
+    void start_using() const;
+    void done_using() const;
     CheckScope check_scope() const{
         return CheckScope(*this);
     }
 
-    static void set_enabled(bool enabled);
-    static void terminate_with_dump();
-
+    static void disable();
 
 
 private:
-    void internal_construct();
+    static void terminate_with_dump();
+    void internal_construct(const char* name);
     void internal_destruct();
+
 
 private:
     uint64_t m_token;
     void* m_self;
     const char* m_name;
+    mutable size_t m_use_counter = 0;
 };
 
 
@@ -80,7 +83,12 @@ private:
 class LifetimeSanitizer{
 public:
     void check_usage() const{}
-    static void set_enabled(bool enabled){}
+    static void disable(){}
+
+    using CheckScope = bool;
+    CheckScope check_scope() const{
+        return false;
+    }
 };
 #endif
 

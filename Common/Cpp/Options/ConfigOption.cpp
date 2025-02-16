@@ -63,17 +63,17 @@ ConfigOption::ConfigOption(ConfigOptionState visibility)
 {}
 
 void ConfigOption::add_listener(Listener& listener){
-    m_lifetime_sanitizer.check_usage();
+    auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
     data.listeners.add(listener);
 }
 void ConfigOption::remove_listener(Listener& listener){
-    m_lifetime_sanitizer.check_usage();
+    auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
     data.listeners.remove(listener);
 }
 size_t ConfigOption::total_listeners() const{
-    m_lifetime_sanitizer.check_usage();
+    auto scope = m_lifetime_sanitizer.check_scope();
     const Data& data = *m_data;
     return data.listeners.count_unique();
 }
@@ -105,7 +105,7 @@ ConfigOptionState ConfigOption::visibility() const{
     return m_data->visibility.load(std::memory_order_relaxed);
 }
 void ConfigOption::set_visibility(ConfigOptionState visibility){
-    m_lifetime_sanitizer.check_usage();
+    auto scope = m_lifetime_sanitizer.check_scope();
     if (m_data->set_visibility(visibility)){
         report_visibility_changed();
     }
@@ -113,17 +113,17 @@ void ConfigOption::set_visibility(ConfigOptionState visibility){
 
 
 void ConfigOption::report_visibility_changed(){
-    m_lifetime_sanitizer.check_usage();
+    auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
     data.listeners.run_method_unique(&Listener::visibility_changed);
 }
 void ConfigOption::report_program_state(bool program_is_running){
-    m_lifetime_sanitizer.check_usage();
+    auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
     data.listeners.run_method_unique(&Listener::program_state_changed, program_is_running);
 }
 void ConfigOption::report_value_changed(void* object){
-    m_lifetime_sanitizer.check_usage();
+    auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
     data.listeners.run_method_unique(&Listener::value_changed, object);
 }
