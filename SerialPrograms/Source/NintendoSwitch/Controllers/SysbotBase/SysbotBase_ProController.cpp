@@ -82,12 +82,16 @@ ProController_SysbotBase::~ProController_SysbotBase(){
 
 
 void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
-//    cout << "ProController_SysbotBase::wait_for_all()" << endl;
+//    cout << "ProController_SysbotBase::wait_for_all - Enter()" << endl;
     issue_barrier(cancellable);
     std::unique_lock<std::mutex> lg(m_lock);
     m_cv.wait(lg, [this]{
-        return m_command_queue.empty() || m_replace_on_next.load(std::memory_order_relaxed);
+        return m_command_queue.empty() || m_replace_on_next;
     });
+    if (cancellable){
+        cancellable->throw_if_cancelled();
+    }
+//    cout << "ProController_SysbotBase::wait_for_all - Exit()" << endl;
 }
 void ProController_SysbotBase::cancel_all_commands(){
 //    cout << "ProController_SysbotBase::cancel_all_commands()" << endl;
@@ -102,11 +106,11 @@ void ProController_SysbotBase::cancel_all_commands(){
     this->clear_on_next();
 }
 void ProController_SysbotBase::replace_on_next_command(){
-//    cout << "ProController_SysbotBase::replace_on_next_command()" << endl;
+//    cout << "ProController_SysbotBase::replace_on_next_command - Enter()" << endl;
     {
         std::lock_guard<std::mutex> lg(m_lock);
         m_cv.notify_all();
-        m_replace_on_next.store(true, std::memory_order_relaxed);
+        m_replace_on_next = true;
     }
     this->clear_on_next();
 }
@@ -120,21 +124,37 @@ void ProController_SysbotBase::issue_controller_state(
     uint8_t right_x, uint8_t right_y,
     Milliseconds duration
 ){
+#if 0
+//    cout << "issue_controller_state(): Entering" << endl;
+    m_logger.log(
+        "issue_controller_state(): (" + button_to_string(button) +
+        "), dpad(" + dpad_to_string(position) +
+        "), LJ(" + std::to_string(left_x) + "," + std::to_string(left_y) +
+        "), RJ(" + std::to_string(right_x) + "," + std::to_string(right_y) +
+        ")",
+        COLOR_DARKGREEN
+    );
+#endif
+
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
 
     std::unique_lock<std::mutex> lg(m_lock);
 
-    if (m_replace_on_next.load(std::memory_order_acquire)){
-        m_command_queue.clear();
-        m_is_active = false;
-        m_replace_on_next.store(false, std::memory_order_relaxed);
+    m_cv.wait(lg, [this]{
+        return m_command_queue.size() < QUEUE_SIZE || m_replace_on_next;
+    });
+
+    if (cancellable){
+        cancellable->throw_if_cancelled();
     }
 
-    m_cv.wait(lg, [this]{
-        return m_command_queue.size() < QUEUE_SIZE;
-    });
+    if (m_replace_on_next){
+        m_command_queue.clear();
+        m_is_active = false;
+        m_replace_on_next = false;
+    }
 
     if (m_command_queue.empty()){
         m_cv.notify_all();

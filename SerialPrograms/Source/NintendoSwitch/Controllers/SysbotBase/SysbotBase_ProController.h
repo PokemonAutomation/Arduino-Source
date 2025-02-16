@@ -86,7 +86,7 @@ private:
     std::string m_error_string;
 
     std::atomic<bool> m_stopping;
-    std::atomic<bool> m_replace_on_next;
+    bool m_replace_on_next;
 
     struct Command{
         SwitchControllerState state;
