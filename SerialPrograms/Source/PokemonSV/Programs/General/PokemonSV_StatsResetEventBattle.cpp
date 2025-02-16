@@ -187,17 +187,12 @@ StatsResetEventBattle::StatsResetEventBattle()
         FILTERS0.set_default(std::move(ret));
         FILTERS0.restore_defaults();
     }
-//    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_STATIC(CALCULATED_IVS);
-//    }
+    PA_ADD_STATIC(CALCULATED_IVS);
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(TRY_TO_TERASTILLIZE);
-//    PA_ADD_OPTION(FILTERS);
-//    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(FILTERS0);
-//    }
+    PA_ADD_OPTION(FILTERS0);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }

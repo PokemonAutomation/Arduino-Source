@@ -6,6 +6,7 @@
 
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "ControllerSelectorWidget.h"
@@ -46,7 +47,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SysbotBaseNetwork)));
 //    interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SysbotBaseUSB)));
 
-    if (!PreloadSettings::instance().DEVELOPER_MODE){
+    if (!IS_BETA_VERSION && !PreloadSettings::instance().DEVELOPER_MODE){
         interface_dropdown->setHidden(true);
     }
 
