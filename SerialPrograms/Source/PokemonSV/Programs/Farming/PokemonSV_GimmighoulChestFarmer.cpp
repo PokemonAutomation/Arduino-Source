@@ -38,7 +38,11 @@ GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
         "Farm Chest Gimmighoul for coins.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        },
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -254,17 +258,17 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
         //  Date skip - in-game day cycle is 72 mins, so 2 hours is fastest way
         //  This isn't perfect because 12 hour format but it works
         home_to_date_time(context, true, false);
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        ssf_issue_scroll(context, DPAD_RIGHT, 0);
-        ssf_press_button(context, BUTTON_A, 2);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
-        ssf_issue_scroll(context, DPAD_RIGHT, 0);
-        ssf_press_button(context, BUTTON_A, 2);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT, 0ms);
+        ssf_press_button_ptv(context, BUTTON_A, 16ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT, 0ms);
+        ssf_press_button_ptv(context, BUTTON_A, 16ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
         stats.resets++;

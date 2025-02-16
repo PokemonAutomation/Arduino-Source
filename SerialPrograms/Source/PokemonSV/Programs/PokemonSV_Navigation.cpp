@@ -56,8 +56,8 @@ void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context)
     pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     home_to_date_time(context, true, true);
 
-    Milliseconds timing_variation = context->timing_variation();
-    if (timing_variation == 0ms){
+    Milliseconds tv = context->timing_variation();
+    if (tv == 0ms){
         ssf_press_button(context, BUTTON_A, 20, 10);
         ssf_issue_scroll(context, DPAD_RIGHT, 0);
         ssf_press_button(context, BUTTON_A, 2);
@@ -69,16 +69,16 @@ void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context)
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
         ssf_press_button(context, BUTTON_A, 20, 10);
     }else{
-        ssf_press_button(context, BUTTON_A, 160ms + timing_variation, 80ms + timing_variation);
-        ssf_issue_scroll(context, DPAD_RIGHT);
-        ssf_press_button(context, BUTTON_A);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
-        ssf_press_button(context, BUTTON_A);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
-        ssf_press_button(context, BUTTON_A, 160ms + timing_variation, 80ms + timing_variation);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms);
     }
 
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);

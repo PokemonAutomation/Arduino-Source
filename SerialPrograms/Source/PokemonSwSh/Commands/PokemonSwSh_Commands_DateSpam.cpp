@@ -36,52 +36,91 @@ void neutral_date_skip(ProControllerContext& context){
 }
 void roll_date_forward_1(ProControllerContext& context, bool fast){
     //  If (fast == true) this will run faster, but slightly less reliably.
-    uint8_t scroll_delay = fast ? 3 : 4;
-    uint8_t up_delay = fast ? 2 : 3;
 
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
-    ssf_press_button(context, BUTTON_A, up_delay);
-//    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, up_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    Milliseconds tv = context->timing_variation();
+    if (tv == 0ms){
+        uint8_t scroll_delay = fast ? 3 : 4;
+        uint8_t up_delay = fast ? 2 : 3;
+
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
+        ssf_press_button(context, BUTTON_A, up_delay);
+    //    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, up_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+        ssf_press_button(context, BUTTON_A, 0);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+    }else{
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
+        ssf_press_button_ptv(context, BUTTON_A);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+    }
+
 }
 void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fast){
+    //  If (fast == true) this will run faster, but slightly less reliably.
+
     if (skips == 0){
         return;
     }
 
-    //  If (fast == true) this will run faster, but slightly less reliably.
-    uint8_t scroll_delay = fast ? 3 : 4;
-    uint8_t up_delay = 3;
+    Milliseconds tv = context->timing_variation();
+    if (tv == 0ms){
+        uint8_t scroll_delay = fast ? 3 : 4;
+        uint8_t up_delay = 3;
 
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    for (uint8_t c = 0; c < skips - 1; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
-    }
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
-    ssf_press_button(context, BUTTON_A, up_delay);
-//    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    for (uint8_t c = 0; c < skips - 1; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
-    }
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
-    ssf_press_button(context, BUTTON_A, up_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-//    if (!fast){
-//        //  Add an extra one in case one is dropped.
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        for (uint8_t c = 0; c < skips - 1; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
+        }
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+        ssf_press_button(context, BUTTON_A, up_delay);
 //        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
-//    }
-    ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+        for (uint8_t c = 0; c < skips - 1; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
+        }
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+        ssf_press_button(context, BUTTON_A, up_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+//        if (!fast){
+//            //  Add an extra one in case one is dropped.
+//            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+//        }
+        ssf_press_button(context, BUTTON_A, 20, 10);
+    }else{
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 6000ms, 6000ms);
+        ssf_press_button_ptv(context, BUTTON_A);
+//        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 6000ms, 6000ms);
+        ssf_press_button_ptv(context, BUTTON_A);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+//        if (!fast){
+//            //  Add an extra one in case one is dropped.
+//            ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+//        }
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+    }
+
+
 }
 void home_roll_date_enter_game_autorollback(
     VideoStream& stream, ProControllerContext& context,

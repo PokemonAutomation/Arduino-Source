@@ -15,8 +15,8 @@ namespace NintendoSwitch{
 void home_to_date_time(ProControllerContext& context, bool to_date_change, bool fast){
     //  If (fast == true) this will run faster, but slightly less accurately.
 
-    Milliseconds timing_variation = context->timing_variation();
-    if (timing_variation == 0ms){
+    Milliseconds tv = context->timing_variation();
+    if (tv == 0ms){
         //  Fast version for tick-precise.
 
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
@@ -69,35 +69,35 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         ssf_do_nothing(context, 1500ms);
 
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
 
         //  Down twice in case we drop one.
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
-//        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+//        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
 
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
 
         //  Two A presses in case we drop the 1st one.
         ssf_mash1_button(context, BUTTON_A, 200ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 2500ms, 2500ms);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 500ms, 500ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 2500ms, 2500ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 500ms, 500ms);
 
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 500ms, 300ms);   //  Scroll down
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, tv, tv);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 250ms, tv);  //  Scroll down
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
 
         if (!to_date_change){
-            ssf_press_button(context, BUTTON_A);
+            ssf_press_button_ptv(context, BUTTON_A);
             return;
         }
 
-        ssf_press_button(context, BUTTON_A, 1000ms, timing_variation, timing_variation);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN);
+        ssf_press_button_ptv(context, BUTTON_A, 1000ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
     }
 }
 

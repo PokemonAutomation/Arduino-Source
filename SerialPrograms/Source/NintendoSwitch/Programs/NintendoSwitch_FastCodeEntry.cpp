@@ -441,8 +441,8 @@ void enter_alphanumeric_code(
         }
     );
     if (settings.include_plus){
-        ssf_press_button(context, BUTTON_PLUS);
-        ssf_press_button(context, BUTTON_PLUS);
+        ssf_press_button_ptv(context, BUTTON_PLUS);
+        ssf_press_button_ptv(context, BUTTON_PLUS);
     }
     ssf_flush_pipeline(context);
 }

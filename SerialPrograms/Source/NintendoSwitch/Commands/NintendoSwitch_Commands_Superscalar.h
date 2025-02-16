@@ -108,12 +108,41 @@ void ssf_issue_scroll(
 
 
 //
-//  These overloads without timing parameters are intended for navigation within
-//  the Switch settings. They will use "context->timing_variation()" to
-//  determine the fastest/safest timings to use.
+//  ptv = plus timing variation
 //
-void ssf_press_button(ProControllerContext& context, Button button);
-void ssf_issue_scroll(ProControllerContext& context, DpadPosition direction);
+//  These are simple wrappers that add "context->timing_variation()" to
+//  every timing. Mostly intended for Switch menu navigation where we usually
+//  attempt fast movements.
+//
+inline void ssf_press_button_ptv(
+    ProControllerContext& context,
+    Button button,
+    Milliseconds delay = 3*8ms,
+    Milliseconds hold = 5*8ms,
+    Milliseconds cool = 3*8ms
+){
+    ssf_press_button(
+        context, button,
+        delay + context->timing_variation(),
+        hold + context->timing_variation(),
+        cool + context->timing_variation()
+    );
+}
+inline void ssf_issue_scroll_ptv(
+    ProControllerContext& context,
+    DpadPosition direction,
+    Milliseconds delay = 3*8ms,
+    Milliseconds hold = 5*8ms,
+    Milliseconds cool = 3*8ms
+){
+    ssf_issue_scroll(
+        context, direction,
+        delay + context->timing_variation(),
+        hold + context->timing_variation(),
+        cool + context->timing_variation()
+    );
+}
+
 
 
 

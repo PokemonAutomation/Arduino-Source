@@ -32,7 +32,8 @@ GimmighoulRoamingFarmer_Descriptor::GimmighoulRoamingFarmer_Descriptor()
         "Farm roaming Gimmighoul for coins.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -78,9 +79,11 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
         if (year >= MAX_YEAR){
             PokemonSwSh::roll_date_backward_N(context, MAX_YEAR, true);
             year = 0;
+        }else{
+            PokemonSwSh::roll_date_forward_1(context, true);
+            year++;
         }
-        PokemonSwSh::roll_date_forward_1(context, true);
-        year++;
+
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
         //  Reset game

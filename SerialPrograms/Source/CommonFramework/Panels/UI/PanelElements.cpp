@@ -121,7 +121,7 @@ CollapsibleGroupBox* make_panel_header(
         case PokemonAutomation::FasterIfTickPrecise::MUCH_FASTER:
             text = html_color_text(
                 "(This program does not have any special controller requirements. "
-                "However, it is strongly recommended to use a controller that is tick-precise since the program will run much faster.)",
+                "However, it is strongly recommended to use a tick-precise controller as the program will run much faster.)",
                 COLOR_DARKGREEN
             );
             break;
