@@ -47,7 +47,8 @@ ShinyHuntScatterbug_Descriptor::ShinyHuntScatterbug_Descriptor()
         "Shiny hunt Scatterbug.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct ShinyHuntScatterbug_Descriptor::Stats : public LetsGoEncounterBotStats{
@@ -130,17 +131,19 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
-        PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
-        PA_ADD_OPTION(SKIP_SANDWICH);
-    }
     PA_ADD_OPTION(SAVE_GAME_AT_START);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
+        PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
+        PA_ADD_OPTION(SKIP_SANDWICH);
+    }
+
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
