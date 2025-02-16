@@ -23,7 +23,7 @@ class ProController_SysbotBase : public ProControllerWithScheduler{
 public:
     using ContextType = ProControllerContext;
 
-    static constexpr size_t QUEUE_SIZE = 8;
+    static constexpr size_t QUEUE_SIZE = 32;
     static constexpr std::chrono::microseconds EARLY_WAKE_SPIN = std::chrono::microseconds(2000);
 
 

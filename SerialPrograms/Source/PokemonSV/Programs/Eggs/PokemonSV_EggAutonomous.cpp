@@ -44,7 +44,8 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         "Automatically get meal power, fetch eggs from a picnic and hatch them.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct EggAutonomous_Descriptor::Stats : public StatsTracker{
