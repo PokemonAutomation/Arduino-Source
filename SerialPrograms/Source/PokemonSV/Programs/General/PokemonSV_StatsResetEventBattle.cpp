@@ -77,7 +77,8 @@ StatsResetEventBattle_Descriptor::StatsResetEventBattle_Descriptor()
         "Repeatedly catch Bloodmoon Ursaluna or Pecharunt until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct StatsResetEventBattle_Descriptor::Stats : public StatsTracker{
@@ -200,13 +201,13 @@ StatsResetEventBattle::StatsResetEventBattle()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
-void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
+void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     PromptDialogWatcher prompt_detector(COLOR_YELLOW);
     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
 
-    //Initiate dialog with Perrin
+    //  Initiate dialog with Perrin
     pbf_press_button(context, BUTTON_A, 10, 50);
     int ret = wait_until(env.console, context, Milliseconds(4000), { advance_detector });
     if (ret == 0){
@@ -214,11 +215,11 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     }else{
         env.log("Dialog not detected.");
     }
-    //Yes, ready
+    //  Yes, ready
     pbf_mash_button(context, BUTTON_A, 400);
     context.wait_for_all_requests();
 
-    //Mash B until next dialog select
+    //  Mash B until next dialog select
     int retPrompt = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
@@ -233,19 +234,19 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     }
     context.wait_for_all_requests();
 
-    //Pick an option to continue
+    //  Pick an option to continue
     pbf_mash_button(context, BUTTON_A, 400);
     context.wait_for_all_requests();
 
-    //Mash B until next dialog select (again)
-    //PromptDialogWatcher prompt_detector2(COLOR_YELLOW);
+    //  Mash B until next dialog select (again)
+//    PromptDialogWatcher prompt_detector2(COLOR_YELLOW);
     int retPrompt2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { prompt_detector }
-        );
+    );
     if (retPrompt2 != 0){
         env.log("Failed to detect prompt (again) dialog!", COLOR_RED);
     }else{
@@ -253,18 +254,18 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
     }
     context.wait_for_all_requests();
 
-    //Pick an option to continue
+    //  Pick an option to continue
     pbf_mash_button(context, BUTTON_A, 400);
     context.wait_for_all_requests();
 
-    //Now keep going until the battle starts
+    //  Now keep going until the battle starts
     int ret_battle = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { battle_menu }
-        );
+    );
     if (ret_battle != 0){
         env.log("Failed to detect battle start!", COLOR_RED);
     }else{
@@ -274,12 +275,11 @@ void StatsResetEventBattle::enter_battle_ursaluna(SingleSwitchProgramEnvironment
 }
 
 void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-
     AdvanceDialogWatcher advance_detector(COLOR_YELLOW);
     AdvanceDialogWatcher advance_detector2(COLOR_YELLOW);
     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
 
-    //Talk to Pecharunt
+    //  Talk to Pecharunt
     pbf_press_button(context, BUTTON_A, 10, 50);
     int ret = wait_until(env.console, context, Milliseconds(6000), { advance_detector });
     if (ret == 0){
@@ -290,19 +290,19 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
     pbf_mash_button(context, BUTTON_A, 400);
     context.wait_for_all_requests();
 
-    //Do you want to challenge the strange pokemon?
+    //  Do you want to challenge the strange pokemon?
     int ret2 = wait_until(env.console, context, Milliseconds(6000), { advance_detector2 });
     if (ret2 == 0){
         env.log("Dialog detected.");
     }else{
         env.log("Dialog not detected.");
     }
-    //Mash through, answer Yes.
+    //  Mash through, answer Yes.
     pbf_mash_button(context, BUTTON_A, 500);
     context.wait_for_all_requests();
 
-    //Mash B until the battle starts
-    //Note - Sending out Ogerpon/Loyal Three during battle adds time, but the below is more than enough.
+    //  Mash B until the battle starts
+    //  Note - Sending out Ogerpon/Loyal Three during battle adds time, but the below is more than enough.
     int ret_battle = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
@@ -321,7 +321,7 @@ void StatsResetEventBattle::enter_battle_pecharunt(SingleSwitchProgramEnvironmen
 bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
 
-    //Assuming the player has a charged orb
+    //  Assuming the player has a charged orb
     if (TRY_TO_TERASTILLIZE){
         env.log("Attempting to terastillize.");
         //Open move menu
@@ -333,7 +333,7 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
         pbf_press_button(context, BUTTON_A, 10, 50);
     }
 
-    //Repeatedly use first attack
+    //  Repeatedly use first attack
     TeraCatchWatcher catch_menu(COLOR_BLUE);
     AdvanceDialogWatcher lost(COLOR_YELLOW);
     WallClock start = current_time();
@@ -430,86 +430,9 @@ bool StatsResetEventBattle::run_battle(SingleSwitchProgramEnvironment& env, ProC
     return true;
 }
 
-#if 0
-bool StatsResetEventBattle::check_stats(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    StatsResetEventBattle_Descriptor::Stats& stats = env.current_stats<StatsResetEventBattle_Descriptor::Stats>();
-    bool match = false;
-
-    //Open box
-    enter_box_system_from_overworld(env.program_info(), env.console, context);
-    context.wait_for(std::chrono::milliseconds(400));
-
-    if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0){
-        //Is this even possible for Ursaluna?
-        env.console.log("One or more empty slots in party. Ursaluna was not caught.");
-        send_program_status_notification(
-            env, NOTIFICATION_STATUS_UPDATE,
-            "One or more empty slots in party. Ursaluna was not caught."
-        );
-    }else{
-        //Navigate to last party slot
-        move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 5, 0);
-
-        //Check the IVs of the newly caught Pokemon - *must be on IV panel*
-        StatsHuntAction action = StatsHuntAction::Keep;
-        check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
-
-        switch (action){
-        case StatsHuntAction::StopProgram:
-            match = true;
-            env.console.log("Match found!");
-            stats.matches++;
-            env.update_stats();
-            send_program_status_notification(
-                env, NOTIFICATION_PROGRAM_FINISH,
-                "Match found!"
-            );
-            break;
-        case StatsHuntAction::Discard:
-            match = false;
-            env.console.log("Stats did not match table settings.");
-            send_program_status_notification(
-                env, NOTIFICATION_STATUS_UPDATE,
-                "Stats did not match table settings."
-            );
-            break;
-        default:
-            env.console.log("Invalid state.");
-            stats.errors++;
-            env.update_stats();
-            OperationFailedException::fire(
-                env.console, ErrorReport::SEND_ERROR_REPORT,
-                "Invalid state.",
-                true
-            );
-        }
-    }
-
-    return match;
-}
-#endif
 
 bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-#if 0
-    //  Clear out dialog until we're free
-    OverworldWatcher overworld(console, COLOR_YELLOW);
-    int retOverworld = run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 10000);
-        },
-        { overworld }
-        );
-    if (retOverworld != 0){
-        env.log("Failed to detect overworld after catching.", COLOR_RED);
-    }else{
-        env.log("Detected overworld.");
-    }
-    context.wait_for_all_requests();
-    return check_stats(env, context);
-#else
-
-    // If this is the first advance dialog, it might be linked to pokedex filling so press A and continue
+    //  If this is the first advance dialog, it might be linked to pokedex filling so press A and continue
     bool first_advance_dialog = true;
 
     while (true){
@@ -607,8 +530,6 @@ bool StatsResetEventBattle::check_stats_after_win(SingleSwitchProgramEnvironment
             );
         }
     }
-
-#endif
 }
 
 void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){

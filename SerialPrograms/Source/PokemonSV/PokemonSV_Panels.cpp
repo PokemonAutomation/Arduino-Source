@@ -29,7 +29,6 @@
 #include "Programs/Farming/PokemonSV_TournamentFarmer.h"
 #include "Programs/Farming/PokemonSV_TournamentFarmer2.h"
 #include "Programs/Farming/PokemonSV_FlyingTrialFarmer.h"
-#include "Programs/Farming/PokemonSV_WildItemFarmer.h"
 #include "Programs/Farming/PokemonSV_BBQSoloFarmer.h"
 #include "Programs/Farming/PokemonSV_MaterialFarmer.h"
 #include "Programs/ItemPrinter/PokemonSV_AutoItemPrinter.h"
@@ -56,6 +55,7 @@
 
 #include "Programs/AutoStory/PokemonSV_AutoStory.h"
 
+#include "Programs/Glitches/PokemonSV_WildItemFarmer.h"
 #include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
 #include "Programs/Glitches/PokemonSV_CloneItems-1.0.1.h"
 

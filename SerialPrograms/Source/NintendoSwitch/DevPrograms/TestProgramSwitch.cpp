@@ -281,12 +281,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.controller());
     VideoOverlaySet overlays(overlay);
 
+//    std::terminate();
+
+
 
 //    ssf_issue_scroll(context, DPAD_LEFT, 0);
 //    ssf_press_button(context, BUTTON_A | BUTTON_L, 3);
 //    ssf_press_button(context, BUTTON_L, 0);
 
-#if 1
+#if 0
     codeboard_enter_digits(
         logger, context, KeyboardLayout::QWERTY,
         "JRH5T9",

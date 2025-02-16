@@ -26,7 +26,8 @@ OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
         "This is a test program that simply observes the game and labels things of interest. "
         "This program doesn't really do anything.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 

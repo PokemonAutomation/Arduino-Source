@@ -36,7 +36,8 @@ AutoItemPrinter_Descriptor::AutoItemPrinter_Descriptor()
         "Automate the Item Printer for rare items.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct AutoItemPrinter_Descriptor::Stats : public StatsTracker{

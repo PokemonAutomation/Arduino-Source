@@ -162,11 +162,15 @@ void MultiSwitchProgramSession::internal_run_program(){
             return;
         }
         AbstractController* controller = session.controller_session().controller();
-        ProController& switch_controller = *dynamic_cast<ProController*>(controller);
+        ProController* switch_controller = dynamic_cast<ProController*>(controller);
+        if (switch_controller == nullptr){
+            report_error("Cannot Start: The controller is not ready or is incompatible.");
+            return;
+        }
         handles.emplace_back(
             c,
             session.logger(),
-            switch_controller,
+            *switch_controller,
             session.video(),
             session.overlay(),
             session.audio(),

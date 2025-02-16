@@ -82,12 +82,14 @@ private:
 #else
 class LifetimeSanitizer{
 public:
+    LifetimeSanitizer(const char* = ""){}
+
     void check_usage() const{}
     static void disable(){}
 
-    using CheckScope = bool;
+    struct CheckScope{};
     CheckScope check_scope() const{
-        return false;
+        return CheckScope();
     }
 };
 #endif

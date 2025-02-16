@@ -7,6 +7,7 @@
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/PersistentSettings.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "PanelListWidget.h"
 

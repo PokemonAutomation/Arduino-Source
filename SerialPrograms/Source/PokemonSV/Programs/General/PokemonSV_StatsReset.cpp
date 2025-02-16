@@ -39,7 +39,8 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         "Repeatedly catch static encounters until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct StatsReset_Descriptor::Stats : public StatsTracker{
@@ -509,11 +510,11 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, ProControllerC
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
     bool match = false;
 
-    //Open box
+    //  Open box
     enter_box_system_from_overworld(env.program_info(), env.console, context);
     context.wait_for(std::chrono::milliseconds(400));
 
-    //Check that the target pokemon was caught
+    //  Check that the target pokemon was caught
     if (check_empty_slots_in_party(env.program_info(), env.console, context) != 0){
         env.console.log("One or more empty slots in party. Target was not caught or user setup error.");
         send_program_status_notification(
@@ -524,10 +525,10 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, ProControllerC
         stats.catches++;
         env.update_stats();
 
-        //Navigate to last party slot
+        //  Navigate to last party slot
         move_box_cursor(env.program_info(), env.console, context, BoxCursorLocation::PARTY, 5, 0);
 
-        //Check the IVs of the newly caught Pokemon - *must be on IV panel*
+        //  Check the IVs of the newly caught Pokemon - *must be on IV panel*
         StatsHuntAction action = StatsHuntAction::Keep;
         check_stats_reset_info(env.console, context, LANGUAGE, FILTERS, action);
 
@@ -565,11 +566,11 @@ bool StatsReset::check_stats(SingleSwitchProgramEnvironment& env, ProControllerC
 }
 
 void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    //This will only work for Pokemon that you press A to talk to.
-    //Regular static spawns will have the same stats, resetting won't work.
-    //Won't apply to the former titan pokemon or the box legends + ogrepon either, as their IVs are locked.
-    //So this really only applies to the ruinous quartet and loyal three
-    //Use first attack if target pokemon is invulnerable (Chi-Yu used Bounce)
+    //  This will only work for Pokemon that you press A to talk to.
+    //  Regular static spawns will have the same stats, resetting won't work.
+    //  Won't apply to the former titan pokemon or the box legends + ogrepon either, as their IVs are locked.
+    //  So this really only applies to the ruinous quartet and loyal three
+    //  Use first attack if target pokemon is invulnerable (Chi-Yu used Bounce)
 
     assert_16_9_720p_min(env.logger(), env.console);
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
@@ -577,7 +578,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 10);
 
-    //Autosave must be off, settings like Tera farmer.
+    //  Autosave must be off, settings like Tera farmer.
     bool stats_matched = false;
     while (!stats_matched){
         bool battle_started = false;
@@ -592,7 +593,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
             }
 
-            //Try to start battle 3 times.
+            //  Try to start battle 3 times.
             if (c > 2){
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
@@ -606,8 +607,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         bool target_fainted = run_battle(env, context);
 
         if (!target_fainted){
-            //Close all the dex entry and caught menus
-            //If the player lost, this closes all dialog from Joy
+            //  Close all the dex entry and caught menus
+            //  If the player lost, this closes all dialog from Joy
             OverworldWatcher overworld(env.console);
             int retOver = run_until<ProControllerContext>(
                 env.console, context,
@@ -627,7 +628,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
 
         if (target_fainted || !stats_matched){
-            //Reset game
+            //  Reset game
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Resetting game."

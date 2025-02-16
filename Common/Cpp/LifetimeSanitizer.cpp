@@ -15,12 +15,12 @@
 #include <Windows.h>
 #endif
 
-#ifdef PA_SANITIZER_ENABLE
-
 
 
 namespace PokemonAutomation{
 
+
+#ifdef PA_SANITIZER_ENABLE
 
 //#define PA_SANITIZER_PRINT_ALL
 const std::set<std::string> SANITIZER_FILTER = {
@@ -91,6 +91,9 @@ LifetimeSanitizer::LifetimeSanitizer(const LifetimeSanitizer& x){
     internal_construct(x.m_name);
 }
 void LifetimeSanitizer::operator=(const LifetimeSanitizer& x){
+    if (LifetimeSanitizer_disabled.load(std::memory_order_relaxed)){
+        return;
+    }
     check_usage();
     x.check_usage();
 }
@@ -195,11 +198,11 @@ void LifetimeSanitizer::internal_destruct(){
     }
     m_self = nullptr;
 }
-
-
-
-
-
-
 #endif
+
+
+
+
+
+
 }

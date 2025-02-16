@@ -124,14 +124,18 @@ void SingleSwitchProgramSession::internal_run_program(){
     );
     CancellableHolder<CancellableScope> scope;
     AbstractController* controller = m_system.controller_session().controller();
-    ProController& switch_controller = *dynamic_cast<ProController*>(controller);
+    ProController* switch_controller = dynamic_cast<ProController*>(controller);
+    if (switch_controller == nullptr){
+        report_error("Cannot Start: The controller is not ready or is incompatible.");
+        return;
+    }
     SingleSwitchProgramEnvironment env(
         program_info,
         scope,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         m_system.logger(),
-        switch_controller,
+        *switch_controller,
         m_system.video(),
         m_system.overlay(),
         m_system.audio(),

@@ -30,7 +30,8 @@ DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
         "Wait for a distortion to appear.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class DistortionWaiter_Descriptor::Stats : public StatsTracker{

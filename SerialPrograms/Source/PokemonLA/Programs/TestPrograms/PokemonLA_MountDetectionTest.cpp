@@ -22,7 +22,8 @@ MountDetectionTest_Descriptor::MountDetectionTest_Descriptor()
         "",
         "Test the mount detection in the bottom right corner.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
