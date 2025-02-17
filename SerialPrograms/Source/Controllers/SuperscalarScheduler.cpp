@@ -30,7 +30,7 @@ SuperscalarScheduler::SuperscalarScheduler(
 
 void SuperscalarScheduler::clear() noexcept{
 //    SpinLockGuard lg(m_lock);
-    m_logger.log("Clearing schedule...");
+//    m_logger.log("Clearing schedule...");
     WallClock now = current_time();
     m_local_start = now;
     m_local_last_activity = now;
@@ -77,13 +77,17 @@ bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
 
     //  Things get complicated if we overshoot the issue time.
     if (next_state_change > m_device_issue_time){
-//            m_logger.log("SuperscalarScheduler: Overshoot due to unfinished early return.", COLOR_RED);
+//        m_logger.log("SuperscalarScheduler: Overshoot due to unfinished early return.", COLOR_RED);
         next_state_change = m_device_issue_time;
     }
 
     WallDuration duration = next_state_change - m_device_sent_time;
     if (duration == WallDuration::zero()){
-//            m_logger.log("SuperscalarScheduler: Scheduler is stalled.", COLOR_RED);
+        //  This happens when the command has a delay of zero. A delay of zero
+        //  is almost always immediately followed by another command that is
+        //  intended to execute simultaneously. Thus we do not attempt to
+        //  execute the schedule any further.
+//        m_logger.log("SuperscalarScheduler: Scheduler is stalled.", COLOR_RED);
         return false;
     }
 
@@ -104,22 +108,35 @@ bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
     WallClock now = current_time();
     m_local_last_activity = now;
 
-#if 1
-    //  If it's been long enough since the issue, we can assume a gap and
-    //  fast forward whatever is scheduled into the future.
-    if (m_device_sent_time < m_device_issue_time){
-        WallDuration time_since_last_activity = now - m_local_last_activity;
-        if (time_since_last_activity > m_flush_threshold){
-            m_logger.log("SuperscalarScheduler: A dangling early-return issue has gapped.", COLOR_RED);
-            m_device_issue_time += time_since_last_activity;
-
-            //  Since we're gapping, we might as well gap a bit more to we don't
-            //  re-enter here so quickly.
-            m_device_issue_time += m_flush_threshold;
-
-            m_max_free_time = std::max(m_max_free_time, m_device_issue_time);
-        }
+    //  If we are not dangling anything, we can return now.
+    if (m_device_sent_time >= m_device_issue_time){
+        return true;
     }
+
+#if 1
+    //
+    //  We are currently dangling a command. We don't know whether the current
+    //  ongoing commands will run out, or if something new will join them in the
+    //  near future.
+    //
+    //  If it's been long enough since the last issue, we can assume that
+    //  nothing will join and thus can gap. (We do require that dangling
+    //  commands be resolved promptly or they may run out.)
+    //
+    //  Thus we can fast forward whatever is scheduled into the future.
+    //
+    WallDuration time_since_last_activity = now - m_local_last_activity;
+    if (time_since_last_activity > m_flush_threshold){
+        m_logger.log("SuperscalarScheduler: A dangling early-return issue has gapped.", COLOR_RED);
+        m_device_issue_time += time_since_last_activity;
+
+        //  Since we're gapping, we might as well gap a bit more to we don't
+        //  re-enter here so quickly.
+        m_device_issue_time += m_flush_threshold;
+
+        m_max_free_time = std::max(m_max_free_time, m_device_issue_time);
+    }
+
 #endif
 
     return true;
@@ -140,6 +157,7 @@ void SuperscalarScheduler::issue_wait_for_all(const Cancellable* cancellable){
         clear();
         return;
     }
+//    m_logger.log("issue_wait_for_all(): states = " + std::to_string(m_state_changes.size()), COLOR_DARKGREEN);
 //    cout << "issue_wait_for_all(): " << m_state_changes.size() << endl;
 //    cout << "issue_time = " << std::chrono::duration_cast<Milliseconds>((m_device_issue_time - m_local_start)).count()
 //         << ", sent_time = " << std::chrono::duration_cast<Milliseconds>((m_device_sent_time - m_local_start)).count()
@@ -168,7 +186,7 @@ void SuperscalarScheduler::issue_nop(const Cancellable* cancellable, WallDuratio
     m_local_last_activity = current_time();
     process_schedule(cancellable);
 }
-void SuperscalarScheduler::wait_for_resource(const Cancellable* cancellable, ExecutionResource& resource){
+void SuperscalarScheduler::issue_wait_for_resource(const Cancellable* cancellable, ExecutionResource& resource){
     if (m_pending_clear.load(std::memory_order_acquire)){
         clear();
         return;

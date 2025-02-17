@@ -1148,6 +1148,7 @@ HEADERS += \
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h \
     ../Common/Cpp/Concurrency/ParallelTaskRunner.h \
     ../Common/Cpp/Concurrency/PeriodicScheduler.h \
+    ../Common/Cpp/Concurrency/ReverseLockGuard.h \
     ../Common/Cpp/Concurrency/ScheduledTaskRunner.h \
     ../Common/Cpp/Concurrency/SpinLock.h \
     ../Common/Cpp/Concurrency/SpinPause.h \

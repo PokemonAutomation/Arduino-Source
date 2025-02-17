@@ -70,7 +70,7 @@ ProController_SysbotBase::ProController_SysbotBase(
 ProController_SysbotBase::~ProController_SysbotBase(){
     m_stopping.store(true, std::memory_order_release);
     {
-        std::lock_guard<std::mutex> lg(m_lock);
+        std::lock_guard<std::mutex> lg(m_state_lock);
         m_cv.notify_all();
     }
     if (m_dispatch_thread.joinable()){
@@ -80,12 +80,35 @@ ProController_SysbotBase::~ProController_SysbotBase(){
 
 
 
+void ProController_SysbotBase::cancel_all_commands(){
+//    cout << "ProController_SysbotBase::cancel_all_commands()" << endl;
+    std::lock_guard<std::mutex> lg(m_state_lock);
+    size_t queue_size = m_command_queue.size();
+    if (queue_size > 0){
+        m_command_queue.clear();
+        m_is_active = false;
+        m_cv.notify_all();
+    }
+    this->clear_on_next();
+    m_logger.log("cancel_all_commands(): Command Queue Size = " + std::to_string(queue_size), COLOR_DARKGREEN);
+}
+void ProController_SysbotBase::replace_on_next_command(){
+//    cout << "ProController_SysbotBase::replace_on_next_command - Enter()" << endl;
+    std::lock_guard<std::mutex> lg(m_state_lock);
+    m_cv.notify_all();
+    m_replace_on_next = true;
+    this->clear_on_next();
+    m_logger.log("replace_on_next_command(): Command Queue Size = " + std::to_string(m_command_queue.size()), COLOR_DARKGREEN);
+}
+
 
 void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
 //    cout << "ProController_SysbotBase::wait_for_all - Enter()" << endl;
-    issue_barrier(cancellable);
-    std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.wait(lg, [this]{
+    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::unique_lock<std::mutex> lg1(m_state_lock);
+    m_logger.log("wait_for_all(): Command Queue Size = " + std::to_string(m_command_queue.size()), COLOR_DARKGREEN);
+    this->issue_wait_for_all(cancellable);
+    m_cv.wait(lg1, [this]{
         return m_command_queue.empty() || m_replace_on_next;
     });
     if (cancellable){
@@ -93,58 +116,45 @@ void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
     }
 //    cout << "ProController_SysbotBase::wait_for_all - Exit()" << endl;
 }
-void ProController_SysbotBase::cancel_all_commands(){
-//    cout << "ProController_SysbotBase::cancel_all_commands()" << endl;
-    {
-        std::lock_guard<std::mutex> lg(m_lock);
-        if (!m_command_queue.empty()){
-            m_command_queue.clear();
-            m_is_active = false;
-            m_cv.notify_all();
-        }
-    }
-    this->clear_on_next();
-}
-void ProController_SysbotBase::replace_on_next_command(){
-//    cout << "ProController_SysbotBase::replace_on_next_command - Enter()" << endl;
-    {
-        std::lock_guard<std::mutex> lg(m_lock);
-        m_cv.notify_all();
-        m_replace_on_next = true;
-    }
-    this->clear_on_next();
-}
-
-
-void ProController_SysbotBase::issue_controller_state(
-    const Cancellable* cancellable,
-    Button button,
-    DpadPosition position,
-    uint8_t left_x, uint8_t left_y,
-    uint8_t right_x, uint8_t right_y,
-    Milliseconds duration
-){
-#if 0
-//    cout << "issue_controller_state(): Entering" << endl;
-    m_logger.log(
-        "issue_controller_state(): (" + button_to_string(button) +
-        "), dpad(" + dpad_to_string(position) +
-        "), LJ(" + std::to_string(left_x) + "," + std::to_string(left_y) +
-        "), RJ(" + std::to_string(right_x) + "," + std::to_string(right_y) +
-        ")",
-        COLOR_DARKGREEN
-    );
-#endif
+void ProController_SysbotBase::push_state(const Cancellable* cancellable, WallDuration duration){
+    //  Must be called inside "m_state_lock".
 
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
+    if (!is_ready()){
+        throw InvalidConnectionStateException();
+    }
 
-    std::unique_lock<std::mutex> lg(m_lock);
+    Button buttons = BUTTON_NONE;
+    for (size_t c = 0; c < 14; c++){
+        buttons |= m_buttons[c].is_busy()
+            ? (Button)((uint16_t)1 << c)
+            : BUTTON_NONE;
+    }
+
+    DpadPosition dpad = m_dpad.is_busy() ? m_dpad.position : DPAD_NONE;
+
+    uint8_t left_x = 128;
+    uint8_t left_y = 128;
+    uint8_t right_x = 128;
+    uint8_t right_y = 128;
+    if (m_left_joystick.is_busy()){
+        left_x = m_left_joystick.x;
+        left_y = m_left_joystick.y;
+    }
+    if (m_right_joystick.is_busy()){
+        right_x = m_right_joystick.x;
+        right_y = m_right_joystick.y;
+    }
+
+    std::unique_lock<std::mutex> lg(m_state_lock, std::adopt_lock_t());
 
     m_cv.wait(lg, [this]{
         return m_command_queue.size() < QUEUE_SIZE || m_replace_on_next;
     });
+
+    lg.release();
 
     if (cancellable){
         cancellable->throw_if_cancelled();
@@ -162,26 +172,14 @@ void ProController_SysbotBase::issue_controller_state(
 
     Command& command = m_command_queue.emplace_back();
 
-    command.state.buttons = button;
-    command.state.dpad = position;
+    command.state.buttons = buttons;
+    command.state.dpad = dpad;
     command.state.left_x = left_x;
     command.state.left_y = left_y;
     command.state.right_x = right_x;
     command.state.right_y = right_y;
 
-    command.duration = duration;
-
-#if 0
-    cout << "issue_controller_state(): Returning" << endl;
-    m_logger.log(
-        "issue_controller_state(): (" + button_to_string(command.state.buttons) +
-        "), dpad(" + dpad_to_string(command.state.dpad) +
-        "), LJ(" + std::to_string(command.state.left_x) + "," + std::to_string(command.state.left_y) +
-        "), RJ(" + std::to_string(command.state.right_x) + "," + std::to_string(command.state.right_y) +
-        ")",
-        COLOR_DARKGREEN
-    );
-#endif
+    command.duration = std::chrono::duration_cast<Milliseconds>(duration);
 }
 
 
@@ -333,7 +331,7 @@ void ProController_SysbotBase::thread_body(){
 
     SwitchControllerState current_state;
 
-    std::unique_lock<std::mutex> lg(m_lock);
+    std::unique_lock<std::mutex> lg(m_state_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
         if (m_command_queue.empty()){
             m_is_active = false;

@@ -15,7 +15,11 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
-#include "Pokemon/Pokemon_Strings.h"
+
+
+#define PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
+
+
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -74,11 +78,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 
     m_scope.store(&scope, std::memory_order_release);
 
-#if 0
-    ProControllerContext context(scope, env.console.controller());
-    m_option.instance().program(env, context);
-    context.wait_for_all_requests();
-#else
+#ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
     try{
         ProControllerContext context(scope, env.console.controller());
         m_option.instance().program(env, context);
@@ -86,6 +86,12 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     }catch (...){
         m_scope.store(nullptr, std::memory_order_release);
         throw;
+    }
+#else
+    {
+        ProControllerContext context(scope, env.console.controller());
+        m_option.instance().program(env, context);
+        context.wait_for_all_requests();
     }
 #endif
     m_scope.store(nullptr, std::memory_order_release);
@@ -173,7 +179,7 @@ void SingleSwitchProgramSession::internal_run_program(){
             message
         );
     }
-#if 1
+#ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
     catch (std::exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.what();

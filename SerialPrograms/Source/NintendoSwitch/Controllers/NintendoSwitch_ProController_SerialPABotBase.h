@@ -36,24 +36,11 @@ public:
 
 
 public:
-    //  General Control
-
-    virtual void wait_for_all(const Cancellable* cancellable) override;
     virtual void cancel_all_commands() override;
     virtual void replace_on_next_command() override;
 
+    virtual void wait_for_all(const Cancellable* cancellable) override;
 
-public:
-    //  Basic Commands
-
-    virtual void issue_controller_state(
-        const Cancellable* cancellable,
-        Button button,
-        DpadPosition position,
-        uint8_t left_x, uint8_t left_y,
-        uint8_t right_x, uint8_t right_y,
-        Milliseconds duration
-    ) override;
     virtual void send_botbase_request(
         const Cancellable* cancellable,
         const BotBaseRequest& request
@@ -65,9 +52,14 @@ public:
 
 
 private:
+    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
+
+
+private:
+    //  These are set on construction and never changed again. So it is safe to
+    //  access these asynchronously.
     SerialPABotBase::SerialPABotBase_Connection& m_handle;
     BotBaseController* m_serial;
-
     std::string m_error_string;
 };
 

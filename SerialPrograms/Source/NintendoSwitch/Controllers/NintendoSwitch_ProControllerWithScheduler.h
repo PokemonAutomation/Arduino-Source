@@ -10,6 +10,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_ControllerWithScheduler_H
 #define PokemonAutomation_NintendoSwitch_ControllerWithScheduler_H
 
+#include <mutex>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Controllers/SuperscalarScheduler.h"
 #include "NintendoSwitch_ProController.h"
@@ -43,7 +44,7 @@ struct ProControllerSchedulerState{
 
 class ProControllerWithScheduler :
     public ProController,
-    private ProControllerSchedulerState,
+    protected ProControllerSchedulerState,
     protected SuperscalarScheduler
 {
 public:
@@ -79,6 +80,14 @@ public:
         uint8_t x, uint8_t y,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) override;
+    virtual void issue_full_controller_state(
+        const Cancellable* cancellable,
+        Button button,
+        DpadPosition position,
+        uint8_t left_x, uint8_t left_y,
+        uint8_t right_x, uint8_t right_y,
+        Milliseconds hold
+    ) override;
 
 
 public:
@@ -103,7 +112,7 @@ public:
     ) override;
 
 
-private:
+protected:
     class LoggingSuppressScope{
     public:
         LoggingSuppressScope(std::atomic<size_t>& counter)
@@ -118,13 +127,22 @@ private:
         std::atomic<size_t>& m_counter;
     };
 
-    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
+//    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
 
 
 protected:
     Logger& m_logger;
     std::atomic<size_t> m_logging_suppress;
-    SpinLock m_lock;
+
+    //  If you need both of these locks, always acquire "m_issue_lock" first.
+
+    //  This lock makes sure that only one command is issued at a time. It can
+    //  be held for long periods of time if the command queue is full.
+    std::mutex m_issue_lock;
+
+    //  This lock protects the state/fields of this class and subclasses.
+    //  This lock is never held for a long time.
+    std::mutex m_state_lock;
 };
 
 

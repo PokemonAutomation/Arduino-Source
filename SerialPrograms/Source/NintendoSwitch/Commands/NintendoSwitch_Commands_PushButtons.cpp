@@ -91,7 +91,7 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     uint16_t ticks
 ){
-    context->issue_controller_state(
+    context->issue_full_controller_state(
         &context,
         button, position,
         left_x, left_y,
@@ -107,7 +107,7 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     Milliseconds duration
 ){
-    context->issue_controller_state(
+    context->issue_full_controller_state(
         &context,
         button, position,
         left_x, left_y,

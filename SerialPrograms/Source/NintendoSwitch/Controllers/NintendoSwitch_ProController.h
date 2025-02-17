@@ -88,10 +88,10 @@ public:
 
 
 public:
-    //  General Control
-
-    //  Wait for all unfinished commands to finish.
-    virtual void wait_for_all(const Cancellable* cancellable) = 0;
+    //
+    //  Cancellation
+    //  These are thread-safe with everything.
+    //
 
     //  Cancel all commands. This returns the controller to the neutral button
     //  state and clears the command queue.
@@ -103,7 +103,21 @@ public:
 
 
 public:
+    //
     //  Basic Commands
+    //
+    //  Commands not thread-safe with other commands. But they are thread-safe
+    //  with the cancellation functions above.
+    //
+    //  As of this writing, all implementations are thread-safe enough that
+    //  they will neither crash nor enter an invalid state with concurrent
+    //  commands. But the implied queuing semantics means that parallelizing
+    //  commands will not do what you want it to do.
+    //
+
+    //  Wait for all unfinished commands to finish. This will also wait out
+    //  hanging commands including their cooldown periods.
+    virtual void wait_for_all(const Cancellable* cancellable) = 0;
 
     //
     //  All commands are enqueued into a FIFO that the controller will execute
@@ -125,36 +139,6 @@ public:
     //  if the command can be enqueued into the FIFO. Otherwise, they will block
     //  until there is space in the FIFO.
 
-    //
-    //  Press all the following buttons/joysticks simultaneously for the
-    //  specified duration. No wait is added at the end. Thus you can issue
-    //  these back-to-back to simulate buttons being pressed and released
-    //  concurrently with other buttons being held down the whole time.
-    //
-    //  The behavior of this function is undefined if there are any unfinished
-    //  asynchronous commands in the controller's queue (including unfinished
-    //  cooldowns). It is the responsibility of the caller to ensure the
-    //  controller is idle by calling "this->wait_for_all_requests()".
-    //
-    //  The sole purpose of this function is for keyboard commands.
-    //  While it's technically possible to implement any button overlapping
-    //  sequence with this, doing so this way can lead to very inefficient
-    //  serial bandwidth usage if buttons are being rapidly pressed and released
-    //  in an arbitrary manner that leads to constant state changes.
-    //
-    //  If we need to support new Switch controller functionality
-    //  (such as Joycon gyro or new stuff in Switch 2), we can simply add
-    //  overloads to this and gate them behind features.
-    //
-    virtual void issue_controller_state(
-        const Cancellable* cancellable,
-        Button button,
-        DpadPosition position,
-        uint8_t left_x, uint8_t left_y,
-        uint8_t right_x, uint8_t right_y,
-        Milliseconds milliseconds
-    ) = 0;
-
     //  Temporary for refactor: Send custom requests for PABotBase's advanced
     //  RPCs.
     virtual void send_botbase_request(
@@ -168,16 +152,9 @@ public:
 
 
 public:
+    //
     //  Superscalar Commands (the "ssf" framework)
-
-    //  Tell the scheduler to wait for all pending commands to finish
-    //  (including cooldowns) before executing further instructions.
-    //  This is used to prevent hanging commands from overlapping with new
-    //  commands issued after this barrier.
-    virtual void issue_barrier(const Cancellable* cancellable) = 0;
-
-    //  Do nothing for this much time.
-    virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) = 0;
+    //
 
     //
     //  delay       Time to wait before moving onto the next command.
@@ -207,6 +184,15 @@ public:
     //  managing the timeline/scheduling.
     //
 
+    //  Tell the scheduler to wait for all pending commands to finish
+    //  (including cooldowns) before executing further instructions.
+    //  This is used to prevent hanging commands from overlapping with new
+    //  commands issued after this barrier.
+    virtual void issue_barrier(const Cancellable* cancellable) = 0;
+
+    //  Do nothing for this much time.
+    virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) = 0;
+
     //  Press all the buttons set in the bitfield simultaneously.
     //  This command will wait until all the selected buttons are ready to
     //  ensure that they are all dispatched simultaneously.
@@ -235,10 +221,39 @@ public:
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) = 0;
 
+    //
+    //  Press all the following buttons/joysticks simultaneously for the
+    //  specified duration. No wait is added at the end. Thus you can issue
+    //  these back-to-back to simulate buttons being pressed and released
+    //  concurrently with other buttons being held down the whole time.
+    //
+    //  This command will wait until the controller is fully idle (including
+    //  cooldowns) before it starts. This ensures that everything is issued
+    //  simultaneously.
+    //
+    //  The sole purpose of this function is for keyboard commands.
+    //  While it's technically possible to implement any button overlapping
+    //  sequence with this, doing so this way can lead to very inefficient
+    //  serial bandwidth usage if buttons are being rapidly pressed and released
+    //  in an arbitrary manner that leads to constant state changes.
+    //
+    //  If we need to support new Switch controller functionality
+    //  (such as Joycon gyro or new stuff in Switch 2), we can simply add
+    //  overloads to this and gate them behind features.
+    //
+    virtual void issue_full_controller_state(
+        const Cancellable* cancellable,
+        Button button,
+        DpadPosition position,
+        uint8_t left_x, uint8_t left_y,
+        uint8_t right_x, uint8_t right_y,
+        Milliseconds hold
+    ) = 0;
+
 
 public:
+    //
     //  High speed Macros
-
     //
     //  It is currently unclear if these can be properly executed over wireless.
     //  If they can't, then it remains to be decided if we should gate these
