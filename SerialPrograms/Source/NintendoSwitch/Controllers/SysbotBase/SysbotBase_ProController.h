@@ -8,8 +8,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_ProController_SysbotBase_H
 #define PokemonAutomation_NintendoSwitch_ProController_SysbotBase_H
 
-#include <mutex>
 #include <condition_variable>
+#include "Common/Cpp/Containers/CircularBuffer.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h"
 #include "SysbotBase_Connection.h"
@@ -23,7 +23,7 @@ class ProController_SysbotBase : public ProControllerWithScheduler{
 public:
     using ContextType = ProControllerContext;
 
-    static constexpr size_t QUEUE_SIZE = 32;
+    static constexpr size_t QUEUE_SIZE = 4;
     static constexpr std::chrono::microseconds EARLY_WAKE_SPIN = std::chrono::microseconds(2000);
 
 
@@ -81,11 +81,10 @@ private:
         SwitchControllerState state;
         Milliseconds duration;
     };
-    std::deque<Command> m_command_queue;
+    CircularBuffer<Command> m_command_queue;
     WallClock m_queue_start_time;
     bool m_is_active;
 
-//    std::mutex m_lock;
     std::condition_variable m_cv;
     std::thread m_dispatch_thread;
 };

@@ -87,6 +87,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Containers/AlignedVector.h
     ../Common/Cpp/Containers/AlignedVector.tpp
     ../Common/Cpp/Containers/BoxSet.h
+    ../Common/Cpp/Containers/CircularBuffer.h
     ../Common/Cpp/Containers/DllSafeString.h
     ../Common/Cpp/Containers/FixedLimitVector.h
     ../Common/Cpp/Containers/FixedLimitVector.tpp

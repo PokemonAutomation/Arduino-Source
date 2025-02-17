@@ -30,6 +30,7 @@ ProController_SysbotBase::ProController_SysbotBase(
     , m_connection(connection)
     , m_stopping(false)
     , m_replace_on_next(false)
+    , m_command_queue(QUEUE_SIZE)
     , m_is_active(false)
 {
     if (!connection.is_ready()){
@@ -170,7 +171,7 @@ void ProController_SysbotBase::push_state(const Cancellable* cancellable, WallDu
         m_cv.notify_all();
     }
 
-    Command& command = m_command_queue.emplace_back();
+    Command& command = m_command_queue.push_back();
 
     command.state.buttons = buttons;
     command.state.dpad = dpad;
