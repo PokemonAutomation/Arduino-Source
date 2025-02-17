@@ -912,7 +912,7 @@ void quest_catch(
     return_to_plaza(info, stream, context);
 
     //Day skip and attempt to respawn fixed encounters
-    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(context, true, true);
     PokemonSwSh::roll_date_forward_1(context, true);
     resume_game_from_home(stream, context);

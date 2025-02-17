@@ -237,7 +237,7 @@ void checkpoint_26(
         context.wait_for_all_requests();
 
         // change the time of day: close game, change time to 5:45 am.
-        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         change_date(env, context, {2025, 1, 1, 5, 45, 0});
         reset_game_from_home(env.program_info(), env.console, context);
 
@@ -566,7 +566,7 @@ void checkpoint_26(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
         
         // fix the time
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);

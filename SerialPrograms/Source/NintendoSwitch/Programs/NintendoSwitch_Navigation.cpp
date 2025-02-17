@@ -67,7 +67,7 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
     }else{
         //  Slow version for tick-imprecise controllers.
 
-        ssf_do_nothing(context, 1500ms);
+//        ssf_do_nothing(context, 1500ms);
 
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);

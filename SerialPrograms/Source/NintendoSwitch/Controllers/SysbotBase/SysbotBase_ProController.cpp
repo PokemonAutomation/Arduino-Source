@@ -353,7 +353,6 @@ void ProController_SysbotBase::thread_body(){
 
         //  Waking up from idle.
         if (!m_is_active){
-            //  Waking up from idle.
             m_is_active = true;
             m_queue_start_time = now;
 

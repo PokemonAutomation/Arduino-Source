@@ -360,7 +360,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
 
         case 2:{
             env.log("Detected prompt dialog.");
-            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
             home_to_date_time(context, true, false);
             pbf_press_button(context, BUTTON_A, 10, 30);
             context.wait_for_all_requests();
@@ -1032,7 +1032,7 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, ProControllerC
     }catch (ProgramFinishedException&){}
 
     if (FIX_TIME_WHEN_DONE){
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);

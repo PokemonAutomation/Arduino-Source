@@ -90,54 +90,56 @@ public:
 public:
     //
     //  Cancellation
-    //  These are thread-safe with everything.
+    //
+    //  These functions will return immediately and are thread-safe with
+    //  everything. The intended use-case is for an inference thread to cancel
+    //  a running sequence of commands on a program thread.
     //
 
     //  Cancel all commands. This returns the controller to the neutral button
     //  state and clears the command queue.
+    //  This does not wait for the commands to finish cancelling. This is an
+    //  asynchronous function that merely initiates the cancellation process.
     virtual void cancel_all_commands() = 0;
 
-    //  Declare that the next command will replace the current command stream
-    //  with no gaps.
+    //  Same as "cancel_all_commands()", but instead of cancelling the stream,
+    //  it lets it keep running. Then on the next command issued after this
+    //  cancel, it will atomically replace the stream without gapping.
+    //  This lets you do stuff like suddenly change joystick movement in
+    //  response to inference while simultaneously holding a button without
+    //  ever releasing it during the transition.
     virtual void replace_on_next_command() = 0;
 
 
 public:
     //
-    //  Basic Commands
+    //  Commands
     //
-    //  Commands not thread-safe with other commands. But they are thread-safe
-    //  with the cancellation functions above.
+    //  Commands are actions like button presses or joystick movements that are
+    //  eventually sent to the console.
     //
-    //  As of this writing, all implementations are thread-safe enough that
-    //  they will neither crash nor enter an invalid state with concurrent
-    //  commands. But the implied queuing semantics means that parallelizing
-    //  commands will not do what you want it to do.
+    //  All commands are prefixed with "issue_".
+    //  Commands are not thread-safe with other commands.
+    //  Commands are thread-safe with the cancellation functions above.
+    //
+    //  Commands are asynchronous. When you call a command function on this,
+    //  class it gets enqueued into a FIFO and immediately returns. It will only
+    //  block if the FIFO is full.
+    //
+    //  If a command is called with a cancelled "cancellable" parameter, it will
+    //  throw an OperationCancelledException.
+    //  If a cancellation happens while you are inside a command function, it
+    //  will immediately stop and throw an OperationCancelledException.
     //
 
     //  Wait for all unfinished commands to finish. This will also wait out
     //  hanging commands including their cooldown periods.
+    //  This is not a true command function as it waits for the entire queue to
+    //  empty out rather than entering itself into the queue.
+    //  If a cancellation happens inside this function, it will immediately
+    //  throw an OperationCancelledException.
     virtual void wait_for_all(const Cancellable* cancellable) = 0;
 
-    //
-    //  All commands are enqueued into a FIFO that the controller will execute
-    //  in order preserving the timing semantics as closely as possible
-    //  irrespective of the latencies between the host and the device.
-    //
-    //  For wired controller emulation, the timings will be preserved exactly as
-    //  long as the FIFO never completely empties out.
-    //
-    //  For wireless controllers (Joy Con), while we do not have an
-    //  implementation of this at this time, we do not expect it to be able to
-    //  preserve timing.
-    //
-    //  Whether a controller supports exact timings is controlled by the feature
-    //  flag "TickPrecise".
-    //
-
-    //  The following functions are asynchronous. They will return immediately
-    //  if the command can be enqueued into the FIFO. Otherwise, they will block
-    //  until there is space in the FIFO.
 
     //  Temporary for refactor: Send custom requests for PABotBase's advanced
     //  RPCs.
@@ -167,7 +169,7 @@ public:
     //  exposes.
     //
     //  If the button is busy (due to still being held down or is waiting out
-    //  the cooldown), the command will block until the button is ready.
+    //  the cooldown), the command will wait until the button is ready.
     //
     //  By setting (delay < hold), the command will "return" early and move onto
     //  the next command while the button is still being held down.
@@ -182,6 +184,14 @@ public:
     //  Each button/stick has its own independent timeline/schedule.
     //  Users are responsible for understanding the controller state and
     //  managing the timeline/scheduling.
+    //
+    //  It is important to remember that the "timeline" here is the timeline
+    //  being fed to the Switch. Thus the timing parameters written in the C++
+    //  code here is what you will get on the console (or as close as possible).
+    //
+    //  The actual calls to the methods in the class will return or block in an
+    //  unspecified manner as they merely enqueue into a FIFO which is then
+    //  "replayed" to the Switch in an implementation-dependent manner.
     //
 
     //  Tell the scheduler to wait for all pending commands to finish
@@ -229,13 +239,12 @@ public:
     //
     //  This command will wait until the controller is fully idle (including
     //  cooldowns) before it starts. This ensures that everything is issued
-    //  simultaneously.
+    //  simultaneously. In other words, there is an implied call to
+    //  "issue_barrier()" before executing the state.
     //
     //  The sole purpose of this function is for keyboard commands.
-    //  While it's technically possible to implement any button overlapping
-    //  sequence with this, doing so this way can lead to very inefficient
-    //  serial bandwidth usage if buttons are being rapidly pressed and released
-    //  in an arbitrary manner that leads to constant state changes.
+    //  For programs, it is easier to use the individual button/joystick
+    //  functions above.
     //
     //  If we need to support new Switch controller functionality
     //  (such as Joycon gyro or new stuff in Switch 2), we can simply add
@@ -255,14 +264,13 @@ public:
     //
     //  High speed Macros
     //
-    //  It is currently unclear if these can be properly executed over wireless.
-    //  If they can't, then it remains to be decided if we should gate these
-    //  behind a feature flag or if the controller should slow them down to make
-    //  them work properly.
+    //  Be mindful when calling these mashing functions on a tick imprecise
+    //  controller. You can guarantee that some (most) of them will be dropped.
     //
-    //  It is not advised to call these if you are micromanaging with tick-level
-    //  precision since the exact timing characteristics and button selection
-    //  is not specified and context-dependent.
+    //  Even if you are on a tick-precise controller, it is not advised to call
+    //  these if you are micromanaging with tick-level granularity. The exact
+    //  timing characteristics and button selection is not specified and may be
+    //  context and implementation-dependent.
     //
 
     //  Mash a button as quickly as possible.

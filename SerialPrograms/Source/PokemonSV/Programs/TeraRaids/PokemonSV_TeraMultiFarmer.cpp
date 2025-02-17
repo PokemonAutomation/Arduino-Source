@@ -255,7 +255,7 @@ void TeraMultiFarmer::value_changed(void* object){
 
 
 void TeraMultiFarmer::reset_host(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     if (ROLLOVER_PREVENTION){
         WallClock now = current_time();
         if (m_last_time_fix == WallClock::min() || now - m_last_time_fix > std::chrono::hours(4)){
@@ -266,7 +266,7 @@ void TeraMultiFarmer::reset_host(const ProgramInfo& info, VideoStream& stream, P
     reset_game_from_home(info, stream, context, 5 * TICKS_PER_SECOND);
 }
 void TeraMultiFarmer::reset_joiner(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     reset_game_from_home(info, stream, context, 5 * TICKS_PER_SECOND);
 }
 bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context){

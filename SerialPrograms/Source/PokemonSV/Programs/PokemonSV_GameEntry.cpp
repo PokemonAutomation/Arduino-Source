@@ -160,7 +160,7 @@ bool reset_game_from_home_zoom_out(
 
 void reset_game(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     try{
-        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         context.wait_for_all_requests();
         if (!reset_game_from_home(info, stream, context, 5 * TICKS_PER_SECOND)){
             OperationFailedException::fire(

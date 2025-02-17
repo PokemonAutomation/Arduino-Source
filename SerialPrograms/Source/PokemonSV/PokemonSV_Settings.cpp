@@ -24,10 +24,10 @@ GameSettings& GameSettings::instance(){
 GameSettings::GameSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
-    , GAME_TO_HOME_DELAY0(
+    , GAME_TO_HOME_DELAY1(
         "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        "100 ms"
+        "1000 ms"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH0(
@@ -79,7 +79,7 @@ GameSettings::GameSettings()
         1000, 0, 48000
     )
 {
-    PA_ADD_OPTION(GAME_TO_HOME_DELAY0);
+    PA_ADD_OPTION(GAME_TO_HOME_DELAY1);
     PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH0);
     PA_ADD_OPTION(START_GAME_WAIT0);

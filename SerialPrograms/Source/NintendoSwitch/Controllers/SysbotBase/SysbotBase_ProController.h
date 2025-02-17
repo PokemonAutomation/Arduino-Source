@@ -24,7 +24,6 @@ public:
     using ContextType = ProControllerContext;
 
     static constexpr size_t QUEUE_SIZE = 4;
-    static constexpr std::chrono::microseconds EARLY_WAKE_SPIN = std::chrono::microseconds(2000);
 
 
 public:

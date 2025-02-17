@@ -23,7 +23,7 @@ public:
     static GameSettings& instance();
 
     SectionDividerOption m_menu_navigation;
-    MillisecondsOption GAME_TO_HOME_DELAY0;
+    MillisecondsOption GAME_TO_HOME_DELAY1;
 
     SectionDividerOption m_start_game_timings;
     MillisecondsOption START_GAME_MASH0;

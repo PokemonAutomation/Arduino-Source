@@ -552,7 +552,7 @@ void StatsResetEventBattle::program(SingleSwitchProgramEnvironment& env, ProCont
             env, NOTIFICATION_STATUS_UPDATE,
             "Resetting game."
         );
-        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
     }
     stats.matches++;

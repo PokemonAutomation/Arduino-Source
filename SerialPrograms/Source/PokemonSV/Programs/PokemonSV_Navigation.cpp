@@ -53,7 +53,7 @@ void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, Pr
 }
 
 void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(context, true, true);
 
     Milliseconds tv = context->timing_variation();
