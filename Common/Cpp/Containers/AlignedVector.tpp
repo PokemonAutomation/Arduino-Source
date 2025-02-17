@@ -11,6 +11,7 @@
 #include <new>
 #include <type_traits>
 #include <utility>
+#include <algorithm>
 #include "Common/Compiler.h"
 #include "AlignedMalloc.h"
 #include "AlignedVector.h"
