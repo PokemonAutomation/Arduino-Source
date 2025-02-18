@@ -34,7 +34,8 @@ FroslassFinder_Descriptor::FroslassFinder_Descriptor()
         "Constantly reset to find a Alpha Froslass or any Shiny in the path.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class FroslassFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -117,6 +118,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContr
     {
         float shiny_coefficient = 1.0;
         std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
+        WallClock destination_time = WallClock::max();
 
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
@@ -130,26 +132,29 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContr
             env.console, context,
             [&](ProControllerContext& context){
                 //  Route to cave entrance
-                pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10);  //Get some distance from the moutain
-                pbf_press_button(context, BUTTON_Y, (uint16_t)(4 * TICKS_PER_SECOND), 10);  //Descend
+                pbf_press_button(context, BUTTON_B, 2000ms, 80ms);  //Get some distance from the moutain
+                pbf_press_button(context, BUTTON_Y, 4000ms, 80ms);  //Descend
                 pbf_press_button(context, BUTTON_B, DASH_DURATION0, 80ms);  //Reach to the cave entrance
-                pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 10,10);
-                pbf_wait(context, (uint16_t)(1.1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 10,10);
-                pbf_press_button(context, BUTTON_B, (uint16_t)(2.8 * TICKS_PER_SECOND), 10); // Braviary Second Push
+                pbf_wait(context, 500ms);
+                pbf_press_button(context, BUTTON_PLUS, 80ms, 80ms);
+                pbf_wait(context, 1100ms);
+                pbf_press_button(context, BUTTON_PLUS, 80ms, 80ms);
+                pbf_press_button(context, BUTTON_B, 2800ms, 80ms);  // Braviary Second Push
 
                 context.wait_for_all_requests();
+                destination_time = current_time();
                 shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
 
                 //  Move to Froslass
-                pbf_press_dpad(context, DPAD_LEFT, 20, 20);
-                pbf_press_button(context, BUTTON_B, (uint16_t)(4.5 * TICKS_PER_SECOND), 10);
+                pbf_press_dpad(context, DPAD_LEFT, 160ms, 160ms);
+                pbf_press_button(context, BUTTON_B, 5000ms, 2000ms);
+                context.wait_for_all_requests();
+
             },
             {{shiny_detector}}
         );
         shiny_detector.throw_if_no_sound();
-        if (ret == 0){
+        if (ret == 0 || shiny_detector.last_detection() > destination_time){
             ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }

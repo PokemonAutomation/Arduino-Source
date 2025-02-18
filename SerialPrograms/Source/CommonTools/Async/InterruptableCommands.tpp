@@ -134,12 +134,6 @@ bool AsyncCommandSession<ControllerType>::cancel(std::exception_ptr exception) n
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_current != nullptr){
         m_current->context.cancel(std::move(exception));
-    }else{
-//        cout << "AsyncCommandSession::cancel() - already cancelled" << endl;
-        //  REMOVE: Check that this can actually be deleted.
-//        try{
-//            m_controller.stop_all_commands();
-//        }catch (...){}
     }
     m_cv.notify_all();
     return false;

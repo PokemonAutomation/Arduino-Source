@@ -31,7 +31,8 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
         "Constantly reset the Snowpoint Temple to find Shiny Alpha Gallade.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class GalladeFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -105,6 +106,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
     {
         float shiny_coefficient = 1.0;
         std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
+        WallClock destination_time = WallClock::max();
 
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
@@ -118,43 +120,44 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
             env.console, context,
             [&](ProControllerContext& context){
                 // forward portion
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(6.8 * TICKS_PER_SECOND)); // forward while running until stairs, mash y a few times down the stairs
-                pbf_mash_button(context, BUTTON_Y,(uint16_t)(2.8 * TICKS_PER_SECOND)); // roll down the stairs, recover stamina
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(4.0 * TICKS_PER_SECOND)); // forward while sprinting again
-                pbf_mash_button(context, BUTTON_Y,(uint16_t)(2.0 * TICKS_PER_SECOND)); // two mashes and then one y
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(3.8 * TICKS_PER_SECOND)); // forward while sprinting again
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 6800ms); // forward while running until stairs, mash y a few times down the stairs
+                pbf_mash_button(context, BUTTON_Y, 2800ms); // roll down the stairs, recover stamina
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 4000ms); // forward while sprinting again
+                pbf_mash_button(context, BUTTON_Y, 2000ms); // two mashes and then one y
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 3800ms); // forward while sprinting again
                 // basic map layout is walk forward for a while, move right, run back, then align camera, then walk left then forward to Gallade
 
                 // right portion
-                pbf_move_left_joystick(context, 255, 128, (uint16_t)(0.5 * TICKS_PER_SECOND), 0); // right alone
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 255, 128, 128, 128, (uint16_t)(2.4 * TICKS_PER_SECOND)); // forward while running until stairs
-                pbf_mash_button(context, BUTTON_Y,(uint16_t)(1.8 * TICKS_PER_SECOND)); // roll down the stairs, recover stamina
-                pbf_move_left_joystick(context, 255, 128, (uint16_t)(1.8 * TICKS_PER_SECOND), 20); // right alone
+                pbf_move_left_joystick(context, 255, 128, 500ms, 0ms); // right alone
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 255, 128, 128, 128, 2400ms); // forward while running until stairs
+                pbf_mash_button(context, BUTTON_Y, 1800ms); // roll down the stairs, recover stamina
+                pbf_move_left_joystick(context, 255, 128, 1800ms, 160ms); // right alone
 
                 // down portion
                 // pbf_move_left_joystick(context, 128, 255, (uint16_t)(1.9 * TICKS_PER_SECOND), 20); // OLD down
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 255, 128, 128, (uint16_t)(1.8 * TICKS_PER_SECOND));
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 255, 128, 128, 1800ms);
 
                 // camera align
                 pbf_press_button(context, BUTTON_ZL, 20, 0); // camera align
                 pbf_wait(context, 70);
 
                 context.wait_for_all_requests();
+                destination_time = current_time();
                 shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
 
-                pbf_move_left_joystick(context, 0, 128, 2 * TICKS_PER_SECOND, 0); // left
+                pbf_move_left_joystick(context, 0, 128, 2000ms, 0ms); // left
 
                 // then forward left
-                pbf_move_left_joystick(context, 0, 0, (uint16_t)(1.1 * TICKS_PER_SECOND), 0);
+                pbf_move_left_joystick(context, 0, 0, 1100ms, 0ms);
 
                 //pbf_move_left_joystick(context, 128, 0, 3.9 * TICKS_PER_SECOND, 0); // OLD forward
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(3.5 * TICKS_PER_SECOND)); // forward while sprinting until stairs, mash y a few times down the stairs
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 3500ms); // forward while sprinting until stairs, mash y a few times down the stairs
                 // we should easily be in range of gallade at this point, so if there's no shiny we're done
             },
             {{shiny_detector}}
         );
         shiny_detector.throw_if_no_sound();
-        if (ret == 0){
+        if (ret == 0 || shiny_detector.last_detection() > destination_time){
             ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }

@@ -14,6 +14,10 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/InferenceCallbacks/InferenceCallback.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 class ProgramEnvironment;

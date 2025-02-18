@@ -22,7 +22,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 CrobatFinder_Descriptor::CrobatFinder_Descriptor()
@@ -33,7 +34,8 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
         "Constantly reset the cave to find Shiny Alpha Crobat.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class CrobatFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -132,6 +134,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
     {
         float shiny_coefficient = 1.0;
         std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
+        WallClock destination_time = WallClock::max();
 
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
@@ -146,21 +149,22 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
             [&](ProControllerContext& context){
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
-                pbf_press_button(context, BUTTON_B, (uint16_t)(2.2 * TICKS_PER_SECOND), 80); // wyrdeer sprint
+                pbf_press_button(context, BUTTON_B, 2200ms, 640ms); // wyrdeer sprint
                 pbf_move_left_joystick(context, 0, 128, 10, 20); // turn left
                 pbf_press_button(context, BUTTON_ZL, 20, 50); // align camera
 
                 // ASCEND THE LEDGE WITH BRAVIARY
                 pbf_press_dpad(context, DPAD_RIGHT, 20, 50); // swap to braviary
-                pbf_wait(context, (uint16_t)(0.6 * TICKS_PER_SECOND)); // wait for the ascent
-                pbf_press_button(context, BUTTON_Y, (uint16_t)(2.4 * TICKS_PER_SECOND), 20); // descend to swap to Wyrdeer automatically
+                pbf_wait(context, 600ms); // wait for the ascent
+                pbf_press_button(context, BUTTON_Y, 2400ms, 160ms); // descend to swap to Wyrdeer automatically
 
                 // TO CROBAT PORTION
-                pbf_press_button(context, BUTTON_B, (uint16_t)(1.05 * TICKS_PER_SECOND), 80); // sprint forward for a split second
+                pbf_press_button(context, BUTTON_B, 1050ms, 640ms); // sprint forward for a split second
                 pbf_move_left_joystick(context, 255, 150, 10, 20); // rotate slightly right
                 pbf_press_button(context, BUTTON_ZL, 20, 70); // align camera
 
                 context.wait_for_all_requests();
+                destination_time = current_time();
                 shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
 
                 pbf_move_left_joystick(context, 128, 0, (uint16_t)(3.8 * TICKS_PER_SECOND), 0); // forward to crobat check
@@ -169,7 +173,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
             {{shiny_detector}}
         );
         shiny_detector.throw_if_no_sound();
-        if (ret == 0){
+        if (ret == 0 || shiny_detector.last_detection() > destination_time){
             ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }

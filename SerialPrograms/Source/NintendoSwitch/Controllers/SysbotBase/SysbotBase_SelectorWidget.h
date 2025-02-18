@@ -35,7 +35,7 @@ public:
         policy.setHorizontalStretch(3);
         this->setSizePolicy(policy);
 
-        this->setPlaceholderText("192.168.0.100:5000");
+        this->setPlaceholderText("192.168.0.100:6000");
 
         if (current == nullptr){
             std::shared_ptr<const ControllerDescriptor> descriptor =
