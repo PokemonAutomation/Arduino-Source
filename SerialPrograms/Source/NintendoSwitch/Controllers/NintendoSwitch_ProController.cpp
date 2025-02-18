@@ -53,8 +53,11 @@ public:
         ControllerDeltas deltas;
         const QtKeyMap& qkey_map = QtKeyMap::instance();
         for (uint32_t native_key : pressed_keys){
-            const std::set<Qt::Key>& qkeys = qkey_map.get_QtKeys(native_key);
-            for (Qt::Key qkey : qkeys){
+            const std::set<Qt::Key>* qkeys = qkey_map.get_QtKeys(native_key);
+            if (qkeys == nullptr){
+                continue;
+            }
+            for (Qt::Key qkey : *qkeys){
                 auto iter = m_mapping.find(qkey);
                 if (iter != m_mapping.end()){
                     deltas += iter->second;
