@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -308,9 +309,15 @@ void TeraSelfFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
             std::string tera_type = raid_data.tera_type.empty()
                 ? "unknown tera type"
                 : raid_data.tera_type;
-            std::string pokemon = raid_data.species.empty()
-                ? "unknown " + Pokemon::STRING_POKEMON
-                : raid_data.species;
+
+            std::string pokemon;
+            if (raid_data.species.empty()){
+                pokemon = "unknown " + Pokemon::STRING_POKEMON;
+            }else if (raid_data.species.size() == 1){
+                pokemon = *raid_data.species.begin();
+            }else{
+                pokemon = set_to_str(raid_data.species);
+            }
 
             ss << " a " << stars << "* " << tera_type << " " << pokemon << " raid";
             env.log(ss.str());

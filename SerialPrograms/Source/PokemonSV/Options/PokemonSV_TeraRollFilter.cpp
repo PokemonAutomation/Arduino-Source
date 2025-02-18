@@ -4,10 +4,9 @@
  *
  */
 
-//#include "Common/Cpp/Exceptions.h"
+#include <algorithm>
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-//#include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
@@ -172,9 +171,15 @@ void TeraRollFilter::read_card(
     std::string tera_type = data.tera_type.empty()
         ? "? tera"
         : data.tera_type;
-    std::string pokemon = data.species.empty()
-        ? "? " + Pokemon::STRING_POKEMON
-        : data.species;
+
+    std::string pokemon;
+    if (data.species.empty()){
+        pokemon = "unknown " + Pokemon::STRING_POKEMON;
+    }else if (data.species.size() == 1){
+        pokemon = *data.species.begin();
+    }else{
+        pokemon = set_to_str(data.species);
+    }
 
     stream.overlay().add_log(
         stars + "* " + tera_type + " " + pokemon,
@@ -183,7 +188,7 @@ void TeraRollFilter::read_card(
     std::string log = "Detected a " + stars + "* " + tera_type + " " + pokemon;
     stream.log(log);
 }
-bool TeraRollFilter::check_herba(const std::string& pokemon_slug) const{
+bool TeraRollFilter::check_herba(const std::set<std::string>& pokemon_slugs) const{
     if (!SKIP_NON_HERBA){
         return true;
     }
@@ -197,10 +202,23 @@ bool TeraRollFilter::check_herba(const std::string& pokemon_slug) const{
         "poliwrath", "snorlax", "basculegion"
     };
 
-    if (fivestar.find(pokemon_slug) != fivestar.end()){
+    std::set<std::string> fivestar_compatible;
+    std::set_intersection(
+        fivestar_compatible.begin(), fivestar_compatible.end(),
+        pokemon_slugs.begin(), pokemon_slugs.end(),
+        std::inserter(fivestar_compatible, fivestar_compatible.begin())
+    );
+    if (!fivestar_compatible.empty()){
         return true;
     }
-    if (sixstar.find(pokemon_slug) != sixstar.end()){
+
+    std::set<std::string> sixstar_compatible;
+    std::set_intersection(
+        sixstar_compatible.begin(), sixstar_compatible.end(),
+        pokemon_slugs.begin(), pokemon_slugs.end(),
+        std::inserter(sixstar_compatible, sixstar_compatible.begin())
+    );
+    if (!sixstar_compatible.empty()){
         return true;
     }
 

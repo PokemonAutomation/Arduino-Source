@@ -53,11 +53,16 @@ ImagePixelBox enclosing_rectangle_with_pixel_filter(const ImageViewRGB32& image,
     size_t cs = 0;
     size_t ce = image.width();
 
+//    cout << "Before: rs = " << rs << ", re = " << re << ", cs = " << cs << ", ce = " << ce << endl;
+
     // If we cannot find a foreground (aka, alpha != 0) pixel on one row or column, we trim it, until hitting a foreground pixel.
     while (rs < re && is_background_row(image, rs    , is_foreground)) rs++;
     while (re > rs && is_background_row(image, re - 1, is_foreground)) re--;
     while (cs < ce && is_background_col(image, cs    , is_foreground)) cs++;
     while (ce > cs && is_background_col(image, ce - 1, is_foreground)) ce--;
+
+//    cout << "After:  rs = " << rs << ", re = " << re << ", cs = " << cs << ", ce = " << ce << endl;
+
     return ImagePixelBox(cs, rs, ce, re);
 }
 

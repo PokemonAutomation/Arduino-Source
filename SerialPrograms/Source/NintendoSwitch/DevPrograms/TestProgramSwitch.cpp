@@ -375,14 +375,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-//    ImageRGB32 image("20250115-110356822901.png");
+    ImageRGB32 image("20250218-003554940153.png");
 //    ImageRGB32 image("raidecho1.jpg");
 //    auto image = feed.snapshot();
 
 //    MaxLairInternal::BattleMenuReader reader(overlay, Language::English);
 //    reader.read_opponent_in_summary(logger, image);
 
-//    TeraCardReader reader;
+    TeraCardReader reader;
+    cout << reader.detect(image) << endl;
+    reader.pokemon_slug(logger, env.program_info(), image);
 //    cout << (int)reader.stars(logger, env.program_info(), image) << endl;
 
 
