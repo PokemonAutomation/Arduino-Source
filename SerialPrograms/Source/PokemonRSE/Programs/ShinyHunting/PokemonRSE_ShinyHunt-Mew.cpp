@@ -67,32 +67,32 @@ ShinyHuntMew::ShinyHuntMew()
     , MEW_WAIT_TIME(
         "<b>Mew wait time:</b><br>Wait this long after entering for Mew to hide in the grass.",
         LockMode::LOCK_WHILE_RUNNING,
-        "100 ms"
+        "2000 ms"
     )
     , DOOR_TO_GRASS_TIME(
         "<b>Door to grass time:</b><br>Time it takes to run from the door to the edge of the tall grass. Three steps up.",
         LockMode::LOCK_WHILE_RUNNING,
-        "100 ms"
+        "400 ms"
     )
     , RIGHT_GRASS_1_TIME(
         "<b>First Right time:</b><br>Time it takes to turn right and take three steps. This follows the edge of the grass.",
         LockMode::LOCK_WHILE_RUNNING,
-        "100 ms"
+        "450 ms"
     )
     , UP_GRASS_1_TIME(
         "<b>Move Up time::</b><br>Time it takes turn up and take one step.",
         LockMode::LOCK_WHILE_RUNNING,
-        "100 ms"
+        "200 ms"
     )
     , RIGHT_GRASS_2_TIME(
         "<b>Second Right time:</b><br>Time it takes to turn right and take two steps.",
         LockMode::LOCK_WHILE_RUNNING,
-        "100 ms"
+        "260 ms"
     )
     , FACE_UP_TIME(
         "<b>Face Up time:</b><br>Time it takes to tap the up button and face up, without taking a step.",
         LockMode::LOCK_WHILE_RUNNING,
-        "100 ms"
+        "150 ms"
     )
 {
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -150,25 +150,20 @@ void ShinyHuntMew::enter_mew(SingleSwitchProgramEnvironment& env, ProControllerC
     pbf_press_dpad(context, DPAD_RIGHT, RIGHT_GRASS_2_TIME, 0ms);
 
     //Turn up. Start battle.
-    ssf_press_button(context, BUTTON_B, 0ms, FACE_UP_TIME);
-    pbf_press_dpad(context, DPAD_RIGHT, FACE_UP_TIME, 0ms);
+    pbf_press_dpad(context, DPAD_UP, FACE_UP_TIME, 0ms);
 
     context.wait_for_all_requests();
 }
 
 void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
-    //We can simply reuse the values from enter_mew
-    ssf_press_button(context, BUTTON_B, 0ms, RIGHT_GRASS_2_TIME);
-    pbf_press_dpad(context, DPAD_LEFT, RIGHT_GRASS_2_TIME, 0ms);
+    ssf_press_button(context, BUTTON_B, 0, 50);
+    pbf_press_dpad(context, DPAD_DOWN, 50, 20);
 
-    ssf_press_button(context, BUTTON_B, 0ms, UP_GRASS_1_TIME);
-    pbf_press_dpad(context, DPAD_DOWN, UP_GRASS_1_TIME, 0ms);
+    ssf_press_button(context, BUTTON_B, 0, 90);
+    pbf_press_dpad(context, DPAD_LEFT, 90, 20);
 
-    ssf_press_button(context, BUTTON_B, 0ms, RIGHT_GRASS_1_TIME);
-    pbf_press_dpad(context, DPAD_LEFT, RIGHT_GRASS_1_TIME, 0ms);
-
-    ssf_press_button(context, BUTTON_B, 0ms, DOOR_TO_GRASS_TIME);
-    pbf_press_dpad(context, DPAD_DOWN, DOOR_TO_GRASS_TIME, 0ms);
+    ssf_press_button(context, BUTTON_B, 0, 100);
+    pbf_press_dpad(context, DPAD_DOWN, 100, 20);
 
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret = run_until<ProControllerContext>(

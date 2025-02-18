@@ -28,6 +28,12 @@ public:
     ShinyHuntMew();
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
+    virtual void start_program_border_check(
+        CancellableScope& scope,
+        VideoStream& stream,
+        FeedbackType feedback_type
+    ) override{}
+
 private:
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
