@@ -4,6 +4,7 @@
  *
  */
 
+#include <iterator>
 #include <algorithm>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"

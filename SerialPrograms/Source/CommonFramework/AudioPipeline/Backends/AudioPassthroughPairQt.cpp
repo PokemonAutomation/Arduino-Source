@@ -60,7 +60,10 @@ public:
             AudioPassthroughPairQt& parent = m_parent;
             WriteSpinLock lg(parent.m_lock);
             if (parent.m_writer){
-                parent.m_writer->operator AudioFloatStreamListener&().on_samples(data, frames);
+                AudioFloatStreamListener* listener = parent.m_writer->float_stream_listener();
+                if (listener){
+                    listener->on_samples(data, frames);
+                }
             }
             if (parent.m_fft_runner){
                 parent.m_fft_runner->on_samples(data, frames);
