@@ -22,13 +22,13 @@ void QtKeyMap::record(const QKeyEvent& event){
     m_map[native_key].insert(qkey);
 }
 
-const std::set<Qt::Key>* QtKeyMap::get_QtKeys(uint32_t native_key) const{
+std::set<Qt::Key> QtKeyMap::get_QtKeys(uint32_t native_key) const{
     ReadSpinLock lg(m_lock);
     auto iter = m_map.find(native_key);
-    if (iter == m_map.end()){
-        return nullptr;
+    if (iter != m_map.end()){
+        return iter->second;
     }
-    return &iter->second;
+    return {};
 }
 
 

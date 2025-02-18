@@ -26,7 +26,7 @@ public:
 
     void record(const QKeyEvent& event);
 
-    const std::set<Qt::Key>* get_QtKeys(uint32_t native_key) const;
+    std::set<Qt::Key> get_QtKeys(uint32_t native_key) const;
 
 
 private:

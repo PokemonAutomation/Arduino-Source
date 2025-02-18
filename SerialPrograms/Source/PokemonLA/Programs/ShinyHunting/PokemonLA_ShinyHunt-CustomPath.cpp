@@ -37,7 +37,8 @@ ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()
         "Repeatedly travel on a custom path to shiny hunt " + STRING_POKEMON + " around it.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController,},
+        FasterIfTickPrecise::FASTER
     )
 {}
 class ShinyHuntCustomPath_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
