@@ -193,68 +193,45 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
     }
 
     for (const BoxSortingSelection preference : *lhs->preferences){
+        bool ret = true;
         switch(preference.sort_type){
         // NOTE edit when adding new struct members
         case BoxSortingSortType::NationalDexNo:
             if (lhs->national_dex_number != rhs->national_dex_number){
-                if (preference.reverse){
-                    return lhs->national_dex_number > rhs->national_dex_number;
-                }else{
-                    return lhs->national_dex_number < rhs->national_dex_number;
-                }
+                ret = lhs->national_dex_number < rhs->national_dex_number;
             }
             break;
         case BoxSortingSortType::Shiny:
             if (lhs->shiny != rhs->shiny){
-                if (preference.reverse){
-                    return rhs->shiny;
-                }else{
-                    return lhs->shiny;
-                }
+                ret = lhs->shiny;
             }
             break;
         case BoxSortingSortType::Gigantamax:
             if (lhs->gmax != rhs->gmax){
-                if (preference.reverse){
-                    return rhs->gmax;
-                }else{
-                    return lhs->gmax;
-                }
+                ret = lhs->gmax;
             }
             break;
         case BoxSortingSortType::Ball_Slug:
             if (lhs->ball_slug < rhs->ball_slug){
-                if (preference.reverse){
-                    return false;
-                }else{
-                    return true;
-                }
+                ret = true;
             }
             if (lhs->ball_slug > rhs->ball_slug){
-                if (preference.reverse){
-                    return true;
-                }else{
-                    return false;
-                }
+                ret = false;
             }
             break;
         case BoxSortingSortType::Gender:
             if (lhs->gender < rhs->gender){
-                if (preference.reverse){
-                    return false;
-                }else{
-                    return true;
-                }
+                ret = true;
             }
             if (lhs->gender > rhs->gender){
-                if (preference.reverse){
-                    return true;
-                }
-                else{
-                    return false;
-                }
+                ret = false;
             }
             break;
+        }
+        if (preference.reverse){
+            return !ret;
+        }else{
+            return ret;
         }
     }
 
