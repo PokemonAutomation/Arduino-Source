@@ -189,22 +189,6 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, ProCont
         dex_slug_order.emplace(dex_slugs[i], i);
     }
 
-    // check if we have any pokemon name read failure.
-    for(size_t i = 0; i < current_order.size(); ++i){
-        const auto it = dex_slug_order.find(current_order[i]);
-        // If OCR gives a name that is not in the nation dex, throw an error:
-        if (it == dex_slug_order.end()){
-            const auto [box, row, col] = get_location(i);
-            std::stringstream os;
-            os << "Failed to read pokemon name at box " << box << " row " << row << " col " << col;
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                os.str(),
-                env.console
-            );
-        }
-    }
-    
     // Sort the read pokemon by the dex order.
     std::vector<std::string> sorted_order = current_order;
 
