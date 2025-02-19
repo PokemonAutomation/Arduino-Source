@@ -30,7 +30,8 @@ DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
         "Level up your party by spamming spread moves in a double battle with a partner that heals you forever.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct DoublesLeveling_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{

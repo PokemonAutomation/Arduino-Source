@@ -61,8 +61,8 @@ public:
     const ShinySparkleAggregator& sparkles_wild_right() const{ return m_best_wild_right; }
     const ShinySparkleAggregator& sparkles_own() const{ return m_best_own; }
 
-    const WallClock& wild_animtion_end_timestmap() const { return m_wild_animation_end_timestamp; }
-    const WallClock& your_animation_end_timestamp() const { return m_your_animation_end_timestamp; }
+    const WallClock& wild_animation_end_timestmap() const { return m_wild_animation_end_timestamp; }
+    const WallClock& your_animation_start_timestamp() const { return m_your_animation_start_timestamp; }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const VideoSnapshot& frame) override;
@@ -79,7 +79,7 @@ private:
     BattleDialogDetector m_dialog_detector;
     EncounterDialogTracker m_dialog_tracker;
     WallClock m_wild_animation_end_timestamp;
-    WallClock m_your_animation_end_timestamp;
+    WallClock m_your_animation_start_timestamp;
 
     ImageFloatBox m_box_wild_left;
     ImageFloatBox m_box_wild_right;

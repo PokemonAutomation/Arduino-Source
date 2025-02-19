@@ -34,7 +34,8 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         "Shiny hunt your starter " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct StarterReset_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{

@@ -33,7 +33,10 @@ MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
         "Farm money by using VS Seeker to rebattle the rich couple on Route 212.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        }
     )
 {}
 struct MoneyFarmerRoute212_Descriptor::Stats : public StatsTracker{
@@ -224,7 +227,7 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProCont
     pbf_move_left_joystick(context, 255, 128, 380, 0);
     pbf_move_left_joystick(context, 128, 255, 300, 0);
     pbf_move_left_joystick(context,   0, 128, 600, 0);
-    pbf_move_left_joystick(context, 255, 128,  70, 0);
+    pbf_move_left_joystick(context, 255, 128,  75, 0);
     pbf_move_left_joystick(context, 128, 255, 1375, 0);
     pbf_move_left_joystick(context, 255, 128, 125, 0);
     pbf_move_left_joystick(context, 128, 255, 200, 0);

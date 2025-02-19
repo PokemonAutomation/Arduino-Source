@@ -30,7 +30,8 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         "Shiny hunt a standing legendary " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
