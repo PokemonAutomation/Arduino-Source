@@ -10,7 +10,6 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -32,7 +31,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         "Repeatedly trade " + STRING_POKEMON + " between two local Switches to fill up research.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {ControllerFeature::NintendoSwitch_ProController},
         FasterIfTickPrecise::NOT_FASTER,
         2, 2, 2
     )
