@@ -27,7 +27,8 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
         "Shiny hunt Shaymin using the runaway method.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntShaymin_Descriptor::make_stats() const{
@@ -178,7 +179,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, ProControlle
         //  Hop on bike, ride down to seabreak path
 //        SHORTCUT.run(env.console, 0);
         pbf_move_left_joystick(context, 128, 255, 360, 0);
-        pbf_move_left_joystick(context, 128, 0, 370, 0);
+        pbf_move_left_joystick(context, 128, 0, 400, 0);
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

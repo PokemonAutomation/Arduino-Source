@@ -58,7 +58,8 @@ GiftBerryReset_Descriptor::GiftBerryReset_Descriptor()
         "Reset the game in front of the NPC that gives rare berries in Pastoria City until a desired berry is received.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct GiftBerryReset_Descriptor::Stats : public StatsTracker{
@@ -181,7 +182,11 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, ProControllerC
     }
 
     env.update_stats();
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    send_program_finished_notification(
+        env, NOTIFICATION_PROGRAM_FINISH,
+        "Match found!",
+        env.console.video().snapshot()
+    );
     GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 

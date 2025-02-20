@@ -27,7 +27,8 @@ PoffinCooker_Descriptor::PoffinCooker_Descriptor()
         "Cook Poffins.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 struct PoffinCooker_Descriptor::Stats : public StatsTracker{
