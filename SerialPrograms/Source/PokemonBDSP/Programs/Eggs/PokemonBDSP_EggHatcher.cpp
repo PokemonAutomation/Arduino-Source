@@ -29,7 +29,8 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         "Hatch eggs from boxes.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct EggHatcher_Descriptor::Stats : public StatsTracker{

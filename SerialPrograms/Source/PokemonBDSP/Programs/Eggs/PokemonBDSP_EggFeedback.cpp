@@ -136,10 +136,10 @@ void withdraw_1st_column_from_overworld(VideoStream& stream, ProControllerContex
 
 void release(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, 50);
-    pbf_move_right_joystick(context, 128, 0, 20, 10);
-    pbf_move_right_joystick(context, 128, 0, 20, 10);
+    pbf_move_right_joystick(context, 128, 0, 20, 30);
+    pbf_move_right_joystick(context, 128, 0, 20, 30);
     pbf_press_button(context, BUTTON_ZL, 20, 105);
-    pbf_move_right_joystick(context, 128, 255, 20, 10);
+    pbf_move_right_joystick(context, 128, 255, 20, 30);
 
     ShortDialogDetector detector;
     for (size_t c = 0; c < 3; c++){

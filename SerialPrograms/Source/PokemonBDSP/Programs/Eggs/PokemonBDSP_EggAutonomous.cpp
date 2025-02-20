@@ -21,6 +21,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
+
 using namespace Pokemon;
 
 
@@ -33,7 +34,8 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         "Automatically fetch+hatch eggs and keep all shinies.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 std::unique_ptr<StatsTracker> EggAutonomous_Descriptor::make_stats() const{

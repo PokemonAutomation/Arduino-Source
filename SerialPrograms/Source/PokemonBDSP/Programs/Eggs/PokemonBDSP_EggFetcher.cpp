@@ -26,7 +26,8 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         "Automatically fetch eggs from the daycare man.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct EggFetcher_Descriptor::Stats : public StatsTracker{
