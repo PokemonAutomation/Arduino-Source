@@ -54,9 +54,9 @@ std::string BattleBallReader::read_ball(const ImageViewRGB32& screen) const{
             sprite_result.results.clear();
         }
     }
-    if (sprite_result.results.empty()){
-        dump_image(m_stream.logger(), ProgramInfo(), "BattleBallReader-Sprite", screen);
-    }
+//    if (sprite_result.results.empty()){
+//        dump_image(m_stream.logger(), ProgramInfo(), "BattleBallReader-Sprite", screen);
+//    }
 
     OCR::StringMatchResult name_result;
     {
@@ -69,14 +69,15 @@ std::string BattleBallReader::read_ball(const ImageViewRGB32& screen) const{
             }
         );
     }
-    if (name_result.results.size() != 1){
-        dump_image(m_stream.logger(), ProgramInfo(), "BattleBallReader-Name", screen);
-    }
+//    if (name_result.results.size() != 1){
+//        dump_image(m_stream.logger(), ProgramInfo(), "BattleBallReader-Name", screen);
+//    }
 
     if (sprite_result.results.empty()){
         if (name_result.results.size() == 1){
             return name_result.results.begin()->second.token;
         }
+        dump_image(m_stream.logger(), ProgramInfo(), "BattleBallReader-FailedSprite-AmbiguousName", screen);
         return "";
     }
 
