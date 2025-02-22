@@ -77,6 +77,7 @@ TeraFarmerPerConsoleOptions::TeraFarmerPerConsoleOptions(std::string label, cons
 {
     PA_ADD_STATIC(is_host_label);
     PA_ADD_OPTION(language);
+    PA_ADD_OPTION(keyboard_layout);
     PA_ADD_OPTION(catch_on_win);
     PA_ADD_OPTION(ball_select);
     PA_ADD_OPTION(battle_ai);
@@ -370,7 +371,14 @@ void TeraMultiFarmer::join_lobby(
                 continue;
             }
             seen_code_entry = true;
-            enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
+            enter_code(
+                console, context,
+                PLAYERS[console.index()]->keyboard_layout,
+                normalized_code,
+                false,
+                true,
+                false
+            );
             context.wait_for(std::chrono::seconds(1));
             continue;
         case 1:

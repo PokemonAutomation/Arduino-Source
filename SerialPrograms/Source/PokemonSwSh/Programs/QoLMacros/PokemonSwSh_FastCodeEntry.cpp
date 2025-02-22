@@ -6,7 +6,7 @@
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_FastCodeEntry.h"
 
@@ -47,14 +47,13 @@ FastCodeEntry::FastCodeEntry()
 }
 
 void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    uint8_t code[8];
-    RAID_CODE.to_str(code);
+    std::string code = RAID_CODE.to_str();
 
     pbf_wait(context, INITIAL_DELAY0);
 
     pbf_press_button(context, BUTTON_PLUS, 5, 5);
     pbf_press_button(context, BUTTON_PLUS, 5, 5);
-    enter_digits(context, 8, code);
+    numberpad_enter_code(env.logger(), context, code, true);
 }
 
 

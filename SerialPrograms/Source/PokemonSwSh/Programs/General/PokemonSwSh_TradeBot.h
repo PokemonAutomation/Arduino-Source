@@ -34,7 +34,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void trade_slot(ProControllerContext& context, const uint8_t code[8], uint8_t slot) const;
+    void trade_slot(
+        Logger& logger, ProControllerContext& context,
+        const std::string& code, uint8_t slot
+    ) const;
 
 private:
     StartInGripOrGameOption START_LOCATION;

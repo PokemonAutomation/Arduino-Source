@@ -46,7 +46,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -114,10 +114,10 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 
 
 #include <QPixmap>
@@ -289,6 +289,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    ssf_press_button(context, BUTTON_A | BUTTON_L, 3);
 //    ssf_press_button(context, BUTTON_L, 0);
 
+    numberpad_enter_code(
+        logger, context,
+        "708538991006",
+        false
+    );
+
+
 #if 0
     codeboard_enter_digits(
         logger, context, KeyboardLayout::QWERTY,
@@ -304,7 +311,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     );
 #endif
 
-    ssf_flush_pipeline(context);
+//    ssf_flush_pipeline(context);
 
 
 //    return_to_academy_after_loss(env, console, context);
@@ -374,7 +381,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-
+#if 0
     ImageRGB32 image("20250218-003554940153.png");
 //    ImageRGB32 image("raidecho1.jpg");
 //    auto image = feed.snapshot();
@@ -386,7 +393,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << reader.detect(image) << endl;
     reader.pokemon_slug(logger, env.program_info(), image);
 //    cout << (int)reader.stars(logger, env.program_info(), image) << endl;
-
+#endif
 
 
 
@@ -1560,8 +1567,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 0
-    CodeboardPosition point0{1, 0};
-    CodeboardPosition point1{1, 10};
+    KeyboardEntryPosition point0{1, 0};
+    KeyboardEntryPosition point1{1, 10};
 //    uint16_t scroll_delay = 3;
 //    uint16_t A_delay = 3;
 

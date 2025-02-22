@@ -811,8 +811,6 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp
@@ -885,6 +883,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/NintendoSwitch_Settings.h
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h
+    Source/NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.cpp
+    Source/NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.cpp
@@ -894,16 +894,18 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/TurboMacroTable.h
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
-    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.cpp
-    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp

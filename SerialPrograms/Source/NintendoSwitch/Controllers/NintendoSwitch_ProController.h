@@ -16,6 +16,10 @@
 #include "ClientSource/Connection/BotBaseMessage.h"
 #include "Controllers/Controller.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 

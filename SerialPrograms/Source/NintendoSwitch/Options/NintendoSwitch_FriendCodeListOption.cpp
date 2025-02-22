@@ -56,11 +56,11 @@ void FriendCodeListOption::restore_defaults(){
 
 
 
-std::vector<uint8_t> FriendCodeListOption::parse(const std::string& line){
-    std::vector<uint8_t> code;
+std::string FriendCodeListOption::parse(const std::string& line){
+    std::string code;
     for (char ch : line){
         if ('0' <= ch && ch <= '9'){
-            code.emplace_back(ch);
+            code.push_back(ch);
         }
     }
     return code;
@@ -93,7 +93,7 @@ std::vector<std::string> FriendCodeListOption::list() const{
     ReadSpinLock lg(m_lock);
     std::vector<std::string> ret;
     for (const auto& item : m_lines){
-        std::vector<uint8_t> line = parse(item);
+        std::string line = parse(item);
         if (line.size() != 12){
             continue;
         }

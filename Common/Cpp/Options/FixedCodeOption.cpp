@@ -101,14 +101,10 @@ JsonValue FixedCodeOption::to_json() const{
     return m_data->m_current;
 }
 
-void FixedCodeOption::to_str(uint8_t* code) const{
-    std::string qstr;
+std::string FixedCodeOption::to_str() const{
     {
         ReadSpinLock lg(m_data->m_lock);
-        qstr = sanitize_code(8, m_data->m_current);
-    }
-    for (int c = 0; c < 8; c++){
-        code[c] = qstr[c] - '0';
+        return sanitize_code(8, m_data->m_current);
     }
 }
 

@@ -33,7 +33,7 @@ void send_raid_notification(
     ProgramEnvironment& env,
     VideoStream& stream,
     AutoHostNotificationOption& settings,
-    bool has_code, uint8_t code[8],
+    const std::string& code,
     const std::string& slug,
     const PathStats& path_stats,
     const StatsTracker& session_stats

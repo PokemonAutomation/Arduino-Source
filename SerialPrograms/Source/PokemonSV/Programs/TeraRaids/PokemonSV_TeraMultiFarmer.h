@@ -15,6 +15,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
@@ -56,6 +57,7 @@ public:
     bool is_host;
     StaticTextOption is_host_label;
     OCR::LanguageOCROption language;
+    KeyboardLayoutOption keyboard_layout;
 
     BooleanCheckBoxOption catch_on_win;
     PokemonSwSh::PokemonBallSelectOption ball_select;

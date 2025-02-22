@@ -265,7 +265,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
-
+#if 0
     {
         CircularBuffer<CheckedObject<std::string>> buffer(4);
 
@@ -302,10 +302,10 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         cout << "Instances = " << CheckedObject<std::string>::instances() << endl;
     }
     cout << "Instances = " << CheckedObject<std::string>::instances() << endl;
+#endif
 
 
-
-#if 0
+#if 1
     int* ptr = nullptr;
     cout << ptr[0] << endl;
 #endif

@@ -25,7 +25,7 @@ public:
 
     std::string check_validity() const;
     bool code_enabled() const;
-    bool get_code(uint8_t* code) const;
+    std::string get_code() const;
 
     bool operator==(const RaidCodeOption& x) const;
 
@@ -53,7 +53,7 @@ public:
     std::string set(RaidCodeOption code);
 
     bool code_enabled() const;
-    bool get_code(uint8_t* code) const;
+    std::string get_code() const;
 
     virtual std::string check_validity() const override;
     virtual void restore_defaults() override;

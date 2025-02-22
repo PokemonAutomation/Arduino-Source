@@ -6,7 +6,7 @@
 
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"
@@ -184,11 +184,10 @@ bool start_raid_host_solo(
     state.boss = read_boss_sprite(stream);
 
     //  Enter code.
-    uint8_t code[8];
-    bool has_code = settings.RAID_CODE.get_code(code);
-    if (has_code){
+    std::string code = settings.RAID_CODE.get_code();
+    if (!code.empty()){
         pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
-        enter_digits(context, 8, code);
+        numberpad_enter_code(env.logger(), context, code, true);
         pbf_wait(context, 2 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         context.wait_for_all_requests();
@@ -198,7 +197,7 @@ bool start_raid_host_solo(
         env,
         stream,
         settings.NOTIFICATIONS,
-        has_code, code,
+        code,
         state.boss,
         path_stats, session_stats
     );

@@ -4,11 +4,12 @@
  *
  */
 
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch_Settings.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -61,6 +62,10 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY0);
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(DIGIT_ENTRY);
+        PA_ADD_OPTION(KEYBOARD_ENTRY);
+    }
     PA_ADD_STATIC(KEYBOARD_SECTION);
     PA_ADD_OPTION(KEYBOARD_MAPPINGS);
 }

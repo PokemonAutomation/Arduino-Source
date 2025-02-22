@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_ClipboardFastCodeEntry_H
 
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
+#include "PokemonSV_CodeEntry.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -26,6 +26,7 @@ public:
 class ClipboardFastCodeEntry : public MultiSwitchProgramInstance{
 public:
     ClipboardFastCodeEntry();
+    virtual void update_active_consoles(size_t switch_count) override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:

@@ -55,7 +55,7 @@ void wait_for_video_code_and_join(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     ScreenWatchOption& screen_watcher,
     VideoFceSettings& join_method,
-    FastCodeEntrySettingsOption& fce_settings
+    const FastCodeEntrySettings& settings
 ){
     bool skip_initial = join_method.SKIP_INITIAL_CODE;
     VideoSnapshot snapshot;
@@ -105,7 +105,7 @@ void wait_for_video_code_and_join(
         case VideoFceOcrMethod::TERA_CARD:
             code = read_raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
         }
-        const char* error = enter_code(env, scope, fce_settings, code, false);
+        const char* error = enter_code(env, scope, settings, code, false, false);
         if (error == nullptr){
             break;
         }else{
@@ -149,7 +149,6 @@ VideoFastCodeEntry::VideoFastCodeEntry()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
-    , FCE_SETTINGS(LockMode::LOCK_WHILE_RUNNING)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
     })
@@ -158,21 +157,22 @@ VideoFastCodeEntry::VideoFastCodeEntry()
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(SKIP_CONNECT_TO_CONTROLLER);
     PA_ADD_OPTION(JOIN_METHOD);
-    PA_ADD_OPTION(FCE_SETTINGS);
+    PA_ADD_OPTION(SETTINGS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     //  Preload the OCR data.
     OCR::ensure_instances(Language::English, 6);
     preload_code_templates();
 }
+void VideoFastCodeEntry::update_active_consoles(size_t switch_count){
+    SETTINGS.set_active_consoles(switch_count);
+}
 
 
 void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    FastCodeEntrySettings settings(FCE_SETTINGS);
-
     if (MODE == Mode::MANUAL){
         std::string code = read_raid_code(env.logger(), env.realtime_dispatcher(), SCREEN_WATCHER.screenshot());
-        const char* error = enter_code(env, scope, settings, code, !SKIP_CONNECT_TO_CONTROLLER);
+        const char* error = enter_code(env, scope, SETTINGS, code, false, !SKIP_CONNECT_TO_CONTROLLER);
         if (error){
             env.log("No valid code found: " + std::string(error), COLOR_RED);
         }
@@ -187,7 +187,7 @@ void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancellable
     //  Preload 6 threads to OCR the code.
     env.realtime_dispatcher().ensure_threads(6);
 
-    wait_for_video_code_and_join(env, scope, SCREEN_WATCHER, JOIN_METHOD, FCE_SETTINGS);
+    wait_for_video_code_and_join(env, scope, SCREEN_WATCHER, JOIN_METHOD, SETTINGS);
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

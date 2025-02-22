@@ -32,7 +32,7 @@ void send_raid_notification(
     const ProgramEnvironment& env,
     VideoStream& stream,
     AutoHostNotificationOption& settings,
-    bool has_code, uint8_t code[8],
+    const std::string& code,
     const ImageViewRGB32& screenshot,
     const DenMonReadResults& results,
     const StatsTracker& stats_tracker

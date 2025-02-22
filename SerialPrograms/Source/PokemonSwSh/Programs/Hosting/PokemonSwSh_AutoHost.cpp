@@ -9,7 +9,7 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
@@ -51,7 +51,7 @@ void send_raid_notification(
     ProgramEnvironment& env,
     VideoStream& stream,
     AutoHostNotificationOption& settings,
-    bool has_code, uint8_t code[8],
+    const std::string& code,
     const ImageViewRGB32& screenshot,
     const DenMonReadResults& results,
     const StatsTracker& stats_tracker
@@ -96,22 +96,7 @@ void send_raid_notification(
     }
     embeds.emplace_back("Current " + STRING_POKEMON + ":", slugs);
 
-    {
-        std::string code_str;
-        if (has_code){
-            size_t c = 0;
-            for (; c < 4; c++){
-                code_str += code[c] + '0';
-            }
-            code_str += " ";
-            for (; c < 8; c++){
-                code_str += code[c] + '0';
-            }
-        }else{
-            code_str += "None";
-        }
-        embeds.emplace_back("Raid Code:", code_str);
-    }
+    embeds.emplace_back("Raid Code:", code.empty() ? "None" : code);
 
     send_program_notification(
         env, settings.NOTIFICATION,
@@ -178,16 +163,18 @@ void run_autohost(
             }
         }
 
-        uint8_t code[8];
-        bool has_code = raid_code && raid_code->get_code(code);
-        if (has_code){
+        std::string code;
+        if (raid_code){
+            code = raid_code->get_code();
+        }
+        if (!code.empty()){
             char str[8];
             for (size_t c = 0; c < 8; c++){
                 str[c] = code[c] + '0';
             }
             env.log("Next Raid Code: " + std::string(str, sizeof(str)));
             pbf_press_button(context, BUTTON_PLUS, 5, 145);
-            enter_digits(context, 8, code);
+            numberpad_enter_code(stream.logger(), context, code, true);
             pbf_wait(context, 180);
             pbf_press_button(context, BUTTON_A, 5, 95);
         }
@@ -198,7 +185,7 @@ void run_autohost(
             env,
             stream,
             notifications,
-            has_code, code,
+            code,
             screen, results, stats
         );
     }

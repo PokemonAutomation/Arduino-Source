@@ -49,27 +49,27 @@ void home_to_add_friends(
     //  the game instead of the Switch Home, these button presses will actually
     //  start the raid - which can kill the den. This will move the cursor over
     //  "Quit" instead of "Ready to Battle!".
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
     for (uint8_t c = 0; c < user_slot; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
     }
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
 
     //  Enter user profile.
-    ssf_press_button(context, BUTTON_A, 200);
+    ssf_press_button_ptv(context, BUTTON_A, 1600ms);
 
     if (fix_cursor){
         //  Force cursor to bottom, then up one to FRs.
-        for (uint8_t c = 0; c < 20; c++){
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        for (uint8_t c = 0; c < 40; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
         }
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
     }
 
     ssf_do_nothing(context, 50);
-    ssf_press_dpad(context, DPAD_RIGHT, 3);
+    ssf_issue_scroll_ptv(context, DPAD_RIGHT);
     while (scroll_down--){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
     }
 }
 void accept_FRs(
