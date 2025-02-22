@@ -34,7 +34,7 @@ MaxLairStandard_Descriptor::MaxLairStandard_Descriptor()
         "Auto Max Lair 2.0 - Run Dynamax Adventures until a shiny legendary is found.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {ControllerFeature::NintendoSwitch_ProController},
         FasterIfTickPrecise::NOT_FASTER,
         1, 4, 1
     )

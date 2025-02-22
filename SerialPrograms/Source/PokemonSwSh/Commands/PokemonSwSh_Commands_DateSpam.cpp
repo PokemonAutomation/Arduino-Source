@@ -144,16 +144,16 @@ void home_roll_date_enter_game(
 
     if (rollback_year){
         roll_date_backward_N(context, MAX_YEAR, true);
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 2);
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 2);
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-//        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 2);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT, 24ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT, 24ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT, 24ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP, 16ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT, 24ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP, 16ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT, 24ms);
+//        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT, 24ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP, 16ms);
     }else{
         roll_date_forward_1(context, true);
     }
@@ -166,23 +166,23 @@ void touch_date_from_home(ProControllerContext& context, Milliseconds settings_t
     //  Touch the date without changing it. This prevents unintentional rollovers.
 
     home_to_date_time(context, true, true);
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_press_button_ptv(context, BUTTON_A, 0ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_press_button_ptv(context, BUTTON_A, 0ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
 
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 2);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_UP, 16ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 0ms);
+    ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 2);
+    ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 16ms);
     ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
 }
 void rollback_hours_from_home(
@@ -191,19 +191,19 @@ void rollback_hours_from_home(
     Milliseconds settings_to_home_delay
 ){
     home_to_date_time(context, true, false);
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_press_button_ptv(context, BUTTON_A, 0ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
     for (uint8_t c = 0; c < hours; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
     }
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_press_button_ptv(context, BUTTON_A, 0ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
 
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
     ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
 }
 

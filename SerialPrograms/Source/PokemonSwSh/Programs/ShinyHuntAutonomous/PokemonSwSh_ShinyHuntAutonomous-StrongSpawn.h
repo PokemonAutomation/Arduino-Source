@@ -38,7 +38,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    StartInGripOrClosedOption START_LOCATION;
+    StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     TimeRollbackHoursOption TIME_ROLLBACK_HOURS;
 

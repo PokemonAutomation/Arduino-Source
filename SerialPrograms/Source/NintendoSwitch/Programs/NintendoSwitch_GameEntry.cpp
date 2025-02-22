@@ -119,7 +119,7 @@ void start_game_from_home_with_inference(
     }
 
     if (game_slot != 0){
-        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 80ms);
+        ssf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         for (uint8_t c = 1; c < game_slot; c++){
             pbf_press_dpad(context, DPAD_RIGHT, 5, 5);
         }
@@ -200,9 +200,9 @@ void start_game_from_home(
     }
 
     if (game_slot != 0){
-        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 80ms);
+        ssf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         for (uint8_t c = 1; c < game_slot; c++){
-            pbf_press_dpad(context, DPAD_RIGHT, 5, 5);
+            ssf_press_dpad_ptv(context, DPAD_RIGHT, 80ms);
         }
     }
 
@@ -216,8 +216,8 @@ void start_game_from_home(
 
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
-        pbf_press_button(context, BUTTON_A, 5, 175);    //  Choose game
-        pbf_press_dpad(context, DPAD_UP, 5, 0);         //  Skip the update window.
+        pbf_press_button(context, BUTTON_A, 10, 175);    //  Choose game
+        pbf_press_dpad(context, DPAD_UP, 10, 0);         //  Skip the update window.
         move_to_user(context, user_slot);
     }
 
@@ -226,9 +226,9 @@ void start_game_from_home(
         //  Mash your way into the game.
         pbf_mash_button(context, BUTTON_A, start_game_mash);
     }else{
-        pbf_press_button(context, BUTTON_A, 5, 175);    //  Enter select user menu.
+        pbf_press_button(context, BUTTON_A, 10, 175);   //  Enter select user menu.
         move_to_user(context, user_slot);
-        pbf_press_button(context, BUTTON_A, 5, 5);      //  Enter game
+        ssf_press_button_ptv(context, BUTTON_A, 120ms); //  Enter game
 
         //  Switch to mashing ZL instead of A to get into the game.
         //  Mash your way into the game.

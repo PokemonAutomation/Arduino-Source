@@ -168,7 +168,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     }
 
     std::set<std::string> desired;
@@ -235,7 +235,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         env.update_stats();
 
         pbf_mash_button(context, BUTTON_B, BACK_OUT_TIME0);
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     }
 
     env.update_stats();

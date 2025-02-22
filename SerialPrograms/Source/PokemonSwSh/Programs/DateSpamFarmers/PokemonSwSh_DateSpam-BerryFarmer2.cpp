@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -35,7 +36,8 @@ BerryFarmer2_Descriptor::BerryFarmer2_Descriptor()
         "Farm berries using Feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -286,7 +288,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
@@ -342,7 +344,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
         // Tap HOME and quickly spam B. The B spamming ensures that we don't
         // accidentally update the system if the system update window pops up.
-        pbf_press_button(context, BUTTON_HOME, 10, 5);
+        ssf_press_button_ptv(context, BUTTON_HOME, 120ms);
         pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0.get() - 120ms);
     }
     VideoSnapshot screen = env.console.video().snapshot();

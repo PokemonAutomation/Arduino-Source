@@ -16,6 +16,10 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_GameEntry.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -132,7 +136,9 @@ void reset_game_from_home_with_inference(
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu
     ){
+//        cout << "close game" << endl;
         close_game(stream, context);
+//        cout << "start_game_from_home_with_inference game" << endl;
         start_game_from_home_with_inference(
             stream, context, tolerate_update_menu, 0, 0, backup_save, post_wait_time
         );

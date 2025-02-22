@@ -8,6 +8,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -31,7 +32,8 @@ ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
         "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct ShinyHuntAutonomousFishing_Descriptor::Stats : public ShinyHuntTracker{
@@ -115,7 +117,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Pr
     while (true){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && current_time() - last_touch >= PERIOD){
-            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
             rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
@@ -146,11 +148,11 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Pr
             case 0:
                 env.log("Missed a hook.", COLOR_RED);
                 stats.m_misses++;
-                pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
                 continue;
             case 1:
                 env.log("Detected hook!", COLOR_PURPLE);
-                pbf_press_button(context, BUTTON_A, 10, 5);
+                ssf_press_button_ptv(context, BUTTON_A, 120ms);
 //                pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
                 break;
             case 2:
@@ -163,14 +165,14 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Pr
                 env.log("Timed out.", COLOR_RED);
                 stats.add_error();
                 env.update_stats();
-                pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
                 continue;
             }
             context.wait_for(std::chrono::seconds(3));
             if (miss_detector.detect(env.console.video().snapshot())){
                 env.log("False alarm! We actually missed.", COLOR_RED);
                 stats.m_misses++;
-                pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
                 continue;
             }
         }

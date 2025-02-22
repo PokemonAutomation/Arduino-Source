@@ -128,6 +128,20 @@ inline void ssf_press_button_ptv(
         cool + context->timing_variation()
     );
 }
+inline void ssf_press_dpad_ptv(
+    ProControllerContext& context,
+    DpadPosition position,
+    Milliseconds delay = 3*8ms,
+    Milliseconds hold = 5*8ms,
+    Milliseconds cool = 3*8ms
+){
+    ssf_press_dpad(
+        context, position,
+        delay + context->timing_variation(),
+        hold + context->timing_variation(),
+        cool + context->timing_variation()
+    );
+}
 inline void ssf_issue_scroll_ptv(
     ProControllerContext& context,
     DpadPosition direction,

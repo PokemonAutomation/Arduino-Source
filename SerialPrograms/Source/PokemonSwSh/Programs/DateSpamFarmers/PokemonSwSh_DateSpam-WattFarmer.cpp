@@ -7,6 +7,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -15,7 +16,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 WattFarmer_Descriptor::WattFarmer_Descriptor()
@@ -23,10 +25,11 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
         "PokemonSwSh:WattFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Watt Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-WattFarmer.md",
-        "Farm watts. (7.2 seconds/fetch, 1 million watts/hour)",
+        "Farm watts. (7.2 seconds/fetch, 1 million watts/hour with a tick-precise controller)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -72,7 +75,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         pbf_wait(context, GRIP_MENU_WAIT0);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     uint8_t year = MAX_YEAR;
@@ -83,7 +86,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         home_roll_date_enter_game_autorollback(env.console, context, year);
         pbf_mash_button(context, BUTTON_B, 90);
 
-        pbf_press_button(context, BUTTON_A, 5, 5);
+        ssf_press_button_ptv(context, BUTTON_A, 40ms);
         pbf_mash_button(context, BUTTON_B, EXIT_DEN_WAIT);
 
         if (SAVE_ITERATIONS != 0){
@@ -99,7 +102,7 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't
         //  accidentally update the system if the system update window pops up.
-        pbf_press_button(context, BUTTON_HOME, 10, 5);
+        ssf_press_button_ptv(context, BUTTON_HOME, 120ms);
         pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0.get() - 120ms);
     }
 

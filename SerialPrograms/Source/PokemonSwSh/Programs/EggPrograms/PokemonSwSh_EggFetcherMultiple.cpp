@@ -147,7 +147,7 @@ void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, ProControl
         run_eggfetcher(env.console, context, GameSettings::instance().AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS_PER_SPECIES);
     }
 
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

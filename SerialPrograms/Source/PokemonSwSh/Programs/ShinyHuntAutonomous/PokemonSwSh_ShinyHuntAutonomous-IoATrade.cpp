@@ -32,7 +32,8 @@ ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
         "Hunt for shiny Isle of Armor trade using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade_Descriptor::make_stats() const{
@@ -108,22 +109,22 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, P
     while (true){
         env.update_stats();
 
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 60);
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 50);
-        pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
-        pbf_press_dpad(context, DPAD_LEFT, 10, 10);
+        pbf_press_button(context, BUTTON_A, 20, 100);
+        pbf_press_button(context, BUTTON_A, 20, 60);
+        pbf_press_button(context, BUTTON_A, 20, 100);
+        pbf_press_button(context, BUTTON_A, 20, 50);
+        pbf_press_button(context, BUTTON_A, 160ms, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
+        pbf_press_dpad(context, DPAD_LEFT, 20, 10);
         pbf_mash_button(context, BUTTON_A, MASH_TO_TRADE_DELAY0);
 
         //  Enter box system.
-        pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-        pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
-        pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
+        pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+        pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
+        pbf_press_button(context, BUTTON_A, 160ms, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
 
         //  View summary.
-        pbf_press_button(context, BUTTON_A, 10, 100);
-        pbf_press_button(context, BUTTON_A, 10, 0);
+        pbf_press_button(context, BUTTON_A, 20, 100);
+        pbf_press_button(context, BUTTON_A, 20, 0);
         context.wait_for_all_requests();
 
         SummaryShinySymbolDetector::Detection detection;
@@ -157,14 +158,14 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, P
             );
             if (VIDEO_ON_SHINY){
                 pbf_wait(context, 1 * TICKS_PER_SECOND);
-                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
             }
             if (!RUN_FROM_EVERYTHING){
                 goto StopProgram;
             }
         }
 
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
         TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
         reset_game_from_home_with_inference(
             env.console, context,

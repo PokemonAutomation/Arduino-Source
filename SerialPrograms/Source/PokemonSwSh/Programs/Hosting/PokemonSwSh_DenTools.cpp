@@ -145,7 +145,7 @@ void rollback_date_from_home(ProControllerContext& context, uint8_t skips){
     //  Note that it is possible for this return animation to run longer than
     //  "SETTINGS_TO_HOME_DELAY" and swallow a subsequent button press.
     //  Therefore the caller needs to be able to tolerate this.
-    ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 80ms);
+    ssf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 }
 
 

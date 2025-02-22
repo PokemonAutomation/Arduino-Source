@@ -52,7 +52,7 @@ void close_game_if_overworld(
     pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
 
     //  Enter Switch Home.
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 
     if (touch_date){
         touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);

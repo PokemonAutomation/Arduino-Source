@@ -8,6 +8,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -27,7 +28,8 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
         "Farm the Loto ID.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -59,7 +61,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     uint8_t year = MAX_YEAR;
@@ -70,13 +72,13 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         pbf_press_button(context, BUTTON_A, 10, 90);
         pbf_press_button(context, BUTTON_B, 10, 70);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 5);
+        ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
         pbf_mash_button(context, BUTTON_ZL, 490);
         pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);
 
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't
         //  accidentally update the system if the system update window pops up.
-        pbf_press_button(context, BUTTON_HOME, 10, 5);
+        ssf_press_button_ptv(context, BUTTON_HOME, 120ms);
         pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0.get() - 120ms);
     }
 

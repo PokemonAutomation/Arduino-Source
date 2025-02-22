@@ -91,7 +91,7 @@ void EggFetcher2::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
     run_eggfetcher(env.console, context, GameSettings::instance().AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS);
 
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }

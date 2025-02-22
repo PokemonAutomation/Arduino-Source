@@ -20,7 +20,8 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
         "Mass delete/block all those unwanted friends.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -59,21 +60,21 @@ FriendDelete::FriendDelete()
     PA_ADD_OPTION(FINISH_DELETE_DELAY0);
 }
 void FriendDelete::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_A, 5, 5);
+    pbf_press_button(context, BUTTON_A, 10, 20);
 
     for (uint16_t c = 0; c < FRIENDS_TO_DELETE; c++){
         pbf_press_button(context, BUTTON_A, 40ms, VIEW_FRIEND_DELAY0);      //  View friend
-        pbf_press_dpad(context, DPAD_DOWN, 5, 5);
+        pbf_press_dpad(context, DPAD_DOWN, 10, 20);
         pbf_press_button(context, BUTTON_A, 10, 90);                        //  Click on Options
         if (BLOCK_FRIENDS){
-            pbf_press_dpad(context, DPAD_DOWN, 5, 5);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 20);
         }
         pbf_press_button(context, BUTTON_A, 10, 90);                        //  Click on Remove/Block Friend
         if (BLOCK_FRIENDS){
-            pbf_press_button(context, BUTTON_A, 40ms, VIEW_FRIEND_DELAY0);  //  Confirm
+            pbf_press_button(context, BUTTON_A, 80ms, VIEW_FRIEND_DELAY0);  //  Confirm
         }
-        pbf_press_button(context, BUTTON_A, 40ms, DELETE_FRIEND_DELAY0);    //  Confirm
-        pbf_press_button(context, BUTTON_A, 40ms, FINISH_DELETE_DELAY0);    //  Finish delete friend.
+        pbf_press_button(context, BUTTON_A, 80ms, DELETE_FRIEND_DELAY0);    //  Confirm
+        pbf_press_button(context, BUTTON_A, 80ms, FINISH_DELETE_DELAY0);    //  Finish delete friend.
     }
 }
 

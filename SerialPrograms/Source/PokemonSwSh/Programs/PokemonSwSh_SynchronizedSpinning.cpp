@@ -21,8 +21,8 @@ SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()
         "Don't ask... seriously, don't ask...",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
-        FasterIfTickPrecise::NOT_FASTER,
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER,
         1, 4, 1
     )
 {}

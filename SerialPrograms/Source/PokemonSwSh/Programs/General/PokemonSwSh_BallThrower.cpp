@@ -23,7 +23,8 @@ BallThrower_Descriptor::BallThrower_Descriptor()
         "Blindly throw balls at the opposing " + STRING_POKEMON + " until it catches.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -47,7 +48,7 @@ void BallThrower::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         pbf_mash_button(context, BUTTON_B, 100);
     }
 
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 }
 
 

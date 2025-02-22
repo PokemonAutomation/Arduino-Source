@@ -7,6 +7,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -26,7 +27,8 @@ DailyHighlightFarmer_Descriptor::DailyHighlightFarmer_Descriptor()
         "Farm the daily highlight watt trader in Crown Tundra.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -58,7 +60,7 @@ void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, ProContr
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     uint8_t year = MAX_YEAR;
@@ -78,16 +80,16 @@ void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, ProContr
             save_count++;
             if (save_count >= SAVE_ITERATIONS){
                 save_count = 0;
-                pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
                 pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
-                pbf_press_button(context, BUTTON_R, 20, 2 * TICKS_PER_SECOND);
-                pbf_press_button(context, BUTTON_ZL, 20, 3 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_R, 160ms, 2000ms);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 3000ms);
             }
         }
 
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't
         //  accidentally update the system if the system update window pops up.
-        pbf_press_button(context, BUTTON_HOME, 10, 5);
+        ssf_press_button_ptv(context, BUTTON_HOME, 120ms);
         pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0.get() - 120ms);
     }
 

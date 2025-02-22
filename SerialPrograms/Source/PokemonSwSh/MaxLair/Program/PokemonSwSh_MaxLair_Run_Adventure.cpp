@@ -83,7 +83,7 @@ AdventureResult run_adventure(
             case StateMachineAction::STOP_PROGRAM:
                 env.log("End of adventure. Stop program requested...", COLOR_PURPLE);
                 if (runtime.go_home_when_done){
-                    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+                    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
                 }
                 stop.store(true, std::memory_order_release);
                 return;
@@ -91,7 +91,7 @@ AdventureResult run_adventure(
                 env.log("Error detected. Attempting to correct by resetting...", COLOR_RED);
                 runtime.session_stats.add_error();
                 error.store(true, std::memory_order_release);
-                pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+                pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
                 reset_game_from_home_with_inference(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 return;
             }
@@ -147,7 +147,7 @@ void loop_adventures(
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
             env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
                 env.log("Touching date to prevent rollover.");
-                pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+                pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
                 touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
                 resume_game_back_out(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 5 * TICKS_PER_SECOND);
             });
@@ -176,7 +176,7 @@ void loop_adventures(
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
             env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-                pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+                pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
                 reset_game_from_home_with_inference(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             });
             continue;

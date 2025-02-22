@@ -30,7 +30,8 @@ ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor
         "Stand in one place and whistle. Shiny hunt everything that attacks you using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct ShinyHuntAutonomousWhistling_Descriptor::Stats : public ShinyHuntTracker{
@@ -107,7 +108,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
     while (true){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && current_time() - last_touch >= PERIOD){
-            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
             rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
@@ -122,8 +123,8 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
                 env.console, context,
                 [](ProControllerContext& context){
                     while (true){
-                        pbf_mash_button(context, BUTTON_LCLICK, TICKS_PER_SECOND);
-                        pbf_move_right_joystick(context, 192, 128, TICKS_PER_SECOND, 0);
+                        pbf_mash_button(context, BUTTON_LCLICK, 1000ms);
+                        pbf_move_right_joystick(context, 192, 128, 1000ms, 0ms);
                     }
                 },
                 {
@@ -137,7 +138,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.m_unexpected_battles++;
                 env.update_stats();
-                pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 1000ms);
                 run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
                 continue;
             case 1:

@@ -8,6 +8,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -31,7 +32,8 @@ ShinyHuntAutonomousRegigigas2_Descriptor::ShinyHuntAutonomousRegigigas2_Descript
         "Automatically hunt for shiny Regigigas using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2_Descriptor::make_stats() const{
@@ -83,7 +85,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
 
 
 bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, ProControllerContext& context) const{
-    pbf_mash_button(context, BUTTON_A, 4 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 4000ms);
 
     RaidCatchDetector detector(stream.overlay());
     int result = wait_until(
@@ -93,7 +95,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, ProCont
     );
     switch (result){
     case 0:
-        pbf_press_dpad(context, DPAD_DOWN, 10, 0);
+        ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
         pbf_press_button(context, BUTTON_A, 80ms, CATCH_TO_OVERWORLD_DELAY0);
         return true;
     default:
@@ -123,7 +125,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){
             env.log("Starting Regigigas Encounter: " + tostr_u_commas(stats.encounters() + 1));
 
-            pbf_mash_button(context, BUTTON_A, 18 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 18s);
             context.wait_for_all_requests();
 
             {
@@ -162,7 +164,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
             kill_and_return(env.console, context);
         }
 
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
         TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
         reset_game_from_home_with_inference(
             env.console, context,

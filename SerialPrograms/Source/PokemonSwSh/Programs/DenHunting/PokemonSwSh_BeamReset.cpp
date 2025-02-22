@@ -5,6 +5,7 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -66,7 +67,7 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
         //  Drop wishing piece.
         pbf_press_button(context, BUTTON_A, 10, 70);
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
 
         for (uint16_t c = 0; c < 4; c++){
             pbf_press_button(context, BUTTON_HOME, 10, 10);
