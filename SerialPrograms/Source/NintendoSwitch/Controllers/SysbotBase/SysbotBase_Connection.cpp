@@ -37,7 +37,7 @@ bool parse_ip_and_port(const std::string& str, QHostAddress& address, int& port)
 }
 
 
-SysbotBaseNetwork_Connection::SysbotBaseNetwork_Connection(
+TcpSysbotBase_Connection::TcpSysbotBase_Connection(
     Logger& logger,
     const std::string& url
 )
@@ -50,9 +50,9 @@ SysbotBaseNetwork_Connection::SysbotBaseNetwork_Connection(
 
     set_status(html_color_text("Connecting...", COLOR_DARKGREEN));
 
-    m_thread = std::thread(&SysbotBaseNetwork_Connection::thread_body_wrapper, this);
+    m_thread = std::thread(&TcpSysbotBase_Connection::thread_body_wrapper, this);
 }
-SysbotBaseNetwork_Connection::~SysbotBaseNetwork_Connection(){
+TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
     m_ready.store(false, std::memory_order_release);
     m_stopping.store(true, std::memory_order_release);
     {
@@ -68,7 +68,7 @@ SysbotBaseNetwork_Connection::~SysbotBaseNetwork_Connection(){
 }
 
 
-std::map<ControllerType, std::set<ControllerFeature>> SysbotBaseNetwork_Connection::supported_controllers() const{
+std::map<ControllerType, std::set<ControllerFeature>> TcpSysbotBase_Connection::supported_controllers() const{
     return {
         {ControllerType::NintendoSwitch_WiredProController, {
             ControllerFeature::NintendoSwitch_ProController
@@ -78,7 +78,7 @@ std::map<ControllerType, std::set<ControllerFeature>> SysbotBaseNetwork_Connecti
 
 
 
-void SysbotBaseNetwork_Connection::write_data(const std::string& data){
+void TcpSysbotBase_Connection::write_data(const std::string& data){
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_socket == nullptr){
         return;
@@ -96,7 +96,7 @@ void SysbotBaseNetwork_Connection::write_data(const std::string& data){
 
 
 
-void SysbotBaseNetwork_Connection::thread_body_wrapper(){
+void TcpSysbotBase_Connection::thread_body_wrapper(){
     QTcpSocket socket;
     {
         std::lock_guard<std::mutex> lg(m_lock);
@@ -134,7 +134,7 @@ void SysbotBaseNetwork_Connection::thread_body_wrapper(){
     std::lock_guard<std::mutex> lg(m_lock);
     m_socket = nullptr;
 }
-void SysbotBaseNetwork_Connection::thread_body_internal(){
+void TcpSysbotBase_Connection::thread_body_internal(){
     std::string message =
         "Connecting To: " + m_address.toString().toStdString() +
         " - Port: " + std::to_string(m_port);

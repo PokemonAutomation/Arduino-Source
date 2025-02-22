@@ -19,13 +19,13 @@ namespace PokemonAutomation{
 namespace SysbotBase{
 
 
-class SysbotBaseNetwork_Connection : public ControllerConnection{
+class TcpSysbotBase_Connection : public ControllerConnection{
 public:
-    SysbotBaseNetwork_Connection(
+    TcpSysbotBase_Connection(
         Logger& logger,
         const std::string& url
     );
-    ~SysbotBaseNetwork_Connection();
+    ~TcpSysbotBase_Connection();
 
     virtual std::map<ControllerType, std::set<ControllerFeature>> supported_controllers() const override;
 

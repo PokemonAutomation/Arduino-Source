@@ -16,42 +16,42 @@
 
 namespace PokemonAutomation{
 
-template class InterfaceType_t<SysbotBase::SysbotBaseNetwork_Descriptor>;
+template class InterfaceType_t<SysbotBase::TcpSysbotBase_Descriptor>;
 
 namespace SysbotBase{
 
 
 
-bool SysbotBaseNetwork_Descriptor::operator==(const ControllerDescriptor& x) const{
+bool TcpSysbotBase_Descriptor::operator==(const ControllerDescriptor& x) const{
     if (typeid(*this) != typeid(x)){
         return false;
     }
-    return m_url == static_cast<const SysbotBaseNetwork_Descriptor&>(x).m_url;
+    return m_url == static_cast<const TcpSysbotBase_Descriptor&>(x).m_url;
 }
 
-std::string SysbotBaseNetwork_Descriptor::display_name() const{
+std::string TcpSysbotBase_Descriptor::display_name() const{
     return m_url;
 }
 
-void SysbotBaseNetwork_Descriptor::load_json(const JsonValue& json){
+void TcpSysbotBase_Descriptor::load_json(const JsonValue& json){
     const std::string* url = json.to_string();
     if (url == nullptr || url->empty()){
         return;
     }
     m_url = *url;
 }
-JsonValue SysbotBaseNetwork_Descriptor::to_json() const{
+JsonValue TcpSysbotBase_Descriptor::to_json() const{
     return m_url;
 }
 
 
 
-std::unique_ptr<ControllerConnection> SysbotBaseNetwork_Descriptor::open_connection(Logger& logger) const{
+std::unique_ptr<ControllerConnection> TcpSysbotBase_Descriptor::open_connection(Logger& logger) const{
     return std::unique_ptr<ControllerConnection>(
-        new SysbotBaseNetwork_Connection(logger, m_url)
+        new TcpSysbotBase_Connection(logger, m_url)
     );
 }
-std::unique_ptr<AbstractController> SysbotBaseNetwork_Descriptor::make_controller(
+std::unique_ptr<AbstractController> TcpSysbotBase_Descriptor::make_controller(
     Logger& logger,
     ControllerConnection& connection,
     ControllerType controller_type,
@@ -60,7 +60,7 @@ std::unique_ptr<AbstractController> SysbotBaseNetwork_Descriptor::make_controlle
     return std::unique_ptr<AbstractController>(
         new NintendoSwitch::ProController_SysbotBase(
             logger,
-            static_cast<SysbotBaseNetwork_Connection&>(connection),
+            static_cast<TcpSysbotBase_Connection&>(connection),
             requirements
         )
     );
@@ -68,8 +68,8 @@ std::unique_ptr<AbstractController> SysbotBaseNetwork_Descriptor::make_controlle
 
 
 
-QWidget* SysbotBaseNetwork_Descriptor::make_selector_QtWidget(ControllerSelectorWidget& parent) const{
-    return new SysbotBaseNetwork_SelectorWidget(parent, this);
+QWidget* TcpSysbotBase_Descriptor::make_selector_QtWidget(ControllerSelectorWidget& parent) const{
+    return new TcpSysbotBase_SelectorWidget(parent, this);
 }
 
 

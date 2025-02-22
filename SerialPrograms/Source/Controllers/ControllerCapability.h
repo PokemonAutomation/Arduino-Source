@@ -42,8 +42,8 @@ enum class FasterIfTickPrecise{
 enum class ControllerInterface{
     None,
     SerialPABotBase,
-    SysbotBaseNetwork,
-    SysbotBaseUSB,
+    TcpSysbotBase,
+    UsbSysbotBase,
 };
 extern const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
 

@@ -21,15 +21,15 @@ namespace SysbotBase{
 
 
 
-class SysbotBaseNetwork_SelectorWidget : public QLineEdit{
+class TcpSysbotBase_SelectorWidget : public QLineEdit{
 public:
-    SysbotBaseNetwork_SelectorWidget(
+    TcpSysbotBase_SelectorWidget(
         ControllerSelectorWidget& parent,
         const ControllerDescriptor* current
     )
         : QLineEdit(&parent)
     {
-//        cout << "SysbotBaseNetwork()" << endl;
+//        cout << "TcpSysbotBase()" << endl;
 
         QSizePolicy policy;
         policy.setHorizontalStretch(3);
@@ -39,9 +39,9 @@ public:
 
         if (current == nullptr){
             std::shared_ptr<const ControllerDescriptor> descriptor =
-                parent.session().option().get_descriptor_from_cache(ControllerInterface::SysbotBaseNetwork);
+                parent.session().option().get_descriptor_from_cache(ControllerInterface::TcpSysbotBase);
             if (!descriptor){
-                descriptor.reset(new SysbotBaseNetwork_Descriptor());
+                descriptor.reset(new TcpSysbotBase_Descriptor());
             }
             parent.session().set_device(descriptor);
         }
@@ -50,7 +50,7 @@ public:
         connect(
             this, &QLineEdit::editingFinished,
             &parent, [this, &parent](){
-                std::shared_ptr<const ControllerDescriptor> selected(new SysbotBaseNetwork_Descriptor(
+                std::shared_ptr<const ControllerDescriptor> selected(new TcpSysbotBase_Descriptor(
                     this->text().toStdString()
                 ));
 

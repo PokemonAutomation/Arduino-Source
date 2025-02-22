@@ -29,7 +29,7 @@ public:
 public:
     ProController_SysbotBase(
         Logger& logger,
-        SysbotBase::SysbotBaseNetwork_Connection& connection,
+        SysbotBase::TcpSysbotBase_Connection& connection,
         const ControllerRequirements& requirements
     );
     ~ProController_SysbotBase();
@@ -69,7 +69,7 @@ private:
 
 
 private:
-    SysbotBase::SysbotBaseNetwork_Connection& m_connection;
+    SysbotBase::TcpSysbotBase_Connection& m_connection;
 
     std::string m_error_string;
 

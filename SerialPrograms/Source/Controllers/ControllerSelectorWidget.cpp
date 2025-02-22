@@ -44,8 +44,8 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     m_dropdowns->addWidget(interface_dropdown);
 
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SerialPABotBase)));
-    interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SysbotBaseNetwork)));
-//    interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SysbotBaseUSB)));
+    interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::TcpSysbotBase)));
+//    interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::UsbSysbotBase)));
 
     if (!IS_BETA_VERSION && !PreloadSettings::instance().DEVELOPER_MODE){
         interface_dropdown->setHidden(true);
@@ -149,8 +149,8 @@ void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_t
         m_dropdowns->insertWidget(1, m_selector);
         break;
 
-    case ControllerInterface::SysbotBaseNetwork:
-        m_selector = new SysbotBase::SysbotBaseNetwork_SelectorWidget(*this, nullptr);
+    case ControllerInterface::TcpSysbotBase:
+        m_selector = new SysbotBase::TcpSysbotBase_SelectorWidget(*this, nullptr);
         m_dropdowns->insertWidget(1, m_selector);
         break;
 
@@ -210,7 +210,8 @@ void ControllerSelectorWidget::post_status_text_changed(const std::string& text)
 void ControllerSelectorWidget::options_locked(bool locked){
     QMetaObject::invokeMethod(this, [this, locked]{
         m_selector->setEnabled(!locked);
-//        m_devices_dropdown->setEnabled(!locked);
+        interface_dropdown->setEnabled(!locked);
+        m_controllers_dropdown->setEnabled(!locked);
         m_reset_button->setEnabled(!locked);
     });
 }

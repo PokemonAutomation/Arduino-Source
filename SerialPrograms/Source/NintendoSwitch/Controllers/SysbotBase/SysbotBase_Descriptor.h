@@ -14,16 +14,16 @@ namespace SysbotBase{
 
 
 
-class SysbotBaseNetwork_Descriptor : public ControllerDescriptor{
+class TcpSysbotBase_Descriptor : public ControllerDescriptor{
 public:
-    static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::SysbotBaseNetwork;
+    static constexpr ControllerInterface INTERFACE_NAME = ControllerInterface::TcpSysbotBase;
 
 
 public:
-    SysbotBaseNetwork_Descriptor()
+    TcpSysbotBase_Descriptor()
         : ControllerDescriptor(INTERFACE_NAME)
     {}
-    SysbotBaseNetwork_Descriptor(std::string url)
+    TcpSysbotBase_Descriptor(std::string url)
         : ControllerDescriptor(INTERFACE_NAME)
         , m_url(std::move(url))
     {}

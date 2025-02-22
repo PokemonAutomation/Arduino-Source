@@ -189,6 +189,7 @@ SwitchSystemWidget::SwitchSystemWidget(
 
 
 void SwitchSystemWidget::update_ui(ProgramState state){
+    m_session.controller_session().set_options_locked(state != ProgramState::STOPPED);
     if (m_session.allow_commands_while_running()){
         m_session.set_allow_user_commands("");
     }else{

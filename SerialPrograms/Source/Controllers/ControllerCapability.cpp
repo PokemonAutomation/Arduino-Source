@@ -12,9 +12,9 @@ namespace PokemonAutomation{
 
 const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS{
     {ControllerInterface::None,                 "None"},
-    {ControllerInterface::SerialPABotBase,      "Serial PABotBase"},
-    {ControllerInterface::SysbotBaseNetwork,    "sys-botbase Network"},
-    {ControllerInterface::SysbotBaseUSB,        "sys-botbase USB"},
+    {ControllerInterface::SerialPABotBase,      "Serial: PABotBase"},
+    {ControllerInterface::TcpSysbotBase,        "TCP: sys-botbase"},
+    {ControllerInterface::UsbSysbotBase,        "USB: sys-botbase"},
 };
 
 const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{

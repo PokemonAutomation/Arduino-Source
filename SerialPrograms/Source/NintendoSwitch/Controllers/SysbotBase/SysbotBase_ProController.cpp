@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 
 ProController_SysbotBase::ProController_SysbotBase(
     Logger& logger,
-    SysbotBase::SysbotBaseNetwork_Connection& connection,
+    SysbotBase::TcpSysbotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
     : ProControllerWithScheduler(logger, std::chrono::milliseconds(150))
