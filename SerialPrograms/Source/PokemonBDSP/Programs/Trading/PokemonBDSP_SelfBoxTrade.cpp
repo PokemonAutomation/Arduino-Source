@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -15,7 +14,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
@@ -26,7 +26,7 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         "Trade boxes of " + STRING_POKEMON + " between two local Switches.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {ControllerFeature::NintendoSwitch_ProController},
         FasterIfTickPrecise::NOT_FASTER,
         2, 2, 2
     )

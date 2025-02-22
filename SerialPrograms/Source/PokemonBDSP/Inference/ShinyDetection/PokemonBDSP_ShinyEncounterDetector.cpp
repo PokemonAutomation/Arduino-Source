@@ -177,13 +177,13 @@ void determine_shiny_status(
     }
 
 #if 0
-    cout << "Wild End: " << std::chrono::duration_cast<Milliseconds>(tracker.wild_animation_end_timestmap() - tracker.m_start_time) << endl; //  REMOVE
-    cout << "Your Start: " << std::chrono::duration_cast<Milliseconds>(tracker.your_animation_start_timestamp() - tracker.m_start_time) << endl; //  REMOVE
+    cout << "Wild End: " << std::chrono::duration_cast<Milliseconds>(tracker.wild_animation_end_timestmap() - tracker.m_start_time) << endl;
+    cout << "Your Start: " << std::chrono::duration_cast<Milliseconds>(tracker.your_animation_start_timestamp() - tracker.m_start_time) << endl;
     for (WallClock time : shiny_sound_timestamps){
-        cout << "Shiny Sound: " << std::chrono::duration_cast<Milliseconds>(time - tracker.m_start_time) << endl; //  REMOVE
+        cout << "Shiny Sound: " << std::chrono::duration_cast<Milliseconds>(time - tracker.m_start_time) << endl;
     }
 #endif
-    
+
     bool wild_shiny_sound_detected = false;
     bool own_shiny_sound_detected = false;
     for (const WallClock& timestamp: shiny_sound_timestamps){
