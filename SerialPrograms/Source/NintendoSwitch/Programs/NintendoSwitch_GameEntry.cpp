@@ -80,7 +80,7 @@ void resume_game_from_home(
 void move_to_user(ProControllerContext& context, uint8_t user_slot){
     if (user_slot != 0){
         //  Move to correct user.
-        for (uint8_t c = 0; c < 8; c++){
+        for (uint8_t c = 0; c < 9; c++){    //  Extra iteration in case one gets dropped.
             ssf_issue_scroll_ptv(context, DPAD_LEFT, 160ms, 160ms);
         }
         for (uint8_t c = 1; c < user_slot; c++){
@@ -119,9 +119,9 @@ void start_game_from_home_with_inference(
     }
 
     if (game_slot != 0){
-        ssf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 160ms);
         for (uint8_t c = 1; c < game_slot; c++){
-            pbf_press_dpad(context, DPAD_RIGHT, 5, 5);
+            ssf_press_dpad_ptv(context, DPAD_RIGHT, 160ms);
         }
         context.wait_for_all_requests();
     }
@@ -200,7 +200,7 @@ void start_game_from_home(
     }
 
     if (game_slot != 0){
-        ssf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 160ms);
         for (uint8_t c = 1; c < game_slot; c++){
             ssf_press_dpad_ptv(context, DPAD_RIGHT, 80ms);
         }

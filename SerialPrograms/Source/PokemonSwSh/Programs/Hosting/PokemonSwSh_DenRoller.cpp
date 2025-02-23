@@ -33,7 +33,8 @@ DenRoller_Descriptor::DenRoller_Descriptor()
         "Roll den to the N'th day, SR and repeat.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 struct DenRoller_Descriptor::Stats : public StatsTracker{
@@ -179,7 +180,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         env.update_stats();
 
         //  Add a little extra wait time since correctness matters here.
-        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
 
         rollback_date_from_home(context, SKIPS);
 //        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);

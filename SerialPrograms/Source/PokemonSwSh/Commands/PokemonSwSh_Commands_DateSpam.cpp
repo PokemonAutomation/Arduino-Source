@@ -123,11 +123,23 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
         ssf_press_button(context, BUTTON_A, 20, 10);
     }else{
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 6000ms, 6000ms);
+        if (skips >= 60){
+            ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 6000ms, 6000ms);
+        }else{
+            for (uint8_t c = 0; c < skips; c++){
+                ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+            }
+        }
         ssf_press_button_ptv(context, BUTTON_A);
 //        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 6000ms, 6000ms);
+        if (skips >= 60){
+            ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 6000ms, 6000ms);
+        }else{
+            for (uint8_t c = 0; c < skips; c++){
+                ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+            }
+        }
         ssf_press_button_ptv(context, BUTTON_A);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);

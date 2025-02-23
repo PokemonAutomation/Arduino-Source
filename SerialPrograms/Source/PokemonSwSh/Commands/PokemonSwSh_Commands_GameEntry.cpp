@@ -135,7 +135,7 @@ void start_game_from_home(
     //  If "user_slot" is zero, it uses whatever the cursor is on.
 
     if (game_slot != 0){
-        ssf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 160ms);
         for (uint8_t c = 1; c < game_slot; c++){
             ssf_press_dpad_ptv(context, DPAD_RIGHT, 80ms);
         }

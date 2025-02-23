@@ -85,8 +85,9 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, tv, tv);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 250ms, tv);  //  Scroll down
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 500ms, tv, tv);
+        ssf_press_right_joystick(context, 128, 224, 1000ms, 300ms, tv);
+//        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 250ms, tv);  //  Scroll down
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
 
