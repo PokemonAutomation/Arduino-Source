@@ -24,7 +24,8 @@ PageSwap_Descriptor::PageSwap_Descriptor()
         "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 

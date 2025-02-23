@@ -9,6 +9,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -31,7 +32,8 @@ StatsResetRegi_Descriptor::StatsResetRegi_Descriptor()
         "Repeatedly catch regi until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct StatsResetRegi_Descriptor::Stats : public StatsTracker{
@@ -135,14 +137,14 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, ProControllerC
                     env.console, context,
                     [](ProControllerContext& context){
                         while (true){
-                            pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
+                            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
                         }
                     },
                     {{fight_detector}}
                 );
                 if (result == 0){
                     env.log("New fight detected, let's begin to throw balls.", COLOR_PURPLE);
-                    pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 1000ms);
                 }
             }
 
@@ -184,7 +186,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, ProControllerC
             }
 
             if (!regi_caught){
-                pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+                ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
                 reset_game_from_home_with_inference(
                     env.console, context,
                     ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
@@ -194,15 +196,15 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         env.log("Check the stats.", COLOR_PURPLE);
         for (int i = 0; i < 20; i++){
-            pbf_press_button(context, BUTTON_B, 10, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
         }
-        pbf_press_button(context, BUTTON_X  , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_RIGHT, 10, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_A  , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_R  , 10, 3   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_LEFT , 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_UP   , 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_UP   , 10, 1   * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_X  , 80ms, 2000ms);
+        pbf_press_dpad  (context, DPAD_RIGHT, 80ms, 500ms);
+        pbf_press_button(context, BUTTON_A  , 80ms, 2000ms);
+        pbf_press_button(context, BUTTON_R  , 80ms, 3000ms);
+        pbf_press_dpad  (context, DPAD_LEFT , 80ms, 1000ms);
+        pbf_press_dpad  (context, DPAD_UP   , 80ms, 1000ms);
+        pbf_press_dpad  (context, DPAD_UP   , 80ms, 1000ms);
 
         context.wait_for_all_requests();
         IvJudgeReaderScope reader(env.console, LANGUAGE);
@@ -218,7 +220,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, ProControllerC
         match_found = ok;
 
         if (!match_found){
-            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+            ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
             reset_game_from_home_with_inference(
                 env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
