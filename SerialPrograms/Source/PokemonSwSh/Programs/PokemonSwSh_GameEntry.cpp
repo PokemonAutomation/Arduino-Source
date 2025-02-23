@@ -125,6 +125,7 @@ void start_game_from_home_with_inference(
     enter_loading_game(stream, context, backup_save, post_wait_time);
 }
 
+
 void reset_game_from_home_with_inference(
     VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu,
@@ -153,6 +154,34 @@ void reset_game_from_home_with_inference(
 }
 
 
+void start_game_from_home(
+    VideoStream& stream, ProControllerContext& context,
+    bool tolerate_update_menu,
+    uint8_t game_slot,
+    uint8_t user_slot,
+    bool backup_save,
+    uint16_t post_wait_time
+){
+    bool video_available = (bool)stream.video().snapshot();
+    if (video_available ||
+        ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
+        tolerate_update_menu
+    ){
+//        cout << "close game" << endl;
+        close_game(stream, context);
+//        cout << "start_game_from_home_with_inference game" << endl;
+        start_game_from_home_with_inference(
+            stream, context, tolerate_update_menu, game_slot, user_slot, backup_save, post_wait_time
+        );
+        return;
+    }
+
+    fast_reset_game(context, GameSettings::instance().START_GAME_MASH0, 0ms, 0ms, 0ms);
+    context.wait_for_all_requests();
+
+    //  Wait for game to load.
+    enter_loading_game(stream, context, backup_save, post_wait_time);
+}
 
 
 }

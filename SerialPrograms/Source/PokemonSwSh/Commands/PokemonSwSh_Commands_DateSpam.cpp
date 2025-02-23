@@ -17,22 +17,41 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 void neutral_date_skip(ProControllerContext& context){
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
-    ssf_press_button(context, BUTTON_A, 2);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-//    ssf_press_button(context, BUTTON_A, 2);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    for (uint8_t c = 0; c < 6; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
+    Milliseconds tv = context->timing_variation();
+    if (tv == 0ms){
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
+        ssf_press_button(context, BUTTON_A, 2);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+//        ssf_press_button(context, BUTTON_A, 2);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        for (uint8_t c = 0; c < 6; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
+        }
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+    }else{
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
+        ssf_press_button_ptv(context, BUTTON_A);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+        for (uint8_t c = 0; c < 6; c++){
+            ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
+        }
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
     }
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
 }
 void roll_date_forward_1(ProControllerContext& context, bool fast){
     //  If (fast == true) this will run faster, but slightly less reliably.

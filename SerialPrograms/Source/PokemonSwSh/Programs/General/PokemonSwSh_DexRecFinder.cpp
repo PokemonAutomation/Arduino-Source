@@ -36,7 +36,8 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 struct DexRecFinder_Descriptor::Stats : public StatsTracker{
@@ -186,7 +187,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         neutral_date_skip(context);
         settings_to_enter_game(context, true);
         pbf_mash_button(context, BUTTON_B, 90);
-        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
 
         if (FILTERS.enabled()){
             context.wait_for_all_requests();

@@ -10,7 +10,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_MultiGameFossil.h"
 
 namespace PokemonAutomation{
@@ -27,7 +27,8 @@ MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
         "Revive fossils. Supports multiple saves so you can go afk for longer than 5 hours.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::FASTER
     )
 {}
 
@@ -74,7 +75,7 @@ void run_fossil_batch(
     }
 
     start_game_from_home(
-        context,
+        stream, context,
         ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST,
         game_slot,
         user_slot,
@@ -97,23 +98,29 @@ void run_fossil_batch(
 #endif
         switch (batch.fossil){
         case Fossil::Dracozolt:
-            ssf_press_button1(context, BUTTON_A, 160);
+            ssf_press_button_ptv(context, BUTTON_A, 1280ms);
             break;
         case Fossil::Arctozolt:
-            ssf_press_button1(context, BUTTON_A, 160);
-            ssf_press_dpad1(context, DPAD_DOWN, 5);
+            ssf_press_button_ptv(context, BUTTON_A, 1280ms);
+            ssf_press_dpad_ptv(context, DPAD_DOWN, 40ms);
             break;
         case Fossil::Dracovish:
-            ssf_press_dpad1(context, DPAD_DOWN, 5);
-            ssf_press_button1(context, BUTTON_A, 160);
+            ssf_press_dpad_ptv(context, DPAD_DOWN, 40ms);
+            ssf_press_button_ptv(context, BUTTON_A, 1280ms);
             break;
         case Fossil::Arctovish:
-            ssf_press_dpad1(context, DPAD_DOWN, 5);
-            ssf_press_button1(context, BUTTON_A, 160);
-            ssf_press_dpad1(context, DPAD_DOWN, 5);
+            ssf_press_dpad_ptv(context, DPAD_DOWN, 40ms);
+            ssf_press_button_ptv(context, BUTTON_A, 1280ms);
+            ssf_press_dpad_ptv(context, DPAD_DOWN, 40ms);
             break;
         }
-        ssf_mash_AZs(context, 400);
+
+        Milliseconds tv = context->timing_variation();
+        if (tv == 0ms){
+            ssf_mash_AZs(context, 3200ms);
+        }else{
+            ssf_mash_AZs(context, 4000ms);
+        }
         pbf_mash_button(
             context,
             BUTTON_B,
@@ -130,8 +137,8 @@ void run_fossil_batch(
 
     //  Save game.
     ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-    ssf_press_button2(context, BUTTON_R, 150, 20);
-    ssf_press_button2(context, BUTTON_A, 500, 10);
+    ssf_press_button(context, BUTTON_R, 150, 20);
+    ssf_press_button(context, BUTTON_A, 500, 10);
 
     //  Exit game.
     ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
@@ -159,7 +166,7 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, ProController
         run_fossil_batch(env.console, env.logger(), context, *list[c], &game_slot_flipped, c + 1 < games);
     }
 
-    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
+    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
 }
 
 

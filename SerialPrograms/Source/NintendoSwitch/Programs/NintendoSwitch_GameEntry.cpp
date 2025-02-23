@@ -81,10 +81,10 @@ void move_to_user(ProControllerContext& context, uint8_t user_slot){
     if (user_slot != 0){
         //  Move to correct user.
         for (uint8_t c = 0; c < 8; c++){
-            pbf_press_dpad(context, DPAD_LEFT, 7, 7);
+            ssf_issue_scroll_ptv(context, DPAD_LEFT, 160ms, 160ms);
         }
         for (uint8_t c = 1; c < user_slot; c++){
-            pbf_press_dpad(context, DPAD_RIGHT, 7, 7);
+            ssf_issue_scroll_ptv(context, DPAD_RIGHT, 160ms, 160ms);
         }
     }
 }
@@ -228,7 +228,7 @@ void start_game_from_home(
     }else{
         pbf_press_button(context, BUTTON_A, 10, 175);   //  Enter select user menu.
         move_to_user(context, user_slot);
-        ssf_press_button_ptv(context, BUTTON_A, 120ms); //  Enter game
+        ssf_press_button_ptv(context, BUTTON_A, 160ms); //  Enter game
 
         //  Switch to mashing ZL instead of A to get into the game.
         //  Mash your way into the game.
