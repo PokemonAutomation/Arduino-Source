@@ -35,6 +35,7 @@ void ControllerConnection::set_status(const std::string& text){
         WriteSpinLock lg(m_status_text_lock);
         m_status_text = text;
     }
+//    cout << "ControllerConnection::set_status() = " << text << endl;
     signal_status_text_changed(text);
 }
 void ControllerConnection::declare_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers){

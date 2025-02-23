@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-//#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "ControllerSession.h"
 
 //#include <iostream>
@@ -371,6 +370,9 @@ void ControllerSession::post_connection_ready(
         //  Commit all changes.
         m_option.m_controller_type = selected_controller;
         ready = m_controller && m_controller->is_ready();
+
+        WriteSpinLock lg1(m_message_lock);
+        m_controller_error = m_controller->error_string();
     }
 
     signal_controller_changed(selected_controller, available_controllers);
@@ -381,11 +383,13 @@ void ControllerSession::status_text_changed(
     ControllerConnection& connection,
     const std::string& text
 ){
+//    cout << "ControllerSession::status_text_changed() = " << text << endl;
     std::string controller_error;
     {
         WriteSpinLock lg(m_message_lock);
         controller_error = m_controller_error;
     }
+//    cout << "ControllerSession::status_text_changed(): controller_error = " << controller_error << endl;
     if (controller_error.empty()){
         m_listeners.run_method_unique(&Listener::post_status_text_changed, text);
     }else{
@@ -418,6 +422,7 @@ void ControllerSession::signal_controller_changed(
     m_listeners.run_method_unique(&Listener::controller_changed, controller_type, available_controllers);
 }
 void ControllerSession::signal_status_text_changed(const std::string& text){
+//    cout << text << endl;
     m_listeners.run_method_unique(&Listener::post_status_text_changed, text);
 }
 void ControllerSession::signal_options_locked(bool locked){
