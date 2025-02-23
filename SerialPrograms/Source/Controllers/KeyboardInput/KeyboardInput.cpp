@@ -27,8 +27,12 @@ void KeyboardInputController::start(){
         [this]{ thread_loop(); }
     );
 }
-void KeyboardInputController::stop(){
-    m_stop.store(true, std::memory_order_release);
+void KeyboardInputController::stop() noexcept{
+    bool expected = false;
+    if (!m_stop.compare_exchange_strong(expected, true)){
+        //  Already stopped.
+        return;
+    }
     {
         std::lock_guard<std::mutex> lg(m_sleep_lock);
         m_cv.notify_all();

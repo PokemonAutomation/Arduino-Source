@@ -84,6 +84,9 @@ public:
     virtual ~ProController();
     ProController(Milliseconds timing_variation);
 
+    //  Must call before destruction begins.
+    void stop() noexcept;
+
     virtual Logger& logger() = 0;
 
     Milliseconds timing_variation() const{

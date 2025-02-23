@@ -69,6 +69,7 @@ ProController_SysbotBase::ProController_SysbotBase(
 
 }
 ProController_SysbotBase::~ProController_SysbotBase(){
+    stop();
     m_stopping.store(true, std::memory_order_release);
     {
         std::lock_guard<std::mutex> lg(m_state_lock);

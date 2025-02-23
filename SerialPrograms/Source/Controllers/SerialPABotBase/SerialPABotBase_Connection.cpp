@@ -304,6 +304,7 @@ void SerialPABotBase_Connection::thread_body(){
             if (!m_ready.load(std::memory_order_relaxed)){
                 break;
             }
+
             m_cv.wait_for(lg, SERIAL_REFRESH_RATE);
         }
     });

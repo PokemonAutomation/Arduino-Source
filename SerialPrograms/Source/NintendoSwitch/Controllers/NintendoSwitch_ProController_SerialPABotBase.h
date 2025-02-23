@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class ProController_SerialPABotBase : public ProControllerWithScheduler{
+class ProController_SerialPABotBase final : public ProControllerWithScheduler{
 public:
     using ContextType = ProControllerContext;
 
@@ -26,6 +26,7 @@ public:
         SerialPABotBase::SerialPABotBase_Connection& connection,
         const ControllerRequirements& requirements
     );
+    ~ProController_SerialPABotBase();
 
     virtual bool is_ready() const override{
         return m_serial && m_handle.is_ready() && m_error_string.empty();

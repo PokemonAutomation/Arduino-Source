@@ -51,8 +51,8 @@ public:
 
 
 protected:
-    void start();   //  Child class must call this at end of constructor.
-    void stop();    //  Child class must call this at start of destructor.
+    void start();           //  Child class must call this at end of constructor.
+    void stop() noexcept;   //  Child class must call this at start of destructor.
 
     virtual std::unique_ptr<ControllerState> make_state() const = 0;
     virtual void update_state(ControllerState& state, const std::set<uint32_t>& pressed_keys) = 0;

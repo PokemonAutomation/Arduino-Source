@@ -32,7 +32,7 @@ class ProController::KeyboardManager : public KeyboardInputController{
 public:
     KeyboardManager(ProController& controller)
         : KeyboardInputController(true)
-        , m_controller(controller)
+        , m_controller(&controller)
     {
         std::vector<std::shared_ptr<EditableTableRow>> mapping =
             ConsoleSettings::instance().KEYBOARD_MAPPINGS.TABLE.current_refs();
@@ -44,6 +44,16 @@ public:
     }
     ~KeyboardManager(){
         stop();
+    }
+    void stop() noexcept{
+        {
+            WriteSpinLock lg(m_lock);
+            if (m_controller == nullptr){
+                return;
+            }
+            m_controller = nullptr;
+        }
+        KeyboardInputController::stop();
     }
 
     virtual std::unique_ptr<ControllerState> make_state() const override{
@@ -65,10 +75,18 @@ public:
         deltas.to_state(static_cast<SwitchControllerState&>(state));
     }
     virtual void cancel_all_commands() override{
-        m_controller.cancel_all_commands();
+        WriteSpinLock lg(m_lock);
+        if (m_controller == nullptr){
+            return;
+        }
+        m_controller->cancel_all_commands();
     }
     virtual void replace_on_next_command() override{
-        m_controller.replace_on_next_command();
+        WriteSpinLock lg(m_lock);
+        if (m_controller == nullptr){
+            return;
+        }
+        m_controller->replace_on_next_command();
     }
     virtual void send_state(const ControllerState& state) override{
         const SwitchControllerState& switch_state = static_cast<const SwitchControllerState&>(state);
@@ -82,7 +100,11 @@ public:
             COLOR_DARKGREEN
         );
 #endif
-        m_controller.issue_full_controller_state(
+        WriteSpinLock lg(m_lock);
+        if (m_controller == nullptr){
+            return;
+        }
+        m_controller->issue_full_controller_state(
             nullptr,
             switch_state.buttons,
             switch_state.dpad,
@@ -96,7 +118,8 @@ public:
 
 
 private:
-    ProController& m_controller;
+    SpinLock m_lock;
+    ProController* m_controller;
     std::map<Qt::Key, ControllerDeltas> m_mapping;
 };
 
@@ -110,6 +133,9 @@ ProController::ProController(Milliseconds timing_variation)
     , m_keyboard_manager(CONSTRUCT_TOKEN, *this)
 {
 
+}
+void ProController::stop() noexcept{
+    m_keyboard_manager->stop();
 }
 
 

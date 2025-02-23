@@ -67,6 +67,9 @@ ProController_SerialPABotBase::ProController_SerialPABotBase(
 
     m_error_string = html_color_text("Missing Feature: " + missing_feature, COLOR_RED);
 }
+ProController_SerialPABotBase::~ProController_SerialPABotBase(){
+    stop();
+}
 
 
 
