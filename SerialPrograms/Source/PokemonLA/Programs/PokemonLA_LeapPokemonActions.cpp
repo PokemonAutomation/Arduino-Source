@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-void route(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, LeapPokemon pokemon){
+void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, LeapPokemon pokemon){
     switch (pokemon){
     case LeapPokemon::Aipom:
         goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Coastlands_Beachside);
@@ -155,7 +155,7 @@ void route(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext
     context.wait_for_all_requests();
 }
 
-void return_to_jubilife(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context, LeapPokemon pokemon){
+void return_to_jubilife(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, LeapPokemon pokemon){
     goto_camp_from_overworld(env, stream, context);
     switch (pokemon){
     case LeapPokemon::Aipom:
@@ -188,7 +188,7 @@ void return_to_jubilife(ProgramEnvironment& env, VideoStream& stream, SwitchCont
     context.wait_for_all_requests();
 }
 
-bool check_tree_or_ore_for_battle(VideoStream& stream, SwitchControllerContext& context){
+bool check_tree_or_ore_for_battle(VideoStream& stream, ProControllerContext& context){
     pbf_press_button(context, BUTTON_ZR, (uint16_t)(0.5 * TICKS_PER_SECOND), 20); //throw pokemon
     pbf_wait(context, (uint16_t)(4.5 * TICKS_PER_SECOND));
     context.wait_for_all_requests();
@@ -233,7 +233,7 @@ bool check_tree_or_ore_for_battle(VideoStream& stream, SwitchControllerContext& 
     return false;
 }
 
-void exit_battle(VideoStream& stream, SwitchControllerContext& context, ExitBattleMethod exit_method){
+void exit_battle(VideoStream& stream, ProControllerContext& context, ExitBattleMethod exit_method){
 //    pbf_press_button(context, BUTTON_B, 20, 225);
 
     if (exit_method == ExitBattleMethod::RunAway){
@@ -249,7 +249,7 @@ void exit_battle(VideoStream& stream, SwitchControllerContext& context, ExitBatt
     mash_A_until_end_of_battle(stream, context);
 }
 
-PokemonDetails get_pokemon_details(VideoStream& stream, SwitchControllerContext& context, Language language){
+PokemonDetails get_pokemon_details(VideoStream& stream, ProControllerContext& context, Language language){
     //  Open Info Screen
     pbf_wait(context, (1 * TICKS_PER_SECOND));
     pbf_press_button(context, BUTTON_PLUS, 20, 20);

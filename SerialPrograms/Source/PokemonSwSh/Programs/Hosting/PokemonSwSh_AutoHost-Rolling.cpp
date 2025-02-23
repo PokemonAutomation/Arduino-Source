@@ -35,7 +35,8 @@ AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
         "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::FASTER
     )
 {}
 std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{
@@ -54,22 +55,20 @@ AutoHostRolling::AutoHostRolling()
         false
     )
     , HOST_ONLINE("<b>Host Online:</b>", LockMode::LOCK_WHILE_RUNNING, true)
-    , LOBBY_WAIT_DELAY(
+    , LOBBY_WAIT_DELAY0(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "60 * TICKS_PER_SECOND"
+        "60 s"
     )
     , FRIEND_ACCEPT_USER_SLOT(
         "<b>Friend Request Accept Slot:</b><br>Zero disables friend accepts.",
         LockMode::LOCK_WHILE_RUNNING,
         0, 0, 8
     )
-    , EXTRA_DELAY_BETWEEN_RAIDS(
+    , EXTRA_DELAY_BETWEEN_RAIDS0(
         "<b>Extra Delay Between Raids:</b><br>May aid in farming.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "0 * TICKS_PER_SECOND"
+        "0 s"
     )
     , MOVE_SLOT(
         "<b>1st Move Select Slot:</b><br>Zero disables 1st move select.",
@@ -99,35 +98,30 @@ AutoHostRolling::AutoHostRolling()
     , m_internet_settings(
         "<font size=4><b>Internet Settings:</b> Increase these if your internet is slow.</font>"
     )
-    , CONNECT_TO_INTERNET_DELAY(
+    , CONNECT_TO_INTERNET_DELAY0(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to enter den.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "60000 ms"
     )
-    , ENTER_ONLINE_DEN_DELAY(
+    , ENTER_ONLINE_DEN_DELAY0(
         "<b>Enter Online Den Delay:</b><br>\"Communicating\" when entering den while online.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000 ms"
     )
-    , OPEN_ONLINE_DEN_LOBBY_DELAY(
+    , OPEN_ONLINE_DEN_LOBBY_DELAY0(
         "<b>Open Online Den Delay:</b><br>Delay from \"Invite Others\" to when the clock starts ticking.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000 ms"
     )
-    , RAID_START_TO_EXIT_DELAY(
+    , RAID_START_TO_EXIT_DELAY0(
         "<b>Raid Start to Exit Delay:</b><br>Time from start raid to reset. (when not selecting move)",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "15 * TICKS_PER_SECOND"
+        "15 s"
     )
-    , DELAY_TO_SELECT_MOVE(
+    , DELAY_TO_SELECT_MOVE0(
         "<b>Delay to Select Move:</b><br>This + above = time from start raid to select move.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "32 * TICKS_PER_SECOND"
+        "32 s"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -137,10 +131,10 @@ AutoHostRolling::AutoHostRolling()
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(BACKUP_SAVE);
     PA_ADD_OPTION(HOST_ONLINE);
-    PA_ADD_OPTION(LOBBY_WAIT_DELAY);
+    PA_ADD_OPTION(LOBBY_WAIT_DELAY0);
     PA_ADD_OPTION(CATCHABILITY);
     PA_ADD_OPTION(FRIEND_ACCEPT_USER_SLOT);
-    PA_ADD_OPTION(EXTRA_DELAY_BETWEEN_RAIDS);
+    PA_ADD_OPTION(EXTRA_DELAY_BETWEEN_RAIDS0);
     PA_ADD_OPTION(MOVE_SLOT);
     PA_ADD_OPTION(DYNAMAX);
     PA_ADD_OPTION(TROLL_HOSTING);
@@ -149,28 +143,28 @@ AutoHostRolling::AutoHostRolling()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_OPTION(m_internet_settings);
-    PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY);
-    PA_ADD_OPTION(ENTER_ONLINE_DEN_DELAY);
-    PA_ADD_OPTION(OPEN_ONLINE_DEN_LOBBY_DELAY);
-    PA_ADD_OPTION(RAID_START_TO_EXIT_DELAY);
-    PA_ADD_OPTION(DELAY_TO_SELECT_MOVE);
+    PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY0);
+    PA_ADD_OPTION(ENTER_ONLINE_DEN_DELAY0);
+    PA_ADD_OPTION(OPEN_ONLINE_DEN_LOBBY_DELAY0);
+    PA_ADD_OPTION(RAID_START_TO_EXIT_DELAY0);
+    PA_ADD_OPTION(DELAY_TO_SELECT_MOVE0);
 }
 
 
 
-void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
-    uint16_t start_raid_delay = HOST_ONLINE
-        ? OPEN_ONLINE_DEN_LOBBY_DELAY
-        : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY;
-    const uint16_t lobby_wait_delay = LOBBY_WAIT_DELAY < start_raid_delay
-        ? 0
-        : LOBBY_WAIT_DELAY - start_raid_delay;
+void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    Milliseconds start_raid_delay = HOST_ONLINE
+        ? OPEN_ONLINE_DEN_LOBBY_DELAY0
+        : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY0;
+    const Milliseconds lobby_wait_delay = LOBBY_WAIT_DELAY0.get() < start_raid_delay
+        ? 0ms
+        : LOBBY_WAIT_DELAY0.get() - start_raid_delay;
 
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 
     if (SKIPS == 0){
@@ -194,19 +188,19 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, SwitchControl
             HOST_ONLINE, FRIEND_ACCEPT_USER_SLOT,
             MOVE_SLOT, DYNAMAX, TROLL_HOSTING,
             HOSTING_NOTIFICATIONS,
-            CONNECT_TO_INTERNET_DELAY,
-            ENTER_ONLINE_DEN_DELAY,
-            OPEN_ONLINE_DEN_LOBBY_DELAY,
-            RAID_START_TO_EXIT_DELAY,
-            DELAY_TO_SELECT_MOVE
+            CONNECT_TO_INTERNET_DELAY0,
+            ENTER_ONLINE_DEN_DELAY0,
+            OPEN_ONLINE_DEN_LOBBY_DELAY0,
+            RAID_START_TO_EXIT_DELAY0,
+            DELAY_TO_SELECT_MOVE0
         );
 
         //  Exit game.
-        ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
         close_game(env.console, context);
 
         //  Post-raid delay.
-        pbf_wait(context, EXTRA_DELAY_BETWEEN_RAIDS);
+        pbf_wait(context, EXTRA_DELAY_BETWEEN_RAIDS0);
 
         //  Touch the date.
         if (SKIPS == 0){

@@ -38,54 +38,51 @@ SurpriseTrade::SurpriseTrade()
         LockMode::LOCK_WHILE_RUNNING,
         2
     )
-    , INITIAL_WAIT(
+    , INITIAL_WAIT0(
         "<b>Time to wait for a Trade Partner:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "30 * TICKS_PER_SECOND"
+        "30 s"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , TRADE_ANIMATION(
+    , TRADE_ANIMATION0(
         "<b>Trade Animation Time:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "23 * TICKS_PER_SECOND"
+        "23 s"
     )
-    , EVOLVE_DELAY(
+    , EVOLVE_DELAY0(
         "<b>Evolve Delay:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "30 * TICKS_PER_SECOND"
+        "30 s"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
 
     PA_ADD_OPTION(BOXES_TO_TRADE);
-    PA_ADD_OPTION(INITIAL_WAIT);
+    PA_ADD_OPTION(INITIAL_WAIT0);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(TRADE_ANIMATION);
-    PA_ADD_OPTION(EVOLVE_DELAY);
+    PA_ADD_OPTION(TRADE_ANIMATION0);
+    PA_ADD_OPTION(EVOLVE_DELAY0);
 }
 
 
-void SurpriseTrade::trade_slot(SwitchControllerContext& context, uint8_t slot, bool next_box) const{
-    ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 50);
+void SurpriseTrade::trade_slot(ProControllerContext& context, uint8_t slot, bool next_box) const{
+    ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 400ms);
     ssf_press_dpad1(context, DPAD_DOWN, 10);
     ssf_press_button2(context, BUTTON_A, 280, 20);
 
     if (next_box){
-        ssf_press_button1(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY);
+        ssf_press_button(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY0);
     }
 
     //  Move to slot
     while (slot >= 6){
-        ssf_press_dpad1(context, DPAD_DOWN, GameSettings::instance().BOX_SCROLL_DELAY);
+        ssf_press_dpad(context, DPAD_DOWN, GameSettings::instance().BOX_SCROLL_DELAY0);
         slot -= 6;
     }
     while (slot > 0){
-        ssf_press_dpad1(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY);
+        ssf_press_dpad(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY0);
         slot--;
     }
 
@@ -94,17 +91,17 @@ void SurpriseTrade::trade_slot(SwitchControllerContext& context, uint8_t slot, b
     ssf_press_button1(context, BUTTON_A, 100);
     ssf_press_button1(context, BUTTON_A, 100);
 
-    pbf_mash_button(context, BUTTON_B, INITIAL_WAIT);
+    pbf_mash_button(context, BUTTON_B, INITIAL_WAIT0);
 
     //  This is a state-merging operation.
     //  If we just finished a trade, this will start the animation for it.
     //  If we failed the previous trade and are stuck in the wrong parity, this
     //  is a no-op that will correct the parity and setup the next trade.
-    ssf_press_button1(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY);
-    pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
+    ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0);
+    pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION0);
 }
 
-void SurpriseTrade::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SurpriseTrade::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -137,14 +134,14 @@ void SurpriseTrade::program(SingleSwitchProgramEnvironment& env, SwitchControlle
             ssf_press_button1(context, BUTTON_B, 280);
             ssf_press_button1(context, BUTTON_B, 200);
             ssf_press_button1(context, BUTTON_A, 100);
-            pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
+            pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION0);
         }
 
         //  Wait out any new pokedex entries or trade evolutions.
-        pbf_mash_button(context, BUTTON_B, EVOLVE_DELAY);
+        pbf_mash_button(context, BUTTON_B, EVOLVE_DELAY0);
     }
 
-    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
 }
 
 

@@ -32,7 +32,8 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         "Automatically hatch eggs from boxes.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct EggHatcher_Descriptor::Stats : public StatsTracker{
@@ -94,7 +95,7 @@ EggHatcher::EggHatcher()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();
 
     for(uint8_t column_index = 0; column_index < 6; column_index++){
@@ -173,7 +174,7 @@ void EggHatcher::hatch_one_box(SingleSwitchProgramEnvironment& env, SwitchContro
     context.wait_for_all_requests();
 }
 
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     EggHatcher_Descriptor::Stats& stats = env.current_stats<EggHatcher_Descriptor::Stats>();

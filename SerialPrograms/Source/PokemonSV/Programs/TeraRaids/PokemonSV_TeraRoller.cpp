@@ -42,7 +42,8 @@ TeraRoller_Descriptor::TeraRoller_Descriptor()
         "Roll Tera raids to find shiny " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 struct TeraRoller_Descriptor::Stats : public StatsTracker{
@@ -110,7 +111,7 @@ TeraRoller::TeraRoller()
 }
 
 
-void TeraRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     TeraRoller_Descriptor::Stats& stats = env.current_stats<TeraRoller_Descriptor::Stats>();
@@ -127,7 +128,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
 
         if (!first){
             day_skip_from_overworld(env.console, context);
-            pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
+            pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY0);
             context.wait_for_all_requests();
             stats.m_skips++;
             skip_counter++;

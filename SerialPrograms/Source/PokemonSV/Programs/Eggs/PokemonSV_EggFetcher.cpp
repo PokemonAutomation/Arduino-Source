@@ -30,7 +30,8 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         "Automatically fetch eggs from a picnic.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct EggFetcher_Descriptor::Stats : public StatsTracker{
@@ -84,7 +85,7 @@ EggFetcher::EggFetcher()
 }
 
 
-void EggFetcher::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void EggFetcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     EggFetcher_Descriptor::Stats& stats = env.current_stats<EggFetcher_Descriptor::Stats>();

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_ShinyHuntShaymin_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -33,11 +33,11 @@ class ShinyHuntShaymin : public SingleSwitchProgramInstance{
 public:
     ShinyHuntShaymin();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 
 private:
-    bool start_encounter(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) const;
+    bool start_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context) const;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
@@ -49,7 +49,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;
+    MillisecondsOption EXIT_BATTLE_TIMEOUT0;
 };
 
 

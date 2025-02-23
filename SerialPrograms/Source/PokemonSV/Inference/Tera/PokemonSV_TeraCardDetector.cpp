@@ -218,22 +218,28 @@ std::string TeraCardReader::tera_type(
 
     return best_type;
 }
-std::string TeraCardReader::pokemon_slug(
+std::set<std::string> TeraCardReader::pokemon_slug(
     Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
 ) const{
     ImageMatch::ImageMatchResult silhouette = m_silhouette.read(screen);
-    silhouette.log(logger, 100);
-    std::string best_silhouette;
-    if (!silhouette.results.empty()){
-        best_silhouette = silhouette.results.begin()->second;
-    }
+    silhouette.log(logger, 110);
+//    std::string best_silhouette;
+//    if (!silhouette.results.empty()){
+//        best_silhouette = silhouette.results.begin()->second;
+//    }
     if (silhouette.results.empty()){
         dump_image(logger, info, "ReadSilhouetteFailed", screen);
-    }else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        dump_debug_image(logger, "PokemonSV/TeraRoller/" + best_silhouette, "", screen);
+    }
+//    else if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+//        dump_debug_image(logger, "PokemonSV/TeraRoller/" + best_silhouette, "", screen);
+//    }
+
+    std::set<std::string> results;
+    for (const auto& item : silhouette.results){
+        results.insert(std::move(item.second));
     }
 
-    return best_silhouette;
+    return results;
 }
 
 

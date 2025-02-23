@@ -8,9 +8,8 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
@@ -24,19 +23,20 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 bool connect_to_internet(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool host_online,
-    uint16_t connect_to_internet_delay
+    Milliseconds connect_to_internet_delay
 ){
     if (!host_online){
         return true;
     }
     if (!stream.video().snapshot()){
-        connect_to_internet(context, GameSettings::instance().OPEN_YCOMM_DELAY, connect_to_internet_delay);
+        connect_to_internet(context, GameSettings::instance().OPEN_YCOMM_DELAY0, connect_to_internet_delay);
         return true;
     }
     if (connect_to_internet_with_inference(
@@ -52,7 +52,7 @@ void send_raid_notification(
     ProgramEnvironment& env,
     VideoStream& stream,
     AutoHostNotificationOption& settings,
-    bool has_code, uint8_t code[8],
+    const std::string& code,
     const ImageViewRGB32& screenshot,
     const DenMonReadResults& results,
     const StatsTracker& stats_tracker
@@ -97,22 +97,7 @@ void send_raid_notification(
     }
     embeds.emplace_back("Current " + STRING_POKEMON + ":", slugs);
 
-    {
-        std::string code_str;
-        if (has_code){
-            size_t c = 0;
-            for (; c < 4; c++){
-                code_str += code[c] + '0';
-            }
-            code_str += " ";
-            for (; c < 8; c++){
-                code_str += code[c] + '0';
-            }
-        }else{
-            code_str += "None";
-        }
-        embeds.emplace_back("Raid Code:", code_str);
-    }
+    embeds.emplace_back("Raid Code:", code.empty() ? "None" : code);
 
     send_program_notification(
         env, settings.NOTIFICATION,
@@ -126,17 +111,17 @@ void send_raid_notification(
 
 
 void run_autohost(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     Catchability catchability, uint8_t skips,
-    const RandomCodeOption* raid_code, uint16_t lobby_wait_delay,
+    const RandomCodeOption* raid_code, Milliseconds lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,
     uint8_t move_slot, bool dynamax, uint8_t troll_hosting,
     AutoHostNotificationOption& notifications,
-    uint16_t connect_to_internet_delay,
-    uint16_t enter_online_den_delay,
-    uint16_t open_online_den_lobby_delay,
-    uint16_t raid_start_to_exit_delay,
-    uint16_t delay_to_select_move
+    Milliseconds connect_to_internet_delay,
+    Milliseconds enter_online_den_delay,
+    Milliseconds open_online_den_lobby_delay,
+    Milliseconds raid_start_to_exit_delay,
+    Milliseconds delay_to_select_move
 ){
     AutoHostStats& stats = env.current_stats<AutoHostStats>();
 
@@ -179,16 +164,18 @@ void run_autohost(
             }
         }
 
-        uint8_t code[8];
-        bool has_code = raid_code && raid_code->get_code(code);
-        if (has_code){
+        std::string code;
+        if (raid_code){
+            code = raid_code->get_code();
+        }
+        if (!code.empty()){
             char str[8];
             for (size_t c = 0; c < 8; c++){
                 str[c] = code[c] + '0';
             }
             env.log("Next Raid Code: " + std::string(str, sizeof(str)));
             pbf_press_button(context, BUTTON_PLUS, 5, 145);
-            enter_digits(context, 8, code);
+            numberpad_enter_code(stream.logger(), context, code, true);
             pbf_wait(context, 180);
             pbf_press_button(context, BUTTON_A, 5, 95);
         }
@@ -199,7 +186,7 @@ void run_autohost(
             env,
             stream,
             notifications,
-            has_code, code,
+            code,
             screen, results, stats
         );
     }
@@ -219,14 +206,10 @@ void run_autohost(
 
     //  Mash A until it's time to close the game.
     if (stream.video().snapshot()){
-//        WallDuration raid_start_to_exit_delay0 = std::chrono::duration_cast<WallDuration>(
-//            std::chrono::milliseconds((uint64_t)raid_start_to_exit_delay * 1000 / TICKS_PER_SECOND)
-//        );
-
         BlackScreenOverWatcher black_screen;
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, raid_start_to_exit_delay);
             },
             {black_screen}
@@ -238,32 +221,6 @@ void run_autohost(
             env.log("Timed out waiting for raid to start.", COLOR_RED);
             stats.add_timeout();
         }
-
-#if 0
-        context.wait_for_all_requests();
-        WallClock start = current_time();
-//        uint32_t start = system_clock(context);
-        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
-        context.wait_for_all_requests();
-
-        WallClock now = start;
-//        uint32_t now = start;
-        while (true){
-            if (black_screen.black_is_over(stream.video().snapshot())){
-                env.log("Raid has Started!", COLOR_BLUE);
-                stats.add_raid(raid_state.raiders());
-                break;
-            }
-            if (now - start >= raid_start_to_exit_delay0){
-                stats.add_timeout();
-                break;
-            }
-            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
-            context.wait_for_all_requests();
-            now = current_time();
-//            now = system_clock(context);
-        }
-#endif
     }else{
         pbf_mash_button(context, BUTTON_A, raid_start_to_exit_delay);
     }

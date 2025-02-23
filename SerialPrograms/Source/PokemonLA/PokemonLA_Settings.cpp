@@ -4,8 +4,6 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA_Settings.h"
 
@@ -23,56 +21,42 @@ GameSettings& GameSettings::instance(){
 GameSettings::GameSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , m_general("<font size=4><b>General Settings:</b></font>")
-    , POST_WARP_DELAY(
+    , POST_WARP_DELAY0(
         "<b>Post-Warp Delay:</b><br>After warping, wait this many seconds before continuing.",
         LockMode::LOCK_WHILE_RUNNING,
-        1.0, 0, 100
+        "1000 ms"
     )
     , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
-//    , OVERWORLD_TO_MENU_DELAY(
-//        "<b>Overworld to Menu Delay:</b><br>Delay to bring up the menu when pressing X in the overworld.",
-//        "250"
-//    )
-//    , MENU_TO_OVERWORLD_DELAY(
-//        "<b>Menu to Overworld Delay:</b><br>Delay to go from menu back to overworld.",
-//        "250"
-//    )
-    , GAME_TO_HOME_DELAY(
+    , GAME_TO_HOME_DELAY0(
         "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "125"
+        "1000 ms"
     )
-    , LOAD_REGION_TIMEOUT(
+    , LOAD_REGION_TIMEOUT0(
         "<b>Load Region Timeout:</b><br>Wait at most this long to enter a region before giving up.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "30 * TICKS_PER_SECOND"
+        "30 s"
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
-    , START_GAME_MASH(
+    , START_GAME_MASH0(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "2 * TICKS_PER_SECOND"
+        "2000 ms"
     )
-    , START_GAME_WAIT0(
+    , START_GAME_WAIT1(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "40 * TICKS_PER_SECOND"
+        "40 s"
     )
-    , ENTER_GAME_MASH(
+    , ENTER_GAME_MASH0(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000 ms"
     )
-    , ENTER_GAME_WAIT(
+    , ENTER_GAME_WAIT0(
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "15 * TICKS_PER_SECOND"
+        "15 s"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -109,19 +93,17 @@ GameSettings::GameSettings()
     )
 {
     PA_ADD_STATIC(m_general);
-    PA_ADD_OPTION(POST_WARP_DELAY);
+    PA_ADD_OPTION(POST_WARP_DELAY0);
 
     PA_ADD_STATIC(m_menu_navigation);
-//    PA_ADD_OPTION(OVERWORLD_TO_MENU_DELAY);
-//    PA_ADD_OPTION(MENU_TO_OVERWORLD_DELAY);
-    PA_ADD_OPTION(GAME_TO_HOME_DELAY);
-    PA_ADD_OPTION(LOAD_REGION_TIMEOUT);
+    PA_ADD_OPTION(GAME_TO_HOME_DELAY0);
+    PA_ADD_OPTION(LOAD_REGION_TIMEOUT0);
 
     PA_ADD_STATIC(m_start_game_timings);
-    PA_ADD_OPTION(START_GAME_MASH);
-    PA_ADD_OPTION(START_GAME_WAIT0);
-    PA_ADD_OPTION(ENTER_GAME_MASH);
-    PA_ADD_OPTION(ENTER_GAME_WAIT);
+    PA_ADD_OPTION(START_GAME_MASH0);
+    PA_ADD_OPTION(START_GAME_WAIT1);
+    PA_ADD_OPTION(ENTER_GAME_MASH0);
+    PA_ADD_OPTION(ENTER_GAME_WAIT0);
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
@@ -140,9 +122,9 @@ GameSettings_Descriptor::GameSettings_Descriptor()
     : PanelDescriptor(
         Color(),
         "PokemonLA:GlobalSettings",
-        STRING_POKEMON + " LA", STRING_POKEMON + " Settings",
+        STRING_POKEMON + " LA", "Game Settings",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PokemonSettings.md",
-        "Global " + STRING_POKEMON + " Settings"
+        "Global " + STRING_POKEMON + " Legends Arceus Settings"
     )
 {}
 

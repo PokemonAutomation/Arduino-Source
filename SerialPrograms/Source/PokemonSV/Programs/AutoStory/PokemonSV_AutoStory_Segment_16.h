@@ -20,7 +20,7 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         AutoStoryOptions options
     ) const override;
 };
@@ -30,7 +30,7 @@ public:
 // end: At Cascarrafa Gym. Received Kofu's wallet.
 void checkpoint_35(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -38,7 +38,7 @@ void checkpoint_35(
 // end: At Porto Marinada Pokecenter.
 void checkpoint_36(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 

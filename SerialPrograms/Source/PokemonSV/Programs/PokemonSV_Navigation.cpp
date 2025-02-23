@@ -11,7 +11,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
@@ -38,7 +38,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     DateReader reader;
     VideoOverlaySet overlays(stream.overlay());
     reader.make_overlays(overlays);
@@ -48,34 +48,50 @@ void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, Sw
     pbf_press_button(context, BUTTON_A, 20, 50);
     reader.set_hours(info, stream, context, 0);
     pbf_press_button(context, BUTTON_A, 20, 30);
-    pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 //    resume_game_from_home(stream, context);
 }
 
-void day_skip_from_overworld(VideoStream& stream, SwitchControllerContext& context){
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context){
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(context, true, true);
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_issue_scroll(context, DPAD_RIGHT, 0);
-    ssf_press_button(context, BUTTON_A, 2);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+
+    Milliseconds tv = context->timing_variation();
+    if (tv == 0ms){
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, DPAD_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 2);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_press_button(context, BUTTON_A, 0);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+    }else{
+        ssf_press_button_ptv(context, BUTTON_A, 160ms);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms);
+    }
+
+    pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(stream, context);
 }
 
-void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context, uint16_t seconds_between_b_presses){
+void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, uint16_t seconds_between_b_presses){
     context.wait_for_all_requests();
     OverworldWatcher overworld(stream.logger(), COLOR_RED);
     NormalBattleMenuWatcher battle(COLOR_BLUE);
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [seconds_between_b_presses](SwitchControllerContext& context){
+        [seconds_between_b_presses](ProControllerContext& context){
             pbf_wait(context, seconds_between_b_presses * TICKS_PER_SECOND); // avoiding pressing B if already in overworld
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, BUTTON_B, 20, seconds_between_b_presses * TICKS_PER_SECOND);
@@ -101,7 +117,7 @@ void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream,
 void open_map_from_overworld(
     const ProgramInfo& info,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     bool clear_tutorial
 ){
     {
@@ -199,7 +215,7 @@ void open_map_from_overworld(
     }
 }
 
-bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context, bool check_fly_menuitem){
+bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, bool check_fly_menuitem){
     context.wait_for_all_requests();
     // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
     pbf_press_button(context, BUTTON_A, 20, 130);
@@ -265,7 +281,7 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, Swi
 }
 
 
-void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     stream.log("Start picnic from overworld...");
     WallClock start = current_time();
@@ -325,7 +341,7 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, SwitchC
     }
 }
 
-void leave_picnic(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     stream.log("Leaving picnic...");
     stream.overlay().add_log("Leaving picnic", COLOR_WHITE);
@@ -383,7 +399,7 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, SwitchController
 
 void enter_box_system_from_overworld(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     context.wait_for_all_requests();
     stream.log("Enter box system from overworld...");
@@ -442,14 +458,14 @@ void enter_box_system_from_overworld(
 }
 
 
-void leave_box_system_to_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void leave_box_system_to_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     stream.log("Leave box system to overworld...");
     press_Bs_to_back_to_overworld(info, stream, context);
 }
 
 
-void open_pokedex_from_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void open_pokedex_from_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     stream.log("Opening Pokédex...");
     WallClock start = current_time();
     while (true){
@@ -490,14 +506,14 @@ void open_pokedex_from_overworld(const ProgramInfo& info, VideoStream& stream, S
 }
 
 
-void open_recently_battled_from_pokedex(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void open_recently_battled_from_pokedex(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     stream.log("Opening recently battled...");
     LetsGoKillWatcher menu(stream.logger(), COLOR_RED, true, {0.23, 0.23, 0.04, 0.20});
     context.wait_for_all_requests();
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             for (size_t i = 0; i < 10; i++){
                 pbf_press_dpad(context, DPAD_DOWN, 20, 105);
             }
@@ -518,16 +534,16 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, VideoStream& st
 }
 
 
-void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     stream.log("Exiting to overworld from Rotom Phone...");
     OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
     NormalBattleMenuWatcher battle(COLOR_BLUE);
     GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::DOWN, {0.475, 0.465, 0.05, 0.085});
     context.wait_for_all_requests();
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             for (size_t i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_Y, 20, 1000);
             }
@@ -566,7 +582,7 @@ void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, Swit
 bool detect_closest_pokecenter_and_move_map_cursor_there(
     const ProgramInfo& info,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     double push_scale
 ){
     context.wait_for_all_requests();
@@ -630,7 +646,7 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(
 bool fly_to_visible_closest_pokecenter_cur_zoom_level(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     double push_scale
 ){
     if (!detect_closest_pokecenter_and_move_map_cursor_there(info, stream, context, push_scale)){
@@ -652,7 +668,7 @@ bool fly_to_visible_closest_pokecenter_cur_zoom_level(
 }
 
 
-void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     const int MAX_TRY_COUNT = 17;
     int try_count = 0;
     // Part 1: Tries to detect a pokecenter that is very close to the player
@@ -750,7 +766,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
    
 }
 
-void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     for (auto i = 0; i < 3; i++){
         pbf_press_button(context, BUTTON_L, 50, 50);
         pbf_press_button(context, BUTTON_B, 50, 50);
@@ -775,7 +791,7 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, 
 }
 
 // Open map and teleport back to town pokecenter to reset the hunting path.
-void reset_to_pokecenter(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void reset_to_pokecenter(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     while (true){
         try {
             open_map_from_overworld(info, stream, context);
@@ -788,7 +804,7 @@ void reset_to_pokecenter(const ProgramInfo& info, VideoStream& stream, SwitchCon
 
 }
 
-void realign_player(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     PlayerRealignMode realign_mode,
     uint8_t move_x, uint8_t move_y, uint16_t move_duration
 ){
@@ -820,7 +836,7 @@ void realign_player(const ProgramInfo& info, VideoStream& stream, SwitchControll
 void walk_forward_until_dialog(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     NavigationMovementMode movement_mode,
     uint16_t seconds_timeout,
     uint8_t x,
@@ -829,9 +845,9 @@ void walk_forward_until_dialog(
 
     DialogBoxWatcher        dialog(COLOR_RED, true);
     context.wait_for_all_requests();
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             ssf_press_left_joystick(context, 128, y, 0, seconds_timeout * TICKS_PER_SECOND);
             if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                 pbf_wait(context, seconds_timeout * TICKS_PER_SECOND);
@@ -862,7 +878,7 @@ void walk_forward_until_dialog(
 void walk_forward_while_clear_front_path(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint16_t forward_ticks,
     uint8_t y,
     uint16_t ticks_between_lets_go,
@@ -895,15 +911,15 @@ void walk_forward_while_clear_front_path(
 
 void mash_button_till_overworld(
     VideoStream& stream,
-    SwitchControllerContext& context, 
-    uint16_t button, uint16_t seconds_run
+    ProControllerContext& context,
+    Button button, uint16_t seconds_run
 ){
     OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
     context.wait_for_all_requests();
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [button, seconds_run](SwitchControllerContext& context){
+        [button, seconds_run](ProControllerContext& context){
             ssf_mash1_button(context, button, seconds_run * TICKS_PER_SECOND);
             pbf_wait(context, seconds_run * TICKS_PER_SECOND);
         },
@@ -923,7 +939,7 @@ void mash_button_till_overworld(
 bool attempt_fly_to_overlapping_flypoint(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context
+    ProControllerContext& context
 ){
     while (true){
         try {
@@ -940,7 +956,7 @@ bool attempt_fly_to_overlapping_flypoint(
 
 }
 
-void fly_to_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void fly_to_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     if (!attempt_fly_to_overlapping_flypoint(info, stream, context)){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -950,7 +966,7 @@ void fly_to_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, S
     }
 }
 
-void confirm_no_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void confirm_no_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     if (attempt_fly_to_overlapping_flypoint(info, stream, context)){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -960,7 +976,7 @@ void confirm_no_overlapping_flypoint(const ProgramInfo& info, VideoStream& strea
     }
 }
 
-void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     int menu_index,
     MenuSide side,
     bool has_minimap
@@ -986,9 +1002,9 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Swi
         NormalBattleMenuWatcher battle(COLOR_RED);
         context.wait_for_all_requests();
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [has_minimap](SwitchControllerContext& context){
+            [has_minimap](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
                     pbf_wait(context, 3 * TICKS_PER_SECOND);
                     if (!has_minimap){ 
@@ -1041,15 +1057,15 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Swi
 void press_button_until_gradient_arrow(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     ImageFloatBox box_area_to_check,
-    uint16_t button,
+    Button button,
     GradientArrowType arrow_type
 ){
     GradientArrowWatcher arrow(COLOR_RED, arrow_type, box_area_to_check);
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [button](SwitchControllerContext& context){
+        [button](ProControllerContext& context){
             pbf_wait(context, 3 * TICKS_PER_SECOND); // avoid pressing button if arrow already detected
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, button, 20, 3 * TICKS_PER_SECOND);
@@ -1071,7 +1087,7 @@ void press_button_until_gradient_arrow(
 void basic_menu_navigation(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     ImageFloatBox arrow_box_start,
     ImageFloatBox arrow_box_end,
     DpadPosition dpad_button,
@@ -1093,10 +1109,10 @@ void basic_menu_navigation(
     }
 
     GradientArrowWatcher arrow_end(COLOR_RED, GradientArrowType::RIGHT, arrow_box_end);
-    ret = run_until<SwitchControllerContext>(
+    ret = run_until<ProControllerContext>(
         stream,
         context,
-        [dpad_button](SwitchControllerContext& context){
+        [dpad_button](ProControllerContext& context){
             for (int i = 0; i < 3; i++){
                 pbf_press_dpad(context, dpad_button, 20, 500);
             }
@@ -1119,7 +1135,7 @@ void basic_menu_navigation(
 void heal_at_pokecenter(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context
+    ProControllerContext& context
 ){
     context.wait_for_all_requests();
     

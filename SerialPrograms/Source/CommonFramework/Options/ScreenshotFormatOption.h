@@ -17,8 +17,8 @@ enum class ImageAttachmentMode{
     JPG,
     PNG,
 };
-inline const EnumDatabase<ImageAttachmentMode>& ImageAttachmentMode_Database(){
-    static EnumDatabase<ImageAttachmentMode> database({
+inline const EnumDropdownDatabase<ImageAttachmentMode>& ImageAttachmentMode_Database(){
+    static EnumDropdownDatabase<ImageAttachmentMode> database({
         {ImageAttachmentMode::NO_SCREENSHOT,    "none", "No Screenshot."},
         {ImageAttachmentMode::JPG,              "jpg",  "Attach as .jpg."},
         {ImageAttachmentMode::PNG,              "png",  "Attach as .png."},

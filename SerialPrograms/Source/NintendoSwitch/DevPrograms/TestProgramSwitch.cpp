@@ -46,7 +46,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -114,6 +114,10 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
+#include "PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 
 
 #include <QPixmap>
@@ -132,6 +136,11 @@ using namespace PokemonAutomation::Kernels::Waterfill;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+uint16_t scroll_to(
+    ProControllerContext& context,
+    uint8_t start_digit, uint8_t end_digit, bool actually_scroll
+);
 
 
 namespace PokemonSwSh{
@@ -163,6 +172,7 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        FasterIfTickPrecise::NOT_FASTER,
         1, 4, 1
     )
 {}
@@ -205,6 +215,11 @@ TestProgram::TestProgram()
         DateTime{2060, 12, 31, 23, 59, 59},
         DateTime{2048, 1, 13, 20, 48}
     )
+    , DURATION(
+        "Duration",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "100"
+    )
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -221,6 +236,7 @@ TestProgram::TestProgram()
 //    PA_ADD_OPTION(battle_AI);
     PA_ADD_OPTION(DATE0);
     PA_ADD_OPTION(DATE1);
+    PA_ADD_OPTION(DURATION);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);
     BUTTON1.add_listener(*this);
@@ -255,22 +271,89 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
-//    using namespace PokemonSV;
+    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
 //    [[maybe_unused]] BotBase& botbase = env.consoles[0];
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
-    SwitchControllerContext context(scope, console.controller());
+    ProControllerContext context(scope, console.controller());
     VideoOverlaySet overlays(overlay);
 
+//    std::terminate();
 
 
+
+//    ssf_issue_scroll(context, DPAD_LEFT, 0);
+//    ssf_press_button(context, BUTTON_A | BUTTON_L, 3);
+//    ssf_press_button(context, BUTTON_L, 0);
+
+    numberpad_enter_code(
+        logger, context,
+        "708538991006",
+        false
+    );
+
+
+#if 0
+    codeboard_enter_digits(
+        logger, context, KeyboardLayout::QWERTY,
+        "JRH5T9",
+        true,
+        CodeboardDelays{
+            .hold = 5 * 8ms,
+            .cool = 3 * 8ms,
+            .press_delay = 4 * 8ms * 1,
+            .move_delay = 5 * 8ms * 1,
+            .wrap_delay = 6 * 8ms * 1,
+        }
+    );
+#endif
+
+//    ssf_flush_pipeline(context);
+
+
+//    return_to_academy_after_loss(env, console, context);
+
+
+
+
+//    fly_from_paldea_to_blueberry_entrance(env.program_info(), console, context);
+
+
+
+#if 0
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+    ssf_press_button(context, BUTTON_A, 0);
+    ssf_do_nothing(context, 4);
+#endif
+
+
+
+//    enter_digits(context, 8, (const uint8_t*)"56685459");
+
+#if 0
+    for (int c = 0; c < 10; c++){
+        scroll_to(context, 1, 9, true);
+        scroll_to(context, 9, 1, true);
+    }
+//    pbf_wait(context, 100);
+#endif
+
+
+#if 0
     ImageRGB32 image("20250131-170450792229.png");
 
     PokemonSwSh::BattleBallReader reader(console, Language::Korean);
     reader.read_ball(image);
+#endif
+
 
 
 #if 0
@@ -298,17 +381,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-
-//    ImageRGB32 image("20250115-110356822901.png");
+#if 0
+    ImageRGB32 image("20250218-003554940153.png");
 //    ImageRGB32 image("raidecho1.jpg");
 //    auto image = feed.snapshot();
 
 //    MaxLairInternal::BattleMenuReader reader(overlay, Language::English);
 //    reader.read_opponent_in_summary(logger, image);
 
-//    TeraCardReader reader;
+    TeraCardReader reader;
+    cout << reader.detect(image) << endl;
+    reader.pokemon_slug(logger, env.program_info(), image);
 //    cout << (int)reader.stars(logger, env.program_info(), image) << endl;
-
+#endif
 
 
 
@@ -1082,9 +1167,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
         AreaZeroSkyTracker sky_tracker(overlay);
         context.wait_for_all_requests();
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 while (true){
                     switch (count++ % 2){
                     case 0:
@@ -1169,7 +1254,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ConsoleHandle& host = env.consoles[host_index];
     BotBaseContext host_context(scope, host.botbase());
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         if (console.index() == host_index){
             open_raid(console, context);
         }else{
@@ -1188,7 +1273,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         OperationFailedException::fire(env.logger(), "Unable to read raid code.");
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         if (console.index() == host_index){
             return;
         }
@@ -1455,12 +1540,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 #if 0
     AsyncCommandSession session(scope, logger, env.realtime_dispatcher(), context.botbase());
-    session.dispatch([](SwitchControllerContext& context){
+    session.dispatch([](ProControllerContext& context){
 //        pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 255);
         pbf_press_button(context, BUTTON_A, 255, 0);
     });
     context.wait_for(std::chrono::seconds(2));
-    session.dispatch([](SwitchControllerContext& context){
+    session.dispatch([](ProControllerContext& context){
 //        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 255);
         pbf_press_button(context, BUTTON_B, 255, 0);
     });
@@ -1482,8 +1567,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 0
-    CodeboardPosition point0{1, 0};
-    CodeboardPosition point1{1, 10};
+    KeyboardEntryPosition point0{1, 0};
+    KeyboardEntryPosition point1{1, 10};
 //    uint16_t scroll_delay = 3;
 //    uint16_t A_delay = 3;
 
@@ -1687,7 +1772,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     TradeStats stats;
     env.run_in_parallel(
         scope,
-        [&](ConsoleHandle& console, SwitchControllerContext& context){
+        [&](ConsoleHandle& console, ProControllerContext& context){
             trade_current_pokemon(console, context, state, stats);
         }
     );

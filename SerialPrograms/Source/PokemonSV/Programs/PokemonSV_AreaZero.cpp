@@ -23,15 +23,15 @@ namespace PokemonSV{
 
 void inside_zero_gate_to_station(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     int station,    //  1 - 4
     bool heal_at_station
 ){
     {
         AdvanceDialogWatcher dialog(COLOR_GREEN);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
             },
             {dialog}
@@ -144,9 +144,9 @@ void inside_zero_gate_to_station(
     stream.log("Exiting station. Waiting for black screen...");
     {
         BlackScreenOverWatcher black_screen(COLOR_RED);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [=](SwitchControllerContext& context){
+            [=](ProControllerContext& context){
                 if (heal_at_station){
                     pbf_move_left_joystick(context, 96, 255, 60 * TICKS_PER_SECOND, 0);
                 }else{
@@ -183,22 +183,22 @@ void inside_zero_gate_to_station(
 
 void return_to_outside_zero_gate(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     open_map_from_overworld(info, stream, context);
-    pbf_move_left_joystick(context, 0, 0, 5, 50);
+    pbf_move_left_joystick(context, 96, 96, 5, 50);
     fly_to_overworld_from_map(info, stream, context);
 }
 void return_to_inside_zero_gate(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     return_to_outside_zero_gate(info, stream, context);
 
     BlackScreenOverWatcher black_screen;
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_move_left_joystick(context, 255, 32, 20, 105);
             pbf_mash_button(context, BUTTON_L, 60);
             pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
@@ -228,12 +228,12 @@ void return_to_inside_zero_gate(
 }
 void return_to_inside_zero_gate_from_picnic(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     BlackScreenOverWatcher black_screen;
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 255, 100, 40);
             pbf_mash_button(context, BUTTON_L, 60);
             pbf_move_left_joystick(context, 128, 0, 10 * TICKS_PER_SECOND, 0);
@@ -266,7 +266,7 @@ void return_to_inside_zero_gate_from_picnic(
 
 
 void inside_zero_gate_to_secret_cave_entrance(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     bool heal_at_station
 ){
     inside_zero_gate_to_station(info, stream, context, 1, heal_at_station);

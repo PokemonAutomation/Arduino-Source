@@ -7,6 +7,10 @@
 #include "Common/Qt/TimeQt.h"
 #include "PokemonSV_ItemPrinterRNGTable.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -79,29 +83,52 @@ std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
 //  - also, hide the date if chain enabled.
 // - trigger the listener for the parent table.
 void ItemPrinterRngRow::value_changed(void* object){
-
-    ItemPrinterRngTable& table = static_cast<ItemPrinterRngTable&>(parent());
-
-    if (object == &desired_item){
-        ItemPrinter::PrebuiltOptions option = desired_item;
-        if (option != ItemPrinter::PrebuiltOptions::NONE){
-            const ItemPrinter::ItemPrinterEnumOption& option_data = option_lookup_by_enum(option);
-            chain = false;
-            date.set(from_seconds_since_epoch(option_data.seed));
-            jobs.set(option_data.jobs);
-        }
-    }else if (object == &date || object == &jobs || object == &chain){
-        date.set_visibility(chain ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
-        const ItemPrinter::ItemPrinterEnumOption* option_data = ItemPrinter::option_lookup_by_seed(to_seconds_since_epoch(date));
-        // seed found in the PrebuiltOptions table, and jobs number matches and chain disabled
-        if (option_data != nullptr && option_data->jobs == jobs && !chain){ 
-            desired_item.set(option_data->enum_value);
-        }else{
-            desired_item.set(ItemPrinter::PrebuiltOptions::NONE);
-        }
+    {
+        WriteSpinLock lg1(m_pending_lock);
+        m_pending.emplace_back(object);
     }
 
-    table.report_value_changed(object);
+    bool keep_going;
+    do{
+        std::unique_lock<std::mutex> lg(m_update_lock, std::try_to_lock_t());
+        if (!lg.owns_lock()){
+            return;
+        }
+
+        {
+            WriteSpinLock lg1(m_pending_lock);
+            object = m_pending.front();
+            m_pending.pop_front();
+        }
+
+        ItemPrinterRngTable& table = static_cast<ItemPrinterRngTable&>(parent());
+
+        if (object == &desired_item){
+            ItemPrinter::PrebuiltOptions option = desired_item;
+            if (option != ItemPrinter::PrebuiltOptions::NONE){
+                const ItemPrinter::ItemPrinterEnumOption& option_data = option_lookup_by_enum(option);
+                chain = false;
+                jobs.set(option_data.jobs);
+                date.set(from_seconds_since_epoch(option_data.seed));
+            }
+        }else if (object == &date || object == &jobs || object == &chain){
+            date.set_visibility(chain ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
+            const ItemPrinter::ItemPrinterEnumOption* option_data = ItemPrinter::option_lookup_by_seed(to_seconds_since_epoch(date));
+//            cout << "option_data = " << option_data << endl;
+            // seed found in the PrebuiltOptions table, and jobs number matches and chain disabled
+            if (option_data != nullptr && option_data->jobs == jobs && !chain){
+                desired_item.set(option_data->enum_value);
+            }else{
+//                cout << "option_data->jobs = " << (size_t)option_data->jobs << ", jobs = " << jobs.current_value() << ", chain = " << chain << endl;
+                desired_item.set(ItemPrinter::PrebuiltOptions::NONE);
+            }
+        }
+
+        table.report_value_changed(object);
+
+        WriteSpinLock lg1(m_pending_lock);
+        keep_going = !m_pending.empty();
+    }while (keep_going);
 }
 
 ItemPrinterRngTable::ItemPrinterRngTable(std::string label)

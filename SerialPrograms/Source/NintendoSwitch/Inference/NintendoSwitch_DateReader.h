@@ -40,14 +40,14 @@ public:
 //    int8_t read_hours(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
 
     void set_hours(
-        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         uint8_t hour    //  0 - 23
     ) const;
 
 
     std::pair<DateFormat, DateTime> read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
     void set_date(
-        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         const DateTime& date    //  Seconds is ignored.
     ) const;
 
@@ -64,11 +64,11 @@ private:
     DateTime read_date_eu(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const;
     DateTime read_date_jp(Logger& logger, std::shared_ptr<const ImageRGB32> screen, bool white_theme) const;
 
-    static void move_cursor(SwitchControllerContext& context, int current, int desired);
-    static void adjust_year(SwitchControllerContext& context, int current, int desired);
-    static void adjust_month(SwitchControllerContext& context, int current, int desired);
-    static void adjust_hour_24(SwitchControllerContext& context, int current, int desired);
-    static void adjust_minute(SwitchControllerContext& context, int current, int desired);
+    static void move_cursor(ProControllerContext& context, int current, int desired);
+    static void adjust_year(ProControllerContext& context, int current, int desired);
+    static void adjust_month(ProControllerContext& context, int current, int desired);
+    static void adjust_hour_24(ProControllerContext& context, int current, int desired);
+    static void adjust_minute(ProControllerContext& context, int current, int desired);
 
 private:
     ImageFloatBox m_background_top;
@@ -105,7 +105,7 @@ public:
 // then go back to the home screen
 void change_date(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     const DateTime& date
 );
 

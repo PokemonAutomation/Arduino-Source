@@ -16,7 +16,9 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-    using namespace Pokemon;
+
+using namespace Pokemon;
+
 
 
 ActivateMenuGlitch113_Descriptor::ActivateMenuGlitch113_Descriptor()
@@ -28,25 +30,28 @@ ActivateMenuGlitch113_Descriptor::ActivateMenuGlitch113_Descriptor()
         "<font color=\"red\">(This works on game versions 1.1.1 - 1.1.3. It has been patched out in later versions.)</font>",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        },
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
 ActivateMenuGlitch113::ActivateMenuGlitch113()
-    : FLY_A_TO_X_DELAY(
+    : FLY_A_TO_X_DELAY0(
         "<b>Fly Menu A-to-X Delay:</b><br>The delay between the A and X presses to overlap the menu with the fly option.<br>"
         "(German players may need to increase this to 90.)",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        20, "50"
+        160ms, "400 ms"
     )
 {
-    PA_ADD_OPTION(FLY_A_TO_X_DELAY);
+    PA_ADD_OPTION(FLY_A_TO_X_DELAY0);
 }
 
 
 
-void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     VideoStream& stream = env.console;
 
     //  Enable Strength
@@ -79,8 +84,8 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, SwitchC
     pbf_press_dpad(context, DPAD_RIGHT, 30, 95);
 
     //  Bring up menu
-    pbf_press_button(context, BUTTON_ZL, 20, FLY_A_TO_X_DELAY - 20);
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_ZL, 160ms, FLY_A_TO_X_DELAY0.get() - 160ms);
+    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
 
     //  Fly
     pbf_press_button(context, BUTTON_ZL, 20, 10 * TICKS_PER_SECOND);

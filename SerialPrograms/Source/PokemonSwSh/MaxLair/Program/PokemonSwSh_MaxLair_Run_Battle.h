@@ -20,7 +20,7 @@ namespace MaxLairInternal{
 
 StateMachineAction run_move_select(
     ProgramEnvironment& env, size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     OcrFailureWatchdog& ocr_watchdog,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings,
@@ -30,7 +30,7 @@ StateMachineAction run_move_select(
 StateMachineAction throw_balls(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     OcrFailureWatchdog& ocr_watchdog,
     GlobalStateTracker& state_tracker,

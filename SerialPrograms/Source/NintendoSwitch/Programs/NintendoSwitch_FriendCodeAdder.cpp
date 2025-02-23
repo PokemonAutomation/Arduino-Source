@@ -4,11 +4,11 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_FriendCodeAdder.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
 
 namespace PokemonAutomation{
@@ -23,7 +23,8 @@ FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
         "Add a list of friend codes.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -44,39 +45,36 @@ FriendCodeAdder::FriendCodeAdder()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , OPEN_CODE_PAD_DELAY(
+    , OPEN_CODE_PAD_DELAY0(
         "<b>Open Code Pad Delay</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1 * TICKS_PER_SECOND"
+        "1000 ms"
     )
-    , SEARCH_TIME(
+    , SEARCH_TIME0(
         "<b>Search Time:</b><br>Wait this long after initiating search.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000 ms"
     )
-    , TOGGLE_BEST_STATUS_DELAY(
+    , TOGGLE_BEST_STATUS_DELAY0(
         "<b>Toggle Best Delay:</b><br>Time needed to toggle the best friend status.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1 * TICKS_PER_SECOND"
+        "1000 ms"
     )
 {
     PA_ADD_OPTION(USER_SLOT);
     PA_ADD_OPTION(FRIEND_CODES);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(OPEN_CODE_PAD_DELAY);
-    PA_ADD_OPTION(SEARCH_TIME);
-    PA_ADD_OPTION(TOGGLE_BEST_STATUS_DELAY);
+    PA_ADD_OPTION(OPEN_CODE_PAD_DELAY0);
+    PA_ADD_OPTION(SEARCH_TIME0);
+    PA_ADD_OPTION(TOGGLE_BEST_STATUS_DELAY0);
 }
 
-void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     grip_menu_connect_go_home(context);
 
     bool first = true;
     for (const std::string& line : FRIEND_CODES.lines()){
-        std::vector<uint8_t> code = FriendCodeListOption::parse(line);
+        std::string code = FriendCodeListOption::parse(line);
         if (code.size() != 12){
             continue;
         }
@@ -84,13 +82,13 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, SwitchControl
         PokemonSwSh::home_to_add_friends(context, USER_SLOT - 1, 3, first);
         first = false;
 
-        ssf_press_button1(context, BUTTON_A, OPEN_CODE_PAD_DELAY);
-        enter_digits(context, 12, &code[0]);
+        ssf_press_button_ptv(context, BUTTON_A, OPEN_CODE_PAD_DELAY0);
+        numberpad_enter_code(env.logger(), context, code, true);
 
-        pbf_wait(context, SEARCH_TIME);
-        ssf_press_button1(context, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
-        ssf_press_button1(context, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
-        pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_wait(context, SEARCH_TIME0);
+        ssf_press_button(context, BUTTON_A, TOGGLE_BEST_STATUS_DELAY0);
+        ssf_press_button(context, BUTTON_A, TOGGLE_BEST_STATUS_DELAY0);
+        pbf_press_button(context, BUTTON_HOME, 80ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     }
 }
 

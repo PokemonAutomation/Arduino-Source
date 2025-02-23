@@ -13,7 +13,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "CommonTools/Options/LanguageOCROption.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
@@ -112,7 +112,7 @@ class LetsGoEncounterBotTracker{
 public:
     LetsGoEncounterBotTracker(
         ProgramEnvironment& env,
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         LetsGoEncounterBotStats& stats,
         OCR::LanguageOCROption& language
     );
@@ -152,7 +152,7 @@ public:
 private:
     ProgramEnvironment& m_env;
     VideoStream& m_stream;
-    SwitchControllerContext& m_context;
+    ProControllerContext& m_context;
     LetsGoEncounterBotStats& m_stats;
 
     OCR::LanguageOCROption& m_language;
@@ -173,10 +173,10 @@ private:
 //  The function tracks kill chain by sound detection from `tracker`. The function
 //  does not handle any pokemon battle encounters (turn-based battles).
 bool use_lets_go_to_clear_in_front(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     LetsGoEncounterBotTracker& tracker,
     bool throw_ball_if_bubble,
-    std::function<void(SwitchControllerContext& context)>&& command
+    std::function<void(ProControllerContext& context)>&& command
 );
 
 

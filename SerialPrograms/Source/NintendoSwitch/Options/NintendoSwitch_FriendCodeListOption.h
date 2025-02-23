@@ -19,7 +19,7 @@ class FriendCodeListOption : public ConfigOption{
 public:
     FriendCodeListOption(std::string label, std::vector<std::string> default_lines);
 
-    static std::vector<uint8_t> parse(const std::string& line);
+    static std::string parse(const std::string& line);
 
     void set(const std::string& text);
     std::vector<std::string> lines() const;

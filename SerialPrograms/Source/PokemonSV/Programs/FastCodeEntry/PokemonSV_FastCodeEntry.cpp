@@ -9,6 +9,7 @@
 #include <condition_variable>
 #include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_CodeEntry.h"
 #include "PokemonSV_FastCodeEntry.h"
@@ -33,7 +34,8 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         "Quickly enter a 4, 6, or 8 digit link code.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER,
         1, 4, 1
     )
 {}
@@ -56,11 +58,13 @@ FastCodeEntry::FastCodeEntry()
         "0123", "0123",
         true
     )
-    , SETTINGS(LockMode::LOCK_WHILE_RUNNING)
 {
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(CODE);
     PA_ADD_OPTION(SETTINGS);
+}
+void FastCodeEntry::update_active_consoles(size_t switch_count){
+    SETTINGS.set_active_consoles(switch_count);
 }
 
 
@@ -99,7 +103,12 @@ public:
 //                code = clipboard->text().toStdString();
 //            }
             if (!code.empty()){
-                const char* error = enter_code(env, scope, settings, code, false);
+                const char* error = enter_code(
+                    env, scope,
+                    settings,
+                    code, false,
+                    false
+                );
                 if (error == nullptr){
                     return;
                 }
@@ -117,10 +126,14 @@ private:
 
 
 void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    FastCodeEntrySettings settings(SETTINGS);
-
     if (MODE == Mode::NORMAL || MODE == Mode::MYSTERY_GIFT){
-        const char* error = enter_code(env, scope, settings, CODE, true, MODE == Mode::MYSTERY_GIFT ? true : false);
+        const char* error = enter_code(
+            env, scope,
+            SETTINGS,
+            CODE,
+            MODE == Mode::MYSTERY_GIFT ? true : false,
+            true
+        );
         if (MODE == Mode::NORMAL && error){
             throw UserSetupError(env.logger(), error);
         }
@@ -128,12 +141,12 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
     }
 
     //  Connect the controller.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
-        pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+        ssf_press_button_ptv(context, BUTTON_R | BUTTON_L);
     });
 
     FceCodeListener listener(CODE);
-    listener.run(env, scope, settings);
+    listener.run(env, scope, SETTINGS);
 
 }
 

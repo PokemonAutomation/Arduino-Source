@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
@@ -20,7 +20,7 @@ namespace PokemonSV{
 
 
 void auto_heal_from_menu_or_overworld(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     uint8_t party_slot, //  0 - 5
     bool return_to_overworld
 );
@@ -28,7 +28,7 @@ void auto_heal_from_menu_or_overworld(
 
 
 //  Returns the # of attempts it took to run.
-int run_from_battle(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
+int run_from_battle(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
 
 

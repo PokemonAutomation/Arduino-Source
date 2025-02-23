@@ -18,9 +18,10 @@
 #ifndef PokemonAutomation_Controllers_ControllerCapabilities_H
 #define PokemonAutomation_Controllers_ControllerCapabilities_H
 
+#include <initializer_list>
 #include <string>
 #include <set>
-#include <map>
+#include "Common/Cpp/EnumStringMap.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
 
 //#include <iostream>
@@ -30,57 +31,62 @@
 namespace PokemonAutomation{
 
 
-//
-//  This class is a double map.
-//  The first level is keyed on a string representing the interface type. (serial, bluetooth, etc...)
-//  The second level is a set of features for that interface type.
-//
-//  Programs will specify which interfaces they support and which features are
-//  required for each interface.
-//
-//  The list of interfaces will filter which connections are shown in the UI
-//  dropdown. The feature set will be enforced after connecting since you won't
-//  know the feature set until after talking to the controller.
-//
+enum class FasterIfTickPrecise{
+    NOT_FASTER,
+    FASTER,
+    MUCH_FASTER,
+};
+
+
+
+enum class ControllerInterface{
+    None,
+    SerialPABotBase,
+    TcpSysbotBase,
+    UsbSysbotBase,
+};
+extern const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
+
+
+enum class ControllerType{
+    None,
+    NintendoSwitch_WiredProController,
+    NintendoSwitch_WirelessProController,
+    NintendoSwitch_LeftJoycon,
+    NintendoSwitch_RightJoycon,
+};
+extern const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS;
+
+
+enum class ControllerFeature{
+    TickPrecise,
+    QueryTickSize,
+    QueryCommandQueueSize,
+    NintendoSwitch_ProController,
+    NintendoSwitch_DateSkip,
+};
+extern const EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS;
+
+
+
+
+
+
 class ControllerRequirements{
 public:
-    ControllerRequirements(std::initializer_list<std::map<std::string, std::set<std::string>>::value_type> args)
-        : m_map(std::move(args))
-        , m_sanitizer("ControllerRequirements")
-    {}
+    ControllerRequirements(std::initializer_list<ControllerFeature> args);
 
-    const std::map<std::string, std::set<std::string>>& map() const{
-        auto scope_check = m_sanitizer.check_scope();
-        return m_map;
-    }
-
-    bool contains_device(const std::string& device) const{
-        auto scope_check = m_sanitizer.check_scope();
-        return m_map.find(device) != m_map.end();
+    bool contains(ControllerFeature feature) const{
+        return m_features.contains(feature);
     }
 
     //  Check compatibility. If compatible, returns empty string.
     //  Otherwise returns one of the missing features.
-    std::string check_compatibility(const std::string& device, const std::set<std::string>& features) const{
-        auto scope_check = m_sanitizer.check_scope();
-
-        auto iter0 = m_map.find(device);
-        if (iter0 == m_map.end()){
-            return device;
-        }
-
-        const std::set<std::string>& required = iter0->second;
-        for (const std::string& feature : required){
-            if (features.find(feature) == features.end()){
-                return feature;
-            }
-        }
-        return "";
-    }
+    std::string check_compatibility(const std::set<ControllerFeature>& features) const;
 
 
 private:
-    std::map<std::string, std::set<std::string>> m_map;
+    std::set<ControllerFeature> m_features;
 
     LifetimeSanitizer m_sanitizer;
 };

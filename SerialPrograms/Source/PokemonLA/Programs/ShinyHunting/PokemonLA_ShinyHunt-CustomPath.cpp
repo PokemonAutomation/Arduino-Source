@@ -37,7 +37,8 @@ ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()
         "Repeatedly travel on a custom path to shiny hunt " + STRING_POKEMON + " around it.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController,},
+        FasterIfTickPrecise::FASTER
     )
 {}
 class ShinyHuntCustomPath_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -82,12 +83,12 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while you are ignoring shinies.",
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if a shiny is detected while you are listening for shinies.",
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -113,7 +114,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
 
 
 void ShinyHuntCustomPath::do_non_listen_action(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const CustomPathTableRow2& row
 ){
     stream.log("Execute action " + row.action.current_display());
@@ -212,7 +213,7 @@ void ShinyHuntCustomPath::do_non_listen_action(
 }
 
 
-void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     std::vector<std::unique_ptr<CustomPathTableRow2>> table = PATH.PATH.copy_snapshot();
 
@@ -247,9 +248,9 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, SwitchCo
         return on_shiny_callback(env, env.console, *shiny_action, error_coefficient);
     });
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             for (const std::unique_ptr<CustomPathTableRow2>& row : table){
                 if (row->action == PathAction::START_LISTEN){
                     listen_for_shiny.store(true, std::memory_order_release);
@@ -272,7 +273,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, SwitchCo
 }
 
 
-void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntCustomPath_Descriptor::Stats& stats = env.current_stats<ShinyHuntCustomPath_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -301,7 +302,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, SwitchCon
 
             if(RESET_METHOD == ResetMethod::SoftReset){
                 env.console.log("Resetting by closing the game.");
-                pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+                pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
                 reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             }else{
                 env.console.log("Resetting by going to village.");
@@ -326,7 +327,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, SwitchCon
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             time_reset_run_count = 0;
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
 

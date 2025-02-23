@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonHome_GenerateNameOCR_H
 #define PokemonAutomation_PokemonHome_GenerateNameOCR_H
 
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -28,11 +28,11 @@ class GenerateNameOCRData : public SingleSwitchProgramInstance{
 public:
     GenerateNameOCRData();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     OCR::LanguageOCROption LANGUAGE;
-    TimeExpressionOption<uint16_t> DELAY;
+    MillisecondsOption DELAY0;
 };
 
 

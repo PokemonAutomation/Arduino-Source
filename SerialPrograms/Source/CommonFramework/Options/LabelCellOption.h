@@ -11,7 +11,7 @@
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
+//#include "CommonFramework/ImageTypes/ImageRGB32.h"
 
 namespace PokemonAutomation{
 

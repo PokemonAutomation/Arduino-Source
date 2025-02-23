@@ -20,7 +20,7 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         AutoStoryOptions options
     ) const override;
 };
@@ -29,7 +29,7 @@ public:
 // end: standing in room. updated settings
 void checkpoint_01(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     Language language
 );
@@ -38,7 +38,7 @@ void checkpoint_01(
 // end: standing in front of power of science NPC. Cleared map tutorial.
 void checkpoint_02(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -46,7 +46,7 @@ void checkpoint_02(
 // end: received starter, changed move order
 void checkpoint_03(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     Language language,
     StarterChoice starter_choice

@@ -24,7 +24,7 @@ namespace PokemonSV{
 //  Pokemon, replacing if neccessary.
 void attach_item_from_bag(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t& errors
 ){
 //    bool attach_attempted = false;
@@ -104,7 +104,7 @@ void attach_item_from_bag(
 
 void attach_item_from_box(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t category_index,
     size_t& errors
 ){

@@ -30,7 +30,8 @@ DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
         "Level up your party by spamming spread moves in a double battle with a partner that heals you forever.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct DoublesLeveling_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
@@ -63,11 +64,10 @@ DoublesLeveling::DoublesLeveling()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -81,8 +81,8 @@ DoublesLeveling::DoublesLeveling()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-//    PA_ADD_OPTION(WATCHDOG_TIMER);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+//    PA_ADD_OPTION(WATCHDOG_TIMER0);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 }
 
 
@@ -91,7 +91,7 @@ DoublesLeveling::DoublesLeveling()
 
 
 
-bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DoublesLeveling_Descriptor::Stats& stats = env.current_stats<DoublesLeveling_Descriptor::Stats>();
 
     env.log("Starting battle!");
@@ -104,9 +104,9 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, SwitchControll
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         FrozenImageDetector overworld(std::chrono::seconds(5), 10);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
@@ -158,7 +158,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, SwitchControll
 
 
 
-void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DoublesLeveling_Descriptor::Stats& stats = env.current_stats<DoublesLeveling_Descriptor::Stats>();
     env.update_stats();
 
@@ -179,7 +179,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, SwitchControl
         if (!battle){
             // Unexpected battle: detect battle menu but not battle starting animation.
             stats.add_error();
-            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
             continue;
         }
 

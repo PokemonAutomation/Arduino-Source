@@ -31,7 +31,7 @@ public:
     size_t channels() const{ return m_channels; }
     size_t samples_per_frame() const{ return m_channels * m_multiplier; }
 
-    operator AudioFloatStreamListener&();
+    AudioFloatStreamListener* float_stream_listener();
 
     void set_volume(double volume);
 

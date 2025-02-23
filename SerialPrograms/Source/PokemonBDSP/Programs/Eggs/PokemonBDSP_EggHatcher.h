@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -36,7 +36,7 @@ class EggHatcher : public SingleSwitchProgramInstance{
 public:
     EggHatcher();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
@@ -51,8 +51,8 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> SAFETY_TIME0;
-    TimeExpressionOption<uint16_t> HATCH_DELAY;
+    MillisecondsOption SAFETY_TIME1;
+    MillisecondsOption HATCH_DELAY0;
 };
 
 

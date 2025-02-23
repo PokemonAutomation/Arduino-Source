@@ -24,7 +24,8 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         "Buy out all the clothing in a store.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -41,7 +42,7 @@ ClothingBuyer::ClothingBuyer()
     PA_ADD_OPTION(CATEGORY_ROTATION);
 }
 
-void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

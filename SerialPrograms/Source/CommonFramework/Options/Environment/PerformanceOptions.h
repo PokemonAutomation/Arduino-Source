@@ -8,6 +8,7 @@
 #define PokemonAutomation_PerformanceOptions_H
 
 #include "Common/Cpp/Options/GroupOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "ProcessPriorityOption.h"
 #include "ProcessorLevelOption.h"
 
@@ -21,6 +22,17 @@ public:
             "Performance",
             LockMode::LOCK_WHILE_RUNNING,
             GroupOption::EnableMode::ALWAYS_ENABLED, true
+        )
+        , PRECISE_WAKE_MARGIN(
+            "<b>Precise Wake Time Margin:</b><br>"
+            "Some operations require a thread to wake up at a very precise time - "
+            "more precise than what the operating system's scheduler can provide. "
+            "This option will force such operations to wake up this many "
+            "microseconds earlier, then busy wait until the time is reached. "
+            "The sys-botbase controller is an example of something that requires "
+            "extremely precise wake times.",
+            LockMode::UNLOCK_WHILE_RUNNING,
+            "2000 us"
         )
         , REALTIME_THREAD_PRIORITY(
             "<b>Realtime Thread Priority:</b><br>"
@@ -39,6 +51,7 @@ public:
             DEFAULT_PRIORITY_COMPUTE
         )
     {
+        PA_ADD_OPTION(PRECISE_WAKE_MARGIN);
         PA_ADD_OPTION(REALTIME_THREAD_PRIORITY);
         PA_ADD_OPTION(INFERENCE_PRIORITY);
         PA_ADD_OPTION(COMPUTE_PRIORITY);
@@ -46,6 +59,8 @@ public:
     }
 
 public:
+    MicrosecondsOption PRECISE_WAKE_MARGIN;
+
     ThreadPriorityOption REALTIME_THREAD_PRIORITY;
     ThreadPriorityOption INFERENCE_PRIORITY;
     ThreadPriorityOption COMPUTE_PRIORITY;

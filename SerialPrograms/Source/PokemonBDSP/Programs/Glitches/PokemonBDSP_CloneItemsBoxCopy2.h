@@ -7,11 +7,9 @@
 #ifndef PokemonAutomation_PokemonBDSP_CloneItemsBoxCopy2_H
 #define PokemonAutomation_PokemonBDSP_CloneItemsBoxCopy2_H
 
-#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
-//#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -32,7 +30,7 @@ class CloneItemsBoxCopy2 : public SingleSwitchProgramInstance{
 public:
     CloneItemsBoxCopy2();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

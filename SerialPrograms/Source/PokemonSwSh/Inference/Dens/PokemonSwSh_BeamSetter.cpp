@@ -28,7 +28,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-BeamSetter::BeamSetter(ProgramEnvironment& /*env*/, VideoStream& stream, SwitchControllerContext& context)
+BeamSetter::BeamSetter(ProgramEnvironment& /*env*/, VideoStream& stream, ProControllerContext& context)
     // : m_env(env)
     : m_stream(stream)
     , m_context(context)
@@ -46,7 +46,7 @@ BeamSetter::BeamSetter(ProgramEnvironment& /*env*/, VideoStream& stream, SwitchC
 
 BeamSetter::Detection BeamSetter::run(
     bool save_screenshot,
-    uint16_t timeout_ticks,
+    Milliseconds timeout,
     double min_brightness,
     double min_euclidean,
     double min_delta_ratio,
@@ -77,10 +77,7 @@ BeamSetter::Detection BeamSetter::run(
         trackers.emplace_back(std::chrono::milliseconds(1000));
     }
 
-    InferenceThrottler throttler(
-        std::chrono::milliseconds((uint64_t)timeout_ticks * 1000 / TICKS_PER_SECOND),
-        std::chrono::milliseconds(50)
-    );
+    InferenceThrottler throttler(timeout, std::chrono::milliseconds(50));
 
     VideoSnapshot last_screenshot = baseline_image;
     do{

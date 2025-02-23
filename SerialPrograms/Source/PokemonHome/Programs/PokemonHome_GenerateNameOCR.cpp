@@ -30,7 +30,8 @@ GenerateNameOCRData_Descriptor::GenerateNameOCRData_Descriptor()
         "Generate " + STRING_POKEMON + " Name OCR data by iterating the National " + STRING_POKEDEX + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -42,20 +43,19 @@ GenerateNameOCRData::GenerateNameOCRData()
         PokemonNameReader::instance().languages(),
         LockMode::LOCK_WHILE_RUNNING
     )
-    , DELAY(
+    , DELAY0(
         "<b>Delay Between Each Iteration:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "30"
+        "240 ms"
     )
 {
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(DELAY);
+    PA_ADD_OPTION(DELAY0);
 
 }
 
 
-void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::string resource_path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
     JsonValue json = load_json_file(resource_path);
     JsonArray& array = json.to_array_throw(resource_path);
@@ -91,7 +91,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, SwitchCon
         path += ".png";
         image.save(path);
 
-        pbf_press_dpad(context, DPAD_RIGHT, 10, DELAY);
+        pbf_press_dpad(context, DPAD_RIGHT, 80ms, DELAY0);
 
         OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
             env.console, LANGUAGE, image,

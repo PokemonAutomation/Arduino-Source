@@ -105,6 +105,7 @@ SendableErrorReport::SendableErrorReport()
         : PROGRAM_NAME + " (" + PROGRAM_VERSION + ")"
     )
     , m_program_runtime_millis(0)
+    , m_dump_name(ERROR_DUMP_NAME)
 {
     QDir().mkpath(QString::fromStdString(m_directory));
 }

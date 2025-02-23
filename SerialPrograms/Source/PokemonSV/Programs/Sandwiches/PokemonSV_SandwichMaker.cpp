@@ -28,7 +28,7 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
         "Make a sandwich of your choice.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -51,7 +51,7 @@ SandwichMaker::SandwichMaker()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void SandwichMaker::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SandwichMaker::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     #if 0

@@ -12,56 +12,74 @@ namespace SerialPABotBase{
 
 
 
-const char NintendoSwitch_Basic[] = "NintendoSwitch-SerialPABotBase";
-
-
-//  Feature List
-const char* to_string(Features feature){
-    switch (feature){
-    case Features::TickPrecise:             return "TickPrecise";
-    case Features::NintendoSwitch_Basic:    return "NintendoSwitch_Basic";
-    case Features::NintendoSwitch_SSF:      return "NintendoSwitch_SSF";
-    case Features::NintendoSwitch_Macros:   return "NintendoSwitch_Macros";
-    case Features::NintendoSwitch_DateSkip: return "NintendoSwitch_DateSkip";
-    }
-    return nullptr;
-}
-
 
 //  Defaults
-const std::pair<std::string, std::set<std::string>> OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
-    NintendoSwitch_Basic,
-    {
-        to_string(Features::TickPrecise),
-        to_string(Features::NintendoSwitch_Basic),
-//        to_string(Features::NintendoSwitch_SSF),
-//        to_string(Features::NintendoSwitch_Macros),
-    }
+const ControllerRequirements OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
+    ControllerFeature::TickPrecise,
+    ControllerFeature::NintendoSwitch_ProController,
 };
 
 
-//  Internal Parsing
-std::set<std::string> program_id_to_features(uint8_t id){
+
+
+std::string program_name(uint8_t id){
     switch (id){
-    case PABB_PID_PABOTBASE_12KB:
-        return {
-            to_string(Features::TickPrecise),
-            to_string(Features::NintendoSwitch_Basic),
-            to_string(Features::NintendoSwitch_SSF),
-            to_string(Features::NintendoSwitch_Macros),
-//            to_string(Features::NintendoSwitch_DateSkip),
-        };
-    case PABB_PID_PABOTBASE_31KB:
-        return {
-            to_string(Features::TickPrecise),
-            to_string(Features::NintendoSwitch_Basic),
-            to_string(Features::NintendoSwitch_SSF),
-            to_string(Features::NintendoSwitch_Macros),
-            to_string(Features::NintendoSwitch_DateSkip),
-        };
+    case PABB_PID_UNSPECIFIED:      return "Microcontroller Program";
+    case PABB_PID_PABOTBASE_12KB:   return "PABotBase-AVR8-12KB";
+    case PABB_PID_PABOTBASE_31KB:   return "PABotBase-AVR8-31KB";
+    default: return "Unknown ID";
     }
-    return {};
 }
+
+
+
+const std::map<
+    uint32_t,   //  Protocol Version
+    std::map<
+        uint32_t,   //  Program ID
+        std::map<ControllerType, std::set<ControllerFeature>>
+    >
+> SUPPORTED_VERSIONS{
+    {2021052600, {
+        {PABB_PID_UNSPECIFIED, {{ControllerType::None, {}}}},
+        {PABB_PID_PABOTBASE_12KB, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_31KB, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+    }},
+    {2023121900, {
+        {PABB_PID_UNSPECIFIED, {{ControllerType::None, {}}}},
+        {PABB_PID_PABOTBASE_12KB, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_31KB, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+//            {ControllerType::NintendoSwitch_WirelessProController, {}},
+//            {ControllerType::NintendoSwitch_LeftJoycon, {}},
+//            {ControllerType::NintendoSwitch_RightJoycon, {}},
+        }},
+    }},
+};
+
 
 
 

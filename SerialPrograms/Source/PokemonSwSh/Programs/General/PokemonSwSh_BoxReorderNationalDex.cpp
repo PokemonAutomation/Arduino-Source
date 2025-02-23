@@ -47,7 +47,7 @@ std::tuple<uint16_t, uint16_t, uint16_t> get_location(size_t index){
 // Move cursor from one location to another
 // The location is represented as a uint16_t, meaning the order of the location starting at the first box.
 // Decode this location into box ID and in-box 2D location by `get_location()`
-uint16_t move_to_location(Logger& logger, SwitchControllerContext& context, uint16_t from, uint16_t to){
+uint16_t move_to_location(Logger& logger, ProControllerContext& context, uint16_t from, uint16_t to){
     auto [from_box, from_row, from_column] = get_location(from);
     auto [to_box, to_row, to_column] = get_location(to);
 
@@ -91,7 +91,7 @@ uint16_t move_to_location(Logger& logger, SwitchControllerContext& context, uint
 // In most cases, a pokemon slug is the lower-case version of the Pokemon name, but there are some cases
 // like the slug of the Pokemon Mr. Mime is "mr-mime".
 std::string read_selected_pokemon(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language
 ){
     context.wait_for_all_requests();
@@ -117,7 +117,7 @@ std::string read_selected_pokemon(
 // Return a list of pokemon slugs.
 std::vector<std::string> read_all_pokemon(
     Logger& logger,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint16_t pokemon_count,
     Language language
 ){
@@ -170,7 +170,7 @@ BoxReorderNationalDex::BoxReorderNationalDex()
     PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
-void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
@@ -189,22 +189,6 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, SwitchC
         dex_slug_order.emplace(dex_slugs[i], i);
     }
 
-    // check if we have any pokemon name read failure.
-    for(size_t i = 0; i < current_order.size(); ++i){
-        const auto it = dex_slug_order.find(current_order[i]);
-        // If OCR gives a name that is not in the nation dex, throw an error:
-        if (it == dex_slug_order.end()){
-            const auto [box, row, col] = get_location(i);
-            std::stringstream os;
-            os << "Failed to read pokemon name at box " << box << " row " << row << " col " << col;
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                os.str(),
-                env.console
-            );
-        }
-    }
-    
     // Sort the read pokemon by the dex order.
     std::vector<std::string> sorted_order = current_order;
 
@@ -243,7 +227,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, SwitchC
     }
 
     // Go to Switch home menu
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().HOME_TO_GAME_DELAY0);
 }
 
 

@@ -9,7 +9,7 @@
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 
 namespace PokemonAutomation{
@@ -19,7 +19,7 @@ namespace MaxLairInternal{
 
 
 std::shared_ptr<const ImageRGB32> enter_lobby(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 );

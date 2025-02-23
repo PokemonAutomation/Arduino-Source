@@ -27,7 +27,8 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         "Repeatedly throw a ball until you catch the pokemon.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct AutonomousBallThrower_Descriptor::Stats : public StatsTracker{
@@ -78,7 +79,7 @@ AutonomousBallThrower::AutonomousBallThrower()
 
 
 
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();

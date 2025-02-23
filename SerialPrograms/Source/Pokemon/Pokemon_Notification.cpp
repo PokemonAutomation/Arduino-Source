@@ -37,7 +37,7 @@ std::string shiny_symbol(ShinyType shiny_type){
     case ShinyType::STAR_SHINY:
         return "\u2728";
     case ShinyType::SQUARE_SHINY:
-        return "\u2733";    //  Green square asterisk
+        return ":purple_square:";
     default:
         return "";
     }

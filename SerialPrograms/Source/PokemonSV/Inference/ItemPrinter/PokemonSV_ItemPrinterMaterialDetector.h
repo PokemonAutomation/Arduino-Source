@@ -14,7 +14,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 #include "CommonTools/VisualDetector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -51,26 +51,26 @@ public:
 
     int8_t find_happiny_dust_row_index(
         AsyncDispatcher& dispatcher,
-        VideoStream& stream, SwitchControllerContext& context
+        VideoStream& stream, ProControllerContext& context
     ) const;
 
     std::vector<int8_t> find_material_value_row_index(
         AsyncDispatcher& dispatcher,
         VideoStream& stream,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         int16_t material_value
     ) const;
 
     int16_t detect_material_quantity(
         AsyncDispatcher& dispatcher,
         VideoStream& stream,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         int8_t row_index
     ) const;
 
     std::string detect_material_name(
         VideoStream& stream,
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         int8_t row_index
     ) const;    
 

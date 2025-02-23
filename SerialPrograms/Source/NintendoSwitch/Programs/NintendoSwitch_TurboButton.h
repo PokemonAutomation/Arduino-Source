@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -26,12 +26,12 @@ class TurboButton : public SingleSwitchProgramInstance{
 public:
     TurboButton();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     IntegerEnumDropdownOption BUTTON;
-    TimeExpressionOption<uint16_t> PRESS_DURATION;
-    TimeExpressionOption<uint16_t> RELEASE_DURATION;
+    MillisecondsOption PRESS_DURATION0;
+    MillisecondsOption RELEASE_DURATION0;
     SimpleIntegerOption<uint64_t> TOTAL_PRESSES;
 };
 

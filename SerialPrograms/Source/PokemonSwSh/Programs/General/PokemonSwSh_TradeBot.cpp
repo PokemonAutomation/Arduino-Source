@@ -4,10 +4,10 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
@@ -49,44 +49,38 @@ TradeBot::TradeBot()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
-    , SEARCH_DELAY(
+    , SEARCH_DELAY0(
         "<b>Time to wait for a Trade Partner:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "20 s"
     )
-    , CONFIRM_DELAY(
+    , CONFIRM_DELAY0(
         "<b>Time to wait for Partner to Confirm:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
-    , TRADE_START(
+    , TRADE_START0(
         "<b>Time for Trade to Start:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
-    , TRADE_COMMUNICATION(
+    , TRADE_COMMUNICATION0(
         "<b>Communication Window:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "20 s"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , TRADE_ANIMATION(
+    , TRADE_ANIMATION0(
         "<b>Trade Animation Time:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "23 * TICKS_PER_SECOND"
+        "23 s"
     )
-    , EVOLVE_DELAY(
+    , EVOLVE_DELAY0(
         "<b>Evolve Delay:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "30 * TICKS_PER_SECOND"
+        "30 s"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -94,18 +88,21 @@ TradeBot::TradeBot()
     PA_ADD_OPTION(TRADE_CODE);
     PA_ADD_OPTION(BOXES_TO_TRADE);
     PA_ADD_OPTION(LINK_TRADE_EXTRA_LINE);
-    PA_ADD_OPTION(SEARCH_DELAY);
-    PA_ADD_OPTION(CONFIRM_DELAY);
-    PA_ADD_OPTION(TRADE_START);
-    PA_ADD_OPTION(TRADE_COMMUNICATION);
+    PA_ADD_OPTION(SEARCH_DELAY0);
+    PA_ADD_OPTION(CONFIRM_DELAY0);
+    PA_ADD_OPTION(TRADE_START0);
+    PA_ADD_OPTION(TRADE_COMMUNICATION0);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(TRADE_ANIMATION);
-    PA_ADD_OPTION(EVOLVE_DELAY);
+    PA_ADD_OPTION(TRADE_ANIMATION0);
+    PA_ADD_OPTION(EVOLVE_DELAY0);
 }
 
 
-void TradeBot::trade_slot(SwitchControllerContext& context, const uint8_t code[8], uint8_t slot) const{
-    ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 50);
+void TradeBot::trade_slot(
+    Logger& logger, ProControllerContext& context,
+    const std::string& code, uint8_t slot
+) const{
+    ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 400ms);
     ssf_press_button2(context, BUTTON_A, 150, 20);
     ssf_press_dpad1(context, DPAD_DOWN, 10);
     ssf_press_button2(context, BUTTON_A, 200, 20);
@@ -117,47 +114,46 @@ void TradeBot::trade_slot(SwitchControllerContext& context, const uint8_t code[8
     ssf_press_button1(context, BUTTON_A, 5);
     ssf_press_button1(context, BUTTON_B, 5);
 
-    enter_digits(context, 8, code);
+    numberpad_enter_code(logger, context, code, true);
     ssf_press_button1(context, BUTTON_PLUS, 200);
     ssf_press_button2(context, BUTTON_B, 125, 10);
     ssf_press_button2(context, BUTTON_A, 50, 10);
     pbf_mash_button(context, BUTTON_B, 400);
 
-    pbf_wait(context, SEARCH_DELAY);
+    pbf_wait(context, SEARCH_DELAY0);
 
     //  If we're not in a trade, enter Y-COMM to avoid a connection at this point.
-    ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 50);
+    ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 400ms);
     ssf_press_button2(context, BUTTON_A, 200, 20);
     ssf_press_button2(context, BUTTON_B, 80, 10);
 
     //  Move to slot
     while (slot >= 6){
-        ssf_press_dpad1(context, DPAD_DOWN, GameSettings::instance().BOX_SCROLL_DELAY);
+        ssf_press_dpad(context, DPAD_DOWN, GameSettings::instance().BOX_SCROLL_DELAY0);
         slot -= 6;
     }
     while (slot > 0){
-        ssf_press_dpad1(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY);
+        ssf_press_dpad(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY0);
         slot--;
     }
 
     //  Select Pokemon
     ssf_press_button1(context, BUTTON_A, 100);
-    ssf_press_button1(context, BUTTON_A, CONFIRM_DELAY);
+    ssf_press_button(context, BUTTON_A, CONFIRM_DELAY0);
 
     //  Start Trade
-    ssf_press_button1(context, BUTTON_A, TRADE_START);
+    ssf_press_button(context, BUTTON_A, TRADE_START0);
 
     //  Cancel out
-    for (uint16_t c = 0; c < TRADE_COMMUNICATION + TRADE_ANIMATION; c += 300){
-        ssf_press_button1(context, BUTTON_B, 100);
-        ssf_press_button1(context, BUTTON_B, 100);
-        ssf_press_button1(context, BUTTON_A, 100);
+    for (Milliseconds c = 0ms; c < TRADE_COMMUNICATION0.get() + TRADE_ANIMATION0.get(); c += 2400ms){
+        ssf_press_button(context, BUTTON_B, 800ms);
+        ssf_press_button(context, BUTTON_B, 800ms);
+        ssf_press_button(context, BUTTON_A, 800ms);
     }
 }
 
-void TradeBot::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
-    uint8_t code[8];
-    TRADE_CODE.to_str(code);
+void TradeBot::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    std::string code = TRADE_CODE.to_str();
 
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
@@ -168,7 +164,7 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env, SwitchControllerCont
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         for (uint8_t c = 0; c < 30; c++){
-            trade_slot(context, code, c);
+            trade_slot(env.logger(), context, code, c);
         }
 
         //  If the previous trade isn't done, either wait to finish or cancel it.
@@ -185,26 +181,26 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env, SwitchControllerCont
             ssf_press_button1(context, BUTTON_B, 280);
             ssf_press_button1(context, BUTTON_B, 200);
             ssf_press_button1(context, BUTTON_A, 100);
-            pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
+            pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION0);
         }
 
         //  Wait out any new pokedex entries or trade evolutions.
-        pbf_mash_button(context, BUTTON_B, EVOLVE_DELAY);
+        pbf_mash_button(context, BUTTON_B, EVOLVE_DELAY0);
 
         //  Change boxes.
-        ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
-        ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
-        ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
-        ssf_press_button2(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY, 10);
+        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
+        ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, 80ms);
+        ssf_press_button(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, 80ms);
+        ssf_press_button(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY0, 80ms);
         pbf_mash_button(
             context, BUTTON_B,
-            GameSettings::instance().BOX_TO_POKEMON_DELAY +
-            GameSettings::instance().POKEMON_TO_MENU_DELAY +
-            GameSettings::instance().OVERWORLD_TO_MENU_DELAY
+            GameSettings::instance().BOX_TO_POKEMON_DELAY0.get() +
+            GameSettings::instance().POKEMON_TO_MENU_DELAY0.get() +
+            GameSettings::instance().OVERWORLD_TO_MENU_DELAY0.get()
         );
     }
 
-    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
 }
 
 

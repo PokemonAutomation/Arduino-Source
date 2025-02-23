@@ -26,6 +26,7 @@ namespace PokemonAutomation{
 namespace FileDownloader{
 
 std::string download_file(Logger& logger, const std::string& url){
+//    cout << "download_file()" << endl;
     QNetworkAccessManager network_access_manager;
     QByteArray downloaded_data;
     std::unique_ptr<QNetworkReply> reply;
@@ -34,6 +35,16 @@ std::string download_file(Logger& logger, const std::string& url){
     QObject::connect(
         &network_access_manager, &QNetworkAccessManager::finished,
         &loop, [&downloaded_data, &loop](QNetworkReply* reply){
+//            cout << "QNetworkAccessManager::finished" << endl;
+            downloaded_data = reply->readAll();
+//            reply->deleteLater();
+            loop.exit();
+        }
+    );
+    QObject::connect(
+        &network_access_manager, &QNetworkAccessManager::sslErrors,
+        &loop, [&downloaded_data, &loop](QNetworkReply* reply){
+//            cout << "QNetworkAccessManager::sslErrors" << endl;
             downloaded_data = reply->readAll();
 //            reply->deleteLater();
             loop.exit();
@@ -48,14 +59,16 @@ std::string download_file(Logger& logger, const std::string& url){
     timer.singleShot(
         5000, [&downloaded_data, &url](){
         if (downloaded_data.isEmpty()){
-            throw ConnectionException(nullptr, "Couldn't retrieved file from url : " + url + " after 5s");
+            throw ConnectionException(nullptr, "Couldn't retrieved file from url : " + url + " after 5 seconds.");
         }
     });
     timer.stop();
     cout << "Stop timer" << endl;
 #endif
 
+//    cout << "loop.exec() - enter" << endl;
     loop.exec();
+//    cout << "loop.exec() - exit" << endl;
 
     if (!reply){
         std::string str = "QNetworkReply is null.";

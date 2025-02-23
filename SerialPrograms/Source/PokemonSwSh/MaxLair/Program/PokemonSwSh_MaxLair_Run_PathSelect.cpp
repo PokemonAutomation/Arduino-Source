@@ -25,7 +25,7 @@ namespace MaxLairInternal{
 
 void run_path_select(
     ProgramEnvironment& env, size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker
 ){
     GlobalState& state = state_tracker[console_index];

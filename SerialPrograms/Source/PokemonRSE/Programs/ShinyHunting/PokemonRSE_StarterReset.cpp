@@ -60,12 +60,11 @@ StarterReset::StarterReset()
         LockMode::LOCK_WHILE_RUNNING,
         Target::treecko
     )
-    , STARTER_WAIT(
-        "<b>Send out starter wait:</b><br>After pressing A to send out your selected starter, wait this long for the animation. Make sure to add extra time in case it is shiny.",
-        LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "6 * TICKS_PER_SECOND"
-    )
+//    , STARTER_WAIT0(
+//        "<b>Send out starter wait:</b><br>After pressing A to send out your selected starter, wait this long for the animation. Make sure to add extra time in case it is shiny.",
+//        LockMode::LOCK_WHILE_RUNNING,
+//        "6000 ms"
+//    )
     , NOTIFICATION_SHINY_STARTER(
         "Shiny Starter",
         true, true, ImageAttachmentMode::JPG,
@@ -76,13 +75,13 @@ StarterReset::StarterReset()
         &NOTIFICATION_SHINY_STARTER,
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
-        })
+    })
 {
     PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     /*
@@ -130,9 +129,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, SwitchController
 
         //Now mash B until the battle menu appears
         BattleMenuWatcher battle_menu(COLOR_RED);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 1000);
             },
             {battle_menu}

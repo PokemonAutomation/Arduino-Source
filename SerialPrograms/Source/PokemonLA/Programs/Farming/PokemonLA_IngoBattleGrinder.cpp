@@ -40,7 +40,8 @@ IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
         "Attend Ingo's battles to grind exp and move related " + STRING_POKEDEX + " research tasks. Less effective than Ingo Move Grinder for " + STRING_POKEDEX + " research tasks but more effective for everything else.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class IngoBattleGrinder_Descriptor::Stats : public StatsTracker{
@@ -86,7 +87,7 @@ IngoBattleGrinder::IngoBattleGrinder()
 
 
 
-bool IngoBattleGrinder::start_dialog(VideoStream& stream, SwitchControllerContext& context){
+bool IngoBattleGrinder::start_dialog(VideoStream& stream, ProControllerContext& context){
     // First press A to start talking with Ingo.
     pbf_press_button(context, BUTTON_A, 20, 150);
     context.wait_for_all_requests();
@@ -113,9 +114,9 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, SwitchControllerContex
             std::chrono::milliseconds(100),
             true
         );
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 150);
                 }
@@ -155,9 +156,9 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, SwitchControllerContex
         std::chrono::milliseconds(100),
         true
     );
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             for (size_t c = 0; c < 5; c++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
             }
@@ -177,7 +178,7 @@ bool IngoBattleGrinder::start_dialog(VideoStream& stream, SwitchControllerContex
 }
 
 
-bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, std::map<size_t, size_t>& pokemon_move_attempts){
+bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::map<size_t, size_t>& pokemon_move_attempts){
     IngoBattleGrinder_Descriptor::Stats& stats = env.current_stats<IngoBattleGrinder_Descriptor::Stats>();
 
     env.console.log("Starting battle...");
@@ -371,7 +372,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, Switc
 
 
 
-void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     IngoBattleGrinder_Descriptor::Stats& stats = env.current_stats<IngoBattleGrinder_Descriptor::Stats>();
 
     //  Connect the controller.

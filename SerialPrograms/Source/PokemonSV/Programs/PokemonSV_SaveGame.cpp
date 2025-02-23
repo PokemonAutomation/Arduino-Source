@@ -23,14 +23,14 @@ namespace PokemonSV{
 
 void save_game_from_menu(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     save_game_from_menu_or_overworld(info, stream, context, false);
 }
 
 void save_game_from_overworld(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     save_game_from_menu_or_overworld(info, stream, context, true);
 }
@@ -39,7 +39,7 @@ void save_game_from_overworld(
 
 void save_game_from_menu_or_overworld(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool return_to_overworld
 ){
     context.wait_for_all_requests();
@@ -115,16 +115,16 @@ void save_game_from_menu_or_overworld(
 
 void save_game_tutorial(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ){
     stream.log("Save game from tutorial. Open the menu.");
     context.wait_for_all_requests();
     
     // open the menu.
     MainMenuWatcher menu(COLOR_RED);
-    int ret0 = run_until<SwitchControllerContext>(
+    int ret0 = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_wait(context, 500); // avoiding pressing X if menu already open
             for (size_t i = 0; i < 10; i++){
                 pbf_press_button(context, BUTTON_X, 20, 500);

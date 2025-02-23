@@ -24,7 +24,7 @@ enum class MoveStyle{
     Agile,
     Strong,
 };
-const EnumDatabase<MoveStyle>& MoveStyle_Database();
+const EnumDropdownDatabase<MoveStyle>& MoveStyle_Database();
 
 
 

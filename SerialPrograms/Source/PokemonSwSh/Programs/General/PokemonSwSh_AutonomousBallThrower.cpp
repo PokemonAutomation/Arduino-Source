@@ -29,7 +29,8 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         "Repeatedly throw a ball and reset until you catch the pokemon.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct AutonomousBallThrower_Descriptor::Stats : public StatsTracker{
@@ -103,7 +104,7 @@ AutonomousBallThrower::AutonomousBallThrower()
 
 
 
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -119,9 +120,9 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, SwitchC
         env.log("Wait for a pokemon to attack you.", COLOR_PURPLE);
         {
             StandardBattleMenuWatcher fight_detector(false);
-            int result = run_until<SwitchControllerContext>(
+            int result = run_until<ProControllerContext>(
                 env.console, context,
-                [](SwitchControllerContext& context){
+                [](ProControllerContext& context){
                     while (true){
                         //TODO edit here for what to do
                         pbf_wait(context, 1 * TICKS_PER_SECOND);
@@ -172,7 +173,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, SwitchC
         }
 
         if (!pokemon_caught){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
             reset_game_from_home_with_inference(
                 env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST

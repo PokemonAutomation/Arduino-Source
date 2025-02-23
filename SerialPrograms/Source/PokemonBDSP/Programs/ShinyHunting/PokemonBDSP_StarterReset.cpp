@@ -34,7 +34,8 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         "Shiny hunt your starter " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct StarterReset_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
@@ -101,7 +102,7 @@ StarterReset::StarterReset()
 
 
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     std::shared_ptr<const ImageRGB32> briefcase = std::make_shared<const ImageRGB32>(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
@@ -124,7 +125,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, SwitchController
         }
 
         if (reset){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
                 consecutive_failures++;
@@ -138,9 +139,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, SwitchController
 
         //  Mash B until we see the briefcase.
         ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {{detector}}

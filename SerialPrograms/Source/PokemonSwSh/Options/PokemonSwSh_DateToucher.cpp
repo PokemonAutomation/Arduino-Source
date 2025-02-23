@@ -71,11 +71,11 @@ bool TouchDateIntervalOption::ok_to_touch_now(){
     m_last_touch = now;
     return true;
 }
-void TouchDateIntervalOption::touch_now_from_home_if_needed(SwitchControllerContext& context){
+void TouchDateIntervalOption::touch_now_from_home_if_needed(ProControllerContext& context){
     if (!ok_to_touch_now()){
         return;
     }
-    touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+    touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 }
 
 

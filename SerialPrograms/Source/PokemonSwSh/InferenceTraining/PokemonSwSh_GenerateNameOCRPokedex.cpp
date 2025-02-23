@@ -35,7 +35,7 @@ GenerateNameOCRDataPokedex_Descriptor::GenerateNameOCRDataPokedex_Descriptor()
         "Generate " + STRING_POKEMON + " Name OCR data by iterating the " + STRING_POKEDEX + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -115,7 +115,7 @@ void GenerateNameOCRDataPokedex::dump_images(
 //    OCR::make_OCR_filter(image).apply(image);
 }
 
-void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     std::string dex_name;
     size_t dex_size = 0;

@@ -115,7 +115,7 @@ int16_t ItemPrinterMaterialDetector::read_number(
 // check each row on the screen for Happiny Dust
 int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
     AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 ) const{
     int8_t value_68_row_index;
     for (size_t c = 0; c < 30; c++){
@@ -148,7 +148,7 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
 // (i.e. Ditto Goo, Happiny Dust, Magby Hair, Beldum Claw)
 std::string ItemPrinterMaterialDetector::detect_material_name(
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     int8_t row_index
 ) const{
     VideoSnapshot snapshot = stream.video().snapshot();
@@ -185,7 +185,7 @@ std::string ItemPrinterMaterialDetector::detect_material_name(
 std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
     AsyncDispatcher& dispatcher,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     int16_t material_value
 ) const{
     context.wait_for_all_requests();
@@ -212,7 +212,7 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
 int16_t ItemPrinterMaterialDetector::detect_material_quantity(
     AsyncDispatcher& dispatcher,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     int8_t row_index
 ) const{
     context.wait_for_all_requests();

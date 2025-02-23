@@ -13,6 +13,10 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV_BoxRelease.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -20,12 +24,13 @@ namespace PokemonSV{
 
 void release_one_pokemon(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t& errors
 ){
     bool release_attempted = false;
     bool release_completed = false;
     int expected = 0;
+    int consecutive_box_neutrals = 0;
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){
@@ -36,6 +41,7 @@ void release_one_pokemon(
         }
 
         SomethingInBoxSlotDetector exists(COLOR_BLUE);
+//        GradientArrowDetector change_marks(COLOR_MAGENTA, GradientArrowType::DOWN, {0.28, 0.38, 0.30, 0.10});
         BoxWatcher box_detector(COLOR_RED);
         BoxSelectWatcher selected(COLOR_YELLOW, std::chrono::milliseconds(100));
         PromptDialogWatcher confirm(COLOR_CYAN, std::chrono::milliseconds(100));
@@ -49,7 +55,7 @@ void release_one_pokemon(
                 box_detector,
                 selected,
                 confirm,
-                advance_dialog,
+                advance_dialog
             }
         );
         context.wait_for(std::chrono::milliseconds(50));
@@ -62,16 +68,37 @@ void release_one_pokemon(
                 ret = 2;
             }
         }
+//        cout << "consecutive_box_neutrals = " << consecutive_box_neutrals << endl;
 
         switch (ret){
         case 0:{
+            auto screenshot = stream.video().snapshot();
+#if 0
+            //  Disambiguate with mark change.
+            if (change_marks.detect(screenshot)){
+                stream.log("Detected mark change.", COLOR_RED);
+                pbf_press_button(context, BUTTON_B, 20, 20);
+                expected = 0;
+                continue;
+            }
+#endif
+
             if (ret == expected){
                 stream.log("Detected box neutral.");
+                consecutive_box_neutrals = 0;
             }else{
+                //  Disambiguate with mark change.
                 stream.log("Detected box neutral. (unexpected)", COLOR_RED);
                 errors++;
+                consecutive_box_neutrals++;
+//                cout << "consecutive_box_neutrals = " << consecutive_box_neutrals << endl;
+                if (consecutive_box_neutrals >= 5){
+                    pbf_press_button(context, BUTTON_B, 20, 20);
+                    expected = 0;
+                    continue;
+                }
             }
-            auto screenshot = stream.video().snapshot();
+
             if (exists.detect(screenshot)){
                 if (release_attempted && release_completed){
                     return;
@@ -127,7 +154,9 @@ void release_one_pokemon(
             continue;
         default:
             dump_image_and_throw_recoverable_exception(
-                info, stream, "NoStateReleasingPokemon", "No recognized state while releasing a pokemon after 10 seconds."
+                info, stream,
+                "NoStateReleasingPokemon",
+                "No recognized state while releasing a pokemon after 10 seconds."
             );
         }
     }
@@ -135,7 +164,7 @@ void release_one_pokemon(
 
 void release_box(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t& errors, uint8_t start_row
 ){
     context.wait_for_all_requests();

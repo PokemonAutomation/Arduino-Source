@@ -77,6 +77,7 @@ TeraFarmerPerConsoleOptions::TeraFarmerPerConsoleOptions(std::string label, cons
 {
     PA_ADD_STATIC(is_host_label);
     PA_ADD_OPTION(language);
+    PA_ADD_OPTION(keyboard_layout);
     PA_ADD_OPTION(catch_on_win);
     PA_ADD_OPTION(ball_select);
     PA_ADD_OPTION(battle_ai);
@@ -111,7 +112,8 @@ TeraMultiFarmer_Descriptor::TeraMultiFarmer_Descriptor()
         "Farm items and " + STRING_POKEMON + " from your own Tera raid using multiple Switches.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER,
         2, 4, 2
     )
 {}
@@ -253,8 +255,8 @@ void TeraMultiFarmer::value_changed(void* object){
 }
 
 
-void TeraMultiFarmer::reset_host(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+void TeraMultiFarmer::reset_host(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     if (ROLLOVER_PREVENTION){
         WallClock now = current_time();
         if (m_last_time_fix == WallClock::min() || now - m_last_time_fix > std::chrono::hours(4)){
@@ -264,11 +266,11 @@ void TeraMultiFarmer::reset_host(const ProgramInfo& info, VideoStream& stream, S
     }
     reset_game_from_home(info, stream, context, 5 * TICKS_PER_SECOND);
 }
-void TeraMultiFarmer::reset_joiner(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+void TeraMultiFarmer::reset_joiner(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     reset_game_from_home(info, stream, context, 5 * TICKS_PER_SECOND);
 }
-bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context){
+bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context){
     TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
     TeraFarmerPerConsoleOptions& option = *PLAYERS[console.index()];
 
@@ -295,7 +297,7 @@ bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& cons
 
     return win;
 }
-void TeraMultiFarmer::run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context){
+void TeraMultiFarmer::run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context){
     TeraFarmerPerConsoleOptions& option = *PLAYERS[console.index()];
 
     bool win = run_tera_battle(env, console, context, option.battle_ai);
@@ -316,7 +318,7 @@ void TeraMultiFarmer::run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& co
     enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
 }
 void TeraMultiFarmer::join_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context,
     size_t host_index, const std::string& normalized_code
 ){
     if (console.index() == host_index){
@@ -369,7 +371,14 @@ void TeraMultiFarmer::join_lobby(
                 continue;
             }
             seen_code_entry = true;
-            enter_code(console, context, FastCodeEntrySettings(), normalized_code, false);
+            enter_code(
+                console, context,
+                PLAYERS[console.index()]->keyboard_layout,
+                normalized_code,
+                false,
+                true,
+                false
+            );
             context.wait_for(std::chrono::seconds(1));
             continue;
         case 1:
@@ -413,10 +422,10 @@ bool TeraMultiFarmer::run_raid(
     TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
     size_t host_index = HOSTING_SWITCH.current_value();
     ConsoleHandle& host_console = env.consoles[host_index];
-    SwitchControllerContext host_context(scope, host_console.controller());
+    ProControllerContext host_context(scope, host_console.controller());
 
     //  Get everyone ready.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         try{
             if (console.index() == host_index){
                 TeraCardReader card_detector(COLOR_RED);
@@ -473,7 +482,7 @@ bool TeraMultiFarmer::run_raid(
 
     //  Join the lobby with local joiners. If anything throws, we need to reset everyone.
     try{
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             join_lobby(env, console, context, host_index, lobby_code);
         });
     }catch (OperationFailedException&){
@@ -538,7 +547,7 @@ bool TeraMultiFarmer::run_raid(
     pbf_mash_button(host_context, BUTTON_A, 10 * TICKS_PER_SECOND);
 
     //  Run the raid.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         try{
             if (console.index() == host_index){
                 win = run_raid_host(env, console, context);
@@ -561,7 +570,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
     if (host_index >= env.consoles.size()){
         throw UserSetupError(env.logger(), "The host Switch doesn't exist.");
     }
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         assert_16_9_720p_min(console.logger(), console);
     });
 
@@ -578,7 +587,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
     m_reset_required[3] = false;
 
     if (RECOVERY_MODE == RecoveryMode::SAVE_AND_RESET){
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             if (console.index() != host_index){
                 //  Do 2 presses in quick succession in case one drops or is
                 //  needed to connect the controller.
@@ -609,7 +618,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
         }
 
         //  Reset all errored Switches.
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             size_t index = console.index();
             if (!m_reset_required[index]){
                 return;

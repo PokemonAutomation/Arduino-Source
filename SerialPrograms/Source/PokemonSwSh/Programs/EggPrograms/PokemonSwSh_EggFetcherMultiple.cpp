@@ -5,10 +5,12 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_EggFetcherMultiple.h"
 
 namespace PokemonAutomation{
@@ -53,15 +55,19 @@ EggFetcherMultiple::EggFetcherMultiple()
         LockMode::LOCK_WHILE_RUNNING,
         10
     )
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH,
+    })
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(POKEMON_SPECIES_COUNT);
     PA_ADD_OPTION(MAX_FETCH_ATTEMPTS_PER_SPECIES);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
 void EggFetcherMultiple::run_eggfetcher(
-    Logger& logger, SwitchControllerContext& context,
+    Logger& logger, ProControllerContext& context,
     bool deposit_automatically,
     uint16_t attempts
 ) const{
@@ -92,7 +98,7 @@ void EggFetcherMultiple::run_eggfetcher(
     }
 }
 
-void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
@@ -141,7 +147,9 @@ void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, SwitchCont
         run_eggfetcher(env.console, context, GameSettings::instance().AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS_PER_SPECIES);
     }
 
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

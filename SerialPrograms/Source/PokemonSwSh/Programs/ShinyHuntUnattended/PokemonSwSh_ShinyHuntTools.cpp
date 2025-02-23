@@ -18,13 +18,13 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void run_away_with_lights(SwitchControllerContext& context){
+void run_away_with_lights(ProControllerContext& context){
 //    set_leds(context, true);
     pbf_press_dpad(context, DPAD_UP, 10, 0);
     pbf_press_button(context, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
 //    set_leds(context, false);
 }
-void enter_summary(SwitchControllerContext& context, bool regi_move_right){
+void enter_summary(ProControllerContext& context, bool regi_move_right){
     pbf_press_dpad(context, DPAD_DOWN, 10, 0);
     pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_A, 10, 200);
@@ -35,12 +35,12 @@ void enter_summary(SwitchControllerContext& context, bool regi_move_right){
     pbf_press_button(context, BUTTON_A, 10, 10);    //  For Regi, this clears the dialog after running.
 }
 void close_game_if_overworld(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool touch_date,
     uint8_t rollback_hours
 ){
     //  Enter Y-COMM.
-    ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 10);
+    ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 80ms);
 
     //  Move the cursor as far away from Link Trade and Surprise Trade as possible.
     //  This is added safety in case connect to internet takes too long.
@@ -52,18 +52,18 @@ void close_game_if_overworld(
     pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
 
     //  Enter Switch Home.
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 
     if (touch_date){
-        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     }
     if (rollback_hours > 0){
-        rollback_hours_from_home(context, rollback_hours, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        rollback_hours_from_home(context, rollback_hours, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     }
 
     //  Enter profile.
     pbf_press_dpad(context, DPAD_UP, 10, 10);
-    pbf_press_button(context, BUTTON_A, 10, GameSettings::instance().ENTER_PROFILE_DELAY);
+    pbf_press_button(context, BUTTON_A, 80ms, GameSettings::instance().ENTER_PROFILE_DELAY0);
 
     //  Back out.
     pbf_press_dpad(context, DPAD_LEFT, 10, 10);

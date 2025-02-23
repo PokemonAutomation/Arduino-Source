@@ -30,7 +30,8 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         "Shiny hunt a standing legendary " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
@@ -67,7 +68,7 @@ LegendaryReset::LegendaryReset()
 
 
 
-void LegendaryReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void LegendaryReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.current_stats<PokemonSwSh::ShinyHuntTracker>();
 
     StandardEncounterHandler handler(
@@ -86,7 +87,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, SwitchControll
         env.update_stats();
 
         if (reset){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
                 continue;
@@ -97,9 +98,9 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, SwitchControll
         StartBattleDetector start_battle(env.console);
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [this](SwitchControllerContext& context){
+            [this](ProControllerContext& context){
                 size_t stop = WALK_UP ? 30 : 60;
                 for (size_t c = 0; c < stop; c++){
                     if (WALK_UP){

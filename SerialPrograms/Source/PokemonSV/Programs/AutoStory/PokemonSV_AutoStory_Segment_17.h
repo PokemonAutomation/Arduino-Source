@@ -20,7 +20,7 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         AutoStoryOptions options
     ) const override;
 };
@@ -30,7 +30,7 @@ public:
 // end: Won auction at Porto Marinada, passed Gym challenge.
 void checkpoint_37(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -38,7 +38,7 @@ void checkpoint_37(
 // end: Defeat Cascarrafa Gym
 void checkpoint_38(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 

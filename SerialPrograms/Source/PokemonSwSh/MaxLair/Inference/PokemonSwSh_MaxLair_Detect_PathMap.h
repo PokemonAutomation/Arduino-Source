@@ -11,7 +11,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
@@ -34,7 +34,7 @@ bool read_type_array(
 
 
 bool read_path(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     PathMap& path,
     const ImageFloatBox& box
 );

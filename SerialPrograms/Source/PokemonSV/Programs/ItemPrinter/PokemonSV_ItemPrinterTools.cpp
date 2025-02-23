@@ -19,8 +19,8 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
-    static const EnumDatabase<ItemPrinterJobs> database({
+const EnumDropdownDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
+    static const EnumDropdownDatabase<ItemPrinterJobs> database({
         {ItemPrinterJobs::Jobs_1, "1", "1 Job"},
         {ItemPrinterJobs::Jobs_5, "5", "5 Jobs"},
         {ItemPrinterJobs::Jobs_10, "10", "10 Jobs"},
@@ -32,7 +32,7 @@ const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
 
 void item_printer_start_print(
     AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language, ItemPrinterJobs jobs
 ){
     stream.log("Starting print...");
@@ -76,7 +76,7 @@ void item_printer_start_print(
 }
 ItemPrinterPrizeResult item_printer_finish_print(
     AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language
 ){
     stream.log("Finishing print...");

@@ -30,7 +30,8 @@ SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
         "Skip nights until full moon.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -45,7 +46,7 @@ SkipToFullMoon::SkipToFullMoon()
 }
 
 
-void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
@@ -105,9 +106,9 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, SwitchControll
 
 
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(100), stop_on_detected);
-        run_until<SwitchControllerContext>(
+        run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& local_context){
+            [](ProControllerContext& local_context){
                 // pbf_mash_button(local_context, BUTTON_B, 7 * TICKS_PER_SECOND);
                 for(size_t i = 0; i < 15; i++){
                      pbf_press_button(local_context, BUTTON_B, 20, 80);

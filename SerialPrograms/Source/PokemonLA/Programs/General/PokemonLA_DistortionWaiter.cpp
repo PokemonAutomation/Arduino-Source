@@ -30,7 +30,8 @@ DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
         "Wait for a distortion to appear.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class DistortionWaiter_Descriptor::Stats : public StatsTracker{
@@ -81,7 +82,7 @@ DistortionWaiter::DistortionWaiter()
 
 
 
-void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DistortionWaiter_Descriptor::Stats& stats = env.current_stats<DistortionWaiter_Descriptor::Stats>();
 
 
@@ -95,9 +96,9 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, SwitchContro
     while (true){
         env.update_stats();
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 for (size_t c = 0; c < 60; c++){
                     pbf_press_button(context, BUTTON_LCLICK, 20, 60 * TICKS_PER_SECOND - 20);
                     context.wait_for_all_requests();
@@ -147,7 +148,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, SwitchContro
         {}, "",
         env.console.video().snapshot()
     );
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
 }
 
 

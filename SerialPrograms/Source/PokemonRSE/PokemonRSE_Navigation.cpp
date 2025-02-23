@@ -21,11 +21,11 @@ namespace NintendoSwitch{
 namespace PokemonRSE{
 
 
-void soft_reset(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void soft_reset(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     // A + B + Select + Start
     pbf_press_button(context, BUTTON_B | BUTTON_Y | BUTTON_MINUS | BUTTON_PLUS, 10, 180);
 
-    pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH);
+    pbf_mash_button(context, BUTTON_PLUS, GameSettings::instance().START_BUTTON_MASH0);
     context.wait_for_all_requests();
 
     pbf_press_button(context, BUTTON_A, 20, 40);
@@ -34,8 +34,8 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, SwitchControllerCo
     BlackScreenOverWatcher detector(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     int ret = wait_until(
         stream, context,
-        std::chrono::milliseconds(GameSettings::instance().ENTER_GAME_WAIT * (1000 / TICKS_PER_SECOND)),
-        {{detector}}
+        GameSettings::instance().ENTER_GAME_WAIT0,
+        {detector}
     );
     if (ret == 0){
         stream.log("Entered game!");
@@ -50,7 +50,7 @@ void soft_reset(const ProgramInfo& info, VideoStream& stream, SwitchControllerCo
     context.wait_for_all_requests();
 }
 
-void flee_battle(VideoStream& stream, SwitchControllerContext& context) {
+void flee_battle(VideoStream& stream, ProControllerContext& context) {
     stream.log("Navigate to Run.");
     pbf_press_dpad(context, DPAD_RIGHT, 20, 20);
     pbf_press_dpad(context, DPAD_DOWN, 20, 20);
@@ -90,7 +90,7 @@ void flee_battle(VideoStream& stream, SwitchControllerContext& context) {
     }
 }
 
-bool handle_encounter(VideoStream& stream, SwitchControllerContext& context) {
+bool handle_encounter(VideoStream& stream, ProControllerContext& context, bool send_out_lead) {
     float shiny_coefficient = 1.0;
     ShinySoundDetector shiny_detector(stream.logger(), [&](float error_coefficient) -> bool{
         shiny_coefficient = error_coefficient;
@@ -102,9 +102,9 @@ bool handle_encounter(VideoStream& stream, SwitchControllerContext& context) {
     pbf_mash_button(context, BUTTON_A, 540);
     context.wait_for_all_requests();
 
-    int res = run_until<SwitchControllerContext>(
+    int res = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context) {
+        [&](ProControllerContext& context) {
             int ret = wait_until(
                 stream, context,
                 std::chrono::seconds(30),
@@ -131,27 +131,30 @@ bool handle_encounter(VideoStream& stream, SwitchControllerContext& context) {
     }
     stream.log("Shiny not found.");
 
-    //Send out lead, no shiny detection needed.
-    BattleMenuWatcher battle_menu(COLOR_RED);
-    stream.log("Sending out lead Pokemon.");
-    pbf_press_button(context, BUTTON_A, 40, 40);
+    if (send_out_lead) {
+        //Send out lead, no shiny detection needed.
+        BattleMenuWatcher battle_menu(COLOR_RED);
+        stream.log("Sending out lead Pokemon.");
+        pbf_press_button(context, BUTTON_A, 40, 40);
 
-    int ret = wait_until(
-        stream, context,
-        std::chrono::seconds(15),
-        {{battle_menu}}
-    );
-    if (ret == 0) {
-        stream.log("Battle menu detecteed!");
-    } else {
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "handle_encounter(): Did not detect battle menu.",
-            stream
+        int ret = wait_until(
+            stream, context,
+            std::chrono::seconds(15),
+            { {battle_menu} }
         );
+        if (ret == 0) {
+            stream.log("Battle menu detecteed!");
+        }
+        else {
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "handle_encounter(): Did not detect battle menu.",
+                stream
+            );
+        }
+        pbf_wait(context, 125);
+        context.wait_for_all_requests();
     }
-    pbf_wait(context, 125);
-    context.wait_for_all_requests();
 
     return false;
 }

@@ -181,7 +181,7 @@ WallClock new_start_time_after_reset(WallClock old_start_time, uint16_t run_time
 void run_material_farmer(
     ProgramEnvironment& env,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
@@ -263,16 +263,16 @@ void run_material_farmer(
             it completes the action or gets caught in a battle 
             */
             run_from_battles_and_back_to_pokecenter(env, stream, context, stats,
-                [&](ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
+                [&](ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
                     // Move to starting position for Let's Go hunting path
                     stream.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
                     move_to_start_position_for_letsgo1(env.program_info(), stream, context);
 
                     // run let's go while updating the HP watcher
                     stream.log("Starting Let's Go hunting path.", COLOR_PURPLE);
-                    run_until<SwitchControllerContext>(
+                    run_until<ProControllerContext>(
                         stream, context,
-                        [&](SwitchControllerContext& context){
+                        [&](ProControllerContext& context){
                             run_lets_go_iteration(stream, context, encounter_tracker, options.NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
                         },
                         {hp_watcher}
@@ -319,7 +319,7 @@ void run_material_farmer(
 void check_hp(
     ProgramEnvironment& env,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     MaterialFarmerOptions& options,
     LetsGoHpWatcher& hp_watcher,
     MaterialFarmerStats& stats
@@ -345,7 +345,7 @@ void check_hp(
 WallClock make_sandwich_material_farm(
     ProgramEnvironment& env,
     VideoStream& stream,
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
@@ -357,7 +357,7 @@ WallClock make_sandwich_material_farm(
     WallClock last_sandwich_time = WallClock::min();
     while(last_sandwich_time == WallClock::min()){
         run_from_battles_and_back_to_pokecenter(env, stream, context, stats,
-            [&](ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
+            [&](ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
                 // Orient camera to look at same direction as player character
                 // - This is needed because when save-load the game, 
                 // the camera angle is different than when just flying to pokecenter
@@ -399,7 +399,7 @@ std::chrono::minutes minutes_remaining(WallClock start_time, std::chrono::minute
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
 void move_to_start_position_for_letsgo0(    
     VideoStream& stream,
-    SwitchControllerContext& context
+    ProControllerContext& context
 ){
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
@@ -453,7 +453,7 @@ void move_to_start_position_for_letsgo0(
 void move_to_start_position_for_letsgo1(
     const ProgramInfo& info,
     VideoStream& stream,
-    SwitchControllerContext& context
+    ProControllerContext& context
 ){
     // Orient camera to look at same direction as player character
     // - This is needed because when save-load the game, 
@@ -482,8 +482,8 @@ void move_to_start_position_for_letsgo1(
     pbf_press_button(context, BUTTON_B, 125, 30);
 
     // Fly 
-    pbf_press_button(context, BUTTON_B, 50, 10); 
-    pbf_press_button(context, BUTTON_B, 50, 10); // Double click in case of drop
+    pbf_press_button(context, BUTTON_B, 50, 10);
+    pbf_press_button(context, BUTTON_B, 50, 50); // Double click in case of drop
     pbf_press_button(context, BUTTON_LCLICK, 50, 0);
 
     // you automatically move forward  when flying without pressing any buttons. 
@@ -513,13 +513,13 @@ void move_to_start_position_for_letsgo1(
 
 
 // wait, then move forward quickly
-void lets_go_movement0(SwitchControllerContext& context){
+void lets_go_movement0(ProControllerContext& context){
     pbf_wait(context, 500);
     pbf_move_left_joystick(context, 128, 0, 200, 10);
 }
 
 // wait, then move forward quickly, then wait some more.
-void lets_go_movement1(SwitchControllerContext& context){
+void lets_go_movement1(ProControllerContext& context){
     pbf_wait(context, 500);
     pbf_move_left_joystick(context, 128, 0, 100, 10);
     pbf_wait(context, 100);
@@ -534,7 +534,7 @@ move forward again to repeat the cycle. It does this as many times as per num_fo
  */
 void run_lets_go_iteration(
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     LetsGoEncounterBotTracker& encounter_tracker,
     int num_forward_moves_per_lets_go_iteration
 ){
@@ -552,7 +552,7 @@ void run_lets_go_iteration(
 
     context.wait_for_all_requests();
     for(int i = 0; i < total_iterations; i++){
-        use_lets_go_to_clear_in_front(stream, context, encounter_tracker, throw_ball_if_bubble, [&](SwitchControllerContext& context){
+        use_lets_go_to_clear_in_front(stream, context, encounter_tracker, throw_ball_if_bubble, [&](ProControllerContext& context){
             // Do the following movement while the Let's Go pokemon clearing wild pokemon.
             stream.log("Move-forward iteration number: " + std::to_string(i + 1) + "/" + std::to_string(total_iterations), COLOR_PURPLE);
 
@@ -577,12 +577,12 @@ only gives you one attempt before returning to the Pokecenter
 void run_from_battles_and_back_to_pokecenter(
     ProgramEnvironment& env,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     MaterialFarmerStats& stats,
     std::function<
         void(ProgramEnvironment& env,
         VideoStream& stream,
-        SwitchControllerContext& context)
+        ProControllerContext& context)
     >&& action
 ){
     bool attempted_action = false;
@@ -590,9 +590,9 @@ void run_from_battles_and_back_to_pokecenter(
     bool returned_to_pokecenter = false;
     while(returned_to_pokecenter == false){
         NormalBattleMenuWatcher battle_menu(COLOR_RED);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 if (!attempted_action){ // We still need to carry out `action`
                     attempted_action = true;
                     context.wait_for_all_requests();
@@ -625,14 +625,14 @@ void run_from_battles_and_back_to_pokecenter(
 
 
 
-void move_from_material_farming_to_item_printer(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void move_from_material_farming_to_item_printer(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     stream.log("Start moving from material farming to item printer.");
     fly_from_paldea_to_blueberry_entrance(info, stream, context);
     move_from_blueberry_entrance_to_league_club(info, stream, context);
     move_from_league_club_entrance_to_item_printer(info, stream, context);
 }
 
-void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     int numAttempts = 0;
     const int maxAttempts = 11;
     bool isFlySuccessful = false;
@@ -658,8 +658,8 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
 
         // move cursor to Blueberry academy fast travel point (up-left)
         // try different magnitudes of cursor push with each failure.
-        int push_magnitude = 81 + adjustment_table[numAttempts];
-        pbf_move_left_joystick(context, 0, 0, (uint16_t)push_magnitude, 50);
+        int push_magnitude = 105 + adjustment_table[numAttempts];
+        pbf_move_left_joystick(context, 64, 64, (uint16_t)push_magnitude, 50);
 
         // press A to fly to Blueberry academy
         isFlySuccessful = fly_to_overworld_from_map(info, stream, context, true);
@@ -678,7 +678,7 @@ void fly_from_paldea_to_blueberry_entrance(const ProgramInfo& info, VideoStream&
     }
 }
 
-void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
     int numAttempts = 0;
     int maxAttempts = 5;
@@ -748,7 +748,7 @@ void move_from_blueberry_entrance_to_league_club(const ProgramInfo& info, VideoS
 
 }
 
-void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
 
     // move forwards towards table next to item printer
@@ -758,14 +758,14 @@ void move_from_league_club_entrance_to_item_printer(const ProgramInfo& info, Vid
     pbf_move_left_joystick(context, 0, 128, 10, 50);
 }
 
-void move_from_item_printer_to_material_farming(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void move_from_item_printer_to_material_farming(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     stream.log("Start moving from item printer to material farming.");
     move_from_item_printer_to_blueberry_entrance(info, stream, context);
     fly_from_blueberry_to_north_province_3(info, stream, context);
 }
 
 // assumes you start in the position in front of the item printer, as if you finished using it.
-void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
 
     // look left towards door
@@ -814,7 +814,7 @@ void move_from_item_printer_to_blueberry_entrance(const ProgramInfo& info, Video
 }
 
 
-void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void fly_from_blueberry_to_north_province_3(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     int numAttempts = 0;
     const int maxAttempts = 11;
     bool isFlySuccessful = false;

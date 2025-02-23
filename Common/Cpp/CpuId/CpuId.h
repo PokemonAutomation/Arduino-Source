@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CpuId_H
 #define PokemonAutomation_CpuId_H
 
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 
 #if 0
 #elif _M_IX86 || _M_X64 || __i386__ || __x86_64__
@@ -67,7 +67,7 @@ struct CpuCapabilityOption{
 const std::vector<CpuCapabilityOption>& AVAILABLE_CAPABILITIES();
 // An enum database to select `CpuCapabilityOption`.
 // This database is built by `AVAILABLE_CAPABILITIES()`, used for UI of choosing CPU instructions.
-const IntegerEnumDatabase& CAPABILITIES_DATABASE();
+const IntegerEnumDropdownDatabase& CAPABILITIES_DATABASE();
 
 
 

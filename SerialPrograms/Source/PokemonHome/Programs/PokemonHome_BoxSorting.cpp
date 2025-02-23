@@ -180,7 +180,8 @@ bool operator==(const Pokemon& lhs, const Pokemon& rhs){
            lhs.shiny == rhs.shiny &&
            lhs.gmax == rhs.gmax &&
            lhs.ball_slug == rhs.ball_slug &&
-           lhs.gender == rhs.gender;
+           lhs.gender == rhs.gender &&
+           lhs.ot_id == rhs.ot_id;
 }
 
 bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& rhs){
@@ -192,39 +193,45 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
     }
 
     for (const BoxSortingSelection preference : *lhs->preferences){
+        bool ret = true;
         switch(preference.sort_type){
         // NOTE edit when adding new struct members
         case BoxSortingSortType::NationalDexNo:
             if (lhs->national_dex_number != rhs->national_dex_number){
-                return lhs->national_dex_number < rhs->national_dex_number;
+                ret = lhs->national_dex_number < rhs->national_dex_number;
             }
             break;
         case BoxSortingSortType::Shiny:
             if (lhs->shiny != rhs->shiny){
-                return lhs->shiny;
+                ret = lhs->shiny;
             }
             break;
         case BoxSortingSortType::Gigantamax:
             if (lhs->gmax != rhs->gmax){
-                return lhs->gmax;
+                ret = lhs->gmax;
             }
             break;
         case BoxSortingSortType::Ball_Slug:
             if (lhs->ball_slug < rhs->ball_slug){
-                return true;
+                ret = true;
             }
             if (lhs->ball_slug > rhs->ball_slug){
-                return false;
+                ret = false;
             }
             break;
         case BoxSortingSortType::Gender:
             if (lhs->gender < rhs->gender){
-                return true;
+                ret = true;
             }
             if (lhs->gender > rhs->gender){
-                return false;
+                ret = false;
             }
             break;
+        }
+        if (preference.reverse){
+            return !ret;
+        }else{
+            return ret;
         }
     }
 
@@ -249,7 +256,7 @@ std::ostream& operator<<(std::ostream& os, const std::optional<Pokemon>& pokemon
     return os;
 }
 
-bool go_to_first_slot(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint16_t VIDEO_DELAY){
+bool go_to_first_slot(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint16_t VIDEO_DELAY){
 
     ImageFloatBox cursor_check(0.07, 0.15, 0.01, 0.01); //cursor position of the first slot of the box
     VideoSnapshot screen = env.console.video().snapshot();
@@ -299,7 +306,7 @@ bool go_to_first_slot(SingleSwitchProgramEnvironment& env, SwitchControllerConte
 }
 
 //Move the cursor to the given coordinates, knowing current pos via the cursor struct
-[[nodiscard]] Cursor move_cursor_to(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, const Cursor& cur_cursor, const Cursor& dest_cursor, uint16_t GAME_DELAY){
+[[nodiscard]] Cursor move_cursor_to(SingleSwitchProgramEnvironment& env, ProControllerContext& context, const Cursor& cur_cursor, const Cursor& dest_cursor, uint16_t GAME_DELAY){
 
     std::ostringstream ss;
     ss << "Moving cursor from " << cur_cursor << " to " << dest_cursor;
@@ -392,7 +399,7 @@ void output_boxes_data_json(const std::vector<std::optional<Pokemon>>& boxes_dat
 
 void do_sort(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     std::vector<std::optional<Pokemon>> boxes_data,
     std::vector<std::optional<Pokemon>> boxes_sorted,
     BoxSorting_Descriptor::Stats& stats,
@@ -446,7 +453,7 @@ void do_sort(
     }
 }
 
-void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     std::vector<BoxSortingSelection> sort_preferences = SORT_TABLE.preferences();
     if (sort_preferences.empty()){
@@ -456,7 +463,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
     BoxSorting_Descriptor::Stats& stats = env.current_stats< BoxSorting_Descriptor::Stats>();
 
     ImageFloatBox select_check(0.495, 0.0045, 0.01, 0.005); // square color to check which mode is active
-    ImageFloatBox national_dex_number_box(0.448, 0.245, 0.042, 0.04); //pokemon national dex number pos
+    ImageFloatBox national_dex_number_box(0.448, 0.245, 0.049, 0.04); //pokemon national dex number pos
     ImageFloatBox shiny_symbol_box(0.702, 0.09, 0.04, 0.06); // shiny symbol pos
     ImageFloatBox gmax_symbol_box(0.463, 0.09, 0.04, 0.06); // gmax symbol pos
     ImageFloatBox origin_symbol_box(0.623, 0.095, 0.033, 0.05); // origin symbol pos

@@ -12,7 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/MultiConsoleErrors.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
@@ -28,7 +28,7 @@ struct TradeStats : public StatsTracker{
 
 
 void trade_current_pokemon(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 );

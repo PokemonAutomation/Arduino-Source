@@ -17,6 +17,10 @@
 #include "PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -48,6 +52,8 @@ ShinyEncounterTracker::ShinyEncounterTracker(
 //    , m_overlay(overlay)
     , m_battle_menu(battle_type)
     , m_dialog_tracker(logger, m_dialog_detector)
+    , m_wild_animation_end_timestamp(WallClock::min())
+    , m_your_animation_start_timestamp(WallClock::min())
     , m_box_wild_left(0.40, 0.02, 0.20, 0.48)
     , m_box_wild_right(0.70, 0.02, 0.20, 0.48)
     , m_sparkle_tracker_wild(logger, overlay, m_sparkles_wild, {0.4, 0.02, 0.60, 0.93})
@@ -94,7 +100,7 @@ bool ShinyEncounterTracker::process_frame(const VideoSnapshot& frame){
     case EncounterState::BEFORE_ANYTHING:
         break;
     case EncounterState::WILD_ANIMATION:{
-        // Update the timestamp that records the end of wild animation
+        //  Update the timestamp that records the end of wild animation
         m_wild_animation_end_timestamp = frame.timestamp;
 
         m_sparkle_tracker_wild.process_frame(frame);
@@ -120,8 +126,10 @@ bool ShinyEncounterTracker::process_frame(const VideoSnapshot& frame){
         break;
     }
     case EncounterState::YOUR_ANIMATION:
-        // Update the timestamp that records the end of player pokemon animation
-        m_your_animation_end_timestamp = frame.timestamp;
+        //  Update the timestamp that records the start of player pokemon animation
+        if (m_your_animation_start_timestamp == WallClock::min()){
+            m_your_animation_start_timestamp = frame.timestamp;
+        }
 
         m_sparkle_tracker_wild.clear_boxes();
         m_sparkle_tracker_own.process_frame(frame);
@@ -167,28 +175,27 @@ void determine_shiny_status(
             alpha_wild_overall += DIALOG_ALPHA;
         }
     }
-    
+
+#if 0
+    cout << "Wild End: " << std::chrono::duration_cast<Milliseconds>(tracker.wild_animation_end_timestmap() - tracker.m_start_time) << endl;
+    cout << "Your Start: " << std::chrono::duration_cast<Milliseconds>(tracker.your_animation_start_timestamp() - tracker.m_start_time) << endl;
+    for (WallClock time : shiny_sound_timestamps){
+        cout << "Shiny Sound: " << std::chrono::duration_cast<Milliseconds>(time - tracker.m_start_time) << endl;
+    }
+#endif
+
     bool wild_shiny_sound_detected = false;
     bool own_shiny_sound_detected = false;
-    for(const WallClock& timestamp: shiny_sound_timestamps){
-        const WallClock& wild_end = tracker.wild_animtion_end_timestmap();
-        const WallClock& own_end = tracker.your_animation_end_timestamp();
+    for (const WallClock& timestamp: shiny_sound_timestamps){
+        const WallClock& wild_end = tracker.wild_animation_end_timestmap();
+        const WallClock& own_start = tracker.your_animation_start_timestamp();
 
-        auto get_timestamp_distance = [](const WallClock& t0, const WallClock& t1) -> std::chrono::milliseconds{
-            if (t0 > t1){
-                return std::chrono::duration_cast<std::chrono::milliseconds>(t0 - t1);
-            }else{
-                return std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
-            }
-        };
+        bool wild_shiny = timestamp < wild_end + Milliseconds(500);
+        bool own_shiny = timestamp >= own_start;
 
-        const auto dist_to_wild = get_timestamp_distance(timestamp, wild_end);
-        const auto dist_to_own = get_timestamp_distance(timestamp, own_end);
-        if (dist_to_wild < dist_to_own){
-            wild_shiny_sound_detected = true;
-        }else if (dist_to_own < dist_to_wild){
-            own_shiny_sound_detected = true;
-        }else{
+        wild_shiny_sound_detected |= wild_shiny;
+        own_shiny_sound_detected |= own_shiny;
+        if (!wild_shiny && !own_shiny){
             throw_and_log<OperationFailedException>(
                 env.logger(), ErrorReport::SEND_ERROR_REPORT,
                 "Wrong shiny sound timing found."

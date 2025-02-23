@@ -8,28 +8,30 @@
 #define PokemonAutomation_PokemonBDSP_GameEntry_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
+using namespace std::chrono_literals;
+
 
 bool gamemenu_to_ingame(
-    VideoStream& stream, SwitchControllerContext& context,
-    uint16_t mash_duration, uint16_t enter_game_timeout
+    VideoStream& stream, ProControllerContext& context,
+    Milliseconds mash_duration, Milliseconds enter_game_timeout
 );
 bool openedgame_to_ingame(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
-    uint16_t load_game_timeout,
-    uint16_t mash_duration, uint16_t enter_game_timeout,
-    uint16_t post_wait_time = 125
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    Milliseconds load_game_timeout,
+    Milliseconds mash_duration, Milliseconds enter_game_timeout,
+    Milliseconds post_wait_time = 1000ms
 );
 bool reset_game_from_home(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu,
-    uint16_t post_wait_time = 125
+    Milliseconds post_wait_time = 1000ms
 );
 
 

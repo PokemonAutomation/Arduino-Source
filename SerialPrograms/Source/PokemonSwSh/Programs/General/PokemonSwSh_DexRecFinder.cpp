@@ -10,6 +10,8 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -34,7 +36,8 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 struct DexRecFinder_Descriptor::Stats : public StatsTracker{
@@ -94,11 +97,10 @@ DexRecFilters::DexRecFilters()
 
 DexRecFinder::DexRecFinder()
     : GO_HOME_WHEN_DONE(false)
-    , VIEW_TIME(
+    , VIEW_TIME0(
         "<b>View Time:</b><br>View the " + STRING_POKEDEX + " for this long before continuing.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "2 * TICKS_PER_SECOND"
+        "2000 ms"
     )
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
@@ -108,29 +110,27 @@ DexRecFinder::DexRecFinder()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , ENTER_POKEDEX_TIME(
+    , ENTER_POKEDEX_TIME0(
         "<b>Enter " + STRING_POKEDEX + " Time:</b><br>Wait this long for the " + STRING_POKEDEX + " to open.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000 ms"
     )
-    , BACK_OUT_TIME(
+    , BACK_OUT_TIME0(
         "<b>Back Out Time:</b><br>Mash B for this long to return to the overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3 * TICKS_PER_SECOND"
+        "3000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
     PA_ADD_OPTION(FILTERS);
-    PA_ADD_OPTION(VIEW_TIME);
+    PA_ADD_OPTION(VIEW_TIME0);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(ENTER_POKEDEX_TIME);
-    PA_ADD_OPTION(BACK_OUT_TIME);
+    PA_ADD_OPTION(ENTER_POKEDEX_TIME0);
+    PA_ADD_OPTION(BACK_OUT_TIME0);
 }
 
 
@@ -164,12 +164,12 @@ void DexRecFinder::read_line(
     }
 }
 
-void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void DexRecFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     }
 
     std::set<std::string> desired;
@@ -187,7 +187,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchController
         neutral_date_skip(context);
         settings_to_enter_game(context, true);
         pbf_mash_button(context, BUTTON_B, 90);
-        pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY - 20);
+        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
 
         if (FILTERS.enabled()){
             context.wait_for_all_requests();
@@ -195,7 +195,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchController
             OverlayBoxScope box1(env.console, ImageFloatBox(0.75, 0.531 + 1 * 0.1115, 0.18, 0.059));
             OverlayBoxScope box2(env.console, ImageFloatBox(0.75, 0.531 + 2 * 0.1115, 0.18, 0.059));
             OverlayBoxScope box3(env.console, ImageFloatBox(0.75, 0.531 + 3 * 0.1115, 0.18, 0.059));
-            pbf_press_button(context, BUTTON_A, 10, ENTER_POKEDEX_TIME);
+            pbf_press_button(context, BUTTON_A, 80ms, ENTER_POKEDEX_TIME0);
             context.wait_for_all_requests();
 
             VideoSnapshot frame = env.console.video().snapshot();
@@ -225,18 +225,18 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, SwitchController
             if (bad_read){
                 env.log("Read Errors. Pausing for user to see.", COLOR_RED);
                 stats.errors++;
-                pbf_wait(context, VIEW_TIME);
+                pbf_wait(context, VIEW_TIME0);
             }
         }else{
             stats.attempts++;
 //            stats.errors++;
-            pbf_press_button(context, BUTTON_A, 10, ENTER_POKEDEX_TIME);
-            pbf_wait(context, VIEW_TIME);
+            pbf_press_button(context, BUTTON_A, 80ms, ENTER_POKEDEX_TIME0);
+            pbf_wait(context, VIEW_TIME0);
         }
         env.update_stats();
 
-        pbf_mash_button(context, BUTTON_B, BACK_OUT_TIME);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_mash_button(context, BUTTON_B, BACK_OUT_TIME0);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     }
 
     env.update_stats();

@@ -26,7 +26,7 @@ FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
         "Disconnect from the internet using the friend search method.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -42,8 +42,8 @@ FriendSearchDisconnect::FriendSearchDisconnect()
     PA_ADD_OPTION(USER_SLOT);
 }
 
-void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
-    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
 
     home_to_add_friends(context, USER_SLOT - 1, 1, true);
 

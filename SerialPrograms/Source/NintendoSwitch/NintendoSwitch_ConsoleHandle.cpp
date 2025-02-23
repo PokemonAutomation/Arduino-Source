@@ -28,7 +28,7 @@ ConsoleHandle::~ConsoleHandle(){
 ConsoleHandle::ConsoleHandle(
     size_t index,
     Logger& logger,
-    SwitchController& controller,
+    ProController& controller,
     VideoFeed& video,
     VideoOverlay& overlay,
     AudioFeed& audio,

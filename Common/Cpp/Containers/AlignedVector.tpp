@@ -11,6 +11,7 @@
 #include <new>
 #include <type_traits>
 #include <utility>
+#include <algorithm>
 #include "Common/Compiler.h"
 #include "AlignedMalloc.h"
 #include "AlignedVector.h"
@@ -59,7 +60,10 @@ AlignedVector<Object>::AlignedVector(const AlignedVector& x)
             break;
         }
     }
-    m_ptr = (Object*)aligned_malloc(m_capacity * sizeof(Object), 64);
+    m_ptr = (Object*)aligned_malloc(
+        m_capacity * sizeof(Object),
+        std::max<size_t>(alignof(Object), 64)
+    );
     if (m_ptr == nullptr){
         throw std::bad_alloc();
     }
@@ -120,6 +124,17 @@ AlignedVector<Object>::AlignedVector(size_t items){
 }
 
 template <typename Object>
+void AlignedVector<Object>::clear() noexcept{
+    if constexpr (std::is_trivially_constructible<Object>::value){
+        m_size = 0;
+    }else{
+        while (m_size > 0){
+            pop_back();
+        }
+    }
+}
+
+template <typename Object>
 template <class... Args>
 void AlignedVector<Object>::emplace_back(Args&&... args){
     if (m_size >= m_capacity){
@@ -131,16 +146,6 @@ void AlignedVector<Object>::emplace_back(Args&&... args){
 template <typename Object>
 void AlignedVector<Object>::pop_back(){
     m_ptr[--m_size].~Object();
-}
-template <typename Object>
-void AlignedVector<Object>::clear(){
-    if constexpr (std::is_trivially_constructible<Object>::value){
-        m_size = 0;
-    }else{
-        while (m_size > 0){
-            pop_back();
-        }
-    }
 }
 
 template <typename Object>

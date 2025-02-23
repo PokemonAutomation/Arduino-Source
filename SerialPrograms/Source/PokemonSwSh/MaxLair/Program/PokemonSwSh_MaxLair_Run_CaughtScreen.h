@@ -9,7 +9,7 @@
 
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 
 namespace PokemonAutomation{
@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 StateMachineAction run_caught_screen(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider,
     const ImageViewRGB32& entrance

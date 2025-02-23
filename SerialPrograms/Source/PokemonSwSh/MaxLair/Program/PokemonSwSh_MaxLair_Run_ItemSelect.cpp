@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 void run_item_select(
     size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker
 ){
     GlobalState& state = state_tracker[console_index];

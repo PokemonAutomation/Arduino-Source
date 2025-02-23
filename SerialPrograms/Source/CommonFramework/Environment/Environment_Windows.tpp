@@ -51,8 +51,8 @@ private:
 
 
 
-const EnumDatabase<ThreadPriority>& PRIORITY_DATABASE(){
-    static EnumDatabase<ThreadPriority> database({
+const EnumDropdownDatabase<ThreadPriority>& PRIORITY_DATABASE(){
+    static EnumDropdownDatabase<ThreadPriority> database({
         {ThreadPriority::Realtime,      "realtime",     "Realtime"},
         {ThreadPriority::High,          "high",         "High"},
         {ThreadPriority::AboveNormal,   "above-normal", "Above Normal"},

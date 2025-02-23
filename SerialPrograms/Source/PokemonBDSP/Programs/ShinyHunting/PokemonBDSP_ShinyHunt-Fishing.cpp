@@ -29,7 +29,8 @@ ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
         "Shiny hunt fishing " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct ShinyHuntFishing_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{
@@ -65,11 +66,10 @@ ShinyHuntFishing::ShinyHuntFishing()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -82,8 +82,7 @@ ShinyHuntFishing::ShinyHuntFishing()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-//    PA_ADD_OPTION(WATCHDOG_TIMER);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 }
 
 
@@ -91,7 +90,7 @@ ShinyHuntFishing::ShinyHuntFishing()
 
 
 
-void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntFishing_Descriptor::Stats& stats = env.current_stats<ShinyHuntFishing_Descriptor::Stats>();
 
     StandardEncounterHandler handler(
@@ -116,9 +115,9 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchContro
             MarkDetector mark_detector(env.console, {0.4, 0.2, 0.2, 0.5});
             StartBattleDetector battle(env.console);
             BattleMenuWatcher battle_menu(BattleType::STANDARD);
-            int ret = run_until<SwitchControllerContext>(
+            int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [this](SwitchControllerContext& context){
+                [this](ProControllerContext& context){
                     SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
                 },
                 {
@@ -139,7 +138,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchContro
             case 2:
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
-                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
                 continue;
             default:
                 env.log("Timed out.", COLOR_RED);
@@ -163,7 +162,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchContro
             case 1:
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
-                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
                 continue;
             default:
                 env.log("Timed out.", COLOR_RED);
@@ -187,7 +186,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchContro
             case 1:
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
-                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
                 continue;
             default:
                 env.log("Missed the hook.", COLOR_ORANGE);
@@ -208,7 +207,9 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, SwitchContro
             ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(
+            result_wild, EXIT_BATTLE_TIMEOUT0
+        );
         if (stop){
             break;
         }

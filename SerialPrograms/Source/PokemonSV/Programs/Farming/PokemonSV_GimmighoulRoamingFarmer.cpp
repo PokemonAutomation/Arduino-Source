@@ -10,6 +10,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -31,7 +32,8 @@ GimmighoulRoamingFarmer_Descriptor::GimmighoulRoamingFarmer_Descriptor()
         "Farm roaming Gimmighoul for coins.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -57,7 +59,7 @@ GimmighoulRoamingFarmer::GimmighoulRoamingFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Start in game facing a roaming Gimmighoul somewhere safe. (ex. Pokemon Center since wild Pokemon can't fight you there.)
@@ -72,26 +74,28 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, Switc
         save_game_from_overworld(env.program_info(), env.console, context);
 
         //  Date skip
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(context, true, true);
         if (year >= MAX_YEAR){
             PokemonSwSh::roll_date_backward_N(context, MAX_YEAR, true);
             year = 0;
+        }else{
+            PokemonSwSh::roll_date_forward_1(context, true);
+            year++;
         }
-        PokemonSwSh::roll_date_forward_1(context, true);
-        year++;
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
         //  Reset game
         reset_game_from_home(env.program_info(), env.console, context, 5 * TICKS_PER_SECOND);
     }
 
     if (FIX_TIME_WHEN_DONE){
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
     }
     GO_HOME_WHEN_DONE.run_end_of_program(context);

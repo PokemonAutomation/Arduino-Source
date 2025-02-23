@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
@@ -104,14 +104,14 @@ public:
 
     //  While in the box system view, move the cursor to the desired slot.
     void move_cursor(
-        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         BoxCursorLocation side, uint8_t row, uint8_t col
     ) const;
 
 private:
     bool to_coordinates(int& x, int& y, BoxCursorLocation side, uint8_t row, uint8_t col) const;
-    void move_vertical(SwitchControllerContext& context, int current, int desired) const;
-    void move_horizontal(SwitchControllerContext& context, int current, int desired) const;
+    void move_vertical(ProControllerContext& context, int current, int desired) const;
+    void move_horizontal(ProControllerContext& context, int current, int desired) const;
 
 private:
     Color m_color;

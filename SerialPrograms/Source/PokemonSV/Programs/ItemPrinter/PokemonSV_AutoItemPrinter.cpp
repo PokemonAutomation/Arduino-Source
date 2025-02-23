@@ -36,7 +36,8 @@ AutoItemPrinter_Descriptor::AutoItemPrinter_Descriptor()
         "Automate the Item Printer for rare items.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct AutoItemPrinter_Descriptor::Stats : public StatsTracker{
@@ -80,7 +81,7 @@ AutoItemPrinter::AutoItemPrinter()
 }
 
 
-void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     env.console.log("Entering printing mode...");
 
     while (true){
@@ -122,7 +123,7 @@ void AutoItemPrinter::enter_printing_mode(SingleSwitchProgramEnvironment& env, S
 
 
 
-void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutoItemPrinter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     AutoItemPrinter_Descriptor::Stats& stats = env.current_stats<AutoItemPrinter_Descriptor::Stats>();

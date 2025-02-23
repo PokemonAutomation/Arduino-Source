@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -31,11 +31,11 @@ public:
 class CurryHunter : public SingleSwitchProgramInstance{
 public:
     CurryHunter();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;
-    TimeExpressionOption<uint16_t> WALK_UP_DELAY;
+    MillisecondsOption WALK_UP_DELAY0;
     SimpleIntegerOption<uint16_t> SMALL_POKEMON;
     BooleanCheckBoxOption TAKE_VIDEO;
     SimpleIntegerOption<uint32_t> ITERATIONS;

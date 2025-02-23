@@ -34,8 +34,8 @@ namespace PokemonAutomation{
 
 CPU_Features CPU_CAPABILITY_CURRENT = CPU_CAPABILITY_NATIVE;
 
-IntegerEnumDatabase make_CAPABILITIES_DATABASE(){
-    IntegerEnumDatabase ret;
+IntegerEnumDropdownDatabase make_CAPABILITIES_DATABASE(){
+    IntegerEnumDropdownDatabase ret;
     size_t c = 0;
     for (const CpuCapabilityOption& item : AVAILABLE_CAPABILITIES()){
         ret.add(c, item.slug, item.display, item.available);
@@ -43,8 +43,8 @@ IntegerEnumDatabase make_CAPABILITIES_DATABASE(){
     }
     return ret;
 };
-const IntegerEnumDatabase& CAPABILITIES_DATABASE(){
-    static const IntegerEnumDatabase database = make_CAPABILITIES_DATABASE();
+const IntegerEnumDropdownDatabase& CAPABILITIES_DATABASE(){
+    static const IntegerEnumDropdownDatabase database = make_CAPABILITIES_DATABASE();
     return database;
 }
 

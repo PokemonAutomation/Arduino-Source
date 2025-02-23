@@ -13,7 +13,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
@@ -97,7 +97,8 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         );
         m_option.instance().start_program_border_check(
             scope,
-            env.consoles[c], c
+            env.consoles[c], c,
+            m_option.descriptor().feedback()
         );
     }
 
@@ -160,12 +161,16 @@ void MultiSwitchProgramSession::internal_run_program(){
             report_error("Cannot Start: The controller is not ready.");
             return;
         }
-        ControllerConnection& connection = session.controller_session().connection();
-        SwitchController& switch_controller = dynamic_cast<SwitchController&>(connection);
+        AbstractController* controller = session.controller_session().controller();
+        ProController* switch_controller = dynamic_cast<ProController*>(controller);
+        if (switch_controller == nullptr){
+            report_error("Cannot Start: The controller is not ready or is incompatible.");
+            return;
+        }
         handles.emplace_back(
             c,
             session.logger(),
-            switch_controller,
+            *switch_controller,
             session.video(),
             session.overlay(),
             session.audio(),

@@ -8,13 +8,13 @@
 #define PokemonAutomation_NintendoSwitch_Commands_Routines_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void close_game(VideoStream& stream, SwitchControllerContext& device);
+void close_game(VideoStream& stream, ProControllerContext& device);
 
 
 

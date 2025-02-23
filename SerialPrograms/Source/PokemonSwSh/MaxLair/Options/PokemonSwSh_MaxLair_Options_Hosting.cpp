@@ -34,35 +34,32 @@ HostingSettings::HostingSettings()
         "Random code is strongly recommended when hosting to ensure your own Switches get in.",
         8, 4, ""
     )
-    , CONNECT_TO_INTERNET_DELAY(
+    , CONNECT_TO_INTERNET_DELAY0(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to start adventure.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "20 * TICKS_PER_SECOND"
+        "20 s"
     )
-    , START_DELAY(
+    , START_DELAY0(
         "<b>Start Delay:</b><br>Wait this long before entering the lobby.<br><br>"
         "If two Switches open a lobby at the same time, they might not see each other and "
         "thus fail to join each other. If you are joining someone else's auto-host, you "
         "will want to set this to 3 seconds or more to make sure that the host opens the "
         "lobby before everyone else tries to join.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "0 * TICKS_PER_SECOND"
+        "0 s"
     )
-    , LOBBY_WAIT_DELAY(
+    , LOBBY_WAIT_DELAY0(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "60 * TICKS_PER_SECOND"
+        "60 s"
     )
     , NOTIFICATIONS("Live-Hosting Announcements", true)
 {
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(RAID_CODE);
-    PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY);
-    PA_ADD_OPTION(START_DELAY);
-    PA_ADD_OPTION(LOBBY_WAIT_DELAY);
+    PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY0);
+    PA_ADD_OPTION(START_DELAY0);
+    PA_ADD_OPTION(LOBBY_WAIT_DELAY0);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     MODE.add_listener(*this);
@@ -76,15 +73,15 @@ std::string HostingSettings::check_validity(size_t consoles) const{
 void HostingSettings::value_changed(void* object){
     HostingMode mode = MODE;
     if (mode == HostingMode::HOST_ONLINE){
-        CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::ENABLED);
+        CONNECT_TO_INTERNET_DELAY0.set_visibility(ConfigOptionState::ENABLED);
     }else{
-        CONNECT_TO_INTERNET_DELAY.set_visibility(ConfigOptionState::DISABLED);
+        CONNECT_TO_INTERNET_DELAY0.set_visibility(ConfigOptionState::DISABLED);
     }
     if (mode != HostingMode::NOT_HOSTING){
-        START_DELAY.set_visibility(ConfigOptionState::ENABLED);
+        START_DELAY0.set_visibility(ConfigOptionState::ENABLED);
         NOTIFICATIONS.set_visibility(ConfigOptionState::ENABLED);
     }else{
-        START_DELAY.set_visibility(ConfigOptionState::DISABLED);
+        START_DELAY0.set_visibility(ConfigOptionState::DISABLED);
         NOTIFICATIONS.set_visibility(ConfigOptionState::DISABLED);
     }
 }

@@ -33,15 +33,15 @@ public:
 class ShinyHuntCustomPath : public SingleSwitchProgramInstance{
 public:
     ShinyHuntCustomPath();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     // Run the custom path on overworld.
-    void run_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void run_path(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     // Do one action (while ignoring listen-related actions)
     void do_non_listen_action(
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         const CustomPathTableRow2& row
     );
 

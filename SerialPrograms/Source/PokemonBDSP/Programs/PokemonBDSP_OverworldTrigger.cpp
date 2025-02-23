@@ -7,6 +7,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
@@ -35,11 +36,10 @@ OverworldTrigger::OverworldTrigger()
         LockMode::LOCK_WHILE_RUNNING,
         TriggerMethod::HORIZONTAL_NO_BIAS
     )
-    , MOVE_DURATION(
+    , MOVE_DURATION0(
         "<b>Move Duration:</b><br>Move in each direction for this long before turning around.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1 * TICKS_PER_SECOND"
+        "1000 ms"
     )
     , SWEET_SCENT_POKEMON_LOCATION(
         "<b>Sweet Scent Pokemon Location:</b><br>Which Pokemon in the party knows Sweet Scent.",
@@ -56,57 +56,66 @@ OverworldTrigger::OverworldTrigger()
     )
 {
     PA_ADD_OPTION(TRIGGER_METHOD);
-    PA_ADD_OPTION(MOVE_DURATION);
+    PA_ADD_OPTION(MOVE_DURATION0);
     PA_ADD_OPTION(SWEET_SCENT_POKEMON_LOCATION);
 }
 
 
-void OverworldTrigger::run_trigger(SwitchControllerContext& context) const{
+void OverworldTrigger::run_trigger(ProControllerContext& context) const{
+    Milliseconds normal_duration = MOVE_DURATION0;
+    Milliseconds biased_duration = MOVE_DURATION0.get() + 200ms;
+    Milliseconds mash_duration = normal_duration - 64ms;
     switch (TRIGGER_METHOD){
     case TriggerMethod::HORIZONTAL_NO_BIAS:
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, MOVE_DURATION);
-//        pbf_move_left_joystick(context, 0, 128, MOVE_DURATION, 0);
-        pbf_move_left_joystick(context, 255, 128, MOVE_DURATION, 0);
+        ssf_press_left_joystick(context,   0, 128, 0ms, normal_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
+        ssf_press_left_joystick(context, 255, 128, 0ms, normal_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::HORIZONTAL_BIAS_LEFT:
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, MOVE_DURATION + 25);
-//        pbf_move_left_joystick(context, 0, 128, MOVE_DURATION + 25, 0);
-        pbf_move_left_joystick(context, 255, 128, MOVE_DURATION, 0);
+        ssf_press_left_joystick(context,   0, 128, 0ms, biased_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
+        ssf_press_left_joystick(context, 255, 128, 0ms, normal_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::HORIZONTAL_BIAS_RIGHT:
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 255, 128, 128, 128, MOVE_DURATION + 25);
-//        pbf_move_left_joystick(context, 255, 128, MOVE_DURATION + 25, 0);
-        pbf_move_left_joystick(context, 0, 128, MOVE_DURATION, 0);
+        ssf_press_left_joystick(context, 255, 128, 0ms, biased_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
+        ssf_press_left_joystick(context,   0, 128, 0ms, normal_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::VERTICAL_NO_BIAS:
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, MOVE_DURATION);
-//        pbf_move_left_joystick(context, 128, 0, MOVE_DURATION, 0);
-        pbf_move_left_joystick(context, 128, 255, MOVE_DURATION, 0);
+        ssf_press_left_joystick(context, 128,   0, 0ms, normal_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
+        ssf_press_left_joystick(context, 128, 255, 0ms, normal_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::VERTICAL_BIAS_UP:
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, MOVE_DURATION + 25);
-//        pbf_move_left_joystick(context, 128, 0, MOVE_DURATION + 25, 0);
-        pbf_move_left_joystick(context, 128, 255, MOVE_DURATION, 0);
+        ssf_press_left_joystick(context, 128,   0, 0ms, biased_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
+        ssf_press_left_joystick(context, 128, 255, 0ms, normal_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     case TriggerMethod::VERTICAL_BIAS_DOWN:
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, MOVE_DURATION + 25);
-//        pbf_move_left_joystick(context, 128, 255, MOVE_DURATION + 25, 0);
-        pbf_move_left_joystick(context, 128, 0, MOVE_DURATION, 0);
+        ssf_press_left_joystick(context, 128, 255, 0ms, biased_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
+        ssf_press_left_joystick(context, 128,   0, 0ms, normal_duration);
+        ssf_mash1_button(context, BUTTON_B, mash_duration);
         break;
     default:;
     }
 }
 
-bool OverworldTrigger::find_encounter(VideoStream& stream, SwitchControllerContext& context) const{
+bool OverworldTrigger::find_encounter(VideoStream& stream, ProControllerContext& context) const{
     BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
     StartBattleDetector start_battle_detector(stream.overlay());
 
     int ret = 0;
     if (TRIGGER_METHOD != TriggerMethod::SWEET_SCENT){
         //  Move character back and forth to trigger encounter.
-        ret = run_until<SwitchControllerContext>(
+        ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 while (true){
                     run_trigger(context);
                 }
@@ -122,8 +131,8 @@ bool OverworldTrigger::find_encounter(VideoStream& stream, SwitchControllerConte
         overworld_to_menu(stream, context);
 
         //  Go to pokemon page
-        const uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
-        pbf_press_button(context, BUTTON_ZL, 20, MENU_TO_POKEMON_DELAY);
+        const Milliseconds MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY0;
+        pbf_press_button(context, BUTTON_ZL, 160ms, MENU_TO_POKEMON_DELAY);
 
         //  Go to the pokemon that knows Sweet Scent
         const size_t location = SWEET_SCENT_POKEMON_LOCATION.current_value();

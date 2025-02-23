@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSV_ItemPrinterTools_H
 
 #include <array>
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class AsyncDispatcher;
@@ -24,7 +24,7 @@ enum class ItemPrinterJobs{
     Jobs_5      =   5,
     Jobs_10     =   10,
 };
-const EnumDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database();
+const EnumDropdownDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database();
 
 struct ItemPrinterPrizeResult{
     std::array<std::string, 10> prizes;
@@ -34,12 +34,12 @@ struct ItemPrinterPrizeResult{
 
 void item_printer_start_print(
     AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language, ItemPrinterJobs jobs
 );
 ItemPrinterPrizeResult item_printer_finish_print(
     AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language
 );
 

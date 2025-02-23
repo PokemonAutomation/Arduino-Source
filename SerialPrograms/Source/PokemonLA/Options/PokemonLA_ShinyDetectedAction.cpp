@@ -34,7 +34,7 @@ ShinyRequiresAudioText::ShinyRequiresAudioText()
 
 ShinyDetectedActionOption::ShinyDetectedActionOption(
     std::string label, std::string description,
-    std::string default_delay_ticks,
+    std::string default_delay,
     ShinyDetectedAction default_action
 )
     : GroupOption(std::move(label), LockMode::LOCK_WHILE_RUNNING)
@@ -51,13 +51,12 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
     )
 //    , STOP_PROGRAM("<b>Stop Program:</b><br>Stop program and go Home if it hears a shiny.", true)
 //    , TAKE_VIDEO("<b>Take Video:</b><br>Take a video if a shiny is heard.", true)
-    , SCREENSHOT_DELAY(
+    , SCREENSHOT_DELAY0(
         "<b>Screenshot Delay:</b><br>"
         "Align the camera, then wait this long before taking a screenshot + video of the shiny.<br>"
         "Set to zero to skip this. Don't set this too large or the shiny may run away!",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        std::move(default_delay_ticks)
+        std::move(default_delay)
     )
     , NOTIFICATIONS(this->label(), true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
 {
@@ -67,7 +66,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
     PA_ADD_OPTION(ACTION);
 //    PA_ADD_OPTION(STOP_PROGRAM);
 //    PA_ADD_OPTION(TAKE_VIDEO);
-    PA_ADD_OPTION(SCREENSHOT_DELAY);
+    PA_ADD_OPTION(SCREENSHOT_DELAY0);
 }
 bool ShinyDetectedActionOption::stop_on_shiny() const{
     return ACTION != ShinyDetectedAction::IGNORE;
@@ -114,7 +113,7 @@ bool on_shiny_callback(
     return false;
 }
 void on_shiny_sound(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     ShinyDetectedActionOption& options,
     float error_coefficient
 ){
@@ -127,7 +126,7 @@ void on_shiny_sound(
     embeds.emplace_back("Detection Results:", ss.str());
 
 //    pbf_press_button(context, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
-    pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
+    pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY0);
     context.wait_for_all_requests();
 
     send_program_notification(
@@ -143,18 +142,18 @@ void on_shiny_sound(
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
     }
 
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     context.wait_for_all_requests();
     throw ProgramFinishedException();
 }
 
 void on_match_found(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     ShinyDetectedActionOption& options, bool stop_program
 ){
     std::vector<std::pair<std::string, std::string>> embeds;
 
-    pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
+    pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY0);
     context.wait_for_all_requests();
 
     send_program_notification(

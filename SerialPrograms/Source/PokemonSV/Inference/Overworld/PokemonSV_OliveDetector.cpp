@@ -51,7 +51,7 @@ void OliveDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 
-std::pair<double, double> OliveDetector::olive_location(VideoStream& stream, SwitchControllerContext& context, ImageFloatBox box){
+std::pair<double, double> OliveDetector::olive_location(VideoStream& stream, ProControllerContext& context, ImageFloatBox box){
     context.wait_for_all_requests();
     ImageFloatBox location = get_olive_floatbox(stream, context, 30, box);
     double x = location.x + (location.width / 2);
@@ -67,7 +67,7 @@ std::pair<double, double> box_center(ImageFloatBox& box){
     return std::make_pair(x, y);
 }
 
-ImageFloatBox OliveDetector::get_olive_floatbox(const ImageViewRGB32& screen, SwitchControllerContext& context, uint8_t rgb_gap, ImageFloatBox box){
+ImageFloatBox OliveDetector::get_olive_floatbox(const ImageViewRGB32& screen, ProControllerContext& context, uint8_t rgb_gap, ImageFloatBox box){
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(0, 10, 0), combine_rgb(255, 255, 255)},
     };
@@ -111,7 +111,7 @@ ImageFloatBox OliveDetector::get_olive_floatbox(const ImageViewRGB32& screen, Sw
     return largest_green;
 }
 
-ImageFloatBox OliveDetector::get_olive_floatbox(VideoStream& stream, SwitchControllerContext& context, uint8_t rgb_gap, ImageFloatBox box){
+ImageFloatBox OliveDetector::get_olive_floatbox(VideoStream& stream, ProControllerContext& context, uint8_t rgb_gap, ImageFloatBox box){
     size_t MAX_ATTEMPTS = 2;
     for (size_t i = 0; i < MAX_ATTEMPTS; i++){
         context.wait_for_all_requests();
@@ -138,7 +138,7 @@ ImageFloatBox OliveDetector::get_olive_floatbox(VideoStream& stream, SwitchContr
 ImageFloatBox OliveDetector::align_to_olive(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     double direction_facing, 
     uint8_t rgb_gap,
     ImageFloatBox area_to_check
@@ -243,7 +243,7 @@ ImageFloatBox OliveDetector::align_to_olive(
 uint16_t OliveDetector::push_olive_forward(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     double direction_facing, 
     uint16_t total_forward_distance,
     uint16_t push_olive,
@@ -323,7 +323,7 @@ uint16_t OliveDetector::push_olive_forward(
 uint16_t OliveDetector::walk_up_to_olive(
     const ProgramInfo& info, 
     VideoStream& stream,
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     double direction_facing, 
     uint8_t rgb_gap,
     ImageFloatBox area_to_check

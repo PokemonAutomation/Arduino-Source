@@ -40,7 +40,10 @@ CloneItems101_Descriptor::CloneItems101_Descriptor()
         "Clone items using the add-to-party glitch.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        }
     )
 {}
 struct CloneItems101_Descriptor::Stats : public StatsTracker{
@@ -122,7 +125,7 @@ CloneItems101::CloneItems101()
 
 
 
-bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context){
+bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     CloneItems101_Descriptor::Stats& stats = env.current_stats<CloneItems101_Descriptor::Stats>();
 
     bool item_held = false;
@@ -259,7 +262,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Swi
     }
 }
 
-void CloneItems101::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void CloneItems101::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     CloneItems101_Descriptor::Stats& stats = env.current_stats<CloneItems101_Descriptor::Stats>();
@@ -289,9 +292,9 @@ void CloneItems101::program(SingleSwitchProgramEnvironment& env, SwitchControlle
         OverworldWatcher overworld(env.console, COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         context.wait_for_all_requests();
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_B, 20, 230);
                 }

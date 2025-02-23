@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -30,17 +30,17 @@ class ShinyHuntUnattendedRegigigas2 : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedRegigigas2();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
     SimpleIntegerOption<uint8_t> REVERSAL_PP;
-    TimeExpressionOption<uint16_t> START_TO_ATTACK_DELAY;
+    MillisecondsOption START_TO_ATTACK_DELAY0;
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> ATTACK_TO_CATCH_DELAY;
-    TimeExpressionOption<uint16_t> CATCH_TO_OVERWORLD_DELAY;
+    MillisecondsOption ATTACK_TO_CATCH_DELAY0;
+    MillisecondsOption CATCH_TO_OVERWORLD_DELAY0;
 };
 
 }

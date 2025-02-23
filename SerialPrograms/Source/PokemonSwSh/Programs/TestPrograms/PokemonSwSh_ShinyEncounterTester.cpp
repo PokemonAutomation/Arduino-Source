@@ -21,7 +21,8 @@ ShinyEncounterTester_Descriptor::ShinyEncounterTester_Descriptor()
         "",
         "Test the shiny encounter detector. Start this program just before an encounter.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -42,7 +43,7 @@ ShinyEncounterTester::ShinyEncounterTester()
 }
 
 
-void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyEncounterTester::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyDetectionResult result = detect_shiny_battle(
         env.console, context,
         ENCOUNTER_TYPE == EncounterType::Wild ? SHINY_BATTLE_REGULAR : SHINY_BATTLE_RAID,

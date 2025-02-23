@@ -38,15 +38,15 @@ class ShinyHuntScatterbug : public SingleSwitchProgramInstance{
 public:
     ShinyHuntScatterbug();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     
-    void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, size_t path_id);
+    void run_lets_go_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t path_id);
 
-    void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, 
-        std::function<void(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context)>&& action);
+    void handle_battles_and_back_to_pokecenter(SingleSwitchProgramEnvironment& env, ProControllerContext& context, 
+        std::function<void(SingleSwitchProgramEnvironment& env, ProControllerContext& context)>&& action);
 
     BooleanCheckBoxOption SAVE_GAME_AT_START;
     

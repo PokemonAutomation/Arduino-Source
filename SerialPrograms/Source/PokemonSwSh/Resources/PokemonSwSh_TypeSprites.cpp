@@ -35,7 +35,7 @@ struct TypeSpriteDatabase{
     }
 
     TypeSpriteDatabase(){
-        for (const auto& item : TYPE_ENUM_TO_SLUG){
+        for (const auto& item : POKEMON_TYPE_SLUGS()){
             if (item.first == PokemonType::NONE){
                 continue;
             }

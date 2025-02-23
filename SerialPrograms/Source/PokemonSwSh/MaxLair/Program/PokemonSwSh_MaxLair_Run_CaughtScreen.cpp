@@ -32,14 +32,14 @@ namespace MaxLairInternal{
 
 StateMachineAction mash_A_to_entrance(
     AdventureRuntime& runtime,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const ImageViewRGB32& entrance
 ){
     EntranceDetector entrance_detector(entrance);
 
-    int result = run_until<SwitchControllerContext>(
+    int result = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
         },
         {{entrance_detector}},
@@ -58,7 +58,7 @@ StateMachineAction mash_A_to_entrance(
 
 void synchronize_caught_screen(
     size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker
 ){
     context.wait_for_all_requests();
@@ -69,7 +69,7 @@ void synchronize_caught_screen(
 StateMachineAction run_caught_screen(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider,
     const ImageViewRGB32& entrance
@@ -181,7 +181,7 @@ StateMachineAction run_caught_screen(
     case CaughtScreenAction::RESET:
         stream.log("Resetting game...", COLOR_BLUE);
         synchronize_caught_screen(console_index, stream, context, state_tracker);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
         reset_game_from_home_with_inference(
             stream, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST

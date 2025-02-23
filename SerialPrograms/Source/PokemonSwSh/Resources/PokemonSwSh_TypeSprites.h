@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_TypeSprites_H
 
 #include <memory>
+#include <map>
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "Pokemon/Pokemon_Types.h"
 

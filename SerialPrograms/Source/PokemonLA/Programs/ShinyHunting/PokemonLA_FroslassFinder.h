@@ -7,12 +7,10 @@
 #ifndef PokemonAutomation_PokemonLA_FroslassFinder_H
 #define PokemonAutomation_PokemonLA_FroslassFinder_H
 
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
-#include "PokemonLA/Inference/PokemonLA_MountDetector.h"
-#include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -29,17 +27,17 @@ public:
 class FroslassFinder : public SingleSwitchProgramInstance{
 public:
     FroslassFinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     class RunRoute;
 
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
-    TimeExpressionOption<uint16_t> DASH_DURATION;
+    MillisecondsOption DASH_DURATION0;
 
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
     ShinyDetectedActionOption SHINY_DETECTED_DESTINATION;

@@ -26,7 +26,7 @@ namespace PokemonLA{
 
 
 bool reset_game_to_gamemenu(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu
 ){
     bool video_available = (bool)stream.video().snapshot();
@@ -40,20 +40,20 @@ bool reset_game_to_gamemenu(
             context,
             tolerate_update_menu,
             0, 0,
-            GameSettings::instance().START_GAME_MASH
+            GameSettings::instance().START_GAME_MASH0
         );
     }else{
         pbf_press_button(context, BUTTON_X, 50, 0);
-        pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH);
+        pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH0);
     }
 
     // Now the game has opened:
-    return openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT0);
+    return openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT1);
 }
 
 bool gamemenu_to_ingame(
-    VideoStream& stream, SwitchControllerContext& context,
-    uint16_t mash_duration, uint16_t enter_game_timeout
+    VideoStream& stream, ProControllerContext& context,
+    Milliseconds mash_duration, Milliseconds enter_game_timeout
 ){
     stream.log("Mashing A to enter game...");
     BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
@@ -75,13 +75,17 @@ bool gamemenu_to_ingame(
 }
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu,
     uint16_t post_wait_time
 ){
     bool ok = true;
     ok &= reset_game_to_gamemenu(stream, context, tolerate_update_menu);
-    ok &= gamemenu_to_ingame(stream, context, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
+    ok &= gamemenu_to_ingame(
+        stream, context,
+        GameSettings::instance().ENTER_GAME_MASH0,
+        GameSettings::instance().ENTER_GAME_WAIT0
+    );
     if (!ok){
         dump_image(stream.logger(), env.program_info(), stream.video(), "StartGame");
     }

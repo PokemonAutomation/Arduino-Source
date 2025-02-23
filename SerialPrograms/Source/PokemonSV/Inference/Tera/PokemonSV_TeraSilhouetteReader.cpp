@@ -60,11 +60,13 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
         225,
     };
 
+//    static int c = 0;
+    ImageMatch::ImageMatchResult slugs;
     for (uint32_t threshold : BRIGHTNESS_THRESHOLDS){
 //        cout << "check0" << endl;
         //  Get a loose crop of the silhouette icon
         ImageViewRGB32 cropped_image = extract_box_reference(screen, m_box);
-//        cropped_image.save("tera_cropped_image.png");
+//        cropped_image.save("tera_cropped_image-" + std::to_string(c++) + ".png");
 
 //        cout << "check1" << endl;
         ImageRGB32 preprocessed_image(cropped_image.width(), cropped_image.height());
@@ -88,14 +90,14 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
 
 //        cout << "check3" << endl;
         ImageRGB32 processed_image = extract_box_reference(preprocessed_image, tight_box).copy();
-//        processed_image.save("tera_processed_image.png");
+//        processed_image.save("tera_processed_image-" + std::to_string(c++) + ".png");
 
 //        cout << "check4" << endl;
         ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, 0xff000000, 0xff5f5f5f, true);
 //        filtered_image.save("tera_filtered_image.png");
 
 //        cout << "check5" << endl;
-        ImageMatch::ImageMatchResult slugs = TERA_RAID_SILHOUETTE_MATCHER().match(filtered_image, ALPHA_SPREAD);
+        slugs = TERA_RAID_SILHOUETTE_MATCHER().match(filtered_image, ALPHA_SPREAD);
         slugs.clear_beyond_alpha(MAX_ALPHA);
 
 //        slugs.log(global_logger_tagged(), MAX_ALPHA);
@@ -105,7 +107,7 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
         }
     }
 
-    return ImageMatch::ImageMatchResult();
+    return slugs;
 }
 
 

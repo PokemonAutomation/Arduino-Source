@@ -156,9 +156,9 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannel
     );
 }
 
-AudioSink::operator AudioFloatStreamListener&(){
+AudioFloatStreamListener* AudioSink::float_stream_listener(){
     auto scope_check = m_sanitizer.check_scope();
-    return *m_writer;
+    return m_writer.get();
 }
 void AudioSink::set_volume(double volume){
     auto scope_check = m_sanitizer.check_scope();

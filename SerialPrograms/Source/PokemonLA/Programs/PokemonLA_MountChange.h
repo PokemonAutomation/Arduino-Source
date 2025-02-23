@@ -16,11 +16,11 @@ namespace PokemonLA{
 
 
 //  Be careful when changing away from Braviary (on) since you will fall down.
-void change_mount(VideoStream& stream, SwitchControllerContext& context, MountState mount);
+void change_mount(VideoStream& stream, ProControllerContext& context, MountState mount);
 
 //  Dismount player character.
 //  Be careful when changing away from Braviary (on) since you will fall down.
-void dismount(VideoStream& stream, SwitchControllerContext& context);
+void dismount(VideoStream& stream, ProControllerContext& context);
 
 
 }

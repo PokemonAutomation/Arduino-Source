@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+//#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{ 
 namespace NintendoSwitch{
@@ -28,7 +28,13 @@ class SoundListener : public SingleSwitchProgramInstance{
 public:
     SoundListener();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+
+    virtual void start_program_border_check(
+        CancellableScope& scope,
+        VideoStream& stream,
+        FeedbackType feedback_type
+    ) override{}
 
 private:
     enum class SoundType{

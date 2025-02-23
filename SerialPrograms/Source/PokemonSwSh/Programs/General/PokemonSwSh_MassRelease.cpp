@@ -25,7 +25,8 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         "Mass release boxes of " + STRING_POKEMON + ".",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::FASTER
     )
 {}
 
@@ -48,7 +49,7 @@ MassRelease::MassRelease()
     PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
-void MassRelease::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);
@@ -59,10 +60,10 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
     release_boxes(
         context,
         BOXES_TO_RELEASE,
-        GameSettings::instance().BOX_SCROLL_DELAY,
-        GameSettings::instance().BOX_CHANGE_DELAY
+        GameSettings::instance().BOX_SCROLL_DELAY0,
+        GameSettings::instance().BOX_CHANGE_DELAY0
     );
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().HOME_TO_GAME_DELAY0);
 }
 
 

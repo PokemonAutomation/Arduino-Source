@@ -45,12 +45,11 @@ ParaglideItemDuper::ParaglideItemDuper()
         LockMode::UNLOCK_WHILE_RUNNING,
         100
     )
-    , LOAD_DELAY(
+    , LOAD_DELAY0(
         "<b>Loading time:</b><br>Adjustable delay for the load screen after warping. "
         "Adjust this to match the loading time of your game.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3125"
+        "25 s"
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -58,15 +57,15 @@ ParaglideItemDuper::ParaglideItemDuper()
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         // &NOTIFICATION_ERROR_FATAL,
-        })
+    })
 {
     PA_ADD_OPTION(ATTEMPTS);
-    PA_ADD_OPTION(LOAD_DELAY);
+    PA_ADD_OPTION(LOAD_DELAY0);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ParaglideItemDuper_Descriptor::Stats& stats = env.current_stats<ParaglideItemDuper_Descriptor::Stats>();
 
     /*
@@ -154,7 +153,7 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchCont
         pbf_press_button(context, BUTTON_A, 20, 10);
 
         //Wait for loading screen
-        pbf_wait(context, LOAD_DELAY);
+        pbf_wait(context, LOAD_DELAY0);
         context.wait_for_all_requests();
 
         // increment counter, increment stats

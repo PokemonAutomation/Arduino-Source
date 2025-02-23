@@ -66,7 +66,7 @@ std::string PathMap::dump() const{
                 str += ", ";
             }
             first = false;
-            str += get_type_slug(mon3[c]);
+            str += POKEMON_TYPE_SLUGS().get_string(mon3[c]);
         }
         str += "\n";
     }
@@ -78,7 +78,7 @@ std::string PathMap::dump() const{
                 str += ", ";
             }
             first = false;
-            str += get_type_slug(mon2[c]);
+            str += POKEMON_TYPE_SLUGS().get_string(mon2[c]);
         }
         str += "\n";
     }
@@ -90,7 +90,7 @@ std::string PathMap::dump() const{
                 str += ", ";
             }
             first = false;
-            str += get_type_slug(mon1[c]);
+            str += POKEMON_TYPE_SLUGS().get_string(mon1[c]);
         }
         str += "\n";
     }
@@ -103,7 +103,7 @@ std::string dump_path(const std::vector<PathNode>& path){
         str += "[";
         str += std::to_string(item.path_slot);
         str += ":";
-        str += get_type_slug(item.type);
+        str += POKEMON_TYPE_SLUGS().get_string(item.type);
         str += "] ";
     }
     return str;
@@ -115,7 +115,7 @@ std::string GlobalState::dump() const{
     std::string str;
     str += "    boss:";
     if (boss.empty()){
-        str += "? (" + get_type_slug(path.boss) + ")";
+        str += "? (" + POKEMON_TYPE_SLUGS().get_string(path.boss) + ")";
     }else{
         str += boss;
     }

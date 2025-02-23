@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -27,13 +26,11 @@ DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
         "A day skipper for Japanese date format. (7600 skips/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {{
-            SerialPABotBase::NintendoSwitch_Basic, {
-                to_string(SerialPABotBase::Features::TickPrecise),
-                to_string(SerialPABotBase::Features::NintendoSwitch_Basic),
-                to_string(SerialPABotBase::Features::NintendoSwitch_DateSkip),
-            }
-        }}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+            ControllerFeature::NintendoSwitch_DateSkip,
+        }
     )
 {}
 
@@ -70,7 +67,7 @@ DaySkipperJPN::DaySkipperJPN()
     PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 
-void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;

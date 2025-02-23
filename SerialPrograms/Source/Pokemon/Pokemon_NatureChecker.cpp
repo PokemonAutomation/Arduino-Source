@@ -10,38 +10,9 @@
 namespace PokemonAutomation{
 namespace Pokemon{
 
-const std::map<std::string, NatureCheckerValue>& NatureCheckerValue_TOKEN_TO_ENUM(){
-    static std::map<std::string, NatureCheckerValue> data{
-        {"Adamant",     NatureCheckerValue::Adamant},
-        {"Bashful",     NatureCheckerValue::Bashful},
-        {"Bold",        NatureCheckerValue::Bold},
-        {"Brave",       NatureCheckerValue::Brave},
-        {"Calm",        NatureCheckerValue::Calm},
-        {"Careful",     NatureCheckerValue::Careful},
-        {"Docile",      NatureCheckerValue::Docile},
-        {"Gentle",      NatureCheckerValue::Gentle},
-        {"Hardy",       NatureCheckerValue::Hardy},
-        {"Hasty",       NatureCheckerValue::Hasty},
-        {"Impish",      NatureCheckerValue::Impish},
-        {"Jolly",       NatureCheckerValue::Jolly},
-        {"Lax",         NatureCheckerValue::Lax},
-        {"Lonely",      NatureCheckerValue::Lonely},
-        {"Mild",        NatureCheckerValue::Mild},
-        {"Modest",      NatureCheckerValue::Modest},
-        {"Naive",       NatureCheckerValue::Naive},
-        {"Naughty",     NatureCheckerValue::Naughty},
-        {"Quiet",       NatureCheckerValue::Quiet},
-        {"Quirky",      NatureCheckerValue::Quirky},
-        {"Rash",        NatureCheckerValue::Rash},
-        {"Relaxed",     NatureCheckerValue::Relaxed},
-        {"Sassy",       NatureCheckerValue::Sassy},
-        {"Serious",     NatureCheckerValue::Serious},
-        {"Timid",       NatureCheckerValue::Timid},
-    };
-    return data;
-}
-const std::map<NatureCheckerValue, std::string>& NatureCheckerValue_ENUM_TO_TOKEN(){
-    static std::map<NatureCheckerValue, std::string> data{
+
+const EnumStringMap<NatureCheckerValue>& NATURE_CHECKER_VALUE_STRINGS(){
+    static EnumStringMap<NatureCheckerValue> database{
         {NatureCheckerValue::UnableToDetect,    "Unable to Detect"},
         {NatureCheckerValue::Neutral,           "Neutral"},
         {NatureCheckerValue::Adamant,           "Adamant"},
@@ -50,6 +21,7 @@ const std::map<NatureCheckerValue, std::string>& NatureCheckerValue_ENUM_TO_TOKE
         {NatureCheckerValue::Brave,             "Brave"},
         {NatureCheckerValue::Calm,              "Calm"},
         {NatureCheckerValue::Careful,           "Careful"},
+        {NatureCheckerValue::Docile,            "Docile"},
         {NatureCheckerValue::Gentle,            "Gentle"},
         {NatureCheckerValue::Hardy,             "Hardy"},
         {NatureCheckerValue::Hasty,             "Hasty"},
@@ -69,8 +41,10 @@ const std::map<NatureCheckerValue, std::string>& NatureCheckerValue_ENUM_TO_TOKE
         {NatureCheckerValue::Serious,           "Serious"},
         {NatureCheckerValue::Timid,             "Timid"},
     };
-    return data;
+    return database;
 }
+
+
 const std::map<std::pair<int, int>, NatureCheckerValue>& NatureCheckerValue_HELPHINDER_TO_ENUM(){
     static std::map<std::pair<int, int>, NatureCheckerValue> data{
         {{ 0, 2 },      NatureCheckerValue::Adamant},
@@ -98,13 +72,6 @@ const std::map<std::pair<int, int>, NatureCheckerValue>& NatureCheckerValue_HELP
     return data;
 }
 
-NatureCheckerValue NatureCheckerValue_string_to_enum(const std::string& token){
-    auto iter = NatureCheckerValue_TOKEN_TO_ENUM().find(token);
-    if (iter == NatureCheckerValue_TOKEN_TO_ENUM().end()){
-        return NatureCheckerValue::UnableToDetect;
-    }
-    return iter->second;
-}
 
 NatureCheckerValue NatureCheckerValue_helphinder_to_enum(const std::pair<int,int>& token){
     auto iter = NatureCheckerValue_HELPHINDER_TO_ENUM().find(token);
@@ -118,8 +85,8 @@ NatureCheckerValue NatureCheckerValue_helphinder_to_enum(const std::pair<int,int
 
 
 
-const EnumDatabase<NatureCheckerValue>& NatureCheckerValue_Database(){
-    static EnumDatabase<NatureCheckerValue> database({
+const EnumDropdownDatabase<NatureCheckerValue>& NatureCheckerValue_Database(){
+    static EnumDropdownDatabase<NatureCheckerValue> database({
         {NatureCheckerValue::Adamant,     "adamant",      "Adamant"},
         {NatureCheckerValue::Bashful,     "bashful",      "Bashful"},
         {NatureCheckerValue::Bold,        "bold",         "Bold"},
@@ -149,8 +116,8 @@ const EnumDatabase<NatureCheckerValue>& NatureCheckerValue_Database(){
     return database;
 }
 
-const EnumDatabase<NatureCheckerFilter>& NatureCheckerFilter_Database(){
-    static EnumDatabase<NatureCheckerFilter> database({
+const EnumDropdownDatabase<NatureCheckerFilter>& NatureCheckerFilter_Database(){
+    static EnumDropdownDatabase<NatureCheckerFilter> database({
         {NatureCheckerFilter::Any,         "any",          "Any"},
         {NatureCheckerFilter::Adamant,     "adamant",      "Adamant"},
         {NatureCheckerFilter::Bashful,     "bashful",      "Bashful"},

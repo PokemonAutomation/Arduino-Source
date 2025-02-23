@@ -46,14 +46,13 @@ BowItemDuper::BowItemDuper()
         LockMode::UNLOCK_WHILE_RUNNING,
         100
     )
-    , TICK_DELAY(
+    , TICK_DELAY0(
         "<b>Menu Delay:</b><br>Adjustable delay for exiting and reentering the menu. "
         "This should not typically be lower than 5 nor exceed 25 for successful results. "
         "Too low and the game will eat inputs and put the program in an irrecoverable state."
         "Too high and the dupes will not be successful.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "15"
+        "120 ms"
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
@@ -61,15 +60,15 @@ BowItemDuper::BowItemDuper()
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
         // &NOTIFICATION_ERROR_FATAL,
-        })
+    })
 {
     PA_ADD_OPTION(ATTEMPTS);
-    PA_ADD_OPTION(TICK_DELAY);
+    PA_ADD_OPTION(TICK_DELAY0);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void BowItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BowItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // assert_16_9_720p_min(env.logger(), env.console);
 
     // just do a forever loop where we have to do stuff
@@ -101,7 +100,7 @@ void BowItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchController
         pbf_press_button(context, BUTTON_A, 10, 15);
 
         // NOW WE HAVE TO PRESS PLUS AS FAST AS POSSIBLE
-        pbf_press_button(context, BUTTON_PLUS, 3, TICK_DELAY);
+        pbf_press_button(context, BUTTON_PLUS, 24ms, TICK_DELAY0);
         pbf_press_button(context, BUTTON_PLUS, 3, 3);
 
         // navigate back to the "current" bow, then drop it

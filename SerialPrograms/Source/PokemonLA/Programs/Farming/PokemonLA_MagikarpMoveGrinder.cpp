@@ -33,7 +33,8 @@ MagikarpMoveGrinder_Descriptor::MagikarpMoveGrinder_Descriptor()
         "grind status moves with any style against a Magikarp to finish " + STRING_POKEDEX + " research tasks.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class MagikarpMoveGrinder_Descriptor::Stats : public StatsTracker{
@@ -80,7 +81,7 @@ MagikarpMoveGrinder::MagikarpMoveGrinder()
 
 
 
-void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
     env.log("Special case: grinding Mimic...");
 
@@ -154,7 +155,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, Switc
     }
 }
 
-void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     // Which pokemon in the party is not fainted
@@ -231,7 +232,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, S
 
 
 
-void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){

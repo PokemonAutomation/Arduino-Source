@@ -5,11 +5,11 @@
  */
 
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.h"
@@ -49,7 +49,7 @@ std::string AutoStory_Segment_11::end_text() const{
 
 void AutoStory_Segment_11::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -71,7 +71,7 @@ void AutoStory_Segment_11::run_segment(
 
 void checkpoint_24(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -85,7 +85,7 @@ void checkpoint_24(
         context.wait_for_all_requests();
         DirectionDetector direction;
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 2.71);
                 pbf_move_left_joystick(context, 128, 0, 375, 100);
                 direction.change_direction(env.program_info(), env.console, context, 1.26);
@@ -97,10 +97,10 @@ void checkpoint_24(
         pbf_wait(context, 5 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
             }, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 0, 100, 20);
             },
             5, 5
@@ -137,7 +137,7 @@ void checkpoint_24(
 
 void checkpoint_25(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -158,7 +158,7 @@ void checkpoint_25(
         
         // section 1.1. keep walking forward and talk to Olive roll NPC
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
             }
         );     
@@ -223,7 +223,7 @@ void checkpoint_25(
 
 void checkpoint_26(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -237,7 +237,7 @@ void checkpoint_26(
         context.wait_for_all_requests();
 
         // change the time of day: close game, change time to 5:45 am.
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         change_date(env, context, {2025, 1, 1, 5, 45, 0});
         reset_game_from_home(env.program_info(), env.console, context);
 
@@ -521,9 +521,9 @@ void checkpoint_26(
         // section 4.2 past second NPC and into the finish line
         NoMinimapWatcher no_minimap(env.console, COLOR_RED, Milliseconds(5000));
         size_t MAX_ATTEMPTS_SECTION_4 = 3;
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 for (size_t i = 0; i < MAX_ATTEMPTS_SECTION_4; i++){
                     try{
                         green.push_olive_forward(env.program_info(), env.console, context, 6.0, 250);
@@ -566,11 +566,11 @@ void checkpoint_26(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
         
         // fix the time
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);        
 
         enter_menu_from_overworld(env.program_info(), env.console, context, -1);
@@ -589,7 +589,7 @@ void checkpoint_26(
 
 void checkpoint_27(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

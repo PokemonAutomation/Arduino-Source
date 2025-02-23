@@ -20,7 +20,7 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         AutoStoryOptions options
     ) const override;
 };
@@ -30,7 +30,7 @@ public:
 // end: Battled Nemona on the beach.
 void checkpoint_04(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 

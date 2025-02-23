@@ -13,8 +13,8 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-const EnumDatabase<ShortcutDirection>& ShortcutDirection_Nullable(){
-    static EnumDatabase<ShortcutDirection> database({
+const EnumDropdownDatabase<ShortcutDirection>& ShortcutDirection_Nullable(){
+    static EnumDropdownDatabase<ShortcutDirection> database({
         {ShortcutDirection::NONE,   "none", "None"},
         {ShortcutDirection::UP,     "up", "Up"},
         {ShortcutDirection::RIGHT,  "right", "Right"},
@@ -23,8 +23,8 @@ const EnumDatabase<ShortcutDirection>& ShortcutDirection_Nullable(){
     });
     return database;
 }
-const EnumDatabase<ShortcutDirection>& ShortcutDirection_Required(){
-    static EnumDatabase<ShortcutDirection> database({
+const EnumDropdownDatabase<ShortcutDirection>& ShortcutDirection_Required(){
+    static EnumDropdownDatabase<ShortcutDirection> database({
         {ShortcutDirection::UP,     "up", "Up"},
         {ShortcutDirection::RIGHT,  "right", "Right"},
         {ShortcutDirection::DOWN,   "down", "Down"},
@@ -44,7 +44,7 @@ ShortcutDirectionOption::ShortcutDirectionOption(std::string label)
     )
 {}
 
-void ShortcutDirectionOption::run(SwitchControllerContext& context, uint16_t delay){
+void ShortcutDirectionOption::run(ProControllerContext& context, uint16_t delay){
     uint8_t shortcut_x = 128;
     uint8_t shortcut_y = 128;
     switch (this->get()){

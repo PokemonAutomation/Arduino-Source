@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DailyHighlightFarmer_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -27,13 +28,15 @@ class DailyHighlightFarmer : public SingleSwitchProgramInstance{
 public:
     DailyHighlightFarmer();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;
 
     SimpleIntegerOption<uint32_t> SKIPS;
     SimpleIntegerOption<uint16_t> SAVE_ITERATIONS;
+
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

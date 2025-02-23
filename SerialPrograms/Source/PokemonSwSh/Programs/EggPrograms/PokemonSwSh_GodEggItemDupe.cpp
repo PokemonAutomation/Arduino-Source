@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
@@ -49,16 +50,20 @@ GodEggItemDupe::GodEggItemDupe()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH,
+    })
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(MAX_FETCH_ATTEMPTS);
     PA_ADD_OPTION(PARTY_ROUND_ROBIN);
     PA_ADD_OPTION(DETACH_BEFORE_RELEASE);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
 void GodEggItemDupe::collect_godegg(
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint8_t party_slot,
     bool map_to_pokemon,
     bool pokemon_to_map
@@ -78,7 +83,7 @@ void GodEggItemDupe::collect_godegg(
     ssf_press_button1(context, BUTTON_B, 100);
 
     //  "Please select a Pokemon to swap from your party."
-    ssf_press_button1(context, BUTTON_B, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+    ssf_press_button(context, BUTTON_B, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
 
     //  Select the party member.
     for (uint8_t c = 0; c < party_slot; c++){
@@ -88,13 +93,13 @@ void GodEggItemDupe::collect_godegg(
     pbf_mash_button(context, BUTTON_B, 500);
 
     //  Enter box
-    ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
     if (map_to_pokemon){
         ssf_press_dpad2(context, DPAD_UP, 20, 10);
         ssf_press_dpad2(context, DPAD_RIGHT, 20, 10);
     }
-    ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
-    ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
+    ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, 80ms);
+    ssf_press_button(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, 80ms);
 
     if (DETACH_BEFORE_RELEASE){
         //  Detach item
@@ -127,7 +132,7 @@ void GodEggItemDupe::collect_godegg(
         pbf_mash_button(context, BUTTON_B, 700);
     }
 }
-void GodEggItemDupe::run_program(Logger& logger, SwitchControllerContext& context, uint16_t attempts) const{
+void GodEggItemDupe::run_program(Logger& logger, ProControllerContext& context, uint16_t attempts) const{
     if (attempts == 0){
         return;
     }
@@ -164,7 +169,7 @@ void GodEggItemDupe::run_program(Logger& logger, SwitchControllerContext& contex
     }
 }
 
-void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
@@ -173,7 +178,9 @@ void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, SwitchControll
     }
 
     run_program(env.console, context, MAX_FETCH_ATTEMPTS);
-    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
+
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 
 

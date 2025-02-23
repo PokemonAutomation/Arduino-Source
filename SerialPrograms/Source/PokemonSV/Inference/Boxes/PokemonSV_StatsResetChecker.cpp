@@ -18,7 +18,7 @@ namespace PokemonSV{
 
 
 bool check_stats_reset_info(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     OCR::LanguageOCROption& LANGUAGE, Pokemon::StatsHuntIvJudgeFilterTable& FILTERS,
     Pokemon::StatsHuntAction& action
 ){

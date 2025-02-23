@@ -11,7 +11,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 
@@ -37,7 +37,7 @@ public:
     ~IngredientSession();
     IngredientSession(
         AsyncDispatcher& dispatcher,
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         Language language, SandwichIngredientType type
     );
 
@@ -46,7 +46,7 @@ public:
     std::string move_to_ingredient(const std::set<std::string>& ingredients) const;
 
     void add_ingredients(
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         std::map<std::string, uint8_t>&& ingredients
     );
 
@@ -63,7 +63,7 @@ public:
 private:
     AsyncDispatcher& m_dispatcher;
     VideoStream& m_stream;
-    SwitchControllerContext& m_context;
+    ProControllerContext& m_context;
     Language m_language;
     VideoOverlaySet m_overlays;
     SandwichIngredientType m_type;
@@ -79,7 +79,7 @@ private:
 //  If any ingredient is not found or insuffient, it will OperationFailedException::fire.
 void add_sandwich_ingredients(
     AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     std::map<std::string, uint8_t>&& fillings,  //  {slug, quantity}
     std::map<std::string, uint8_t>&& condiments

@@ -36,7 +36,8 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         "Shake trees and ores to grind tasks",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class LeapGrinder_Descriptor::Stats : public StatsTracker{
@@ -112,12 +113,12 @@ LeapGrinder::LeapGrinder()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to destination.",
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
     , MATCH_DETECTED_OPTIONS(
         "Match Action",
         "What to do when the leaping Pokemon matches the *Stop On*.",
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -140,7 +141,7 @@ LeapGrinder::LeapGrinder()
 }
 
 
-bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
     stats.attempts++;
@@ -171,9 +172,9 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
         return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
     });
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             route(env, env.console, context, (LeapPokemon)POKEMON.index());
         },
         {{shiny_detector}}
@@ -261,7 +262,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
     return false;
 }
 
-void LeapGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void LeapGrinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -278,7 +279,7 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             // Switch from items to pokemons
             pbf_press_button(context, BUTTON_X, 20, 30);
@@ -286,7 +287,7 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
     }
 
     env.update_stats();
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
 

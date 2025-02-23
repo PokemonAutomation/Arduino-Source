@@ -8,8 +8,8 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Controllers/ControllerSession.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Handle.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h"
 #include "ProgramTracker.h"
 
@@ -125,8 +125,8 @@ std::string ProgramTracker::nsw_press_button(uint64_t console_id, NintendoSwitch
     Milliseconds duration = ticks * 8ms;
     std::string err;
     try{
-        err = iter->second.first->controller().try_run<SwitchController>(
-            [=](SwitchController& controller){
+        err = iter->second.first->controller().try_run<ProController>(
+            [=](ProController& controller){
                 controller.issue_buttons(nullptr, button, duration, duration, 0ms);
             }
         );
@@ -155,8 +155,8 @@ std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, NintendoSwitch::
     Milliseconds duration = ticks * 8ms;
     std::string err;
     try{
-        err = iter->second.first->controller().try_run<SwitchController>(
-            [=](SwitchController& controller){
+        err = iter->second.first->controller().try_run<ProController>(
+            [=](ProController& controller){
                 controller.issue_dpad(nullptr, position, duration, duration, 0ms);
             }
         );
@@ -185,8 +185,8 @@ std::string ProgramTracker::nsw_press_left_joystick(uint64_t console_id, uint8_t
     Milliseconds duration = ticks * 8ms;
     std::string err;
     try{
-        err = iter->second.first->controller().try_run<SwitchController>(
-            [=](SwitchController& controller){
+        err = iter->second.first->controller().try_run<ProController>(
+            [=](ProController& controller){
                 controller.issue_left_joystick(nullptr, x, y, duration, duration, 0ms);
             }
         );
@@ -215,8 +215,8 @@ std::string ProgramTracker::nsw_press_right_joystick(uint64_t console_id, uint8_
     Milliseconds duration = ticks * 8ms;
     std::string err;
     try{
-        err = iter->second.first->controller().try_run<SwitchController>(
-            [=](SwitchController& controller){
+        err = iter->second.first->controller().try_run<ProController>(
+            [=](ProController& controller){
                 controller.issue_right_joystick(nullptr, x, y, duration, duration, 0ms);
             }
         );

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_ActivateMenuGlitchPoketch_H
 #define PokemonAutomation_PokemonBDSP_ActivateMenuGlitchPoketch_H
 
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -26,10 +26,10 @@ class ActivateMenuGlitch112 : public SingleSwitchProgramInstance{
 public:
     ActivateMenuGlitch112();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    TimeExpressionOption<uint16_t> FLY_A_TO_X_DELAY;
+    MillisecondsOption FLY_A_TO_X_DELAY0;
 };
 
 

@@ -10,7 +10,7 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceSession.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_AreaZeroSkyDetector.h"
 
@@ -99,7 +99,7 @@ enum class OverworldState{
     TurningRight,
 };
 void find_and_center_on_sky(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
 ){
     context.wait_for_all_requests();
     stream.log("Looking for the sky...");
@@ -110,7 +110,7 @@ void find_and_center_on_sky(
         {sky_tracker}
     );
 
-    AsyncCommandSession<SwitchController> session(
+    AsyncCommandSession<ProController> session(
         context, stream.logger(),
         env.realtime_dispatcher(),
         context.controller()
@@ -138,7 +138,7 @@ void find_and_center_on_sky(
         if (!sky){
             if (state != OverworldState::FindingSky){
                 stream.log("Sky not detected. Attempting to find the sky...", COLOR_ORANGE);
-                session.dispatch([](SwitchControllerContext& context){
+                session.dispatch([](ProControllerContext& context){
                     pbf_move_right_joystick(context, 128, 0, 250, 0);
                     pbf_move_right_joystick(context, 0, 0, 10 * TICKS_PER_SECOND, 0);
                 });
@@ -154,7 +154,7 @@ void find_and_center_on_sky(
                 stream.log("Centering the sky... Moving left.");
                 uint8_t magnitude = (uint8_t)((0.5 - sky_x) * 96 + 31);
                 uint16_t duration = (uint16_t)((0.5 - sky_x) * 125 + 20);
-                session.dispatch([=](SwitchControllerContext& context){
+                session.dispatch([=](ProControllerContext& context){
                     pbf_move_right_joystick(context, 128 - magnitude, 128, duration, 0);
                 });
                 state = OverworldState::TurningLeft;
@@ -166,7 +166,7 @@ void find_and_center_on_sky(
                 stream.log("Centering the sky... Moving Right.");
                 uint8_t magnitude = (uint8_t)((sky_x - 0.5) * 96 + 31);
                 uint16_t duration = (uint16_t)((sky_x - 0.5) * 125 + 20);
-                session.dispatch([=](SwitchControllerContext& context){
+                session.dispatch([=](ProControllerContext& context){
                     pbf_move_right_joystick(context, 128 + magnitude, 128, duration, 0);
                 });
                 state = OverworldState::TurningRight;

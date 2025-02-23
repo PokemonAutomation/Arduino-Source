@@ -47,7 +47,7 @@ AutoHost_Descriptor::AutoHost_Descriptor()
         "Auto-host a Tera raid.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct AutoHost_Descriptor::Stats : public StatsTracker{
@@ -129,7 +129,7 @@ AutoHost::AutoHost()
 
 
 WallClock AutoHost::wait_for_lobby_open(
-    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     std::string& lobby_code
 ){
     VideoOverlaySet overlays(env.console.overlay());
@@ -181,7 +181,7 @@ void AutoHost::update_stats_on_raid_start(SingleSwitchProgramEnvironment& env, u
     stats.m_raiders += player_count - 1;
 }
 bool AutoHost::start_raid(
-    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     WallClock start_time,
     uint8_t player_count
 ){
@@ -194,9 +194,9 @@ bool AutoHost::start_raid(
         WhiteScreenOverWatcher start_raid(COLOR_BLUE);
         TeraBattleMenuWatcher battle_menu(COLOR_CYAN);
         context.wait_for_all_requests();
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [start_time](SwitchControllerContext& context){
+            [start_time](ProControllerContext& context){
                 while (true){
                     pbf_press_button(context, BUTTON_A, 20, 105);
                     context.wait_for_all_requests();
@@ -233,7 +233,7 @@ bool AutoHost::start_raid(
 
 
 bool AutoHost::run_lobby(
-    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     std::string& lobby_code,
     std::array<std::map<Language, std::string>, 4>& player_names
 ){
@@ -265,7 +265,7 @@ bool AutoHost::run_lobby(
     return start_raid(env, context, start_time, waiter.last_known_players());
 }
 
-void AutoHost::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutoHost::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     AutoHost_Descriptor::Stats& stats = env.current_stats<AutoHost_Descriptor::Stats>();
@@ -294,7 +294,7 @@ void AutoHost::program(SingleSwitchProgramEnvironment& env, SwitchControllerCont
         fail_tracker.on_raid_start();
 
         if (!skip_reset){
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
             if (ROLLOVER_PREVENTION){
                 WallClock now = current_time();
                 if (last_time_fix == WallClock::min() || now - last_time_fix > std::chrono::hours(4)){

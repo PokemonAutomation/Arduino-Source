@@ -36,7 +36,7 @@ public:
 class StatsResetCalyrex : public SingleSwitchProgramInstance{
 public:
     StatsResetCalyrex();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;

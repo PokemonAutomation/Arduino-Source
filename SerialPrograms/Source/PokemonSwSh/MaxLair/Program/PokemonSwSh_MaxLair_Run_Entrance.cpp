@@ -19,7 +19,7 @@ namespace MaxLairInternal{
 void run_entrance(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool save_path,
     GlobalStateTracker& state_tracker
 ){

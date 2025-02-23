@@ -19,6 +19,10 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+//std::atomic<bool> force_detected(false);
+
+
+
 AudioPerSpectrumDetectorBase::AudioPerSpectrumDetectorBase(
     Logger& logger,
     std::string label,
@@ -174,6 +178,10 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
             break;
         }
     }
+
+//    if (force_detected){
+//        return true;
+//    }
 
     //  No shiny detected.
     if (m_last_error >= 1.0){

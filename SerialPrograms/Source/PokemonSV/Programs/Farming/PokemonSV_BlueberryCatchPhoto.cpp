@@ -11,10 +11,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -38,7 +38,7 @@ namespace PokemonSV{
 
 CameraAngle quest_photo_navi(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 ){
@@ -273,7 +273,7 @@ CameraAngle quest_photo_navi(
 
 void quest_photo(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 ){
@@ -282,9 +282,9 @@ void quest_photo(
 
     while(!took_photo){
         EncounterWatcher encounter_watcher(stream, COLOR_RED);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
 
                 move_camera = quest_photo_navi(info, stream, context, BBQ_OPTIONS, current_quest);
 
@@ -316,9 +316,9 @@ void quest_photo(
                 }
 
                 //Mash B until overworld
-                int exit = run_until<SwitchControllerContext>(
+                int exit = run_until<ProControllerContext>(
                     stream, context,
-                    [&](SwitchControllerContext& context){
+                    [&](ProControllerContext& context){
                         pbf_mash_button(context, BUTTON_B, 2000);
                     },
                     {{ overworld }}
@@ -370,7 +370,7 @@ void quest_photo(
 
 void quest_catch_navi(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 ){
@@ -625,7 +625,7 @@ void quest_catch_navi(
 
 void quest_catch_throw_ball(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     const std::string& selected_ball
 ){
@@ -681,7 +681,7 @@ void quest_catch_throw_ball(
 
 void quest_catch_handle_battle(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 ){
@@ -695,9 +695,9 @@ void quest_catch_handle_battle(
     bool tera_target = false;
     bool use_quickball = BBQ_OPTIONS.QUICKBALL;
 
-    int ret2 = run_until<SwitchControllerContext>(
+    int ret2 = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             while (true){
                 //Check that battle menu appears - this is in case of swapping pokemon
                 NormalBattleMenuWatcher menu_before_throw(COLOR_YELLOW);
@@ -759,9 +759,9 @@ void quest_catch_handle_battle(
                         MoveSelectWatcher move_watcher(COLOR_BLUE);
                         MoveSelectDetector move_select(COLOR_BLUE);
 
-                        int ret_move_select = run_until<SwitchControllerContext>(
+                        int ret_move_select = run_until<ProControllerContext>(
                             stream, context,
-                            [&](SwitchControllerContext& context){
+                            [&](ProControllerContext& context){
                                 pbf_press_button(context, BUTTON_A, 10, 50);
                                 pbf_wait(context, 100);
                                 context.wait_for_all_requests();
@@ -865,16 +865,16 @@ void quest_catch_handle_battle(
 
 void quest_catch(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 ){
     EncounterWatcher encounter_watcher(stream, COLOR_RED);
 
     //Navigate to target and start battle
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             
             quest_catch_navi(info, stream, context, BBQ_OPTIONS, current_quest);
             context.wait_for_all_requests();
@@ -912,7 +912,7 @@ void quest_catch(
     return_to_plaza(info, stream, context);
 
     //Day skip and attempt to respawn fixed encounters
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(context, true, true);
     PokemonSwSh::roll_date_forward_1(context, true);
     resume_game_from_home(stream, context);
@@ -924,9 +924,9 @@ void quest_catch(
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
-    int exit = run_until<SwitchControllerContext>(
+    int exit = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
@@ -942,7 +942,7 @@ void quest_catch(
 
 void wild_battle_tera(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool& tera_self
 ){
     AdvanceDialogWatcher lost(COLOR_YELLOW);
@@ -951,9 +951,9 @@ void wild_battle_tera(
     uint8_t switch_party_slot = 1;
     bool first_turn = true;
 
-    int ret2 = run_until<SwitchControllerContext>(
+    int ret2 = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             while(true){
                 if (current_time() - start > std::chrono::minutes(5)){
                     stream.log("Timed out during battle after 5 minutes.", COLOR_RED);

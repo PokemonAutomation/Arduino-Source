@@ -22,9 +22,9 @@ namespace PokemonSwSh{
 //  Returns the # of slots scrolled. Returns -1 if not found.
 int move_to_ball(
     const BattleBallReader& reader,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const std::string& ball_slug,
-    bool forward, int attempts, uint16_t delay
+    bool forward, int attempts, Milliseconds delay
 ){
     VideoSnapshot frame = stream.video().snapshot();
     std::string first_ball = reader.read_ball(frame);
@@ -34,7 +34,7 @@ int move_to_ball(
 
     size_t repeat_counter = 0;
     for (int c = 1; c < attempts; c++){
-        pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 10, delay);
+        pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 80ms, delay);
         context.wait_for_all_requests();
         frame = stream.video().snapshot();
         std::string current_ball = reader.read_ball(frame);
@@ -54,11 +54,11 @@ int move_to_ball(
 //  Returns the quantity of the ball.
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
-    const BattleBallReader& reader, VideoStream& stream, SwitchControllerContext& context,
+    const BattleBallReader& reader, VideoStream& stream, ProControllerContext& context,
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
-    int ret = move_to_ball(reader, stream, context, ball_slug, true, 100, 40);
+    int ret = move_to_ball(reader, stream, context, ball_slug, true, 100, 320ms);
     if (ret < 0){
         return 0;
     }
@@ -68,12 +68,12 @@ int16_t move_to_ball(
     }
 
     //  Wait a second to let the video catch up.
-    pbf_wait(context, TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
     //  Now try again in reverse at a lower speed in case we overshot.
     //  This will return immediately if we got it right the first time.
-    ret = move_to_ball(reader, stream, context, ball_slug, false, 5, TICKS_PER_SECOND);
+    ret = move_to_ball(reader, stream, context, ball_slug, false, 5, 1000ms);
     if (ret < 0){
         return 0;
     }
@@ -86,7 +86,7 @@ int16_t move_to_ball(
 
 
 CatchResults throw_balls(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 ){
@@ -144,7 +144,7 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 ){
@@ -170,9 +170,9 @@ CatchResults basic_catcher(
     {
         stream.log("Waiting for black screen end...");
         BlackScreenOverWatcher black_screen_detector;
-        run_until<SwitchControllerContext>(
+        run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {{black_screen_detector}}
@@ -186,9 +186,9 @@ CatchResults basic_catcher(
     {
         ReceivePokemonDetector caught_detector(true);
 
-        int result = run_until<SwitchControllerContext>(
+        int result = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
             },
             {{caught_detector}}
@@ -210,9 +210,9 @@ CatchResults basic_catcher(
     {
         stream.log("Waiting for black screen end...");
         BlackScreenOverWatcher black_screen_detector;
-        run_until<SwitchControllerContext>(
+        run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             },
             {{black_screen_detector}}

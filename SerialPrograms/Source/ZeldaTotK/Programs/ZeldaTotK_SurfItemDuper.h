@@ -26,7 +26,7 @@ public:
 class SurfItemDuper : public SingleSwitchProgramInstance{
 public:
     SurfItemDuper();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> ATTEMPTS;

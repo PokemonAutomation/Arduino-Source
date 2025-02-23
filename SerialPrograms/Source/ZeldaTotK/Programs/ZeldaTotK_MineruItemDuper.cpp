@@ -64,7 +64,7 @@ MineruItemDuper::MineruItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     MineruItemDuper_Descriptor::Stats& stats = env.current_stats<MineruItemDuper_Descriptor::Stats>();
 
     /*

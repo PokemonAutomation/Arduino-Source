@@ -34,7 +34,7 @@ public:
     ~ItemPrinterRNG();
     ItemPrinterRNG();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 
 private:
@@ -52,9 +52,9 @@ private:
 
     bool overlapping_bonus();
 
-    void run_item_printer_rng_automode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
+    void run_item_printer_rng_automode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 
-    void run_item_printer_rng(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
+    void run_item_printer_rng(SingleSwitchProgramEnvironment& env, ProControllerContext& context, ItemPrinterRNG_Descriptor::Stats& stats);
 
     std::vector<ItemPrinterRngRowSnapshot> desired_print_table(
         ItemPrinter::PrebuiltOptions desired_item,
@@ -71,18 +71,18 @@ private:
     // return to item printer
     void run_material_farming_then_return_to_item_printer(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context, 
+        ProControllerContext& context, 
         ItemPrinterRNG_Descriptor::Stats& stats,
         MaterialFarmerOptions& material_farmer_options
     );
 
     ItemPrinterPrizeResult run_print_at_date(
-        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context,
         const DateTime& date, ItemPrinterJobs jobs
     );
 
     void print_again(
-        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context,
         ItemPrinterJobs jobs
     ) const;
 
@@ -107,12 +107,12 @@ private:
 
     uint32_t calc_num_jobs_using_happiny_dust(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         uint16_t min_happiny_dust
     );
 
     uint32_t check_num_happiny_dust(
-        SingleSwitchProgramEnvironment& env, SwitchControllerContext& context
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context
     );
 
 private:

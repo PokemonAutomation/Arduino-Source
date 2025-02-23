@@ -20,7 +20,7 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         AutoStoryOptions options
     ) const override;
 };
@@ -30,7 +30,7 @@ public:
 // end: At Mesagoza West gate flypoint
 void checkpoint_21(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -38,7 +38,7 @@ void checkpoint_21(
 // end: At South Province Area Two Pokecenter.
 void checkpoint_22(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -46,7 +46,7 @@ void checkpoint_22(
 // end: At Cortondo East Pokecenter
 void checkpoint_23(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 

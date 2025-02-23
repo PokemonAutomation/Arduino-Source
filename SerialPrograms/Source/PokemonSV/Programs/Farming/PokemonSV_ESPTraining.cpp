@@ -31,7 +31,8 @@ ESPTraining_Descriptor::ESPTraining_Descriptor()
         "Clear the ESP Training to farm EV berries.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct ESPTraining_Descriptor::Stats : public StatsTracker{
@@ -87,7 +88,7 @@ ESPTraining::ESPTraining()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ESPTraining::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     ESPTraining_Descriptor::Stats& stats = env.current_stats<ESPTraining_Descriptor::Stats>();
 
@@ -223,9 +224,9 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
 
         //Program done, mash B until overworld detected
         OverworldWatcher overworld(env.console, COLOR_CYAN);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 700);
             },
             {overworld}

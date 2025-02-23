@@ -48,7 +48,7 @@ SnapshotDumper::SnapshotDumper()
     PA_ADD_OPTION(FORMAT);
 }
 
-void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::string folder_path = USER_FILE_PATH() + "ScreenshotDumper/";
     QDir().mkpath(folder_path.c_str());
     while (true){

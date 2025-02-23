@@ -83,7 +83,7 @@ AudioStarterReset::AudioStarterReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     AudioStarterReset_Descriptor::Stats& stats = env.current_stats<AudioStarterReset_Descriptor::Stats>();
 
     /*
@@ -134,9 +134,9 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, SwitchContr
         env.log("Starter selected. Checking for shiny Poochyena.");
         AdvanceBattleDialogWatcher pooch_appeared(COLOR_YELLOW);
 
-        int res = run_until<SwitchControllerContext>(
+        int res = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context) {
+            [&](ProControllerContext& context) {
                 int ret = wait_until(
                     env.console, context,
                     std::chrono::seconds(20),
@@ -169,9 +169,9 @@ void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, SwitchContr
         });
 
         BattleMenuWatcher battle_menu(COLOR_RED);
-        int res2 = run_until<SwitchControllerContext>(
+        int res2 = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context) {
+            [&](ProControllerContext& context) {
                 env.log("Sending out selected starter.");
                 pbf_press_button(context, BUTTON_A, 40, 40);
 

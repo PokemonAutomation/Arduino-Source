@@ -17,7 +17,7 @@ namespace PokemonSwSh{
 
 Xoroshiro128PlusState find_rng_state(
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     bool save_screenshots,
     bool log_image_values
 ){
@@ -69,7 +69,7 @@ Xoroshiro128PlusState find_rng_state(
 
 Xoroshiro128PlusState refind_rng_state(
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Xoroshiro128PlusState last_known_state,
     size_t min_advances,
     size_t max_advances,
@@ -145,7 +145,7 @@ Xoroshiro128PlusState refind_rng_state(
 
 
 void do_rng_advances(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Xoroshiro128Plus& rng,
     size_t advances,
     uint16_t press_duration,

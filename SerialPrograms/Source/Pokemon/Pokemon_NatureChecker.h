@@ -8,8 +8,8 @@
 #define PokemonAutomation_Pokemon_NatureChecker_H
 
 #include <string>
-#include <vector>
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/EnumStringMap.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -51,8 +51,8 @@ enum class NatureCheckerValue{
     Quiet,
     Sassy,
 };
-const EnumDatabase<NatureCheckerValue>& NatureCheckerValue_Database();
-NatureCheckerValue NatureCheckerValue_string_to_enum(const std::string& token);
+const EnumStringMap<NatureCheckerValue>& NATURE_CHECKER_VALUE_STRINGS();
+const EnumDropdownDatabase<NatureCheckerValue>& NatureCheckerValue_Database();
 NatureCheckerValue NatureCheckerValue_helphinder_to_enum(const std::pair<int,int>& token);
 
 
@@ -91,7 +91,7 @@ enum class NatureCheckerFilter{
     Sassy,
 };
 
-const EnumDatabase<NatureCheckerFilter>& NatureCheckerFilter_Database();
+const EnumDropdownDatabase<NatureCheckerFilter>& NatureCheckerFilter_Database();
 bool NatureChecker_filter_match(NatureCheckerFilter filter, NatureCheckerValue value);
 
 }

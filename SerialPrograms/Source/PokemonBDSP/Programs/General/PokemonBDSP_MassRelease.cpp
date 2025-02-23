@@ -26,7 +26,8 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         "Mass release boxes of " + STRING_POKEMON + ".",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct MassRelease_Descriptor::Stats : public StatsTracker{
@@ -66,15 +67,15 @@ MassRelease::MassRelease()
 
 
 
-void MassRelease::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
     env.update_stats();
 
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
-    uint16_t box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY_0;
-    uint16_t box_change_delay = GameSettings::instance().BOX_CHANGE_DELAY_0;
+    Milliseconds box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY0;
+    Milliseconds box_change_delay = GameSettings::instance().BOX_CHANGE_DELAY0;
 
     if (BOXES_TO_RELEASE > 0){
         env.update_stats();
@@ -82,13 +83,13 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
         stats.m_boxes_released++;
         for (uint8_t box = 1; box < BOXES_TO_RELEASE; box++){
             env.update_stats();
-            pbf_press_dpad(context, DPAD_DOWN, 20, box_scroll_delay);
-            pbf_press_dpad(context, DPAD_DOWN, 20, box_scroll_delay);
-            pbf_press_dpad(context, DPAD_DOWN, 20, box_scroll_delay);
-            pbf_press_dpad(context, DPAD_RIGHT, 20, box_scroll_delay);
-            pbf_press_dpad(context, DPAD_RIGHT, 20, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, box_scroll_delay);
             pbf_wait(context, 50);
-            pbf_press_button(context, BUTTON_R, 20, box_change_delay);
+            pbf_press_button(context, BUTTON_R, 160ms, box_change_delay);
             release_box(context, box_scroll_delay);
             stats.m_boxes_released++;
         }

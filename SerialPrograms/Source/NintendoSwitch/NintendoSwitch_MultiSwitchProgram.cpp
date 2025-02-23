@@ -37,13 +37,13 @@ MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
 
 void MultiSwitchProgramEnvironment::run_in_parallel(
     CancellableScope& scope,
-    const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
+    const std::function<void(ConsoleHandle& console, ProControllerContext& context)>& func
 ){
     run_in_parallel(scope, 0, consoles.size(), func);
 }
 void MultiSwitchProgramEnvironment::run_in_parallel(
     CancellableScope& scope, size_t s, size_t e,
-    const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
+    const std::function<void(ConsoleHandle& console, ProControllerContext& context)>& func
 ){
     realtime_dispatcher().run_in_parallel(
         s, e,
@@ -52,7 +52,7 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
             ThreadUtilizationStat stat(current_thread_handle(), "Program Thread " + std::to_string(index) + ":");
             console.overlay().add_stat(stat);
             try{
-                SwitchControllerContext context(scope, consoles[index].controller());
+                ProControllerContext context(scope, consoles[index].controller());
                 func(console, context);
                 context.wait_for_all_requests();
                 console.overlay().remove_stat(stat);
@@ -74,12 +74,13 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
     ControllerRequirements requirements,
+    FasterIfTickPrecise faster_if_tick_precise,
     size_t min_switches,
     size_t max_switches,
     size_t default_switches
 )
     : ProgramDescriptor(
-        pick_color(feedback),
+        pick_color(requirements, faster_if_tick_precise),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
@@ -87,6 +88,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     )
     , m_feedback(feedback)
     , m_requirements(std::move(requirements))
+    , m_faster_if_tick_precise(faster_if_tick_precise)
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_min_switches(min_switches)
     , m_max_switches(max_switches)
@@ -142,9 +144,17 @@ void MultiSwitchProgramInstance::start_program_feedback_check(
 }
 void MultiSwitchProgramInstance::start_program_border_check(
     CancellableScope& scope,
-    VideoStream& stream, size_t console_index
+    VideoStream& stream, size_t console_index,
+    FeedbackType feedback_type
 ){
-    StartProgramChecks::check_border(stream);
+    switch (feedback_type){
+    case FeedbackType::NONE:
+    case FeedbackType::OPTIONAL_:
+        return;
+    case FeedbackType::REQUIRED:
+    case FeedbackType::VIDEO_AUDIO:
+        StartProgramChecks::check_border(stream);
+    }
 }
 
 

@@ -9,6 +9,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -32,7 +33,8 @@ DenRoller_Descriptor::DenRoller_Descriptor()
         "Roll den to the N'th day, SR and repeat.",
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 struct DenRoller_Descriptor::Stats : public StatsTracker{
@@ -68,12 +70,11 @@ DenRoller::DenRoller()
         "<b>Desired " + STRING_POKEMON + ":</b><br>"
         "Automatically stop when this " + STRING_POKEMON + " is rolled. Video output is required."
     )
-    , VIEW_TIME(
+    , VIEW_TIME0(
         "<b>View Time:</b><br>Wait this long before restting. This wait is skipped if the desired " +
         STRING_POKEMON + " is set since the program will be watching it for you.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5 s"
     )
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
@@ -83,43 +84,42 @@ DenRoller::DenRoller()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , READ_DELAY(
+    , READ_DELAY0(
         "<b>Read Delay:</b><br>Wait this long before attempting to " +
         STRING_POKEMON + ". This needs to be long enough for the silhouette to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1 * TICKS_PER_SECOND"
+        "1000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(FILTER);
     PA_ADD_OPTION(CATCHABILITY);
-    PA_ADD_OPTION(VIEW_TIME);
+    PA_ADD_OPTION(VIEW_TIME0);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(READ_DELAY);
+    PA_ADD_OPTION(READ_DELAY0);
 }
 
 
 
 
-void DenRoller::ring_bell(SwitchControllerContext& context, int count) const{
+void DenRoller::ring_bell(ProControllerContext& context, int count) const{
     for (int c = 0; c < count; c++){
         pbf_press_button(context, BUTTON_LCLICK, 5, 10);
     }
     pbf_wait(context, 200);
 }
 
-void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void DenRoller::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DenRoller_Descriptor::Stats& stats = env.current_stats<DenRoller_Descriptor::Stats>();
 
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
     }
 
     rollback_date_from_home(context, SKIPS);
@@ -132,7 +132,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerCon
 
     VideoSnapshot screen;
     while (true){
-        roll_den(env.console, context, 0, 0, SKIPS, CATCHABILITY);
+        roll_den(env.console, context, 0ms, 0ms, SKIPS, CATCHABILITY);
 
         size_t desired_index = FILTER.index();
         std::string desired_slug = FILTER.slug();
@@ -148,10 +148,10 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerCon
         {
             DenMonReader reader(env.console, env.console);
 
-            enter_den(context, 0, SKIPS != 0, false);
+            enter_den(context, 0ms, SKIPS != 0, false);
 
             if (desired_index != 0){
-                pbf_wait(context, READ_DELAY);
+                pbf_wait(context, READ_DELAY0);
             }
             context.wait_for_all_requests();
 
@@ -161,12 +161,12 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerCon
             //  Give user time to look at the mon.
             if (desired_index == 0){
                 //  No filter enabled. Keep going.
-                pbf_wait(context, VIEW_TIME);
+                pbf_wait(context, VIEW_TIME0);
             }else if (results.slugs.results.empty()){
                 //  No detection. Keep going.
                 stats.errors++;
                 dump_image(env.console, env.program_info(), "ReadDenMon", screen);
-                pbf_wait(context, VIEW_TIME);
+                pbf_wait(context, VIEW_TIME0);
             }else{
                 //  Check if we got what we wanted.
                 for (const auto& item : results.slugs.results){
@@ -180,7 +180,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, SwitchControllerCon
         env.update_stats();
 
         //  Add a little extra wait time since correctness matters here.
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE - 10);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
 
         rollback_date_from_home(context, SKIPS);
 //        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);

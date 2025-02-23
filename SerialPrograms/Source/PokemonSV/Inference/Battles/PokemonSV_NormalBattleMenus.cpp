@@ -58,7 +58,7 @@ int8_t NormalBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const
 //    cout << "slot = " << slot << endl;
     return (int8_t)(slot + 0.5);
 }
-bool NormalBattleMenuDetector::move_to_slot(VideoStream& stream, SwitchControllerContext& context, uint8_t slot) const{
+bool NormalBattleMenuDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const{
     if (slot > 3){
         return false;
     }
@@ -104,7 +104,7 @@ bool NormalBattleMenuDetector::move_to_slot(VideoStream& stream, SwitchControlle
 
 
 std::set<std::string> read_singles_opponent(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     Language language
 ){
     VideoOverlaySet overlay = stream.overlay();
@@ -219,7 +219,7 @@ int8_t MoveSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
 
     return (int8_t)(y + 0.5);
 }
-bool MoveSelectDetector::move_to_slot(VideoStream& stream, SwitchControllerContext& context, uint8_t slot) const{
+bool MoveSelectDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const{
     if (slot > 3){
         return false;
     }
@@ -304,7 +304,7 @@ int8_t SwapMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
     //cout << "slot = " << slot << endl;
     return (int8_t)slot;
 }
-bool SwapMenuDetector::move_to_slot(VideoStream& stream, SwitchControllerContext& context, uint8_t slot) const{
+bool SwapMenuDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const{
     if (slot > 5){
         return false;
     }

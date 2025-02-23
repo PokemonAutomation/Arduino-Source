@@ -552,7 +552,7 @@ void AutoStory::value_changed(void* object){
 void AutoStory::test_checkpoints(
     SingleSwitchProgramEnvironment& env,
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     int start, int end, 
     int loop, int start_loop, int end_loop
 ){
@@ -679,7 +679,7 @@ std::string AutoStory::end_segment_description(){
 }
 
 
-void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     AutoStoryOptions options{
         LANGUAGE,
         STARTERCHOICE,
@@ -702,7 +702,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, SwitchControl
     }
 }
 
-void AutoStory::test_code(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (TEST_CURRENT_DIRECTION){
         DirectionDetector direction;
         // direction.change_direction(env.program_info(), env.console, context, DIR_RADIANS);
@@ -760,7 +760,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, SwitchControllerC
 
 }
 
-void AutoStory::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     // AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 

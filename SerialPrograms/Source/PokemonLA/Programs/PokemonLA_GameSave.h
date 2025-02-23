@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_GameSave_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
@@ -27,7 +27,7 @@ bool save_tab_disabled(const ImageViewRGB32 &screen);
 // or is rolling or falling.
 bool save_game_from_overworld(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 );
 
 

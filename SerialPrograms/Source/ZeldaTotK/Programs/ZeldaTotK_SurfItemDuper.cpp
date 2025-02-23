@@ -58,7 +58,7 @@ SurfItemDuper::SurfItemDuper()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     SurfItemDuper_Descriptor::Stats& stats = env.current_stats<SurfItemDuper_Descriptor::Stats>();
 
     /*

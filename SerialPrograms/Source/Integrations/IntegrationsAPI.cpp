@@ -106,7 +106,7 @@ void pai_stop_program(DllSafeString& error, uint64_t program_id){
 }
 
 void pai_nsw_press_button(DllSafeString& error, uint64_t console_id, uint16_t button, uint16_t ticks){
-    error = ProgramTracker::instance().nsw_press_button(console_id, button, ticks);
+    error = ProgramTracker::instance().nsw_press_button(console_id, (NintendoSwitch::Button)button, ticks);
 }
 void pai_nsw_press_dpad(DllSafeString& error, uint64_t console_id, uint8_t position, uint16_t ticks){
     error = ProgramTracker::instance().nsw_press_dpad(console_id, (NintendoSwitch::DpadPosition)position, ticks);

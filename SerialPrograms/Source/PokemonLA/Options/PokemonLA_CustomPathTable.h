@@ -33,7 +33,7 @@ enum class PathAction{
     START_LISTEN,
     END_LISTEN,
 };
-const EnumDatabase<PathAction>& PathAction_Database();
+const EnumDropdownDatabase<PathAction>& PathAction_Database();
 
 enum class PathMount{
     NO_MOUNT,
@@ -43,7 +43,7 @@ enum class PathMount{
     SNEASLER,
     BRAVIARY,
 };
-const EnumDatabase<PathMount>& PathMount_Database();
+const EnumDropdownDatabase<PathMount>& PathMount_Database();
 
 enum class PathSpeed{
     NORMAL_SPEED,
@@ -53,7 +53,7 @@ enum class PathSpeed{
     DASH_B_SPAM,
     DIVE,
 };
-const EnumDatabase<PathSpeed>& PathSpeed_Database();
+const EnumDropdownDatabase<PathSpeed>& PathSpeed_Database();
 
 
 

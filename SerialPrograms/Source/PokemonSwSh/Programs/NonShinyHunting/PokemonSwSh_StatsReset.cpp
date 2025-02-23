@@ -31,7 +31,8 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         "Repeatedly receive gift " + STRING_POKEMON + " until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct StatsReset_Descriptor::Stats : public StatsTracker{
@@ -101,7 +102,7 @@ StatsReset::StatsReset()
 
 
 
-void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -118,15 +119,15 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         context.wait_for_all_requests();
         {
             BlackScreenOverWatcher detector;
-            int result = run_until<SwitchControllerContext>(
+            int result = run_until<ProControllerContext>(
                 env.console, context,
-                [this](SwitchControllerContext& context){
+                [this](ProControllerContext& context){
                     if (POKEMON == GiftPokemon::TypeNull){
-                        pbf_mash_button(context, BUTTON_A, 10 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_A, 10s);
                     }else{
-                        pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_A, 5s);
                     }
-                    pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 20s);
                 },
                 {{detector}}
             );
@@ -138,12 +139,12 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         }
         stats.attempts++;
 
-        pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
 
-        pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-        ssf_press_dpad2(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY, 10);
-        ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
-        ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
+        ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
+        ssf_press_dpad(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY0, 160ms);
+        ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, 160ms);
+        ssf_press_button(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, 160ms);
         context.wait_for_all_requests();
 
         {
@@ -163,7 +164,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
         }
 
         //  Add a little extra wait time since correctness matters here.
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
 
         reset_game_from_home_with_inference(
             env.console, context,
@@ -175,8 +176,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, SwitchControllerCo
     env.update_stats();
     env.log("Result Found!", COLOR_BLUE);
 
-    pbf_wait(context, 5 * TICKS_PER_SECOND);
-    pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+    pbf_wait(context, 5000ms);
+    pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 5000ms);
 
     send_program_finished_notification(
         env, NOTIFICATION_PROGRAM_FINISH,

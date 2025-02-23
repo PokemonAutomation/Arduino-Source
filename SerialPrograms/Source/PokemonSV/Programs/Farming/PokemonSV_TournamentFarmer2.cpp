@@ -35,7 +35,7 @@ TournamentFarmer2_Descriptor::TournamentFarmer2_Descriptor()
         "Farm the Academy Ace Tournament for money and prizes. (version 2)",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -149,7 +149,7 @@ private:
 
 
 
-void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     TournamentFarmer2_Descriptor::Stats& stats = env.current_stats<TournamentFarmer2_Descriptor::Stats>();
 
@@ -182,9 +182,9 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchContr
         }
         {
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-            int ret = run_until<SwitchControllerContext>(
+            int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](SwitchControllerContext& context){
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 10000); //it takes a while to load and start
                 },
                 {battle_menu}
@@ -208,9 +208,9 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchContr
         for (uint16_t battles = 0; battles < 4; battles++){
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);  //  Next battle started
             OverworldWatcher overworld(env.console, COLOR_CYAN);             //  Previous battle was lost
-            int ret = run_until<SwitchControllerContext>(
+            int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](SwitchControllerContext& context){
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
                 },
                 {battle_menu, overworld}
@@ -253,9 +253,9 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchContr
                   - if win: Fast Travel will be detected
                   - if lose: will time out.
                 */
-                ret = run_until<SwitchControllerContext>(
+                ret = run_until<ProControllerContext>(
                     env.console, context,
-                    [](SwitchControllerContext& context){
+                    [](ProControllerContext& context){
                         pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
                     },
                     {overworld} 
@@ -270,9 +270,9 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchContr
                 context.wait_for_all_requests();
 
                 FastTravelWatcher fast_travel(COLOR_YELLOW, env.console.overlay(), MINIMAP_AREA);
-                ret = run_until<SwitchControllerContext>(
+                ret = run_until<ProControllerContext>(
                     env.console, context,
-                    [](SwitchControllerContext& context){
+                    [](ProControllerContext& context){
                         pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
                     },
                     {fast_travel}
@@ -295,7 +295,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, SwitchContr
 
 
             if (battle_lost){
-                return_to_academy_after_loss(env, context);
+                return_to_academy_after_loss(env, env.console, context);
                 break;
             }
         }

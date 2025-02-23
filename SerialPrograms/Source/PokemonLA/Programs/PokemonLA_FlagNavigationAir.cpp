@@ -21,7 +21,7 @@ namespace PokemonLA{
 
 
 FlagNavigationAir::FlagNavigationAir(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     uint16_t stop_radius,
     double flag_reached_delay,
     std::chrono::seconds navigate_timeout
@@ -53,7 +53,7 @@ FlagNavigationAir::FlagNavigationAir(
     *this += m_leftB;
     *this += m_dialog_detector;
 
-    auto find_flag = [this](SwitchControllerContext& context){
+    auto find_flag = [this](ProControllerContext& context){
         uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         for (size_t c = 0; c < 2; c++){
             pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
@@ -75,7 +75,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::WYRDEER_BASCULEGION_OFF, [this](){
         m_stream.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
-        m_active_command->dispatch([](SwitchControllerContext& context){
+        m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -83,14 +83,14 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::WYRDEER_BASCULEGION_ON, [this](){
         m_stream.log("Switching from Wyrdeer/Basculegion (on) to Braviary (on)...");
-        m_active_command->dispatch([](SwitchControllerContext& context){
+        m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::URSALUNA_OFF, [this](){
         m_stream.log("Switching from Ursaluna (off) to Braviary (on)...");
-        m_active_command->dispatch([](SwitchControllerContext& context){
+        m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
 //            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
 //            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
@@ -99,7 +99,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::URSALUNA_ON, [this](){
         m_stream.log("Switching from Ursaluna (on) to Braviary (on)...");
-        m_active_command->dispatch([](SwitchControllerContext& context){
+        m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
 //            pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -107,7 +107,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::SNEASLER_OFF, [this](){
         m_stream.log("Switching from Sneasler (off) to Braviary (on)...");
-        m_active_command->dispatch([](SwitchControllerContext& context){
+        m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_dpad(context, DPAD_LEFT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -116,7 +116,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::SNEASLER_ON, [this](){
         m_stream.log("Switching from Sneasler (on) to Braviary (on)...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([](SwitchControllerContext& context){
+        m_active_command->dispatch([](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 125, 0);
             pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -125,7 +125,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::BRAVIARY_OFF, [this](){
         m_stream.log("Switching from Braviary (off) to Braviary (on)...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([](SwitchControllerContext& context){
+        m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -133,7 +133,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::GET_ON_SNEASLER, [this](){
         m_stream.log("Getting on Sneasler...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([](SwitchControllerContext& context){
+        m_active_command->dispatch([](ProControllerContext& context){
             pbf_press_button(context, BUTTON_A, 20, 230);
         });
         return false;
@@ -141,7 +141,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::CLIMBING, [this](){
         m_stream.log("Climbing wall...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([](SwitchControllerContext& context){
+        m_active_command->dispatch([](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
         });
         return false;
@@ -149,7 +149,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     register_state_command(State::DASH_FORWARD_MASH_B, [this](){
         m_stream.log("Dashing forward (mash B)...");
-        m_active_command->dispatch([this](SwitchControllerContext& context){
+        m_active_command->dispatch([this](ProControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -164,7 +164,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::DASH_FORWARD_HOLD_B, [this](){
         m_stream.log("Dashing forward (hold B)...");
-        m_active_command->dispatch([this](SwitchControllerContext& context){
+        m_active_command->dispatch([this](ProControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -180,9 +180,11 @@ FlagNavigationAir::FlagNavigationAir(
 
     auto dash_turn = [this](){
         m_stream.log("Dashing Turn...");
-        m_active_command->dispatch([this](SwitchControllerContext& context){
+        m_active_command->dispatch([this](ProControllerContext& context){
             //  Move forward to straighten out direction.
+//            cout << "Straight ahead = " << m_looking_straight_ahead.load(std::memory_order_acquire) << endl;
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
+//                pbf_wait(context, 1000ms);
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
                 m_looking_straight_ahead_timestamp.store(current_time());
@@ -206,7 +208,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     register_state_command(State::DIVE_STRAIGHT, [this](){
         m_stream.log("Diving Straight...");
-        m_active_command->dispatch([this](SwitchControllerContext& context){
+        m_active_command->dispatch([this](ProControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -222,7 +224,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     auto dive_turn = [this](){
         m_stream.log("Diving Turn...");
-        m_active_command->dispatch([this](SwitchControllerContext& context){
+        m_active_command->dispatch([this](ProControllerContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -248,7 +250,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     register_state_command(State::TURN_LEFT, [this](){
         m_stream.log("Turning Left...");
-        m_active_command->dispatch([this](SwitchControllerContext& context){
+        m_active_command->dispatch([this](ProControllerContext& context){
             pbf_wait(context, 150);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
@@ -261,7 +263,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::TURN_RIGHT, [this](){
         m_stream.log("Turning Right...");
-        m_active_command->dispatch([this](SwitchControllerContext& context){
+        m_active_command->dispatch([this](ProControllerContext& context){
             pbf_wait(context, 150);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
@@ -284,7 +286,7 @@ void FlagNavigationAir::set_distance_callback(std::function<void(double distance
     m_flag_callback = std::move(flag_callback);
 }
 
-bool FlagNavigationAir::run_state(AsyncCommandSession<SwitchController>& commands, WallClock timestamp){
+bool FlagNavigationAir::run_state(AsyncCommandSession<ProController>& commands, WallClock timestamp){
     if (last_state_change() + std::chrono::seconds(60) < timestamp){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -406,7 +408,7 @@ bool FlagNavigationAir::run_state(AsyncCommandSession<SwitchController>& command
     m_stream.log("No state handler for current state.", COLOR_RED);
     return false;
 }
-bool FlagNavigationAir::run_flying(AsyncCommandSession<SwitchController>& commands, WallClock timestamp){
+bool FlagNavigationAir::run_flying(AsyncCommandSession<ProController>& commands, WallClock timestamp){
     //  Need to get on Sneasler.
     if (m_centerA.detected() && last_state_change() + std::chrono::seconds(2) < timestamp){
         return run_state_action(State::GET_ON_SNEASLER);
@@ -501,7 +503,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession<SwitchController>& comman
     return run_state_action(State::DIVE_STRAIGHT);
 #endif
 }
-bool FlagNavigationAir::run_climbing(AsyncCommandSession<SwitchController>& commands, WallClock timestamp){
+bool FlagNavigationAir::run_climbing(AsyncCommandSession<ProController>& commands, WallClock timestamp){
     //  Can't jump off means you're able to stand. Switch back to Braviary.
     if (!m_leftB.detected()){
         return run_state_action(State::SNEASLER_ON);

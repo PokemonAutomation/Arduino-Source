@@ -41,7 +41,7 @@ std::string AutoStory_Segment_06::end_text() const{
 
 void AutoStory_Segment_06::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -64,7 +64,7 @@ void AutoStory_Segment_06::run_segment(
 
 void checkpoint_11(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -78,7 +78,7 @@ void checkpoint_11(
 
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 realign_player(info, stream, context, PlayerRealignMode::REALIGN_NEW_MARKER, 100, 210, 100);
                 pbf_move_left_joystick(context, 128, 0, 187, 20);
                 pbf_move_left_joystick(context, 0, 128, 30, 8 * TICKS_PER_SECOND);
@@ -90,12 +90,12 @@ void checkpoint_11(
 
         env.console.log("overworld_navigation: Go to Los Platos.");
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
                     128, 0, 75, 75, true, true);
             }, 
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 128, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }

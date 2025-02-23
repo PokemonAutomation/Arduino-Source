@@ -64,8 +64,11 @@ public:
 
 
 public:
-    //  These are the standard commands.
-    //  They are not thread-safe with each other.
+    //  These are the standard "issue" commands.
+    //
+    //  These functions may or may not block.
+    //  These are not thread-safe with each other.
+    //
 
     //  Wait until the pipeline has completely cleared and all resources have
     //  returned to the ready state.
@@ -77,7 +80,7 @@ public:
 
     //  Wait until the specified resource is ready to be used.
     //  This will advance the issue timestamp until the resource is ready.
-    void wait_for_resource(const Cancellable* cancellable, ExecutionResource& resource);
+    void issue_wait_for_resource(const Cancellable* cancellable, ExecutionResource& resource);
 
     //  Issue a resource with the specified timing parameters.
     //  The resource must be ready to be used.
@@ -88,6 +91,17 @@ public:
 
 
 protected:
+    //
+    //  This class will automatically call "push_state()" when a state is ready.
+    //  The child class should send/queue this state to the device/Switch.
+    //
+    //  This function is allowed to block. In other words, it can wait until
+    //  there is space in the queue before returning.
+    //
+    //  This will always be called inside one of the above "issue_XXX()"
+    //  functions. Implementations of this method should be aware of this
+    //  re-entrancy when this gets called on them with respect to locking.
+    //
     virtual void push_state(const Cancellable* cancellable, WallDuration duration) = 0;
 
 

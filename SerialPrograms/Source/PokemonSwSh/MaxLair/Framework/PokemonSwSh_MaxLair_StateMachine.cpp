@@ -69,7 +69,7 @@ AdventureRuntime::AdventureRuntime(
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     bool save_path,
     GlobalStateTracker& global_state,
     const EndBattleDecider& decider,

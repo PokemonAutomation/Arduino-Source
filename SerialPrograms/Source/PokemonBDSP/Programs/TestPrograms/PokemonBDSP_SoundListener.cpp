@@ -35,7 +35,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         "",
         "Test sound detectors listening to audio stream.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -61,7 +61,7 @@ SoundListener::SoundListener()
 
 // void search_alpha_roar_from_audio_dump();
 
-void SoundListener::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SoundListener::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // search_alpha_roar_from_audio_dump();
     // return;
 

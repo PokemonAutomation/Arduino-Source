@@ -6,7 +6,6 @@
 
 #include <mutex>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "BoxDraw.h"
 
 namespace PokemonAutomation{
@@ -21,7 +20,7 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
         "",
         "Test box coordinates for development.",
         FeedbackType::NONE, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {{SerialPABotBase::NintendoSwitch_Basic, {to_string(SerialPABotBase::Features::NintendoSwitch_Basic)}}}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -76,7 +75,7 @@ private:
     std::mutex m_lock;
 };
 
-void BoxDraw::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BoxDraw::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     Overlay overlay(*this, env.console.overlay());
     overlay.value_changed(this);
     context.wait_until_cancel();

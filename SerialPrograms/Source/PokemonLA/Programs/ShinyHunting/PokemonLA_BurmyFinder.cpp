@@ -47,7 +47,8 @@ BurmyFinder_Descriptor::BurmyFinder_Descriptor()
         "Check nearby trees for a possible Shiny, Alpha or Alpha Shiny Burmy",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::FASTER
     )
 {}
 class BurmyFinder_Descriptor::Stats : public StatsTracker{
@@ -99,12 +100,13 @@ BurmyFinder::BurmyFinder()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while traveling in the overworld.",
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
     , MATCH_DETECTED_OPTIONS(
-      "Match Action",
-      "What to do when a Burmy is found that matches the \"Stop On\" parameter.",
-      "0 * TICKS_PER_SECOND")
+        "Match Action",
+        "What to do when a Burmy is found that matches the \"Stop On\" parameter.",
+        "0 ms"
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -148,7 +150,7 @@ struct BurmyFinder::TreeCounter{
     }
 };
 
-bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
@@ -207,7 +209,7 @@ bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, SwitchContr
 }
 
 
-bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
 
     disable_shiny_sound(context);
@@ -227,7 +229,7 @@ bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, SwitchControll
     return ret;
 }
 
-void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
     disable_shiny_sound(context);
     // Throw pokemon
@@ -238,21 +240,21 @@ void BurmyFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env, Switch
 //    enable_shiny_sound(context);
 }
 
-void BurmyFinder::disable_shiny_sound(SwitchControllerContext& context){
+void BurmyFinder::disable_shiny_sound(ProControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(false, std::memory_order_release);
 }
-void BurmyFinder::enable_shiny_sound(SwitchControllerContext& context){
+void BurmyFinder::enable_shiny_sound(ProControllerContext& context){
     context.wait_for_all_requests();
     m_enable_shiny_sound.store(true, std::memory_order_release);
 }
 
-void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     const bool stop_on_detected = true;
     BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
         },
         {
@@ -274,7 +276,7 @@ void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, SwitchC
     }
 }
 
-size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, size_t path, TreeCounter& tree_counter){
+size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t path, TreeCounter& tree_counter){
 
     size_t last_checked_tree = 0;
 
@@ -286,9 +288,9 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, SwitchCont
 
     BattleMenuDetector battle_menu_detector(env.console, env.console, true);
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             switch (path){
             case 0:
                 //============ Tree 0=============//
@@ -518,7 +520,7 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, SwitchCont
     return last_checked_tree;
 }
 
-void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, size_t path, size_t last_tree, TreeCounter& tree_counter){
+void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t path, size_t last_tree, TreeCounter& tree_counter){
     env.console.log("Last tree was: " + std::to_string(last_tree));
 
     switch (path){
@@ -704,7 +706,7 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, SwitchControl
 
 }
 
-void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, TreeCounter& tree_counter){
+void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, TreeCounter& tree_counter){
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
     stats.attempts++;
     env.update_stats();
@@ -744,9 +746,9 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
 
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
 
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         env.console, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
 
             for (int path = 0; path < 4; path++){
                 size_t last_tree = grouped_path(env, context, path, tree_counter);
@@ -783,7 +785,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
     from_professor_return_to_jubilife(env, env.console, context);
 }
 
-void BurmyFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BurmyFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -801,7 +803,7 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }

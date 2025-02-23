@@ -14,8 +14,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
@@ -38,7 +38,11 @@ GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
         "Farm Chest Gimmighoul for coins.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        },
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -83,11 +87,10 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
         "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, false
     )
-    , ADDITIONAL_BATTLE_WAIT_TIME(
+    , ADDITIONAL_BATTLE_WAIT_TIME0(
         "<b>Additional Battle Wait Time:</b><br>Increase this if you are timing out when entering battle.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1250"
+        "10000 ms"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -100,11 +103,11 @@ GimmighoulChestFarmer::GimmighoulChestFarmer()
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
-    PA_ADD_OPTION(ADDITIONAL_BATTLE_WAIT_TIME);
+    PA_ADD_OPTION(ADDITIONAL_BATTLE_WAIT_TIME0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) {
+void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //Cursor is already in position
     fly_to_overworld_from_map(env.program_info(), env.console, context);
     pbf_move_left_joystick(context, 0, 0, 158, 0);
@@ -127,7 +130,7 @@ void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& en
     context.wait_for_all_requests();
 }
 
-void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     GimmighoulChestFarmer_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarmer_Descriptor::Stats>();
 
@@ -179,7 +182,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, SwitchC
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret = wait_until(
                 env.console, context,
-                std::chrono::milliseconds(ADDITIONAL_BATTLE_WAIT_TIME * (1000 / TICKS_PER_SECOND)),
+                ADDITIONAL_BATTLE_WAIT_TIME0,
                 { battle_menu }
             );
 
@@ -250,23 +253,23 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, SwitchC
 
         //  Save the game
         save_game_from_overworld(env.program_info(), env.console, context);
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
 
         //  Date skip - in-game day cycle is 72 mins, so 2 hours is fastest way
         //  This isn't perfect because 12 hour format but it works
         home_to_date_time(context, true, false);
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        ssf_issue_scroll(context, DPAD_RIGHT, 0);
-        ssf_press_button(context, BUTTON_A, 2);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 3);
-        ssf_issue_scroll(context, DPAD_RIGHT, 0);
-        ssf_press_button(context, BUTTON_A, 2);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT, 0ms);
+        ssf_press_button_ptv(context, BUTTON_A, 16ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT, 0ms);
+        ssf_press_button_ptv(context, BUTTON_A, 16ms);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
         stats.resets++;
         env.update_stats();
@@ -275,11 +278,11 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, SwitchC
     }
 
     if (FIX_TIME_WHEN_DONE){
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
     }
     GO_HOME_WHEN_DONE.run_end_of_program(context);

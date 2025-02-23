@@ -22,7 +22,8 @@ BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
         "Increase your height in place using the height glitch.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -30,7 +31,7 @@ BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
 BraviaryHeightGlitch::BraviaryHeightGlitch(){}
 
 
-void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     while (true){
         pbf_press_button(context, BUTTON_Y, 30, 0);
         pbf_press_button(context, BUTTON_PLUS, 30, 10);

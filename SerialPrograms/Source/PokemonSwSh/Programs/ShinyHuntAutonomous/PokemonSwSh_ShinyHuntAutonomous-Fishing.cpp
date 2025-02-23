@@ -7,8 +7,8 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -32,7 +32,8 @@ ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
         "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct ShinyHuntAutonomousFishing_Descriptor::Stats : public ShinyHuntTracker{
@@ -66,17 +67,15 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld and for the fish to reappear.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10000 ms"
     )
-    , FISH_RESPAWN_TIME(
+    , FISH_RESPAWN_TIME0(
         "<b>Fish Respawn Time:</b><br>Wait this long for fish to respawn.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -88,13 +87,13 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
-    PA_ADD_OPTION(FISH_RESPAWN_TIME);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
+    PA_ADD_OPTION(FISH_RESPAWN_TIME0);
 }
 
 
 
-void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -104,8 +103,6 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Sw
 
     WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
     WallClock last_touch = current_time();
-//    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-//    uint32_t last_touch = system_clock(context);
 
     ShinyHuntAutonomousFishing_Descriptor::Stats& stats = env.current_stats<ShinyHuntAutonomousFishing_Descriptor::Stats>();
     env.update_stats();
@@ -120,14 +117,13 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Sw
     while (true){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && current_time() - last_touch >= PERIOD){
-//        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
 
-        pbf_wait(context, FISH_RESPAWN_TIME);
+        pbf_wait(context, FISH_RESPAWN_TIME0);
         context.wait_for_all_requests();
 
         //  Trigger encounter.
@@ -152,31 +148,31 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Sw
             case 0:
                 env.log("Missed a hook.", COLOR_RED);
                 stats.m_misses++;
-                pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
                 continue;
             case 1:
                 env.log("Detected hook!", COLOR_PURPLE);
-                pbf_press_button(context, BUTTON_A, 10, 5);
+                ssf_press_button_ptv(context, BUTTON_A, 120ms);
 //                pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
                 break;
             case 2:
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
                 env.update_stats();
-                run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
+                run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
                 continue;
             default:
                 env.log("Timed out.", COLOR_RED);
                 stats.add_error();
                 env.update_stats();
-                pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
                 continue;
             }
             context.wait_for(std::chrono::seconds(3));
             if (miss_detector.detect(env.console.video().snapshot())){
                 env.log("False alarm! We actually missed.", COLOR_RED);
                 stats.m_misses++;
-                pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 2000ms);
                 continue;
             }
         }
@@ -188,7 +184,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Sw
             std::chrono::seconds(30)
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT0);
         if (stop){
             break;
         }

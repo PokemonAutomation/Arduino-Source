@@ -11,7 +11,9 @@
 #include "PokemonRSE_Settings.h"
 
 #include "Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h"
+#include "Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.h"
 #include "Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.h"
+#include "Programs/ShinyHunting/PokemonRSE_ShinyHunt-Mew.h"
 
 #include "Programs/ShinyHunting/PokemonRSE_StarterReset.h"
 #include "Programs/TestPrograms/PokemonRSE_SoundListener.h"
@@ -38,7 +40,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AudioStarterReset_Descriptor, AudioStarterReset>());
 
     ret.emplace_back("---- Shiny Hunting (Emerald) ----");
+    ret.emplace_back(make_single_switch_program<LegendaryHuntEmerald_Descriptor, LegendaryHuntEmerald>());
     ret.emplace_back(make_single_switch_program<ShinyHuntDeoxys_Descriptor, ShinyHuntDeoxys>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntMew_Descriptor, ShinyHuntMew>());
     
 
     if (PreloadSettings::instance().DEVELOPER_MODE){

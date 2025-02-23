@@ -8,7 +8,7 @@
 #define PokemonAutomation_ZeldaTotK_BowItemDuper_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -27,11 +27,11 @@ public:
 class BowItemDuper : public SingleSwitchProgramInstance{
 public:
     BowItemDuper();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> ATTEMPTS;
-    TimeExpressionOption<uint16_t> TICK_DELAY;
+    MillisecondsOption TICK_DELAY0;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

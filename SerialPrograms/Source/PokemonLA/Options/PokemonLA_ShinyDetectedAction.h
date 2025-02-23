@@ -9,11 +9,11 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class EventNotificationOption;
@@ -52,7 +52,7 @@ class ShinyDetectedActionOption : public GroupOption{
 public:
     ShinyDetectedActionOption(
         std::string label, std::string description,
-        std::string default_delay_ticks,
+        std::string default_delay,
         ShinyDetectedAction default_action = ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM
     );
 
@@ -62,7 +62,7 @@ public:
     EnumDropdownOption<ShinyDetectedAction> ACTION;
 //    BooleanCheckBoxOption STOP_PROGRAM;
 //    BooleanCheckBoxOption TAKE_VIDEO;
-    TimeExpressionOption<uint16_t> SCREENSHOT_DELAY;
+    MillisecondsOption SCREENSHOT_DELAY0;
     EventNotificationOption NOTIFICATIONS;
 };
 
@@ -78,14 +78,14 @@ bool on_shiny_callback(
 
 //  Call this after the session ends. Only if the session stopped on the shiny.
 void on_shiny_sound(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     ShinyDetectedActionOption& options,
     float error_coefficient
 );
 
 // Alternative for matches (shiny/alphas) not found by sound.
 void on_match_found(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     ShinyDetectedActionOption& options, bool is_match
 );
 

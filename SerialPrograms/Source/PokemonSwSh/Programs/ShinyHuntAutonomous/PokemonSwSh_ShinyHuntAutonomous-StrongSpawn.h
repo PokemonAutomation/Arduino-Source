@@ -7,9 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousStrongSpawn_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousStrongSpawn_H
 
-#include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -21,6 +18,9 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+using namespace Pokemon;
+
 
 
 class ShinyHuntAutonomousStrongSpawn_Descriptor : public SingleSwitchProgramDescriptor{
@@ -35,10 +35,10 @@ public:
 class ShinyHuntAutonomousStrongSpawn : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousStrongSpawn();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    StartInGripOrClosedOption START_LOCATION;
+    StartInGripOrGameOption START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     TimeRollbackHoursOption TIME_ROLLBACK_HOURS;
 

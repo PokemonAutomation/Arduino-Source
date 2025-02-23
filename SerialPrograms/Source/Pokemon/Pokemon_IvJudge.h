@@ -7,9 +7,8 @@
 #ifndef PokemonAutomation_Pokemon_IvJudge_H
 #define PokemonAutomation_Pokemon_IvJudge_H
 
-#include <string>
-#include <vector>
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/EnumStringMap.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -25,8 +24,8 @@ enum class IvJudgeValue{
     Best,
     HyperTrained,
 };
-const EnumDatabase<IvJudgeValue>& IvJudgeValue_Database();
-IvJudgeValue IvJudgeValue_string_to_enum(const std::string& token);
+const EnumStringMap<IvJudgeValue>& IV_JUDGE_VALUE_STRINGS();
+const EnumDropdownDatabase<IvJudgeValue>& IvJudgeValue_Database();
 
 
 enum class IvJudgeFilter{
@@ -38,7 +37,7 @@ enum class IvJudgeFilter{
     Fantastic,
     Best,
 };
-const EnumDatabase<IvJudgeFilter>& IvJudgeFilter_Database();
+const EnumDropdownDatabase<IvJudgeFilter>& IvJudgeFilter_Database();
 bool IvJudge_filter_match(IvJudgeFilter filter, IvJudgeValue value);
 
 

@@ -4,7 +4,6 @@
  *
  */
 
-#include <iterator>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
@@ -22,72 +21,104 @@ namespace PokemonAutomation{
 //
 //  Here we store a map of all controller types in the program.
 //
-std::map<std::string, std::unique_ptr<ControllerType>> CONTROLLER_TYPES;
+std::map<ControllerInterface, std::unique_ptr<InterfaceType>> ALL_CONTROLLER_INTERFACES;
 
 
-void ControllerType::register_factory(
-    const std::string& name,
-    std::unique_ptr<ControllerType> factory
+void InterfaceType::register_factory(
+    ControllerInterface controller_interface,
+    std::unique_ptr<InterfaceType> factory
 ){
-    auto ret = CONTROLLER_TYPES.emplace(name, std::move(factory));
+    auto ret = ALL_CONTROLLER_INTERFACES.emplace(controller_interface, std::move(factory));
     if (!ret.second){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Factory Name: " + name);
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Duplicate Factory Name: " + CONTROLLER_INTERFACE_STRINGS.get_string(controller_interface)
+        );
     }
 }
-
-
-
-std::vector<std::shared_ptr<const ControllerDescriptor>>
-get_compatible_descriptors(const ControllerRequirements& requirements){
-    std::vector<std::shared_ptr<const ControllerDescriptor>> ret;
-
-    //  Find all the devices in common between the supported list and the
-    //  required list. For each of those, enumerate all the descriptors and
-    //  combine them into a single list.
-    for (const auto& device : requirements.map()){
-        auto iter = CONTROLLER_TYPES.find(device.first);
-        if (iter != CONTROLLER_TYPES.end()){
-            std::vector<std::shared_ptr<const ControllerDescriptor>> list = iter->second->list();
-            std::move(list.begin(), list.end(), std::back_inserter(ret));
-        }
-    }
-
-    return ret;
-}
-
-
-
 
 
 
 
 ControllerOption::ControllerOption()
-    : m_current(new NullControllerDescriptor())
+    : m_controller_type(ControllerType::None)
+    , m_descriptor(new NullControllerDescriptor())
 {}
 
+
+void ControllerOption::set_descriptor(std::shared_ptr<const ControllerDescriptor> descriptor){
+    m_descriptor_cache[descriptor->interface_type] = descriptor;
+    m_descriptor = std::move(descriptor);
+}
+
+std::shared_ptr<const ControllerDescriptor> ControllerOption::get_descriptor_from_cache(ControllerInterface interface_type) const{
+    auto iter = m_descriptor_cache.find(interface_type);
+    if (iter == m_descriptor_cache.end()){
+        return nullptr;
+    }
+    return iter->second;
+}
+
+
+
 void ControllerOption::load_json(const JsonValue& json){
-    if (json.is_null()){
-        m_current.reset(new NullControllerDescriptor());
-    }
-    const JsonObject& obj = json.to_object_throw();
-    const std::string& type = obj.get_string_throw("DeviceType");
-    const JsonValue& params = obj.get_value_throw("Parameters");
+    std::shared_ptr<const ControllerDescriptor> descriptor;
+    ControllerType controller_type = ControllerType::None;
+    do{
+        if (json.is_null()){
+            break;
+        }
 
-    auto iter = CONTROLLER_TYPES.find(type);
-    if (iter == CONTROLLER_TYPES.end()){
-        m_current.reset(new NullControllerDescriptor());
-        return;
+        const JsonObject* obj = json.to_object();
+        if (obj == nullptr){
+            break;
+        }
+        const std::string* type = obj->get_string("Interface");
+        if (type == nullptr){
+            break;
+        }
+        const std::string* controller = obj->get_string("Controller");
+        if (controller != nullptr){
+            controller_type = CONTROLLER_TYPE_STRINGS.get_enum(*controller, ControllerType::None);
+        }
+
+        for (const auto& item : ALL_CONTROLLER_INTERFACES){
+            const JsonValue* params = obj->get_value(CONTROLLER_INTERFACE_STRINGS.get_string(item.first));
+            if (params == nullptr){
+                continue;
+            }
+            m_descriptor_cache[item.first] = item.second->make(*params);
+        }
+
+        auto iter = m_descriptor_cache.find(CONTROLLER_INTERFACE_STRINGS.get_enum(*type, ControllerInterface::None));
+        if (iter == m_descriptor_cache.end()){
+            break;
+        }
+
+        descriptor = iter->second;
+
+    }while (false);
+
+    if (descriptor == nullptr){
+        descriptor.reset(new NullControllerDescriptor());
     }
 
-    m_current = iter->second->make(params);
+    m_descriptor = std::move(descriptor);
+    m_controller_type = controller_type;
 }
 JsonValue ControllerOption::to_json() const{
-    if (!m_current){
+    if (!m_descriptor){
         return JsonValue();
     }
     JsonObject obj;
-    obj["DeviceType"] = m_current->type_name();
-    obj["Parameters"] = m_current->to_json();
+    obj["Interface"] = CONTROLLER_INTERFACE_STRINGS.get_string(m_descriptor->interface_type);
+    obj["Controller"] = CONTROLLER_TYPE_STRINGS.get_string(m_controller_type);
+
+    for (const auto& item : m_descriptor_cache){
+        obj[CONTROLLER_INTERFACE_STRINGS.get_string(item.first)] = item.second->to_json();
+    }
+
+
     return obj;
 }
 

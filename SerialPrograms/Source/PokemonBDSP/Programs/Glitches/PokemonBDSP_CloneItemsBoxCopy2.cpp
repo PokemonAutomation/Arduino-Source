@@ -31,7 +31,11 @@ CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
         "<font color=\"red\">(The menu glitch can only be activated on version 1.1.0 - 1.1.3.)</font>",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        },
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct CloneItemsBoxCopy2_Descriptor::Stats : public StatsTracker{
@@ -81,16 +85,16 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2()
 
 
 
-void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     CloneItemsBoxCopy2_Descriptor::Stats& stats = env.current_stats<CloneItemsBoxCopy2_Descriptor::Stats>();
 
 //    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
 //    uint16_t POKEMON_TO_BOX_DELAY = GameSettings::instance().POKEMON_TO_BOX_DELAY0;
 //    uint16_t OVERWORLD_TO_MENU_DELAY = GameSettings::instance().OVERWORLD_TO_MENU_DELAY;
 //    uint16_t MENU_TO_OVERWORLD_DELAY = GameSettings::instance().MENU_TO_OVERWORLD_DELAY;
-    uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
-    uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
-    uint16_t BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY_0;
+    Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
+    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
 //    uint16_t BOX_TO_POKEMON_DELAY = GameSettings::instance().BOX_TO_POKEMON_DELAY;
 //    uint16_t POKEMON_TO_MENU_DELAY = GameSettings::instance().POKEMON_TO_MENU_DELAY;
 
@@ -133,17 +137,17 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, SwitchCont
         //  Move entire box to a new box.
         pbf_press_button(context, BUTTON_Y, 20, 50);
         pbf_press_button(context, BUTTON_Y, 20, 50);
-        pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+        pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
         for (size_t c = 0; c < 10; c++){
             pbf_move_right_joystick(context, 255, 128, 5, 3);
             pbf_move_right_joystick(context, 128, 255, 5, 3);
         }
-        pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+        pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
         int box_offset = RELEASE ? 1 : 1 + box;
         for (int i = 0; i < box_offset; ++i){
-            pbf_press_button(context, BUTTON_R, 20, BOX_CHANGE_DELAY);
+            pbf_press_button(context, BUTTON_R, 160ms, BOX_CHANGE_DELAY);
         }
-        pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+        pbf_press_button(context, BUTTON_ZL, 160ms, BOX_PICKUP_DROP_DELAY);
 
         //  Back to previous menu.
         box_to_overworld(context);
@@ -157,16 +161,16 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, SwitchCont
 
         if (RELEASE){
             //  Release the cloned box.
-            pbf_press_button(context, BUTTON_R, 20, BOX_CHANGE_DELAY);
+            pbf_press_button(context, BUTTON_R, 160ms, BOX_CHANGE_DELAY);
             release_box(context, BOX_SCROLL_DELAY);
-            pbf_press_button(context, BUTTON_L, 20, BOX_CHANGE_DELAY);
+            pbf_press_button(context, BUTTON_L, 160ms, BOX_CHANGE_DELAY);
 
             //  Move cursor back to starting position.
-            pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(context, 255, 128, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(context, 255, 128, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 128, 255, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 255, 128, 160ms, BOX_SCROLL_DELAY);
         }
 #endif
 

@@ -34,10 +34,10 @@ public:
 class ShinyHuntFlagPin : public SingleSwitchProgramInstance{
 public:
     ShinyHuntFlagPin();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;

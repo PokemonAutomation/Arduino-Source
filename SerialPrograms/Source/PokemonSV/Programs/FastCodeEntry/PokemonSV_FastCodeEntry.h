@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Options/TextEditOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h"
+#include "PokemonSV_CodeEntry.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -28,6 +28,7 @@ public:
 class FastCodeEntry : public MultiSwitchProgramInstance{
 public:
     FastCodeEntry();
+    virtual void update_active_consoles(size_t switch_count) override;
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
@@ -39,8 +40,8 @@ private:
     EnumDropdownOption<Mode> MODE;
 
     TextEditOption CODE;
-
     FastCodeEntrySettingsOption SETTINGS;
+
 };
 
 

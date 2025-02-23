@@ -61,23 +61,23 @@ private:
 };
 
 
-bool reset_game_to_gamemenu(VideoStream& stream, SwitchControllerContext& context){
+bool reset_game_to_gamemenu(VideoStream& stream, ProControllerContext& context){
     close_game(stream, context);
     start_game_from_home(
         stream, context,
         true,
         0, 0,
-        GameSettings::instance().START_GAME_MASH
+        GameSettings::instance().START_GAME_MASH0
     );
 
-    uint16_t timeout = GameSettings::instance().START_GAME_WAIT;
+    Milliseconds timeout = GameSettings::instance().START_GAME_WAIT0;
 
     {
         stream.log("Waiting to load game...");
         WaitforWhiteLoadScreen detector(false);
         int ret = wait_until(
             stream, context,
-            std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
+            timeout,
             {{detector}}
         );
         if (ret < 0){
@@ -90,7 +90,7 @@ bool reset_game_to_gamemenu(VideoStream& stream, SwitchControllerContext& contex
         WaitforWhiteLoadScreen detector(true);
         int ret = wait_until(
             stream, context,
-            std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
+            timeout,
             {{detector}}
         );
         if (ret < 0){
@@ -104,15 +104,15 @@ bool reset_game_to_gamemenu(VideoStream& stream, SwitchControllerContext& contex
     return true;
 }
 
-bool gamemenu_to_ingame(VideoStream& stream, SwitchControllerContext& context){
+bool gamemenu_to_ingame(VideoStream& stream, ProControllerContext& context){
     stream.log("Mashing A to enter game...");
     BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
-    pbf_mash_button(context, BUTTON_A, GameSettings::instance().ENTER_GAME_MASH);
+    pbf_mash_button(context, BUTTON_A, GameSettings::instance().ENTER_GAME_MASH0);
     context.wait_for_all_requests();
     stream.log("Waiting to enter game...");
     int ret = wait_until(
         stream, context,
-        std::chrono::milliseconds(GameSettings::instance().ENTER_GAME_WAIT * (1000 / TICKS_PER_SECOND)),
+        GameSettings::instance().ENTER_GAME_WAIT0,
         {{detector}}
     );
     if (ret == 0){
@@ -125,7 +125,7 @@ bool gamemenu_to_ingame(VideoStream& stream, SwitchControllerContext& context){
 }
 
 bool reset_game_from_home(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     uint16_t post_wait_time
 ){
     stream.log("Resetting game from home...");
@@ -142,7 +142,7 @@ bool reset_game_from_home(
     return ok;
 }
 bool reset_game_from_home_zoom_out(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     uint16_t post_wait_time
 ){
     bool ret = reset_game_from_home(info, stream, context, post_wait_time);
@@ -158,9 +158,9 @@ bool reset_game_from_home_zoom_out(
     return ret;
 }
 
-void reset_game(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void reset_game(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     try{
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         context.wait_for_all_requests();
         if (!reset_game_from_home(info, stream, context, 5 * TICKS_PER_SECOND)){
             OperationFailedException::fire(

@@ -22,7 +22,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 CrobatFinder_Descriptor::CrobatFinder_Descriptor()
@@ -33,7 +34,8 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
         "Constantly reset the cave to find Shiny Alpha Crobat.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class CrobatFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -64,12 +66,12 @@ CrobatFinder::CrobatFinder()
     : SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if you are still traveling to the Crobat.",
-        "2 * TICKS_PER_SECOND"
+        "2000 ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if you are near the Crobat.",
-        "2 * TICKS_PER_SECOND"
+        "2000 ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -89,7 +91,7 @@ CrobatFinder::CrobatFinder()
 
 
 
-void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // NOTE: there's no "stunned by alpha" detection in case any of the close ones are alphas!
     CrobatFinder_Descriptor::Stats& stats = env.current_stats<CrobatFinder_Descriptor::Stats>();
 
@@ -132,6 +134,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchCont
     {
         float shiny_coefficient = 1.0;
         std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
+        WallClock destination_time = WallClock::max();
 
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
@@ -141,26 +144,27 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchCont
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
-                pbf_press_button(context, BUTTON_B, (uint16_t)(2.2 * TICKS_PER_SECOND), 80); // wyrdeer sprint
+                pbf_press_button(context, BUTTON_B, 2200ms, 640ms); // wyrdeer sprint
                 pbf_move_left_joystick(context, 0, 128, 10, 20); // turn left
                 pbf_press_button(context, BUTTON_ZL, 20, 50); // align camera
 
                 // ASCEND THE LEDGE WITH BRAVIARY
                 pbf_press_dpad(context, DPAD_RIGHT, 20, 50); // swap to braviary
-                pbf_wait(context, (uint16_t)(0.6 * TICKS_PER_SECOND)); // wait for the ascent
-                pbf_press_button(context, BUTTON_Y, (uint16_t)(2.4 * TICKS_PER_SECOND), 20); // descend to swap to Wyrdeer automatically
+                pbf_wait(context, 600ms); // wait for the ascent
+                pbf_press_button(context, BUTTON_Y, 2400ms, 160ms); // descend to swap to Wyrdeer automatically
 
                 // TO CROBAT PORTION
-                pbf_press_button(context, BUTTON_B, (uint16_t)(1.05 * TICKS_PER_SECOND), 80); // sprint forward for a split second
+                pbf_press_button(context, BUTTON_B, 1050ms, 640ms); // sprint forward for a split second
                 pbf_move_left_joystick(context, 255, 150, 10, 20); // rotate slightly right
                 pbf_press_button(context, BUTTON_ZL, 20, 70); // align camera
 
                 context.wait_for_all_requests();
+                destination_time = current_time();
                 shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
 
                 pbf_move_left_joystick(context, 128, 0, (uint16_t)(3.8 * TICKS_PER_SECOND), 0); // forward to crobat check
@@ -169,7 +173,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchCont
             {{shiny_detector}}
         );
         shiny_detector.throw_if_no_sound();
-        if (ret == 0){
+        if (ret == 0 || shiny_detector.last_detection() > destination_time){
             ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }
@@ -178,12 +182,12 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchCont
     // then reset since no shiny was found
     env.console.log("No shiny detected, restarting the game!");
 
-    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
     reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
 
-void CrobatFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void CrobatFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     CrobatFinder_Descriptor::Stats& stats = env.current_stats<CrobatFinder_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -198,7 +202,7 @@ void CrobatFinder::program(SingleSwitchProgramEnvironment& env, SwitchController
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }

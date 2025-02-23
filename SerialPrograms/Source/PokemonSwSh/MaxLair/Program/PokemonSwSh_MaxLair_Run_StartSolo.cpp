@@ -6,7 +6,7 @@
 
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"
@@ -24,7 +24,7 @@ namespace MaxLairInternal{
 
 
 bool wait_for_a_player(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const ImageViewRGB32& entrance,
     WallClock time_limit
 ){
@@ -60,7 +60,7 @@ bool wait_for_a_player(
 }
 
 bool wait_for_lobby_ready(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const ImageViewRGB32& entrance,
     size_t min_players,
     size_t start_players,
@@ -93,7 +93,7 @@ bool wait_for_lobby_ready(
     return true;
 }
 bool start_adventure(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t consoles
 ){
     LobbyMinReadyDetector ready_detector(consoles, true);
@@ -104,9 +104,9 @@ bool start_adventure(
 
     //  Press A until you're not in the lobby anymore.
     LobbyDetector lobby_detector(true);
-    int result = run_until<SwitchControllerContext>(
+    int result = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             for (size_t c = 0; c < 180; c++){
                 pbf_press_button(context, BUTTON_A, 10, 115);
                 context.wait_for_all_requests();
@@ -128,7 +128,7 @@ bool start_adventure(
 
 
 bool start_raid_self_solo(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     ReadableQuantity999& ore
@@ -155,7 +155,7 @@ bool start_raid_self_solo(
 }
 
 bool start_raid_host_solo(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     HostingSettings& settings,
@@ -168,7 +168,7 @@ bool start_raid_host_solo(
     GlobalState& state = state_tracker[0];
 
     //  Start delay.
-    context.wait_for(std::chrono::milliseconds(settings.START_DELAY * 1000 / TICKS_PER_SECOND));
+    context.wait_for(settings.START_DELAY0);
 
     //  Enter lobby.
     entrance = enter_lobby(
@@ -184,11 +184,10 @@ bool start_raid_host_solo(
     state.boss = read_boss_sprite(stream);
 
     //  Enter code.
-    uint8_t code[8];
-    bool has_code = settings.RAID_CODE.get_code(code);
-    if (has_code){
+    std::string code = settings.RAID_CODE.get_code();
+    if (!code.empty()){
         pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
-        enter_digits(context, 8, code);
+        numberpad_enter_code(env.logger(), context, code, true);
         pbf_wait(context, 2 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         context.wait_for_all_requests();
@@ -198,7 +197,7 @@ bool start_raid_host_solo(
         env,
         stream,
         settings.NOTIFICATIONS,
-        has_code, code,
+        code,
         state.boss,
         path_stats, session_stats
     );
@@ -207,8 +206,7 @@ bool start_raid_host_solo(
     pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     context.wait_for_all_requests();
 
-    auto time_limit = current_time() +
-        std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
+    auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
 
     if (!wait_for_a_player(stream, context, *entrance, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);

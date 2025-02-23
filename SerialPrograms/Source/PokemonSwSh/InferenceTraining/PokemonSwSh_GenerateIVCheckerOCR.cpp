@@ -36,7 +36,7 @@ GenerateIVCheckerOCR_Descriptor::GenerateIVCheckerOCR_Descriptor()
         "Generate IV Checker OCR Data",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -65,7 +65,7 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR()
 }
 
 
-void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     IvJudgeReaderScope reader(env.console, LANGUAGE);
 
     std::string path = "IVCheckerOCR/";
@@ -82,7 +82,7 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, SwitchCo
 
     std::string now = now_to_filestring();
     
-    const EnumDatabase<IvJudgeValue>& database = IvJudgeValue_Database();
+    const EnumDropdownDatabase<IvJudgeValue>& database = IvJudgeValue_Database();
     images[0].save(path + database.find(HP)->display + "-" + now + "a.png");
     images[1].save(path + database.find(ATTACK)->display + "-" + now + "b.png");
     images[2].save(path + database.find(DEFENSE)->display + "-" + now + "c.png");

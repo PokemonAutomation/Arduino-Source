@@ -10,6 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -34,7 +35,8 @@ StatsResetMoltres_Descriptor::StatsResetMoltres_Descriptor()
         "Repeatedly catch moltres until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct StatsResetMoltres_Descriptor::Stats : public StatsTracker{
@@ -94,7 +96,7 @@ StatsResetMoltres::StatsResetMoltres()
 
 
 
-void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -109,18 +111,18 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
         env.log("Wait for moltres to attack you.", COLOR_PURPLE);
         {
             StandardBattleMenuWatcher fight_detector(false);
-            int result = run_until<SwitchControllerContext>(
+            int result = run_until<ProControllerContext>(
                 env.console, context,
-                [](SwitchControllerContext& context){
+                [](ProControllerContext& context){
                     while (true){
-                        pbf_wait(context, 1 * TICKS_PER_SECOND);
+                        pbf_wait(context, 1000ms);
                     }
                 },
                 {{fight_detector}}
             );
             if (result == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
-                pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 1000ms);
             }
         }
 
@@ -137,18 +139,18 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
         context.wait_for_all_requests();
         env.log("Exit the fight.", COLOR_PURPLE);
         for (int i = 0; i < 20; i++){
-            pbf_press_button(context, BUTTON_B, 10, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
         }
 
         context.wait_for_all_requests();
         env.log("Check the stats.", COLOR_PURPLE);
-        pbf_press_button(context, BUTTON_X , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-        pbf_press_dpad  (context, DPAD_UP  , 10, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_A , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_R , 10, 3   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_LEFT, 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_UP  , 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_UP  , 10, 1   * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_X , 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+        pbf_press_dpad  (context, DPAD_UP  , 80ms, 500ms);
+        pbf_press_button(context, BUTTON_A , 80ms, 2000ms);
+        pbf_press_button(context, BUTTON_R , 80ms, 3000ms);
+        pbf_press_dpad  (context, DPAD_LEFT, 80ms, 1000ms);
+        pbf_press_dpad  (context, DPAD_UP  , 80ms, 1000ms);
+        pbf_press_dpad  (context, DPAD_UP  , 80ms, 1000ms);
 
         context.wait_for_all_requests();
         IvJudgeReaderScope reader(env.console, LANGUAGE);
@@ -166,7 +168,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
         }else{
             stats.resets++;
             env.update_stats();
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
             reset_game_from_home_with_inference(
                 env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
@@ -176,42 +178,42 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, SwitchContr
             env.log("Wait for moltres to attack you.", COLOR_PURPLE);
             {
                 StandardBattleMenuWatcher fight_detector(false);
-                int ret = run_until<SwitchControllerContext>(
+                int ret = run_until<ProControllerContext>(
                     env.console, context,
-                    [](SwitchControllerContext& context){
+                    [](ProControllerContext& context){
                         while (true){
-                            pbf_wait(context, 1 * TICKS_PER_SECOND);
+                            pbf_wait(context, 1000ms);
                         }
                     },
                     {{fight_detector}}
                 );
                 if (ret == 0){
                     env.log("New fight detected.", COLOR_PURPLE);
-                    pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
-                    pbf_press_dpad(context, DPAD_UP , 10, 1 * TICKS_PER_SECOND);
-                    pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 1000ms);
+                    pbf_press_dpad(context, DPAD_UP , 80ms, 1000ms);
+                    pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
                 }
             }
             for (int i = 0; i < 10; i++){
-                pbf_press_button(context, BUTTON_B, 10, 1 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
             }
 
             context.wait_for_all_requests();
             env.log("Let's camp.", COLOR_PURPLE);
-            pbf_press_button(context, BUTTON_X  , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-            pbf_press_dpad  (context, DPAD_RIGHT, 10, 1 * TICKS_PER_SECOND);
-            pbf_press_dpad  (context, DPAD_DOWN , 10, 1 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_A  , 10, 8 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_X  , 10, 1 * TICKS_PER_SECOND);
-            pbf_press_dpad  (context, DPAD_LEFT , 10, 1 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_A  , 10, 7 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_X  , 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+            pbf_press_dpad  (context, DPAD_RIGHT, 80ms, 1000ms);
+            pbf_press_dpad  (context, DPAD_DOWN , 80ms, 1000ms);
+            pbf_press_button(context, BUTTON_A  , 80ms, 8000ms);
+            pbf_press_button(context, BUTTON_X  , 80ms, 1000ms);
+            pbf_press_dpad  (context, DPAD_LEFT , 80ms, 1000ms);
+            pbf_press_button(context, BUTTON_A  , 80ms, 7000ms);
 
             context.wait_for_all_requests();
             env.log("Let's save.", COLOR_PURPLE);
-            pbf_press_button(context, BUTTON_X , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-            pbf_press_button(context, BUTTON_R , 10, 1 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_A , 10, 1 * TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_A , 10, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_X , 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+            pbf_press_button(context, BUTTON_R , 80ms, 1000ms);
+            pbf_press_button(context, BUTTON_A , 80ms, 1000ms);
+            pbf_press_button(context, BUTTON_A , 80ms, 1000ms);
         }
     }
 

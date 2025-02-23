@@ -11,9 +11,9 @@
 #include <string>
 #include <vector>
 #include <map>
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonLA_Locations.h"
 
 namespace PokemonAutomation{
@@ -31,13 +31,13 @@ struct TravelLocation{
     uint8_t warp_sub_slot; // which menu slot to warp the region map, if the location is a settlement or arena that requires an in-region warp.
     bool reverse_sub_menu_direction; // whether it is faster to go upwards in the in-region warp map to reach the destination slot.
 
-    std::function<void(VideoStream& stream, SwitchControllerContext& context)> post_arrival_maneuver;
+    std::function<void(VideoStream& stream, ProControllerContext& context)> post_arrival_maneuver;
 
     TravelLocation(
         const char* p_slug, const char* p_display,
         MapRegion p_region,
         uint8_t p_warp_slot, uint8_t p_warp_sub_slot,
-        std::function<void(VideoStream& stream, SwitchControllerContext& context)>&& p_post_arrival_maneuver,
+        std::function<void(VideoStream& stream, ProControllerContext& context)>&& p_post_arrival_maneuver,
         bool reverse_sub_menu_direction = false
     );
 };
@@ -50,7 +50,7 @@ public:
     const TravelLocation& operator[](size_t index) const{
         return *m_list[index];
     }
-    const IntegerEnumDatabase& database() const;
+    const IntegerEnumDropdownDatabase& database() const;
 
 
 public:
@@ -87,7 +87,7 @@ private:
     std::vector<const TravelLocation*> m_list;
     std::map<std::string, const TravelLocation*> m_map;
 
-    IntegerEnumDatabase m_database;
+    IntegerEnumDropdownDatabase m_database;
 };
 
 

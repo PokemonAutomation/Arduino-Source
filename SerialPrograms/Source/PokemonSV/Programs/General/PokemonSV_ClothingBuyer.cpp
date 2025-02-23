@@ -28,7 +28,8 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         "Buy all the clothing in a store.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -61,7 +62,7 @@ ClothingBuyer::ClothingBuyer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     /*

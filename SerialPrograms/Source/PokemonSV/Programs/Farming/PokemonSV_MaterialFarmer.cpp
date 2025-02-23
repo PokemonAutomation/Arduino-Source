@@ -32,7 +32,7 @@ MaterialFarmer_Descriptor::MaterialFarmer_Descriptor()
         "Farm materials - Happiny dust from Chanseys/Blisseys, for Item Printer.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -65,7 +65,7 @@ MaterialFarmer::MaterialFarmer()
 }
 
 
-void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MaterialFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     //  Connect the controller.

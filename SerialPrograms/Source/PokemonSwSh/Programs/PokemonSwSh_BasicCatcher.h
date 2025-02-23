@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 
@@ -23,7 +23,7 @@ using namespace Pokemon;
 //  Returns the quantity of the ball.
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
-    const BattleBallReader& reader, VideoStream& stream, SwitchControllerContext& context,
+    const BattleBallReader& reader, VideoStream& stream, ProControllerContext& context,
     const std::string& ball_slug
 );
 
@@ -33,7 +33,7 @@ struct CatchResults{
     uint16_t balls_used;
 };
 CatchResults basic_catcher(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     const std::string& ball_slug, uint16_t ball_limit
 );

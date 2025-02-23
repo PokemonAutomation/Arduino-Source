@@ -9,17 +9,17 @@
 #ifndef PokemonAutomation_PokemonSwSh_Commands_EggRoutines_H
 #define PokemonAutomation_PokemonSwSh_Commands_EggRoutines_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void eggfetcher_loop        (SwitchControllerContext& context);
-void move_while_mashing_B   (SwitchControllerContext& context, uint16_t duration);
-void spin_and_mash_A        (SwitchControllerContext& context, uint16_t duration);
-void travel_to_spin_location(SwitchControllerContext& context);
-void travel_back_to_lady    (SwitchControllerContext& context);
+void eggfetcher_loop        (ProControllerContext& context);
+void move_while_mashing_B   (ProControllerContext& context, Milliseconds duration);
+void spin_and_mash_A        (ProControllerContext& context, Milliseconds duration);
+void travel_to_spin_location(ProControllerContext& context);
+void travel_back_to_lady    (ProControllerContext& context);
 
 
 

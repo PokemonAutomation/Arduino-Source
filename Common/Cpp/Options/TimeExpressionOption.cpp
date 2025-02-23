@@ -7,10 +7,10 @@
 #include <limits>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/ExpressionEvaluator.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Json/JsonValue.h"
-#include "Common/Qt/ExpressionEvaluator.h"
 #include "Common/Qt/Options/TimeExpressionWidget.h"
 #include "TimeExpressionOption.h"
 
@@ -66,6 +66,7 @@ std::string ticks_to_time(double ticks_per_second, int64_t ticks){
 template <typename Type>
 struct TimeExpressionCell<Type>::Data{
     const double m_ticks_per_second;
+    const double m_milliseconds_per_tick;
     const Type m_min_value;
     const Type m_max_value;
     const std::string m_default;
@@ -80,6 +81,7 @@ struct TimeExpressionCell<Type>::Data{
         std::string default_value
     )
         : m_ticks_per_second(ticks_per_second)
+        , m_milliseconds_per_tick(1000 / ticks_per_second)
         , m_min_value(min_value)
         , m_max_value(max_value)
         , m_default(std::move(default_value))
@@ -189,6 +191,14 @@ TimeExpressionCell<Type>::operator Type() const{
     ReadSpinLock lg(data.m_lock);
     return data.m_value;
 }
+#if 0
+template <typename Type>
+TimeExpressionCell<Type>::operator Milliseconds() const{
+    Type value = (Type)*this;
+    double millis = (double)value * m_data->m_milliseconds_per_tick;
+    return Milliseconds(Milliseconds::rep(millis > 0 ? millis + 0.5 : millis - 0.5));
+}
+#endif
 template <typename Type>
 Type TimeExpressionCell<Type>::get() const{
     const Data& data = *m_data;

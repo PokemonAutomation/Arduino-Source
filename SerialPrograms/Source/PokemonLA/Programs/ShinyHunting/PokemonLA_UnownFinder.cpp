@@ -35,7 +35,8 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
         "Constantly reset to find a Shiny Unown or any Shiny in the path.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class UnownFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -68,12 +69,12 @@ UnownFinder::UnownFinder()
     : SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to the ruins.",
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if a shiny is detected inside the ruins.",
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -92,7 +93,7 @@ UnownFinder::UnownFinder()
 }
 
 
-void ruins_entrance_route(SwitchControllerContext& context){
+void ruins_entrance_route(ProControllerContext& context){
     pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 139, 120, 10, 10);
     pbf_wait(context, (uint16_t)(1.3 * TICKS_PER_SECOND));
@@ -105,7 +106,7 @@ void ruins_entrance_route(SwitchControllerContext& context){
     pbf_press_button(context, BUTTON_PLUS, 10, 10);
 }
 
-void enter_ruins(SwitchControllerContext& context){
+void enter_ruins(ProControllerContext& context){
     pbf_press_button(context, BUTTON_B, (uint16_t)(4 * TICKS_PER_SECOND), 10);
     pbf_wait(context, (uint16_t)(1.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 128, 255, 10, 0);
@@ -113,7 +114,7 @@ void enter_ruins(SwitchControllerContext& context){
 }
 
 
-void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     stats.attempts++;
@@ -127,6 +128,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
     {
         float shiny_coefficient = 1.0;
         std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
+        WallClock destination_time = WallClock::max();
 
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
@@ -136,12 +138,13 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 ruins_entrance_route(context);
 
                 context.wait_for_all_requests();
+                destination_time = current_time();
                 shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
 
                 enter_ruins(context);
@@ -149,7 +152,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
             {{shiny_detector}}
         );
         shiny_detector.throw_if_no_sound();
-        if (ret == 0){
+        if (ret == 0 || shiny_detector.last_detection() > destination_time){
             ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }
@@ -163,7 +166,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, SwitchContr
 }
 
 
-void UnownFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void UnownFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -178,7 +181,7 @@ void UnownFinder::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }

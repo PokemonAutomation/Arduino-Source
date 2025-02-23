@@ -22,9 +22,9 @@
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_NuggetFarmerHighlands.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -40,7 +40,8 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
         "Farm nuggets off the Miss Fortune sisters in the Coronet Highlands.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class NuggetFarmerHighlands_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -74,7 +75,7 @@ std::unique_ptr<StatsTracker> NuggetFarmerHighlands_Descriptor::make_stats() con
 
 
 NuggetFarmerHighlands::NuggetFarmerHighlands()
-    : SHINY_DETECTED("Shiny Detected Action", "", "2 * TICKS_PER_SECOND")
+    : SHINY_DETECTED("Shiny Detected Action", "", "2000 ms")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -91,7 +92,7 @@ NuggetFarmerHighlands::NuggetFarmerHighlands()
 
 
 
-bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
@@ -117,9 +118,9 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, S
             return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 212, 50, 0);
                 pbf_press_button(context, BUTTON_B, 495, 80);
 
@@ -185,8 +186,8 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, S
             return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(env.console, context,
-            [&env](SwitchControllerContext& context){
+        int ret = run_until<ProControllerContext>(env.console, context,
+            [&env](ProControllerContext& context){
                 goto_camp_from_overworld(env, env.console, context);
                 goto_professor(env.console, context, Camp::HIGHLANDS_HIGHLANDS);
             },
@@ -210,7 +211,7 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, S
 
 
 
-void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -230,7 +231,7 @@ void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, SwitchC
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }

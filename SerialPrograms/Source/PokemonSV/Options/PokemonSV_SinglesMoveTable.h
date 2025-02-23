@@ -24,8 +24,8 @@ enum class SinglesMoveType{
     Move4,
     Run,
 };
-const EnumDatabase<SinglesMoveType>& singles_move_enum_database_wild();
-const EnumDatabase<SinglesMoveType>& singles_move_enum_database_trainer();
+const EnumDropdownDatabase<SinglesMoveType>& singles_move_enum_database_wild();
+const EnumDropdownDatabase<SinglesMoveType>& singles_move_enum_database_trainer();
 
 
 struct SinglesMoveEntry{

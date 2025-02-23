@@ -24,10 +24,11 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     std::string description,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    ControllerRequirements requirements
+    ControllerRequirements requirements,
+    FasterIfTickPrecise faster_if_tick_precise
 )
     : ProgramDescriptor(
-        pick_color(feedback),
+        pick_color(requirements, faster_if_tick_precise),
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),
@@ -35,6 +36,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     )
     , m_feedback(feedback)
     , m_requirements(std::move(requirements))
+    , m_faster_if_tick_precise(faster_if_tick_precise)
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
 {}
 std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{
@@ -87,9 +89,17 @@ void SingleSwitchProgramInstance::start_program_feedback_check(
 }
 void SingleSwitchProgramInstance::start_program_border_check(
     CancellableScope& scope,
-    VideoStream& stream
+    VideoStream& stream,
+    FeedbackType feedback_type
 ){
-    StartProgramChecks::check_border(stream);
+    switch (feedback_type){
+    case FeedbackType::NONE:
+    case FeedbackType::OPTIONAL_:
+        return;
+    case FeedbackType::REQUIRED:
+    case FeedbackType::VIDEO_AUDIO:
+        StartProgramChecks::check_border(stream);
+    }
 }
 
 

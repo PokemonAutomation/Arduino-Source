@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedIoATrade_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -29,17 +29,17 @@ class ShinyHuntUnattendedIoATrade : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedIoATrade();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    TimeExpressionOption<uint16_t> START_TO_RUN_DELAY;
+    MillisecondsOption START_TO_RUN_DELAY0;
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> FLY_DURATION;
-    TimeExpressionOption<uint16_t> MOVE_DURATION;
-    TimeExpressionOption<uint16_t> MASH_TO_TRADE_DELAY;
+    MillisecondsOption FLY_DURATION0;
+    MillisecondsOption MOVE_DURATION0;
+    MillisecondsOption MASH_TO_TRADE_DELAY0;
 };
 
 

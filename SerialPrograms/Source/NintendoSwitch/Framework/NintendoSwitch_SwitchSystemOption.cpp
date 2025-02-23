@@ -13,8 +13,9 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-    // constexpr Color COLOR_GREEN2(0xff00aa00);
+// constexpr Color COLOR_GREEN2(0xff00aa00);
 
+#if 0
 Color pick_color(FeedbackType feedback){
     switch (feedback){
     case FeedbackType::NONE:
@@ -28,7 +29,27 @@ Color pick_color(FeedbackType feedback){
     }
     return Color();
 }
+#endif
+Color pick_color(
+    const ControllerRequirements& requirements,
+    FasterIfTickPrecise faster_if_tick_precise
+){
+    if (requirements.contains(ControllerFeature::NintendoSwitch_DateSkip)){
+        return COLOR_RED;
+    }
+    if (requirements.contains(ControllerFeature::TickPrecise)){
+        return COLOR_PURPLE;
+    }
+    switch (faster_if_tick_precise){
+    case FasterIfTickPrecise::MUCH_FASTER:
+    case FasterIfTickPrecise::FASTER:
+        return COLOR_DARKGREEN;
+    case FasterIfTickPrecise::NOT_FASTER:
+        return COLOR_BLUE;
+    }
 
+    return COLOR_BLUE;
+}
 
 
 const std::string SwitchSystemOption::JSON_CONTROLLER  = "Controller";

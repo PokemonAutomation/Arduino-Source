@@ -8,6 +8,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -31,7 +32,8 @@ ShinyHuntAutonomousRegigigas2_Descriptor::ShinyHuntAutonomousRegigigas2_Descript
         "Automatically hunt for shiny Regigigas using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2_Descriptor::make_stats() const{
@@ -62,11 +64,10 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , CATCH_TO_OVERWORLD_DELAY(
+    , CATCH_TO_OVERWORLD_DELAY0(
         "<b>Catch to Overworld Delay:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -78,13 +79,13 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
+    PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY0);
 }
 
 
 
-bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, SwitchControllerContext& context) const{
-    pbf_mash_button(context, BUTTON_A, 4 * TICKS_PER_SECOND);
+bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, ProControllerContext& context) const{
+    pbf_mash_button(context, BUTTON_A, 4000ms);
 
     RaidCatchDetector detector(stream.overlay());
     int result = wait_until(
@@ -94,15 +95,15 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, SwitchC
     );
     switch (result){
     case 0:
-        pbf_press_dpad(context, DPAD_DOWN, 10, 0);
-        pbf_press_button(context, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
+        ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
+        pbf_press_button(context, BUTTON_A, 80ms, CATCH_TO_OVERWORLD_DELAY0);
         return true;
     default:
         stream.log("Raid Catch Menu not found.", COLOR_RED);
         return false;
     }
 }
-void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
@@ -124,7 +125,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){
             env.log("Starting Regigigas Encounter: " + tostr_u_commas(stats.encounters() + 1));
 
-            pbf_mash_button(context, BUTTON_A, 18 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 18s);
             context.wait_for_all_requests();
 
             {
@@ -163,7 +164,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
             kill_and_return(env.console, context);
         }
 
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
         TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
         reset_game_from_home_with_inference(
             env.console, context,

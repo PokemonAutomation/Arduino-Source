@@ -4,46 +4,48 @@
  *
  */
 
-#ifndef PokemonAutomation_Controllers_Controller_H
-#define PokemonAutomation_Controllers_Controller_H
+#ifndef PokemonAutomation_Controllers_ControllerDescriptor_H
+#define PokemonAutomation_Controllers_ControllerDescriptor_H
 
 #include <string>
 #include <memory>
 #include "Common/Cpp/AbstractLogger.h"
+//#include "Common/Cpp/Json/JsonObject.h"
+#include "ControllerCapability.h"
+#include "Controller.h"
+
+class QWidget;
 
 namespace PokemonAutomation{
 
 class JsonValue;
-class ControllerRequirements;
-class ControllerType;
+class InterfaceType;
 class ControllerDescriptor;
 class ControllerConnection;
+class ControllerSelectorWidget;
 
 
 //
-//  Represents an entire type of controller.
+//  Represents an entire controller interface.
 //
 //  For example:
-//      -   "Nintendo Switch via Serial PABotBase" is a type of controller.
-//      -   "Nintendo Switch via Joycon Emulatiion" is a type of controller. (hypothetical)
-//      -   "Xbox One via whatever..." ...
+//      -   Serial PABotBase
+//      -   Direct USB to X (hypothetical)
+//      -   Emulator IPC (hypothetical)
 //
-//  One instance of this class exists for each type of controller.
+//  One instance of this class exists for each interface.
 //
-class ControllerType{
+class InterfaceType{
 public:
-    virtual ~ControllerType() = default;
-
-    //  Returns a list of all available instances for this controller type.
-    virtual std::vector<std::shared_ptr<const ControllerDescriptor>> list() const = 0;
+    virtual ~InterfaceType() = default;
 
     //  Construct a descriptor from a JSON config. (reloading saved controller settings)
     virtual std::unique_ptr<ControllerDescriptor> make(const JsonValue& json) const = 0;
 
 protected:
     static void register_factory(
-        const std::string& name,
-        std::unique_ptr<ControllerType> factory
+        ControllerInterface controller_interface,
+        std::unique_ptr<InterfaceType> factory
     );
 };
 
@@ -52,12 +54,8 @@ protected:
 //  Subclass helper for ControllerType.
 //
 template <typename DescriptorType>
-class ControllerType_t : public ControllerType{
+class InterfaceType_t : public InterfaceType{
 public:
-    //  Subclasses must implement this function.
-    virtual std::vector<std::shared_ptr<const ControllerDescriptor>> list() const override;
-
-    //  This function is provided for you.
     virtual std::unique_ptr<ControllerDescriptor> make(const JsonValue& json) const override{
         std::unique_ptr<DescriptorType> ptr(new DescriptorType());
         ptr->load_json(json);
@@ -66,16 +64,16 @@ public:
 
 private:
     static int register_class(){
-        ControllerType::register_factory(
-            DescriptorType::TYPENAME,
-            std::make_unique<ControllerType_t<DescriptorType>>()
+        InterfaceType::register_factory(
+            DescriptorType::INTERFACE_NAME,
+            std::make_unique<InterfaceType_t<DescriptorType>>()
         );
         return 0;
     }
     static int initializer;
 };
 template <typename DescriptorType>
-int ControllerType_t<DescriptorType>::initializer = register_class();
+int InterfaceType_t<DescriptorType>::initializer = register_class();
 
 
 
@@ -87,27 +85,38 @@ int ControllerType_t<DescriptorType>::initializer = register_class();
 //
 class ControllerDescriptor{
 public:
+    const ControllerInterface interface_type;
+
+    ControllerDescriptor(ControllerInterface p_interface_type)
+        : interface_type(p_interface_type)
+    {}
     virtual ~ControllerDescriptor() = default;
     virtual bool operator==(const ControllerDescriptor& x) const = 0;
 
-    virtual const char* type_name() const = 0;
     virtual std::string display_name() const = 0;
 
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
 
-    virtual std::unique_ptr<ControllerConnection> open(
+    virtual std::unique_ptr<ControllerConnection> open_connection(Logger& logger) const = 0;
+    virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
+        ControllerConnection& connection,
+        ControllerType controller_type,
         const ControllerRequirements& requirements
-    ) const = 0;
+    ) const{
+        return nullptr;
+    }
+
+    virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const = 0;
 };
 
 
 
-
+#if 0
 std::vector<std::shared_ptr<const ControllerDescriptor>>
 get_compatible_descriptors(const ControllerRequirements& requirements);
-
+#endif
 
 
 
@@ -120,16 +129,27 @@ class ControllerOption{
 public:
     ControllerOption();
 
-    std::shared_ptr<const ControllerDescriptor> current() const{
-        return m_current;
+    std::shared_ptr<const ControllerDescriptor> descriptor() const{
+        return m_descriptor;
     }
+    void set_descriptor(std::shared_ptr<const ControllerDescriptor> descriptor);
 
+
+    std::shared_ptr<const ControllerDescriptor> get_descriptor_from_cache(ControllerInterface interface_type) const;
+
+
+public:
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
 
+
+public:
+//    friend class ControllerSession;
+    ControllerType m_controller_type;
 private:
-    friend class ControllerSession;
-    std::shared_ptr<const ControllerDescriptor> m_current;
+    std::shared_ptr<const ControllerDescriptor> m_descriptor;
+
+    std::map<ControllerInterface, std::shared_ptr<const ControllerDescriptor>> m_descriptor_cache;
 };
 
 

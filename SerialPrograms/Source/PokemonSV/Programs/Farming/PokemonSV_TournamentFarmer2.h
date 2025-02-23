@@ -30,7 +30,7 @@ class TournamentFarmer2 : public SingleSwitchProgramInstance, public ButtonListe
 public:
     ~TournamentFarmer2();
     TournamentFarmer2();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
     virtual void on_press() override;
 
 private:

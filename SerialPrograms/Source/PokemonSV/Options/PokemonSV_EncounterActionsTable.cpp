@@ -17,8 +17,8 @@ using namespace Pokemon;
 
 
 
-const EnumDatabase<EncounterActionsAction>& EncounterFilterAction_database(){
-    static EnumDatabase<EncounterActionsAction> database{
+const EnumDropdownDatabase<EncounterActionsAction>& EncounterFilterAction_database(){
+    static EnumDropdownDatabase<EncounterActionsAction> database{
         {EncounterActionsAction::RUN_AWAY,              "run-away",     "Run Away"},
         {EncounterActionsAction::STOP_PROGRAM,          "stop-program", "Stop Program"},
         {EncounterActionsAction::THROW_BALLS,           "throw-balls",  "Throw Balls"},
@@ -26,8 +26,8 @@ const EnumDatabase<EncounterActionsAction>& EncounterFilterAction_database(){
     };
     return database;
 }
-const EnumDatabase<EncounterActionsShininess>& EncounterFilterShininess_database(){
-    static EnumDatabase<EncounterActionsShininess> database{
+const EnumDropdownDatabase<EncounterActionsShininess>& EncounterFilterShininess_database(){
+    static EnumDropdownDatabase<EncounterActionsShininess> database{
         {EncounterActionsShininess::ANYTHING,   "anything",     "Anything"},
         {EncounterActionsShininess::NOT_SHINY,  "not-shiny",    "Not Shiny"},
         {EncounterActionsShininess::SHINY,      "shiny",        "Shiny"},

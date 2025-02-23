@@ -38,7 +38,7 @@ TournamentFarmer_Descriptor::TournamentFarmer_Descriptor()
         "Farm the Academy Ace Tournament for money and prizes.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -160,7 +160,7 @@ void TournamentFarmer::on_press(){
 }
 
 //Check and process the amount of money earned at the end of a battle
-void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     int top_money = -1;
@@ -223,7 +223,7 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, SwitchCo
 
 
 //Handle a single battle by mashing A until AdvanceDialog (end of battle) is detected
-void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     //Only applies if the player has The Hidden Treasure of Area Zero Hisuian Zoroark
@@ -257,9 +257,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, SwitchCon
             context.wait_for_all_requests();
 
             //Try six times, in case of paralysis (only applies to Pachirisu's Nuzzle) preventing use of Memento.
-            int retF = run_until<SwitchControllerContext>(
+            int retF = run_until<ProControllerContext>(
                 env.console, context,
-                [&](SwitchControllerContext& context){
+                [&](ProControllerContext& context){
                     for (size_t c = 0; c < 6; c++){
                         NormalBattleMenuWatcher battle_memento(COLOR_RED);
                         int ret_memento = wait_until(
@@ -349,9 +349,9 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, SwitchCon
     AdvanceDialogWatcher end_of_battle(COLOR_YELLOW);
     WallClock start = current_time();
     uint8_t switch_party_slot = HHH_ZOROARK ? 2: 1;
-    int ret_black = run_until<SwitchControllerContext>(
+    int ret_black = run_until<ProControllerContext>(
         env.console, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             for(size_t c = 0; c < 30; c++) { //Sylveon build has 16 PP at max, and Chi-Yu build has 24.
                 if (current_time() - start > std::chrono::minutes(5)){
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
@@ -448,7 +448,7 @@ void TournamentFarmer::run_battle(SingleSwitchProgramEnvironment& env, SwitchCon
 
 
 //Check prize and notify if it matches filters after a tournament win
-void TournamentFarmer::check_prize(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TournamentFarmer::check_prize(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     VideoSnapshot screen = env.console.video().snapshot();
@@ -494,7 +494,7 @@ void TournamentFarmer::check_prize(SingleSwitchProgramEnvironment& env, SwitchCo
 
 
 //Tournament won and over
-void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
     //Space out the black screen detection after the "champion" battle
@@ -503,9 +503,9 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
 
     //One more black screen when done to load the academy
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
-    int ret_black_won = run_until<SwitchControllerContext>(
+    int ret_black_won = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 10000);
         },
         { black_screen }
@@ -533,9 +533,9 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
 
     //Clear remaining dialog
     OverworldWatcher overworld(env.console, COLOR_CYAN);
-    int ret_over = run_until<SwitchControllerContext>(
+    int ret_over = run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 700);
         },
         { overworld }
@@ -552,9 +552,13 @@ void TournamentFarmer::handle_end_of_tournament(SingleSwitchProgramEnvironment& 
 
 
 //Fly to academy from west pokemon center after losing.
-void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void return_to_academy_after_loss(
+    ProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context
+){
     env.log("Tournament lost! Navigating back to academy.");
-    go_to_academy_fly_point(env, context);
+    go_to_academy_fly_point(env, stream, context);
 
 
     pbf_wait(context, 100);
@@ -571,9 +575,9 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, SwitchCon
     pbf_press_button(context, BUTTON_B, 50, 40);
 
     BlackScreenOverWatcher black_screen(COLOR_RED, { 0.2, 0.2, 0.6, 0.6 });
-    int ret_black_lost = run_until<SwitchControllerContext>(
-        env.console, context,
-        [](SwitchControllerContext& context){
+    int ret_black_lost = run_until<ProControllerContext>(
+        stream, context,
+        [](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 5000, 0);
         },
         { black_screen }
@@ -584,8 +588,8 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, SwitchCon
     }
 
     //Wait for academy to load.
-    OverworldWatcher overworld(env.console, COLOR_CYAN);
-    int ret_academy = wait_until(env.console, context, Milliseconds(4000), { overworld });
+    OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
+    int ret_academy = wait_until(stream, context, Milliseconds(4000), { overworld });
     if (ret_academy == 0){
         env.log("Entered academy. Walking to tournament entry.");
     }
@@ -598,19 +602,19 @@ void return_to_academy_after_loss(SingleSwitchProgramEnvironment& env, SwitchCon
     context.wait_for_all_requests();
 }
 
-void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void go_to_academy_fly_point(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
     int numAttempts = 0;
     int maxAttempts = 5;
 
     bool isFlySuccessful = false;
 
     while (!isFlySuccessful && numAttempts < maxAttempts ){
-        open_map_from_overworld(env.program_info(), env.console, context);
+        open_map_from_overworld(env.program_info(), stream, context);
         pbf_press_button(context, BUTTON_ZR, 50, 40);
         pbf_move_left_joystick(context, 200, 0, 47, 25);  
         // pbf_move_left_joystick(context, 187, 0, 50, 0);
         numAttempts++;
-        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), env.console, context, true);
+        isFlySuccessful = fly_to_overworld_from_map(env.program_info(), stream, context, true);
         if (!isFlySuccessful){
             env.log("Unsuccessful fly attempt.");
         }
@@ -621,7 +625,7 @@ void go_to_academy_fly_point(SingleSwitchProgramEnvironment& env, SwitchControll
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to fly back to academy!",
-            env.console
+            stream
         );
     }
 
@@ -644,7 +648,7 @@ private:
 
 
 
-void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     TournamentFarmer_Descriptor::Stats& stats = env.current_stats<TournamentFarmer_Descriptor::Stats>();
 
@@ -687,9 +691,9 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, SwitchContro
         context.wait_for_all_requests();
 
         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-        int ret_battle = run_until<SwitchControllerContext>(
+        int ret_battle = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 10000); //it takes a while to load and start
             },
             { battle_menu }
@@ -703,9 +707,9 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, SwitchContro
         for (uint16_t battles = 0; battles < 4; battles++){
             NormalBattleMenuWatcher battle_menu2(COLOR_YELLOW); //Next battle started
             OverworldWatcher overworld(env.console, COLOR_CYAN); //Previous battle was lost
-            int ret_battle2 = run_until<SwitchControllerContext>(
+            int ret_battle2 = run_until<ProControllerContext>(
                 env.console, context,
-                [](SwitchControllerContext& context){
+                [](ProControllerContext& context){
                     pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
                 },
                 { battle_menu2, overworld }
@@ -766,7 +770,7 @@ void TournamentFarmer::program(SingleSwitchProgramEnvironment& env, SwitchContro
             }
 
             if (battle_lost){
-                return_to_academy_after_loss(env, context);
+                return_to_academy_after_loss(env, env.console, context);
                 break;
             }
         }

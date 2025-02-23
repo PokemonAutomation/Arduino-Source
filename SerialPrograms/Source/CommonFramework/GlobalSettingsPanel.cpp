@@ -13,6 +13,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Options/CheckForUpdatesOption.h"
 #include "CommonFramework/Options/ResolutionOption.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
@@ -100,11 +101,7 @@ GlobalSettings::~GlobalSettings(){
 }
 GlobalSettings::GlobalSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
-    , CHECK_FOR_UPDATES(
-        "<b>Check for Updates:</b><br>Automatically check for updates.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
+    , CHECK_FOR_UPDATES(CONSTRUCT_TOKEN)
     , STATS_FILE(
         false,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
@@ -169,7 +166,8 @@ GlobalSettings::GlobalSettings()
     , VIDEO_PIPELINE(CONSTRUCT_TOKEN)
     , ENABLE_LIFETIME_SANITIZER0(
         "<b>Enable Lifetime Sanitizer: (for debugging)</b><br>"
-        "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found.",
+        "Check for C++ object lifetime violations. Terminate program with stack dump if violations are found. "
+        "If enabling, you must restart the program for it to take effect.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
 //        IS_BETA_VERSION
@@ -340,11 +338,11 @@ JsonValue GlobalSettings::to_json() const{
 
 void GlobalSettings::value_changed(void* object){
     bool enabled = ENABLE_LIFETIME_SANITIZER0;
-    LifetimeSanitizer::set_enabled(enabled);
     if (enabled){
         global_logger_tagged().log("LifeTime Sanitizer: Enabled", COLOR_BLUE);
     }else{
         global_logger_tagged().log("LifeTime Sanitizer: Disabled", COLOR_BLUE);
+        LifetimeSanitizer::disable();
     }
 }
 

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_ItemPrinterDatabase_H
 #define PokemonAutomation_PokemonSV_ItemPrinterDatabase_H
 
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "PokemonSV_ItemPrinterTools.h"
 
 namespace PokemonAutomation{
@@ -63,11 +63,11 @@ enum class PrebuiltOptions{
     WATER_TERA,
     STELLAR_TERA,
 };
-const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Database();
+const EnumDropdownDatabase<PrebuiltOptions>& PrebuiltOptions_Database();
 
-const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_AutoMode_Database();
+const EnumDropdownDatabase<PrebuiltOptions>& PrebuiltOptions_AutoMode_Database();
 
-const EnumDatabase<PrebuiltOptions>& PrebuiltOptions_Simple_Database2();
+const EnumDropdownDatabase<PrebuiltOptions>& PrebuiltOptions_Simple_Database2();
 
 
 struct ItemPrinterEnumOption{

@@ -21,7 +21,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
@@ -32,7 +33,10 @@ MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
         "Farm money by using VS Seeker to rebattle the rich couple on Route 212.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        }
     )
 {}
 struct MoneyFarmerRoute212_Descriptor::Stats : public StatsTracker{
@@ -107,7 +111,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212()
 
 
 
-bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t pp[4], bool man){
+bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp[4], bool man){
     MoneyFarmerRoute212_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute212_Descriptor::Stats>();
     context.wait_for_all_requests();
     if (man){
@@ -129,9 +133,9 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, SwitchCont
         BattleMenuWatcher battle_menu(BattleType::TRAINER);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
             },
             {
@@ -208,7 +212,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, SwitchCont
 }
 
 
-void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]){
+void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, ProControllerContext& context, uint8_t pp[4]){
     stream.overlay().add_log("Heal at " + STRING_POKEMON + " Center", COLOR_WHITE);
     stream.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
@@ -223,7 +227,7 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, SwitchC
     pbf_move_left_joystick(context, 255, 128, 380, 0);
     pbf_move_left_joystick(context, 128, 255, 300, 0);
     pbf_move_left_joystick(context,   0, 128, 600, 0);
-    pbf_move_left_joystick(context, 255, 128,  70, 0);
+    pbf_move_left_joystick(context, 255, 128,  75, 0);
     pbf_move_left_joystick(context, 128, 255, 1375, 0);
     pbf_move_left_joystick(context, 255, 128, 125, 0);
     pbf_move_left_joystick(context, 128, 255, 200, 0);
@@ -246,10 +250,10 @@ void MoneyFarmerRoute212::heal_at_center_and_return(VideoStream& stream, SwitchC
 }
 
 
-void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, SwitchControllerContext& context, uint8_t pp[4]){
+void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, ProControllerContext& context, uint8_t pp[4]){
     stream.log("Flying back to Hearthome City to heal.");
     stream.overlay().add_log("Fly to Hearthome City", COLOR_WHITE);
-    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
@@ -258,7 +262,7 @@ void MoneyFarmerRoute212::fly_to_center_heal_and_return(VideoStream& stream, Swi
 }
 
 bool MoneyFarmerRoute212::heal_after_battle_and_return(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint8_t pp[4])
 {
     if (HEALING_METHOD == HealMethod::Hearthome){
@@ -277,7 +281,7 @@ bool MoneyFarmerRoute212::heal_after_battle_and_return(
     }
 }
 
-void MoneyFarmerRoute212::charge_vs_seeker(SwitchControllerContext& context){
+void MoneyFarmerRoute212::charge_vs_seeker(ProControllerContext& context){
     for (size_t c = 0; c < 5; c++){
         pbf_move_left_joystick(context, 0, 128, 180, 0);
         pbf_move_left_joystick(context, 255, 128, 180, 0);
@@ -295,7 +299,7 @@ size_t MoneyFarmerRoute212::total_pp(uint8_t pp[4]){
 }
 
 
-void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     MoneyFarmerRoute212_Descriptor::Stats& stats = env.current_stats<MoneyFarmerRoute212_Descriptor::Stats>();
 
     uint8_t pp[4] = {
@@ -341,9 +345,9 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, SwitchCon
         {
             env.console.overlay().add_log("Using Vs. Seeker", COLOR_WHITE);
             VSSeekerReactionTracker tracker(env.console, {0.23, 0.30, 0.35, 0.30});
-            run_until<SwitchControllerContext>(
+            run_until<ProControllerContext>(
                 env.console, context,
-                [this](SwitchControllerContext& context){
+                [this](ProControllerContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 
                 },

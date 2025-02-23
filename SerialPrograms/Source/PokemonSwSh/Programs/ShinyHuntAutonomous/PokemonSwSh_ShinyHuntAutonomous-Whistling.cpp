@@ -6,7 +6,6 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -31,7 +30,8 @@ ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor
         "Stand in one place and whistle. Shiny hunt everything that attacks you using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct ShinyHuntAutonomousWhistling_Descriptor::Stats : public ShinyHuntTracker{
@@ -64,11 +64,10 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -80,12 +79,12 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 }
 
 
 
-void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -95,8 +94,6 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
 
     WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
     WallClock last_touch = current_time();
-//    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-//    uint32_t last_touch = system_clock(context);
 
     ShinyHuntAutonomousWhistling_Descriptor::Stats& stats = env.current_stats<ShinyHuntAutonomousWhistling_Descriptor::Stats>();
     env.update_stats();
@@ -111,9 +108,8 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
     while (true){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && current_time() - last_touch >= PERIOD){
-//        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
@@ -123,12 +119,12 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_battle_detector;
 
-            int result = run_until<SwitchControllerContext>(
+            int result = run_until<ProControllerContext>(
                 env.console, context,
-                [](SwitchControllerContext& context){
+                [](ProControllerContext& context){
                     while (true){
-                        pbf_mash_button(context, BUTTON_LCLICK, TICKS_PER_SECOND);
-                        pbf_move_right_joystick(context, 192, 128, TICKS_PER_SECOND, 0);
+                        pbf_mash_button(context, BUTTON_LCLICK, 1000ms);
+                        pbf_move_right_joystick(context, 192, 128, 1000ms, 0ms);
                     }
                 },
                 {
@@ -142,8 +138,8 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.m_unexpected_battles++;
                 env.update_stats();
-                pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-                run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
+                pbf_mash_button(context, BUTTON_B, 1000ms);
+                run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
                 continue;
             case 1:
                 env.log("Battle started!");
@@ -158,7 +154,9 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
             std::chrono::seconds(30)
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(
+            result, EXIT_BATTLE_TIMEOUT0
+        );
         if (stop){
             break;
         }

@@ -23,11 +23,11 @@ namespace PokemonLA{
 
 
 
-void mash_A_until_end_of_battle(VideoStream& stream, SwitchControllerContext& context){
+void mash_A_until_end_of_battle(VideoStream& stream, ProControllerContext& context){
     OverworldDetector detector(stream.logger(), stream.overlay());
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 180 * TICKS_PER_SECOND);
         },
         {{detector}}
@@ -45,7 +45,7 @@ void mash_A_until_end_of_battle(VideoStream& stream, SwitchControllerContext& co
 
 
 size_t switch_pokemon(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t pokemon_to_switch_to,
     size_t max_num_pokemon
 ){
@@ -98,7 +98,7 @@ size_t switch_pokemon(
 
 
 void use_move_blindly(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     MoveStyle style,
     size_t cur_pokemon,
     size_t cur_move
@@ -126,7 +126,7 @@ void use_move_blindly(
 
 
 bool use_move(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t cur_pokemon,
     size_t cur_move,
     MoveStyle style,
@@ -167,7 +167,7 @@ bool use_move(
 }
 
 void use_next_move_with_pp(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t cur_pokemon,
     size_t& cur_move
 ){

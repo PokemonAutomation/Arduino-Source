@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_PostMMOSpawnReset_H
 #define PokemonAutomation_PokemonLA_PostMMOSpawnReset_H
 
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
@@ -29,17 +29,17 @@ public:
 class PostMMOSpawnReset : public SingleSwitchProgramInstance{
 public:
     PostMMOSpawnReset();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
-    TimeExpressionOption<int16_t> TURN_DURATION;
-    TimeExpressionOption<uint16_t> FORWARD_DURATION;
-    TimeExpressionOption<uint16_t> WAIT_DURATION;
+    MillisecondsOption TURN_DURATION0;
+    MillisecondsOption FORWARD_DURATION0;
+    MillisecondsOption WAIT_DURATION0;
 
     ShinyDetectedActionOption SHINY_DETECTED;
 

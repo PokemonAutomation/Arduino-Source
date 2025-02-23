@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_EventBeamFinder_H
 #define PokemonAutomation_PokemonSwSh_EventBeamFinder_H
 
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -28,15 +28,15 @@ public:
     EventBeamFinder();
 
 
-    void goto_near_den(SwitchControllerContext& context) const;
-    void goto_far_den(SwitchControllerContext& context) const;
-    void drop_wishing_piece(SwitchControllerContext& context) const;
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    void goto_near_den(ProControllerContext& context) const;
+    void goto_far_den(ProControllerContext& context) const;
+    void drop_wishing_piece(ProControllerContext& context) const;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;
 
-    TimeExpressionOption<uint16_t> WAIT_TIME_IN_DEN;
+    MillisecondsOption WAIT_TIME_IN_DEN0;
 };
 
 

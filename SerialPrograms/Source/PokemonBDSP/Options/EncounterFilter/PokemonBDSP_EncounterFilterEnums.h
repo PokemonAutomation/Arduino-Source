@@ -33,7 +33,7 @@ enum class ShinyFilter{
     SHINY,
     NOTHING,
 };
-const EnumDatabase<ShinyFilter>& ShinyFilter_Database();
+const EnumDropdownDatabase<ShinyFilter>& ShinyFilter_Database();
 
 class ShinyFilterCell : public EnumDropdownCell<ShinyFilter>{
 public:

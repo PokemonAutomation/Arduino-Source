@@ -18,7 +18,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 ActivateMenuGlitch112_Descriptor::ActivateMenuGlitch112_Descriptor()
@@ -30,30 +31,33 @@ ActivateMenuGlitch112_Descriptor::ActivateMenuGlitch112_Descriptor()
         "<font color=\"red\">(This requires game versions 1.1.0 - 1.1.2. The glitch it relies on was patched in v1.1.3.)</font>",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        },
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
 ActivateMenuGlitch112::ActivateMenuGlitch112()
-    : FLY_A_TO_X_DELAY(
+    : FLY_A_TO_X_DELAY0(
         "<b>Fly Menu A-to-X Delay:</b><br>The delay between the A and X presses to overlap the menu with the fly option.<br>"
         "(German players may need to increase this to 90.)",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        20, "50"
+        160ms, "400 ms"
     )
 {
-    PA_ADD_OPTION(FLY_A_TO_X_DELAY);
+    PA_ADD_OPTION(FLY_A_TO_X_DELAY0);
 }
 
 
 
-void trigger_menu(VideoStream& stream, SwitchControllerContext& context){
+void trigger_menu(VideoStream& stream, ProControllerContext& context){
     context.wait_for_all_requests();
     MapWatcher detector;
-    int ret = run_until<SwitchControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             for (size_t i = 0; i < 12; i++){
                 for (size_t c = 0; c < 42; c++){
                     pbf_controller_state(context, BUTTON_ZL, DPAD_NONE, 128, 128, 128, 128, 1);
@@ -83,7 +87,7 @@ void trigger_menu(VideoStream& stream, SwitchControllerContext& context){
         context.wait_for_all_requests();
     }
 }
-void trigger_map_overlap(VideoStream& stream, SwitchControllerContext& context){
+void trigger_map_overlap(VideoStream& stream, ProControllerContext& context){
     for (size_t c = 0; c < 10; c++){
         trigger_menu(stream, context);
 
@@ -111,7 +115,7 @@ void trigger_map_overlap(VideoStream& stream, SwitchControllerContext& context){
 
 
 
-void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     VideoStream& stream = env.console;
 
     trigger_map_overlap(stream, context);
@@ -132,9 +136,9 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, SwitchC
     {
         context.wait_for_all_requests();
         BlackScreenWatcher detector;
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 for (size_t c = 0; c < 5; c++){
                     pbf_press_dpad(context, DPAD_LEFT, 20, 105);
                     pbf_press_dpad(context, DPAD_DOWN, 20, 105);
@@ -154,12 +158,12 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, SwitchC
     pbf_move_left_joystick(context, 128, 255, 125, 4 * TICKS_PER_SECOND);
 
     //  Center cursor.
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().MENU_TO_OVERWORLD_DELAY);
+    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().MENU_TO_OVERWORLD_DELAY0);
 
     //  Bring up menu
-    pbf_press_button(context, BUTTON_ZL, 20, FLY_A_TO_X_DELAY - 20);
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_ZL, 160ms, FLY_A_TO_X_DELAY0.get() - 160ms);
+    pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
 
     //  Fly
     pbf_press_button(context, BUTTON_ZL, 20, 10 * TICKS_PER_SECOND);

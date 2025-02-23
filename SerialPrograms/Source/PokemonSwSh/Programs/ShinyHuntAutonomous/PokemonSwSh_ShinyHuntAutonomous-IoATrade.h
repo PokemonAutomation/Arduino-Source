@@ -9,12 +9,11 @@
 
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 
 namespace PokemonAutomation{
@@ -34,7 +33,7 @@ public:
 class ShinyHuntAutonomousIoATrade : public SingleSwitchProgramInstance{
 public:
     ShinyHuntAutonomousIoATrade();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrGameOption START_LOCATION;
@@ -47,7 +46,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> MASH_TO_TRADE_DELAY;
+    MillisecondsOption MASH_TO_TRADE_DELAY0;
     BooleanCheckBoxOption RUN_FROM_EVERYTHING;
 };
 

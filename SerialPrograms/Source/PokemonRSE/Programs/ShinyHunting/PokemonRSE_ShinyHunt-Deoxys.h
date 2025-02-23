@@ -7,8 +7,7 @@
 #ifndef PokemonAutomation_PokemonRSE_ShinyHuntDeoxys_H
 #define PokemonAutomation_PokemonRSE_ShinyHuntDeoxys_H
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -26,16 +25,29 @@ public:
 class ShinyHuntDeoxys : public SingleSwitchProgramInstance{
 public:
     ShinyHuntDeoxys();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+
+    virtual void start_program_border_check(
+        CancellableScope& scope,
+        VideoStream& stream,
+        FeedbackType feedback_type
+    ) override{}
 
 private:
-    TimeExpressionOption<uint16_t> WALK_UP_DOWN_TIME;
+    enum class StartPos{
+        boat,
+        rock_unsolved,
+        rock_solved,
+    };
+    EnumDropdownOption<StartPos> STARTPOS;
+
+    MillisecondsOption WALK_UP_DOWN_TIME0;
 
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void solve_puzzle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void solve_puzzle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 };
 
 }

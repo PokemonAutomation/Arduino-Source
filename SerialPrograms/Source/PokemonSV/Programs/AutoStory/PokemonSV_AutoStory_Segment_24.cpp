@@ -37,7 +37,7 @@ std::string AutoStory_Segment_24::end_text() const{
 
 void AutoStory_Segment_24::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();

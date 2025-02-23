@@ -24,7 +24,7 @@ MenuOption::~MenuOption() = default;
 
 MenuOption::MenuOption(
     VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     Language language
 )
     : m_stream(stream)

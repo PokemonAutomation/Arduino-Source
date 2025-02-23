@@ -8,7 +8,6 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -36,7 +35,8 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
         "Automatically shiny hunt overworld " + STRING_POKEMON + " with video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct ShinyHuntAutonomousOverworld_Descriptor::Stats : public ShinyHuntTracker{
@@ -97,12 +97,11 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
         LockMode::LOCK_WHILE_RUNNING,
         TriggerMethod::Whistle3Circle1
     )
-    , MAX_MOVE_DURATION(
+    , MAX_MOVE_DURATION0(
         "<b>Maximum Move Duration:</b><br>Do not move in the same direction for more than this long."
         " If you set this too high, you may wander too far from the grassy area.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "200"
+        "1600 ms"
     )
     , MAX_TARGET_ALPHA(
         "<b>Max Target Alpha:</b><br>Ignore all targets with alpha larger than this. Set to zero to ignore all marks.",
@@ -121,17 +120,15 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , WATCHDOG_TIMER(
+    , WATCHDOG_TIMER0(
         "<b>Watchdog Timer:</b><br>Reset the game if you go this long without any encounters.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "60 * TICKS_PER_SECOND"
+        "60 s"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
     , TARGET_CIRCLING(
         "<b>Target Circling:</b><br>After moving towards a " + STRING_POKEMON + ", make a circle."
@@ -148,15 +145,15 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     PA_ADD_OPTION(MARK_OFFSET);
     PA_ADD_OPTION(MARK_PRIORITY);
     PA_ADD_OPTION(TRIGGER_METHOD);
-    PA_ADD_OPTION(MAX_MOVE_DURATION);
+    PA_ADD_OPTION(MAX_MOVE_DURATION0);
     PA_ADD_OPTION(MAX_TARGET_ALPHA);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(WATCHDOG_TIMER);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(WATCHDOG_TIMER0);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
     PA_ADD_OPTION(TARGET_CIRCLING);
 }
 
@@ -164,7 +161,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
 
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     ShinyHuntAutonomousOverworld_Descriptor::Stats& stats,
     WallClock expiration
 ) const{
@@ -234,9 +231,9 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_battle_detector;
 
-            int result = run_until<SwitchControllerContext>(
+            int result = run_until<ProControllerContext>(
                 stream, context,
-                [&](SwitchControllerContext& context){
+                [&](ProControllerContext& context){
                     trigger->run(context);
                 },
                 {
@@ -286,7 +283,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
 bool ShinyHuntAutonomousOverworld::charge_at_target(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const std::pair<double, OverworldTarget>& target
 ) const{
     OverlayBoxScope target_box(stream.overlay(), target.second.box, COLOR_YELLOW);
@@ -310,10 +307,8 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         ", Direction = " + tostr_default(-angle) + " degrees"
     );
 
-    int duration = trajectory.distance_in_ticks + 16;
-    if (duration > (int)MAX_MOVE_DURATION){
-        duration = MAX_MOVE_DURATION;
-    }
+    Milliseconds duration = (trajectory.distance_in_ticks + 16) * 8ms;
+    duration = std::min<Milliseconds>(duration, MAX_MOVE_DURATION0);
 
 
     StandardBattleMenuWatcher battle_menu_detector(false);
@@ -326,15 +321,15 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         MAX_TARGET_ALPHA
     );
 
-    int result = run_until<SwitchControllerContext>(
+    int result = run_until<ProControllerContext>(
         stream, context,
-        [&](SwitchControllerContext& context){
+        [&](ProControllerContext& context){
             //  Move to target.
             pbf_move_left_joystick(
                 context,
                 trajectory.joystick_x,
                 trajectory.joystick_y,
-                (uint16_t)duration, 0
+                duration, 0ms
             );
 
             //  Circle Maneuver
@@ -372,7 +367,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
 
 
-void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     srand((unsigned)time(nullptr));
 
     if (START_LOCATION.start_in_grip_menu()){
@@ -383,12 +378,9 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
     }
     pbf_move_right_joystick(context, 128, 255, TICKS_PER_SECOND, 0);
 
-    WallDuration TIMEOUT = std::chrono::milliseconds((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
+    WallDuration TIMEOUT = WATCHDOG_TIMER0;
     WallDuration PERIOD = std::chrono::hours(TIME_ROLLBACK_HOURS);
     WallClock last_touch = current_time();
-//    const std::chrono::milliseconds TIMEOUT((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
-//    const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-//    uint32_t last_touch = system_clock(context);
 
     ShinyHuntAutonomousOverworld_Descriptor::Stats& stats = env.current_stats<ShinyHuntAutonomousOverworld_Descriptor::Stats>();
     env.update_stats();
@@ -405,18 +397,15 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
     while (true){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && current_time() - last_touch >= PERIOD){
-//        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
 
-//        cout << "TOLERATE_SYSTEM_UPDATE_MENU_FAST = " << TOLERATE_SYSTEM_UPDATE_MENU_FAST << endl;
-
         auto now = current_time();
         if (now - last > TIMEOUT){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
             reset_game_from_home_with_inference(
                 env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
@@ -441,7 +430,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
         );
 //        shininess = ShinyDetection::SQUARE_SHINY;
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT0);
         if (stop){
             break;
         }

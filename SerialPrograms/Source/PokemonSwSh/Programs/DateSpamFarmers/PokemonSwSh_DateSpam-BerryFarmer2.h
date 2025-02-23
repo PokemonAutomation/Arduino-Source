@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
@@ -38,7 +38,7 @@ class BerryFarmer2 : public SingleSwitchProgramInstance{
 public:
     BerryFarmer2();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     enum Rustling{
         No,
@@ -48,8 +48,8 @@ public:
     };
 
 private:
-    Rustling check_rustling(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
-    uint16_t do_secondary_attempts(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, Rustling last_rustling);
+    Rustling check_rustling(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    uint16_t do_secondary_attempts(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Rustling last_rustling);
 
 private:
     StaticTextOption REQUIRES_AUDIO;
@@ -64,11 +64,11 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;
+    MillisecondsOption EXIT_BATTLE_TIMEOUT0;
 //    SimpleIntegerOption<uint16_t> START_BATTLE_TIMEOUT;
     SimpleIntegerOption<uint16_t> RUSTLING_INTERVAL;
-    TimeExpressionOption<uint16_t> RUSTLING_TIMEOUT;
-    TimeExpressionOption<uint16_t> SECONDARY_ATTEMPT_MASH_TIME;
+    MillisecondsOption RUSTLING_TIMEOUT0;
+    MillisecondsOption SECONDARY_ATTEMPT_MASH_TIME0;
     FloatingPointOption SOUND_THRESHOLD;
 };
 

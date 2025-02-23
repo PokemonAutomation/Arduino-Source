@@ -27,8 +27,8 @@ enum class Fossil{
 
 class FossilGame : public EditableTableRow{
 private:
-    static const EnumDatabase<Fossil>& Fossil_Database(){
-        static const EnumDatabase<Fossil> database({
+    static const EnumDropdownDatabase<Fossil>& Fossil_Database(){
+        static const EnumDropdownDatabase<Fossil> database({
             {Fossil::Dracozolt, "dracozolt", "Dracozolt"},
             {Fossil::Arctozolt, "arctozolt", "Arctozolt"},
             {Fossil::Dracovish, "dracovish", "Dracovish"},

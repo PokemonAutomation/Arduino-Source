@@ -23,7 +23,7 @@ enum class BattleMoveType{
     Move3,
     Move4,
 };
-const EnumDatabase<BattleMoveType>& Battle_move_enum_database();
+const EnumDropdownDatabase<BattleMoveType>& Battle_move_enum_database();
 
 class BattleMoveTableRow : public EditableTableRow{
 public:

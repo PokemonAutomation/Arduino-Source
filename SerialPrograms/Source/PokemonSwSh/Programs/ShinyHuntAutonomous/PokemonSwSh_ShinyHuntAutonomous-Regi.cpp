@@ -28,7 +28,8 @@ ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
         "Automatically hunt for shiny Regi using video feedback.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi_Descriptor::make_stats() const{
@@ -54,23 +55,20 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
-    , POST_BATTLE_MASH_TIME(
+    , POST_BATTLE_MASH_TIME0(
         "<b>Post-Battle Mash:</b><br>After each battle, mash B for this long to clear the dialogs.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "1 * TICKS_PER_SECOND"
+        "1000 ms"
     )
-    , TRANSITION_DELAY(
+    , TRANSITION_DELAY0(
         "<b>Transition Delay:</b><br>Time to enter/exit the building.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "5 * TICKS_PER_SECOND"
+        "5000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
@@ -84,15 +82,15 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
-    PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
-    PA_ADD_OPTION(TRANSITION_DELAY);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
+    PA_ADD_OPTION(POST_BATTLE_MASH_TIME0);
+    PA_ADD_OPTION(TRANSITION_DELAY0);
 }
 
 
 
 
-void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -112,8 +110,8 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, Switc
 
     bool error = false;
     while (true){
-        pbf_mash_button(context, BUTTON_B, POST_BATTLE_MASH_TIME);
-        move_to_corner(env.console, context, error, TRANSITION_DELAY);
+        pbf_mash_button(context, BUTTON_B, POST_BATTLE_MASH_TIME0);
+        move_to_corner(env.console, context, error, TRANSITION_DELAY0);
         if (error){
             env.update_stats();
             error = false;
@@ -122,8 +120,8 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, Switc
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
             env.log("Touching date to prevent rollover.");
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+            touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
 
@@ -144,12 +142,14 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, Switc
         if (result.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-            run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
+            run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
             error = true;
             continue;
         }
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(
+            result, EXIT_BATTLE_TIMEOUT0
+        );
         if (stop){
             break;
         }

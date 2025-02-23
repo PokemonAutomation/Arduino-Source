@@ -12,9 +12,9 @@
 #ifndef PokemonAutomation_Options_EnumDropdownOption_H
 #define PokemonAutomation_Options_EnumDropdownOption_H
 
-#include "Common/Cpp/EnumDatabase.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "ConfigOption.h"
+#include "EnumDropdownDatabase.h"
 
 namespace PokemonAutomation{
 
@@ -27,22 +27,22 @@ public:
 
 public:
     IntegerEnumDropdownCell(
-        const IntegerEnumDatabase& database,
+        const IntegerEnumDropdownDatabase& database,
         LockMode lock_while_running,
         size_t default_value, size_t current_value
     );
     IntegerEnumDropdownCell(
-        const IntegerEnumDatabase& database,
+        const IntegerEnumDropdownDatabase& database,
         LockMode lock_while_running,
         size_t default_value
     );
 
     //  Constructing from inlined database is not supported for cell.
-    IntegerEnumDropdownCell(IntegerEnumDatabase&& database,
+    IntegerEnumDropdownCell(IntegerEnumDropdownDatabase&& database,
                             LockMode lock_while_running,
         size_t default_value, size_t current_value
     ) = delete;
-    IntegerEnumDropdownCell(IntegerEnumDatabase&& database,
+    IntegerEnumDropdownCell(IntegerEnumDropdownDatabase&& database,
                             LockMode lock_while_running,
         size_t default_value
     ) = delete;
@@ -52,7 +52,7 @@ public:
 
     virtual bool set_value(size_t value);
 
-    const IntegerEnumDatabase& database() const;
+    const IntegerEnumDropdownDatabase& database() const;
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
@@ -72,7 +72,7 @@ template <typename EnumType>
 class EnumDropdownCell : public IntegerEnumDropdownCell{
 public:
     EnumDropdownCell(
-        const EnumDatabase<EnumType>& database,
+        const EnumDropdownDatabase<EnumType>& database,
         LockMode lock_while_running,
         EnumType default_value
     )
@@ -81,7 +81,7 @@ public:
 
     //  Constructing from inlined database is not supported for cell.
     EnumDropdownCell(
-        EnumDatabase<EnumType>&& database,
+        EnumDropdownDatabase<EnumType>&& database,
         LockMode lock_while_running,
         EnumType default_value
     ) = delete;
@@ -106,26 +106,26 @@ public:
 
 
 
-class IntegerEnumDropdownOption : private IntegerEnumDatabase, public IntegerEnumDropdownCell{
+class IntegerEnumDropdownOption : private IntegerEnumDropdownDatabase, public IntegerEnumDropdownCell{
 public:
     IntegerEnumDropdownOption(const IntegerEnumDropdownOption& x) = delete;
     IntegerEnumDropdownOption(
         std::string label,
-        const IntegerEnumDatabase& database,
+        const IntegerEnumDropdownDatabase& database,
         LockMode lock_while_running,
         size_t default_value
     )
-        : IntegerEnumDatabase(nullptr)
+        : IntegerEnumDropdownDatabase(nullptr)
         , IntegerEnumDropdownCell(database, lock_while_running, default_value)
         , m_label(std::move(label))
     {}
     IntegerEnumDropdownOption(
         std::string label,
-        IntegerEnumDatabase&& database,
+        IntegerEnumDropdownDatabase&& database,
         LockMode lock_while_running,
         size_t default_value
     )
-        : IntegerEnumDatabase(std::move(database))
+        : IntegerEnumDropdownDatabase(std::move(database))
         , IntegerEnumDropdownCell(*this, lock_while_running, default_value)
         , m_label(std::move(label))
     {}
@@ -144,7 +144,7 @@ class EnumDropdownOption : public IntegerEnumDropdownOption{
 public:
     EnumDropdownOption(
         std::string label,
-        const EnumDatabase<EnumType>& database,
+        const EnumDropdownDatabase<EnumType>& database,
         LockMode lock_while_running,
         EnumType default_value
     )
@@ -152,7 +152,7 @@ public:
     {}
     EnumDropdownOption(
         std::string label,
-        EnumDatabase<EnumType>&& database,
+        EnumDropdownDatabase<EnumType>&& database,
         LockMode lock_while_running,
         EnumType default_value
     )

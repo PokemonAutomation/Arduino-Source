@@ -7,12 +7,13 @@
 #ifndef PokemonAutomation_PokemonSV_TeraRollFilter_H
 #define PokemonAutomation_PokemonSV_TeraRollFilter_H
 
+#include <set>
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -37,7 +38,7 @@ struct TeraRaidData{
 
     uint8_t stars = 0;
     std::string tera_type;
-    std::string species;
+    std::set<std::string> species;
 };
 
 
@@ -55,7 +56,7 @@ public:
     };
 
     FilterResult run_filter(
-        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         TeraRaidData& data
     ) const;
 
@@ -65,7 +66,7 @@ private:
         const ProgramInfo& info, VideoStream& stream, const ImageViewRGB32& screen,
         TeraCardReader& reader, TeraRaidData& data
     ) const;
-    bool check_herba(const std::string& pokemon_slug) const;
+    bool check_herba(const std::set<std::string>& pokemon_slugs) const;
 
 public:
     enum class EventCheckMode{

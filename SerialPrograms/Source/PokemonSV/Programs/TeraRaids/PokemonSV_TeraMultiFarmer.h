@@ -15,6 +15,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_BallSelectOption.h"
 #include "PokemonSV/Options/PokemonSV_TeraAIOption.h"
@@ -56,6 +57,7 @@ public:
     bool is_host;
     StaticTextOption is_host_label;
     OCR::LanguageOCROption language;
+    KeyboardLayoutOption keyboard_layout;
 
     BooleanCheckBoxOption catch_on_win;
     PokemonSwSh::PokemonBallSelectOption ball_select;
@@ -84,13 +86,13 @@ public:
     virtual void value_changed(void* object) override;
 
 private:
-    void reset_host(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
-    void reset_joiner(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
+    void reset_host(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+    void reset_joiner(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
-    bool run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
-    void run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context);
+    bool run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context);
+    void run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context);
     void join_lobby(
-        ProgramEnvironment& env, ConsoleHandle& console, SwitchControllerContext& context,
+        ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context,
         size_t host_index, const std::string& normalized_code
     );
 

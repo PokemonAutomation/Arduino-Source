@@ -44,13 +44,13 @@ public:
     //  Run the specified lambda for all switches in parallel.
     void run_in_parallel(
         CancellableScope& scope,
-        const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
+        const std::function<void(ConsoleHandle& console, ProControllerContext& context)>& func
     );
 
     //  Run the specified lambda for switch indices [s, e) in parallel.
     void run_in_parallel(
         CancellableScope& scope, size_t s, size_t e,
-        const std::function<void(ConsoleHandle& console, SwitchControllerContext& context)>& func
+        const std::function<void(ConsoleHandle& console, ProControllerContext& context)>& func
     );
 
 };
@@ -67,6 +67,7 @@ public:
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         ControllerRequirements m_requirements,
+        FasterIfTickPrecise faster_if_tick_precise,
         size_t min_switches,
         size_t max_switches,
         size_t default_switches
@@ -74,6 +75,7 @@ public:
 
     FeedbackType feedback() const{ return m_feedback; }
     const ControllerRequirements& requirements() const{ return m_requirements; }
+    FasterIfTickPrecise faster_if_tick_precise() const{ return m_faster_if_tick_precise; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     size_t min_switches() const{ return m_min_switches; }
@@ -86,6 +88,7 @@ public:
 private:
     const FeedbackType m_feedback;
     const ControllerRequirements m_requirements;
+    const FasterIfTickPrecise m_faster_if_tick_precise;
     const bool m_allow_commands_while_running;
 
     const size_t m_min_switches;
@@ -144,7 +147,8 @@ public:
     );
     virtual void start_program_border_check(
         CancellableScope& scope,
-        VideoStream& stream, size_t console_index
+        VideoStream& stream, size_t console_index,
+        FeedbackType feedback_type
     );
 
 

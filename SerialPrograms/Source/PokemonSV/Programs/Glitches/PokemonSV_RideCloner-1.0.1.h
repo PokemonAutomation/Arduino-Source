@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_RideCloner_H
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -38,14 +38,14 @@ public:
 class RideCloner101 : public SingleSwitchProgramInstance{
 public:
     RideCloner101();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void setup(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context);
+    void setup(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
     bool run_post_win(
         ProgramEnvironment& env,
         VideoStream& stream,
-        SwitchControllerContext& context
+        ProControllerContext& context
     );
 
 private:
@@ -66,7 +66,7 @@ private:
     PokemonSwSh::PokemonBallSelectOption BALL_SELECT;
     BooleanCheckBoxOption FIX_TIME_ON_CATCH;
 
-    TimeExpressionOption<uint16_t> A_TO_B_DELAY;
+    MillisecondsOption A_TO_B_DELAY0;
     TeraAIOption BATTLE_AI;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

@@ -28,8 +28,8 @@ namespace MaxLairInternal{
 
 
 
-const EnumDatabase<BossAction>& BossAction_Database(){
-    static const EnumDatabase<BossAction> database({
+const EnumDropdownDatabase<BossAction>& BossAction_Database(){
+    static const EnumDropdownDatabase<BossAction> database({
         {BossAction::CATCH_AND_STOP_PROGRAM, "always-stop", "Always stop program."},
         {BossAction::CATCH_AND_STOP_IF_SHINY, "stop-if-shiny", "Stop if shiny."},
     });

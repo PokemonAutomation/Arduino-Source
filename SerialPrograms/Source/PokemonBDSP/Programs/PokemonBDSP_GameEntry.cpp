@@ -16,9 +16,9 @@
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP_GameEntry.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -26,8 +26,8 @@ namespace PokemonBDSP{
 
 
 bool gamemenu_to_ingame(
-    VideoStream& stream, SwitchControllerContext& context,
-    uint16_t mash_duration, uint16_t enter_game_timeout
+    VideoStream& stream, ProControllerContext& context,
+    Milliseconds mash_duration, Milliseconds enter_game_timeout
 ){
     stream.log("Mashing A to enter game...");
     BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
@@ -48,10 +48,10 @@ bool gamemenu_to_ingame(
     }
 }
 bool openedgame_to_ingame(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
-    uint16_t load_game_timeout,
-    uint16_t mash_duration, uint16_t enter_game_timeout,
-    uint16_t post_wait_time
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    Milliseconds load_game_timeout,
+    Milliseconds mash_duration, Milliseconds enter_game_timeout,
+    Milliseconds post_wait_time
 ){
     bool ok = true;
     ok &= openedgame_to_gamemenu(stream, context, load_game_timeout);
@@ -69,9 +69,9 @@ bool openedgame_to_ingame(
 
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context,
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     bool tolerate_update_menu,
-    uint16_t post_wait_time
+    Milliseconds post_wait_time
 ){
     bool video_available = (bool)stream.video().snapshot();
     if (video_available ||
@@ -84,17 +84,17 @@ bool reset_game_from_home(
             context,
             tolerate_update_menu,
             0, 0,
-            GameSettings::instance().START_GAME_MASH
+            GameSettings::instance().START_GAME_MASH0
         );
     }else{
         pbf_press_button(context, BUTTON_X, 50, 0);
-        pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH);
+        pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH0);
     }
     bool ret = openedgame_to_ingame(
         env, stream, context,
-        GameSettings::instance().START_GAME_WAIT,
-        GameSettings::instance().ENTER_GAME_MASH,
-        GameSettings::instance().ENTER_GAME_WAIT,
+        GameSettings::instance().START_GAME_WAIT0,
+        GameSettings::instance().ENTER_GAME_MASH0,
+        GameSettings::instance().ENTER_GAME_WAIT0,
         post_wait_time
     );
     context.wait_for_all_requests();

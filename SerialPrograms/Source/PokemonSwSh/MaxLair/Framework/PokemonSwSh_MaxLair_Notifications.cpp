@@ -68,7 +68,7 @@ void send_raid_notification(
     ProgramEnvironment& env,
     VideoStream& stream,
     AutoHostNotificationOption& settings,
-    bool has_code, uint8_t code[8],
+    const std::string& code,
     const std::string& slug,
     const PathStats& path_stats,
     const StatsTracker& session_stats
@@ -95,17 +95,8 @@ void send_raid_notification(
 
     {
         std::string code_str;
-        if (has_code){
-            size_t c = 0;
-            for (; c < 4; c++){
-                code_str += code[c] + '0';
-            }
-            code_str += " ";
-            for (; c < 8; c++){
-                code_str += code[c] + '0';
-            }
-        }else{
-            code_str += "None";
+        if (code.empty()){
+            code_str = "None";
         }
         embeds.emplace_back("Raid Code:", std::move(code_str));
     }

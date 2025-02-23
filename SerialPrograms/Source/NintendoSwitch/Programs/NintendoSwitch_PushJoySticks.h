@@ -24,7 +24,7 @@ class PushJoySticks : public SingleSwitchProgramInstance{
 public:
     PushJoySticks();
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     SimpleIntegerOption<uint8_t> LEFT_X;

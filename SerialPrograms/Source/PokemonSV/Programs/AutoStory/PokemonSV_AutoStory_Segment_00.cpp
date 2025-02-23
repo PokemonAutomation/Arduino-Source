@@ -36,7 +36,7 @@ std::string AutoStory_Segment_00::end_text() const{
 
 void AutoStory_Segment_00::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -55,15 +55,15 @@ void AutoStory_Segment_00::run_segment(
 }
 
 
-void checkpoint_00(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void checkpoint_00(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
 
     // Mash A through intro cutscene, until the L stick button is detected
     WhiteButtonWatcher leftstick(COLOR_GREEN, WhiteButton::ButtonLStick, {0.435, 0.912, 0.046, 0.047});
     context.wait_for_all_requests();
-    run_until<SwitchControllerContext>(
+    run_until<ProControllerContext>(
         env.console, context,
-        [](SwitchControllerContext& context){
+        [](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_A, 240 * TICKS_PER_SECOND);
         },
         {leftstick}

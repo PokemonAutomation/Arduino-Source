@@ -26,7 +26,8 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         "Trade boxes of " + STRING_POKEMON + " between two local Switches.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER,
         2, 2, 2
     )
 {}
@@ -76,7 +77,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
-            env.run_in_parallel(scope, [](ConsoleHandle& console, SwitchControllerContext& context){
+            env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
                 move_to_right_box(context);
 //                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
 //                pbf_press_dpad(context, DPAD_DOWN, 20, 30);

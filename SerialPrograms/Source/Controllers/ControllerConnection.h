@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Controllers_ControllerConnection_H
 #define PokemonAutomation_Controllers_ControllerConnection_H
 
+#include <set>
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ControllerDescriptor.h"
@@ -17,8 +18,17 @@ namespace PokemonAutomation{
 class ControllerConnection{
 public:
     struct StatusListener{
-        virtual void ready_changed(bool ready) = 0;
-        virtual void status_text_changed(const std::string& text) = 0;
+//        virtual void pre_connection_not_ready(ControllerConnection& connection){}
+        virtual void post_connection_ready(
+            ControllerConnection& connection,
+            const std::map<ControllerType, std::set<ControllerFeature>>& controllers
+        ){}
+        virtual void status_text_changed(
+            ControllerConnection& connection, const std::string& text
+        ){}
+        virtual void on_error(
+            ControllerConnection& connection, const std::string& text
+        ){};
     };
 
     void add_status_listener(StatusListener& listener);
@@ -28,22 +38,30 @@ public:
 public:
     virtual ~ControllerConnection() = default;
 
-    bool ready() const{ return m_ready.load(std::memory_order_acquire); }
+    bool is_ready() const{ return m_ready.load(std::memory_order_acquire); }
     std::string status_text() const;
+
+    virtual std::map<ControllerType, std::set<ControllerFeature>> supported_controllers() const = 0;
 
 
 protected:
-    void signal_ready_changed(bool ready);
+    void set_status(const std::string& text);
+    void declare_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);
+
+
+private:
+//    void signal_pre_not_ready();
+    void signal_post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);
     void signal_status_text_changed(const std::string& text);
+    void signal_error(const std::string& text);
 
 
 protected:
     std::atomic<bool> m_ready;
 
+private:
     mutable SpinLock m_status_text_lock;
     std::string m_status_text;
-
-private:
     ListenerSet<StatusListener> m_status_listeners;
 };
 

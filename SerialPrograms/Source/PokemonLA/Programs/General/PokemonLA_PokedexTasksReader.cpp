@@ -64,7 +64,8 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
         "Read all the tasks in your " + STRING_POKEDEX + " and output a file with the tasks you did.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -72,7 +73,7 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
 PokedexTasksReader::PokedexTasksReader(){}
 
 
-void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void PokedexTasksReader::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 

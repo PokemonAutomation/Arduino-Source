@@ -29,7 +29,7 @@ public:
     operator const std::string&() const;
     const std::string& get() const;
     std::string set(std::string x);
-    void to_str(uint8_t* code) const;
+    std::string to_str() const;
 
     virtual std::string check_validity() const override;
     std::string check_validity(const std::string& x) const;

@@ -16,9 +16,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h"
@@ -48,7 +48,10 @@ RideCloner101_Descriptor::RideCloner101_Descriptor()
         "Clone your ride legendary (and its item) using the add-to-party glitch.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {
+            ControllerFeature::TickPrecise,
+            ControllerFeature::NintendoSwitch_ProController,
+        }
     )
 {}
 struct RideCloner101_Descriptor::Stats : public StatsTracker{
@@ -124,11 +127,10 @@ RideCloner101::RideCloner101()
         "<b>Fix Clock on Catch:</b><br>Fix the time when catching so the caught date will be correct.",
         LockMode::UNLOCK_WHILE_RUNNING, false
     )
-    , A_TO_B_DELAY(
+    , A_TO_B_DELAY0(
         "<b>A-to-B Delay:</b><br>The delay between the critical A-to-B press that activates the glitch.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8"
+        "64ms"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY(
@@ -158,7 +160,7 @@ RideCloner101::RideCloner101()
     PA_ADD_OPTION(MAX_STARS);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(FIX_TIME_ON_CATCH);
-    PA_ADD_OPTION(A_TO_B_DELAY);
+    PA_ADD_OPTION(A_TO_B_DELAY0);
     PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -167,7 +169,7 @@ RideCloner101::RideCloner101()
 
 //  Start from the overworld with 5 (non-ride legendary) Pokemon in your
 //  party. Move your ride legendary into the 6th slot in your party.
-void RideCloner101::setup(const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+void RideCloner101::setup(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     stream.log("Running setup...");
 
     bool in_party = false;
@@ -250,18 +252,18 @@ void RideCloner101::setup(const ProgramInfo& info, VideoStream& stream, SwitchCo
 bool RideCloner101::run_post_win(
     ProgramEnvironment& env,
     VideoStream& stream,
-    SwitchControllerContext& context
+    ProControllerContext& context
 ){
     stream.log("Running post-win...");
 
     RideCloner101_Descriptor::Stats& stats = env.current_stats<RideCloner101_Descriptor::Stats>();
 
     if (FIX_TIME_ON_CATCH){
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(stream, context);
     }
 
@@ -273,8 +275,12 @@ bool RideCloner101::run_post_win(
     while (true){
         context.wait_for_all_requests();
         if (current_time() - start > std::chrono::minutes(5)){
-            dump_image_and_throw_recoverable_exception(env.program_info(), stream, "RideCloneReturnToOverworldFailed",
-                "Failed to return to overworld after 5 minutes.");
+            dump_image_and_throw_recoverable_exception(
+                env.program_info(),
+                stream,
+                "RideCloneReturnToOverworldFailed",
+                "Failed to return to overworld after 5 minutes."
+            );
         }
 
         TeraCatchWatcher catch_menu(COLOR_BLUE);
@@ -379,7 +385,7 @@ bool RideCloner101::run_post_win(
 //            context.wait_for(std::chrono::milliseconds(150));
             try{
                 if (main_menu.move_cursor(env.program_info(), stream, context, MenuSide::LEFT, 5, false)){
-                    ssf_press_button(context, BUTTON_A, A_TO_B_DELAY, 20);
+                    ssf_press_button(context, BUTTON_A, A_TO_B_DELAY0, 160ms);
                     pbf_press_button(context, BUTTON_B, 20, 230);
                 }
             }catch (OperationFailedException& e){
@@ -416,7 +422,7 @@ bool RideCloner101::run_post_win(
 
 
 
-void RideCloner101::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void RideCloner101::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     RideCloner101_Descriptor::Stats& stats = env.current_stats<RideCloner101_Descriptor::Stats>();
@@ -435,7 +441,7 @@ void RideCloner101::program(SingleSwitchProgramEnvironment& env, SwitchControlle
             env.update_stats();
             if (!first){
                 day_skip_from_overworld(env.console, context);
-                pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY);
+                pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY0);
                 context.wait_for_all_requests();
                 stats.m_skips++;
             }

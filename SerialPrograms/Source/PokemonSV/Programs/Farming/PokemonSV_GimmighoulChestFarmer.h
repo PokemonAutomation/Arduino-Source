@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -29,7 +29,7 @@ public:
 class GimmighoulChestFarmer : public SingleSwitchProgramInstance{
 public:
     GimmighoulChestFarmer();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     enum class StartLocation{
@@ -41,11 +41,11 @@ private:
     EnumDropdownOption<StartLocation> START_LOCATION;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
-    TimeExpressionOption<uint16_t> ADDITIONAL_BATTLE_WAIT_TIME;
+    MillisecondsOption ADDITIONAL_BATTLE_WAIT_TIME0;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
-    void navigate_to_gimmi(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context);
+    void navigate_to_gimmi(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 };
 
 }

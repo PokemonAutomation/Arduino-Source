@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -40,39 +39,36 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
         LockMode::LOCK_WHILE_RUNNING,
         24
     )
-    , START_TO_ATTACK_DELAY(
+    , START_TO_ATTACK_DELAY0(
         "<b>Start to Attack Delay:</b><br>This needs to be carefully calibrated.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "3750"
+        "30000 ms"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , ATTACK_TO_CATCH_DELAY(
+    , ATTACK_TO_CATCH_DELAY0(
         "<b>Attack to Catch Delay:</b><br>Increase this if you seem to be catching Regigigas very often.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "9 * TICKS_PER_SECOND"
+        "9000 ms"
     )
-    , CATCH_TO_OVERWORLD_DELAY(
+    , CATCH_TO_OVERWORLD_DELAY0(
         "<b>Catch to Overworld Delay:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "8 * TICKS_PER_SECOND"
+        "8000 ms"
     )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
     PA_ADD_OPTION(REVERSAL_PP);
-    PA_ADD_OPTION(START_TO_ATTACK_DELAY);
+    PA_ADD_OPTION(START_TO_ATTACK_DELAY0);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(ATTACK_TO_CATCH_DELAY);
-    PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
+    PA_ADD_OPTION(ATTACK_TO_CATCH_DELAY0);
+    PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY0);
 }
 
-void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
@@ -87,7 +83,7 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env,
 
             pbf_press_button(context, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
-            pbf_press_button(context, BUTTON_A, 10, START_TO_ATTACK_DELAY);
+            pbf_press_button(context, BUTTON_A, 80ms, START_TO_ATTACK_DELAY0);
 
 //            set_leds(context, true);
             pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
@@ -102,9 +98,9 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env,
             pbf_press_dpad(context, DPAD_DOWN, 10, 0);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
 
-            pbf_wait(context, ATTACK_TO_CATCH_DELAY);
+            pbf_wait(context, ATTACK_TO_CATCH_DELAY0);
             pbf_press_dpad(context, DPAD_DOWN, 10, 0);
-            pbf_press_button(context, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
+            pbf_press_button(context, BUTTON_A, 80ms, CATCH_TO_OVERWORLD_DELAY0);
         }
 
         //  Conditional close game.
@@ -118,7 +114,7 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env,
         start_game_from_home_with_inference(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
     }
 
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 }
 
 

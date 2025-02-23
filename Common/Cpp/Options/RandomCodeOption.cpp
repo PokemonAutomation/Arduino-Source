@@ -42,16 +42,18 @@ std::string RaidCodeOption::check_validity() const{
 bool RaidCodeOption::code_enabled() const{
     return m_random_digits != 0 || m_code.size() > 0;
 }
-bool RaidCodeOption::get_code(uint8_t* code) const{
+std::string RaidCodeOption::get_code() const{
     if (!code_enabled()){
-        return false;
+        return "";
     }
+    std::string code;
+    code.resize(8);
     if (m_random_digits == 0){
         std::string qstr = sanitize_code(8, m_code);
         for (int c = 0; c < 8; c++){
             code[c] = qstr[c] - '0';
         }
-        return true;
+        return code;
     }
     srand((unsigned)time(nullptr));
     for (uint8_t c = 0; c < m_random_digits; c++){
@@ -64,7 +66,7 @@ bool RaidCodeOption::get_code(uint8_t* code) const{
     for (size_t c = m_random_digits; c < m_digits; c++){
         code[c] = code[c - 1];
     }
-    return true;
+    return code;
 }
 bool RaidCodeOption::operator==(const RaidCodeOption& x) const{
     return
@@ -175,9 +177,9 @@ bool RandomCodeOption::code_enabled() const{
     ReadSpinLock lg(m_data->m_lock);
     return m_data->m_current.code_enabled();
 }
-bool RandomCodeOption::get_code(uint8_t* code) const{
+std::string RandomCodeOption::get_code() const{
     ReadSpinLock lg(m_data->m_lock);
-    return m_data->m_current.get_code(code);
+    return m_data->m_current.get_code();
 }
 
 std::string RandomCodeOption::check_validity() const{

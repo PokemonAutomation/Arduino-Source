@@ -9,6 +9,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -31,7 +32,8 @@ StatsResetCalyrex_Descriptor::StatsResetCalyrex_Descriptor()
         "Repeatedly catch calyrex (and its horse) until you get the stats you want.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct StatsResetCalyrex_Descriptor::Stats : public StatsTracker{
@@ -139,7 +141,7 @@ StatsResetCalyrex::StatsResetCalyrex()
 
 
 
-void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_back_out(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -158,22 +160,22 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, SwitchContr
             context.wait_for_all_requests();
             {
                 StandardBattleMenuWatcher fight_detector(false);
-                int result = run_until<SwitchControllerContext>(
+                int result = run_until<ProControllerContext>(
                     env.console, context,
-                    [](SwitchControllerContext& context){
+                    [](ProControllerContext& context){
                         while (true){
-                            pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
+                            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
                         }
                     },
                     {{fight_detector}}
                 );
                 if (result == 0){
                     env.log("New fight detected, let's begin to throw balls.", COLOR_PURPLE);
-                    pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 1000ms);
                 }
             }
 
-            pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
             CatchResults result = basic_catcher(env.console, context, LANGUAGE, BALL_SELECT.slug(), 999);
             switch (result.result){
             case CatchResult::POKEMON_CAUGHT:
@@ -211,7 +213,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, SwitchContr
             }
 
             if (!calyrex_caught){
-                pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
                 reset_game_from_home_with_inference(
                     env.console, context,
                     ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
@@ -221,32 +223,32 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, SwitchContr
 
         env.log("Unfuse calyrex.", COLOR_PURPLE);
         for (int i = 0; i < 40; i++){
-            pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 80ms, 1000ms);
         }
-        pbf_press_button(context, BUTTON_X  , 10, (uint16_t)(1.5 * TICKS_PER_SECOND));
-        pbf_press_dpad  (context, DPAD_RIGHT, 10, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        pbf_press_dpad  (context, DPAD_RIGHT, 10, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_A  , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_LEFT , 10, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        pbf_press_dpad  (context, DPAD_UP   , 10, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_A  , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A  , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_UP   , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A  , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A  , 10, 2   * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_X  , 80ms, 1500ms);
+        pbf_press_dpad  (context, DPAD_RIGHT, 80ms, 500ms);
+        pbf_press_dpad  (context, DPAD_RIGHT, 80ms, 500ms);
+        pbf_press_button(context, BUTTON_A  , 80ms, 2000ms);
+        pbf_press_dpad  (context, DPAD_LEFT , 80ms, 500ms);
+        pbf_press_dpad  (context, DPAD_UP   , 80ms, 500ms);
+        pbf_press_button(context, BUTTON_A  , 80ms, 2000ms);
+        pbf_press_button(context, BUTTON_A  , 80ms, 2000ms);
+        pbf_press_dpad  (context, DPAD_UP   , 80ms, 2000ms);
+        pbf_press_button(context, BUTTON_A  , 80ms, 2000ms);
+        pbf_press_button(context, BUTTON_A  , 80ms, 2000ms);
         context.wait_for_all_requests();
 
         env.log("Check the stats.", COLOR_PURPLE);
         for (int i = 0; i < 10; i++){
-            pbf_press_button(context, BUTTON_B, 10, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
         }
-        pbf_press_button(context, BUTTON_X , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_LEFT, 10, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_A , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_R , 10, 3   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_LEFT, 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_UP  , 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_UP  , 10, 1   * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_X , 80ms, 2000ms);
+        pbf_press_dpad  (context, DPAD_LEFT, 80ms, 500ms);
+        pbf_press_button(context, BUTTON_A , 80ms, 2000ms);
+        pbf_press_button(context, BUTTON_R , 80ms, 3000ms);
+        pbf_press_dpad  (context, DPAD_LEFT, 80ms, 1000ms);
+        pbf_press_dpad  (context, DPAD_UP  , 80ms, 1000ms);
+        pbf_press_dpad  (context, DPAD_UP  , 80ms, 1000ms);
 
         if (CHECK_HORSE_STATS){
             context.wait_for_all_requests();
@@ -264,7 +266,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, SwitchContr
             }
         }
         if (CHECK_CALYREX_STATS){
-            pbf_press_dpad(context, DPAD_UP, 10, 1 * TICKS_PER_SECOND);
+            pbf_press_dpad(context, DPAD_UP, 80ms, 1000ms);
             context.wait_for_all_requests();
             
             IvJudgeReaderScope reader(env.console, LANGUAGE);
@@ -281,7 +283,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, SwitchContr
             }
         }
         if (!match_found){
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
             reset_game_from_home_with_inference(
                 env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST

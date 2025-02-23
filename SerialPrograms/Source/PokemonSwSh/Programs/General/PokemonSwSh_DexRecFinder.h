@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DexRecFinder_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/Options/StringSelectTableOption.h"
@@ -46,7 +46,7 @@ public:
 class DexRecFinder : public SingleSwitchProgramInstance{
 public:
     DexRecFinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     void read_line(
@@ -66,14 +66,14 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     DexRecFilters FILTERS;
-    TimeExpressionOption<uint16_t> VIEW_TIME;
+    MillisecondsOption VIEW_TIME0;
 
     EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> ENTER_POKEDEX_TIME;
-    TimeExpressionOption<uint16_t> BACK_OUT_TIME;
+    MillisecondsOption ENTER_POKEDEX_TIME0;
+    MillisecondsOption BACK_OUT_TIME0;
 };
 
 }

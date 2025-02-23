@@ -13,7 +13,7 @@
 #include <QCheckBox>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.h"
+#include "Controllers/ControllerSession.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -21,7 +21,6 @@ namespace NintendoSwitch{
 
 class CommandRow :
     public QWidget,
-    public VirtualController,
     public VideoOverlaySession::Listener,
     public ControllerSession::Listener
 {
@@ -74,6 +73,7 @@ private:
     QPushButton* m_screenshot_button;
     QPushButton* m_video_button;
     bool m_last_known_focus;
+    ProgramState m_last_known_state;
 };
 
 

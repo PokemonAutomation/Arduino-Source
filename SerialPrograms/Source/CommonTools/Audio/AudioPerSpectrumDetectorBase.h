@@ -36,6 +36,7 @@
 
 namespace PokemonAutomation{
 
+
 class Logger;
 class SpectrogramMatcher;
 
@@ -64,6 +65,10 @@ public:
     );
 
     virtual ~AudioPerSpectrumDetectorBase();
+
+    WallClock last_detection() const{
+        return m_last_timestamp;
+    }
 
     void throw_if_no_sound(std::chrono::milliseconds min_duration = std::chrono::milliseconds(5000)) const;
 

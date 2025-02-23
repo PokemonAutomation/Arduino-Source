@@ -11,7 +11,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -34,7 +34,7 @@ public:
     //  While sitting on the menu, move the cursor to the desired slot.
     //  Returns true if success.
     bool move_cursor(
-        const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+        const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         int row
     ) const;
 

@@ -11,10 +11,12 @@
 #include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
+#include "Controllers/ControllerCapability.h"
 
 class QPushButton;
 
 namespace PokemonAutomation{
+
 
 
 
@@ -24,12 +26,22 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& doc_link,
     const std::string& description
 );
+#if 0
 CollapsibleGroupBox* make_panel_header(
     QWidget& parent,
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
     FeedbackType feedback
+);
+#endif
+CollapsibleGroupBox* make_panel_header(
+    QWidget& parent,
+    const std::string& display_name,
+    const std::string& doc_link,
+    const std::string& description,
+    const ControllerRequirements& requirements,
+    FasterIfTickPrecise faster_if_tick_precise
 );
 
 

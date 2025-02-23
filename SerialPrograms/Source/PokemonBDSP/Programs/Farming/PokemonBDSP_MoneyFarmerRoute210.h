@@ -31,24 +31,24 @@ public:
 class MoneyFarmerRoute210 : public SingleSwitchProgramInstance{
 public:
     MoneyFarmerRoute210();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     // Run the battle loop. Return true if the program should stop.
-    bool battle(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    bool battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
     // From the bottom row of the Ace Trainer pair, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
     bool heal_after_battle_and_return(
         SingleSwitchProgramEnvironment& env,
-        VideoStream& stream, SwitchControllerContext& context,
+        VideoStream& stream, ProControllerContext& context,
         uint8_t pp0[4], uint8_t pp1[4]
     );
     // Starting in front of the Celestic Town Pokecenter, heal and return
     // to the Ace Trainer pair.
-    void heal_at_center_and_return(Logger& logger, SwitchControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    void heal_at_center_and_return(Logger& logger, ProControllerContext& context, uint8_t pp0[4], uint8_t pp1[4]);
     // Fly from the Ace Trainer pair to Hearthome Pokecenter, heal and return.
     void fly_to_center_heal_and_return(
-        Logger& logger, SwitchControllerContext& context,
+        Logger& logger, ProControllerContext& context,
         uint8_t pp0[4],uint8_t pp1[4]
     );
     // Move around to charge VS Seeker.

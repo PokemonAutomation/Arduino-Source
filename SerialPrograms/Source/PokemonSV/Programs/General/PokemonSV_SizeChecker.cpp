@@ -34,7 +34,8 @@ SizeChecker_Descriptor::SizeChecker_Descriptor()
         "Check boxes of " + STRING_POKEMON + " for size marks.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct SizeChecker_Descriptor::Stats : public StatsTracker{
@@ -85,7 +86,7 @@ SizeChecker::SizeChecker()
 
 
 
-void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     env.console.log("Enter box mode to check size...");
     WallClock start = current_time();
 
@@ -135,7 +136,7 @@ void SizeChecker::enter_check_mode(SingleSwitchProgramEnvironment& env, SwitchCo
 
 
 
-void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, VideoSnapshot screen){
+void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, VideoSnapshot screen){
     SizeChecker_Descriptor::Stats& stats = env.current_stats<SizeChecker_Descriptor::Stats>();
     env.console.log("Check size and exit box mode...");
     WallClock start = current_time();
@@ -194,7 +195,7 @@ void SizeChecker::exit_check_mode(SingleSwitchProgramEnvironment& env, SwitchCon
 
 
 
-void SizeChecker::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void SizeChecker::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     SizeChecker_Descriptor::Stats& stats = env.current_stats<SizeChecker_Descriptor::Stats>();
@@ -245,9 +246,9 @@ void SizeChecker::program(SingleSwitchProgramEnvironment& env, SwitchControllerC
 
                 // Initiate size checking prompt.
                 DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_WHITE);
-                int ret = run_until<SwitchControllerContext>(
+                int ret = run_until<ProControllerContext>(
                     env.console, context,
-                    [](SwitchControllerContext& context){
+                    [](ProControllerContext& context){
                         for (size_t c = 0; c < 10; c++){
                             pbf_press_button(context, BUTTON_A, 20, 105);
                         }

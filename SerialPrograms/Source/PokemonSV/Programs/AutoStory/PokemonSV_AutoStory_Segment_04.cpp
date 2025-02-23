@@ -43,7 +43,7 @@ std::string AutoStory_Segment_04::end_text() const{
 
 void AutoStory_Segment_04::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -64,7 +64,7 @@ void AutoStory_Segment_04::run_segment(
 
 void checkpoint_08(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -101,9 +101,9 @@ void checkpoint_08(
         GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::RIGHT, {0.104, 0.312, 0.043, 0.08});
         context.wait_for_all_requests();
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
                     pbf_press_dpad(context, DPAD_UP, 20, 250);
                 }
@@ -131,7 +131,7 @@ void checkpoint_08(
         env.console.log("Enter cave");
         env.console.overlay().add_log("Enter cave", COLOR_WHITE);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 128, 0, 600, 50);
                 realign_player(env.program_info(), stream, context, PlayerRealignMode::REALIGN_NO_MARKER, 150, 20, 20);
                 pbf_move_left_joystick(context, 128, 0, 1000, 50);
@@ -146,7 +146,7 @@ void checkpoint_08(
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
 
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-            [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 // Legendary rock break
                 context.wait_for_all_requests();
                 stream.log("Rock break");

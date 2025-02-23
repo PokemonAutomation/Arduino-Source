@@ -33,7 +33,8 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         "Mass release boxes of " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct MassRelease_Descriptor::Stats : public StatsTracker{
@@ -95,7 +96,7 @@ MassRelease::MassRelease()
 
 
 
-void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();
 
     env.log("Selecting " + STRING_POKEMON + "...");
@@ -151,7 +152,7 @@ void MassRelease::release_one(BoxDetector& box_detector, SingleSwitchProgramEnvi
         throw;
     }
 }
-void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     for (uint8_t row = 0; row < 5; row++){
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             // Go through slots in a Z-shape pattern
@@ -165,7 +166,7 @@ void MassRelease::release_box(BoxDetector& box_detector, SingleSwitchProgramEnvi
 
 
 
-void MassRelease::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     MassRelease_Descriptor::Stats& stats = env.current_stats<MassRelease_Descriptor::Stats>();

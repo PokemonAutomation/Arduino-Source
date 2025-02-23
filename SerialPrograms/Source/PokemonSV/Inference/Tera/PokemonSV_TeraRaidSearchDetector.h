@@ -13,7 +13,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
@@ -32,7 +32,7 @@ public:
     bool detect_search_location(ImageFloatBox& box, const ImageViewRGB32& screen) const;
     bool move_cursor_to_search(
         const ProgramInfo& info,
-        VideoStream& stream, SwitchControllerContext& context
+        VideoStream& stream, ProControllerContext& context
     ) const;
 
 private:

@@ -40,7 +40,7 @@ public:
     std::string tera_type(
         Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
     ) const;
-    std::string pokemon_slug(
+    std::set<std::string> pokemon_slug(
         Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
     ) const;
 

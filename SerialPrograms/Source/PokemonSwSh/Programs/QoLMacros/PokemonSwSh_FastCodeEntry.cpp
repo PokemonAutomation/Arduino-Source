@@ -5,9 +5,8 @@
  */
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_FastCodeEntry.h"
 
@@ -25,7 +24,8 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         "Force your way into raids by entering 8-digit codes in under 1 second.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -37,28 +37,24 @@ FastCodeEntry::FastCodeEntry()
         8,
         "9107 3091"
     )
-    , INITIAL_DELAY(
+    , INITIAL_DELAY0(
         "<b>Initial Delay:</b><br>Wait this long before entering the code.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
 {
     PA_ADD_OPTION(RAID_CODE);
-    PA_ADD_OPTION(INITIAL_DELAY);
+    PA_ADD_OPTION(INITIAL_DELAY0);
 }
 
-void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
-    uint8_t code[8];
-    RAID_CODE.to_str(code);
+void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    std::string code = RAID_CODE.to_str();
 
-    if (INITIAL_DELAY != 0){
-        pbf_wait(context, INITIAL_DELAY);
-    }
+    pbf_wait(context, INITIAL_DELAY0);
 
     pbf_press_button(context, BUTTON_PLUS, 5, 5);
     pbf_press_button(context, BUTTON_PLUS, 5, 5);
-    enter_digits(context, 8, code);
+    numberpad_enter_code(env.logger(), context, code, true);
 }
 
 

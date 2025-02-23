@@ -9,7 +9,6 @@
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_CodeEntry.h"
 #include "PokemonSV_ClipboardFastCodeEntry.h"
@@ -29,25 +28,25 @@ ClipboardFastCodeEntry_Descriptor::ClipboardFastCodeEntry_Descriptor()
         "Automatically enter a 4, 6, or 8 digit link code from your clipboard.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER,
         1, 4, 1
     )
 {}
 
-ClipboardFastCodeEntry::ClipboardFastCodeEntry()
-    : SETTINGS(LockMode::LOCK_WHILE_RUNNING)
-{
+ClipboardFastCodeEntry::ClipboardFastCodeEntry(){
     PA_ADD_OPTION(SETTINGS);
+}
+void ClipboardFastCodeEntry::update_active_consoles(size_t switch_count){
+    SETTINGS.set_active_consoles(switch_count);
 }
 
 
 void ClipboardFastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     //  Connect the controller.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
     });
-
-    FastCodeEntrySettings settings(SETTINGS);
 
     QClipboard* clipboard = QApplication::clipboard();
 #if 0
@@ -68,7 +67,7 @@ void ClipboardFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancell
     while (true){
         std::string code = clipboard->text().toStdString();
         if (code != start_text && !code.empty()){
-            const char* error = enter_code(env, scope, settings, code, false);
+            const char* error = enter_code(env, scope, SETTINGS, code, false, false);
             if (error == nullptr){
                 return;
             }

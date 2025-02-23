@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 
 namespace PokemonAutomation{
@@ -26,7 +26,7 @@ public:
     SectionDividerOption m_egg_options;
     BooleanCheckBoxOption AUTO_DEPOSIT;
     BooleanCheckBoxOption EGG_FETCH_EXTRA_LINE;
-    TimeExpressionOption<uint16_t> FETCH_EGG_MASH_DELAY;
+    MillisecondsOption FETCH_EGG_MASH_DELAY0;
 
     SectionDividerOption m_den_options;
     BooleanCheckBoxOption DODGE_UNCATCHABLE_PROMPT_FAST;
@@ -34,42 +34,42 @@ public:
     SectionDividerOption m_advanced_options;
 
     SectionDividerOption m_general_options;
-    TimeExpressionOption<uint16_t> AUTO_FR_DURATION;
+    MillisecondsOption AUTO_FR_DURATION0;
 
     SectionDividerOption m_menu_navigation;
-    TimeExpressionOption<uint16_t> OVERWORLD_TO_MENU_DELAY;
-    TimeExpressionOption<uint16_t> MENU_TO_OVERWORLD_DELAY;
-    TimeExpressionOption<uint16_t> GAME_TO_HOME_DELAY_FAST;
-    TimeExpressionOption<uint16_t> GAME_TO_HOME_DELAY_SAFE;
-    TimeExpressionOption<uint16_t> HOME_TO_GAME_DELAY;
-    TimeExpressionOption<uint16_t> OPEN_YCOMM_DELAY;
-    TimeExpressionOption<uint16_t> ENTER_PROFILE_DELAY;
+    MillisecondsOption OVERWORLD_TO_MENU_DELAY0;
+    MillisecondsOption MENU_TO_OVERWORLD_DELAY0;
+    MillisecondsOption GAME_TO_HOME_DELAY_FAST0;
+    MillisecondsOption GAME_TO_HOME_DELAY_SAFE0;
+    MillisecondsOption HOME_TO_GAME_DELAY0;
+    MillisecondsOption OPEN_YCOMM_DELAY0;
+    MillisecondsOption ENTER_PROFILE_DELAY0;
 
     SectionDividerOption m_start_game_timings;
-    TimeExpressionOption<uint16_t> START_GAME_MASH;
-    TimeExpressionOption<uint16_t> START_GAME_WAIT;
-    TimeExpressionOption<uint16_t> ENTER_GAME_MASH;
-    TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
+    MillisecondsOption START_GAME_MASH0;
+    MillisecondsOption START_GAME_WAIT0;
+    MillisecondsOption ENTER_GAME_MASH0;
+    MillisecondsOption ENTER_GAME_WAIT0;
 
     SectionDividerOption m_den_timings;
-    TimeExpressionOption<uint16_t> ENTER_OFFLINE_DEN_DELAY;
-    TimeExpressionOption<uint16_t> REENTER_DEN_DELAY;
-    TimeExpressionOption<uint16_t> COLLECT_WATTS_OFFLINE_DELAY;
-    TimeExpressionOption<uint16_t> COLLECT_WATTS_ONLINE_DELAY;
-    TimeExpressionOption<uint16_t> UNCATCHABLE_PROMPT_DELAY;
-    TimeExpressionOption<uint16_t> OPEN_LOCAL_DEN_LOBBY_DELAY;
-    TimeExpressionOption<uint16_t> ENTER_SWITCH_POKEMON;
-    TimeExpressionOption<uint16_t> EXIT_SWITCH_POKEMON;
-    TimeExpressionOption<uint16_t> FULL_LOBBY_TIMER;
+    MillisecondsOption ENTER_OFFLINE_DEN_DELAY0;
+    MillisecondsOption REENTER_DEN_DELAY0;
+    MillisecondsOption COLLECT_WATTS_OFFLINE_DELAY0;
+    MillisecondsOption COLLECT_WATTS_ONLINE_DELAY0;
+    MillisecondsOption UNCATCHABLE_PROMPT_DELAY0;
+    MillisecondsOption OPEN_LOCAL_DEN_LOBBY_DELAY0;
+    MillisecondsOption ENTER_SWITCH_POKEMON0;
+    MillisecondsOption EXIT_SWITCH_POKEMON0;
+    MillisecondsOption FULL_LOBBY_TIMER0;
 
     SectionDividerOption m_box_timings;
-    TimeExpressionOption<uint16_t> BOX_SCROLL_DELAY;
-    TimeExpressionOption<uint16_t> BOX_CHANGE_DELAY;
-    TimeExpressionOption<uint16_t> BOX_PICKUP_DROP_DELAY;
-    TimeExpressionOption<uint16_t> MENU_TO_POKEMON_DELAY;
-    TimeExpressionOption<uint16_t> POKEMON_TO_BOX_DELAY;
-    TimeExpressionOption<uint16_t> BOX_TO_POKEMON_DELAY;
-    TimeExpressionOption<uint16_t> POKEMON_TO_MENU_DELAY;
+    MillisecondsOption BOX_SCROLL_DELAY0;
+    MillisecondsOption BOX_CHANGE_DELAY0;
+    MillisecondsOption BOX_PICKUP_DROP_DELAY0;
+    MillisecondsOption MENU_TO_POKEMON_DELAY0;
+    MillisecondsOption POKEMON_TO_BOX_DELAY0;
+    MillisecondsOption BOX_TO_POKEMON_DELAY0;
+    MillisecondsOption POKEMON_TO_MENU_DELAY0;
 
     SectionDividerOption m_shiny_detection;
     FloatingPointOption SHINY_ALPHA_THRESHOLD;

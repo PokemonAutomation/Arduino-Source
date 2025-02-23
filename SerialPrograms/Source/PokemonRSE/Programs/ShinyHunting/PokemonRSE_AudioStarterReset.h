@@ -7,8 +7,6 @@
 #ifndef PokemonAutomation_PokemonRSE_AudioStarterReset_H
 #define PokemonAutomation_PokemonRSE_AudioStarterReset_H
 
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -26,7 +24,13 @@ public:
 class AudioStarterReset : public SingleSwitchProgramInstance{
 public:
     AudioStarterReset();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+
+    virtual void start_program_border_check(
+        CancellableScope& scope,
+        VideoStream& stream,
+        FeedbackType feedback_type
+    ) override{}
 
 private:
     enum class Target{

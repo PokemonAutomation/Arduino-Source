@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Controllers/ControllerCapability.h"
 #include "PanelElements.h"
 
 namespace PokemonAutomation{
@@ -50,6 +51,7 @@ CollapsibleGroupBox* make_panel_header(
 
     return header;
 }
+#if 0
 CollapsibleGroupBox* make_panel_header(
     QWidget& parent,
     const std::string& display_name,
@@ -89,6 +91,57 @@ CollapsibleGroupBox* make_panel_header(
     }
     text->setWordWrap(true);
     layout->addWidget(text);
+
+    return header;
+}
+#endif
+CollapsibleGroupBox* make_panel_header(
+    QWidget& parent,
+    const std::string& display_name,
+    const std::string& doc_link,
+    const std::string& description,
+    const ControllerRequirements& requirements,
+    FasterIfTickPrecise faster_if_tick_precise
+){
+    CollapsibleGroupBox* header = make_panel_header(parent, display_name, doc_link, description);
+    QLayout* layout = header->widget()->layout();
+
+    std::string text;
+    do{
+        if (requirements.contains(ControllerFeature::NintendoSwitch_DateSkip)){
+            text = html_color_text("(This program requires advanced RPCs. It requires Serial PABotBase.)", COLOR_RED);
+            break;
+        }
+        if (requirements.contains(ControllerFeature::TickPrecise)){
+            text = html_color_text("(This program requires a tick-precise controller.)", COLOR_PURPLE);
+            break;
+        }
+
+        switch (faster_if_tick_precise){
+        case PokemonAutomation::FasterIfTickPrecise::MUCH_FASTER:
+            text = html_color_text(
+                "(This program does not have any special controller requirements. "
+                "However, it is strongly recommended to use a tick-precise controller as the program will run much faster and/or more reliably.)",
+                COLOR_DARKGREEN
+            );
+            break;
+        case PokemonAutomation::FasterIfTickPrecise::FASTER:
+            text = html_color_text(
+                "(This program does not have any special controller requirements. "
+                "However, it runs faster if the controller is tick-precise.)",
+                COLOR_DARKGREEN
+            );
+            break;
+        case PokemonAutomation::FasterIfTickPrecise::NOT_FASTER:
+            text = html_color_text("(This program does not have any special controller requirements.)", COLOR_BLUE);
+            break;
+        }
+
+    }while (false);
+
+    QLabel* label = new QLabel(QString::fromStdString(text), header);
+    label->setWordWrap(true);
+    layout->addWidget(label);
 
     return header;
 }

@@ -28,7 +28,8 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         "Repeatedly throw a ball and reset until you catch the pokemon.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct AutonomousBallThrower_Descriptor::Stats : public StatsTracker{
@@ -102,7 +103,7 @@ AutonomousBallThrower::AutonomousBallThrower()
 
 
 
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     AutonomousBallThrower_Descriptor::Stats& stats = env.current_stats<AutonomousBallThrower_Descriptor::Stats>();
     env.update_stats();
 
@@ -115,9 +116,9 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, SwitchC
         env.log("Wait for a pokemon to attack you.", COLOR_PURPLE);
         {
             BattleMenuWatcher fight_detector(BattleType::STANDARD);
-            int ret = run_until<SwitchControllerContext>(
+            int ret = run_until<ProControllerContext>(
                 env.console, context,
-                [](SwitchControllerContext& context){
+                [](ProControllerContext& context){
                     while (true){
                         //TODO edit here for what to do
                         //pbf_wait(context, 1 * TICKS_PER_SECOND);
@@ -170,7 +171,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, SwitchC
         }
 
         if (!pokemon_caught){
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, true);
         }
     }

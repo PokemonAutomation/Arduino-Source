@@ -40,7 +40,7 @@ std::string AutoStory_Segment_07::end_text() const{
 
 void AutoStory_Segment_07::run_segment(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     AutoStoryOptions options
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
@@ -71,7 +71,7 @@ void AutoStory_Segment_07::run_segment(
 
 void checkpoint_12(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     EventNotificationOption& notif_status_update
 ){
     // reset rate: ~25%. 12 resets out of 52. 
@@ -92,7 +92,7 @@ void checkpoint_12(
             // re-orient camera
             pbf_press_button(context, BUTTON_L, 20, 20);
             do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-                [&](const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context){
+                [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                     walk_forward_while_clear_front_path(env.program_info(), env.console, context, 35);
 
                     // place the marker elsewhere

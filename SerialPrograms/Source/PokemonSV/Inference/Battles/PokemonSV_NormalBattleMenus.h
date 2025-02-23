@@ -11,7 +11,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -34,7 +34,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(VideoStream& stream, SwitchControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const;
 
 private:
     WhiteButtonDetector m_status_button;
@@ -48,7 +48,7 @@ public:
 };
 
 std::set<std::string> read_singles_opponent(
-    const ProgramInfo& info, VideoStream& stream, SwitchControllerContext& context,
+    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     Language language
 );
 
@@ -63,7 +63,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(VideoStream& stream, SwitchControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const;
 
 private:
     WhiteButtonDetector m_info_button;
@@ -101,7 +101,7 @@ public:
 
     //  Returns -1 if not found.
     int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(VideoStream& stream, SwitchControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const;
 
 private:
     GradientArrowDetector m_arrow;

@@ -12,7 +12,7 @@
 #include <cstddef>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 
 namespace PokemonAutomation{
@@ -30,7 +30,7 @@ namespace PokemonSV{
 // no sandwich can be made.
 bool enter_sandwich_recipe_list(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 );
 
 // Starting at sandwich recipe selection menu, select the desired sandwich recipe and press A to enter
@@ -41,20 +41,20 @@ bool enter_sandwich_recipe_list(
 // the recipe cell is semi-transparent, failed to be detected.
 bool select_sandwich_recipe(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     size_t sandwich_index
 );
 
 // Assuming sandwich is made, press A repeatedly to finish eating animation until returning to picnic
 void finish_sandwich_eating(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 );
 
 // Assuming at sanwich recipe list, press X to enter custom sandwich mode
 void enter_custom_sandwich_mode(
     const ProgramInfo& info,
-    VideoStream& stream, SwitchControllerContext& context
+    VideoStream& stream, ProControllerContext& context
 );
 
 enum class EggSandwichType{
@@ -73,7 +73,7 @@ enum class EggSandwichType{
 // After entering sandiwich mini game, it will drop the filling to quickly make a two-herb only sandwich to gain egg power lv 3.
 void make_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     EggSandwichType sandwich_type,
     size_t sweet_herb_index_last,
     size_t salty_herb_index_last,
@@ -86,7 +86,7 @@ void make_two_herbs_sandwich(
 void make_two_herbs_sandwich(
     const ProgramInfo& info,
     AsyncDispatcher& dispatcher, VideoStream& stream,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EggSandwichType sandwich_type,
     Language language
 );
@@ -95,7 +95,7 @@ void make_two_herbs_sandwich(
 // Process sandwich options and make a custom sandwich by calling make_sandwich_preset
 void make_sandwich_option(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     SandwichMakerOption& SANDWICH_OPTIONS
 );
 
@@ -105,7 +105,7 @@ void make_sandwich_option(
 // make_sandwich_preset(env, context, language, fillings, condiments);
 void make_sandwich_preset(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     std::map<std::string, uint8_t>& fillings,
     std::map<std::string, uint8_t>& condiments
@@ -117,7 +117,7 @@ void make_sandwich_preset(
 // make great pb sandwich does call this directly, as it skips the custom sandwich menu
 void run_sandwich_maker(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted,
     int& plates

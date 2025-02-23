@@ -254,7 +254,7 @@ void test_find_symbols(
 //    hits.clear();
     cout << "---------------" << endl;
     for (const auto& item : candidates){
-        cout << get_type_slug(item.second.first) << ": " << item.first << endl;
+        cout << POKEMON_TYPE_SLUGS().get_string(item.second.first) << ": " << item.first << endl;
         hits.emplace_back(overlay, translate_to_parent(screen, box, item.second.second), COLOR_GREEN);
     }
 

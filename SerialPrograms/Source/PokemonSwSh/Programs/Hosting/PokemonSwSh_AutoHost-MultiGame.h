@@ -11,12 +11,10 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/RandomCodeOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
-#include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
@@ -38,7 +36,7 @@ public:
 class AutoHostMultiGame : public SingleSwitchProgramInstance{
 public:
     AutoHostMultiGame();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
     StartInGripOrClosedOption START_LOCATION;
@@ -46,7 +44,7 @@ private:
 
     RandomCodeOption RAID_CODE;
     BooleanCheckBoxOption HOST_ONLINE;
-    TimeExpressionOption<uint16_t> LOBBY_WAIT_DELAY;
+    MillisecondsOption LOBBY_WAIT_DELAY0;
     MultiHostTable GAME_LIST;
     SimpleIntegerOption<uint8_t> FR_FORWARD_ACCEPT;
 
@@ -54,11 +52,11 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_internet_settings;
-    TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;
-    TimeExpressionOption<uint16_t> ENTER_ONLINE_DEN_DELAY;
-    TimeExpressionOption<uint16_t> OPEN_ONLINE_DEN_LOBBY_DELAY;
-    TimeExpressionOption<uint16_t> RAID_START_TO_EXIT_DELAY;
-    TimeExpressionOption<uint16_t> DELAY_TO_SELECT_MOVE;
+    MillisecondsOption CONNECT_TO_INTERNET_DELAY0;
+    MillisecondsOption ENTER_ONLINE_DEN_DELAY0;
+    MillisecondsOption OPEN_ONLINE_DEN_LOBBY_DELAY0;
+    MillisecondsOption RAID_START_TO_EXIT_DELAY0;
+    MillisecondsOption DELAY_TO_SELECT_MOVE0;
 };
 
 

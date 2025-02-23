@@ -23,7 +23,8 @@ FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()
         "Navigate to the flag pin.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -55,7 +56,7 @@ FlagNavigationTest::FlagNavigationTest()
 }
 
 
-void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     FlagNavigationAir session(
         env, env.console, context,

@@ -31,13 +31,13 @@ public:
 class IngoBattleGrinder : public SingleSwitchProgramInstance{
 public:
     IngoBattleGrinder();
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, std::map<size_t, size_t>& pokemon_move_attempts);
+    bool run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::map<size_t, size_t>& pokemon_move_attempts);
 
     //  Returns true if version 1.0.
-    bool start_dialog(VideoStream& stream, SwitchControllerContext& context);
+    bool start_dialog(VideoStream& stream, ProControllerContext& context);
 
 private:
     IngoOpponentOption OPPONENT;

@@ -47,7 +47,8 @@ ShinyHuntScatterbug_Descriptor::ShinyHuntScatterbug_Descriptor()
         "Shiny hunt Scatterbug.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 struct ShinyHuntScatterbug_Descriptor::Stats : public LetsGoEncounterBotStats{
@@ -130,22 +131,24 @@ ShinyHuntScatterbug::ShinyHuntScatterbug()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
-        PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
-        PA_ADD_OPTION(SKIP_SANDWICH);
-    }
     PA_ADD_OPTION(SAVE_GAME_AT_START);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SANDWICH_OPTIONS);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(AUTO_HEAL_PERCENT);
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
+        PA_ADD_OPTION(DEBUG_WARP_TO_POKECENTER);
+        PA_ADD_OPTION(SKIP_SANDWICH);
+    }
+
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
-void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -224,8 +227,8 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, SwitchCon
 // `action` must be an action starting at the PokeCenter
 void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
-    std::function<void(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context)>&& action
+    ProControllerContext& context,
+    std::function<void(SingleSwitchProgramEnvironment& env, ProControllerContext& context)>&& action
 ){
     if (m_encounter_tracker == nullptr){
         throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "m_encounter_tracker == nullptr");
@@ -238,9 +241,9 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(
     while(action_finished == false || returned_to_pokecenter == false){
         // env.console.overlay().add_log("Calculate what to do next");
         EncounterWatcher encounter_watcher(env.console, COLOR_RED);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 if (action_finished){
                     // `action` is already finished. Now we just try to get back to pokecenter:
                     reset_to_pokecenter(env.program_info(), env.console, context);
@@ -292,7 +295,7 @@ void ShinyHuntScatterbug::handle_battles_and_back_to_pokecenter(
 
 // Start at Mesagoza South Gate pokecenter, make a sandwich, then use let's go repeatedly until 30 min passes.
 // If 
-void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntScatterbug_Descriptor::Stats& stats = env.current_stats<ShinyHuntScatterbug_Descriptor::Stats>();
 
     bool saved_after_this_sandwich = false;
@@ -308,7 +311,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
     };
 
     handle_battles_and_back_to_pokecenter(env, context, 
-        [this, &last_sandwich_time](SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+        [this, &last_sandwich_time](SingleSwitchProgramEnvironment& env, ProControllerContext& context){
             // Orient camera to look at same direction as player character
             // This is needed because when save-load the game, the camera is reset
             // to this location.
@@ -362,10 +365,10 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
         }
 
         handle_battles_and_back_to_pokecenter(env, context, 
-            [this, &path_id, &hp_watcher](SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
-                run_until<SwitchControllerContext>(
+            [this, &path_id, &hp_watcher](SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+                run_until<ProControllerContext>(
                     env.console, context,
-                    [&](SwitchControllerContext& context){
+                    [&](ProControllerContext& context){
                         run_lets_go_iteration(env, context, path_id);
                     },
                     {hp_watcher}
@@ -386,7 +389,7 @@ void ShinyHuntScatterbug::run_one_sandwich_iteration(SingleSwitchProgramEnvironm
 
 // One iteration of the hunt: 
 // start at Mesagoza South Gate pokecenter, go out and use Let's Go to battle Scatterbug, 
-void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, size_t path_id){
+void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t path_id){
     auto& console = env.console;
     // Orient camera to look at same direction as player character
     // This is needed because when save-load the game, the camera is reset
@@ -398,7 +401,7 @@ void ShinyHuntScatterbug::run_lets_go_iteration(SingleSwitchProgramEnvironment& 
     auto move_forward_with_lets_go = [&](int num_iterations){
         context.wait_for_all_requests();
         for(int i = 0; i < num_iterations; i++){
-            use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](SwitchControllerContext& context){
+            use_lets_go_to_clear_in_front(console, context, *m_encounter_tracker, throw_ball_if_bubble, [&](ProControllerContext& context){
                 // Do the following movement while the Let's Go pokemon clearing wild pokemon.
                 // Slowly Moving forward
                 pbf_move_left_joystick(context, 128, 105, 800, 0);

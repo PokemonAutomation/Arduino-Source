@@ -76,7 +76,7 @@
 #include "Common/Cpp/StringTools.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
-#include "Common/Cpp/EnumDatabase.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 
@@ -118,6 +118,7 @@
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h"
 #include "PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
+#include "Common/Cpp/Containers/CircularBuffer.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -215,6 +216,43 @@ class WatchdogTest1 : public WatchdogCallback{
 
 
 
+template <typename Type>
+class CheckedObject{
+public:
+    template <class... Args>
+    CheckedObject(Args&&... args)
+        : m_object(std::forward<Args>(args)...)
+    {
+        m_instances++;
+    }
+    ~CheckedObject(){
+        m_instances--;
+    }
+
+    operator const Type&() const{
+        return m_object;
+    }
+    operator Type&(){
+        return m_object;
+    }
+
+    static size_t instances(){
+        return m_instances.load(std::memory_order_relaxed);
+    }
+
+    friend std::ostream& operator<<(std::ostream& stream, const CheckedObject& x){
+        return stream << (const Type&)x;
+    }
+
+private:
+    static std::atomic<size_t> m_instances;
+    Type m_object;
+    LifetimeSanitizer m_lifetime_santizer;
+};
+
+template <typename Type>
+std::atomic<size_t> CheckedObject<Type>::m_instances(0);
+
 
 
 
@@ -226,6 +264,51 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+
+#if 0
+    {
+        CircularBuffer<CheckedObject<std::string>> buffer(4);
+
+        cout << "Dumping:" << endl;
+        for (size_t c = 0; c < buffer.size(); c++){
+            cout << "    " << buffer[c] << endl;
+        }
+
+        buffer.push_back("123");
+        buffer.push_back("456");
+        buffer.push_back("789");
+
+
+        cout << "Dumping:" << endl;
+        for (size_t c = 0; c < buffer.size(); c++){
+            cout << "    " << buffer[c] << endl;
+        }
+
+        buffer.pop_front();
+
+        cout << "Dumping:" << endl;
+        for (size_t c = 0; c < buffer.size(); c++){
+            cout << "    " << buffer[c] << endl;
+        }
+
+        buffer.push_back("asd");
+        buffer.push_back("sdf");
+
+        cout << "Dumping:" << endl;
+        for (size_t c = 0; c < buffer.size(); c++){
+            cout << "    " << buffer[c] << endl;
+        }
+
+        cout << "Instances = " << CheckedObject<std::string>::instances() << endl;
+    }
+    cout << "Instances = " << CheckedObject<std::string>::instances() << endl;
+#endif
+
+
+#if 1
+    int* ptr = nullptr;
+    cout << ptr[0] << endl;
+#endif
 
 #if 0
     send_program_notification_with_file(
@@ -251,9 +334,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     );
 #endif
 
-
-    int* ptr = nullptr;
-    cout << ptr[0] << endl;
 
 #if 0
     std::random_device rndsource;

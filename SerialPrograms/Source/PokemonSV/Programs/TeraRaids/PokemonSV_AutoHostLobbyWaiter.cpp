@@ -22,7 +22,7 @@ namespace PokemonSV{
 
 TeraLobbyWaiter::TeraLobbyWaiter(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     uint8_t host_players,
     const std::string& lobby_code, WallClock start_time,
     SimpleIntegerOption<uint16_t>& LOBBY_WAIT_DELAY,

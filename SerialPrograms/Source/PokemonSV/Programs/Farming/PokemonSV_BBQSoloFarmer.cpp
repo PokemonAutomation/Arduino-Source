@@ -7,15 +7,15 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV_BBQSoloFarmer.h"
 
@@ -67,7 +67,7 @@ BBQSoloFarmer::BBQSoloFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     BBQSoloFarmer_Descriptor::Stats& stats = env.current_stats<BBQSoloFarmer_Descriptor::Stats>();
     
@@ -144,11 +144,11 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, SwitchControlle
     env.update_stats();
 
     if (BBQ_OPTIONS.FIX_TIME_WHEN_DONE){
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
 
         open_map_from_overworld(env.program_info(), env.console, context);

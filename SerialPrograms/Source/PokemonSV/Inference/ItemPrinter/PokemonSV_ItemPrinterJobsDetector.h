@@ -11,7 +11,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -29,7 +29,7 @@ public:
     //  "jobs" jobs must be 1, 5, or 10.
     void set_print_jobs(
         AsyncDispatcher& dispatcher,
-        VideoStream& stream, SwitchControllerContext& context, uint8_t jobs
+        VideoStream& stream, ProControllerContext& context, uint8_t jobs
     ) const;
 
 

@@ -110,7 +110,7 @@ public:
 
 
 void trade_current_pokemon(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
@@ -130,9 +130,9 @@ void trade_current_pokemon(
     //  Wait for black screen.
     {
         BlackScreenOverWatcher black_screen(COLOR_CYAN);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
             },
             {{black_screen}}
@@ -173,6 +173,7 @@ void trade_current_pokemon(
             break;
         default:
             stats.m_errors++;
+
             tracker.report_unrecoverable_error(stream, "Failed to return to box after 2 minutes after a trade.");
         }
     }
@@ -191,7 +192,7 @@ void trade_current_box(
             send_program_status_notification(env, notifications);
 
             MultiConsoleErrorState error_state;
-            env.run_in_parallel(scope, [&](ConsoleHandle& console, SwitchControllerContext& context){
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
                 VideoOverlaySet overlays(console.overlay());
 
                 move_box_cursor(env.program_info(), console, context, BoxCursorLocation::SLOTS, row, col);

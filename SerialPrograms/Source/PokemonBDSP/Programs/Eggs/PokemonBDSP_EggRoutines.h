@@ -7,23 +7,23 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggRoutines_H
 #define PokemonAutomation_PokemonBDSP_EggRoutines_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-void egg_spin(SwitchControllerContext& context, uint16_t duration);
-void egg_spin_with_A(SwitchControllerContext& context, uint16_t duration);
+void egg_spin(ProControllerContext& context, Milliseconds duration);
+void egg_spin_with_A(ProControllerContext& context, Milliseconds duration);
 
-void pickup_column(SwitchControllerContext& context);
-void party_to_column(SwitchControllerContext& context, uint8_t column);
-void column_to_party(SwitchControllerContext& context, uint8_t column);
+void pickup_column(ProControllerContext& context);
+void party_to_column(ProControllerContext& context, uint8_t column);
+void column_to_party(ProControllerContext& context, uint8_t column);
 
-void withdraw_1st_column_from_overworld(SwitchControllerContext& context);
-void deposit_party_to_column(SwitchControllerContext& context, uint8_t column);
-void swap_party(SwitchControllerContext& context, uint8_t current_column);
+void withdraw_1st_column_from_overworld(ProControllerContext& context);
+void deposit_party_to_column(ProControllerContext& context, uint8_t column);
+void swap_party(ProControllerContext& context, uint8_t current_column);
 
 
 }

@@ -13,7 +13,7 @@
 #include <vector>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
@@ -33,12 +33,12 @@ public:
 public:
     BeamSetter(
         ProgramEnvironment& env,
-        VideoStream& stream, SwitchControllerContext& context
+        VideoStream& stream, ProControllerContext& context
     );
 
     Detection run(
         bool save_screenshot,
-        uint16_t timeout_ticks,
+        Milliseconds timeout,
         double min_brightness,
         double min_euclidean,
         double min_delta_ratio,
@@ -48,7 +48,7 @@ public:
 
 private:
     VideoStream& m_stream;
-    SwitchControllerContext& m_context;
+    ProControllerContext& m_context;
     OverlayBoxScope m_text_box0;
     OverlayBoxScope m_text_box1;
     OverlayBoxScope m_box;

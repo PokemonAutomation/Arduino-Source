@@ -18,8 +18,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
@@ -32,9 +32,9 @@
 #include "PokemonSV_ItemPrinterDatabase.h"
 #include "PokemonSV_ItemPrinterRNG.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -50,7 +50,8 @@ ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
         "Farm the Item Printer using RNG Manipulation.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::FASTER
     )
 {}
 
@@ -199,10 +200,10 @@ ItemPrinterRNG::ItemPrinterRNG()
 {
     PA_ADD_OPTION(LANGUAGE);
 
-   if (PreloadSettings::instance().DEVELOPER_MODE){
-       PA_ADD_OPTION(MODE);
-       PA_ADD_OPTION(DESIRED_ITEM_TABLE);
-   }
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(MODE);
+        PA_ADD_OPTION(DESIRED_ITEM_TABLE);
+    }
     PA_ADD_OPTION(NUM_ITEM_PRINTER_ROUNDS);
     PA_ADD_OPTION(DATE_SEED_TABLE);
     PA_ADD_OPTION(OVERLAPPING_BONUS_WARNING);
@@ -211,13 +212,10 @@ ItemPrinterRNG::ItemPrinterRNG()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        
-        PA_ADD_OPTION(MATERIAL_FARMER_TRIGGER);
-        PA_ADD_OPTION(MATERIAL_FARMER_FIXED_NUM_JOBS);
-        PA_ADD_OPTION(MIN_HAPPINY_DUST);
-        PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
-    }
+    PA_ADD_OPTION(MATERIAL_FARMER_TRIGGER);
+    PA_ADD_OPTION(MATERIAL_FARMER_FIXED_NUM_JOBS);
+    PA_ADD_OPTION(MIN_HAPPINY_DUST);
+    PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(ENABLE_SEED_CALC);
     }
@@ -309,14 +307,23 @@ bool ItemPrinterRNG::overlapping_bonus(){
 
 
 ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
-    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     const DateTime& date, ItemPrinterJobs jobs
 ){
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     ItemPrinterPrizeResult prize_result;
     bool printed = false;
     bool overworld_seen = false;
+    size_t failures = 0;
+    std::chrono::seconds next_wait_time = std::chrono::seconds(120);
     while (true){
+        if (failures >= 5){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to print after 5 attempts.",
+                env.console
+            );
+        }
         context.wait_for_all_requests();
 
         OverworldWatcher overworld(env.console, COLOR_BLUE);
@@ -325,7 +332,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
         DateChangeWatcher date_reader;
         WhiteButtonWatcher material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
         int ret = wait_until(
-            env.console, context, std::chrono::seconds(120),
+            env.console, context, next_wait_time,
             {
                 overworld,
                 dialog,
@@ -334,6 +341,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
                 material,
             }
         );
+        next_wait_time = std::chrono::seconds(120);
         switch (ret){
         case 0:
             overworld_seen = true;
@@ -352,10 +360,11 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
 
         case 2:{
             env.log("Detected prompt dialog.");
-            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
             home_to_date_time(context, true, false);
             pbf_press_button(context, BUTTON_A, 10, 30);
             context.wait_for_all_requests();
+            next_wait_time = std::chrono::seconds(5);
             continue;
         }
         case 3:{
@@ -385,7 +394,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             env.log("Will commit in " + tostr_u_commas(trigger_delay.count()) + " milliseconds.");
 
             //  Re-enter the game.
-            pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_from_home(env.console, context, false);
 
             if (!prompt.detect(env.console.video().snapshot())){
@@ -430,13 +439,17 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             continue;
         }
         default:
+            failures++;
             stats.errors++;
             env.update_stats();
+            env.console.log("No state detected after 2 minutes.", COLOR_RED);
+#if 0
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "No state detected after 2 minutes.",
                 env.console
             );
+#endif
         }
     }
 }
@@ -560,7 +573,7 @@ bool ItemPrinterRNG::results_approximately_match(
 }
 
 void ItemPrinterRNG::print_again(
-    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context,
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     ItemPrinterJobs jobs
 ) const{
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
@@ -618,7 +631,7 @@ void ItemPrinterRNG::print_again(
 
 void ItemPrinterRNG::run_item_printer_rng_automode(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
     const uint16_t min_happiny_dust = 400;
@@ -738,7 +751,7 @@ int16_t ItemPrinterRNG::check_obtained_quantity(std::map<std::string, uint16_t> 
 
 void ItemPrinterRNG::run_material_farming_then_return_to_item_printer(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context, 
+    ProControllerContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats,
     MaterialFarmerOptions& material_farmer_options
 ){
@@ -792,7 +805,7 @@ std::vector<ItemPrinterRngRowSnapshot> ItemPrinterRNG::desired_print_table(
 
 
 ItemPrinter::PrebuiltOptions ItemPrinterRNG::get_bonus_type(ItemPrinter::PrebuiltOptions desired_item){
-    // EnumDatabase<ItemPrinter::PrebuiltOptions> database = ItemPrinter::PrebuiltOptions_AutoMode_Database();
+    // EnumDropdownDatabase<ItemPrinter::PrebuiltOptions> database = ItemPrinter::PrebuiltOptions_AutoMode_Database();
     // std::string slug = database.find(desired_item)->slug;
     std::string slug = ItemPrinter::PrebuiltOptions_AutoMode_Database().find(desired_item)->slug;
     // cout << slug << endl;
@@ -805,7 +818,7 @@ ItemPrinter::PrebuiltOptions ItemPrinterRNG::get_bonus_type(ItemPrinter::Prebuil
 
 
 void ItemPrinterRNG::run_item_printer_rng(
-    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context, 
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context, 
     ItemPrinterRNG_Descriptor::Stats& stats
 ){
     //  For each job that we print, we increment jobs_counter.
@@ -912,7 +925,7 @@ void ItemPrinterRNG::run_item_printer_rng(
 // and how low we allow the Happiny dust to go (min_happiny_dust)
 uint32_t ItemPrinterRNG::calc_num_jobs_using_happiny_dust(
     SingleSwitchProgramEnvironment& env, 
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     uint16_t min_happiny_dust
 ){
     uint32_t num_happiny_dust = check_num_happiny_dust(env, context);
@@ -930,7 +943,7 @@ uint32_t ItemPrinterRNG::calc_num_jobs_using_happiny_dust(
 }
 
 uint32_t ItemPrinterRNG::check_num_happiny_dust(
-    SingleSwitchProgramEnvironment& env, SwitchControllerContext& context
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context
 ){
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.log("Check how much Happiny Dust we have.");
@@ -992,7 +1005,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
     return 0;
 }
 
-void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     ItemPrinterRNG_Descriptor::Stats& stats = env.current_stats<ItemPrinterRNG_Descriptor::Stats>();
     env.update_stats();
@@ -1016,45 +1029,14 @@ void ItemPrinterRNG::program(SingleSwitchProgramEnvironment& env, SwitchControll
             run_item_printer_rng(env, context, stats);
         }
 
-#if 0
-        if (!AUTO_MATERIAL_FARMING){
-            run_item_printer_rng(env, context, stats);
-        }else{
-            // Throw user setup errors early in program
-            // - Ensure language is set
-            const Language language = LANGUAGE;
-            if (language == Language::None) {
-                throw UserSetupError(env.console.logger(), "Must set game language option to read item printer rewards.");
-            }
-
-            // - Ensure audio input is enabled
-            LetsGoKillSoundDetector audio_detector(env.console, [](float){ return true; });
-            wait_until(
-                env.console, context,
-                std::chrono::milliseconds(1100),
-                {audio_detector}
-            );
-            audio_detector.throw_if_no_sound(std::chrono::milliseconds(1000));
-
-            // Don't allow the material farmer stats to affect the Item Printer's stats.
-            MaterialFarmerStats mat_farm_stats;// = env.current_stats<MaterialFarmer_Descriptor::Stats>();
-            for (int i = 0; i < NUM_ROUNDS_OF_ITEM_PRINTER_TO_MATERIAL_FARM; i++){
-                run_item_printer_rng(env, context, stats);
-                press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
-                move_from_item_printer_to_material_farming(env, context);
-                run_material_farmer(env, env.console, context, MATERIAL_FARMER_OPTIONS, mat_farm_stats);
-                move_from_material_farming_to_item_printer(env, context);
-            }
-        }
-#endif
     }catch (ProgramFinishedException&){}
 
     if (FIX_TIME_WHEN_DONE){
-        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_HOME, 20, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
     }
     GO_HOME_WHEN_DONE.run_end_of_program(context);

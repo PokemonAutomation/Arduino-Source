@@ -26,7 +26,7 @@ namespace MaxLairInternal{
 
 bool read_battle_menu(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context, size_t player_index,
+    VideoStream& stream, ProControllerContext& context, size_t player_index,
     OcrFailureWatchdog& ocr_watchdog,
     GlobalState& state,
     const ConsoleSpecificOptions& settings,
@@ -197,7 +197,7 @@ bool read_battle_menu(
 
 StateMachineAction run_move_select(
     ProgramEnvironment& env, size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     OcrFailureWatchdog& ocr_watchdog,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings,
@@ -265,9 +265,9 @@ StateMachineAction run_move_select(
 
         //  Back out and look for battle menu. This indicates that the move wasn't selectable.
         BattleMenuDetector detector;
-        int result = run_until<SwitchControllerContext>(
+        int result = run_until<ProControllerContext>(
             stream, context,
-            [](SwitchControllerContext& context){
+            [](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
             },
             {{detector}},
@@ -319,7 +319,7 @@ StateMachineAction run_move_select(
 StateMachineAction throw_balls(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     Language language,
     OcrFailureWatchdog& ocr_watchdog,
     GlobalStateTracker& state_tracker,

@@ -20,7 +20,7 @@ public:
     virtual std::string end_text() const override;
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
-        SwitchControllerContext& context,
+        ProControllerContext& context,
         AutoStoryOptions options
     ) const override;
 };
@@ -31,7 +31,7 @@ public:
 // end: Defeated Team Star (Dark) grunts at base entrance
 void checkpoint_32(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -39,7 +39,7 @@ void checkpoint_32(
 // end: Defeated Team Star (Dark) boss
 void checkpoint_33(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 
@@ -47,7 +47,7 @@ void checkpoint_33(
 // end: At Cascarrafa (West) Pokecenter.
 void checkpoint_34(
     SingleSwitchProgramEnvironment& env,
-    SwitchControllerContext& context,
+    ProControllerContext& context,
     EventNotificationOption& notif_status_update
 );
 

@@ -10,9 +10,9 @@
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-//#include "Common/Cpp/Options/StringOption.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
+#include "Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "Controllers/NintendoSwitch_KeyboardMapping.h"
 
 namespace PokemonAutomation{
@@ -28,12 +28,14 @@ class ConsoleSettings : public BatchOption{
 public:
     static ConsoleSettings& instance();
 
-    TimeExpressionOption<uint16_t> CONNECT_CONTROLLER_DELAY;
-    TimeExpressionOption<uint16_t> SETTINGS_TO_HOME_DELAY;
+    MillisecondsOption SETTINGS_TO_HOME_DELAY0;
     BooleanCheckBoxOption START_GAME_REQUIRES_INTERNET;
-    TimeExpressionOption<uint16_t> START_GAME_INTERNET_CHECK_DELAY;
+    MillisecondsOption START_GAME_INTERNET_CHECK_DELAY0;
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_FAST;
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_SLOW;
+
+    DigitEntryTimingsOption DIGIT_ENTRY;
+    KeyboardEntryTimingsOption KEYBOARD_ENTRY;
 
     SectionDividerOption KEYBOARD_SECTION;
     KeyboardMappingOption KEYBOARD_MAPPINGS;

@@ -38,7 +38,7 @@ enum class TurboMacroAction{
     DPADDOWN,
     WAIT
 };
-const EnumDatabase<TurboMacroAction>& TurboMacroAction_Database();
+const EnumDropdownDatabase<TurboMacroAction>& TurboMacroAction_Database();
 
 
 class TurboMacroCell : public BatchOption, private ConfigOption::Listener{

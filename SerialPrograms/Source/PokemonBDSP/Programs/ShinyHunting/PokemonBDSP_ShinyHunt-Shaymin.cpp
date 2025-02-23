@@ -27,7 +27,8 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
         "Shiny hunt Shaymin using the runaway method.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntShaymin_Descriptor::make_stats() const{
@@ -51,11 +52,10 @@ ShinyHuntShaymin::ShinyHuntShaymin()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_TIMEOUT(
+    , EXIT_BATTLE_TIMEOUT0(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         LockMode::LOCK_WHILE_RUNNING,
-        TICKS_PER_SECOND,
-        "10 * TICKS_PER_SECOND"
+        "10 s"
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -66,19 +66,19 @@ ShinyHuntShaymin::ShinyHuntShaymin()
 
     PA_ADD_STATIC(m_advanced_options);
 //    PA_ADD_OPTION(WATCHDOG_TIMER);
-    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT0);
 }
 
 
 
-bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) const{
+bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, ProControllerContext& context) const{
     context.wait_for_all_requests();
     {
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         ShortDialogWatcher dialog_detector;
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
                         pbf_press_button(context, BUTTON_ZL, 20, 105);
@@ -103,9 +103,9 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, Swit
     {
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         StartBattleDetector start_battle_detector(env.console);
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
                         pbf_press_button(context, BUTTON_ZL, 20, 105);
@@ -130,7 +130,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, Swit
     return true;
 }
 
-void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.current_stats<PokemonSwSh::ShinyHuntTracker>();
     env.update_stats();
 
@@ -151,7 +151,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, SwitchContro
         bool battle = start_encounter(env, context);
         if (!battle){
             stats.add_error();
-            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
+            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT0);
             continue;
         }
 
@@ -167,7 +167,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, SwitchContro
             ENCOUNTER_BOT_OPTIONS.USE_SOUND_DETECTION
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT0);
         if (stop){
             break;
         }
@@ -179,7 +179,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, SwitchContro
         //  Hop on bike, ride down to seabreak path
 //        SHORTCUT.run(env.console, 0);
         pbf_move_left_joystick(context, 128, 255, 360, 0);
-        pbf_move_left_joystick(context, 128, 0, 370, 0);
+        pbf_move_left_joystick(context, 128, 0, 400, 0);
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

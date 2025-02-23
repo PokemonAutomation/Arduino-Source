@@ -12,7 +12,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -54,7 +54,7 @@ private:
 
 
 void find_and_center_on_sky(
-    ProgramEnvironment& env, VideoStream& stream, SwitchControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
 );
 
 

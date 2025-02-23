@@ -241,7 +241,7 @@ void PathReader::read_hp(
 
 void PathReader::read_path(
     ProgramEnvironment& env,
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     GlobalState& state
 ){
     PathMap path;

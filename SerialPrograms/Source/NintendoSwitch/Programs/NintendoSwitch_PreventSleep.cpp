@@ -19,7 +19,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
         "Press B every 15 seconds to keep the Switch from sleeping.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -27,7 +27,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
 
 PreventSleep::PreventSleep(){}
 
-void PreventSleep::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void PreventSleep::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     while (true){
         ssf_press_button2(context, BUTTON_B, 15 * TICKS_PER_SECOND, 10);
     }

@@ -29,11 +29,11 @@ CommandRow::CommandRow(
     bool allow_commands_while_running
 )
     : QWidget(&parent)
-    , VirtualController(controller, allow_commands_while_running)
     , m_controller(controller)
     , m_session(session)
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_focus(false)
+    , m_last_known_state(ProgramState::STOPPED)
 {
     QHBoxLayout* command_row = new QHBoxLayout(this);
     command_row->setContentsMargins(0, 0, 0, 0);
@@ -147,19 +147,38 @@ CommandRow::CommandRow(
 }
 
 void CommandRow::on_key_press(const QKeyEvent& key){
-    if (m_last_known_focus){
-        VirtualController::on_key_press(key);
+    if (!m_last_known_focus){
+        m_controller.logger().log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
+        return;
     }
+    AbstractController* controller = m_controller.controller();
+    if (controller == nullptr){
+        m_controller.logger().log("Keyboard Command Suppressed: Controller is null.", COLOR_RED);
+        return;
+    }
+    if (!m_allow_commands_while_running && m_last_known_state != ProgramState::STOPPED){
+        m_controller.logger().log("Keyboard Command Suppressed: Program is running.", COLOR_RED);
+        return;
+    }
+    controller->keyboard_press(key);
 }
 void CommandRow::on_key_release(const QKeyEvent& key){
-    if (m_last_known_focus){
-        VirtualController::on_key_release(key);
+    if (!m_last_known_focus){
+        return;
     }
+    AbstractController* controller = m_controller.controller();
+    if (controller == nullptr){
+        return;
+    }
+    controller->keyboard_release(key);
 }
 
 void CommandRow::set_focus(bool focused){
+    AbstractController* controller = m_controller.controller();
     if (!focused){
-        clear_state();
+        if (controller != nullptr){
+            controller->keyboard_release_all();
+        }
     }
     if (m_last_known_focus == focused){
         return;
@@ -171,7 +190,7 @@ void CommandRow::set_focus(bool focused){
 void CommandRow::update_ui(){
 //    cout << "CommandRow::update_ui(): focus = " << m_last_known_focus << endl;
 
-    bool stopped = last_known_state() == ProgramState::STOPPED;
+    bool stopped = m_last_known_state == ProgramState::STOPPED;
     m_load_profile_button->setEnabled(stopped);
     if (!m_allow_commands_while_running){
 //        m_reset_button->setEnabled(stopped);
@@ -218,7 +237,13 @@ void CommandRow::update_ui(){
 }
 
 void CommandRow::on_state_changed(ProgramState state){
-    VirtualController::on_state_changed(state);
+    m_last_known_state = state;
+    if (m_allow_commands_while_running || state == ProgramState::STOPPED){
+        AbstractController* controller = m_controller.controller();
+        if (controller != nullptr){
+            controller->keyboard_release_all();
+        }
+    }
     update_ui();
 }
 

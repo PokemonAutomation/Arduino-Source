@@ -12,10 +12,14 @@
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
-#include "Pokemon/Pokemon_Strings.h"
+
+
+#define PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
+
+
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -60,23 +64,36 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
     }
 
     //  Startup Checks
-    m_option.instance().start_program_controller_check(scope, m_system.controller_session());
-    m_option.instance().start_program_feedback_check(scope, env.console, m_option.descriptor().feedback());
-    if (m_option.descriptor().category() != Pokemon::STRING_POKEMON + " RSE"
-        && m_option.descriptor().category() != Pokemon::STRING_POKEMON + " FRLG"){
-        m_option.instance().start_program_border_check(scope, env.console);
-    }
+    m_option.instance().start_program_controller_check(
+        scope, m_system.controller_session()
+    );
+    m_option.instance().start_program_feedback_check(
+        scope, env.console,
+        m_option.descriptor().feedback()
+    );
+    m_option.instance().start_program_border_check(
+        scope, env.console,
+        m_option.descriptor().feedback()
+    );
 
     m_scope.store(&scope, std::memory_order_release);
 
+#ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
     try{
-        SwitchControllerContext context(scope, env.console.controller());
+        ProControllerContext context(scope, env.console.controller());
         m_option.instance().program(env, context);
         context.wait_for_all_requests();
     }catch (...){
         m_scope.store(nullptr, std::memory_order_release);
         throw;
     }
+#else
+    {
+        ProControllerContext context(scope, env.console.controller());
+        m_option.instance().program(env, context);
+        context.wait_for_all_requests();
+    }
+#endif
     m_scope.store(nullptr, std::memory_order_release);
 }
 void SingleSwitchProgramSession::internal_stop_program(){
@@ -112,15 +129,19 @@ void SingleSwitchProgramSession::internal_run_program(){
         timestamp()
     );
     CancellableHolder<CancellableScope> scope;
-    ControllerConnection& connection = m_system.controller_session().connection();
-    SwitchController& switch_controller = dynamic_cast<SwitchController&>(connection);
+    AbstractController* controller = m_system.controller_session().controller();
+    ProController* switch_controller = dynamic_cast<ProController*>(controller);
+    if (switch_controller == nullptr){
+        report_error("Cannot Start: The controller is not ready or is incompatible.");
+        return;
+    }
     SingleSwitchProgramEnvironment env(
         program_info,
         scope,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         m_system.logger(),
-        switch_controller,
+        *switch_controller,
         m_system.video(),
         m_system.overlay(),
         m_system.audio(),
@@ -157,7 +178,9 @@ void SingleSwitchProgramSession::internal_run_program(){
             env, m_option.instance().NOTIFICATION_ERROR_FATAL,
             message
         );
-    }catch (std::exception& e){
+    }
+#ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
+    catch (std::exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         std::string message = e.what();
         if (message.empty()){
@@ -176,6 +199,7 @@ void SingleSwitchProgramSession::internal_run_program(){
             "Unknown error."
         );
     }
+#endif
 }
 
 

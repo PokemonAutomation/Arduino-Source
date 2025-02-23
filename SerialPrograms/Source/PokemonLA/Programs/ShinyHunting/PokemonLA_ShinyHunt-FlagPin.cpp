@@ -33,7 +33,8 @@ ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
         "Repeatedly travel to a flag pin to shiny hunt " + STRING_POKEMON + " around it.",
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 class ShinyHuntFlagPin_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{
@@ -73,12 +74,12 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to the flag. (defined as being more than the \"Enroute Distance\" specified above)",
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
         "This applies if a shiny is detected at or near the flag. (defined as being less than the \"Enroute Distance\" specified above)",
-        "0 * TICKS_PER_SECOND"
+        "0 ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -126,7 +127,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin()
 
 
 
-void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntFlagPin_Descriptor::Stats& stats = env.current_stats<ShinyHuntFlagPin_Descriptor::Stats>();
     stats.attempts++;
 
@@ -148,9 +149,9 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, Switch
             return on_shiny_callback(env, env.console, *shiny_action, error_coefficient);
         });
 
-        int ret = run_until<SwitchControllerContext>(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](SwitchControllerContext& context){
+            [&](ProControllerContext& context){
                 goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
                 FlagNavigationAir session(
                     env, env.console, context,
@@ -172,7 +173,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, Switch
 
         if(RESET_METHOD == ResetMethod::SoftReset){
             env.console.log("Resetting by closing the game.");
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }else{
             env.console.log("Resetting by going to village.");
@@ -184,7 +185,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, Switch
 }
 
 
-void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHuntFlagPin_Descriptor::Stats& stats = env.current_stats<ShinyHuntFlagPin_Descriptor::Stats>();
 
     //  Connect the controller.
@@ -199,7 +200,7 @@ void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, SwitchContro
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
-            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }

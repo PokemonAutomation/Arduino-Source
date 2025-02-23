@@ -20,7 +20,7 @@ TurboMacro_Descriptor::TurboMacro_Descriptor()
         "Create macros",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 
@@ -35,7 +35,7 @@ TurboMacro::TurboMacro()
     PA_ADD_OPTION(MACRO);
 }
 
-void TurboMacro::run_macro(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TurboMacro::run_macro(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::vector<std::unique_ptr<TurboMacroRow>> table = MACRO.copy_snapshot();
     for (const std::unique_ptr<TurboMacroRow>& row : table){
         execute_action(env.console, context, *row);
@@ -43,7 +43,7 @@ void TurboMacro::run_macro(SingleSwitchProgramEnvironment& env, SwitchController
 }
 
 void TurboMacro::execute_action(
-    VideoStream& stream, SwitchControllerContext& context,
+    VideoStream& stream, ProControllerContext& context,
     const TurboMacroRow& row
 ){
     stream.log("Execute action " + row.action.current_display());
@@ -110,7 +110,7 @@ void TurboMacro::execute_action(
     }
 }
 
-void TurboMacro::program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context){
+void TurboMacro::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
     //  Connect the controller.
     //pbf_press_button(context, BUTTON_LCLICK, 5, 5);

@@ -14,7 +14,7 @@
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "Controllers/ControllerCapability.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"    //  REMOVE
-#include "NintendoSwitch/Controllers/NintendoSwitch_Controller.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
@@ -58,11 +58,13 @@ public:
         std::string description,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
-        ControllerRequirements requirements
+        ControllerRequirements requirements,
+        FasterIfTickPrecise faster_if_tick_precise = FasterIfTickPrecise::NOT_FASTER
     );
 
     FeedbackType feedback() const{ return m_feedback; }
     const ControllerRequirements& requirements() const{ return m_requirements; }
+    FasterIfTickPrecise faster_if_tick_precise() const{ return m_faster_if_tick_precise; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
     virtual std::unique_ptr<PanelInstance> make_panel() const override;
@@ -71,6 +73,7 @@ public:
 private:
     const FeedbackType m_feedback;
     const ControllerRequirements m_requirements;
+    const FasterIfTickPrecise m_faster_if_tick_precise;
     const bool m_allow_commands_while_running;
 };
 
@@ -110,7 +113,7 @@ public:
         const std::vector<std::string>& error_notification_tags = {"Notifs"}
     );
 
-    virtual void program(SingleSwitchProgramEnvironment& env, SwitchControllerContext& context) = 0;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) = 0;
 
 
 public:
@@ -127,7 +130,8 @@ public:
     );
     virtual void start_program_border_check(
         CancellableScope& scope,
-        VideoStream& stream
+        VideoStream& stream,
+        FeedbackType feedback_type
     );
 
 
