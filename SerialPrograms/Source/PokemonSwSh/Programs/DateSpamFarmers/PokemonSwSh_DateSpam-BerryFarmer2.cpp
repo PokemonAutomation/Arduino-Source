@@ -288,7 +288,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 
     BerryFarmer2_Descriptor::Stats& stats = env.current_stats<BerryFarmer2_Descriptor::Stats>();
@@ -344,7 +344,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
         // Tap HOME and quickly spam B. The B spamming ensures that we don't
         // accidentally update the system if the system update window pops up.
-        ssf_press_button_ptv(context, BUTTON_HOME, 120ms);
+        ssf_press_button(context, BUTTON_HOME, 120ms, 160ms);
         pbf_mash_button(context, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0.get() - 120ms);
     }
     VideoSnapshot screen = env.console.video().snapshot();

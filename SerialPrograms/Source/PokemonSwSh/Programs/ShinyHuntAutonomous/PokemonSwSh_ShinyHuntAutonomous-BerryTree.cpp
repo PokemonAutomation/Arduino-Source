@@ -100,7 +100,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
 
     uint8_t year = MAX_YEAR;
     while (true){
-        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
         home_roll_date_enter_game_autorollback(env.console, context, year);
 //        home_to_date_time(context, true, true);
 //        neutral_date_skip(context);

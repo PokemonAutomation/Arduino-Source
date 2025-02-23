@@ -86,11 +86,11 @@ void settings_to_enter_game(ProControllerContext& context, bool fast){
         //  100 ticks for the first press isn't enough to finish the animation.
         //  But since the HOME button has delayed effect, we start pressing the 2nd
         //  press before the animation finishes.
-        ssf_press_button_ptv(context, BUTTON_HOME, 800ms, 160ms);
-        ssf_press_button_ptv(context, BUTTON_HOME, 160ms, 160ms);
+        ssf_press_button(context, BUTTON_HOME, 800ms, 160ms);
+        ssf_press_button(context, BUTTON_HOME, 160ms, 160ms);
     }else{
-        ssf_press_button_ptv(context, BUTTON_HOME, 1600ms, 160ms);
-        ssf_press_button_ptv(context, BUTTON_HOME, 160ms, 160ms);
+        ssf_press_button(context, BUTTON_HOME, 1600ms, 160ms);
+        ssf_press_button(context, BUTTON_HOME, 160ms, 160ms);
     }
 }
 void settings_to_enter_game_den_lobby(
