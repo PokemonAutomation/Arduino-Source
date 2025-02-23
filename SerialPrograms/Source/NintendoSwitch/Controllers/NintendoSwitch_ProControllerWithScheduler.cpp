@@ -347,12 +347,24 @@ void ProControllerWithScheduler::issue_mash_AZs(
         cancellable->throw_if_cancelled();
     }
     LoggingSuppressScope scope(m_logging_suppress);
+    bool log = true;
     while (true){
         if (duration <= Milliseconds::zero()){
             break;
         }
         issue_buttons(cancellable, BUTTON_A, 3*8ms, 5*8ms, 3*8ms);
         duration -= std::min(3*8ms, duration);
+
+        //  We never log before the first issue to avoid delaying the critical path.
+        //  But we do want to log before the mash spam. So we log after the first
+        //  issue, but before the second.
+        if (log && m_logging_suppress.load(std::memory_order_relaxed) == 1){
+            m_logger.log(
+                "issue_mash_AZs(): duration = " + std::to_string(duration.count()) + "ms",
+                COLOR_DARKGREEN
+            );
+        }
+        log = false;
 
         if (duration <= Milliseconds::zero()){
             break;
@@ -365,12 +377,6 @@ void ProControllerWithScheduler::issue_mash_AZs(
         }
         issue_buttons(cancellable, BUTTON_ZR, 3*8ms, 5*8ms, 3*8ms);
         duration -= std::min(3*8ms, duration);
-    }
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 1){
-        m_logger.log(
-            "issue_mash_AZs(): duration = " + std::to_string(duration.count()) + "ms",
-            COLOR_DARKGREEN
-        );
     }
 }
 void ProControllerWithScheduler::issue_system_scroll(
