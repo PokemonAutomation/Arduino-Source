@@ -91,8 +91,8 @@ SOURCES += \
     ../Common/Cpp/Concurrency/Watchdog.cpp \
     ../Common/Cpp/Containers/AlignedMalloc.cpp \
     ../Common/Cpp/CpuId/CpuId.cpp \
-    ../Common/Cpp/EnumDatabase.cpp \
     ../Common/Cpp/Exceptions.cpp \
+    ../Common/Cpp/ExpressionEvaluator.cpp \
     ../Common/Cpp/ImageResolution.cpp \
     ../Common/Cpp/Json/JsonArray.cpp \
     ../Common/Cpp/Json/JsonObject.cpp \
@@ -105,6 +105,7 @@ SOURCES += \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
     ../Common/Cpp/Options/EditableTableOption.cpp \
+    ../Common/Cpp/Options/EnumDropdownDatabase.cpp \
     ../Common/Cpp/Options/EnumDropdownOption.cpp \
     ../Common/Cpp/Options/FixedCodeOption.cpp \
     ../Common/Cpp/Options/FloatingPointOption.cpp \
@@ -117,6 +118,7 @@ SOURCES += \
     ../Common/Cpp/Options/StaticTextOption.cpp \
     ../Common/Cpp/Options/StringOption.cpp \
     ../Common/Cpp/Options/TextEditOption.cpp \
+    ../Common/Cpp/Options/TimeDurationOption.cpp \
     ../Common/Cpp/Options/TimeExpressionOption.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
@@ -130,7 +132,6 @@ SOURCES += \
     ../Common/Qt/AutoWidthLineEdit.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/CollapsibleGroupBox.cpp \
-    ../Common/Qt/ExpressionEvaluator.cpp \
     ../Common/Qt/Options/BatchWidget.cpp \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ButtonWidget.cpp \
@@ -149,6 +150,7 @@ SOURCES += \
     ../Common/Qt/Options/StaticTextWidget.cpp \
     ../Common/Qt/Options/StringWidget.cpp \
     ../Common/Qt/Options/TextEditWidget.cpp \
+    ../Common/Qt/Options/TimeDurationWidget.cpp \
     ../Common/Qt/Options/TimeExpressionWidget.cpp \
     ../Common/Qt/Redispatch.cpp \
     ../Common/Qt/StringToolsQt.cpp \
@@ -308,15 +310,18 @@ SOURCES += \
     Source/ComputerPrograms/Framework/ComputerProgramOption.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramSession.cpp \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp \
+    Source/Controllers/ControllerCapability.cpp \
     Source/Controllers/ControllerConnection.cpp \
     Source/Controllers/ControllerSelectorWidget.cpp \
     Source/Controllers/ControllerSession.cpp \
     Source/Controllers/ControllerDescriptor.cpp \
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp \
     Source/Controllers/KeyboardInput/KeyboardInput.cpp \
+    Source/Controllers/KeyboardInput/KeyboardStateTracker.cpp \
     Source/Controllers/NullController.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp \
     Source/Controllers/SuperscalarScheduler.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
     Source/Integrations/DiscordIntegrationTable.cpp \
@@ -397,16 +402,17 @@ SOURCES += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64xH_Default.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.cpp \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.cpp \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
@@ -430,14 +436,16 @@ SOURCES += \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.cpp \
+    Source/NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.cpp \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp \
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.cpp \
     Source/NintendoSwitch/Options/TurboMacroTable.cpp \
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp \
-    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.cpp \
@@ -656,7 +664,9 @@ SOURCES += \
     Source/PokemonRSE/PokemonRSE_Panels.cpp \
     Source/PokemonRSE/PokemonRSE_Settings.cpp \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.cpp \
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.cpp \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.cpp \
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Mew.cpp \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.cpp \
     Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.cpp \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.cpp \
@@ -794,7 +804,6 @@ SOURCES += \
     Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.cpp \
-    Source/PokemonSV/Programs/Farming/PokemonSV_WildItemFarmer.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.cpp \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.cpp \
@@ -807,6 +816,7 @@ SOURCES += \
     Source/PokemonSV/Programs/General/PokemonSV_StatsResetEventBattle.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.cpp \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.cpp \
+    Source/PokemonSV/Programs/Glitches/PokemonSV_WildItemFarmer.cpp \
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_AutoItemPrinter.cpp \
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterDatabase.cpp \
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.cpp \
@@ -1139,6 +1149,7 @@ HEADERS += \
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h \
     ../Common/Cpp/Concurrency/ParallelTaskRunner.h \
     ../Common/Cpp/Concurrency/PeriodicScheduler.h \
+    ../Common/Cpp/Concurrency/ReverseLockGuard.h \
     ../Common/Cpp/Concurrency/ScheduledTaskRunner.h \
     ../Common/Cpp/Concurrency/SpinLock.h \
     ../Common/Cpp/Concurrency/SpinPause.h \
@@ -1147,6 +1158,7 @@ HEADERS += \
     ../Common/Cpp/Containers/AlignedVector.h \
     ../Common/Cpp/Containers/AlignedVector.tpp \
     ../Common/Cpp/Containers/BoxSet.h \
+    ../Common/Cpp/Containers/CircularBuffer.h \
     ../Common/Cpp/Containers/DllSafeString.h \
     ../Common/Cpp/Containers/FixedLimitVector.h \
     ../Common/Cpp/Containers/FixedLimitVector.tpp \
@@ -1158,9 +1170,10 @@ HEADERS += \
     ../Common/Cpp/CpuId/CpuId_x86.h \
     ../Common/Cpp/CpuId/CpuId_x86.tpp \
     ../Common/Cpp/DateTime.h \
-    ../Common/Cpp/EnumDatabase.h \
+    ../Common/Cpp/EnumStringMap.h \
     ../Common/Cpp/EventRateTracker.h \
     ../Common/Cpp/Exceptions.h \
+    ../Common/Cpp/ExpressionEvaluator.h \
     ../Common/Cpp/ImageResolution.h \
     ../Common/Cpp/Json/JsonArray.h \
     ../Common/Cpp/Json/JsonObject.h \
@@ -1174,6 +1187,7 @@ HEADERS += \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
     ../Common/Cpp/Options/EditableTableOption.h \
+    ../Common/Cpp/Options/EnumDropdownDatabase.h \
     ../Common/Cpp/Options/EnumDropdownOption.h \
     ../Common/Cpp/Options/FixedCodeOption.h \
     ../Common/Cpp/Options/FloatingPointOption.h \
@@ -1186,6 +1200,7 @@ HEADERS += \
     ../Common/Cpp/Options/StaticTextOption.h \
     ../Common/Cpp/Options/StringOption.h \
     ../Common/Cpp/Options/TextEditOption.h \
+    ../Common/Cpp/Options/TimeDurationOption.h \
     ../Common/Cpp/Options/TimeExpressionOption.h \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/PrettyPrint.h \
@@ -1211,7 +1226,6 @@ HEADERS += \
     ../Common/Qt/AutoWidthLineEdit.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/CollapsibleGroupBox.h \
-    ../Common/Qt/ExpressionEvaluator.h \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BatchWidget.h \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
@@ -1231,6 +1245,7 @@ HEADERS += \
     ../Common/Qt/Options/StaticTextWidget.h \
     ../Common/Qt/Options/StringWidget.h \
     ../Common/Qt/Options/TextEditWidget.h \
+    ../Common/Qt/Options/TimeDurationWidget.h \
     ../Common/Qt/Options/TimeExpressionWidget.h \
     ../Common/Qt/Redispatch.h \
     ../Common/Qt/StringToolsQt.h \
@@ -1308,6 +1323,7 @@ HEADERS += \
     Source/CommonFramework/Notifications/ProgramInfo.h \
     Source/CommonFramework/Notifications/ProgramNotifications.h \
     Source/CommonFramework/Notifications/SenderNotificationTable.h \
+    Source/CommonFramework/Options/CheckForUpdatesOption.h \
     Source/CommonFramework/Options/Environment/PerformanceOptions.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
@@ -1438,6 +1454,7 @@ HEADERS += \
     Source/ComputerPrograms/Framework/ComputerProgramOption.h \
     Source/ComputerPrograms/Framework/ComputerProgramSession.h \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h \
+    Source/Controllers/Controller.h \
     Source/Controllers/ControllerCapability.h \
     Source/Controllers/ControllerConnection.h \
     Source/Controllers/ControllerSelectorWidget.h \
@@ -1448,7 +1465,9 @@ HEADERS += \
     Source/Controllers/KeyboardInput/KeyboardStateTracker.h \
     Source/Controllers/NullController.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Handle.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h \
     Source/Controllers/SuperscalarScheduler.h \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \
@@ -1541,19 +1560,21 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_Controller.h \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardInput.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_SerialPABotBase.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.h \
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
@@ -1577,15 +1598,17 @@ HEADERS += \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
     Source/NintendoSwitch/NintendoSwitch_Settings.h \
     Source/NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h \
+    Source/NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h \
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h \
     Source/NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h \
     Source/NintendoSwitch/Options/TurboMacroTable.h \
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h \
-    Source/NintendoSwitch/Programs/NintendoSwitch_FastCodeEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h \
@@ -1808,7 +1831,9 @@ HEADERS += \
     Source/PokemonRSE/PokemonRSE_Panels.h \
     Source/PokemonRSE/PokemonRSE_Settings.h \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h \
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.h \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Deoxys.h \
+    Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_ShinyHunt-Mew.h \
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.h \
     Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.h \
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h \
@@ -1949,7 +1974,6 @@ HEADERS += \
     Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h \
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.h \
-    Source/PokemonSV/Programs/Farming/PokemonSV_WildItemFarmer.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_ClipboardFastCodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h \
     Source/PokemonSV/Programs/FastCodeEntry/PokemonSV_FastCodeEntry.h \
@@ -1962,6 +1986,7 @@ HEADERS += \
     Source/PokemonSV/Programs/General/PokemonSV_StatsResetEventBattle.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_CloneItems-1.0.1.h \
     Source/PokemonSV/Programs/Glitches/PokemonSV_RideCloner-1.0.1.h \
+    Source/PokemonSV/Programs/Glitches/PokemonSV_WildItemFarmer.h \
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_AutoItemPrinter.h \
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterDatabase.h \
     Source/PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterRNG.h \
