@@ -94,7 +94,7 @@ void accept_FRs(
     //  Return to Switch Home menu. (or game)
     if (stream.video().snapshot()){
         stream.log("Entering game using inference...");
-        pbf_press_button(context, BUTTON_HOME, 10, 190);
+        pbf_press_button(context, BUTTON_HOME, 20, 180);
         NintendoSwitch::resume_game_from_home(stream, context);
     }else{
         stream.log("Entering game without inference...", COLOR_RED);

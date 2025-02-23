@@ -163,7 +163,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, ProController
         grip_menu_connect_go_home(context);
     }else{
         pbf_press_button(context, BUTTON_B, 5, 5);
-        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
     }
 
     if (SKIPS == 0){
@@ -195,7 +195,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, ProController
         );
 
         //  Exit game.
-        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
         close_game(env.console, context);
 
         //  Post-raid delay.

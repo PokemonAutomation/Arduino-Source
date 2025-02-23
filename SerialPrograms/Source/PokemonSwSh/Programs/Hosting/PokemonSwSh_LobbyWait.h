@@ -11,10 +11,13 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -76,7 +79,7 @@ static RaidLobbyState raid_lobby_wait(
         if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
             return state;
         }
-        if (current_time() > deadline_lobby_limit){
+        if (current_time() > deadline_start_time){
             break;
         }
         context.wait_for(std::chrono::milliseconds(1000));
@@ -88,7 +91,7 @@ static RaidLobbyState raid_lobby_wait(
         if (!state.valid || state.raiders_are_ready()){
             return state;
         }
-        if (current_time() > deadline_start_time){
+        if (current_time() > deadline_lobby_limit){
             return state;
         }
         context.wait_for(std::chrono::milliseconds(1000));
