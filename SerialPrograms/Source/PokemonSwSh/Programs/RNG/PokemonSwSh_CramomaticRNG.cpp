@@ -133,12 +133,16 @@ CramomaticRNG::CramomaticRNG()
         300
     )
     , ADVANCE_PRESS_DURATION(
-        "<b>Advance Press Duration:</b><br>Hold the button down for this long to advance once.",
+        "<b>Advance Press Duration:</b><br>"
+        "Hold the button down for this long to advance once.<br>"
+        "<font color=\"red\">For tick-imprecise controllers, this number will be increased automatically.</font>",
         LockMode::LOCK_WHILE_RUNNING,
         "80 ms"
     )
     , ADVANCE_RELEASE_DURATION(
-        "<b>Advance Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
+        "<b>Advance Release Duration:</b><br>"
+        "After releasing the button, wait this long before pressing it again.<br>"
+        "<font color=\"red\">For tick-imprecise controllers, this number will be increased automatically.</font>",
         LockMode::LOCK_WHILE_RUNNING,
         "80 ms"
     )
