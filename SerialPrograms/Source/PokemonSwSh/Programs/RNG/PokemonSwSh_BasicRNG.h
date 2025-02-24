@@ -37,8 +37,8 @@ void do_rng_advances(
     VideoStream& stream, ProControllerContext& context,
     Xoroshiro128Plus& rng,
     size_t advances,
-    uint16_t press_duration = 10,
-    uint16_t release_duration = 10
+    Milliseconds press_duration,
+    Milliseconds release_duration
 );
 
 

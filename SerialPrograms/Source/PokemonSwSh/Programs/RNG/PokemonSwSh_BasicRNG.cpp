@@ -148,19 +148,25 @@ void do_rng_advances(
     VideoStream& stream, ProControllerContext& context,
     Xoroshiro128Plus& rng,
     size_t advances,
-    uint16_t press_duration,
-    uint16_t release_duration
+    Milliseconds press_duration,
+    Milliseconds release_duration
 ){
+    Milliseconds tv = context->timing_variation();
     for (size_t i = 0; i < advances; i++){
         if ((i + 1) % 10 == 0){
             std::string text = std::to_string(i + 1) + "/" + std::to_string(advances);
             stream.log("RNG advance: " + text);
             stream.overlay().add_log("Advancing: " + text, COLOR_GREEN);
         }
-        pbf_press_button(context, BUTTON_RCLICK, press_duration, release_duration);
+        pbf_press_button(
+            context,
+            BUTTON_RCLICK,
+            press_duration + tv,
+            release_duration + tv
+        );
         rng.next();
     }
-    pbf_wait(context, 1 * TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
 }
 
 

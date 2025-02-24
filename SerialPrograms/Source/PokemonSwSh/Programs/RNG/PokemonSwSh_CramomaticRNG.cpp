@@ -20,6 +20,7 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
@@ -48,7 +49,8 @@ CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()
         "Perform RNG manipulation to get rare balls from the Cram-o-matic.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -133,12 +135,12 @@ CramomaticRNG::CramomaticRNG()
     , ADVANCE_PRESS_DURATION(
         "<b>Advance Press Duration:</b><br>Hold the button down for this long to advance once.",
         LockMode::LOCK_WHILE_RUNNING,
-        10
+        "80 ms"
     )
     , ADVANCE_RELEASE_DURATION(
         "<b>Advance Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
         LockMode::LOCK_WHILE_RUNNING,
-        10
+        "80 ms"
     )
     , SAVE_SCREENSHOTS(
         "<b>Save Debug Screenshots:</b>",
@@ -174,8 +176,8 @@ CramomaticRNG::CramomaticRNG()
 
 void CramomaticRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     pbf_press_button(context, BUTTON_X, 10, 125);
-    pbf_press_button(context, BUTTON_A, 10, 10);
-    pbf_wait(context, 2 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 20, 10);
+    pbf_wait(context, 2000ms);
 }
 
 CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, std::vector<CramomaticSelection> selected_balls){
@@ -281,7 +283,7 @@ CramomaticTarget CramomaticRNG::calculate_target(SingleSwitchProgramEnvironment&
 }
 
 void CramomaticRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_B, 2 * TICKS_PER_SECOND, 5);
+    pbf_press_button(context, BUTTON_B, 2000ms, 40ms);
     pbf_press_button(context, BUTTON_B, 10, 70);
 
     pbf_mash_button(context, BUTTON_A, 320);
@@ -305,7 +307,7 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, ProCont
     }
 
     // select the apricorn(s)
-    pbf_wait(context, 1 * TICKS_PER_SECOND);
+    pbf_wait(context, 1000ms);
     pbf_press_button(context, BUTTON_A, 10, 30);
     if (sport){
         pbf_press_dpad(context, DPAD_DOWN, 20, 10);
@@ -317,7 +319,7 @@ void CramomaticRNG::choose_apricorn(SingleSwitchProgramEnvironment& env, ProCont
     }
     pbf_press_button(context, BUTTON_A, 10, 30);
 
-    pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 5000ms);
 }
 
 std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -367,16 +369,16 @@ std::pair<bool, std::string> CramomaticRNG::receive_ball(SingleSwitchProgramEnvi
             arrow_detected = true;
         }
     }
-    pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_B, 80ms, 1000ms);
     return {arrow_detected, best_ball};
 }
 
 void CramomaticRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // Mash the B button to exit potential menus or dialog boxes
-    pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_B, 30s);
 
     // take a step in case Hyde repositioned the player
-    pbf_move_left_joystick(context, 128, 0, TICKS_PER_SECOND, 10);
+    pbf_move_left_joystick(context, 128, 0, 1000ms, 80ms);
 
     context.wait_for_all_requests();
 }
@@ -436,7 +438,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
             env.log("Touching date to prevent rollover.");
-            pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+            ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
             touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
@@ -482,7 +484,13 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         num_apricorn_one -= sport ? 2 : 4;
         num_apricorn_two -= sport ? 2 : 0;
 
-        do_rng_advances(env.console, context, rng, target.needed_advances, ADVANCE_PRESS_DURATION, ADVANCE_RELEASE_DURATION);
+        do_rng_advances(
+            env.console, context,
+            rng,
+            target.needed_advances,
+            ADVANCE_PRESS_DURATION,
+            ADVANCE_RELEASE_DURATION
+        );
         leave_to_overworld_and_interact(env, context);
 
         try{

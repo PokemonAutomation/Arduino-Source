@@ -7,9 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_CramomaticRNG_H
 #define PokemonAutomation_PokemonSwSh_CramomaticRNG_H
 
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
@@ -59,8 +60,8 @@ private:
     SectionDividerOption m_advanced_options;
     SimpleIntegerOption<uint16_t> MAX_PRIORITY_ADVANCES;
     SimpleIntegerOption<uint16_t> MAX_UNKNOWN_ADVANCES;
-    SimpleIntegerOption<uint16_t> ADVANCE_PRESS_DURATION;
-    SimpleIntegerOption<uint16_t> ADVANCE_RELEASE_DURATION;
+    MillisecondsOption ADVANCE_PRESS_DURATION;
+    MillisecondsOption ADVANCE_RELEASE_DURATION;
     BooleanCheckBoxOption SAVE_SCREENSHOTS;
     BooleanCheckBoxOption LOG_VALUES;
 
