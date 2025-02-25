@@ -64,7 +64,8 @@ void run_path_select(
     for (uint8_t c = 0; c < slot; c++){
         pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
     }
-    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 1000ms);
+    pbf_wait(context, 5000ms);
     context.wait_for_all_requests();
 }
 
