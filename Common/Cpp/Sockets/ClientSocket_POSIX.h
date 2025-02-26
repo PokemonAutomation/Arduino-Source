@@ -27,8 +27,10 @@ namespace PokemonAutomation{
 class ClientSocket_POSIX final : public AbstractClientSocket{
 public:
     ClientSocket_POSIX()
-        : m_socket(-1)
-    {}
+        : m_socket(socket(AF_INET, SOCK_STREAM, 0))
+    {
+        fcntl(m_socket, F_SETFL, O_NONBLOCK);
+    }
 
     virtual ~ClientSocket_POSIX(){
         close();
@@ -53,16 +55,12 @@ public:
             return;
         }
         try{
-            m_socket = socket(AF_INET, SOCK_STREAM, 0);
-            fcntl(m_socket, F_SETFL, O_NONBLOCK);
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
             m_thread = std::thread(
                 &ClientSocket_POSIX::thread_loop,
                 this, address, port
             );
         }catch (...){
-            ::close(m_socket);
-            m_socket = -1;
             m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
             throw;
         }
@@ -70,20 +68,15 @@ public:
 
 
     virtual size_t blocking_send(const void* data, size_t bytes) override{
-        std::unique_lock<std::mutex> lg(m_lock);
-        constexpr int BLOCK_SIZE = (int)1 << 30;
-        const char* ptr = (const char*)data;
-        size_t sent = 0;
         if (m_socket == -1){
             return 0;
         }
-        bool skip_wait = true;
-        while (bytes > 0){
-            if (!skip_wait){
-                m_cv.wait_for(lg, std::chrono::milliseconds(1));
-            }
-            skip_wait = true;
 
+        constexpr int BLOCK_SIZE = (int)1 << 30;
+        const char* ptr = (const char*)data;
+        size_t sent = 0;
+
+        while (bytes > 0){
             size_t current = std::min<size_t>(bytes, BLOCK_SIZE);
             int current_sent = ::send(m_socket, ptr, (int)current, MSG_DONTWAIT);
             if (current_sent != -1){
@@ -96,6 +89,11 @@ public:
                 continue;
             }
 
+            std::unique_lock<std::mutex> lg(m_lock);
+            if (state() == State::DESTRUCTING){
+                break;
+            }
+
             int error = errno;
 //            cout << "error = " << error << endl;
             switch (error){
@@ -106,6 +104,8 @@ public:
                 m_error = "POSIX Error Code: " + std::to_string(error);
                 return sent;
             }
+
+            m_cv.wait_for(lg, std::chrono::milliseconds(1));
         }
         return sent;
     }
@@ -199,7 +199,15 @@ Connected:
 
             if (bytes > 0){
                 m_listeners.run_method_unique(&Listener::on_receive_data, buffer, bytes);
-            }else if (bytes < 0){
+                continue;
+            }
+
+            std::unique_lock<std::mutex> lg(m_lock);
+            if (state() == State::DESTRUCTING){
+                return;
+            }
+
+            if (bytes < 0){
 //                cout << "error = " << error << endl;
                 switch (error){
                 case EAGAIN:
@@ -212,7 +220,6 @@ Connected:
                 }
             }
 
-            std::unique_lock<std::mutex> lg(m_lock);
             m_cv.wait_for(lg, std::chrono::milliseconds(1));
         }
 
@@ -220,7 +227,7 @@ Connected:
 
 
 private:
-    int m_socket;
+    const int m_socket;
 
     std::string m_error;
 

@@ -23,8 +23,15 @@ namespace PokemonAutomation{
 class ClientSocket_WinSocket final : public AbstractClientSocket{
 public:
     ClientSocket_WinSocket()
-        : m_socket(INVALID_SOCKET)
-    {}
+        : m_socket(::socket(AF_INET, SOCK_STREAM, 0))
+    {
+        u_long non_blocking = 1;
+        if (ioctlsocket(m_socket, FIONBIO, &non_blocking)){
+//            cout << "ioctlsocket() Failed" << endl;
+            closesocket(m_socket);
+            return;
+        }
+    }
 
     virtual ~ClientSocket_WinSocket(){
         close();
@@ -49,20 +56,12 @@ public:
             return;
         }
         try{
-            m_socket = socket(AF_INET, SOCK_STREAM, 0);
-            u_long non_blocking = 1;
-            if (ioctlsocket(m_socket, FIONBIO, &non_blocking)){
-    //            cout << "ioctlsocket() Failed" << endl;
-                return;
-            }
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
             m_thread = std::thread(
                 &ClientSocket_WinSocket::thread_loop,
                 this, address, port
             );
         }catch (...){
-            closesocket(m_socket);
-            m_socket = INVALID_SOCKET;
             m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
             throw;
         }
@@ -70,20 +69,15 @@ public:
 
 
     virtual size_t blocking_send(const void* data, size_t bytes) override{
-        std::unique_lock<std::mutex> lg(m_lock);
-        constexpr int BLOCK_SIZE = (int)1 << 30;
-        const char* ptr = (const char*)data;
-        size_t sent = 0;
         if (m_socket == INVALID_SOCKET){
             return 0;
         }
-        bool skip_wait = true;
-        while (bytes > 0){
-            if (!skip_wait){
-                m_cv.wait_for(lg, std::chrono::milliseconds(1));
-            }
-            skip_wait = true;
 
+        constexpr int BLOCK_SIZE = (int)1 << 30;
+        const char* ptr = (const char*)data;
+        size_t sent = 0;
+
+        while (bytes > 0 && state() == State::CONNECTED){
             size_t current = std::min<size_t>(bytes, BLOCK_SIZE);
             int current_sent = ::send(m_socket, ptr, (int)current, 0);
             if (current_sent != SOCKET_ERROR){
@@ -98,6 +92,12 @@ public:
 
             int error = WSAGetLastError();
 //            cout << "error = " << error << endl;
+
+            std::unique_lock<std::mutex> lg(m_lock);
+            if (state() == State::DESTRUCTING){
+                break;
+            }
+
             switch (error){
             case WSAEWOULDBLOCK:
                 break;
@@ -105,6 +105,8 @@ public:
                 m_error = "WSA Error Code: " + std::to_string(error);
                 return sent;
             }
+
+            m_cv.wait_for(lg, std::chrono::milliseconds(1));
         }
         return sent;
     }
@@ -184,7 +186,6 @@ Connected:
             int bytes;
             int error = 0;
             {
-                std::unique_lock<std::mutex> lg(m_lock);
                 State state = m_state.load(std::memory_order_relaxed);
                 if (state == State::DESTRUCTING){
                     return;
@@ -197,19 +198,25 @@ Connected:
 
             if (bytes > 0){
                 m_listeners.run_method_unique(&Listener::on_receive_data, buffer, bytes);
-            }else if (bytes == SOCKET_ERROR){
+                continue;
+            }
+
+            std::unique_lock<std::mutex> lg(m_lock);
+            if (state() == State::DESTRUCTING){
+                return;
+            }
+
+            if (bytes == SOCKET_ERROR){
 //                cout << "error = " << error << endl;
                 switch (error){
                 case WSAEWOULDBLOCK:
                     break;
                 default:
-                    std::unique_lock<std::mutex> lg(m_lock);
                     m_error = "WSA Error Code: " + std::to_string(error);
                     return;
                 }
             }
 
-            std::unique_lock<std::mutex> lg(m_lock);
             m_cv.wait_for(lg, std::chrono::milliseconds(1));
         }
 
@@ -217,7 +224,7 @@ Connected:
 
 
 private:
-    SOCKET m_socket;
+    const SOCKET m_socket;
 
     std::string m_error;
 

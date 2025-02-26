@@ -50,6 +50,7 @@ private:
     std::string m_version;
     WallClock m_last_receive;
 
+    SpinLock m_send_lock;
     std::mutex m_lock;
     std::condition_variable m_cv;
     std::thread m_thread;

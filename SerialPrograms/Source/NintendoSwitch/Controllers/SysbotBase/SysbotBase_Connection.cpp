@@ -79,8 +79,7 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
 
 TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
     try{
-        std::string str = "detachController\n";
-        m_socket.blocking_send(str.data(), str.size());
+        write_data("detachController\n");
     }catch (...){}
     m_socket.remove_listener(*this);
     m_socket.close();
@@ -103,6 +102,7 @@ std::map<ControllerType, std::set<ControllerFeature>> TcpSysbotBase_Connection::
 }
 
 void TcpSysbotBase_Connection::write_data(const std::string& data){
+    WriteSpinLock lg(m_send_lock);
     m_socket.blocking_send(data.data(), data.size());
 }
 
@@ -167,12 +167,9 @@ void TcpSysbotBase_Connection::on_connect_finished(const std::string& error_mess
 
         m_logger.log(m_connecting_message + " (Success)", COLOR_BLUE);
 
-        {
-            std::unique_lock<std::mutex> lg(m_lock);
-            write_data("configure echoCommands 0\n");
-            write_data("getVersion\n");
-            write_data("configure mainLoopSleepTime 0\n");
-        }
+        write_data("configure echoCommands 0\n");
+        write_data("getVersion\n");
+        write_data("configure mainLoopSleepTime 0\n");
 
         m_thread = std::thread(&TcpSysbotBase_Connection::thread_loop, this);
 
