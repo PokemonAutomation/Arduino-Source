@@ -135,7 +135,7 @@ void TcpSysbotBase_Connection::thread_loop(){
             std::string str = "Response Time: " + pretty_print(latency.count()) + " ms";
             if (latency < 10ms){
                 set_status(html_color_text(m_version + str, COLOR_BLUE));
-            }else if (latency < 20ms){
+            }else if (latency < 50ms){
                 set_status(html_color_text(m_version + str, COLOR_ORANGE));
             }else{
                 set_status(html_color_text(m_version + str, COLOR_RED));
@@ -182,9 +182,10 @@ void TcpSysbotBase_Connection::on_connect_finished(const std::string& error_mess
     }catch (...){}
 }
 void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
+    WallClock now = current_time();
     std::lock_guard<std::mutex> lg(m_lock);
     try{
-        m_last_receive = current_time();
+        m_last_receive = now;
 //        cout << "sys-botbase Response: " << std::string((const char*)data, bytes) << endl;
 
         if (m_version.empty()){
