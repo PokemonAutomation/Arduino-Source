@@ -119,7 +119,7 @@
 #include "PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
 #include "Common/Cpp/Containers/CircularBuffer.h"
-#include "Common/Cpp/Sockets/ClientSocket_WinSocket.h"
+#include "Common/Cpp/Sockets/ClientSocket.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -275,7 +275,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace std::chrono_literals;
 
 
-    ClientSocket_WinSocket socket;
+    ClientSocket socket;
     socket.connect("192.168.1.66", 6000);
 //    socket.connect("192.168.1.66", 6000);
 
