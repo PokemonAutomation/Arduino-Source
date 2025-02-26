@@ -387,6 +387,9 @@ void ProController_SysbotBase::thread_body(){
 
 //        cout << "Delay = " << std::chrono::duration_cast<std::chrono::microseconds>(delay) << endl;
     }
+
+    SwitchControllerState neutral_state;
+    send_diff(current_state, neutral_state);
 }
 
 

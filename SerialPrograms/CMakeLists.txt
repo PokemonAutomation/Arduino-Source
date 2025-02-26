@@ -168,6 +168,11 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/PrintDebuggers.h
     ../Common/Cpp/Rectangle.h
     ../Common/Cpp/Rectangle.tpp
+    ../Common/Cpp/Sockets/AbstractClientSocket.h
+    ../Common/Cpp/Sockets/ClientSocket.cpp
+    ../Common/Cpp/Sockets/ClientSocket.h
+    ../Common/Cpp/Sockets/ClientSocket_POSIX.h
+    ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
