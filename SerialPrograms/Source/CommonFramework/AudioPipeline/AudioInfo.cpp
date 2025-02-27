@@ -439,6 +439,11 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
     }
 #endif
 
+    bool show_all_devices = GlobalSettings::instance().AUDIO_PIPELINE->SHOW_ALL_DEVICES;
+    if (show_all_devices){
+        return list;
+    }
+
     //  Get map of greatest format counts.
     std::map<std::string, size_t> most_formats;
     for (AudioDeviceInfo& device : list){
