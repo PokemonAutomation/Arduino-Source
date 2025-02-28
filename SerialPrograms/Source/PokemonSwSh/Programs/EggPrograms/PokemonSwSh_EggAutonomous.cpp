@@ -453,7 +453,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
     env.console.overlay().add_log("Save game", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     pbf_press_button(context, BUTTON_R, 80ms, 2000ms);
-    pbf_press_button(context, BUTTON_A, 80ms, 2000ms);
+    pbf_mash_button(context, BUTTON_A, 500ms);
     wait_for_y_comm_icon(env, context, "Cannot detect end of saving game.");
 }
 
@@ -856,9 +856,12 @@ void EggAutonomous::wait_for_y_comm_icon(
     context.wait_for_all_requests();
     const bool y_comm_visible = true;
     YCommIconDetector y_comm_detector(y_comm_visible);
-    int ret = wait_until(
-        env.console, context, std::chrono::seconds(10),
-        {{y_comm_detector}}
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            pbf_wait(context, 10s);
+        },
+        {y_comm_detector}
     );
     if (ret != 0){
         OperationFailedException::fire(

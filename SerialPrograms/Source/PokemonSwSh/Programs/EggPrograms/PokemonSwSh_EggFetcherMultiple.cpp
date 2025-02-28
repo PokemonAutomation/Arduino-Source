@@ -38,7 +38,8 @@ EggFetcherMultiple_Descriptor::EggFetcherMultiple_Descriptor()
         "Fetch eggs from multiple species without hatching them.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -110,18 +111,18 @@ void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, ProControl
         fly_home_collect_egg(context, true);
 
         //remove the second pokemon from the daycare
-        pbf_press_button(context, BUTTON_A , 10, (uint16_t)(1.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_A , 10, (uint16_t)(1.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_A , 10, 1 * TICKS_PER_SECOND);
-        pbf_press_dpad  (context, DPAD_DOWN, 10, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A , 10, 1 * TICKS_PER_SECOND);
-        pbf_mash_button (context, BUTTON_B , 5 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A , 160ms, 1500ms);
+        pbf_press_button(context, BUTTON_A , 160ms, 1500ms);
+        pbf_press_button(context, BUTTON_A , 160ms, 1000ms);
+        pbf_press_dpad  (context, DPAD_DOWN, 160ms, 1000ms);
+        pbf_press_button(context, BUTTON_A , 160ms, 1000ms);
+        pbf_mash_button (context, BUTTON_B , 5000ms);
 
         //add a new second pokemon from the daycare
-        pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 10, (uint16_t)(1.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 1500ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 2000ms);
         auto [box, row, column] = get_location(s);
         if (row == 0 && column == 0 && box != 0){
             box = 1;
@@ -129,20 +130,20 @@ void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env, ProControl
             box = 0;
         }
         for (uint16_t b = 0; b < box; ++b){
-            pbf_press_button(context, BUTTON_R, 10, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_R, 160ms, 1000ms);
         }
         for (uint16_t r = 0; r < row; ++r){
-            pbf_press_dpad(context, DPAD_DOWN, 10, 1 * TICKS_PER_SECOND);
+            pbf_press_dpad(context, DPAD_DOWN, 160ms, 1000ms);
         }
         for (uint16_t c = 0; c < column; ++c){
-            pbf_press_dpad(context, DPAD_RIGHT, 10, 1 * TICKS_PER_SECOND);
+            pbf_press_dpad(context, DPAD_RIGHT, 160ms, 1000ms);
         }
-        pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 2000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 5000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
 
         run_eggfetcher(env.console, context, GameSettings::instance().AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS_PER_SPECIES);
     }

@@ -26,7 +26,8 @@ GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
         "Mass duplicate " + STRING_POKEMON + " with the God Egg.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController},
+        FasterIfTickPrecise::FASTER
     )
 {}
 
@@ -56,27 +57,27 @@ GodEggDuplication::GodEggDuplication()
 
 void GodEggDuplication::collect_godegg(ProControllerContext& context, uint8_t party_slot) const{
     pbf_wait(context, 50);
-    ssf_press_button1(context, BUTTON_B, 100);
-    ssf_press_button1(context, BUTTON_B, 100);
+    ssf_press_button_ptv(context, BUTTON_B, 800ms);
+    ssf_press_button_ptv(context, BUTTON_B, 800ms);
     pbf_wait(context, 225);
 
     //  "You received an Egg from the Nursery worker!"
-    ssf_press_button1(context, BUTTON_B, 300);
+    ssf_press_button_ptv(context, BUTTON_B, 2400ms);
 
     //  "Where do you want to send the Egg to?"
-    ssf_press_button1(context, BUTTON_A, 100);
+    ssf_press_button_ptv(context, BUTTON_A, 800ms);
 
     //  (extra line of text for French)
-    ssf_press_button1(context, BUTTON_B, 100);
+    ssf_press_button_ptv(context, BUTTON_B, 800ms);
 
     //  "Please select a Pokemon to swap from your party."
-    ssf_press_button(context, BUTTON_B, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
+    ssf_press_button_ptv(context, BUTTON_B, GameSettings::instance().MENU_TO_POKEMON_DELAY0);
 
     //  Select the party member.
     for (uint8_t c = 0; c < party_slot; c++){
-        ssf_press_dpad1(context, DPAD_DOWN, 10);
+        ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
     }
-    ssf_press_button1(context, BUTTON_A, 300);
+    ssf_press_button_ptv(context, BUTTON_A, 2400ms);
     pbf_mash_button(context, BUTTON_B, 500);
 }
 void GodEggDuplication::run_program(Logger& logger, ProControllerContext& context, uint16_t attempts) const{

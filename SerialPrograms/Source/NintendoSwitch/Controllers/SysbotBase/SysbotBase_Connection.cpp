@@ -136,9 +136,9 @@ void TcpSysbotBase_Connection::thread_loop(){
             if (latency < 10ms){
                 set_status(html_color_text(m_version + str, COLOR_BLUE));
             }else if (latency < 50ms){
-                set_status(html_color_text(m_version + str, COLOR_ORANGE));
+                set_status(html_color_text(m_version + str, COLOR_DARKGREEN));
             }else{
-                set_status(html_color_text(m_version + str, COLOR_RED));
+                set_status(html_color_text(m_version + str, COLOR_ORANGE));
             }
             send_time = current_time();
             write_data("getVersion\n");

@@ -46,8 +46,14 @@
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Moltres.h"
 #include "Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.h"
 
-#include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
-#include "Programs/RNG/PokemonSwSh_SeedFinder.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggAutonomous.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggCombined2.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h"
+#include "Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h"
+#include "Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h"
 
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_MultiGameFossil.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.h"
@@ -67,14 +73,8 @@
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h"
 #include "Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h"
 
-#include "Programs/EggPrograms/PokemonSwSh_EggAutonomous.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggCombined2.h"
-#include "Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h"
-#include "Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h"
-#include "Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h"
+#include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
+#include "Programs/RNG/PokemonSwSh_SeedFinder.h"
 
 #include "Programs/PokemonSwSh_SynchronizedSpinning.h"
 #include "Programs/PokemonSwSh_RaidItemFarmerOKHO.h"
@@ -129,7 +129,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<PokeJobsFarmer_Descriptor, PokeJobsFarmer>());
 
     ret.emplace_back("---- Den Hunting ----");
-    ret.emplace_back(make_single_switch_program<BeamReset_Descriptor, BeamReset>());
     ret.emplace_back(make_single_switch_program<PurpleBeamFinder_Descriptor, PurpleBeamFinder>());
     ret.emplace_back(make_single_switch_program<EventBeamFinder_Descriptor, EventBeamFinder>());
     ret.emplace_back(make_single_switch_program<DaySkipperJPN_Descriptor, DaySkipperJPN>());
@@ -142,22 +141,25 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AutoHostRolling_Descriptor, AutoHostRolling>());
     ret.emplace_back(make_single_switch_program<AutoHostMultiGame_Descriptor, AutoHostMultiGame>());
 
+    ret.emplace_back("---- Eggs ----");
+    ret.emplace_back(make_single_switch_program<EggFetcher2_Descriptor, EggFetcher2>());
+    ret.emplace_back(make_single_switch_program<EggFetcherMultiple_Descriptor, EggFetcherMultiple>());
+    ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
+    ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
+    ret.emplace_back(make_single_switch_program<GodEggItemDupe_Descriptor, GodEggItemDupe>());
+    if (PreloadSettings::instance().NAUGHTY_MODE || PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());
+    }
+
     ret.emplace_back("---- Non-Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
     ret.emplace_back(make_single_switch_program<StatsResetCalyrex_Descriptor, StatsResetCalyrex>());
     ret.emplace_back(make_single_switch_program<StatsResetMoltres_Descriptor, StatsResetMoltres>());
     ret.emplace_back(make_single_switch_program<StatsResetRegi_Descriptor, StatsResetRegi>());
 
-    ret.emplace_back("---- Unattended Shiny Hunting ----");
+    ret.emplace_back("---- Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<MultiGameFossil_Descriptor, MultiGameFossil>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedRegi_Descriptor, ShinyHuntUnattendedRegi>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedSwordsOfJustice_Descriptor, ShinyHuntUnattendedSwordsOfJustice>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedStrongSpawn_Descriptor, ShinyHuntUnattendedStrongSpawn>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedRegigigas2_Descriptor, ShinyHuntUnattendedRegigigas2>());
-    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedIoATrade_Descriptor, ShinyHuntUnattendedIoATrade>());
     ret.emplace_back(make_single_switch_program<CurryHunter_Descriptor, CurryHunter>());
-
-    ret.emplace_back("---- Autonomous Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousRegi_Descriptor, ShinyHuntAutonomousRegi>());
     ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousSwordsOfJustice_Descriptor, ShinyHuntAutonomousSwordsOfJustice>());
     ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousStrongSpawn_Descriptor, ShinyHuntAutonomousStrongSpawn>());
@@ -167,18 +169,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousWhistling_Descriptor, ShinyHuntAutonomousWhistling>());
     ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousFishing_Descriptor, ShinyHuntAutonomousFishing>());
     ret.emplace_back(make_single_switch_program<ShinyHuntAutonomousOverworld_Descriptor, ShinyHuntAutonomousOverworld>());
-
-    ret.emplace_back("---- Eggs ----");
-    ret.emplace_back(make_single_switch_program<EggFetcher2_Descriptor, EggFetcher2>());
-    ret.emplace_back(make_single_switch_program<EggFetcherMultiple_Descriptor, EggFetcherMultiple>());
-    ret.emplace_back(make_single_switch_program<EggHatcher_Descriptor, EggHatcher>());
-    ret.emplace_back(make_single_switch_program<EggCombined2_Descriptor, EggCombined2>());
-    ret.emplace_back(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
-    ret.emplace_back(make_single_switch_program<EggAutonomous_Descriptor, EggAutonomous>());
-    ret.emplace_back(make_single_switch_program<GodEggItemDupe_Descriptor, GodEggItemDupe>());
-    if (PreloadSettings::instance().NAUGHTY_MODE || PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<GodEggDuplication_Descriptor, GodEggDuplication>());
-    }
 
     ret.emplace_back("---- RNG ----");
     ret.emplace_back(make_single_switch_program<SeedFinder_Descriptor, SeedFinder>());
@@ -192,6 +182,16 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_multi_switch_program<MaxLairStandard_Descriptor, MaxLairStandard>());
     ret.emplace_back(make_multi_switch_program<MaxLairStrongBoss_Descriptor, MaxLairStrongBoss>());
     ret.emplace_back(make_multi_switch_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>());
+
+    ret.emplace_back("---- Deprecated Programs ----");
+    ret.emplace_back(make_single_switch_program<BeamReset_Descriptor, BeamReset>());
+    ret.emplace_back(make_single_switch_program<EggCombined2_Descriptor, EggCombined2>());
+    ret.emplace_back(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedRegi_Descriptor, ShinyHuntUnattendedRegi>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedSwordsOfJustice_Descriptor, ShinyHuntUnattendedSwordsOfJustice>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedStrongSpawn_Descriptor, ShinyHuntUnattendedStrongSpawn>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedRegigigas2_Descriptor, ShinyHuntUnattendedRegigigas2>());
+    ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedIoATrade_Descriptor, ShinyHuntUnattendedIoATrade>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
 //        ret.emplace_back("---- Untested/Beta/WIP ----");
