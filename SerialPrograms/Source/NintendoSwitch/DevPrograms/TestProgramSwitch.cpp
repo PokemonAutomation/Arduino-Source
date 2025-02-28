@@ -289,12 +289,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    ssf_press_button(context, BUTTON_A | BUTTON_L, 3);
 //    ssf_press_button(context, BUTTON_L, 0);
 
+#if 0
     numberpad_enter_code(
         logger, context,
         "708538991006",
         false
     );
-
+#endif
 
 #if 0
     codeboard_enter_digits(
@@ -355,18 +356,24 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
+    ImageRGB32 image("screenshot-20250224-203247822474.png");
 
 #if 0
-    ImageRGB32 image("20250125-232444699636.png");
-
-//    TeraSilhouetteReader reader;
-//    ImageMatch::ImageMatchResult results = reader.read(image);
-//    results.log(logger, 110);
-
-    TeraTypeReader reader;
-    ImageMatch::ImageMatchResult results = reader.read(image);
-    results.log(logger, 100);
+    {
+        TeraSilhouetteReader reader;
+        ImageMatch::ImageMatchResult results = reader.read(image);
+        results.log(logger, 110);
+    }
 #endif
+
+#if 1
+    {
+        TeraTypeReader reader;
+        ImageMatch::ImageMatchResult results = reader.read(image);
+        results.log(logger, 100);
+    }
+#endif
+
 
 #if 0
     ImageRGB32 image("20250125-224044294692.png");

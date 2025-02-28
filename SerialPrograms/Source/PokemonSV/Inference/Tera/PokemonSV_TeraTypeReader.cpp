@@ -7,8 +7,11 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"
 #include "PokemonSV/Resources/PokemonSV_PokemonSprites.h"
-
 #include "PokemonSV_TeraTypeReader.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -64,6 +67,11 @@ ImageMatch::ImageMatchResult TeraTypeReader::read(const ImageViewRGB32& screen) 
                 return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < threshold;
             }
         );
+
+        if (tight_box.area() == 0){
+            continue;
+        }
+
         ImageRGB32 processed_image = extract_box_reference(cropped_image, tight_box).copy();
         //processed_image.save("processed_image.png");
 

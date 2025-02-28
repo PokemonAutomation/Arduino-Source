@@ -119,6 +119,7 @@
 #include "PokemonSV/Programs/ItemPrinter/PokemonSV_ItemPrinterSeedCalc.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
 #include "Common/Cpp/Containers/CircularBuffer.h"
+#include "Common/Cpp/Sockets/ClientSocket.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -257,6 +258,12 @@ std::atomic<size_t> CheckedObject<Type>::m_instances(0);
 
 
 
+
+
+
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch;
@@ -264,6 +271,25 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonSV;
     using namespace Pokemon;
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
+
+    using namespace std::chrono_literals;
+
+
+    ClientSocket socket;
+    socket.connect("192.168.1.66", 6000);
+//    socket.connect("192.168.1.66", 6000);
+
+
+
+    scope.wait_for(std::chrono::seconds(60));
+
+#if 0
+    int* ptr = nullptr;
+    cout << ptr[0] << endl;
+#endif
+
+
+
 
 #if 0
     {
@@ -305,10 +331,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-#if 1
-    int* ptr = nullptr;
-    cout << ptr[0] << endl;
-#endif
 
 #if 0
     send_program_notification_with_file(

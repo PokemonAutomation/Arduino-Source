@@ -44,54 +44,49 @@ void run_professor_swap(
     if (swap){
         stream.log("Choosing to swap.", COLOR_PURPLE);
         std::lock_guard<std::mutex> lg(runtime.m_delay_lock);
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
         context.wait_for_all_requests();
     }else{
         stream.log("Choosing not to swap.", COLOR_PURPLE);
-        pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 1000ms);
     }
     context.wait_for_all_requests();
 
-#if 1
+
     //  Wait until we exit the window.
     {
         BlackScreenWatcher detector;
-        int result = run_until<ProControllerContext>(
+        int result = wait_until(
             stream, context,
-            [&](ProControllerContext& context){
-                pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
-            },
-            {{detector}}
+            std::chrono::seconds(30),
+            {detector}
         );
         if (result < 0){
             stream.log("Timed out waiting for black screen.", COLOR_RED);
-        }else{
-            stream.log("Found path screen. Reading party...");
+            return;
         }
     }
-#endif
+
     {
         PathScreenDetector detector;
         int result = wait_until(
             stream, context,
             std::chrono::seconds(30),
-            {{detector}},
+            {detector},
             INFERENCE_RATE
         );
         if (result < 0){
             stream.log("Timed out waiting for path screen.", COLOR_RED);
-        }else{
-            stream.log("Found path screen. Reading party...");
+            return;
         }
     }
 
+    stream.log("Found path screen. Reading party...");
     context.wait_for(std::chrono::milliseconds(100));
 
-    {
-        VideoSnapshot screen = stream.video().snapshot();
-        reader.read_sprites(stream.logger(), state, screen);
-        reader.read_hp(stream.logger(), state, screen);
-    }
+    VideoSnapshot screen = stream.video().snapshot();
+    reader.read_sprites(stream.logger(), state, screen);
+    reader.read_hp(stream.logger(), state, screen);
 }
 
 

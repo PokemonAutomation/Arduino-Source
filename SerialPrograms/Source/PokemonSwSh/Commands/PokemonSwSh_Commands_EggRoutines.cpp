@@ -33,22 +33,22 @@ void move_while_mashing_B(ProControllerContext& context, Milliseconds duration){
     ssf_mash1_button(context, BUTTON_B, duration);
 }
 void spin_and_mash_A(ProControllerContext& context, Milliseconds duration){
-    for (Milliseconds c = 0ms; c < duration; c += 1024ms){
-        ssf_press_left_joystick(context, STICK_CENTER, STICK_MAX, 0, 32);
-        ssf_press_button(context, BUTTON_A, 16);
-        ssf_press_button(context, BUTTON_A, 16);
+    for (Milliseconds c = 0ms; c < duration; c += 1280ms){
+        ssf_press_left_joystick(context, STICK_CENTER, STICK_MAX, 0ms, 320ms);
+        ssf_press_button(context, BUTTON_A, 160ms);
+        ssf_press_button(context, BUTTON_A, 160ms);
 
-        ssf_press_left_joystick(context, STICK_MAX, STICK_CENTER, 0, 32);
-        ssf_press_button(context, BUTTON_A, 16);
-        ssf_press_button(context, BUTTON_A, 16);
+        ssf_press_left_joystick(context, STICK_MAX, STICK_CENTER, 0ms, 320ms);
+        ssf_press_button(context, BUTTON_A, 160ms);
+        ssf_press_button(context, BUTTON_A, 160ms);
 
-        ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 0, 32);
-        ssf_press_button(context, BUTTON_A, 16);
-        ssf_press_button(context, BUTTON_A, 16);
+        ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 0ms, 320ms);
+        ssf_press_button(context, BUTTON_A, 160ms);
+        ssf_press_button(context, BUTTON_A, 160ms);
 
-        ssf_press_left_joystick(context, STICK_MIN, STICK_CENTER, 0, 32);
-        ssf_press_button(context, BUTTON_A, 16);
-        ssf_press_button(context, BUTTON_A, 16);
+        ssf_press_left_joystick(context, STICK_MIN, STICK_CENTER, 0ms, 320ms);
+        ssf_press_button(context, BUTTON_A, 160ms);
+        ssf_press_button(context, BUTTON_A, 160ms);
     }
 }
 void travel_to_spin_location(ProControllerContext& context){

@@ -49,13 +49,13 @@ void navigate_to_menu_app(
     const DpadPosition dir = (cur_col < target_col ? DPAD_RIGHT : DPAD_LEFT);
     const int steps = std::abs(cur_col - target_col);
     for(int i = 0; i < steps; i++){
-        ssf_press_dpad(context, dir, BOX_SCROLL_DELAY, 80ms);
+        ssf_press_dpad_ptv(context, dir, BOX_SCROLL_DELAY, 80ms);
     }
 
     if (cur_row < target_row){
-        ssf_press_dpad(context, DPAD_DOWN, BOX_SCROLL_DELAY, 80ms);
+        ssf_press_dpad_ptv(context, DPAD_DOWN, BOX_SCROLL_DELAY, 80ms);
     }else if (cur_row > target_row){
-        ssf_press_dpad(context, DPAD_UP, BOX_SCROLL_DELAY, 80ms);
+        ssf_press_dpad_ptv(context, DPAD_UP, BOX_SCROLL_DELAY, 80ms);
     }
 
     context.wait_for_all_requests();

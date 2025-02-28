@@ -348,12 +348,12 @@ StateMachineAction throw_balls(
     }
 
     BattleBallReader reader(stream, language);
-    pbf_press_button(context, BUTTON_A, 10, 125);
+    pbf_press_button(context, BUTTON_A, 50, 75);
     context.wait_for_all_requests();
 
     int16_t balls = move_to_ball(reader, stream, context, ball);
     if (balls != 0){
-        pbf_press_button(context, BUTTON_A, 10, 125);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
     }else{
         OperationFailedException::fire(
             ErrorReport::NO_ERROR_REPORT,

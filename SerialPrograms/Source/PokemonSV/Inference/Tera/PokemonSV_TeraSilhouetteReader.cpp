@@ -84,8 +84,8 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
         );
 
         if (tight_box.area() == 0){
-            global_logger_tagged().log("TeraSilhouetteReader::read(): Cropped image is empty.", COLOR_RED);
-            return ImageMatch::ImageMatchResult();
+//            global_logger_tagged().log("TeraSilhouetteReader::read(): Cropped image is empty.", COLOR_RED);
+            continue;
         }
 
 //        cout << "check3" << endl;

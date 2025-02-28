@@ -93,7 +93,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
             // Roll back to 2001
             env.log("Rolling back!");
             ssf_press_button_ptv(context, BUTTON_B, 80ms);
-            ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+            ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
             home_roll_date_enter_game_autorollback(env.console, context, year);
             pbf_mash_button(context, BUTTON_B, MASH_B_DURATION0);
 
@@ -133,7 +133,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         // Go to home menu
         env.log("#### Go to Switch home menu");
-        ssf_press_button_ptv(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0);
+        ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 160ms);
 
         // Skip frame
         env.log("#### Skip frame");

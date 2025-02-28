@@ -122,6 +122,7 @@ SOURCES += \
     ../Common/Cpp/Options/TimeExpressionOption.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
+    ../Common/Cpp/Sockets/ClientSocket.cpp \
     ../Common/Cpp/StreamConverters.cpp \
     ../Common/Cpp/StringTools.cpp \
     ../Common/Cpp/Time.cpp \
@@ -446,6 +447,7 @@ SOURCES += \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.cpp \
@@ -1207,6 +1209,10 @@ HEADERS += \
     ../Common/Cpp/PrintDebuggers.h \
     ../Common/Cpp/Rectangle.h \
     ../Common/Cpp/SIMDDebuggers.h \
+    ../Common/Cpp/Sockets/AbstractClientSocket.h \
+    ../Common/Cpp/Sockets/ClientSocket.h \
+    ../Common/Cpp/Sockets/ClientSocket_POSIX.h \
+    ../Common/Cpp/Sockets/ClientSocket_WinSocket.h \
     ../Common/Cpp/StreamConverters.h \
     ../Common/Cpp/StringTools.h \
     ../Common/Cpp/Time.h \
@@ -1609,6 +1615,7 @@ HEADERS += \
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h \
