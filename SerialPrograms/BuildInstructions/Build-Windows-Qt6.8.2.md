@@ -34,8 +34,8 @@ If you are ok with creating an account with Qt and using their online installer,
             - Qt Serial Port
         - Qt Debug Information Files   
 
-![](../BuildSetup/Windows-Install-Qt6.7.3-Custom.png)
-![](../BuildSetup/Windows-Install-Qt6.8.2-Components.png)
+![](Images/Windows-Install-Qt6.7.3-Custom.png)
+![](Images/Windows-Install-Qt6.8.2-Components.png)
 
 If you repeatedly run into an error involving "SSL handshake failed", you will not be able to use the online installer. Please try the other option.
 
@@ -56,7 +56,7 @@ If you are unable or unwilling to use the online installer, the alternative is t
 2. Clone the [Packages Repo](https://github.com/PokemonAutomation/Packages).
 3. In the `Packages` repo, copy the `SerialPrograms/Resources` folder into the root of the `Arduino-Source` repo.
 
-![](../BuildSetup/Directory.png)
+![](Images/Directory.png)
 
 4. Open Qt Creator.
 5. Click on `File` -> `Open File or Project`.
@@ -65,11 +65,11 @@ If you are unable or unwilling to use the online installer, the alternative is t
     - Ensure the build directory for `Desktop_Qt_6_8_2_MSVC2022_64bit-RelWithDebInfo` is located in the root of the `Arduino-Source` repo, and not buried in subfolders (e.g. `build` or `SerialPrograms`).
     - Click `Configure Project`.
 
-![](../BuildSetup/Windows-configure-project-qt-creator-13.png)
+![](Images/Windows-configure-project-qt-creator-13.png)
 
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
 
-![](../BuildSetup/Windows-Configuration-Qt6.png)
+![](Images/Windows-Configuration-Qt6.png)
 
 9. Still in the bottom left corner, click the upper green arrow to compile and launch the program.
 
