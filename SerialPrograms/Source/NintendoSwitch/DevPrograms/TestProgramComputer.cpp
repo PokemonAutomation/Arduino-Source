@@ -275,15 +275,15 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace std::chrono_literals;
 
 
+#if 0
     ClientSocket socket;
     socket.connect("192.168.1.66", 6000);
 //    socket.connect("192.168.1.66", 6000);
 
-
-
     scope.wait_for(std::chrono::seconds(60));
+#endif
 
-#if 0
+#if 1
     int* ptr = nullptr;
     cout << ptr[0] << endl;
 #endif
