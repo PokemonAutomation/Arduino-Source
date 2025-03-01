@@ -47,7 +47,7 @@ If you are ok with creating an account with Qt and using their online installer,
 4. Open Qt Creator.
 5. Click on `File` -> `Open File or Project`.
 6. Navigate to `SerialPrograms` and select `CMakeLists.txt`.
-7. (configuration details TDB)
+7. Enable parallel build: Build & Run -> Build Steps -> Build -> Details -> CMake arguments: `-j16` (the # of cores you have)
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
 9. Still in the bottom left corner, click the upper green arrow to compile and launch the program.
 
