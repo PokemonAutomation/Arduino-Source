@@ -39,6 +39,7 @@ FastCodeEntryKeyboardLayout::FastCodeEntryKeyboardLayout()
     PA_ADD_OPTION(CONSOLE[2]);
     PA_ADD_OPTION(CONSOLE[3]);
 }
+FastCodeEntryKeyboardLayout::~FastCodeEntryKeyboardLayout() = default;
 
 
 FastCodeEntrySettingsOption::FastCodeEntrySettingsOption()

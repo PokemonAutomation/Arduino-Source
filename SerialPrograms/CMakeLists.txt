@@ -2299,10 +2299,15 @@ else()
         target_link_libraries(SerialPrograms PRIVATE libdpp)
     endif()
 
-    # Add -Wno-c11-extensions to avoid clang gives
-    # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
-    # when compiling OpenCV
-    target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
+    if (APPLE)
+        # Add -Wno-c11-extensions to avoid clang gives
+        # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
+        # when compiling OpenCV
+        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
+    else()
+        # Assume GCC
+        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
+    endif()
 
     # Set OS-specific flags
     if (WIN32)

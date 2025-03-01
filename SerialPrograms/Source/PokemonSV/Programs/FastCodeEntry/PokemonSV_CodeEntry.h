@@ -22,6 +22,7 @@ namespace PokemonSV{
 class FastCodeEntryKeyboardLayout : public GroupOption{
 public:
     FastCodeEntryKeyboardLayout();
+    ~FastCodeEntryKeyboardLayout();
 
 public:
     FixedLimitVector<KeyboardLayoutOption> CONSOLE;
