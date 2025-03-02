@@ -172,6 +172,8 @@
 #define PABB_BAUD_RATE                  115200
 #define PABB_RETRANSMIT_DELAY_MILLIS    80
 
+//  This limit of 12 is only for AVR8. ESP32 will go much larger. So we ignore
+//  this number and allow large messages on the computer side.
 #define PABB_MAX_MESSAGE_SIZE           12
 #define PABB_PROTOCOL_OVERHEAD          (2 + sizeof(uint32_t))
 #define PABB_MAX_PACKET_SIZE            (PABB_MAX_MESSAGE_SIZE + PABB_PROTOCOL_OVERHEAD)

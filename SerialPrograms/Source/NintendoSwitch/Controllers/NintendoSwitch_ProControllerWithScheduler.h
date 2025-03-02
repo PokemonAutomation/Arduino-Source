@@ -11,7 +11,6 @@
 #define PokemonAutomation_NintendoSwitch_ControllerWithScheduler_H
 
 #include <mutex>
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Controllers/SuperscalarScheduler.h"
 #include "NintendoSwitch_ProController.h"
 
@@ -37,6 +36,35 @@ struct ProControllerSchedulerState{
     SwitchButton_Joystick m_right_joystick;
 };
 
+
+struct SplitDpad{
+    bool up = false;
+    bool right = false;
+    bool down = false;
+    bool left = false;
+};
+inline SplitDpad convert_unified_to_split_dpad(DpadPosition dpad){
+    switch (dpad){
+    case DpadPosition::DPAD_UP:
+        return {true, false, false, false};
+    case DpadPosition::DPAD_UP_RIGHT:
+        return {true, true, false, false};
+    case DpadPosition::DPAD_RIGHT:
+        return {false, true, false, false};
+    case DpadPosition::DPAD_DOWN_RIGHT:
+        return {false, true, true, false};
+    case DpadPosition::DPAD_DOWN:
+        return {false, false, true, false};
+    case DpadPosition::DPAD_DOWN_LEFT:
+        return {false, false, true, true};
+    case DpadPosition::DPAD_LEFT:
+        return {false, false, false, true};
+    case DpadPosition::DPAD_UP_LEFT:
+        return {true, false, false, true};
+    default:
+        return {false, false, false, false};
+    }
+}
 
 
 

@@ -10,7 +10,8 @@
 #include "SerialPABotBase_Descriptor.h"
 #include "SerialPABotBase_SelectorWidget.h"
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h"
+#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_PokkenController.h"
+#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_WirelessProController.h"
 
 //#include <iostream>
 //using std::cout;
@@ -67,11 +68,18 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
 ) const{
     switch (controller_type){
     case ControllerType::NintendoSwitch_WiredProController:
+        return std::unique_ptr<AbstractController>(
+            new NintendoSwitch::SerialPABotBase_PokkenController(
+                logger,
+                static_cast<SerialPABotBase_Connection&>(connection),
+                requirements
+            )
+        );
+
     case ControllerType::NintendoSwitch_WirelessProController:
         return std::unique_ptr<AbstractController>(
-            new NintendoSwitch::ProController_SerialPABotBase(
+            new NintendoSwitch::SerialPABotBase_WirelessProController(
                 logger,
-                controller_type,
                 static_cast<SerialPABotBase_Connection&>(connection),
                 requirements
             )

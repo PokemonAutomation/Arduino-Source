@@ -11,9 +11,9 @@
 #include "BotBaseMessage.h"
 #include "PABotBaseConnection.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -67,7 +67,7 @@ void PABotBaseConnection::send_message(const BotBaseMessage& message, bool is_re
     m_sniffer->on_send(message, is_retransmit);
 
     size_t total_bytes = PABB_PROTOCOL_OVERHEAD + message.body.size();
-    if (total_bytes > PABB_MAX_PACKET_SIZE){
+    if (total_bytes > MAX_MESSAGE_SIZE){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too long.");
     }
 
@@ -105,7 +105,7 @@ void PABotBaseConnection::on_recv(const void* data, size_t bytes){
         }
 
         //  Message is too long.
-        if (length > PABB_MAX_PACKET_SIZE){
+        if (length > MAX_MESSAGE_SIZE){
             m_sniffer->log("Message is too long: bytes = " + std::to_string(length));
             m_recv_buffer.pop_front();
             continue;
