@@ -67,9 +67,11 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
 ) const{
     switch (controller_type){
     case ControllerType::NintendoSwitch_WiredProController:
+    case ControllerType::NintendoSwitch_WirelessProController:
         return std::unique_ptr<AbstractController>(
             new NintendoSwitch::ProController_SerialPABotBase(
                 logger,
+                controller_type,
                 static_cast<SerialPABotBase_Connection&>(connection),
                 requirements
             )

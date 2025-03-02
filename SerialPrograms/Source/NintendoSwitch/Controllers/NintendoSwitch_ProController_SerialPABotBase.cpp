@@ -33,6 +33,7 @@ PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
 
 ProController_SerialPABotBase::ProController_SerialPABotBase(
     Logger& logger,
+    ControllerType controller_type,
     SerialPABotBase::SerialPABotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
@@ -47,12 +48,12 @@ ProController_SerialPABotBase::ProController_SerialPABotBase(
     //  Check compatibility.
 
     const std::map<ControllerType, std::set<ControllerFeature>>& controllers = connection.supported_controllers();
-    auto iter = controllers.find(ControllerType::NintendoSwitch_WiredProController);
+    auto iter = controllers.find(controller_type);
 
     std::string missing_feature;
     do{
         if (iter == controllers.end()){
-            missing_feature = "NintendoSwitch_WiredProController";
+            missing_feature = CONTROLLER_TYPE_STRINGS.get_string(controller_type);
             break;
         }
 

@@ -22,7 +22,7 @@ SnapshotDumper_Descriptor::SnapshotDumper_Descriptor()
         "Periodically take screenshots.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

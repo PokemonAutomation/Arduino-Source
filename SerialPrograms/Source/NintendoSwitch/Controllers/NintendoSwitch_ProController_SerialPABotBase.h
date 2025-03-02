@@ -23,6 +23,7 @@ public:
 public:
     ProController_SerialPABotBase(
         Logger& logger,
+        ControllerType controller_type,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         const ControllerRequirements& requirements
     );

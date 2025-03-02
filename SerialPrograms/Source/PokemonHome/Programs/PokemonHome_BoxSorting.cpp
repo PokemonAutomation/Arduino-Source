@@ -63,7 +63,7 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
-        )
+    )
 {}
 struct BoxSorting_Descriptor::Stats : public StatsTracker{
     Stats()
