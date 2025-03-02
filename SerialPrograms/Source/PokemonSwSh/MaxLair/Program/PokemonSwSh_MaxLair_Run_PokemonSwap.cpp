@@ -104,11 +104,11 @@ void run_swap_pokemon(
         );
         if (result < 0){
             stream.log("Timed out waiting for path screen.", COLOR_RED);
-        }else{
-            stream.log("Found path screen. Reading party...");
+            return;
         }
     }
 
+    stream.log("Found path screen. Reading party...");
     context.wait_for(std::chrono::milliseconds(100));
 
     PathReader path_reader(stream.overlay(), player_index);
