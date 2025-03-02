@@ -27,6 +27,7 @@ std::string program_name(uint8_t id){
     case PABB_PID_UNSPECIFIED:      return "Microcontroller Program";
     case PABB_PID_PABOTBASE_12KB:   return "PABotBase-AVR8-12KB";
     case PABB_PID_PABOTBASE_31KB:   return "PABotBase-AVR8-31KB";
+    case PABB_PID_PABOTBASE_ESP32:  return "PABotBase-ESP32";
     default: return "Unknown ID";
     }
 }
@@ -73,9 +74,17 @@ const std::map<
                 ControllerFeature::NintendoSwitch_ProController,
                 ControllerFeature::NintendoSwitch_DateSkip,
             }},
-//            {ControllerType::NintendoSwitch_WirelessProController, {}},
-//            {ControllerType::NintendoSwitch_LeftJoycon, {}},
-//            {ControllerType::NintendoSwitch_RightJoycon, {}},
+        }},
+        {PABB_PID_PABOTBASE_ESP32, {
+            {ControllerType::NintendoSwitch_WirelessProController, {
+                ControllerFeature::QueryCommandQueueSize,
+            }},
+            {ControllerType::NintendoSwitch_LeftJoycon, {
+                ControllerFeature::QueryCommandQueueSize,
+            }},
+            {ControllerType::NintendoSwitch_RightJoycon, {
+                ControllerFeature::QueryCommandQueueSize,
+            }},
         }},
     }},
 };

@@ -325,7 +325,11 @@ void SerialPABotBase_Connection::thread_body(){
                 &scope
             ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
             uint32_t wallclock = response.data;
-            str = ticks_to_time(NintendoSwitch::TICKS_PER_SECOND, wallclock);
+            if (wallclock == 0){
+                str = "Unknown";
+            }else{
+                str = ticks_to_time(NintendoSwitch::TICKS_PER_SECOND, wallclock);
+            }
         }catch (InvalidConnectionStateException&){
             break;
         }catch (SerialProtocolException& e){

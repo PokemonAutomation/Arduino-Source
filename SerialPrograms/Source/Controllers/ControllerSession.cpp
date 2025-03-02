@@ -372,7 +372,9 @@ void ControllerSession::post_connection_ready(
         ready = m_controller && m_controller->is_ready();
 
         WriteSpinLock lg1(m_message_lock);
-        m_controller_error = m_controller->error_string();
+        if (m_controller){
+            m_controller_error = m_controller->error_string();
+        }
     }
 
     signal_controller_changed(selected_controller, available_controllers);
