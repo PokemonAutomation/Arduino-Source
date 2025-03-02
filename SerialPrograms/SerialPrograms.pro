@@ -408,9 +408,11 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp \
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_PokkenController.cpp \
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_ProController.cpp \
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_WirelessProController.cpp \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.cpp \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.cpp \
@@ -1574,9 +1576,11 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController_SerialPABotBase.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h \
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_PokkenController.h \
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_ProController.h \
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_WirelessProController.h \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.h \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.h \
