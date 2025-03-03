@@ -39,6 +39,7 @@ private:
     void status_thread();
 
 private:
+    CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;
     std::mutex m_sleep_lock;
     std::condition_variable m_cv;

@@ -43,8 +43,12 @@ SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
 {}
 SerialPABotBase_PokkenController::~SerialPABotBase_PokkenController(){
     stop();
+    m_scope.cancel(nullptr);
     {
         std::unique_lock<std::mutex> lg(m_sleep_lock);
+        if (m_serial){
+            m_serial->notify_all();
+        }
         m_cv.notify_all();
         m_stopping.store(true, std::memory_order_relaxed);
     }
@@ -100,7 +104,6 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
 
 
 void SerialPABotBase_PokkenController::status_thread(){
-
     constexpr std::chrono::milliseconds PERIOD(1000);
     std::atomic<WallClock> last_ack(current_time());
 
@@ -134,8 +137,6 @@ void SerialPABotBase_PokkenController::status_thread(){
         }
     });
 
-    CancellableHolder<CancellableScope> scope;
-
     WallClock next_ping = current_time();
     while (true){
         if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
@@ -147,7 +148,7 @@ void SerialPABotBase_PokkenController::status_thread(){
             pabb_MsgAckRequestI32 response;
             m_serial->issue_request_and_wait(
                 NintendoSwitch::DeviceRequest_system_clock(),
-                &scope
+                &m_scope
             ).convert<PABB_MSG_ACK_REQUEST_I32>(logger(), response);
             last_ack.store(current_time(), std::memory_order_relaxed);
             uint32_t wallclock = response.data;
@@ -162,6 +163,8 @@ void SerialPABotBase_PokkenController::status_thread(){
                     theme_friendly_darkblue()
                 );
             }
+        }catch (OperationCancelledException&){
+            break;
         }catch (InvalidConnectionStateException&){
             break;
         }catch (SerialProtocolException& e){

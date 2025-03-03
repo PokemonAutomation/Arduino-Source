@@ -62,6 +62,8 @@ public:
     virtual State state() const override { return State::RUNNING; }
     virtual size_t queue_limit() const override { return PABB_DEVICE_QUEUE_SIZE; }
 
+    virtual void notify_all() override{}
+
     virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) override {}
 
     virtual bool try_stop_all_commands() override { return true; }

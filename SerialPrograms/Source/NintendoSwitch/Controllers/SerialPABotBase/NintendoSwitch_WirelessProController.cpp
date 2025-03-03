@@ -10,6 +10,7 @@
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
 #include "ClientSource/Libraries/MessageConverter.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
@@ -43,8 +44,12 @@ SerialPABotBase_WirelessProController::SerialPABotBase_WirelessProController(
 {}
 SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
     stop();
+    m_scope.cancel(nullptr);
     {
         std::unique_lock<std::mutex> lg(m_sleep_lock);
+        if (m_serial){
+            m_serial->notify_all();
+        }
         m_cv.notify_all();
         m_stopping.store(true, std::memory_order_relaxed);
     }
@@ -82,6 +87,21 @@ public:
 };
 
 int register_message_converters_ESP32(){
+    register_message_converter(
+        PABB_MSG_ESP32_REQUEST_STATUS,
+        [](const std::string& body){
+            //  Disable this by default since it's very spammy.
+            if (!GlobalSettings::instance().LOG_EVERYTHING){
+                return std::string();
+            }
+            std::ostringstream ss;
+            ss << "ESP32_controller_status() - ";
+            if (body.size() != sizeof(pabb_esp32_RequestStatus)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_esp32_RequestStatus*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
     register_message_converter(
         PABB_MSG_ESP32_REPORT,
         [](const std::string& body){
@@ -181,7 +201,6 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
 
 
 void SerialPABotBase_WirelessProController::status_thread(){
-
     constexpr std::chrono::milliseconds PERIOD(1000);
     std::atomic<WallClock> last_ack(current_time());
 
@@ -215,8 +234,6 @@ void SerialPABotBase_WirelessProController::status_thread(){
         }
     });
 
-    CancellableHolder<CancellableScope> scope;
-
     WallClock next_ping = current_time();
     while (true){
         if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
@@ -228,7 +245,7 @@ void SerialPABotBase_WirelessProController::status_thread(){
             pabb_MsgAckRequestI32 response;
             m_serial->issue_request_and_wait(
                 MessageControllerStatus(),
-                &scope
+                &m_scope
             ).convert<PABB_MSG_ACK_REQUEST_I32>(logger(), response);
             last_ack.store(current_time(), std::memory_order_relaxed);
 

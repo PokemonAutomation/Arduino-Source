@@ -68,6 +68,7 @@ public:
     virtual State state() const override{
         return m_state.load(std::memory_order_acquire);
     }
+    virtual void notify_all() override;
 
     virtual size_t queue_limit() const override{
         return m_max_pending_requests.load(std::memory_order_relaxed);
@@ -170,7 +171,7 @@ public:
     ) override;
 
 private:
-    BotBaseMessage wait_for_request(uint64_t seqnum);
+    BotBaseMessage wait_for_request(uint64_t seqnum, const Cancellable* cancelled = nullptr);
 
 private:
     Logger& m_logger;

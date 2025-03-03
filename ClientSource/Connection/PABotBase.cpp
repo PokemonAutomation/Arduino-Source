@@ -124,6 +124,11 @@ void PABotBase::stop(){
     //  it is safe to destruct.
     m_state.store(State::STOPPED, std::memory_order_release);
 }
+void PABotBase::notify_all(){
+    std::unique_lock<std::mutex> lg(m_sleep_lock);
+    m_cv.notify_all();
+}
+
 void PABotBase::set_queue_limit(size_t queue_limit){
     m_max_pending_requests.store(queue_limit, std::memory_order_relaxed);
 }
@@ -810,13 +815,17 @@ BotBaseMessage PABotBase::issue_request_and_wait(
     }
 
     uint64_t seqnum = issue_request(cancelled, request, false);
-    return wait_for_request(seqnum);
+    return wait_for_request(seqnum, cancelled);
 }
-BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum){
+BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum, const Cancellable* cancelled){
     auto scope_check = m_sanitizer.check_scope();
 
     std::unique_lock<std::mutex> lg(m_sleep_lock);
     while (true){
+        if (cancelled && cancelled->cancelled()){
+            throw OperationCancelledException();
+        }
+
         {
             WriteSpinLock slg(m_state_lock, "PABotBase::issue_request_and_wait()");
             auto iter = m_pending_requests.find(seqnum);
