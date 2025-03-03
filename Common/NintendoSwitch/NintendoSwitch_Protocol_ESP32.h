@@ -55,6 +55,7 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint8_t ticks;
+    bool active;
     ESP32Report0x30 report;
 } PABB_PACK pabb_esp32_report30;
 
