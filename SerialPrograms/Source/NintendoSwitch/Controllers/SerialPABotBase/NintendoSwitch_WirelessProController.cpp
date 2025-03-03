@@ -53,10 +53,23 @@ SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
 
 
 
-class SerialPABotBase_WirelessProController::Message : public BotBaseRequest{
+
+class SerialPABotBase_WirelessProController::MessageControllerStatus : public BotBaseRequest{
+public:
+    pabb_esp32_RequestStatus params;
+    MessageControllerStatus()
+        : BotBaseRequest(false)
+    {
+        params.seqnum = 0;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_ESP32_REQUEST_STATUS, params);
+    }
+};
+class SerialPABotBase_WirelessProController::MessageControllerState : public BotBaseRequest{
 public:
     pabb_esp32_report30 params;
-    Message(uint8_t ticks, ESP32Report0x30 report)
+    MessageControllerState(uint8_t ticks, ESP32Report0x30 report)
         : BotBaseRequest(true)
     {
         params.seqnum = 0;
@@ -159,7 +172,7 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         Milliseconds current_ms = std::min(time_left, 255 * 15ms);
         uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_15ms(current_ms.count());
         m_serial->issue_request(
-            Message(current_ticks, report),
+            MessageControllerState(current_ticks, report),
             cancellable
         );
         time_left -= current_ms;
@@ -210,27 +223,30 @@ void SerialPABotBase_WirelessProController::status_thread(){
             break;
         }
 
-        std::string str;
         std::string error;
         try{
             pabb_MsgAckRequestI32 response;
             m_serial->issue_request_and_wait(
-                NintendoSwitch::DeviceRequest_system_clock(),
+                MessageControllerStatus(),
                 &scope
             ).convert<PABB_MSG_ACK_REQUEST_I32>(logger(), response);
             last_ack.store(current_time(), std::memory_order_relaxed);
-            uint32_t wallclock = response.data;
-            if (wallclock == 0){
-                m_handle.set_status_line1(
-                    "Not connected to Switch.",
-                    COLOR_RED
-                );
-            }else{
-                m_handle.set_status_line1(
-                    "Status Reports: " + tostr_u_commas(wallclock),
-                    theme_friendly_darkblue()
-                );
-            }
+
+            uint32_t status = response.data;
+            bool status_paired      = status & 1;
+            bool status_connected   = status & 2;
+
+            std::string str;
+            str += "Paired: " + (status_paired
+                ? html_color_text("Yes", theme_friendly_darkblue())
+                : html_color_text("No", COLOR_RED)
+            );
+            str += ", Connected: " + (status_connected
+                ? html_color_text("Yes", theme_friendly_darkblue())
+                : html_color_text("No", COLOR_RED)
+            );
+
+            m_handle.set_status_line1(str);
         }catch (InvalidConnectionStateException&){
             break;
         }catch (SerialProtocolException& e){

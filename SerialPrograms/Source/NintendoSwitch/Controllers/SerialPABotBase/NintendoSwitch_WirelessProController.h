@@ -26,7 +26,8 @@ public:
     ~SerialPABotBase_WirelessProController();
 
 public:
-    class Message;
+    class MessageControllerStatus;
+    class MessageControllerState;
 
 private:
     template <typename Type>

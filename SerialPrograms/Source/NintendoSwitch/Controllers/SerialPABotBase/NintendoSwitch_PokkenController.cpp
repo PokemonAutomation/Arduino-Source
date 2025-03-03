@@ -142,7 +142,6 @@ void SerialPABotBase_PokkenController::status_thread(){
             break;
         }
 
-        std::string str;
         std::string error;
         try{
             pabb_MsgAckRequestI32 response;

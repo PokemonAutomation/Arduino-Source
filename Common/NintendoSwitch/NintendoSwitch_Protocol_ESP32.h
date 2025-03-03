@@ -23,6 +23,17 @@ namespace NintendoSwitch{
 #endif
 
 
+
+
+#define PABB_MSG_ESP32_REQUEST_STATUS   0x50
+typedef struct{
+    seqnum_t seqnum;
+} PABB_PACK pabb_esp32_RequestStatus;
+
+
+
+
+
 typedef struct{
     uint8_t report_id;
     uint8_t timer;
@@ -40,7 +51,7 @@ typedef struct{
     uint8_t gyro[49 - 13];
 } PABB_PACK ESP32Report0x30;
 
-#define PABB_MSG_ESP32_REPORT       0x9e
+#define PABB_MSG_ESP32_REPORT           0x9e
 typedef struct{
     seqnum_t seqnum;
     uint8_t ticks;
