@@ -187,8 +187,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Microcontroller/DeviceRoutines.h
     ../Common/Microcontroller/MessageProtocol.h
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_Superscalar.h
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h
     ../Common/PokemonSwSh/PokemonProgramIDs.h
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h
@@ -824,7 +824,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Superscalar.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp

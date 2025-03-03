@@ -25,11 +25,10 @@ public:
     );
     ~SerialPABotBase_WirelessProController();
 
-
-private:
-    struct Report_0x30;
+public:
     class Message;
 
+private:
     template <typename Type>
     PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
         return milliseconds / 8 + (milliseconds % 8 + 7) / 8;
