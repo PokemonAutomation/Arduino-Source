@@ -4,6 +4,7 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
 #include "ClientSource/Libraries/MessageConverter.h"
@@ -121,12 +122,12 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
     //  Left Joycon
     report.leftstick_x_lo = (m_left_joystick.x << 4) & 0xf0;
     report.leftstick_x_hi = (m_left_joystick.x & 0xf0) >> 4;
-    report.leftstick_y = m_left_joystick.y;
+    report.leftstick_y = 255 - m_left_joystick.y;
 
     //  Right Joycon
     report.rightstick_x_lo = (m_right_joystick.x << 4) & 0xf0;
     report.rightstick_x_hi = (m_right_joystick.x & 0xf0) >> 4;
-    report.rightstick_y = m_right_joystick.y;
+    report.rightstick_y = 255 - m_right_joystick.y;
 
 
     //  Release the state lock since we are no longer touching state.

@@ -10,9 +10,9 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
+//#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
+//#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
 //#include "ClientSource/Connection/BotBase.h"
@@ -328,7 +328,8 @@ void SerialPABotBase_Connection::thread_body(){
             if (wallclock == 0){
                 str = "Unknown";
             }else{
-                str = ticks_to_time(NintendoSwitch::TICKS_PER_SECOND, wallclock);
+//                str = ticks_to_time(NintendoSwitch::TICKS_PER_SECOND, wallclock);
+                str = tostr_u_commas(wallclock);
             }
         }catch (InvalidConnectionStateException&){
             break;
@@ -338,7 +339,7 @@ void SerialPABotBase_Connection::thread_body(){
             error = e.message();
         }
         if (error.empty()){
-            std::string text = "Up Time: " + str;
+            std::string text = "State Reports: " + str;
             set_uptime_text(text, theme_friendly_darkblue());
         }else{
             set_uptime_text(error, COLOR_RED);
