@@ -34,6 +34,24 @@ struct ProControllerSchedulerState{
     SwitchButton_Dpad m_dpad;
     SwitchButton_Joystick m_left_joystick;
     SwitchButton_Joystick m_right_joystick;
+
+    bool is_active() const{
+        for (size_t c = 0; c < 14; c++){
+            if (m_buttons[c].is_busy()){
+                return true;
+            }
+        }
+        if (m_dpad.is_busy()){
+            return true;
+        }
+        if (m_left_joystick.is_busy()){
+            return true;
+        }
+        if (m_right_joystick.is_busy()){
+            return true;
+        }
+        return false;
+    }
 };
 
 

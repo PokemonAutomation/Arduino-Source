@@ -467,7 +467,7 @@ void CameraSession::startup(){
 }
 
 void CameraSession::on_watchdog_timeout(){
-    m_logger.log("CameraSession::on_watchdog_timeout()", COLOR_RED);
+//    m_logger.log("CameraSession::on_watchdog_timeout()", COLOR_RED);
     {
         std::lock_guard<std::mutex> lg(m_lock);
         if (!m_device){

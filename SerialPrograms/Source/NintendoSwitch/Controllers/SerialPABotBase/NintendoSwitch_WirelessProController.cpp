@@ -13,7 +13,6 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerCapability.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
 #include "NintendoSwitch_WirelessProController.h"
 
 //#include <iostream>
@@ -74,11 +73,12 @@ public:
 class SerialPABotBase_WirelessProController::MessageControllerState : public BotBaseRequest{
 public:
     pabb_esp32_report30 params;
-    MessageControllerState(uint8_t ticks, ESP32Report0x30 report)
+    MessageControllerState(uint8_t ticks, bool active, ESP32Report0x30 report)
         : BotBaseRequest(true)
     {
         params.seqnum = 0;
         params.ticks = ticks;
+        params.active = active;
         params.report = report;
     }
     virtual BotBaseMessage message() const override{
@@ -111,6 +111,7 @@ int register_message_converters_ESP32(){
             const auto* params = (const pabb_esp32_report30*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
             ss << ", ticks = " << (int)params->ticks;
+            ss << ", active = " << (int)params->active;
             return ss.str();
         }
     );
@@ -122,6 +123,8 @@ int init_Messages_ESP32 = register_message_converters_ESP32();
 
 void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancellable, WallDuration duration){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
+
+    bool is_active = this->is_active();
 
     ESP32Report0x30 report{
         .report_id = 0x30,
@@ -172,14 +175,18 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
     report.button5 |= (m_buttons[6].is_busy() ? 1 : 0) << 7;    //  ZL
 
     //  Left Joycon
-    report.leftstick_x_lo = (m_left_joystick.x << 4) & 0xf0;
-    report.leftstick_x_hi = (m_left_joystick.x & 0xf0) >> 4;
-    report.leftstick_y = 255 - m_left_joystick.y;
+    if (m_left_joystick.is_busy()){
+        report.leftstick_x_lo = (m_left_joystick.x << 4) & 0xf0;
+        report.leftstick_x_hi = (m_left_joystick.x & 0xf0) >> 4;
+        report.leftstick_y = 255 - m_left_joystick.y;
+    }
 
     //  Right Joycon
-    report.rightstick_x_lo = (m_right_joystick.x << 4) & 0xf0;
-    report.rightstick_x_hi = (m_right_joystick.x & 0xf0) >> 4;
-    report.rightstick_y = 255 - m_right_joystick.y;
+    if (m_right_joystick.is_busy()){
+        report.rightstick_x_lo = (m_right_joystick.x << 4) & 0xf0;
+        report.rightstick_x_hi = (m_right_joystick.x & 0xf0) >> 4;
+        report.rightstick_y = 255 - m_right_joystick.y;
+    }
 
 
     //  Release the state lock since we are no longer touching state.
@@ -192,7 +199,7 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         Milliseconds current_ms = std::min(time_left, 255 * 15ms);
         uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_15ms(current_ms.count());
         m_serial->issue_request(
-            MessageControllerState(current_ticks, report),
+            MessageControllerState(current_ticks, is_active, report),
             cancellable
         );
         time_left -= current_ms;
@@ -250,15 +257,15 @@ void SerialPABotBase_WirelessProController::status_thread(){
             last_ack.store(current_time(), std::memory_order_relaxed);
 
             uint32_t status = response.data;
-            bool status_paired      = status & 1;
-            bool status_connected   = status & 2;
+            bool status_connected   = status & 1;
+            bool status_paired      = status & 2;
 
             std::string str;
-            str += "Paired: " + (status_paired
+            str += "Connected: " + (status_connected
                 ? html_color_text("Yes", theme_friendly_darkblue())
                 : html_color_text("No", COLOR_RED)
             );
-            str += ", Connected: " + (status_connected
+            str += ", Paired: " + (status_paired
                 ? html_color_text("Yes", theme_friendly_darkblue())
                 : html_color_text("No", COLOR_RED)
             );
