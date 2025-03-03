@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include <iostream>
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
