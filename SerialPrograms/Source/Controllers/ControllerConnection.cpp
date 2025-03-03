@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "ControllerConnection.h"
 
 //#include <iostream>
@@ -26,17 +27,29 @@ void ControllerConnection::remove_status_listener(StatusListener& listener){
 
 std::string ControllerConnection::status_text() const{
     SpinLockGuard lg(m_status_text_lock);
-    return m_status_text;
+    std::string str = m_status_line0;
+    if (!str.empty() && !m_status_line1.empty()){
+        str += "<br>";
+        str += m_status_line1;
+    }
+    return str;
 }
 
 
-void ControllerConnection::set_status(const std::string& text){
+
+void ControllerConnection::set_status_line0(const std::string& text, Color color){
     {
         WriteSpinLock lg(m_status_text_lock);
-        m_status_text = text;
+        m_status_line0 = html_color_text(text, color);
     }
-//    cout << "ControllerConnection::set_status() = " << text << endl;
-    signal_status_text_changed(text);
+    signal_status_text_changed(status_text());
+}
+void ControllerConnection::set_status_line1(const std::string& text, Color color){
+    {
+        WriteSpinLock lg(m_status_text_lock);
+        m_status_line1 = html_color_text(text, color);
+    }
+    signal_status_text_changed(status_text());
 }
 void ControllerConnection::declare_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers){
     m_ready.store(true, std::memory_order_release);

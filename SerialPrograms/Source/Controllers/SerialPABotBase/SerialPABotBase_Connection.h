@@ -24,11 +24,11 @@ namespace SerialPABotBase{
 
 class SerialPABotBase_Connection : public ControllerConnection{
 public:
-    ~SerialPABotBase_Connection();
     SerialPABotBase_Connection(
         Logger& logger,
         const QSerialPortInfo* port
     );
+    ~SerialPABotBase_Connection();
 
     void update_with_capabilities(const std::set<ControllerFeature>& capabilities);
 
@@ -43,9 +43,6 @@ public:
 private:
     std::map<ControllerType, std::set<ControllerFeature>> read_device_specs();
 
-    void set_label_text(const std::string& text, Color color = Color());
-    void set_uptime_text(const std::string& text, Color color);
-
     void thread_body();
 
 
@@ -55,9 +52,6 @@ private:
     uint32_t m_protocol = 0;
     uint8_t m_program_id = 0;
     std::map<ControllerType, std::set<ControllerFeature>> m_controllers;
-
-    std::string m_label;
-    std::string m_uptime;
 
     std::thread m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;

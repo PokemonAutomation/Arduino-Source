@@ -27,10 +27,11 @@ using namespace std::chrono_literals;
 SerialPABotBase_ProController::SerialPABotBase_ProController(
     Logger& logger,
     ControllerType controller_type,
+    Milliseconds timing_variation,
     SerialPABotBase::SerialPABotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
-    : ProControllerWithScheduler(logger, 0ms)
+    : ProControllerWithScheduler(logger, timing_variation)
     , m_handle(connection)
     , m_serial(connection.botbase())
 {

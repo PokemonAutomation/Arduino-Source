@@ -7,20 +7,14 @@
 #include <QtGlobal>
 #include <QSerialPortInfo>
 #include <QMessageBox>
-#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
-//#include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
-//#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
-//#include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/PABotBase.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Connection.h"
 
@@ -41,7 +35,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
 )
     : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
 {
-    set_label_text("Not Connected", COLOR_RED);
+    set_status_line0("Not Connected", COLOR_RED);
 
     //  No port selected.
     if (port == nullptr || port->isNull()){
@@ -60,14 +54,14 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
         );
         std::string text = "Cannot connect to Prolific controller.";
         m_logger.log(text, COLOR_RED);
-        set_label_text(text, COLOR_RED);
+        set_status_line0(text, COLOR_RED);
         return;
     }
 
     std::string name = port->systemLocation().toUtf8().data();
     std::string error;
     try{
-        set_label_text("Connecting...", COLOR_DARKGREEN);
+        set_status_line0("Connecting...", COLOR_DARKGREEN);
 
         std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
@@ -79,7 +73,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
         error = e.message();
     }
     if (!error.empty()){
-        set_label_text("Unable to open port.", COLOR_RED);
+        set_status_line0("Unable to open port.", COLOR_RED);
         return;
     }
 
@@ -140,34 +134,6 @@ BotBaseController* SerialPABotBase_Connection::botbase(){
     }
     return ret;
 }
-
-
-void SerialPABotBase_Connection::set_label_text(const std::string& text, Color color){
-    m_label = html_color_text(text, color);
-
-    std::string status = m_label;
-    if (!m_uptime.empty()){
-        if (!status.empty()){
-            status += "<br>";
-        }
-        status += m_uptime;
-    }
-    set_status(status);
-}
-void SerialPABotBase_Connection::set_uptime_text(const std::string& text, Color color){
-    m_uptime = html_color_text(text, color);
-
-    std::string status = m_label;
-    if (!m_uptime.empty()){
-        if (!status.empty()){
-            status += "<br>";
-        }
-        status += m_uptime;
-    }
-    set_status(status);
-}
-
-
 
 
 
@@ -238,7 +204,7 @@ void SerialPABotBase_Connection::thread_body(){
             m_botbase->connect();
         }catch (InvalidConnectionStateException&){
             m_botbase->stop();
-            set_label_text("");
+            set_status_line0("");
             return;
         }catch (SerialProtocolException& e){
             error = e.message();
@@ -247,7 +213,7 @@ void SerialPABotBase_Connection::thread_body(){
         }
         if (!error.empty()){
             m_botbase->stop();
-            set_label_text(error, COLOR_RED);
+            set_status_line0(error, COLOR_RED);
             return;
         }
     }
@@ -273,95 +239,16 @@ void SerialPABotBase_Connection::thread_body(){
         if (error.empty()){
 //            std::string text = "Program: " + program_name(m_program_id) + " (" + std::to_string(m_protocol) + ")";
             std::string text = program_name(m_program_id) + " (" + std::to_string(m_protocol) + ")";
-            set_label_text(text, theme_friendly_darkblue());
+            set_status_line0(text, theme_friendly_darkblue());
             declare_ready(controllers);
         }else{
             m_ready.store(false, std::memory_order_relaxed);
-            set_label_text(error, COLOR_RED);
+            set_status_line0(error, COLOR_RED);
 //            signal_pre_not_ready();
             m_botbase->stop();
             return;
         }
     }
-
-
-    std::thread watchdog([this]{
-        while (true){
-            if (!m_ready.load(std::memory_order_relaxed)){
-                break;
-            }
-
-            auto last = current_time() - m_botbase->last_ack();
-            std::chrono::duration<double> seconds = last;
-            if (last > 2 * SERIAL_REFRESH_RATE){
-                std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
-                set_uptime_text(text, COLOR_RED);
-//                m_logger.log("Connection issue detected. Turning on all logging...");
-//                settings.log_everything.store(true, std::memory_order_release);
-            }
-
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
-            if (!m_ready.load(std::memory_order_relaxed)){
-                break;
-            }
-
-            m_cv.wait_for(lg, SERIAL_REFRESH_RATE);
-        }
-    });
-
-    CancellableHolder<CancellableScope> scope;
-
-    while (true){
-        if (!m_ready.load(std::memory_order_relaxed)){
-            break;
-        }
-
-        std::string str;
-        std::string error;
-        try{
-            pabb_MsgAckRequestI32 response;
-            m_botbase->issue_request_and_wait(
-                NintendoSwitch::DeviceRequest_system_clock(),
-                &scope
-            ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
-            uint32_t wallclock = response.data;
-            if (wallclock == 0){
-                str = "Unknown";
-            }else{
-//                str = ticks_to_time(NintendoSwitch::TICKS_PER_SECOND, wallclock);
-                str = tostr_u_commas(wallclock);
-            }
-        }catch (InvalidConnectionStateException&){
-            break;
-        }catch (SerialProtocolException& e){
-            error = e.message();
-        }catch (ConnectionException& e){
-            error = e.message();
-        }
-        if (error.empty()){
-            std::string text = "State Reports: " + str;
-            set_uptime_text(text, theme_friendly_darkblue());
-        }else{
-            set_uptime_text(error, COLOR_RED);
-            error.clear();
-            m_ready.store(false, std::memory_order_relaxed);
-            break;
-        }
-
-//        cout << "lock()" << endl;
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-//        cout << "lock() - done" << endl;
-        if (!m_ready.load(std::memory_order_relaxed)){
-            break;
-        }
-        m_cv.wait_for(lg, SERIAL_REFRESH_RATE);
-    }
-
-    {
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-        m_cv.notify_all();
-    }
-    watchdog.join();
 }
 
 

@@ -30,10 +30,18 @@ public:
 
 private:
     template <typename Type>
-    PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
-        return milliseconds / 8 + (milliseconds % 8 + 7) / 8;
+    PA_FORCE_INLINE Type milliseconds_to_ticks_15ms(Type milliseconds){
+        return milliseconds / 15 + (milliseconds % 15 + 14) / 15;
     }
     virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
+
+    void status_thread();
+
+private:
+    std::atomic<bool> m_stopping;
+    std::mutex m_sleep_lock;
+    std::condition_variable m_cv;
+    std::thread m_status_thread;
 };
 
 

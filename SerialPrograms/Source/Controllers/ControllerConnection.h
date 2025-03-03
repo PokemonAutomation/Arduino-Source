@@ -44,8 +44,12 @@ public:
     virtual std::map<ControllerType, std::set<ControllerFeature>> supported_controllers() const = 0;
 
 
+public:
+    void set_status_line0(const std::string& text, Color color = Color());
+    void set_status_line1(const std::string& text, Color color = Color());
+
+
 protected:
-    void set_status(const std::string& text);
     void declare_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);
 
 
@@ -61,7 +65,8 @@ protected:
 
 private:
     mutable SpinLock m_status_text_lock;
-    std::string m_status_text;
+    std::string m_status_line0;
+    std::string m_status_line1;
     ListenerSet<StatusListener> m_status_listeners;
 };
 

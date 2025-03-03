@@ -23,6 +23,7 @@ public:
     SerialPABotBase_ProController(
         Logger& logger,
         ControllerType controller_type,
+        Milliseconds timing_variation,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         const ControllerRequirements& requirements
     );

@@ -6,11 +6,18 @@
 
 #include <sstream>
 #include <iostream>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
 #include "ClientSource/Libraries/MessageConverter.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerCapability.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
 #include "NintendoSwitch_WirelessProController.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -27,12 +34,21 @@ SerialPABotBase_WirelessProController::SerialPABotBase_WirelessProController(
     : SerialPABotBase_ProController(
         logger,
         ControllerType::NintendoSwitch_WirelessProController,
+        14ms,
         connection,
         requirements
     )
+    , m_stopping(false)
+    , m_status_thread(&SerialPABotBase_WirelessProController::status_thread, this)
 {}
 SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
     stop();
+    {
+        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        m_cv.notify_all();
+        m_stopping.store(true, std::memory_order_relaxed);
+    }
+    m_status_thread.join();
 }
 
 
@@ -72,6 +88,8 @@ int init_Messages_ESP32 = register_message_converters_ESP32();
 
 
 void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancellable, WallDuration duration){
+    //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
+
     ESP32Report0x30 report{
         .report_id = 0x30,
         .timer = 0,     //  Populate on controller.
@@ -138,14 +156,112 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
     //  Divide the controller state into smaller chunks of 255 ticks.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
     while (time_left > Milliseconds::zero()){
-        Milliseconds current_ms = std::min(time_left, 255 * 8ms);
-        uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_8ms(current_ms.count());
+        Milliseconds current_ms = std::min(time_left, 255 * 15ms);
+        uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_15ms(current_ms.count());
         m_serial->issue_request(
             Message(current_ticks, report),
             cancellable
         );
         time_left -= current_ms;
     }
+}
+
+
+void SerialPABotBase_WirelessProController::status_thread(){
+
+    constexpr std::chrono::milliseconds PERIOD(1000);
+    std::atomic<WallClock> last_ack(current_time());
+
+    std::thread watchdog([&, this]{
+        WallClock next_ping = current_time();
+        while (true){
+            if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
+                break;
+            }
+
+            auto last = current_time() - last_ack.load(std::memory_order_relaxed);
+            std::chrono::duration<double> seconds = last;
+            if (last > 2 * PERIOD){
+                std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
+                m_handle.set_status_line1(text, COLOR_RED);
+//                m_logger.log("Connection issue detected. Turning on all logging...");
+//                settings.log_everything.store(true, std::memory_order_release);
+            }
+
+            std::unique_lock<std::mutex> lg(m_sleep_lock);
+            if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
+                break;
+            }
+
+            WallClock now = current_time();
+            next_ping += PERIOD;
+            if (now + PERIOD < next_ping){
+                next_ping = now + PERIOD;
+            }
+            m_cv.wait_until(lg, next_ping);
+        }
+    });
+
+    CancellableHolder<CancellableScope> scope;
+
+    WallClock next_ping = current_time();
+    while (true){
+        if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
+            break;
+        }
+
+        std::string str;
+        std::string error;
+        try{
+            pabb_MsgAckRequestI32 response;
+            m_serial->issue_request_and_wait(
+                NintendoSwitch::DeviceRequest_system_clock(),
+                &scope
+            ).convert<PABB_MSG_ACK_REQUEST_I32>(logger(), response);
+            last_ack.store(current_time(), std::memory_order_relaxed);
+            uint32_t wallclock = response.data;
+            if (wallclock == 0){
+                m_handle.set_status_line1(
+                    "Not connected to Switch.",
+                    COLOR_RED
+                );
+            }else{
+                m_handle.set_status_line1(
+                    "Status Reports: " + tostr_u_commas(wallclock),
+                    theme_friendly_darkblue()
+                );
+            }
+        }catch (InvalidConnectionStateException&){
+            break;
+        }catch (SerialProtocolException& e){
+            error = e.message();
+        }catch (ConnectionException& e){
+            error = e.message();
+        }
+        if (!error.empty()){
+            m_handle.set_status_line1(error, COLOR_RED);
+        }
+
+//        cout << "lock()" << endl;
+        std::unique_lock<std::mutex> lg(m_sleep_lock);
+//        cout << "lock() - done" << endl;
+        if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
+            break;
+        }
+
+        WallClock now = current_time();
+        next_ping += PERIOD;
+        if (now + PERIOD < next_ping){
+            next_ping = now + PERIOD;
+        }
+        m_cv.wait_until(lg, next_ping);
+    }
+
+    {
+        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        m_cv.notify_all();
+    }
+    watchdog.join();
 }
 
 
