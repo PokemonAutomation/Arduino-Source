@@ -1,11 +1,11 @@
-/*  Pro Controller
+/*  SerialPABotBase: Pro Controller
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_ProController_H
-#define PokemonAutomation_NintendoSwitch_ProController_H
+#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_ProController_H
+#define PokemonAutomation_NintendoSwitch_SerialPABotBase_ProController_H
 
 #include "ClientSource/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"

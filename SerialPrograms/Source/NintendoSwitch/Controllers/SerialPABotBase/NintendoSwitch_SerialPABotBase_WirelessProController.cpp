@@ -1,4 +1,4 @@
-/*  Pokken Controller
+/*  SerialPABotBase: Wireless Pro Controller
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -13,7 +13,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerCapability.h"
-#include "NintendoSwitch_WirelessProController.h"
+#include "NintendoSwitch_SerialPABotBase_WirelessProController.h"
 
 //#include <iostream>
 //using std::cout;

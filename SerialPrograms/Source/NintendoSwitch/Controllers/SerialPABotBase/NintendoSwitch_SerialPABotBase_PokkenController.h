@@ -1,14 +1,14 @@
-/*  Pokken Controller
+/*  SerialPABotBase: Pokken Controller
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_PokkenController_H
-#define PokemonAutomation_NintendoSwitch_PokkenController_H
+#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_PokkenController_H
+#define PokemonAutomation_NintendoSwitch_SerialPABotBase_PokkenController_H
 
 #include "Controllers/ControllerCapability.h"
-#include "NintendoSwitch_ProController.h"
+#include "NintendoSwitch_SerialPABotBase_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

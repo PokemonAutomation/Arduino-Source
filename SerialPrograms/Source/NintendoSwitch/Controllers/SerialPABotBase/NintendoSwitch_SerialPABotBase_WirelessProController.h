@@ -1,13 +1,13 @@
-/*  Wireless Pro Controller
+/*  SerialPABotBase: Wireless Pro Controller
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_WirelessProController_H
-#define PokemonAutomation_NintendoSwitch_WirelessProController_H
+#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessProController_H
+#define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessProController_H
 
-#include "NintendoSwitch_ProController.h"
+#include "NintendoSwitch_SerialPABotBase_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

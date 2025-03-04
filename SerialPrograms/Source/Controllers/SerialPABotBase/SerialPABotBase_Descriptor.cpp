@@ -11,8 +11,8 @@
 #include "SerialPABotBase_Descriptor.h"
 #include "SerialPABotBase_SelectorWidget.h"
 
-#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_PokkenController.h"
-#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_WirelessProController.h"
+#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.h"
+#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessProController.h"
 
 //#include <iostream>
 //using std::cout;

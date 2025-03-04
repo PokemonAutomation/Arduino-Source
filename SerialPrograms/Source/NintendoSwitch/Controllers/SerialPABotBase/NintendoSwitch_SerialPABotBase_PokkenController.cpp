@@ -1,4 +1,4 @@
-/*  Pokken Controller
+/*  SerialPABotBase: Pokken Controller
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -12,7 +12,7 @@
 #include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
-#include "NintendoSwitch_PokkenController.h"
+#include "NintendoSwitch_SerialPABotBase_PokkenController.h"
 
 //#include <iostream>
 //using std::cout;

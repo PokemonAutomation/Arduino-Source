@@ -1,4 +1,4 @@
-/*  Pro Controller
+/*  SerialPABotBase: Pro Controller
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -8,7 +8,7 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/ControllerCapability.h"
-#include "NintendoSwitch_ProController.h"
+#include "NintendoSwitch_SerialPABotBase_ProController.h"
 
 //#include <iostream>
 //using std::cout;
