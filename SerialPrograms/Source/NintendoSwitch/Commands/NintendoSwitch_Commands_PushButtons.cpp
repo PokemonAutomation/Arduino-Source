@@ -6,6 +6,7 @@
 
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
@@ -155,6 +156,10 @@ int register_message_converters_push_button_framework(){
     register_message_converter(
         PABB_MSG_CONTROLLER_STATE,
         [](const std::string& body){
+            //  Disable this by default since it's very spammy.
+            if (!GlobalSettings::instance().LOG_EVERYTHING){
+                return std::string();
+            }
             std::ostringstream ss;
             ss << "controller_state() - ";
             if (body.size() != sizeof(pabb_controller_state)){ ss << "(invalid size)" << std::endl; return ss.str(); }

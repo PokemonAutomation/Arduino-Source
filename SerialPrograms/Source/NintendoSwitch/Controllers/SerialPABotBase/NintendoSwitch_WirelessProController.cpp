@@ -34,7 +34,7 @@ SerialPABotBase_WirelessProController::SerialPABotBase_WirelessProController(
     : SerialPABotBase_ProController(
         logger,
         ControllerType::NintendoSwitch_WirelessProController,
-        14ms,
+        0ms,
         connection,
         requirements
     )
@@ -105,6 +105,10 @@ int register_message_converters_ESP32(){
     register_message_converter(
         PABB_MSG_ESP32_REPORT,
         [](const std::string& body){
+            //  Disable this by default since it's very spammy.
+            if (!GlobalSettings::instance().LOG_EVERYTHING){
+                return std::string();
+            }
             std::ostringstream ss;
             ss << "ESP32_controller_state() - ";
             if (body.size() != sizeof(pabb_esp32_report30)){ ss << "(invalid size)" << std::endl; return ss.str(); }
@@ -164,11 +168,13 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
     //  7 = Charging Grip
 
     //  Left
-    SplitDpad dpad = convert_unified_to_split_dpad(m_dpad.position);
-    report.button5 |= (dpad.down  ? 1 : 0) << 0;
-    report.button5 |= (dpad.up    ? 1 : 0) << 1;
-    report.button5 |= (dpad.right ? 1 : 0) << 2;
-    report.button5 |= (dpad.left  ? 1 : 0) << 3;
+    if (m_dpad.is_busy()){
+        SplitDpad dpad = convert_unified_to_split_dpad(m_dpad.position);
+        report.button5 |= (dpad.down  ? 1 : 0) << 0;
+        report.button5 |= (dpad.up    ? 1 : 0) << 1;
+        report.button5 |= (dpad.right ? 1 : 0) << 2;
+        report.button5 |= (dpad.left  ? 1 : 0) << 3;
+    }
     //  4 = Left Joycon: SR
     //  5 = Left Joycon: SL
     report.button5 |= (m_buttons[4].is_busy() ? 1 : 0) << 6;    //  L
@@ -265,18 +271,22 @@ void SerialPABotBase_WirelessProController::status_thread(){
                 ? html_color_text("Yes", theme_friendly_darkblue())
                 : html_color_text("No", COLOR_RED)
             );
-            str += ", Paired: " + (status_paired
+            str += " - Paired: " + (status_paired
                 ? html_color_text("Yes", theme_friendly_darkblue())
                 : html_color_text("No", COLOR_RED)
             );
 
             m_handle.set_status_line1(str);
+        }catch (OperationCancelledException&){
+            break;
         }catch (InvalidConnectionStateException&){
             break;
         }catch (SerialProtocolException& e){
             error = e.message();
         }catch (ConnectionException& e){
             error = e.message();
+        }catch (...){
+            error = "Unknown error.";
         }
         if (!error.empty()){
             m_handle.set_status_line1(error, COLOR_RED);

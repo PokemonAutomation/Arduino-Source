@@ -171,6 +171,8 @@ void SerialPABotBase_PokkenController::status_thread(){
             error = e.message();
         }catch (ConnectionException& e){
             error = e.message();
+        }catch (...){
+            error = "Unknown error.";
         }
         if (!error.empty()){
             m_handle.set_status_line1(error, COLOR_RED);

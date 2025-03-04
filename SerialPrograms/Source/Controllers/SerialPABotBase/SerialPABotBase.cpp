@@ -77,13 +77,16 @@ const std::map<
         }},
         {PABB_PID_PABOTBASE_ESP32, {
             {ControllerType::NintendoSwitch_WirelessProController, {
+                ControllerFeature::TickPrecise,
                 ControllerFeature::QueryCommandQueueSize,
                 ControllerFeature::NintendoSwitch_ProController,
             }},
             {ControllerType::NintendoSwitch_LeftJoycon, {
+                ControllerFeature::TickPrecise,
                 ControllerFeature::QueryCommandQueueSize,
             }},
             {ControllerType::NintendoSwitch_RightJoycon, {
+                ControllerFeature::TickPrecise,
                 ControllerFeature::QueryCommandQueueSize,
             }},
         }},
