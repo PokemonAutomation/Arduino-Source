@@ -26,6 +26,17 @@ public:
     ~SerialPABotBase_WirelessProController();
 
 public:
+    virtual ControllerType controller_type() const override{
+        return ControllerType::NintendoSwitch_WirelessProController;
+    }
+    virtual Milliseconds ticksize() const override{
+        return Milliseconds(15);
+    }
+    virtual Milliseconds timing_variation() const override{
+        return Milliseconds::zero();
+    }
+
+public:
     class MessageControllerStatus;
     class MessageControllerState;
 

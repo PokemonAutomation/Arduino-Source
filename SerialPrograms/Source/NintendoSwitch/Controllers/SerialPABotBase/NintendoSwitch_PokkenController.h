@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_PokkenController_H
 #define PokemonAutomation_NintendoSwitch_PokkenController_H
 
+#include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
@@ -25,6 +26,16 @@ public:
     );
     ~SerialPABotBase_PokkenController();
 
+public:
+    virtual ControllerType controller_type() const override{
+        return ControllerType::NintendoSwitch_WiredProController;
+    }
+    virtual Milliseconds ticksize() const override{
+        return Milliseconds(8);
+    }
+    virtual Milliseconds timing_variation() const override{
+        return Milliseconds::zero();
+    }
 
 private:
     template <typename Type>

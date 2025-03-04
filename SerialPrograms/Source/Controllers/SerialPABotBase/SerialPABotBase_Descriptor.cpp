@@ -7,6 +7,7 @@
 #include <QWidget>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "Controllers/ControllerTypeStrings.h"
 #include "SerialPABotBase_Descriptor.h"
 #include "SerialPABotBase_SelectorWidget.h"
 

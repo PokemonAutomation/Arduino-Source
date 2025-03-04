@@ -128,9 +128,8 @@ private:
 ProController::~ProController(){
 
 }
-ProController::ProController(Milliseconds timing_variation)
-    : m_timing_variation(timing_variation)
-    , m_keyboard_manager(CONSTRUCT_TOKEN, *this)
+ProController::ProController()
+    : m_keyboard_manager(CONSTRUCT_TOKEN, *this)
 {
 
 }

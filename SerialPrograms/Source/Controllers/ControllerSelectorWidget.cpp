@@ -9,6 +9,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
 
 #include "SerialPABotBase/SerialPABotBase_SelectorWidget.h"

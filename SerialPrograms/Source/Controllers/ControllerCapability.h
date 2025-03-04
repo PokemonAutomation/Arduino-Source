@@ -21,54 +21,10 @@
 #include <initializer_list>
 #include <string>
 #include <set>
-#include "Common/Cpp/EnumStringMap.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include "ControllerTypes.h"
 
 namespace PokemonAutomation{
-
-
-enum class FasterIfTickPrecise{
-    NOT_FASTER,
-    FASTER,
-    MUCH_FASTER,
-};
-
-
-
-enum class ControllerInterface{
-    None,
-    SerialPABotBase,
-    TcpSysbotBase,
-    UsbSysbotBase,
-};
-extern const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
-
-
-enum class ControllerType{
-    None,
-    NintendoSwitch_WiredProController,
-    NintendoSwitch_WirelessProController,
-    NintendoSwitch_LeftJoycon,
-    NintendoSwitch_RightJoycon,
-};
-extern const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS;
-
-
-enum class ControllerFeature{
-    TickPrecise,
-    QueryTickSize,
-    QueryCommandQueueSize,
-    NintendoSwitch_ProController,
-    NintendoSwitch_DateSkip,
-};
-extern const EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS;
-
-
-
 
 
 

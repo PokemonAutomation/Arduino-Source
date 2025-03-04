@@ -34,7 +34,6 @@ SerialPABotBase_WirelessProController::SerialPABotBase_WirelessProController(
     : SerialPABotBase_ProController(
         logger,
         ControllerType::NintendoSwitch_WirelessProController,
-        0ms,
         connection,
         requirements
     )

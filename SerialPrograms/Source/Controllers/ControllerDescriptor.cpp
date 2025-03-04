@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "ControllerCapability.h"
+#include "ControllerTypeStrings.h"
 #include "ControllerDescriptor.h"
 #include "NullController.h"
 

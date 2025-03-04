@@ -316,6 +316,7 @@ SOURCES += \
     Source/Controllers/ControllerSelectorWidget.cpp \
     Source/Controllers/ControllerSession.cpp \
     Source/Controllers/ControllerDescriptor.cpp \
+    Source/Controllers/ControllerTypeStrings.cpp \
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp \
     Source/Controllers/KeyboardInput/KeyboardInput.cpp \
     Source/Controllers/KeyboardInput/KeyboardStateTracker.cpp \
@@ -1467,6 +1468,8 @@ HEADERS += \
     Source/Controllers/ControllerSelectorWidget.h \
     Source/Controllers/ControllerSession.h \
     Source/Controllers/ControllerDescriptor.h \
+    Source/Controllers/ControllerTypeStrings.h \
+    Source/Controllers/ControllerTypes.h \
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h \
     Source/Controllers/KeyboardInput/KeyboardInput.h \
     Source/Controllers/KeyboardInput/KeyboardStateTracker.h \

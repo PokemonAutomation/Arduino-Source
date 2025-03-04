@@ -629,6 +629,9 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerSelectorWidget.cpp
     Source/Controllers/ControllerSelectorWidget.h
+    Source/Controllers/ControllerTypes.h
+    Source/Controllers/ControllerTypeStrings.cpp
+    Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
     Source/Controllers/KeyboardInput/KeyboardInput.cpp

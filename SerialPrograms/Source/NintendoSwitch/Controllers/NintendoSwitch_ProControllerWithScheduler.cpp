@@ -17,9 +17,8 @@ using namespace std::chrono_literals;
 
 
 
-ProControllerWithScheduler::ProControllerWithScheduler(Logger& logger, Milliseconds timing_variation)
-    : ProController(timing_variation)
-    , SuperscalarScheduler(
+ProControllerWithScheduler::ProControllerWithScheduler(Logger& logger)
+    : SuperscalarScheduler(
         logger, Milliseconds(4),
         {
             &m_buttons[ 0],
@@ -45,39 +44,6 @@ ProControllerWithScheduler::ProControllerWithScheduler(Logger& logger, Milliseco
     , m_logging_suppress(0)
 {}
 
-
-#if 0
-void ProControllerWithScheduler::push_state(const Cancellable* cancellable, WallDuration duration){
-    Button buttons = BUTTON_NONE;
-    for (size_t c = 0; c < 14; c++){
-        buttons |= m_buttons[c].is_busy()
-            ? (Button)((uint16_t)1 << c)
-            : BUTTON_NONE;
-    }
-
-    uint8_t left_x = 128;
-    uint8_t left_y = 128;
-    uint8_t right_x = 128;
-    uint8_t right_y = 128;
-    if (m_left_joystick.is_busy()){
-        left_x = m_left_joystick.x;
-        left_y = m_left_joystick.y;
-    }
-    if (m_right_joystick.is_busy()){
-        right_x = m_right_joystick.x;
-        right_y = m_right_joystick.y;
-    }
-
-    issue_controller_state(
-        cancellable,
-        buttons,
-        m_dpad.is_busy() ? m_dpad.position : DPAD_NONE,
-        left_x, left_y,
-        right_x, right_y,
-        std::chrono::duration_cast<Milliseconds>(duration)
-    );
-}
-#endif
 
 
 void ProControllerWithScheduler::issue_barrier(const Cancellable* cancellable){

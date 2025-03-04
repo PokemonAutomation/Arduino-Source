@@ -23,7 +23,6 @@ public:
     SerialPABotBase_ProController(
         Logger& logger,
         ControllerType controller_type,
-        Milliseconds timing_variation,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         const ControllerRequirements& requirements
     );
@@ -51,14 +50,6 @@ public:
         const Cancellable* cancellable,
         const BotBaseRequest& request
     ) override;
-
-
-private:
-//    template <typename Type>
-//    PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
-//        return milliseconds / 8 + (milliseconds % 8 + 7) / 8;
-//    }
-//    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
 
 
 protected:

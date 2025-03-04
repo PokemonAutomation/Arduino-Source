@@ -1,0 +1,24 @@
+/*  Controller Type Strings
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_Controllers_ControllerTypeStrings_H
+#define PokemonAutomation_Controllers_ControllerTypeStrings_H
+
+#include "Common/Cpp/EnumStringMap.h"
+#include "ControllerTypes.h"
+
+namespace PokemonAutomation{
+
+
+
+extern const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
+extern const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS;
+extern const EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS;
+
+
+
+}
+#endif

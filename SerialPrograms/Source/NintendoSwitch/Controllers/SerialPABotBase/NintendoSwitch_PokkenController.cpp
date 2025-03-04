@@ -34,7 +34,6 @@ SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
     : SerialPABotBase_ProController(
         logger,
         ControllerType::NintendoSwitch_WiredProController,
-        0ms,
         connection,
         requirements
     )

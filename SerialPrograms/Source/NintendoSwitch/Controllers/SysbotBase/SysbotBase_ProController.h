@@ -34,6 +34,20 @@ public:
     );
     ~ProController_SysbotBase();
 
+
+public:
+    virtual ControllerType controller_type() const override{
+        return ControllerType::NintendoSwitch_WiredProController;
+    }
+    virtual Milliseconds ticksize() const override{
+        return Milliseconds::zero();
+    }
+    virtual Milliseconds timing_variation() const override{
+        return Milliseconds(150);
+    }
+
+
+public:
     virtual bool is_ready() const override{
         return m_connection.is_ready() && m_error_string.empty();
     }

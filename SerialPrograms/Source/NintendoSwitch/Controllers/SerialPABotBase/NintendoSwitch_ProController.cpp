@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch_ProController.h"
 
@@ -27,11 +28,10 @@ using namespace std::chrono_literals;
 SerialPABotBase_ProController::SerialPABotBase_ProController(
     Logger& logger,
     ControllerType controller_type,
-    Milliseconds timing_variation,
     SerialPABotBase::SerialPABotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
-    : ProControllerWithScheduler(logger, timing_variation)
+    : ProControllerWithScheduler(logger)
     , m_handle(connection)
     , m_serial(connection.botbase())
 {

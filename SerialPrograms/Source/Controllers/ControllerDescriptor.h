@@ -9,6 +9,7 @@
 
 #include <string>
 #include <memory>
+#include <map>
 #include "Common/Cpp/AbstractLogger.h"
 //#include "Common/Cpp/Json/JsonObject.h"
 #include "ControllerCapability.h"
@@ -113,10 +114,6 @@ public:
 
 
 
-#if 0
-std::vector<std::shared_ptr<const ControllerDescriptor>>
-get_compatible_descriptors(const ControllerRequirements& requirements);
-#endif
 
 
 

@@ -15,7 +15,9 @@ namespace NintendoSwitch{
 void home_to_date_time(ProControllerContext& context, bool to_date_change, bool fast){
     //  If (fast == true) this will run faster, but slightly less accurately.
 
+    Milliseconds ticksize = context->ticksize();
     Milliseconds tv = context->timing_variation();
+    Milliseconds unit = round_up_to_ticksize(ticksize, 17ms);
     if (tv == 0ms){
         //  Fast version for tick-precise.
 
@@ -33,14 +35,17 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
         ssf_press_button(context, BUTTON_A, 3);
 
         //  Just button mash it. lol
-        uint8_t stop0 = fast ? 51 : 52;
-        for (uint8_t c = 0; c < stop0; c++){
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        {
+            auto iterations = Milliseconds(1200) / unit + 1;
+            do{
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+            }while (--iterations);
         }
-//        ssf_issue_scroll1(SSF_SCROLL_RIGHT, fast ? 40 : 45);
-//        stop0 = fast ? 14 : 15;
-        for (uint8_t c = 0; c < 15; c++){
-            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+        {
+            auto iterations = Milliseconds(336) / unit + 1;
+            do{
+                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+            }while (--iterations);
         }
 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
@@ -56,9 +61,11 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
         }
 
         ssf_press_button(context, BUTTON_A, 3);
-        uint8_t stop1 = fast ? 10 : 12;
-        for (uint8_t c = 0; c < stop1; c++){
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        {
+            auto iterations = Milliseconds(216) / unit + 1;
+            do{
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+            }while (--iterations);
         }
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
 

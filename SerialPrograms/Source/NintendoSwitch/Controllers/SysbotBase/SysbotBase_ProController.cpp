@@ -8,6 +8,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Controllers/ControllerTypeStrings.h"
 #include "SysbotBase_ProController.h"
 
 #include "Common/Cpp/Concurrency/SpinPause.h"
@@ -26,7 +27,7 @@ ProController_SysbotBase::ProController_SysbotBase(
     SysbotBase::TcpSysbotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
-    : ProControllerWithScheduler(logger, std::chrono::milliseconds(150))
+    : ProControllerWithScheduler(logger)
     , m_connection(connection)
     , m_stopping(false)
     , m_replace_on_next(false)

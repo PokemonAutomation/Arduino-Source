@@ -82,16 +82,12 @@ public:
     using ContextType = ProControllerContext;
 
     virtual ~ProController();
-    ProController(Milliseconds timing_variation);
+    ProController();
 
     //  Must call before destruction begins.
     void stop() noexcept;
 
     virtual Logger& logger() = 0;
-
-    Milliseconds timing_variation() const{
-        return m_timing_variation;
-    }
 
 
 public:
@@ -328,8 +324,6 @@ public:
 
 
 private:
-    const Milliseconds m_timing_variation;
-
     class KeyboardManager;
     Pimpl<KeyboardManager> m_keyboard_manager;
 };
