@@ -134,7 +134,9 @@ int read_number_waterfill(
         filter_by_mask(tmp, cropped, Color(0xffffffff), true);
         ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
         std::string ocr = OCR::ocr_read(Language::English, padded);
-        ocr_text += ocr[0];
+        if (!ocr.empty()){
+            ocr_text += ocr[0];
+        }
     }
 
     std::string normalized = run_number_normalization(ocr_text);
