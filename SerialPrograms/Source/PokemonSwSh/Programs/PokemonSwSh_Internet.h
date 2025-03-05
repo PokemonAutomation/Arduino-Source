@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSwSh_Internet_H
 
 #include <chrono>
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 

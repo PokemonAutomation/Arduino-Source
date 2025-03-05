@@ -25,6 +25,7 @@ public:
         const ControllerRequirements& requirements
     );
     ~SerialPABotBase_PokkenController();
+    void stop();
 
 public:
     virtual ControllerType controller_type() const override{

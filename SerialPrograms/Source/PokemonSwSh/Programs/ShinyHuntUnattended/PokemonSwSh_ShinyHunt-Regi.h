@@ -9,11 +9,11 @@
 
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Time.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSwSh/Options/PokemonSwSh_RegiSelector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-    class ProControllerContext;
 namespace PokemonSwSh{
 
 

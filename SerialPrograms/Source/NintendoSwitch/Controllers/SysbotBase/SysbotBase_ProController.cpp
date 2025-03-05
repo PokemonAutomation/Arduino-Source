@@ -71,13 +71,18 @@ ProController_SysbotBase::ProController_SysbotBase(
 }
 ProController_SysbotBase::~ProController_SysbotBase(){
     stop();
-    m_stopping.store(true, std::memory_order_release);
+    if (m_dispatch_thread.joinable()){
+        m_dispatch_thread.join();
+    }
+}
+void ProController_SysbotBase::stop(){
+    if (m_stopping.exchange(true)){
+        return;
+    }
+    ProControllerWithScheduler::stop();
     {
         std::lock_guard<std::mutex> lg(m_state_lock);
         m_cv.notify_all();
-    }
-    if (m_dispatch_thread.joinable()){
-        m_dispatch_thread.join();
     }
 }
 
@@ -224,45 +229,60 @@ void ProController_SysbotBase::send_diff(
 
     //  These need to match:
     //  https://github.com/olliz0r/sys-botbase/blob/master/sys-botbase/source/util.c#L145
-    static const std::string BUTTON_MAP[] = {
-        "Y", "B", "A", "X",
-        "L", "R", "ZL", "ZR",
-        "MINUS", "PLUS", "LSTICK", "RSTICK",
-        "HOME", "CAPTURE"
+    static const std::vector<std::pair<Button, std::string>> BUTTON_MAP{
+        {BUTTON_Y, "Y"},
+        {BUTTON_B, "B"},
+        {BUTTON_A, "A"},
+        {BUTTON_X, "X"},
+        {BUTTON_L, "L"},
+        {BUTTON_R, "R"},
+        {BUTTON_ZL, "ZL"},
+        {BUTTON_ZR, "ZR"},
+        {BUTTON_MINUS, "MINUS"},
+        {BUTTON_PLUS, "PLUS"},
+        {BUTTON_LCLICK, "LSTICK"},
+        {BUTTON_RCLICK, "RSTICK"},
+        {BUTTON_HOME, "HOME"},
+        {BUTTON_CAPTURE, "CAPTURE"},
+        {BUTTON_UP, "DU"},
+        {BUTTON_RIGHT, "DR"},
+        {BUTTON_DOWN, "DD"},
+        {BUTTON_LEFT, "DL"},
     };
 
     std::string message;
 
-    if (old_state.buttons != new_state.buttons){
-        for (size_t c = 0; c < 14; c++){
-            uint16_t mask = (uint16_t)1 << c;
-            bool before = (uint16_t)old_state.buttons & mask;
-            bool after = (uint16_t)new_state.buttons & mask;
+
+    //  Merge the dpad states.
+    ButtonFlagType old_buttons = old_state.buttons;
+    ButtonFlagType new_buttons = new_state.buttons;
+
+    SplitDpad old_dpad = convert_unified_to_split_dpad(old_state.dpad);
+    if (old_dpad.up)    old_buttons |= BUTTON_UP;
+    if (old_dpad.right) old_buttons |= BUTTON_RIGHT;
+    if (old_dpad.down)  old_buttons |= BUTTON_DOWN;
+    if (old_dpad.left)  old_buttons |= BUTTON_LEFT;
+
+    SplitDpad new_dpad = convert_unified_to_split_dpad(new_state.dpad);
+    if (new_dpad.up)    new_buttons |= BUTTON_UP;
+    if (new_dpad.right) new_buttons |= BUTTON_RIGHT;
+    if (new_dpad.down)  new_buttons |= BUTTON_DOWN;
+    if (new_dpad.left)  new_buttons |= BUTTON_LEFT;
+
+
+    if (old_buttons != new_buttons){
+        for (const auto& button : BUTTON_MAP){
+            ButtonFlagType mask = (ButtonFlagType)button.first;
+            bool before = (ButtonFlagType)old_buttons & mask;
+            bool after = (ButtonFlagType)new_buttons & mask;
             if (before == after){
                 continue;
             }
             if (after){
-                message += "press " + BUTTON_MAP[c] + "\n";
+                message += "press " + button.second + "\n";
             }else{
-                message += "release " + BUTTON_MAP[c] + "\n";
+                message += "release " + button.second + "\n";
             }
-        }
-    }
-
-    if (old_state.dpad != new_state.dpad){
-        SplitDpad old_dpad = convert_unified_to_split_dpad(old_state.dpad);
-        SplitDpad new_dpad = convert_unified_to_split_dpad(new_state.dpad);
-        if (old_dpad.up != new_dpad.up){
-            message += new_dpad.up ? "press DU\n" : "release DU\n";
-        }
-        if (old_dpad.right != new_dpad.right){
-            message += new_dpad.right ? "press DR\n" : "release DR\n";
-        }
-        if (old_dpad.down != new_dpad.down){
-            message += new_dpad.down ? "press DD\n" : "release DD\n";
-        }
-        if (old_dpad.left != new_dpad.left){
-            message += new_dpad.left ? "press DL\n" : "release DL\n";
         }
     }
 

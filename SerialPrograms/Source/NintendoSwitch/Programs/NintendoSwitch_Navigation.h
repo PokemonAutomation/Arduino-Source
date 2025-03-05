@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_NintendoSwitch_Navigation_H
 #define PokemonAutomation_NintendoSwitch_Navigation_H
 
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-class ProControllerContext;
 
 
 

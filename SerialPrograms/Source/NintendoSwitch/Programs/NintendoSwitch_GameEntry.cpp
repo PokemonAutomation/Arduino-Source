@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"

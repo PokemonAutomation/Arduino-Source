@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_StartGame_H
 #define PokemonAutomation_PokemonSwSh_StartGame_H
 
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 

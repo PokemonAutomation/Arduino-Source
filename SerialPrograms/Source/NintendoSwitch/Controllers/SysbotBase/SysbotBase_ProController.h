@@ -33,6 +33,7 @@ public:
         const ControllerRequirements& requirements
     );
     ~ProController_SysbotBase();
+    void stop();
 
 
 public:

@@ -4,9 +4,6 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "CommonFramework/Globals.h"
-
 #include "ZeldaTotK_Settings.h"
 
 namespace PokemonAutomation{

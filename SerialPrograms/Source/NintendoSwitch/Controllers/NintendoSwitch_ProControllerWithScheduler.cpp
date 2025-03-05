@@ -20,25 +20,7 @@ using namespace std::chrono_literals;
 ProControllerWithScheduler::ProControllerWithScheduler(Logger& logger)
     : SuperscalarScheduler(
         logger, Milliseconds(4),
-        {
-            &m_buttons[ 0],
-            &m_buttons[ 1],
-            &m_buttons[ 2],
-            &m_buttons[ 3],
-            &m_buttons[ 4],
-            &m_buttons[ 5],
-            &m_buttons[ 6],
-            &m_buttons[ 7],
-            &m_buttons[ 8],
-            &m_buttons[ 9],
-            &m_buttons[10],
-            &m_buttons[11],
-            &m_buttons[12],
-            &m_buttons[13],
-            &m_dpad,
-            &m_left_joystick,
-            &m_right_joystick,
-        }
+        make_resource_list()
     )
     , m_logger(logger)
     , m_logging_suppress(0)
@@ -79,14 +61,14 @@ void ProControllerWithScheduler::issue_buttons(
         cancellable->throw_if_cancelled();
     }
 
-    for (size_t c = 0; c < 14; c++){
-        uint16_t mask = (uint16_t)1 << c;
+    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+        ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
             this->issue_wait_for_resource(cancellable, m_buttons[c]);
         }
     }
-    for (size_t c = 0; c < 14; c++){
-        uint16_t mask = (uint16_t)1 << c;
+    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+        ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
             this->issue_to_resource(
                 cancellable, m_buttons[c],

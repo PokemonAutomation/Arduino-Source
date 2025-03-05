@@ -4,6 +4,7 @@
  *
  */
 
+#include <map>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
@@ -42,6 +43,13 @@ SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
 {}
 SerialPABotBase_PokkenController::~SerialPABotBase_PokkenController(){
     stop();
+    m_status_thread.join();
+}
+void SerialPABotBase_PokkenController::stop(){
+    if (m_stopping.exchange(true)){
+        return;
+    }
+    SerialPABotBase_ProController::stop();
     m_scope.cancel(nullptr);
     {
         std::unique_lock<std::mutex> lg(m_sleep_lock);
@@ -49,9 +57,7 @@ SerialPABotBase_PokkenController::~SerialPABotBase_PokkenController(){
             m_serial->notify_all();
         }
         m_cv.notify_all();
-        m_stopping.store(true, std::memory_order_relaxed);
     }
-    m_status_thread.join();
 }
 
 void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable, WallDuration duration){
@@ -61,14 +67,101 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
         throw InvalidConnectionStateException();
     }
 
-    Button buttons = BUTTON_NONE;
-    for (size_t c = 0; c < 14; c++){
-        buttons |= m_buttons[c].is_busy()
-            ? (Button)((uint16_t)1 << c)
-            : BUTTON_NONE;
+    int dpad_x = 0;
+    int dpad_y = 0;
+    uint16_t buttons = 0;
+    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+        if (!m_buttons[c].is_busy()){
+            continue;
+        }
+        Button button = (Button)((ButtonFlagType)1 << c);
+        switch (button){
+        case BUTTON_Y:          buttons |= 1 <<  0; break;
+        case BUTTON_B:          buttons |= 1 <<  1; break;
+        case BUTTON_A:          buttons |= 1 <<  2; break;
+        case BUTTON_X:          buttons |= 1 <<  3; break;
+        case BUTTON_L:          buttons |= 1 <<  4; break;
+        case BUTTON_R:          buttons |= 1 <<  5; break;
+        case BUTTON_ZL:         buttons |= 1 <<  6; break;
+        case BUTTON_ZR:         buttons |= 1 <<  7; break;
+        case BUTTON_MINUS:      buttons |= 1 <<  8; break;
+        case BUTTON_PLUS:       buttons |= 1 <<  9; break;
+        case BUTTON_LCLICK:     buttons |= 1 << 10; break;
+        case BUTTON_RCLICK:     buttons |= 1 << 11; break;
+        case BUTTON_HOME:       buttons |= 1 << 12; break;
+        case BUTTON_CAPTURE:    buttons |= 1 << 13; break;
+        case BUTTON_UP:         dpad_y--; break;
+        case BUTTON_RIGHT:      dpad_x++; break;
+        case BUTTON_DOWN:       dpad_y++; break;
+        case BUTTON_LEFT:       dpad_x--; break;
+        default:;
+        }
     }
 
+
+    //  Merge the dpad states.
     DpadPosition dpad = m_dpad.is_busy() ? m_dpad.position : DPAD_NONE;
+    {
+        switch (dpad){
+        case DpadPosition::DPAD_UP:
+            dpad_y--;
+            break;
+        case DpadPosition::DPAD_UP_RIGHT:
+            dpad_x++;
+            dpad_y--;
+            break;
+        case DpadPosition::DPAD_RIGHT:
+            dpad_x++;
+            break;
+        case DpadPosition::DPAD_DOWN_RIGHT:
+            dpad_x++;
+            dpad_y++;
+            break;
+        case DpadPosition::DPAD_DOWN:
+            dpad_y++;
+            break;
+        case DpadPosition::DPAD_DOWN_LEFT:
+            dpad_x--;
+            dpad_y++;
+            break;
+        case DpadPosition::DPAD_LEFT:
+            dpad_x--;
+            break;
+        case DpadPosition::DPAD_UP_LEFT:
+            dpad_x--;
+            dpad_y--;
+            break;
+        default:;
+        }
+
+        if (dpad_x < 0){
+            if (dpad_y < 0){
+                dpad = DpadPosition::DPAD_UP_LEFT;
+            }else if (dpad_y > 0){
+                dpad = DpadPosition::DPAD_DOWN_LEFT;
+            }else{
+                dpad = DpadPosition::DPAD_LEFT;
+            }
+        }else if (dpad_x > 0){
+            if (dpad_y < 0){
+                dpad = DpadPosition::DPAD_UP_RIGHT;
+            }else if (dpad_y > 0){
+                dpad = DpadPosition::DPAD_DOWN_RIGHT;
+            }else{
+                dpad = DpadPosition::DPAD_RIGHT;
+            }
+        }else{
+            if (dpad_y < 0){
+                dpad = DpadPosition::DPAD_UP;
+            }else if (dpad_y > 0){
+                dpad = DpadPosition::DPAD_DOWN;
+            }else{
+                dpad = DPAD_NONE;
+            }
+        }
+    }
+
+
 
     uint8_t left_x = 128;
     uint8_t left_y = 128;

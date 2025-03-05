@@ -24,6 +24,7 @@ public:
         const ControllerRequirements& requirements
     );
     ~SerialPABotBase_WirelessProController();
+    void stop();
 
 public:
     virtual ControllerType controller_type() const override{

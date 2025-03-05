@@ -13,8 +13,8 @@
 #include <vector>
 #include <map>
 #include <mutex>
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Globals.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h"
 #include "ProgramTrackerInterfaces.h"
 
 namespace PokemonAutomation{

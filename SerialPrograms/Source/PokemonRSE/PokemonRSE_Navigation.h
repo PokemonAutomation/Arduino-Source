@@ -10,7 +10,6 @@
 #define PokemonAutomation_PokemonRSE_Navigation_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{

@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-KeyMapTableRow::KeyMapTableRow(EditableTableOption& parent_table)
+ProControllerKeyMapTableRow::ProControllerKeyMapTableRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
     , label(false, LockMode::UNLOCK_WHILE_RUNNING, "", "")
     , key(LockMode::UNLOCK_WHILE_RUNNING)
@@ -37,16 +37,16 @@ KeyMapTableRow::KeyMapTableRow(EditableTableOption& parent_table)
     add_option(left_stick_y, "Left-Stick y");
     add_option(right_stick_x, "Right-Stick x");
     add_option(right_stick_y, "Right-Stick y");
-    set_advanced_mode(static_cast<KeyboardMappingTable&>(parent_table).advanced_mode());
+    set_advanced_mode(static_cast<ProControllerKeyboardMappingTable&>(parent_table).advanced_mode());
 }
-KeyMapTableRow::KeyMapTableRow(
+ProControllerKeyMapTableRow::ProControllerKeyMapTableRow(
     EditableTableOption& parent_table,
     bool advanced_mode,
     std::string description,
     Qt::Key key,
     const ControllerDeltas& deltas
 )
-    : KeyMapTableRow(parent_table)
+    : ProControllerKeyMapTableRow(parent_table)
 {
     label.set(std::move(description));
     this->key.set(key);
@@ -59,8 +59,8 @@ KeyMapTableRow::KeyMapTableRow(
     right_stick_y.set(deltas.right_y);
     set_advanced_mode(advanced_mode);
 }
-std::unique_ptr<EditableTableRow> KeyMapTableRow::clone() const{
-    std::unique_ptr<KeyMapTableRow> ret(new KeyMapTableRow(parent()));
+std::unique_ptr<EditableTableRow> ProControllerKeyMapTableRow::clone() const{
+    std::unique_ptr<ProControllerKeyMapTableRow> ret(new ProControllerKeyMapTableRow(parent()));
     ret->label.set(label);
     ret->key.set((uint32_t)key);
     ret->buttons.set(buttons);
@@ -73,7 +73,7 @@ std::unique_ptr<EditableTableRow> KeyMapTableRow::clone() const{
     ret->set_advanced_mode(m_advanced_mode.load(std::memory_order_relaxed));
     return ret;
 }
-ControllerDeltas KeyMapTableRow::snapshot() const{
+ControllerDeltas ProControllerKeyMapTableRow::snapshot() const{
     return {
         .buttons = (Button)buttons.current_value(),
         .dpad_x = dpad_x,
@@ -84,7 +84,7 @@ ControllerDeltas KeyMapTableRow::snapshot() const{
         .right_y = right_stick_y,
     };
 }
-void KeyMapTableRow::set_advanced_mode(bool enabled){
+void ProControllerKeyMapTableRow::set_advanced_mode(bool enabled){
     m_advanced_mode.store(enabled, std::memory_order_relaxed);
     if (enabled){
         label.set_locked(false);
@@ -111,8 +111,8 @@ void KeyMapTableRow::set_advanced_mode(bool enabled){
 
 
 
-KeyboardMappingTable::KeyboardMappingTable()
-    : EditableTableOption_t<KeyMapTableRow>(
+ProControllerKeyboardMappingTable::ProControllerKeyboardMappingTable()
+    : EditableTableOption_t<ProControllerKeyMapTableRow>(
         "",
         LockMode::UNLOCK_WHILE_RUNNING,
         true,
@@ -120,7 +120,7 @@ KeyboardMappingTable::KeyboardMappingTable()
     )
     , m_advanced_mode(false)
 {}
-std::vector<std::string> KeyboardMappingTable::make_header() const{
+std::vector<std::string> ProControllerKeyboardMappingTable::make_header() const{
     return std::vector<std::string>{
         "Description",
         "Key",
@@ -133,20 +133,20 @@ std::vector<std::string> KeyboardMappingTable::make_header() const{
         "Right-Stick y",
     };
 }
-void KeyboardMappingTable::set_advanced_mode(bool enabled){
+void ProControllerKeyboardMappingTable::set_advanced_mode(bool enabled){
     m_advanced_mode.store(enabled, std::memory_order_relaxed);
-    run_on_all_rows([enabled](KeyMapTableRow& row){
+    run_on_all_rows([enabled](ProControllerKeyMapTableRow& row){
         row.set_advanced_mode(enabled);
     });
 }
 
 
-std::unique_ptr<EditableTableRow> KeyboardMappingTable::make_mapping(
+std::unique_ptr<EditableTableRow> ProControllerKeyboardMappingTable::make_mapping(
     std::string description,
     Qt::Key key,
     const ControllerDeltas& deltas
 ){
-    return std::make_unique<KeyMapTableRow>(
+    return std::make_unique<ProControllerKeyMapTableRow>(
         *this,
         m_advanced_mode.load(std::memory_order_relaxed),
         std::move(description),
@@ -154,7 +154,7 @@ std::unique_ptr<EditableTableRow> KeyboardMappingTable::make_mapping(
         deltas
     );
 }
-std::vector<std::unique_ptr<EditableTableRow>> KeyboardMappingTable::make_defaults(){
+std::vector<std::unique_ptr<EditableTableRow>> ProControllerKeyboardMappingTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
 
     ret.emplace_back(make_mapping("Dpad Up",            Qt::Key::Key_8,         ControllerDeltas{.dpad_x =  0, .dpad_y = -1}));

@@ -42,6 +42,13 @@ SerialPABotBase_WirelessProController::SerialPABotBase_WirelessProController(
 {}
 SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
     stop();
+    m_status_thread.join();
+}
+void SerialPABotBase_WirelessProController::stop(){
+    if (m_stopping.exchange(true)){
+        return;
+    }
+    SerialPABotBase_ProController::stop();
     m_scope.cancel(nullptr);
     {
         std::unique_lock<std::mutex> lg(m_sleep_lock);
@@ -49,9 +56,7 @@ SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
             m_serial->notify_all();
         }
         m_cv.notify_all();
-        m_stopping.store(true, std::memory_order_relaxed);
     }
-    m_status_thread.join();
 }
 
 
@@ -146,27 +151,45 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         .gyro = {},
     };
 
-    //  Right
-    report.button3 |= (m_buttons[0].is_busy() ? 1 : 0) << 0;    //  Y
-    report.button3 |= (m_buttons[3].is_busy() ? 1 : 0) << 1;    //  X
-    report.button3 |= (m_buttons[1].is_busy() ? 1 : 0) << 2;    //  A
-    report.button3 |= (m_buttons[2].is_busy() ? 1 : 0) << 3;    //  B
-    //  4 = Right Joycon: SR
-    //  5 = Right Joycon: SL
-    report.button3 |= (m_buttons[5].is_busy() ? 1 : 0) << 6;    //  R
-    report.button3 |= (m_buttons[7].is_busy() ? 1 : 0) << 7;    //  ZR
 
-    //  Shared
-    report.button4 |= (m_buttons[8].is_busy() ? 1 : 0) << 0;    //  Minus
-    report.button4 |= (m_buttons[9].is_busy() ? 1 : 0) << 1;    //  Plus
-    report.button4 |= (m_buttons[11].is_busy() ? 1 : 0) << 2;   //  R Click
-    report.button4 |= (m_buttons[10].is_busy() ? 1 : 0) << 3;   //  L Click
-    report.button4 |= (m_buttons[12].is_busy() ? 1 : 0) << 4;   //  Home
-    report.button4 |= (m_buttons[13].is_busy() ? 1 : 0) << 5;   //  Capture
-    //  6 = Unused
-    //  7 = Charging Grip
+    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+        if (!m_buttons[c].is_busy()){
+            continue;
+        }
+        Button button = (Button)((ButtonFlagType)1 << c);
+        switch (button){
+        //  Right
+        case BUTTON_Y:          report.button3 |= 1 << 0; break;
+        case BUTTON_X:          report.button3 |= 1 << 1; break;
+        case BUTTON_B:          report.button3 |= 1 << 2; break;
+        case BUTTON_A:          report.button3 |= 1 << 3; break;
+//        case BUTTON_RIGHT_SR:   report.button3 |= 1 << 4; break;
+//        case BUTTON_RIGHT_SL:   report.button3 |= 1 << 5; break;
+        case BUTTON_R:          report.button3 |= 1 << 6; break;
+        case BUTTON_ZR:         report.button3 |= 1 << 7; break;
 
-    //  Left
+        //  Shared
+        case BUTTON_MINUS:      report.button4 |= 1 << 0; break;
+        case BUTTON_PLUS:       report.button4 |= 1 << 1; break;
+        case BUTTON_RCLICK:     report.button4 |= 1 << 2; break;
+        case BUTTON_LCLICK:     report.button4 |= 1 << 3; break;
+        case BUTTON_HOME:       report.button4 |= 1 << 4; break;
+        case BUTTON_CAPTURE:    report.button4 |= 1 << 5; break;
+
+        //  Left
+        case BUTTON_DOWN:       report.button5 |= 1 << 0; break;
+        case BUTTON_UP:         report.button5 |= 1 << 1; break;
+        case BUTTON_RIGHT:      report.button5 |= 1 << 2; break;
+        case BUTTON_LEFT:       report.button5 |= 1 << 3; break;
+//        case BUTTON_LEFT_SR:    report.button5 |= 1 << 4; break;
+//        case BUTTON_LEFT_SL:    report.button5 |= 1 << 5; break;
+        case BUTTON_L:          report.button5 |= 1 << 6; break;
+        case BUTTON_ZL:         report.button5 |= 1 << 7; break;
+
+        default:;
+        }
+    }
+
     if (m_dpad.is_busy()){
         SplitDpad dpad = convert_unified_to_split_dpad(m_dpad.position);
         report.button5 |= (dpad.down  ? 1 : 0) << 0;
@@ -174,19 +197,15 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         report.button5 |= (dpad.right ? 1 : 0) << 2;
         report.button5 |= (dpad.left  ? 1 : 0) << 3;
     }
-    //  4 = Left Joycon: SR
-    //  5 = Left Joycon: SL
-    report.button5 |= (m_buttons[4].is_busy() ? 1 : 0) << 6;    //  L
-    report.button5 |= (m_buttons[6].is_busy() ? 1 : 0) << 7;    //  ZL
 
-    //  Left Joycon
+    //  Left Stick
     if (m_left_joystick.is_busy()){
         report.leftstick_x_lo = (m_left_joystick.x << 4) & 0xf0;
         report.leftstick_x_hi = (m_left_joystick.x & 0xf0) >> 4;
         report.leftstick_y = 255 - m_left_joystick.y;
     }
 
-    //  Right Joycon
+    //  Right Stick
     if (m_right_joystick.is_busy()){
         report.rightstick_x_lo = (m_right_joystick.x << 4) & 0xf0;
         report.rightstick_x_hi = (m_right_joystick.x & 0xf0) >> 4;

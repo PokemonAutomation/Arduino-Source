@@ -15,7 +15,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_Commands_Superscalar_H
 #define PokemonAutomation_NintendoSwitch_Commands_Superscalar_H
 
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 

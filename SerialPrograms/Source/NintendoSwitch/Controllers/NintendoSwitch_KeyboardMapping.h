@@ -24,10 +24,10 @@ struct ControllerDeltas;
 
 
 
-class KeyMapTableRow : public EditableTableRow{
+class ProControllerKeyMapTableRow : public EditableTableRow{
 public:
-    KeyMapTableRow(EditableTableOption& parent_table);
-    KeyMapTableRow(
+    ProControllerKeyMapTableRow(EditableTableOption& parent_table);
+    ProControllerKeyMapTableRow(
         EditableTableOption& parent_table,
         bool advanced_mode,
         std::string description,
@@ -38,8 +38,6 @@ public:
     ControllerDeltas snapshot() const;
 
     void set_advanced_mode(bool enabled);
-
-//    virtual void value_changed(void* object) override;
 
 private:
     std::atomic<bool> m_advanced_mode;
@@ -56,9 +54,9 @@ public:
     SimpleIntegerCell<int8_t> right_stick_y;
 };
 
-class KeyboardMappingTable : public EditableTableOption_t<KeyMapTableRow>{
+class ProControllerKeyboardMappingTable : public EditableTableOption_t<ProControllerKeyMapTableRow>{
 public:
-    KeyboardMappingTable();
+    ProControllerKeyboardMappingTable();
     virtual std::vector<std::string> make_header() const override;
 
     bool advanced_mode() const{ return m_advanced_mode.load(std::memory_order_relaxed); }
@@ -75,6 +73,42 @@ private:
     std::atomic<bool> m_advanced_mode;
 };
 
+#if 0
+
+class LeftJoyconKeyMapTableRow : public EditableTableRow{
+public:
+    LeftJoyconKeyMapTableRow(EditableTableOption& parent_table);
+    LeftJoyconKeyMapTableRow(
+        EditableTableOption& parent_table,
+        bool advanced_mode,
+        std::string description,
+        Qt::Key key,
+        const ControllerDeltas& deltas
+    );
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+    ControllerDeltas snapshot() const;
+
+    void set_advanced_mode(bool enabled);
+
+private:
+    std::atomic<bool> m_advanced_mode;
+
+public:
+    StringCell label;
+    KeyBindingCell key;
+    SimpleIntegerCell<uint16_t> buttons;
+    SimpleIntegerCell<int8_t> stick_x;
+    SimpleIntegerCell<int8_t> stick_y;
+};
+
+#endif
+
+
+
+
+
+
+
 
 class KeyboardMappingOption : public BatchOption, private ConfigOption::Listener{
 public:
@@ -88,7 +122,7 @@ private:
 public:
     StaticTextOption DESCRIPTION;
     BooleanCheckBoxOption ADVANCED_MODE;
-    KeyboardMappingTable TABLE;
+    ProControllerKeyboardMappingTable TABLE;
 };
 
 

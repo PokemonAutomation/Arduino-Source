@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"

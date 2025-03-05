@@ -37,7 +37,7 @@ public:
         std::vector<std::shared_ptr<EditableTableRow>> mapping =
             ConsoleSettings::instance().KEYBOARD_MAPPINGS.TABLE.current_refs();
         for (const auto& deltas : mapping){
-            const KeyMapTableRow& row = static_cast<const KeyMapTableRow&>(*deltas);
+            const ProControllerKeyMapTableRow& row = static_cast<const ProControllerKeyMapTableRow&>(*deltas);
             m_mapping[(Qt::Key)(uint32_t)row.key] += row.snapshot();
         }
         start();

@@ -407,6 +407,7 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.cpp \
@@ -1575,6 +1576,7 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h \

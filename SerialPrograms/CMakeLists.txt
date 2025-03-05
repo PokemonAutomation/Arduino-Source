@@ -827,6 +827,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp

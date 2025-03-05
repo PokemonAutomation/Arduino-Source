@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh_Settings.h"

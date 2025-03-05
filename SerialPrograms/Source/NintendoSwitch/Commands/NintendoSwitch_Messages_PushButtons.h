@@ -9,6 +9,7 @@
 
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "ClientSource/Connection/BotBaseMessage.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,8 +19,8 @@ class DeviceRequest_controller_state : public BotBaseRequest{
 public:
     pabb_controller_state params;
     DeviceRequest_controller_state(
-        Button button,
-        DpadPosition dpad,
+        uint16_t button,
+        uint8_t dpad,
         uint8_t left_joystick_x,
         uint8_t left_joystick_y,
         uint8_t right_joystick_x,

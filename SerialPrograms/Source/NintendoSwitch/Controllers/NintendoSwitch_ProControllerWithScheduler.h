@@ -20,8 +20,6 @@ namespace NintendoSwitch{
 
 
 
-
-
 struct SwitchButton_Dpad : public ExecutionResource{
     DpadPosition position;
 };
@@ -30,13 +28,13 @@ struct SwitchButton_Joystick : public ExecutionResource{
     uint8_t y;
 };
 struct ProControllerSchedulerState{
-    ExecutionResource m_buttons[14];
+    ExecutionResource m_buttons[TOTAL_BUTTONS];
     SwitchButton_Dpad m_dpad;
     SwitchButton_Joystick m_left_joystick;
     SwitchButton_Joystick m_right_joystick;
 
     bool is_active() const{
-        for (size_t c = 0; c < 14; c++){
+        for (size_t c = 0; c < TOTAL_BUTTONS; c++){
             if (m_buttons[c].is_busy()){
                 return true;
             }
@@ -51,6 +49,17 @@ struct ProControllerSchedulerState{
             return true;
         }
         return false;
+    }
+
+    std::vector<ExecutionResource*> make_resource_list(){
+        std::vector<ExecutionResource*> ret;
+        for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+            ret.emplace_back(m_buttons + c);
+        }
+        ret.emplace_back(&m_dpad);
+        ret.emplace_back(&m_left_joystick);
+        ret.emplace_back(&m_right_joystick);
+        return ret;
     }
 };
 
