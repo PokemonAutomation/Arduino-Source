@@ -91,11 +91,14 @@ TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
 }
 
 
-std::map<ControllerType, std::set<ControllerFeature>> TcpSysbotBase_Connection::supported_controllers() const{
+ControllerModeStatus TcpSysbotBase_Connection::controller_mode_status() const{
     return {
-        {ControllerType::NintendoSwitch_WiredProController, {
-            ControllerFeature::NintendoSwitch_ProController
-        }},
+        ControllerType::NintendoSwitch_WiredProController,
+        {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::NintendoSwitch_ProController
+            }},
+        }
     };
 }
 
@@ -173,7 +176,7 @@ void TcpSysbotBase_Connection::on_connect_finished(const std::string& error_mess
 
 //        set_status_line0(m_version);
 
-        declare_ready(supported_controllers());
+        declare_ready(controller_mode_status());
     }catch (...){}
 }
 void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){

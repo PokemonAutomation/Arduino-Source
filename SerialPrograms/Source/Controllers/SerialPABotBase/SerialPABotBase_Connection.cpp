@@ -137,13 +137,13 @@ BotBaseController* SerialPABotBase_Connection::botbase(){
 
 
 
-std::map<ControllerType, std::set<ControllerFeature>> SerialPABotBase_Connection::supported_controllers() const{
+ControllerModeStatus SerialPABotBase_Connection::controller_mode_status() const{
     std::lock_guard<std::mutex> lg(m_lock);
-    return m_controllers;
+    return m_mode_status;
 }
 
 
-std::map<ControllerType, std::set<ControllerFeature>> SerialPABotBase_Connection::read_device_specs(){
+ControllerModeStatus SerialPABotBase_Connection::read_device_specs(){
     Logger& logger = m_logger;
 
 
@@ -187,7 +187,17 @@ std::map<ControllerType, std::set<ControllerFeature>> SerialPABotBase_Connection
         );
     }
 
-    return program_iter->second;
+
+    //  Controller Type
+    ControllerType current_controller = ControllerType::None;
+    if (program_iter->second.size() == 1){
+        current_controller = program_iter->second.begin()->first;
+    }else if (program_iter->second.size() > 1){
+        uint32_t type_id = Microcontroller::controller_mode(*m_botbase);
+        current_controller = controller_type(type_id);
+    }
+
+    return {current_controller, program_iter->second};
 }
 
 
@@ -220,12 +230,12 @@ void SerialPABotBase_Connection::thread_body(){
 
     //  Check protocol and version.
     {
-        std::map<ControllerType, std::set<ControllerFeature>> controllers;
+        ControllerModeStatus mode_status;
         std::string error;
         try{
-            controllers = read_device_specs();
+            mode_status = read_device_specs();
             std::lock_guard<std::mutex> lg(m_lock);
-            m_controllers = controllers;
+            m_mode_status = mode_status;
 
             //  Stop pending commands.
             m_botbase->stop_all_commands();
@@ -240,7 +250,7 @@ void SerialPABotBase_Connection::thread_body(){
 //            std::string text = "Program: " + program_name(m_program_id) + " (" + std::to_string(m_protocol) + ")";
             std::string text = program_name(m_program_id) + " (" + std::to_string(m_protocol) + ")";
             set_status_line0(text, theme_friendly_darkblue());
-            declare_ready(controllers);
+            declare_ready(mode_status);
         }else{
             m_ready.store(false, std::memory_order_relaxed);
             set_status_line0(error, COLOR_RED);

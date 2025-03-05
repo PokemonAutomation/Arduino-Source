@@ -40,12 +40,12 @@ ProController_SysbotBase::ProController_SysbotBase(
 
     //  Check compatibility.
 
-    const std::map<ControllerType, std::set<ControllerFeature>>& controllers = connection.supported_controllers();
-    auto iter = controllers.find(ControllerType::NintendoSwitch_WiredProController);
+    ControllerModeStatus mode_status = connection.controller_mode_status();
+    auto iter = mode_status.supported_controllers.find(ControllerType::NintendoSwitch_WiredProController);
 
     std::string missing_feature;
     do{
-        if (iter == controllers.end()){
+        if (iter == mode_status.supported_controllers.end()){
             missing_feature = "NintendoSwitch_WiredProController";
             break;
         }

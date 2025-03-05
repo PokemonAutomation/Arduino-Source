@@ -263,6 +263,15 @@ typedef struct{
 } PABB_PACK pabb_MsgAckRequestI32;
 
 ////////////////////////////////////////////////////////////////////////////////
+//  Custom Info
+
+#define PABB_MSG_INFO_I32                       0x20
+typedef struct{
+    uint8_t tag;
+    uint32_t data;
+} PABB_PACK pabb_MsgInfoI32;
+
+////////////////////////////////////////////////////////////////////////////////
 //  Requests
 #define PABB_MSG_SEQNUM_RESET                   0x40
 //  After you send this message, the next seqnum you should use is (seqnum + 1).
@@ -313,14 +322,10 @@ typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_MsgRequestQueueSize;
 
-////////////////////////////////////////////////////////////////////////////////
-//  Custom Info
-
-#define PABB_MSG_INFO_I32                       0x20
+#define PABB_MSG_REQUEST_CONTROLLER_MODE        0x49
 typedef struct{
-    uint8_t tag;
-    uint32_t data;
-} PABB_PACK pabb_MsgInfoI32;
+    seqnum_t seqnum;
+} PABB_PACK pabb_MsgRequestControllerMode;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Commands

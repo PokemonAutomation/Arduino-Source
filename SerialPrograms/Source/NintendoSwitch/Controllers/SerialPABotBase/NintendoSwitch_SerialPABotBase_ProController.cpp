@@ -41,7 +41,13 @@ SerialPABotBase_ProController::SerialPABotBase_ProController(
 
     //  Check compatibility.
 
-    const std::map<ControllerType, std::set<ControllerFeature>>& controllers = connection.supported_controllers();
+    ControllerModeStatus mode_status = connection.controller_mode_status();
+    logger.log(
+        "SerialPABotBase_ProController(): ControllerType = " +
+        CONTROLLER_TYPE_STRINGS.get_string(mode_status.current_controller)
+    );
+
+    const std::map<ControllerType, std::set<ControllerFeature>>& controllers = mode_status.supported_controllers;
     auto iter = controllers.find(controller_type);
 
     std::string missing_feature;

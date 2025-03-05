@@ -24,6 +24,7 @@ extern const ControllerRequirements OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS;
 
 
 std::string program_name(uint8_t id);
+ControllerType controller_type(uint32_t id);
 
 
 

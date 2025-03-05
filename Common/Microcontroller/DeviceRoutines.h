@@ -18,6 +18,7 @@ uint32_t protocol_version(BotBaseController& botbase);
 uint32_t program_version(BotBaseController& botbase);
 uint8_t device_queue_size(BotBaseController& botbase);
 uint8_t program_id(BotBaseController& botbase);
+uint32_t controller_mode(BotBaseController& botbase);
 
 
 class DeviceRequest_seqnum_reset : public BotBaseRequest{
@@ -88,6 +89,16 @@ public:
     {}
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_REQUEST_PROGRAM_ID, params);
+    }
+};
+class DeviceRequest_controller_mode : public BotBaseRequest{
+public:
+    pabb_MsgRequestControllerMode params;
+    DeviceRequest_controller_mode()
+        : BotBaseRequest(false)
+    {}
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_CONTROLLER_MODE, params);
     }
 };
 

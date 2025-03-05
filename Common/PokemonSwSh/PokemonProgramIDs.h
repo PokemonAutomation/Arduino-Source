@@ -13,6 +13,11 @@
 #define PABB_PID_PABOTBASE_31KB                             0x09
 #define PABB_PID_PABOTBASE_ESP32                            0x10
 
+#define PABB_CID_NONE                                       0
+#define PABB_CID_NINTENDO_SWITCH_WIRED_PRO_CONTROLLER       1
+#define PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER    2
+#define PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON                3
+#define PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON               4
 
 
 #endif

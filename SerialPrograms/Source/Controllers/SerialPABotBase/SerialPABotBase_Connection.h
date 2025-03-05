@@ -37,11 +37,12 @@ public:
     BotBaseController* botbase();
 
 public:
-    virtual std::map<ControllerType, std::set<ControllerFeature>> supported_controllers() const override;
+
+    virtual ControllerModeStatus controller_mode_status() const override;
 
 
 private:
-    std::map<ControllerType, std::set<ControllerFeature>> read_device_specs();
+    ControllerModeStatus read_device_specs();
 
     void thread_body();
 
@@ -51,7 +52,7 @@ private:
 
     uint32_t m_protocol = 0;
     uint8_t m_program_id = 0;
-    std::map<ControllerType, std::set<ControllerFeature>> m_controllers;
+    ControllerModeStatus m_mode_status;
 
     std::thread m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;

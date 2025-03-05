@@ -29,7 +29,7 @@ public:
     );
     ~TcpSysbotBase_Connection();
 
-    virtual std::map<ControllerType, std::set<ControllerFeature>> supported_controllers() const override;
+    virtual ControllerModeStatus controller_mode_status() const override;
 
     void write_data(const std::string& data);
 

@@ -62,7 +62,8 @@ ControllerSession::ControllerSession(
         //  If we already missed it, run it ourselves.
         if (m_connection->is_ready()){
             ControllerSession::post_connection_ready(
-                *m_connection, m_connection->supported_controllers()
+                *m_connection,
+                m_connection->controller_mode_status()
             );
         }
     }catch (...){
@@ -180,7 +181,8 @@ void ControllerSession::make_controller(){
     //  If we already missed it, run it ourselves.
     if (ready){
         ControllerSession::post_connection_ready(
-            *m_connection, m_connection->supported_controllers()
+            *m_connection,
+            m_connection->controller_mode_status()
         );
     }
 }
@@ -305,18 +307,21 @@ std::string ControllerSession::reset(){
 //}
 void ControllerSession::post_connection_ready(
     ControllerConnection& connection,
-    const std::map<ControllerType, std::set<ControllerFeature>>& controllers
+    const ControllerModeStatus& mode_status
 ){
-    if (controllers.empty()){
+    const std::map<ControllerType, std::set<ControllerFeature>>& supported_controllers = mode_status.supported_controllers;
+    if (supported_controllers.empty()){
         return;
     }
+
+    ControllerType current_controller = mode_status.current_controller;
 
 //    cout << "sleeping" << endl;
 //    Sleep(10000);
 
 
     std::vector<ControllerType> available_controllers;
-    ControllerType selected_controller = ControllerType::None;
+//    ControllerType selected_controller = ControllerType::None;
     bool ready;
     {
         std::lock_guard<std::mutex> lg(m_state_lock);
@@ -333,10 +338,10 @@ void ControllerSession::post_connection_ready(
 
         //  We only show the "none" option when there are multiple controllers
         //  to choose from.
-        if (controllers.size() > 1){
+        if (supported_controllers.size() > 1){
             available_controllers.emplace_back(ControllerType::None);
         }
-        for (const auto& item : controllers){
+        for (const auto& item : supported_controllers){
             available_controllers.emplace_back(item.first);
         }
 
@@ -345,30 +350,30 @@ void ControllerSession::post_connection_ready(
         m_available_controllers = available_controllers;
 
 
-        auto iter = controllers.begin();
-        if (controllers.size() == 1){
+        auto iter = supported_controllers.begin();
+        if (supported_controllers.size() == 1){
             //  Only one controller available. Force the option to it.
-            selected_controller = iter->first;
+            current_controller = iter->first;
         }else{
             //  Keep the current controller only if it exists.
-            iter = controllers.find(m_option.m_controller_type);
-            if (iter != controllers.end()){
-                selected_controller = m_option.m_controller_type;
+            iter = supported_controllers.find(m_option.m_controller_type);
+            if (iter != supported_controllers.end()){
+                current_controller = m_option.m_controller_type;
             }
         }
 
         //  Construct the controller.
-        if (selected_controller != ControllerType::None){
+        if (current_controller != ControllerType::None){
             m_controller = m_descriptor->make_controller(
                 m_logger,
                 *m_connection,
-                selected_controller,
+                current_controller,
                 m_requirements
             );
         }
 
         //  Commit all changes.
-        m_option.m_controller_type = selected_controller;
+        m_option.m_controller_type = current_controller;
         ready = m_controller && m_controller->is_ready();
 
         WriteSpinLock lg1(m_message_lock);
@@ -377,7 +382,7 @@ void ControllerSession::post_connection_ready(
         }
     }
 
-    signal_controller_changed(selected_controller, available_controllers);
+    signal_controller_changed(current_controller, available_controllers);
     signal_ready_changed(ready);
     signal_status_text_changed(status_text());
 }

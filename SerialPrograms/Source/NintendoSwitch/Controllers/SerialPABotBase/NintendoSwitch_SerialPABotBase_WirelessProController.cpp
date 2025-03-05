@@ -138,10 +138,10 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         .button5 = 0,
         .leftstick_x_lo = 0x00,
         .leftstick_x_hi = 0x08,
-        .leftstick_y = 128,
+        .leftstick_y = 0x80,
         .rightstick_x_lo = 0x00,
         .rightstick_x_hi = 0x08,
-        .rightstick_y = 128,
+        .rightstick_y = 0x80,
         .vibrator = 0x80,
         .gyro = {},
     };

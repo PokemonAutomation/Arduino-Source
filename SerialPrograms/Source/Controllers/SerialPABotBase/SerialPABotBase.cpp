@@ -31,6 +31,22 @@ std::string program_name(uint8_t id){
     default: return "Unknown ID";
     }
 }
+ControllerType controller_type(uint32_t id){
+    switch (id){
+    case PABB_CID_NONE:
+        return ControllerType::None;
+    case PABB_CID_NINTENDO_SWITCH_WIRED_PRO_CONTROLLER:
+        return ControllerType::NintendoSwitch_WiredProController;
+    case PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER:
+        return ControllerType::NintendoSwitch_WirelessProController;
+    case PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON:
+        return ControllerType::NintendoSwitch_LeftJoycon;
+    case PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON:
+        return ControllerType::NintendoSwitch_RightJoycon;
+    default:
+        return ControllerType::None;
+    }
+}
 
 
 

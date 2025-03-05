@@ -123,7 +123,7 @@ private:
 //    virtual void pre_connection_not_ready(ControllerConnection& connection) override;
     virtual void post_connection_ready(
         ControllerConnection& connection,
-        const std::map<ControllerType, std::set<ControllerFeature>>& controllers
+        const ControllerModeStatus& mode_status
     ) override;
     virtual void status_text_changed(
         ControllerConnection& connection,

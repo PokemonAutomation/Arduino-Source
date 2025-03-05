@@ -15,13 +15,21 @@
 namespace PokemonAutomation{
 
 
+
+struct ControllerModeStatus{
+    ControllerType current_controller = ControllerType::None;
+    std::map<ControllerType, std::set<ControllerFeature>> supported_controllers;
+};
+
+
+
 class ControllerConnection{
 public:
     struct StatusListener{
 //        virtual void pre_connection_not_ready(ControllerConnection& connection){}
         virtual void post_connection_ready(
             ControllerConnection& connection,
-            const std::map<ControllerType, std::set<ControllerFeature>>& controllers
+            const ControllerModeStatus& mode_status
         ){}
         virtual void status_text_changed(
             ControllerConnection& connection, const std::string& text
@@ -41,7 +49,10 @@ public:
     bool is_ready() const{ return m_ready.load(std::memory_order_acquire); }
     std::string status_text() const;
 
-    virtual std::map<ControllerType, std::set<ControllerFeature>> supported_controllers() const = 0;
+    //  Returns the current controller type and the list of supported controllers.
+    //  The current controller may be "None" if there is only one supported
+    //  controller since it is implied to be that.
+    virtual ControllerModeStatus controller_mode_status() const = 0;
 
 
 public:
@@ -50,12 +61,12 @@ public:
 
 
 protected:
-    void declare_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);
+    void declare_ready(const ControllerModeStatus& mode_status);
 
 
 private:
 //    void signal_pre_not_ready();
-    void signal_post_ready(const std::map<ControllerType, std::set<ControllerFeature>>& controllers);
+    void signal_post_ready(const ControllerModeStatus& mode_status);
     void signal_status_text_changed(const std::string& text);
     void signal_error(const std::string& text);
 
