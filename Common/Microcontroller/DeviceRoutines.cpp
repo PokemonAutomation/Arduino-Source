@@ -39,10 +39,17 @@ uint8_t program_id(BotBaseController& botbase){
     ).convert<PABB_MSG_ACK_REQUEST_I8>(botbase.logger(), response);
     return response.data;
 }
-uint32_t controller_mode(BotBaseController& botbase){
+uint32_t read_controller_mode(BotBaseController& botbase){
     pabb_MsgAckRequestI32 response;
     botbase.issue_request_and_wait(
-        DeviceRequest_controller_mode()
+        DeviceRequest_read_controller_mode()
+    ).convert<PABB_MSG_ACK_REQUEST_I32>(botbase.logger(), response);
+    return response.data;
+}
+uint32_t change_controller_mode(BotBaseController& botbase, uint32_t mode){
+    pabb_MsgAckRequestI32 response;
+    botbase.issue_request_and_wait(
+        DeviceRequest_change_controller_mode(mode)
     ).convert<PABB_MSG_ACK_REQUEST_I32>(botbase.logger(), response);
     return response.data;
 }

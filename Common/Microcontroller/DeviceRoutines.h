@@ -18,7 +18,8 @@ uint32_t protocol_version(BotBaseController& botbase);
 uint32_t program_version(BotBaseController& botbase);
 uint8_t device_queue_size(BotBaseController& botbase);
 uint8_t program_id(BotBaseController& botbase);
-uint32_t controller_mode(BotBaseController& botbase);
+uint32_t read_controller_mode(BotBaseController& botbase);
+uint32_t change_controller_mode(BotBaseController& botbase, uint32_t mode);
 
 
 class DeviceRequest_seqnum_reset : public BotBaseRequest{
@@ -91,14 +92,26 @@ public:
         return BotBaseMessage(PABB_MSG_REQUEST_PROGRAM_ID, params);
     }
 };
-class DeviceRequest_controller_mode : public BotBaseRequest{
+class DeviceRequest_read_controller_mode : public BotBaseRequest{
 public:
-    pabb_MsgRequestControllerMode params;
-    DeviceRequest_controller_mode()
+    pabb_MsgRequestReadControllerMode params;
+    DeviceRequest_read_controller_mode()
         : BotBaseRequest(false)
     {}
     virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_REQUEST_CONTROLLER_MODE, params);
+        return BotBaseMessage(PABB_MSG_REQUEST_READ_CONTROLLER_MODE, params);
+    }
+};
+class DeviceRequest_change_controller_mode : public BotBaseRequest{
+public:
+    pabb_MsgRequestChangeControllerMode params;
+    DeviceRequest_change_controller_mode(uint32_t mode)
+        : BotBaseRequest(false)
+    {
+        params.mode = mode;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE, params);
     }
 };
 

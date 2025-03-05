@@ -322,10 +322,16 @@ typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_MsgRequestQueueSize;
 
-#define PABB_MSG_REQUEST_CONTROLLER_MODE        0x49
+#define PABB_MSG_REQUEST_READ_CONTROLLER_MODE   0x49
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestControllerMode;
+} PABB_PACK pabb_MsgRequestReadControllerMode;
+
+#define PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE 0x4a
+typedef struct{
+    seqnum_t seqnum;
+    uint32_t mode;
+} PABB_PACK pabb_MsgRequestChangeControllerMode;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Commands

@@ -15,6 +15,7 @@
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Controllers/ControllerTypeStrings.h"
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Connection.h"
 
@@ -189,13 +190,15 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(){
 
 
     //  Controller Type
+    logger.log("Reading Controller Mode...");
     ControllerType current_controller = ControllerType::None;
     if (program_iter->second.size() == 1){
         current_controller = program_iter->second.begin()->first;
     }else if (program_iter->second.size() > 1){
-        uint32_t type_id = Microcontroller::controller_mode(*m_botbase);
+        uint32_t type_id = Microcontroller::read_controller_mode(*m_botbase);
         current_controller = controller_type(type_id);
     }
+    logger.log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
 
     return {current_controller, program_iter->second};
 }
