@@ -42,7 +42,7 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
     ESP32Report0x30 report{
         .report_id = 0x30,
         .timer = 0,     //  Populate on controller.
-        .byte2 = 0x91,  //  Full + charging : Pro controller + USB powered
+        .byte2 = 0x99,  //  Full + charging : Pro controller + USB powered
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -52,7 +52,7 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         .rightstick_x_lo = 0x00,
         .rightstick_x_hi = 0x08,
         .rightstick_y = 0x80,
-        .vibrator = 0x80,
+        .vibrator = 0x00,
         .gyro = {},
     };
 

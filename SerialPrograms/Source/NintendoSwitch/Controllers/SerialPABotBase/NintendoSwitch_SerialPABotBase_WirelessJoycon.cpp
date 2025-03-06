@@ -136,7 +136,7 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
     ESP32Report0x30 report{
         .report_id = 0x30,
         .timer = 0,     //  Populate on controller.
-        .byte2 = 0x96,  //  Full + charging : Pro controller + USB powered
+        .byte2 = 0x8d,  //  Full + battery : Joycon
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -146,7 +146,7 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
         .rightstick_x_lo = 0x00,
         .rightstick_x_hi = 0x08,
         .rightstick_y = 0x80,
-        .vibrator = 0x80,
+        .vibrator = 0x00,
         .gyro = {},
     };
 
@@ -206,7 +206,7 @@ void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* 
     ESP32Report0x30 report{
         .report_id = 0x30,
         .timer = 0,     //  Populate on controller.
-        .byte2 = 0x96,  //  Full + charging : Pro controller + USB powered
+        .byte2 = 0x8d,  //  Full + battery : Joycon
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -216,7 +216,7 @@ void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* 
         .rightstick_x_lo = 0x00,
         .rightstick_x_hi = 0x08,
         .rightstick_y = 0x80,
-        .vibrator = 0x80,
+        .vibrator = 0x00,
         .gyro = {},
     };
 
