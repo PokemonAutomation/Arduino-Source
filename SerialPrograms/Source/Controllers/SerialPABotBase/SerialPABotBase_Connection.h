@@ -26,7 +26,8 @@ class SerialPABotBase_Connection : public ControllerConnection{
 public:
     SerialPABotBase_Connection(
         Logger& logger,
-        const QSerialPortInfo* port
+        const QSerialPortInfo* port,
+        std::optional<ControllerType> change_controller
     );
     ~SerialPABotBase_Connection();
 
@@ -42,9 +43,13 @@ public:
 
 
 private:
-    ControllerModeStatus read_device_specs();
+    ControllerModeStatus read_device_specs(
+        std::optional<ControllerType> change_controller
+    );
 
-    void thread_body();
+    void thread_body(
+        std::optional<ControllerType> change_controller
+    );
 
 
 private:

@@ -25,7 +25,7 @@ using namespace std::chrono_literals;
 SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
-        ControllerType controller_type,
+    ControllerType controller_type,
     const ControllerRequirements& requirements
 )
     : SerialPABotBase_Controller(

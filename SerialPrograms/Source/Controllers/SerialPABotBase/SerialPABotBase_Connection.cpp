@@ -10,6 +10,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
+#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Connection/PABotBase.h"
@@ -32,7 +33,8 @@ namespace SerialPABotBase{
 
 SerialPABotBase_Connection::SerialPABotBase_Connection(
     Logger& logger,
-    const QSerialPortInfo* port
+    const QSerialPortInfo* port,
+    std::optional<ControllerType> change_controller
 )
     : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
 {
@@ -78,7 +80,11 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
         return;
     }
 
-    m_status_thread = std::thread(run_with_catch, "SerialPABotBase_Connection::thread_body()", [this]{ thread_body(); });
+    m_status_thread = std::thread(
+        run_with_catch,
+        "SerialPABotBase_Connection::thread_body()",
+        [=, this]{ thread_body(change_controller); }
+    );
 }
 SerialPABotBase_Connection::~SerialPABotBase_Connection(){
     m_ready.store(false, std::memory_order_release);
@@ -144,7 +150,9 @@ ControllerModeStatus SerialPABotBase_Connection::controller_mode_status() const{
 }
 
 
-ControllerModeStatus SerialPABotBase_Connection::read_device_specs(){
+ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
+    std::optional<ControllerType> change_controller
+){
     Logger& logger = m_logger;
 
 
@@ -196,16 +204,34 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(){
         current_controller = program_iter->second.begin()->first;
     }else if (program_iter->second.size() > 1){
         uint32_t type_id = Microcontroller::read_controller_mode(*m_botbase);
-        current_controller = controller_type(type_id);
+        current_controller = id_to_controller_type(type_id);
     }
     logger.log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
+
+
+    if (change_controller && program_iter->second.size() > 1){
+        ControllerType desired_controller = change_controller.value();
+        uint32_t native_controller_id = controller_type_to_id(desired_controller);
+        m_botbase->issue_request_and_wait(
+            Microcontroller::DeviceRequest_change_controller_mode(native_controller_id),
+            nullptr
+        );
+
+        //  Re-read the controller.
+        logger.log("Reading Controller Mode...");
+        uint32_t type_id = Microcontroller::read_controller_mode(*m_botbase);
+        current_controller = id_to_controller_type(type_id);
+        logger.log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
+    }
 
     return {current_controller, program_iter->second};
 }
 
 
 
-void SerialPABotBase_Connection::thread_body(){
+void SerialPABotBase_Connection::thread_body(
+    std::optional<ControllerType> change_controller
+){
     using namespace PokemonAutomation;
 
     m_botbase->set_sniffer(&m_logger);
@@ -236,7 +262,7 @@ void SerialPABotBase_Connection::thread_body(){
         ControllerModeStatus mode_status;
         std::string error;
         try{
-            mode_status = read_device_specs();
+            mode_status = read_device_specs(change_controller);
             std::lock_guard<std::mutex> lg(m_lock);
             m_mode_status = mode_status;
 

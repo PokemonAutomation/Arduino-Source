@@ -48,10 +48,10 @@ ControllerSession::ControllerSession(
     : m_logger(logger)
     , m_requirements(requirements)
     , m_option(option)
+    , m_controller_type(ControllerType::None)
     , m_options_locked(false)
-    , m_connection_is_shutting_down(false)
     , m_descriptor(option.descriptor())
-    , m_connection(m_descriptor->open_connection(logger))
+    , m_connection(m_descriptor->open_connection(logger, {}))
 {
     if (!m_connection){
         return;
@@ -102,7 +102,7 @@ std::shared_ptr<const ControllerDescriptor> ControllerSession::descriptor() cons
 }
 ControllerType ControllerSession::controller_type() const{
     std::lock_guard<std::mutex> lg(m_state_lock);
-    return m_option.m_controller_type;
+    return m_controller_type;
 }
 std::string ControllerSession::status_text() const{
     std::lock_guard<std::mutex> lg(m_state_lock);
@@ -166,13 +166,13 @@ void ControllerSession::set_options_locked(bool locked){
 }
 
 
-void ControllerSession::make_controller(){
+void ControllerSession::make_controller(std::optional<ControllerType> change_controller){
     //  Must be called under "m_reset_lock".
 
     bool ready = false;
     {
         std::lock_guard<std::mutex> lg(m_state_lock);
-        m_connection = m_descriptor->open_connection(m_logger);
+        m_connection = m_descriptor->open_connection(m_logger, change_controller);
         if (m_connection){
             m_connection->add_status_listener(*this);
             ready = m_connection->is_ready();
@@ -222,7 +222,7 @@ bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescrip
         controller.reset();
         connection.reset();
 
-        make_controller();
+        make_controller({});
     }
     signal_descriptor_changed(device);
     signal_status_text_changed(status_text());
@@ -242,7 +242,7 @@ bool ControllerSession::set_controller(ControllerType controller_type){
             if (m_options_locked){
                 return false;
             }
-            if (m_option.m_controller_type == controller_type){
+            if (m_controller_type == controller_type){
                 return true;
             }
 
@@ -250,7 +250,7 @@ bool ControllerSession::set_controller(ControllerType controller_type){
             controller = std::move(m_controller);
             connection = std::move(m_connection);
 
-            m_option.m_controller_type = controller_type;
+            m_controller_type = controller_type;
         }
 
         //  With the lock released, it is now safe to destroy them.
@@ -259,7 +259,7 @@ bool ControllerSession::set_controller(ControllerType controller_type){
         controller.reset();
         connection.reset();
 
-        make_controller();
+        make_controller(controller_type);
         device = m_descriptor;
     }
     signal_descriptor_changed(device);
@@ -296,7 +296,7 @@ std::string ControllerSession::reset(){
         controller.reset();
         connection.reset();
 
-        make_controller();
+        make_controller(m_controller_type);
     }
     signal_status_text_changed(status_text());
     return "";
@@ -377,7 +377,7 @@ void ControllerSession::post_connection_ready(
 
         //  Commit all changes.
 //        cout << "current_controller = " << CONTROLLER_TYPE_STRINGS.get_string(current_controller) << endl;
-        m_option.m_controller_type = current_controller;
+        m_controller_type = current_controller;
         ready = m_controller && m_controller->is_ready();
 
         WriteSpinLock lg1(m_message_lock);

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Controllers_ControllerDescriptor_H
 #define PokemonAutomation_Controllers_ControllerDescriptor_H
 
+#include <optional>
 #include <string>
 #include <memory>
 #include <map>
@@ -99,7 +100,10 @@ public:
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
 
-    virtual std::unique_ptr<ControllerConnection> open_connection(Logger& logger) const = 0;
+    virtual std::unique_ptr<ControllerConnection> open_connection(
+        Logger& logger,
+        std::optional<ControllerType> change_controller
+    ) const = 0;
     virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
         ControllerConnection& connection,
@@ -140,9 +144,6 @@ public:
     JsonValue to_json() const;
 
 
-public:
-//    friend class ControllerSession;
-    ControllerType m_controller_type;
 private:
     std::shared_ptr<const ControllerDescriptor> m_descriptor;
 

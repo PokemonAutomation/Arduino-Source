@@ -118,7 +118,7 @@ public:
 
 
 private:
-    void make_controller();
+    void make_controller(std::optional<ControllerType> change_controller);
 
 //    virtual void pre_connection_not_ready(ControllerConnection& connection) override;
     virtual void post_connection_ready(
@@ -150,12 +150,12 @@ private:
     Logger& m_logger;
     const ControllerRequirements& m_requirements;
     ControllerOption& m_option;
+    ControllerType m_controller_type;
 
     std::mutex m_reset_lock;
     mutable std::mutex m_state_lock;
 
     bool m_options_locked;
-    std::atomic<bool> m_connection_is_shutting_down;
     std::string m_user_input_disallow_reason;
 
     SpinLock m_message_lock;

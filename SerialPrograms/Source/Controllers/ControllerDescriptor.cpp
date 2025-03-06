@@ -41,8 +41,7 @@ void InterfaceType::register_factory(
 
 
 ControllerOption::ControllerOption()
-    : m_controller_type(ControllerType::None)
-    , m_descriptor(new NullControllerDescriptor())
+    : m_descriptor(new NullControllerDescriptor())
 {}
 
 
@@ -63,7 +62,6 @@ std::shared_ptr<const ControllerDescriptor> ControllerOption::get_descriptor_fro
 
 void ControllerOption::load_json(const JsonValue& json){
     std::shared_ptr<const ControllerDescriptor> descriptor;
-    ControllerType controller_type = ControllerType::None;
     do{
         if (json.is_null()){
             break;
@@ -76,10 +74,6 @@ void ControllerOption::load_json(const JsonValue& json){
         const std::string* type = obj->get_string("Interface");
         if (type == nullptr){
             break;
-        }
-        const std::string* controller = obj->get_string("Controller");
-        if (controller != nullptr){
-            controller_type = CONTROLLER_TYPE_STRINGS.get_enum(*controller, ControllerType::None);
         }
 
         for (const auto& item : ALL_CONTROLLER_INTERFACES){
@@ -104,7 +98,6 @@ void ControllerOption::load_json(const JsonValue& json){
     }
 
     m_descriptor = std::move(descriptor);
-    m_controller_type = controller_type;
 }
 JsonValue ControllerOption::to_json() const{
     if (!m_descriptor){
@@ -112,7 +105,6 @@ JsonValue ControllerOption::to_json() const{
     }
     JsonObject obj;
     obj["Interface"] = CONTROLLER_INTERFACE_STRINGS.get_string(m_descriptor->interface_type);
-    obj["Controller"] = CONTROLLER_TYPE_STRINGS.get_string(m_controller_type);
 
     for (const auto& item : m_descriptor_cache){
         obj[CONTROLLER_INTERFACE_STRINGS.get_string(item.first)] = item.second->to_json();
