@@ -1,82 +1,65 @@
-/*  Nintendo Switch Pro Controller
+/*  Nintendo Switch Joycon
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  This is the raw (full) controller API that is exposed to programs.
- *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_Controller_H
-#define PokemonAutomation_NintendoSwitch_Controller_H
+#ifndef PokemonAutomation_NintendoSwitch_Joycon_H
+#define PokemonAutomation_NintendoSwitch_Joycon_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
-#include "ClientSource/Connection/BotBaseMessage.h"
 #include "NintendoSwitch_ControllerState.h"
 #include "Controllers/Controller.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class ProController;
-using ProControllerContext = ControllerContext<ProController>;
+class JoyconController;
+using JoyconContext = ControllerContext<JoyconController>;
 
 
-constexpr Button VALID_PRO_CONTROLLER_BUTTONS =
-    BUTTON_Y |
-    BUTTON_B |
-    BUTTON_A |
-    BUTTON_X |
-    BUTTON_L |
-    BUTTON_R |
-    BUTTON_ZL |
-    BUTTON_ZR |
-    BUTTON_MINUS |
-    BUTTON_PLUS |
-    BUTTON_LCLICK |
-    BUTTON_RCLICK |
-    BUTTON_HOME |
-    BUTTON_CAPTURE |
+
+constexpr Button VALID_LEFT_JOYCON_BUTTONS =
+    BUTTON_DOWN |
     BUTTON_UP |
     BUTTON_RIGHT |
-    BUTTON_DOWN |
-    BUTTON_LEFT;
+    BUTTON_LEFT |
+    BUTTON_LEFT_SR |
+    BUTTON_LEFT_SL |
+    BUTTON_L |
+    BUTTON_ZL |
+    BUTTON_MINUS |
+    BUTTON_LCLICK |
+    BUTTON_CAPTURE;
+
+constexpr Button VALID_RIGHT_JOYCON_BUTTONS =
+    BUTTON_Y |
+    BUTTON_X |
+    BUTTON_B |
+    BUTTON_A |
+    BUTTON_RIGHT_SR |
+    BUTTON_RIGHT_SL |
+    BUTTON_R |
+    BUTTON_ZR |
+    BUTTON_PLUS |
+    BUTTON_RCLICK |
+    BUTTON_HOME;
 
 
 
-//
-//  This is the generic interface a Switch pro controller.
-//
-class ProController : public AbstractController{
+class JoyconController : public AbstractController{
 public:
-    using ContextType = ProControllerContext;
+    using ContextType = JoyconContext;
 
-    ProController();
-    virtual ~ProController();
+    JoyconController(ControllerType controller_type);
+    virtual ~JoyconController();
 
     //  Must call before destruction begins.
     void stop() noexcept;
 
 
 public:
-    //  Temporary for refactor: Send custom requests for PABotBase's advanced
-    //  RPCs.
-    virtual void send_botbase_request(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    ) = 0;
-    virtual BotBaseMessage send_botbase_request_and_wait(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    ) = 0;
-
-
-public:
-
     //  Press all the buttons set in the bitfield simultaneously.
     //  This command will wait until all the selected buttons are ready to
     //  ensure that they are all dispatched simultaneously.
@@ -86,20 +69,7 @@ public:
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) = 0;
 
-    //  Dpad
-    virtual void issue_dpad(
-        const Cancellable* cancellable,
-        DpadPosition position,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-    ) = 0;
-
-    //  Joysticks
-    virtual void issue_left_joystick(
-        const Cancellable* cancellable,
-        uint8_t x, uint8_t y,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-    ) = 0;
-    virtual void issue_right_joystick(
+    virtual void issue_joystick(
         const Cancellable* cancellable,
         uint8_t x, uint8_t y,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -127,9 +97,7 @@ public:
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
         Button button,
-        DpadPosition position,
-        uint8_t left_x, uint8_t left_y,
-        uint8_t right_x, uint8_t right_y,
+        uint8_t joystick_x, uint8_t joystick_y,
         Milliseconds hold
     ) = 0;
 
@@ -153,38 +121,6 @@ public:
         Button button, Milliseconds duration
     ) = 0;
 
-    //  Alternate pressing "button0" and "button1" as quickly as possible.
-    //  "button0" will always be pressed first.
-    //  Both buttons will be pressed at least once.
-    virtual void issue_mash_button(
-        const Cancellable* cancellable,
-        Button button0, Button button1, Milliseconds dutation
-    ) = 0;
-
-    //  In situations where A, ZL, and RL all do the same thing, use all 3 of
-    //  them to logically mash A much faster than is possible with just one
-    //  button.
-    virtual void issue_mash_AZs(
-        const Cancellable* cancellable,
-        Milliseconds duration
-    ) = 0;
-
-    //
-    //  Send a scroll command in the specified direction.
-    //
-    //  This will use either the dpad or either joystick - whichever is
-    //  available first in the pipeline.
-    //
-    //  The intended use-case of this for fast scrolling in the system menu
-    //  where all 3 buttons have the same effect and can be used at the same
-    //  time.
-    //
-    virtual void issue_system_scroll(
-        const Cancellable* cancellable,
-        DpadPosition direction, //  Diagonals not allowed.
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-    ) = 0;
-
 
 public:
     //  Keyboard Input
@@ -198,8 +134,6 @@ private:
     class KeyboardManager;
     Pimpl<KeyboardManager> m_keyboard_manager;
 };
-
-
 
 
 

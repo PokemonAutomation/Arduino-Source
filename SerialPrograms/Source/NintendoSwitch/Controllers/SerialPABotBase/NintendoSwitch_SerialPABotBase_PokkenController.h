@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_PokkenController_H
 
 #include "Controllers/ControllerCapability.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
 namespace PokemonAutomation{
@@ -94,6 +95,7 @@ public:
         Button button,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
     ) override{
+        button &= VALID_PRO_CONTROLLER_BUTTONS;
         ControllerWithScheduler::issue_buttons(cancellable, button, delay, hold, cooldown);
     }
     virtual void issue_dpad(
@@ -143,12 +145,15 @@ public:
         const Cancellable* cancellable,
         Button button, Milliseconds duration
     ) override{
+        button &= VALID_PRO_CONTROLLER_BUTTONS;
         ControllerWithScheduler::issue_mash_button(cancellable, button, duration);
     }
     virtual void issue_mash_button(
         const Cancellable* cancellable,
         Button button0, Button button1, Milliseconds duration
     ) override{
+        button0 &= VALID_PRO_CONTROLLER_BUTTONS;
+        button1 &= VALID_PRO_CONTROLLER_BUTTONS;
         ControllerWithScheduler::issue_mash_button(cancellable, button0, button1, duration);
     }
     virtual void issue_mash_AZs(

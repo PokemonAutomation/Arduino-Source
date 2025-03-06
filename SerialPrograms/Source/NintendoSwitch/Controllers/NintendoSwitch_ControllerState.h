@@ -47,11 +47,17 @@ enum Button : ButtonFlagType{
     BUTTON_RIGHT_SL =   ((uint32_t)1 << 20),
     BUTTON_RIGHT_SR =   ((uint32_t)1 << 21),
 };
-inline Button operator|(Button x, Button y){
+inline constexpr Button operator|(Button x, Button y){
     return (Button)((ButtonFlagType)x | (ButtonFlagType)y);
 }
-inline void operator|=(Button& x, Button y){
+inline constexpr void operator|=(Button& x, Button y){
     x = (Button)((ButtonFlagType)x | (ButtonFlagType)y);
+}
+inline constexpr Button operator&(Button x, Button y){
+    return (Button)((ButtonFlagType)x & (ButtonFlagType)y);
+}
+inline constexpr void operator&=(Button& x, Button y){
+    x = (Button)((ButtonFlagType)x & (ButtonFlagType)y);
 }
 
 std::string button_to_string(Button button);

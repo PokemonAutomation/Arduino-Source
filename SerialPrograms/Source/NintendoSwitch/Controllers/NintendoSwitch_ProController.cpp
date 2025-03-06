@@ -4,15 +4,13 @@
  *
  */
 
-#include <QKeyEvent>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "CommonTools/Async/InterruptableCommands.tpp"
 #include "CommonTools/Async/SuperControlSession.tpp"
-#include "Controllers/KeyboardInput/GlobalQtKeyMap.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch_ProController.h"
 #include "NintendoSwitch_VirtualControllerState.h"
+#include "NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 
@@ -22,17 +20,19 @@ template class SuperControlSession<NintendoSwitch::ProController>;
 
 namespace NintendoSwitch{
 
-
 using namespace std::chrono_literals;
 
 
 
 
-class ProController::KeyboardManager : public KeyboardInputController{
+
+
+class ProController::KeyboardManager final :
+    public PokemonAutomation::KeyboardManager<ProControllerState, ProControllerDeltas>
+{
 public:
     KeyboardManager(ProController& controller)
-        : KeyboardInputController(true)
-        , m_controller(&controller)
+        : PokemonAutomation::KeyboardManager<ProControllerState, ProControllerDeltas>(controller)
     {
         std::vector<std::shared_ptr<EditableTableRow>> mapping =
             ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER.current_refs();
@@ -44,49 +44,6 @@ public:
     }
     ~KeyboardManager(){
         stop();
-    }
-    void stop() noexcept{
-        {
-            WriteSpinLock lg(m_lock);
-            if (m_controller == nullptr){
-                return;
-            }
-            m_controller = nullptr;
-        }
-        KeyboardInputController::stop();
-    }
-
-    virtual std::unique_ptr<ControllerState> make_state() const override{
-        return std::make_unique<ProControllerState>();
-    }
-    virtual void update_state(ControllerState& state, const std::set<uint32_t>& pressed_keys) override{
-        ProControllerDeltas deltas;
-        const QtKeyMap& qkey_map = QtKeyMap::instance();
-        for (uint32_t native_key : pressed_keys){
-            std::set<Qt::Key> qkeys = qkey_map.get_QtKeys(native_key);
-            for (Qt::Key qkey : qkeys){
-                auto iter = m_mapping.find(qkey);
-                if (iter != m_mapping.end()){
-                    deltas += iter->second;
-                    break;
-                }
-            }
-        }
-        deltas.to_state(static_cast<ProControllerState&>(state));
-    }
-    virtual void cancel_all_commands() override{
-        WriteSpinLock lg(m_lock);
-        if (m_controller == nullptr){
-            return;
-        }
-        m_controller->cancel_all_commands();
-    }
-    virtual void replace_on_next_command() override{
-        WriteSpinLock lg(m_lock);
-        if (m_controller == nullptr){
-            return;
-        }
-        m_controller->replace_on_next_command();
     }
     virtual void send_state(const ControllerState& state) override{
         const ProControllerState& switch_state = static_cast<const ProControllerState&>(state);
@@ -105,7 +62,7 @@ public:
             return;
         }
         Milliseconds ticksize = m_controller->ticksize();
-        m_controller->issue_full_controller_state(
+        static_cast<ProController*>(m_controller)->issue_full_controller_state(
             nullptr,
             switch_state.buttons,
             switch_state.dpad,
@@ -116,12 +73,6 @@ public:
             ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255
         );
     }
-
-
-private:
-    SpinLock m_lock;
-    ProController* m_controller;
-    std::map<Qt::Key, ProControllerDeltas> m_mapping;
 };
 
 

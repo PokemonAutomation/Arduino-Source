@@ -13,6 +13,7 @@
 
 #include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.h"
 #include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessProController.h"
+#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessJoycon.h"
 
 //#include <iostream>
 //using std::cout;
@@ -82,6 +83,17 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
             new NintendoSwitch::SerialPABotBase_WirelessProController(
                 logger,
                 static_cast<SerialPABotBase_Connection&>(connection),
+                requirements
+            )
+        );
+
+    case ControllerType::NintendoSwitch_LeftJoycon:
+    case ControllerType::NintendoSwitch_RightJoycon:
+        return std::unique_ptr<AbstractController>(
+            new NintendoSwitch::SerialPABotBase_WirelessJoycon(
+                logger,
+                static_cast<SerialPABotBase_Connection&>(connection),
+                controller_type,
                 requirements
             )
         );

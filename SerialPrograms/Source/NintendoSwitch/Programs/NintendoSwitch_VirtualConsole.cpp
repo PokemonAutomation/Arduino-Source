@@ -22,7 +22,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/VirtualConsole.md",
         "Play your Switch from your computer. Device logging is logged to the output window."
     )
-    , m_requirements({ControllerFeature::NintendoSwitch_ProController})
+    , m_requirements({})
 {}
 
 

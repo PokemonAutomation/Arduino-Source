@@ -9,7 +9,6 @@
 
 #include "ClientSource/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h"
 
 namespace PokemonAutomation{
@@ -17,9 +16,6 @@ namespace NintendoSwitch{
 
 
 class SerialPABotBase_Controller : public ControllerWithScheduler{
-public:
-    using ContextType = ProControllerContext;
-
 public:
     SerialPABotBase_Controller(
         Logger& logger,

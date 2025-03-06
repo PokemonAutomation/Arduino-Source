@@ -4,10 +4,12 @@
  *
  */
 
+#include <iostream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
 #include "ClientSource/Libraries/MessageConverter.h"
+#include "ClientSource/Connection/BotBaseMessage.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessController.h"

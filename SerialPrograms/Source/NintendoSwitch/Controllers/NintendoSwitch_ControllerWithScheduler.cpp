@@ -180,8 +180,8 @@ void ControllerWithScheduler::issue_full_controller_state(
         cancellable->throw_if_cancelled();
     }
 
-    for (size_t c = 0; c < 14; c++){
-        uint16_t mask = (uint16_t)1 << c;
+    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+        ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
             this->issue_wait_for_resource(cancellable, m_buttons[c]);
         }
@@ -196,8 +196,8 @@ void ControllerWithScheduler::issue_full_controller_state(
     m_right_joystick.x = right_x;
     m_right_joystick.y = right_y;
 
-    for (size_t c = 0; c < 14; c++){
-        uint16_t mask = (uint16_t)1 << c;
+    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+        ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
             this->issue_to_resource(
                 cancellable, m_buttons[c],

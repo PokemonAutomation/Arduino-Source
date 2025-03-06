@@ -14,11 +14,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class SerialPABotBase_WirelessController : public SerialPABotBase_Controller
-{
-public:
-    using ContextType = ProControllerContext;
-
+class SerialPABotBase_WirelessController : public SerialPABotBase_Controller{
 public:
     SerialPABotBase_WirelessController(
         Logger& logger,
