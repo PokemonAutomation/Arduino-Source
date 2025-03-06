@@ -136,7 +136,7 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
     ESP32Report0x30 report{
         .report_id = 0x30,
         .timer = 0,     //  Populate on controller.
-        .byte2 = 0x8d,  //  Full + battery : Joycon
+        .byte2 = 0x9d,  //  Full + Charging : Joycon
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -206,7 +206,7 @@ void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* 
     ESP32Report0x30 report{
         .report_id = 0x30,
         .timer = 0,     //  Populate on controller.
-        .byte2 = 0x8d,  //  Full + battery : Joycon
+        .byte2 = 0x9d,  //  Full + Charging : Joycon
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
