@@ -22,7 +22,7 @@ MountDetectionTest_Descriptor::MountDetectionTest_Descriptor()
         "",
         "Test the mount detection in the bottom right corner.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
+        {},
         FasterIfTickPrecise::NOT_FASTER
     )
 {}

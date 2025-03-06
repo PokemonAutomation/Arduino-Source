@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "ControllerTypeStrings.h"
 #include "ControllerSession.h"
 
 //#include <iostream>
@@ -350,6 +351,7 @@ void ControllerSession::post_connection_ready(
         m_available_controllers = available_controllers;
 
 
+#if 0
         auto iter = supported_controllers.begin();
         if (supported_controllers.size() == 1){
             //  Only one controller available. Force the option to it.
@@ -361,6 +363,7 @@ void ControllerSession::post_connection_ready(
                 current_controller = m_option.m_controller_type;
             }
         }
+#endif
 
         //  Construct the controller.
         if (current_controller != ControllerType::None){
@@ -373,6 +376,7 @@ void ControllerSession::post_connection_ready(
         }
 
         //  Commit all changes.
+//        cout << "current_controller = " << CONTROLLER_TYPE_STRINGS.get_string(current_controller) << endl;
         m_option.m_controller_type = current_controller;
         ready = m_controller && m_controller->is_ready();
 

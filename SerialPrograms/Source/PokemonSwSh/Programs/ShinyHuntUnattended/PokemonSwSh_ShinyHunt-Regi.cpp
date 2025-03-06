@@ -41,7 +41,7 @@ void regirock(ProControllerContext& context){
     pbf_move_left_joystick(context, 128, 0, 140, 0);
     pbf_move_left_joystick(context, 226, 255, 90, 0);
     pbf_move_left_joystick(context, 128, 0, 20, 0);
-    pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, 128, 0, 200, 0);
 }
 void regice(ProControllerContext& context){
@@ -50,9 +50,9 @@ void regice(ProControllerContext& context){
     pbf_move_left_joystick(context, 128, 255, 56, 0);
     pbf_move_left_joystick(context, 32, 0, 76, 0);
     pbf_move_left_joystick(context, 0, 128, 54, 0);
-    pbf_move_left_joystick(context, 255, 68, 154, 0);
+    pbf_move_left_joystick(context, 255, 68, 153, 0);
     pbf_move_left_joystick(context, 128, 0, 20, 0);
-    pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND - 20);
+    pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, 128, 0, 170, 0);
 }
 void registeel(ProControllerContext& context){
@@ -64,7 +64,7 @@ void registeel(ProControllerContext& context){
     pbf_move_left_joystick(context, 192, 0, 66, 0);
     pbf_move_left_joystick(context, 230, 255, 90, 0);
     pbf_move_left_joystick(context, 128, 0, 50, 0);
-    pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, 128, 0, 250, 0);
 }
 void regieleki(ProControllerContext& context){
@@ -75,7 +75,7 @@ void regieleki(ProControllerContext& context){
     pbf_move_left_joystick(context, 0, 206, 93, 0);
     pbf_move_left_joystick(context, 216, 0, 78, 0);
     pbf_move_left_joystick(context, 56, 0, 80, 0);
-    pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, 216, 0, 170, 0);
 }
 void regidrago(ProControllerContext& context){
@@ -86,7 +86,7 @@ void regidrago(ProControllerContext& context){
     pbf_move_left_joystick(context, 0, 56, 60, 0);
     pbf_move_left_joystick(context, 64, 0, 60, 0);
     pbf_move_left_joystick(context, 255, 148, 75, 0);
-    pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, 128, 0, 180, 0);
 }
 

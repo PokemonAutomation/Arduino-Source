@@ -21,7 +21,7 @@ ShinyEncounterTester_Descriptor::ShinyEncounterTester_Descriptor()
         "",
         "Test the shiny encounter detector. Start this program just before an encounter.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
+        {},
         FasterIfTickPrecise::NOT_FASTER
     )
 {}

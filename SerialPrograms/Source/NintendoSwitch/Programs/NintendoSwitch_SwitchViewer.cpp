@@ -23,7 +23,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/SwitchViewer.md",
         "View status information from one or more running programs."
     )
-    , m_requirements({ControllerFeature::NintendoSwitch_ProController})
+    , m_requirements({})
 {}
 
 

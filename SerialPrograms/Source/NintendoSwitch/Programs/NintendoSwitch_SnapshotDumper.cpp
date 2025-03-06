@@ -22,7 +22,7 @@ SnapshotDumper_Descriptor::SnapshotDumper_Descriptor()
         "Periodically take screenshots.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        {}
     )
 {}
 
