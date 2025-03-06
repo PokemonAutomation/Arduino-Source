@@ -4,52 +4,49 @@
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_ProController_H
-#define PokemonAutomation_NintendoSwitch_SerialPABotBase_ProController_H
+#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_Controller_H
+#define PokemonAutomation_NintendoSwitch_SerialPABotBase_Controller_H
 
 #include "ClientSource/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class SerialPABotBase_ProController : public ProControllerWithScheduler{
+class SerialPABotBase_Controller : public ControllerWithScheduler{
 public:
     using ContextType = ProControllerContext;
 
 public:
-    SerialPABotBase_ProController(
+    SerialPABotBase_Controller(
         Logger& logger,
         ControllerType controller_type,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         const ControllerRequirements& requirements
     );
-    ~SerialPABotBase_ProController();
 
-    virtual bool is_ready() const override{
+    bool is_ready() const{
         return m_serial && m_handle.is_ready() && m_error_string.empty();
-    }
-    virtual std::string error_string() const override{
-        return m_error_string;
     }
 
 
 public:
-    virtual void cancel_all_commands() override;
-    virtual void replace_on_next_command() override;
+    void cancel_all_commands();
+    void replace_on_next_command();
 
-    virtual void wait_for_all(const Cancellable* cancellable) override;
+    void wait_for_all(const Cancellable* cancellable);
 
-    virtual void send_botbase_request(
+    void send_botbase_request(
         const Cancellable* cancellable,
         const BotBaseRequest& request
-    ) override;
-    virtual BotBaseMessage send_botbase_request_and_wait(
+    );
+    BotBaseMessage send_botbase_request_and_wait(
         const Cancellable* cancellable,
         const BotBaseRequest& request
-    ) override;
+    );
 
 
 protected:

@@ -12,11 +12,10 @@
 
 #include <mutex>
 #include "Controllers/SuperscalarScheduler.h"
-#include "NintendoSwitch_ProController.h"
+#include "NintendoSwitch_ControllerState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
 
 
 
@@ -97,74 +96,69 @@ inline SplitDpad convert_unified_to_split_dpad(DpadPosition dpad){
 
 
 
-class ProControllerWithScheduler :
-    public ProController,
+class ControllerWithScheduler :
     protected ProControllerSchedulerState,
     protected SuperscalarScheduler
 {
 public:
-    ProControllerWithScheduler(Logger& logger);
-
-    virtual Logger& logger() override{
-        return m_logger;
-    }
+    ControllerWithScheduler(Logger& logger);
 
 
 public:
     //  Superscalar Commands (the "ssf" framework)
 
-    virtual void issue_barrier(const Cancellable* cancellable) override;
-    virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) override;
-    virtual void issue_buttons(
+    void issue_barrier(const Cancellable* cancellable);
+    void issue_nop(const Cancellable* cancellable, Milliseconds duration);
+    void issue_buttons(
         const Cancellable* cancellable,
         Button button,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-    ) override;
-    virtual void issue_dpad(
+    );
+    void issue_dpad(
         const Cancellable* cancellable,
         DpadPosition position,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-    ) override;
-    virtual void issue_left_joystick(
+    );
+    void issue_left_joystick(
         const Cancellable* cancellable,
         uint8_t x, uint8_t y,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-    ) override;
-    virtual void issue_right_joystick(
+    );
+    void issue_right_joystick(
         const Cancellable* cancellable,
         uint8_t x, uint8_t y,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-    ) override;
-    virtual void issue_full_controller_state(
+    );
+    void issue_full_controller_state(
         const Cancellable* cancellable,
         Button button,
         DpadPosition position,
         uint8_t left_x, uint8_t left_y,
         uint8_t right_x, uint8_t right_y,
         Milliseconds hold
-    ) override;
+    );
 
 
 public:
     //  High speed RPCs.
 
-    virtual void issue_mash_button(
+    void issue_mash_button(
         const Cancellable* cancellable,
         Button button, Milliseconds duration
-    ) override;
-    virtual void issue_mash_button(
+    );
+    void issue_mash_button(
         const Cancellable* cancellable,
         Button button0, Button button1, Milliseconds duration
-    ) override;
-    virtual void issue_mash_AZs(
+    );
+    void issue_mash_AZs(
         const Cancellable* cancellable,
         Milliseconds duration
-    ) override;
-    virtual void issue_system_scroll(
+    );
+    void issue_system_scroll(
         const Cancellable* cancellable,
         DpadPosition direction, //  Diagonals not allowed.
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown
-    ) override;
+    );
 
 
 protected:

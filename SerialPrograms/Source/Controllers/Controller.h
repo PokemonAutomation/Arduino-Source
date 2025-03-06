@@ -85,6 +85,28 @@ public:
 
 public:
     //
+    //  Commands
+    //
+    //  Commands are actions like button presses or joystick movements that are
+    //  eventually sent to the console.
+    //
+    //  All commands are prefixed with "issue_".
+    //  Commands are not thread-safe with other commands.
+    //  Commands are thread-safe with the cancellation functions above.
+    //
+    //  Commands are asynchronous. When you call a command function on this,
+    //  class it gets enqueued into a FIFO and immediately returns. It will only
+    //  block if the FIFO is full.
+    //
+    //  If a command is called with a cancelled "cancellable" parameter, it will
+    //  throw an OperationCancelledException.
+    //  If a cancellation happens while you are inside a command function, it
+    //  will immediately stop and throw an OperationCancelledException.
+    //
+
+
+public:
+    //
     //  Superscalar Commands (the "ssf" framework)
     //
 

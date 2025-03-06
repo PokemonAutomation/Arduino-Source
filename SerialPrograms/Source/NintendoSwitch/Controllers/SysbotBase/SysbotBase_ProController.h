@@ -11,7 +11,8 @@
 #include <condition_variable>
 #include "Common/Cpp/Containers/CircularBuffer.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h"
 #include "SysbotBase_Connection.h"
 
 namespace PokemonAutomation{
@@ -19,7 +20,9 @@ namespace NintendoSwitch{
 
 
 
-class ProController_SysbotBase final : public ProControllerWithScheduler{
+class ProController_SysbotBase final :
+    public ProController,
+    public ControllerWithScheduler{
 public:
     using ContextType = ProControllerContext;
 
@@ -49,6 +52,9 @@ public:
 
 
 public:
+    virtual Logger& logger() override{
+        return m_logger;
+    }
     virtual bool is_ready() const override{
         return m_connection.is_ready() && m_error_string.empty();
     }
@@ -73,12 +79,98 @@ public:
     ) override;
 
 
+public:
+    //  Superscalar Commands (the "ssf" framework)
+
+    virtual void issue_barrier(const Cancellable* cancellable) override{
+        ControllerWithScheduler::issue_barrier(cancellable);
+    }
+    virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) override{
+        ControllerWithScheduler::issue_nop(cancellable, duration);
+    }
+    virtual void issue_buttons(
+        const Cancellable* cancellable,
+        Button button,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    ) override{
+        ControllerWithScheduler::issue_buttons(cancellable, button, delay, hold, cooldown);
+    }
+    virtual void issue_dpad(
+        const Cancellable* cancellable,
+        DpadPosition position,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    ) override{
+        ControllerWithScheduler::issue_dpad(cancellable, position, delay, hold, cooldown);
+    }
+    virtual void issue_left_joystick(
+        const Cancellable* cancellable,
+        uint8_t x, uint8_t y,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    ) override{
+        ControllerWithScheduler::issue_left_joystick(cancellable, x, y, delay, hold, cooldown);
+    }
+    virtual void issue_right_joystick(
+        const Cancellable* cancellable,
+        uint8_t x, uint8_t y,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    ) override{
+        ControllerWithScheduler::issue_right_joystick(cancellable, x, y, delay, hold, cooldown);
+    }
+    virtual void issue_full_controller_state(
+        const Cancellable* cancellable,
+        Button button,
+        DpadPosition position,
+        uint8_t left_x, uint8_t left_y,
+        uint8_t right_x, uint8_t right_y,
+        Milliseconds hold
+    ) override{
+        ControllerWithScheduler::issue_full_controller_state(
+            cancellable,
+            button,
+            position,
+            left_x, left_y,
+            right_x, right_y,
+            hold
+        );
+    }
+
+
+public:
+    //  High speed RPCs.
+
+    virtual void issue_mash_button(
+        const Cancellable* cancellable,
+        Button button, Milliseconds duration
+    ) override{
+        ControllerWithScheduler::issue_mash_button(cancellable, button, duration);
+    }
+    virtual void issue_mash_button(
+        const Cancellable* cancellable,
+        Button button0, Button button1, Milliseconds duration
+    ) override{
+        ControllerWithScheduler::issue_mash_button(cancellable, button0, button1, duration);
+    }
+    virtual void issue_mash_AZs(
+        const Cancellable* cancellable,
+        Milliseconds duration
+    ) override{
+        ControllerWithScheduler::issue_mash_AZs(cancellable, duration);
+    }
+    virtual void issue_system_scroll(
+        const Cancellable* cancellable,
+        DpadPosition direction, //  Diagonals not allowed.
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    ) override{
+        ControllerWithScheduler::issue_system_scroll(cancellable, direction, delay, hold, cooldown);
+    }
+
+
 private:
     virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
 
     void send_diff(
-        const SwitchControllerState& old_state,
-        const SwitchControllerState& new_state
+        const ProControllerState& old_state,
+        const ProControllerState& new_state
     );
     void thread_body();
 
@@ -92,7 +184,7 @@ private:
     bool m_replace_on_next;
 
     struct Command{
-        SwitchControllerState state;
+        ProControllerState state;
         Milliseconds duration;
     };
     CircularBuffer<Command> m_command_queue;

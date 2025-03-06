@@ -1,4 +1,4 @@
-/*  SerialPABotBase: Pro Controller
+/*  SerialPABotBase: Controller
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -8,7 +8,7 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/ControllerCapability.h"
-#include "NintendoSwitch_SerialPABotBase_ProController.h"
+#include "NintendoSwitch_SerialPABotBase_Controller.h"
 
 //#include <iostream>
 //using std::cout;
@@ -22,16 +22,13 @@ using namespace std::chrono_literals;
 
 
 
-
-
-
-SerialPABotBase_ProController::SerialPABotBase_ProController(
+SerialPABotBase_Controller::SerialPABotBase_Controller(
     Logger& logger,
     ControllerType controller_type,
     SerialPABotBase::SerialPABotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
-    : ProControllerWithScheduler(logger)
+    : ControllerWithScheduler(logger)
     , m_handle(connection)
     , m_serial(connection.botbase())
 {
@@ -43,7 +40,7 @@ SerialPABotBase_ProController::SerialPABotBase_ProController(
 
     ControllerModeStatus mode_status = connection.controller_mode_status();
     logger.log(
-        "SerialPABotBase_ProController(): ControllerType = " +
+        "SerialPABotBase_Controller(): ControllerType = " +
         CONTROLLER_TYPE_STRINGS.get_string(mode_status.current_controller)
     );
 
@@ -68,14 +65,11 @@ SerialPABotBase_ProController::SerialPABotBase_ProController(
 
     m_error_string = html_color_text("Missing Feature: " + missing_feature, COLOR_RED);
 }
-SerialPABotBase_ProController::~SerialPABotBase_ProController(){
-    stop();
-}
 
 
 
 
-void SerialPABotBase_ProController::cancel_all_commands(){
+void SerialPABotBase_Controller::cancel_all_commands(){
     std::lock_guard<std::mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException();
@@ -83,7 +77,7 @@ void SerialPABotBase_ProController::cancel_all_commands(){
     m_serial->stop_all_commands();
     this->clear_on_next();
 }
-void SerialPABotBase_ProController::replace_on_next_command(){
+void SerialPABotBase_Controller::replace_on_next_command(){
     std::lock_guard<std::mutex> lg(m_state_lock);
     if (!is_ready()){
         throw InvalidConnectionStateException();
@@ -93,7 +87,7 @@ void SerialPABotBase_ProController::replace_on_next_command(){
 }
 
 
-void SerialPABotBase_ProController::wait_for_all(const Cancellable* cancellable){
+void SerialPABotBase_Controller::wait_for_all(const Cancellable* cancellable){
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     {
         std::lock_guard<std::mutex> lg1(m_state_lock);
@@ -114,7 +108,7 @@ void SerialPABotBase_ProController::wait_for_all(const Cancellable* cancellable)
 
 
 
-void SerialPABotBase_ProController::send_botbase_request(
+void SerialPABotBase_Controller::send_botbase_request(
     const Cancellable* cancellable,
     const BotBaseRequest& request
 ){
@@ -125,7 +119,7 @@ void SerialPABotBase_ProController::send_botbase_request(
     }
     m_serial->issue_request(request, cancellable);
 }
-BotBaseMessage SerialPABotBase_ProController::send_botbase_request_and_wait(
+BotBaseMessage SerialPABotBase_Controller::send_botbase_request_and_wait(
     const Cancellable* cancellable,
     const BotBaseRequest& request
 ){

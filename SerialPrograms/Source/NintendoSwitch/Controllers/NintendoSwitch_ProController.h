@@ -31,42 +31,18 @@ using ProControllerContext = ControllerContext<ProController>;
 //
 //  This is the generic interface a Switch pro controller.
 //
-//  Currently we only have one implementation (SerialPABotBase). But we expect
-//  to add more in the future.
-//
 class ProController : public AbstractController{
 public:
     using ContextType = ProControllerContext;
 
-    virtual ~ProController();
     ProController();
+    virtual ~ProController();
 
     //  Must call before destruction begins.
     void stop() noexcept;
 
 
 public:
-    //
-    //  Commands
-    //
-    //  Commands are actions like button presses or joystick movements that are
-    //  eventually sent to the console.
-    //
-    //  All commands are prefixed with "issue_".
-    //  Commands are not thread-safe with other commands.
-    //  Commands are thread-safe with the cancellation functions above.
-    //
-    //  Commands are asynchronous. When you call a command function on this,
-    //  class it gets enqueued into a FIFO and immediately returns. It will only
-    //  block if the FIFO is full.
-    //
-    //  If a command is called with a cancelled "cancellable" parameter, it will
-    //  throw an OperationCancelledException.
-    //  If a cancellation happens while you are inside a command function, it
-    //  will immediately stop and throw an OperationCancelledException.
-    //
-
-
     //  Temporary for refactor: Send custom requests for PABotBase's advanced
     //  RPCs.
     virtual void send_botbase_request(

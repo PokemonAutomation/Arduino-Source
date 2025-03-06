@@ -20,32 +20,32 @@ constexpr uint16_t TICKS_PER_SECOND = 125;
 
 
 //  Buttons
-constexpr size_t TOTAL_BUTTONS = 18;
+constexpr size_t TOTAL_BUTTONS = 22;
 using ButtonFlagType = uint32_t;
 enum Button : ButtonFlagType{
     BUTTON_NONE     =   0,
-    BUTTON_Y        =   ((uint16_t)1 <<  0),
-    BUTTON_B        =   ((uint16_t)1 <<  1),
-    BUTTON_A        =   ((uint16_t)1 <<  2),
-    BUTTON_X        =   ((uint16_t)1 <<  3),
-    BUTTON_L        =   ((uint16_t)1 <<  4),
-    BUTTON_R        =   ((uint16_t)1 <<  5),
-    BUTTON_ZL       =   ((uint16_t)1 <<  6),
-    BUTTON_ZR       =   ((uint16_t)1 <<  7),
-    BUTTON_MINUS    =   ((uint16_t)1 <<  8),
-    BUTTON_PLUS     =   ((uint16_t)1 <<  9),
-    BUTTON_LCLICK   =   ((uint16_t)1 << 10),
-    BUTTON_RCLICK   =   ((uint16_t)1 << 11),
-    BUTTON_HOME     =   ((uint16_t)1 << 12),
-    BUTTON_CAPTURE  =   ((uint16_t)1 << 13),
-    BUTTON_UP       =   ((uint16_t)1 << 14),
-    BUTTON_RIGHT    =   ((uint16_t)1 << 15),
-    BUTTON_DOWN     =   ((uint16_t)1 << 16),
-    BUTTON_LEFT     =   ((uint16_t)1 << 17),
-    BUTTON_LEFT_SL  =   ((uint16_t)1 << 18),
-    BUTTON_LEFT_SR  =   ((uint16_t)1 << 19),
-    BUTTON_RIGHT_SL =   ((uint16_t)1 << 20),
-    BUTTON_RIGHT_SR =   ((uint16_t)1 << 21),
+    BUTTON_Y        =   ((uint32_t)1 <<  0),
+    BUTTON_B        =   ((uint32_t)1 <<  1),
+    BUTTON_A        =   ((uint32_t)1 <<  2),
+    BUTTON_X        =   ((uint32_t)1 <<  3),
+    BUTTON_L        =   ((uint32_t)1 <<  4),
+    BUTTON_R        =   ((uint32_t)1 <<  5),
+    BUTTON_ZL       =   ((uint32_t)1 <<  6),
+    BUTTON_ZR       =   ((uint32_t)1 <<  7),
+    BUTTON_MINUS    =   ((uint32_t)1 <<  8),
+    BUTTON_PLUS     =   ((uint32_t)1 <<  9),
+    BUTTON_LCLICK   =   ((uint32_t)1 << 10),
+    BUTTON_RCLICK   =   ((uint32_t)1 << 11),
+    BUTTON_HOME     =   ((uint32_t)1 << 12),
+    BUTTON_CAPTURE  =   ((uint32_t)1 << 13),
+    BUTTON_UP       =   ((uint32_t)1 << 14),
+    BUTTON_RIGHT    =   ((uint32_t)1 << 15),
+    BUTTON_DOWN     =   ((uint32_t)1 << 16),
+    BUTTON_LEFT     =   ((uint32_t)1 << 17),
+    BUTTON_LEFT_SL  =   ((uint32_t)1 << 18),
+    BUTTON_LEFT_SR  =   ((uint32_t)1 << 19),
+    BUTTON_RIGHT_SL =   ((uint32_t)1 << 20),
+    BUTTON_RIGHT_SR =   ((uint32_t)1 << 21),
 };
 inline Button operator|(Button x, Button y){
     return (Button)((ButtonFlagType)x | (ButtonFlagType)y);

@@ -35,7 +35,7 @@ public:
         , m_controller(&controller)
     {
         std::vector<std::shared_ptr<EditableTableRow>> mapping =
-            ConsoleSettings::instance().KEYBOARD_MAPPINGS.TABLE.current_refs();
+            ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER.current_refs();
         for (const auto& deltas : mapping){
             const ProControllerKeyMapTableRow& row = static_cast<const ProControllerKeyMapTableRow&>(*deltas);
             m_mapping[(Qt::Key)(uint32_t)row.key] += row.snapshot();
@@ -57,10 +57,10 @@ public:
     }
 
     virtual std::unique_ptr<ControllerState> make_state() const override{
-        return std::make_unique<SwitchControllerState>();
+        return std::make_unique<ProControllerState>();
     }
     virtual void update_state(ControllerState& state, const std::set<uint32_t>& pressed_keys) override{
-        ControllerDeltas deltas;
+        ProControllerDeltas deltas;
         const QtKeyMap& qkey_map = QtKeyMap::instance();
         for (uint32_t native_key : pressed_keys){
             std::set<Qt::Key> qkeys = qkey_map.get_QtKeys(native_key);
@@ -72,7 +72,7 @@ public:
                 }
             }
         }
-        deltas.to_state(static_cast<SwitchControllerState&>(state));
+        deltas.to_state(static_cast<ProControllerState&>(state));
     }
     virtual void cancel_all_commands() override{
         WriteSpinLock lg(m_lock);
@@ -89,7 +89,7 @@ public:
         m_controller->replace_on_next_command();
     }
     virtual void send_state(const ControllerState& state) override{
-        const SwitchControllerState& switch_state = static_cast<const SwitchControllerState&>(state);
+        const ProControllerState& switch_state = static_cast<const ProControllerState&>(state);
 #if 0
         m_controller.logger().log(
             "VirtualController: (" + button_to_string(switch_state.buttons) +
@@ -104,6 +104,7 @@ public:
         if (m_controller == nullptr){
             return;
         }
+        Milliseconds ticksize = m_controller->ticksize();
         m_controller->issue_full_controller_state(
             nullptr,
             switch_state.buttons,
@@ -112,7 +113,7 @@ public:
             switch_state.left_y,
             switch_state.right_x,
             switch_state.right_y,
-            255 * 8ms
+            ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255
         );
     }
 
@@ -120,17 +121,17 @@ public:
 private:
     SpinLock m_lock;
     ProController* m_controller;
-    std::map<Qt::Key, ControllerDeltas> m_mapping;
+    std::map<Qt::Key, ProControllerDeltas> m_mapping;
 };
 
 
 
-ProController::~ProController(){
-
-}
 ProController::ProController()
     : m_keyboard_manager(CONSTRUCT_TOKEN, *this)
 {
+
+}
+ProController::~ProController(){
 
 }
 void ProController::stop() noexcept{

@@ -7,7 +7,7 @@
  *
  */
 
-#include "NintendoSwitch_ProControllerWithScheduler.h"
+#include "NintendoSwitch_ControllerWithScheduler.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -17,7 +17,7 @@ using namespace std::chrono_literals;
 
 
 
-ProControllerWithScheduler::ProControllerWithScheduler(Logger& logger)
+ControllerWithScheduler::ControllerWithScheduler(Logger& logger)
     : SuperscalarScheduler(
         logger, Milliseconds(4),
         make_resource_list()
@@ -28,7 +28,7 @@ ProControllerWithScheduler::ProControllerWithScheduler(Logger& logger)
 
 
 
-void ProControllerWithScheduler::issue_barrier(const Cancellable* cancellable){
+void ControllerWithScheduler::issue_barrier(const Cancellable* cancellable){
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     std::lock_guard<std::mutex> lg1(m_state_lock);
     this->issue_wait_for_all(cancellable);
@@ -36,7 +36,7 @@ void ProControllerWithScheduler::issue_barrier(const Cancellable* cancellable){
         m_logger.log("issue_barrier()", COLOR_DARKGREEN);
     }
 }
-void ProControllerWithScheduler::issue_nop(const Cancellable* cancellable, Milliseconds duration){
+void ControllerWithScheduler::issue_nop(const Cancellable* cancellable, Milliseconds duration){
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     std::lock_guard<std::mutex> lg1(m_state_lock);
     if (cancellable){
@@ -50,7 +50,7 @@ void ProControllerWithScheduler::issue_nop(const Cancellable* cancellable, Milli
         );
     }
 }
-void ProControllerWithScheduler::issue_buttons(
+void ControllerWithScheduler::issue_buttons(
     const Cancellable* cancellable,
     Button button,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -88,7 +88,7 @@ void ProControllerWithScheduler::issue_buttons(
         );
     }
 }
-void ProControllerWithScheduler::issue_dpad(
+void ControllerWithScheduler::issue_dpad(
     const Cancellable* cancellable,
     DpadPosition position,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -113,7 +113,7 @@ void ProControllerWithScheduler::issue_dpad(
         );
     }
 }
-void ProControllerWithScheduler::issue_left_joystick(
+void ControllerWithScheduler::issue_left_joystick(
     const Cancellable* cancellable,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -140,7 +140,7 @@ void ProControllerWithScheduler::issue_left_joystick(
         );
     }
 }
-void ProControllerWithScheduler::issue_right_joystick(
+void ControllerWithScheduler::issue_right_joystick(
     const Cancellable* cancellable,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -166,7 +166,7 @@ void ProControllerWithScheduler::issue_right_joystick(
         );
     }
 }
-void ProControllerWithScheduler::issue_full_controller_state(
+void ControllerWithScheduler::issue_full_controller_state(
     const Cancellable* cancellable,
     Button button,
     DpadPosition position,
@@ -231,7 +231,7 @@ void ProControllerWithScheduler::issue_full_controller_state(
 }
 
 
-void ProControllerWithScheduler::issue_mash_button(
+void ControllerWithScheduler::issue_mash_button(
     const Cancellable* cancellable,
     Button button, Milliseconds duration
 ){
@@ -259,7 +259,7 @@ void ProControllerWithScheduler::issue_mash_button(
         log = false;
     }
 }
-void ProControllerWithScheduler::issue_mash_button(
+void ControllerWithScheduler::issue_mash_button(
     const Cancellable* cancellable,
     Button button0, Button button1, Milliseconds duration
 ){
@@ -287,7 +287,7 @@ void ProControllerWithScheduler::issue_mash_button(
         log = false;
     }
 }
-void ProControllerWithScheduler::issue_mash_AZs(
+void ControllerWithScheduler::issue_mash_AZs(
     const Cancellable* cancellable,
     Milliseconds duration
 ){
@@ -327,7 +327,7 @@ void ProControllerWithScheduler::issue_mash_AZs(
         duration -= std::min(3*8ms, duration);
     }
 }
-void ProControllerWithScheduler::issue_system_scroll(
+void ControllerWithScheduler::issue_system_scroll(
     const Cancellable* cancellable,
     DpadPosition direction, //  Diagonals not allowed.
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown

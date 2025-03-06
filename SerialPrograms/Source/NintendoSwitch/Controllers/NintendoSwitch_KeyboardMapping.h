@@ -15,12 +15,14 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "Common/Cpp/Options/KeyBindingOption.h"
+#include "NintendoSwitch_ControllerState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-struct ControllerDeltas;
+struct ProControllerDeltas;
+struct JoyconDeltas;
 
 
 
@@ -32,10 +34,10 @@ public:
         bool advanced_mode,
         std::string description,
         Qt::Key key,
-        const ControllerDeltas& deltas
+        const ProControllerDeltas& deltas
     );
     virtual std::unique_ptr<EditableTableRow> clone() const override;
-    ControllerDeltas snapshot() const;
+    ProControllerDeltas snapshot() const;
 
     void set_advanced_mode(bool enabled);
 
@@ -45,7 +47,7 @@ private:
 public:
     StringCell label;
     KeyBindingCell key;
-    SimpleIntegerCell<uint16_t> buttons;
+    SimpleIntegerCell<ButtonFlagType> buttons;
     SimpleIntegerCell<int8_t> dpad_x;
     SimpleIntegerCell<int8_t> dpad_y;
     SimpleIntegerCell<int8_t> left_stick_x;
@@ -65,7 +67,7 @@ public:
     std::unique_ptr<EditableTableRow> make_mapping(
         std::string description,
         Qt::Key key,
-        const ControllerDeltas& deltas
+        const ProControllerDeltas& deltas
     );
     std::vector<std::unique_ptr<EditableTableRow>> make_defaults();
 
@@ -73,20 +75,21 @@ private:
     std::atomic<bool> m_advanced_mode;
 };
 
-#if 0
 
-class LeftJoyconKeyMapTableRow : public EditableTableRow{
+
+
+class JoyconKeyMapTableRow : public EditableTableRow{
 public:
-    LeftJoyconKeyMapTableRow(EditableTableOption& parent_table);
-    LeftJoyconKeyMapTableRow(
+    JoyconKeyMapTableRow(EditableTableOption& parent_table);
+    JoyconKeyMapTableRow(
         EditableTableOption& parent_table,
         bool advanced_mode,
         std::string description,
         Qt::Key key,
-        const ControllerDeltas& deltas
+        const JoyconDeltas& deltas
     );
     virtual std::unique_ptr<EditableTableRow> clone() const override;
-    ControllerDeltas snapshot() const;
+    JoyconDeltas snapshot() const;
 
     void set_advanced_mode(bool enabled);
 
@@ -96,12 +99,29 @@ private:
 public:
     StringCell label;
     KeyBindingCell key;
-    SimpleIntegerCell<uint16_t> buttons;
-    SimpleIntegerCell<int8_t> stick_x;
-    SimpleIntegerCell<int8_t> stick_y;
+    SimpleIntegerCell<ButtonFlagType> buttons;
+    SimpleIntegerCell<int8_t> joystick_x;
+    SimpleIntegerCell<int8_t> joystick_y;
 };
 
-#endif
+class JoyconKeyboardMappingTable : public EditableTableOption_t<JoyconKeyMapTableRow>{
+public:
+    JoyconKeyboardMappingTable(bool left);
+    virtual std::vector<std::string> make_header() const override;
+
+    bool advanced_mode() const{ return m_advanced_mode.load(std::memory_order_relaxed); }
+    void set_advanced_mode(bool enabled);
+
+    std::unique_ptr<EditableTableRow> make_mapping(
+        std::string description,
+        Qt::Key key,
+        const JoyconDeltas& deltas
+    );
+    std::vector<std::unique_ptr<EditableTableRow>> make_defaults(bool left);
+
+private:
+    std::atomic<bool> m_advanced_mode;
+};
 
 
 
@@ -122,7 +142,9 @@ private:
 public:
     StaticTextOption DESCRIPTION;
     BooleanCheckBoxOption ADVANCED_MODE;
-    ProControllerKeyboardMappingTable TABLE;
+    ProControllerKeyboardMappingTable PRO_CONTROLLER;
+    JoyconKeyboardMappingTable LEFT_JOYCON;
+    JoyconKeyboardMappingTable RIGHT_JOYCON;
 };
 
 

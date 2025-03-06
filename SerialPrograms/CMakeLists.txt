@@ -833,14 +833,16 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerWithScheduler.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.h
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessController.cpp
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessController.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessProController.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessProController.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.cpp

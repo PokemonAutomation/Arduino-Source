@@ -14,12 +14,10 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class SwitchControllerState : public ControllerState{
+class ProControllerState : public ControllerState{
 public:
     virtual void clear() override;
-
     virtual bool operator==(const ControllerState& x) const override;
-
     virtual bool is_neutral() const override;
 
 public:
@@ -31,8 +29,7 @@ public:
     uint8_t right_y = 128;
 };
 
-
-struct ControllerDeltas{
+struct ProControllerDeltas{
     Button buttons = BUTTON_NONE;
     int dpad_x = 0;
     int dpad_y = 0;
@@ -41,12 +38,36 @@ struct ControllerDeltas{
     int right_x = 0;
     int right_y = 0;
 
-    void operator+=(const ControllerDeltas& x);
+    void operator+=(const ProControllerDeltas& x);
 
     //  Returns true if neutral.
-    bool to_state(SwitchControllerState& state) const;
+    bool to_state(ProControllerState& state) const;
 };
 
+
+
+class JoyconState : public ControllerState{
+public:
+    virtual void clear() override;
+    virtual bool operator==(const ControllerState& x) const override;
+    virtual bool is_neutral() const override;
+
+public:
+    Button buttons = BUTTON_NONE;
+    uint8_t joystick_x = 128;
+    uint8_t joystick_y = 128;
+};
+
+struct JoyconDeltas{
+    Button buttons = BUTTON_NONE;
+    int joystick_x = 0;
+    int joystick_y = 0;
+
+    void operator+=(const JoyconDeltas& x);
+
+    //  Returns true if neutral.
+    bool to_state(JoyconState& state) const;
+};
 
 
 

@@ -32,7 +32,7 @@ SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
     SerialPABotBase::SerialPABotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
-    : SerialPABotBase_ProController(
+    : SerialPABotBase_Controller(
         logger,
         ControllerType::NintendoSwitch_WiredProController,
         connection,
@@ -49,7 +49,7 @@ void SerialPABotBase_PokkenController::stop(){
     if (m_stopping.exchange(true)){
         return;
     }
-    SerialPABotBase_ProController::stop();
+    ProController::stop();
     m_scope.cancel(nullptr);
     {
         std::unique_lock<std::mutex> lg(m_sleep_lock);

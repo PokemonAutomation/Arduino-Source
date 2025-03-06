@@ -19,7 +19,7 @@ using namespace std::chrono_literals;
 
 
 
-void SwitchControllerState::clear(){
+void ProControllerState::clear(){
     buttons = BUTTON_NONE;
     dpad = DPAD_NONE;
     left_x = 128;
@@ -27,13 +27,12 @@ void SwitchControllerState::clear(){
     right_x = 128;
     right_y = 128;
 }
-
-bool SwitchControllerState::operator==(const ControllerState& x) const{
+bool ProControllerState::operator==(const ControllerState& x) const{
     if (typeid(*this) != typeid(x)){
         return false;
     }
 
-    const SwitchControllerState& r = static_cast<const SwitchControllerState&>(x);
+    const ProControllerState& r = static_cast<const ProControllerState&>(x);
 
     if (buttons != r.buttons){
         return false;
@@ -55,8 +54,7 @@ bool SwitchControllerState::operator==(const ControllerState& x) const{
     }
     return true;
 }
-
-bool SwitchControllerState::is_neutral() const{
+bool ProControllerState::is_neutral() const{
     return buttons == 0
         && dpad == DPAD_NONE
         && left_x == 128
@@ -66,10 +64,7 @@ bool SwitchControllerState::is_neutral() const{
 }
 
 
-
-
-
-void ControllerDeltas::operator+=(const ControllerDeltas& x){
+void ProControllerDeltas::operator+=(const ProControllerDeltas& x){
     buttons |= x.buttons;
     dpad_x += x.dpad_x;
     dpad_y += x.dpad_y;
@@ -78,7 +73,7 @@ void ControllerDeltas::operator+=(const ControllerDeltas& x){
     right_x += x.right_x;
     right_y += x.right_y;
 }
-bool ControllerDeltas::to_state(SwitchControllerState& state) const{
+bool ProControllerDeltas::to_state(ProControllerState& state) const{
     bool neutral;
 
     state.buttons = buttons;
@@ -135,6 +130,66 @@ bool ControllerDeltas::to_state(SwitchControllerState& state) const{
             : std::abs(right_y);
         state.right_x = (uint8_t)std::min(128 * right_x / mag + 128, 255);
         state.right_y = (uint8_t)std::min(128 * right_y / mag + 128, 255);
+    }
+
+    return neutral;
+}
+
+
+
+
+
+
+void JoyconState::clear(){
+    buttons = BUTTON_NONE;
+    joystick_x = 128;
+    joystick_y = 128;
+}
+bool JoyconState::operator==(const ControllerState& x) const{
+    if (typeid(*this) != typeid(x)){
+        return false;
+    }
+
+    const JoyconState& r = static_cast<const JoyconState&>(x);
+
+    if (buttons != r.buttons){
+        return false;
+    }
+    if (joystick_x != r.joystick_x){
+        return false;
+    }
+    if (joystick_y != r.joystick_y){
+        return false;
+    }
+    return true;
+}
+bool JoyconState::is_neutral() const{
+    return buttons == 0
+        && joystick_x == 128
+        && joystick_y == 128;
+}
+
+
+void JoyconDeltas::operator+=(const JoyconDeltas& x){
+    buttons |= x.buttons;
+    joystick_x += x.joystick_x;
+    joystick_y += x.joystick_y;
+}
+bool JoyconDeltas::to_state(JoyconState& state) const{
+    bool neutral;
+
+    state.buttons = buttons;
+    neutral = buttons == 0;
+
+    state.joystick_x = 128;
+    state.joystick_y = 128;
+    if (joystick_x != 0 || joystick_y != 0){
+        neutral = false;
+        int mag = std::abs(joystick_x) > std::abs(joystick_y)
+            ? std::abs(joystick_x)
+            : std::abs(joystick_y);
+        state.joystick_x = (uint8_t)std::min(128 * joystick_x / mag + 128, 255);
+        state.joystick_y = (uint8_t)std::min(128 * joystick_y / mag + 128, 255);
     }
 
     return neutral;

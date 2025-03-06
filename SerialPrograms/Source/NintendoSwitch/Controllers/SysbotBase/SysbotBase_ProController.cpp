@@ -27,7 +27,7 @@ ProController_SysbotBase::ProController_SysbotBase(
     SysbotBase::TcpSysbotBase_Connection& connection,
     const ControllerRequirements& requirements
 )
-    : ProControllerWithScheduler(logger)
+    : ControllerWithScheduler(logger)
     , m_connection(connection)
     , m_stopping(false)
     , m_replace_on_next(false)
@@ -79,7 +79,7 @@ void ProController_SysbotBase::stop(){
     if (m_stopping.exchange(true)){
         return;
     }
-    ProControllerWithScheduler::stop();
+    ProController::stop();
     {
         std::lock_guard<std::mutex> lg(m_state_lock);
         m_cv.notify_all();
@@ -213,8 +213,8 @@ BotBaseMessage ProController_SysbotBase::send_botbase_request_and_wait(
 
 
 void ProController_SysbotBase::send_diff(
-    const SwitchControllerState& old_state,
-    const SwitchControllerState& new_state
+    const ProControllerState& old_state,
+    const ProControllerState& new_state
 ){
 #if 0
     m_logger.log(
@@ -322,7 +322,7 @@ void ProController_SysbotBase::thread_body(){
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
     std::chrono::microseconds EARLY_WAKE = GlobalSettings::instance().PERFORMANCE->PRECISE_WAKE_MARGIN;
 
-    SwitchControllerState current_state;
+    ProControllerState current_state;
 
     std::unique_lock<std::mutex> lg(m_state_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
@@ -333,7 +333,7 @@ void ProController_SysbotBase::thread_body(){
                 continue;
             }
 
-            send_diff(current_state, SwitchControllerState());
+            send_diff(current_state, ProControllerState());
             current_state.clear();
             continue;
         }
@@ -379,7 +379,7 @@ void ProController_SysbotBase::thread_body(){
 //        cout << "Delay = " << std::chrono::duration_cast<std::chrono::microseconds>(delay) << endl;
     }
 
-    SwitchControllerState neutral_state;
+    ProControllerState neutral_state;
     send_diff(current_state, neutral_state);
 }
 
