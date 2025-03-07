@@ -109,7 +109,7 @@ CollapsibleGroupBox* make_panel_header(
     std::string text;
     do{
         if (required_features.contains(ControllerFeature::NintendoSwitch_DateSkip)){
-            text = html_color_text("(This program requires advanced RPCs. It requires Serial PABotBase.)", COLOR_RED);
+            text = html_color_text("(This program requires advanced RPCs.)", COLOR_RED);
             break;
         }
         if (required_features.contains(ControllerFeature::TickPrecise)){

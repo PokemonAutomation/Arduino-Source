@@ -10,57 +10,97 @@
 #include "PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_Messages_DaySkippers.h"
 
+#ifdef PA_OFFICIAL
+//#define PA_CC_DAY_SKIPPERS
+#endif
+
+#ifdef PA_CC_DAY_SKIPPERS
+#include "../../Internal/SerialPrograms/PokemonSwSh_DateSkippers.h"
+#endif
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
 void skipper_init_view(ProControllerContext& context){
+#ifdef PA_CC_DAY_SKIPPERS
+    DaySkippers::init_view(context);
+#else
     context->send_botbase_request(
         &context,
         DeviceRequest_skipper_init_view()
     );
+#endif
 }
 void skipper_auto_recovery(ProControllerContext& context){
+#ifdef PA_CC_DAY_SKIPPERS
+    DaySkippers::auto_recovery(context);
+#else
     context->send_botbase_request(
         &context,
         DeviceRequest_skipper_auto_recovery()
     );
+#endif
 }
 void skipper_rollback_year_full(ProControllerContext& context, bool date_us){
+#ifdef PA_CC_DAY_SKIPPERS
+    DaySkippers::rollback_year_full(context, date_us);
+#else
     context->send_botbase_request(
         &context,
         DeviceRequest_skipper_rollback_year_full(date_us)
     );
+#endif
 }
 void skipper_rollback_year_sync(ProControllerContext& context){
+#ifdef PA_CC_DAY_SKIPPERS
+    DaySkippers::rollback_year_sync(context);
+#else
     context->send_botbase_request(
         &context,
         DeviceRequest_skipper_rollback_year_sync()
     );
+#endif
 }
 void skipper_increment_day(ProControllerContext& context, bool date_us){
+#ifdef PA_CC_DAY_SKIPPERS
+    DaySkippers::increment_day(context, date_us);
+#else
     context->send_botbase_request(
         &context,
         DeviceRequest_skipper_increment_day(date_us)
     );
+#endif
 }
 void skipper_increment_month(ProControllerContext& context, uint8_t days){
+#ifdef PA_CC_DAY_SKIPPERS
+    DaySkippers::increment_month(context, days);
+#else
     context->send_botbase_request(
         &context,
         DeviceRequest_skipper_increment_month(days)
     );
+#endif
 }
 void skipper_increment_all(ProControllerContext& context){
+#ifdef PA_CC_DAY_SKIPPERS
+    DaySkippers::increment_all(context);
+#else
     context->send_botbase_request(
         &context,
         DeviceRequest_skipper_increment_all()
     );
+#endif
 }
 void skipper_increment_all_rollback(ProControllerContext& context){
+#ifdef PA_CC_DAY_SKIPPERS
+    DaySkippers::increment_all_rollback(context);
+#else
     context->send_botbase_request(
         &context,
         DeviceRequest_skipper_increment_all_rollback()
     );
+#endif
 }
 
 

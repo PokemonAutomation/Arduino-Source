@@ -15,7 +15,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 DaySkipperUS_Descriptor::DaySkipperUS_Descriptor()
