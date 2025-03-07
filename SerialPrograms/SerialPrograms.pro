@@ -667,6 +667,7 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
+    Source/PokemonLGPE/PokemonLGPE_Panels.cpp \
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp \
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp \
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp \
@@ -1846,6 +1847,7 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
+    Source/PokemonLGPE/PokemonLGPE_Panels.h \
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h \
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h \
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h \
