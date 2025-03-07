@@ -24,6 +24,7 @@
 #include "Programs/NintendoSwitch_SnapshotDumper.h"
 #include "DevPrograms/TestProgramComputer.h"
 #include "DevPrograms/TestProgramSwitch.h"
+#include "DevPrograms/JoyconProgram.h"
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
 
@@ -67,6 +68,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<SnapshotDumper_Descriptor, SnapshotDumper>());
         ret.emplace_back(make_computer_program<TestProgramComputer_Descriptor, TestProgramComputer>());
         ret.emplace_back(make_multi_switch_program<TestProgram_Descriptor, TestProgram>());
+        ret.emplace_back(make_single_switch_program<JoyconProgram_Descriptor, JoyconProgram>());
         ret.emplace_back(make_computer_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>());
         ret.emplace_back(make_computer_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>());
 #ifdef PA_OFFICIAL

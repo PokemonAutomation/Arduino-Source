@@ -114,10 +114,12 @@ const std::map<
             {ControllerType::NintendoSwitch_LeftJoycon, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_LeftJoycon,
             }},
             {ControllerType::NintendoSwitch_RightJoycon, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_RightJoycon,
             }},
         }},
     }},

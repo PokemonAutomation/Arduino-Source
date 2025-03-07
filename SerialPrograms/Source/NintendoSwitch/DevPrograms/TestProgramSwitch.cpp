@@ -278,7 +278,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    [[maybe_unused]] BotBase& botbase = env.consoles[0];
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
-    ProControllerContext context(scope, console.controller());
+    ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
 //    std::terminate();

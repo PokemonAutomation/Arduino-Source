@@ -148,6 +148,46 @@ int init_PushButtonFramework = register_message_converters_push_button_framework
 
 
 
+void pbf_wait(JoyconContext& context, Milliseconds duration){
+    ssf_do_nothing(context, duration);
+}
+void pbf_press_button(JoyconContext& context, Button button, Milliseconds hold, Milliseconds release){
+    ssf_press_button(context, button, hold + release, hold, 0ms);
+}
+void pbf_move_joystick(JoyconContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release){
+    ssf_press_joystick(context, x, y, hold + release, hold, 0ms);
+}
+void pbf_mash_button(JoyconContext& context, Button button, Milliseconds duration){
+    ssf_mash1_button(context, button, duration);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 }
 }
 

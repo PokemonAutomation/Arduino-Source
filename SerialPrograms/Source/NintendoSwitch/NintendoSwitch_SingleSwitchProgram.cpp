@@ -72,6 +72,15 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(
 {}
 
 
+void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+    ProControllerContext context(env.console.pro_controller());
+    program(env, context);
+}
+void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Not implemented.");
+}
+
+
 void SingleSwitchProgramInstance::start_program_controller_check(
     CancellableScope& scope,
     ControllerSession& session

@@ -113,7 +113,9 @@ public:
         const std::vector<std::string>& error_notification_tags = {"Notifs"}
     );
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) = 0;
+    //  Child classes should override one of these.
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope);
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 
 public:

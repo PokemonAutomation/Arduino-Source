@@ -98,7 +98,7 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO()
 }
 
 void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    ProControllerContext host(scope, env.consoles[0].controller());
+    ProControllerContext host(scope, env.consoles[0].pro_controller());
     size_t switches = env.consoles.size();
 
     WallDuration TOUCH_DATE_INTERVAL = TOUCH_DATE_INTERVAL0;

@@ -136,6 +136,29 @@ void ssf_issue_scroll(
 
 
 
+void ssf_flush_pipeline(JoyconContext& context){
+    context->issue_barrier(&context);
+}
+void ssf_do_nothing(JoyconContext& context, Milliseconds duration){
+    context->issue_nop(&context, duration);
+}
+void ssf_press_button(
+    JoyconContext& context,
+    Button button,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_buttons(&context, button, delay, hold, cool);
+}
+void ssf_press_joystick(
+    JoyconContext& context,
+    uint8_t x, uint8_t y,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    context->issue_joystick(&context, x, y, delay, hold, cool);
+}
+void ssf_mash1_button(JoyconContext& context, Button button, Milliseconds duration){
+    context->issue_mash_button(&context, button, duration);
+}
 
 
 

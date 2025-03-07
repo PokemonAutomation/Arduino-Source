@@ -40,6 +40,8 @@ enum class ControllerFeature{
     QueryTickSize,
     QueryCommandQueueSize,
     NintendoSwitch_ProController,
+    NintendoSwitch_LeftJoycon,
+    NintendoSwitch_RightJoycon,
     NintendoSwitch_DateSkip,
 };
 

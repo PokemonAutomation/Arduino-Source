@@ -80,18 +80,16 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 
 #ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
     try{
-        ProControllerContext context(scope, env.console.controller());
-        m_option.instance().program(env, context);
-        context.wait_for_all_requests();
+        m_option.instance().program(env, scope);
+        env.console.controller().wait_for_all(&scope);
     }catch (...){
         m_scope.store(nullptr, std::memory_order_release);
         throw;
     }
 #else
     {
-        ProControllerContext context(scope, env.console.controller());
-        m_option.instance().program(env, context);
-        context.wait_for_all_requests();
+        m_option.instance().program(env, scope);
+        env.console.controller().wait_for_all(&scope);
     }
 #endif
     m_scope.store(nullptr, std::memory_order_release);
@@ -130,18 +128,13 @@ void SingleSwitchProgramSession::internal_run_program(){
     );
     CancellableHolder<CancellableScope> scope;
     AbstractController* controller = m_system.controller_session().controller();
-    ProController* switch_controller = dynamic_cast<ProController*>(controller);
-    if (switch_controller == nullptr){
-        report_error("Cannot Start: The controller is not ready or is incompatible.");
-        return;
-    }
     SingleSwitchProgramEnvironment env(
         program_info,
         scope,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         m_system.logger(),
-        *switch_controller,
+        *controller,
         m_system.video(),
         m_system.overlay(),
         m_system.audio(),

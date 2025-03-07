@@ -858,6 +858,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
+    Source/NintendoSwitch/DevPrograms/JoyconProgram.cpp
+    Source/NintendoSwitch/DevPrograms/JoyconProgram.h
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp

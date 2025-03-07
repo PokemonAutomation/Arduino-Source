@@ -18,6 +18,7 @@
 #define PokemonAutomation_NintendoSwitch_Commands_PushButtons_H
 
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -111,6 +112,15 @@ void pbf_controller_state(
     uint8_t right_x, uint8_t right_y,
     Milliseconds duration
 );
+
+
+
+
+void pbf_wait           (JoyconContext& context, Milliseconds duration);
+void pbf_press_button   (JoyconContext& context, Button button, Milliseconds hold, Milliseconds release);
+void pbf_move_joystick  (JoyconContext& context, uint8_t x, uint8_t y, Milliseconds hold, Milliseconds release);
+void pbf_mash_button    (JoyconContext& context, Button button, Milliseconds duration);
+
 
 
 

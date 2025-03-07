@@ -422,6 +422,7 @@ SOURCES += \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
+    Source/NintendoSwitch/DevPrograms/JoyconProgram.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp \
@@ -1595,6 +1596,7 @@ HEADERS += \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.h \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
+    Source/NintendoSwitch/DevPrograms/JoyconProgram.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h \

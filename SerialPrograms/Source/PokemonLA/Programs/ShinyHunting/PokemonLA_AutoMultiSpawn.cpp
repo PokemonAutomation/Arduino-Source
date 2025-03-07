@@ -83,7 +83,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
         context,
         env.console.logger(),
         env.realtime_dispatcher(),
-        env.console.controller()
+        env.console.pro_controller()
     );
 
     // First, let controller press ZL non-stop to start focusing on a pokemon

@@ -16,7 +16,7 @@
 #define PokemonAutomation_NintendoSwitch_Commands_Superscalar_H
 
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
-
+#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -210,6 +210,25 @@ inline void ssf_hold_joystick1(
         ssf_press_right_joystick(context, x, y, hold, hold);
     }
 }
+
+
+
+
+
+void ssf_flush_pipeline (JoyconContext& context);
+void ssf_do_nothing     (JoyconContext& context, Milliseconds duration);
+void ssf_press_button(
+    JoyconContext& context,
+    Button button,
+    Milliseconds delay, Milliseconds hold = 3*15ms, Milliseconds cool = 2*15ms
+);
+void ssf_press_joystick(
+    JoyconContext& context,
+    uint8_t x, uint8_t y,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
+);
+void ssf_mash1_button   (JoyconContext& context, Button button, Milliseconds duration);
+
 
 
 
