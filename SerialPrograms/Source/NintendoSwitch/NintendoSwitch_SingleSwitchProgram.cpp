@@ -73,7 +73,7 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(
 
 
 void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
-    ProControllerContext context(env.console.pro_controller());
+    ProControllerContext context(scope, env.console.pro_controller());
     program(env, context);
 }
 void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
