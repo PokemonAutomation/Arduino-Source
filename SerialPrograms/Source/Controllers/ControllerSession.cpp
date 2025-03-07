@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "ControllerTypeStrings.h"
 #include "ControllerSession.h"
 
 //#include <iostream>

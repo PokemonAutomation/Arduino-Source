@@ -37,7 +37,7 @@ public:
 
         this->setPlaceholderText("192.168.0.100:6000");
 
-        if (current == nullptr){
+        if (current == nullptr || current->interface_type != ControllerInterface::TcpSysbotBase){
             std::shared_ptr<const ControllerDescriptor> descriptor =
                 parent.session().option().get_descriptor_from_cache(ControllerInterface::TcpSysbotBase);
             if (!descriptor){

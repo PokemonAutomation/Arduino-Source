@@ -34,7 +34,11 @@ public:
     {
 //        cout << "SerialPABotBase(): " << current << endl;
 
-        if (current == nullptr){
+        if (current == nullptr || (
+                current->interface_type != ControllerInterface::None &&
+                current->interface_type != ControllerInterface::SerialPABotBase
+            )
+        ){
             std::shared_ptr<const ControllerDescriptor> descriptor =
                 parent.session().option().get_descriptor_from_cache(ControllerInterface::SerialPABotBase);
             if (!descriptor){

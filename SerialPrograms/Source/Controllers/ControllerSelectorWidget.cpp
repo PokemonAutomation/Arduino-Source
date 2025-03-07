@@ -146,12 +146,12 @@ void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_t
 
     switch (interface_type){
     case ControllerInterface::SerialPABotBase:
-        m_selector = new SerialPABotBase::SerialPABotBase_SelectorWidget(*this, nullptr);
+        m_selector = new SerialPABotBase::SerialPABotBase_SelectorWidget(*this, m_session.descriptor().get());
         m_dropdowns->insertWidget(1, m_selector);
         break;
 
     case ControllerInterface::TcpSysbotBase:
-        m_selector = new SysbotBase::TcpSysbotBase_SelectorWidget(*this, nullptr);
+        m_selector = new SysbotBase::TcpSysbotBase_SelectorWidget(*this, m_session.descriptor().get());
         m_dropdowns->insertWidget(1, m_selector);
         break;
 
