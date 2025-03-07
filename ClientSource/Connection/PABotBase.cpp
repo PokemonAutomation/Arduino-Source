@@ -563,7 +563,37 @@ void PABotBase::retransmit_thread(){
 
         //  Retransmit
         //      Iterate through all pending requests and retransmit them in
-        //  chronological order. Skip the ones that are new.
+        //  chronological order. ~~Skip the ones that are new.~~
+        //  (Don't skip the new ones since it will lead to gaps.)
+
+        //  Gather together all requests/commands. Sort them by seqnum and
+        //  resend everything.
+
+        WallClock oldest = last_sent;
+
+        std::map<uint64_t, const BotBaseMessage*> messages;
+        for (auto& item : m_pending_requests){
+            item.second.sanitizer.check_usage();
+            if (item.second.state == AckState::NOT_ACKED){
+                oldest = std::max(oldest, item.second.first_sent);
+                messages[item.first] = &item.second.request;
+            }
+        }
+        for (auto& item : m_pending_commands){
+            item.second.sanitizer.check_usage();
+            if (item.second.state == AckState::NOT_ACKED){
+                oldest = std::max(oldest, item.second.first_sent);
+                messages[item.first] = &item.second.request;
+            }
+        }
+
+        if (!messages.empty() && now - oldest >= m_retransmit_delay){
+            for (const auto& item : messages){
+                send_message(*item.second, true);
+            }
+        }
+
+#if 0
         for (auto& item : m_pending_requests){
             item.second.sanitizer.check_usage();
             if (item.second.state == AckState::NOT_ACKED &&
@@ -580,6 +610,8 @@ void PABotBase::retransmit_thread(){
                 send_message(item.second.request, true);
             }
         }
+#endif
+
         last_sent = current_time();
     }
 //    cout << "retransmit_thread() - exit" << endl;
