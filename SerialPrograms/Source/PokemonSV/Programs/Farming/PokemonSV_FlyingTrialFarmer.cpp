@@ -224,7 +224,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControll
                     pbf_wait(context,  Milliseconds(1005)); 
                     pbf_move_left_joystick(context, 110, get_final_y_axis( -78), Milliseconds(1995), Milliseconds(0)); 
                     pbf_wait(context,  Milliseconds(14040));
-                    pbf_move_left_joystick(context, 205, get_final_y_axis(  30), Milliseconds(750), Milliseconds(0));
+                    pbf_move_left_joystick(context, 205, get_final_y_axis(  30), Milliseconds(735), Milliseconds(0));
                     pbf_wait(context,  Milliseconds(9000));                                       
                 }else{
                     pbf_wait(context,  3 * TICKS_PER_SECOND);
