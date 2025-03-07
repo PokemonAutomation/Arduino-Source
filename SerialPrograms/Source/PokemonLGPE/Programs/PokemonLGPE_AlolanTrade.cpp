@@ -59,8 +59,8 @@ std::unique_ptr<StatsTracker> AlolanTrade_Descriptor::make_stats() const{
 AlolanTrade::AlolanTrade()
     : NUM_TRADES(
         "<b>Number of Pokemon to trade:</b>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        30
+        LockMode::LOCK_WHILE_RUNNING,
+        30, 1
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_SHINY(
@@ -76,7 +76,7 @@ AlolanTrade::AlolanTrade()
     })
 {
     PA_ADD_OPTION(NUM_TRADES);
-    //PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -89,12 +89,13 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     WARNING: JOYCON TEST PROGRAM. Not well tested. Minimum infra to get this running. Bare minimum in general.
     Use at your own risk, it won't skip update checks and the like.
     FLASH RIGHT JOYCON. YOU NEED RIGHT JOYCON. YOU NEED THE HOME BUTTON. (this means no on-switch screenshots)
-    Also don't remap any of the buttons in the switch button mapping settings. Yet?
+    Also don't remap any of the buttons in the switch button mapping settings. Yet? Could use this to add Home and Screenshot.
 
     Preconditions:
     DO NOT have any Pokemon you want to keep in your boxes. Move them out to Home first.
     Favoriting a Pokemon does not prevent it from being traded.
     This must not be your first time doing the trade. (I've done all the trades, can't check first time trade behavior.)
+    In your boxes, sort by ORDER CAUGHT
 
     Setup:
     Catch the Kanto variant of the target.
@@ -109,26 +110,6 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     actual enter game and start screen detectors
     menu detectors, reset game from home, etc.
     get rid of all this blindly mashing A in general...so need everything really.
-    */
-
-    //to check pokemon in menu boxes - not used
-    //Open menu - always defaults to center (Party)
-    /* Menu:
-    Play with Partner
-    Pokedex - Bag - Party - Communicate - Save
-    (Press Y for options)
-
-    sort boxes by recently caught and press left to get to most recent pokemon
-    */
-
-    /*
-    pbf_press_button(context, BUTTON_A, 200ms, 2000ms);
-    pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
-    pbf_move_joystick(context, 128, 0, 100ms, 100ms);
-    pbf_move_joystick(context, 128, 0, 100ms, 100ms);
-    pbf_move_joystick(context, 255, 128, 100ms, 100ms);
-    pbf_move_joystick(context, 128, 0, 100ms, 100ms);
-    pbf_press_button(context, BUTTON_X, 200ms, 2000ms);
     */
 
     bool shiny_found = false;
@@ -160,7 +141,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
             }
 
             //Wait for trade to complete.
-            BlackScreenOverWatcher trade_completed(COLOR_RED);
+            BlackScreenOverWatcher trade_completed(COLOR_YELLOW);
             int ret2 = wait_until(
                 env.console, context,
                 std::chrono::seconds(120),
@@ -179,36 +160,104 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
                 env.log("Trade completed.");
             }
 
-            //After black screen fade is done, a summary will appear.
-            //pbf_wait(context, 250);
+            //Summary will appear the first time you trade in a session(?) Close that as well.
+            //Exit menu and dialog.
+            pbf_mash_button(context, BUTTON_B, 3000ms);
             context.wait_for_all_requests();
 
+            stats.trades++;
+            env.update_stats();
+        }
+
+        //to check pokemon in menu boxes
+        //Open menu - always defaults to center (Party)
+        /* Menu:
+        Play with Partner
+        Pokedex - Bag - Party - Communicate - Save (these all have a colored line under when selected)
+        (Press Y for options)
+
+        sort boxes by recently caught and press left to get to most recent pokemon
+        */
+
+        //Wait a bit.
+        pbf_press_button(context, BUTTON_X, 0ms, 2500ms);
+        context.wait_for_all_requests();
+
+        //Open menu, open party, open boxes
+        env.log("Opening boxes.");
+        pbf_press_button(context, BUTTON_X, 200ms, 500ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+        pbf_press_button(context, BUTTON_Y, 200ms, 1500ms);
+        context.wait_for_all_requests();
+
+        //Sort by order caught
+        env.log("Sorting by order caught.");
+        pbf_press_button(context, BUTTON_Y, 200ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+        context.wait_for_all_requests();
+
+        //Press left to go to last (most recent) Pokemon
+        env.log("Opening summary of most recent Pokemon.");
+        pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+        context.wait_for_all_requests();
+
+        //View summary - it takes a moment to load, wait is below
+        pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
+        pbf_move_joystick(context, 128, 255, 100ms, 100ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 100ms);
+        context.wait_for_all_requests();
+
+        //Wait.
+        pbf_press_button(context, BUTTON_X, 0ms, 5000ms);
+        context.wait_for_all_requests();
+
+        //Now check for shinies. Check everything that was traded.
+        for (uint16_t i = 0; i < NUM_TRADES; i++) {
             VideoSnapshot screen = env.console.video().snapshot();
             ShinySymbolDetector shiny_checker(COLOR_YELLOW);
-            shiny_found = shiny_checker.read(env.console.logger(), screen);
+            bool check = shiny_checker.read(env.console.logger(), screen);
 
-            if (shiny_found) {
+            if (check) {
                 env.log("Shiny detected!");
                 stats.shinies++;
+                env.update_stats();
                 send_program_status_notification(env, NOTIFICATION_SHINY, "Shiny found!", screen, true);
-                break;
+                shiny_found = true;
             }
             else {
                 env.log("Not shiny.");
-                stats.trades++;
             }
+
+            //Move left, check next.
+            pbf_move_joystick(context, 0, 128, 100ms, 100ms);
+            pbf_press_button(context, BUTTON_X, 0ms, 2000ms);
+            context.wait_for_all_requests();
         }
 
         if (!shiny_found) {
-            //Go to home, reset game
-            //How to handle sideways joycons vs in-game? What if a set is paired?
-            //Set as-is for now - I only have one ESP32, don't know how we're handling multiple joycons w/our usual home functions
+            //TODO? Check if home button even exists before attempting to reset.
+            //This way, if on left joycon, stop the program and alert the user.
 
             env.log("Out of Pokemon to trade. Resetting game.");
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
                 "Out of Pokemon to trade. Resetting game."
             );
+
+            //TODO: Need to make proper GameEntry eventually
+            //Thankfully, Joycon is upright after going to home.
+            //Go to home and close game
+            pbf_press_button(context, BUTTON_HOME, 200ms, 3000ms);
+            pbf_press_button(context, BUTTON_X, 200ms, 1000ms);
+            pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+
+            //Enter game from home
+            //break;
+
+            stats.resets++;
+            env.update_stats();
         }
     }
 

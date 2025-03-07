@@ -13,48 +13,32 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "PokemonLGPE_ShinySymbolDetector.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLGPE{
 
 ShinySymbolDetector::ShinySymbolDetector(Color color)
-    : m_box_star(0.204, 0.095, 0.033, 0.053)
+    : m_box_star(0.666, 0.779, 0.028, 0.044)
 {}
 void ShinySymbolDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box_star);
 }
 bool ShinySymbolDetector::read(Logger& logger, const ImageViewRGB32& frame){
-    const bool replace_color_within_range = true;
-
-    //Filter out background
-    ImageRGB32 filtered_region = filter_rgb32_range(
-        extract_box_reference(frame, m_box_star),
-        combine_rgb(138, 97, 221), combine_rgb(200, 181, 239), Color(0), replace_color_within_range
-    );
-    ImageStats stats = image_stats(filtered_region);
-
-    /*
-    filtered_region.save("./filtered_only.png");
-    cout << stats.average.r << endl;
-    cout << stats.average.g << endl;
-    cout << stats.average.b << endl;
-    */
-
     /*
     Shiny:
-    R: 196.632, G: 196.771, B: 145.863
+    Add infer box: (0.6660, 0.7790, 0.0280, 0.0440), RGB avg [159, 123, 125] avg sum 408 ratio [0.391, 0.301, 0.308] stddev [74.898, 54.696, 53.354] sum 182.948 crop size (54, 48)
+
     Not shiny:
-    R: 181.862, G: 180.686, B: 193.999
+    Add infer box: (0.6660, 0.7790, 0.0280, 0.0440), RGB avg [82, 113, 100] avg sum 295 ratio [0.276, 0.384, 0.340] stddev [15.477, 2.178, 2.648] sum 20.303 crop size (54, 48)
     */
 
-    if (stats.average.r + 100 > stats.average.b){
-        return true;
-    }
-    return false;
+
+    const auto stats = image_stats(extract_box_reference(frame, m_box_star));
+    return stats.stddev.sum() > 100;
 }
 
 
