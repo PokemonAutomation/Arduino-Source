@@ -20,12 +20,11 @@ public:
     SerialPABotBase_Controller(
         Logger& logger,
         ControllerType controller_type,
-        SerialPABotBase::SerialPABotBase_Connection& connection,
-        const ControllerRequirements& requirements
+        SerialPABotBase::SerialPABotBase_Connection& connection
     );
 
     bool is_ready() const{
-        return m_serial && m_handle.is_ready() && m_error_string.empty();
+        return m_serial && m_handle.is_ready();
     }
 
 
@@ -50,7 +49,7 @@ protected:
     //  access these asynchronously.
     SerialPABotBase::SerialPABotBase_Connection& m_handle;
     BotBaseController* m_serial;
-    std::string m_error_string;
+    ControllerFeatures m_supported_features;
 };
 
 

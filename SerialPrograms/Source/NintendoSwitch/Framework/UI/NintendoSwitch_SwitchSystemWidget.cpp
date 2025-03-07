@@ -132,7 +132,7 @@ SwitchSystemWidget::SwitchSystemWidget(
             }
 
             SwitchSystemOption option(
-                m_session.requirements(),
+                m_session.required_features(),
                 m_session.allow_commands_while_running()
             );
 
@@ -152,7 +152,7 @@ SwitchSystemWidget::SwitchSystemWidget(
 
             //  Create a copy of option, to be able to serialize it later on
             SwitchSystemOption option(
-                m_session.requirements(),
+                m_session.required_features(),
                 m_session.allow_commands_while_running()
             );
 

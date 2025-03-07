@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_Controllers_ControllerConnection_H
 #define PokemonAutomation_Controllers_ControllerConnection_H
 
-#include <set>
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "ControllerDescriptor.h"
@@ -18,7 +17,7 @@ namespace PokemonAutomation{
 
 struct ControllerModeStatus{
     ControllerType current_controller = ControllerType::None;
-    std::map<ControllerType, std::set<ControllerFeature>> supported_controllers;
+    std::map<ControllerType, ControllerFeatures> supported_controllers;
 };
 
 

@@ -33,8 +33,7 @@ public:
     virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
         ControllerConnection& connection,
-        ControllerType controller_type,
-        const ControllerRequirements& requirements
+        ControllerType controller_type
     ) const override;
 
     virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const override;

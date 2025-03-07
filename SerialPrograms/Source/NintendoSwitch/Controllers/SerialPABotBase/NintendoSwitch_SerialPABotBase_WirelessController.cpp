@@ -25,14 +25,12 @@ using namespace std::chrono_literals;
 SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
-    ControllerType controller_type,
-    const ControllerRequirements& requirements
+    ControllerType controller_type
 )
     : SerialPABotBase_Controller(
         logger,
         controller_type,
-        connection,
-        requirements
+        connection
     )
     , m_stopping(false)
     , m_status_thread(&SerialPABotBase_WirelessController::status_thread, this)

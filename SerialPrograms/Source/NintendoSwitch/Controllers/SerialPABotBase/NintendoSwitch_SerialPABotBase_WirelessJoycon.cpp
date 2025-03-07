@@ -7,7 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
 #include "ClientSource/Libraries/MessageConverter.h"
-#include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessJoycon.h"
 
 //#include <iostream>
@@ -22,15 +21,13 @@ namespace NintendoSwitch{
 SerialPABotBase_WirelessJoycon::SerialPABotBase_WirelessJoycon(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
-    ControllerType controller_type,
-    const ControllerRequirements& requirements
+    ControllerType controller_type
 )
     : JoyconController(controller_type)
     , SerialPABotBase_WirelessController(
         logger,
         connection,
-        controller_type,
-        requirements
+        controller_type
     )
     , m_controller_type(controller_type)
 {

@@ -58,12 +58,12 @@ public:
         std::string description,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
-        ControllerRequirements requirements,
+        ControllerFeatures required_features,
         FasterIfTickPrecise faster_if_tick_precise = FasterIfTickPrecise::NOT_FASTER
     );
 
     FeedbackType feedback() const{ return m_feedback; }
-    const ControllerRequirements& requirements() const{ return m_requirements; }
+    const ControllerFeatures& required_features() const{ return m_required_features; }
     FasterIfTickPrecise faster_if_tick_precise() const{ return m_faster_if_tick_precise; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
@@ -72,7 +72,7 @@ public:
 
 private:
     const FeedbackType m_feedback;
-    const ControllerRequirements m_requirements;
+    const ControllerFeatures m_required_features;
     const FasterIfTickPrecise m_faster_if_tick_precise;
     const bool m_allow_commands_while_running;
 };

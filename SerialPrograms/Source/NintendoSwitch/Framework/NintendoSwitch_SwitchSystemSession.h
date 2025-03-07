@@ -50,7 +50,7 @@ public:
 
 public:
     size_t console_number() const{ return m_console_number; }
-    const ControllerRequirements& requirements() const{ return m_option.m_requirements; }
+    const ControllerFeatures& required_features() const{ return m_option.m_required_features; }
     bool allow_commands_while_running() const{ return m_option.m_allow_commands_while_running; }
 
     Logger& logger(){ return m_logger; }

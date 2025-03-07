@@ -30,7 +30,7 @@ namespace NintendoSwitch{
 
 //Color pick_color(FeedbackType feedback);
 Color pick_color(
-    const ControllerRequirements& requirements,
+    const ControllerFeatures& required_features,
     FasterIfTickPrecise faster_if_tick_precise
 );
 
@@ -43,11 +43,11 @@ class SwitchSystemOption{
 
 public:
     SwitchSystemOption(
-        const ControllerRequirements& requirements,
+        const ControllerFeatures& required_features,
         bool allow_commands_while_running
     );
     SwitchSystemOption(
-        const ControllerRequirements& requirements,
+        const ControllerFeatures& required_features,
         bool allow_commands_while_running,
         const JsonValue& json
     );
@@ -57,7 +57,7 @@ public:
 
 
 public:
-    const ControllerRequirements& m_requirements;
+    const ControllerFeatures& m_required_features;
     const bool m_allow_commands_while_running;
 
     ControllerOption m_controller;

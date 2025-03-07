@@ -32,8 +32,7 @@ public:
 public:
     ProController_SysbotBase(
         Logger& logger,
-        SysbotBase::TcpSysbotBase_Connection& connection,
-        const ControllerRequirements& requirements
+        SysbotBase::TcpSysbotBase_Connection& connection
     );
     ~ProController_SysbotBase();
     void stop();
@@ -43,6 +42,8 @@ public:
     virtual ControllerType controller_type() const override{
         return ControllerType::NintendoSwitch_WiredProController;
     }
+    virtual const ControllerFeatures& controller_features() const override;
+
     virtual Milliseconds ticksize() const override{
         return Milliseconds::zero();
     }
@@ -56,10 +57,7 @@ public:
         return m_logger;
     }
     virtual bool is_ready() const override{
-        return m_connection.is_ready() && m_error_string.empty();
-    }
-    virtual std::string error_string() const override{
-        return m_error_string;
+        return m_connection.is_ready();
     }
 
 
@@ -177,8 +175,6 @@ private:
 
 private:
     SysbotBase::TcpSysbotBase_Connection& m_connection;
-
-    std::string m_error_string;
 
     std::atomic<bool> m_stopping;
     bool m_replace_on_next;

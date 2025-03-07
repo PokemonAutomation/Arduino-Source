@@ -19,8 +19,7 @@ public:
     SerialPABotBase_WirelessController(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
-        ControllerType controller_type,
-        const ControllerRequirements& requirements
+        ControllerType controller_type
     );
     ~SerialPABotBase_WirelessController();
     void stop();

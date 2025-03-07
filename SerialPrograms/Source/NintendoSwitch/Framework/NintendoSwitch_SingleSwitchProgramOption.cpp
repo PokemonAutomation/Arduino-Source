@@ -18,7 +18,7 @@ SingleSwitchProgramOption::SingleSwitchProgramOption(const SingleSwitchProgramDe
     : PanelInstance(descriptor)
     , m_descriptor(descriptor)
     , m_system(
-        descriptor.requirements(),
+        descriptor.required_features(),
         descriptor.allow_commands_while_running()
     )
     , m_instance(descriptor.make_instance())

@@ -9,7 +9,6 @@
 
 #include <stdint.h>
 #include <string>
-#include <set>
 #include <map>
 #include "Controllers/ControllerCapability.h"
 
@@ -19,7 +18,7 @@ namespace SerialPABotBase{
 
 
 //  Defaults
-extern const ControllerRequirements OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS;
+extern const ControllerFeatures OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS;
 
 
 
@@ -33,7 +32,7 @@ extern const std::map<
     uint32_t,   //  Protocol Version
     std::map<
         uint32_t,   //  Program ID
-        std::map<ControllerType, std::set<ControllerFeature>>
+        std::map<ControllerType, ControllerFeatures>
     >
 > SUPPORTED_VERSIONS;
 

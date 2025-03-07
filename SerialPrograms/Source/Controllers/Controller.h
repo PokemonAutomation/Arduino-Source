@@ -18,6 +18,7 @@ class QKeyEvent;
 namespace PokemonAutomation{
 
 enum class ControllerType;
+class ControllerFeatures;
 
 
 
@@ -42,6 +43,7 @@ public:
     //  Static Information
 
     virtual ControllerType controller_type() const = 0;
+    virtual const ControllerFeatures& controller_features() const = 0;
 
     //  If the controller is polled at a fixed interval, this is that interval.
     //  Otherwise, returns zero.
@@ -56,7 +58,6 @@ public:
     //  Status
 
     virtual bool is_ready() const = 0;
-    virtual std::string error_string() const = 0;
 
 
 public:

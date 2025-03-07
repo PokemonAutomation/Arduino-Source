@@ -45,7 +45,7 @@ SwitchSystemSession::SwitchSystemSession(
     : m_console_number(console_number)
     , m_logger(global_logger_raw(), "Console " + std::to_string(console_number))
     , m_option(option)
-    , m_controller(m_logger, option.m_controller, option.m_requirements)
+    , m_controller(m_logger, option.m_controller, option.m_required_features)
 //    , m_serial(m_logger, option.m_serial)
     , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
     , m_audio(m_logger, option.m_audio)

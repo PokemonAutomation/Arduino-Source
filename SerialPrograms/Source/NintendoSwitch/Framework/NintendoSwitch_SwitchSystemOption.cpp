@@ -31,13 +31,13 @@ Color pick_color(FeedbackType feedback){
 }
 #endif
 Color pick_color(
-    const ControllerRequirements& requirements,
+    const ControllerFeatures& required_features,
     FasterIfTickPrecise faster_if_tick_precise
 ){
-    if (requirements.contains(ControllerFeature::NintendoSwitch_DateSkip)){
+    if (required_features.contains(ControllerFeature::NintendoSwitch_DateSkip)){
         return COLOR_RED;
     }
-    if (requirements.contains(ControllerFeature::TickPrecise)){
+    if (required_features.contains(ControllerFeature::TickPrecise)){
         return COLOR_PURPLE;
     }
     switch (faster_if_tick_precise){
@@ -59,20 +59,20 @@ const std::string SwitchSystemOption::JSON_OVERLAY = "Overlay";
 
 
 SwitchSystemOption::SwitchSystemOption(
-    const ControllerRequirements& requirements,
+    const ControllerFeatures& required_features,
     bool allow_commands_while_running
 )
-    : m_requirements(requirements)
+    : m_required_features(required_features)
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_camera(DEFAULT_RESOLUTION)
 //    , m_audio()
 {}
 SwitchSystemOption::SwitchSystemOption(
-    const ControllerRequirements& requirements,
+    const ControllerFeatures& required_features,
     bool allow_commands_while_running,
     const JsonValue& json
 )
-    : SwitchSystemOption(requirements, allow_commands_while_running)
+    : SwitchSystemOption(required_features, allow_commands_while_running)
 {
     load_json(json);
 }

@@ -24,8 +24,7 @@ namespace NintendoSwitch{
 
 ProController_SysbotBase::ProController_SysbotBase(
     Logger& logger,
-    SysbotBase::TcpSysbotBase_Connection& connection,
-    const ControllerRequirements& requirements
+    SysbotBase::TcpSysbotBase_Connection& connection
 )
     : ControllerWithScheduler(logger)
     , m_connection(connection)
@@ -42,32 +41,9 @@ ProController_SysbotBase::ProController_SysbotBase(
 
     ControllerModeStatus mode_status = connection.controller_mode_status();
     auto iter = mode_status.supported_controllers.find(ControllerType::NintendoSwitch_WiredProController);
-
-    std::string missing_feature;
-    do{
-        if (iter == mode_status.supported_controllers.end()){
-            missing_feature = "NintendoSwitch_WiredProController";
-            break;
-        }
-
-        missing_feature = requirements.check_compatibility(iter->second);
-
-        if (PreloadSettings::instance().DEVELOPER_MODE &&
-            missing_feature == CONTROLLER_FEATURE_STRINGS.get_string(ControllerFeature::TickPrecise)
-        ){
-            logger.log("Bypassing Missing Requirement: " + missing_feature, COLOR_RED);
-            missing_feature.clear();
-        }
-
-        if (missing_feature.empty()){
-            m_dispatch_thread = std::thread(&ProController_SysbotBase::thread_body, this);
-            return;
-        }
-
-    }while (false);
-
-    m_error_string = html_color_text("Missing Feature: " + missing_feature, COLOR_RED);
-
+    if (iter != mode_status.supported_controllers.end()){
+        m_dispatch_thread = std::thread(&ProController_SysbotBase::thread_body, this);
+    }
 }
 ProController_SysbotBase::~ProController_SysbotBase(){
     stop();
@@ -84,6 +60,14 @@ void ProController_SysbotBase::stop(){
         std::lock_guard<std::mutex> lg(m_state_lock);
         m_cv.notify_all();
     }
+}
+
+
+const ControllerFeatures& ProController_SysbotBase::controller_features() const{
+    static const ControllerFeatures features{
+        ControllerFeature::NintendoSwitch_ProController,
+    };
+    return features;
 }
 
 

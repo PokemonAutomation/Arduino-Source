@@ -14,7 +14,7 @@ namespace SerialPABotBase{
 
 
 //  Defaults
-const ControllerRequirements OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
+const ControllerFeatures OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
     ControllerFeature::TickPrecise,
     ControllerFeature::NintendoSwitch_ProController,
 };
@@ -68,7 +68,7 @@ const std::map<
     uint32_t,   //  Protocol Version
     std::map<
         uint32_t,   //  Program ID
-        std::map<ControllerType, std::set<ControllerFeature>>
+        std::map<ControllerType, ControllerFeatures>
     >
 > SUPPORTED_VERSIONS{
     {2021052600, {

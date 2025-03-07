@@ -19,10 +19,6 @@ namespace NintendoSwitch{
 class SwitchViewer_Descriptor : public PanelDescriptor{
 public:
     SwitchViewer_Descriptor();
-    const ControllerRequirements& requirements() const{ return m_requirements; }
-
-private:
-    const ControllerRequirements m_requirements;
 };
 
 

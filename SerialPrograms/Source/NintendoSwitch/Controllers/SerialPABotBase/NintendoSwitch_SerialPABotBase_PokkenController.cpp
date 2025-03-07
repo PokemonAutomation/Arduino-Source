@@ -29,14 +29,12 @@ using namespace std::chrono_literals;
 
 SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
     Logger& logger,
-    SerialPABotBase::SerialPABotBase_Connection& connection,
-    const ControllerRequirements& requirements
+    SerialPABotBase::SerialPABotBase_Connection& connection
 )
     : SerialPABotBase_Controller(
         logger,
         ControllerType::NintendoSwitch_WiredProController,
-        connection,
-        requirements
+        connection
     )
     , m_stopping(false)
     , m_status_thread(&SerialPABotBase_PokkenController::status_thread, this)
@@ -59,6 +57,10 @@ void SerialPABotBase_PokkenController::stop(){
         m_cv.notify_all();
     }
 }
+
+
+
+
 
 void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable, WallDuration duration){
     //  Must be called inside "m_state_lock".

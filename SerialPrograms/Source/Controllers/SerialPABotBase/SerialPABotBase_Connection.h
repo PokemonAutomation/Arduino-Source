@@ -31,7 +31,7 @@ public:
     );
     ~SerialPABotBase_Connection();
 
-    void update_with_capabilities(const std::set<ControllerFeature>& capabilities);
+    void update_with_capabilities(const ControllerFeatures& capabilities);
 
 
 public:

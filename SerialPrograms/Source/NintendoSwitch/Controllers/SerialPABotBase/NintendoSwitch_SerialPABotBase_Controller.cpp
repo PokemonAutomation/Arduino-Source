@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBaseMessage.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
@@ -26,8 +25,7 @@ using namespace std::chrono_literals;
 SerialPABotBase_Controller::SerialPABotBase_Controller(
     Logger& logger,
     ControllerType controller_type,
-    SerialPABotBase::SerialPABotBase_Connection& connection,
-    const ControllerRequirements& requirements
+    SerialPABotBase::SerialPABotBase_Connection& connection
 )
     : ControllerWithScheduler(logger)
     , m_handle(connection)
@@ -45,26 +43,12 @@ SerialPABotBase_Controller::SerialPABotBase_Controller(
         CONTROLLER_TYPE_STRINGS.get_string(mode_status.current_controller)
     );
 
-    const std::map<ControllerType, std::set<ControllerFeature>>& controllers = mode_status.supported_controllers;
+    std::map<ControllerType, ControllerFeatures>& controllers = mode_status.supported_controllers;
     auto iter = controllers.find(controller_type);
-
-    std::string missing_feature;
-    do{
-        if (iter == controllers.end()){
-            missing_feature = CONTROLLER_TYPE_STRINGS.get_string(controller_type);
-            break;
-        }
-
-        missing_feature = requirements.check_compatibility(iter->second);
-
-        if (missing_feature.empty()){
-            connection.update_with_capabilities(iter->second);
-            return;
-        }
-
-    }while (false);
-
-    m_error_string = html_color_text("Missing Feature: " + missing_feature, COLOR_RED);
+    if (iter != controllers.end()){
+        m_supported_features = std::move(iter->second);
+        connection.update_with_capabilities(m_supported_features);
+    }
 }
 
 

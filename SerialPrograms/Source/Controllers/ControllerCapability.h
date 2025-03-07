@@ -27,26 +27,29 @@
 namespace PokemonAutomation{
 
 
-
-class ControllerRequirements{
+class ControllerFeatures{
 public:
-    ControllerRequirements(std::initializer_list<ControllerFeature> args);
+    ControllerFeatures()
+        : m_sanitizer("ControllerFeatures")
+    {}
+    ControllerFeatures(std::initializer_list<ControllerFeature> list)
+        : m_features(std::move(list))
+        , m_sanitizer("ControllerFeatures")
+    {}
 
     bool contains(ControllerFeature feature) const{
         return m_features.contains(feature);
     }
 
-    //  Check compatibility. If compatible, returns empty string.
-    //  Otherwise returns one of the missing features.
-    std::string check_compatibility(const std::set<ControllerFeature>& features) const;
-
+    //  Returns empty string if this class contains everything in "features".
+    //  Otherwise, returns the name of one of the missing features.
+    std::string contains_all(const ControllerFeatures& features) const;
 
 private:
     std::set<ControllerFeature> m_features;
 
     LifetimeSanitizer m_sanitizer;
 };
-
 
 
 

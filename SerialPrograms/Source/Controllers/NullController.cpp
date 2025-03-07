@@ -37,8 +37,7 @@ std::unique_ptr<ControllerConnection> NullControllerDescriptor::open_connection(
 std::unique_ptr<AbstractController> NullControllerDescriptor::make_controller(
     Logger& logger,
     ControllerConnection& connection,
-    ControllerType controller_type,
-    const ControllerRequirements& requirements
+    ControllerType controller_type
 ) const{
     return nullptr;
 }

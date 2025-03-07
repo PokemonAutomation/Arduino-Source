@@ -57,14 +57,12 @@ std::unique_ptr<ControllerConnection> TcpSysbotBase_Descriptor::open_connection(
 std::unique_ptr<AbstractController> TcpSysbotBase_Descriptor::make_controller(
     Logger& logger,
     ControllerConnection& connection,
-    ControllerType controller_type,
-    const ControllerRequirements& requirements
+    ControllerType controller_type
 ) const{
     return std::unique_ptr<AbstractController>(
         new NintendoSwitch::ProController_SysbotBase(
             logger,
-            static_cast<TcpSysbotBase_Connection&>(connection),
-            requirements
+            static_cast<TcpSysbotBase_Connection&>(connection)
         )
     );
 }

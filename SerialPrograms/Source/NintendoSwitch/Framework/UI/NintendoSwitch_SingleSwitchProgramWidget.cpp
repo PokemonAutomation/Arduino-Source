@@ -52,7 +52,7 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         descriptor.display_name(),
         descriptor.doc_link(),
         descriptor.description(),
-        descriptor.requirements(),
+        descriptor.required_features(),
         descriptor.faster_if_tick_precise()
     );
     layout->addWidget(header);

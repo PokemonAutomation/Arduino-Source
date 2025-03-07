@@ -23,7 +23,6 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/SwitchViewer.md",
         "View status information from one or more running programs."
     )
-    , m_requirements({})
 {}
 
 
@@ -31,7 +30,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
 SwitchViewer::SwitchViewer(const SwitchViewer_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_switches(
-        descriptor.requirements(),
+        {},
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         1, 4, 1

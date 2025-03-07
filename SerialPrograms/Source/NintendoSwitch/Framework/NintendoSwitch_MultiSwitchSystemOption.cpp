@@ -14,14 +14,14 @@ namespace NintendoSwitch{
 
 
 MultiSwitchSystemOption::MultiSwitchSystemOption(
-    const ControllerRequirements& requirements,
+    const ControllerFeatures& required_features,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
     size_t switches
 )
-    : m_requirements(requirements)
+    : m_required_features(required_features)
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
@@ -32,14 +32,14 @@ MultiSwitchSystemOption::MultiSwitchSystemOption(
     resize(switches);
 }
 MultiSwitchSystemOption::MultiSwitchSystemOption(
-    const ControllerRequirements& requirements,
+    const ControllerFeatures& required_features,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
     const JsonValue& json
 )
-    : m_requirements(requirements)
+    : m_required_features(required_features)
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
@@ -62,8 +62,7 @@ void MultiSwitchSystemOption::load_json(const JsonValue& json){
         for (size_t c = 0; c < items; c++){
             m_switches.emplace_back(
                 new SwitchSystemOption(
-                    m_requirements,
-//                    m_min_pabotbase,
+                    m_required_features,
                     m_allow_commands_while_running,
                     (*array)[c]
                 )
@@ -86,8 +85,7 @@ void MultiSwitchSystemOption::resize(size_t count){
     while (m_switches.size() < count){
         m_switches.emplace_back(
             new SwitchSystemOption(
-                m_requirements,
-//                m_min_pabotbase,
+                m_required_features,
                 m_allow_commands_while_running
             )
         );

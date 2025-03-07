@@ -43,10 +43,10 @@ ControllerSession::~ControllerSession(){
 ControllerSession::ControllerSession(
     Logger& logger,
     ControllerOption& option,
-    const ControllerRequirements& requirements
+    const ControllerFeatures& required_features
 )
     : m_logger(logger)
-    , m_requirements(requirements)
+    , m_required_features(required_features)
     , m_option(option)
     , m_controller_type(ControllerType::None)
     , m_options_locked(false)
@@ -108,12 +108,6 @@ std::string ControllerSession::status_text() const{
     std::lock_guard<std::mutex> lg(m_state_lock);
     if (!m_connection){
         return "<font color=\"red\">No controller selected.</font>";
-    }
-    if (m_controller){
-        std::string error_string = m_controller->error_string();
-        if (!error_string.empty()){
-            return error_string;
-        }
     }
     return m_connection->status_text();
 }
@@ -310,7 +304,7 @@ void ControllerSession::post_connection_ready(
     ControllerConnection& connection,
     const ControllerModeStatus& mode_status
 ){
-    const std::map<ControllerType, std::set<ControllerFeature>>& supported_controllers = mode_status.supported_controllers;
+    const std::map<ControllerType, ControllerFeatures>& supported_controllers = mode_status.supported_controllers;
     if (supported_controllers.empty()){
         return;
     }
@@ -370,8 +364,7 @@ void ControllerSession::post_connection_ready(
             m_controller = m_descriptor->make_controller(
                 m_logger,
                 *m_connection,
-                current_controller,
-                m_requirements
+                current_controller
             );
         }
 
@@ -379,11 +372,6 @@ void ControllerSession::post_connection_ready(
 //        cout << "current_controller = " << CONTROLLER_TYPE_STRINGS.get_string(current_controller) << endl;
         m_controller_type = current_controller;
         ready = m_controller && m_controller->is_ready();
-
-        WriteSpinLock lg1(m_message_lock);
-        if (m_controller){
-            m_controller_error = m_controller->error_string();
-        }
     }
 
     signal_controller_changed(current_controller, available_controllers);

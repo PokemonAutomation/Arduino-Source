@@ -40,7 +40,7 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
-    const ControllerRequirements& requirements,
+    const ControllerFeatures& required_features,
     FasterIfTickPrecise faster_if_tick_precise
 );
 

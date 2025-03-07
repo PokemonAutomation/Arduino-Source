@@ -22,14 +22,13 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/VirtualConsole.md",
         "Play your Switch from your computer. Device logging is logged to the output window."
     )
-    , m_requirements({})
 {}
 
 
 
 VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
     : PanelInstance(descriptor)
-    , m_switch(descriptor.requirements(), false)
+    , m_switch({}, false)
 {}
 void VirtualConsole::from_json(const JsonValue& json){
     m_switch.load_json(json);

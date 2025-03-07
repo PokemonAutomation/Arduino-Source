@@ -23,8 +23,7 @@ public:
     SerialPABotBase_WirelessJoycon(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
-        ControllerType controller_type,
-        const ControllerRequirements& requirements
+        ControllerType controller_type
     );
     ~SerialPABotBase_WirelessJoycon();
 
@@ -34,15 +33,16 @@ public:
     virtual bool is_ready() const override{
         return SerialPABotBase_Controller::is_ready();
     }
-    virtual std::string error_string() const override{
-        return m_error_string;
-    }
 
 
 public:
     virtual ControllerType controller_type() const override{
         return m_controller_type;
     }
+    virtual const ControllerFeatures& controller_features() const override{
+        return m_supported_features;
+    }
+
     virtual Milliseconds ticksize() const override{
         return SerialPABotBase_WirelessController::ticksize();
     }

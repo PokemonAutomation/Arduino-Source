@@ -10,6 +10,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetectors/BlackBorderDetector.h"
+#include "Controllers/ControllerCapability.h"
 #include "StartProgramChecks.h"
 
 namespace PokemonAutomation{
@@ -21,11 +22,14 @@ void check_feedback(VideoStream& stream, FeedbackType feedback){
         return;
     }
     VideoSnapshot screen = stream.video().snapshot();
-    if (!screen){
-        if (feedback == FeedbackType::REQUIRED || feedback == FeedbackType::VIDEO_AUDIO){
-            throw UserSetupError(stream.logger(), "This program requires video feedback. Please make sure the video is working.");
-        }
+    if (screen){
         return;
+    }
+    if (feedback == FeedbackType::REQUIRED || feedback == FeedbackType::VIDEO_AUDIO){
+        throw UserSetupError(
+            stream.logger(),
+            "This program requires video feedback. Please make sure the video is working."
+        );
     }
 }
 
@@ -34,11 +38,32 @@ void check_border(VideoStream& stream){
     VideoOverlaySet set(stream.overlay());
     detector.make_overlays(set);
     VideoSnapshot screen = stream.video().snapshot();
-    if (detector.detect(screen)){
-        throw UserSetupError(stream.logger(), "Black border detected! Please set your screen size to 100% in the TV Settings on your Nintendo Switch.");
+    if (!detector.detect(screen)){
+        return;
     }
-
+    throw UserSetupError(
+        stream.logger(),
+        "Black border detected! Please set your screen size to 100% in the TV Settings on your Nintendo Switch."
+    );
 }
+
+
+
+void check_controller_features(
+    Logger& logger,
+    const ControllerFeatures& capabilities,
+    const ControllerFeatures& required_features
+){
+    std::string missing_feature = capabilities.contains_all(required_features);
+    if (missing_feature.empty()){
+        return;
+    }
+    throw UserSetupError(
+        logger,
+        "Cannot start program. The controller is missing the feature: " + missing_feature
+    );
+}
+
 
 
 

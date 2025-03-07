@@ -100,7 +100,7 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
-    const ControllerRequirements& requirements,
+    const ControllerFeatures& required_features,
     FasterIfTickPrecise faster_if_tick_precise
 ){
     CollapsibleGroupBox* header = make_panel_header(parent, display_name, doc_link, description);
@@ -108,11 +108,11 @@ CollapsibleGroupBox* make_panel_header(
 
     std::string text;
     do{
-        if (requirements.contains(ControllerFeature::NintendoSwitch_DateSkip)){
+        if (required_features.contains(ControllerFeature::NintendoSwitch_DateSkip)){
             text = html_color_text("(This program requires advanced RPCs. It requires Serial PABotBase.)", COLOR_RED);
             break;
         }
-        if (requirements.contains(ControllerFeature::TickPrecise)){
+        if (required_features.contains(ControllerFeature::TickPrecise)){
             text = html_color_text("(This program requires a tick-precise controller.)", COLOR_PURPLE);
             break;
         }

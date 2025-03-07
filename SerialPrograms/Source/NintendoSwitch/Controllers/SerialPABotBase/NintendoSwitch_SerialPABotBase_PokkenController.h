@@ -26,8 +26,7 @@ public:
 public:
     SerialPABotBase_PokkenController(
         Logger& logger,
-        SerialPABotBase::SerialPABotBase_Connection& connection,
-        const ControllerRequirements& requirements
+        SerialPABotBase::SerialPABotBase_Connection& connection
     );
     ~SerialPABotBase_PokkenController();
     void stop();
@@ -38,15 +37,16 @@ public:
     virtual bool is_ready() const override{
         return SerialPABotBase_Controller::is_ready();
     }
-    virtual std::string error_string() const override{
-        return m_error_string;
-    }
 
 
 public:
     virtual ControllerType controller_type() const override{
         return ControllerType::NintendoSwitch_WiredProController;
     }
+    virtual const ControllerFeatures& controller_features() const override{
+        return m_supported_features;
+    }
+
     virtual Milliseconds ticksize() const override{
         return Milliseconds(8);
     }

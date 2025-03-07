@@ -6,7 +6,6 @@
 
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
 #include "ClientSource/Libraries/MessageConverter.h"
-#include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessProController.h"
 
 //#include <iostream>
@@ -20,14 +19,12 @@ namespace NintendoSwitch{
 
 SerialPABotBase_WirelessProController::SerialPABotBase_WirelessProController(
     Logger& logger,
-    SerialPABotBase::SerialPABotBase_Connection& connection,
-    const ControllerRequirements& requirements
+    SerialPABotBase::SerialPABotBase_Connection& connection
 )
     : SerialPABotBase_WirelessController(
         logger,
         connection,
-        ControllerType::NintendoSwitch_WirelessProController,
-        requirements
+        ControllerType::NintendoSwitch_WirelessProController
     )
 {}
 SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){

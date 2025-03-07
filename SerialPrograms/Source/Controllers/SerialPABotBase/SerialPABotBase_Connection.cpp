@@ -104,7 +104,7 @@ SerialPABotBase_Connection::~SerialPABotBase_Connection(){
 }
 
 
-void SerialPABotBase_Connection::update_with_capabilities(const std::set<ControllerFeature>& capabilities){
+void SerialPABotBase_Connection::update_with_capabilities(const ControllerFeatures& capabilities){
     Logger& logger = m_logger;
 
     do{
@@ -186,7 +186,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
     m_program_id = Microcontroller::program_id(*m_botbase);
     logger.log("Checking Program ID... Program ID = " + std::to_string(m_program_id));
 
-    const std::map<uint32_t, std::map<ControllerType, std::set<ControllerFeature>>>& PROGRAM_IDS = protocol_iter->second;
+    const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>& PROGRAM_IDS = protocol_iter->second;
     auto program_iter = PROGRAM_IDS.find(m_program_id);
     if (program_iter == PROGRAM_IDS.end()){
         throw SerialProtocolException(
