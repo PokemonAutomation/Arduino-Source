@@ -8,7 +8,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLGPE_Panels.h"
 
-
+#include "Programs/PokemonLGPE_AlolanTrade.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -27,7 +27,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     //ret.emplace_back("---- General ----");
 
     ret.emplace_back("---- Shiny Hunting ----");
-    //ret.emplace_back(make_single_switch_program<AudioStarterReset_Descriptor, AudioStarterReset>());
+    ret.emplace_back(make_single_switch_program<AlolanTrade_Descriptor, AlolanTrade>());
 
     return ret;
 }
