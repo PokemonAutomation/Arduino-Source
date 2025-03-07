@@ -133,7 +133,7 @@ void trade_current_pokemon(
         );
         if (ret < 0){
             stats.m_errors++;
-//            box_image->save("ExpectedBox.png");   //  REMOVE
+//            box_image->save("ExpectedBox.png");
             tracker.report_unrecoverable_error(stream, "Failed to return to box after 2 minutes after a trade.");
         }
         stream.log("Detected box. Trade completed.");

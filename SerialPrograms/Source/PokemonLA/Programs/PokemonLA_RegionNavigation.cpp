@@ -109,6 +109,7 @@ void from_professor_return_to_jubilife(
             return;
         case 1:
             stream.log("Detected report research option...");
+            pbf_press_button(context, BUTTON_A, 20, 125);
             break;
         case 2:
             stream.log("Backing out of Pokedex...");
