@@ -239,23 +239,53 @@ void PABotBase::clear_all_active_commands(uint64_t seqnum){
     WriteSpinLock lg1(m_state_lock, "PABotBase::next_command_interrupt()");
     m_logger.log("Clearing all active commands... (Commands: " + std::to_string(m_pending_commands.size()) + ")", COLOR_DARKGREEN);
 
-//    if (m_pending_commands.size() > 2){
-//        cout << "asdf" << endl;
-//    }
+    m_cv.notify_all();
 
-    if (!m_pending_commands.empty()){
-        //  Remove all active commands up to the seqnum.
-        while (true){
-            auto iter = m_pending_commands.begin();
-            if (iter == m_pending_commands.end() || iter->first > seqnum){
-                break;
-            }
-            iter->second.sanitizer.check_usage();
-            m_pending_commands.erase(iter);
-        }
+    if (m_pending_commands.empty()){
+        return;
     }
 
-    m_cv.notify_all();
+    //  Remove all active commands up to the seqnum.
+    while (true){
+        auto iter = m_pending_commands.begin();
+        if (iter == m_pending_commands.end() || iter->first > seqnum){
+            break;
+        }
+        iter->second.sanitizer.check_usage();
+
+        //  We cannot remove un-acked messages from our buffer. If an un-acked
+        //  message is dropped and the receiver is still waiting for it, it will
+        //  wait forever since we will never retransmit.
+
+        if (iter->second.state == AckState::NOT_ACKED){
+            //  Convert the command into a no-op request.
+            Microcontroller::DeviceRequest_program_id request;
+            BotBaseMessage message = request.message();
+            seqnum_t seqnum_s = (seqnum_t)iter->first;
+            memcpy(&message.body[0], &seqnum_s, sizeof(seqnum_t));
+
+//                cout << "removing = " << seqnum_s << ", " << (int)iter->second.state << endl;
+
+            std::pair<std::map<uint64_t, PendingRequest>::iterator, bool> ret = m_pending_requests.emplace(
+                std::piecewise_construct,
+                std::forward_as_tuple(iter->first),
+                std::forward_as_tuple()
+            );
+            if (!ret.second){
+                throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Duplicate sequence number: " + std::to_string(seqnum));
+            }
+
+            //  This block will never throw.
+            {
+                PendingRequest& handle = ret.first->second;
+                handle.silent_remove = true;
+                handle.request = std::move(message);
+                handle.first_sent = current_time();
+            }
+        }
+
+        m_pending_commands.erase(iter);
+    }
 }
 template <typename Map>
 uint64_t PABotBase::infer_full_seqnum(const Map& map, seqnum_t seqnum) const{
