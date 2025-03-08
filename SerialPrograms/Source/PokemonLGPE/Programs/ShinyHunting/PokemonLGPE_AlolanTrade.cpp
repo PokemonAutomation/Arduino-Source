@@ -164,6 +164,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     while (!shiny_found) {
         //Run trades
         for (uint16_t i = 0; i < NUM_TRADES; i++) {
+            env.log("Running trade.");
             run_trade(env, context);
 
             stats.trades++;
@@ -236,7 +237,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
 
             //Move left, check next.
             pbf_move_joystick(context, 0, 128, 100ms, 100ms);
-            pbf_press_button(context, BUTTON_X, 0ms, 2000ms);
+            pbf_press_button(context, BUTTON_X, 0ms, 1000ms);
             context.wait_for_all_requests();
         }
         /*
@@ -263,7 +264,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
         }
         */
         //Break for now since resetting the game doesn't work.
-        break;
+        //break;
     }
 
     if (GO_HOME_WHEN_DONE) {

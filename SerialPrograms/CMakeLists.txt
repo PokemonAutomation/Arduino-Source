@@ -1364,10 +1364,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h
-    Source/PokemonLGPE/Programs/PokemonLGPE_AlolanTrade.cpp
-    Source/PokemonLGPE/Programs/PokemonLGPE_AlolanTrade.h
+    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp
+    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h
+    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp
+    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h
     Source/PokemonLGPE/PokemonLGPE_Panels.cpp
     Source/PokemonLGPE/PokemonLGPE_Panels.h
+    Source/PokemonLGPE/PokemonLGPE_Settings.cpp
+    Source/PokemonLGPE/PokemonLGPE_Settings.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp

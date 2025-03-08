@@ -7,8 +7,9 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLGPE_Panels.h"
+#include "PokemonLGPE_Settings.h"
 
-#include "Programs/PokemonLGPE_AlolanTrade.h"
+#include "Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -22,7 +23,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     std::vector<PanelEntry> ret;
     
     ret.emplace_back("---- Settings ----");
-    //ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
+    ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
     //ret.emplace_back("---- General ----");
 
