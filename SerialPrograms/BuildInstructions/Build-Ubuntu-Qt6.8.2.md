@@ -15,12 +15,6 @@ sudo apt install libopencv-dev
 
 ## Install Qt 6.8.2:
 
-Unlike with Qt 5.12, there is no offline installer for it. So you have two options here, use the online installer, or use a copy of an installation.
-
-### Official Online Installer:
-
-If you are ok with creating an account with Qt and using their online installer, then use this method.
-
 1. Download the online installer from here: https://www.qt.io/download-qt-installer
 2. Select custom install settings.
 3. Select the following options: 
