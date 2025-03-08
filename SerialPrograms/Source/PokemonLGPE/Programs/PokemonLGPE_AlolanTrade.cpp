@@ -12,14 +12,11 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
 #include "PokemonLGPE_AlolanTrade.h"
-
-//#include <iostream>
-//using std::cout;
-//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -86,19 +83,20 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     AlolanTrade_Descriptor::Stats& stats = env.current_stats<AlolanTrade_Descriptor::Stats>();
 
     /*
-    WARNING: JOYCON TEST PROGRAM. Not well tested. Minimum infra to get this running. Bare minimum in general.
-    Use at your own risk, it won't skip update checks and the like.
-    FLASH RIGHT JOYCON. YOU NEED RIGHT JOYCON. YOU NEED THE HOME BUTTON. (this means no on-switch screenshots)
+    WARNING: JOYCON TEST PROGRAM. Not well tested. Bare minimum in general.
+
+    Only works with Right joycon atm. Do not update right joycon.
+
+    Right joycon required for home button (this means no on-switch screenshots).
     Also don't remap any of the buttons in the switch button mapping settings. Yet? Could use this to add Home and Screenshot.
 
     Preconditions:
     DO NOT have any Pokemon you want to keep in your boxes. Move them out to Home first.
     Favoriting a Pokemon does not prevent it from being traded.
-    This must not be your first time doing the trade. (I've done all the trades, can't check first time trade behavior.)
-    In your boxes, sort by ORDER CAUGHT
+    This must not be your first time doing the trade. (I've done all the trades, so I can't check first time trade behavior.)
 
     Setup:
-    Catch the Kanto variant of the target.
+    Catch the Kanto variant of the target. Put this number in NUM_TRADES.
     Stand in front of trade NPC.
     Start the program in-game.
     
@@ -116,7 +114,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     while (!shiny_found) {
         //Run trades
         for (uint16_t i = 0; i < NUM_TRADES; i++) {
-            //TODO: This is messy, pull it all out. run_trade()?
+            //TODO: This is messy, pull it all out?
 
             //Talk to NPC, say Yes, select Pokemon from box.
             BlackScreenOverWatcher trade_started(COLOR_RED);
@@ -160,7 +158,8 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
                 env.log("Trade completed.");
             }
 
-            //Summary will appear the first time you trade in a session(?) Close that as well.
+            //Summary will appear the first time you trade in a session(?)
+            //Sometimes it appears anyway, don't know what determines it
             //Exit menu and dialog.
             pbf_mash_button(context, BUTTON_B, 3000ms);
             context.wait_for_all_requests();
@@ -169,14 +168,18 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
             env.update_stats();
         }
 
-        //to check pokemon in menu boxes
+        env.log("Done trading. Checking boxes.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Done trading. Checking boxes."
+        );
+
+        //To check pokemon in menu boxes
         //Open menu - always defaults to center (Party)
         /* Menu:
         Play with Partner
         Pokedex - Bag - Party - Communicate - Save (these all have a colored line under when selected)
         (Press Y for options)
-
-        sort boxes by recently caught and press left to get to most recent pokemon
         */
 
         //Wait a bit.
@@ -223,7 +226,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
                 env.log("Shiny detected!");
                 stats.shinies++;
                 env.update_stats();
-                send_program_status_notification(env, NOTIFICATION_SHINY, "Shiny found!", screen, true);
+                send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
                 shiny_found = true;
             }
             else {
@@ -236,6 +239,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
             context.wait_for_all_requests();
         }
 
+        /*
         if (!shiny_found) {
             //TODO? Check if home button even exists before attempting to reset.
             //This way, if on left joycon, stop the program and alert the user.
@@ -250,15 +254,18 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
             //Thankfully, Joycon is upright after going to home.
             //Go to home and close game
             pbf_press_button(context, BUTTON_HOME, 200ms, 3000ms);
-            pbf_press_button(context, BUTTON_X, 200ms, 1000ms);
-            pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
 
-            //Enter game from home
-            //break;
+            //TODO:
+            //joycon context->pro controller context?
+            start_game_from_home(env.console, context, true, 0, 0, std::chrono::milliseconds(2000));
 
             stats.resets++;
             env.update_stats();
         }
+        */
+
+        //Break for now since resetting the game doesn't work.
+        break;
     }
 
     //GO_HOME_WHEN_DONE.run_end_of_program(context);

@@ -14,9 +14,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLGPE{
 
-// After an in-game trade, the Pokemon's summary will appear.
-// Red star for shiny. No star if not.
-// Position is different when viewing in boxes. Do not use this for that.
+//Check for the red shiny star on a Pokemon's summary from the Party/Box menu.
+//This does not work for the summary that appears after a catch.
 class ShinySymbolDetector{
 public:
     ShinySymbolDetector(Color color);
