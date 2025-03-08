@@ -77,6 +77,56 @@ AlolanTrade::AlolanTrade()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& context){
+    //Talk to NPC, say Yes, select Pokemon from box.
+    BlackScreenOverWatcher trade_started(COLOR_RED);
+    int ret = run_until<JoyconContext>(
+        env.console, context,
+        [](JoyconContext& context){
+            pbf_mash_button(context, BUTTON_A, 15000ms);
+        },
+        {trade_started}
+    );
+    context.wait_for_all_requests();
+    if (ret != 0){
+        env.log("Failed to start trade.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to start trade.",
+            env.console
+        );
+    }
+    else {
+        env.log("Trade started.");
+    }
+
+    //Wait for trade to complete.
+    BlackScreenOverWatcher trade_completed(COLOR_YELLOW);
+    int ret2 = wait_until(
+        env.console, context,
+        std::chrono::seconds(120),
+        {trade_completed}
+    );
+    context.wait_for_all_requests();
+    if (ret2 != 0){
+        env.log("Did not detect end of trade.", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Did not detect end of trade.",
+            env.console
+        );
+    }
+    else {
+        env.log("Trade completed.");
+    }
+
+    //Summary will appear the first time you trade in a session(?)
+    //Sometimes it appears anyway, don't know what determines it
+    //Exit menu and dialog.
+    pbf_mash_button(context, BUTTON_B, 3000ms);
+    context.wait_for_all_requests();
+}
+
 void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     JoyconContext context(scope, env.console.controller<JoyconController>());
     assert_16_9_720p_min(env.logger(), env.console);
@@ -114,55 +164,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     while (!shiny_found) {
         //Run trades
         for (uint16_t i = 0; i < NUM_TRADES; i++) {
-            //TODO: This is messy, pull it all out?
-
-            //Talk to NPC, say Yes, select Pokemon from box.
-            BlackScreenOverWatcher trade_started(COLOR_RED);
-            int ret = run_until<JoyconContext>(
-                env.console, context,
-                [](JoyconContext& context){
-                    pbf_mash_button(context, BUTTON_A, 15000ms);
-                },
-                {trade_started}
-            );
-            context.wait_for_all_requests();
-            if (ret != 0){
-                env.log("Failed to start trade.", COLOR_RED);
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "Failed to start trade.",
-                    env.console
-                );
-            }
-            else {
-                env.log("Trade started.");
-            }
-
-            //Wait for trade to complete.
-            BlackScreenOverWatcher trade_completed(COLOR_YELLOW);
-            int ret2 = wait_until(
-                env.console, context,
-                std::chrono::seconds(120),
-                {trade_completed}
-            );
-            context.wait_for_all_requests();
-            if (ret2 != 0){
-                env.log("Did not detect end of trade.", COLOR_RED);
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "Did not detect end of trade.",
-                    env.console
-                );
-            }
-            else {
-                env.log("Trade completed.");
-            }
-
-            //Summary will appear the first time you trade in a session(?)
-            //Sometimes it appears anyway, don't know what determines it
-            //Exit menu and dialog.
-            pbf_mash_button(context, BUTTON_B, 3000ms);
-            context.wait_for_all_requests();
+            run_trade(env, context);
 
             stats.trades++;
             env.update_stats();
@@ -183,7 +185,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
         */
 
         //Wait a bit.
-        pbf_press_button(context, BUTTON_X, 0ms, 2500ms);
+        pbf_wait(context, 2500ms);
         context.wait_for_all_requests();
 
         //Open menu, open party, open boxes
@@ -205,15 +207,14 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
         pbf_move_joystick(context, 0, 128, 100ms, 100ms);
         context.wait_for_all_requests();
 
-        //View summary - it takes a moment to load, wait is below
+        //View summary - it takes a moment to load
         pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
         pbf_move_joystick(context, 128, 255, 100ms, 100ms);
         pbf_move_joystick(context, 128, 255, 100ms, 100ms);
         pbf_press_button(context, BUTTON_A, 200ms, 100ms);
         context.wait_for_all_requests();
 
-        //Wait.
-        pbf_press_button(context, BUTTON_X, 0ms, 5000ms);
+        pbf_wait(context, 5000ms);
         context.wait_for_all_requests();
 
         //Now check for shinies. Check everything that was traded.
@@ -238,22 +239,20 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
             pbf_press_button(context, BUTTON_X, 0ms, 2000ms);
             context.wait_for_all_requests();
         }
-
         /*
         if (!shiny_found) {
-            //TODO? Check if home button even exists before attempting to reset.
-            //This way, if on left joycon, stop the program and alert the user.
-
-            env.log("Out of Pokemon to trade. Resetting game.");
+            env.log("Out of Pokemon to trade and no shiny found. Resetting game.");
             send_program_status_notification(
                 env, NOTIFICATION_STATUS_UPDATE,
-                "Out of Pokemon to trade. Resetting game."
+                "Out of Pokemon to trade and no shiny found. Resetting game."
             );
 
             //TODO: Need to make proper GameEntry eventually
             //Thankfully, Joycon is upright after going to home.
             //Go to home and close game
             pbf_press_button(context, BUTTON_HOME, 200ms, 3000ms);
+            pbf_press_button(context, BUTTON_X, 200ms, 200ms);
+            pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
 
             //TODO:
             //joycon context->pro controller context?
@@ -263,14 +262,12 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
             env.update_stats();
         }
         */
-
         //Break for now since resetting the game doesn't work.
         break;
     }
 
-    //GO_HOME_WHEN_DONE.run_end_of_program(context);
     if (GO_HOME_WHEN_DONE) {
-        pbf_press_button(context, BUTTON_HOME, 200ms, 3000ms);
+        pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
