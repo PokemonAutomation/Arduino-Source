@@ -361,8 +361,6 @@ std::vector<std::unique_ptr<EditableTableRow>> JoyconKeyboardMappingTable::make_
         ret.emplace_back(make_mapping("-",              Qt::Key::Key_Minus,     JoyconDeltas{.buttons = BUTTON_MINUS}));
         ret.emplace_back(make_mapping("-",              Qt::Key::Key_Underscore,JoyconDeltas{.buttons = BUTTON_MINUS}));
 
-        ret.emplace_back(make_mapping("Capture",        Qt::Key::Key_Home,      JoyconDeltas{.buttons = BUTTON_CAPTURE}));
-        ret.emplace_back(make_mapping("Capture",        Qt::Key::Key_Escape,    JoyconDeltas{.buttons = BUTTON_CAPTURE}));
         ret.emplace_back(make_mapping("Capture",        Qt::Key::Key_Insert,    JoyconDeltas{.buttons = BUTTON_CAPTURE}));
 
         ret.emplace_back(make_mapping("SL",             Qt::Key::Key_F1,        JoyconDeltas{.buttons = BUTTON_LEFT_SL}));
@@ -409,7 +407,6 @@ std::vector<std::unique_ptr<EditableTableRow>> JoyconKeyboardMappingTable::make_
 
         ret.emplace_back(make_mapping("Home",           Qt::Key::Key_Home,      JoyconDeltas{.buttons = BUTTON_HOME}));
         ret.emplace_back(make_mapping("Home",           Qt::Key::Key_Escape,    JoyconDeltas{.buttons = BUTTON_HOME}));
-        ret.emplace_back(make_mapping("Home",           Qt::Key::Key_Insert,    JoyconDeltas{.buttons = BUTTON_HOME}));
 
         ret.emplace_back(make_mapping("SL",             Qt::Key::Key_F1,        JoyconDeltas{.buttons = BUTTON_RIGHT_SL}));
         ret.emplace_back(make_mapping("SR",             Qt::Key::Key_F3,        JoyconDeltas{.buttons = BUTTON_RIGHT_SR}));
