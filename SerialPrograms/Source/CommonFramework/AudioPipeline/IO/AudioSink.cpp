@@ -102,17 +102,21 @@ AudioSink::~AudioSink(){}
 AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, double volume){
     NativeAudioInfo native_info = device.native_info();
     QAudioFormat native_format = native_info.preferredFormat();
+    QAudioFormat target_format = native_format;
 
-    set_format(native_format, format);
+    set_format(target_format, format);
 
-    AudioSampleFormat sample_format = get_sample_format(native_format);
+    AudioSampleFormat sample_format = get_sample_format(target_format);
     if (sample_format == AudioSampleFormat::INVALID){
         sample_format = AudioSampleFormat::FLOAT32;
-        setSampleFormatToFloat(native_format);
+        setSampleFormatToFloat(target_format);
     }
 
-    logger.log("AudioOutputDevice(): " + dumpAudioFormat(native_format));
-    if (!native_info.isFormatSupported(native_format)){
+    logger.log("AudioOutputDevice(): Target: " + dumpAudioFormat(target_format));
+    logger.log("AudioOutputDevice(): Native: " + dumpAudioFormat(native_format));
+    if (!native_info.isFormatSupported(native_format) &&
+        native_format != target_format
+    ){
         logger.log("Audio output device does not support the requested audio format.", COLOR_RED);
         return;
     }
