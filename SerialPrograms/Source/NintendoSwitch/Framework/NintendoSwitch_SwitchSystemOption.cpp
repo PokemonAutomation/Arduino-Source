@@ -37,6 +37,11 @@ Color pick_color(
     if (required_features.contains(ControllerFeature::NintendoSwitch_DateSkip)){
         return COLOR_RED;
     }
+    if (required_features.contains(ControllerFeature::NintendoSwitch_LeftJoycon) ||
+        required_features.contains(ControllerFeature::NintendoSwitch_RightJoycon)
+    ){
+        return COLOR_MAGENTA;
+    }
     if (required_features.contains(ControllerFeature::TickPrecise)){
         return COLOR_PURPLE;
     }
