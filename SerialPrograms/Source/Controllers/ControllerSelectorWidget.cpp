@@ -6,7 +6,6 @@
 
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
@@ -48,9 +47,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::TcpSysbotBase)));
 //    interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::UsbSysbotBase)));
 
-    if (!IS_BETA_VERSION && !PreloadSettings::instance().DEVELOPER_MODE){
-        interface_dropdown->setHidden(true);
-    }
+//    interface_dropdown->setHidden(true);
 
     auto current = session.descriptor();
     if (current == nullptr || current->interface_type == ControllerInterface::None){
@@ -191,6 +188,7 @@ void ControllerSelectorWidget::descriptor_changed(
 //    cout << "descriptor_changed()" << endl;
     QMetaObject::invokeMethod(this, [=, this]{
         refresh_selection(descriptor->interface_type);
+        refresh_controllers(ControllerType::None, {});
     }, Qt::QueuedConnection);
 }
 void ControllerSelectorWidget::controller_changed(

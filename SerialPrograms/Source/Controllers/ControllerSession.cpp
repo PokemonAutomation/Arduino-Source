@@ -179,6 +179,8 @@ void ControllerSession::make_controller(std::optional<ControllerType> change_con
             m_connection->controller_mode_status()
         );
     }
+
+    signal_descriptor_changed(m_descriptor);
 }
 
 
