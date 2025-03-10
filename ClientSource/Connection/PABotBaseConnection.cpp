@@ -106,7 +106,11 @@ void PABotBaseConnection::on_recv(const void* data, size_t bytes){
 
         //  Message is too long.
         if (length > MAX_MESSAGE_SIZE){
-            m_sniffer->log("Message is too long: bytes = " + std::to_string(length));
+            char ascii = ~length;
+            std::string text = ascii < 32
+                ? ", ascii = " + std::to_string(ascii)
+                : std::string(", char = ") + ascii;
+            m_sniffer->log("Message is too long: bytes = " + std::to_string(length) + text);
             m_recv_buffer.pop_front();
             continue;
         }
