@@ -90,6 +90,7 @@ SOURCES += \
     ../Common/Cpp/Concurrency/SpinLock.cpp \
     ../Common/Cpp/Concurrency/Watchdog.cpp \
     ../Common/Cpp/Containers/AlignedMalloc.cpp \
+    ../Common/Cpp/Containers/SparseArray.cpp \
     ../Common/Cpp/CpuId/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/ExpressionEvaluator.cpp \
@@ -1177,6 +1178,7 @@ HEADERS += \
     ../Common/Cpp/Containers/FixedLimitVector.tpp \
     ../Common/Cpp/Containers/Pimpl.h \
     ../Common/Cpp/Containers/Pimpl.tpp \
+    ../Common/Cpp/Containers/SparseArray.h \
     ../Common/Cpp/CpuId/CpuId.h \
     ../Common/Cpp/CpuId/CpuId_arm64.h \
     ../Common/Cpp/CpuId/CpuId_arm64.tpp \

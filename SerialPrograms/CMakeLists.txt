@@ -93,6 +93,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Containers/FixedLimitVector.tpp
     ../Common/Cpp/Containers/Pimpl.h
     ../Common/Cpp/Containers/Pimpl.tpp
+    ../Common/Cpp/Containers/SparseArray.cpp
+    ../Common/Cpp/Containers/SparseArray.h
     ../Common/Cpp/CpuId/CpuId.cpp
     ../Common/Cpp/CpuId/CpuId.h
     ../Common/Cpp/CpuId/CpuId_arm64.h
