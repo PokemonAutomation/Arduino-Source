@@ -20,7 +20,7 @@ void SparseArray::write(size_t address, size_t bytes, const void* data){
         m_data.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(address),
-            std::forward_as_tuple((uint8_t*)data, (uint8_t*)data + bytes)
+            std::forward_as_tuple((char*)data, (char*)data + bytes)
         );
         return;
     }
@@ -32,7 +32,7 @@ void SparseArray::write(size_t address, size_t bytes, const void* data){
         m_data.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(address),
-            std::forward_as_tuple((uint8_t*)data, (uint8_t*)data + bytes)
+            std::forward_as_tuple((char*)data, (char*)data + bytes)
         );
         return;
     }
@@ -43,7 +43,7 @@ void SparseArray::write(size_t address, size_t bytes, const void* data){
         m_data.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(address),
-            std::forward_as_tuple((uint8_t*)data, (uint8_t*)data + bytes)
+            std::forward_as_tuple((char*)data, (char*)data + bytes)
         );
         return;
     }
@@ -72,7 +72,7 @@ void SparseArray::write(size_t address, size_t bytes, const void* data){
     lowest = std::min(lowest, address);
     highest = std::max(highest, top);
 
-    std::vector<uint8_t> block(highest - lowest);
+    std::string block(highest - lowest, 0);
 
     //  Copy in the partial blocks.
     bool one_block = lower == upper;
@@ -161,7 +161,7 @@ void SparseArray::read(size_t address, size_t bytes, void* data) const{
 //        cout << "address = " << address << endl;
 //        cout << "block = " << block << endl;
 
-        const uint8_t* ptr = lower->second.data();
+        const char* ptr = lower->second.data();
         size_t len = lower->second.size();
 
         if (block < address){

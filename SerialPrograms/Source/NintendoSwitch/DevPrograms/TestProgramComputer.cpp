@@ -273,9 +273,11 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace std::chrono_literals;
 
+
+
     SparseArray data{
-        {100, 10, "0123456789"},
-        {120, 8, "asdfzxcv"},
+        {100, "0123456789"},
+        {120, {'a', 0x20, 'd'}},
     };
 //    data.set_data(100, "0123456789", 10);
 //    data.set_data(120, "asdfzxcv", 8);

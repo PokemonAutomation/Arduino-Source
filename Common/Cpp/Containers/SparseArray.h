@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_SparseArray_H
 #define PokemonAutomation_SparseArray_H
 
+#include <string.h>
 #include <string>
-#include <vector>
 #include <map>
 
 namespace PokemonAutomation{
@@ -16,8 +16,16 @@ namespace PokemonAutomation{
 
 struct SparseArrayBlock{
     size_t address;
-    size_t bytes;
-    const void* data;
+    std::string data;
+
+    SparseArrayBlock(size_t p_address, const char* str)
+        : address(p_address)
+        , data(str, str + strlen(str))
+    {}
+    SparseArrayBlock(size_t p_address, std::initializer_list<char> p_data)
+        : address(p_address)
+        , data(p_data)
+    {}
 };
 
 
@@ -26,7 +34,7 @@ public:
     SparseArray() = default;
     SparseArray(std::initializer_list<SparseArrayBlock> list){
         for (auto& item : list){
-            write(item.address, item.bytes, item.data);
+            write(item.address, item.data.size(), item.data.data());
         }
     }
 
@@ -42,7 +50,7 @@ public:
             ret += " : ";
             ret += std::to_string(item.first + item.second.size());
             ret += "} = ";
-            ret += std::string((const char*)item.second.data(), item.second.size());
+            ret += item.second;
             ret += "\n";
         }
         return ret;
@@ -50,7 +58,7 @@ public:
 #endif
 
 private:
-    std::map<size_t, std::vector<uint8_t>> m_data;
+    std::map<size_t, std::string> m_data;
 };
 
 
