@@ -915,6 +915,7 @@ void quest_catch(
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(context, true, true);
     PokemonSwSh::roll_date_forward_1(context, true);
+    pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(stream, context);
 
     //Heal up and then reset position again.
