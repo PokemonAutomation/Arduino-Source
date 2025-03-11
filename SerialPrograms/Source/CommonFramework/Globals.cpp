@@ -5,6 +5,7 @@
  */
 
 #include <QCoreApplication>
+#include <QStandardPaths>
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
@@ -112,9 +113,14 @@ std::string get_training_path(){
 }
 
 std::string get_runtime_base_path(){
+    //  On MacOS, find the writable application support directory
     if (QSysInfo::productType() == "macos" || QSysInfo::productType() == "osx"){
-        QString application_dir_path = get_application_base_dir_path();
-        return application_dir_path.toStdString() + "/";
+        QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        QDir dir(appSupportPath);
+        if (!dir.exists()) {
+            dir.mkpath(".");
+        }
+        return appSupportPath.toStdString() + "/";
     }
     return "./";
 }

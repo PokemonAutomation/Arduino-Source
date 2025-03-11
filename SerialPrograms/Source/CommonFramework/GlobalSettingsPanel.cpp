@@ -6,6 +6,7 @@
 
 #include <iostream>
 #include <set>
+#include <QStandardPaths>
 #include <QCryptographicHash>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/LifetimeSanitizer.h"
@@ -106,15 +107,25 @@ GlobalSettings::GlobalSettings()
         false,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
         LockMode::LOCK_WHILE_RUNNING,
+        #if defined(__APPLE__)
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt",
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt"
+        #else
         "UserSettings/PA-Stats.txt",
         "UserSettings/PA-Stats.txt"
+        #endif
     )
     , TEMP_FOLDER(
         false,
         "<b>Temp Folder:</b><br>Place temporary files in this directory.",
         LockMode::LOCK_WHILE_RUNNING,
+        #if defined(__APPLE__)
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/",
+        QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/"
+        #else
         "TempFiles/",
         "TempFiles/"
+        #endif
     )
     , THEME(CONSTRUCT_TOKEN)
     , WINDOW_SIZE(
