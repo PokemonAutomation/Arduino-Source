@@ -1,6 +1,6 @@
 /*  Binary Matrix (arm64 NEON)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

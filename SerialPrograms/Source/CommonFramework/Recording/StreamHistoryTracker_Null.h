@@ -1,6 +1,6 @@
 /*  Stream History Tracker
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  A null implementation that will compile before Qt 6.8.
  *

@@ -1,6 +1,6 @@
 /*  Item Printer Seed Calculation
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This file is ported from:
  *  https://github.com/kwsch/ItemPrinterDeGacha/blob/main/ItemPrinterDeGacha.Core/ItemPrinter.cs

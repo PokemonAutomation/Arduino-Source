@@ -1,6 +1,6 @@
 /*  Audio Sink
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      AudioSink represents an audio output stream. Once constructed,
  *  you can push float audio samples to it and it will play it from the

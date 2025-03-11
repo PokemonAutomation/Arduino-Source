@@ -1,6 +1,6 @@
 /*  Switch System Option
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This class represents the serializable state of a Switch console.
  *  Specifially, holds the settings of:

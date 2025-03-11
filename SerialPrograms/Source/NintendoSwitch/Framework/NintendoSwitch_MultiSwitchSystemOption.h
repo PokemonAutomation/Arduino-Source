@@ -1,6 +1,6 @@
 /*  Multi-Switch System Option
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This class represents the serializable state of a set of Switch.
  *  consoles. Specifically, it holds a SwitchSystemOption for each of the

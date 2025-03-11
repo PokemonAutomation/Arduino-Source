@@ -1,6 +1,6 @@
 /*  Push Button Framework (pbf_*)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  The functions to send Switch commands to the micro controller.
  *  The timing of the commands are measured in ticks. One second is 125 ticks.

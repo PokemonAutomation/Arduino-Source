@@ -1,6 +1,6 @@
 /*  Dialogue Yellow Arrow Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  The yellow marker pointing to the button to advance dialogue boxes.
  *  For different types of dialogue boxes, the locations of the yellow arrow is different.

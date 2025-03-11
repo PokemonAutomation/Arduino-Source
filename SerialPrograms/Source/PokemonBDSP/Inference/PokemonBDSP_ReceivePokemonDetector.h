@@ -1,6 +1,6 @@
 /*  Receive Pokemon (Blue Background) Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *
  *      Returns true after the background of receiving a pokemon

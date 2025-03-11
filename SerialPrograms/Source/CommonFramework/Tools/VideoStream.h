@@ -1,6 +1,6 @@
 /*  Video Stream
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      Represents a single video stream. Includes video, audio, as well
  *  as their inference pivots. Also includes a logger and the video overlay.

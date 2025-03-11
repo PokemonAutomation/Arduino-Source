@@ -1,6 +1,6 @@
 /*  Battle Sprite Watcher
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Watch the sprites appear on the upper right corner of the screen during a mult-pokemon
  *  battle. This is useful to detect if any skittish pokemon escape during the starting

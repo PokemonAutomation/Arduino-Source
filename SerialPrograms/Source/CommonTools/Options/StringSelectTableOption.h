@@ -1,6 +1,6 @@
 /*  String Select Table
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      A simple editable table of StringSelect options.
  *

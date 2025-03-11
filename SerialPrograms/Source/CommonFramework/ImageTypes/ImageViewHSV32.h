@@ -1,6 +1,6 @@
 /*  Image View (HSV 32)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

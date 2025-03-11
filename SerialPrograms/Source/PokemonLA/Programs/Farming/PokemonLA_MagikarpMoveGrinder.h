@@ -1,6 +1,6 @@
 /*  Magikarp Move Grinder
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Battle a magikarp to grind move related research tasks.
  */

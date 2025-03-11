@@ -1,6 +1,6 @@
 /*  Summary Shiny Symbol
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *
  *      Check shiny symbol in the party pokemon info screen.

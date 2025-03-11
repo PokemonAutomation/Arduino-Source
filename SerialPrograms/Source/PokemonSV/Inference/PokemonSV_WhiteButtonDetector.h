@@ -1,6 +1,6 @@
 /*  White Button Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Warning: This detector is currently very prone to false positives.
  *  It is much worse than the PLA buttons because these one have transparent

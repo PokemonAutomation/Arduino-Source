@@ -1,6 +1,6 @@
 /*  Superscalar Framework (ssf_*)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Don't use these unless you know what you're doing and you really need to.
  *

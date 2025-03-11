@@ -1,6 +1,6 @@
 /*  Auto Multi-Spawn
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Advance a path in Multi-Spawn shiny hunting method
  */

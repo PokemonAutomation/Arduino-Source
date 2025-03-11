@@ -1,6 +1,6 @@
 /*  Orbeetle Attack Animation Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *
  *      Detects whether Orbeetle's animation is special or physical.

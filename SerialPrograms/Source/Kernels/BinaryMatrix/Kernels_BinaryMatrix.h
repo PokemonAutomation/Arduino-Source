@@ -1,6 +1,6 @@
 /*  Binary Matrix
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This class represents a memory-efficient binary matrix where each bit
  *  is stored as just one bit in memory.

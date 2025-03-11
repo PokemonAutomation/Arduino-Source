@@ -1,6 +1,6 @@
 /*  Push Joy Sticks
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

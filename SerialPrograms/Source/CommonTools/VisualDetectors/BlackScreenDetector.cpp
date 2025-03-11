@@ -1,6 +1,6 @@
 /*  Black Border Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *
  *      Returns true after a black screen has been detected and

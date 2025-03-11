@@ -1,6 +1,6 @@
 /*  Audio Passthrough Pair (Qt separate thread)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      Same as AudioPassthroughPairQt, but with the audio running
  *  on a separate thread to avoid UI thread noise.

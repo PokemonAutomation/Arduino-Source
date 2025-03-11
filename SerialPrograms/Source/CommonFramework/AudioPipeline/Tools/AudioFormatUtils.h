@@ -1,6 +1,6 @@
 /*  Audio format Utils
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Host various util functions for audio format related tasks.
  */

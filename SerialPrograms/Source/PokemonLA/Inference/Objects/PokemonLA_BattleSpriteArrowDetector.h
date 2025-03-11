@@ -1,6 +1,6 @@
 /*  Battle Sprite Arrow Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Detect the white arrow pointing towards left on the selected sprite, in the upper right corner
  *  of the screen, during a multi-pokemon battle.

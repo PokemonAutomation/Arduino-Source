@@ -1,6 +1,6 @@
 /*  Auction Item Selector, UI component to select multiple items from auctions
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

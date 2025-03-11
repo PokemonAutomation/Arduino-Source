@@ -1,6 +1,6 @@
 /*  Program Session
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      ProgramSession represents the real-time state of a program.
  *

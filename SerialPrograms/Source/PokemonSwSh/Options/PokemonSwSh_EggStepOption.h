@@ -1,6 +1,6 @@
 /*  Egg Step Count Dropdown
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

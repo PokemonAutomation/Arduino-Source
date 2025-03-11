@@ -1,6 +1,6 @@
 /*  Frozen Screen Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Detect if the entire screen is frozen.
  */

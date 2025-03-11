@@ -1,6 +1,6 @@
 /*  Status Info Screen Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Detect shiny and alpha on the Status Info Screen in a battle.
  */

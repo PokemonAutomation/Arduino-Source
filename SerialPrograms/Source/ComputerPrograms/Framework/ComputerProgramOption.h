@@ -1,6 +1,6 @@
 /*  Computer Program Option
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This class represents the serializable state of a computer program.
  *  This class maintains no UI and is not thread-safe.

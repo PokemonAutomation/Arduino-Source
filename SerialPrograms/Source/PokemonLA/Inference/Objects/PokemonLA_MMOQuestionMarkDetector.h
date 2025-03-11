@@ -1,6 +1,6 @@
 /*  MMO Question Mark Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Detect MMO question mark symbol.
  */

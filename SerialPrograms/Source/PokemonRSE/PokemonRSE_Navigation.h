@@ -1,6 +1,6 @@
 /*  Pokemon RSE Navigation
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Soft reset, menus, etc.
  *

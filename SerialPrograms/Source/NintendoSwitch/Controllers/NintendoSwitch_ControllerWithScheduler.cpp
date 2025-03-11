@@ -1,6 +1,6 @@
 /*  Nintendo Switch Controller (With Scheduler)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This implements most of the SwitchController API using only the controller
  *  state function. It uses SuperscalarScheduler to do this.

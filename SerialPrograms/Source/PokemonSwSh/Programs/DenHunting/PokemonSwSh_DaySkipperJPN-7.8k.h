@@ -1,6 +1,6 @@
 /*  Day Skipper (JPN) - 7.8k version
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

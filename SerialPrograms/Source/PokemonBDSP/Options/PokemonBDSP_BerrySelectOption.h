@@ -1,6 +1,6 @@
 /*  Berry Selector, UI component to select multiple berries
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

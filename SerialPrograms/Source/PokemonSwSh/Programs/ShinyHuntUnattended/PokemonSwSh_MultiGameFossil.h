@@ -1,6 +1,6 @@
 /*  Multiple Game Fossil
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

@@ -1,6 +1,6 @@
 /*  Stream History Session
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Capture the last X seconds of audio and video.
  *

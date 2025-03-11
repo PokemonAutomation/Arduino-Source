@@ -1,6 +1,6 @@
 /*  Sandwich Ingredients Table
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

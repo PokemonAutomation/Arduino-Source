@@ -1,6 +1,6 @@
 /*  Raid Lobby Reader
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *
  *      Determine if a raid is full and ready to start early.

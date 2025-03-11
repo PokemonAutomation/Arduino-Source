@@ -1,6 +1,6 @@
 /*  Camera Session
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      CameraSession represents a live camera. It holds onto a Camera object
  *  and can be started/stopped/queried, etc...

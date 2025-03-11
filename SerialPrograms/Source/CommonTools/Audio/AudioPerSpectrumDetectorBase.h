@@ -1,6 +1,6 @@
 /*  Audio Per-Spectrum Detector Base
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  A base class for audio detectors.
  * 

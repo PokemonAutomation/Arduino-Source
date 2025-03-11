@@ -1,6 +1,6 @@
 /*  Audio Source
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      AudioSource represents an audio input stream. Once constructed,
  *  it spits out the float samples. Listeners can attach themselves to this

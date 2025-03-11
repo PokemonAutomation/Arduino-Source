@@ -1,6 +1,6 @@
 /*  Test Program (Computer)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 
@@ -120,6 +120,7 @@
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
 #include "Common/Cpp/Containers/CircularBuffer.h"
 #include "Common/Cpp/Sockets/ClientSocket.h"
+#include "Common/Cpp/Containers/SparseArray.h"
 
 #ifdef PA_ARCH_x86
 //#include "Kernels/Kernels_x64_SSE41.h"
@@ -262,8 +263,6 @@ std::atomic<size_t> CheckedObject<Type>::m_instances(0);
 
 
 
-
-
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch;
@@ -274,6 +273,23 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace std::chrono_literals;
 
+    SparseArray data{
+        {100, 10, "0123456789"},
+        {120, 8, "asdfzxcv"},
+    };
+//    data.set_data(100, "0123456789", 10);
+//    data.set_data(120, "asdfzxcv", 8);
+
+    cout << data.dump() << endl;
+//    data.set_data(110, 12, "qwerqwerqwer");
+
+    std::string read(12, '?');
+    data.read(109, 12, read.data());
+
+    cout << "read = " << read << endl;
+
+//    data.print();
+
 
 #if 0
     ClientSocket socket;
@@ -283,7 +299,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     scope.wait_for(std::chrono::seconds(60));
 #endif
 
-#if 1
+#if 0
     int* ptr = nullptr;
     cout << ptr[0] << endl;
 #endif

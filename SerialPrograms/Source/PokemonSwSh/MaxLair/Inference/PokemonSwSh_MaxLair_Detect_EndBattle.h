@@ -1,6 +1,6 @@
 /*  Max Lair Detect End Battle
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

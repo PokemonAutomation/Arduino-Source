@@ -1,6 +1,6 @@
 /*  Sub-Object Template Matcher
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      Suppose we have an object with a distinctive sub-feature.
  *

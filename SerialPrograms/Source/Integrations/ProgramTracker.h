@@ -1,6 +1,6 @@
 /*  Program Tracker
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      A singleton class that keeps track of all live programs and handles.
  *  This allows Discord integration to safely interface with programs.

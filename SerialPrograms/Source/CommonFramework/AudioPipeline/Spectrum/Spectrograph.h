@@ -1,6 +1,6 @@
 /*  Audio Device Info
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      Holds a history of the most recent FFT spectrums as colors.
  *  This is used to render the spectrograph.

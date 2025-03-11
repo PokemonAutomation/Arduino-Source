@@ -1,6 +1,6 @@
 /*  Video Overlay Session
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This class holds the real-time state of the video overlays. You can
  *  asychronously add/remove objects to it.

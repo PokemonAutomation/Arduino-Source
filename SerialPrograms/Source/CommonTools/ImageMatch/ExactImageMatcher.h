@@ -1,6 +1,6 @@
 /*  Exact Image Match Preprocessed Data
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

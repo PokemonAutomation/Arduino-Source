@@ -1,6 +1,6 @@
 /*  Single Switch Program Widget
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This is the Qt Widget implementation of the UI for SwitchSystemSession.
  *

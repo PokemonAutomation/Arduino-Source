@@ -6,7 +6,7 @@
  - Does not work if obstructed by the radar beam (while outdoors), 
  or if obstructed by the radar dot
 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

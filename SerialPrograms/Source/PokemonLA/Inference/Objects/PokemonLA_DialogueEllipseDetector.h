@@ -1,6 +1,6 @@
 /*  Dialogue Ellipse Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Detect the white wide ellipse at the end of the transparent dialogue box.
  *  The transparent dialogue box comes from your opponent shown before and/or after the battle, like

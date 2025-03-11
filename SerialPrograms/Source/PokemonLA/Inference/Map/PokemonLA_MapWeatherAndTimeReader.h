@@ -1,6 +1,6 @@
 /*  Map weather & Time Reader
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Read the weather and time symbols on the map.
  */

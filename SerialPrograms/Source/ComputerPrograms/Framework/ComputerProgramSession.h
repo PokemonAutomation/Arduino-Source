@@ -1,6 +1,6 @@
 /*  Computer Program Session
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This class holds the run-time state of a computer program.
  *

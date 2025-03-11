@@ -1,6 +1,6 @@
 /*  Dialog Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Detect the battle menu, which has the option (A) battle, (B) run, 
  *  DPAD_UP for items and DPAD_DOWN to change pokemon.

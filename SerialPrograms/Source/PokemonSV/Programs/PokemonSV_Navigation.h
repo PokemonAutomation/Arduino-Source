@@ -1,6 +1,6 @@
 /*  Navigation
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Move between different game elements: overworld, save, internet, map, etc.
  *

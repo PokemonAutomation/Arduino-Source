@@ -1,6 +1,6 @@
 /*  Generate IV Checker OCR Data
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

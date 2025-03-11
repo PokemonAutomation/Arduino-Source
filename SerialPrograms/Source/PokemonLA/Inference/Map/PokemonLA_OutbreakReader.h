@@ -1,6 +1,6 @@
 /*  Outbreak Reader
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Read Outbreak pokemon text on map when leaving village
  */

@@ -1,6 +1,6 @@
 /*  Stream History Tracker
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Implement by running two recordings in parallel.
  *  When each reaches 2X seconds, delete it start over.

@@ -1,6 +1,6 @@
 /*  Sound Listener
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Debug program to test all kinds of sound detectors.
  */

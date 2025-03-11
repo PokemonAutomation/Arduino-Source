@@ -1,6 +1,6 @@
 /*  Max Lair Detect Item Select Menu
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

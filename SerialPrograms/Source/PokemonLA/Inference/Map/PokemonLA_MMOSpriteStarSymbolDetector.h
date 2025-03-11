@@ -1,6 +1,6 @@
 /*  MMO Sprite Star Symbol Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Detect the star symbols on MMO sprite on the map
  */

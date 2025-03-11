@@ -1,6 +1,6 @@
 /*  Wild Pokemon Focus Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Detect the lower left dark translucent tab when player focuses on one pokemon
  */

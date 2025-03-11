@@ -1,6 +1,6 @@
 /*  Waterfill Intrinsics (x64 AVX512-GF)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

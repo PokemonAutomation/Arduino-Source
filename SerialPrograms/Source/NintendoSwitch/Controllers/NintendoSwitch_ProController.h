@@ -1,6 +1,6 @@
 /*  Nintendo Switch Pro Controller
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  This is the raw (full) controller API that is exposed to programs.
  *

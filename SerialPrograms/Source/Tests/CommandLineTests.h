@@ -1,6 +1,6 @@
 /*  Command Line Tests
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Explanation of the command line test framework
  * 

@@ -1,6 +1,6 @@
 /*  Waterfill Core (64-bit integer)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

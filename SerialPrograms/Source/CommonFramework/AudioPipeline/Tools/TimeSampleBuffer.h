@@ -1,6 +1,6 @@
 /*  Time Sample Buffer
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *
  *  This is a buffer for raw audio samples taken from an audio input.

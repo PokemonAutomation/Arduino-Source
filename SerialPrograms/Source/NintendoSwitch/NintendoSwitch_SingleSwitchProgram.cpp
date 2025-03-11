@@ -1,6 +1,6 @@
 /*  Single Switch Program Template
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

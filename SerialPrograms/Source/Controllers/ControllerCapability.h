@@ -1,6 +1,6 @@
 /*  Controller Capabilities
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      Represents optional features that each controller
  *  interface may have.

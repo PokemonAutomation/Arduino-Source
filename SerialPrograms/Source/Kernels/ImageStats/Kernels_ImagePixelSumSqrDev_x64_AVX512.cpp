@@ -1,6 +1,6 @@
 /*  Sum of Squares of Deviation (x64 AVX512)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

@@ -1,6 +1,6 @@
 /*  Tenacity Candy Farmer
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Battle Pearl Clan in Path of Tenacity to farm exp, Exp Candy XL and random evolution items.
  */

@@ -1,6 +1,6 @@
 /*  Battle Start Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Detect the start of a battle when the upper and lower part of the screen
  *  is covered by black.

@@ -1,6 +1,6 @@
 /*  Beam Setter
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *
  *      Drop a wishing piece and determine if it is red or purple.

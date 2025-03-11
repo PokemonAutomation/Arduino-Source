@@ -1,6 +1,6 @@
 /*  Sandwich Routines
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Various functions to do sandwich making related automation.
  *  This file is used to share sandwich related code among different programs (egg auto, sandwich auto, etc.).

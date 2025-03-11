@@ -1,6 +1,6 @@
 /*  Image Gradient
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Header for various image gradient related functions, mostly for visual inferences
  */

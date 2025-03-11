@@ -1,6 +1,6 @@
 /*  Image Filters Basic
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Perform a filter over an image and replace pixels that match the filter.
  *

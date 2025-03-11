@@ -1,6 +1,6 @@
 /*  Multi-Switch System Option
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

@@ -1,6 +1,6 @@
 /*  Cram-o-matic RNG Manipulation
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Credit goes to Anubis for discovering how the Cram-o-matic works
  *  and for the original code to calculate how many advances are needed

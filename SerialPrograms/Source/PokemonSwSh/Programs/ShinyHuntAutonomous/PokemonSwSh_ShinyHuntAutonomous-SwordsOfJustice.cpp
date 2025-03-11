@@ -1,6 +1,6 @@
 /*  Shiny Hunt Autonomous - Swords Of Justice
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

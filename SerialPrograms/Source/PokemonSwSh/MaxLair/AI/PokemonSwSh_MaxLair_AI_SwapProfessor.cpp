@@ -1,6 +1,6 @@
 /*  Max Lair AI Swap with Professor
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

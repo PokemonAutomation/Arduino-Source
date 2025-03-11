@@ -1,6 +1,6 @@
 /*  Scale Invariant Matrix Match (x86 FMA3)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

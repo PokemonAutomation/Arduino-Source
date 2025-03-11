@@ -1,6 +1,6 @@
 /*  Battle Move Selection Detector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Detect the move selection screen. Useful to detect whether a move has no PP so it can
  *  not be used.

@@ -1,6 +1,6 @@
 /*  Map Location
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Function to detect player character location and orientation on the in-game map.
  */

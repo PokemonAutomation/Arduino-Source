@@ -1,6 +1,6 @@
 /*  Egg Routines
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Various functions to do egg related automation.
  *  This file is used to prevent main function like EggAutonomous from becoming too long.

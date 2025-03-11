@@ -1,6 +1,6 @@
 /*  Sum of Squares of Deviation (Default)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

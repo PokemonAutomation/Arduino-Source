@@ -1,6 +1,6 @@
 /*  Pixel Sum + Sum of Squares (x64 SSE4.1)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

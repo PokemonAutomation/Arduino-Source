@@ -1,6 +1,6 @@
 /*  Money Farmer (Route 210)
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

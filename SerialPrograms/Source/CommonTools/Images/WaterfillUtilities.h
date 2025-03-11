@@ -1,6 +1,6 @@
 /*  Waterfill Utilities
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *  
  *  Util functions that process waterfill objects and matrices.
  */

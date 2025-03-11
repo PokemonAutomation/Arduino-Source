@@ -1,6 +1,6 @@
 /*  Pokemon LA Weather And Time Icons
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

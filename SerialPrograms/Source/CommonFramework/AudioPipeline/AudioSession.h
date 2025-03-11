@@ -1,6 +1,6 @@
 /*  Audio Session
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      AudioSession represents a live audio session. It holds onto the audio
  *  input/output sessions which can be asynchronously set at any time.
