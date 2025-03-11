@@ -1,6 +1,6 @@
 /*  Game Entry
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 
@@ -36,8 +36,7 @@ bool reset_game_to_gamemenu(
         tolerate_update_menu
     ){
         //Handle Right Joycon attempting to update
-        //If no update, this will open the All Software menu
-        //The active game will be closed from there
+        //Need detector for update prompt
         //pbf_move_joystick(context, 0, 128, 100ms, 10ms);
         //pbf_move_joystick(context, 0, 128, 100ms, 10ms);
         //pbf_press_button(context, BUTTON_A, 100ms, 10ms);
@@ -69,8 +68,8 @@ bool gamemenu_to_ingame(
     pbf_mash_button(context, BUTTON_A, mash_duration);
     context.wait_for_all_requests();
 
-    //White screen, Pikachu/Eevee running across the screen.
-    //Mash A at then end.
+    //White screen, Pikachu/Eevee running across the screen. Mash will not speed it up.
+    //Mash A at then end to enter continue screen
     BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
     stream.log("Waiting to enter game...");
     int ret = run_until<JoyconContext>(

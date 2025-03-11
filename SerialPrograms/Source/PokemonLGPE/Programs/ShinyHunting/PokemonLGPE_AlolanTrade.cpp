@@ -136,7 +136,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     /*
     WARNING: JOYCON TEST PROGRAM. Not well tested. Bare minimum in general.
 
-    Only works with Right joycon atm. Do not update right joycon.
+    Only works with Right joycon atm. Do not update right joycon. Decline the update before running this.
 
     Right joycon required for home button (this means no on-switch screenshots).
     Also don't remap any of the buttons in the switch button mapping settings. Yet? Could use this to add Home and Screenshot.
@@ -157,7 +157,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     "you don't have any pokemon your trading partner wants"
     detect dialog box, detect yes/no confirm box
     actual enter game and start screen detectors
-    menu detectors, reset game from home, etc.
+    menu detectors, etc.
     get rid of all this blindly mashing A in general...so need everything really.
     */
 
@@ -180,11 +180,10 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
 
         //To check pokemon in menu boxes
         //Open menu - always defaults to center (Party)
-        /* Menu:
-        Play with Partner
-        Pokedex - Bag - Party - Communicate - Save (these all have a colored line under when selected)
-        (Press Y for options)
-        */
+        //Menu:
+        // --Play with Partner--(centered)
+        //Pokedex - Bag - Party - Communicate - Save (these all have a colored line under when selected + an arrow to indicate)
+        //(Press Y for options)
 
         //Wait a bit.
         pbf_wait(context, 2500ms);
