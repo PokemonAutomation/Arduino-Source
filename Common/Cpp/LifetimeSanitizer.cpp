@@ -1,6 +1,6 @@
 /*  Lifetime Sanitizer
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 
@@ -26,7 +26,7 @@ namespace PokemonAutomation{
 const std::set<std::string> SANITIZER_FILTER = {
 //    "MultiSwitchProgramSession",
 //    "MultiSwitchProgramWidget2",
-//    "ControllerRequirements",
+//    "ControllerFeatures",
 };
 
 SpinLock sanitizer_lock;

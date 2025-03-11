@@ -1,6 +1,6 @@
 /*  Value Debouncer
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      This class is used to debounce a resizing loop in Qt with widgets of
  *  fixed aspect ratio.

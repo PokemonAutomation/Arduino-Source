@@ -217,6 +217,8 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
             nullptr
         );
 
+
+
         //  Re-read the controller.
         logger.log("Reading Controller Mode...");
         uint32_t type_id = Microcontroller::read_controller_mode(*m_botbase);

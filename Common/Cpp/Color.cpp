@@ -1,6 +1,6 @@
 /*  Color
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      A very lightweight color class to avoid pulling in <QColor>.
  *

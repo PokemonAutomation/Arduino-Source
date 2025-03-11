@@ -1,6 +1,6 @@
 /*  Silence Warnings for DPP Headers
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Include this before every DPP header to silence warnings in those headers.
  *

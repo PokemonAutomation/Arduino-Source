@@ -1,6 +1,6 @@
 /*  Reverse Lock Guard
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

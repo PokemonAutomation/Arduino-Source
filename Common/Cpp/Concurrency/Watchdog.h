@@ -1,6 +1,6 @@
 /*  Watchdog
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      This class runs callbacks at specified intervals. The user can also
  *  delay the next call.

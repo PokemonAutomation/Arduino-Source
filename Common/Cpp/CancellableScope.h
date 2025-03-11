@@ -1,6 +1,6 @@
 /*  Cancellable Scope
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      A cancellable scope is a node with a tree. If "cancel()" is called on
  *  a scope, only the scope and all child scopes will be canceled. Parents are

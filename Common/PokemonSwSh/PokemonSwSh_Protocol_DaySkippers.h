@@ -1,6 +1,6 @@
 /*  Day Skippers
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  *      This file requires (PABB_PABOTBASE_LEVEL >= 31).
  * 

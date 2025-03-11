@@ -1,6 +1,6 @@
 /*  Fixed Limit Vector
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      A non-copyable, non-movable vector whose buffer cannot be resized.
  *  It supports emplace_back() and pop_back(). All elements are unchanged

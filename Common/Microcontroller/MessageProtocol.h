@@ -1,6 +1,6 @@
 /*  Message Protocol
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  * 
  *      Pokemon Automation Bot-Base implements reliable data transmissions over
@@ -124,6 +124,10 @@
 
 #include <stdbool.h>
 #include <stdint.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 #if _WIN32
 #pragma pack(push, 1)
@@ -352,6 +356,10 @@ typedef struct{
 
 #if _WIN32
 #pragma pack(pop)
+#endif
+
+#ifdef __cplusplus
+}
 #endif
 
 #endif

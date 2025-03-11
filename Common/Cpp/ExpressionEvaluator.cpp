@@ -1,6 +1,6 @@
 /*  Simple (and incomplete) Expression Evaluator
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  */
 

@@ -1,6 +1,6 @@
 /*  Async Task Runner
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  *      This class is meant for asynchronous tasks, not for parallel computation.
  * This class will always spawn enough threads run all tasks in parallel.

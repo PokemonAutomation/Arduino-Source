@@ -1,6 +1,6 @@
 /*  Box Set
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      This class is experimental. It currently doesn't actually accomplish
  *  what it was intended for.

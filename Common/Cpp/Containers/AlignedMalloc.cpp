@@ -1,6 +1,6 @@
 /*  Aligned Malloc
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Copy-edited from:
  *      https://github.com/Mysticial/y-cruncher/blob/master/trunk/Source/PublicLibs/BasicLibs/Memory/AlignedMalloc.cpp

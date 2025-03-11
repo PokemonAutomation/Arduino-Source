@@ -1,6 +1,6 @@
 /*  WAV FILE
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *  Class to read a .wav file. Edited from Qt multimedia example Spectrum:
  *  https://code.qt.io/cgit/qt/qtmultimedia.git/tree/examples/multimedia/spectrum/app/wavfile.cpp?h=5.15

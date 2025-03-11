@@ -1,6 +1,6 @@
 /*  Enum Dropdown Option
  *
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  *
  *      A simple dropdown menu for enums.
  *
