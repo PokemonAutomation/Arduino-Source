@@ -2204,7 +2204,7 @@ if (APPLE)
         TARGET SerialPrograms
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/../Resources"
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Packages/SerialPrograms/Resources"
         "$<TARGET_FILE_DIR:SerialPrograms>/../Resources"
     )
 else() # WIN and Linux:
