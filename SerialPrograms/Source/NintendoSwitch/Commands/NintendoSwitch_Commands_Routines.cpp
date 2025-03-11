@@ -80,10 +80,10 @@ void close_game(VideoStream& stream, JoyconContext& context){
     // regardless of whether the game is initially open or closed.
 
                                                         // if game initially open.  |  if game initially closed
-    pbf_mash_button(context, BUTTON_X, 800ms);            // - Close game.            |  - does nothing
+    pbf_mash_button(context, BUTTON_X, 800ms);          // - Close game.            |  - does nothing
     pbf_move_joystick(context, 128, 255, 100ms, 10ms);  // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
     pbf_move_joystick(context, 128, 255, 100ms, 10ms);  // - Does nothing.          |  - Press Down a second time in case we drop one.
-    pbf_mash_button(context, BUTTON_A, 400ms);             // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
+    pbf_mash_button(context, BUTTON_A, 400ms);          // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
                                                         // - Does nothing.          |  - goes back to home screen.
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     context.wait_for_all_requests();

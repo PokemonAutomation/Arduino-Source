@@ -26,7 +26,6 @@ public:
 
     SectionDividerOption m_menu_navigation;
     MillisecondsOption GAME_TO_HOME_DELAY0;
-    MillisecondsOption LOAD_REGION_TIMEOUT0;
 
     SectionDividerOption m_start_game_timings;
     MillisecondsOption START_GAME_MASH0;

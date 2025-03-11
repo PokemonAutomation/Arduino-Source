@@ -27,11 +27,6 @@ GameSettings::GameSettings()
         LockMode::LOCK_WHILE_RUNNING,
         "1000 ms"
     )
-    , LOAD_REGION_TIMEOUT0(
-        "<b>Load Region Timeout:</b><br>Wait at most this long to enter a region before giving up.",
-        LockMode::LOCK_WHILE_RUNNING,
-        "30 s"
-    )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH0(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
@@ -41,15 +36,15 @@ GameSettings::GameSettings()
     , START_GAME_WAIT1(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
-        "40 s"
+        "20 s"
     )
     , ENTER_GAME_MASH0(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         LockMode::LOCK_WHILE_RUNNING,
-        "5000 ms"
+        "5 s"
     )
     , ENTER_GAME_WAIT0(
-        "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
+        "<b>4. Enter Game Wait:</b><br>Wait this long for the opening animations to finish.",
         LockMode::LOCK_WHILE_RUNNING,
         "15 s"
     )
@@ -58,7 +53,6 @@ GameSettings::GameSettings()
 
     PA_ADD_STATIC(m_menu_navigation);
     PA_ADD_OPTION(GAME_TO_HOME_DELAY0);
-    PA_ADD_OPTION(LOAD_REGION_TIMEOUT0);
 
     PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH0);

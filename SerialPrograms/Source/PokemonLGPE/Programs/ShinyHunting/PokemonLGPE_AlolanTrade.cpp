@@ -16,6 +16,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
+#include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
 #include "PokemonLGPE_AlolanTrade.h"
 
 namespace PokemonAutomation{
@@ -192,8 +193,8 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
         //Open menu, open party, open boxes
         env.log("Opening boxes.");
         pbf_press_button(context, BUTTON_X, 200ms, 500ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-        pbf_press_button(context, BUTTON_Y, 200ms, 1500ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 1500ms);
+        pbf_press_button(context, BUTTON_Y, 200ms, 2000ms);
         context.wait_for_all_requests();
 
         //Sort by order caught
@@ -240,7 +241,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
             pbf_press_button(context, BUTTON_X, 0ms, 1000ms);
             context.wait_for_all_requests();
         }
-        /*
+        
         if (!shiny_found) {
             env.log("Out of Pokemon to trade and no shiny found. Resetting game.");
             send_program_status_notification(
@@ -248,23 +249,14 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
                 "Out of Pokemon to trade and no shiny found. Resetting game."
             );
 
-            //TODO: Need to make proper GameEntry eventually
-            //Thankfully, Joycon is upright after going to home.
-            //Go to home and close game
-            pbf_press_button(context, BUTTON_HOME, 200ms, 3000ms);
-            pbf_press_button(context, BUTTON_X, 200ms, 200ms);
-            pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-
-            //TODO:
-            //joycon context->pro controller context?
-            start_game_from_home(env.console, context, true, 0, 0, std::chrono::milliseconds(2000));
+            //Reset game
+            pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
+            reset_game_from_home(env, env.console, context, true, 3000ms);
+            context.wait_for_all_requests();
 
             stats.resets++;
             env.update_stats();
         }
-        */
-        //Break for now since resetting the game doesn't work.
-        //break;
     }
 
     if (GO_HOME_WHEN_DONE) {

@@ -37,7 +37,7 @@ bool gamemenu_to_ingame(
 bool reset_game_from_home(
     ProgramEnvironment& env, VideoStream& stream, JoyconContext& context,
     bool tolerate_update_menu,
-    uint16_t post_wait_time = 125
+    Milliseconds post_wait_time = 125ms
 );
 
 
