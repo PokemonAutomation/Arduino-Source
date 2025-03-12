@@ -41,7 +41,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     serial_row->addSpacing(5);
 
     interface_dropdown = new NoWheelComboBox(this);
-    m_dropdowns->addWidget(interface_dropdown);
+    m_dropdowns->addWidget(interface_dropdown, 2);
 
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SerialPABotBase)));
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::TcpSysbotBase)));
@@ -56,15 +56,12 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     }
     interface_dropdown->setCurrentIndex((int)current->interface_type - 1);
     m_selector = current->make_selector_QtWidget(*this);
-    m_dropdowns->insertWidget(1, m_selector);
+    m_dropdowns->addWidget(m_selector);
 
 
     m_dropdowns->addSpacing(5);
     m_controllers_dropdown = new NoWheelComboBox(this);
-    m_dropdowns->addWidget(m_controllers_dropdown);
-    if (!PreloadSettings::instance().DEVELOPER_MODE){
-        m_controllers_dropdown->setHidden(true);
-    }
+    m_dropdowns->addWidget(m_controllers_dropdown, 3);
     refresh_controllers(session.controller_type(), session.available_controllers());
 
     m_status_text = new QLabel(this);
