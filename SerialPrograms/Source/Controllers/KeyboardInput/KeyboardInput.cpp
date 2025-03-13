@@ -4,9 +4,10 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Exceptions/ProgramFinishedException.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "Controllers/KeyboardInput/GlobalQtKeyMap.h"
 #include "KeyboardInput.h"
@@ -152,9 +153,8 @@ void KeyboardInputController::thread_loop(){
                 std::swap(last, current);
                 last_neutral = false;
                 last_press = now;
-            }catch (ProgramCancelledException&){
-            }catch (ProgramFinishedException&){
-            }catch (InvalidConnectionStateException&){
+            }catch (Exception& e){
+                e.log(global_logger_tagged());
             }
         }while (false);
 
