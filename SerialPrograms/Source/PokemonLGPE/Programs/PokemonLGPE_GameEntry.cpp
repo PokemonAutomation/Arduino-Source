@@ -30,29 +30,14 @@ bool reset_game_to_gamemenu(
     VideoStream& stream, JoyconContext& context,
     bool tolerate_update_menu
 ){
-    bool video_available = (bool)stream.video().snapshot();
-    if (video_available ||
-        ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
-        tolerate_update_menu
-    ){
-        //Handle Right Joycon attempting to update
-        //Need detector for update prompt
-        //pbf_move_joystick(context, 0, 128, 100ms, 10ms);
-        //pbf_move_joystick(context, 0, 128, 100ms, 10ms);
-        //pbf_press_button(context, BUTTON_A, 100ms, 10ms);
-
-        close_game(stream, context);
-        start_game_from_home(
-            stream,
-            context,
-            tolerate_update_menu,
-            0, 0,
-            GameSettings::instance().START_GAME_MASH0
-        );
-    }else{
-        pbf_press_button(context, BUTTON_X, 400ms, 0ms);
-        pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH0);
-    }
+    close_game(stream, context);
+    start_game_from_home(
+        stream,
+        context,
+        tolerate_update_menu,
+        0, 0,
+        GameSettings::instance().START_GAME_MASH0
+    );
 
     // Now the game has opened:
     return openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT1);
