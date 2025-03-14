@@ -137,12 +137,8 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
-        .leftstick_x_lo = 0x00,
-        .leftstick_x_hi = 0x08,
-        .leftstick_y = 0x80,
-        .rightstick_x_lo = 0x00,
-        .rightstick_x_hi = 0x08,
-        .rightstick_y = 0x80,
+        .left_joystick = {0x00, 0x08, 0x80},
+        .right_joystick = {0x00, 0x08, 0x80},
         .vibrator = 0x00,
         .gyro = {},
     };
@@ -190,9 +186,7 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
 
     //  Left Stick
     if (m_left_joystick.is_busy()){
-        report.leftstick_x_lo = (m_left_joystick.x << 4) & 0xf0;
-        report.leftstick_x_hi = (m_left_joystick.x & 0xf0) >> 4;
-        report.leftstick_y = 255 - m_left_joystick.y;
+        encode_joystick(report.left_joystick, m_left_joystick.x, m_left_joystick.y);
     }
 
     issue_report(cancellable, report, duration);
@@ -207,12 +201,8 @@ void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* 
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
-        .leftstick_x_lo = 0x00,
-        .leftstick_x_hi = 0x08,
-        .leftstick_y = 0x80,
-        .rightstick_x_lo = 0x00,
-        .rightstick_x_hi = 0x08,
-        .rightstick_y = 0x80,
+        .left_joystick = {0x00, 0x08, 0x80},
+        .right_joystick = {0x00, 0x08, 0x80},
         .vibrator = 0x00,
         .gyro = {},
     };
@@ -257,9 +247,7 @@ void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* 
 
     //  Right Stick
     if (m_right_joystick.is_busy()){
-        report.rightstick_x_lo = (m_right_joystick.x << 4) & 0xf0;
-        report.rightstick_x_hi = (m_right_joystick.x & 0xf0) >> 4;
-        report.rightstick_y = 255 - m_right_joystick.y;
+        encode_joystick(report.right_joystick, m_right_joystick.x, m_right_joystick.y);
     }
 
     issue_report(cancellable, report, duration);

@@ -10,6 +10,10 @@
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -40,6 +44,37 @@ public:
 
 
 protected:
+    void encode_joystick(uint8_t data[3], uint8_t x, uint8_t y){
+        const uint16_t min = 1897;
+        const uint16_t max = 320;
+
+        const double SHIFT = 2048 - min;
+        const double RATIO = (min - max) / 127.;
+
+        double dx = x - 128.;
+        double dy = y - 128.;
+
+        dx *= RATIO;
+        dy *= RATIO;
+
+        if (dx != 0){
+            dx += dx >= 0 ? SHIFT : -SHIFT;
+        }
+        if (dy != 0){
+            dy += dy >= 0 ? SHIFT : -SHIFT;
+        }
+
+        uint16_t wx = (uint16_t)(2048 + dx + 0.5);
+        uint16_t wy = (uint16_t)(2048 - dy + 0.5);
+
+//        wx = 320;
+//        cout << "wx = " << wx << endl;
+
+        data[0] = (uint8_t)wx;
+        data[1] = (uint8_t)(wx >> 8 | wy << 4);
+        data[2] = (uint8_t)(wy >> 4);
+    }
+
     void issue_report(
         const Cancellable* cancellable,
         const ESP32Report0x30& report,
