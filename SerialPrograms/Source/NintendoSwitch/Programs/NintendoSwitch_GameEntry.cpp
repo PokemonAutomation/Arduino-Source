@@ -416,66 +416,6 @@ void start_game_from_home_with_inference(
     }
 }
 
-void start_game_from_home(
-    VideoStream& stream, JoyconContext& context,
-    bool tolerate_update_menu,
-    uint8_t game_slot,
-    uint8_t user_slot,
-    Milliseconds start_game_mash
-){
-    context.wait_for_all_requests();
-    if (stream.video().snapshot()){
-        stream.log("start_game_from_home(): Video capture available. Using inference...");
-        start_game_from_home_with_inference(stream, context, game_slot, user_slot, start_game_mash);
-        return;
-    }else{
-        stream.log("start_game_from_home(): Video capture not available.", COLOR_RED);
-    }
-
-    if (game_slot != 0){
-        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 160ms);
-        for (uint8_t c = 1; c < game_slot; c++){
-            pbf_move_joystick(context, 255, 128, 80ms, 0ms);
-        }
-    }
-
-    if (tolerate_update_menu){
-        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
-            throw UserSetupError(
-                stream.logger(),
-                "Cannot have both \"Tolerate Update Menu\" and \"Start Game Requires Internet\" enabled at the same time without video feedback."
-            );
-        }
-
-        //  If the update menu isn't there, these will get swallowed by the opening
-        //  animation for the select user menu.
-        pbf_press_button(context, BUTTON_A, 80ms, 1400ms);       //  Choose game
-        pbf_move_joystick(context, 128, 255, 100ms, 0ms);   //  Skip the update window.
-        move_to_user(context, user_slot);
-    }
-
-//    cout << "START_GAME_REQUIRES_INTERNET = " << ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET << endl;
-    if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && user_slot == 0){
-        //  Mash your way into the game.
-        pbf_mash_button(context, BUTTON_A, start_game_mash);
-    }else{
-        pbf_press_button(context, BUTTON_A, 80ms, 1400ms);   //  Enter select user menu.
-        move_to_user(context, user_slot);
-        ssf_press_button(context, BUTTON_A, 160ms); //  Enter game
-
-        //  Switch to mashing ZL instead of A to get into the game.
-        //  Mash your way into the game.
-        Milliseconds duration = start_game_mash;
-        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
-            //  Need to wait a bit longer for the internet check.
-            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY0;
-        }
-//        pbf_mash_button(context, BUTTON_ZL, duration);
-        pbf_wait(context, duration);
-    }
-    context.wait_for_all_requests();
-}
-
 bool openedgame_to_gamemenu(
     VideoStream& stream, JoyconContext& context,
     Milliseconds timeout

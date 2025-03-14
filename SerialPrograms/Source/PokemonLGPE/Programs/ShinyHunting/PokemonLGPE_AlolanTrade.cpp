@@ -250,7 +250,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
 
             //Reset game
             pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
-            reset_game_from_home(env, env.console, context, true, 3000ms);
+            reset_game_from_home(env, env.console, context, 3000ms);
             context.wait_for_all_requests();
 
             stats.resets++;

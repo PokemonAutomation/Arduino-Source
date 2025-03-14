@@ -27,14 +27,12 @@ namespace PokemonLGPE{
 
 
 bool reset_game_to_gamemenu(
-    VideoStream& stream, JoyconContext& context,
-    bool tolerate_update_menu
+    VideoStream& stream, JoyconContext& context
 ){
     close_game(stream, context);
-    start_game_from_home(
+    start_game_from_home_with_inference(
         stream,
         context,
-        tolerate_update_menu,
         0, 0,
         GameSettings::instance().START_GAME_MASH0
     );
@@ -98,11 +96,11 @@ bool gamemenu_to_ingame(
 
 bool reset_game_from_home(
     ProgramEnvironment& env, VideoStream& stream, JoyconContext& context,
-    bool tolerate_update_menu,
     Milliseconds post_wait_time
 ){
+    
     bool ok = true;
-    ok &= reset_game_to_gamemenu(stream, context, tolerate_update_menu);
+    ok &= reset_game_to_gamemenu(stream, context);
     ok &= gamemenu_to_ingame(
         stream, context,
         GameSettings::instance().ENTER_GAME_MASH0,
