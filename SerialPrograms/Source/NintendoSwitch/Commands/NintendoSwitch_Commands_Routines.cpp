@@ -88,33 +88,19 @@ void close_game(VideoStream& stream, JoyconContext& context){
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     context.wait_for_all_requests();
 
-//    cout << "waiting..." << endl;
-//    context.wait_for(10s);
-
-    // send a second Home button press, if the first one is dropped
-    bool video_available = (bool)stream.video().snapshot();
-    if (video_available){
-        HomeWatcher detector;
-        int ret = wait_until(
-            stream, context,
-            std::chrono::milliseconds(5000),
-            { detector }
-        );
-        if (ret == 0){
-            stream.log("Detected Home screen.");
-        }else{  // if game initially open.  |  if game initially closed
-            // initial Home button press was dropped
-            // - Does nothing.          |  - goes back to home screen, from opened app
-            pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-        }
-    }else{
-        // - wait some time after first Home button press 
-        // to avoid triggering zoom
-        context.wait_for(std::chrono::milliseconds(1000));
-        // - Does nothing.          |  - Press Home a second time in case we drop one.
+    HomeWatcher detector;
+    int ret = wait_until(
+        stream, context,
+        std::chrono::milliseconds(5000),
+        { detector }
+    );
+    if (ret == 0){
+        stream.log("Detected Home screen.");
+    }else{  // if game initially open.  |  if game initially closed
+        // initial Home button press was dropped
+        // - Does nothing.          |  - goes back to home screen, from opened app
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     }
-
 
     // fail-safe against button drops and unexpected error messages.
     pbf_mash_button(context, BUTTON_X, 400ms);
