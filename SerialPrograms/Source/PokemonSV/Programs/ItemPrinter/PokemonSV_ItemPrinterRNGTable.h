@@ -44,7 +44,7 @@ public:
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual void value_changed(void* object) override;
 
-    void set_seed_based_on_desired_item();
+//    void set_seed_based_on_desired_item();
 
 public:
     BooleanCheckBoxCell chain;
@@ -53,6 +53,7 @@ public:
     EnumDropdownCell<ItemPrinter::PrebuiltOptions> desired_item;
 
 private:
+    //  Brutal work-around for circular callback dependency.
     SpinLock m_pending_lock;
     std::deque<void*> m_pending;
     std::mutex m_update_lock;

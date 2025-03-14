@@ -22,6 +22,8 @@
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
+#include "Common/Cpp/Options/ColorOption.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -75,6 +77,8 @@ private:
     DateTimeOption DATE1;
 
     MillisecondsOption DURATION;
+    ColorCell COLOR;
+    ControllerSettingsTable CONTROLLER_TABLE;
 
 
 //    PokemonSV::SinglesAIOption battle_AI;

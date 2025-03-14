@@ -83,6 +83,9 @@ std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
 //  - also, hide the date if chain enabled.
 // - trigger the listener for the parent table.
 void ItemPrinterRngRow::value_changed(void* object){
+    //  This is really ugly due to the circular update dependency.
+    //  TODO: Redesign this.
+
     {
         WriteSpinLock lg1(m_pending_lock);
         m_pending.emplace_back(object);
@@ -94,7 +97,6 @@ void ItemPrinterRngRow::value_changed(void* object){
         if (!lg.owns_lock()){
             return;
         }
-
         {
             WriteSpinLock lg1(m_pending_lock);
             object = m_pending.front();

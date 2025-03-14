@@ -45,6 +45,18 @@ public:
 
 protected:
     void encode_joystick(uint8_t data[3], uint8_t x, uint8_t y){
+        //  2048 is the neutral position.
+        //
+        //  1897 is the point where the joystick calibrator will register it as
+        //  off-center.
+        //
+        //  ~320 is where it reaches the maximum value.
+        //
+        //  It we linearly interpolate between 1897 and 320, we seem to match
+        //  the wired controller's behavior.
+        //
+        //  I suspect the need to offset by 151 from 2048 -> 1897 is Nintendo's
+        //  way to alleviate the joycon drift problem.
         const uint16_t min = 1897;
         const uint16_t max = 320;
 
@@ -68,7 +80,7 @@ protected:
         uint16_t wy = (uint16_t)(2048 - dy + 0.5);
 
 //        wx = 320;
-//        cout << "wx = " << wx << endl;
+//        cout << "wx = " << wx << ", wy = " << wy << endl;
 
         data[0] = (uint8_t)wx;
         data[1] = (uint8_t)(wx >> 8 | wy << 4);

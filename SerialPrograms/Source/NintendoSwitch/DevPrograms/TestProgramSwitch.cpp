@@ -163,6 +163,28 @@ const StringSelectDatabase& test_database(){
 }
 
 
+
+
+
+
+class MacAddressCell : public StringCell{
+public:
+
+private:
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
 TestProgram_Descriptor::TestProgram_Descriptor()
     : MultiSwitchProgramDescriptor(
         "NintendoSwitch:TestProgram",
@@ -220,6 +242,11 @@ TestProgram::TestProgram()
         LockMode::UNLOCK_WHILE_RUNNING,
         "100"
     )
+    , COLOR(
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false,
+        0x000000, 0x000000
+    )
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -237,6 +264,8 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(DATE0);
     PA_ADD_OPTION(DATE1);
     PA_ADD_OPTION(DURATION);
+    PA_ADD_OPTION(COLOR);
+    PA_ADD_OPTION(CONTROLLER_TABLE);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);
     BUTTON1.add_listener(*this);
@@ -283,6 +312,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::terminate();
 
+
+    pbf_move_left_joystick(context, 0, 0, 10000, 0);
 
 
 //    ssf_issue_scroll(context, DPAD_LEFT, 0);
@@ -356,7 +387,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-    ImageRGB32 image("screenshot-20250224-203247822474.png");
+//    ImageRGB32 image("screenshot-20250224-203247822474.png");
 
 #if 0
     {
@@ -366,7 +397,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     }
 #endif
 
-#if 1
+#if 0
     {
         TeraTypeReader reader;
         ImageMatch::ImageMatchResult results = reader.read(image);
