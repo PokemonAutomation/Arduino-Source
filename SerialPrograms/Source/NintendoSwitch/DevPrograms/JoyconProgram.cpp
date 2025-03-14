@@ -8,10 +8,9 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 #include "JoyconProgram.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

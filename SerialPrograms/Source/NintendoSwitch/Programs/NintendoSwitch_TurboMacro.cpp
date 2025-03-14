@@ -8,6 +8,10 @@
 #include "NintendoSwitch/Options/TurboMacroTable.h"
 #include "NintendoSwitch_TurboMacro.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 

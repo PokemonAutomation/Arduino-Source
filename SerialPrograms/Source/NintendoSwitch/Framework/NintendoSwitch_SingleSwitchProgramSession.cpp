@@ -12,13 +12,14 @@
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 
-
 #define PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 
 namespace PokemonAutomation{
@@ -81,7 +82,9 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 #ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
     try{
         m_option.instance().program(env, scope);
-        env.console.controller().wait_for_all(&scope);
+
+        ControllerContext<AbstractController> context(scope, env.console.controller());
+        context.wait_for_all_requests();
     }catch (...){
         env.console.controller().cancel_all_commands();
         m_scope.store(nullptr, std::memory_order_release);
@@ -97,7 +100,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 }
 void SingleSwitchProgramSession::internal_stop_program(){
     WriteSpinLock lg(m_lock);
-//    m_system.serial_session().stop();
+
     CancellableScope* scope = m_scope.load(std::memory_order_acquire);
     if (scope != nullptr){
         scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
@@ -107,8 +110,6 @@ void SingleSwitchProgramSession::internal_stop_program(){
     while (m_scope.load(std::memory_order_acquire) != nullptr){
         pause();
     }
-
-//    m_system.serial_session().reset();
 }
 void SingleSwitchProgramSession::internal_run_program(){
     GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();

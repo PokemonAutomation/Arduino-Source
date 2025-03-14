@@ -185,11 +185,11 @@ public:
     using ControllerType = Type;
 
 public:
-    ControllerContext(ControllerType& botbase)
-        : m_controller(botbase)
+    ControllerContext(ControllerType& controller)
+        : m_controller(controller)
     {}
-    ControllerContext(CancellableScope& parent, ControllerType& botbase)
-        : m_controller(botbase)
+    ControllerContext(CancellableScope& parent, ControllerType& controller)
+        : m_controller(controller)
     {
         attach(parent);
     }

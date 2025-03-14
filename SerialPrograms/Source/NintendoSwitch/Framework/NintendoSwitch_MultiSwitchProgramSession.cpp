@@ -107,7 +107,8 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     try{
         m_option.instance().program(env, scope);
         for (size_t c = 0; c < consoles; c++){
-            env.consoles[c].controller().wait_for_all(&scope);
+            ControllerContext<AbstractController> context(scope, env.consoles[c].controller());
+            context.wait_for_all_requests();
         }
     }catch (...){
         for (size_t c = 0; c < consoles; c++){
