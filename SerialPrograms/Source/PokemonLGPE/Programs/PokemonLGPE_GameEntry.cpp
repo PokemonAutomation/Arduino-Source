@@ -7,8 +7,10 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
@@ -98,7 +100,15 @@ bool reset_game_from_home(
     ProgramEnvironment& env, VideoStream& stream, JoyconContext& context,
     Milliseconds post_wait_time
 ){
-    
+    if (!(context.controller().controller_type() == ControllerType::NintendoSwitch_RightJoycon)) {
+        stream.log("Right Joycon required!", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "reset_game_from_home(): Right Joycon required.",
+            stream
+        );
+        return false;
+    }
     bool ok = true;
     ok &= reset_game_to_gamemenu(stream, context);
     ok &= gamemenu_to_ingame(

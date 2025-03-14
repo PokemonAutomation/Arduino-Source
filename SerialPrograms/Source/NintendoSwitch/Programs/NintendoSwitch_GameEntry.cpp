@@ -12,6 +12,7 @@
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -331,6 +332,16 @@ void start_game_from_home_with_inference(
     Milliseconds start_game_wait
 ){
     context.wait_for_all_requests();
+
+    if (!(context.controller().controller_type() == ControllerType::NintendoSwitch_RightJoycon)) {
+        stream.log("Right Joycon required!", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "start_game_from_home_with_inference(): Right Joycon required.",
+            stream
+        );
+    }
+
     {
         HomeWatcher detector;
         int ret = run_until<JoyconContext>(
