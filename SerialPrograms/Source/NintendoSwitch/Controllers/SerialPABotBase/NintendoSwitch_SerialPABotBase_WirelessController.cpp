@@ -8,11 +8,16 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
+#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/BotBaseMessage.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessController.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -32,6 +37,7 @@ SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
         controller_type,
         connection
     )
+    , m_controller_type(controller_type)
     , m_stopping(false)
     , m_status_thread(&SerialPABotBase_WirelessController::status_thread, this)
 {}
@@ -57,7 +63,7 @@ void SerialPABotBase_WirelessController::stop(){
 
 class SerialPABotBase_WirelessController::MessageControllerStatus : public BotBaseRequest{
 public:
-    pabb_esp32_RequestStatus params;
+    pabb_esp32_request_status params;
     MessageControllerStatus()
         : BotBaseRequest(false)
     {
@@ -65,6 +71,19 @@ public:
     }
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_ESP32_REQUEST_STATUS, params);
+    }
+};
+class SerialPABotBase_WirelessController::MessageControllerColors : public BotBaseRequest{
+public:
+    pabb_esp32_get_colors params;
+    MessageControllerColors(uint32_t controller_type)
+        : BotBaseRequest(false)
+    {
+        params.seqnum = 0;
+        params.controller_type = controller_type;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_ESP32_REQUEST_GET_COLORS, params);
     }
 };
 class SerialPABotBase_WirelessController::MessageControllerState : public BotBaseRequest{
@@ -93,8 +112,31 @@ int register_message_converters_ESP32(){
             }
             std::ostringstream ss;
             ss << "ESP32_controller_status() - ";
-            if (body.size() != sizeof(pabb_esp32_RequestStatus)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_esp32_RequestStatus*)body.c_str();
+            if (body.size() != sizeof(pabb_esp32_request_status)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_esp32_request_status*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_ESP32_REQUEST_GET_COLORS,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "pabb_esp32_get_colors() - ";
+            if (body.size() != sizeof(pabb_esp32_get_colors)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_esp32_get_colors*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", controller = " << (uint64_t)params->controller_type;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_ESP32_REQUEST_SET_COLORS,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "pabb_esp32_set_colors() - ";
+            if (body.size() != sizeof(pabb_esp32_set_colors)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_esp32_set_colors*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
             return ss.str();
         }
@@ -154,6 +196,68 @@ void SerialPABotBase_WirelessController::status_thread(){
     constexpr std::chrono::milliseconds PERIOD(1000);
     std::atomic<WallClock> last_ack(current_time());
 
+    //  Read controller colors.
+    std::string color_html;
+#if 1
+    try{
+        m_logger.log("Reading Controller Colors...");
+        uint32_t controller_id = PABB_CID_NONE;
+        switch (m_controller_type){
+        case ControllerType::NintendoSwitch_WirelessProController:
+            controller_id = PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER;
+            break;
+        case ControllerType::NintendoSwitch_LeftJoycon:
+            controller_id = PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
+            break;
+        case ControllerType::NintendoSwitch_RightJoycon:
+            controller_id = PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
+            break;
+        default:;
+        }
+        BotBaseMessage response = m_serial->issue_request_and_wait(
+            MessageControllerColors(controller_id),
+            &m_scope
+        );
+        ControllerColors colors{};
+        if (response.body.size() == sizeof(seqnum_t) + sizeof(ControllerColors)){
+            memcpy(&colors, response.body.data() + sizeof(seqnum_t), sizeof(ControllerColors));
+        }else{
+            m_logger.log(
+                "Invalid response size to PABB_MSG_ESP32_GET_COLORS: body = " + std::to_string(response.body.size()),
+                COLOR_RED
+            );
+            m_handle.set_status_line1("Error: See log for more information.", COLOR_RED);
+            return;
+        }
+        m_logger.log("Reading Controller Colors... Done");
+
+        switch (m_controller_type){
+        case ControllerType::NintendoSwitch_WirelessProController:{
+            Color left(colors.left_grip[0], colors.left_grip[1], colors.left_grip[2]);
+            Color body(colors.body[0], colors.body[1], colors.body[2]);
+            Color right(colors.right_grip[0], colors.right_grip[1], colors.right_grip[2]);
+            color_html += html_color_text("&#x2b24;", left);
+            color_html += " " + html_color_text("&#x2b24;", body);
+            color_html += " " + html_color_text("&#x2b24;", right);
+            break;
+        }
+        case ControllerType::NintendoSwitch_LeftJoycon:
+        case ControllerType::NintendoSwitch_RightJoycon:{
+            Color body(colors.body[0], colors.body[1], colors.body[2]);
+            color_html = html_color_text("&#x2b24;", body);
+            break;
+        }
+        default:;
+        }
+
+    }catch (Exception& e){
+        e.log(m_logger);
+        m_handle.set_status_line1("Error: See log for more information.", COLOR_RED);
+        return;
+    }
+#endif
+
+
     std::thread watchdog([&, this]{
         WallClock next_ping = current_time();
         while (true){
@@ -212,6 +316,7 @@ void SerialPABotBase_WirelessController::status_thread(){
                 ? html_color_text("Yes", theme_friendly_darkblue())
                 : html_color_text("No", COLOR_RED)
             );
+            str += " - " + color_html;
 
             m_handle.set_status_line1(str);
         }catch (OperationCancelledException&){

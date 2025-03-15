@@ -1,6 +1,6 @@
 /*  Pokemon Automation Bot Base
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  *      This is the main PABotBase class.
  * 
@@ -123,8 +123,10 @@ private:
 
     uint64_t oldest_live_seqnum() const;
 
-    template <typename Params> void process_ack_request(BotBaseMessage message);
-    template <typename Params> void process_ack_command(BotBaseMessage message);
+    template <typename Params, bool variable_length = false>
+    void process_ack_request(BotBaseMessage message);
+    template <typename Params>
+    void process_ack_command(BotBaseMessage message);
 
     template <typename Params> void process_command_finished(BotBaseMessage message);
     virtual void on_recv_message(BotBaseMessage message) override;

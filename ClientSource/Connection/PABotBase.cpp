@@ -1,6 +1,6 @@
 /*  Pokemon Automation Bot Base
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  */
 
@@ -329,13 +329,15 @@ uint64_t PABotBase::oldest_live_seqnum() const{
     return oldest;
 }
 
-template <typename Params>
+template <typename Params, bool variable_length>
 void PABotBase::process_ack_request(BotBaseMessage message){
     auto scope_check = m_sanitizer.check_scope();
 
-    if (message.body.size() != sizeof(Params)){
-        m_sniffer->log("Ignoring message with invalid size.");
-        return;
+    if constexpr (!variable_length){
+        if (message.body.size() != sizeof(Params)){
+            m_sniffer->log("Ignoring message with invalid size.");
+            return;
+        }
     }
     const Params* params = (const Params*)message.body.c_str();
     seqnum_t seqnum = params->seqnum;
@@ -501,6 +503,9 @@ void PABotBase::on_recv_message(BotBaseMessage message){
         return;
     case PABB_MSG_ACK_REQUEST_I32:
         process_ack_request<pabb_MsgAckRequestI32>(std::move(message));
+        return;
+    case PABB_MSG_ACK_REQUEST_DATA:
+        process_ack_request<pabb_MsgAckRequestData, true>(std::move(message));
         return;
     case PABB_MSG_ERROR_INVALID_TYPE:{
         if (message.body.size() != sizeof(pabb_MsgInfoInvalidType)){

@@ -53,7 +53,7 @@ typedef struct{
 #define PABB_MSG_ESP32_REQUEST_STATUS   0x50
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_esp32_RequestStatus;
+} PABB_PACK pabb_esp32_request_status;
 
 
 #if 0
@@ -67,13 +67,18 @@ typedef struct{
 
 
 
-#define PABB_MSG_ESP32_GET_COLORS           0x64
-#define PABB_MSG_ESP32_SET_COLORS           0x65
+#define PABB_MSG_ESP32_REQUEST_GET_COLORS       0x64
+typedef struct{
+    seqnum_t seqnum;
+    uint32_t controller_type;
+} PABB_PACK pabb_esp32_get_colors;
+
+#define PABB_MSG_ESP32_REQUEST_SET_COLORS       0x65
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
     ControllerColors colors;
-} PABB_PACK pabb_esp32_colors;
+} PABB_PACK pabb_esp32_set_colors;
 
 
 #define PABB_MSG_ESP32_CONTROLLER_STATE_BUTTONS     0xa0

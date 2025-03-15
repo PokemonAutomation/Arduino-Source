@@ -1,6 +1,6 @@
 /*  Message Pretty Printing
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  */
 
@@ -181,6 +181,24 @@ int register_message_converters_framework_acks(){
             const auto* params = (const pabb_MsgAckRequestI32*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
             ss << ", message = " << params->data;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_ACK_REQUEST_DATA,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_ACK_REQUEST_DATA - ";
+//            if (body.size() != sizeof(pabb_MsgAckRequestI32)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgAckRequestI32*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", bytes = " << body.size() - sizeof(seqnum_t);
+            ss << ", data =";
+            static const char HEX_DIGITS[] = "0123456789abcdef";
+            for (size_t c = sizeof(seqnum_t); c < body.size(); c++){
+                uint8_t byte = body[c];
+                ss << " " << HEX_DIGITS[(byte >> 4)] << " " << HEX_DIGITS[byte & 15];
+            }
             return ss.str();
         }
     );

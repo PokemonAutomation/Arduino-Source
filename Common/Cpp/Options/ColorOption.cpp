@@ -17,15 +17,15 @@ ColorCell::ColorCell(const ColorCell& x)
 {}
 ColorCell::ColorCell(
     LockMode lock_while_running,
-    bool allow_alpha,
+    bool has_alpha,
     uint32_t default_value, uint32_t current_value
 )
     : ConfigOption(lock_while_running)
-    , m_allow_alpha(allow_alpha)
+    , m_has_alpha(has_alpha)
     , m_default_value(default_value)
     , m_current_value(current_value)
 {
-    if (!m_allow_alpha){
+    if (!m_has_alpha){
         m_default_value &= 0x00ffffff;
         m_current_value &= 0x00ffffff;
     }
@@ -34,22 +34,29 @@ uint32_t ColorCell::default_value() const{
     return m_default_value;
 }
 std::string ColorCell::to_str() const{
+    return color_to_str(*this, m_has_alpha);
+}
+std::string ColorCell::color_to_str(uint32_t color, bool has_alpha){
     static const char HEX_DIGITS[] = "0123456789ABCDEF";
-    std::string str(6, '0');
-    uint32_t x = *this;
-    str[0] = HEX_DIGITS[(x >> 20) & 0xf];
-    str[1] = HEX_DIGITS[(x >> 16) & 0xf];
-    str[2] = HEX_DIGITS[(x >> 12) & 0xf];
-    str[3] = HEX_DIGITS[(x >>  8) & 0xf];
-    str[4] = HEX_DIGITS[(x >>  4) & 0xf];
-    str[5] = HEX_DIGITS[(x >>  0) & 0xf];
+    std::string str;
+    size_t c = 0;
+    if (has_alpha){
+        str[c++] += HEX_DIGITS[(color >> 28) & 0xf];
+        str[c++] += HEX_DIGITS[(color >> 24) & 0xf];
+    }
+    str[c++] += HEX_DIGITS[(color >> 20) & 0xf];
+    str[c++] += HEX_DIGITS[(color >> 16) & 0xf];
+    str[c++] += HEX_DIGITS[(color >> 12) & 0xf];
+    str[c++] += HEX_DIGITS[(color >>  8) & 0xf];
+    str[c++] += HEX_DIGITS[(color >>  4) & 0xf];
+    str[c++] += HEX_DIGITS[(color >>  0) & 0xf];
     return str;
 }
 ColorCell::operator uint32_t() const{
     return m_current_value.load(std::memory_order_relaxed);
 }
 void ColorCell::set(uint32_t x){
-    if (!m_allow_alpha){
+    if (!m_has_alpha){
         x &= 0x00ffffff;
     }
     if (x != m_current_value.exchange(x, std::memory_order_relaxed)){
@@ -57,7 +64,7 @@ void ColorCell::set(uint32_t x){
     }
 }
 void ColorCell::set(const std::string& str){
-    size_t max_digits = m_allow_alpha ? 8 : 6;
+    size_t max_digits = m_has_alpha ? 8 : 6;
 
     uint32_t x = 0;
     size_t count = 0;
@@ -95,7 +102,7 @@ void ColorCell::set(const std::string& str){
 
         break;
     }
-    if (!m_allow_alpha){
+    if (!m_has_alpha){
         x &= 0x00ffffff;
     }
     set(x);

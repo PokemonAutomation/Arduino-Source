@@ -41,6 +41,7 @@ public:
 
 public:
     class MessageControllerStatus;
+    class MessageControllerColors;
     class MessageControllerState;
 
 
@@ -91,7 +92,8 @@ private:
 
     void status_thread();
 
-
+protected:
+    const ControllerType m_controller_type;
 private:
     CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;

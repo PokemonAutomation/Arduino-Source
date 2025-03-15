@@ -19,12 +19,13 @@ public:
     ColorCell(const ColorCell& x);
     ColorCell(
         LockMode lock_while_running,
-        bool allow_alpha,
+        bool has_alpha,
         uint32_t default_value, uint32_t current_value
     );
 
     uint32_t default_value() const;
     std::string to_str() const;
+    static std::string color_to_str(uint32_t color, bool has_alpha);
 
     operator uint32_t() const;
     void set(uint32_t x);
@@ -38,7 +39,7 @@ public:
 
 
 private:
-    bool m_allow_alpha;
+    bool m_has_alpha;
     uint32_t m_default_value;
     std::atomic<uint32_t> m_current_value;
 };
