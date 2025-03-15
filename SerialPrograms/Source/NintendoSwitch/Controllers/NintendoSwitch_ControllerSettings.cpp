@@ -4,7 +4,13 @@
  *
  */
 
+#include <chrono>
+#include "Common/CRC32.h"
 #include "NintendoSwitch_ControllerSettings.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -17,6 +23,40 @@ struct OfficialJoyconColors{
     uint32_t left_buttons;
     uint32_t right_body;
     uint32_t right_buttons;
+
+    void write_to_profile(ControllerProfile& profile, ControllerType controller) const{
+        profile.official_name = name;
+        switch (controller){
+        case ControllerType::NintendoSwitch_WirelessProController:{
+            //  Set the grips to the joycon colors.
+            profile.left_grip = left_body;
+            profile.right_grip = right_body;
+
+            //  Average the two button colors.
+            uint32_t red = ((left_buttons >> 16) & 0xff) + ((right_buttons >> 16) & 0xff);
+            uint32_t green = ((left_buttons >> 8) & 0xff) + ((right_buttons >> 8) & 0xff);
+            uint32_t blue = ((left_buttons >> 0) & 0xff) + ((right_buttons >> 0) & 0xff);
+            red /= 2;
+            green /= 2;
+            blue /= 2;
+            profile.button_color = (red << 16) | (green << 8) | (blue << 0);
+
+            //  Pick something for the controller body.
+            profile.body_color = 0xd0d0d0;
+            break;
+        }
+        case ControllerType::NintendoSwitch_LeftJoycon:
+            profile.button_color = left_buttons;
+            profile.body_color = left_body;
+            break;
+        case ControllerType::NintendoSwitch_RightJoycon:
+            profile.button_color = right_buttons;
+            profile.body_color = right_body;
+            break;
+        default:;
+        }
+
+    }
 };
 
 const std::vector<OfficialJoyconColors>& OFFICIAL_JOYCON_COLORS(){
@@ -192,37 +232,9 @@ void ControllerSettingsRow::value_changed(void* object){
     try{
         m_pending_official_load++;
 
-        const OfficialJoyconColors& entry = OFFICIAL_JOYCON_COLORS()[index - 1];
-        switch (controller){
-        case ControllerType::NintendoSwitch_WirelessProController:{
-            //  Set the grips to the joycon colors.
-            left_grip.set(entry.left_body);
-            right_grip.set(entry.right_body);
-
-            //  Average the two button colors.
-            uint32_t red = ((entry.left_buttons >> 16) & 0xff) + ((entry.right_buttons >> 16) & 0xff);
-            uint32_t green = ((entry.left_buttons >> 8) & 0xff) + ((entry.right_buttons >> 8) & 0xff);
-            uint32_t blue = ((entry.left_buttons >> 0) & 0xff) + ((entry.right_buttons >> 0) & 0xff);
-            red /= 2;
-            green /= 2;
-            blue /= 2;
-            button_color.set((red << 16) | (green << 8) | (blue << 0));
-
-            //  Pick something for the controller body.
-            body_color.set(0xd0d0d0);
-
-            break;
-        }
-        case ControllerType::NintendoSwitch_LeftJoycon:
-            button_color.set(entry.left_buttons);
-            body_color.set(entry.left_body);
-            break;
-        case ControllerType::NintendoSwitch_RightJoycon:
-            button_color.set(entry.right_buttons);
-            body_color.set(entry.right_body);
-            break;
-        default:;
-        }
+        ControllerProfile profile{};
+        OFFICIAL_JOYCON_COLORS()[index - 1].write_to_profile(profile, controller);
+        this->set_profile(profile);
 
         m_pending_official_load--;
     }catch (...){
@@ -255,7 +267,60 @@ std::vector<std::string> ControllerSettingsTable::make_header() const{
 }
 
 
+ControllerProfile ControllerSettingsTable::get_or_make_profile(
+    const std::string& name,
+    ControllerType controller
+){
+//    cout << "ControllerSettingsTable::get_or_make_profile(): " << this << endl;
 
+    ControllerProfile profile{};
+
+    //  Only relevant to Switch controllers.
+    switch (controller){
+    case ControllerType::NintendoSwitch_WiredProController:
+    case ControllerType::NintendoSwitch_WirelessProController:
+    case ControllerType::NintendoSwitch_LeftJoycon:
+    case ControllerType::NintendoSwitch_RightJoycon:
+        break;
+    default:
+        return profile;
+    }
+
+    bool found = false;
+    this->run_on_all_rows([&, controller](ControllerSettingsRow& row){
+        if ((std::string)row.name != name){
+            return false;
+        }
+        if (row.controller != controller){
+            return false;
+        }
+
+        found = true;
+        profile = row;
+        return true;
+    });
+
+    if (found){
+        return profile;
+    }
+
+    const std::vector<OfficialJoyconColors>& DATABASE = OFFICIAL_JOYCON_COLORS();
+
+    uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    seed = pabb_crc32(0, &seed, sizeof(seed));
+    seed %= DATABASE.size();
+
+    DATABASE[(size_t)seed].write_to_profile(profile, controller);
+
+    std::unique_ptr<ControllerSettingsRow> row(new ControllerSettingsRow(*this));
+    row->name.set(name);
+    row->controller.set(controller);
+    row->set_profile(profile);
+
+    this->append_row(std::move(row));
+
+    return profile;
+}
 
 
 

@@ -137,6 +137,7 @@ void ProControllerKeyboardMappingTable::set_advanced_mode(bool enabled){
     m_advanced_mode.store(enabled, std::memory_order_relaxed);
     run_on_all_rows([enabled](ProControllerKeyMapTableRow& row){
         row.set_advanced_mode(enabled);
+        return false;
     });
 }
 
@@ -304,6 +305,7 @@ void JoyconKeyboardMappingTable::set_advanced_mode(bool enabled){
     m_advanced_mode.store(enabled, std::memory_order_relaxed);
     run_on_all_rows([enabled](JoyconKeyMapTableRow& row){
         row.set_advanced_mode(enabled);
+        return false;
     });
 }
 

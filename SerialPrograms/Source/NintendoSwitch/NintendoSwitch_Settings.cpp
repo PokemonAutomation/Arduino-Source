@@ -57,6 +57,7 @@ ConsoleSettings::ConsoleSettings()
     )
     , KEYBOARD_SECTION("<font size=4><b>Keyboard to Controller Mappings:</b></font>")
 {
+    PA_ADD_OPTION(CONTROLLER_SETTINGS);
     PA_ADD_OPTION(SETTINGS_TO_HOME_DELAY0);
     PA_ADD_OPTION(START_GAME_REQUIRES_INTERNET);
     PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY0);
@@ -68,6 +69,13 @@ ConsoleSettings::ConsoleSettings()
     }
     PA_ADD_STATIC(KEYBOARD_SECTION);
     PA_ADD_OPTION(KEYBOARD_MAPPINGS);
+}
+void ConsoleSettings::load_json(const JsonValue& json){
+    if (m_loaded){
+        return;
+    }
+    m_loaded = true;
+    BatchOption::load_json(json);
 }
 
 

@@ -7,8 +7,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_ControllerSettings_H
 #define PokemonAutomation_NintendoSwitch_ControllerSettings_H
 
-#include <deque>
-#include <mutex>
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/ColorOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
@@ -21,7 +19,13 @@ namespace NintendoSwitch{
 
 
 
-
+struct ControllerProfile{
+    uint32_t button_color;
+    uint32_t body_color;
+    uint32_t left_grip;
+    uint32_t right_grip;
+    std::string official_name;
+};
 
 class ControllerSettingsRow : public EditableTableRow, public ConfigOption::Listener{
 public:
@@ -30,7 +34,24 @@ public:
     virtual std::unique_ptr<EditableTableRow> clone() const override;
     virtual void value_changed(void* object) override;
 
-private:
+    operator ControllerProfile() const{
+        return {
+            button_color,
+            body_color,
+            left_grip,
+            right_grip,
+            official_color.slug(),
+        };
+    }
+    void set_profile(const ControllerProfile& profile){
+        button_color.set(profile.button_color);
+        body_color.set(profile.body_color);
+        left_grip.set(profile.left_grip);
+        right_grip.set(profile.right_grip);
+        official_color.set_by_slug(profile.official_name);
+    }
+
+public:
     StringCell name;
     EnumDropdownCell<ControllerType> controller;
     ColorCell button_color;
@@ -49,7 +70,10 @@ public:
     ControllerSettingsTable();
     virtual std::vector<std::string> make_header() const override;
 
-
+    ControllerProfile get_or_make_profile(
+        const std::string& name,
+        ControllerType controller
+    );
 
 };
 

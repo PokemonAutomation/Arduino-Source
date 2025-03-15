@@ -8,9 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
-#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
-#include "ClientSource/Connection/BotBaseMessage.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessController.h"
@@ -25,82 +23,6 @@ namespace NintendoSwitch{
 using namespace std::chrono_literals;
 
 
-
-
-SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
-    Logger& logger,
-    SerialPABotBase::SerialPABotBase_Connection& connection,
-    ControllerType controller_type
-)
-    : SerialPABotBase_Controller(
-        logger,
-        controller_type,
-        connection
-    )
-    , m_controller_type(controller_type)
-    , m_stopping(false)
-    , m_status_thread(&SerialPABotBase_WirelessController::status_thread, this)
-{}
-SerialPABotBase_WirelessController::~SerialPABotBase_WirelessController(){
-    stop();
-    m_status_thread.join();
-}
-void SerialPABotBase_WirelessController::stop(){
-    if (m_stopping.exchange(true)){
-        return;
-    }
-    m_scope.cancel(nullptr);
-    {
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-        if (m_serial){
-            m_serial->notify_all();
-        }
-        m_cv.notify_all();
-    }
-}
-
-
-
-class SerialPABotBase_WirelessController::MessageControllerStatus : public BotBaseRequest{
-public:
-    pabb_esp32_request_status params;
-    MessageControllerStatus()
-        : BotBaseRequest(false)
-    {
-        params.seqnum = 0;
-    }
-    virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_ESP32_REQUEST_STATUS, params);
-    }
-};
-class SerialPABotBase_WirelessController::MessageControllerColors : public BotBaseRequest{
-public:
-    pabb_esp32_get_colors params;
-    MessageControllerColors(uint32_t controller_type)
-        : BotBaseRequest(false)
-    {
-        params.seqnum = 0;
-        params.controller_type = controller_type;
-    }
-    virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_ESP32_REQUEST_GET_COLORS, params);
-    }
-};
-class SerialPABotBase_WirelessController::MessageControllerState : public BotBaseRequest{
-public:
-    pabb_esp32_report30 params;
-    MessageControllerState(uint8_t ticks, bool active, ESP32Report0x30 report)
-        : BotBaseRequest(true)
-    {
-        params.seqnum = 0;
-        params.ticks = ticks;
-        params.active = active;
-        params.report = report;
-    }
-    virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_ESP32_REPORT, params);
-    }
-};
 
 int register_message_converters_ESP32(){
     register_message_converter(
@@ -165,6 +87,44 @@ int init_Messages_ESP32 = register_message_converters_ESP32();
 
 
 
+SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
+    Logger& logger,
+    SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerType controller_type
+)
+    : SerialPABotBase_Controller(
+        logger,
+        controller_type,
+        connection
+    )
+    , m_controller_type(controller_type)
+    , m_stopping(false)
+    , m_status_thread(&SerialPABotBase_WirelessController::status_thread, this)
+{}
+SerialPABotBase_WirelessController::~SerialPABotBase_WirelessController(){
+    stop();
+    m_status_thread.join();
+}
+void SerialPABotBase_WirelessController::stop(){
+    if (m_stopping.exchange(true)){
+        return;
+    }
+    m_scope.cancel(nullptr);
+    {
+        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        if (m_serial){
+            m_serial->notify_all();
+        }
+        m_cv.notify_all();
+    }
+}
+
+
+
+
+
+
+
 void SerialPABotBase_WirelessController::issue_report(
     const Cancellable* cancellable,
     const ESP32Report0x30& report,
@@ -201,21 +161,8 @@ void SerialPABotBase_WirelessController::status_thread(){
 #if 1
     try{
         m_logger.log("Reading Controller Colors...");
-        uint32_t controller_id = PABB_CID_NONE;
-        switch (m_controller_type){
-        case ControllerType::NintendoSwitch_WirelessProController:
-            controller_id = PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER;
-            break;
-        case ControllerType::NintendoSwitch_LeftJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
-            break;
-        case ControllerType::NintendoSwitch_RightJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
-            break;
-        default:;
-        }
         BotBaseMessage response = m_serial->issue_request_and_wait(
-            MessageControllerColors(controller_id),
+            MessageControllerGetColors(m_controller_type),
             &m_scope
         );
         ControllerColors colors{};

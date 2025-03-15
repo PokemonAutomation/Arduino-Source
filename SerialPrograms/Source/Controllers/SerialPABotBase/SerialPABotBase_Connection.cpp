@@ -10,13 +10,15 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
-#include "Common/PokemonSwSh/PokemonProgramIDs.h"
+//#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessController.h"
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Connection.h"
 
@@ -61,12 +63,12 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
         return;
     }
 
-    std::string name = port->systemLocation().toUtf8().data();
+    m_device_name = port->portName().toStdString();
     std::string error;
     try{
         set_status_line0("Connecting...", COLOR_DARKGREEN);
 
-        std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
+        std::unique_ptr<SerialConnection> connection(new SerialConnection(port->systemLocation().toStdString(), PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
     }catch (const ConnectionException& e){
         error = e.message();
@@ -211,13 +213,57 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
 
     if (change_controller && program_iter->second.size() > 1){
         ControllerType desired_controller = change_controller.value();
+        switch (desired_controller){
+        case ControllerType::NintendoSwitch_WiredProController:
+        case ControllerType::NintendoSwitch_WirelessProController:
+        case ControllerType::NintendoSwitch_LeftJoycon:
+        case ControllerType::NintendoSwitch_RightJoycon:{
+            NintendoSwitch::ControllerProfile profile =
+                NintendoSwitch::ConsoleSettings::instance().CONTROLLER_SETTINGS.get_or_make_profile(
+                    m_device_name,
+                    desired_controller
+                );
+
+            NintendoSwitch::ControllerColors colors;
+            {
+                Color color(profile.body_color);
+                colors.body[0] = color.red();
+                colors.body[1] = color.green();
+                colors.body[2] = color.blue();
+            }
+            {
+                Color color(profile.button_color);
+                colors.buttons[0] = color.red();
+                colors.buttons[1] = color.green();
+                colors.buttons[2] = color.blue();
+            }
+            {
+                Color color(profile.left_grip);
+                colors.left_grip[0] = color.red();
+                colors.left_grip[1] = color.green();
+                colors.left_grip[2] = color.blue();
+            }
+            {
+                Color color(profile.right_grip);
+                colors.right_grip[0] = color.red();
+                colors.right_grip[1] = color.green();
+                colors.right_grip[2] = color.blue();
+            }
+
+            m_botbase->issue_request_and_wait(
+                NintendoSwitch::MessageControllerSetColors(desired_controller, colors),
+                nullptr
+            );
+        }
+        default:;
+        }
+
+
         uint32_t native_controller_id = controller_type_to_id(desired_controller);
         m_botbase->issue_request_and_wait(
             Microcontroller::DeviceRequest_change_controller_mode(native_controller_id),
             nullptr
         );
-
-
 
         //  Re-read the controller.
         logger.log("Reading Controller Mode...");

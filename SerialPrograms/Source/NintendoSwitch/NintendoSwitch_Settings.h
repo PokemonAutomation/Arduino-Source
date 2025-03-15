@@ -13,6 +13,7 @@
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Options/NintendoSwitch_CodeEntrySettingsOption.h"
+#include "Controllers/NintendoSwitch_ControllerSettings.h"
 #include "Controllers/NintendoSwitch_KeyboardMapping.h"
 
 namespace PokemonAutomation{
@@ -25,8 +26,11 @@ extern const Resolution DEFAULT_RESOLUTION;
 
 class ConsoleSettings : public BatchOption{
     ConsoleSettings();
+    virtual void load_json(const JsonValue& json) override;
 public:
     static ConsoleSettings& instance();
+
+    ControllerSettingsTable CONTROLLER_SETTINGS;
 
     MillisecondsOption SETTINGS_TO_HOME_DELAY0;
     BooleanCheckBoxOption START_GAME_REQUIRES_INTERNET;
@@ -40,6 +44,8 @@ public:
     SectionDividerOption KEYBOARD_SECTION;
     KeyboardMappingOption KEYBOARD_MAPPINGS;
 
+private:
+    bool m_loaded;
 };
 
 

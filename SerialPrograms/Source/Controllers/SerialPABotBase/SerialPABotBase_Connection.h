@@ -54,6 +54,7 @@ private:
 
 private:
     SerialLogger m_logger;
+    std::string m_device_name;
 
     uint32_t m_protocol = 0;
     uint8_t m_program_id = 0;

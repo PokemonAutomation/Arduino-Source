@@ -97,6 +97,10 @@ public:
     //  These reference are live in that they may be asynchronously changed.
     std::vector<std::shared_ptr<EditableTableRow>> current_refs() const;
 
+//    SpinLock& get_lock() const{
+//        return m_current_lock;
+//    }
+
     //  Return a copy of the entire table at the exact moment this is called.
     template <typename RowType>
     std::vector<std::unique_ptr<RowType>> copy_snapshot() const{
@@ -121,11 +125,15 @@ public:
         }
         return ret;
     }
+
+    //  Lambda returns a boolean. False to continue running. True to stop.
     template <typename RowType, typename Lambda>
     void run_on_all_rows(Lambda function){
         ReadSpinLock lg(m_current_lock);
         for (auto& item : m_current){
-            function(static_cast<RowType&>(*item));
+            if (function(static_cast<RowType&>(*item))){
+                return;
+            }
         }
     }
 
@@ -144,6 +152,7 @@ public:
 
     //  Undefined behavior to call these on rows that aren't part of the table.
     void insert_row(size_t index, std::unique_ptr<EditableTableRow> row);
+    void append_row(std::unique_ptr<EditableTableRow> row);
     void clone_row(const EditableTableRow& row);
     void remove_row(EditableTableRow& row);
 
@@ -176,6 +185,8 @@ public:
     std::vector<RowSnapshotType> snapshot() const{
         return EditableTableOption::snapshot<RowType, RowSnapshotType>();
     }
+
+    //  Lambda returns a boolean. False to continue running. True to stop.
     template <typename Lambda>
     void run_on_all_rows(Lambda function){
         EditableTableOption::run_on_all_rows<RowType>(std::move(function));

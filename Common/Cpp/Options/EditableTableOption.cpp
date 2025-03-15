@@ -122,6 +122,8 @@ void EditableTableOption::clear(){
     m_current.clear();
 }
 void EditableTableOption::load_json(const JsonValue& json){
+//    cout << "EditableTableOption::load_json(): " << this << endl;
+
     const JsonArray* array = json.to_array();
     if (array == nullptr){
         return;
@@ -215,6 +217,9 @@ void EditableTableOption::insert_row(size_t index, std::unique_ptr<EditableTable
         }
     }
     report_value_changed(this);
+}
+void EditableTableOption::append_row(std::unique_ptr<EditableTableRow> row){
+    insert_row((size_t)-1, std::move(row));
 }
 void EditableTableOption::clone_row(const EditableTableRow& row){
     {
