@@ -112,7 +112,9 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         }
     }catch (...){
         for (size_t c = 0; c < consoles; c++){
-            env.consoles[c].controller().cancel_all_commands();
+            try{
+                env.consoles[c].controller().cancel_all_commands();
+            }catch (...){}
         }
         m_scope.store(nullptr, std::memory_order_release);
         throw;

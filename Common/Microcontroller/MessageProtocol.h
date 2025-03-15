@@ -266,6 +266,11 @@ typedef struct{
     uint32_t data;
 } PABB_PACK pabb_MsgAckRequestI32;
 
+#define PABB_MSG_ACK_REQUEST_DATA               0x1f
+typedef struct{
+    seqnum_t seqnum;
+} PABB_PACK pabb_MsgAckRequestData;
+
 ////////////////////////////////////////////////////////////////////////////////
 //  Custom Info
 

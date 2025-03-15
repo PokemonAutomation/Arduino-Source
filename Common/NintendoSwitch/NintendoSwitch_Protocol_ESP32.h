@@ -66,12 +66,14 @@ typedef struct{
 #endif
 
 
-#define PABB_MSG_ESP32_SET_COLORS           0x62
+
+#define PABB_MSG_ESP32_GET_COLORS           0x64
+#define PABB_MSG_ESP32_SET_COLORS           0x65
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
     ControllerColors colors;
-} PABB_PACK pabb_esp32_set_colors;
+} PABB_PACK pabb_esp32_colors;
 
 
 #define PABB_MSG_ESP32_CONTROLLER_STATE_BUTTONS     0xa0

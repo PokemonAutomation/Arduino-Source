@@ -86,7 +86,9 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         ControllerContext<AbstractController> context(scope, env.console.controller());
         context.wait_for_all_requests();
     }catch (...){
-        env.console.controller().cancel_all_commands();
+        try{
+            env.console.controller().cancel_all_commands();
+        }catch (...){}
         m_scope.store(nullptr, std::memory_order_release);
         throw;
     }

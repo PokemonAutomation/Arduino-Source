@@ -9,7 +9,6 @@
 
 #include <map>
 #include <atomic>
-#include <mutex>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 
 //#include <iostream>
