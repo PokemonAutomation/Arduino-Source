@@ -1,6 +1,6 @@
 /*  PABotBase Connection
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  *      This class wraps a raw SerialConnection object and applies the
  *  communication protocol on top of it. It automatically throws out bad

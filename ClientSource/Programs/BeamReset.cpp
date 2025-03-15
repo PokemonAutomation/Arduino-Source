@@ -1,6 +1,6 @@
 /*  Beam Reset
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  *  This program is identical to BeamReset in the Arduino programs.
  *  Please follow the same start instructions.

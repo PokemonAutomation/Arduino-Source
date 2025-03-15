@@ -1,6 +1,6 @@
 /*  Device Logger
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  *      Run this program and it will automatically begin logging status updates
  *  from whatever program is running on the device.

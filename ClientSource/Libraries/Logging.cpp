@@ -1,6 +1,6 @@
 /*  Pokemon Automation Bot Base - Client Example
  * 
- *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *  From: https://github.com/PokemonAutomation/
  * 
  */
 
