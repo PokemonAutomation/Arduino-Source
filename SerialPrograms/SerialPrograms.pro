@@ -674,6 +674,7 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp \
+    Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemRespawnFarmer.cpp \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp \
     Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp \
     Source/PokemonLGPE/PokemonLGPE_Panels.cpp \
@@ -1864,6 +1865,7 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h \
+    Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemRespawnFarmer.h \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h \
     Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h \
     Source/PokemonLGPE/PokemonLGPE_Panels.h \
