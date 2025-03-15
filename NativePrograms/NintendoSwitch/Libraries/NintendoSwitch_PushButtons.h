@@ -10,9 +10,8 @@
 //#ifdef __AVR__
 //#include "NativePrograms/NintendoSwitch/Framework/Master.h"
 //#endif
-#include "Common/Microcontroller/MessageProtocol.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 
 
 

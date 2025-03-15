@@ -22,7 +22,6 @@
 //  Thus to add a new program, you must edit all of the above.
 //
 
-#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "NativePrograms/DeviceFramework/DeviceSettings.h"
 #include "NativePrograms/NintendoSwitch/Libraries/FrameworkSettings.h"
 #include "NativePrograms/NintendoSwitch/Libraries/NintendoSwitch_Device.h"

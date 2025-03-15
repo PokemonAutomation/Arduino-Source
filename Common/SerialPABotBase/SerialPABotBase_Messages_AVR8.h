@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_SerialPABotBase_Messages_AVR8_H
 #define PokemonAutomation_SerialPABotBase_Messages_AVR8_H
 
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
+#include "SerialPABotBase_Protocol.h"
 
 #if _WIN32
 #pragma pack(push, 1)

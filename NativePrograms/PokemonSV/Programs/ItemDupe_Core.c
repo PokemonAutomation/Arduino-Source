@@ -20,7 +20,6 @@
 // Arduino UNO R3 - STABLE
 // Pro Micro - STABLE
 
-#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "NativePrograms/DeviceFramework/DeviceSettings.h"
 #include "NativePrograms/NintendoSwitch/Libraries/FrameworkSettings.h"
 #include "NativePrograms/NintendoSwitch/Libraries/NintendoSwitch_Device.h"
