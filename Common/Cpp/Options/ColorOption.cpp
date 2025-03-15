@@ -39,17 +39,16 @@ std::string ColorCell::to_str() const{
 std::string ColorCell::color_to_str(uint32_t color, bool has_alpha){
     static const char HEX_DIGITS[] = "0123456789ABCDEF";
     std::string str;
-    size_t c = 0;
     if (has_alpha){
-        str[c++] += HEX_DIGITS[(color >> 28) & 0xf];
-        str[c++] += HEX_DIGITS[(color >> 24) & 0xf];
+        str += HEX_DIGITS[(color >> 28) & 0xf];
+        str += HEX_DIGITS[(color >> 24) & 0xf];
     }
-    str[c++] += HEX_DIGITS[(color >> 20) & 0xf];
-    str[c++] += HEX_DIGITS[(color >> 16) & 0xf];
-    str[c++] += HEX_DIGITS[(color >> 12) & 0xf];
-    str[c++] += HEX_DIGITS[(color >>  8) & 0xf];
-    str[c++] += HEX_DIGITS[(color >>  4) & 0xf];
-    str[c++] += HEX_DIGITS[(color >>  0) & 0xf];
+    str += HEX_DIGITS[(color >> 20) & 0xf];
+    str += HEX_DIGITS[(color >> 16) & 0xf];
+    str += HEX_DIGITS[(color >> 12) & 0xf];
+    str += HEX_DIGITS[(color >>  8) & 0xf];
+    str += HEX_DIGITS[(color >>  4) & 0xf];
+    str += HEX_DIGITS[(color >>  0) & 0xf];
     return str;
 }
 ColorCell::operator uint32_t() const{
