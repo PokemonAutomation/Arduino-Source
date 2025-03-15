@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_AVR8.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
