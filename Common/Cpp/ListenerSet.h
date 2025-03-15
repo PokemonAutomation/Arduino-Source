@@ -10,6 +10,7 @@
 #include <map>
 #include <atomic>
 #include <mutex>
+#include "Common/Cpp/Concurrency/SpinLock.h"
 
 //#include <iostream>
 //using std::cout;
@@ -30,12 +31,14 @@ public:
     }
 
     void add(ListenerType& listener){
-        std::lock_guard<std::mutex> lg(m_lock);
+        WriteSpinLock lg(m_lock);
+//        std::lock_guard<std::mutex> lg(m_lock);
         m_listeners[&listener]++;
         m_count.store(m_listeners.size(), std::memory_order_relaxed);
     }
     void remove(ListenerType& listener){
-        std::lock_guard<std::mutex> lg(m_lock);
+        WriteSpinLock lg(m_lock);
+//        std::lock_guard<std::mutex> lg(m_lock);
         auto iter = m_listeners.find(&listener);
         if (iter == m_listeners.end()){
             return;
@@ -51,7 +54,8 @@ public:
         if (empty()){
             return;
         }
-        std::lock_guard<std::mutex> lg(m_lock);
+        ReadSpinLock lg(m_lock);
+//        std::lock_guard<std::mutex> lg(m_lock);
         for (auto& item : m_listeners){
             lambda(*item.first);
         }
@@ -61,7 +65,8 @@ public:
         if (empty()){
             return;
         }
-        std::lock_guard<std::mutex> lg(m_lock);
+        ReadSpinLock lg(m_lock);
+//        std::lock_guard<std::mutex> lg(m_lock);
         for (auto& item : m_listeners){
             ListenerType& listener = *item.first;
             size_t count = item.second;
@@ -76,7 +81,8 @@ public:
         if (empty()){
             return;
         }
-        std::lock_guard<std::mutex> lg(m_lock);
+        ReadSpinLock lg(m_lock);
+//        std::lock_guard<std::mutex> lg(m_lock);
         for (auto& item : m_listeners){
             (item.first->*function)(std::forward<Args>(args)...);
         }
@@ -86,7 +92,8 @@ public:
         if (empty()){
             return;
         }
-        std::lock_guard<std::mutex> lg(m_lock);
+        ReadSpinLock lg(m_lock);
+//        std::lock_guard<std::mutex> lg(m_lock);
         for (auto& item : m_listeners){
             ListenerType& listener = *item.first;
             size_t count = item.second;
@@ -101,7 +108,8 @@ private:
     //  skip the lock when there are no listeners.
     std::atomic<size_t> m_count;
 
-    mutable std::mutex m_lock;
+    mutable SpinLock m_lock;
+//    mutable std::mutex m_lock;
     std::map<ListenerType*, size_t> m_listeners;
 };
 

@@ -217,6 +217,8 @@ void EditableTableWidget::update_value(){
                 QWidget* cell_widget = new QWidget(this);
                 QVBoxLayout* layout = new QVBoxLayout(cell_widget);
                 layout->setContentsMargins(0, 0, 0, 0);
+//                cell_widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
+                widget->setSizePolicy(QSizePolicy::Expanding, QSizePolicy::Expanding);
                 layout->addWidget(widget);
 //                cell_widgets.emplace_back(widget);
                 m_table->setCellWidget((int)index_new, c, cell_widget);

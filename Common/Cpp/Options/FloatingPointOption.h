@@ -51,7 +51,6 @@ public:
 private:
     struct Data;
     Pimpl<Data> m_data;
-    const std::string m_label;
 };
 
 

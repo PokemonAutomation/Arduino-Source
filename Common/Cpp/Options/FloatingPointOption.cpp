@@ -41,8 +41,7 @@ struct FloatingPointCell::Data{
 FloatingPointCell::~FloatingPointCell() = default;
 FloatingPointCell::FloatingPointCell(const FloatingPointCell& x)
     : ConfigOption(x)
-    , m_data(CONSTRUCT_TOKEN, x.min_value(), x.max_value(), x.default_value(), x.default_value())
-    , m_label(x.m_label)
+    , m_data(CONSTRUCT_TOKEN, x.min_value(), x.max_value(), x.default_value(), x)
 {}
 FloatingPointCell::FloatingPointCell(
     LockMode lock_while_running,
