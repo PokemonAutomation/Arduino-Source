@@ -103,6 +103,7 @@ SOURCES += \
     ../Common/Cpp/Options/BatchOption.cpp \
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp \
     ../Common/Cpp/Options/ButtonOption.cpp \
+    ../Common/Cpp/Options/ColorOption.cpp \
     ../Common/Cpp/Options/ConfigOption.cpp \
     ../Common/Cpp/Options/DateOption.cpp \
     ../Common/Cpp/Options/EditableTableOption.cpp \
@@ -137,6 +138,7 @@ SOURCES += \
     ../Common/Qt/Options/BatchWidget.cpp \
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp \
     ../Common/Qt/Options/ButtonWidget.cpp \
+    ../Common/Qt/Options/ColorWidget.cpp \
     ../Common/Qt/Options/ConfigWidget.cpp \
     ../Common/Qt/Options/DateWidget.cpp \
     ../Common/Qt/Options/EditableTableWidget.cpp \
@@ -1199,6 +1201,7 @@ HEADERS += \
     ../Common/Cpp/Options/BatchOption.h \
     ../Common/Cpp/Options/BooleanCheckBoxOption.h \
     ../Common/Cpp/Options/ButtonOption.h \
+    ../Common/Cpp/Options/ColorOption.h \
     ../Common/Cpp/Options/ConfigOption.h \
     ../Common/Cpp/Options/DateOption.h \
     ../Common/Cpp/Options/EditableTableOption.h \
@@ -1248,6 +1251,7 @@ HEADERS += \
     ../Common/Qt/Options/BatchWidget.h \
     ../Common/Qt/Options/BooleanCheckBoxWidget.h \
     ../Common/Qt/Options/ButtonWidget.h \
+    ../Common/Qt/Options/ColorWidget.h \
     ../Common/Qt/Options/ConfigWidget.h \
     ../Common/Qt/Options/DateWidget.h \
     ../Common/Qt/Options/EditableTableWidget.h \
@@ -1480,6 +1484,7 @@ HEADERS += \
     Source/Controllers/ControllerDescriptor.h \
     Source/Controllers/ControllerTypeStrings.h \
     Source/Controllers/ControllerTypes.h \
+    Source/Controllers/JoystickTools.h \
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h \
     Source/Controllers/KeyboardInput/KeyboardInput.h \
     Source/Controllers/KeyboardInput/KeyboardStateTracker.h \

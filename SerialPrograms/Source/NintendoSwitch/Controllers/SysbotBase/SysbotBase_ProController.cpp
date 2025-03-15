@@ -5,13 +5,11 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "Controllers/ControllerTypeStrings.h"
+#include "Controllers/JoystickTools.h"
 #include "SysbotBase_ProController.h"
-
-#include "Common/Cpp/Concurrency/SpinPause.h"
 
 //#include <iostream>
 //using std::cout;
@@ -273,19 +271,29 @@ void ProController_SysbotBase::send_diff(
     if (old_state.left_x != new_state.left_x ||
         old_state.left_y != new_state.left_y
     ){
+        double fx = JoystickTools::linear_u8_to_float(new_state.left_x);
+        double fy = -JoystickTools::linear_u8_to_float(new_state.left_y);
+//        cout << "fx = " << fx << ", fy = " << fy << endl;
+        int16_t ix = JoystickTools::linear_float_to_s16(fx);
+        int16_t iy = JoystickTools::linear_float_to_s16(fy);
+//        cout << "ix = " << ix << ", iy = " << iy << endl;
         message += "setStick LEFT ";
-        message += std::to_string(((uint16_t)new_state.left_x - 128) << 8);
+        message += std::to_string(ix);
         message += " ";
-        message += std::to_string(((uint16_t)128 - new_state.left_y) << 8);
+        message += std::to_string(iy);
         message += "\n";
     }
     if (old_state.right_x != new_state.right_x ||
         old_state.right_y != new_state.right_y
     ){
+        double fx = JoystickTools::linear_u8_to_float(new_state.right_x);
+        double fy = -JoystickTools::linear_u8_to_float(new_state.right_y);
+        int16_t ix = JoystickTools::linear_float_to_s16(fx);
+        int16_t iy = JoystickTools::linear_float_to_s16(fy);
         message += "setStick RIGHT ";
-        message += std::to_string(((uint16_t)new_state.right_x - 128) << 8);
+        message += std::to_string(ix);
         message += " ";
-        message += std::to_string(((uint16_t)128 - new_state.right_y) << 8);
+        message += std::to_string(iy);
         message += "\n";
     }
 

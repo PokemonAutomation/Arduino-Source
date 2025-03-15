@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessController_H
 
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
+#include "Controllers/JoystickTools.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
 //#include <iostream>
@@ -60,26 +61,15 @@ protected:
         const uint16_t min = 1897;
         const uint16_t max = 320;
 
-        const double SHIFT = 2048 - min;
-        const double RATIO = (min - max) / 127.;
+        const double lo = 1 - min / 2048.;
+        const double hi = 1 - max / 2048.;
 
-        double dx = x - 128.;
-        double dy = y - 128.;
+        double fx = JoystickTools::linear_u8_to_float(x);
+        double fy = -JoystickTools::linear_u8_to_float(y);
+//        cout << "fx = " << fx << ", fy = " << fy << endl;
 
-        dx *= RATIO;
-        dy *= RATIO;
-
-        if (dx != 0){
-            dx += dx >= 0 ? SHIFT : -SHIFT;
-        }
-        if (dy != 0){
-            dy += dy >= 0 ? SHIFT : -SHIFT;
-        }
-
-        uint16_t wx = (uint16_t)(2048 + dx + 0.5);
-        uint16_t wy = (uint16_t)(2048 - dy + 0.5);
-
-//        wx = 320;
+        uint16_t wx = JoystickTools::linear_float_to_u12(lo, hi, fx);
+        uint16_t wy = JoystickTools::linear_float_to_u12(lo, hi, fy);
 //        cout << "wx = " << wx << ", wy = " << wy << endl;
 
         data[0] = (uint8_t)wx;

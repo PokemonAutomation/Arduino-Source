@@ -127,6 +127,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/ButtonOption.cpp
     ../Common/Cpp/Options/ButtonOption.h
+    ../Common/Cpp/Options/ColorOption.cpp
+    ../Common/Cpp/Options/ColorOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
     ../Common/Cpp/Options/ConfigOption.h
     ../Common/Cpp/Options/DateOption.cpp
@@ -212,6 +214,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/BooleanCheckBoxWidget.h
     ../Common/Qt/Options/ButtonWidget.cpp
     ../Common/Qt/Options/ButtonWidget.h
+    ../Common/Qt/Options/ColorWidget.cpp
+    ../Common/Qt/Options/ColorWidget.h
     ../Common/Qt/Options/ConfigWidget.cpp
     ../Common/Qt/Options/ConfigWidget.h
     ../Common/Qt/Options/DateWidget.cpp
@@ -634,6 +638,7 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerTypes.h
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
+    Source/Controllers/JoystickTools.h
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
     Source/Controllers/KeyboardInput/KeyboardInput.cpp
@@ -829,6 +834,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
