@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_Tests_TestUtils_H
 #define PokemonAutomation_Tests_TestUtils_H
 
-#include "Common/Microcontroller/MessageProtocol.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/BotBaseMessage.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"

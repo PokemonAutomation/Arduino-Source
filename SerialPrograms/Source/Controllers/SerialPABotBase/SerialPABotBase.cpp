@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/PokemonSwSh/PokemonProgramIDs.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "SerialPABotBase.h"
 
 namespace PokemonAutomation{

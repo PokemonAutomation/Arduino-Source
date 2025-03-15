@@ -129,7 +129,6 @@ SOURCES += \
     ../Common/Cpp/StringTools.cpp \
     ../Common/Cpp/Time.cpp \
     ../Common/Cpp/Unicode.cpp \
-    ../Common/Microcontroller/DeviceRoutines.cpp \
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.cpp \
     ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/AutoWidthLineEdit.cpp \
@@ -327,6 +326,9 @@ SOURCES += \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp \
     Source/Controllers/SuperscalarScheduler.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
     Source/Integrations/DiscordIntegrationTable.cpp \
@@ -410,6 +412,7 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp \
@@ -1236,12 +1239,9 @@ HEADERS += \
     ../Common/Cpp/Time.h \
     ../Common/Cpp/Unicode.h \
     ../Common/Cpp/ValueDebouncer.h \
-    ../Common/Microcontroller/DeviceRoutines.h \
-    ../Common/Microcontroller/MessageProtocol.h \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h \
-    ../Common/PokemonSwSh/PokemonProgramIDs.h \
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h \
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h \
@@ -1275,6 +1275,9 @@ HEADERS += \
     ../Common/Qt/StringToolsQt.h \
     ../Common/Qt/TimeQt.h \
     ../Common/Qt/WidgetStackFixedAspectRatio.h \
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h \
+    ../Common/SerialPABotBase/SerialPABotBase_Protocol.h \
+    ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h \
     ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioFeed.h \
@@ -1494,6 +1497,9 @@ HEADERS += \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h \
     Source/Controllers/SuperscalarScheduler.h \
     Source/Integrations/DiscordIntegrationSettings.h \
@@ -1590,8 +1596,7 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h \

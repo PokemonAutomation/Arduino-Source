@@ -8,8 +8,8 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
-#include "Common/Microcontroller/MessageProtocol.h"
-#include "Common/Microcontroller/DeviceRoutines.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "PABotBase.h"
 
 //#include <iostream>
@@ -82,7 +82,7 @@ void PABotBase::connect(){
 
     pabb_MsgAckRequest response;
     issue_request_and_wait(
-        Microcontroller::DeviceRequest_seqnum_reset(), nullptr
+        SerialPABotBase::DeviceRequest_seqnum_reset(), nullptr
     ).convert<PABB_MSG_ACK_REQUEST>(logger(), response);
 }
 void PABotBase::stop(){
@@ -184,7 +184,7 @@ bool PABotBase::try_stop_all_commands(){
 
     auto scope_check = m_sanitizer.check_scope();
 
-    uint64_t seqnum = try_issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true);
+    uint64_t seqnum = try_issue_request(nullptr, SerialPABotBase::DeviceRequest_request_stop(), true);
     if (seqnum != 0){
         clear_all_active_commands(seqnum);
         return true;
@@ -211,13 +211,13 @@ void PABotBase::stop_all_commands(){
 
     auto scope_check = m_sanitizer.check_scope();
 
-    uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true);
+    uint64_t seqnum = issue_request(nullptr, SerialPABotBase::DeviceRequest_request_stop(), true);
     clear_all_active_commands(seqnum);
 }
 bool PABotBase::try_next_command_interrupt(){
     auto scope_check = m_sanitizer.check_scope();
 
-    uint64_t seqnum = try_issue_request(nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true);
+    uint64_t seqnum = try_issue_request(nullptr, SerialPABotBase::DeviceRequest_next_command_interrupt(), true);
     if (seqnum != 0){
         clear_all_active_commands(seqnum);
         return true;
@@ -228,7 +228,7 @@ bool PABotBase::try_next_command_interrupt(){
 void PABotBase::next_command_interrupt(){
     auto scope_check = m_sanitizer.check_scope();
 
-    uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true);
+    uint64_t seqnum = issue_request(nullptr, SerialPABotBase::DeviceRequest_next_command_interrupt(), true);
     clear_all_active_commands(seqnum);
 }
 void PABotBase::clear_all_active_commands(uint64_t seqnum){
@@ -259,7 +259,7 @@ void PABotBase::clear_all_active_commands(uint64_t seqnum){
 
         if (iter->second.state == AckState::NOT_ACKED){
             //  Convert the command into a no-op request.
-            Microcontroller::DeviceRequest_program_id request;
+            SerialPABotBase::DeviceRequest_program_id request;
             BotBaseMessage message = request.message();
             seqnum_t seqnum_s = (seqnum_t)iter->first;
             memcpy(&message.body[0], &seqnum_s, sizeof(seqnum_t));

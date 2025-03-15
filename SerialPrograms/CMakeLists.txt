@@ -187,14 +187,13 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
-    ../Common/Microcontroller/DeviceRoutines.cpp
-    ../Common/Microcontroller/DeviceRoutines.h
-    ../Common/Microcontroller/MessageProtocol.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_AVR8.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h
+    ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
+    ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h
-    ../Common/PokemonSwSh/PokemonProgramIDs.h
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.cpp
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h
@@ -655,6 +654,12 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
@@ -832,8 +837,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.cpp

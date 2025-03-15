@@ -4,8 +4,7 @@
  *
  */
 
-#include "Common/Microcontroller/MessageProtocol.h"
-#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "BotBaseMessage.h"
 #include "MessageLogger.h"

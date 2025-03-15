@@ -9,16 +9,15 @@
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
-#include "Common/Microcontroller/DeviceRoutines.h"
-//#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessController.h"
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Connection.h"
 
@@ -116,7 +115,7 @@ void SerialPABotBase_Connection::update_with_capabilities(const ControllerFeatur
 
         //  Program Version
         logger.log("Checking Firmware Version...");
-        uint32_t version = Microcontroller::program_version(*m_botbase);
+        uint32_t version = program_version(*m_botbase);
         logger.log("Checking Firmware Version... Version = " + std::to_string(version));
 
         //  REMOVE: Temporary for migration.
@@ -129,7 +128,7 @@ void SerialPABotBase_Connection::update_with_capabilities(const ControllerFeatur
     }while (false);
 
     logger.log("Device supports queue size. Requesting queue size...", COLOR_BLUE);
-    uint8_t queue_limit = Microcontroller::device_queue_size(*m_botbase);
+    uint8_t queue_limit = device_queue_size(*m_botbase);
     logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
     m_botbase->set_queue_limit(queue_limit);
 }
@@ -160,7 +159,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
 
     //  Protocol
     logger.log("Checking device protocol compatibility...");
-    m_protocol = Microcontroller::protocol_version(*m_botbase);
+    m_protocol = protocol_version(*m_botbase);
     logger.log("Checking device protocol compatibility... Protocol = " + std::to_string(m_protocol));
 
     //  (protocol_requested / 100) == (protocol_device / 100)
@@ -185,7 +184,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
 
     //  Program ID
     logger.log("Checking Program ID...");
-    m_program_id = Microcontroller::program_id(*m_botbase);
+    m_program_id = program_id(*m_botbase);
     logger.log("Checking Program ID... Program ID = " + std::to_string(m_program_id));
 
     const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>& PROGRAM_IDS = protocol_iter->second;
@@ -205,7 +204,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
     if (program_iter->second.size() == 1){
         current_controller = program_iter->second.begin()->first;
     }else if (program_iter->second.size() > 1){
-        uint32_t type_id = Microcontroller::read_controller_mode(*m_botbase);
+        uint32_t type_id = read_controller_mode(*m_botbase);
         current_controller = id_to_controller_type(type_id);
     }
     logger.log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
@@ -219,12 +218,12 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
         case ControllerType::NintendoSwitch_LeftJoycon:
         case ControllerType::NintendoSwitch_RightJoycon:{
             NintendoSwitch::ControllerProfile profile =
-                NintendoSwitch::ConsoleSettings::instance().CONTROLLER_SETTINGS.get_or_make_profile(
+                PokemonAutomation::NintendoSwitch::ConsoleSettings::instance().CONTROLLER_SETTINGS.get_or_make_profile(
                     m_device_name,
                     desired_controller
                 );
 
-            NintendoSwitch::ControllerColors colors;
+            NintendoSwitch_ControllerColors colors;
             {
                 Color color(profile.body_color);
                 colors.body[0] = color.red();
@@ -251,7 +250,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
             }
 
             m_botbase->issue_request_and_wait(
-                NintendoSwitch::MessageControllerSetColors(desired_controller, colors),
+                MessageControllerSetColors(desired_controller, colors),
                 nullptr
             );
         }
@@ -261,13 +260,13 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
 
         uint32_t native_controller_id = controller_type_to_id(desired_controller);
         m_botbase->issue_request_and_wait(
-            Microcontroller::DeviceRequest_change_controller_mode(native_controller_id),
+            DeviceRequest_change_controller_mode(native_controller_id),
             nullptr
         );
 
         //  Re-read the controller.
         logger.log("Reading Controller Mode...");
-        uint32_t type_id = Microcontroller::read_controller_mode(*m_botbase);
+        uint32_t type_id = read_controller_mode(*m_botbase);
         current_controller = id_to_controller_type(type_id);
         logger.log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
     }

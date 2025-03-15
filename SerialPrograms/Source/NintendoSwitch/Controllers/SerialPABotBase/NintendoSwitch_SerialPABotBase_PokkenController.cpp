@@ -4,15 +4,13 @@
  *
  */
 
-#include <map>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "Controllers/ControllerCapability.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.h"
 #include "NintendoSwitch_SerialPABotBase_PokkenController.h"
 
 //#include <iostream>
@@ -189,7 +187,7 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
         Milliseconds current_ms = std::min(time_left, 255 * 8ms);
         uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_8ms(current_ms.count());
         m_serial->issue_request(
-            DeviceRequest_controller_state(buttons, dpad, left_x, left_y, right_x, right_y, current_ticks),
+            SerialPABotBase::DeviceRequest_controller_state(buttons, dpad, left_x, left_y, right_x, right_y, current_ticks),
             cancellable
         );
         time_left -= current_ms;
@@ -241,7 +239,7 @@ void SerialPABotBase_PokkenController::status_thread(){
         try{
             pabb_MsgAckRequestI32 response;
             m_serial->issue_request_and_wait(
-                NintendoSwitch::DeviceRequest_system_clock(),
+                SerialPABotBase::DeviceRequest_system_clock(),
                 &m_scope
             ).convert<PABB_MSG_ACK_REQUEST_I32>(logger(), response);
             last_ack.store(current_time(), std::memory_order_relaxed);

@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessJoycon.h"
 
@@ -130,7 +129,7 @@ void SerialPABotBase_WirelessJoycon::issue_mash_button(
 void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* cancellable, WallDuration duration){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
-    ESP32Report0x30 report{
+    SerialPABotBase::NintendoSwitch_ESP32Report0x30 report{
         .report_id = 0x30,
         .timer = 0,     //  Populate on controller.
         .byte2 = 0x9d,  //  Full + Charging : Joycon
@@ -194,7 +193,7 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
 void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* cancellable, WallDuration duration){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
-    ESP32Report0x30 report{
+    SerialPABotBase::NintendoSwitch_ESP32Report0x30 report{
         .report_id = 0x30,
         .timer = 0,     //  Populate on controller.
         .byte2 = 0x9d,  //  Full + Charging : Joycon

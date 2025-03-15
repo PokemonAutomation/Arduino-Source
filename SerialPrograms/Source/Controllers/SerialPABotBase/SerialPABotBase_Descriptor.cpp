@@ -73,7 +73,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
     switch (controller_type){
     case ControllerType::NintendoSwitch_WiredProController:
         return std::unique_ptr<AbstractController>(
-            new NintendoSwitch::SerialPABotBase_PokkenController(
+            new PokemonAutomation::NintendoSwitch::SerialPABotBase_PokkenController(
                 logger,
                 static_cast<SerialPABotBase_Connection&>(connection)
             )
@@ -81,7 +81,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
 
     case ControllerType::NintendoSwitch_WirelessProController:
         return std::unique_ptr<AbstractController>(
-            new NintendoSwitch::SerialPABotBase_WirelessProController(
+            new PokemonAutomation::NintendoSwitch::SerialPABotBase_WirelessProController(
                 logger,
                 static_cast<SerialPABotBase_Connection&>(connection)
             )
@@ -90,7 +90,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
     case ControllerType::NintendoSwitch_LeftJoycon:
     case ControllerType::NintendoSwitch_RightJoycon:
         return std::unique_ptr<AbstractController>(
-            new NintendoSwitch::SerialPABotBase_WirelessJoycon(
+            new PokemonAutomation::NintendoSwitch::SerialPABotBase_WirelessJoycon(
                 logger,
                 static_cast<SerialPABotBase_Connection&>(connection),
                 controller_type

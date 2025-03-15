@@ -1,13 +1,13 @@
-/*  ESP32 Commands
+/*  SerialPABotBase Messages (ESP32)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_ESP32_H
-#define PokemonAutomation_NintendoSwitch_ESP32_H
+#ifndef PokemonAutomation_SerialPABotBase_Messages_ESP32_H
+#define PokemonAutomation_SerialPABotBase_Messages_ESP32_H
 
-#include "Common/Microcontroller/MessageProtocol.h"
+#include "SerialPABotBase_Protocol.h"
 
 #if _WIN32
 #pragma pack(push, 1)
@@ -20,7 +20,7 @@
 #ifdef __cplusplus
 extern "C" {
 namespace PokemonAutomation{
-namespace NintendoSwitch{
+namespace SerialPABotBase{
 #endif
 
 
@@ -30,7 +30,7 @@ typedef struct{
     uint8_t buttons[3];
     uint8_t left_grip[3];
     uint8_t right_grip[3];
-} ControllerColors;
+} NintendoSwitch_ControllerColors;
 
 typedef struct{
     uint8_t button3;
@@ -39,11 +39,11 @@ typedef struct{
     uint8_t left_joystick[3];
     uint8_t right_joystick[3];
     uint8_t vibrator;
-} ButtonState;
+} NintendoSwitch_ButtonState;
 
 typedef struct{
     uint8_t data[36];
-} GyroState;
+} NintendoSwitch_GyroState;
 
 
 
@@ -53,7 +53,7 @@ typedef struct{
 #define PABB_MSG_ESP32_REQUEST_STATUS   0x50
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_esp32_request_status;
+} PABB_PACK pabb_Message_ESP32_RequestStatus;
 
 
 #if 0
@@ -62,7 +62,7 @@ typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
     uint8_t mac_address[6];
-} PABB_PACK pabb_esp32_set_mac_address;
+} PABB_PACK pabb_Message_ESP32_SetMacAddress;
 #endif
 
 
@@ -71,31 +71,31 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
-} PABB_PACK pabb_esp32_get_colors;
+} PABB_PACK pabb_Message_ESP32_GetColors;
 
 #define PABB_MSG_ESP32_REQUEST_SET_COLORS       0x65
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
-    ControllerColors colors;
-} PABB_PACK pabb_esp32_set_colors;
+    NintendoSwitch_ControllerColors colors;
+} PABB_PACK pabb_Message_ESP32_SetColors;
 
 
 #define PABB_MSG_ESP32_CONTROLLER_STATE_BUTTONS     0xa0
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    ButtonState buttons;
-} PABB_PACK pabb_esp32_controller_state_buttons;
+    NintendoSwitch_ButtonState buttons;
+} PABB_PACK pabb_Message_ESP32_CommandButtonState;
 
 
 #define PABB_MSG_ESP32_CONTROLLER_STATE_FULL        0xa1
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    ButtonState buttons;
-    GyroState gyro;
-} PABB_PACK pabb_esp32_controller_state_full;
+    NintendoSwitch_ButtonState buttons;
+    NintendoSwitch_GyroState gyro;
+} PABB_PACK pabb_Message_ESP32_CommandFullState;
 
 
 
@@ -113,7 +113,7 @@ typedef struct{
     uint8_t right_joystick[3];
     uint8_t vibrator;
     uint8_t gyro[49 - 13];
-} ESP32Report0x30;
+} NintendoSwitch_ESP32Report0x30;
 
 
 #define PABB_MSG_ESP32_REPORT       0x9e
@@ -121,7 +121,7 @@ typedef struct{
     seqnum_t seqnum;
     uint8_t ticks;
     bool active;
-    ESP32Report0x30 report;
+    NintendoSwitch_ESP32Report0x30 report;
 } PABB_PACK pabb_esp32_report30;
 
 

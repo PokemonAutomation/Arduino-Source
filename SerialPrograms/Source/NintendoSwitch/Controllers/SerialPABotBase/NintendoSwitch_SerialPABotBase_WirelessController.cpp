@@ -4,13 +4,10 @@
  *
  */
 
-#include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
-#include "Common/NintendoSwitch/NintendoSwitch_Protocol_ESP32.h"
-#include "ClientSource/Libraries/MessageConverter.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessController.h"
 
 //#include <iostream>
@@ -24,65 +21,6 @@ using namespace std::chrono_literals;
 
 
 
-int register_message_converters_ESP32(){
-    register_message_converter(
-        PABB_MSG_ESP32_REQUEST_STATUS,
-        [](const std::string& body){
-            //  Disable this by default since it's very spammy.
-            if (!GlobalSettings::instance().LOG_EVERYTHING){
-                return std::string();
-            }
-            std::ostringstream ss;
-            ss << "ESP32_controller_status() - ";
-            if (body.size() != sizeof(pabb_esp32_request_status)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_esp32_request_status*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_ESP32_REQUEST_GET_COLORS,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "pabb_esp32_get_colors() - ";
-            if (body.size() != sizeof(pabb_esp32_get_colors)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_esp32_get_colors*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", controller = " << (uint64_t)params->controller_type;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_ESP32_REQUEST_SET_COLORS,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "pabb_esp32_set_colors() - ";
-            if (body.size() != sizeof(pabb_esp32_set_colors)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_esp32_set_colors*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_ESP32_REPORT,
-        [](const std::string& body){
-            //  Disable this by default since it's very spammy.
-            if (!GlobalSettings::instance().LOG_EVERYTHING){
-                return std::string();
-            }
-            std::ostringstream ss;
-            ss << "ESP32_controller_state() - ";
-            if (body.size() != sizeof(pabb_esp32_report30)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_esp32_report30*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", ticks = " << (int)params->ticks;
-            ss << ", active = " << (int)params->active;
-            return ss.str();
-        }
-    );
-    return 0;
-}
-int init_Messages_ESP32 = register_message_converters_ESP32();
 
 
 
@@ -127,7 +65,7 @@ void SerialPABotBase_WirelessController::stop(){
 
 void SerialPABotBase_WirelessController::issue_report(
     const Cancellable* cancellable,
-    const ESP32Report0x30& report,
+    const SerialPABotBase::NintendoSwitch_ESP32Report0x30& report,
     WallDuration duration
 ){
     bool is_active = this->is_active();
@@ -142,7 +80,7 @@ void SerialPABotBase_WirelessController::issue_report(
         Milliseconds current_ms = std::min(time_left, 255 * 15ms);
         uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_15ms(current_ms.count());
         m_serial->issue_request(
-            MessageControllerState(current_ticks, is_active, report),
+            SerialPABotBase::MessageControllerState(current_ticks, is_active, report),
             cancellable
         );
         time_left -= current_ms;
@@ -162,9 +100,11 @@ void SerialPABotBase_WirelessController::status_thread(){
     try{
         m_logger.log("Reading Controller Colors...");
         BotBaseMessage response = m_serial->issue_request_and_wait(
-            MessageControllerGetColors(m_controller_type),
+            SerialPABotBase::MessageControllerGetColors(m_controller_type),
             &m_scope
         );
+
+        using ControllerColors = SerialPABotBase::NintendoSwitch_ControllerColors;
         ControllerColors colors{};
         if (response.body.size() == sizeof(seqnum_t) + sizeof(ControllerColors)){
             memcpy(&colors, response.body.data() + sizeof(seqnum_t), sizeof(ControllerColors));
@@ -245,7 +185,7 @@ void SerialPABotBase_WirelessController::status_thread(){
         try{
             pabb_MsgAckRequestI32 response;
             m_serial->issue_request_and_wait(
-                MessageControllerStatus(),
+                SerialPABotBase::MessageControllerStatus(),
                 &m_scope
             ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
             last_ack.store(current_time(), std::memory_order_relaxed);
