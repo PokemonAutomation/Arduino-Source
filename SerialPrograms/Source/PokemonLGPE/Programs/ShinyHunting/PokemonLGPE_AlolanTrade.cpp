@@ -16,6 +16,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
+#include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
 #include "PokemonLGPE_AlolanTrade.h"
 
 namespace PokemonAutomation{
@@ -135,7 +136,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     /*
     WARNING: JOYCON TEST PROGRAM. Not well tested. Bare minimum in general.
 
-    Only works with Right joycon atm. Do not update right joycon.
+    Only works with Right joycon atm. Do not update right joycon. Decline the update before running this.
 
     Right joycon required for home button (this means no on-switch screenshots).
     Also don't remap any of the buttons in the switch button mapping settings. Yet? Could use this to add Home and Screenshot.
@@ -156,7 +157,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     "you don't have any pokemon your trading partner wants"
     detect dialog box, detect yes/no confirm box
     actual enter game and start screen detectors
-    menu detectors, reset game from home, etc.
+    menu detectors, etc.
     get rid of all this blindly mashing A in general...so need everything really.
     */
 
@@ -164,6 +165,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     while (!shiny_found) {
         //Run trades
         for (uint16_t i = 0; i < NUM_TRADES; i++) {
+            env.log("Running trade.");
             run_trade(env, context);
 
             stats.trades++;
@@ -178,11 +180,10 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
 
         //To check pokemon in menu boxes
         //Open menu - always defaults to center (Party)
-        /* Menu:
-        Play with Partner
-        Pokedex - Bag - Party - Communicate - Save (these all have a colored line under when selected)
-        (Press Y for options)
-        */
+        //Menu:
+        // --Play with Partner--(centered)
+        //Pokedex - Bag - Party - Communicate - Save (these all have a colored line under when selected + an arrow to indicate)
+        //(Press Y for options)
 
         //Wait a bit.
         pbf_wait(context, 2500ms);
@@ -191,8 +192,8 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
         //Open menu, open party, open boxes
         env.log("Opening boxes.");
         pbf_press_button(context, BUTTON_X, 200ms, 500ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-        pbf_press_button(context, BUTTON_Y, 200ms, 1500ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 1500ms);
+        pbf_press_button(context, BUTTON_Y, 200ms, 2000ms);
         context.wait_for_all_requests();
 
         //Sort by order caught
@@ -236,10 +237,10 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
 
             //Move left, check next.
             pbf_move_joystick(context, 0, 128, 100ms, 100ms);
-            pbf_press_button(context, BUTTON_X, 0ms, 2000ms);
+            pbf_press_button(context, BUTTON_X, 0ms, 1000ms);
             context.wait_for_all_requests();
         }
-        /*
+        
         if (!shiny_found) {
             env.log("Out of Pokemon to trade and no shiny found. Resetting game.");
             send_program_status_notification(
@@ -247,23 +248,14 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
                 "Out of Pokemon to trade and no shiny found. Resetting game."
             );
 
-            //TODO: Need to make proper GameEntry eventually
-            //Thankfully, Joycon is upright after going to home.
-            //Go to home and close game
-            pbf_press_button(context, BUTTON_HOME, 200ms, 3000ms);
-            pbf_press_button(context, BUTTON_X, 200ms, 200ms);
-            pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-
-            //TODO:
-            //joycon context->pro controller context?
-            start_game_from_home(env.console, context, true, 0, 0, std::chrono::milliseconds(2000));
+            //Reset game
+            pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
+            reset_game_from_home(env, env.console, context, 3000ms);
+            context.wait_for_all_requests();
 
             stats.resets++;
             env.update_stats();
         }
-        */
-        //Break for now since resetting the game doesn't work.
-        break;
     }
 
     if (GO_HOME_WHEN_DONE) {

@@ -12,6 +12,7 @@
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -308,6 +309,156 @@ bool openedgame_to_gamemenu(
     return true;
 }
 
+
+
+
+
+void move_to_user(JoyconContext& context, uint8_t user_slot){
+    if (user_slot != 0){
+        //  Move to correct user.
+        for (uint8_t c = 0; c < 9; c++){    //  Extra iteration in case one gets dropped.
+            pbf_move_joystick(context, 0, 128, 160ms, 160ms);
+        }
+        for (uint8_t c = 1; c < user_slot; c++){
+            pbf_move_joystick(context, 0, 128, 160ms, 160ms);
+        }
+    }
+}
+
+void start_game_from_home_with_inference(
+    VideoStream& stream, JoyconContext& context,
+    uint8_t game_slot,
+    uint8_t user_slot,
+    Milliseconds start_game_wait
+){
+    context.wait_for_all_requests();
+
+    if (!(context.controller().controller_type() == ControllerType::NintendoSwitch_RightJoycon)) {
+        stream.log("Right Joycon required!", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "start_game_from_home_with_inference(): Right Joycon required.",
+            stream
+        );
+    }
+
+    {
+        HomeWatcher detector;
+        int ret = run_until<JoyconContext>(
+            stream, context,
+            [](JoyconContext& context){
+                pbf_mash_button(context, BUTTON_B, 10000ms);
+            },
+            { detector }
+        );
+        if (ret == 0){
+            stream.log("Detected Home screen.");
+        }else{
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "start_game_from_home_with_inference(): Failed to detect Home screen after 10 seconds.",
+                stream
+            );
+        }
+        context.wait_for(std::chrono::milliseconds(100));
+    }
+
+    if (game_slot != 0){
+        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 160ms);
+        for (uint8_t c = 1; c < game_slot; c++){
+            pbf_move_joystick(context, 255, 128, 160ms, 0ms);
+        }
+        context.wait_for_all_requests();
+    }
+
+    pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+
+    while (true){
+        HomeWatcher home(std::chrono::milliseconds(2000));
+        StartGameUserSelectWatcher user_select(COLOR_GREEN);
+        UpdateMenuWatcher update_menu(COLOR_PURPLE);
+        CheckOnlineWatcher check_online(COLOR_CYAN);
+        BlackScreenWatcher black_screen(COLOR_BLUE);
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            stream, context,
+            std::chrono::seconds(30),
+            {
+                home,
+                user_select,
+                update_menu,
+                check_online,
+                black_screen,
+            }
+        );
+
+        //  Wait for screen to stabilize.
+        context.wait_for(std::chrono::milliseconds(100));
+
+        switch (ret){
+        case 0:
+            stream.log("Detected home screen (again).", COLOR_RED);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            break;
+        case 1:
+            stream.log("Detected user-select screen.");
+            move_to_user(context, user_slot);
+            pbf_press_button(context, BUTTON_A, 80ms, start_game_wait);
+            break;
+        case 2:
+            stream.log("Detected update menu.", COLOR_RED);
+            pbf_move_joystick(context, 128, 0, 50ms, 0ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 840ms);
+            break;
+        case 3:
+            stream.log("Detected check online.", COLOR_RED);
+            context.wait_for(std::chrono::seconds(1));
+            break;
+        case 4:
+            stream.log("Detected black screen. Game started...");
+            return;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "start_game_from_home_with_inference(): No recognizable state after 30 seconds.",
+                stream
+            );
+        }
+    }
+}
+
+bool openedgame_to_gamemenu(
+    VideoStream& stream, JoyconContext& context,
+    Milliseconds timeout
+){
+    {
+        stream.log("Waiting to load game...");
+        GameLoadingDetector detector(false);
+        int ret = wait_until(
+            stream, context,
+            timeout,
+            {{detector}}
+        );
+        if (ret < 0){
+            stream.log("Timed out waiting to enter game.", COLOR_RED);
+            return false;
+        }
+    }
+    {
+        stream.log("Waiting for game menu...");
+        GameLoadingDetector detector(true);
+        int ret = wait_until(
+            stream, context,
+            timeout,
+            {{detector}}
+        );
+        if (ret < 0){
+            stream.log("Timed out waiting for game menu.", COLOR_RED);
+            return false;
+        }
+    }
+    return true;
+}
 
 
 

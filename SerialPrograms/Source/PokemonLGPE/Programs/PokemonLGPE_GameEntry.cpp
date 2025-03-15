@@ -1,0 +1,134 @@
+/*  Game Entry
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "Controllers/ControllerCapability.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "PokemonLGPE/PokemonLGPE_Settings.h"
+#include "PokemonLGPE_GameEntry.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLGPE{
+
+
+bool reset_game_to_gamemenu(
+    VideoStream& stream, JoyconContext& context
+){
+    close_game(stream, context);
+    start_game_from_home_with_inference(
+        stream,
+        context,
+        0, 0,
+        GameSettings::instance().START_GAME_MASH0
+    );
+
+    // Now the game has opened:
+    return openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT1);
+}
+
+bool gamemenu_to_ingame(
+    VideoStream& stream, JoyconContext& context,
+    Milliseconds mash_duration, Milliseconds enter_game_timeout
+){
+    //Includes choosing the controller.
+    //Controllers are disconnected? on selection screen so make sure to mash.
+    stream.log("Mashing A to enter game and select controller...");
+    pbf_mash_button(context, BUTTON_A, mash_duration);
+    context.wait_for_all_requests();
+
+    //White screen, Pikachu/Eevee running across the screen. Mash will not speed it up.
+    //Mash A at then end to enter continue screen
+    BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
+    stream.log("Waiting to enter game...");
+    int ret = run_until<JoyconContext>(
+        stream, context,
+        [&enter_game_timeout](JoyconContext& context){
+            pbf_wait(context, enter_game_timeout);
+            pbf_press_button(context, BUTTON_A, 400ms, 10ms);
+            pbf_wait(context, 5000ms);
+        },
+        {detector}
+    );
+    context.wait_for_all_requests();
+    if (ret == 0){
+        stream.log("At continue screen.");
+    }else{
+        stream.log("Timed out waiting to enter game and select continue.", COLOR_RED);
+        return false;
+    }
+    pbf_wait(context, 1000ms);
+    context.wait_for_all_requests();
+
+    //Continue your adventure.
+    BlackScreenOverWatcher detector2(COLOR_YELLOW, {0.2, 0.2, 0.6, 0.6});
+    int ret2 = run_until<JoyconContext>(
+        stream, context,
+        [](JoyconContext& context){
+            pbf_press_button(context, BUTTON_A, 400ms, 10ms);
+            pbf_wait(context, 5000ms);
+        },
+        {detector2}
+    );
+    context.wait_for_all_requests();
+    if (ret2 == 0){
+        stream.log("Entered game!");
+        return true;
+    }else{
+        stream.log("Timed out waiting to enter game.", COLOR_RED);
+        return false;
+    }
+}
+
+bool reset_game_from_home(
+    ProgramEnvironment& env, VideoStream& stream, JoyconContext& context,
+    Milliseconds post_wait_time
+){
+    if (!(context.controller().controller_type() == ControllerType::NintendoSwitch_RightJoycon)) {
+        stream.log("Right Joycon required!", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "reset_game_from_home(): Right Joycon required.",
+            stream
+        );
+        return false;
+    }
+    bool ok = true;
+    ok &= reset_game_to_gamemenu(stream, context);
+    ok &= gamemenu_to_ingame(
+        stream, context,
+        GameSettings::instance().ENTER_GAME_MASH0,
+        GameSettings::instance().ENTER_GAME_WAIT0
+    );
+    if (!ok){
+        dump_image(stream.logger(), env.program_info(), stream.video(), "StartGame");
+    }
+    stream.log("Entered game! Waiting out grace period.");
+    pbf_wait(context, post_wait_time);
+    context.wait_for_all_requests();
+    return ok;
+}
+
+
+
+
+
+}
+}
+}

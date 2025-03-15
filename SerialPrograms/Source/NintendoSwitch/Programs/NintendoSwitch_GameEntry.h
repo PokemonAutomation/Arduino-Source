@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -33,6 +34,19 @@ bool openedgame_to_gamemenu(
     Milliseconds timeout
 );
 
+
+
+void start_game_from_home_with_inference(
+    VideoStream& stream, JoyconContext& context,
+    uint8_t game_slot,
+    uint8_t user_slot,
+    Milliseconds start_game_mash
+);
+
+bool openedgame_to_gamemenu(
+    VideoStream& stream, JoyconContext& context,
+    Milliseconds timeout
+);
 
 
 }
