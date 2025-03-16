@@ -4,6 +4,8 @@
  *
  */
 
+#include "Controllers/ControllerTypes.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch_Navigation.h"
 
@@ -13,14 +15,8 @@ namespace NintendoSwitch{
 
 
 void home_to_date_time(ProControllerContext& context, bool to_date_change, bool fast){
-    //  If (fast == true) this will run faster, but slightly less accurately.
-
-    Milliseconds ticksize = context->ticksize();
-    Milliseconds tv = context->timing_variation();
-    Milliseconds unit = round_up_to_ticksize(ticksize, 17ms);
-    if (tv == 0ms){
-        //  Fast version for tick-precise.
-
+    switch (context->performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
 
@@ -36,15 +32,15 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         //  Just button mash it. lol
         {
-            auto iterations = Milliseconds(1200) / unit + 1;
+            auto iterations = Milliseconds(1200) / 24ms + 1;
             do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
             }while (--iterations);
         }
         {
-            auto iterations = Milliseconds(336) / unit + 1;
+            auto iterations = Milliseconds(336) / 24ms + 1;
             do{
-                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
             }while (--iterations);
         }
 
@@ -62,18 +58,72 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         ssf_press_button(context, BUTTON_A, 3);
         {
+            auto iterations = Milliseconds(216) / 24ms + 1;
+            do{
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+            }while (--iterations);
+        }
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+        break;
+    }
+    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
+        Milliseconds tv = context->timing_variation();
+        Milliseconds unit = 32ms + tv;
+
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+
+        //  Down twice in case we drop one.
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 2*unit, unit);
+
+        //  Press A multiple times to make sure one goes through.
+        pbf_press_button(context, BUTTON_A, 2*unit, unit);
+        pbf_press_button(context, BUTTON_A, 2*unit, unit);
+        pbf_press_button(context, BUTTON_A, 2*unit, unit);
+
+        //  Just button mash it. lol
+        {
+            auto iterations = Milliseconds(1100) / unit + 1;
+            do{
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+            }while (--iterations);
+        }
+        {
+            auto iterations = Milliseconds(336) / unit + 1;
+            do{
+                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+            }while (--iterations);
+        }
+
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 2*unit, unit);
+        ssf_press_dpad(context, DPAD_DOWN, 360ms, 304ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+
+        if (!to_date_change){
+            ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
+            return;
+        }
+
+        ssf_press_button(context, BUTTON_A, unit);
+        {
             auto iterations = Milliseconds(216) / unit + 1;
             do{
                 ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
             }while (--iterations);
         }
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
-
-//        //  Insert this to move the cursor away from sleep if we messed up.
-//        ssf_issue_scroll1(SSF_SCROLL_LEFT, 0);
-    }else{
+        break;
+    }
+    default:{
         //  Slow version for tick-imprecise controllers.
 
+        Milliseconds tv = context->timing_variation();
 //        ssf_do_nothing(context, 1500ms);
 
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
@@ -85,7 +135,7 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
 
-        //  Two A presses in case we drop the 1st one.
+        //  Press A multiple times to make sure one goes through.
         ssf_mash1_button(context, BUTTON_A, 200ms);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 2500ms, 2500ms);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 500ms, 500ms);
@@ -107,6 +157,10 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
     }
+    }
+
+
+
 }
 
 

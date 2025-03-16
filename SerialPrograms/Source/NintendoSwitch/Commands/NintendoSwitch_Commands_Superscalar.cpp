@@ -128,6 +128,13 @@ void ssf_issue_scroll(
 void ssf_issue_scroll(
     ProControllerContext& context,
     DpadPosition direction,
+    Milliseconds delay
+){
+    context->issue_system_scroll(&context, direction, delay, 2*delay, delay);
+}
+void ssf_issue_scroll(
+    ProControllerContext& context,
+    DpadPosition direction,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
     context->issue_system_scroll(&context, direction, delay, hold, cool);

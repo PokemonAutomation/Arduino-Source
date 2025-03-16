@@ -43,9 +43,15 @@ public:
         return ControllerType::NintendoSwitch_WiredProController;
     }
     virtual const ControllerFeatures& controller_features() const override;
+    virtual ControllerPerformanceClass performance_class() const override{
+        return ControllerPerformanceClass::SysbotBase;
+    }
 
     virtual Milliseconds ticksize() const override{
         return Milliseconds::zero();
+    }
+    virtual Milliseconds cooldown() const override{
+        return Milliseconds(150);
     }
     virtual Milliseconds timing_variation() const override{
         return Milliseconds(150);

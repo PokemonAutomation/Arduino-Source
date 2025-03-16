@@ -45,12 +45,13 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         .vibrator = 0x00,
     };
 
-
+    Button all_buttons = BUTTON_NONE;
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
         if (!m_buttons[c].is_busy()){
             continue;
         }
         Button button = (Button)((ButtonFlagType)1 << c);
+        all_buttons |= button;
         switch (button){
         //  Right
         case BUTTON_Y:          report.button3 |= 1 << 0; break;
@@ -103,6 +104,17 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
     }
 
     issue_report(cancellable, report, duration);
+
+#if 0
+    m_logger.log(
+        "push_state(): (" + button_to_string(all_buttons) +
+        "), dpad(" + dpad_to_string(m_dpad.position) +
+        "), LJ(" + std::to_string(m_left_joystick.x) + "," + std::to_string(m_left_joystick.y) +
+        "), RJ(" + std::to_string(m_right_joystick.x) + "," + std::to_string(m_right_joystick.y) +
+        "), hold = " + std::to_string(std::chrono::duration_cast<Milliseconds>(duration).count()) + "ms",
+        COLOR_DARKGREEN
+    );
+#endif
 }
 
 

@@ -72,16 +72,36 @@ void SerialPABotBase_WirelessController::issue_report(
     //  This loop can block indefinitely if the command queue is full.
     ReverseLockGuard<std::mutex> lg(m_state_lock);
 
-    //  Divide the controller state into smaller chunks of 255 ticks.
+    //  We will not do any throttling or timing adjustments here. We'll defer
+    //  to the microcontroller to do that for us.
+
+    //  Divide the controller state into smaller chunks of 65535 milliseconds.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
+
+//    time_left = (time_left + 14ms) / 15ms * 15ms;
+
+//    time_left = std::max(time_left, 15ms);
     while (time_left > Milliseconds::zero()){
-        Milliseconds current_ms = std::min(time_left, 255 * 15ms);
-        uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_15ms(current_ms.count());
+        Milliseconds current = std::min(time_left, 65535ms);
+        time_left -= current;
+
+#if 0
+        //  Make sure the last block isn't too small.
+        if (0ms < time_left && time_left < 15ms){
+            time_left += current;
+            current = time_left / 2;
+            time_left -= current;
+        }
+#endif
+//        cout << "current = " << current.count() << endl;
+
         m_serial->issue_request(
-            SerialPABotBase::MessageControllerStateButtons(current_ticks * 15, buttons),
+            SerialPABotBase::MessageControllerStateButtons(
+                (uint16_t)current.count(),
+                buttons
+            ),
             cancellable
         );
-        time_left -= current_ms;
     }
 }
 

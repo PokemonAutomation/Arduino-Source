@@ -41,9 +41,15 @@ public:
     virtual const ControllerFeatures& controller_features() const override{
         return m_supported_features;
     }
+    virtual ControllerPerformanceClass performance_class() const override{
+        return ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32;
+    }
 
     virtual Milliseconds ticksize() const override{
         return SerialPABotBase_WirelessController::ticksize();
+    }
+    virtual Milliseconds cooldown() const override{
+        return SerialPABotBase_WirelessController::cooldown();
     }
     virtual Milliseconds timing_variation() const override{
         return SerialPABotBase_WirelessController::timing_variation();

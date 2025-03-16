@@ -35,8 +35,11 @@ public:
     Milliseconds ticksize() const{
         return Milliseconds(15);
     }
+    Milliseconds cooldown() const{
+        return Milliseconds(15);
+    }
     Milliseconds timing_variation() const{
-        return Milliseconds::zero();
+        return Milliseconds(0);
     }
 
 
@@ -55,7 +58,8 @@ protected:
         //  I suspect the need to offset by 151 from 2048 -> 1897 is Nintendo's
         //  way to alleviate the joycon drift problem.
         const uint16_t min = 1897;
-        const uint16_t max = 320;
+//        const uint16_t max = 320;
+        const uint16_t max = 275;   //  REMOVE: TODO: Fix the clipping for real.
 
         const double lo = 1 - min / 2048.;
         const double hi = 1 - max / 2048.;

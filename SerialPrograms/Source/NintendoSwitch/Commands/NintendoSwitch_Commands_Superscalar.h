@@ -38,7 +38,7 @@ void ssf_press_button(
 void ssf_press_button(
     ProControllerContext& context,
     Button button,
-    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
+    Milliseconds delay = 24ms, Milliseconds hold = 48ms, Milliseconds cool = 24ms
 );
 
 void ssf_press_dpad(
@@ -49,7 +49,7 @@ void ssf_press_dpad(
 void ssf_press_dpad(
     ProControllerContext& context,
     DpadPosition position,
-    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
+    Milliseconds delay, Milliseconds hold = 48ms, Milliseconds cool = 24ms
 );
 
 
@@ -99,7 +99,12 @@ void ssf_issue_scroll(
 void ssf_issue_scroll(
     ProControllerContext& context,
     DpadPosition direction,
-    Milliseconds delay, Milliseconds hold = 5*8ms, Milliseconds cool = 3*8ms
+    Milliseconds delay
+);
+void ssf_issue_scroll(
+    ProControllerContext& context,
+    DpadPosition direction,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
 );
 
 
@@ -116,44 +121,40 @@ void ssf_issue_scroll(
 inline void ssf_press_button_ptv(
     ProControllerContext& context,
     Button button,
-    Milliseconds delay = 3*8ms,
-    Milliseconds hold = 5*8ms,
-    Milliseconds cool = 3*8ms
+    Milliseconds delay = 24ms,
+    Milliseconds hold = 48ms,
+    Milliseconds cool = 24ms
 ){
-    ssf_press_button(
-        context, button,
-        delay + context->timing_variation(),
-        hold + context->timing_variation(),
-        cool + context->timing_variation()
-    );
+    Milliseconds tv = context->timing_variation();
+    if (delay > 0ms) delay += tv;
+    if (hold > 0ms) hold += tv;
+    if (cool > 0ms) cool += tv;
+    ssf_press_button(context, button, delay, hold, cool);
 }
 inline void ssf_press_dpad_ptv(
     ProControllerContext& context,
     DpadPosition position,
-    Milliseconds delay = 3*8ms,
-    Milliseconds hold = 5*8ms,
-    Milliseconds cool = 3*8ms
+    Milliseconds delay = 24ms,
+    Milliseconds hold = 48ms,
+    Milliseconds cool = 24ms
 ){
-    ssf_press_dpad(
-        context, position,
-        delay + context->timing_variation(),
-        hold + context->timing_variation(),
-        cool + context->timing_variation()
-    );
+    Milliseconds tv = context->timing_variation();
+    if (delay > 0ms) delay += tv;
+    if (hold > 0ms) hold += tv;
+    if (cool > 0ms) cool += tv;
+    ssf_press_dpad(context, position, delay, hold, cool);
 }
 inline void ssf_issue_scroll_ptv(
     ProControllerContext& context,
     DpadPosition direction,
-    Milliseconds delay = 3*8ms,
-    Milliseconds hold = 5*8ms,
-    Milliseconds cool = 3*8ms
+    Milliseconds delay = 24ms,
+    Milliseconds hold = 48ms,
+    Milliseconds cool = 24ms
 ){
-    ssf_issue_scroll(
-        context, direction,
-        delay + context->timing_variation(),
-        hold + context->timing_variation(),
-        cool + context->timing_variation()
-    );
+    Milliseconds tv = context->timing_variation();
+    if (delay > 0ms) delay += tv;
+    if (hold > 0ms) hold += tv;
+    ssf_issue_scroll(context, direction, delay, hold, cool);
 }
 
 
@@ -220,7 +221,7 @@ void ssf_do_nothing     (JoyconContext& context, Milliseconds duration);
 void ssf_press_button(
     JoyconContext& context,
     Button button,
-    Milliseconds delay, Milliseconds hold = 3*15ms, Milliseconds cool = 2*15ms
+    Milliseconds delay, Milliseconds hold = 48ms, Milliseconds cool = 24ms
 );
 void ssf_press_joystick(
     JoyconContext& context,

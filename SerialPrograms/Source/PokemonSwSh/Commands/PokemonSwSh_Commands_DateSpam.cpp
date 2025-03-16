@@ -5,6 +5,7 @@
  */
 
 #include "ClientSource/Libraries/MessageConverter.h"
+#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
@@ -17,8 +18,8 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 void neutral_date_skip(ProControllerContext& context){
-    Milliseconds tv = context->timing_variation();
-    if (tv == 0ms){
+    switch (context->performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
         ssf_press_button(context, BUTTON_A, 20, 10);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
         ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
@@ -35,7 +36,32 @@ void neutral_date_skip(ProControllerContext& context){
         }
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
-    }else{
+        break;
+    }
+    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
+        Milliseconds tv = context->timing_variation();
+        Milliseconds unit = 34ms + tv;
+
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
+        ssf_press_button(context, BUTTON_A, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+//        ssf_press_button(context, BUTTON_A, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        for (uint8_t c = 0; c < 6; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
+        }
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+
+        break;
+    }
+    default:{
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
@@ -52,12 +78,13 @@ void neutral_date_skip(ProControllerContext& context){
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
     }
+    }
 }
 void roll_date_forward_1(ProControllerContext& context, bool fast){
     //  If (fast == true) this will run faster, but slightly less reliably.
 
-    Milliseconds tv = context->timing_variation();
-    if (tv == 0ms){
+    switch (context->performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
         uint8_t scroll_delay = fast ? 3 : 4;
         uint8_t up_delay = fast ? 2 : 3;
 
@@ -73,7 +100,27 @@ void roll_date_forward_1(ProControllerContext& context, bool fast){
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
         ssf_press_button(context, BUTTON_A, 20, 10);
-    }else{
+        break;
+    }
+    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
+        Milliseconds tv = context->timing_variation();
+        Milliseconds unit = 34ms + tv;
+
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
+        ssf_press_button(context, BUTTON_A, unit);
+    //    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_press_button(context, BUTTON_A, 0);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        break;
+    }
+    default:{
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
         ssf_press_button_ptv(context, BUTTON_A);
@@ -86,7 +133,7 @@ void roll_date_forward_1(ProControllerContext& context, bool fast){
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
     }
-
+    }
 }
 void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fast){
     //  If (fast == true) this will run faster, but slightly less reliably.
@@ -95,8 +142,8 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
         return;
     }
 
-    Milliseconds tv = context->timing_variation();
-    if (tv == 0ms){
+    switch (context->performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
         uint8_t scroll_delay = fast ? 3 : 4;
         uint8_t up_delay = 3;
 
@@ -116,12 +163,33 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-//        if (!fast){
-//            //  Add an extra one in case one is dropped.
-//            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
-//        }
         ssf_press_button(context, BUTTON_A, 20, 10);
-    }else{
+        break;
+    }
+    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
+        Milliseconds tv = context->timing_variation();
+        Milliseconds unit = 32ms + tv;
+
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        for (uint8_t c = 0; c < skips - 1; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        }
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+        ssf_press_button(context, BUTTON_A, unit);
+//        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        for (uint8_t c = 0; c < skips - 1; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        }
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+        ssf_press_button(context, BUTTON_A, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+        ssf_press_button(context, BUTTON_A, 20, 10);
+        break;
+    }
+    default:{
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
         if (skips >= 60){
             ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 6000ms, 6000ms);
@@ -144,14 +212,9 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-//        if (!fast){
-//            //  Add an extra one in case one is dropped.
-//            ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-//        }
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
     }
-
-
+    }
 }
 void home_roll_date_enter_game_autorollback(
     VideoStream& stream, ProControllerContext& context,
@@ -190,7 +253,6 @@ void home_roll_date_enter_game(
     }
 
     settings_to_enter_game(context, true);
-
     resume_game_from_home(stream, context, true);
 }
 void touch_date_from_home(ProControllerContext& context, Milliseconds settings_to_home_delay){

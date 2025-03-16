@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_Controllers_Controller_H
 #define PokemonAutomation_Controllers_Controller_H
 
-#include <string>
 #include "Common/Compiler.h"
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Time.h"
@@ -18,6 +17,7 @@ class QKeyEvent;
 namespace PokemonAutomation{
 
 enum class ControllerType;
+enum class ControllerPerformanceClass;
 class ControllerFeatures;
 
 
@@ -44,10 +44,15 @@ public:
 
     virtual ControllerType controller_type() const = 0;
     virtual const ControllerFeatures& controller_features() const = 0;
+    virtual ControllerPerformanceClass performance_class() const = 0;
 
     //  If the controller is polled at a fixed interval, this is that interval.
     //  Otherwise, returns zero.
     virtual Milliseconds ticksize() const = 0;
+
+    //  The minimum amount of time between two state reports. This effectively
+    //  limits how quickly you can change states.
+    virtual Milliseconds cooldown() const = 0;
 
     //  Some controllers are imprecise. This returns the variation.
     //  Zero means "tick precise".

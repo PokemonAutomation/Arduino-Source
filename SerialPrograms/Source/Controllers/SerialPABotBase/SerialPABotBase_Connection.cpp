@@ -66,7 +66,6 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
     std::string error;
     try{
         set_status_line0("Connecting...", COLOR_DARKGREEN);
-
         std::unique_ptr<SerialConnection> connection(new SerialConnection(port->systemLocation().toStdString(), PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
     }catch (const ConnectionException& e){

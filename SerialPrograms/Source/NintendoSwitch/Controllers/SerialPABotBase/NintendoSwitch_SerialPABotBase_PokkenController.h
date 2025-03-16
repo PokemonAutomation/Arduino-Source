@@ -46,8 +46,14 @@ public:
     virtual const ControllerFeatures& controller_features() const override{
         return m_supported_features;
     }
+    virtual ControllerPerformanceClass performance_class() const override{
+        return ControllerPerformanceClass::SerialPABotBase_Wired_125Hz;
+    }
 
     virtual Milliseconds ticksize() const override{
+        return Milliseconds(8);
+    }
+    virtual Milliseconds cooldown() const override{
         return Milliseconds(8);
     }
     virtual Milliseconds timing_variation() const override{
