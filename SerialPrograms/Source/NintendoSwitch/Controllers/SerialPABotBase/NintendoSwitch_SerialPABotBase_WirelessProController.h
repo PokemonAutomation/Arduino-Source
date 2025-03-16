@@ -19,6 +19,9 @@ class SerialPABotBase_WirelessProController final :
     public ProController,
     public SerialPABotBase_WirelessController
 {
+    static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1897;
+    static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 320;
+
 public:
     SerialPABotBase_WirelessProController(
         Logger& logger,

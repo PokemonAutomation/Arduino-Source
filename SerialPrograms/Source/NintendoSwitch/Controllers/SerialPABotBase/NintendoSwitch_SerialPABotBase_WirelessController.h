@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessController_H
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessController_H
 
+#include <cmath>
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h"
 #include "Controllers/JoystickTools.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
@@ -44,6 +45,7 @@ public:
 
 
 protected:
+    template <uint16_t min_threshold, uint16_t max_threshold>
     void encode_joystick(uint8_t data[3], uint8_t x, uint8_t y){
         //  2048 is the neutral position.
         //
@@ -52,25 +54,46 @@ protected:
         //
         //  ~320 is where it reaches the maximum value.
         //
-        //  It we linearly interpolate between 1897 and 320, we seem to match
+        //  If we linearly interpolate between 1897 and 320, we seem to match
         //  the wired controller's behavior.
         //
         //  I suspect the need to offset by 151 from 2048 -> 1897 is Nintendo's
         //  way to alleviate the joycon drift problem.
-        const uint16_t min = 1897;
+        //
+        //  The values 320 and 1897 are for the pro controller. Joycons are
+        //  slightly different.
+        //
+//        const uint16_t min = 1897;
 //        const uint16_t max = 320;
-        const uint16_t max = 275;   //  REMOVE: TODO: Fix the clipping for real.
+//        const uint16_t max = 275;
 
-        const double lo = 1 - min / 2048.;
-        const double hi = 1 - max / 2048.;
+        constexpr double lo = 1 - min_threshold / 2048.;
+        constexpr double hi = 1 - max_threshold / 2048.;
 
         double fx = JoystickTools::linear_u8_to_float(x);
         double fy = -JoystickTools::linear_u8_to_float(y);
 //        cout << "fx = " << fx << ", fy = " << fy << endl;
+        double mag_squared = fx*fx + fy*fy;
 
-        uint16_t wx = JoystickTools::linear_float_to_u12(lo, hi, fx);
-        uint16_t wy = JoystickTools::linear_float_to_u12(lo, hi, fy);
+        uint16_t wx, wy;
+        if (mag_squared == 0){
+            wx = 2048;
+            wy = 2048;
+        }else if (mag_squared >= 1){
+            JoystickTools::max_out_magnitude(fx, fy);
+            wx = JoystickTools::linear_float_to_u12(fx);
+            wy = JoystickTools::linear_float_to_u12(fy);
+        }else{
+            double true_mag = std::sqrt(mag_squared);
+            double report_mag = JoystickTools::project_to_range(true_mag, lo, hi);
+            double scale = report_mag / true_mag;
+            wx = JoystickTools::linear_float_to_u12(fx * scale);
+            wy = JoystickTools::linear_float_to_u12(fy * scale);
+        }
+
 //        cout << "wx = " << wx << ", wy = " << wy << endl;
+//        wy = 2048;
+//        wx = 260;
 
         data[0] = (uint8_t)wx;
         data[1] = (uint8_t)(wx >> 8 | wy << 4);

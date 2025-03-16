@@ -14,6 +14,35 @@ namespace PokemonAutomation{
 namespace JoystickTools{
 
 
+inline void max_out_magnitude(double& x, double& y){
+    double mag = x*x + y*y;
+    if (mag == 0){
+        return;
+    }
+
+    double abs_x = std::abs(x);
+    double abs_y = std::abs(y);
+
+    if (abs_x < abs_y){
+        x /= abs_y;
+        y = y < 0 ? -1 : 1;
+    }else{
+        y /= abs_x;
+        x = x < 0 ? -1 : 1;
+    }
+}
+inline double project_to_range(double x, double lo, double hi){
+    if (x <= -1){
+        return -1;
+    }
+    if (x >= 1){
+        return 1;
+    }
+    return x * (hi - lo) + lo;
+}
+
+
+
 
 inline double linear_u8_to_float(uint8_t x){
     if (x <= 128){
@@ -55,23 +84,25 @@ inline uint16_t linear_float_to_u16(double f){
         return (uint16_t)(f + 0.5);
     }
 }
-inline uint16_t linear_float_to_u12(double lo, double hi, double f){
-    if (f == 0){
-        return 2048;
-    }else if (f <= 0){
+
+
+
+inline uint16_t linear_float_to_u12(double f){
+    if (f <= 0){
         f = std::max<double>(f, -1);
-//        if (f < -1){ return 0; }
-        f = f * (hi - lo) - lo;
         f = f * 2048 + 2048;
         return (uint16_t)(f + 0.5);
     }else{
         f = std::min<double>(f, +1);
-//        if (f > 1){ return 4095; }
-        f = f * (hi - lo) + lo;
         f = f * 2047 + 2048;
         return (uint16_t)(f + 0.5);
     }
 }
+
+
+
+
+
 
 
 

@@ -95,12 +95,18 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
 
     //  Left Stick
     if (m_left_joystick.is_busy()){
-        encode_joystick(report.left_joystick, m_left_joystick.x, m_left_joystick.y);
+        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
+            report.left_joystick,
+            m_left_joystick.x, m_left_joystick.y
+        );
     }
 
     //  Right Stick
     if (m_right_joystick.is_busy()){
-        encode_joystick(report.right_joystick, m_right_joystick.x, m_right_joystick.y);
+        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
+            report.right_joystick,
+            m_right_joystick.x, m_right_joystick.y
+        );
     }
 
     issue_report(cancellable, report, duration);

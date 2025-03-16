@@ -312,6 +312,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::terminate();
 
+#if 0
     for (size_t i = 0; i < 100; i++){
         for (size_t c = 0; c < 2; c++){
             ssf_issue_scroll(context, DPAD_RIGHT, 32ms);
@@ -323,7 +324,6 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 0
     for (size_t c = 0; c < 60; c++){
         ssf_issue_scroll(context, DPAD_DOWN, 20ms);
     }
@@ -333,7 +333,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     }
 #endif
 
-//    pbf_move_left_joystick(context, 0, 0, 10000, 0);
+    pbf_move_left_joystick(context, 38, 38, 10000, 0);
 
 
 //    ssf_issue_scroll(context, DPAD_LEFT, 0);
