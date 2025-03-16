@@ -50,7 +50,7 @@ StringSelectCellWidget::StringSelectCellWidget(QWidget& parent, StringSelectCell
     QPixmap pixmap = QPixmap::fromImage(entry.icon.to_QImage_ref());
     this->addItem(pixmap, QString::fromStdString(entry.display_name));
     this->setCurrentIndex(0);
-    this->setMinimumContentsLength((int)value.database().longest_text_length());
+//    this->setMinimumContentsLength((int)value.database().longest_text_length());
 
     StringSelectCellWidget::update_value();
 
