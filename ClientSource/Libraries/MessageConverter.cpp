@@ -197,7 +197,7 @@ int register_message_converters_framework_acks(){
             static const char HEX_DIGITS[] = "0123456789abcdef";
             for (size_t c = sizeof(seqnum_t); c < body.size(); c++){
                 uint8_t byte = body[c];
-                ss << " " << HEX_DIGITS[(byte >> 4)] << " " << HEX_DIGITS[byte & 15];
+                ss << " " << HEX_DIGITS[(byte >> 4)] << HEX_DIGITS[byte & 15];
             }
             return ss.str();
         }

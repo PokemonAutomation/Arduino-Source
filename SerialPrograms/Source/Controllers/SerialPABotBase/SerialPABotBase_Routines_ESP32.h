@@ -86,19 +86,37 @@ public:
         return BotBaseMessage(PABB_MSG_ESP32_REQUEST_SET_COLORS, params);
     }
 };
-class MessageControllerState : public BotBaseRequest{
+class MessageControllerStateButtons : public BotBaseRequest{
 public:
-    pabb_esp32_report30 params;
-    MessageControllerState(uint8_t ticks, bool active, NintendoSwitch_ESP32Report0x30 report)
+    pabb_Message_ESP32_CommandButtonState params;
+    MessageControllerStateButtons(uint16_t milliseconds, const NintendoSwitch_ButtonState& state)
         : BotBaseRequest(true)
     {
         params.seqnum = 0;
-        params.ticks = ticks;
-        params.active = active;
-        params.report = report;
+        params.milliseconds = milliseconds;
+        params.buttons = state;
     }
     virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_ESP32_REPORT, params);
+        return BotBaseMessage(PABB_MSG_ESP32_CONTROLLER_STATE_BUTTONS, params);
+    }
+};
+class MessageControllerStateFull : public BotBaseRequest{
+public:
+    pabb_Message_ESP32_CommandFullState params;
+    MessageControllerStateFull(
+        uint16_t milliseconds,
+        const NintendoSwitch_ButtonState& buttons,
+        const NintendoSwitch_GyroState& gyro
+    )
+        : BotBaseRequest(true)
+    {
+        params.seqnum = 0;
+        params.milliseconds = milliseconds;
+        params.buttons = buttons;
+        params.gyro = gyro;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_ESP32_CONTROLLER_STATE_FULL, params);
     }
 };
 

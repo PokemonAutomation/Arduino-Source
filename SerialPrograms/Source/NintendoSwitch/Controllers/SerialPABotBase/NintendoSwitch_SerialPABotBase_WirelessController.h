@@ -75,7 +75,7 @@ protected:
 
     void issue_report(
         const Cancellable* cancellable,
-        const SerialPABotBase::NintendoSwitch_ESP32Report0x30& report,
+        const SerialPABotBase::NintendoSwitch_ButtonState& buttons,
         WallDuration duration
     );
 

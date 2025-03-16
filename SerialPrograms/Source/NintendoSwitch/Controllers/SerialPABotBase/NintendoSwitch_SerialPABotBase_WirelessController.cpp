@@ -65,11 +65,9 @@ void SerialPABotBase_WirelessController::stop(){
 
 void SerialPABotBase_WirelessController::issue_report(
     const Cancellable* cancellable,
-    const SerialPABotBase::NintendoSwitch_ESP32Report0x30& report,
+    const SerialPABotBase::NintendoSwitch_ButtonState& buttons,
     WallDuration duration
 ){
-    bool is_active = this->is_active();
-
     //  Release the state lock since we are no longer touching state.
     //  This loop can block indefinitely if the command queue is full.
     ReverseLockGuard<std::mutex> lg(m_state_lock);
@@ -80,7 +78,7 @@ void SerialPABotBase_WirelessController::issue_report(
         Milliseconds current_ms = std::min(time_left, 255 * 15ms);
         uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_15ms(current_ms.count());
         m_serial->issue_request(
-            SerialPABotBase::MessageControllerState(current_ticks, is_active, report),
+            SerialPABotBase::MessageControllerStateButtons(current_ticks * 15, buttons),
             cancellable
         );
         time_left -= current_ms;

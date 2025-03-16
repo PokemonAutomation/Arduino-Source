@@ -16,6 +16,17 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+uint32_t average_colors(uint32_t x, uint32_t y){
+    //  Average the two button colors.
+    uint32_t red = ((x >> 16) & 0xff) + ((y >> 16) & 0xff);
+    uint32_t green = ((x >> 8) & 0xff) + ((y >> 8) & 0xff);
+    uint32_t blue = ((x >> 0) & 0xff) + ((y >> 0) & 0xff);
+    red /= 2;
+    green /= 2;
+    blue /= 2;
+    return (red << 16) | (green << 8) | (blue << 0);
+}
+
 
 struct OfficialJoyconColors{
     std::string name;
@@ -31,18 +42,8 @@ struct OfficialJoyconColors{
             //  Set the grips to the joycon colors.
             profile.left_grip = left_body;
             profile.right_grip = right_body;
-
-            //  Average the two button colors.
-            uint32_t red = ((left_buttons >> 16) & 0xff) + ((right_buttons >> 16) & 0xff);
-            uint32_t green = ((left_buttons >> 8) & 0xff) + ((right_buttons >> 8) & 0xff);
-            uint32_t blue = ((left_buttons >> 0) & 0xff) + ((right_buttons >> 0) & 0xff);
-            red /= 2;
-            green /= 2;
-            blue /= 2;
-            profile.button_color = (red << 16) | (green << 8) | (blue << 0);
-
-            //  Pick something for the controller body.
-            profile.body_color = 0xd0d0d0;
+            profile.body_color = average_colors(left_buttons, right_buttons);
+            profile.button_color = average_colors(left_body, right_body);
             break;
         }
         case ControllerType::NintendoSwitch_LeftJoycon:

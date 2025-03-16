@@ -129,17 +129,13 @@ void SerialPABotBase_WirelessJoycon::issue_mash_button(
 void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* cancellable, WallDuration duration){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
-    SerialPABotBase::NintendoSwitch_ESP32Report0x30 report{
-        .report_id = 0x30,
-        .timer = 0,     //  Populate on controller.
-        .byte2 = 0x9d,  //  Full + Charging : Joycon
+    SerialPABotBase::NintendoSwitch_ButtonState report{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
         .left_joystick = {0x00, 0x08, 0x80},
         .right_joystick = {0x00, 0x08, 0x80},
         .vibrator = 0x00,
-        .gyro = {},
     };
 
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
@@ -193,17 +189,13 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
 void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* cancellable, WallDuration duration){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
-    SerialPABotBase::NintendoSwitch_ESP32Report0x30 report{
-        .report_id = 0x30,
-        .timer = 0,     //  Populate on controller.
-        .byte2 = 0x9d,  //  Full + Charging : Joycon
+    SerialPABotBase::NintendoSwitch_ButtonState report{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
         .left_joystick = {0x00, 0x08, 0x80},
         .right_joystick = {0x00, 0x08, 0x80},
         .vibrator = 0x00,
-        .gyro = {},
     };
 
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){

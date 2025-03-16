@@ -37,13 +37,13 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
 
 WattFarmer::WattFarmer()
     : GRIP_MENU_WAIT0(
-        "<b>Exit Grip Menu Delay:</b> "
+        "<b>Exit Grip Menu Delay:</b><br>"
         "Wait this long after leaving the grip menu to allow for the Switch to reestablish local connection.",
         LockMode::LOCK_WHILE_RUNNING,
         "5000 ms"
     )
     , EXIT_DEN_WAIT(
-        "<b>Exit Den Wait Time:</b> "
+        "<b>Exit Den Wait Time:</b><br>"
         "Wait this long after backing out of the den before date skipping.",
         LockMode::LOCK_WHILE_RUNNING,
         "1720 ms"
@@ -62,6 +62,7 @@ WattFarmer::WattFarmer()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(GRIP_MENU_WAIT0);
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(EXIT_DEN_WAIT);
     PA_ADD_OPTION(SKIPS);

@@ -36,17 +36,13 @@ SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
 void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancellable, WallDuration duration){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
-    SerialPABotBase::NintendoSwitch_ESP32Report0x30 report{
-        .report_id = 0x30,
-        .timer = 0,     //  Populate on controller.
-        .byte2 = 0x99,  //  Full + charging : Pro controller + USB powered
+    SerialPABotBase::NintendoSwitch_ButtonState report{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
         .left_joystick = {0x00, 0x08, 0x80},
         .right_joystick = {0x00, 0x08, 0x80},
         .vibrator = 0x00,
-        .gyro = {},
     };
 
 

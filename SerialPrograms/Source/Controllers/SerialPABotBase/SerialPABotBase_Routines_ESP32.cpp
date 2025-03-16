@@ -54,6 +54,38 @@ int register_message_converters_ESP32(){
         }
     );
     register_message_converter(
+        PABB_MSG_ESP32_CONTROLLER_STATE_BUTTONS,
+        [](const std::string& body){
+            //  Disable this by default since it's very spammy.
+            if (!GlobalSettings::instance().LOG_EVERYTHING){
+                return std::string();
+            }
+            std::ostringstream ss;
+            ss << "PABB_MSG_ESP32_CONTROLLER_STATE_BUTTONS() - ";
+            if (body.size() != sizeof(pabb_Message_ESP32_CommandButtonState)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_ESP32_CommandButtonState*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", milliseconds = " << params->milliseconds;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_ESP32_CONTROLLER_STATE_FULL,
+        [](const std::string& body){
+            //  Disable this by default since it's very spammy.
+            if (!GlobalSettings::instance().LOG_EVERYTHING){
+                return std::string();
+            }
+            std::ostringstream ss;
+            ss << "PABB_MSG_ESP32_CONTROLLER_STATE_FULL() - ";
+            if (body.size() != sizeof(pabb_Message_ESP32_CommandFullState)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_ESP32_CommandFullState*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", milliseconds = " << params->milliseconds;
+            return ss.str();
+        }
+    );
+    register_message_converter(
         PABB_MSG_ESP32_REPORT,
         [](const std::string& body){
             //  Disable this by default since it's very spammy.
