@@ -122,7 +122,7 @@ bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, P
             env.console, context,
             [](ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 212, 50, 0);
-                pbf_press_button(context, BUTTON_B, 490, 80);
+                pbf_press_button(context, BUTTON_B, 492, 80);
 
                 pbf_move_left_joystick(context, 224, 0, 50, 0);
 //                pbf_press_button(context, BUTTON_B, 350, 80);
