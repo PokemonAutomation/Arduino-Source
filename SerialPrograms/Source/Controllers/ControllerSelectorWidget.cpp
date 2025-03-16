@@ -7,7 +7,6 @@
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
 
@@ -136,7 +135,7 @@ void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_t
     delete m_selector;
     m_selector = nullptr;
 
-    m_status_text->setText(QString::fromStdString(html_color_text("Not Connected", COLOR_RED)));
+//    m_status_text->setText(QString::fromStdString(html_color_text("Not Connected", COLOR_RED)));
 
     switch (interface_type){
     case ControllerInterface::SerialPABotBase:
