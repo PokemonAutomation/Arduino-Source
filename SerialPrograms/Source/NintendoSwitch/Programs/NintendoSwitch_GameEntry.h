@@ -35,7 +35,10 @@ bool openedgame_to_gamemenu(
 );
 
 
-
+void resume_game_from_home(
+    VideoStream& stream, JoyconContext& context,
+    bool skip_home_press = false
+);
 void start_game_from_home_with_inference(
     VideoStream& stream, JoyconContext& context,
     uint8_t game_slot,

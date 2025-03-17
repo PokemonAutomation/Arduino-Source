@@ -167,7 +167,7 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
 void home_to_date_time(JoyconContext& context, bool to_date_change){
     Milliseconds tv = context->timing_variation();
-    Milliseconds unit = 50ms + tv;
+    Milliseconds unit = 32ms + tv;
 
     //From ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32
     //as Joycon will only have that controller type

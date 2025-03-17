@@ -14,10 +14,13 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "PokemonLGPE/Commands/PokemonLGPE_DateSpam.h"
 #include "PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
 #include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonLGPE_DailyItemRespawnFarmer.h"
 
 namespace PokemonAutomation{
@@ -96,7 +99,7 @@ DailyItemRespawnFarmer::DailyItemRespawnFarmer()
 void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     JoyconContext context(scope, env.console.controller<JoyconController>());
     assert_16_9_720p_min(env.logger(), env.console);
-    //DailyItemRespawnFarmer_Descriptor::Stats& stats = env.current_stats<DailyItemRespawnFarmer_Descriptor::Stats>();
+    DailyItemRespawnFarmer_Descriptor::Stats& stats = env.current_stats<DailyItemRespawnFarmer_Descriptor::Stats>();
 
     /* Stand in front of the fossil spawn near Mewtwo.
     *  Use a repel to keep wild encounters away.
@@ -106,9 +109,6 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
     *  Should work for other hidden daily items, game corner, mt moon moonstones, etc.
     */
 
-    home_to_date_time(context, true);
-
-    /*
     for (uint32_t count = 0; count < ATTEMPTS; count++) {
         //Pick up item
         pbf_mash_button(context, BUTTON_A, 3000ms);
@@ -184,8 +184,8 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
     if (FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 80ms, 1000ms);
         home_to_date_time(context, false);
-        pbf_press_button(context, BUTTON_A, 20, 105);
-        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20ms, 10ms);
+        pbf_press_button(context, BUTTON_A, 20ms, 10ms);
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
     }
@@ -194,7 +194,6 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
     }
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-    */
 }
 
 
