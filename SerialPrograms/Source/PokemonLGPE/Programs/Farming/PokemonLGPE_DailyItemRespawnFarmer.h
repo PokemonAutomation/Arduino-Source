@@ -47,6 +47,7 @@ private:
     EnumDropdownOption<LinkCode> LINK_CODE;
     
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

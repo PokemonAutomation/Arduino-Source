@@ -28,7 +28,7 @@ DailyItemRespawnFarmer_Descriptor::DailyItemRespawnFarmer_Descriptor()
         "PokemonLGPE:DailyItemRespawnFarmer",
         Pokemon::STRING_POKEMON + " LGPE", "Daily Item Respawn Farmer",
         "",
-        "Farm daily item respawns, such as fossils, by date-skipping.",
+        "Farm daily item respawns (ex. fossils) by date-skipping.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_RightJoycon},
@@ -38,13 +38,13 @@ DailyItemRespawnFarmer_Descriptor::DailyItemRespawnFarmer_Descriptor()
 
 struct DailyItemRespawnFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
-        : trades(m_stats["Trades"])
+        : skips(m_stats["Skips"])
         , resets(m_stats["Resets"])
     {
-        m_display_order.emplace_back("Trades");
+        m_display_order.emplace_back("Skips");
         m_display_order.emplace_back("Resets");
     }
-    std::atomic<uint64_t>& trades;
+    std::atomic<uint64_t>& skips;
     std::atomic<uint64_t>& resets;
 };
 std::unique_ptr<StatsTracker> DailyItemRespawnFarmer_Descriptor::make_stats() const{
@@ -75,6 +75,10 @@ DailyItemRespawnFarmer::DailyItemRespawnFarmer()
         LinkCode::Pikachu
     )
     , GO_HOME_WHEN_DONE(false)
+    , FIX_TIME_WHEN_DONE(
+        "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.",
+        LockMode::UNLOCK_WHILE_RUNNING, false
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -84,13 +88,14 @@ DailyItemRespawnFarmer::DailyItemRespawnFarmer()
     PA_ADD_OPTION(ATTEMPTS);
     PA_ADD_OPTION(LINK_CODE);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     JoyconContext context(scope, env.console.controller<JoyconController>());
     assert_16_9_720p_min(env.logger(), env.console);
-    //DailyItemRespawnFarmer_Descriptor::Stats& stats = env.current_stats<DailyItemRespawnFarmer_Descriptor::Stats>();
+    DailyItemRespawnFarmer_Descriptor::Stats& stats = env.current_stats<DailyItemRespawnFarmer_Descriptor::Stats>();
 
     /* Stand in front of the fossil spawn near Mewtwo.
     *  Use a repel to keep wild encounters away.
@@ -99,6 +104,8 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
     *  Other cave item spawns are tied to steps taken.
     *  Should work for other hidden daily items, game corner, mt moon moonstones, etc.
     */
+
+
 
     for (uint32_t count = 0; count < ATTEMPTS; count++) {
         //Pick up item
@@ -150,9 +157,9 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
         case LinkCode::Diglett:
             pbf_move_joystick(context, 128, 255, 100ms, 100ms);
             pbf_move_joystick(context, 0, 128, 100ms, 100ms);
-
             break;
         default:
+            env.log("Invalid link code selection. Defaulting to Pikachu.");
             break;
         }
         //Select symbol three times, then enter link search
@@ -167,8 +174,19 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
         //Close out link menu
 
         //stats.
+
+        stats.skips++;
+        env.update_stats();
     }
 
+    if (FIX_TIME_WHEN_DONE){
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        home_to_date_time(context, false, false);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+        resume_game_from_home(env.console, context);
+    }
 
     if (GO_HOME_WHEN_DONE) {
         pbf_press_button(context, BUTTON_HOME, 200ms, 1000ms);
