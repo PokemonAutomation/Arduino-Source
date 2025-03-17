@@ -56,29 +56,23 @@ typedef struct{
 } PABB_PACK pabb_Message_ESP32_RequestStatus;
 
 
-#if 0
-#define PABB_MSG_ESP32_SET_MAC_ADDRESS      0x61
+
+#define PABB_MSG_ESP32_REQUEST_READ_SPI         0x60
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
-    uint8_t mac_address[6];
-} PABB_PACK pabb_Message_ESP32_SetMacAddress;
-#endif
+    uint32_t address;
+    uint8_t bytes;
+} PABB_PACK pabb_Message_ESP32_ReadSpi;
 
-
-
-#define PABB_MSG_ESP32_REQUEST_GET_COLORS       0x64
+#define PABB_MSG_ESP32_REQUEST_WRITE_SPI        0x61
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
-} PABB_PACK pabb_Message_ESP32_GetColors;
+    uint32_t address;
+    uint8_t bytes;
+} PABB_PACK pabb_Message_ESP32_WriteSpi;
 
-#define PABB_MSG_ESP32_REQUEST_SET_COLORS       0x65
-typedef struct{
-    seqnum_t seqnum;
-    uint32_t controller_type;
-    NintendoSwitch_ControllerColors colors;
-} PABB_PACK pabb_Message_ESP32_SetColors;
 
 
 #define PABB_MSG_ESP32_CONTROLLER_STATE_BUTTONS     0xa0
@@ -96,33 +90,6 @@ typedef struct{
     NintendoSwitch_ButtonState buttons;
     NintendoSwitch_GyroState gyro;
 } PABB_PACK pabb_Message_ESP32_CommandFullState;
-
-
-
-
-//  Deprecated
-
-typedef struct{
-    uint8_t report_id;
-    uint8_t timer;
-    uint8_t byte2;
-    uint8_t button3;
-    uint8_t button4;
-    uint8_t button5;
-    uint8_t left_joystick[3];
-    uint8_t right_joystick[3];
-    uint8_t vibrator;
-    uint8_t gyro[49 - 13];
-} NintendoSwitch_ESP32Report0x30;
-
-
-#define PABB_MSG_ESP32_REPORT       0x9e
-typedef struct{
-    seqnum_t seqnum;
-    uint8_t ticks;
-    bool active;
-    NintendoSwitch_ESP32Report0x30 report;
-} PABB_PACK pabb_esp32_report30;
 
 
 
