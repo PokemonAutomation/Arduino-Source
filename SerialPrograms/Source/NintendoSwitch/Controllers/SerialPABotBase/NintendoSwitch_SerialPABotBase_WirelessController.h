@@ -34,7 +34,7 @@ public:
 
 public:
     Milliseconds ticksize() const{
-        return Milliseconds(15);
+        return Milliseconds(0);
     }
     Milliseconds cooldown() const{
         return Milliseconds(15);

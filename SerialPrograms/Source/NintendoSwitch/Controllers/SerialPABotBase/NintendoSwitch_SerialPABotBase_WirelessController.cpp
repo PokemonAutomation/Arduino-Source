@@ -117,12 +117,17 @@ void SerialPABotBase_WirelessController::status_thread(){
 #if 1
     try{
         m_logger.log("Reading Controller Colors...");
+
+        using ControllerColors = SerialPABotBase::NintendoSwitch_ControllerColors;
+
         BotBaseMessage response = m_serial->issue_request_and_wait(
-            SerialPABotBase::MessageControllerGetColors(m_controller_type),
+            SerialPABotBase::MessageControllerReadSpi(
+                m_controller_type,
+                0x00006050, sizeof(ControllerColors)
+            ),
             &m_scope
         );
 
-        using ControllerColors = SerialPABotBase::NintendoSwitch_ControllerColors;
         ControllerColors colors{};
         if (response.body.size() == sizeof(seqnum_t) + sizeof(ControllerColors)){
             memcpy(&colors, response.body.data() + sizeof(seqnum_t), sizeof(ControllerColors));

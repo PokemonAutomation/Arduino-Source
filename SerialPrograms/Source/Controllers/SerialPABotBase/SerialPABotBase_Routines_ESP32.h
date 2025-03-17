@@ -30,6 +30,70 @@ public:
         return BotBaseMessage(PABB_MSG_ESP32_REQUEST_STATUS, params);
     }
 };
+class MessageControllerReadSpi : public BotBaseRequest{
+public:
+    pabb_Message_ESP32_ReadSpi params;
+    MessageControllerReadSpi(ControllerType controller_type, uint32_t address, uint8_t bytes)
+        : BotBaseRequest(false)
+    {
+        uint32_t controller_id = PABB_CID_NONE;
+        switch (controller_type){
+        case ControllerType::NintendoSwitch_WirelessProController:
+            controller_id = PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER;
+            break;
+        case ControllerType::NintendoSwitch_LeftJoycon:
+            controller_id = PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
+            break;
+        case ControllerType::NintendoSwitch_RightJoycon:
+            controller_id = PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
+            break;
+        default:;
+        }
+        params.seqnum = 0;
+        params.controller_type = controller_id;
+        params.address = address;
+        params.bytes = bytes;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_ESP32_REQUEST_READ_SPI, params);
+    }
+};
+class MessageControllerWriteSpi : public BotBaseRequest{
+public:
+    std::string data;
+    MessageControllerWriteSpi(
+        ControllerType controller_type,
+        uint32_t address, uint8_t bytes,
+        const void* p_data
+    )
+        : BotBaseRequest(false)
+    {
+        uint32_t controller_id = PABB_CID_NONE;
+        switch (controller_type){
+        case ControllerType::NintendoSwitch_WirelessProController:
+            controller_id = PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER;
+            break;
+        case ControllerType::NintendoSwitch_LeftJoycon:
+            controller_id = PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
+            break;
+        case ControllerType::NintendoSwitch_RightJoycon:
+            controller_id = PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
+            break;
+        default:;
+        }
+        pabb_Message_ESP32_WriteSpi params;
+        params.seqnum = 0;
+        params.controller_type = controller_id;
+        params.address = address;
+        params.bytes = bytes;
+        data = std::string((char*)&params, sizeof(params));
+        data += std::string((const char*)p_data, bytes);
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_ESP32_REQUEST_WRITE_SPI, data);
+    }
+};
+#if 0
 class MessageControllerGetColors : public BotBaseRequest{
 public:
     pabb_Message_ESP32_GetColors params;
@@ -86,6 +150,7 @@ public:
         return BotBaseMessage(PABB_MSG_ESP32_REQUEST_SET_COLORS, params);
     }
 };
+#endif
 class MessageControllerStateButtons : public BotBaseRequest{
 public:
     pabb_Message_ESP32_CommandButtonState params;

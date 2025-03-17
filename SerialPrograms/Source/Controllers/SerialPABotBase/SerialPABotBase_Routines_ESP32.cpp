@@ -5,6 +5,7 @@
  */
 
 #include <sstream>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -31,6 +32,35 @@ int register_message_converters_ESP32(){
         }
     );
     register_message_converter(
+        PABB_MSG_ESP32_REQUEST_READ_SPI,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_ESP32_REQUEST_READ_SPI() - ";
+            if (body.size() != sizeof(pabb_Message_ESP32_ReadSpi)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_ESP32_ReadSpi*)body.c_str();
+            ss << "seqnum = " << params->seqnum;
+            ss << ", controller = " << params->controller_type;
+            ss << ", address = 0x" << tostr_hex(params->address);
+            ss << ", bytes = " << (size_t)params->bytes;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_ESP32_REQUEST_WRITE_SPI,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_ESP32_REQUEST_WRITE_SPI() - ";
+            if (body.size() <= sizeof(pabb_Message_ESP32_WriteSpi)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_ESP32_WriteSpi*)body.c_str();
+            ss << "seqnum = " << params->seqnum;
+            ss << ", controller = " << params->controller_type;
+            ss << ", address = 0x" << tostr_hex(params->address);
+            ss << ", bytes = " << (size_t)params->bytes;
+            return ss.str();
+        }
+    );
+#if 0
+    register_message_converter(
         PABB_MSG_ESP32_REQUEST_GET_COLORS,
         [](const std::string& body){
             std::ostringstream ss;
@@ -53,6 +83,7 @@ int register_message_converters_ESP32(){
             return ss.str();
         }
     );
+#endif
     register_message_converter(
         PABB_MSG_ESP32_CONTROLLER_STATE_BUTTONS,
         [](const std::string& body){
@@ -85,6 +116,7 @@ int register_message_converters_ESP32(){
             return ss.str();
         }
     );
+#if 0
     register_message_converter(
         PABB_MSG_ESP32_REPORT,
         [](const std::string& body){
@@ -102,6 +134,7 @@ int register_message_converters_ESP32(){
             return ss.str();
         }
     );
+#endif
     return 0;
 }
 int init_Messages_ESP32 = register_message_converters_ESP32();

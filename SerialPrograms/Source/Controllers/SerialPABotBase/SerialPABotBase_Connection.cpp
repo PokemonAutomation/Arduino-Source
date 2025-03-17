@@ -249,7 +249,12 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
             }
 
             m_botbase->issue_request_and_wait(
-                MessageControllerSetColors(desired_controller, colors),
+                MessageControllerWriteSpi(
+                    desired_controller,
+                    0x00006050, sizeof(NintendoSwitch_ControllerColors),
+                    &colors
+                ),
+//                MessageControllerSetColors(desired_controller, colors),
                 nullptr
             );
         }
