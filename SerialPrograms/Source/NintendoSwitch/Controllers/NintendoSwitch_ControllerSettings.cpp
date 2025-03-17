@@ -178,6 +178,8 @@ ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table)
     add_option(right_grip, "Right Grip");
     add_option(official_color, "Official Color");
 
+    set_profile(ControllerSettingsTable::random_profile(controller));
+
     controller.add_listener(*this);
 #if 1
     button_color.add_listener(*this);
@@ -268,6 +270,19 @@ std::vector<std::string> ControllerSettingsTable::make_header() const{
 }
 
 
+
+ControllerProfile ControllerSettingsTable::random_profile(ControllerType controller){
+    const std::vector<OfficialJoyconColors>& DATABASE = OFFICIAL_JOYCON_COLORS();
+
+    ControllerProfile profile;
+
+    uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
+    seed = pabb_crc32(0, &seed, sizeof(seed));
+    seed %= DATABASE.size();
+
+    DATABASE[(size_t)seed].write_to_profile(profile, controller);
+    return profile;
+}
 ControllerProfile ControllerSettingsTable::get_or_make_profile(
     const std::string& name,
     ControllerType controller
@@ -305,13 +320,7 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
         return profile;
     }
 
-    const std::vector<OfficialJoyconColors>& DATABASE = OFFICIAL_JOYCON_COLORS();
-
-    uint64_t seed = std::chrono::high_resolution_clock::now().time_since_epoch().count();
-    seed = pabb_crc32(0, &seed, sizeof(seed));
-    seed %= DATABASE.size();
-
-    DATABASE[(size_t)seed].write_to_profile(profile, controller);
+    profile = random_profile(controller);
 
     std::unique_ptr<ControllerSettingsRow> row(new ControllerSettingsRow(*this));
     row->name.set(name);

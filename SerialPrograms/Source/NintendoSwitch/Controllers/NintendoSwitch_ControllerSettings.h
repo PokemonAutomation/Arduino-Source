@@ -70,6 +70,7 @@ public:
     ControllerSettingsTable();
     virtual std::vector<std::string> make_header() const override;
 
+    static ControllerProfile random_profile(ControllerType controller);
     ControllerProfile get_or_make_profile(
         const std::string& name,
         ControllerType controller
