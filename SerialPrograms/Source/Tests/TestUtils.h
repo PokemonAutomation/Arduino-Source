@@ -60,7 +60,7 @@ public:
     virtual Logger& logger() override { return m_logger; }
 
     virtual State state() const override { return State::RUNNING; }
-    virtual size_t queue_limit() const override { return PABB_DEVICE_QUEUE_SIZE; }
+    virtual size_t queue_limit() const override { return PABB_DEVICE_MINIMUM_QUEUE_SIZE; }
 
     virtual void notify_all() override{}
 

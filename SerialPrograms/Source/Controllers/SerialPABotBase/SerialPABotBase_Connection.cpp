@@ -168,7 +168,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
         throw SerialProtocolException(
             logger, PA_CURRENT_FUNCTION,
             "Incompatible protocol. Device: " + std::to_string(m_protocol) + "<br>"
-            "Please install the .hex that came with this version of the program."
+            "Please install the firmware that came with this version of the program."
         );
     }
     --protocol_iter;
@@ -176,7 +176,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
         throw SerialProtocolException(
             logger, PA_CURRENT_FUNCTION,
             "Incompatible protocol. Device: " + std::to_string(m_protocol) + "<br>"
-            "Please install the .hex that came with this version of the program."
+            "Please install the firmware that came with this version of the program."
         );
     }
 
@@ -192,7 +192,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
         throw SerialProtocolException(
             logger, PA_CURRENT_FUNCTION,
             "Unrecognized Program ID: " + std::to_string(m_program_id) + "<br>"
-            "Please install the .hex that came with this version of the program."
+            "Please install the firmware that came with this version of the program."
         );
     }
 

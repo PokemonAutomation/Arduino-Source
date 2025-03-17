@@ -39,7 +39,7 @@ PABotBase::PABotBase(
 )
     : PABotBaseConnection(logger, std::move(connection))
     , m_logger(logger)
-    , m_max_pending_requests(PABB_DEVICE_QUEUE_SIZE)
+    , m_max_pending_requests(PABB_DEVICE_MINIMUM_QUEUE_SIZE)
     , m_send_seq(1)
     , m_retransmit_delay(retransmit_delay)
     , m_last_ack(current_time())
