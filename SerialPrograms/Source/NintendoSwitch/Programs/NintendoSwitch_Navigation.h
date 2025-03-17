@@ -17,7 +17,8 @@ namespace NintendoSwitch{
 
 void home_to_date_time(ProControllerContext& context, bool to_date_change, bool fast);
 
-void home_to_date_time(JoyconContext& context, bool to_date_change, bool fast);
+//Joycon must not be sideways
+void home_to_date_time(JoyconContext& context, bool to_date_change);
 
 
 
