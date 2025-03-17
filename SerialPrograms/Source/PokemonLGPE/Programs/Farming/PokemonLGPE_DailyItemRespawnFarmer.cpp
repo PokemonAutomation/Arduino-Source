@@ -43,13 +43,10 @@ DailyItemRespawnFarmer_Descriptor::DailyItemRespawnFarmer_Descriptor()
 struct DailyItemRespawnFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : skips(m_stats["Skips"])
-        , resets(m_stats["Resets"])
     {
         m_display_order.emplace_back("Skips");
-        m_display_order.emplace_back("Resets");
     }
     std::atomic<uint64_t>& skips;
-    std::atomic<uint64_t>& resets;
 };
 std::unique_ptr<StatsTracker> DailyItemRespawnFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -62,7 +59,7 @@ DailyItemRespawnFarmer::DailyItemRespawnFarmer()
         30, 1
     )
     , LINK_CODE(
-        "<b>Link Code:</b><br>Only needed when running multiple LGPE date-skip programs at the same time. The link code used when matching for a trade/battle.",
+        "<b>Link Code:</b><br>The link code used when matching for a trade/battle. This only needs to be changed when running multiple LGPE date-skip programs at the same time.",
         {   //Combinations of 3 different symbols is possible but 10 choices seems like enough.
             {LinkCode::Pikachu,     "pikachu",      "Pikachu"},
             {LinkCode::Eevee,       "eevee",        "Eevee"},
@@ -78,11 +75,11 @@ DailyItemRespawnFarmer::DailyItemRespawnFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         LinkCode::Pikachu
     )
-    , GO_HOME_WHEN_DONE(false)
     , FIX_TIME_WHEN_DONE(
         "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.",
         LockMode::UNLOCK_WHILE_RUNNING, false
     )
+    , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -91,8 +88,8 @@ DailyItemRespawnFarmer::DailyItemRespawnFarmer()
 {
     PA_ADD_OPTION(ATTEMPTS);
     PA_ADD_OPTION(LINK_CODE);
-    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -109,15 +106,20 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
     *  Should work for other hidden daily items, game corner, mt moon moonstones, etc.
     */
 
+    uint8_t year = MAX_YEAR;
+
     for (uint32_t count = 0; count < ATTEMPTS; count++) {
         //Pick up item
-        pbf_mash_button(context, BUTTON_A, 3000ms);
+        pbf_mash_button(context, BUTTON_A, 4000ms);
+        context.wait_for_all_requests();
 
         //Open Menu -> Communication -> Nearby player -> Local Trade
         pbf_press_button(context, BUTTON_X, 200ms, 500ms);
         pbf_move_joystick(context, 255, 128, 100ms, 100ms);
         pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
         pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+        pbf_wait(context, 1000ms); //Black screen
+        context.wait_for_all_requests();
         pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
         pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
 
@@ -165,17 +167,28 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
             break;
         }
         //Select symbol three times, then enter link search
-        pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-        pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 100ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 100ms);
+        pbf_press_button(context, BUTTON_A, 200ms, 100ms);
+        pbf_wait(context, 1000ms); //let search start
+        context.wait_for_all_requests();
 
         //Dateskip
+        pbf_press_button(context, BUTTON_HOME, 160ms, 1000ms);
+        home_to_date_time(context, true);
+        if (year >= MAX_YEAR){
+            roll_date_backward_N(context, MAX_YEAR);
+            year = 0;
+        }else{
+            roll_date_forward_1(context);
+            year++;
+        }
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
-        //Re-enter game
-
-        //Close out link menu
-
-        //stats.
+        //Re-enter game and close out link menu
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+        pbf_mash_button(context, BUTTON_B, 5000ms);
+        context.wait_for_all_requests();
 
         stats.skips++;
         env.update_stats();
@@ -184,8 +197,10 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
     if (FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 80ms, 1000ms);
         home_to_date_time(context, false);
-        pbf_press_button(context, BUTTON_A, 20ms, 10ms);
-        pbf_press_button(context, BUTTON_A, 20ms, 10ms);
+        pbf_press_button(context, BUTTON_A, 30ms, 50ms);
+        context.wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 30ms, 50ms);
+        context.wait_for_all_requests();
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);
     }
