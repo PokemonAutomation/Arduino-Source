@@ -1,4 +1,4 @@
-/*  LGPE Daily Item Respawn Farmer
+/*  LGPE Daily Item Farmer
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -21,16 +21,16 @@
 #include "PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h"
 #include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-#include "PokemonLGPE_DailyItemRespawnFarmer.h"
+#include "PokemonLGPE_DailyItemFarmer.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLGPE{
 
-DailyItemRespawnFarmer_Descriptor::DailyItemRespawnFarmer_Descriptor()
+DailyItemFarmer_Descriptor::DailyItemFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonLGPE:DailyItemRespawnFarmer",
-        Pokemon::STRING_POKEMON + " LGPE", "Daily Item Respawn Farmer",
+        "PokemonLGPE:DailyItemFarmer",
+        Pokemon::STRING_POKEMON + " LGPE", "Daily Item Farmer",
         "",
         "Farm daily item respawns (ex. fossils) by date-skipping.",
         FeedbackType::NONE,
@@ -40,7 +40,7 @@ DailyItemRespawnFarmer_Descriptor::DailyItemRespawnFarmer_Descriptor()
     )
 {}
 
-struct DailyItemRespawnFarmer_Descriptor::Stats : public StatsTracker{
+struct DailyItemFarmer_Descriptor::Stats : public StatsTracker{
     Stats()
         : skips(m_stats["Skips"])
     {
@@ -48,11 +48,11 @@ struct DailyItemRespawnFarmer_Descriptor::Stats : public StatsTracker{
     }
     std::atomic<uint64_t>& skips;
 };
-std::unique_ptr<StatsTracker> DailyItemRespawnFarmer_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> DailyItemFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-DailyItemRespawnFarmer::DailyItemRespawnFarmer()
+DailyItemFarmer::DailyItemFarmer()
     : ATTEMPTS(
         "<b>Number of attempts:</b>",
         LockMode::LOCK_WHILE_RUNNING,
@@ -93,10 +93,10 @@ DailyItemRespawnFarmer::DailyItemRespawnFarmer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     JoyconContext context(scope, env.console.controller<JoyconController>());
     assert_16_9_720p_min(env.logger(), env.console);
-    DailyItemRespawnFarmer_Descriptor::Stats& stats = env.current_stats<DailyItemRespawnFarmer_Descriptor::Stats>();
+    DailyItemFarmer_Descriptor::Stats& stats = env.current_stats<DailyItemFarmer_Descriptor::Stats>();
 
     /* Stand in front of the fossil spawn near Mewtwo.
     *  Use a repel to keep wild encounters away.
@@ -197,9 +197,9 @@ void DailyItemRespawnFarmer::program(SingleSwitchProgramEnvironment& env, Cancel
     if (FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 80ms, 1000ms);
         home_to_date_time(context, false);
-        pbf_press_button(context, BUTTON_A, 30ms, 50ms);
-        context.wait_for_all_requests();
-        pbf_press_button(context, BUTTON_A, 30ms, 50ms);
+        pbf_press_button(context, BUTTON_A, 50ms, 500ms);
+        pbf_press_button(context, BUTTON_A, 50ms, 500ms);
+        pbf_wait(context, 100ms);
         context.wait_for_all_requests();
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         resume_game_from_home(env.console, context);

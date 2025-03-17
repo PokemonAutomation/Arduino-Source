@@ -9,7 +9,7 @@
 #include "PokemonLGPE_Panels.h"
 #include "PokemonLGPE_Settings.h"
 
-#include "Programs/Farming/PokemonLGPE_DailyItemRespawnFarmer.h"
+#include "Programs/Farming/PokemonLGPE_DailyItemFarmer.h"
 #include "Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h"
 
 namespace PokemonAutomation{
@@ -27,7 +27,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_settings<GameSettings_Descriptor, GameSettingsPanel>());
 
     ret.emplace_back("---- General ----");
-    ret.emplace_back(make_single_switch_program<DailyItemRespawnFarmer_Descriptor, DailyItemRespawnFarmer>());
+    ret.emplace_back(make_single_switch_program<DailyItemFarmer_Descriptor, DailyItemFarmer>());
 
     ret.emplace_back("---- Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<AlolanTrade_Descriptor, AlolanTrade>());

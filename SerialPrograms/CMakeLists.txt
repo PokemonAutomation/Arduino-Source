@@ -1376,8 +1376,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.h
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h
-    Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemRespawnFarmer.cpp
-    Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemRespawnFarmer.h
+    Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.cpp
+    Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.h
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h
     Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp

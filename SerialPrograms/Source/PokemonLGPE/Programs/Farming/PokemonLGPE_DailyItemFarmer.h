@@ -1,11 +1,11 @@
-/*  LGPE Daily Item Respawn Farmer
+/*  LGPE Daily Item Farmer
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonLGPE_DailyItemRespawnFarmer_H
-#define PokemonAutomation_PokemonLGPE_DailyItemRespawnFarmer_H
+#ifndef PokemonAutomation_PokemonLGPE_DailyItemFarmer_H
+#define PokemonAutomation_PokemonLGPE_DailyItemFarmer_H
 
 #include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -17,16 +17,16 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLGPE{
 
-class DailyItemRespawnFarmer_Descriptor : public SingleSwitchProgramDescriptor{
+class DailyItemFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    DailyItemRespawnFarmer_Descriptor();
+    DailyItemFarmer_Descriptor();
     struct Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
-class DailyItemRespawnFarmer : public SingleSwitchProgramInstance{
+class DailyItemFarmer : public SingleSwitchProgramInstance{
 public:
-    DailyItemRespawnFarmer();
+    DailyItemFarmer();
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
