@@ -112,13 +112,13 @@ void SerialPABotBase_Connection::update_with_capabilities(const ControllerFeatur
             break;
         }
 
-        //  Program Version
-        logger.log("Checking Firmware Version...");
-        uint32_t version = program_version(*m_botbase);
-        logger.log("Checking Firmware Version... Version = " + std::to_string(version));
+//        //  Program Version
+//        logger.log("Checking Firmware Version...");
+//        uint32_t version = program_version(*m_botbase);
+//        logger.log("Checking Firmware Version... Version = " + std::to_string(version));
 
         //  REMOVE: Temporary for migration.
-        if (m_protocol / 100 == 20210526 && version == 2023121900){
+        if (m_protocol / 100 == 20210526 && m_version == 2023121900){
             break;
         }
 
@@ -196,6 +196,9 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
         );
     }
 
+    logger.log("Checking Firmware Version...");
+    m_version = program_version(*m_botbase);
+    logger.log("Checking Firmware Version... Version = " + std::to_string(m_version));
 
     //  Controller Type
     logger.log("Reading Controller Mode...");
@@ -327,8 +330,8 @@ void SerialPABotBase_Connection::thread_body(
             error = e.message();
         }
         if (error.empty()){
-//            std::string text = "Program: " + program_name(m_program_id) + " (" + std::to_string(m_protocol) + ")";
-            std::string text = program_name(m_program_id) + " (" + std::to_string(m_protocol) + ")";
+//            std::string text = "Program: " + program_name(m_program_id) + " (" + std::to_string(m_version) + ")";
+            std::string text = program_name(m_program_id) + " (" + std::to_string(m_version) + ")";
             set_status_line0(text, theme_friendly_darkblue());
             declare_ready(mode_status);
         }else{

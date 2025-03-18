@@ -300,7 +300,7 @@ void ControllerWithScheduler::issue_mash_AZs(
         if (duration <= Milliseconds::zero()){
             break;
         }
-        issue_buttons(cancellable, BUTTON_A, 3*8ms, 5*8ms, 3*8ms);
+        issue_buttons(cancellable, BUTTON_A, 3*8ms, 6*8ms, 3*8ms);
         duration -= std::min(3*8ms, duration);
 
         //  We never log before the first issue to avoid delaying the critical path.
@@ -317,13 +317,13 @@ void ControllerWithScheduler::issue_mash_AZs(
         if (duration <= Milliseconds::zero()){
             break;
         }
-        issue_buttons(cancellable, BUTTON_ZL, 3*8ms, 5*8ms, 3*8ms);
+        issue_buttons(cancellable, BUTTON_ZL, 3*8ms, 6*8ms, 3*8ms);
         duration -= std::min(3*8ms, duration);
 
         if (duration <= Milliseconds::zero()){
             break;
         }
-        issue_buttons(cancellable, BUTTON_ZR, 3*8ms, 5*8ms, 3*8ms);
+        issue_buttons(cancellable, BUTTON_ZR, 3*8ms, 6*8ms, 3*8ms);
         duration -= std::min(3*8ms, duration);
     }
 }

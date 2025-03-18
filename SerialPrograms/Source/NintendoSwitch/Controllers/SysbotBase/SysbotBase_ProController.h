@@ -22,7 +22,8 @@ namespace NintendoSwitch{
 
 class ProController_SysbotBase final :
     public ProController,
-    public ControllerWithScheduler{
+    public ControllerWithScheduler
+{
 public:
     using ContextType = ProControllerContext;
 

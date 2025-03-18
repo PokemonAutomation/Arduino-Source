@@ -49,7 +49,7 @@ constexpr Button VALID_PRO_CONTROLLER_BUTTONS =
 
 
 //
-//  This is the generic interface a Switch pro controller.
+//  This is the generic interface to a Switch pro controller.
 //
 class ProController : public AbstractController{
 public:

@@ -57,6 +57,7 @@ private:
     std::string m_device_name;
 
     uint32_t m_protocol = 0;
+    uint32_t m_version = 0;
     uint8_t m_program_id = 0;
     ControllerModeStatus m_mode_status;
 
