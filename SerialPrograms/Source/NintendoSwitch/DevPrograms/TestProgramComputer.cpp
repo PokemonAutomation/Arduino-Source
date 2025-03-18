@@ -301,7 +301,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     scope.wait_for(std::chrono::seconds(60));
 #endif
 
-#if 0
+#if 1
     int* ptr = nullptr;
     cout << ptr[0] << endl;
 #endif

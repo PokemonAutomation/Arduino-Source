@@ -95,22 +95,20 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
             refresh_selection(incoming);
         }
     );
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        connect(
-            m_controllers_dropdown, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
-            this, [this](int index){
-                index = std::max(index, 0);
-                ControllerType new_value = CONTROLLER_TYPE_STRINGS.get_enum(
-                    m_controllers_dropdown->itemText(index).toStdString(),
-                    ControllerType::None
-                );
-                if (new_value == m_session.controller_type()){
-                    return;
-                }
-                m_session.set_controller(new_value);
+    connect(
+        m_controllers_dropdown, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
+        this, [this](int index){
+            index = std::max(index, 0);
+            ControllerType new_value = CONTROLLER_TYPE_STRINGS.get_enum(
+                m_controllers_dropdown->itemText(index).toStdString(),
+                ControllerType::None
+            );
+            if (new_value == m_session.controller_type()){
+                return;
             }
-        );
-    }
+            m_session.set_controller(new_value);
+        }
+    );
     connect(
         m_reset_button, &QPushButton::clicked,
         this, [this](bool){

@@ -6,7 +6,6 @@
 
 #include <QWidget>
 #include "Common/Cpp/Json/JsonValue.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "SerialPABotBase_Descriptor.h"
 #include "SerialPABotBase_SelectorWidget.h"
@@ -40,11 +39,10 @@ std::string SerialPABotBase_Descriptor::display_name() const{
     if (m_port.isNull()){
         return "";
     }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
         return m_port.portName().toStdString();
-    }
-    return m_port.portName().toStdString() + " - " + m_port.description().toStdString();
-//    return "Serial (PABotBase): " + m_port.portName().toStdString() + " - " + m_port.description().toStdString();
+//    }
+//    return m_port.portName().toStdString() + " - " + m_port.description().toStdString();
 }
 void SerialPABotBase_Descriptor::load_json(const JsonValue& json){
     const std::string* name = json.to_string();
