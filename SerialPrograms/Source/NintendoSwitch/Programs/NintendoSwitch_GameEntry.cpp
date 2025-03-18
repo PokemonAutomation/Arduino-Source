@@ -312,7 +312,44 @@ bool openedgame_to_gamemenu(
 
 
 
+void resume_game_from_home(
+    VideoStream& stream, JoyconContext& context,
+    bool skip_home_press
+){
+    if (!skip_home_press){
+        pbf_press_button(context, BUTTON_HOME, 20ms, 10ms);
+    }
+    context.wait_for_all_requests();
 
+    while (true){
+        {
+            UpdateMenuWatcher update_detector;
+            int ret = wait_until(
+                stream, context,
+                std::chrono::milliseconds(1000),
+                { update_detector }
+            );
+            if (ret == 0){
+                stream.log("Detected update window.", COLOR_RED);
+
+                pbf_move_joystick(context, 128, 0, 10ms, 0ms);
+                pbf_press_button(context, BUTTON_A, 10ms, 500ms);
+                context.wait_for_all_requests();
+                continue;
+            }
+        }
+
+        //  In case we failed to enter the game.
+        HomeWatcher home_detector;
+        if (home_detector.detect(stream.video().snapshot())){
+            stream.log("Failed to re-enter game. Trying again...", COLOR_RED);
+            pbf_press_button(context, BUTTON_HOME, 20ms, 10ms);
+            continue;
+        }else{
+            break;
+        }
+    }
+}
 void move_to_user(JoyconContext& context, uint8_t user_slot){
     if (user_slot != 0){
         //  Move to correct user.

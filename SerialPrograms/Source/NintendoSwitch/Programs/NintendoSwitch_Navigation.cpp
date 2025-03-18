@@ -165,6 +165,66 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
 
 
+void home_to_date_time(JoyconContext& context, bool to_date_change){
+    Milliseconds tv = context->timing_variation();
+    Milliseconds unit = 32ms + tv;
+
+    //From ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32
+    //as Joycon will only have that controller type
+
+    pbf_move_joystick(context, 255, 128, 2*unit, unit);
+    pbf_move_joystick(context, 255, 128, 2*unit, unit);
+
+    //  Down twice in case we drop one.
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+
+    pbf_move_joystick(context, 255, 128, 2*unit, unit);
+
+    //  Press A multiple times to make sure one goes through.
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+
+    
+    //  Just button mash it. lol
+    {
+        auto iterations = Milliseconds(1100) / unit + 1;
+        do{
+            pbf_move_joystick(context, 128, 255, 2*unit, unit);
+        }while (--iterations);
+    }
+    {
+        auto iterations = Milliseconds(336) / unit + 1;
+        do{
+            pbf_move_joystick(context, 255, 128, 2*unit, unit);
+        }while (--iterations);
+    }
+    
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    pbf_move_joystick(context, 128, 255, 4*unit, unit);
+    pbf_move_joystick(context, 128, 255, 360ms, 304ms);
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    //pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    
+    if (!to_date_change){
+        ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
+        return;
+    }
+
+    ssf_press_button(context, BUTTON_A, unit);
+    {
+        auto iterations = Milliseconds(216) / unit + 1;
+        do{
+            pbf_move_joystick(context, 128, 255, 2*unit, unit);
+        }while (--iterations);
+    }
+    pbf_move_joystick(context, 128, 255, 2*unit, 0ms);
+}
+
+
+
 
 }
 }
