@@ -673,6 +673,7 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.cpp \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
+    Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.cpp \
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp \
     Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.cpp \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp \
@@ -1241,7 +1242,6 @@ HEADERS += \
     ../Common/Cpp/Unicode.h \
     ../Common/Cpp/ValueDebouncer.h \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h \
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h \
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h \
@@ -1864,6 +1864,7 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_NameDatabase.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonSprites.h \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
+    Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.h \
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h \
     Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.h \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h \
