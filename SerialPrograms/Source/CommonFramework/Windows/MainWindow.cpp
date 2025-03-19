@@ -192,6 +192,8 @@ MainWindow::MainWindow(QWidget* parent)
             keyboard, &QPushButton::clicked,
             this, [button = m_button_diagram.get()](bool){
                 button->show();
+                button->raise(); // bring the window to front on macOS
+                button->activateWindow(); // bring the window to front on Windows
             }
         );
     }
