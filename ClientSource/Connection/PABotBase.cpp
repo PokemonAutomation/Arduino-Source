@@ -534,6 +534,14 @@ void PABotBase::on_recv_message(BotBaseMessage message){
         }
         return;
     }
+    case PABB_MSG_ERROR_DISCONNECTED:{
+        m_logger.log("The console has disconnected the controller.", COLOR_RED);
+        m_error_message = "Disconnected by console.";
+        m_error.store(true, std::memory_order_release);
+        std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        m_cv.notify_all();
+        return;
+    }
     case PABB_MSG_REQUEST_COMMAND_FINISHED:{
         process_command_finished<pabb_MsgRequestCommandFinished>(std::move(message));
         return;

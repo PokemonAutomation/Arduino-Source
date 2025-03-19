@@ -241,7 +241,9 @@ void SerialPABotBase_WirelessController::status_thread(){
             error = "Unknown error.";
         }
         if (!error.empty()){
+            stop();
             m_handle.set_status_line1(error, COLOR_RED);
+            break;
         }
 
 //        cout << "lock()" << endl;

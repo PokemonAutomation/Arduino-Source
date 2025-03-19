@@ -123,6 +123,17 @@ int register_message_converters_framework_errors(){
             return ss.str();
         }
     );
+    register_message_converter(
+        PABB_MSG_ERROR_DISCONNECTED,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_ERROR_DISCONNECTED - ";
+            if (body.size() != sizeof(pabb_MsgInfoDisconnected)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgInfoDisconnected*)body.c_str();
+            ss << "error code = " << params->error_code;
+            return ss.str();
+        }
+    );
     return 0;
 }
 int register_message_converters_framework_acks(){
@@ -329,6 +340,7 @@ int register_message_converters_framework_requests(){
             return ss.str();
         }
     );
+#if 0
     register_message_converter(
         PABB_MSG_COMMAND_END_PROGRAM_CALLBACK,
         [](const std::string& body){
@@ -340,6 +352,7 @@ int register_message_converters_framework_requests(){
             return ss.str();
         }
     );
+#endif
     register_message_converter(
         PABB_MSG_COMMAND_SET_LED_STATE,
         [](const std::string& body){
