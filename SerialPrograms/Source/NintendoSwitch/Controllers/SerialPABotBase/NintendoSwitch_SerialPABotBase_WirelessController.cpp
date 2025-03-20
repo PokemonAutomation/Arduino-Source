@@ -214,15 +214,15 @@ void SerialPABotBase_WirelessController::status_thread(){
             last_ack.store(current_time(), std::memory_order_relaxed);
 
             uint32_t status = response.data;
-            bool status_connected   = status & 1;
-            bool status_paired      = status & 2;
+            bool status_connected = status & 1;
+            bool status_ready     = status & 2;
 
             std::string str;
             str += "Connected: " + (status_connected
                 ? html_color_text("Yes", theme_friendly_darkblue())
                 : html_color_text("No", COLOR_RED)
             );
-            str += " - Paired: " + (status_paired
+            str += " - Ready: " + (status_ready
                 ? html_color_text("Yes", theme_friendly_darkblue())
                 : html_color_text("No", COLOR_RED)
             );
