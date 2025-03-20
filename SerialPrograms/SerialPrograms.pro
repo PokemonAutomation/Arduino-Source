@@ -677,6 +677,7 @@ SOURCES += \
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp \
     Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.cpp \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp \
+    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.cpp \
     Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp \
     Source/PokemonLGPE/PokemonLGPE_Panels.cpp \
     Source/PokemonLGPE/PokemonLGPE_Settings.cpp \
@@ -1868,6 +1869,7 @@ HEADERS += \
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h \
     Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.h \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h \
+    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.h \
     Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h \
     Source/PokemonLGPE/PokemonLGPE_Panels.h \
     Source/PokemonLGPE/PokemonLGPE_Settings.h \

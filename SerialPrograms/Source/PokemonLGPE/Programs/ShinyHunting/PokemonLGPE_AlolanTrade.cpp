@@ -29,7 +29,7 @@ AlolanTrade_Descriptor::AlolanTrade_Descriptor()
         Pokemon::STRING_POKEMON + " LGPE", "Alolan Trade",
         "",
         "Shiny hunt Alolan forms by trading in-game.",
-        FeedbackType::NONE,
+        FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_RightJoycon},
         FasterIfTickPrecise::NOT_FASTER
@@ -136,19 +136,18 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
     /*
     WARNING: JOYCON TEST PROGRAM. Not well tested. Bare minimum in general.
 
-    Only works with Right joycon atm. Do not update right joycon. Decline the update before running this.
-
     Right joycon required for home button (this means no on-switch screenshots).
-    Also don't remap any of the buttons in the switch button mapping settings. Yet? Could use this to add Home and Screenshot.
+    Also don't remap any of the buttons in the switch button mapping settings.
 
     Preconditions:
     DO NOT have any Pokemon you want to keep in your boxes. Move them out to Home first.
     Favoriting a Pokemon does not prevent it from being traded.
-    This must not be your first time doing the trade. (I've done all the trades, so I can't check first time trade behavior.)
+    ?This must not be your first time doing the trade? (I've done all the trades, so I can't check first time trade behavior.)
 
     Setup:
     Catch the Kanto variant of the target. Put this number in NUM_TRADES.
     Stand in front of trade NPC.
+    Save the game.
     Start the program in-game.
     
     Future additions?:
@@ -230,6 +229,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
                 env.update_stats();
                 send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
                 shiny_found = true;
+                //TODO: Favorite the shiny.
             }
             else {
                 env.log("Not shiny.");
