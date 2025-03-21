@@ -168,9 +168,9 @@ std::vector<std::unique_ptr<EditableTableRow>> ProControllerKeyboardMappingTable
     ret.emplace_back(make_mapping("Dpad Up+Left",       Qt::Key::Key_7,         ProControllerDeltas{.dpad_x = -1, .dpad_y = -1}));
 
     ret.emplace_back(make_mapping("Left-Stick Up",      Qt::Key::Key_W,         ProControllerDeltas{.left_x =  0, .left_y = -1}));
-    ret.emplace_back(make_mapping("Left-Stick Right",   Qt::Key::Key_D,         ProControllerDeltas{.left_x = +1, .left_y =  0}));
-    ret.emplace_back(make_mapping("Left-Stick Down",    Qt::Key::Key_S,         ProControllerDeltas{.left_x =  0, .left_y = +1}));
     ret.emplace_back(make_mapping("Left-Stick Left",    Qt::Key::Key_A,         ProControllerDeltas{.left_x = -1, .left_y =  0}));
+    ret.emplace_back(make_mapping("Left-Stick Down",    Qt::Key::Key_S,         ProControllerDeltas{.left_x =  0, .left_y = +1}));
+    ret.emplace_back(make_mapping("Left-Stick Right",   Qt::Key::Key_D,         ProControllerDeltas{.left_x = +1, .left_y =  0}));
     ret.emplace_back(make_mapping("Right-Stick Up",     Qt::Key::Key_Up,        ProControllerDeltas{.right_x =  0, .right_y = -1}));
     ret.emplace_back(make_mapping("Right-Stick Right",  Qt::Key::Key_Right,     ProControllerDeltas{.right_x = +1, .right_y =  0}));
     ret.emplace_back(make_mapping("Right-Stick Down",   Qt::Key::Key_Down,      ProControllerDeltas{.right_x =  0, .right_y = +1}));
@@ -328,9 +328,9 @@ std::vector<std::unique_ptr<EditableTableRow>> JoyconKeyboardMappingTable::make_
 
     if (left){
         ret.emplace_back(make_mapping("Vertical: JS Up",    Qt::Key::Key_W,         JoyconDeltas{.joystick_x =  0, .joystick_y = -1}));
-        ret.emplace_back(make_mapping("Vertical: JS Right", Qt::Key::Key_D,         JoyconDeltas{.joystick_x = +1, .joystick_y =  0}));
-        ret.emplace_back(make_mapping("Vertical: JS Down",  Qt::Key::Key_S,         JoyconDeltas{.joystick_x =  0, .joystick_y = +1}));
         ret.emplace_back(make_mapping("Vertical: JS Left",  Qt::Key::Key_A,         JoyconDeltas{.joystick_x = -1, .joystick_y =  0}));
+        ret.emplace_back(make_mapping("Vertical: JS Down",  Qt::Key::Key_S,         JoyconDeltas{.joystick_x =  0, .joystick_y = +1}));
+        ret.emplace_back(make_mapping("Vertical: JS Right", Qt::Key::Key_D,         JoyconDeltas{.joystick_x = +1, .joystick_y =  0}));
 
         ret.emplace_back(make_mapping("Vertical: Up",       Qt::Key::Key_Up,        JoyconDeltas{.buttons = BUTTON_UP}));
         ret.emplace_back(make_mapping("Vertical: Right",    Qt::Key::Key_Right,     JoyconDeltas{.buttons = BUTTON_RIGHT}));
@@ -342,9 +342,9 @@ std::vector<std::unique_ptr<EditableTableRow>> JoyconKeyboardMappingTable::make_
         ret.emplace_back(make_mapping("Vertical: JS-Click", Qt::Key::Key_C,         JoyconDeltas{.buttons = BUTTON_LCLICK}));
 
         ret.emplace_back(make_mapping("Sideways: JS Up",    Qt::Key::Key_T,         JoyconDeltas{.joystick_x = +1, .joystick_y =  0}));
-        ret.emplace_back(make_mapping("Sideways: JS Right", Qt::Key::Key_H,         JoyconDeltas{.joystick_x =  0, .joystick_y = +1}));
-        ret.emplace_back(make_mapping("Sideways: JS Down",  Qt::Key::Key_G,         JoyconDeltas{.joystick_x = -1, .joystick_y =  0}));
         ret.emplace_back(make_mapping("Sideways: JS Left",  Qt::Key::Key_F,         JoyconDeltas{.joystick_x =  0, .joystick_y = -1}));
+        ret.emplace_back(make_mapping("Sideways: JS Down",  Qt::Key::Key_G,         JoyconDeltas{.joystick_x = -1, .joystick_y =  0}));
+        ret.emplace_back(make_mapping("Sideways: JS Right", Qt::Key::Key_H,         JoyconDeltas{.joystick_x =  0, .joystick_y = +1}));
 
         ret.emplace_back(make_mapping("Sideways: Up",       Qt::Key::Key_Apostrophe,JoyconDeltas{.buttons = BUTTON_RIGHT}));
         ret.emplace_back(make_mapping("Sideways: Up",       Qt::Key::Key_QuoteDbl,  JoyconDeltas{.buttons = BUTTON_RIGHT}));
@@ -369,9 +369,9 @@ std::vector<std::unique_ptr<EditableTableRow>> JoyconKeyboardMappingTable::make_
         ret.emplace_back(make_mapping("SR",             Qt::Key::Key_F3,        JoyconDeltas{.buttons = BUTTON_LEFT_SR}));
     }else{
         ret.emplace_back(make_mapping("Vertical: JS Up",    Qt::Key::Key_W,         JoyconDeltas{.joystick_x =  0, .joystick_y = -1}));
-        ret.emplace_back(make_mapping("Vertical: JS Right", Qt::Key::Key_D,         JoyconDeltas{.joystick_x = +1, .joystick_y =  0}));
-        ret.emplace_back(make_mapping("Vertical: JS Down",  Qt::Key::Key_S,         JoyconDeltas{.joystick_x =  0, .joystick_y = +1}));
         ret.emplace_back(make_mapping("Vertical: JS Left",  Qt::Key::Key_A,         JoyconDeltas{.joystick_x = -1, .joystick_y =  0}));
+        ret.emplace_back(make_mapping("Vertical: JS Down",  Qt::Key::Key_S,         JoyconDeltas{.joystick_x =  0, .joystick_y = +1}));
+        ret.emplace_back(make_mapping("Vertical: JS Right", Qt::Key::Key_D,         JoyconDeltas{.joystick_x = +1, .joystick_y =  0}));
 
         ret.emplace_back(make_mapping("Vertical: X",        Qt::Key::Key_Apostrophe,JoyconDeltas{.buttons = BUTTON_X}));
         ret.emplace_back(make_mapping("Vertical: X",        Qt::Key::Key_QuoteDbl,  JoyconDeltas{.buttons = BUTTON_X}));
@@ -390,9 +390,9 @@ std::vector<std::unique_ptr<EditableTableRow>> JoyconKeyboardMappingTable::make_
         ret.emplace_back(make_mapping("Vertical: JS-Click", Qt::Key::Key_C,         JoyconDeltas{.buttons = BUTTON_RCLICK}));
 
         ret.emplace_back(make_mapping("Sideways: JS Up",    Qt::Key::Key_T,         JoyconDeltas{.joystick_x = -1, .joystick_y =  0}));
-        ret.emplace_back(make_mapping("Sideways: JS Right", Qt::Key::Key_H,         JoyconDeltas{.joystick_x =  0, .joystick_y = -1}));
-        ret.emplace_back(make_mapping("Sideways: JS Down",  Qt::Key::Key_G,         JoyconDeltas{.joystick_x = +1, .joystick_y =  0}));
         ret.emplace_back(make_mapping("Sideways: JS Left",  Qt::Key::Key_F,         JoyconDeltas{.joystick_x =  0, .joystick_y = +1}));
+        ret.emplace_back(make_mapping("Sideways: JS Down",  Qt::Key::Key_G,         JoyconDeltas{.joystick_x = +1, .joystick_y =  0}));
+        ret.emplace_back(make_mapping("Sideways: JS Right", Qt::Key::Key_H,         JoyconDeltas{.joystick_x =  0, .joystick_y = -1}));
 
         ret.emplace_back(make_mapping("Sideways: X",        Qt::Key::Key_Up,        JoyconDeltas{.buttons = BUTTON_Y}));
         ret.emplace_back(make_mapping("Sideways: A",        Qt::Key::Key_Right,     JoyconDeltas{.buttons = BUTTON_X}));

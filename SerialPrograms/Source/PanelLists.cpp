@@ -46,13 +46,15 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
 
     add(std::make_unique<NintendoSwitch::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonHome::PanelListFactory>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        add(std::make_unique<NintendoSwitch::PokemonLGPE::PanelListFactory>());
+    }
     add(std::make_unique<NintendoSwitch::PokemonSwSh::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonBDSP::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonLA::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonSV::PanelListFactory>());
-    if (PreloadSettings::instance().DEVELOPER_MODE) {
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         add(std::make_unique<NintendoSwitch::PokemonRSE::PanelListFactory>());
-        add(std::make_unique<NintendoSwitch::PokemonLGPE::PanelListFactory>());
     }
     add(std::make_unique<NintendoSwitch::ZeldaTotK::PanelListFactory>());
 

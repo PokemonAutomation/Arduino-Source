@@ -253,7 +253,7 @@ void ControllerSettingsRow::value_changed(void* object){
 
 ControllerSettingsTable::ControllerSettingsTable()
     : EditableTableOption_t<ControllerSettingsRow>(
-        "<b>Controller Settings:</b>",
+        "<b>Wireless Controller Settings:</b><br>Changes take effect after resetting the device.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )

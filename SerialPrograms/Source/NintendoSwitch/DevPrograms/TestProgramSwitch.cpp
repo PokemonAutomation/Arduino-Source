@@ -118,6 +118,7 @@
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
+#include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
 
 
 #include <QPixmap>
@@ -311,6 +312,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 //    std::terminate();
+
+    auto image = feed.snapshot();
+
+    ItemPrinterMenuDetector detector(COLOR_GREEN);
+    cout << detector.detect(image) << endl;
+
+
 
 #if 0
     for (size_t i = 0; i < 100; i++){
