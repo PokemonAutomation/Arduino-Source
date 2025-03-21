@@ -94,6 +94,12 @@ ConsoleSettingsPanel::ConsoleSettingsPanel(const ConsoleSettings_Descriptor& des
     , settings(ConsoleSettings::instance())
 {
     PA_ADD_OPTION(settings);
+
+    settings.CONTROLLER_SETTINGS.set_visibility(
+        settings.CONTROLLER_SETTINGS.current_rows() > 0
+            ? ConfigOptionState::ENABLED
+            : ConfigOptionState::HIDDEN
+    );
 }
 
 
