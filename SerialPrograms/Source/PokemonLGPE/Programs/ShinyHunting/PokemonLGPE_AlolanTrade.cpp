@@ -218,6 +218,7 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
         context.wait_for_all_requests();
 
         //Now check for shinies. Check everything that was traded.
+        env.log("Checking received Pokemon.");
         for (uint16_t i = 0; i < NUM_TRADES; i++) {
             VideoSnapshot screen = env.console.video().snapshot();
             ShinySymbolDetector shiny_checker(COLOR_YELLOW);
@@ -229,7 +230,27 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
                 env.update_stats();
                 send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", screen, true);
                 shiny_found = true;
-                //TODO: Favorite the shiny.
+
+                //Back out to menu and favorite the shiny.
+                env.log("Favoriting shiny.");
+                pbf_press_button(context, BUTTON_B, 200ms, 5000ms);
+                pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+                pbf_move_joystick(context, 128, 0, 100ms, 100ms);
+                pbf_move_joystick(context, 128, 0, 100ms, 100ms);
+                pbf_move_joystick(context, 128, 0, 100ms, 200ms);
+                pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+                pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+                pbf_press_button(context, BUTTON_B, 200ms, 800ms);
+
+                //Go into summary again
+                env.log("Navigating back into summary.");
+                pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
+                pbf_move_joystick(context, 128, 255, 100ms, 100ms);
+                pbf_move_joystick(context, 128, 255, 100ms, 100ms);
+                pbf_press_button(context, BUTTON_A, 200ms, 100ms);
+                context.wait_for_all_requests();
+                pbf_wait(context, 5000ms);
+                context.wait_for_all_requests();
             }
             else {
                 env.log("Not shiny.");
