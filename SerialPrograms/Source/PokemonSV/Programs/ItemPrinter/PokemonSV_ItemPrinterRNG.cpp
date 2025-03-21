@@ -25,6 +25,7 @@
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/PokemonSV_Navigation.h"
@@ -953,7 +954,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
         AdvanceDialogWatcher dialog(COLOR_RED);
         PromptDialogWatcher prompt(COLOR_GREEN);
         DateChangeWatcher date_reader;
-        WhiteButtonWatcher material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
+        ItemPrinterMenuWatcher material(COLOR_GREEN);
         int ret = wait_until(
             env.console, context, std::chrono::seconds(120),
             {
