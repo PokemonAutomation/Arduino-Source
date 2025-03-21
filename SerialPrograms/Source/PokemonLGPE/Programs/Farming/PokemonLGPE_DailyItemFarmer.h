@@ -30,6 +30,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
+    void start_local_trade(SingleSwitchProgramEnvironment& env, JoyconContext& context);
+
     SimpleIntegerOption<uint32_t> ATTEMPTS;
 
     enum class LinkCode{
