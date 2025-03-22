@@ -247,6 +247,10 @@ typedef struct{
     uint8_t tag;
     uint32_t data;
 } PABB_PACK pabb_MsgInfoI32;
+#define PABB_MSG_INFO_DATA                      0x21
+typedef struct{
+    uint32_t tag;
+} PABB_PACK pabb_MsgInfoData;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Requests

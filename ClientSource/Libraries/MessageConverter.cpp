@@ -380,6 +380,24 @@ int register_message_converters_custom_info(){
             return ss.str();
         }
     );
+    register_message_converter(
+        PABB_MSG_INFO_DATA,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_INFO_DATA - ";
+//            if (body.size() != sizeof(pabb_MsgInfoData)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgInfoData*)body.c_str();
+            ss << "tag = " << (uint64_t)params->tag;
+            ss << ", bytes = " << body.size() - sizeof(seqnum_t);
+            ss << ", data =";
+            static const char HEX_DIGITS[] = "0123456789abcdef";
+            for (size_t c = sizeof(seqnum_t); c < body.size(); c++){
+                uint8_t byte = body[c];
+                ss << " " << HEX_DIGITS[(byte >> 4)] << HEX_DIGITS[byte & 15];
+            }
+            return ss.str();
+        }
+    );
     return 0;
 }
 
