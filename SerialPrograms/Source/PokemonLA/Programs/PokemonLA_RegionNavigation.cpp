@@ -247,6 +247,7 @@ void goto_camp_from_jubilife(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     const TravelLocation& location
 ){
+    stream.overlay().add_log("Travel to " + std::string(MAP_REGION_NAMES[int(location.region)]));
     // Move backwards and talk to guard to open the map.
     context.wait_for_all_requests();
     open_travel_map_from_jubilife(env, stream, context);

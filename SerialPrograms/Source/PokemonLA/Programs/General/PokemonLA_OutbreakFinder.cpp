@@ -182,6 +182,13 @@ std::unique_ptr<StatsTracker> OutbreakFinder_Descriptor::make_stats() const{
 
 OutbreakFinder::OutbreakFinder()
     : GO_HOME_WHEN_DONE(false)
+    , RESET_GAME_AND_CONTINUE_SEARCHING(
+        "<b>Reset game and continue searching at start</b><br>If the last outbreak found by the program does not yield what you want, check "
+        "this option to let the program reset the game and skip the ongoing outbreaks at start, before continuing the search.<br>"
+        "Note: you must have saved at Jubilife Village front gate beforehand.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
     , LANGUAGE(
         "<b>Game Language:</b>",
         Pokemon::PokemonNameReader::instance().languages(),
@@ -218,6 +225,7 @@ OutbreakFinder::OutbreakFinder()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(RESET_GAME_AND_CONTINUE_SEARCHING);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(DESIRED_MO_SLUGS);
@@ -336,6 +344,8 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
 void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, ProControllerContext& context, 
     bool inside_travel_map
 ){
+    env.log("Go to a random region and back to refresh outbreaks...");
+    env.console.overlay().add_log("Refresh outbreaks");
     OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     if (inside_travel_map == false){
@@ -730,12 +740,14 @@ bool OutbreakFinder::run_iteration(
                 os << "Found desired MMO pokemon (including desired MMO pokemon with star symbols): ";
                 for (const auto& pokemon : found_pokemon){
                     os << pokemon << ", ";
+                    env.console.overlay().add_log("Found " + pokemon);
                 }
                 env.log(os.str());
                 return true;
             }
 
             env.log("No target MMO sprite found. Reset game...");
+            env.console.overlay().add_log("No target MMO");
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
@@ -745,7 +757,6 @@ bool OutbreakFinder::run_iteration(
     send_program_status_notification(env, NOTIFICATION_STATUS);
 
     //  Go to region and return.
-    env.log("Go to a random region and back to refresh outbreaks...");
     goto_region_and_return(env, context, inside_travel_map);
 
     return false;
@@ -761,10 +772,20 @@ std::set<std::string> OutbreakFinder::to_set(const StringSelectTableOption& opti
 }
 
 void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-//    OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
-    // goto_Mai_from_camp(env.logger(), context, Camp::HIGHLANDS_HIGHLANDS);
-    // return;
+    if (RESET_GAME_AND_CONTINUE_SEARCHING){
+        // press a random button to let Switch register the wired controller
+        pbf_press_button(context, BUTTON_ZL, 10ms, 30ms);
+        // the outbreak found by the last program run did not yield what the user wants.
+        // so we reset the game now and skip the ongoing outbreaks
+        env.log("Reset game and skip ongoing outbreaks");
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
+        reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+
+        //  Go to region and return.
+        bool inside_travel_map = false;
+        goto_region_and_return(env, context, inside_travel_map);
+    }
 
     std::set<std::string> desired_outbreaks = to_set(DESIRED_MO_SLUGS);
     std::set<std::string> desired_MMO_pokemon = to_set(DESIRED_MMO_SLUGS);

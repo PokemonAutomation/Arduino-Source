@@ -82,6 +82,7 @@ private:
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    BooleanCheckBoxOption RESET_GAME_AND_CONTINUE_SEARCHING;
 
     OCR::LanguageOCROption LANGUAGE;
 

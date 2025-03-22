@@ -79,6 +79,8 @@ public:
     const TravelLocation Icelands_PearlSettlement_SW;
     const TravelLocation Icelands_Arena;
 
+    const TravelLocation Retreat;
+
 
 private:
     TravelLocations();

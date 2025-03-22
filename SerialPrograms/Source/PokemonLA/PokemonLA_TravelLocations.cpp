@@ -165,6 +165,11 @@ TravelLocations::TravelLocations()
         "Alabaster Icelands - Icepeak Arena",
         MapRegion::ICELANDS, 0, 2, nullptr, true
     )
+    , Retreat(
+        "retreat",
+        "Ancient Retreat",
+        MapRegion::RETREAT, 0, 0, nullptr, false
+    )
 {
     add_location(Fieldlands_Fieldlands);
     add_location(Fieldlands_Heights);
@@ -190,6 +195,7 @@ TravelLocations::TravelLocations()
     add_location(Icelands_PearlSettlement);
     add_location(Icelands_PearlSettlement_SW);
     add_location(Icelands_Arena);
+    add_location(Retreat);
 }
 
 
