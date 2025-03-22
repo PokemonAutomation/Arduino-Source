@@ -4,7 +4,6 @@
  *
  */
 
-#include <array>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
 #include <QLabel>
@@ -46,9 +45,7 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
 
     add(std::make_unique<NintendoSwitch::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonHome::PanelListFactory>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        add(std::make_unique<NintendoSwitch::PokemonLGPE::PanelListFactory>());
-    }
+    add(std::make_unique<NintendoSwitch::PokemonLGPE::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonSwSh::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonBDSP::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonLA::PanelListFactory>());
