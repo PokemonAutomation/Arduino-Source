@@ -167,7 +167,7 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
 void home_to_date_time(JoyconContext& context, bool to_date_change){
     Milliseconds tv = context->timing_variation();
-    Milliseconds unit = 50ms + tv;
+    Milliseconds unit = 100ms + tv;
 
     //From ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32
     //as Joycon will only have that controller type
@@ -186,33 +186,28 @@ void home_to_date_time(JoyconContext& context, bool to_date_change){
     pbf_press_button(context, BUTTON_A, 2*unit, unit);
     pbf_press_button(context, BUTTON_A, 2*unit, unit);
 
+    // Scroll to System, move right to top option (update)
+    pbf_move_joystick(context, 128, 255, 2500ms, unit);
+    pbf_move_joystick(context, 255, 128, 500ms, unit);
     
-    //  Just button mash it. lol
-    {
-        auto iterations = Milliseconds(1100) / unit + 1;
-        do{
-            pbf_move_joystick(context, 128, 255, 2*unit, unit);
-        }while (--iterations);
-    }
-    {
-        auto iterations = Milliseconds(336) / unit + 1;
-        do{
-            pbf_move_joystick(context, 255, 128, 2*unit, unit);
-        }while (--iterations);
-    }
-    
+    // To date/time
     pbf_move_joystick(context, 128, 255, 2*unit, unit);
     pbf_move_joystick(context, 128, 255, 2*unit, unit);
-    pbf_move_joystick(context, 128, 255, 4*unit, unit);
-    pbf_move_joystick(context, 128, 255, 360ms, 304ms);
+    context.wait_for_all_requests();
+    pbf_move_joystick(context, 128, 255, 525ms, unit);
+    //pbf_move_joystick(context, 128, 255, 365ms, 305ms);
     pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    //pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    context.wait_for_all_requests();
     
     if (!to_date_change){
         ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
         return;
     }
 
-    ssf_press_button(context, BUTTON_A, unit);
+    //ssf_press_button(context, BUTTON_A, unit);
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+    context.wait_for_all_requests();
     {
         auto iterations = Milliseconds(216) / unit + 1;
         do{
