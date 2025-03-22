@@ -15,6 +15,7 @@ public:
     ~ButtonDiagram();
 
 private:
+    void set_image(const std::string& resource_name);
     void resizeEvent(QResizeEvent*);
 
 private:
