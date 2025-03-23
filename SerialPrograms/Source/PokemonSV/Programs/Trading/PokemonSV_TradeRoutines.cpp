@@ -150,7 +150,7 @@ void trade_current_pokemon(
     TradeDoneHold trade_done(stream.overlay());
 
     while (true){
-        AdvanceDialogWatcher dialog(COLOR_YELLOW, std::chrono::seconds(2));
+        AdvanceDialogWatcher dialog(COLOR_YELLOW, DialogType::DIALOG_ALL, std::chrono::seconds(2));
         PromptDialogWatcher learn_move(COLOR_BLUE);
 
         int ret = wait_until(

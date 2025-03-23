@@ -45,7 +45,7 @@ void release_one_pokemon(
         BoxWatcher box_detector(COLOR_RED);
         BoxSelectWatcher selected(COLOR_YELLOW, std::chrono::milliseconds(100));
         PromptDialogWatcher confirm(COLOR_CYAN, std::chrono::milliseconds(100));
-        AdvanceDialogWatcher advance_dialog(COLOR_GREEN, std::chrono::milliseconds(250));
+        AdvanceDialogWatcher advance_dialog(COLOR_GREEN, DialogType::DIALOG_ALL, std::chrono::milliseconds(250));
 
         context.wait_for_all_requests();
         int ret = wait_until(

@@ -67,7 +67,7 @@ bool DialogBoxDetector::detect(const ImageViewRGB32& screen) const{
 
     ImageStats stats_border_top = image_stats(extract_box_reference(screen, m_border_top));
 //    cout << stats_border_top.average << stats_border_top.stddev << endl;
-    if (stats_border_top.stddev.sum() < 75){
+    if (stats_border_top.stddev.sum() < 50){
         return !m_true_if_detected;
     }
 
@@ -83,8 +83,8 @@ bool DialogBoxDetector::detect(const ImageViewRGB32& screen) const{
 
 
 
-AdvanceDialogDetector::AdvanceDialogDetector(Color color)
-    : m_box(color)
+AdvanceDialogDetector::AdvanceDialogDetector(Color color, DialogType type)
+    : m_box(color, true, type)
     , m_arrow(0.710, 0.850, 0.030, 0.042)
 {}
 void AdvanceDialogDetector::make_overlays(VideoOverlaySet& items) const{

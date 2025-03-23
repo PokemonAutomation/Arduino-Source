@@ -157,7 +157,7 @@ void order_compote_du_fils(
     while(eating == false){
         context.wait_for_all_requests();
 
-        AdvanceDialogWatcher dialog_watcher(COLOR_RED, std::chrono::milliseconds(100));
+        AdvanceDialogWatcher dialog_watcher(COLOR_RED, DialogType::DIALOG_ALL, std::chrono::milliseconds(100));
         GradientArrowWatcher menu_item_0_watcher(COLOR_BLUE, GradientArrowType::RIGHT, {0.037, 0.224, 0.074, 0.104});
         GradientArrowWatcher menu_item_1_watcher(COLOR_BLUE, GradientArrowType::RIGHT, {0.037, 0.339, 0.074, 0.104});
         PromptDialogWatcher prompt_watcher(COLOR_RED, {0.535, 0.450, 0.367, 0.124});
@@ -205,7 +205,7 @@ void order_compote_du_fils(
     } // end state machine for restaurant menu
 
     { // Now wait for eating animation to finish.
-        AdvanceDialogWatcher dialog_watcher(COLOR_RED, std::chrono::milliseconds(100));
+        AdvanceDialogWatcher dialog_watcher(COLOR_RED, DialogType::DIALOG_ALL, std::chrono::milliseconds(100));
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
@@ -229,7 +229,7 @@ void order_compote_du_fils(
     while(true){
         context.wait_for_all_requests();
 
-        AdvanceDialogWatcher dialog_watcher(COLOR_RED, std::chrono::milliseconds(100));
+        AdvanceDialogWatcher dialog_watcher(COLOR_RED, DialogType::DIALOG_ALL, std::chrono::milliseconds(100));
         OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         int ret = wait_until(
             stream, context,

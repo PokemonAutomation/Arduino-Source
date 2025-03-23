@@ -43,7 +43,7 @@ void attach_item_from_bag(
         GradientArrowWatcher bag_neutral(COLOR_RED, GradientArrowType::RIGHT, {0.10, 0.15, 0.05, 0.77}, std::chrono::milliseconds(1000));
         GradientArrowWatcher selected(COLOR_RED, GradientArrowType::RIGHT, {0.20, 0.20, 0.30, 0.60});
         PromptDialogWatcher prompt(COLOR_CYAN, std::chrono::milliseconds(100));
-        AdvanceDialogWatcher advance_dialog(COLOR_YELLOW, std::chrono::milliseconds(100));
+        AdvanceDialogWatcher advance_dialog(COLOR_YELLOW, DialogType::DIALOG_ALL, std::chrono::milliseconds(100));
 
         context.wait_for_all_requests();
         int ret = wait_until(

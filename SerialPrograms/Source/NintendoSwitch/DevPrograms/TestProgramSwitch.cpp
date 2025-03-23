@@ -313,11 +313,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::terminate();
 
+    ImageRGB32 image("20250323-011605651979.png");
+
+    DialogBoxDetector detector;
+    detector.make_overlays(overlays);
+    cout << detector.detect(image) << endl;
+
+
+
+#if 0
     auto image = feed.snapshot();
 
     ItemPrinterMenuDetector detector(COLOR_GREEN);
     cout << detector.detect(image) << endl;
-
+#endif
 
 
 #if 0

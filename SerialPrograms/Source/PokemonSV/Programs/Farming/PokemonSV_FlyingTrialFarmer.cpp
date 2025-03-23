@@ -116,7 +116,7 @@ FlyingTrialFarmer::FlyingTrialFarmer()
 bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     //  Wait until a dialog shows up.
     {
-        DialogBoxWatcher dialog(COLOR_GREEN, true);
+        AdvanceDialogWatcher dialog(COLOR_RED);
         int ret = wait_until(
             env.console, context,
             std::chrono::seconds(180),
@@ -135,8 +135,8 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, ProCont
     bool trial_passed = false;
     while (true){
         OverworldWatcher overworld(env.console, COLOR_CYAN);
-        DialogBoxWatcher dialog_white(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_WHITE);
-        DialogBoxWatcher dialog_black(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
+        AdvanceDialogWatcher dialog_white(COLOR_RED, DialogType::DIALOG_WHITE);
+        AdvanceDialogWatcher dialog_black(COLOR_RED, DialogType::DIALOG_BLACK);
         context.wait_for_all_requests();
 
         int ret_finish = wait_until(

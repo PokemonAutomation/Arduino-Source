@@ -61,7 +61,7 @@ public:
 //  It should be able to detect both the white background dialog and black background dialog.
 class AdvanceDialogDetector : public StaticScreenDetector{
 public:
-    AdvanceDialogDetector(Color color = COLOR_RED);
+    AdvanceDialogDetector(Color color = COLOR_RED, DialogType type = DialogType::DIALOG_ALL);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -72,8 +72,8 @@ private:
 };
 class AdvanceDialogWatcher : public DetectorToFinder<AdvanceDialogDetector>{
 public:
-    AdvanceDialogWatcher(Color color, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
-         : DetectorToFinder("AdvanceDialogWatcher", duration, color)
+    AdvanceDialogWatcher(Color color, DialogType type = DialogType::DIALOG_ALL, std::chrono::milliseconds duration = std::chrono::milliseconds(250))
+         : DetectorToFinder("AdvanceDialogWatcher", duration, color, type)
     {}
 };
 
@@ -102,14 +102,14 @@ public:
         Color color,
         std::chrono::milliseconds duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("PromptDialogWatcher", std::chrono::milliseconds(250), color)
+         : DetectorToFinder("PromptDialogWatcher", duration, color)
     {}
     PromptDialogWatcher(
         Color color,
         const ImageFloatBox& arrow_box,
         std::chrono::milliseconds duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("PromptDialogWatcher", std::chrono::milliseconds(250), color, arrow_box)
+         : DetectorToFinder("PromptDialogWatcher", duration, color, arrow_box)
     {}
 };
 
