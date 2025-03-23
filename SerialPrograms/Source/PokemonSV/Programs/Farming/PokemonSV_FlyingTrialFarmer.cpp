@@ -119,13 +119,13 @@ bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, ProCont
         DialogBoxWatcher dialog(COLOR_GREEN, true);
         int ret = wait_until(
             env.console, context,
-            std::chrono::seconds(120),
+            std::chrono::seconds(180),
             {dialog}
         );
         if (ret != 0){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "End of trial not detected after 2 minutes.",
+                "End of trial not detected after 3 minutes.",
                 env.console
             );
         }
