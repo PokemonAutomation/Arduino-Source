@@ -114,27 +114,52 @@ FlyingTrialFarmer::FlyingTrialFarmer()
 
 
 bool FlyingTrialFarmer::run_rewards(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    bool trial_failed = true;
+    //  Wait until a dialog shows up.
+    {
+        DialogBoxWatcher dialog(COLOR_GREEN, true);
+        int ret = wait_until(
+            env.console, context,
+            std::chrono::seconds(120),
+            {dialog}
+        );
+        if (ret != 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "End of trial not detected after 2 minutes.",
+                env.console
+            );
+        }
+        env.log("Detected end of trial.");
+    }
+
+    bool trial_passed = false;
     while (true){
-        DialogBoxWatcher dialog(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
         OverworldWatcher overworld(env.console, COLOR_CYAN);
+        DialogBoxWatcher dialog_white(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_WHITE);
+        DialogBoxWatcher dialog_black(COLOR_GREEN, true, std::chrono::milliseconds(250), DialogType::DIALOG_BLACK);
         context.wait_for_all_requests();
 
-        int ret_finish = run_until<ProControllerContext>(
+        int ret_finish = wait_until(
             env.console, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 10000);
-            },
-            { dialog, overworld }
+            std::chrono::seconds(80),
+            {
+                overworld,
+                dialog_white,
+                dialog_black
+            }
         );
         context.wait_for_all_requests();
 
         switch (ret_finish){
-        case 0: // dialog
-            trial_failed = false;
+        case 0: // overworld
+            return trial_passed;
+        case 1: // white dialog
+            pbf_press_button(context, BUTTON_B, 160ms, 0ms);
             continue;
-        case 1: // overworld
-            return trial_failed;
+        case 2: // black dialog
+            pbf_press_button(context, BUTTON_B, 160ms, 0ms);
+            trial_passed = true;
+            continue;
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
@@ -216,6 +241,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControll
                 pbf_wait(context,  9 * TICKS_PER_SECOND);
                 break;
             case FlightPath::BACK_ENTRY_SOFT_TURN:
+#if 0
                 if (env.console.controller().controller_type() == ControllerType::NintendoSwitch_WirelessProController){
                     pbf_wait(context,  Milliseconds(3000));
                     pbf_move_left_joystick(context, 180, get_final_y_axis(-108), Milliseconds(1005), Milliseconds(0));
@@ -227,17 +253,17 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControll
                     pbf_move_left_joystick(context, 205, get_final_y_axis(  30), Milliseconds(735), Milliseconds(0));
                     pbf_wait(context,  Milliseconds(9000));                                       
                 }else{
-                    pbf_wait(context,  3 * TICKS_PER_SECOND);
-                    pbf_move_left_joystick(context, 180, get_final_y_axis(-108), 1 * TICKS_PER_SECOND, 0);
-                    pbf_wait(context,  2 * TICKS_PER_SECOND);
-                    pbf_move_left_joystick(context,  40, get_final_y_axis( -78), 240, 0);
-                    pbf_wait(context,  1 * TICKS_PER_SECOND);
-                    pbf_move_left_joystick(context, 110, get_final_y_axis( -78), 2 * TICKS_PER_SECOND, 0);
-                    pbf_wait(context, 14 * TICKS_PER_SECOND);
-                    pbf_move_left_joystick(context, 205, get_final_y_axis(  37), 160, 0);
-                    pbf_wait(context,  9 * TICKS_PER_SECOND);
-                }
-                
+#endif
+                    pbf_wait(context,  3000ms);
+                    pbf_move_left_joystick(context, 180, get_final_y_axis(-108), 1000ms, 0ms);
+                    pbf_wait(context,  2000ms);
+                    pbf_move_left_joystick(context,  40, get_final_y_axis( -78), 1920ms, 0ms);
+                    pbf_wait(context,  1000ms);
+                    pbf_move_left_joystick(context, 110, get_final_y_axis( -78), 2000ms, 0ms);
+                    pbf_wait(context, 14000ms);
+                    pbf_move_left_joystick(context, 205, get_final_y_axis(  37), 1280ms, 0ms);
+                    pbf_wait(context,  9000ms);
+//                }
                 break;
             case FlightPath::BACK_ENTRY_HARD_TURN:
                 pbf_wait(context,  3 * TICKS_PER_SECOND);
@@ -253,7 +279,7 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControll
             }
         }
 
-        if (!run_rewards(env, context)){
+        if (run_rewards(env, context)){
             stats.m_success++;
         }else{
             stats.m_fail++;
