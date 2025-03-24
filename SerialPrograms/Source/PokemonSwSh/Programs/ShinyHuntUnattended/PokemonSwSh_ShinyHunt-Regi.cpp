@@ -73,15 +73,15 @@ void regieleki(ProControllerContext& context){
     pbf_move_left_joystick(context, 200, 255, 52, 0);
     pbf_move_left_joystick(context, 0, 50, 122, 0);
     pbf_move_left_joystick(context, 0, 206, 93, 0);
-    pbf_move_left_joystick(context, 216, 0, 78, 0);
-    pbf_move_left_joystick(context, 56, 0, 80, 0);
+    pbf_move_left_joystick(context, 208, 0, 78, 0);
+    pbf_move_left_joystick(context, 60, 0, 80, 0);
     pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, 216, 0, 170, 0);
 }
 void regidrago(ProControllerContext& context){
     pbf_move_left_joystick(context, 16, 255, 160, 0);
     pbf_move_left_joystick(context, 72, 255, 50, 0);
-    pbf_move_left_joystick(context, 48, 255, 104, 0);
+    pbf_move_left_joystick(context, 48, 255, 105, 0);
     pbf_move_left_joystick(context, 128, 0, 48, 0);
     pbf_move_left_joystick(context, 0, 56, 60, 0);
     pbf_move_left_joystick(context, 64, 0, 60, 0);
