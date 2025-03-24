@@ -92,14 +92,16 @@ FossilRevival::FossilRevival()
 void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconContext& context){
     //Press A to get to selection
     env.log("Starting dialog.");
-    pbf_press_button(context, BUTTON_A, 100ms, 500ms);
+    pbf_press_button(context, BUTTON_A, 100ms, 800ms);
+    pbf_wait(context, 1000ms); //Wait for scientist to turn and face player
+    context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_A, 100ms, 500ms);
     pbf_press_button(context, BUTTON_A, 100ms, 500ms);
     pbf_press_button(context, BUTTON_A, 100ms, 500ms);
     pbf_press_button(context, BUTTON_A, 100ms, 500ms);
     context.wait_for_all_requests();
 
-    pbf_wait(context, 700ms);
+    pbf_wait(context, 500ms);
     context.wait_for_all_requests();
 
     //Select fossil slot
@@ -107,7 +109,6 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
     for (uint16_t c = 0; c < (uint16_t)SLOT.current_value(); c++){
         pbf_move_joystick(context, 128, 255, 100ms, 200ms);
     }
-    pbf_press_button(context, BUTTON_A, 200ms, 300ms);
     context.wait_for_all_requests();
 
     //Mash A until revival over
@@ -155,7 +156,7 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
     }
 
     //Close out come back soon text.
-    pbf_mash_button(context, BUTTON_B, 500ms);
+    pbf_mash_button(context, BUTTON_B, 1000ms);
     context.wait_for_all_requests();
 }
 
@@ -168,7 +169,8 @@ void FossilRevival::program(SingleSwitchProgramEnvironment& env, CancellableScop
     Settings:
     Text speed fast
 
-    is first time dialog different?
+    is first time dialog different? clear it out first.
+    selection dialog still appears if only one fossil type
 
     Setup:
     Stand in front of the scientist in cinnebar.
