@@ -107,25 +107,25 @@ GlobalSettings::GlobalSettings()
         false,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
         LockMode::LOCK_WHILE_RUNNING,
-        #if defined(__APPLE__)
+#if defined(__APPLE__)
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt",
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/UserSettings/PA-Stats.txt"
-        #else
+#else
         "UserSettings/PA-Stats.txt",
         "UserSettings/PA-Stats.txt"
-        #endif
+#endif
     )
     , TEMP_FOLDER(
         false,
         "<b>Temp Folder:</b><br>Place temporary files in this directory.",
         LockMode::LOCK_WHILE_RUNNING,
-        #if defined(__APPLE__)
+#if defined(__APPLE__)
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/",
         QStandardPaths::writableLocation(QStandardPaths::AppDataLocation).toStdString() + "/TempFiles/"
-        #else
+#else
         "TempFiles/",
         "TempFiles/"
-        #endif
+#endif
     )
     , THEME(CONSTRUCT_TOKEN)
     , WINDOW_SIZE(
