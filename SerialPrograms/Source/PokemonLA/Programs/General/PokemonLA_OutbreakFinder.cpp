@@ -183,7 +183,7 @@ std::unique_ptr<StatsTracker> OutbreakFinder_Descriptor::make_stats() const{
 OutbreakFinder::OutbreakFinder()
     : GO_HOME_WHEN_DONE(false)
     , RESET_GAME_AND_CONTINUE_SEARCHING(
-        "<b>Reset game and continue searching at start</b><br>If the last outbreak found by the program does not yield what you want, check "
+        "<b>Reset Game and Skip Outbreak at Start</b><br>If the last outbreak found by the program does not yield what you want, check "
         "this option to let the program reset the game and skip the ongoing outbreaks at start, before continuing the search.<br>"
         "Note: you must have saved at Jubilife Village front gate beforehand.",
         LockMode::LOCK_WHILE_RUNNING,
