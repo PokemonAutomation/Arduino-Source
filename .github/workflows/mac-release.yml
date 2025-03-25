@@ -96,13 +96,13 @@ jobs:
       - name: Codesign
         run: codesign --force --deep --sign - SerialPrograms.app
 
-      # Read-write format in case Resources needs to be updated
+      # Create a disk image for installation
       - name: Create disk image
         run: |
           brew install create-dmg
           mkdir dmg
           cd dmg
-          cp -r ../SerialPrograms.app .
+          mv ../SerialPrograms.app ./SerialPrograms.app
           create-dmg --volname "SerialPrograms Installer" \
             --window-pos 150 150 \
             --window-size 600 400  \
@@ -112,17 +112,18 @@ jobs:
             --app-drop-link 450 160 \
             "SerialPrograms-Installer.dmg" \
             "./"
-
+          mv SerialPrograms-Installer.dmg $GITHUB_WORKSPACE/SerialPrograms-Installer.dmg
+          
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: SerialPrograms.dmg
-          path: SerialPrograms.dmg
+          name: SerialPrograms-Installer.dmg
+          path: SerialPrograms-Installer.dmg
 
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: SerialPrograms.dmg
+          files: SerialPrograms-Installer.dmg
           # Tag should be automatically set in the case of a tag push
           tag_name: ${{ github.event.inputs.version }}
           token: ${{ secrets.GITHUB_TOKEN }}
