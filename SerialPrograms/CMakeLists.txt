@@ -2225,6 +2225,14 @@ if (APPLE)
         MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/cmake/MacOSXBundleInfo.plist.in
         RESOURCE ${SerialPrograms_ICON}
     )
+
+    add_custom_command(
+        TARGET SerialPrograms
+        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${CMAKE_CURRENT_SOURCE_DIR}/../../Packages/SerialPrograms/Resources"
+        "$<TARGET_FILE_DIR:SerialPrograms>/../Resources"
+    )
 else() # WIN and Linux:
     add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
 endif()
