@@ -133,7 +133,7 @@ void start_game_from_home_with_inference(
         StartGameUserSelectWatcher user_select(COLOR_GREEN);
         UpdateMenuWatcher update_menu(COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);
-        BlackScreenWatcher black_screen(COLOR_BLUE);
+        BlackScreenWatcher black_screen(COLOR_BLUE, {0.1, 0.15, 0.8, 0.7});
         context.wait_for_all_requests();
         int ret = wait_until(
             stream, context,
