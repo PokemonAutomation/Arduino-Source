@@ -50,7 +50,7 @@ void PageSwap::program(SingleSwitchProgramEnvironment& env, ProControllerContext
         pbf_press_button(context, BUTTON_RCLICK, 5, 5);
     }
 
-    const uint16_t PICKUP_DELAY = 125;
+    const uint16_t PICKUP_DELAY = 250;
     const uint16_t SCROLL_DELAY = 20;
 
     for (uint8_t i = 0; i < 2; i++){

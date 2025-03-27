@@ -138,6 +138,8 @@
 //#include "Kernels/ImageScaling/Kernels_ImageScaling_Default.h"
 //#include "Kernels/ImageScaling/Kernels_ImageScaling_x64_SSE41.h"
 #endif
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
+//#include "Common/SerialPABotBase/LightweightWallClock_StdChrono.h"
 
 //#include <opencv2/core.hpp>
 #include <random>
@@ -259,6 +261,21 @@ std::atomic<size_t> CheckedObject<Type>::m_instances(0);
 
 
 
+#if 0
+struct RequestManagerConfig{
+    using ClockType = LightweightWallClock_StdChrono;
+    using ClockDuration = LightweightDuration_StdChrono;
+    using SeqnumType = seqnum_t;
+    using MessageSizeType = uint8_t;
+    static constexpr size_t MAX_MESSAGE_SIZE = 64;
+    static constexpr size_t QUEUE_SIZE = 64;
+};
+#endif
+
+
+
+
+
 
 
 
@@ -272,8 +289,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonSwSh::MaxLairInternal;
 
     using namespace std::chrono_literals;
-
-
 
     SparseArray data{
         {100, "0123456789"},
