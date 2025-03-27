@@ -36,7 +36,7 @@ SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
 void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancellable, WallDuration duration){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
-    SerialPABotBase::NintendoSwitch_ButtonState report{
+    PABB_ESP32_NintendoSwitch_ButtonState report{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,

@@ -65,7 +65,7 @@ void SerialPABotBase_WirelessController::stop(){
 
 void SerialPABotBase_WirelessController::issue_report(
     const Cancellable* cancellable,
-    const SerialPABotBase::NintendoSwitch_ButtonState& buttons,
+    const PABB_ESP32_NintendoSwitch_ButtonState& buttons,
     WallDuration duration
 ){
     //  Release the state lock since we are no longer touching state.
@@ -118,7 +118,7 @@ void SerialPABotBase_WirelessController::status_thread(){
     try{
         m_logger.log("Reading Controller Colors...");
 
-        using ControllerColors = SerialPABotBase::NintendoSwitch_ControllerColors;
+        using ControllerColors = PABB_ESP32_NintendoSwitch_ControllerColors;
 
         BotBaseMessage response = m_serial->issue_request_and_wait(
             SerialPABotBase::MessageControllerReadSpi(

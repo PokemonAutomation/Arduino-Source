@@ -19,8 +19,6 @@
 
 #ifdef __cplusplus
 extern "C" {
-namespace PokemonAutomation{
-namespace SerialPABotBase{
 #endif
 
 
@@ -30,7 +28,7 @@ typedef struct{
     uint8_t buttons[3];
     uint8_t left_grip[3];
     uint8_t right_grip[3];
-} NintendoSwitch_ControllerColors;
+} PABB_ESP32_NintendoSwitch_ControllerColors;
 
 typedef struct{
     uint8_t button3;
@@ -39,11 +37,11 @@ typedef struct{
     uint8_t left_joystick[3];
     uint8_t right_joystick[3];
     uint8_t vibrator;
-} NintendoSwitch_ButtonState;
+} PABB_ESP32_NintendoSwitch_ButtonState;
 
 typedef struct{
     uint8_t data[36];
-} NintendoSwitch_GyroState;
+} PABB_ESP32_NintendoSwitch_GyroState;
 
 
 
@@ -79,7 +77,7 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    NintendoSwitch_ButtonState buttons;
+    PABB_ESP32_NintendoSwitch_ButtonState buttons;
 } PABB_PACK pabb_Message_ESP32_CommandButtonState;
 
 
@@ -87,16 +85,14 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    NintendoSwitch_ButtonState buttons;
-    NintendoSwitch_GyroState gyro;
+    PABB_ESP32_NintendoSwitch_ButtonState buttons;
+    PABB_ESP32_NintendoSwitch_GyroState gyro;
 } PABB_PACK pabb_Message_ESP32_CommandFullState;
 
 
 
 
 #ifdef __cplusplus
-}
-}
 }
 #endif
 

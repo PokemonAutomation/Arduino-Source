@@ -154,7 +154,7 @@ public:
 class MessageControllerStateButtons : public BotBaseRequest{
 public:
     pabb_Message_ESP32_CommandButtonState params;
-    MessageControllerStateButtons(uint16_t milliseconds, const NintendoSwitch_ButtonState& state)
+    MessageControllerStateButtons(uint16_t milliseconds, const PABB_ESP32_NintendoSwitch_ButtonState& state)
         : BotBaseRequest(true)
     {
         params.seqnum = 0;
@@ -170,8 +170,8 @@ public:
     pabb_Message_ESP32_CommandFullState params;
     MessageControllerStateFull(
         uint16_t milliseconds,
-        const NintendoSwitch_ButtonState& buttons,
-        const NintendoSwitch_GyroState& gyro
+        const PABB_ESP32_NintendoSwitch_ButtonState& buttons,
+        const PABB_ESP32_NintendoSwitch_GyroState& gyro
     )
         : BotBaseRequest(true)
     {

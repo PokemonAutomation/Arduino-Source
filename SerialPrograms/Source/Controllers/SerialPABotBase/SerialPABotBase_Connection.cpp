@@ -225,7 +225,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
                     desired_controller
                 );
 
-            NintendoSwitch_ControllerColors colors;
+            PABB_ESP32_NintendoSwitch_ControllerColors colors;
             {
                 Color color(profile.body_color);
                 colors.body[0] = color.red();
@@ -254,7 +254,7 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
             m_botbase->issue_request_and_wait(
                 MessageControllerWriteSpi(
                     desired_controller,
-                    0x00006050, sizeof(NintendoSwitch_ControllerColors),
+                    0x00006050, sizeof(PABB_ESP32_NintendoSwitch_ControllerColors),
                     &colors
                 ),
 //                MessageControllerSetColors(desired_controller, colors),
