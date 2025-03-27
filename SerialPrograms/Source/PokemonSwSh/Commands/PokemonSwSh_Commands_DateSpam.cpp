@@ -106,18 +106,18 @@ void roll_date_forward_1(ProControllerContext& context, bool fast){
         Milliseconds tv = context->timing_variation();
         Milliseconds unit = 34ms + tv;
 
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
+        ssf_press_button(context, BUTTON_A, 160ms, 3*unit);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, 0ms, 2*unit, unit);
         ssf_press_button(context, BUTTON_A, unit);
     //    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_press_button(context, BUTTON_A, 0);
+        ssf_press_button(context, BUTTON_A, 0ms, 2*unit, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 2*unit, unit);
+        ssf_press_button(context, BUTTON_A, 160ms, 3*unit);
         break;
     }
     default:{
@@ -170,23 +170,23 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
         Milliseconds tv = context->timing_variation();
         Milliseconds unit = 32ms + tv;
 
-        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_press_button(context, BUTTON_A, 160ms, 3*unit);
         for (uint8_t c = 0; c < skips - 1; c++){
             ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
         }
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0ms, 2*unit, unit);
         ssf_press_button(context, BUTTON_A, unit);
 //        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         for (uint8_t c = 0; c < skips - 1; c++){
             ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
         }
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0ms, 2*unit, unit);
         ssf_press_button(context, BUTTON_A, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-        ssf_press_button(context, BUTTON_A, 20, 10);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 2*unit, unit);
+        ssf_press_button(context, BUTTON_A, 160ms, 3*unit);
         break;
     }
     default:{

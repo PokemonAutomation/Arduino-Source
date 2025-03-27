@@ -68,7 +68,7 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
     }
     case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
         Milliseconds tv = context->timing_variation();
-        Milliseconds unit = 32ms + tv;
+        Milliseconds unit = 34ms + tv;
 
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
@@ -100,7 +100,7 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 2*unit, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 400ms, 2*unit, unit);
         ssf_press_dpad(context, DPAD_DOWN, 360ms, 304ms);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
