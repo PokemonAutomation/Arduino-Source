@@ -51,7 +51,7 @@ std::string RaidCodeOption::get_code() const{
     if (m_random_digits == 0){
         std::string qstr = sanitize_code(8, m_code);
         for (int c = 0; c < 8; c++){
-            code[c] = qstr[c] - '0';
+            code[c] = qstr[c];
         }
         return code;
     }
@@ -61,7 +61,7 @@ std::string RaidCodeOption::get_code() const{
         do{
             x = rand() & 0x0f;
         }while (x >= 10);
-        code[c] = x;
+        code[c] = x + '0';
     }
     for (size_t c = m_random_digits; c < m_digits; c++){
         code[c] = code[c - 1];
