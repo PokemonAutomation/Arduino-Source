@@ -242,9 +242,6 @@ void ControllerWithScheduler::issue_mash_button(
     bool log = true;
     while (duration > Milliseconds::zero()){
         issue_buttons(cancellable, button, 8*8ms, 5*8ms, 3*8ms);
-        duration = duration >= 8*8ms
-            ? duration - 8*8ms
-            : Milliseconds::zero();
 
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
@@ -257,6 +254,10 @@ void ControllerWithScheduler::issue_mash_button(
             );
         }
         log = false;
+
+        duration = duration >= 8*8ms
+            ? duration - 8*8ms
+            : Milliseconds::zero();
     }
 }
 void ControllerWithScheduler::issue_mash_button(
@@ -271,7 +272,6 @@ void ControllerWithScheduler::issue_mash_button(
     while (duration > Milliseconds::zero()){
         issue_buttons(cancellable, button0, Milliseconds(4*8), 5*8ms, 3*8ms);
         issue_buttons(cancellable, button1, Milliseconds(4*8), 5*8ms, 3*8ms);
-        duration -= std::min(8*8ms, duration);
 
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
@@ -285,6 +285,8 @@ void ControllerWithScheduler::issue_mash_button(
             );
         }
         log = false;
+
+        duration -= std::min(8*8ms, duration);
     }
 }
 void ControllerWithScheduler::issue_mash_AZs(
@@ -301,7 +303,6 @@ void ControllerWithScheduler::issue_mash_AZs(
             break;
         }
         issue_buttons(cancellable, BUTTON_A, 3*8ms, 6*8ms, 3*8ms);
-        duration -= std::min(3*8ms, duration);
 
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
@@ -314,6 +315,7 @@ void ControllerWithScheduler::issue_mash_AZs(
         }
         log = false;
 
+        duration -= std::min(3*8ms, duration);
         if (duration <= Milliseconds::zero()){
             break;
         }
