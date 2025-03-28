@@ -826,7 +826,7 @@ void ItemPrinterRNG::run_item_printer_rng(
 
     bool done_one_last_material_check_before_mat_farming = false;
     uint32_t material_farmer_jobs_period = MATERIAL_FARMER_FIXED_NUM_JOBS;
-    if (MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST){
+    if (MATERIAL_FARMER_OPTIONS.enabled() && MATERIAL_FARMER_TRIGGER == MaterialFarmerTrigger::MINIMUM_HAPPINY_DUST){
         // Check material quantity when:
         // - once when first starting the item printer
         // - before starting material farming. If still have material, 
