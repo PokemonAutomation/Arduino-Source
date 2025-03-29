@@ -35,6 +35,7 @@ int read_number_waterfill(
 
 // applies color filters on the text, until each individual waterfilled character/number is less than width_max. then apply OCR.
 // this solves the problem where characters are too close to each other and touch, causing more than one character to be OCR'ed
+// also, if running OCR on a character results in an empty string, try the next color filter
 // the filters should be arranged in order of preference. (probably should be arranged broadest to narrowest)
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,

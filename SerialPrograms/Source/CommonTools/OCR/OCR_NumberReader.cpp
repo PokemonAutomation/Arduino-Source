@@ -105,52 +105,10 @@ int read_number_waterfill(
     uint32_t rgb32_min, uint32_t rgb32_max,
     bool text_inside_range
 ){
-    using namespace Kernels::Waterfill;
-
-    //  Direct OCR is unreliable. Instead, we will waterfill each character
-    //  to isolate them, then OCR them individually.
-
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, rgb32_min, rgb32_max, text_inside_range);
-
-//    static int c = 0;
-//    filtered.save("test-" + std::to_string(c++) + ".png");
-
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
-
-    std::map<size_t, WaterfillObject> map;
-    {
-        std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
-        auto iter = session->make_iterator(20);
-        WaterfillObject object;
-        while (map.size() < 16 && iter->find_next(object, true)){
-            map.emplace(object.min_x, std::move(object));
-        }
-    }
-
-    std::string ocr_text;
-    for (const auto& item : map){
-        const WaterfillObject& object = item.second;
-        ImageRGB32 cropped = extract_box_reference(filtered, object).copy();
-        PackedBinaryMatrix tmp(object.packed_matrix());
-        filter_by_mask(tmp, cropped, Color(0xffffffff), true);
-        ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
-        std::string ocr = OCR::ocr_read(Language::English, padded);
-        if (!ocr.empty()){
-            ocr_text += ocr[0];
-        }
-    }
-
-    std::string normalized = run_number_normalization(ocr_text);
-
-    if (normalized.empty()){
-        logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
-        return -1;
-    }
-
-    int number = std::atoi(normalized.c_str());
-    logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
-
-    return number;
+    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
+        {rgb32_min, rgb32_max}
+    };
+    return read_number_waterfill(logger, image, filters, UINT32_MAX, text_inside_range);
 }
 
 int read_number_waterfill(
