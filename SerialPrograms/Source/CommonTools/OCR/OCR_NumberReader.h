@@ -27,6 +27,10 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language =
 //  This version attempts to improve reliability by first isolating each number
 //  via waterfill. Then it OCRs each number by itself and recombines them at the
 //  end. This requires specifying the color range for the text.
+//
+// text_inside_range: binary filter is applied to the image so that any pixels within the color range will be turned black, and everything else will be white
+// width_max: return -1 if any character's width is greater than width_max (likely means that two characters are touching, and so are treated as one large character)
+// check_empty_string: if set to true, return -1 (and stop evaluation) if any character returns an empty string from OCR
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,
@@ -35,10 +39,8 @@ int read_number_waterfill(
     bool check_empty_string = false
  );
 
-// applies color filters on the text, until each individual waterfilled character/number is less than width_max. then apply OCR.
-// this solves the problem where characters are too close to each other and touch, causing more than one character to be OCR'ed
-// also, if running OCR on a character results in an empty string, try the next color filter
-// the filters should be arranged in order of preference. (probably should be arranged broadest to narrowest)
+// Try OCR with all the given color filters.
+// Return the best majority candidate
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,
