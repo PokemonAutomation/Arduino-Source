@@ -30,7 +30,9 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language =
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,
-    bool text_inside_range = true
+    bool text_inside_range = true,
+    uint32_t width_max = UINT32_MAX,
+    bool check_empty_string = false
  );
 
 // applies color filters on the text, until each individual waterfilled character/number is less than width_max. then apply OCR.

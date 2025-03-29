@@ -102,97 +102,104 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
 
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
-    uint32_t rgb32_min, uint32_t rgb32_max,
-    bool text_inside_range
+    uint32_t rgb32_min, uint32_t rgb32_max,    
+    bool text_inside_range,
+    uint32_t width_max,
+    bool check_empty_string
 ){
-    const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {rgb32_min, rgb32_max}
-    };
-    return read_number_waterfill(logger, image, filters, UINT32_MAX, text_inside_range);
+    using namespace Kernels::Waterfill;
+
+    //  Direct OCR is unreliable. Instead, we will waterfill each character
+    //  to isolate them, then OCR them individually.
+
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, rgb32_min, rgb32_max, text_inside_range);
+
+//    static int c = 0;
+//    int i = 0;
+//    filtered.save("test-" + std::to_string(c++) + ".png");
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
+
+    std::map<size_t, WaterfillObject> map;
+    {
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+        auto iter = session->make_iterator(20);
+        WaterfillObject object;
+        while (map.size() < 16 && iter->find_next(object, true)){
+            if (object.width() > width_max){
+                logger.log("Skipped this filter: character exceeded max width.");
+                return -1;
+            }
+            map.emplace(object.min_x, std::move(object));
+        }
+    }
+
+    std::string ocr_text;
+    for (const auto& item : map){
+        const WaterfillObject& object = item.second;
+        ImageRGB32 cropped = extract_box_reference(filtered, object).copy();            
+        PackedBinaryMatrix tmp(object.packed_matrix());
+        filter_by_mask(tmp, cropped, Color(0xffffffff), true);
+        ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
+        std::string ocr = OCR::ocr_read(Language::English, padded);
+        // padded.save("test-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
+        // std::cout << ocr[0] << std::endl;
+        if (!ocr.empty()){
+            ocr_text += ocr[0];
+        }else{
+            if (check_empty_string){
+                logger.log("Skipped this filter: empty string.");
+                return -1;
+            }
+        }
+    }
+
+    std::string normalized = run_number_normalization(ocr_text);
+
+    if (normalized.empty()){
+        logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
+        return -1;
+    }
+
+    int number = std::atoi(normalized.c_str());
+    logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
+
+    return number;
 }
 
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
-    std::vector<std::pair<uint32_t, uint32_t>> filters,
-    uint32_t width_max,
+    std::vector<std::pair<uint32_t, uint32_t>> filters,    
+    uint32_t width_max, 
     bool text_inside_range
 ){
-    using namespace Kernels::Waterfill;
+    
 
-
-
+    std::map<int, uint8_t> candidates;
     for (std::pair<uint32_t, uint32_t> filter : filters){
 
         uint32_t rgb32_min = filter.first;
         uint32_t rgb32_max = filter.second;
-        
-        //  Direct OCR is unreliable. Instead, we will waterfill each character
-        //  to isolate them, then OCR them individually.
-
-        ImageRGB32 filtered = to_blackwhite_rgb32_range(image, rgb32_min, rgb32_max, text_inside_range);
-
-    //    static int c = 0;
-    //    int i = 0;
-    //    filtered.save("test-" + std::to_string(c++) + ".png");
-
-        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
-
-        std::map<size_t, WaterfillObject> map;
-        {
-            std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
-            auto iter = session->make_iterator(20);
-            WaterfillObject object;
-            bool exceed_width_max = false;
-            while (map.size() < 16 && iter->find_next(object, true)){
-                if (object.width() > width_max){
-                    exceed_width_max = true;
-                    break;
-                }
-                map.emplace(object.min_x, std::move(object));
-            }
-            if (exceed_width_max){
-                // try the next color filter
-                continue;
-            }
+        int candidate = read_number_waterfill(logger, image, rgb32_min, rgb32_max, text_inside_range, width_max, true);
+        if (candidate != -1){
+            candidates[candidate]++;
         }
-
-        std::string ocr_text;
-        bool empty_char = false;
-        for (const auto& item : map){
-            const WaterfillObject& object = item.second;
-            ImageRGB32 cropped = extract_box_reference(filtered, object).copy();            
-            PackedBinaryMatrix tmp(object.packed_matrix());
-            filter_by_mask(tmp, cropped, Color(0xffffffff), true);
-            ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
-            std::string ocr = OCR::ocr_read(Language::English, padded);
-            // padded.save("test-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
-            // std::cout << ocr[0] << std::endl;
-            if (!ocr.empty()){
-                ocr_text += ocr[0];
-            }else{
-                empty_char = true;
-                break;
-            }
-        }
-        if (empty_char){
-            // try the next color filter
-            continue;
-        }
-
-        std::string normalized = run_number_normalization(ocr_text);
-
-        if (normalized.empty()){
-            logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
-            return -1;
-        }
-
-        int number = std::atoi(normalized.c_str());
-        logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
-
-        return number;
     }
 
-    return -1;
+    if (candidates.empty()){
+        logger.log("Unable to read number.");
+        return -1;
+    }
+
+    std::pair<int, uint8_t> best;
+    for (const auto& item : candidates){
+        if (item.second > best.second){
+            best = item;
+        }
+    }
+
+    logger.log("Best candidate: --------------------------> " + std::to_string(best.first));
+    return best.first;
 }
 
 

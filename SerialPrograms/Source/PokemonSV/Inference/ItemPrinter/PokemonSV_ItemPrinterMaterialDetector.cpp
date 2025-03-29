@@ -119,9 +119,9 @@ int16_t ItemPrinterMaterialDetector::read_number(
             {0xffa0a0a0, 0xffffffff},
             {0xffb0b0b0, 0xffffffff},
             {0xffc0c0c0, 0xffffffff},
-            {0xffd0d0d0, 0xffffffff},
-            {0xffe0e0e0, 0xffffffff},
-            {0xfff0f0f0, 0xffffffff},
+            // {0xffd0d0d0, 0xffffffff},
+            // {0xffe0e0e0, 0xffffffff},
+            // {0xfff0f0f0, 0xffffffff},
         };        
         number = (int16_t)OCR::read_number_waterfill(logger, cropped, filters, 24);
     }
