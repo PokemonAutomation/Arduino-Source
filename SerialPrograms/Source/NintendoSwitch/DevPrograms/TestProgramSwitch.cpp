@@ -313,12 +313,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::terminate();
 
+#if 1
+    ImageRGB32 image("720p1.png");
+    // auto image = feed.snapshot();
+
+    ItemPrinterMaterialDetector detector(COLOR_RED, Language::English);
+
+    std::vector<ImageFloatBox> boxes = {
+        {0.485,0.176758,0.037,0.05}, {0.485,0.250977,0.037,0.05}, {0.485,0.325196,0.037,0.05}, {0.485,0.399415,0.037,0.05}, {0.485,0.473634,0.037,0.05}, {0.485,0.547853,0.037,0.05}, {0.485,0.622072,0.037,0.05}, {0.485,0.696291,0.037,0.05}, {0.485,0.77051,0.037,0.05}, {0.485,0.844729,0.037,0.05}, 
+        // {0.39,0.176758,0.025,0.05}, {0.39,0.250977,0.025,0.05}, {0.39,0.325196,0.025,0.05}, {0.39,0.399415,0.025,0.05}, {0.39,0.473634,0.025,0.05}, {0.39,0.547853,0.025,0.05}, {0.39,0.622072,0.025,0.05}, {0.39,0.696291,0.025,0.05}, {0.39,0.77051,0.025,0.05}, {0.39,0.844729,0.025,0.05}, 
+    };
+    for (ImageFloatBox box : boxes){
+        detector.read_number(console.logger(), env.inference_dispatcher(), image, box);
+    }
+    
+#endif
+
+#if 0
+
     ImageRGB32 image("20250323-011605651979.png");
 
     DialogBoxDetector detector;
     detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;
 
+#endif
 
 
 #if 0
