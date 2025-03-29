@@ -48,6 +48,7 @@ std::string run_number_normalization(const std::string& input){
         {'S', '5'},
         {'s', '5'},
         {'/', '7'},
+        {'g', '9'},
 
         //  Japanese OCR likes to do this.
         {U'🄋', '0'},
@@ -115,8 +116,8 @@ int read_number_waterfill(
     ImageRGB32 filtered = to_blackwhite_rgb32_range(image, rgb32_min, rgb32_max, text_inside_range);
 
 //    static int c = 0;
+//    filtered.save("zztest-" + std::to_string(c++) + ".png");
 //    int i = 0;
-//    filtered.save("test-" + std::to_string(c++) + ".png");
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
 
@@ -142,7 +143,7 @@ int read_number_waterfill(
         filter_by_mask(tmp, cropped, Color(0xffffffff), true);
         ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
         std::string ocr = OCR::ocr_read(Language::English, padded);
-        // padded.save("test-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
+        // padded.save("zztest-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
         // std::cout << ocr[0] << std::endl;
         if (!ocr.empty()){
             ocr_text += ocr[0];

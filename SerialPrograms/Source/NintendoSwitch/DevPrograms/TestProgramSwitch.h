@@ -68,6 +68,8 @@ private:
 
     OCR::LanguageOCROption LANGUAGE;
 
+    StringOption IMAGE_PATH;
+
     StaticTextOption STATIC_TEXT;
 
     StringSelectOption SELECT;
