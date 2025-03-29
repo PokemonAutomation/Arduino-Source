@@ -39,6 +39,7 @@ std::string run_number_normalization(const std::string& input){
         {'9', '9'},
 
         //  Common misreads.
+        {'|', '1'},
         {']', '1'},
         {'l', '1'},
         {'i', '1'},
@@ -173,7 +174,7 @@ int read_number_waterfill(
         ImageRGB32 filtered = to_blackwhite_rgb32_range(image, rgb32_min, rgb32_max, text_inside_range);
 
     //    static int c = 0;
-    //    static int i = 0;
+    //    int i = 0;
     //    filtered.save("test-" + std::to_string(c++) + ".png");
 
         PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
@@ -198,6 +199,7 @@ int read_number_waterfill(
         }
 
         std::string ocr_text;
+        bool empty_char = false;
         for (const auto& item : map){
             const WaterfillObject& object = item.second;
             ImageRGB32 cropped = extract_box_reference(filtered, object).copy();            
@@ -206,10 +208,17 @@ int read_number_waterfill(
             ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
             std::string ocr = OCR::ocr_read(Language::English, padded);
             // padded.save("test-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
-            // std::cout << ocr << std::endl;
+            // std::cout << ocr[0] << std::endl;
             if (!ocr.empty()){
                 ocr_text += ocr[0];
+            }else{
+                empty_char = true;
+                break;
             }
+        }
+        if (empty_char){
+            // try the next color filter
+            continue;
         }
 
         std::string normalized = run_number_normalization(ocr_text);
