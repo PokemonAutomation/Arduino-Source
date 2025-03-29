@@ -8,6 +8,7 @@
 #define PokemonAutomation_CommonTools_OCR_NumberReader_H
 
 #include <stdint.h>
+#include <vector>
 #include "CommonFramework/Language.h"
 
 namespace PokemonAutomation{
@@ -32,6 +33,15 @@ int read_number_waterfill(
     bool text_inside_range = true
  );
 
+// applies color filters on the text, until each individual waterfilled character/number is less than width_max. then apply OCR.
+// this solves the problem where characters are too close to each other and touch, causing more than one character to be OCR'ed
+// the filters should be arranged in order of preference. (probably should be arranged broadest to narrowest)
+int read_number_waterfill(
+    Logger& logger, const ImageViewRGB32& image,
+    std::vector<std::pair<uint32_t, uint32_t>> filters,
+    uint32_t width_max,
+    bool text_inside_range = true
+ );
 
 
 }
