@@ -188,7 +188,7 @@ int read_number_waterfill(
     }
 
     if (candidates.empty()){
-        logger.log("Unable to read number.");
+        logger.log("No valid OCR candidates. Unable to read number.");
         return -1;
     }
 
