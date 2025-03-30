@@ -78,7 +78,7 @@ static const Milliseconds EGG_BUTTON_HOLD_DELAY = 80ms;
 // - Move cursor to the second pokemon in the party, aka first hatched pokemon in the party
 // - Press button Y two times to change pokemon selection to group selection
 static void menu_to_box(ProControllerContext& context, bool from_map){
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
     if (from_map){
         ssf_press_dpad_ptv(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
         ssf_press_dpad_ptv(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
@@ -103,7 +103,7 @@ static void box_to_menu(ProControllerContext& context){
     //  In state (2):   The 1st B will drop the party pokemon. The 2nd B will
     //                  back out of the box.
 
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
 
     ssf_press_button_ptv(context, BUTTON_B, 160ms, EGG_BUTTON_HOLD_DELAY);
     ssf_press_button_ptv(context, BUTTON_B, GameSettings::instance().BOX_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
@@ -116,7 +116,7 @@ static void box_to_menu(ProControllerContext& context){
 }
 
 static void party_to_column(ProControllerContext& context, uint8_t column){
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
 
     ssf_press_dpad_ptv(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     column++;
@@ -131,7 +131,7 @@ static void party_to_column(ProControllerContext& context, uint8_t column){
     }
 }
 static void column_to_party(ProControllerContext& context, uint8_t column){
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
 
     column++;
     if (column <= 3){
@@ -147,7 +147,7 @@ static void column_to_party(ProControllerContext& context, uint8_t column){
 }
 
 static void pickup_column(ProControllerContext& context, char party){
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
 
     ssf_press_button_ptv(context, BUTTON_A, 160ms, EGG_BUTTON_HOLD_DELAY);
     if (party){

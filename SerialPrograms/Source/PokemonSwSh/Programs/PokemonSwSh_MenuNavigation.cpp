@@ -44,7 +44,7 @@ void navigate_to_menu_app(
     const int target_row = (int)target_app_index / 5;
     const int target_col = (int)target_app_index % 5;
     
-    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
 
     const DpadPosition dir = (cur_col < target_col ? DPAD_RIGHT : DPAD_LEFT);
     const int steps = std::abs(cur_col - target_col);

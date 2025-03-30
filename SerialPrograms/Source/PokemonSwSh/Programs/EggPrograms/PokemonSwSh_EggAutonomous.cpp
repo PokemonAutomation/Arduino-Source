@@ -596,7 +596,7 @@ bool EggAutonomous::process_hatched_pokemon(
 
     navigate_to_menu_app(env, env.console, context, POKEMON_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
 
-    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
     const Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
     const Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
 

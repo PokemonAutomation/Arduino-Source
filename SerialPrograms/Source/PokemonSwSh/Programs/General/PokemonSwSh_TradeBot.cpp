@@ -129,11 +129,11 @@ void TradeBot::trade_slot(
 
     //  Move to slot
     while (slot >= 6){
-        ssf_press_dpad(context, DPAD_DOWN, GameSettings::instance().BOX_SCROLL_DELAY0);
+        ssf_press_dpad(context, DPAD_DOWN, GameSettings::instance().BOX_SCROLL_DELAY1);
         slot -= 6;
     }
     while (slot > 0){
-        ssf_press_dpad(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY0);
+        ssf_press_dpad(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY1);
         slot--;
     }
 

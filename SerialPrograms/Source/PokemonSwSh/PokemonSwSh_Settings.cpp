@@ -156,10 +156,10 @@ GameSettings::GameSettings()
         "180 s"
     )
     , m_box_timings("<font size=4><b>Box Timings:</b></font> (for egg programs)")
-    , BOX_SCROLL_DELAY0(
+    , BOX_SCROLL_DELAY1(
         "<b>Box Scroll Delay:</b><br>Delay to move the cursor.",
         LockMode::LOCK_WHILE_RUNNING,
-        "160 ms"
+        "200 ms"
     )
     , BOX_CHANGE_DELAY0(
         "<b>Box Change Delay:</b><br>Delay to change boxes.",
@@ -264,7 +264,7 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(FULL_LOBBY_TIMER0);
 
     PA_ADD_STATIC(m_box_timings);
-    PA_ADD_OPTION(BOX_SCROLL_DELAY0);
+    PA_ADD_OPTION(BOX_SCROLL_DELAY1);
     PA_ADD_OPTION(BOX_CHANGE_DELAY0);
     PA_ADD_OPTION(BOX_PICKUP_DROP_DELAY0);
     PA_ADD_OPTION(MENU_TO_POKEMON_DELAY0);

@@ -54,7 +54,7 @@ uint8_t swap_party(ProControllerContext& context, uint8_t column){
     pickup_column(context, true);
 
     Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY0;
+    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
 
     //  Move to column.
     party_to_column(context, column);

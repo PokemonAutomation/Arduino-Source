@@ -142,7 +142,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         pbf_mash_button(context, BUTTON_B, 1000ms);
 
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-        ssf_press_dpad(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY0, 160ms);
+        ssf_press_dpad(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY1, 160ms);
         ssf_press_button(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, 160ms);
         ssf_press_button(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, 160ms);
         context.wait_for_all_requests();

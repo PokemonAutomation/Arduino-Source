@@ -8,7 +8,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 //#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
-#include "PokemonSwSh/Programs/ReleaseHelpers.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_ReleaseHelpers.h"
 #include "PokemonSwSh_EggCombinedShared.h"
 #include "PokemonSwSh_EggSuperCombined2.h"
 
@@ -113,12 +113,7 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, ProControll
     ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
     ssf_press_button1(context, BUTTON_A, 200);
     ssf_press_button1(context, BUTTON_R, 250);
-    release_boxes(
-        context,
-        BOXES_TO_RELEASE,
-        GameSettings::instance().BOX_SCROLL_DELAY0,
-        GameSettings::instance().BOX_CHANGE_DELAY0
-    );
+    release_boxes(context, BOXES_TO_RELEASE);
 
     //  Skip Boxes
     for (uint8_t c = 0; c <= BOXES_TO_SKIP; c++){

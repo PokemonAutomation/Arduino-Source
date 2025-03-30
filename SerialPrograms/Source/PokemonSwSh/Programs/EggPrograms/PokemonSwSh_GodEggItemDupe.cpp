@@ -9,9 +9,8 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
-#include "PokemonSwSh/Programs/ReleaseHelpers.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_ReleaseHelpers.h"
 #include "PokemonSwSh_GodEggItemDupe.h"
 
 namespace PokemonAutomation{

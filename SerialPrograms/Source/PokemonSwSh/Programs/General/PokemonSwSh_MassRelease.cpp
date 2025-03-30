@@ -8,7 +8,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
-#include "PokemonSwSh/Programs/ReleaseHelpers.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_ReleaseHelpers.h"
 #include "PokemonSwSh_MassRelease.h"
 
 namespace PokemonAutomation{
@@ -57,12 +57,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         pbf_press_button(context, BUTTON_LCLICK, 5, 5);
     }
 
-    release_boxes(
-        context,
-        BOXES_TO_RELEASE,
-        GameSettings::instance().BOX_SCROLL_DELAY0,
-        GameSettings::instance().BOX_CHANGE_DELAY0
-    );
+    release_boxes(context, BOXES_TO_RELEASE);
     pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().HOME_TO_GAME_DELAY0);
 }
 
