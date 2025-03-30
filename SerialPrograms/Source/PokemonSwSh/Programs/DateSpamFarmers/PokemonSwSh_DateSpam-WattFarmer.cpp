@@ -53,10 +53,10 @@ WattFarmer::WattFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         33334
     )
-    , SAVE_ITERATIONS(
+    , SAVE_ITERATIONS0(
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
         LockMode::LOCK_WHILE_RUNNING,
-        0, 0
+        100
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -66,7 +66,7 @@ WattFarmer::WattFarmer()
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(EXIT_DEN_WAIT);
     PA_ADD_OPTION(SKIPS);
-    PA_ADD_OPTION(SAVE_ITERATIONS);
+    PA_ADD_OPTION(SAVE_ITERATIONS0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -90,9 +90,9 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         ssf_press_button_ptv(context, BUTTON_A, 40ms);
         pbf_mash_button(context, BUTTON_B, EXIT_DEN_WAIT);
 
-        if (SAVE_ITERATIONS != 0){
+        if (SAVE_ITERATIONS0 != 0){
             save_count++;
-            if (save_count >= SAVE_ITERATIONS){
+            if (save_count >= SAVE_ITERATIONS0){
                 save_count = 0;
                 pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
                 pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);

@@ -40,10 +40,10 @@ StowOnSideFarmer::StowOnSideFarmer()
         LockMode::LOCK_WHILE_RUNNING,
         100000
     )
-    , SAVE_ITERATIONS(
+    , SAVE_ITERATIONS0(
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
         LockMode::LOCK_WHILE_RUNNING,
-        0, 0
+        100
     )
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -51,7 +51,7 @@ StowOnSideFarmer::StowOnSideFarmer()
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(SKIPS);
-    PA_ADD_OPTION(SAVE_ITERATIONS);
+    PA_ADD_OPTION(SAVE_ITERATIONS0);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -74,9 +74,9 @@ void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
         pbf_mash_button(context, BUTTON_ZL, 385);
         pbf_mash_button(context, BUTTON_B, 700);
 
-        if (SAVE_ITERATIONS != 0){
+        if (SAVE_ITERATIONS0 != 0){
             save_count++;
-            if (save_count >= SAVE_ITERATIONS){
+            if (save_count >= SAVE_ITERATIONS0){
                 save_count = 0;
                 pbf_mash_button(context, BUTTON_B, 2000ms);
                 pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);

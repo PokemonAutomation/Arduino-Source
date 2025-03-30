@@ -34,7 +34,7 @@ private:
     StartInGripOrGameOption START_LOCATION;
 
     SimpleIntegerOption<uint32_t> SKIPS;
-    SimpleIntegerOption<uint16_t> SAVE_ITERATIONS;
+    SimpleIntegerOption<uint16_t> SAVE_ITERATIONS0;
 
     EventNotificationsOption NOTIFICATIONS;
 };

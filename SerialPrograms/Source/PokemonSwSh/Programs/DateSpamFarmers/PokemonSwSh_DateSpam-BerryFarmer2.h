@@ -56,7 +56,7 @@ private:
     StartInGripOrGameOption START_LOCATION;
 
     SimpleIntegerOption<uint32_t> FETCH_ATTEMPTS;
-    SimpleIntegerOption<uint16_t> SAVE_ITERATIONS;
+    SimpleIntegerOption<uint16_t> SAVE_ITERATIONS0;
 
     EncounterBotLanguage LANGUAGE;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;

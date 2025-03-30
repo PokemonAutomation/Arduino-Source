@@ -74,10 +74,10 @@ BerryFarmer2::BerryFarmer2()
         LockMode::UNLOCK_WHILE_RUNNING,
         100000
     )
-    , SAVE_ITERATIONS(
+    , SAVE_ITERATIONS0(
         "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
         LockMode::UNLOCK_WHILE_RUNNING,
-        0
+        100
     )
     , ENCOUNTER_BOT_OPTIONS(false, true)
     , NOTIFICATIONS({
@@ -125,7 +125,7 @@ BerryFarmer2::BerryFarmer2()
     PA_ADD_OPTION(REQUIRES_AUDIO);
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(FETCH_ATTEMPTS);
-    PA_ADD_OPTION(SAVE_ITERATIONS);
+    PA_ADD_OPTION(SAVE_ITERATIONS0);
 
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
@@ -330,7 +330,7 @@ void BerryFarmer2::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
         c += iteration_attempts;
 
-        uint16_t save_iterations = SAVE_ITERATIONS;
+        uint16_t save_iterations = SAVE_ITERATIONS0;
         if (save_iterations != 0){
             save_count += iteration_attempts;
             if (save_count >= save_iterations){
