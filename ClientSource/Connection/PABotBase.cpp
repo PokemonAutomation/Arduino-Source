@@ -16,6 +16,12 @@
 //using std::cout;
 //using std::endl;
 
+
+//  Intentionally drop some messages to test self-recovery.
+//#define INTENTIONALLY_DROP_MESSAGES
+
+
+
 // #define DEBUG_STACK_TRACE
 
 #ifdef DEBUG_STACK_TRACE
@@ -264,7 +270,7 @@ void PABotBase::clear_all_active_commands(uint64_t seqnum){
             seqnum_t seqnum_s = (seqnum_t)iter->first;
             memcpy(&message.body[0], &seqnum_s, sizeof(seqnum_t));
 
-//                cout << "removing = " << seqnum_s << ", " << (int)iter->second.state << endl;
+//            cout << "removing = " << seqnum_s << ", " << (int)iter->second.state << endl;
 
             std::pair<std::map<uint64_t, PendingRequest>::iterator, bool> ret = m_pending_requests.emplace(
                 std::piecewise_construct,
@@ -449,7 +455,15 @@ void PABotBase::process_command_finished(BotBaseMessage message){
     std::lock_guard<std::mutex> lg0(m_sleep_lock);
     WriteSpinLock lg1(m_state_lock, "PABotBase::process_command_finished() - 0");
 
+#ifdef INTENTIONALLY_DROP_MESSAGES
+    if (rand() % 10 != 0){
+        send_message(BotBaseMessage(PABB_MSG_ACK_REQUEST, std::string((char*)&ack, sizeof(ack))), false);
+    }else{
+        m_logger.log("Intentionally dropping finish ack: " + std::to_string(seqnum), COLOR_RED);
+    }
+#else
     send_message(BotBaseMessage(PABB_MSG_ACK_REQUEST, std::string((char*)&ack, sizeof(ack))), false);
+#endif
 
     if (m_pending_commands.empty()){
         m_sniffer->log(
@@ -664,7 +678,7 @@ uint64_t PABotBase::try_issue_request(
 
     //  Too many unacked requests in flight.
     if (inflight_requests() >= queue_limit){
-        m_logger.log("Message throttled due to too many inflight requests.");
+//        m_logger.log("Message throttled due to too many inflight requests.");
         return 0;
     }
 
@@ -694,7 +708,15 @@ uint64_t PABotBase::try_issue_request(
     handle.request = std::move(message);
     handle.first_sent = current_time();
 
+#ifdef INTENTIONALLY_DROP_MESSAGES
+    if (rand() % 10 != 0){
+        send_message(handle.request, false);
+    }else{
+        m_logger.log("Intentionally dropping request: " + std::to_string(seqnum), COLOR_RED);
+    }
+#else
     send_message(handle.request, false);
+#endif
 
     return seqnum;
 }
@@ -735,7 +757,7 @@ uint64_t PABotBase::try_issue_command(
 
     //  Too many unacked requests in flight.
     if (inflight_requests() >= queue_limit){
-        m_logger.log("Message throttled due to too many inflight requests.");
+//        m_logger.log("Message throttled due to too many inflight requests.");
         return 0;
     }
 
@@ -765,7 +787,15 @@ uint64_t PABotBase::try_issue_command(
     handle.request = std::move(message);
     handle.first_sent = current_time();
 
+#ifdef INTENTIONALLY_DROP_MESSAGES
+    if (rand() % 10 != 0){
+        send_message(handle.request, false);
+    }else{
+        m_logger.log("Intentionally dropping command: " + std::to_string(seqnum), COLOR_RED);
+    }
+#else
     send_message(handle.request, false);
+#endif
 
     return seqnum;
 }
