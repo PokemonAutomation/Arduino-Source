@@ -17,9 +17,9 @@
 #include "OCR_RawOCR.h"
 #include "OCR_NumberReader.h"
 
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace OCR{
@@ -39,6 +39,7 @@ std::string run_number_normalization(const std::string& input){
         {'9', '9'},
 
         //  Common misreads.
+        {'|', '1'},
         {']', '1'},
         {'l', '1'},
         {'i', '1'},
@@ -47,6 +48,7 @@ std::string run_number_normalization(const std::string& input){
         {'S', '5'},
         {'s', '5'},
         {'/', '7'},
+        {'g', '9'},
 
         //  Japanese OCR likes to do this.
         {U'🄋', '0'},
@@ -101,8 +103,10 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
 
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
-    uint32_t rgb32_min, uint32_t rgb32_max,
-    bool text_inside_range
+    uint32_t rgb32_min, uint32_t rgb32_max,    
+    bool text_inside_range,
+    uint32_t width_max,
+    bool check_empty_string
 ){
     using namespace Kernels::Waterfill;
 
@@ -112,7 +116,8 @@ int read_number_waterfill(
     ImageRGB32 filtered = to_blackwhite_rgb32_range(image, rgb32_min, rgb32_max, text_inside_range);
 
 //    static int c = 0;
-//    filtered.save("test-" + std::to_string(c++) + ".png");
+//    filtered.save("zztest-" + std::to_string(c++) + ".png");
+//    int i = 0;
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(filtered, 0xff000000, 0xff7f7f7f);
 
@@ -122,6 +127,10 @@ int read_number_waterfill(
         auto iter = session->make_iterator(20);
         WaterfillObject object;
         while (map.size() < 16 && iter->find_next(object, true)){
+            if (object.width() > width_max){
+                logger.log("Skipped this filter: character exceeded max width.");
+                return -1;
+            }
             map.emplace(object.min_x, std::move(object));
         }
     }
@@ -129,13 +138,20 @@ int read_number_waterfill(
     std::string ocr_text;
     for (const auto& item : map){
         const WaterfillObject& object = item.second;
-        ImageRGB32 cropped = extract_box_reference(filtered, object).copy();
+        ImageRGB32 cropped = extract_box_reference(filtered, object).copy();            
         PackedBinaryMatrix tmp(object.packed_matrix());
         filter_by_mask(tmp, cropped, Color(0xffffffff), true);
         ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
         std::string ocr = OCR::ocr_read(Language::English, padded);
+        // padded.save("zztest-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
+        // std::cout << ocr[0] << std::endl;
         if (!ocr.empty()){
             ocr_text += ocr[0];
+        }else{
+            if (check_empty_string){
+                logger.log("Skipped this filter: empty string.");
+                return -1;
+            }
         }
     }
 
@@ -150,6 +166,41 @@ int read_number_waterfill(
     logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
 
     return number;
+}
+
+int read_number_waterfill(
+    Logger& logger, const ImageViewRGB32& image,
+    std::vector<std::pair<uint32_t, uint32_t>> filters,    
+    uint32_t width_max, 
+    bool text_inside_range
+){
+    
+
+    std::map<int, uint8_t> candidates;
+    for (std::pair<uint32_t, uint32_t> filter : filters){
+
+        uint32_t rgb32_min = filter.first;
+        uint32_t rgb32_max = filter.second;
+        int candidate = read_number_waterfill(logger, image, rgb32_min, rgb32_max, text_inside_range, width_max, true);
+        if (candidate != -1){
+            candidates[candidate]++;
+        }
+    }
+
+    if (candidates.empty()){
+        logger.log("No valid OCR candidates. Unable to read number.");
+        return -1;
+    }
+
+    std::pair<int, uint8_t> best;
+    for (const auto& item : candidates){
+        if (item.second > best.second){
+            best = item;
+        }
+    }
+
+    logger.log("Best candidate: --------------------------> " + std::to_string(best.first));
+    return best.first;
 }
 
 

@@ -18,7 +18,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_ItemPrinterMaterialDetector.h"
 
-//#include <iostream>
+// #include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -69,7 +69,9 @@ std::array<ImageFloatBox, 10> ItemPrinterMaterialDetector::Material_Boxes(ImageF
     for (size_t i = 0; i < 10; i++){
         double y = initial_y + i*y_spacing;
         material_boxes[i] = ImageFloatBox(x, y, width, height);
+        // std::cout << "{" << x << "," << y << "," << width << "," << height << "}, ";
     }
+    // std::cout << std::endl;
     return material_boxes;
 }
 
@@ -98,9 +100,36 @@ int16_t ItemPrinterMaterialDetector::read_number(
 
     int16_t number;
     if (is_dark_text_light_background){
-        number = (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff000000, 0xff808080);
+        const std::vector<std::pair<uint32_t, uint32_t>> filters = {
+            // {0xff000000, 0xffb0b0b0},
+            {0xff000000, 0xffa0a0a0},
+            {0xff000000, 0xff959595},
+            {0xff000000, 0xff909090},
+            {0xff000000, 0xff858585},
+            {0xff000000, 0xff808080},
+            // {0xff000000, 0xff707070},
+            // {0xff000000, 0xff606060},
+            // {0xff000000, 0xff505050},
+            // {0xff000000, 0xff404040},
+            // {0xff000000, 0xff303030},
+            // {0xff000000, 0xff202020},
+            // {0xff000000, 0xff101010},
+        };
+        number = (int16_t)OCR::read_number_waterfill(logger, cropped, filters, 24);
     }else{
-        number = (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff808080, 0xffffffff);
+        const std::vector<std::pair<uint32_t, uint32_t>> filters = {
+            {0xff808080, 0xffffffff},
+            {0xff858585, 0xffffffff},
+            {0xff909090, 0xffffffff},
+            {0xff959595, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
+            // {0xffb0b0b0, 0xffffffff},
+            // {0xffc0c0c0, 0xffffffff},
+            // {0xffd0d0d0, 0xffffffff},
+            // {0xffe0e0e0, 0xffffffff},
+            // {0xfff0f0f0, 0xffffffff},
+        };        
+        number = (int16_t)OCR::read_number_waterfill(logger, cropped, filters, 24);
     }
 
     if (number < 1 || number > 999){

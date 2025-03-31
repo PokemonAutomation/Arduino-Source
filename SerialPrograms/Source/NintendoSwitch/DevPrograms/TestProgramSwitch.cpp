@@ -219,6 +219,7 @@ TestProgram::TestProgram()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
     , STATIC_TEXT("Test text...")
     , SELECT("String Select", test_database(), LockMode::LOCK_WHILE_RUNNING, 0)
 //    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
@@ -258,6 +259,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(BUTTON0);
     PA_ADD_OPTION(BUTTON1);
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(IMAGE_PATH);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(SELECT);
 //    PA_ADD_OPTION(PLAYER_LIST);
@@ -313,12 +315,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::terminate();
 
+#if 1
+    // ImageRGB32 image(IMAGE_PATH);
+    auto image = feed.snapshot();
+
+    ItemPrinterMaterialDetector detector(COLOR_RED, Language::English);
+
+    std::vector<ImageFloatBox> boxes = {
+        // {0.485,0.176758,0.037,0.05}, {0.485,0.250977,0.037,0.05}, {0.485,0.325196,0.037,0.05}, {0.485,0.399415,0.037,0.05}, {0.485,0.473634,0.037,0.05}, {0.485,0.547853,0.037,0.05}, {0.485,0.622072,0.037,0.05}, {0.485,0.696291,0.037,0.05}, {0.485,0.77051,0.037,0.05}, {0.485,0.844729,0.037,0.05}, 
+        {0.39,0.176758,0.025,0.05}, {0.39,0.250977,0.025,0.05}, {0.39,0.325196,0.025,0.05}, {0.39,0.399415,0.025,0.05}, {0.39,0.473634,0.025,0.05}, {0.39,0.547853,0.025,0.05}, {0.39,0.622072,0.025,0.05}, {0.39,0.696291,0.025,0.05}, {0.39,0.77051,0.025,0.05}, {0.39,0.844729,0.025,0.05}, 
+    };
+    for (ImageFloatBox box : boxes){
+        detector.read_number(console.logger(), env.inference_dispatcher(), image, box);
+    }
+    
+#endif
+
+#if 0
+
     ImageRGB32 image("20250323-011605651979.png");
 
     DialogBoxDetector detector;
     detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;
 
+#endif
 
 
 #if 0
