@@ -107,7 +107,12 @@ void roll_date_forward_1(ProControllerContext& context, bool fast){
         Milliseconds unit = 34ms + tv;
 
         ssf_press_button(context, BUTTON_A, 160ms, 3*unit);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 0ms, 2*unit, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
+
+        //  Left scroll in case we missed the date menu and landed in the
+        //  language change.
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
+
         ssf_press_button(context, BUTTON_A, unit);
     //    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
@@ -123,6 +128,11 @@ void roll_date_forward_1(ProControllerContext& context, bool fast){
     default:{
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
+
+        //  Left scroll in case we missed the date menu and landed in the
+        //  language change.
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
+
         ssf_press_button_ptv(context, BUTTON_A);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
@@ -171,9 +181,15 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
         Milliseconds unit = 32ms + tv;
 
         ssf_press_button(context, BUTTON_A, 160ms, 3*unit);
+
         for (uint8_t c = 0; c < skips - 1; c++){
             ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
         }
+
+        //  Left scroll in case we missed the date menu and landed in the
+        //  language change.
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
+
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0ms, 2*unit, unit);
         ssf_press_button(context, BUTTON_A, unit);
 //        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
@@ -198,6 +214,11 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
                 ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
             }
         }
+
+        //  Left scroll in case we missed the date menu and landed in the
+        //  language change.
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
+
         ssf_press_button_ptv(context, BUTTON_A);
 //        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
