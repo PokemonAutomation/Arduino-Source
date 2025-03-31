@@ -34,7 +34,7 @@ ButtonDiagram::ButtonDiagram(QWidget* parent)
     connect(
         pro_controller, &QMenu::aboutToShow,
         this, [this](){
-            set_image("/NintendoSwitch/Layout-ProController.jpg");
+            set_image("/NintendoSwitch/Layout-ProController.png");
         }
     );
     connect(
