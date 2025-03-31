@@ -6,10 +6,12 @@ Source code for the "Computer Control" programs.
 
 ## How to Build
 
-Currently, we build with Qt 6.8.2. But we still retain compatibility with Qt 5.12.
+Currently, we build with Qt 6.8.3. But we still retain compatibility with Qt 5.12.
 
 **Windows:**
 
+- [How to Build (Qt 6.8.3) - Windows](BuildInstructions/Build-Windows-Qt6.8.3.md)
+- [How to Build (Qt 6.8.2) - Windows](BuildInstructions/Build-Windows-Qt6.8.2.md)
 - [How to Build (Qt 6.8.1) - Windows](BuildInstructions/Build-Windows-Qt6.8.1.md)
 - [How to Build (Qt 6.8.0) - Windows](BuildInstructions/Build-Windows-Qt6.8.0.md)
 - [How to Build (Qt 6.7.3) - Windows](BuildInstructions/Build-Windows-Qt6.7.3.md)
