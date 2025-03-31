@@ -375,8 +375,14 @@ int register_message_converters_custom_info(){
             ss << "PABB_MSG_INFO_I32 - ";
             if (body.size() != sizeof(pabb_MsgInfoI32)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_MsgInfoI32*)body.c_str();
-            ss << "tag = " << (unsigned)params->tag;
-            ss << ", data = " << params->data;
+            switch (params->tag){
+            case PABB_MSG_INFO_I32_TAG_SCHEDULE_THROTTLED:
+                ss << "Command schedule throttled by: " << params->data;
+                break;
+            default:
+                ss << "tag = " << (unsigned)params->tag;
+                ss << ", data = " << params->data;
+            }
             return ss.str();
         }
     );
@@ -385,16 +391,38 @@ int register_message_converters_custom_info(){
         [](const std::string& body){
             std::ostringstream ss;
             ss << "PABB_MSG_INFO_DATA - ";
-//            if (body.size() != sizeof(pabb_MsgInfoData)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_MsgInfoData*)body.c_str();
-            ss << "tag = " << (uint64_t)params->tag;
-            ss << ", bytes = " << body.size() - sizeof(seqnum_t);
+            ss << "tag = " << (uint32_t)params->tag;
+            ss << ", bytes = " << body.size() - sizeof(uint32_t);
             ss << ", data =";
             static const char HEX_DIGITS[] = "0123456789abcdef";
             for (size_t c = sizeof(seqnum_t); c < body.size(); c++){
                 uint8_t byte = body[c];
                 ss << " " << HEX_DIGITS[(byte >> 4)] << HEX_DIGITS[byte & 15];
             }
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_INFO_STRING,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_INFO_STRING - ";
+            ss << body;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_INFO_I32_LABEL,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_INFO_I32_LABEL - ";
+            if (body.size() < sizeof(uint32_t)){
+                ss << "(invalid size)" << std::endl; return ss.str();
+            }
+            const auto* params = (const pabb_MsgInfoI32Label*)body.c_str();
+            ss << std::string(body.data() + sizeof(uint32_t), body.size() - sizeof(uint32_t));
+            ss << ": " << params->value;
             return ss.str();
         }
     );
