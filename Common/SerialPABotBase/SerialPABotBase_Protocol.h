@@ -246,11 +246,20 @@ typedef struct{
 typedef struct{
     uint8_t tag;
     uint32_t data;
+#define PABB_MSG_INFO_I32_TAG_SCHEDULE_THROTTLED    0xff
 } PABB_PACK pabb_MsgInfoI32;
+
 #define PABB_MSG_INFO_DATA                      0x21
 typedef struct{
     uint32_t tag;
 } PABB_PACK pabb_MsgInfoData;
+
+#define PABB_MSG_INFO_STRING                    0x23
+
+#define PABB_MSG_INFO_I32_LABEL                 0x24
+typedef struct{
+    uint32_t value;
+} PABB_PACK pabb_MsgInfoI32Label;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Requests
