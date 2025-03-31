@@ -2315,6 +2315,10 @@ if (MSVC)
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_17_Skylake)
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_19_IceLake)
 
+    # Visual Leak Detector
+    target_compile_definitions(SerialPrograms PRIVATE VISUAL_LEAK_DETECTOR)
+    target_link_libraries(SerialPrograms PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/vld.lib)
+
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX2   /DPA_Arch_x64_AVX2)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
