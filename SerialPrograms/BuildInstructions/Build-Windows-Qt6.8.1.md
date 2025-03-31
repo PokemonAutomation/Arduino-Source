@@ -1,7 +1,5 @@
 # How to Build (Qt 6.8.1) - Windows
 
-**(Note: These instructions have not been fully tested for 6.8.1. Let us know if you encounter any issues.)**
-
 ## Build Tools:
 
 The installation order here is important. While other orderings may work, this is the specific order that we have tested. And the Qt installation must be the last thing installed.
