@@ -193,7 +193,7 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
     }
 
     for (const BoxSortingSelection preference : *lhs->preferences){
-        bool ret = true;
+        std::optional<bool> ret{};
         switch(preference.sort_type){
         // NOTE edit when adding new struct members
         case BoxSortingSortType::NationalDexNo:
@@ -228,10 +228,13 @@ bool operator<(const std::optional<Pokemon>& lhs, const std::optional<Pokemon>& 
             }
             break;
         }
-        if (preference.reverse){
-            return !ret;
-        }else{
-            return ret;
+        if (ret.has_value()){
+            bool value = *ret;
+            if (preference.reverse){
+                return !value;
+            }else{
+                return value;
+            }
         }
     }
 
