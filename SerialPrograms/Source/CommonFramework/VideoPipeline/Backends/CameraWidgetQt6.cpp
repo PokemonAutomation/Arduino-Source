@@ -289,6 +289,7 @@ void CameraSession::startup(){
     }
     if (device == nullptr){
         m_logger.log("Camera not found: " + m_device.device_name(), COLOR_RED);
+        m_device.clear();
         return;
     }
 
