@@ -96,13 +96,13 @@ If you have already have older versions of Qt installed, but need to upgrade Qt 
 - Open the `SerialPrograms` project in Qt, as outlined in the "Setup" section above.
 - In the toolbar, click `Edit` -> `Preferences`
 - Under `Kits` tab, choose the newer Qt version (e.g. Desktop Qt 6.8.3)
-<img src="images/QT-kits.png">
+<img src="Images/QT-kits.png">
 
 - Under `Compiler`, set it to Microsoft Visual C++ Compiler or Visual Studio, if not already set.
     - If you recently installed new compilers, go to the `Compilers` tab, click `Re-dedect`, then click `Apply` in the bottom right. Back in the `Kits` tab, your newly installed compilers should now show up in the list of compilers.
 - Click `Ok`, to save Kits preferences.
 - Click the Monitor symbol at the bottom left
-<img src="images/QT-kit-build.png">
+<img src="Images/QT-kit-build.png">
 
 - Under `Kit`: choose the desired Qt version.
 - Under `Build`: choose `Release with Debug Information`
