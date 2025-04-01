@@ -83,6 +83,32 @@ If you are unable or unwilling to use the online installer, the alternative is t
     - to: `Arduino-Source/build-SerialPrograms-Desktop_Qt_6_8_3_MSVC2022_64bit-RelWithDebInfo`
 
 
+## Upgrading Qt components
+
+### Installing newer Qt version
+If you have already have older versions of Qt installed, but need to upgrade Qt components, you can use the Maintenance tool, which comes pre-instaled with Qt (C:\Qt\MaintenanceTool.exe).
+
+- When prompted, in `Maintenance Actions`, choose `Add or remove components`.
+- You may select the components needed, as per the instructions above, for the newer version. And de-select old versions to remove them, if you wish.
+- Optional: In `Maintenance Actions`, you may also choose `Update components` as well. To update Qt Creator, and other components.
+
+### Building with the newer Qt version
+- Open the `SerialPrograms` project in Qt, as outlined in the "Setup" section above.
+- In the toolbar, click `Edit` -> `Preferences`
+- Under `Kits` tab, choose the newer Qt version (e.g. Desktop Qt 6.8.3)
+<img src="images/QT-kits.png">
+
+- Under `Compiler`, set it to Microsoft Visual C++ Compiler, if not already set.
+- Click `Ok`.
+- Click the Monitor symbol at the bottom left
+<img src="images/QT-kit-build.png">
+
+- Under `Kit`: choose the desired Qt version.
+- Under `Build`: choose `Release with Debug Information`
+- Click the green arrow to compile and launch the program.
+- Optional: Move the `UserSettings` folder from the old build folder to the new build folder, to keep your old settings, such as the dev key.
+
+
 <hr>
 
 **Discord Server:** 
