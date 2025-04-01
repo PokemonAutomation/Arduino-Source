@@ -6,6 +6,7 @@ SerialPrograms/bin/
 .DS_Store
 
 build-*/
+build/
 
 # Qt config file on a user basis
 *.pro.user
