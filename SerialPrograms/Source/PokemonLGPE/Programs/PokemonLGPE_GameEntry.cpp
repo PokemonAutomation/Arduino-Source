@@ -107,7 +107,6 @@ bool reset_game_from_home(
             "reset_game_from_home(): Right Joycon required.",
             stream
         );
-        return false;
     }
     bool ok = true;
     ok &= reset_game_to_gamemenu(stream, context);
