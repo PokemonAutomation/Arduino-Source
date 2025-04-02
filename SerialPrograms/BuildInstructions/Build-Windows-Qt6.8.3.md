@@ -99,7 +99,6 @@ If you have already have older versions of Qt installed, but need to upgrade Qt 
 <img src="Images/QT-kits.png">
 
 - Under `Compiler`, set it to Microsoft Visual C++ Compiler or Visual Studio, if not already set.
-    - If you recently installed new compilers, go to the `Compilers` tab, click `Re-dedect`, then click `Apply` in the bottom right. Back in the `Kits` tab, your newly installed compilers should now show up in the list of compilers.
 - Click `Ok`, to save Kits preferences.
 - Click the Monitor symbol at the bottom left
 <img src="Images/QT-kit-build.png">
@@ -109,6 +108,14 @@ If you have already have older versions of Qt installed, but need to upgrade Qt 
 - Click the green arrow to compile and launch the program.
 - Optional: Move the `UserSettings` folder from the old build folder to the new build folder, to keep your old settings, such as the dev key.
 
+### Upgrade compiler
+- Upgrade the compiler by installing a new version of Visual Studio. Ensure `Desktop development with C++` is checked, so the latest MSVC compiler is also installed.
+- Open the `SerialPrograms` project in Qt, as outlined in the "Setup" section above.
+- In the toolbar, click `Edit` -> `Preferences`
+- Click the `Kits` tab on the left. Then click the `Compilers` tab, click `Re-detect` to refresh the list of compilers. Then click `Apply` in the bottom right. 
+- Back in the `Kits` tab, your newly installed compilers should now show up in the list of compilers.
+
+When building, if you get the error `yvals_core.h:931: error: STL1001: Unexpected compiler version, expected MSVC 19.42 or newer` (or something similar), consider deleting the old build folder, and rebuilding from scratch.
 
 <hr>
 
