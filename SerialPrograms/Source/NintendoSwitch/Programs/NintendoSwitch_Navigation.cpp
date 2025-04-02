@@ -110,14 +110,20 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
             return;
         }
 
+        //  Double up this A press in case one is dropped.
+        ssf_press_button(context, BUTTON_A, unit);
         ssf_press_button(context, BUTTON_A, unit);
         {
-            auto iterations = Milliseconds(216) / unit + 1;
+            auto iterations = Milliseconds(240) / unit + 1;
             do{
                 ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
             }while (--iterations);
         }
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+
+        //  Left scroll in case we missed the date menu and landed in the
+        //  language change.
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
+
         break;
     }
     default:{
