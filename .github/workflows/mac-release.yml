@@ -55,9 +55,12 @@ jobs:
           brew install tesseract-lang
           brew install opencv
 
+      - name: Get QT Version
+        run: echo "QT_VERSION=${{ github.event.inputs.qt_version || '6.8.2' }}" >> $GITHUB_ENV
+
       - uses: jurplel/install-qt-action@v4
         with:
-          version: ${{ github.event.inputs.qt_version || "6.8.2"}}
+          version: ${{ env.QT_VERSION }}
           modules: 'qtmultimedia qtserialport'
 
       - name: Build SerialPrograms.app
