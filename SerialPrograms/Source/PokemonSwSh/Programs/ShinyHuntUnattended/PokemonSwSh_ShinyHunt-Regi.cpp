@@ -81,7 +81,7 @@ void regieleki(ProControllerContext& context){
 void regidrago(ProControllerContext& context){
     pbf_move_left_joystick(context, 16, 255, 160, 0);
     pbf_move_left_joystick(context, 72, 255, 50, 0);
-    pbf_move_left_joystick(context, 48, 255, 105, 0);
+    pbf_move_left_joystick(context, 48, 255, 106, 0);
     pbf_move_left_joystick(context, 128, 0, 48, 0);
     pbf_move_left_joystick(context, 0, 56, 60, 0);
     pbf_move_left_joystick(context, 64, 0, 60, 0);
