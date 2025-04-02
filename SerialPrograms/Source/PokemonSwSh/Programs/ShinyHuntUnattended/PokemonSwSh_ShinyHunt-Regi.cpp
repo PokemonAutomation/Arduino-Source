@@ -85,7 +85,8 @@ void regidrago(ProControllerContext& context){
     pbf_move_left_joystick(context, 128, 0, 48, 0);
     pbf_move_left_joystick(context, 0, 56, 60, 0);
     pbf_move_left_joystick(context, 64, 0, 60, 0);
-    pbf_move_left_joystick(context, 255, 148, 75, 0);
+    pbf_move_left_joystick(context, 255, 152, 80, 0);
+    pbf_move_left_joystick(context, 128, 0, 20, 0);
     pbf_mash_button(context, BUTTON_A, 5000ms);
     pbf_move_left_joystick(context, 128, 0, 180, 0);
 }
