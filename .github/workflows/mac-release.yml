@@ -35,7 +35,7 @@ on:
 
 jobs:
   build:
-    runs-on: ${{ github.event.inputs.runner }}
+    runs-on: ${{ github.event.inputs.runner || 'macos-13'}}
     steps:
       - name: Checkout Arduino-Source
         uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
 
       - uses: jurplel/install-qt-action@v4
         with:
-          version: ${{ github.event.inputs.qt_version }}
+          version: ${{ github.event.inputs.qt_version || "6.8.2"}}
           modules: 'qtmultimedia qtserialport'
 
       - name: Build SerialPrograms.app
@@ -66,7 +66,7 @@ jobs:
           mkdir bin
           cd bin
           cmake .. -DUNIX_LINK_TESSERACT:BOOL=true -DCMAKE_BUILD_TYPE:STRING=Release
-          cmake --build . -j ${{ github.event.inputs.jobs }}
+          cmake --build . -j ${{ github.event.inputs.jobs || 4}}
           cp -r SerialPrograms.app ../../../SerialPrograms.app
 
       # Important: GitHub MacOS runners do not have the lib area in its rpath by default. It must manually be added for frameworks to be discovered and added to the bundle
