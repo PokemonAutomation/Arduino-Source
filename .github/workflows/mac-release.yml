@@ -1,9 +1,9 @@
 name: SerialPrograms MacOS Release
 
 on:
-  push:
-    tags:
-      # Start MacOS release flow when a new version tag is created
+  create:
+    branch:
+      # Start MacOS release flow when a new version branch is created
       - 'v*'
   workflow_dispatch:
     # Manual release / testing
@@ -125,5 +125,5 @@ jobs:
         with:
           files: SerialPrograms-Installer.dmg
           # Tag should be automatically set in the case of a tag push
-          tag_name: ${{ github.event.inputs.version }}
+          tag_name: ${{ github.event.inputs.version || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
