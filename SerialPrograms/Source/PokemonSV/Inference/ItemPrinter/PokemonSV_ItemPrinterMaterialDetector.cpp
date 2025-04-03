@@ -115,7 +115,7 @@ int16_t ItemPrinterMaterialDetector::read_number(
             // {0xff000000, 0xff202020},
             // {0xff000000, 0xff101010},
         };
-        number = (int16_t)OCR::read_number_waterfill(logger, cropped, filters, 24);
+        number = (int16_t)OCR::read_number_waterfill_multifilter(logger, cropped, filters, 24);
     }else{
         const std::vector<std::pair<uint32_t, uint32_t>> filters = {
             {0xff808080, 0xffffffff},
@@ -129,7 +129,7 @@ int16_t ItemPrinterMaterialDetector::read_number(
             // {0xffe0e0e0, 0xffffffff},
             // {0xfff0f0f0, 0xffffffff},
         };        
-        number = (int16_t)OCR::read_number_waterfill(logger, cropped, filters, 24);
+        number = (int16_t)OCR::read_number_waterfill_multifilter(logger, cropped, filters, 24);
     }
 
     if (number < 1 || number > 999){
