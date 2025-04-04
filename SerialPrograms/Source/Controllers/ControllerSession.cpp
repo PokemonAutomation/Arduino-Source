@@ -265,6 +265,8 @@ bool ControllerSession::set_controller(ControllerType controller_type){
 
 
 std::string ControllerSession::reset(){
+//    cout << "ControllerSession::reset()" << endl;
+
     {
         std::lock_guard<std::mutex> lg0(m_reset_lock);
 
@@ -276,9 +278,10 @@ std::string ControllerSession::reset(){
             if (m_options_locked){
                 return "Options are locked.";
             }
-            if (!m_connection){
-                return "No connection set.";
-            }
+//            if (!m_connection){
+//                cout << "ControllerSession::reset() - early return" << endl;
+//                return "No connection set.";
+//            }
 
             //  Move these out to indicate that we should no longer access them.
             controller = std::move(m_controller);
