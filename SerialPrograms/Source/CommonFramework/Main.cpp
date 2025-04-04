@@ -24,6 +24,9 @@
 #include "Startup/NewVersionCheck.h"
 #include "Windows/MainWindow.h"
 
+#if defined (VISUAL_LEAK_DETECTOR)
+#include <VLD/vld.h>
+#endif
 
 #include <iostream>
 using std::cout;
