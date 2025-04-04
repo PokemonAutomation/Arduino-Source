@@ -4,18 +4,21 @@
  *
  */
 
+#ifdef PA_OFFICIAL
+
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_DateSkippers.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_DaySkipperStats.h"
 #include "PokemonSwSh_DaySkipperJPN-7.8k.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 DaySkipperJPN7p8k_Descriptor::DaySkipperJPN7p8k_Descriptor()
@@ -107,7 +110,7 @@ bool date_increment_day(ProControllerContext& context, DateSmall* date, bool pre
     uint8_t days = days_in_month(date->year, date->month);
     if (date->day != days){
         if (press){
-            skipper_increment_day(context, false);
+            DateSkippers::increment_day(context, false);
         }
         date->day++;
         return true;
@@ -128,20 +131,27 @@ bool date_increment_day(ProControllerContext& context, DateSmall* date, bool pre
     }
 
     if (date->month != 1){
-        skipper_increment_month(context, DAYS_PER_MONTH[date->month - 1]);
+        DateSkippers::increment_month(context, DAYS_PER_MONTH[date->month - 1]);
         return true;
     }
 
     if (date->year != 0){
-        skipper_increment_all(context);
+        DateSkippers::increment_all(context);
         return true;
     }
 
-    skipper_increment_all_rollback(context);
+    DateSkippers::increment_all_rollback(context);
     return false;
 }
 
 void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz){
+        throw UserSetupError(
+            env.logger(),
+            "This program requires a tick precise wired controller."
+        );
+    }
+
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;
@@ -172,7 +182,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
     }
 
     //  Setup starting state.
-    skipper_init_view(context);
+    DateSkippers::init_view(context);
 
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
@@ -188,7 +198,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            skipper_auto_recovery(context);
+            DateSkippers::auto_recovery(context);
         }
 
     }
@@ -208,6 +218,4 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
 }
 }
 }
-
-
-
+#endif

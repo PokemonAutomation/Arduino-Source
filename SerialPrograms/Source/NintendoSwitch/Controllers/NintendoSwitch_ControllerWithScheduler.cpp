@@ -23,7 +23,7 @@ ControllerWithScheduler::ControllerWithScheduler(Logger& logger)
         make_resource_list()
     )
     , m_logger(logger)
-    , m_logging_suppress(0)
+//    , m_logging_suppress(0)
 {}
 
 
@@ -32,7 +32,7 @@ void ControllerWithScheduler::issue_barrier(const Cancellable* cancellable){
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     std::lock_guard<std::mutex> lg1(m_state_lock);
     this->issue_wait_for_all(cancellable);
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
+    if (m_logging_throttler){
         m_logger.log("issue_barrier()", COLOR_DARKGREEN);
     }
 }
@@ -43,7 +43,7 @@ void ControllerWithScheduler::issue_nop(const Cancellable* cancellable, Millisec
         cancellable->throw_if_cancelled();
     }
     this->SuperscalarScheduler::issue_nop(cancellable, WallDuration(duration));
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
+    if (m_logging_throttler){
         m_logger.log(
             "issue_nop(): duration = " + std::to_string(duration.count()) + "ms",
             COLOR_DARKGREEN
@@ -78,7 +78,7 @@ void ControllerWithScheduler::issue_buttons(
     }
     this->SuperscalarScheduler::issue_nop(cancellable, delay);
 
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
+    if (m_logging_throttler){
         m_logger.log(
             "issue_buttons(): " + button_to_string(button) +
             ", delay = " + std::to_string(delay.count()) + "ms" +
@@ -103,7 +103,7 @@ void ControllerWithScheduler::issue_dpad(
     m_dpad.position = position;
     this->issue_to_resource(cancellable, m_dpad, delay, hold, cooldown);
 
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
+    if (m_logging_throttler){
         m_logger.log(
             "issue_dpad(): " + dpad_to_string(position) +
             ", delay = " + std::to_string(delay.count()) + "ms" +
@@ -130,7 +130,7 @@ void ControllerWithScheduler::issue_left_joystick(
     m_left_joystick.y = y;
     this->issue_to_resource(cancellable, m_left_joystick, delay, hold, cooldown);
 
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
+    if (m_logging_throttler){
         m_logger.log(
             "issue_left_joystick(): (" + std::to_string(x) + "," + std::to_string(y) + ")" +
             ", delay = " + std::to_string(delay.count()) + "ms" +
@@ -156,7 +156,7 @@ void ControllerWithScheduler::issue_right_joystick(
     m_right_joystick.y = y;
     this->issue_to_resource(cancellable, m_right_joystick, delay, hold, cooldown);
 
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
+    if (m_logging_throttler){
         m_logger.log(
             "issue_right_joystick(): (" + std::to_string(x) + "," + std::to_string(y) + ")" +
             ", delay = " + std::to_string(delay.count()) + "ms" +
@@ -218,7 +218,7 @@ void ControllerWithScheduler::issue_full_controller_state(
         hold, hold, WallDuration::zero()
     );
 
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 0){
+    if (m_logging_throttler){
         m_logger.log(
             "issue_controller_state(): (" + button_to_string(button) +
             "), dpad(" + dpad_to_string(position) +
@@ -238,7 +238,7 @@ void ControllerWithScheduler::issue_mash_button(
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
-    LoggingSuppressScope scope(m_logging_suppress);
+    ThrottleScope scope(m_logging_throttler);
     bool log = true;
     while (duration > Milliseconds::zero()){
         issue_buttons(cancellable, button, 8*8ms, 5*8ms, 3*8ms);
@@ -246,7 +246,7 @@ void ControllerWithScheduler::issue_mash_button(
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
         //  issue, but before the second.
-        if (log && m_logging_suppress.load(std::memory_order_relaxed) == 1){
+        if (log && scope){
             m_logger.log(
                 "issue_mash_button(): " + button_to_string(button) +
                 ", duration = " + std::to_string(duration.count()) + "ms",
@@ -267,7 +267,7 @@ void ControllerWithScheduler::issue_mash_button(
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
-    LoggingSuppressScope scope(m_logging_suppress);
+    ThrottleScope scope(m_logging_throttler);
     bool log = true;
     while (duration > Milliseconds::zero()){
         issue_buttons(cancellable, button0, Milliseconds(4*8), 5*8ms, 3*8ms);
@@ -276,7 +276,7 @@ void ControllerWithScheduler::issue_mash_button(
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
         //  issue, but before the second.
-        if (log && m_logging_suppress.load(std::memory_order_relaxed) == 1){
+        if (log && scope){
             m_logger.log(
                 "issue_mash_button(): (" + button_to_string(button0) +
                 "), (" + button_to_string(button1) +
@@ -296,7 +296,7 @@ void ControllerWithScheduler::issue_mash_AZs(
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
-    LoggingSuppressScope scope(m_logging_suppress);
+    ThrottleScope scope(m_logging_throttler);
     bool log = true;
     while (true){
         if (duration <= Milliseconds::zero()){
@@ -307,7 +307,7 @@ void ControllerWithScheduler::issue_mash_AZs(
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
         //  issue, but before the second.
-        if (log && m_logging_suppress.load(std::memory_order_relaxed) == 1){
+        if (log && scope){
             m_logger.log(
                 "issue_mash_AZs(): duration = " + std::to_string(duration.count()) + "ms",
                 COLOR_DARKGREEN
@@ -338,7 +338,7 @@ void ControllerWithScheduler::issue_system_scroll(
         cancellable->throw_if_cancelled();
     }
 
-    LoggingSuppressScope scope(m_logging_suppress);
+    ThrottleScope scope(m_logging_throttler);
 
     WallClock dpad = m_dpad.free_time();
     WallClock left_joystick = m_left_joystick.free_time();
@@ -403,7 +403,7 @@ void ControllerWithScheduler::issue_system_scroll(
         }
     }while (false);
 
-    if (m_logging_suppress.load(std::memory_order_relaxed) == 1){
+    if (scope){
         m_logger.log(
             "issue_system_scroll(): " + dpad_to_string(direction) +
             ", delay = " + std::to_string(delay.count()) + "ms" +

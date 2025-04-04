@@ -24,10 +24,24 @@ const ControllerFeatures OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
 
 std::string program_name(uint8_t id){
     switch (id){
-    case PABB_PID_UNSPECIFIED:      return "Microcontroller Program";
-    case PABB_PID_PABOTBASE_12KB:   return "PABotBase-AVR8-12KB";
-    case PABB_PID_PABOTBASE_31KB:   return "PABotBase-AVR8-31KB";
-    case PABB_PID_PABOTBASE_ESP32:  return "PABotBase-ESP32";
+    case PABB_PID_UNSPECIFIED:                  return "Microcontroller Program";
+
+    //  Old (fat) PABotBase with scheduler.
+    case PABB_PID_PABOTBASE_12KB:               return "PABotBase-AVR8-12KB";
+    case PABB_PID_PABOTBASE_31KB:               return "PABotBase-AVR8-31KB";
+
+    //  New (slim) PABotBase.
+    case PABB_PID_PABOTBASE_ArduinoUnoR3:       return "PABotBase-UnoR3";
+    case PABB_PID_PABOTBASE_ArduinoLeonardo:    return "PABotBase-Leonardo";
+    case PABB_PID_PABOTBASE_ProMicro:           return "PABotBase-ProMicro";
+    case PABB_PID_PABOTBASE_Teensy2:            return "PABotBase-Teensy2.0";
+    case PABB_PID_PABOTBASE_TeensyPP2:          return "PABotBase-Teensy++2.0";
+
+    case PABB_PID_PABOTBASE_CH552:              return "PABotBase-CH552";
+
+    case PABB_PID_PABOTBASE_ESP32:              return "PABotBase-ESP32";
+    case PABB_PID_PABOTBASE_ESP32S3:            return "PABotBase-ESP32-S3";
+
     default: return "Unknown ID";
     }
 }
@@ -71,6 +85,7 @@ const std::map<
         std::map<ControllerType, ControllerFeatures>
     >
 > SUPPORTED_VERSIONS{
+#if 0
     {2021052600, {
         {PABB_PID_UNSPECIFIED, {{ControllerType::None, {}}}},
         {PABB_PID_PABOTBASE_12KB, {
@@ -106,6 +121,7 @@ const std::map<
             }},
         }},
     }},
+#endif
     {2025033000, {
         {PABB_PID_PABOTBASE_ESP32, {
             {ControllerType::NintendoSwitch_WirelessProController, {
@@ -122,6 +138,48 @@ const std::map<
                 ControllerFeature::TickPrecise,
                 ControllerFeature::QueryCommandQueueSize,
                 ControllerFeature::NintendoSwitch_RightJoycon,
+            }},
+        }},
+    }},
+    {2025040200, {
+        {PABB_PID_PABOTBASE_ArduinoUnoR3, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_ArduinoLeonardo, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_ProMicro, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_Teensy2, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_TeensyPP2, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
     }},

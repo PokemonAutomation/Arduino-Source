@@ -4,18 +4,21 @@
  *
  */
 
+#ifdef PA_OFFICIAL
+
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_DateSkippers.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_DaySkipperStats.h"
 #include "PokemonSwSh_DaySkipperJPN.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
@@ -68,6 +71,13 @@ DaySkipperJPN::DaySkipperJPN()
 }
 
 void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz){
+        throw UserSetupError(
+            env.logger(),
+            "This program requires a tick precise wired controller."
+        );
+    }
+
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;
@@ -79,14 +89,14 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     pbf_press_button(context, BUTTON_ZR, 5, 5);
 
     //  Setup starting state.
-    skipper_init_view(context);
+    DateSkippers::init_view(context);
 
     uint8_t day = 1;
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
         send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
 
-        skipper_increment_day(context, false);
+        DateSkippers::increment_day(context, false);
 
         if (day == 31){
             day = 1;
@@ -100,7 +110,7 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            skipper_auto_recovery(context);
+            DateSkippers::auto_recovery(context);
         }
 
     }
@@ -119,3 +129,4 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 }
 }
 }
+#endif

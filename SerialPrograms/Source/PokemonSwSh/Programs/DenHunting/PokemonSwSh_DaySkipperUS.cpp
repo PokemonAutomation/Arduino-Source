@@ -4,11 +4,13 @@
  *
  */
 
+#ifdef PA_OFFICIAL
+
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_DateSkippers.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_DaySkipperStats.h"
 #include "PokemonSwSh_DaySkipperUS.h"
 
@@ -76,6 +78,13 @@ DaySkipperUS::DaySkipperUS()
 
 
 void DaySkipperUS::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz){
+        throw UserSetupError(
+            env.logger(),
+            "This program requires a tick precise wired controller."
+        );
+    }
+
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
     stats.runs++;
@@ -92,15 +101,15 @@ void DaySkipperUS::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     pbf_press_button(context, BUTTON_ZR, 5, 5);
 
     //  Setup starting state.
-    skipper_init_view(context);
-    skipper_rollback_year_full(context, true);
+    DateSkippers::init_view(context);
+    DateSkippers::rollback_year_full(context, true);
     year = 0;
 
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
         send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
 
-        skipper_increment_day(context, true);
+        DateSkippers::increment_day(context, true);
 
         correct_count++;
         year++;
@@ -111,16 +120,16 @@ void DaySkipperUS::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 
         if (year >= 60){
             if (real_life_year <= 36){
-                skipper_rollback_year_sync(context);
+                DateSkippers::rollback_year_sync(context);
                 year = real_life_year;
             }else{
-                skipper_rollback_year_full(context, true);
+                DateSkippers::rollback_year_full(context, true);
                 year = 0;
             }
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            skipper_auto_recovery(context);
+            DateSkippers::auto_recovery(context);
         }
     }
 
@@ -139,3 +148,4 @@ void DaySkipperUS::program(SingleSwitchProgramEnvironment& env, ProControllerCon
 }
 }
 }
+#endif

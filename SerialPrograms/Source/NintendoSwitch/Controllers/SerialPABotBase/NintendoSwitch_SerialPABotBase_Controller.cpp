@@ -77,8 +77,8 @@ void SerialPABotBase_Controller::wait_for_all(const Cancellable* cancellable){
     {
         std::lock_guard<std::mutex> lg1(m_state_lock);
 
-        LoggingSuppressScope scope(m_logging_suppress);
-        if (m_logging_suppress.load(std::memory_order_relaxed) == 1){
+        ThrottleScope scope(m_logging_throttler);
+        if (scope){
             m_logger.log("wait_for_all()", COLOR_DARKGREEN);
         }
 

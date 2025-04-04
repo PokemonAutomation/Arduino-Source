@@ -11,6 +11,7 @@
 #define PokemonAutomation_NintendoSwitch_ControllerWithScheduler_H
 
 #include <mutex>
+#include "Common/Cpp/RecursiveThrottler.h"
 #include "Controllers/SuperscalarScheduler.h"
 #include "NintendoSwitch_ControllerState.h"
 
@@ -103,6 +104,10 @@ class ControllerWithScheduler :
 public:
     ControllerWithScheduler(Logger& logger);
 
+    RecursiveThrottler& logging_throttler(){
+        return m_logging_throttler;
+    }
+
 
 public:
     //  Superscalar Commands (the "ssf" framework)
@@ -162,6 +167,7 @@ public:
 
 
 protected:
+#if 0
     class LoggingSuppressScope{
     public:
         LoggingSuppressScope(std::atomic<size_t>& counter)
@@ -175,13 +181,15 @@ protected:
     private:
         std::atomic<size_t>& m_counter;
     };
+#endif
 
 //    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
 
 
 protected:
     Logger& m_logger;
-    std::atomic<size_t> m_logging_suppress;
+//    std::atomic<size_t> m_logging_suppress;
+    RecursiveThrottler m_logging_throttler;
 
     //  If you need both of these locks, always acquire "m_issue_lock" first.
 

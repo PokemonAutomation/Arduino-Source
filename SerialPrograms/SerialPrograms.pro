@@ -882,7 +882,6 @@ SOURCES += \
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.cpp \
@@ -1234,6 +1233,7 @@ HEADERS += \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/PrintDebuggers.h \
     ../Common/Cpp/Rectangle.h \
+    ../Common/Cpp/RecursiveThrottler.h \
     ../Common/Cpp/SIMDDebuggers.h \
     ../Common/Cpp/Sockets/AbstractClientSocket.h \
     ../Common/Cpp/Sockets/ClientSocket.h \
@@ -2080,11 +2080,9 @@ HEADERS += \
     Source/PokemonSV/Resources/PokemonSV_TournamentPrizeNames.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h \
-    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DaySkippers.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h \
