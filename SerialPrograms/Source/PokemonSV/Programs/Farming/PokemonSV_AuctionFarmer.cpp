@@ -14,6 +14,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -30,6 +31,8 @@
 #include "PokemonSV/Resources/PokemonSV_AuctionItemNames.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV_AuctionFarmer.h"
+
+#include "Common/Cpp/PrettyPrint.h"
 
 
 namespace PokemonAutomation{
@@ -366,9 +369,51 @@ void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, ProContr
 }
 
 
-uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, bool high){
+uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Language language, bool high){
+    // How much to cut off from the bid text in order to not read currencies and exclamation marks as numbers.
+    // Values are pixels for a 1920x1080 screen, negative values are padding
+    static const std::map<Language, std::pair<int8_t, int8_t>> cutoffs = {
+        { Language::English, {22, 7} },
+        { Language::Japanese, {-5, 54} },
+        { Language::Spanish, {6, 32} },
+        { Language::French, {-5, 45} },
+        { Language::German, {-5, 22} },
+        { Language::Italian, {-5, 35} },
+        { Language::Korean, {-5, 42} },
+        { Language::ChineseSimplified, {22, 7} },
+        { Language::ChineseTraditional, {22,7} }
+    };
+
+    static const std::map<Language, float> high_x = {
+        { Language::English, 0.75f },
+        { Language::Japanese, 0.75f },
+        { Language::Spanish, 0.73f },
+        { Language::French, 0.68f },
+        { Language::German, 0.73f },
+        { Language::Italian, 0.75f },
+        { Language::Korean, 0.75f },
+        { Language::ChineseSimplified, 0.75f },
+        { Language::ChineseTraditional, 0.75f }
+    };
+
+    static const std::map<Language, float> low_x = {
+        { Language::English, 0.75f },
+        { Language::Japanese, 0.75f },
+        { Language::Spanish, 0.75f },
+        { Language::French, 0.75f },
+        { Language::German, 0.73f },
+        { Language::Italian, 0.75f },
+        { Language::Korean, 0.75f },
+        { Language::ChineseSimplified, 0.75f },
+        { Language::ChineseTraditional, 0.75f }
+    };
+
+
     float box_y = high ? 0.42f : 0.493f;
-    OverlayBoxScope box(stream.overlay(), { 0.73, box_y, 0.17, 0.048 });
+    float box_x = high ? high_x.at(language) : low_x.at(language);
+    float width = 0.9f - box_x; // max_x is always the same for all languages
+    OverlayBoxScope box(stream.overlay(), { box_x, box_y, width, 0.048 });
+
     std::unordered_map<uint64_t, size_t> read_bids;
     size_t highest_read = 0;
     uint64_t read_value = 0;
@@ -376,7 +421,26 @@ uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, bool 
     // read next bid multiple times since the selection arrow sometimes blocks the first digit
     for (size_t i = 0; i < 10; i++){
         VideoSnapshot screen = stream.video().snapshot();
-        uint64_t read_bid = OCR::read_number(stream.logger(), extract_box_reference(screen, box));
+        double screen_scale = (double)screen->width() / 1920.0;
+        double vertical_padding = 5.0; // small amount of pixels so numbers do not touch the edge of the view when reading them
+        float left_cutoff = cutoffs.at(language).first;
+        float right_cutoff = cutoffs.at(language).second;
+
+        ImageViewRGB32 raw_bid_image = extract_box_reference(screen, box);
+        ImagePixelBox bid_bounding_box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+            raw_bid_image,
+            [](Color pixel) {
+                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 250;
+            });
+
+        ImagePixelBox cut_bid_bounding_box(
+            bid_bounding_box.min_x + (size_t)(left_cutoff * screen_scale),
+            bid_bounding_box.min_y - (size_t)(vertical_padding * screen_scale),
+            bid_bounding_box.max_x - (size_t)(right_cutoff * screen_scale),
+            bid_bounding_box.max_y + (size_t)(vertical_padding * screen_scale)
+        );
+       
+        uint64_t read_bid = OCR::read_number(stream.logger(), extract_box_reference(raw_bid_image, cut_bid_bounding_box));
 
         if (read_bids.find(read_bid) == read_bids.end()){
             read_bids[read_bid] = 0;
@@ -418,11 +482,11 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, ProControll
             pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
             break;
         case 1:
-            current_bid = read_next_bid(env.console, context, true);
+            current_bid = read_next_bid(env.console, context, LANGUAGE, true);
             pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
             break;
         case 2:
-            current_bid = read_next_bid(env.console, context, false);
+            current_bid = read_next_bid(env.console, context, LANGUAGE, false);
             pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
             break;
         case 3:
