@@ -9,6 +9,7 @@
 
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 
@@ -30,6 +31,7 @@ public:
 
 private:
     SandwichMakerOption SANDWICH_OPTIONS;
+    SimpleIntegerOption<uint16_t> NUM_SANDWICHES;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationsOption NOTIFICATIONS;
 };
