@@ -59,25 +59,35 @@ void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context)
     Milliseconds tv = context->timing_variation();
     if (tv == 0ms){
         ssf_press_button(context, BUTTON_A, 20, 10);
+
+        //  Left scroll in case we missed the date menu and landed in the
+        //  language change.
+        ssf_issue_scroll(context, DPAD_LEFT, 0ms);
+
+        ssf_press_button(context, BUTTON_A, 24ms);
+        ssf_issue_scroll(context, DPAD_RIGHT, 24ms);
+        ssf_issue_scroll(context, DPAD_RIGHT, 24ms);
+        ssf_press_button(context, BUTTON_A, 0ms);
+        ssf_issue_scroll(context, DPAD_RIGHT, 24ms);
+        ssf_issue_scroll(context, DPAD_RIGHT, 24ms);
+        ssf_issue_scroll(context, DPAD_RIGHT, 24ms);
         ssf_issue_scroll(context, DPAD_RIGHT, 0);
-        ssf_press_button(context, BUTTON_A, 2);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_press_button(context, BUTTON_A, 0);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
         ssf_press_button(context, BUTTON_A, 20, 10);
     }else{
         ssf_press_button_ptv(context, BUTTON_A, 160ms);
+
+        //  Left scroll in case we missed the date menu and landed in the
+        //  language change.
+        ssf_issue_scroll_ptv(context, DPAD_LEFT);
+
         ssf_issue_scroll_ptv(context, DPAD_RIGHT);
         ssf_press_button_ptv(context, BUTTON_A);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT);
         ssf_press_button_ptv(context, BUTTON_A);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT);
+        ssf_issue_scroll_ptv(context, DPAD_RIGHT);
         ssf_press_button_ptv(context, BUTTON_A, 160ms);
     }
 
