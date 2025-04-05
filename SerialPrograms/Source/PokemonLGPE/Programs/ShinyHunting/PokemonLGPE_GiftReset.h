@@ -30,6 +30,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
+    BooleanCheckBoxOption EXTRA_DIALOG;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_SHINY;
