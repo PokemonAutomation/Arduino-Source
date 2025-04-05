@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
@@ -32,6 +33,22 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
     )
 {}
 
+struct SandwichMaker_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : sandwiches(m_stats["Sandwiches"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Sandwiches");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+    }
+    std::atomic<uint64_t>& sandwiches;
+    std::atomic<uint64_t>& errors;
+};
+
+std::unique_ptr<StatsTracker> SandwichMaker_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
 SandwichMaker::SandwichMaker()
     : SANDWICH_OPTIONS(
         "Sandwich Options",
@@ -40,6 +57,11 @@ SandwichMaker::SandwichMaker()
         false,
         GroupOption::EnableMode::ALWAYS_ENABLED
     )
+    , NUM_SANDWICHES(
+        "<b>Number of sandwiches to make:</b><br>Repeatedly make the same sandwich.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        1, 1, 1000
+    )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
@@ -47,22 +69,22 @@ SandwichMaker::SandwichMaker()
         })
 {
     PA_ADD_OPTION(SANDWICH_OPTIONS);
+    PA_ADD_OPTION(NUM_SANDWICHES);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 void SandwichMaker::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
+    SandwichMaker_Descriptor::Stats& stats = env.current_stats<SandwichMaker_Descriptor::Stats>();
 
-    #if 0
-        // make unlimited sandwiches. until it errors out.
-        while (true){
-            make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
-            enter_sandwich_recipe_list(env.program_info(), env.console, context);
-        }
-    #endif
-
-    make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
+    for (int i = 0; i < NUM_SANDWICHES; i++){
+        env.console.log("Making sandwich number: " + std::to_string(i+1), COLOR_ORANGE);
+        stats.sandwiches++;
+        env.update_stats();
+        make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
+        enter_sandwich_recipe_list(env.program_info(), env.console, context);
+    }
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
