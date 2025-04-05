@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
@@ -31,6 +32,22 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
         {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
+
+struct SandwichMaker_Descriptor::Stats : public StatsTracker{
+    Stats()
+        : sandwiches(m_stats["Sandwiches"])
+        , errors(m_stats["Errors"])
+    {
+        m_display_order.emplace_back("Sandwiches");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+    }
+    std::atomic<uint64_t>& sandwiches;
+    std::atomic<uint64_t>& errors;
+};
+
+std::unique_ptr<StatsTracker> SandwichMaker_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
 
 SandwichMaker::SandwichMaker()
     : SANDWICH_OPTIONS(
@@ -59,9 +76,12 @@ SandwichMaker::SandwichMaker()
 
 void SandwichMaker::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
+    SandwichMaker_Descriptor::Stats& stats = env.current_stats<SandwichMaker_Descriptor::Stats>();
 
     for (int i = 0; i < NUM_SANDWICHES; i++){
         env.console.log("Making sandwich number: " + std::to_string(i+1), COLOR_ORANGE);
+        stats.sandwiches++;
+        env.update_stats();
         make_sandwich_option(env, env.console, context, SANDWICH_OPTIONS);
         enter_sandwich_recipe_list(env.program_info(), env.console, context);
     }

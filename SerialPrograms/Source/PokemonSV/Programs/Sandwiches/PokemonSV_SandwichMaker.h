@@ -21,6 +21,8 @@ namespace PokemonSV{
 class SandwichMaker_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     SandwichMaker_Descriptor();
+    struct Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class SandwichMaker : public SingleSwitchProgramInstance{

@@ -119,6 +119,7 @@
 #include "PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 
 
 #include <QPixmap>
@@ -316,8 +317,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    std::terminate();
 
 #if 1
-    // ImageRGB32 image(IMAGE_PATH);
-    auto image = feed.snapshot();
+    ImageRGB32 image(IMAGE_PATH);
+    // auto image = feed.snapshot();
+
+    SandwichHandLocator hand(SandwichHandType::FREE, {0, 0, 1, 1});
+    std::pair<double, double> location = hand.locate_sandwich_hand(image, {0,0,1,1});
+    cout << location.first << ", " << location.second << endl;
+#endif
+
+#if 0
+    ImageRGB32 image(IMAGE_PATH);
+    // auto image = feed.snapshot();
 
     ItemPrinterMaterialDetector detector(COLOR_RED, Language::English);
 
