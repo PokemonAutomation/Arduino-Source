@@ -37,6 +37,10 @@ ArcPhoneTracker::ArcPhoneTracker()
             Color(0xff909090),
             Color(0xffa0a0a0),
             Color(0xffb0b0b0),
+            Color(0xffc0c0c0),
+            Color(0xffd0d0d0),
+            Color(0xffe0e0e0),
+            Color(0xfff0f0f0),
         }
     )
 {}
@@ -45,9 +49,9 @@ void ArcPhoneTracker::process_object(const ImageViewRGB32& image, const Waterfil
 //    cout << "asdf" << endl;
 //    static int c = 0;
 //    cout << "c = " << c << endl;
-//    extract_box_reference(image, object).save("test-" + std::to_string(c++) + ".png");
+//    extract_box_reference(image, object).save("testA-" + std::to_string(c++) + ".png");
 //    image.save("test-" + std::to_string(c++) + "-A.png");
-//    extract_box(image, object).save("test-" + std::to_string(c++) + "-B.png");
+//    extract_box_reference(image, object).save("testB-" + std::to_string(c++) + ".png");
 
     double width = (double)object.width() / image.width();
     if (width < 0.40 || width > 0.50){
@@ -65,6 +69,8 @@ void ArcPhoneTracker::process_object(const ImageViewRGB32& image, const Waterfil
     }
 }
 void ArcPhoneTracker::finish(const ImageViewRGB32& image){
+//    static int count = 0;
+//    image.save("test0-" + std::to_string(count++) + ".png");
     merge_heavily_overlapping();
 }
 
@@ -114,8 +120,11 @@ void ArcPhoneDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool ArcPhoneDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     m_watcher.process_frame(frame, timestamp);
+//    cout << "White Objects = " << m_tracker_phone.detections().size() << endl;
     bool detected0 = m_debouncer_phone.push_value(!m_tracker_phone.detections().empty(), timestamp);
     bool detected1 = m_debouncer_button.push_value(!m_tracker_phone.detections().empty(), timestamp);
+
+//    cout << detected0 << ", " << detected1 << endl;
 
 #if 0
     if (detected){

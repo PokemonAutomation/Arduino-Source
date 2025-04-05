@@ -9,8 +9,6 @@
 
 #include <stddef.h>
 #include <stdint.h>
-//#include <map>
-//#include <iostream>
 #include "Common/Cpp/Rectangle.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 

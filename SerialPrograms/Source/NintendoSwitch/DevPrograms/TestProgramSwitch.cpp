@@ -15,6 +15,7 @@
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "Common/Cpp/Concurrency/PeriodicScheduler.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -302,8 +303,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Pokemon;
     using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-//    using namespace PokemonLA;
-    using namespace PokemonSV;
+    using namespace PokemonLA;
+//    using namespace PokemonSV;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -315,7 +316,25 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::terminate();
 
-#if 1
+
+    ImageRGB32 image("20250404-154507236508.png");
+
+    ArcPhoneDetector phone(logger, overlay, std::chrono::milliseconds(250), true);
+
+    while (true){
+        cout << phone.process_frame(image, current_time()) << endl;
+        scope.wait_for(100ms);
+    }
+
+#if 0
+    wait_until(
+        console, context,
+        10000ms,
+        {phone}
+    );
+#endif
+
+#if 0
     // ImageRGB32 image(IMAGE_PATH);
     auto image = feed.snapshot();
 
