@@ -211,7 +211,7 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     VideoSnapshot screen = env.console.video().snapshot();
     std::vector<ImagePixelBox> dialog_boxes = detect_dialog_boxes(screen);
     std::deque<OverlayBoxScope> bubbles_boxes;
-    std::deque<OverlayBoxScope> offer_boxes;
+    std::deque<OverlayBoxScope> offer_overlay_boxes;
     std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers;
 
     if (dialog_boxes.empty()){
@@ -220,57 +220,61 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     }
 
     // read dialog bubble
+    ImageFloatBox top_offer_box(0.05, 0.02, 0.90, 0.49);
+    ImageFloatBox bottom_offer_box(0.05, 0.49, 0.90, 0.49);
+    std::vector<ImageFloatBox> offer_boxes = {top_offer_box, bottom_offer_box};
     for (ImagePixelBox dialog_box : dialog_boxes){
-//        std::cout << "dialog_box: ["
-//                << dialog_box.min_x << "," << dialog_box.min_y << "] - ["
-//                << dialog_box.max_x << "," << dialog_box.max_y << "]" << std::endl;
+        for (ImageFloatBox offer_box : offer_boxes) {
+            //        std::cout << "dialog_box: ["
+            //                << dialog_box.min_x << "," << dialog_box.min_y << "] - ["
+            //                << dialog_box.max_x << "," << dialog_box.max_y << "]" << std::endl;
 
-        ImageFloatBox dialog_float_box = pixelbox_to_floatbox(screen, dialog_box);
-        bubbles_boxes.emplace_back(env.console, dialog_float_box, COLOR_GREEN);
-
-
-//        OverlayBoxScope dialog_overlay(env.console, dialog_box, COLOR_DARK_BLUE);
-        ImageFloatBox offer_box(0.05, 0.02, 0.90, 0.49);
-        ImageFloatBox translated_offer_box = translate_to_parent(
-            screen,
-            dialog_float_box,
-            floatbox_to_pixelbox(dialog_box.width(), dialog_box.height(), offer_box)
-        );
-//        std::cout << "translated_offer_box: ["
-//                << translated_offer_box.x << "," << translated_offer_box.y << "] - ["
-//                << translated_offer_box.width << "," << translated_offer_box.height << "]" << std::endl;
-
-        offer_boxes.emplace_back(env.console, translated_offer_box, COLOR_BLUE);
-
-//        OverlayBoxScope offer_overlay(env.console, translated_offer_box, COLOR_BLUE);
-        
-        ImageViewRGB32 dialog = extract_box_reference(screen, dialog_box);
-        ImageViewRGB32 offer_image = extract_box_reference(dialog, offer_box);
-
-//        std::cout << offer_image.width() << " x " << offer_image.height() << std::endl;
+            ImageFloatBox dialog_float_box = pixelbox_to_floatbox(screen, dialog_box);
+            bubbles_boxes.emplace_back(env.console, dialog_float_box, COLOR_GREEN);
 
 
-        const double LOG10P_THRESHOLD = -1.5;
-        std::string best_item;
-        OCR::StringMatchResult result = AuctionItemNameReader::instance().read_substring(
-            env.console, LANGUAGE,
-            offer_image,
-            OCR::BLACK_TEXT_FILTERS()
-        );
+            //        OverlayBoxScope dialog_overlay(env.console, dialog_box, COLOR_DARK_BLUE);
+            ImageFloatBox translated_offer_box = translate_to_parent(
+                screen,
+                dialog_float_box,
+                floatbox_to_pixelbox(dialog_box.width(), dialog_box.height(), offer_box)
+            );
+            //        std::cout << "translated_offer_box: ["
+            //                << translated_offer_box.x << "," << translated_offer_box.y << "] - ["
+            //                << translated_offer_box.width << "," << translated_offer_box.height << "]" << std::endl;
 
-        result.clear_beyond_log10p(LOG10P_THRESHOLD);
-        if (best_item.empty() && !result.results.empty()){
-            auto iter = result.results.begin();
-            if (iter->first < LOG10P_THRESHOLD){
-                best_item = iter->second.token;
+            offer_overlay_boxes.emplace_back(env.console, translated_offer_box, COLOR_BLUE);
 
-                AuctionOffer offer{ best_item };
-                std::pair<AuctionOffer, ImageFloatBox> pair(offer, dialog_float_box);
-                offers.emplace_back(pair);
+            //        OverlayBoxScope offer_overlay(env.console, translated_offer_box, COLOR_BLUE);
+
+            ImageViewRGB32 dialog = extract_box_reference(screen, dialog_box);
+            ImageViewRGB32 offer_image = extract_box_reference(dialog, offer_box);
+
+            //        std::cout << offer_image.width() << " x " << offer_image.height() << std::endl;
+
+
+            const double LOG10P_THRESHOLD = -1.5;
+            std::string best_item;
+            OCR::StringMatchResult result = AuctionItemNameReader::instance().read_substring(
+                env.console, LANGUAGE,
+                offer_image,
+                OCR::BLACK_TEXT_FILTERS()
+            );
+
+            result.clear_beyond_log10p(LOG10P_THRESHOLD);
+            if (best_item.empty() && !result.results.empty()) {
+                auto iter = result.results.begin();
+                if (iter->first < LOG10P_THRESHOLD) {
+                    best_item = iter->second.token;
+
+                    AuctionOffer offer{ best_item };
+                    std::pair<AuctionOffer, ImageFloatBox> pair(offer, dialog_float_box);
+                    offers.emplace_back(pair);
+                }
             }
         }
     }
-//    context.wait_for(std::chrono::seconds(100));
+//  context.wait_for(std::chrono::seconds(100));
     return offers;
 }
 
