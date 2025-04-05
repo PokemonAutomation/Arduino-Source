@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include <map>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Qt/StringToolsQt.h"
@@ -98,10 +99,28 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
     return number;
 }
 
-
-
-
 int read_number_waterfill(
+    Logger& logger, const ImageViewRGB32& image,
+    uint32_t rgb32_min, uint32_t rgb32_max,    
+    bool text_inside_range
+){
+    std::string ocr_text = read_number_waterfill_no_normalization(logger, image, rgb32_min, rgb32_max, text_inside_range, UINT32_MAX, false);
+
+    std::string normalized = run_number_normalization(ocr_text);
+
+    if (normalized.empty()){
+        logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
+        return -1;
+    }
+
+    int number = std::atoi(normalized.c_str());
+    logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
+
+    return number;
+}
+
+
+std::string  read_number_waterfill_no_normalization(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,    
     bool text_inside_range,
@@ -128,8 +147,8 @@ int read_number_waterfill(
         WaterfillObject object;
         while (map.size() < 16 && iter->find_next(object, true)){
             if (object.width() > width_max){
-                logger.log("Skipped this filter: character exceeded max width.");
-                return -1;
+                logger.log("OCR fail: one of characters exceeded max width.", COLOR_RED);
+                return "";
             }
             map.emplace(object.min_x, std::move(object));
         }
@@ -149,30 +168,27 @@ int read_number_waterfill(
             ocr_text += ocr[0];
         }else{
             if (check_empty_string){
-                logger.log("Skipped this filter: empty string.");
-                return -1;
+                logger.log("OCR fail: one of characters read as empty string.", COLOR_RED);
+                return "";
             }
         }
     }
 
-    std::string normalized = run_number_normalization(ocr_text);
+    return ocr_text;
 
-    if (normalized.empty()){
-        logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
-        return -1;
-    }
-
-    int number = std::atoi(normalized.c_str());
-    logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
-
-    return number;
 }
 
-int read_number_waterfill(
+bool is_digits(const std::string &str)
+{
+    return std::all_of(str.begin(), str.end(), ::isdigit);
+}
+
+int read_number_waterfill_multifilter(
     Logger& logger, const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,    
     uint32_t width_max, 
-    bool text_inside_range
+    bool text_inside_range,
+    bool prioritize_numeric_only_results
 ){
     
 
@@ -181,19 +197,32 @@ int read_number_waterfill(
 
         uint32_t rgb32_min = filter.first;
         uint32_t rgb32_max = filter.second;
-        int candidate = read_number_waterfill(logger, image, rgb32_min, rgb32_max, text_inside_range, width_max, true);
-        if (candidate != -1){
+        std::string ocr_text = read_number_waterfill_no_normalization(logger, image, rgb32_min, rgb32_max, text_inside_range, width_max, true);
+
+        std::string normalized = run_number_normalization(ocr_text);
+        if (normalized.empty()){
+            // logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
+            continue;
+        }
+
+        int candidate = std::atoi(normalized.c_str());
+        logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(candidate));
+
+        if (prioritize_numeric_only_results && is_digits(ocr_text)){
+            candidates[candidate] += 2;
+        }else{
             candidates[candidate]++;
         }
     }
 
     if (candidates.empty()){
-        logger.log("No valid OCR candidates. Unable to read number.");
+        logger.log("No valid OCR candidates. Unable to read number.", COLOR_ORANGE);
         return -1;
     }
 
     std::pair<int, uint8_t> best;
     for (const auto& item : candidates){
+        logger.log("Candidate " + std::to_string(item.first) + ": " + std::to_string(item.second) + " votes");
         if (item.second > best.second){
             best = item;
         }
