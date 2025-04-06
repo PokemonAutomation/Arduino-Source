@@ -2252,7 +2252,10 @@ endif()
 
 #extract opencv_world460d.dll from archive on Windows Debug builds
 if (MSVC)
-    file(ARCHIVE_EXTRACT INPUT ../../../3rdPartyBinaries/opencv_world460d.zip DESTINATION ../../../3rdPartyBinaries/)
+    file(ARCHIVE_EXTRACT
+      INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world460d.zip
+      DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/
+    )
 endif()
 
 #add include directory
