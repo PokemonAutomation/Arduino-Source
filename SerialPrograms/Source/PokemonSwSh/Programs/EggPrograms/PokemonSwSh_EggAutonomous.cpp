@@ -523,14 +523,15 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
             pbf_wait(context, 200);
         },
         {
-            {egg_arrow_detector},
-            {no_egg_arrow_detector},
+            egg_arrow_detector,
+            no_egg_arrow_detector,
         }
     );
     
     const bool y_comm_visible_at_end_of_dialog = true;
     YCommIconDetector dialog_over_detector(y_comm_visible_at_end_of_dialog);
-    if (ret == 0){
+    switch (ret){
+    case 0:
         ++num_eggs_retrieved;
         env.log("Found egg");
         env.console.overlay().add_log("Found egg " + std::to_string(num_eggs_retrieved) + "/5", COLOR_WHITE);
@@ -546,23 +547,29 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
             },
             {{dialog_over_detector}}
         );
-    }else if (ret == 1){
+        break;
+
+    case 1:
         env.log("No egg");
         env.console.overlay().add_log("No egg", COLOR_WHITE);
-        ret = run_until<ProControllerContext>(
+        run_until<ProControllerContext>(
             env.console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 30s);
+                pbf_mash_button(context, BUTTON_B, 5s);
             },
             {{dialog_over_detector}}
         );
-    }else{
+        return num_eggs_retrieved;
+//        break;
+
+    default:
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect dialog selection arrow when talking to Nursery lady.",
             env.console
         );
     }
+
     // If dialog over is not detected:
     if (ret < 0){
         OperationFailedException::fire(
