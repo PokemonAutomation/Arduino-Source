@@ -140,8 +140,8 @@ const std::map<
                 ControllerFeature::NintendoSwitch_RightJoycon,
             }},
         }},
-    }},
-    {2025040500, {
+//    }},
+//    {2025040500, {
         {PABB_PID_PABOTBASE_ArduinoUnoR3, {
             {ControllerType::NintendoSwitch_WiredProController, {
                 ControllerFeature::TickPrecise,
