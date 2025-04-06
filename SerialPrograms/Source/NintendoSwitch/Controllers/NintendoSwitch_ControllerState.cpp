@@ -34,11 +34,11 @@ std::string button_to_string(Button button){
     if (button & BUTTON_LEFT_SR)    str += "Left-SR";
     if (button & BUTTON_RIGHT_SL)   str += "Right-SL";
     if (button & BUTTON_RIGHT_SR)   str += "Right-SR";
-    if (str.back() == ' '){
-        str.pop_back();
-    }
     if (str.empty()){
         str = "none";
+    }
+    if (str.back() == ' '){
+        str.pop_back();
     }
     return str;
 }
