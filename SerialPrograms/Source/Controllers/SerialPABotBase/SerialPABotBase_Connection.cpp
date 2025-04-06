@@ -127,9 +127,13 @@ void SerialPABotBase_Connection::update_with_capabilities(const ControllerFeatur
     }while (false);
 
     logger.log("Device supports queue size. Requesting queue size...", COLOR_BLUE);
-    uint8_t queue_limit = device_queue_size(*m_botbase);
-    logger.log("Setting queue size to: " + std::to_string(queue_limit), COLOR_BLUE);
-    m_botbase->set_queue_limit(queue_limit);
+    uint8_t queue_size = device_queue_size(*m_botbase);
+
+    //  For now we don't need to use that much queue size.
+    queue_size = std::min<uint8_t>(queue_size, 16);
+
+    logger.log("Setting queue size to: " + std::to_string(queue_size), COLOR_BLUE);
+    m_botbase->set_queue_limit(queue_size);
 }
 
 
