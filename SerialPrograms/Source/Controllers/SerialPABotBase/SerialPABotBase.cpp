@@ -122,7 +122,7 @@ const std::map<
         }},
     }},
 #endif
-    {2025033000, {
+    {2025040500, {
         {PABB_PID_PABOTBASE_ESP32, {
             {ControllerType::NintendoSwitch_WirelessProController, {
                 ControllerFeature::TickPrecise,
@@ -141,7 +141,7 @@ const std::map<
             }},
         }},
     }},
-    {2025040200, {
+    {2025040500, {
         {PABB_PID_PABOTBASE_ArduinoUnoR3, {
             {ControllerType::NintendoSwitch_WiredProController, {
                 ControllerFeature::TickPrecise,
@@ -175,6 +175,14 @@ const std::map<
             }},
         }},
         {PABB_PID_PABOTBASE_TeensyPP2, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_ESP32S3, {
             {ControllerType::NintendoSwitch_WiredProController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::QueryCommandQueueSize,
