@@ -121,7 +121,7 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& s
 
         if (EXTRA_DIALOG){
             env.log("Persian/Arcanine selected. Mashing B to exit dialog.");
-            pbf_mash_button(context, BUTTON_B, 3000ms);
+            pbf_mash_button(context, BUTTON_B, 4100ms);
             context.wait_for_all_requests();
         }
 
