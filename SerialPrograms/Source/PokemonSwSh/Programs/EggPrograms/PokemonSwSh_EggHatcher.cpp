@@ -10,6 +10,7 @@
 //#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
 #include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_EggHatcher.h"
 
@@ -54,21 +55,20 @@ uint8_t swap_party(ProControllerContext& context, uint8_t column){
     pickup_column(context, true);
 
     Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
 
     //  Move to column.
     party_to_column(context, column);
-    ssf_press_button_ptv(context, BUTTON_A, BOX_PICKUP_DROP_DELAY);
+    ssf_press_button_ptv(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, 100ms);
 
     //  Move to next column.
     column++;
     if (column < 6){
-        ssf_press_dpad(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
+        box_scroll(context, DPAD_RIGHT);
     }else{
         column = 0;
-        ssf_press_button_ptv(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY0);
-        ssf_press_dpad_ptv(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
-        ssf_press_dpad_ptv(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
+        ssf_press_button_ptv(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY0, 100ms);
+        box_scroll(context, DPAD_RIGHT);
+        box_scroll(context, DPAD_RIGHT);
     }
 
     pickup_column(context, false);

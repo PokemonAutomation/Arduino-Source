@@ -2229,6 +2229,7 @@ HEADERS += \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTrigger.h \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h \
+    Source/PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_GameEntry.h \

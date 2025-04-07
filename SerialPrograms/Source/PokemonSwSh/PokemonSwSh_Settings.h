@@ -63,7 +63,7 @@ public:
     MillisecondsOption FULL_LOBBY_TIMER0;
 
     SectionDividerOption m_box_timings;
-    MillisecondsOption BOX_SCROLL_DELAY1;
+//    MillisecondsOption BOX_SCROLL_DELAY1;
     MillisecondsOption BOX_CHANGE_DELAY0;
     MillisecondsOption BOX_PICKUP_DROP_DELAY0;
     MillisecondsOption MENU_TO_POKEMON_DELAY0;

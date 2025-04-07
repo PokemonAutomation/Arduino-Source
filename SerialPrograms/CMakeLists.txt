@@ -2093,6 +2093,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h
     Source/PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h
+    Source/PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.cpp

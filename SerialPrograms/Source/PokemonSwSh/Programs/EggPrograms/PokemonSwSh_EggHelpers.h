@@ -10,6 +10,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -78,15 +79,14 @@ static const Milliseconds EGG_BUTTON_HOLD_DELAY = 80ms;
 // - Move cursor to the second pokemon in the party, aka first hatched pokemon in the party
 // - Press button Y two times to change pokemon selection to group selection
 static void menu_to_box(ProControllerContext& context, bool from_map){
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
     if (from_map){
-        ssf_press_dpad_ptv(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-        ssf_press_dpad_ptv(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+        box_scroll(context, DPAD_UP);
+        box_scroll(context, DPAD_RIGHT);
     }
     ssf_press_button_ptv(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
     ssf_press_button_ptv(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY0, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_dpad_ptv(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_dpad_ptv(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    box_scroll(context, DPAD_LEFT);
+    box_scroll(context, DPAD_DOWN);
     ssf_press_button_ptv(context, BUTTON_Y, 240ms, EGG_BUTTON_HOLD_DELAY);
     ssf_press_button_ptv(context, BUTTON_Y, 240ms, EGG_BUTTON_HOLD_DELAY);
 }
@@ -103,57 +103,49 @@ static void box_to_menu(ProControllerContext& context){
     //  In state (2):   The 1st B will drop the party pokemon. The 2nd B will
     //                  back out of the box.
 
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
-
     ssf_press_button_ptv(context, BUTTON_B, 160ms, EGG_BUTTON_HOLD_DELAY);
     ssf_press_button_ptv(context, BUTTON_B, GameSettings::instance().BOX_TO_POKEMON_DELAY0, EGG_BUTTON_HOLD_DELAY);
 
     //  Back out to menu.
     ssf_press_button_ptv(context, BUTTON_B, GameSettings::instance().POKEMON_TO_MENU_DELAY0, EGG_BUTTON_HOLD_DELAY);
 
-    ssf_press_dpad_ptv(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_dpad_ptv(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    box_scroll(context, DPAD_LEFT);
+    box_scroll(context, DPAD_DOWN);
 }
 
 static void party_to_column(ProControllerContext& context, uint8_t column){
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
-
-    ssf_press_dpad_ptv(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    box_scroll(context, DPAD_UP);
     column++;
     if (column <= 3){
         for (uint8_t c = 0; c != column; c++){
-            ssf_press_dpad_ptv(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            box_scroll(context, DPAD_RIGHT);
         }
     }else{
         for (uint8_t c = 7; c != column; c--){
-            ssf_press_dpad_ptv(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            box_scroll(context, DPAD_LEFT);
         }
     }
 }
 static void column_to_party(ProControllerContext& context, uint8_t column){
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
-
     column++;
     if (column <= 3){
         for (uint8_t c = column; c != 0; c--){
-            ssf_press_dpad_ptv(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            box_scroll(context, DPAD_LEFT);
         }
     }else{
         for (uint8_t c = column; c != 7; c++){
-            ssf_press_dpad_ptv(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            box_scroll(context, DPAD_RIGHT);
         }
     }
-    ssf_press_dpad_ptv(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    box_scroll(context, DPAD_DOWN);
 }
 
 static void pickup_column(ProControllerContext& context, char party){
-    Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
-
     ssf_press_button_ptv(context, BUTTON_A, 160ms, EGG_BUTTON_HOLD_DELAY);
     if (party){
-        ssf_press_dpad_ptv(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+        box_scroll(context, DPAD_UP);
     }
-    ssf_press_dpad_ptv(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    box_scroll(context, DPAD_UP);
     ssf_press_button_ptv(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY0, EGG_BUTTON_HOLD_DELAY);
 }
 

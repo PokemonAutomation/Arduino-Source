@@ -13,6 +13,7 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh_EggHelpers.h"
 
@@ -90,7 +91,6 @@ struct EggCombinedSession{
 
         Milliseconds BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY0;
         Milliseconds BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY0;
-        Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
 
         //  Move to column.
         party_to_column(context, column);
@@ -100,12 +100,12 @@ struct EggCombinedSession{
         //  Move to next column.
         column++;
         if (column < 6){
-            ssf_press_dpad(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            box_scroll(context, DPAD_RIGHT);
         }else{
             column = 0;
             ssf_press_button(context, BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-            ssf_press_dpad(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-            ssf_press_dpad(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            box_scroll(context, DPAD_RIGHT);
+            box_scroll(context, DPAD_RIGHT);
         }
 
         pickup_column(context, false);

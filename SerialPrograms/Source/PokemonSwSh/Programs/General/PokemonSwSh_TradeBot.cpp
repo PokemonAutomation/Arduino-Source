@@ -11,6 +11,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
 #include "PokemonSwSh_TradeBot.h"
 
 namespace PokemonAutomation{
@@ -129,11 +130,11 @@ void TradeBot::trade_slot(
 
     //  Move to slot
     while (slot >= 6){
-        ssf_press_dpad(context, DPAD_DOWN, GameSettings::instance().BOX_SCROLL_DELAY1);
+        box_scroll(context, DPAD_DOWN);
         slot -= 6;
     }
     while (slot > 0){
-        ssf_press_dpad(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY1);
+        box_scroll(context, DPAD_RIGHT);
         slot--;
     }
 

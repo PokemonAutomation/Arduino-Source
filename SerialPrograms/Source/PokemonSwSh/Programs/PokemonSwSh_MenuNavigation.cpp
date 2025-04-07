@@ -8,9 +8,8 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
-#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
 #include "PokemonSwSh_MenuNavigation.h"
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -43,19 +42,17 @@ void navigate_to_menu_app(
 
     const int target_row = (int)target_app_index / 5;
     const int target_col = (int)target_app_index % 5;
-    
-    const Milliseconds BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY1;
 
     const DpadPosition dir = (cur_col < target_col ? DPAD_RIGHT : DPAD_LEFT);
     const int steps = std::abs(cur_col - target_col);
     for(int i = 0; i < steps; i++){
-        ssf_press_dpad_ptv(context, dir, BOX_SCROLL_DELAY, 80ms);
+        box_scroll(context, dir);
     }
 
     if (cur_row < target_row){
-        ssf_press_dpad_ptv(context, DPAD_DOWN, BOX_SCROLL_DELAY, 80ms);
+        box_scroll(context, DPAD_DOWN);
     }else if (cur_row > target_row){
-        ssf_press_dpad_ptv(context, DPAD_UP, BOX_SCROLL_DELAY, 80ms);
+        box_scroll(context, DPAD_UP);
     }
 
     context.wait_for_all_requests();
