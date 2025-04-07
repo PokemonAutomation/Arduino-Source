@@ -563,11 +563,14 @@ size_t EggAutonomous::talk_to_lady_to_fetch_egg(
 //        break;
 
     default:
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "Cannot detect dialog selection arrow when talking to Nursery lady.",
-            env.console
-        );
+        env.log("Daycare lady not found.");
+        env.console.overlay().add_log("No daycare lady", COLOR_WHITE);
+        return num_eggs_retrieved;
+//        OperationFailedException::fire(
+//            ErrorReport::SEND_ERROR_REPORT,
+//            "Cannot detect dialog selection arrow when talking to Nursery lady.",
+//            env.console
+//        );
     }
 
     // If dialog over is not detected:
