@@ -95,7 +95,7 @@ private:
 
     // Used to wait until Y-Comm icon shows up.
     // Throw error if it does not find it after 10 sec.
-    void wait_for_y_comm_icon(
+    void mash_B_until_y_comm_icon(
         SingleSwitchProgramEnvironment& env,
         ProControllerContext& context,
         const std::string& error_msg

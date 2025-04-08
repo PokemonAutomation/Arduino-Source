@@ -455,7 +455,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     pbf_press_button(context, BUTTON_R, 80ms, 2000ms);
     pbf_mash_button(context, BUTTON_A, 500ms);
-    wait_for_y_comm_icon(env, context, "Cannot detect end of saving game.");
+    mash_B_until_y_comm_icon(env, context, "Cannot detect end of saving game.");
 }
 
 void EggAutonomous::call_flying_taxi(
@@ -474,7 +474,7 @@ void EggAutonomous::call_flying_taxi(
     navigate_to_menu_app(env, env.console, context, TOWN_MAP_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);
 
     fly_home(context, false);
-    wait_for_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
+    mash_B_until_y_comm_icon(env, context, "Cannot detect end of flying taxi animation.");
 }
 
 void EggAutonomous::wait_for_egg_hatched(
@@ -858,7 +858,7 @@ bool EggAutonomous::process_hatched_pokemon(
     return false;
 }
 
-void EggAutonomous::wait_for_y_comm_icon(
+void EggAutonomous::mash_B_until_y_comm_icon(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     const std::string& error_msg
@@ -869,7 +869,7 @@ void EggAutonomous::wait_for_y_comm_icon(
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_wait(context, 10s);
+            pbf_mash_button(context, BUTTON_B, 1000ms);
         },
         {y_comm_detector}
     );
