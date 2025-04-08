@@ -68,7 +68,7 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
     }
     case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
         Milliseconds tv = context->timing_variation();
-        Milliseconds unit = 34ms + tv;
+        Milliseconds unit = 24ms + tv;
 
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);

@@ -276,18 +276,17 @@ void numberpad_enter_code(
 
 
     //  Fetch the delays.
-    NumberEntryDelays delays{
-        .hold = ConsoleSettings::instance().DIGIT_ENTRY.BUTTON_HOLD,
-        .cool = ConsoleSettings::instance().DIGIT_ENTRY.BUTTON_COOLDOWN,
-        .press_delay = ConsoleSettings::instance().DIGIT_ENTRY.PRESS_DELAY,
-        .move_delay = ConsoleSettings::instance().DIGIT_ENTRY.SCROLL_DELAY,
-    };
 
-    //  Increase delays by controller timing variation.
-    delays.hold += context->timing_variation();
-    delays.cool += context->timing_variation();
-    delays.press_delay += context->timing_variation();
-    delays.move_delay += context->timing_variation();
+    Milliseconds unit = ConsoleSettings::instance().DIGIT_ENTRY.TIME_UNIT;
+    Milliseconds tv = context->timing_variation();
+    unit += tv;
+
+    NumberEntryDelays delays{
+        .hold = 2*unit,
+        .cool = unit,
+        .press_delay = unit,
+        .move_delay = unit,
+    };
 
 
     //  Get all the possible paths.
@@ -301,7 +300,7 @@ void numberpad_enter_code(
     std::vector<NumberEntryActionWithDelay> best_path = keyboard_get_best_path(
         all_paths,
         delays,
-        context->timing_variation() == 0ms
+        context->atomic_multibutton()
     );
 
     keyboard_execute_path(context, delays, best_path);

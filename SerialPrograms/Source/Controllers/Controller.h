@@ -60,6 +60,12 @@ public:
     //  Zero means "tick precise".
     virtual Milliseconds timing_variation() const = 0;
 
+    //  If the controller can atomically press/release multiple buttons
+    //  return true. This means that if the program presses A and B
+    //  simultaneously, the console will never see an intermediate state where
+    //  either A or B is pressed by itself before the other is pressed as well.
+    virtual bool atomic_multibutton() const = 0;
+
 
 public:
     //  Status

@@ -23,6 +23,16 @@ namespace NintendoSwitch{
 extern const Resolution DEFAULT_RESOLUTION;
 
 
+class TimingOptions : public GroupOption{
+public:
+    TimingOptions();
+
+public:
+    MillisecondsOption WIRED_MICROCONTROLLER;
+    MillisecondsOption WIRELESS_ESP32;
+    MillisecondsOption SYSBOTBASE;
+};
+
 
 class ConsoleSettings : public BatchOption{
     ConsoleSettings();
@@ -37,6 +47,8 @@ public:
     MillisecondsOption START_GAME_INTERNET_CHECK_DELAY0;
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_FAST;
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_SLOW;
+
+    TimingOptions TIMING_OPTIONS;
 
     DigitEntryTimingsOption DIGIT_ENTRY;
     KeyboardEntryTimingsOption KEYBOARD_ENTRY;

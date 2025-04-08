@@ -60,6 +60,9 @@ public:
     virtual Milliseconds timing_variation() const override{
         return SerialPABotBase_WirelessController::timing_variation();
     }
+    virtual bool atomic_multibutton() const override{
+        return true;
+    }
 
 
 public:

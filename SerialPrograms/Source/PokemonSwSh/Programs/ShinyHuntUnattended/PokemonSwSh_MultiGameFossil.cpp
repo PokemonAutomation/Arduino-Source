@@ -115,11 +115,10 @@ void run_fossil_batch(
             break;
         }
 
-        Milliseconds tv = context->timing_variation();
-        if (tv == 0ms){
-            ssf_mash_AZs(context, 3200ms);
-        }else{
+        if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
             ssf_mash_AZs(context, 4000ms);
+        }else{
+            ssf_mash_AZs(context, 3200ms);
         }
         pbf_mash_button(
             context,

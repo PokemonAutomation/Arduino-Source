@@ -385,28 +385,37 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
+    numberpad_enter_code(logger, context, "708538991006", false);
+
+
+
 #if 0
     for (size_t i = 0; i < 100; i++){
-        for (size_t c = 0; c < 2; c++){
-            ssf_issue_scroll(context, DPAD_RIGHT, 32ms);
+        for (size_t c = 0; c < 7; c++){
+            ssf_issue_scroll(context, DPAD_RIGHT, 40ms);
         }
-        for (size_t c = 0; c < 2; c++){
-            ssf_issue_scroll(context, DPAD_LEFT, 32ms);
+        for (size_t c = 0; c < 7; c++){
+            ssf_issue_scroll(context, DPAD_LEFT, 40ms);
         }
-    }
-
-
-
-    for (size_t c = 0; c < 60; c++){
-        ssf_issue_scroll(context, DPAD_DOWN, 20ms);
-    }
-    ssf_do_nothing(context, 1000ms);
-    for (size_t c = 0; c < 60; c++){
-        ssf_issue_scroll(context, DPAD_UP, 20ms);
     }
 #endif
 
-    pbf_move_left_joystick(context, 38, 38, 10000, 0);
+
+
+#if 0
+    while (true){
+        for (size_t c = 0; c < 60; c++){
+            ssf_issue_scroll(context, DPAD_DOWN, 24ms);
+        }
+        ssf_do_nothing(context, 1000ms);
+        for (size_t c = 0; c < 60; c++){
+            ssf_issue_scroll(context, DPAD_UP, 24ms);
+        }
+        ssf_do_nothing(context, 1000ms);
+    }
+#endif
+
+//    pbf_move_left_joystick(context, 38, 38, 10000, 0);
 
 
 //    ssf_issue_scroll(context, DPAD_LEFT, 0);

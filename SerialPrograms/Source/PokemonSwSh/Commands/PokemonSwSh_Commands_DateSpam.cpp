@@ -40,7 +40,7 @@ void neutral_date_skip(ProControllerContext& context){
     }
     case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
         Milliseconds tv = context->timing_variation();
-        Milliseconds unit = 34ms + tv;
+        Milliseconds unit = 24ms + tv;
 
         ssf_press_button(context, BUTTON_A, 20, 10);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
@@ -104,7 +104,7 @@ void roll_date_forward_1(ProControllerContext& context, bool fast){
     }
     case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
         Milliseconds tv = context->timing_variation();
-        Milliseconds unit = 34ms + tv;
+        Milliseconds unit = 24ms + tv;
 
         ssf_press_button(context, BUTTON_A, 160ms, 3*unit);
         ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
@@ -178,7 +178,7 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
     }
     case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
         Milliseconds tv = context->timing_variation();
-        Milliseconds unit = 32ms + tv;
+        Milliseconds unit = 24ms + tv;
 
         ssf_press_button(context, BUTTON_A, 160ms, 3*unit);
 

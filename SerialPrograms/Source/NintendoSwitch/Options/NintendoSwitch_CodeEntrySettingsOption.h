@@ -42,12 +42,7 @@ public:
 
 public:
     BooleanCheckBoxOption DIGIT_REORDERING;
-
-    MillisecondsOption BUTTON_HOLD;
-    MillisecondsOption BUTTON_COOLDOWN;
-
-    MillisecondsOption PRESS_DELAY;
-    MillisecondsOption SCROLL_DELAY;
+    MillisecondsOption TIME_UNIT;
 };
 
 class KeyboardEntryTimingsOption : public GroupOption{
@@ -56,13 +51,7 @@ public:
 
 public:
     BooleanCheckBoxOption DIGIT_REORDERING;
-
-    MillisecondsOption BUTTON_HOLD;
-    MillisecondsOption BUTTON_COOLDOWN;
-
-    MillisecondsOption PRESS_DELAY;
-    MillisecondsOption SCROLL_DELAY;
-    MillisecondsOption WRAP_DELAY;
+    MillisecondsOption TIME_UNIT;
 };
 
 

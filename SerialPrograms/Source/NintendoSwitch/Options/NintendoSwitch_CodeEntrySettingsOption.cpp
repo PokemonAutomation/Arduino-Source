@@ -58,38 +58,15 @@ DigitEntryTimingsOption::DigitEntryTimingsOption()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-    , BUTTON_HOLD(
-        "<b>Button Hold Duration:</b><br>Hold button down for this long.<br>"
-        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
+    , TIME_UNIT(
+        "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.<br>"
+        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        "40 ms"
-    )
-    , BUTTON_COOLDOWN(
-        "<b>Button Cooldown Delay:</b><br>After releasing a button, do not use it again for this long.<br>"
-        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        "24 ms"
-    )
-    , PRESS_DELAY(
-        "<b>Press Delay:</b><br>Delay after entering a digit.<br>"
-        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        "32 ms"
-    )
-    , SCROLL_DELAY(
-        "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.<br>"
-        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        "32 ms"
+        PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
     )
 {
     PA_ADD_OPTION(DIGIT_REORDERING);
-
-    PA_ADD_OPTION(BUTTON_HOLD);
-    PA_ADD_OPTION(BUTTON_COOLDOWN);
-
-    PA_ADD_OPTION(PRESS_DELAY);
-    PA_ADD_OPTION(SCROLL_DELAY);
+    PA_ADD_OPTION(TIME_UNIT);
 }
 
 
@@ -105,45 +82,15 @@ KeyboardEntryTimingsOption::KeyboardEntryTimingsOption()
         LockMode::UNLOCK_WHILE_RUNNING,
         PreloadSettings::instance().DEVELOPER_MODE
     )
-    , BUTTON_HOLD(
-        "<b>Button Hold Duration:</b><br>Hold button down for this long.<br>"
-        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
+    , TIME_UNIT(
+        "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.<br>"
+        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        "40 ms"
-    )
-    , BUTTON_COOLDOWN(
-        "<b>Button Cooldown Delay:</b><br>After releasing a button, do not use it again for this long.<br>"
-        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        "24 ms"
-    )
-    , PRESS_DELAY(
-        "<b>Press Delay:</b><br>Delay after entering a digit.<br>"
-        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        "32 ms"
-    )
-    , SCROLL_DELAY(
-        "<b>Scroll Delay:</b><br>Delay to scroll between adjacent keys.<br>"
-        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        PreloadSettings::instance().DEVELOPER_MODE ? "40 ms" : "48 ms"
-    )
-    , WRAP_DELAY(
-        "<b>Wrap Delay:</b><br>Delay to wrap between left/right edges.<br>"
-        "<font color=\"red\">This timing is only relevant if the controller is tick-precise.</font>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        "48 ms"
+        PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
     )
 {
     PA_ADD_OPTION(DIGIT_REORDERING);
-
-    PA_ADD_OPTION(BUTTON_HOLD);
-    PA_ADD_OPTION(BUTTON_COOLDOWN);
-
-    PA_ADD_OPTION(PRESS_DELAY);
-    PA_ADD_OPTION(SCROLL_DELAY);
-    PA_ADD_OPTION(WRAP_DELAY);
+    PA_ADD_OPTION(TIME_UNIT);
 }
 
 

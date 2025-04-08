@@ -8,6 +8,7 @@
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessController.h"
 
 //#include <iostream>
@@ -36,6 +37,7 @@ SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
         connection
     )
     , m_controller_type(controller_type)
+    , m_timing_variation(ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS_ESP32)
     , m_stopping(false)
     , m_status_thread(&SerialPABotBase_WirelessController::status_thread, this)
 {}

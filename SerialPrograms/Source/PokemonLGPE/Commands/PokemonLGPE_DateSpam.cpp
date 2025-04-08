@@ -17,7 +17,7 @@ namespace PokemonLGPE{
 
 void roll_date_forward_1(JoyconContext& context){
     Milliseconds tv = context->timing_variation();
-    Milliseconds unit = 34ms + tv;
+    Milliseconds unit = 24ms + tv;
 
     pbf_press_button(context, BUTTON_A, 2*unit, unit);
     pbf_move_joystick(context, 128, 0, 2*unit, unit);
@@ -38,7 +38,7 @@ void roll_date_backward_N(JoyconContext& context, uint8_t skips){
     }
 
     Milliseconds tv = context->timing_variation();
-    Milliseconds unit = 32ms + tv;
+    Milliseconds unit = 24ms + tv;
 
     pbf_press_button(context, BUTTON_A, 2*unit, unit);
 

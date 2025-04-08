@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_PokkenController_H
 
 #include "Controllers/ControllerCapability.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
@@ -60,7 +61,10 @@ public:
         return Milliseconds(8);
     }
     virtual Milliseconds timing_variation() const override{
-        return Milliseconds::zero();
+        return ConsoleSettings::instance().TIMING_OPTIONS.WIRED_MICROCONTROLLER;
+    }
+    virtual bool atomic_multibutton() const override{
+        return true;
     }
 
 

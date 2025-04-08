@@ -40,7 +40,7 @@ public:
         return Milliseconds(15);
     }
     Milliseconds timing_variation() const{
-        return Milliseconds(0);
+        return m_timing_variation;
     }
 
 
@@ -116,6 +116,7 @@ private:
 
 protected:
     const ControllerType m_controller_type;
+    Milliseconds m_timing_variation;
 private:
     CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;

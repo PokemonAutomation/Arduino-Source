@@ -10,6 +10,7 @@
 
 #include <condition_variable>
 #include "Common/Cpp/Containers/CircularBuffer.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h"
@@ -55,7 +56,10 @@ public:
         return Milliseconds(150);
     }
     virtual Milliseconds timing_variation() const override{
-        return Milliseconds(150);
+        return ConsoleSettings::instance().TIMING_OPTIONS.SYSBOTBASE;
+    }
+    virtual bool atomic_multibutton() const override{
+        return false;
     }
 
 

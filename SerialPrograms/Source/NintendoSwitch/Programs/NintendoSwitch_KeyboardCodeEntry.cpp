@@ -379,22 +379,19 @@ void keyboard_enter_code(
     }
 
 
-    //  Fetch the delays.
+    //  Compute the delays.
+
+    Milliseconds unit = ConsoleSettings::instance().KEYBOARD_ENTRY.TIME_UNIT;
+    Milliseconds tv = context->timing_variation();
+    unit += tv;
+
     KeyboardEntryDelays delays{
-        .hold = ConsoleSettings::instance().KEYBOARD_ENTRY.BUTTON_HOLD,
-        .cool = ConsoleSettings::instance().KEYBOARD_ENTRY.BUTTON_COOLDOWN,
-        .press_delay = ConsoleSettings::instance().KEYBOARD_ENTRY.PRESS_DELAY,
-        .move_delay = ConsoleSettings::instance().KEYBOARD_ENTRY.SCROLL_DELAY,
-        .wrap_delay = ConsoleSettings::instance().KEYBOARD_ENTRY.WRAP_DELAY,
+        .hold = 2*unit,
+        .cool = unit,
+        .press_delay = unit,
+        .move_delay = unit,
+        .wrap_delay = 2*unit,
     };
-
-    //  Increase delays by controller timing variation.
-    delays.hold += context->timing_variation();
-    delays.cool += context->timing_variation();
-    delays.press_delay += context->timing_variation();
-    delays.move_delay += context->timing_variation();
-    delays.wrap_delay += context->timing_variation();
-
 
     //  Get all the possible paths.
     std::vector<std::vector<KeyboardEntryAction>> all_paths = keyboard_get_all_paths(
@@ -407,7 +404,7 @@ void keyboard_enter_code(
     std::vector<KeyboardEntryActionWithDelay> best_path = keyboard_get_best_path(
         all_paths,
         delays,
-        context->timing_variation() == 0ms
+        context->atomic_multibutton()
     );
 
     keyboard_execute_path(context, delays, best_path);
