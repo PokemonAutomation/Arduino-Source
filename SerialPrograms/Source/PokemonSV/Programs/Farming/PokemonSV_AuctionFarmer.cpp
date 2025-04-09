@@ -32,10 +32,6 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV_AuctionFarmer.h"
 
-#include <algorithm>
-
-#include "Common/Cpp/PrettyPrint.h"
-
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -224,7 +220,11 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     // read dialog bubble
     ImageFloatBox top_offer_box(0.05, 0.02, 0.90, 0.49);
     ImageFloatBox bottom_offer_box(0.05, 0.49, 0.90, 0.49);
-    std::vector<ImageFloatBox> offer_boxes = {top_offer_box, bottom_offer_box};
+    std::vector<ImageFloatBox> offer_boxes = {top_offer_box};
+    if (LANGUAGE == Language::Spanish || LANGUAGE == Language::ChineseTraditional) {
+        offer_boxes.emplace_back(bottom_offer_box);
+    }
+
     for (ImagePixelBox dialog_box : dialog_boxes){
         for (ImageFloatBox offer_box : offer_boxes) {
             //        std::cout << "dialog_box: ["
