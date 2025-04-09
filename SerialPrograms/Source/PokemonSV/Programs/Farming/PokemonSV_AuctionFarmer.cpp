@@ -32,6 +32,8 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV_AuctionFarmer.h"
 
+#include <algorithm>
+
 #include "Common/Cpp/PrettyPrint.h"
 
 
@@ -377,7 +379,7 @@ uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Langu
     // How much to cut off from the bid text in order to not read currencies and exclamation marks as numbers.
     // Values are pixels for a 1920x1080 screen, negative values are padding
     static const std::map<Language, std::pair<int8_t, int8_t>> cutoffs = {
-        { Language::English, {22, 7} },
+        { Language::English, {22, 6} },
         { Language::Japanese, {-5, 54} },
         { Language::Spanish, {6, 32} },
         { Language::French, {-5, 45} },
@@ -387,6 +389,7 @@ uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Langu
         { Language::ChineseSimplified, {22, 7} },
         { Language::ChineseTraditional, {22,7} }
     };
+    
 
     static const std::map<Language, float> high_x = {
         { Language::English, 0.75f },
@@ -412,7 +415,6 @@ uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Langu
         { Language::ChineseTraditional, 0.75f }
     };
 
-
     float box_y = high ? 0.42f : 0.493f;
     float box_x = high ? high_x.at(language) : low_x.at(language);
     float width = 0.9f - box_x; // max_x is always the same for all languages
@@ -427,8 +429,6 @@ uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Langu
         VideoSnapshot screen = stream.video().snapshot();
         double screen_scale = (double)screen->width() / 1920.0;
         double vertical_padding = 5.0; // small amount of pixels so numbers do not touch the edge of the view when reading them
-        float left_cutoff = cutoffs.at(language).first;
-        float right_cutoff = cutoffs.at(language).second;
 
         ImageViewRGB32 raw_bid_image = extract_box_reference(screen, box);
         ImagePixelBox bid_bounding_box = ImageMatch::enclosing_rectangle_with_pixel_filter(
@@ -437,13 +437,19 @@ uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Langu
                 return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 250;
             });
 
+        int32_t max_width = static_cast<int32_t>(raw_bid_image.width() - 1);
+        int32_t max_height = static_cast<int32_t>(raw_bid_image.height() - 1);
+        int32_t scaled_vertical_padding = static_cast<int32_t>(vertical_padding * screen_scale);
+        int32_t left_cutoff = static_cast<int32_t>(cutoffs.at(language).first * screen_scale);
+        int32_t right_cutoff = static_cast<int32_t>(cutoffs.at(language).second * screen_scale);
+
         ImagePixelBox cut_bid_bounding_box(
-            bid_bounding_box.min_x + (size_t)(left_cutoff * screen_scale),
-            bid_bounding_box.min_y - (size_t)(vertical_padding * screen_scale),
-            bid_bounding_box.max_x - (size_t)(right_cutoff * screen_scale),
-            bid_bounding_box.max_y + (size_t)(vertical_padding * screen_scale)
-        );
-       
+            std::max(0, std::min(max_width, static_cast<int32_t>(bid_bounding_box.min_x) + left_cutoff)),
+            std::max(0, std::min(max_height, static_cast<int32_t>(bid_bounding_box.min_y) - scaled_vertical_padding)),
+            std::max(0, std::min(max_width, static_cast<int32_t>(bid_bounding_box.max_x) - right_cutoff)),
+            std::max(0, std::min(max_height, static_cast<int32_t>(bid_bounding_box.max_y) + scaled_vertical_padding))
+            );
+
         uint64_t read_bid = OCR::read_number(stream.logger(), extract_box_reference(raw_bid_image, cut_bid_bounding_box));
 
         if (read_bids.find(read_bid) == read_bids.end()){
