@@ -52,7 +52,11 @@ std::unique_ptr<StatsTracker> GiftReset_Descriptor::make_stats() const{
 }
 
 GiftReset::GiftReset()
-    : GO_HOME_WHEN_DONE(false)
+    : EXTRA_DIALOG(
+        "<b>Persian/Arcanine:</b><br>Check this if the gift Pokemon is Persian or Arcanine.",
+        LockMode::UNLOCK_WHILE_RUNNING, false
+    )
+    , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_SHINY(
         "Shiny Found",
         true, true, ImageAttachmentMode::JPG,
@@ -65,6 +69,7 @@ GiftReset::GiftReset()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(EXTRA_DIALOG);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -113,6 +118,12 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& s
             env, NOTIFICATION_STATUS_UPDATE,
             "Received gift Pokemon."
         );
+
+        if (EXTRA_DIALOG){
+            env.log("Persian/Arcanine selected. Mashing B to exit dialog.");
+            pbf_mash_button(context, BUTTON_B, 4100ms);
+            context.wait_for_all_requests();
+        }
 
         //Wait a bit.
         pbf_wait(context, 2500ms);
