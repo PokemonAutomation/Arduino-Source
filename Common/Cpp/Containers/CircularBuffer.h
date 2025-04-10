@@ -42,6 +42,8 @@ public:
 
     template <class... Args>
     Object& push_back(Args&&... args);
+    template <class... Args>
+    Object* try_push_back(Args&&... args);
     void pop_front();
 
 private:
@@ -173,6 +175,20 @@ Object& CircularBuffer<Object>::push_back(Args&&... args){
     new (m_ptr + back) Object(std::forward<Args>(args)...);
     m_back++;
     return m_ptr[back];
+}
+template <typename Object>
+template <class... Args>
+Object* CircularBuffer<Object>::try_push_back(Args&&... args){
+    if (m_back - m_front >= m_capacity){
+        return nullptr;
+    }
+    size_t back = m_back;
+    if (back >= m_capacity){
+        back -= m_capacity;
+    }
+    new (m_ptr + back) Object(std::forward<Args>(args)...);
+    m_back++;
+    return &m_ptr[back];
 }
 
 template <typename Object>

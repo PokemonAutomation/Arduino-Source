@@ -213,7 +213,7 @@ GameSettings::GameSettings()
         0.3, 0
     )
     , LINE_SPARKLE_ALPHA(
-        "<b>Star Sparkle Alpha:</b>",
+        "<b>Line Sparkle Alpha:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         0.3, 0
     )

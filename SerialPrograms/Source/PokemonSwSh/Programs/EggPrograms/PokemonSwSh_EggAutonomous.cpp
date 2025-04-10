@@ -869,7 +869,7 @@ void EggAutonomous::mash_B_until_y_comm_icon(
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_B, 1000ms);
+            pbf_mash_button(context, BUTTON_B, 10s);
         },
         {y_comm_detector}
     );

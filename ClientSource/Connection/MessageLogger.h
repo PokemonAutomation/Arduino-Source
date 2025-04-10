@@ -9,6 +9,9 @@
 
 #include <atomic>
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Time.h"
+#include "Common/Cpp/Containers/CircularBuffer.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "MessageSniffer.h"
 
 namespace PokemonAutomation{
@@ -46,7 +49,13 @@ public:
     virtual void log(std::string msg) override;
 
 private:
+    bool ok_to_log();
+
+private:
     Logger& m_logger;
+    SpinLock m_lock;
+    size_t m_messages_dropped = 0;
+    CircularBuffer<WallClock> m_history;
 };
 
 

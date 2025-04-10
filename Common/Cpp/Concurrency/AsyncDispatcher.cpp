@@ -7,6 +7,7 @@
 #include "Common/Cpp/PanicDump.h"
 #include "AsyncDispatcher.h"
 
+//#include <Windows.h>
 //#include <iostream>
 //using std::cout;
 //using std::endl;
@@ -62,6 +63,7 @@ AsyncDispatcher::~AsyncDispatcher(){
         m_cv.notify_all();
     }
     for (std::thread& thread : m_threads){
+//        cout << "AsyncDispatcher::~AsyncDispatcher() joining = " << thread.get_id() << endl;
         thread.join();
     }
     for (AsyncTask* task : m_queue){
@@ -144,6 +146,7 @@ void AsyncDispatcher::run_in_parallel(
 
 
 void AsyncDispatcher::thread_loop(){
+//    cout << "AsyncDispatcher::thread_loop() Start = " << GetCurrentThreadId() << ", threads = " << m_threads.size() << endl;
     if (m_new_thread_callback){
         m_new_thread_callback();
     }
@@ -158,6 +161,9 @@ void AsyncDispatcher::thread_loop(){
             }
 
             if (m_stopping){
+//                cout << "AsyncDispatcher::thread_loop() End (inside-start) = " << GetCurrentThreadId() << endl;
+//                Sleep(10000);
+//                cout << "AsyncDispatcher::thread_loop() End (inside-done) = " << GetCurrentThreadId() << endl;
                 return;
             }
             if (m_queue.empty()){
@@ -185,6 +191,7 @@ void AsyncDispatcher::thread_loop(){
         }
         task->signal();
     }
+//    cout << "AsyncDispatcher::thread_loop() End (outside) = " << GetCurrentThreadId() << endl;
 }
 
 
