@@ -14,6 +14,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/ImageMatch/ImageCropper.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -208,7 +209,7 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     VideoSnapshot screen = env.console.video().snapshot();
     std::vector<ImagePixelBox> dialog_boxes = detect_dialog_boxes(screen);
     std::deque<OverlayBoxScope> bubbles_boxes;
-    std::deque<OverlayBoxScope> offer_boxes;
+    std::deque<OverlayBoxScope> offer_overlay_boxes;
     std::vector<std::pair<AuctionOffer, ImageFloatBox>> offers;
 
     if (dialog_boxes.empty()){
@@ -217,57 +218,65 @@ std::vector<std::pair<AuctionOffer, ImageFloatBox>> AuctionFarmer::check_offers(
     }
 
     // read dialog bubble
+    ImageFloatBox top_offer_box(0.05, 0.02, 0.90, 0.49);
+    ImageFloatBox bottom_offer_box(0.05, 0.49, 0.90, 0.49);
+    std::vector<ImageFloatBox> offer_boxes = {top_offer_box};
+    if (LANGUAGE == Language::Spanish || LANGUAGE == Language::ChineseTraditional) {
+        offer_boxes.emplace_back(bottom_offer_box);
+    }
+
     for (ImagePixelBox dialog_box : dialog_boxes){
-//        std::cout << "dialog_box: ["
-//                << dialog_box.min_x << "," << dialog_box.min_y << "] - ["
-//                << dialog_box.max_x << "," << dialog_box.max_y << "]" << std::endl;
+        for (ImageFloatBox offer_box : offer_boxes) {
+            //        std::cout << "dialog_box: ["
+            //                << dialog_box.min_x << "," << dialog_box.min_y << "] - ["
+            //                << dialog_box.max_x << "," << dialog_box.max_y << "]" << std::endl;
 
-        ImageFloatBox dialog_float_box = pixelbox_to_floatbox(screen, dialog_box);
-        bubbles_boxes.emplace_back(env.console, dialog_float_box, COLOR_GREEN);
-
-
-//        OverlayBoxScope dialog_overlay(env.console, dialog_box, COLOR_DARK_BLUE);
-        ImageFloatBox offer_box(0.05, 0.02, 0.90, 0.49);
-        ImageFloatBox translated_offer_box = translate_to_parent(
-            screen,
-            dialog_float_box,
-            floatbox_to_pixelbox(dialog_box.width(), dialog_box.height(), offer_box)
-        );
-//        std::cout << "translated_offer_box: ["
-//                << translated_offer_box.x << "," << translated_offer_box.y << "] - ["
-//                << translated_offer_box.width << "," << translated_offer_box.height << "]" << std::endl;
-
-        offer_boxes.emplace_back(env.console, translated_offer_box, COLOR_BLUE);
-
-//        OverlayBoxScope offer_overlay(env.console, translated_offer_box, COLOR_BLUE);
-        
-        ImageViewRGB32 dialog = extract_box_reference(screen, dialog_box);
-        ImageViewRGB32 offer_image = extract_box_reference(dialog, offer_box);
-
-//        std::cout << offer_image.width() << " x " << offer_image.height() << std::endl;
+            ImageFloatBox dialog_float_box = pixelbox_to_floatbox(screen, dialog_box);
+            bubbles_boxes.emplace_back(env.console, dialog_float_box, COLOR_GREEN);
 
 
-        const double LOG10P_THRESHOLD = -1.5;
-        std::string best_item;
-        OCR::StringMatchResult result = AuctionItemNameReader::instance().read_substring(
-            env.console, LANGUAGE,
-            offer_image,
-            OCR::BLACK_TEXT_FILTERS()
-        );
+            //        OverlayBoxScope dialog_overlay(env.console, dialog_box, COLOR_DARK_BLUE);
+            ImageFloatBox translated_offer_box = translate_to_parent(
+                screen,
+                dialog_float_box,
+                floatbox_to_pixelbox(dialog_box.width(), dialog_box.height(), offer_box)
+            );
+            //        std::cout << "translated_offer_box: ["
+            //                << translated_offer_box.x << "," << translated_offer_box.y << "] - ["
+            //                << translated_offer_box.width << "," << translated_offer_box.height << "]" << std::endl;
 
-        result.clear_beyond_log10p(LOG10P_THRESHOLD);
-        if (best_item.empty() && !result.results.empty()){
-            auto iter = result.results.begin();
-            if (iter->first < LOG10P_THRESHOLD){
-                best_item = iter->second.token;
+            offer_overlay_boxes.emplace_back(env.console, translated_offer_box, COLOR_BLUE);
 
-                AuctionOffer offer{ best_item };
-                std::pair<AuctionOffer, ImageFloatBox> pair(offer, dialog_float_box);
-                offers.emplace_back(pair);
+            //        OverlayBoxScope offer_overlay(env.console, translated_offer_box, COLOR_BLUE);
+
+            ImageViewRGB32 dialog = extract_box_reference(screen, dialog_box);
+            ImageViewRGB32 offer_image = extract_box_reference(dialog, offer_box);
+
+            //        std::cout << offer_image.width() << " x " << offer_image.height() << std::endl;
+
+
+            const double LOG10P_THRESHOLD = -1.5;
+            std::string best_item;
+            OCR::StringMatchResult result = AuctionItemNameReader::instance().read_substring(
+                env.console, LANGUAGE,
+                offer_image,
+                OCR::BLACK_TEXT_FILTERS()
+            );
+
+            result.clear_beyond_log10p(LOG10P_THRESHOLD);
+            if (best_item.empty() && !result.results.empty()) {
+                auto iter = result.results.begin();
+                if (iter->first < LOG10P_THRESHOLD) {
+                    best_item = iter->second.token;
+
+                    AuctionOffer offer{ best_item };
+                    std::pair<AuctionOffer, ImageFloatBox> pair(offer, dialog_float_box);
+                    offers.emplace_back(pair);
+                }
             }
         }
     }
-//    context.wait_for(std::chrono::seconds(100));
+//  context.wait_for(std::chrono::seconds(100));
     return offers;
 }
 
@@ -366,9 +375,51 @@ void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, ProContr
 }
 
 
-uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, bool high){
+uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Language language, bool high){
+    // How much to cut off from the bid text in order to not read currencies and exclamation marks as numbers.
+    // Values are pixels for a 1920x1080 screen, negative values are padding
+    static const std::map<Language, std::pair<int8_t, int8_t>> cutoffs = {
+        { Language::English, {22, 6} },
+        { Language::Japanese, {-5, 54} },
+        { Language::Spanish, {6, 32} },
+        { Language::French, {-5, 45} },
+        { Language::German, {-5, 22} },
+        { Language::Italian, {-5, 35} },
+        { Language::Korean, {-5, 42} },
+        { Language::ChineseSimplified, {22, 7} },
+        { Language::ChineseTraditional, {22,7} }
+    };
+    
+
+    static const std::map<Language, float> high_x = {
+        { Language::English, 0.75f },
+        { Language::Japanese, 0.75f },
+        { Language::Spanish, 0.73f },
+        { Language::French, 0.68f },
+        { Language::German, 0.73f },
+        { Language::Italian, 0.75f },
+        { Language::Korean, 0.75f },
+        { Language::ChineseSimplified, 0.75f },
+        { Language::ChineseTraditional, 0.75f }
+    };
+
+    static const std::map<Language, float> low_x = {
+        { Language::English, 0.75f },
+        { Language::Japanese, 0.75f },
+        { Language::Spanish, 0.75f },
+        { Language::French, 0.75f },
+        { Language::German, 0.73f },
+        { Language::Italian, 0.75f },
+        { Language::Korean, 0.75f },
+        { Language::ChineseSimplified, 0.75f },
+        { Language::ChineseTraditional, 0.75f }
+    };
+
     float box_y = high ? 0.42f : 0.493f;
-    OverlayBoxScope box(stream.overlay(), { 0.73, box_y, 0.17, 0.048 });
+    float box_x = high ? high_x.at(language) : low_x.at(language);
+    float width = 0.9f - box_x; // max_x is always the same for all languages
+    OverlayBoxScope box(stream.overlay(), { box_x, box_y, width, 0.048 });
+
     std::unordered_map<uint64_t, size_t> read_bids;
     size_t highest_read = 0;
     uint64_t read_value = 0;
@@ -376,7 +427,30 @@ uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, bool 
     // read next bid multiple times since the selection arrow sometimes blocks the first digit
     for (size_t i = 0; i < 10; i++){
         VideoSnapshot screen = stream.video().snapshot();
-        uint64_t read_bid = OCR::read_number(stream.logger(), extract_box_reference(screen, box));
+        double screen_scale = (double)screen->width() / 1920.0;
+        double vertical_padding = 5.0; // small amount of pixels so numbers do not touch the edge of the view when reading them
+
+        ImageViewRGB32 raw_bid_image = extract_box_reference(screen, box);
+        ImagePixelBox bid_bounding_box = ImageMatch::enclosing_rectangle_with_pixel_filter(
+            raw_bid_image,
+            [](Color pixel) {
+                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < 250;
+            });
+
+        int32_t max_width = static_cast<int32_t>(raw_bid_image.width() - 1);
+        int32_t max_height = static_cast<int32_t>(raw_bid_image.height() - 1);
+        int32_t scaled_vertical_padding = static_cast<int32_t>(vertical_padding * screen_scale);
+        int32_t left_cutoff = static_cast<int32_t>(cutoffs.at(language).first * screen_scale);
+        int32_t right_cutoff = static_cast<int32_t>(cutoffs.at(language).second * screen_scale);
+
+        ImagePixelBox cut_bid_bounding_box(
+            std::max(0, std::min(max_width, static_cast<int32_t>(bid_bounding_box.min_x) + left_cutoff)),
+            std::max(0, std::min(max_height, static_cast<int32_t>(bid_bounding_box.min_y) - scaled_vertical_padding)),
+            std::max(0, std::min(max_width, static_cast<int32_t>(bid_bounding_box.max_x) - right_cutoff)),
+            std::max(0, std::min(max_height, static_cast<int32_t>(bid_bounding_box.max_y) + scaled_vertical_padding))
+            );
+
+        uint64_t read_bid = OCR::read_number(stream.logger(), extract_box_reference(raw_bid_image, cut_bid_bounding_box));
 
         if (read_bids.find(read_bid) == read_bids.end()){
             read_bids[read_bid] = 0;
@@ -418,11 +492,11 @@ void AuctionFarmer::bid_on_item(SingleSwitchProgramEnvironment& env, ProControll
             pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
             break;
         case 1:
-            current_bid = read_next_bid(env.console, context, true);
+            current_bid = read_next_bid(env.console, context, LANGUAGE, true);
             pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
             break;
         case 2:
-            current_bid = read_next_bid(env.console, context, false);
+            current_bid = read_next_bid(env.console, context, LANGUAGE, false);
             pbf_press_button(context, BUTTON_A, 20, TICKS_PER_SECOND);
             break;
         case 3:
