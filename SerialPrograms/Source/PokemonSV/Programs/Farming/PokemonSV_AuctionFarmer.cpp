@@ -378,7 +378,7 @@ void AuctionFarmer::reset_position(SingleSwitchProgramEnvironment& env, ProContr
 uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Language language, bool high){
     // How much to cut off from the bid text in order to not read currencies and exclamation marks as numbers.
     // Values are pixels for a 1920x1080 screen, negative values are padding
-    static const std::map<Language, std::pair<int8_t, int8_t>> cutoffs = {
+    static const std::map<Language, std::pair<int, int>> cutoffs = {
         { Language::English, {22, 6} },
         { Language::Japanese, {-5, 54} },
         { Language::Spanish, {6, 32} },
