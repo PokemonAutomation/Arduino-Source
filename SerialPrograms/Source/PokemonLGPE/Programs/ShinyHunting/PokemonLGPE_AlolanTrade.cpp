@@ -184,6 +184,10 @@ void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope&
         //Pokedex - Bag - Party - Communicate - Save (these all have a colored line under when selected + an arrow to indicate)
         //(Press Y for options)
 
+        //Make sure any extra dialog is closed
+        pbf_mash_button(context, BUTTON_B, 3000ms);
+        context.wait_for_all_requests();
+
         //Wait a bit.
         pbf_wait(context, 2500ms);
         context.wait_for_all_requests();
