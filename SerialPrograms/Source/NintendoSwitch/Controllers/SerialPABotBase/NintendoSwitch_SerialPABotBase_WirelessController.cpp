@@ -80,23 +80,8 @@ void SerialPABotBase_WirelessController::issue_report(
     //  Divide the controller state into smaller chunks of 65535 milliseconds.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
 
-//    time_left = (time_left + 14ms) / 15ms * 15ms;
-
-//    time_left = std::max(time_left, 15ms);
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
-        time_left -= current;
-
-#if 0
-        //  Make sure the last block isn't too small.
-        if (0ms < time_left && time_left < 15ms){
-            time_left += current;
-            current = time_left / 2;
-            time_left -= current;
-        }
-#endif
-//        cout << "current = " << current.count() << endl;
-
         m_serial->issue_request(
             SerialPABotBase::MessageControllerStateButtons(
                 (uint16_t)current.count(),
@@ -104,6 +89,7 @@ void SerialPABotBase_WirelessController::issue_report(
             ),
             cancellable
         );
+        time_left -= current;
     }
 }
 

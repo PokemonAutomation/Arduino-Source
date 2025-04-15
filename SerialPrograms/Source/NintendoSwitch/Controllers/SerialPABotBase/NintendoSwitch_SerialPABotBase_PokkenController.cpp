@@ -8,9 +8,10 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/Cpp/Options/TimeExpressionOption.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.h"
 #include "NintendoSwitch_SerialPABotBase_PokkenController.h"
 
 //#include <iostream>
@@ -34,6 +35,7 @@ SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
         ControllerType::NintendoSwitch_WiredProController,
         connection
     )
+    , m_use_milliseconds(m_supported_features.contains(ControllerFeature::TimingFlexibleMilliseconds))
     , m_stopping(false)
     , m_status_thread(&SerialPABotBase_PokkenController::status_thread, this)
 {}
@@ -183,14 +185,38 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
 
     //  Divide the controller state into smaller chunks of 255 ticks.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
-    while (time_left > Milliseconds::zero()){
-        Milliseconds current_ms = std::min(time_left, 255 * 8ms);
-        uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_8ms(current_ms.count());
-        m_serial->issue_request(
-            SerialPABotBase::DeviceRequest_controller_state(buttons, dpad, left_x, left_y, right_x, right_y, current_ticks),
-            cancellable
-        );
-        time_left -= current_ms;
+
+    if (m_use_milliseconds){
+        while (time_left > Milliseconds::zero()){
+            Milliseconds current = std::min(time_left, 65535ms);
+            m_serial->issue_request(
+                SerialPABotBase::DeviceRequest_NS_Generic_ControllerStateMs(
+                    (uint16_t)current.count(),
+                    buttons,
+                    dpad,
+                    left_x, left_y,
+                    right_x, right_y
+                ),
+                cancellable
+            );
+            time_left -= current;
+        }
+    }else{
+        while (time_left > Milliseconds::zero()){
+            Milliseconds current_ms = std::min(time_left, 255 * 8ms);
+            uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_8ms(current_ms.count());
+            m_serial->issue_request(
+                SerialPABotBase::DeviceRequest_NS_Generic_ControllerStateTicks(
+                    buttons,
+                    dpad,
+                    left_x, left_y,
+                    right_x, right_y,
+                    current_ticks
+                ),
+                cancellable
+            );
+            time_left -= current_ms;
+        }
     }
 }
 
@@ -251,7 +277,12 @@ void SerialPABotBase_PokkenController::status_thread(){
                 );
             }else{
                 m_handle.set_status_line1(
-                    "Up Time: " + ticks_to_time(NintendoSwitch::TICKS_PER_SECOND, wallclock),
+                    "Up Time: " + ticks_to_time(
+                        m_use_milliseconds
+                            ? 1000
+                            : NintendoSwitch::TICKS_PER_SECOND,
+                        wallclock
+                    ),
                     theme_friendly_darkblue()
                 );
             }

@@ -389,7 +389,6 @@ uint64_t read_next_bid(VideoStream& stream, ProControllerContext& context, Langu
         { Language::ChineseSimplified, {22, 7} },
         { Language::ChineseTraditional, {22,7} }
     };
-    
 
     static const std::map<Language, float> high_x = {
         { Language::English, 0.75f },

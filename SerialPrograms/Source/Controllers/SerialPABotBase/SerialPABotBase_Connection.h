@@ -35,6 +35,9 @@ public:
 
 
 public:
+//    uint8_t program_id() const{
+//        return m_program_id;
+//    }
     BotBaseController* botbase();
 
 public:

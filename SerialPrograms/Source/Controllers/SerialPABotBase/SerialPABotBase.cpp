@@ -85,57 +85,23 @@ const std::map<
         std::map<ControllerType, ControllerFeatures>
     >
 > SUPPORTED_VERSIONS{
-#if 0
-    {2021052600, {
-        {PABB_PID_UNSPECIFIED, {{ControllerType::None, {}}}},
-        {PABB_PID_PABOTBASE_12KB, {
-            {ControllerType::NintendoSwitch_WiredProController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
-        }},
-        {PABB_PID_PABOTBASE_31KB, {
-            {ControllerType::NintendoSwitch_WiredProController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }},
-        }},
-    }},
-    {2023121900, {
-        {PABB_PID_UNSPECIFIED, {{ControllerType::None, {}}}},
-        {PABB_PID_PABOTBASE_12KB, {
-            {ControllerType::NintendoSwitch_WiredProController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::QueryCommandQueueSize,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }},
-        }},
-        {PABB_PID_PABOTBASE_31KB, {
-            {ControllerType::NintendoSwitch_WiredProController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::QueryCommandQueueSize,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }},
-        }},
-    }},
-#endif
     {2025040500, {
         {PABB_PID_PABOTBASE_ESP32, {
             {ControllerType::NintendoSwitch_WirelessProController, {
                 ControllerFeature::TickPrecise,
+                ControllerFeature::TimingFlexibleMilliseconds,
                 ControllerFeature::QueryCommandQueueSize,
                 ControllerFeature::NintendoSwitch_ProController,
             }},
             {ControllerType::NintendoSwitch_LeftJoycon, {
                 ControllerFeature::TickPrecise,
+                ControllerFeature::TimingFlexibleMilliseconds,
                 ControllerFeature::QueryCommandQueueSize,
                 ControllerFeature::NintendoSwitch_LeftJoycon,
             }},
             {ControllerType::NintendoSwitch_RightJoycon, {
                 ControllerFeature::TickPrecise,
+                ControllerFeature::TimingFlexibleMilliseconds,
                 ControllerFeature::QueryCommandQueueSize,
                 ControllerFeature::NintendoSwitch_RightJoycon,
             }},
@@ -182,9 +148,12 @@ const std::map<
                 ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
+    }},
+    {2025041400, {
         {PABB_PID_PABOTBASE_ESP32S3, {
             {ControllerType::NintendoSwitch_WiredProController, {
                 ControllerFeature::TickPrecise,
+                ControllerFeature::TimingFlexibleMilliseconds,
                 ControllerFeature::QueryCommandQueueSize,
                 ControllerFeature::NintendoSwitch_ProController,
                 ControllerFeature::NintendoSwitch_DateSkip,

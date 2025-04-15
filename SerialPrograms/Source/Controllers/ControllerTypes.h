@@ -37,6 +37,7 @@ enum class ControllerType{
 
 enum class ControllerFeature{
     TickPrecise,
+    TimingFlexibleMilliseconds,
     QueryTickSize,
     QueryCommandQueueSize,
     NintendoSwitch_ProController,

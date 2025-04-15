@@ -188,8 +188,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
-    ../Common/SerialPABotBase/SerialPABotBase_Messages_AVR8.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_Generic.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h
@@ -655,10 +655,10 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h

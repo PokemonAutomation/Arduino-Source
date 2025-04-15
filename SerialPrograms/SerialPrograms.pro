@@ -326,8 +326,8 @@ SOURCES += \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp \
     Source/Controllers/SuperscalarScheduler.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
@@ -1280,6 +1280,7 @@ HEADERS += \
     ../Common/Qt/TimeQt.h \
     ../Common/Qt/WidgetStackFixedAspectRatio.h \
     ../Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h \
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_Generic.h \
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h \
     ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h \
     ../SerialPrograms/Source/PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h \
@@ -1501,8 +1502,8 @@ HEADERS += \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h \
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_AVR8.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h \
     Source/Controllers/SuperscalarScheduler.h \

@@ -195,6 +195,7 @@ private:
 
 
 private:
+    bool m_use_milliseconds;
     CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;
     std::mutex m_sleep_lock;

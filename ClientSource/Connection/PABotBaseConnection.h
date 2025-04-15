@@ -16,7 +16,7 @@
 
 #include <memory>
 #include <deque>
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
+//#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "BotBase.h"
 #include "MessageSniffer.h"
 #include "StreamInterface.h"
