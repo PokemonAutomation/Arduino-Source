@@ -54,6 +54,7 @@ public:
 
     //  The minimum amount of time between two state reports. This effectively
     //  limits how quickly you can change states.
+    //  Controllers with non-zero ticksize will have (ticksize == cooldown).
     virtual Milliseconds cooldown() const = 0;
 
     //  Some controllers are imprecise. This returns the variation.

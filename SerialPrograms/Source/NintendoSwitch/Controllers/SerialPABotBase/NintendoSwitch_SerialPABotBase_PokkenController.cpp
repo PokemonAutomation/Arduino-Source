@@ -183,7 +183,8 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
     //  This loop can block indefinitely if the command queue is full.
     ReverseLockGuard<std::mutex> lg(m_state_lock);
 
-    //  Divide the controller state into smaller chunks of 255 ticks.
+    //  Divide the controller state into smaller chunks that fit into the report
+    //  duration.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
 
     if (m_use_milliseconds){
@@ -221,6 +222,32 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
 }
 
 
+//
+//  Given a regularly reported 32-bit counter that wraps around, infer its true
+//  64-bit value.
+//
+class ExtendedLengthCounter{
+public:
+    ExtendedLengthCounter()
+        : m_high_bits(0)
+        , m_last_received(0)
+    {}
+
+    uint64_t push_short_value(uint32_t counter){
+        if (counter < m_last_received && counter - m_last_received < 0x40000000){
+            m_high_bits++;
+        }
+        m_last_received = counter;
+        return ((uint64_t)m_high_bits << 32) | counter;
+    }
+
+private:
+    uint32_t m_high_bits;
+    uint32_t m_last_received;
+};
+
+
+
 void SerialPABotBase_PokkenController::status_thread(){
     constexpr std::chrono::milliseconds PERIOD(1000);
     std::atomic<WallClock> last_ack(current_time());
@@ -255,6 +282,8 @@ void SerialPABotBase_PokkenController::status_thread(){
         }
     });
 
+
+    ExtendedLengthCounter clock_tracker;
     WallClock next_ping = current_time();
     while (true){
         if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
@@ -269,7 +298,8 @@ void SerialPABotBase_PokkenController::status_thread(){
                 &m_scope
             ).convert<PABB_MSG_ACK_REQUEST_I32>(logger(), response);
             last_ack.store(current_time(), std::memory_order_relaxed);
-            uint32_t wallclock = response.data;
+            uint64_t wallclock = clock_tracker.push_short_value(response.data);
+
             if (wallclock == 0){
                 m_handle.set_status_line1(
                     "Not connected to Switch.",

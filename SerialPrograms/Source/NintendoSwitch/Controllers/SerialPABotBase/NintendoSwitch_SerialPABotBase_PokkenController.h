@@ -55,10 +55,10 @@ public:
     }
 
     virtual Milliseconds ticksize() const override{
-        return Milliseconds(8);
+        return m_use_milliseconds ? Milliseconds(0) : Milliseconds(8);
     }
     virtual Milliseconds cooldown() const override{
-        return Milliseconds(8);
+        return m_use_milliseconds ? Milliseconds(0) : Milliseconds(8);
     }
     virtual Milliseconds timing_variation() const override{
         return ConsoleSettings::instance().TIMING_OPTIONS.WIRED_MICROCONTROLLER;
