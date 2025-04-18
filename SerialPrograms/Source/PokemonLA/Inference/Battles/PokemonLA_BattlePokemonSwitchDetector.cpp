@@ -57,7 +57,7 @@ bool BattlePokemonSwitchDetector::process_frame(const ImageViewRGB32& frame, Wal
     }
 
     const ImageStats white_3 = image_stats(extract_box_reference(frame, m_white_bg_3));
-    if(is_white(white_3, 500, 10) == false){
+    if(is_white(white_3, 500, 15) == false){
         // std::cout << "no white_3" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
