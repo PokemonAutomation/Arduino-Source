@@ -1,7 +1,0 @@
-﻿{
-    "0-ProgramName": "PABotBase",
-    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/NintendoSwitch/PABotBase.md",
-    "2-Description": "Control your Arduino/Teensy (and therefore your Switch) from a computer.",
-    "3-Parameters": [
-    ]
-}

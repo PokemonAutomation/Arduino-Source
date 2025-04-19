@@ -1,8 +1,0 @@
-.qmake.stash
-Makefile
-Settings.json
-HexGenerator
-moc_MainWindow.cpp
-moc_RightPanel.cpp
-moc_predefs.h
-Logs/

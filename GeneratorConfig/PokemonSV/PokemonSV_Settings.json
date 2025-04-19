@@ -1,9 +1,0 @@
-{
-    "0-ConfigName": "PokemonSettings",
-    "1-ConfigPath": "PokemonSCVI",
-    "2-Documentation": "",
-    "3-Description": "Global Pokémon Settings",
-    "4-Header": "Libraries/PokemonSCVI_Settings.h",
-    "5-Options": [
-    ]
-}
