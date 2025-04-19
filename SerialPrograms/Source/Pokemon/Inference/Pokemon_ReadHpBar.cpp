@@ -35,7 +35,7 @@ double read_hp_bar_internal(const ImageViewRGB32& image){
         max_color = std::max(max_color, stats.average.g);
         max_color = std::max(max_color, stats.average.b);
 //        cout << "max_color: " << max_color << ", stddev: " << stats.stddev.sum() << endl;
-        if (max_color > 128 && stats.stddev.sum() < 70){
+        if (max_color > 128 && stats.stddev.sum() < 120){
             break;
         }
         bar *= 0.5;
@@ -83,8 +83,10 @@ double read_hp_bar(const ImageViewRGB32& image){
 
 double read_hp_bar(Logger& logger, const ImageViewRGB32& image){
     double hp = read_hp_bar(image);
+
 //    static int c = 0;
 //    image.save("test-" + std::to_string(c++) + ".png");
+
     if (hp <= 0){
         logger.log("HP Read: ?", COLOR_RED);
     }else{

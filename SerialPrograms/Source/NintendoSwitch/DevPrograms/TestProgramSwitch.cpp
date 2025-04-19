@@ -121,6 +121,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 
 
 #include <QPixmap>
@@ -317,6 +318,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::terminate();
 
+    ImageRGB32 image("20250420-043111395281.png");
+
+    OcrFailureWatchdog watchdog(logger);
+
+    PokemonSwSh::MaxLairInternal::PokemonSwapMenuReader reader(logger, overlay, Language::Korean, watchdog);
+
+    double hp[4];
+    reader.read_hp(image, hp);
+
 
 #if 0
     ImageRGB32 image("20250404-154507236508.png");
@@ -385,17 +395,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-    numberpad_enter_code(logger, context, "708538991006", false);
+//    numberpad_enter_code(logger, context, "708538991006", false);
 
 
 
 #if 0
     for (size_t i = 0; i < 100; i++){
-        for (size_t c = 0; c < 7; c++){
-            ssf_issue_scroll(context, DPAD_RIGHT, 40ms);
+        for (size_t c = 0; c < 4; c++){
+            ssf_issue_scroll(context, DPAD_RIGHT, 17ms);
         }
-        for (size_t c = 0; c < 7; c++){
-            ssf_issue_scroll(context, DPAD_LEFT, 40ms);
+        for (size_t c = 0; c < 4; c++){
+            ssf_issue_scroll(context, DPAD_LEFT, 17ms);
         }
     }
 #endif
