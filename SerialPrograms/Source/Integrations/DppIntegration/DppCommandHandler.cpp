@@ -376,7 +376,8 @@ void Handler::create_unified_commands(commandhandler& handler){
                 {"15", "DDOWN"},
                 {"16", "DLEFT"},
                 {"17", "DRIGHT"},}
-            )}
+            )},
+            {"ticks", param_info(pt_integer, false, "How long to hold the button for, in ticks.")},
         },
         [&handler, this](const std::string& command, const parameter_list_t& params, command_source src){
             log_dpp("Executing " + command + "...", "Unified Command Handler", ll_info);
@@ -389,7 +390,7 @@ void Handler::create_unified_commands(commandhandler& handler){
             embed embed;
             embed.set_color((uint32_t)color).set_title("Command Response");
 
-            if (params.size() < 2){
+            if (params.size() < 3){
                 embed.set_description("Missing command arguments.");
                 message.add_embed(embed);
                 handler.reply(message, src);
@@ -401,6 +402,7 @@ void Handler::create_unified_commands(commandhandler& handler){
 
             std::string name = "None";
             int64_t button = Utility::get_value_from_input(handler, command, button_input, name);
+            int64_t ticks = Utility::sanitize_integer_input(params, 2);
 
             if (button < 0){
                 embed.set_description("No such button found: " + button_input);
@@ -411,9 +413,9 @@ void Handler::create_unified_commands(commandhandler& handler){
 
             std::string response;
             if (button > 13){
-                response = Integration::press_dpad(id, Utility::get_button(button), 50);
+                response = Integration::press_dpad(id, Utility::get_button(button), ticks);
             }else{
-                response = Integration::press_button(id, Utility::get_button(button), 50);
+                response = Integration::press_button(id, Utility::get_button(button), ticks);
             }
 
             if (!response.empty()){
