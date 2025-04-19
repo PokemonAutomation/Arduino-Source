@@ -1,7 +1,0 @@
-﻿{
-    "0-ProgramName": "CustomProgram",
-    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/NintendoSwitch/CustomProgram.md",
-    "2-Description": "Write your own program by editing \"NativePrograms/PokemonSwShPrograms/CustomProgram_Core.c\".<br>(This example is just a copy of TurboA.)",
-    "3-Parameters": [
-    ]
-}

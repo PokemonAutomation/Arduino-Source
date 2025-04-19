@@ -1,7 +1,0 @@
-
----- Programs ----
-CustomProgram
-
-TurboA
-FriendDelete
-PABotBase
