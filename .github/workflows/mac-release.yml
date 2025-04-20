@@ -2,8 +2,8 @@ name: SerialPrograms MacOS Release
 
 on:
   create:
-    branch:
-      # Start MacOS release flow when a new version branch is created
+  push:
+    branches:
       - 'v*'
   workflow_dispatch:
     # Manual release / testing
@@ -35,6 +35,11 @@ on:
 
 jobs:
   build:
+    # Run when manually triggered, when a new version branch is created, or when a version branch is updated
+    if: |
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'create' && github.ref_type == 'branch' && startsWith(github.ref, 'refs/heads/v')) ||
+      (github.event_name == 'push' && startsWith(github.ref, 'refs/heads/v'))
     runs-on: ${{ github.event.inputs.runner || 'macos-13'}}
     steps:
       - name: Checkout Arduino-Source
@@ -126,7 +131,9 @@ jobs:
       - name: GitHub Release
         uses: softprops/action-gh-release@v2
         with:
-          files: SerialPrograms-Installer.dmg
+          files: |
+            SerialPrograms-Installer.dmg
+            Packages/PABotBase/PABotBase-Switch/*
           # Tag should be automatically set in the case of a tag push
           tag_name: ${{ github.event.inputs.version || github.ref_name }}
           token: ${{ secrets.GITHUB_TOKEN }}
