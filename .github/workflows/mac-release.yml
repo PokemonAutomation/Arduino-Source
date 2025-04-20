@@ -83,16 +83,16 @@ jobs:
           install_name_tool -add_rpath $BREW_PREFIX/lib SerialPrograms.app/Contents/MacOS/SerialPrograms
           otool -l SerialPrograms.app/Contents/MacOS/SerialPrograms | grep -A2 LC_RPATH
           mkdir SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/protobuf/29.3/lib/libutf8_validity.dylib SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/webp/1.5.0/lib/libsharpyuv.0.dylib SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/jpeg-xl/0.11.1/lib/libjxl_cms.0.11.dylib SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/vtk/9.4.1_2/lib/libvtkCommonComputationalGeometry-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/vtk/9.4.1_2/lib/libvtkFiltersVerdict-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/vtk/9.4.1_2/lib/libvtkfmt-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/vtk/9.4.1_2/lib/libvtkFiltersGeometry-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/vtk/9.4.1_2/lib/libvtkFiltersCore-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/vtk/9.4.1_2/lib/libvtkCommonCore-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
-          cp $BREW_PREFIX/Cellar/vtk/9.4.1_2/lib/libvtkCommonSystem-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/protobuf/lib/libutf8_validity.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/webp/lib/libsharpyuv.0.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/jpeg-xl/lib/libjxl_cms.0.11.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkCommonComputationalGeometry-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkFiltersVerdict-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkfmt-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkFiltersGeometry-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkFiltersCore-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkCommonCore-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
+          cp $BREW_PREFIX/opt/vtk/lib/libvtkCommonSystem-9.4.1.dylib SerialPrograms.app/Contents/Frameworks
 
       # Use macdeployqt to bundle the app with dependencies
       - name: Run macdeployqt
