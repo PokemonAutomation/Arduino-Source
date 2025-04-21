@@ -160,6 +160,16 @@ const std::map<
             }},
         }},
     }},
+    {2025042000, {
+        {PABB_PID_PABOTBASE_CH552, {
+            {ControllerType::NintendoSwitch_WiredProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+    }},
 };
 
 
