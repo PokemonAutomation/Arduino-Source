@@ -1375,6 +1375,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
     Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.cpp
     Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.h
+    Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleMenuDetector.cpp
+    Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleMenuDetector.h
     Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.cpp
     Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp
