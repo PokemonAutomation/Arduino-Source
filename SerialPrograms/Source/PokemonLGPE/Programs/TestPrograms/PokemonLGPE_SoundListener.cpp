@@ -18,9 +18,9 @@
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 #include "PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h"
 #include "PokemonLGPE_SoundListener.h"
-
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,7 +35,8 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         "",
         "Test sound detectors listening to audio stream.",
         FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon}
+        {ControllerFeature::NintendoSwitch_RightJoycon},
+        FasterIfTickPrecise::NOT_FASTER
     )
 {}
 
@@ -58,7 +59,9 @@ SoundListener::SoundListener()
     PA_ADD_OPTION(STOP_ON_DETECTED_SOUND);
 }
 
-void SoundListener::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void SoundListener::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+    JoyconContext context(scope, env.console.controller<JoyconController>());
+
     std::cout << "Running audio test program." << std::endl;
 
     std::shared_ptr<AudioInferenceCallback> detector;

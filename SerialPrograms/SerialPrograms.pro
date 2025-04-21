@@ -681,6 +681,7 @@ SOURCES += \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.cpp \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.cpp \
+    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.cpp \
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp \
     Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp \
     Source/PokemonLGPE/PokemonLGPE_Panels.cpp \
@@ -1879,6 +1880,7 @@ HEADERS += \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.h \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.h \
+    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h \
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h \
     Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h \
     Source/PokemonLGPE/PokemonLGPE_Panels.h \
