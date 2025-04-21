@@ -32,6 +32,10 @@ public:
     MillisecondsOption START_GAME_WAIT1;
     MillisecondsOption ENTER_GAME_MASH0;
     MillisecondsOption ENTER_GAME_WAIT0;
+
+    SectionDividerOption m_shiny_audio_settings;
+    FloatingPointOption SHINY_SOUND_THRESHOLD;
+    FloatingPointOption SHINY_SOUND_LOW_FREQUENCY;
 };
 
 
