@@ -32,6 +32,13 @@ public:
 private:
     bool run_battle(SingleSwitchProgramEnvironment& env, JoyconContext& context);
 
+    enum class Target{
+        mewtwo,
+        snorlax,
+        snorlax2,
+    };
+    EnumDropdownOption<Target> TARGET;
+
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_SHINY;

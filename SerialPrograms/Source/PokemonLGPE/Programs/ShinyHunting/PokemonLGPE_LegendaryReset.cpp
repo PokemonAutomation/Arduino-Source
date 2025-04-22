@@ -53,7 +53,17 @@ std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
 }
 
 LegendaryReset::LegendaryReset()
-    : GO_HOME_WHEN_DONE(true)
+    : TARGET(
+        "<b>Target:</b><br>",
+        {
+            {Target::mewtwo, "mewtwo", "Mewtwo, Articuno, Zapdos, Moltres"},
+            {Target::snorlax, "snorlax", "Snorlax"},
+            //{Target::snorlax2, "snorlax2", "Snorlax (w/Fuji)"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        Target::mewtwo
+    )
+    , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_SHINY(
         "Shiny Found",
         true, true, ImageAttachmentMode::JPG,
@@ -66,6 +76,7 @@ LegendaryReset::LegendaryReset()
         &NOTIFICATION_PROGRAM_FINISH,
     })
 {
+    PA_ADD_OPTION(TARGET);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -79,7 +90,17 @@ bool LegendaryReset::run_battle(SingleSwitchProgramEnvironment& env, JoyconConte
     BattleMenuWatcher battle_started(COLOR_YELLOW);
 
     env.log("Starting battle.");
-    pbf_mash_button(context, BUTTON_A, 25000ms); //10000ms
+    switch (TARGET) {
+    case Target::mewtwo:
+        pbf_mash_button(context, BUTTON_A, 5000ms); //untested
+        break;
+    case Target::snorlax:
+        pbf_mash_button(context, BUTTON_A, 15000ms);
+        break;
+    case Target::snorlax2:
+        pbf_mash_button(context, BUTTON_A, 25000ms); //can't test
+        break;
+    }
     context.wait_for_all_requests();
 
     int res = run_until<JoyconContext>(
