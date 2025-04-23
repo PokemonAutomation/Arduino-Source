@@ -30,12 +30,12 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
-    bool run_battle(SingleSwitchProgramEnvironment& env, JoyconContext& context);
+    bool run_encounter(SingleSwitchProgramEnvironment& env, JoyconContext& context);
 
     enum class Target{
         mewtwo,
         snorlax,
-        snorlax2,
+        //snorlax2,
     };
     EnumDropdownOption<Target> TARGET;
 

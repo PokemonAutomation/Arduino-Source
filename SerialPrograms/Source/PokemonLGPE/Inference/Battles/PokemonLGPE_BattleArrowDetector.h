@@ -28,7 +28,7 @@ public:
     Don't know what changes for a double battle.
     */
     //Arrow bounces back and forth.
-    BattleArrowDetector(Color color, const ImageFloatBox& box = {0.546, 0.863, 0.045, 0.068}); //Wild battle.
+    BattleArrowDetector(Color color, const ImageFloatBox& box);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -39,8 +39,8 @@ protected:
 };
 class BattleArrowWatcher : public DetectorToFinder<BattleArrowDetector>{
 public:
-    BattleArrowWatcher(Color color = COLOR_RED)
-         : DetectorToFinder("BattleArrowWatcher", std::chrono::milliseconds(100), color)
+    BattleArrowWatcher(Color color = COLOR_RED, ImageFloatBox box = {0.546, 0.863, 0.045, 0.068})
+         : DetectorToFinder("BattleArrowWatcher", std::chrono::milliseconds(100), color, box)
     {}
 };
 

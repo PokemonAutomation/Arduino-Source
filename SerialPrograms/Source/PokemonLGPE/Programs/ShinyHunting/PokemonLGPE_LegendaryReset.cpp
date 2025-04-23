@@ -81,13 +81,13 @@ LegendaryReset::LegendaryReset()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-bool LegendaryReset::run_battle(SingleSwitchProgramEnvironment& env, JoyconContext& context){
+bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconContext& context){
     float shiny_coefficient = 1.0;
     ShinySoundDetector shiny_detector(env.logger(), [&](float error_coefficient) -> bool{
         shiny_coefficient = error_coefficient;
         return true;
     });
-    BattleArrowWatcher battle_started(COLOR_YELLOW);
+    BattleArrowWatcher battle_started(COLOR_YELLOW, {0.546, 0.863, 0.045, 0.068});
 
     env.log("Starting battle.");
     switch (TARGET) {
@@ -146,14 +146,15 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
 
     Settings:
     Text Speed fast
-    Skip cutscene option?
+    Skip cutscene On
+    Skip move animation On
 
     Mewtwo, Articuno, Zapdos, Moltres, Snorlax, Electrode(?)
     Don't do it on the first Snorlax, otherwise have to sit through fuji tutorial
     */
 
     while (true) {
-        bool encounter_battle = run_battle(env, context);
+        bool encounter_battle = run_encounter(env, context);
         if (encounter_battle) {
             stats.shinies++;
             env.update_stats();
@@ -173,6 +174,59 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
 
         stats.resets++;
         env.update_stats();
+    }
+    //Shiny found, complete the battle
+    WallClock start = current_time();
+    BattleArrowWatcher catching_started(COLOR_RED, {0.005, 0.662, 0.049, 0.069});
+    int res = run_until<JoyconContext>(
+        env.console, context,
+        [&](JoyconContext& context) {
+            while(true){
+                if (current_time() - start > std::chrono::minutes(5)){
+                    env.log("Timed out during battle after 5 minutes.", COLOR_RED);
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle after 5 minutes.",
+                        env.console
+                    );
+                }
+                BattleArrowWatcher battle_menu(COLOR_YELLOW, {0.546, 0.863, 0.045, 0.068});
+                context.wait_for_all_requests();
+
+                int ret = wait_until(
+                    env.console, context,
+                    std::chrono::seconds(30),
+                    { battle_menu }
+                );
+                switch (ret){
+                case 0:
+                    env.log("Detected battle menu. Mashing A to attack.");
+                    pbf_mash_button(context, BUTTON_A, 3000ms);
+                    context.wait_for_all_requests();
+                    break;
+                default:
+                    env.log("Timed out during battle. Stuck, crashed, or took more than 30 seconds for a turn.", COLOR_RED);
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Timed out during battle. Stuck, crashed, or took more than 30 seconds for a turn.",
+                        env.console
+                    );
+                }
+            }
+        },
+        {{catching_started}}
+    );
+    switch (res){
+    case 0:
+        env.log("Catching menu detected.");
+        break;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect catching menu.",
+            env.console
+        );
+        break;
     }
 
     if (GO_HOME_WHEN_DONE) {
