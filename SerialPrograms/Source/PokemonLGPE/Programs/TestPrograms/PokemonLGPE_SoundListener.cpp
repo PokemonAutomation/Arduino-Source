@@ -79,7 +79,7 @@ void SoundListener::program(SingleSwitchProgramEnvironment& env, CancellableScop
     default:
         throw InternalProgramError(
             &env.logger(), PA_CURRENT_FUNCTION,
-            "Not such sound detector as sound type " + std::to_string((size_t)type)
+            "No such sound detector as sound type " + std::to_string((size_t)type)
         );
         return;
     }

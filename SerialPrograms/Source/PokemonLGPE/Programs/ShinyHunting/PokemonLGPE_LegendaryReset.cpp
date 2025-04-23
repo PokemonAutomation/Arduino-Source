@@ -92,13 +92,12 @@ bool LegendaryReset::run_battle(SingleSwitchProgramEnvironment& env, JoyconConte
     env.log("Starting battle.");
     switch (TARGET) {
     case Target::mewtwo:
-        pbf_mash_button(context, BUTTON_A, 5000ms); //untested
+        pbf_mash_button(context, BUTTON_A, 3000ms); //untested
+        pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms); //also untested
         break;
     case Target::snorlax:
-        pbf_mash_button(context, BUTTON_A, 15000ms);
-        break;
-    case Target::snorlax2:
-        pbf_mash_button(context, BUTTON_A, 25000ms); //can't test, not really worth it
+        pbf_mash_button(context, BUTTON_A, 5000ms);
+        pbf_mash_button(context, BUTTON_B, 10000ms);
         break;
     }
     context.wait_for_all_requests();
