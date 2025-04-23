@@ -15,7 +15,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "PokemonLGPE/Inference/Battles/PokemonLGPE_BattleMenuDetector.h"
+#include "PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h"
 #include "PokemonLGPE/Programs/PokemonLGPE_GameEntry.h"
 #include "PokemonLGPE_LegendaryReset.h"
@@ -87,7 +87,7 @@ bool LegendaryReset::run_battle(SingleSwitchProgramEnvironment& env, JoyconConte
         shiny_coefficient = error_coefficient;
         return true;
     });
-    BattleMenuWatcher battle_started(COLOR_YELLOW);
+    BattleArrowWatcher battle_started(COLOR_YELLOW);
 
     env.log("Starting battle.");
     switch (TARGET) {
@@ -98,7 +98,7 @@ bool LegendaryReset::run_battle(SingleSwitchProgramEnvironment& env, JoyconConte
         pbf_mash_button(context, BUTTON_A, 15000ms);
         break;
     case Target::snorlax2:
-        pbf_mash_button(context, BUTTON_A, 25000ms); //can't test
+        pbf_mash_button(context, BUTTON_A, 25000ms); //can't test, not really worth it
         break;
     }
     context.wait_for_all_requests();
@@ -120,7 +120,6 @@ bool LegendaryReset::run_battle(SingleSwitchProgramEnvironment& env, JoyconConte
                     env.console
                 );
             }
-            pbf_wait(context, 1000ms);
             context.wait_for_all_requests();
         },
         {{shiny_detector}}
