@@ -1375,6 +1375,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h
     Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.cpp
     Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.h
+    Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.cpp
+    Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h
+    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.cpp
+    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h
     Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.cpp
@@ -1385,6 +1389,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.h
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.cpp
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.h
+    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.cpp
+    Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
+    Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
+    Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
     Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp
     Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h
     Source/PokemonLGPE/PokemonLGPE_Panels.cpp

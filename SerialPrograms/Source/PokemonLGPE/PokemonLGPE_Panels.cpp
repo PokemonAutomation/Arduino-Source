@@ -13,6 +13,9 @@
 #include "Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h"
 #include "Programs/ShinyHunting/PokemonLGPE_FossilRevival.h"
 #include "Programs/ShinyHunting/PokemonLGPE_GiftReset.h"
+#include "Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h"
+
+#include "Programs/TestPrograms/PokemonLGPE_SoundListener.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,6 +38,14 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AlolanTrade_Descriptor, AlolanTrade>());
     ret.emplace_back(make_single_switch_program<FossilRevival_Descriptor, FossilRevival>());
     ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
+    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE) {
+        ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
+    }
+
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Developer Tools ----");
+        ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+    }
 
     return ret;
 }
