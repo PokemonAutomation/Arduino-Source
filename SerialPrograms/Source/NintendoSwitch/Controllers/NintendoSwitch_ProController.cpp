@@ -64,13 +64,13 @@ public:
         Milliseconds ticksize = m_controller->ticksize();
         static_cast<ProController*>(m_controller)->issue_full_controller_state(
             nullptr,
+            ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255,
             switch_state.buttons,
             switch_state.dpad,
             switch_state.left_x,
             switch_state.left_y,
             switch_state.right_x,
-            switch_state.right_y,
-            ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255
+            switch_state.right_y
         );
     }
 };

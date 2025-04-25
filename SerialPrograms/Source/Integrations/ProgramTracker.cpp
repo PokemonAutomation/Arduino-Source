@@ -125,7 +125,7 @@ std::string ProgramTracker::nsw_press_button(uint64_t console_id, NintendoSwitch
     try{
         err = iter->second.first->controller().try_run<ProController>(
             [=](ProController& controller){
-                controller.issue_buttons(nullptr, button, duration, duration, 0ms);
+                controller.issue_buttons(nullptr, duration, duration, 0ms, button);
             }
         );
     }catch (Exception& e){
@@ -155,7 +155,7 @@ std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, NintendoSwitch::
     try{
         err = iter->second.first->controller().try_run<ProController>(
             [=](ProController& controller){
-                controller.issue_dpad(nullptr, position, duration, duration, 0ms);
+                controller.issue_dpad(nullptr, duration, duration, 0ms, position);
             }
         );
     }catch (Exception& e){
@@ -185,7 +185,7 @@ std::string ProgramTracker::nsw_press_left_joystick(uint64_t console_id, uint8_t
     try{
         err = iter->second.first->controller().try_run<ProController>(
             [=](ProController& controller){
-                controller.issue_left_joystick(nullptr, x, y, duration, duration, 0ms);
+                controller.issue_left_joystick(nullptr, duration, duration, 0ms, x, y);
             }
         );
     }catch (Exception& e){
@@ -215,7 +215,7 @@ std::string ProgramTracker::nsw_press_right_joystick(uint64_t console_id, uint8_
     try{
         err = iter->second.first->controller().try_run<ProController>(
             [=](ProController& controller){
-                controller.issue_right_joystick(nullptr, x, y, duration, duration, 0ms);
+                controller.issue_right_joystick(nullptr, duration, duration, 0ms, x, y);
             }
         );
     }catch (Exception& e){

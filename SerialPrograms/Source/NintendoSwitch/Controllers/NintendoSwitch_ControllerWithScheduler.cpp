@@ -52,8 +52,8 @@ void ControllerWithScheduler::issue_nop(const Cancellable* cancellable, Millisec
 }
 void ControllerWithScheduler::issue_buttons(
     const Cancellable* cancellable,
-    Button button,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+    Button button
 ){
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     std::lock_guard<std::mutex> lg1(m_state_lock);
@@ -90,8 +90,8 @@ void ControllerWithScheduler::issue_buttons(
 }
 void ControllerWithScheduler::issue_dpad(
     const Cancellable* cancellable,
-    DpadPosition position,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+    DpadPosition position
 ){
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     std::lock_guard<std::mutex> lg1(m_state_lock);
@@ -115,8 +115,8 @@ void ControllerWithScheduler::issue_dpad(
 }
 void ControllerWithScheduler::issue_left_joystick(
     const Cancellable* cancellable,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+    uint8_t x, uint8_t y
 ){
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     std::lock_guard<std::mutex> lg1(m_state_lock);
@@ -142,8 +142,8 @@ void ControllerWithScheduler::issue_left_joystick(
 }
 void ControllerWithScheduler::issue_right_joystick(
     const Cancellable* cancellable,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+    uint8_t x, uint8_t y
 ){
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     std::lock_guard<std::mutex> lg1(m_state_lock);
@@ -168,11 +168,11 @@ void ControllerWithScheduler::issue_right_joystick(
 }
 void ControllerWithScheduler::issue_full_controller_state(
     const Cancellable* cancellable,
+    Milliseconds hold,
     Button button,
     DpadPosition position,
     uint8_t left_x, uint8_t left_y,
-    uint8_t right_x, uint8_t right_y,
-    Milliseconds hold
+    uint8_t right_x, uint8_t right_y
 ){
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     std::lock_guard<std::mutex> lg1(m_state_lock);
@@ -233,7 +233,8 @@ void ControllerWithScheduler::issue_full_controller_state(
 
 void ControllerWithScheduler::issue_mash_button(
     const Cancellable* cancellable,
-    Button button, Milliseconds duration
+    Milliseconds duration,
+    Button button
 ){
     if (cancellable){
         cancellable->throw_if_cancelled();
@@ -241,7 +242,7 @@ void ControllerWithScheduler::issue_mash_button(
     ThrottleScope scope(m_logging_throttler);
     bool log = true;
     while (duration > Milliseconds::zero()){
-        issue_buttons(cancellable, button, 8*8ms, 5*8ms, 3*8ms);
+        issue_buttons(cancellable, 8*8ms, 5*8ms, 3*8ms, button);
 
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
@@ -262,7 +263,8 @@ void ControllerWithScheduler::issue_mash_button(
 }
 void ControllerWithScheduler::issue_mash_button(
     const Cancellable* cancellable,
-    Button button0, Button button1, Milliseconds duration
+    Milliseconds duration,
+    Button button0, Button button1
 ){
     if (cancellable){
         cancellable->throw_if_cancelled();
@@ -270,8 +272,8 @@ void ControllerWithScheduler::issue_mash_button(
     ThrottleScope scope(m_logging_throttler);
     bool log = true;
     while (duration > Milliseconds::zero()){
-        issue_buttons(cancellable, button0, Milliseconds(4*8), 5*8ms, 3*8ms);
-        issue_buttons(cancellable, button1, Milliseconds(4*8), 5*8ms, 3*8ms);
+        issue_buttons(cancellable, 4*8ms, 5*8ms, 3*8ms, button0);
+        issue_buttons(cancellable, 4*8ms, 5*8ms, 3*8ms, button1);
 
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
@@ -302,7 +304,7 @@ void ControllerWithScheduler::issue_mash_AZs(
         if (duration <= Milliseconds::zero()){
             break;
         }
-        issue_buttons(cancellable, BUTTON_A, 3*8ms, 6*8ms, 3*8ms);
+        issue_buttons(cancellable, 3*8ms, 6*8ms, 3*8ms, BUTTON_A);
 
         //  We never log before the first issue to avoid delaying the critical path.
         //  But we do want to log before the mash spam. So we log after the first
@@ -319,20 +321,20 @@ void ControllerWithScheduler::issue_mash_AZs(
         if (duration <= Milliseconds::zero()){
             break;
         }
-        issue_buttons(cancellable, BUTTON_ZL, 3*8ms, 6*8ms, 3*8ms);
+        issue_buttons(cancellable, 3*8ms, 6*8ms, 3*8ms, BUTTON_ZL);
         duration -= std::min(3*8ms, duration);
 
         if (duration <= Milliseconds::zero()){
             break;
         }
-        issue_buttons(cancellable, BUTTON_ZR, 3*8ms, 6*8ms, 3*8ms);
+        issue_buttons(cancellable, 3*8ms, 6*8ms, 3*8ms, BUTTON_ZR);
         duration -= std::min(3*8ms, duration);
     }
 }
 void ControllerWithScheduler::issue_system_scroll(
     const Cancellable* cancellable,
-    DpadPosition direction, //  Diagonals not allowed.
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+    DpadPosition direction  //  Diagonals not allowed.
 ){
     if (cancellable){
         cancellable->throw_if_cancelled();
@@ -347,8 +349,9 @@ void ControllerWithScheduler::issue_system_scroll(
     do{
         if (dpad <= left_joystick && dpad <= right_joystick){
             issue_dpad(
-                cancellable, direction,
-                delay, hold, cooldown
+                cancellable,
+                delay, hold, cooldown,
+                direction
             );
             break;
         }
@@ -397,9 +400,9 @@ void ControllerWithScheduler::issue_system_scroll(
         }
 
         if (left_joystick <= dpad && left_joystick <= right_joystick){
-            issue_left_joystick(cancellable, x, y, delay, hold, cooldown);
+            issue_left_joystick(cancellable, delay, hold, cooldown, x, y);
         }else{
-            issue_right_joystick(cancellable, x, y, delay, hold, cooldown);
+            issue_right_joystick(cancellable, delay, hold, cooldown, x, y);
         }
     }while (false);
 

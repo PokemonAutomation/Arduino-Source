@@ -70,27 +70,27 @@ public:
     //  ensure that they are all dispatched simultaneously.
     virtual void issue_buttons(
         const Cancellable* cancellable,
-        Button button,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        Button button
     ) = 0;
 
     //  Dpad
     virtual void issue_dpad(
         const Cancellable* cancellable,
-        DpadPosition position,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        DpadPosition position
     ) = 0;
 
     //  Joysticks
     virtual void issue_left_joystick(
         const Cancellable* cancellable,
-        uint8_t x, uint8_t y,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
     ) = 0;
     virtual void issue_right_joystick(
         const Cancellable* cancellable,
-        uint8_t x, uint8_t y,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
     ) = 0;
 
     //
@@ -114,11 +114,11 @@ public:
     //
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
+        Milliseconds duration,
         Button button,
         DpadPosition position,
         uint8_t left_x, uint8_t left_y,
-        uint8_t right_x, uint8_t right_y,
-        Milliseconds hold
+        uint8_t right_x, uint8_t right_y
     ) = 0;
 
 
@@ -138,7 +138,8 @@ public:
     //  Mash a button as quickly as possible.
     virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Button button, Milliseconds duration
+        Milliseconds duration,
+        Button button
     ) = 0;
 
     //  Alternate pressing "button0" and "button1" as quickly as possible.
@@ -146,7 +147,8 @@ public:
     //  Both buttons will be pressed at least once.
     virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Button button0, Button button1, Milliseconds dutation
+        Milliseconds dutation,
+        Button button0, Button button1
     ) = 0;
 
     //  In situations where A, ZL, and RL all do the same thing, use all 3 of
@@ -169,8 +171,8 @@ public:
     //
     virtual void issue_system_scroll(
         const Cancellable* cancellable,
-        DpadPosition direction, //  Diagonals not allowed.
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        DpadPosition direction  //  Diagonals not allowed.
     ) = 0;
 
 

@@ -89,47 +89,47 @@ public:
     }
     virtual void issue_buttons(
         const Cancellable* cancellable,
-        Button button,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        Button button
     ) override{
-        ControllerWithScheduler::issue_buttons(cancellable, button, delay, hold, cooldown);
+        ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
     }
     virtual void issue_dpad(
         const Cancellable* cancellable,
-        DpadPosition position,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        DpadPosition position
     ) override{
-        ControllerWithScheduler::issue_dpad(cancellable, position, delay, hold, cooldown);
+        ControllerWithScheduler::issue_dpad(cancellable, delay, hold, cooldown, position);
     }
     virtual void issue_left_joystick(
         const Cancellable* cancellable,
-        uint8_t x, uint8_t y,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
     ) override{
-        ControllerWithScheduler::issue_left_joystick(cancellable, x, y, delay, hold, cooldown);
+        ControllerWithScheduler::issue_left_joystick(cancellable, delay, hold, cooldown, x, y);
     }
     virtual void issue_right_joystick(
         const Cancellable* cancellable,
-        uint8_t x, uint8_t y,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
     ) override{
-        ControllerWithScheduler::issue_right_joystick(cancellable, x, y, delay, hold, cooldown);
+        ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, x, y);
     }
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
+        Milliseconds hold,
         Button button,
         DpadPosition position,
         uint8_t left_x, uint8_t left_y,
-        uint8_t right_x, uint8_t right_y,
-        Milliseconds hold
+        uint8_t right_x, uint8_t right_y
     ) override{
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
+            hold,
             button,
             position,
             left_x, left_y,
-            right_x, right_y,
-            hold
+            right_x, right_y
         );
     }
 
@@ -139,15 +139,17 @@ public:
 
     virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Button button, Milliseconds duration
+        Milliseconds duration,
+        Button button
     ) override{
-        ControllerWithScheduler::issue_mash_button(cancellable, button, duration);
+        ControllerWithScheduler::issue_mash_button(cancellable, duration, button);
     }
     virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Button button0, Button button1, Milliseconds duration
+        Milliseconds duration,
+        Button button0, Button button1
     ) override{
-        ControllerWithScheduler::issue_mash_button(cancellable, button0, button1, duration);
+        ControllerWithScheduler::issue_mash_button(cancellable, duration, button0, button1);
     }
     virtual void issue_mash_AZs(
         const Cancellable* cancellable,
@@ -157,10 +159,10 @@ public:
     }
     virtual void issue_system_scroll(
         const Cancellable* cancellable,
-        DpadPosition direction, //  Diagonals not allowed.
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        DpadPosition direction  //  Diagonals not allowed.
     ) override{
-        ControllerWithScheduler::issue_system_scroll(cancellable, direction, delay, hold, cooldown);
+        ControllerWithScheduler::issue_system_scroll(cancellable, delay, hold, cooldown, direction);
     }
 
 

@@ -30,8 +30,9 @@ void ssf_press_button(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->issue_buttons(
-        &context, button,
-        delay*8ms, hold*8ms, cool*8ms
+        &context,
+        delay*8ms, hold*8ms, cool*8ms,
+        button
     );
 }
 void ssf_press_button(
@@ -39,7 +40,7 @@ void ssf_press_button(
     Button button,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_buttons(&context, button, delay, hold, cool);
+    context->issue_buttons(&context, delay, hold, cool, button);
 }
 
 void ssf_press_dpad(
@@ -48,8 +49,9 @@ void ssf_press_dpad(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->issue_dpad(
-        &context, position,
-        delay*8ms, hold*8ms, cool*8ms
+        &context,
+        delay*8ms, hold*8ms, cool*8ms,
+        position
     );
 }
 void ssf_press_dpad(
@@ -57,7 +59,7 @@ void ssf_press_dpad(
     DpadPosition position,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_dpad(&context, position, delay, hold, cool);
+    context->issue_dpad(&context, delay, hold, cool, position);
 }
 
 void ssf_press_left_joystick(
@@ -66,8 +68,9 @@ void ssf_press_left_joystick(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->issue_left_joystick(
-        &context, x, y,
-        delay*8ms, hold*8ms, cool*8ms
+        &context,
+        delay*8ms, hold*8ms, cool*8ms,
+        x, y
     );
 }
 void ssf_press_left_joystick(
@@ -75,7 +78,7 @@ void ssf_press_left_joystick(
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_left_joystick(&context, x, y, delay, hold, cool);
+    context->issue_left_joystick(&context, delay, hold, cool, x, y);
 }
 void ssf_press_right_joystick(
     ProControllerContext& context,
@@ -83,8 +86,9 @@ void ssf_press_right_joystick(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->issue_right_joystick(
-        &context, x, y,
-        delay*8ms, hold*8ms, cool*8ms
+        &context,
+        delay*8ms, hold*8ms, cool*8ms,
+        x, y
     );
 }
 void ssf_press_right_joystick(
@@ -92,22 +96,22 @@ void ssf_press_right_joystick(
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_right_joystick(&context, x, y, delay, hold, cool);
+    context->issue_right_joystick(&context, delay, hold, cool, x, y);
 }
 
 
 
 void ssf_mash1_button(ProControllerContext& context, Button button, uint16_t ticks){
-    context->issue_mash_button(&context, button, ticks*8ms);
+    context->issue_mash_button(&context, ticks*8ms, button);
 }
 void ssf_mash1_button(ProControllerContext& context, Button button, Milliseconds duration){
-    context->issue_mash_button(&context, button, duration);
+    context->issue_mash_button(&context, duration, button);
 }
 void ssf_mash2_button(ProControllerContext& context, Button button0, Button button1, uint16_t ticks){
-    context->issue_mash_button(&context, button0, button1, ticks*8ms);
+    context->issue_mash_button(&context, ticks*8ms, button0, button1);
 }
 void ssf_mash2_button(ProControllerContext& context, Button button0, Button button1, Milliseconds duration){
-    context->issue_mash_button(&context, button0, button1, duration);
+    context->issue_mash_button(&context, duration, button0, button1);
 }
 void ssf_mash_AZs(ProControllerContext& context, uint16_t ticks){
     context->issue_mash_AZs(&context, ticks*8ms);
@@ -121,8 +125,9 @@ void ssf_issue_scroll(
     uint16_t delay, uint16_t hold, uint8_t cool
 ){
     context->issue_system_scroll(
-        &context, direction,
-        delay*8ms, hold*8ms, cool*8ms
+        &context,
+        delay*8ms, hold*8ms, cool*8ms,
+        direction
     );
 }
 void ssf_issue_scroll(
@@ -130,14 +135,14 @@ void ssf_issue_scroll(
     DpadPosition direction,
     Milliseconds delay
 ){
-    context->issue_system_scroll(&context, direction, delay, 2*delay, delay);
+    context->issue_system_scroll(&context, delay, 2*delay, delay, direction);
 }
 void ssf_issue_scroll(
     ProControllerContext& context,
     DpadPosition direction,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_system_scroll(&context, direction, delay, hold, cool);
+    context->issue_system_scroll(&context, delay, hold, cool, direction);
 }
 
 

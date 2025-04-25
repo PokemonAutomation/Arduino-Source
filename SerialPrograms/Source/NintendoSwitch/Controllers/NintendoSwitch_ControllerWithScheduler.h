@@ -116,31 +116,31 @@ public:
     void issue_nop(const Cancellable* cancellable, Milliseconds duration);
     void issue_buttons(
         const Cancellable* cancellable,
-        Button button,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        Button button
     );
     void issue_dpad(
         const Cancellable* cancellable,
-        DpadPosition position,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        DpadPosition position
     );
     void issue_left_joystick(
         const Cancellable* cancellable,
-        uint8_t x, uint8_t y,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
     );
     void issue_right_joystick(
         const Cancellable* cancellable,
-        uint8_t x, uint8_t y,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
     );
     void issue_full_controller_state(
         const Cancellable* cancellable,
+        Milliseconds hold,
         Button button,
         DpadPosition position,
         uint8_t left_x, uint8_t left_y,
-        uint8_t right_x, uint8_t right_y,
-        Milliseconds hold
+        uint8_t right_x, uint8_t right_y
     );
 
 
@@ -149,11 +149,13 @@ public:
 
     void issue_mash_button(
         const Cancellable* cancellable,
-        Button button, Milliseconds duration
+        Milliseconds duration,
+        Button button
     );
     void issue_mash_button(
         const Cancellable* cancellable,
-        Button button0, Button button1, Milliseconds duration
+        Milliseconds duration,
+        Button button0, Button button1
     );
     void issue_mash_AZs(
         const Cancellable* cancellable,
@@ -161,8 +163,8 @@ public:
     );
     void issue_system_scroll(
         const Cancellable* cancellable,
-        DpadPosition direction, //  Diagonals not allowed.
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        DpadPosition direction  //  Diagonals not allowed.
     );
 
 

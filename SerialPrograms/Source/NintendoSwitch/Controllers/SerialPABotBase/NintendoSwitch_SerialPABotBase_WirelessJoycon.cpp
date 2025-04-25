@@ -56,10 +56,10 @@ void SerialPABotBase_WirelessJoycon::issue_buttons(
     button &= m_valid_buttons;
     switch (m_controller_type){
     case ControllerType::NintendoSwitch_LeftJoycon:
-        ControllerWithScheduler::issue_buttons(cancellable, button, delay, hold, cooldown);
+        ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
         break;
     case ControllerType::NintendoSwitch_RightJoycon:
-        ControllerWithScheduler::issue_buttons(cancellable, button, delay, hold, cooldown);
+        ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
         break;
     default:
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Invalid joycon type.");
@@ -72,10 +72,10 @@ void SerialPABotBase_WirelessJoycon::issue_joystick(
 ){
     switch (m_controller_type){
     case ControllerType::NintendoSwitch_LeftJoycon:
-        ControllerWithScheduler::issue_left_joystick(cancellable, x, y, delay, hold, cooldown);
+        ControllerWithScheduler::issue_left_joystick(cancellable, delay, hold, cooldown, x, y);
         break;
     case ControllerType::NintendoSwitch_RightJoycon:
-        ControllerWithScheduler::issue_right_joystick(cancellable, x, y, delay, hold, cooldown);
+        ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, x, y);
         break;
     default:
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Invalid joycon type.");
@@ -92,21 +92,21 @@ void SerialPABotBase_WirelessJoycon::issue_full_controller_state(
     case ControllerType::NintendoSwitch_LeftJoycon:
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
+            hold,
             button,
             DPAD_NONE,
             joystick_x, joystick_y,
-            0x80, 0x80,
-            hold
+            0x80, 0x80
         );
         break;
     case ControllerType::NintendoSwitch_RightJoycon:
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
+            hold,
             button,
             DPAD_NONE,
             0x80, 0x80,
-            joystick_x, joystick_y,
-            hold
+            joystick_x, joystick_y
         );
         break;
     default:;
@@ -120,7 +120,7 @@ void SerialPABotBase_WirelessJoycon::issue_mash_button(
     Button button, Milliseconds duration
 ){
     button &= m_valid_buttons;
-    ControllerWithScheduler::issue_mash_button(cancellable, button, duration);
+    ControllerWithScheduler::issue_mash_button(cancellable, duration, button);
 }
 
 
