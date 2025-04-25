@@ -318,6 +318,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::terminate();
 
+
+    ssf_press_button(context, Button::BUTTON_ZR, 1s, 60s, 0ms);
+
+    while (true){
+        context->issue_gyro_rotate_z(&scope, 1s, 1s, 0s, +1);
+        context->issue_gyro_rotate_z(&scope, 1s, 1s, 0s, 0x0000);
+        context->issue_gyro_rotate_z(&scope, 1s, 1s, 0s, -1);
+        context->issue_gyro_rotate_z(&scope, 1s, 1s, 0s, 0x0000);
+    }
+
+
+
+#if 0
     ImageRGB32 image("20250420-043111395281.png");
 
     OcrFailureWatchdog watchdog(logger);
@@ -326,7 +339,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     double hp[4];
     reader.read_hp(image, hp);
-
+#endif
 
 #if 0
     ImageRGB32 image("20250404-154507236508.png");

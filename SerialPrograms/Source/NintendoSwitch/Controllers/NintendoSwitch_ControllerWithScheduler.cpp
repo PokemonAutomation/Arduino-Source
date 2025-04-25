@@ -166,6 +166,38 @@ void ControllerWithScheduler::issue_right_joystick(
         );
     }
 }
+
+
+
+void ControllerWithScheduler::issue_gyro(
+    const Cancellable* cancellable,
+    SwitchGyro& gyro, const char* name,
+    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+    int16_t value
+){
+    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::lock_guard<std::mutex> lg1(m_state_lock);
+    if (cancellable){
+        cancellable->throw_if_cancelled();
+    }
+
+    this->issue_wait_for_resource(cancellable, gyro);
+    gyro.value = value;
+    this->issue_to_resource(cancellable, gyro, delay, hold, cooldown);
+
+    if (m_logging_throttler){
+        m_logger.log(
+            std::string(name) + "(): (" + std::to_string(value) + ")" +
+            ", delay = " + std::to_string(delay.count()) + "ms" +
+            ", hold = " + std::to_string(hold.count()) + "ms" +
+            ", cooldown = " + std::to_string(cooldown.count()) + "ms",
+            COLOR_DARKGREEN
+        );
+    }
+}
+
+
+
 void ControllerWithScheduler::issue_full_controller_state(
     const Cancellable* cancellable,
     Milliseconds hold,

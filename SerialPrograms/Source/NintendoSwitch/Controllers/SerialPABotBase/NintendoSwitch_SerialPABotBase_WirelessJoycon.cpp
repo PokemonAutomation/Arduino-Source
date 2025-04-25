@@ -127,9 +127,7 @@ void SerialPABotBase_WirelessJoycon::issue_mash_button(
 
 
 void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* cancellable, WallDuration duration){
-    //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
-
-    PABB_ESP32_NintendoSwitch_ButtonState report{
+    PABB_NintendoSwitch_ButtonState buttons{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -138,61 +136,27 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
         .vibrator = 0x00,
     };
 
-    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
-        if (!m_buttons[c].is_busy()){
-            continue;
-        }
-
-//        cout << "button: " << c << endl;
-
-        Button button = (Button)((ButtonFlagType)1 << c);
-        switch (button){
-        //  Right
-//        case BUTTON_Y:          report.button3 |= 1 << 0; break;
-//        case BUTTON_X:          report.button3 |= 1 << 1; break;
-//        case BUTTON_B:          report.button3 |= 1 << 2; break;
-//        case BUTTON_A:          report.button3 |= 1 << 3; break;
-//        case BUTTON_RIGHT_SR:   report.button3 |= 1 << 4; break;
-//        case BUTTON_RIGHT_SL:   report.button3 |= 1 << 5; break;
-//        case BUTTON_R:          report.button3 |= 1 << 6; break;
-//        case BUTTON_ZR:         report.button3 |= 1 << 7; break;
-
-        //  Shared
-        case BUTTON_MINUS:      report.button4 |= 1 << 0; break;
-//        case BUTTON_PLUS:       report.button4 |= 1 << 1; break;
-//        case BUTTON_RCLICK:     report.button4 |= 1 << 2; break;
-        case BUTTON_LCLICK:     report.button4 |= 1 << 3; break;
-//        case BUTTON_HOME:       report.button4 |= 1 << 4; break;
-        case BUTTON_CAPTURE:    report.button4 |= 1 << 5; break;
-
-        //  Left
-        case BUTTON_DOWN:       report.button5 |= 1 << 0; break;
-        case BUTTON_UP:         report.button5 |= 1 << 1; break;
-        case BUTTON_RIGHT:      report.button5 |= 1 << 2; break;
-        case BUTTON_LEFT:       report.button5 |= 1 << 3; break;
-        case BUTTON_LEFT_SR:    report.button5 |= 1 << 4; break;
-        case BUTTON_LEFT_SL:    report.button5 |= 1 << 5; break;
-        case BUTTON_L:          report.button5 |= 1 << 6; break;
-        case BUTTON_ZL:         report.button5 |= 1 << 7; break;
-
-        default:;
-        }
-    }
+    populate_report_buttons(buttons);
 
     //  Left Stick
     if (m_left_joystick.is_busy()){
         encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            report.left_joystick,
+            buttons.left_joystick,
             m_left_joystick.x, m_left_joystick.y
         );
     }
 
-    issue_report(cancellable, report, duration);
+    PABB_NintendoSwitch_GyroState gyro{};
+    bool gyro_active = populate_report_gyro(gyro);
+
+    if (!gyro_active){
+        issue_report(cancellable, duration, buttons);
+    }else{
+        issue_report(cancellable, duration, buttons, gyro);
+    }
 }
 void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* cancellable, WallDuration duration){
-    //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
-
-    PABB_ESP32_NintendoSwitch_ButtonState report{
+    PABB_NintendoSwitch_ButtonState buttons{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -201,54 +165,24 @@ void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* 
         .vibrator = 0x00,
     };
 
-    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
-        if (!m_buttons[c].is_busy()){
-            continue;
-        }
-        Button button = (Button)((ButtonFlagType)1 << c);
-        switch (button){
-        //  Right
-        case BUTTON_Y:          report.button3 |= 1 << 0; break;
-        case BUTTON_X:          report.button3 |= 1 << 1; break;
-        case BUTTON_B:          report.button3 |= 1 << 2; break;
-        case BUTTON_A:          report.button3 |= 1 << 3; break;
-        case BUTTON_RIGHT_SR:   report.button3 |= 1 << 4; break;
-        case BUTTON_RIGHT_SL:   report.button3 |= 1 << 5; break;
-        case BUTTON_R:          report.button3 |= 1 << 6; break;
-        case BUTTON_ZR:         report.button3 |= 1 << 7; break;
-
-        //  Shared
-//        case BUTTON_MINUS:      report.button4 |= 1 << 0; break;
-        case BUTTON_PLUS:       report.button4 |= 1 << 1; break;
-        case BUTTON_RCLICK:     report.button4 |= 1 << 2; break;
-//        case BUTTON_LCLICK:     report.button4 |= 1 << 3; break;
-        case BUTTON_HOME:       report.button4 |= 1 << 4; break;
-//        case BUTTON_CAPTURE:    report.button4 |= 1 << 5; break;
-
-        //  Left
-//        case BUTTON_DOWN:       report.button5 |= 1 << 0; break;
-//        case BUTTON_UP:         report.button5 |= 1 << 1; break;
-//        case BUTTON_RIGHT:      report.button5 |= 1 << 2; break;
-//        case BUTTON_LEFT:       report.button5 |= 1 << 3; break;
-//        case BUTTON_LEFT_SR:    report.button5 |= 1 << 4; break;
-//        case BUTTON_LEFT_SL:    report.button5 |= 1 << 5; break;
-//        case BUTTON_L:          report.button5 |= 1 << 6; break;
-//        case BUTTON_ZL:         report.button5 |= 1 << 7; break;
-
-        default:;
-        }
-    }
+    populate_report_buttons(buttons);
 
     //  Right Stick
     if (m_right_joystick.is_busy()){
         encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            report.right_joystick,
+            buttons.right_joystick,
             m_right_joystick.x, m_right_joystick.y
         );
     }
 
-    issue_report(cancellable, report, duration);
+    PABB_NintendoSwitch_GyroState gyro{};
+    bool gyro_active = populate_report_gyro(gyro);
 
+    if (!gyro_active){
+        issue_report(cancellable, duration, buttons);
+    }else{
+        issue_report(cancellable, duration, buttons, gyro);
+    }
 }
 void SerialPABotBase_WirelessJoycon::push_state(const Cancellable* cancellable, WallDuration duration){
     switch (m_controller_type){

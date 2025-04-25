@@ -93,29 +93,6 @@ void SerialPABotBase_Controller::wait_for_all(const Cancellable* cancellable){
 
 
 
-void SerialPABotBase_Controller::send_botbase_request(
-    const Cancellable* cancellable,
-    const BotBaseRequest& request
-){
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
-    std::lock_guard<std::mutex> lg1(m_state_lock);
-    if (!is_ready()){
-        throw InvalidConnectionStateException();
-    }
-    m_serial->issue_request(request, cancellable);
-}
-BotBaseMessage SerialPABotBase_Controller::send_botbase_request_and_wait(
-    const Cancellable* cancellable,
-    const BotBaseRequest& request
-){
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
-    std::lock_guard<std::mutex> lg1(m_state_lock);
-    if (!is_ready()){
-        throw InvalidConnectionStateException();
-    }
-    return m_serial->issue_request_and_wait(request, cancellable);
-}
-
 
 
 

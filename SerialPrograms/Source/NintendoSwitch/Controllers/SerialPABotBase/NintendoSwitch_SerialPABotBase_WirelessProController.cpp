@@ -36,7 +36,7 @@ SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
 void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancellable, WallDuration duration){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
-    PABB_ESP32_NintendoSwitch_ButtonState report{
+    PABB_NintendoSwitch_ButtonState buttons{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -45,58 +45,21 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         .vibrator = 0x00,
     };
 
-    Button all_buttons = BUTTON_NONE;
-    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
-        if (!m_buttons[c].is_busy()){
-            continue;
-        }
-        Button button = (Button)((ButtonFlagType)1 << c);
-        all_buttons |= button;
-        switch (button){
-        //  Right
-        case BUTTON_Y:          report.button3 |= 1 << 0; break;
-        case BUTTON_X:          report.button3 |= 1 << 1; break;
-        case BUTTON_B:          report.button3 |= 1 << 2; break;
-        case BUTTON_A:          report.button3 |= 1 << 3; break;
-//        case BUTTON_RIGHT_SR:   report.button3 |= 1 << 4; break;
-//        case BUTTON_RIGHT_SL:   report.button3 |= 1 << 5; break;
-        case BUTTON_R:          report.button3 |= 1 << 6; break;
-        case BUTTON_ZR:         report.button3 |= 1 << 7; break;
-
-        //  Shared
-        case BUTTON_MINUS:      report.button4 |= 1 << 0; break;
-        case BUTTON_PLUS:       report.button4 |= 1 << 1; break;
-        case BUTTON_RCLICK:     report.button4 |= 1 << 2; break;
-        case BUTTON_LCLICK:     report.button4 |= 1 << 3; break;
-        case BUTTON_HOME:       report.button4 |= 1 << 4; break;
-        case BUTTON_CAPTURE:    report.button4 |= 1 << 5; break;
-
-        //  Left
-        case BUTTON_DOWN:       report.button5 |= 1 << 0; break;
-        case BUTTON_UP:         report.button5 |= 1 << 1; break;
-        case BUTTON_RIGHT:      report.button5 |= 1 << 2; break;
-        case BUTTON_LEFT:       report.button5 |= 1 << 3; break;
-//        case BUTTON_LEFT_SR:    report.button5 |= 1 << 4; break;
-//        case BUTTON_LEFT_SL:    report.button5 |= 1 << 5; break;
-        case BUTTON_L:          report.button5 |= 1 << 6; break;
-        case BUTTON_ZL:         report.button5 |= 1 << 7; break;
-
-        default:;
-        }
-    }
+//    Button all_buttons =
+    populate_report_buttons(buttons);
 
     if (m_dpad.is_busy()){
         SplitDpad dpad = convert_unified_to_split_dpad(m_dpad.position);
-        report.button5 |= (dpad.down  ? 1 : 0) << 0;
-        report.button5 |= (dpad.up    ? 1 : 0) << 1;
-        report.button5 |= (dpad.right ? 1 : 0) << 2;
-        report.button5 |= (dpad.left  ? 1 : 0) << 3;
+        buttons.button5 |= (dpad.down  ? 1 : 0) << 0;
+        buttons.button5 |= (dpad.up    ? 1 : 0) << 1;
+        buttons.button5 |= (dpad.right ? 1 : 0) << 2;
+        buttons.button5 |= (dpad.left  ? 1 : 0) << 3;
     }
 
     //  Left Stick
     if (m_left_joystick.is_busy()){
         encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            report.left_joystick,
+            buttons.left_joystick,
             m_left_joystick.x, m_left_joystick.y
         );
     }
@@ -104,12 +67,23 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
     //  Right Stick
     if (m_right_joystick.is_busy()){
         encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            report.right_joystick,
+            buttons.right_joystick,
             m_right_joystick.x, m_right_joystick.y
         );
     }
 
-    issue_report(cancellable, report, duration);
+    PABB_NintendoSwitch_GyroState gyro{};
+    bool gyro_active = populate_report_gyro(gyro);
+
+//    gyro_active = true;
+//    gyro.rotation_y = 0x00ff;
+//    gyro.rotation_z = 0x000f;
+
+    if (!gyro_active){
+        issue_report(cancellable, duration, buttons);
+    }else{
+        issue_report(cancellable, duration, buttons, gyro);
+    }
 
 #if 0
     m_logger.log(

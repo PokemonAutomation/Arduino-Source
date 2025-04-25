@@ -93,68 +93,10 @@ public:
         return BotBaseMessage(PABB_MSG_ESP32_REQUEST_WRITE_SPI, data);
     }
 };
-#if 0
-class MessageControllerGetColors : public BotBaseRequest{
-public:
-    pabb_Message_ESP32_GetColors params;
-    MessageControllerGetColors(ControllerType controller_type)
-        : BotBaseRequest(false)
-    {
-        uint32_t controller_id = PABB_CID_NONE;
-        switch (controller_type){
-        case ControllerType::NintendoSwitch_WirelessProController:
-            controller_id = PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER;
-            break;
-        case ControllerType::NintendoSwitch_LeftJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
-            break;
-        case ControllerType::NintendoSwitch_RightJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
-            break;
-        default:;
-        }
-        params.seqnum = 0;
-        params.controller_type = controller_id;
-    }
-    virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_ESP32_REQUEST_GET_COLORS, params);
-    }
-};
-class MessageControllerSetColors : public BotBaseRequest{
-public:
-    pabb_Message_ESP32_SetColors params;
-    MessageControllerSetColors(
-        ControllerType controller_type,
-        const NintendoSwitch_ControllerColors& colors
-    )
-        : BotBaseRequest(false)
-    {
-        uint32_t controller_id = PABB_CID_NONE;
-        switch (controller_type){
-        case ControllerType::NintendoSwitch_WirelessProController:
-            controller_id = PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER;
-            break;
-        case ControllerType::NintendoSwitch_LeftJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
-            break;
-        case ControllerType::NintendoSwitch_RightJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
-            break;
-        default:;
-        }
-        params.seqnum = 0;
-        params.controller_type = controller_id;
-        params.colors = colors;
-    }
-    virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_ESP32_REQUEST_SET_COLORS, params);
-    }
-};
-#endif
 class MessageControllerStateButtons : public BotBaseRequest{
 public:
     pabb_Message_ESP32_CommandButtonState params;
-    MessageControllerStateButtons(uint16_t milliseconds, const PABB_ESP32_NintendoSwitch_ButtonState& state)
+    MessageControllerStateButtons(uint16_t milliseconds, const PABB_NintendoSwitch_ButtonState& state)
         : BotBaseRequest(true)
     {
         params.seqnum = 0;
@@ -170,8 +112,8 @@ public:
     pabb_Message_ESP32_CommandFullState params;
     MessageControllerStateFull(
         uint16_t milliseconds,
-        const PABB_ESP32_NintendoSwitch_ButtonState& buttons,
-        const PABB_ESP32_NintendoSwitch_GyroState& gyro
+        const PABB_NintendoSwitch_ButtonState& buttons,
+        const PABB_NintendoSwitch_GyroStateX3& gyro
     )
         : BotBaseRequest(true)
     {

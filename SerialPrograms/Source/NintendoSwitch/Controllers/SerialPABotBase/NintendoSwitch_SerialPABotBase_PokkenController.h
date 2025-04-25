@@ -119,6 +119,50 @@ public:
     ) override{
         ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, x, y);
     }
+
+    virtual void issue_gyro_accel_x(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ) override{
+        ControllerWithScheduler::issue_gyro_accel_x(cancellable, delay, hold, cooldown, value);
+    }
+    virtual void issue_gyro_accel_y(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ) override{
+        ControllerWithScheduler::issue_gyro_accel_y(cancellable, delay, hold, cooldown, value);
+    }
+    virtual void issue_gyro_accel_z(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ) override{
+        ControllerWithScheduler::issue_gyro_accel_z(cancellable, delay, hold, cooldown, value);
+    }
+    virtual void issue_gyro_rotate_x(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ) override{
+        ControllerWithScheduler::issue_gyro_rotate_x(cancellable, delay, hold, cooldown, value);
+    }
+    virtual void issue_gyro_rotate_y(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ) override{
+        ControllerWithScheduler::issue_gyro_rotate_y(cancellable, delay, hold, cooldown, value);
+    }
+    virtual void issue_gyro_rotate_z(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ) override{
+        ControllerWithScheduler::issue_gyro_rotate_z(cancellable, delay, hold, cooldown, value);
+    }
+
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
         Milliseconds hold,

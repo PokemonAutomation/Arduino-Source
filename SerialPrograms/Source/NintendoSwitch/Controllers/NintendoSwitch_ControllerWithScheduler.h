@@ -27,11 +27,21 @@ struct SwitchButton_Joystick : public ExecutionResource{
     uint8_t x;
     uint8_t y;
 };
-struct ProControllerSchedulerState{
+struct SwitchGyro : public ExecutionResource{
+    int16_t value;
+};
+struct ControllerSchedulerState{
     ExecutionResource m_buttons[TOTAL_BUTTONS];
     SwitchButton_Dpad m_dpad;
     SwitchButton_Joystick m_left_joystick;
     SwitchButton_Joystick m_right_joystick;
+
+    SwitchGyro m_accel_x;
+    SwitchGyro m_accel_y;
+    SwitchGyro m_accel_z;
+    SwitchGyro m_rotation_x;
+    SwitchGyro m_rotation_y;
+    SwitchGyro m_rotation_z;
 
     bool is_active() const{
         for (size_t c = 0; c < TOTAL_BUTTONS; c++){
@@ -39,15 +49,17 @@ struct ProControllerSchedulerState{
                 return true;
             }
         }
-        if (m_dpad.is_busy()){
-            return true;
-        }
-        if (m_left_joystick.is_busy()){
-            return true;
-        }
-        if (m_right_joystick.is_busy()){
-            return true;
-        }
+        if (m_dpad.is_busy()) return true;
+        if (m_left_joystick.is_busy()) return true;
+        if (m_right_joystick.is_busy()) return true;
+
+        if (m_accel_x.is_busy()) return true;
+        if (m_accel_y.is_busy()) return true;
+        if (m_accel_z.is_busy()) return true;
+        if (m_rotation_x.is_busy()) return true;
+        if (m_rotation_y.is_busy()) return true;
+        if (m_rotation_z.is_busy()) return true;
+
         return false;
     }
 
@@ -59,6 +71,12 @@ struct ProControllerSchedulerState{
         ret.emplace_back(&m_dpad);
         ret.emplace_back(&m_left_joystick);
         ret.emplace_back(&m_right_joystick);
+        ret.emplace_back(&m_accel_x);
+        ret.emplace_back(&m_accel_y);
+        ret.emplace_back(&m_accel_z);
+        ret.emplace_back(&m_rotation_x);
+        ret.emplace_back(&m_rotation_y);
+        ret.emplace_back(&m_rotation_z);
         return ret;
     }
 };
@@ -98,7 +116,7 @@ inline SplitDpad convert_unified_to_split_dpad(DpadPosition dpad){
 
 
 class ControllerWithScheduler :
-    protected ProControllerSchedulerState,
+    protected ControllerSchedulerState,
     protected SuperscalarScheduler
 {
 public:
@@ -134,6 +152,56 @@ public:
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         uint8_t x, uint8_t y
     );
+
+    void issue_gyro(
+        const Cancellable* cancellable,
+        SwitchGyro& gyro, const char* name,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    );
+    void issue_gyro_accel_x(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ){
+        issue_gyro(cancellable, m_accel_x, "issue_gyro_accel_x", delay, hold, cooldown, value);
+    }
+    void issue_gyro_accel_y(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ){
+        issue_gyro(cancellable, m_accel_y, "issue_gyro_accel_y", delay, hold, cooldown, value);
+    }
+    void issue_gyro_accel_z(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ){
+        issue_gyro(cancellable, m_accel_z, "issue_gyro_accel_z", delay, hold, cooldown, value);
+    }
+    void issue_gyro_rotate_x(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ){
+        issue_gyro(cancellable, m_rotation_x, "issue_gyro_rotate_x", delay, hold, cooldown, value);
+    }
+    void issue_gyro_rotate_y(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ){
+        issue_gyro(cancellable, m_rotation_y, "issue_gyro_rotate_y", delay, hold, cooldown, value);
+    }
+    void issue_gyro_rotate_z(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        int16_t value
+    ){
+        issue_gyro(cancellable, m_rotation_z, "issue_gyro_rotate_z", delay, hold, cooldown, value);
+    }
+
     void issue_full_controller_state(
         const Cancellable* cancellable,
         Milliseconds hold,

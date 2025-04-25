@@ -34,15 +34,6 @@ public:
 
     void wait_for_all(const Cancellable* cancellable);
 
-    void send_botbase_request(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    );
-    BotBaseMessage send_botbase_request_and_wait(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    );
-
 
 protected:
     //  These are set on construction and never changed again. So it is safe to

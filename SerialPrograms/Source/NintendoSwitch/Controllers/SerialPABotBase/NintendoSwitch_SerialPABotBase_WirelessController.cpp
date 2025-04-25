@@ -63,12 +63,86 @@ void SerialPABotBase_WirelessController::stop(){
 
 
 
+Button SerialPABotBase_WirelessController::populate_report_buttons(PABB_NintendoSwitch_ButtonState& buttons){
+    //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
+
+    Button all_buttons = BUTTON_NONE;
+    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+        if (!m_buttons[c].is_busy()){
+            continue;
+        }
+        Button button = (Button)((ButtonFlagType)1 << c);
+        all_buttons |= button;
+        switch (button){
+        //  Right
+        case BUTTON_Y:          buttons.button3 |= 1 << 0; break;
+        case BUTTON_X:          buttons.button3 |= 1 << 1; break;
+        case BUTTON_B:          buttons.button3 |= 1 << 2; break;
+        case BUTTON_A:          buttons.button3 |= 1 << 3; break;
+        case BUTTON_RIGHT_SR:   buttons.button3 |= 1 << 4; break;
+        case BUTTON_RIGHT_SL:   buttons.button3 |= 1 << 5; break;
+        case BUTTON_R:          buttons.button3 |= 1 << 6; break;
+        case BUTTON_ZR:         buttons.button3 |= 1 << 7; break;
+
+        //  Shared
+        case BUTTON_MINUS:      buttons.button4 |= 1 << 0; break;
+        case BUTTON_PLUS:       buttons.button4 |= 1 << 1; break;
+        case BUTTON_RCLICK:     buttons.button4 |= 1 << 2; break;
+        case BUTTON_LCLICK:     buttons.button4 |= 1 << 3; break;
+        case BUTTON_HOME:       buttons.button4 |= 1 << 4; break;
+        case BUTTON_CAPTURE:    buttons.button4 |= 1 << 5; break;
+
+        //  Left
+        case BUTTON_DOWN:       buttons.button5 |= 1 << 0; break;
+        case BUTTON_UP:         buttons.button5 |= 1 << 1; break;
+        case BUTTON_RIGHT:      buttons.button5 |= 1 << 2; break;
+        case BUTTON_LEFT:       buttons.button5 |= 1 << 3; break;
+        case BUTTON_LEFT_SR:    buttons.button5 |= 1 << 4; break;
+        case BUTTON_LEFT_SL:    buttons.button5 |= 1 << 5; break;
+        case BUTTON_L:          buttons.button5 |= 1 << 6; break;
+        case BUTTON_ZL:         buttons.button5 |= 1 << 7; break;
+
+        default:;
+        }
+    }
+    return all_buttons;
+}
+bool SerialPABotBase_WirelessController::populate_report_gyro(PABB_NintendoSwitch_GyroState& gyro){
+    bool gyro_active = false;
+    {
+        if (m_accel_x.is_busy()){
+            gyro.accel_x = m_accel_x.value;
+            gyro_active = true;
+        }
+        if (m_accel_y.is_busy()){
+            gyro.accel_y = m_accel_y.value;
+            gyro_active = true;
+        }
+        if (m_accel_z.is_busy()){
+            gyro.accel_z = m_accel_z.value;
+            gyro_active = true;
+        }
+        if (m_rotation_x.is_busy()){
+            gyro.rotation_x = m_rotation_x.value;
+            gyro_active = true;
+        }
+        if (m_rotation_y.is_busy()){
+            gyro.rotation_y = m_rotation_y.value;
+            gyro_active = true;
+        }
+        if (m_rotation_z.is_busy()){
+            gyro.rotation_z = m_rotation_z.value;
+            gyro_active = true;
+        }
+    }
+    return gyro_active;
+}
 
 
 void SerialPABotBase_WirelessController::issue_report(
     const Cancellable* cancellable,
-    const PABB_ESP32_NintendoSwitch_ButtonState& buttons,
-    WallDuration duration
+    WallDuration duration,
+    const PABB_NintendoSwitch_ButtonState& buttons
 ){
     //  Release the state lock since we are no longer touching state.
     //  This loop can block indefinitely if the command queue is full.
@@ -92,6 +166,39 @@ void SerialPABotBase_WirelessController::issue_report(
         time_left -= current;
     }
 }
+void SerialPABotBase_WirelessController::issue_report(
+    const Cancellable* cancellable,
+    WallDuration duration,
+    const PABB_NintendoSwitch_ButtonState& buttons,
+    const PABB_NintendoSwitch_GyroState& gyro
+){
+    //  Release the state lock since we are no longer touching state.
+    //  This loop can block indefinitely if the command queue is full.
+    ReverseLockGuard<std::mutex> lg(m_state_lock);
+
+    //  TODO: For now we duplicate the gyro data to all 3 5ms segments.
+    PABB_NintendoSwitch_GyroStateX3 gyro3{
+        gyro, gyro, gyro
+    };
+
+    //  We will not do any throttling or timing adjustments here. We'll defer
+    //  to the microcontroller to do that for us.
+
+    //  Divide the controller state into smaller chunks of 65535 milliseconds.
+    Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
+
+    while (time_left > Milliseconds::zero()){
+        Milliseconds current = std::min(time_left, 65535ms);
+        m_serial->issue_request(
+            SerialPABotBase::MessageControllerStateFull(
+                (uint16_t)current.count(),
+                buttons, gyro3
+            ),
+            cancellable
+        );
+        time_left -= current;
+    }
+}
 
 
 
@@ -106,7 +213,7 @@ void SerialPABotBase_WirelessController::status_thread(){
     try{
         m_logger.log("Reading Controller Colors...");
 
-        using ControllerColors = PABB_ESP32_NintendoSwitch_ControllerColors;
+        using ControllerColors = PABB_NintendoSwitch_ControllerColors;
 
         BotBaseMessage response = m_serial->issue_request_and_wait(
             SerialPABotBase::MessageControllerReadSpi(
