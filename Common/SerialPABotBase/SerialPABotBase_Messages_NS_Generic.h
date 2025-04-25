@@ -12,8 +12,10 @@
 #if _WIN32
 #pragma pack(push, 1)
 #define PABB_PACK
-#else
+#elif __GNUC__
 #define PABB_PACK   __attribute__((packed))
+#else
+#define PABB_PACK
 #endif
 
 

@@ -12,8 +12,10 @@
 #if _WIN32
 #pragma pack(push, 1)
 #define PABB_PACK
-#else
+#elif __GNUC__
 #define PABB_PACK   __attribute__((packed))
+#else
+#define PABB_PACK
 #endif
 
 
@@ -28,7 +30,7 @@ typedef struct{
     uint8_t buttons[3];
     uint8_t left_grip[3];
     uint8_t right_grip[3];
-} PABB_ESP32_NintendoSwitch_ControllerColors;
+} PABB_NintendoSwitch_ControllerColors;
 
 typedef struct{
     uint8_t button3;
@@ -37,11 +39,22 @@ typedef struct{
     uint8_t left_joystick[3];
     uint8_t right_joystick[3];
     uint8_t vibrator;
-} PABB_ESP32_NintendoSwitch_ButtonState;
+} PABB_NintendoSwitch_ButtonState;
 
 typedef struct{
-    uint8_t data[36];
-} PABB_ESP32_NintendoSwitch_GyroState;
+    uint16_t accel_x;
+    uint16_t accel_y;
+    uint16_t accel_z;
+    uint16_t rotation_x;
+    uint16_t rotation_y;
+    uint16_t rotation_z;
+} PABB_NintendoSwitch_GyroState;
+
+typedef struct{
+    PABB_NintendoSwitch_GyroState time0;
+    PABB_NintendoSwitch_GyroState time1;
+    PABB_NintendoSwitch_GyroState time2;
+} PABB_NintendoSwitch_GyroStateX3;
 
 
 
@@ -77,7 +90,7 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    PABB_ESP32_NintendoSwitch_ButtonState buttons;
+    PABB_NintendoSwitch_ButtonState buttons;
 } PABB_PACK pabb_Message_ESP32_CommandButtonState;
 
 
@@ -85,8 +98,8 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    PABB_ESP32_NintendoSwitch_ButtonState buttons;
-    PABB_ESP32_NintendoSwitch_GyroState gyro;
+    PABB_NintendoSwitch_ButtonState buttons;
+    PABB_NintendoSwitch_GyroStateX3 gyro;
 } PABB_PACK pabb_Message_ESP32_CommandFullState;
 
 
