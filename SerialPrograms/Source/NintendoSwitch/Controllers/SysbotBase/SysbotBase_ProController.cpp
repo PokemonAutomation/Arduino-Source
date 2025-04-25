@@ -173,26 +173,6 @@ void ProController_SysbotBase::push_state(const Cancellable* cancellable, WallDu
 }
 
 
-void ProController_SysbotBase::send_botbase_request(
-    const Cancellable* cancellable,
-    const BotBaseRequest& request
-){
-    throw InternalProgramError(
-        &m_logger, PA_CURRENT_FUNCTION,
-        "ProController_SysbotBase::send_botbase_request(): Not supported."
-    );
-}
-BotBaseMessage ProController_SysbotBase::send_botbase_request_and_wait(
-    const Cancellable* cancellable,
-    const BotBaseRequest& request
-){
-    throw InternalProgramError(
-        &m_logger, PA_CURRENT_FUNCTION,
-        "ProController_SysbotBase::send_botbase_request_and_wait(): Not supported."
-    );
-}
-
-
 
 void ProController_SysbotBase::send_diff(
     const ProControllerState& old_state,

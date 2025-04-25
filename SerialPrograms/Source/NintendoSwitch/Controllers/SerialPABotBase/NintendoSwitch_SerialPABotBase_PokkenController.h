@@ -80,19 +80,6 @@ public:
         SerialPABotBase_Controller::wait_for_all(cancellable);
     }
 
-    virtual void send_botbase_request(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    ) override{
-        SerialPABotBase_Controller::send_botbase_request(cancellable, request);
-    }
-    virtual BotBaseMessage send_botbase_request_and_wait(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    ) override{
-        return SerialPABotBase_Controller::send_botbase_request_and_wait(cancellable, request);
-    }
-
 
 public:
     //  Superscalar Commands (the "ssf" framework)

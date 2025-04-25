@@ -63,19 +63,7 @@ public:
 
 
 public:
-    //  Temporary for refactor: Send custom requests for PABotBase's advanced
-    //  RPCs.
-    virtual void send_botbase_request(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    ) = 0;
-    virtual BotBaseMessage send_botbase_request_and_wait(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    ) = 0;
-
-
-public:
+    //  Standard Commands
 
     //  Press all the buttons set in the bitfield simultaneously.
     //  This command will wait until all the selected buttons are ready to

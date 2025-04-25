@@ -81,15 +81,6 @@ public:
 
     virtual void wait_for_all(const Cancellable* cancellable) override;
 
-    virtual void send_botbase_request(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    ) override;
-    virtual BotBaseMessage send_botbase_request_and_wait(
-        const Cancellable* cancellable,
-        const BotBaseRequest& request
-    ) override;
-
 
 public:
     //  Superscalar Commands (the "ssf" framework)
