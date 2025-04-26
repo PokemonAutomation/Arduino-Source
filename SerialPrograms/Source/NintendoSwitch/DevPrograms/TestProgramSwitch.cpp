@@ -319,15 +319,30 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    std::terminate();
 
 
-    ssf_press_button(context, Button::BUTTON_ZR, 1s, 60s, 0ms);
+#if 1
+    ssf_press_button(context, Button::BUTTON_ZR, 1s, 60h, 0ms);
+//    context->issue_gyro_rotate_x(&scope, 0s, 60h, 0ms, 0x1000);
+//    context->issue_gyro_rotate_y(&scope, 0s, 60h, 0ms, 0x0000);
+//    context->issue_gyro_rotate_z(&scope, 0s, 60h, 0ms, 0x1000);
 
-    while (true){
-        context->issue_gyro_rotate_z(&scope, 1s, 1s, 0s, +1);
-        context->issue_gyro_rotate_z(&scope, 1s, 1s, 0s, 0x0000);
-        context->issue_gyro_rotate_z(&scope, 1s, 1s, 0s, -1);
-        context->issue_gyro_rotate_z(&scope, 1s, 1s, 0s, 0x0000);
+//    auto duration = 10s;
+
+//    context->issue_gyro_rotate_x(&scope, duration, duration, 0s, 0x1000);
+//    context->issue_nop(&scope, 60h);
+
+#if 1
+    auto duration = 15ms;
+    for (size_t c = 0; c < 65536; c += 1){
+        context->issue_gyro_accel_x(&scope, 0s, duration, 0s, 688 + 0*c % 2);
+        context->issue_gyro_accel_y(&scope, 0s, duration, 0s, 1*c % 2);
+        context->issue_gyro_accel_z(&scope, 0s, duration, 0s, -4038 + 0*c % 2);
+        context->issue_gyro_rotate_x(&scope, 0s, duration, 0s, (uint16_t)(0x0000 + 1*c));
+        context->issue_gyro_rotate_y(&scope, 0s, duration, 0s, (uint16_t)(0x0000 + 1*c));
+        context->issue_gyro_rotate_z(&scope, 0s, duration, 0s, (uint16_t)(0x0000 + 0*c));
+        context->issue_nop(&scope, duration);
     }
-
+#endif
+#endif
 
 
 #if 0

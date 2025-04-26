@@ -90,7 +90,8 @@ protected:
 
 //        cout << "wx = " << wx << ", wy = " << wy << endl;
 //        wy = 2048;
-//        wx = 260;
+//        wx = 1874;
+//        wx = 320;
 
         data[0] = (uint8_t)wx;
         data[1] = (uint8_t)(wx >> 8 | wy << 4);

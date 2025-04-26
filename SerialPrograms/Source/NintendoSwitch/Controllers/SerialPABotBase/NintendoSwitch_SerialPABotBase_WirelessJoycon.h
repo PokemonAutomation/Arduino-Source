@@ -19,7 +19,7 @@ class SerialPABotBase_WirelessJoycon final :
     public JoyconController,
     public SerialPABotBase_WirelessController
 {
-    static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1873;
+    static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1874;
     static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 260;
 
 public:

@@ -72,7 +72,14 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         );
     }
 
-    PABB_NintendoSwitch_GyroState gyro{};
+    PABB_NintendoSwitch_GyroState gyro{
+        0x0000,
+        0x0000,
+        0x0000,
+        0x0000,
+        0x0000,
+        0x0000,
+    };
     bool gyro_active = populate_report_gyro(gyro);
 
 //    gyro_active = true;

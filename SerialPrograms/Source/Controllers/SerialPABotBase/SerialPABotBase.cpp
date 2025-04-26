@@ -86,28 +86,6 @@ const std::map<
     >
 > SUPPORTED_VERSIONS{
     {2025040500, {
-        {PABB_PID_PABOTBASE_ESP32, {
-            {ControllerType::NintendoSwitch_WirelessProController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::TimingFlexibleMilliseconds,
-                ControllerFeature::QueryCommandQueueSize,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
-            {ControllerType::NintendoSwitch_LeftJoycon, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::TimingFlexibleMilliseconds,
-                ControllerFeature::QueryCommandQueueSize,
-                ControllerFeature::NintendoSwitch_LeftJoycon,
-            }},
-            {ControllerType::NintendoSwitch_RightJoycon, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::TimingFlexibleMilliseconds,
-                ControllerFeature::QueryCommandQueueSize,
-                ControllerFeature::NintendoSwitch_RightJoycon,
-            }},
-        }},
-//    }},
-//    {2025040500, {
         {PABB_PID_PABOTBASE_ArduinoUnoR3, {
             {ControllerType::NintendoSwitch_WiredProController, {
                 ControllerFeature::TickPrecise,
@@ -160,6 +138,7 @@ const std::map<
             }},
         }},
     }},
+#if 0
     {2025042000, {
         {PABB_PID_PABOTBASE_CH552, {
             {ControllerType::NintendoSwitch_WiredProController, {
@@ -167,6 +146,29 @@ const std::map<
                 ControllerFeature::QueryCommandQueueSize,
                 ControllerFeature::NintendoSwitch_ProController,
                 ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+    }},
+#endif
+    {2025042600, {
+        {PABB_PID_PABOTBASE_ESP32, {
+            {ControllerType::NintendoSwitch_WirelessProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::TimingFlexibleMilliseconds,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_ProController,
+            }},
+            {ControllerType::NintendoSwitch_LeftJoycon, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::TimingFlexibleMilliseconds,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_LeftJoycon,
+            }},
+            {ControllerType::NintendoSwitch_RightJoycon, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::TimingFlexibleMilliseconds,
+                ControllerFeature::QueryCommandQueueSize,
+                ControllerFeature::NintendoSwitch_RightJoycon,
             }},
         }},
     }},
