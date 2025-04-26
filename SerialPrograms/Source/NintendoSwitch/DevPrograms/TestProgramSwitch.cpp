@@ -333,9 +333,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #if 1
     auto duration = 15ms;
     for (size_t c = 0; c < 65536; c += 1){
-        context->issue_gyro_accel_x(&scope, 0s, duration, 0s, 688 + 0*c % 2);
-        context->issue_gyro_accel_y(&scope, 0s, duration, 0s, 1*c % 2);
-        context->issue_gyro_accel_z(&scope, 0s, duration, 0s, -4038 + 0*c % 2);
+        context->issue_gyro_accel_x(&scope, 0s, duration, 0s, (uint16_t)(688 + 0*c % 2));
+        context->issue_gyro_accel_y(&scope, 0s, duration, 0s, (uint16_t)(1*c % 2));
+        context->issue_gyro_accel_z(&scope, 0s, duration, 0s, (uint16_t)(-4038 + 0*c % 2));
         context->issue_gyro_rotate_x(&scope, 0s, duration, 0s, (uint16_t)(0x0000 + 1*c));
         context->issue_gyro_rotate_y(&scope, 0s, duration, 0s, (uint16_t)(0x0000 + 1*c));
         context->issue_gyro_rotate_z(&scope, 0s, duration, 0s, (uint16_t)(0x0000 + 0*c));
