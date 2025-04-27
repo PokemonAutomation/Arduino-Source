@@ -342,18 +342,6 @@ int register_message_converters_framework_requests(){
     );
 #if 0
     register_message_converter(
-        PABB_MSG_COMMAND_END_PROGRAM_CALLBACK,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "end_program_callback() - ";
-            if (body.size() != sizeof(pabb_end_program_callback)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_end_program_callback*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-#endif
-    register_message_converter(
         PABB_MSG_COMMAND_SET_LED_STATE,
         [](const std::string& body){
             std::ostringstream ss;
@@ -365,6 +353,7 @@ int register_message_converters_framework_requests(){
             return ss.str();
         }
     );
+#endif
     return 0;
 }
 int register_message_converters_custom_info(){
@@ -375,14 +364,14 @@ int register_message_converters_custom_info(){
             ss << "PABB_MSG_INFO_I32 - ";
             if (body.size() != sizeof(pabb_MsgInfoI32)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_MsgInfoI32*)body.c_str();
-            switch (params->tag){
-            case PABB_MSG_INFO_I32_TAG_SCHEDULE_THROTTLED:
-                ss << "Command schedule throttled by: " << params->data;
-                break;
-            default:
+//            switch (params->tag){
+//            case PABB_MSG_INFO_I32_TAG_SCHEDULE_THROTTLED:
+//                ss << "Command schedule throttled by: " << params->data;
+//                break;
+//            default:
                 ss << "tag = " << (unsigned)params->tag;
                 ss << ", data = " << params->data;
-            }
+//            }
             return ss.str();
         }
     );
@@ -418,11 +407,27 @@ int register_message_converters_custom_info(){
             std::ostringstream ss;
             ss << "PABB_MSG_INFO_I32_LABEL - ";
             if (body.size() < sizeof(uint32_t)){
-                ss << "(invalid size)" << std::endl; return ss.str();
+                ss << "(invalid size)" << std::endl;
+                return ss.str();
             }
             const auto* params = (const pabb_MsgInfoI32Label*)body.c_str();
             ss << std::string(body.data() + sizeof(uint32_t), body.size() - sizeof(uint32_t));
             ss << ": " << params->value;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_INFO_H32_LABEL,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_INFO_I32_LABEL - ";
+            if (body.size() < sizeof(uint32_t)){
+                ss << "(invalid size)" << std::endl;
+                return ss.str();
+            }
+            const auto* params = (const pabb_MsgInfoI32Label*)body.c_str();
+            ss << std::string(body.data() + sizeof(uint32_t), body.size() - sizeof(uint32_t));
+            ss << ": 0x" << std::hex << params->value;
             return ss.str();
         }
     );

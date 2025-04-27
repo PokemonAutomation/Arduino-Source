@@ -84,7 +84,7 @@ void MessageLogger::on_recv(const BotBaseMessage& message){
 SerialLogger::SerialLogger(Logger& logger, bool log_everything)
     : MessageLogger(log_everything)
     , m_logger(logger)
-    , m_history(1000)
+    , m_history(200)
 {}
 void SerialLogger::log(const char* msg, Color color){
     if (ok_to_log()){
