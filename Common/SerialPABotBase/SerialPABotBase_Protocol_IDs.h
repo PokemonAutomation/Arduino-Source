@@ -1,7 +1,7 @@
 /*  SerialPABotBase Protocol IDs
- *
+ * 
  *  From: https://github.com/PokemonAutomation/
- *
+ * 
  */
 
 #ifndef PokemonAutomation_SerialPABotBase_Protocol_IDs_H

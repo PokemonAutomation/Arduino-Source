@@ -181,6 +181,40 @@ void SerialPABotBase_WirelessController::issue_report(
         gyro, gyro, gyro
     };
 
+#if 0
+    //  Purturb results to show the Switch that they are not stuck.
+    if (gyro3.time1.accel_x > 0){
+        gyro3.time0.accel_x--;
+        gyro3.time2.accel_x--;
+    }else if (gyro3.time1.accel_x < 0){
+        gyro3.time0.accel_x++;
+        gyro3.time2.accel_x++;
+    }else{
+        gyro3.time0.accel_x--;
+        gyro3.time2.accel_x++;
+    }
+    if (gyro3.time1.accel_y > 0){
+        gyro3.time0.accel_y--;
+        gyro3.time2.accel_y--;
+    }else if (gyro3.time1.accel_y < 0){
+        gyro3.time0.accel_y++;
+        gyro3.time2.accel_y++;
+    }else{
+        gyro3.time0.accel_y--;
+        gyro3.time2.accel_y++;
+    }
+    if (gyro3.time1.accel_z > 0){
+        gyro3.time0.accel_z--;
+        gyro3.time2.accel_z--;
+    }else if (gyro3.time1.accel_z < 0){
+        gyro3.time0.accel_z++;
+        gyro3.time2.accel_z++;
+    }else{
+        gyro3.time0.accel_z--;
+        gyro3.time2.accel_z++;
+    }
+#endif
+
     //  We will not do any throttling or timing adjustments here. We'll defer
     //  to the microcontroller to do that for us.
 

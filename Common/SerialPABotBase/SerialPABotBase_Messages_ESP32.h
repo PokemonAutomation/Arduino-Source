@@ -42,12 +42,12 @@ typedef struct{
 } PABB_NintendoSwitch_ButtonState;
 
 typedef struct{
-    uint16_t accel_x;
-    uint16_t accel_y;
-    uint16_t accel_z;
-    uint16_t rotation_x;
-    uint16_t rotation_y;
-    uint16_t rotation_z;
+    int16_t accel_x;
+    int16_t accel_y;
+    int16_t accel_z;
+    int16_t rotation_x;
+    int16_t rotation_y;
+    int16_t rotation_z;
 } PABB_NintendoSwitch_GyroState;
 
 typedef struct{

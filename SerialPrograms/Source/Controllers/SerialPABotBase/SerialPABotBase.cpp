@@ -138,19 +138,7 @@ const std::map<
             }},
         }},
     }},
-#if 0
-    {2025042000, {
-        {PABB_PID_PABOTBASE_CH552, {
-            {ControllerType::NintendoSwitch_WiredProController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::QueryCommandQueueSize,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }},
-        }},
-    }},
-#endif
-    {2025042600, {
+    {2025042601, {
         {PABB_PID_PABOTBASE_ESP32, {
             {ControllerType::NintendoSwitch_WirelessProController, {
                 ControllerFeature::TickPrecise,
