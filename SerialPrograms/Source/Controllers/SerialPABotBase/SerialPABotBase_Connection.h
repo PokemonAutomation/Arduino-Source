@@ -31,8 +31,6 @@ public:
     );
     ~SerialPABotBase_Connection();
 
-    void update_with_capabilities(const ControllerFeatures& capabilities);
-
 
 public:
 //    uint8_t program_id() const{
@@ -41,11 +39,24 @@ public:
     BotBaseController* botbase();
 
 public:
-
     virtual ControllerModeStatus controller_mode_status() const override;
 
 
 private:
+    const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>&
+    get_programs_for_protocol(uint32_t protocol);
+
+    const std::map<ControllerType, ControllerFeatures>&
+    get_controllers_for_program(
+        const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>& available_programs,
+        uint32_t program_id
+    );
+
+    void process_queue_size();
+    ControllerType get_controller_type(
+        const std::map<ControllerType, ControllerFeatures>& available_controllers
+    );
+
     ControllerModeStatus read_device_specs(
         std::optional<ControllerType> change_controller
     );

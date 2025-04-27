@@ -326,6 +326,7 @@ SOURCES += \
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_PostConnectActions.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.cpp \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp \
@@ -1506,6 +1507,7 @@ HEADERS += \
     Source/Controllers/SerialPABotBase/SerialPABotBase.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h \
+    Source/Controllers/SerialPABotBase/SerialPABotBase_PostConnectActions.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.h \
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h \

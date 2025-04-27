@@ -47,7 +47,6 @@ SerialPABotBase_Controller::SerialPABotBase_Controller(
     auto iter = controllers.find(controller_type);
     if (iter != controllers.end()){
         m_supported_features = std::move(iter->second);
-        connection.update_with_capabilities(m_supported_features);
     }
 }
 

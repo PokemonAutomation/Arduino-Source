@@ -16,9 +16,8 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "SerialPABotBase.h"
+#include "SerialPABotBase_PostConnectActions.h"
 #include "SerialPABotBase_Connection.h"
 
 //#include <iostream>
@@ -104,39 +103,6 @@ SerialPABotBase_Connection::~SerialPABotBase_Connection(){
 }
 
 
-void SerialPABotBase_Connection::update_with_capabilities(const ControllerFeatures& capabilities){
-    Logger& logger = m_logger;
-
-    do{
-        if (capabilities.contains(ControllerFeature::QueryCommandQueueSize)){
-            break;
-        }
-
-//        //  Program Version
-//        logger.log("Checking Firmware Version...");
-//        uint32_t version = program_version(*m_botbase);
-//        logger.log("Checking Firmware Version... Version = " + std::to_string(version));
-
-        //  REMOVE: Temporary for migration.
-        if (m_protocol / 100 == 20210526 && m_version == 2023121900){
-            break;
-        }
-
-        logger.log("Queue size not supported. Defaulting to size 4.", COLOR_RED);
-        return;
-    }while (false);
-
-    logger.log("Device supports queue size. Requesting queue size...", COLOR_BLUE);
-    uint8_t queue_size = device_queue_size(*m_botbase);
-
-    //  For now we don't need to use that much queue size.
-    queue_size = std::min<uint8_t>(queue_size, 16);
-
-    logger.log("Setting queue size to: " + std::to_string(queue_size), COLOR_BLUE);
-    m_botbase->set_queue_limit(queue_size);
-}
-
-
 
 BotBaseController* SerialPABotBase_Connection::botbase(){
     BotBaseController* ret = m_botbase.get();
@@ -154,135 +120,119 @@ ControllerModeStatus SerialPABotBase_Connection::controller_mode_status() const{
 }
 
 
+
+const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>&
+SerialPABotBase_Connection::get_programs_for_protocol(uint32_t protocol){
+    //  (protocol_requested / 100) == (protocol_device / 100)
+    //  (protocol_requested % 100) <= (protocol_device / 100)
+    auto iter = SUPPORTED_VERSIONS.upper_bound(protocol);
+    if (iter == SUPPORTED_VERSIONS.begin()){
+        throw SerialProtocolException(
+            m_logger, PA_CURRENT_FUNCTION,
+            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
+            "Please install the firmware that came with this version of the program."
+        );
+    }
+    --iter;
+    if (iter->first < protocol / 100 * 100){
+        throw SerialProtocolException(
+            m_logger, PA_CURRENT_FUNCTION,
+            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
+            "Please install the firmware that came with this version of the program."
+        );
+    }
+
+    return iter->second;
+}
+
+const std::map<ControllerType, ControllerFeatures>&
+SerialPABotBase_Connection::get_controllers_for_program(
+    const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>& available_programs,
+    uint32_t program_id
+){
+    auto iter = available_programs.find(program_id);
+    if (iter == available_programs.end()){
+        throw SerialProtocolException(
+            m_logger, PA_CURRENT_FUNCTION,
+            "Unrecognized Program ID: " + std::to_string(program_id) + "<br>"
+            "Please install the firmware that came with this version of the program."
+        );
+    }
+    return iter->second;
+}
+
+void SerialPABotBase_Connection::process_queue_size(){
+    m_logger.log("Requesting queue size...");
+    uint8_t queue_size = device_queue_size(*m_botbase);
+    m_logger.Logger::log("Requesting queue size... Queue Size = " + std::to_string(queue_size));
+
+    //  For now we don't need to use that much queue size.
+    queue_size = std::min<uint8_t>(queue_size, 32);
+
+    m_logger.Logger::log("Setting queue size to: " + std::to_string(queue_size));
+    m_botbase->set_queue_limit(queue_size);
+}
+ControllerType SerialPABotBase_Connection::get_controller_type(
+    const std::map<ControllerType, ControllerFeatures>& available_controllers
+){
+    m_logger.log("Reading Controller Mode...");
+    ControllerType current_controller = ControllerType::None;
+    if (available_controllers.size() == 1){
+        current_controller = available_controllers.begin()->first;
+    }else if (available_controllers.size() > 1){
+        uint32_t type_id = read_controller_mode(*m_botbase);
+        current_controller = id_to_controller_type(type_id);
+    }
+    m_logger.Logger::log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
+    return current_controller;
+}
+
+
+
 ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
     std::optional<ControllerType> change_controller
 ){
-    Logger& logger = m_logger;
-
-
     //  Protocol
-    logger.log("Checking device protocol compatibility...");
-    m_protocol = protocol_version(*m_botbase);
-    logger.log("Checking device protocol compatibility... Protocol = " + std::to_string(m_protocol));
-
-    //  (protocol_requested / 100) == (protocol_device / 100)
-    //  (protocol_requested % 100) <= (protocol_device / 100)
-    auto protocol_iter = SUPPORTED_VERSIONS.upper_bound(m_protocol);
-    if (protocol_iter == SUPPORTED_VERSIONS.begin()){
-        throw SerialProtocolException(
-            logger, PA_CURRENT_FUNCTION,
-            "Incompatible protocol. Device: " + std::to_string(m_protocol) + "<br>"
-            "Please install the firmware that came with this version of the program."
-        );
+    {
+        m_logger.Logger::log("Checking Protocol Version...");
+        m_protocol = protocol_version(*m_botbase);
+        m_logger.Logger::log("Checking Protocol Version... Protocol = " + std::to_string(m_protocol));
     }
-    --protocol_iter;
-    if (protocol_iter->first < m_protocol / 100 * 100){
-        throw SerialProtocolException(
-            logger, PA_CURRENT_FUNCTION,
-            "Incompatible protocol. Device: " + std::to_string(m_protocol) + "<br>"
-            "Please install the firmware that came with this version of the program."
-        );
-    }
+    const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>& PROGRAMS =
+        get_programs_for_protocol(m_protocol);
 
 
     //  Program ID
-    logger.log("Checking Program ID...");
-    m_program_id = program_id(*m_botbase);
-    logger.log("Checking Program ID... Program ID = " + std::to_string(m_program_id));
+    {
+        m_logger.Logger::log("Checking Program ID...");
+        m_program_id = program_id(*m_botbase);
+        m_logger.Logger::log("Checking Program ID... Program ID = " + std::to_string(m_program_id));
+    }
+    const std::map<ControllerType, ControllerFeatures>& CONTROLLERS =
+        get_controllers_for_program(PROGRAMS, m_program_id);
 
-    const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>& PROGRAM_IDS = protocol_iter->second;
-    auto program_iter = PROGRAM_IDS.find(m_program_id);
-    if (program_iter == PROGRAM_IDS.end()){
-        throw SerialProtocolException(
-            logger, PA_CURRENT_FUNCTION,
-            "Unrecognized Program ID: " + std::to_string(m_program_id) + "<br>"
-            "Please install the firmware that came with this version of the program."
-        );
+    //  Firmware Version
+    {
+        m_logger.Logger::log("Checking Firmware Version...");
+        m_version = program_version(*m_botbase);
+        m_logger.Logger::log("Checking Firmware Version... Version = " + std::to_string(m_version));
     }
 
-    logger.log("Checking Firmware Version...");
-    m_version = program_version(*m_botbase);
-    logger.log("Checking Firmware Version... Version = " + std::to_string(m_version));
+    //  Queue Size
+    process_queue_size();
 
     //  Controller Type
-    logger.log("Reading Controller Mode...");
-    ControllerType current_controller = ControllerType::None;
-    if (program_iter->second.size() == 1){
-        current_controller = program_iter->second.begin()->first;
-    }else if (program_iter->second.size() > 1){
-        uint32_t type_id = read_controller_mode(*m_botbase);
-        current_controller = id_to_controller_type(type_id);
-    }
-    logger.log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
+    ControllerType current_controller = get_controller_type(CONTROLLERS);
 
-
-    if (change_controller && program_iter->second.size() > 1){
-        ControllerType desired_controller = change_controller.value();
-        switch (desired_controller){
-        case ControllerType::NintendoSwitch_WiredProController:
-        case ControllerType::NintendoSwitch_WirelessProController:
-        case ControllerType::NintendoSwitch_LeftJoycon:
-        case ControllerType::NintendoSwitch_RightJoycon:{
-            NintendoSwitch::ControllerProfile profile =
-                PokemonAutomation::NintendoSwitch::ConsoleSettings::instance().CONTROLLER_SETTINGS.get_or_make_profile(
-                    m_device_name,
-                    desired_controller
-                );
-
-            PABB_NintendoSwitch_ControllerColors colors;
-            {
-                Color color(profile.body_color);
-                colors.body[0] = color.red();
-                colors.body[1] = color.green();
-                colors.body[2] = color.blue();
-            }
-            {
-                Color color(profile.button_color);
-                colors.buttons[0] = color.red();
-                colors.buttons[1] = color.green();
-                colors.buttons[2] = color.blue();
-            }
-            {
-                Color color(profile.left_grip);
-                colors.left_grip[0] = color.red();
-                colors.left_grip[1] = color.green();
-                colors.left_grip[2] = color.blue();
-            }
-            {
-                Color color(profile.right_grip);
-                colors.right_grip[0] = color.red();
-                colors.right_grip[1] = color.green();
-                colors.right_grip[2] = color.blue();
-            }
-
-            m_botbase->issue_request_and_wait(
-                MessageControllerWriteSpi(
-                    desired_controller,
-                    0x00006050, sizeof(PABB_NintendoSwitch_ControllerColors),
-                    &colors
-                ),
-//                MessageControllerSetColors(desired_controller, colors),
-                nullptr
-            );
-        }
-        default:;
-        }
-
-
-        uint32_t native_controller_id = controller_type_to_id(desired_controller);
-        m_botbase->issue_request_and_wait(
-            DeviceRequest_change_controller_mode(native_controller_id),
-            nullptr
-        );
-
-        //  Re-read the controller.
-        logger.log("Reading Controller Mode...");
-        uint32_t type_id = read_controller_mode(*m_botbase);
-        current_controller = id_to_controller_type(type_id);
-        logger.log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
-    }
-
-    return {current_controller, program_iter->second};
+    //  Run any post-connection actions specific to this program.
+    ControllerModeStatus ret{current_controller, CONTROLLERS};
+    run_post_connect_actions(
+        ret,
+        m_program_id, m_device_name,
+        *m_botbase,
+        change_controller
+    );
+    return ret;
 }
 
 
