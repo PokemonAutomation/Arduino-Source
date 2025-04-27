@@ -35,6 +35,7 @@ private:
     enum class Target{
         mewtwo,
         snorlax,
+        electrode,
         //snorlax2,
     };
     EnumDropdownOption<Target> TARGET;

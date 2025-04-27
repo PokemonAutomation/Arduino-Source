@@ -58,6 +58,7 @@ LegendaryReset::LegendaryReset()
         {
             {Target::mewtwo, "mewtwo", "Mewtwo, Articuno, Zapdos, Moltres"},
             {Target::snorlax, "snorlax", "Snorlax"},
+            {Target::electrode, "electrode", "Electrode"},
             //{Target::snorlax2, "snorlax2", "Snorlax (w/Fuji)"},
         },
         LockMode::LOCK_WHILE_RUNNING,
@@ -87,17 +88,21 @@ bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconCo
         shiny_coefficient = error_coefficient;
         return true;
     });
-    BattleArrowWatcher battle_started(COLOR_YELLOW, {0.546, 0.863, 0.045, 0.068});
+    BattleArrowWatcher battle_started(COLOR_RED, {0.546, 0.863, 0.045, 0.068});
 
     env.log("Starting battle.");
     switch (TARGET) {
     case Target::mewtwo:
-        pbf_mash_button(context, BUTTON_A, 3000ms); //untested
-        pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms); //also untested
+        pbf_mash_button(context, BUTTON_A, 3000ms);
+        pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
         break;
     case Target::snorlax:
         pbf_mash_button(context, BUTTON_A, 5000ms);
         pbf_mash_button(context, BUTTON_B, 10000ms);
+        break;
+    case Target::electrode:
+        pbf_press_button(context, BUTTON_A, 200ms, 200ms);
+        pbf_mash_button(context, BUTTON_B, 5000ms);
         break;
     }
     context.wait_for_all_requests();
@@ -219,6 +224,10 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
     switch (res){
     case 0:
         env.log("Catching menu detected.");
+        send_program_status_notification(
+            env, NOTIFICATION_STATUS_UPDATE,
+            "Catching menu detected."
+        );
         break;
     default:
         OperationFailedException::fire(
