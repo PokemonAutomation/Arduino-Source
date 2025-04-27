@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "SerialPABotBase.h"
 
@@ -57,12 +58,16 @@ ControllerType id_to_controller_type(uint32_t id){
         return ControllerType::NintendoSwitch_LeftJoycon;
     case PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON:
         return ControllerType::NintendoSwitch_RightJoycon;
-    default:
-        return ControllerType::None;
     }
+    throw InternalProgramError(
+        nullptr, PA_CURRENT_FUNCTION,
+        "Invalid Controller ID: " + std::to_string(id)
+    );
 }
 uint32_t controller_type_to_id(ControllerType controller_type){
     switch (controller_type){
+    case ControllerType::None:
+        return PABB_CID_NONE;
     case ControllerType::NintendoSwitch_WiredProController:
         return PABB_CID_NINTENDO_SWITCH_WIRED_PRO_CONTROLLER;
     case ControllerType::NintendoSwitch_WirelessProController:
@@ -71,9 +76,11 @@ uint32_t controller_type_to_id(ControllerType controller_type){
         return PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
     case ControllerType::NintendoSwitch_RightJoycon:
         return PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
-    default:
-        return PABB_CID_NONE;
     }
+    throw InternalProgramError(
+        nullptr, PA_CURRENT_FUNCTION,
+        "Invalid Controller Enum: " + std::to_string((int)controller_type)
+    );
 }
 
 

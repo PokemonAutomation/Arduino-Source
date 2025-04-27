@@ -33,6 +33,7 @@ public:
         , m_parent(parent)
     {
 //        cout << "SerialPABotBase(): " << current << endl;
+        this->setMaxVisibleItems(32);
 
         if (current == nullptr || (
                 current->interface_type != ControllerInterface::None &&
@@ -70,10 +71,15 @@ public:
     }
 
     void refresh_devices(){
+//        cout << "Current = " << width() << " x " << height() << endl;
+//        cout << "sizeHint = " << sizeHint().width() << " x " << sizeHint().height() << endl;
+//        cout << "minimumContentsLength = " << this->minimumContentsLength() << endl;
+
         m_ports.clear();
         this->clear();
 
 //        cout << "SerialPABotBase_SelectorWidget::refresh_devices()" << endl;
+
 
         m_ports.emplace_back(new NullControllerDescriptor());
         for (QSerialPortInfo& port : QSerialPortInfo::availablePorts()){
@@ -86,16 +92,23 @@ public:
             m_ports.emplace_back(new SerialPABotBase_Descriptor(port));
         }
 
+        size_t width = 6;
         int index = 0;
         int c = 0;
         for (const auto& port : m_ports){
-            this->addItem(QString::fromStdString(port->display_name()));
+            QString display_name = QString::fromStdString(port->display_name());
+            width = std::max<size_t>(width, display_name.size());
+            this->addItem(display_name);
             if (*m_parent.session().descriptor() == *m_ports[c]){
                 index = c;
             }
             c++;
         }
 
+        if (this->count() > this->maxVisibleItems()){
+            width++;
+        }
+        setMinimumContentsLength((int)width);
         setCurrentIndex(index);
     }
 

@@ -44,10 +44,12 @@ CameraSelectorWidget::CameraSelectorWidget(
     camera_row->addSpacing(5);
 
     m_camera_box = new NoWheelComboBox(this);
+    m_camera_box->setMaxVisibleItems(20);
     camera_row->addWidget(m_camera_box, 5);
     camera_row->addSpacing(5);
 
     m_resolution_box = new NoWheelComboBox(this);
+    m_resolution_box->setMaxVisibleItems(20);
     camera_row->addWidget(m_resolution_box, 3);
     camera_row->addSpacing(5);
 

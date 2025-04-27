@@ -48,15 +48,9 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
         QHBoxLayout* input_layout = new QHBoxLayout();
         row0->addLayout(input_layout, 10);
 
-//        if (PreloadSettings::instance().DEVELOPER_MODE){
-//            m_audio_input_box = new NoWheelComboBox(this);
-//            input_layout->addWidget(m_audio_input_box, 7);
-//            m_load_file_button = new QPushButton("Load File", this);
-//            input_layout->addWidget(m_load_file_button, 3);
-//        }else{
-            m_audio_input_box = new NoWheelComboBox(this);
-            input_layout->addWidget(m_audio_input_box, 10);
-//        }
+        m_audio_input_box = new NoWheelComboBox(this);
+        m_audio_input_box->setMaxVisibleItems(20);
+        input_layout->addWidget(m_audio_input_box, 10);
         row0->addSpacing(5);
 
         m_audio_format_box = new NoWheelComboBox(this);
@@ -77,13 +71,13 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
 
         QHBoxLayout* output_layout = new QHBoxLayout();
         row1->addLayout(output_layout, 10);
+        m_audio_output_box = new NoWheelComboBox(this);
+        m_audio_output_box->setMaxVisibleItems(20);
         if (GlobalSettings::instance().AUDIO_PIPELINE->SHOW_RECORD_FREQUENCIES){
-            m_audio_output_box = new NoWheelComboBox(this);
             output_layout->addWidget(m_audio_output_box, 7);
             m_record_button = new QPushButton("Record Frequencies", this);
             output_layout->addWidget(m_record_button, 3);
         }else{
-            m_audio_output_box = new NoWheelComboBox(this);
             output_layout->addWidget(m_audio_output_box, 10);
         }
         row1->addSpacing(5);
