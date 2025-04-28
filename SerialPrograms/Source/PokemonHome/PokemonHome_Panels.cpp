@@ -10,6 +10,7 @@
 
 #include "Programs/PokemonHome_PageSwap.h"
 #include "Programs/PokemonHome_BoxSorting.h"
+#include "Programs/PokemonHome_Enrichment.h"
 
 #include "Programs/PokemonHome_GenerateNameOCR.h"
 
@@ -31,6 +32,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>());
     ret.emplace_back(make_single_switch_program<PokemonHome::BoxSorting_Descriptor, PokemonHome::BoxSorting>());
+    ret.emplace_back(make_single_switch_program<PokemonHome::Enrichment_Descriptor, PokemonHome::Enrichment>());
 
 //    ret.emplace_back("---- Trading ----");
 
