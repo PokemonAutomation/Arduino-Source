@@ -183,12 +183,13 @@ void home_to_date_time(JoyconContext& context, bool to_date_change){
 
     pbf_move_joystick(context, 255, 128, 2*unit, unit);
     pbf_move_joystick(context, 255, 128, 2*unit, unit);
+    pbf_move_joystick(context, 255, 128, 2*unit, unit);
 
     //  Down twice in case we drop one.
     pbf_move_joystick(context, 128, 255, 2*unit, unit);
     pbf_move_joystick(context, 128, 255, 2*unit, unit);
 
-    pbf_move_joystick(context, 255, 128, 2*unit, unit);
+    pbf_move_joystick(context, 0, 128, 2*unit, unit);
 
     //  Press A multiple times to make sure one goes through.
     pbf_press_button(context, BUTTON_A, 2*unit, unit);
