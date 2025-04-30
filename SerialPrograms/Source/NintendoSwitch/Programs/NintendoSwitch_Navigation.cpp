@@ -19,12 +19,13 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
     case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
 
         //  Down twice in case we drop one.
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
 
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
 
         //  Two A presses in case we drop the 1st one.
         ssf_press_button(context, BUTTON_A, 3);
@@ -72,12 +73,13 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
 
         //  Down twice in case we drop one.
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
 
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 2*unit, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
 
         //  Press A multiple times to make sure one goes through.
         pbf_press_button(context, BUTTON_A, 2*unit, unit);
@@ -134,12 +136,13 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
 
         //  Down twice in case we drop one.
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
 //        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
 
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
 
         //  Press A multiple times to make sure one goes through.
         ssf_mash1_button(context, BUTTON_A, 200ms);
