@@ -319,7 +319,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    std::terminate();
 
 
+
+    ImageRGB32 image("20250430-043221293730.png");
+
 #if 1
+    {
+        TeraSilhouetteReader reader;
+        ImageMatch::ImageMatchResult results = reader.read(image);
+        results.log(logger, 110);
+    }
+#endif
+
+
+
+
+
+#if 0
     ssf_press_button(context, Button::BUTTON_ZR, 1s, 60h, 0ms);
 //    context->issue_gyro_rotate_x(&scope, 0s, 60h, 0ms, 0x1000);
 //    context->issue_gyro_rotate_y(&scope, 0s, 60h, 0ms, 0x0000);
@@ -526,16 +541,6 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     reader.read_ball(image);
 #endif
 
-
-//    ImageRGB32 image("screenshot-20250224-203247822474.png");
-
-#if 0
-    {
-        TeraSilhouetteReader reader;
-        ImageMatch::ImageMatchResult results = reader.read(image);
-        results.log(logger, 110);
-    }
-#endif
 
 #if 0
     {
