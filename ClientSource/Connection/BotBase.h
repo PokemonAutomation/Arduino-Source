@@ -43,7 +43,6 @@ public:
 
     //  Stop all pending commands. This wipes the command queue on both sides
     //  and stops any currently executing command.
-    virtual bool try_stop_all_commands() = 0;
     virtual void stop_all_commands() = 0;
 
     //  Tell the device that the next command should replace the command queue.
@@ -53,7 +52,6 @@ public:
     //
     //  Once this function is called, all commands before it are no longer
     //  guaranteed to finish even if no command interrupts it.
-    virtual bool try_next_command_interrupt() = 0;
     virtual void next_command_interrupt() = 0;
 
 public:

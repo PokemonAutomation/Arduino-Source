@@ -65,11 +65,7 @@ public:
     virtual void notify_all() override{}
 
     virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) override {}
-
-    virtual bool try_stop_all_commands() override { return true; }
     virtual void stop_all_commands() override {}
-
-    virtual bool try_next_command_interrupt() override { return true; }
     virtual void next_command_interrupt() override {};
 
     virtual bool try_issue_request(
