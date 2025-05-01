@@ -152,27 +152,47 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
         return;
     }
 
+    //  We can no longer use A to scroll right since that may put the
+    //  Switch to sleep if we landed on the sleep confirmation menu.
+
+
     switch (context->performance_class()){
     case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
         uint8_t scroll_delay = fast ? 3 : 4;
         uint8_t up_delay = 3;
-
         ssf_press_button(context, BUTTON_A, 20, 10);
         for (uint8_t c = 0; c < skips - 1; c++){
             ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
         }
+#if 0
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
-        ssf_press_button(context, BUTTON_A, up_delay);
-//        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+//        ssf_press_button(context, BUTTON_A, up_delay);
+#else
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+#endif
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
         for (uint8_t c = 0; c < skips - 1; c++){
             ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
         }
+#if 0
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
         ssf_press_button(context, BUTTON_A, up_delay);
+#else
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+#endif
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+
+#if 0
+//        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+#else
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, scroll_delay);
+        ssf_press_button(context, BUTTON_A);
+#endif
+
         ssf_press_button(context, BUTTON_A, 20, 10);
         break;
     }
@@ -186,19 +206,24 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
             ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
         }
 
-        //  Left scroll in case we missed the date menu and landed in the
-        //  language change.
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
-
+#if 0
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0ms, 2*unit, unit);
         ssf_press_button(context, BUTTON_A, unit);
-//        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+#else
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+#endif
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         for (uint8_t c = 0; c < skips - 1; c++){
             ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
         }
+#if 0
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0ms, 2*unit, unit);
         ssf_press_button(context, BUTTON_A, unit);
+#else
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+#endif
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 2*unit, unit);

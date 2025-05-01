@@ -38,8 +38,14 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
                 ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
             }while (--iterations);
         }
+
+        //  Scroll left and press A to exit the sleep menu if we happened to
+        //  land there.
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
+        ssf_press_button(context, BUTTON_A, 3);
+
         {
-            auto iterations = Milliseconds(336) / 24ms + 1;
+            auto iterations = Milliseconds(312) / 24ms + 1;
             do{
                 ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
             }while (--iterations);
@@ -59,12 +65,17 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
 
         ssf_press_button(context, BUTTON_A, 3);
         {
-            auto iterations = Milliseconds(216) / 24ms + 1;
+            auto iterations = Milliseconds(240) / 24ms + 1;
             do{
                 ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
             }while (--iterations);
         }
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+//        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+
+        //  Left scroll in case we missed landed in the language change or sleep
+        //  confirmation menus.
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms);
+
         break;
     }
     case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
@@ -93,8 +104,14 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
                 ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
             }while (--iterations);
         }
+
+        //  Scroll left and press A to exit the sleep menu if we happened to
+        //  land there.
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
+        ssf_press_button(context, BUTTON_A, unit, 2*unit, unit);
+
         {
-            auto iterations = Milliseconds(336) / unit + 1;
+            auto iterations = Milliseconds(312) / unit + 1;
             do{
                 ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
             }while (--iterations);
@@ -108,6 +125,8 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
 
         if (!to_date_change){
+            //  Double up this A press in case one is dropped.
+            ssf_press_button(context, BUTTON_A, unit);
             ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
             return;
         }
@@ -122,8 +141,8 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
             }while (--iterations);
         }
 
-        //  Left scroll in case we missed the date menu and landed in the
-        //  language change.
+        //  Left scroll in case we missed landed in the language change or sleep
+        //  confirmation menus.
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
 
         break;
