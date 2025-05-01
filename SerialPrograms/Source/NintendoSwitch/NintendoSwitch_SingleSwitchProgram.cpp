@@ -82,7 +82,6 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, P
 
 
 void SingleSwitchProgramInstance::start_program_controller_check(
-    CancellableScope& scope,
     ControllerSession& session
 ){
     if (!session.ready()){
@@ -96,14 +95,12 @@ void SingleSwitchProgramInstance::start_program_controller_check(
     );
 }
 void SingleSwitchProgramInstance::start_program_feedback_check(
-    CancellableScope& scope,
     VideoStream& stream,
     FeedbackType feedback_type
 ){
     StartProgramChecks::check_feedback(stream, feedback_type);
 }
 void SingleSwitchProgramInstance::start_program_border_check(
-    CancellableScope& scope,
     VideoStream& stream,
     FeedbackType feedback_type
 ){
