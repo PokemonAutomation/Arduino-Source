@@ -170,34 +170,6 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
 
 //    m_logger.log("Waiting for all requests to finish... Completed.", COLOR_DARKGREEN);
 }
-
-bool PABotBase::try_stop_all_commands(){
-
-#ifdef DEBUG_STACK_TRACE
-    cout << __FILE__ << ":" << __LINE__ <<  " PABotBase::try_stop_all_commands()" << endl;
-    cout << "-----------------------------------------------------------------------------------------" << endl;
-#if defined(__APPLE__)
-    void* callstack[128];
-    int i, frames = backtrace(callstack, 128);
-    char** strs = backtrace_symbols(callstack, frames);
-    for (i = 0; i < frames; ++i) {
-        cout << strs[i] << endl;
-    }
-    free(strs);
-#endif
-    cout << "-----------------------------------------------------------------------------------------" << endl;
-#endif
-
-    auto scope_check = m_sanitizer.check_scope();
-
-    uint64_t seqnum = try_issue_request(nullptr, SerialPABotBase::DeviceRequest_request_stop(), true);
-    if (seqnum != 0){
-        clear_all_active_commands(seqnum);
-        return true;
-    }else{
-        return false;
-    }
-}
 void PABotBase::stop_all_commands(){
 
 #ifdef DEBUG_STACK_TRACE
@@ -217,24 +189,13 @@ void PABotBase::stop_all_commands(){
 
     auto scope_check = m_sanitizer.check_scope();
 
-    uint64_t seqnum = issue_request(nullptr, SerialPABotBase::DeviceRequest_request_stop(), true);
+    uint64_t seqnum = issue_request(nullptr, SerialPABotBase::DeviceRequest_request_stop(), true, true);
     clear_all_active_commands(seqnum);
-}
-bool PABotBase::try_next_command_interrupt(){
-    auto scope_check = m_sanitizer.check_scope();
-
-    uint64_t seqnum = try_issue_request(nullptr, SerialPABotBase::DeviceRequest_next_command_interrupt(), true);
-    if (seqnum != 0){
-        clear_all_active_commands(seqnum);
-        return true;
-    }else{
-        return false;
-    }
 }
 void PABotBase::next_command_interrupt(){
     auto scope_check = m_sanitizer.check_scope();
 
-    uint64_t seqnum = issue_request(nullptr, SerialPABotBase::DeviceRequest_next_command_interrupt(), true);
+    uint64_t seqnum = issue_request(nullptr, SerialPABotBase::DeviceRequest_next_command_interrupt(), true, true);
     clear_all_active_commands(seqnum);
 }
 void PABotBase::clear_all_active_commands(uint64_t seqnum){
@@ -649,7 +610,8 @@ void PABotBase::retransmit_thread(){
 
 uint64_t PABotBase::try_issue_request(
     const Cancellable* cancelled,
-    const BotBaseRequest& request, bool silent_remove
+    const BotBaseRequest& request,
+    bool silent_remove, bool do_not_block
 ){
     auto scope_check = m_sanitizer.check_scope();
 
@@ -677,7 +639,7 @@ uint64_t PABotBase::try_issue_request(
     size_t queue_limit = m_max_pending_requests.load(std::memory_order_relaxed);
 
     //  Too many unacked requests in flight.
-    if (inflight_requests() >= queue_limit){
+    if (!do_not_block && inflight_requests() >= queue_limit){
 //        m_logger.log("Message throttled due to too many inflight requests.");
         return 0;
     }
@@ -685,6 +647,12 @@ uint64_t PABotBase::try_issue_request(
     //  Don't get too far ahead of the oldest seqnum.
     uint64_t seqnum = m_send_seq;
     if (seqnum - oldest_live_seqnum() > MAX_SEQNUM_GAP){
+        if (do_not_block){
+            throw ConnectionException(
+                &m_logger,
+                "Connection has stalled for a long time. Assuming it is dead."
+            );
+        }
         return 0;
     }
 
@@ -722,7 +690,8 @@ uint64_t PABotBase::try_issue_request(
 }
 uint64_t PABotBase::try_issue_command(
     const Cancellable* cancelled,
-    const BotBaseRequest& request, bool silent_remove
+    const BotBaseRequest& request,
+    bool silent_remove
 ){
     auto scope_check = m_sanitizer.check_scope();
 
@@ -801,11 +770,12 @@ uint64_t PABotBase::try_issue_command(
 }
 uint64_t PABotBase::issue_request(
     const Cancellable* cancelled,
-    const BotBaseRequest& request, bool silent_remove
+    const BotBaseRequest& request,
+    bool silent_remove, bool do_not_block
 ){
     auto scope_check = m_sanitizer.check_scope();
 
-    //  Issue a request or a command and return.
+    //  Issue a request and return.
     //
     //  If it cannot be issued (because we're over the limits), this function
     //  will wait until it can be issued.
@@ -824,7 +794,7 @@ uint64_t PABotBase::issue_request(
     //
 
     while (true){
-        uint64_t seqnum = try_issue_request(cancelled, request, silent_remove);
+        uint64_t seqnum = try_issue_request(cancelled, request, silent_remove, do_not_block);
         if (seqnum != 0){
             return seqnum;
         }
@@ -843,11 +813,12 @@ uint64_t PABotBase::issue_request(
 }
 uint64_t PABotBase::issue_command(
     const Cancellable* cancelled,
-    const BotBaseRequest& request, bool silent_remove
+    const BotBaseRequest& request,
+    bool silent_remove
 ){
     auto scope_check = m_sanitizer.check_scope();
 
-    //  Issue a request or a command and return.
+    //  Issue a command and return.
     //
     //  If it cannot be issued (because we're over the limits), this function
     //  will wait until it can be issued.
@@ -891,7 +862,7 @@ bool PABotBase::try_issue_request(
     auto scope_check = m_sanitizer.check_scope();
 
     if (!request.is_command()){
-        return try_issue_request(cancelled, request, true) != 0;
+        return try_issue_request(cancelled, request, true, false) != 0;
     }else{
         return try_issue_command(cancelled, request, true) != 0;
     }
@@ -903,7 +874,7 @@ void PABotBase::issue_request(
     auto scope_check = m_sanitizer.check_scope();
 
     if (!request.is_command()){
-        issue_request(cancelled, request, true);
+        issue_request(cancelled, request, true, false);
     }else{
         issue_command(cancelled, request, true);
     }
@@ -919,7 +890,7 @@ BotBaseMessage PABotBase::issue_request_and_wait(
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "This function only supports requests.");
     }
 
-    uint64_t seqnum = issue_request(cancelled, request, false);
+    uint64_t seqnum = issue_request(cancelled, request, false, false);
     return wait_for_request(seqnum, cancelled);
 }
 BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum, const Cancellable* cancelled){

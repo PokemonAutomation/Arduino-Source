@@ -66,24 +66,23 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
 
     //  Startup Checks
     m_option.instance().start_program_controller_check(
-        scope, m_system.controller_session()
+        m_system.controller_session()
     );
     m_option.instance().start_program_feedback_check(
-        scope, env.console,
+        env.console,
         m_option.descriptor().feedback()
     );
     m_option.instance().start_program_border_check(
-        scope, env.console,
+        env.console,
         m_option.descriptor().feedback()
     );
 
-    m_scope.store(&scope, std::memory_order_release);
+    ControllerContext<AbstractController> context(scope, env.console.controller());
+    m_scope.store(&context, std::memory_order_release);
 
 #ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
     try{
-        m_option.instance().program(env, scope);
-
-        ControllerContext<AbstractController> context(scope, env.console.controller());
+        m_option.instance().program(env, context);
         context.wait_for_all_requests();
     }catch (...){
         try{
@@ -130,11 +129,11 @@ void SingleSwitchProgramSession::internal_run_program(){
         m_option.descriptor().display_name(),
         timestamp()
     );
-    CancellableHolder<CancellableScope> scope;
     AbstractController* controller = m_system.controller_session().controller();
+    ControllerContext<AbstractController> context(*controller);
     SingleSwitchProgramEnvironment env(
         program_info,
-        scope,
+        context,
         *this,
         current_stats_tracker(), historical_stats_tracker(),
         m_system.logger(),
@@ -147,7 +146,7 @@ void SingleSwitchProgramSession::internal_run_program(){
 
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");
-        run_program_instance(env, scope);
+        run_program_instance(env, context);
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
     }catch (ProgramCancelledException&){

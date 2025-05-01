@@ -48,7 +48,7 @@ void TeraSilhouetteReader::make_overlays(VideoOverlaySet& items) const{
 }
 
 ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& screen) const{
-    static constexpr double MAX_ALPHA = 110;
+    static constexpr double MAX_ALPHA = 120;
     static constexpr double ALPHA_SPREAD = 20;
 
     const std::vector<uint32_t> BRIGHTNESS_THRESHOLDS{
@@ -61,6 +61,7 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
     };
 
 //    static int c = 0;
+
     ImageMatch::ImageMatchResult slugs;
     for (uint32_t threshold : BRIGHTNESS_THRESHOLDS){
 //        cout << "check0" << endl;
@@ -94,10 +95,11 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
 
 //        cout << "check4" << endl;
         ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, 0xff000000, 0xff5f5f5f, true);
-//        filtered_image.save("tera_filtered_image.png");
+//        filtered_image.save("tera_filtered_image-" + std::to_string(c++) + ".png");
 
 //        cout << "check5" << endl;
         slugs = TERA_RAID_SILHOUETTE_MATCHER().match(filtered_image, ALPHA_SPREAD);
+
         slugs.clear_beyond_alpha(MAX_ALPHA);
 
 //        slugs.log(global_logger_tagged(), MAX_ALPHA);

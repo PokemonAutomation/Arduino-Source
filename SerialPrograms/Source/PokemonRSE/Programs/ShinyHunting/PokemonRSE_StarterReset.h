@@ -28,7 +28,6 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext &context) override;
 
     virtual void start_program_border_check(
-        CancellableScope& scope,
         VideoStream& stream,
         FeedbackType feedback_type
     ) override{}

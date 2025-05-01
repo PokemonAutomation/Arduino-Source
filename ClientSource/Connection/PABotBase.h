@@ -79,11 +79,7 @@ public:
     //  Basic Requests
 
     virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) override;
-
-    virtual bool try_stop_all_commands() override;
     virtual void stop_all_commands() override;
-
-    virtual bool try_next_command_interrupt() override;
     virtual void next_command_interrupt() override;
 
 
@@ -141,21 +137,25 @@ private:
     //  Returns the seqnum of the request. If failed, returns zero.
     uint64_t try_issue_request(
         const Cancellable* cancelled,
-        const BotBaseRequest& request, bool silent_remove
+        const BotBaseRequest& request,
+        bool silent_remove, bool do_not_block
     );
     uint64_t try_issue_command(
         const Cancellable* cancelled,
-        const BotBaseRequest& request, bool silent_remove
+        const BotBaseRequest& request,
+        bool silent_remove
     );
 
     //  Returns the seqnum of the request.
     uint64_t issue_request(
         const Cancellable* cancelled,
-        const BotBaseRequest& request, bool silent_remove
+        const BotBaseRequest& request,
+        bool silent_remove, bool do_not_block
     );
     uint64_t issue_command(
         const Cancellable* cancelled,
-        const BotBaseRequest& request, bool silent_remove
+        const BotBaseRequest& request,
+        bool silent_remove
     );
 
 public:

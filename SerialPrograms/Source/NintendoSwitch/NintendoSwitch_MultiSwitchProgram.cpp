@@ -155,7 +155,6 @@ MultiSwitchProgramInstance::MultiSwitchProgramInstance(
 
 
 void MultiSwitchProgramInstance::start_program_controller_check(
-    CancellableScope& scope,
     ControllerSession& session, size_t console_index
 ){
     if (!session.ready()){
@@ -163,14 +162,12 @@ void MultiSwitchProgramInstance::start_program_controller_check(
     }
 }
 void MultiSwitchProgramInstance::start_program_feedback_check(
-    CancellableScope& scope,
     VideoStream& stream, size_t console_index,
     FeedbackType feedback_type
 ){
     StartProgramChecks::check_feedback(stream, feedback_type);
 }
 void MultiSwitchProgramInstance::start_program_border_check(
-    CancellableScope& scope,
     VideoStream& stream, size_t console_index,
     FeedbackType feedback_type
 ){
