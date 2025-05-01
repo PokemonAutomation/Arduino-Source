@@ -87,16 +87,13 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
     size_t consoles = m_system.count();
     for (size_t c = 0; c < consoles; c++){
         m_option.instance().start_program_controller_check(
-            scope,
             m_system[c].controller_session(), c
         );
         m_option.instance().start_program_feedback_check(
-            scope,
             env.consoles[c], c,
             m_option.descriptor().feedback()
         );
         m_option.instance().start_program_border_check(
-            scope,
             env.consoles[c], c,
             m_option.descriptor().feedback()
         );
