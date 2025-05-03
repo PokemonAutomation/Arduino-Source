@@ -318,8 +318,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    std::terminate();
 
+    Milliseconds unit = 24ms;
+
+    ssf_issue_scroll(context, DPAD_DOWN, 2*unit, 2*unit, unit);
+    ssf_issue_scroll(context, DPAD_LEFT, unit, 2*unit, unit);
+    ssf_issue_scroll(context, DPAD_LEFT, unit, 2*unit, unit);
+    ssf_issue_scroll(context, DPAD_LEFT, unit, 2*unit, unit);
 
 
+
+#if 0
     ImageRGB32 image("20250430-043221293730.png");
 
 #if 1
@@ -329,7 +337,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         results.log(logger, 110);
     }
 #endif
-
+#endif
 
 
 
