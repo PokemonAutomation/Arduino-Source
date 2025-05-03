@@ -28,6 +28,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+using namespace std::chrono_literals;
+
 
 
 
@@ -78,33 +80,48 @@ CustomPathCell::~CustomPathCell(){
 void CustomPathCell::operator=(const CustomPathCell& x){
     text.set_text(x.text.text());
     mount.set(x.mount);
-    move_forward_ticks.set(x.move_forward_ticks);
+    move_forward.set(x.move_forward.current_text());
     move_speed.set(x.move_speed);
     left_x.set(x.left_x);
     left_y.set(x.left_y);
-    jump_wait_ticks.set(x.jump_wait_ticks);
-    wait_ticks.set(x.wait_ticks);
+    jump_wait.set(x.jump_wait.current_text());
+    wait.set(x.wait.current_text());
 }
 CustomPathCell::CustomPathCell(EnumDropdownCell<PathAction>& action)
     : BatchOption(LockMode::LOCK_WHILE_RUNNING, true)
     , m_action(action)
     , text("", false)
     , mount(PathMount_Database(), LockMode::LOCK_WHILE_RUNNING, PathMount::NO_MOUNT)
-    , move_forward_ticks("Ticks to Move:", LockMode::LOCK_WHILE_RUNNING, 0)
+    , move_forward(
+        "Duration (ms):", false,
+        LockMode::LOCK_WHILE_RUNNING,
+        0ms, Milliseconds::max(),
+        "2000 ms"
+    )
     , move_speed(PathSpeed_Database(), LockMode::LOCK_WHILE_RUNNING,PathSpeed::NORMAL_SPEED)
     , left_x("x: [left: -1.0, right: 1.0]", LockMode::LOCK_WHILE_RUNNING, 0, -1.0, 1.0)
     , left_y("y: [backward: -1.0, forward: 1.0]", LockMode::LOCK_WHILE_RUNNING, 0, -1.0, 1.0)
-    , jump_wait_ticks("Ticks after jump:", LockMode::LOCK_WHILE_RUNNING, 0)
-    , wait_ticks("Ticks:", LockMode::LOCK_WHILE_RUNNING, 0)
+    , jump_wait(
+        "Wait after jump (ms):", false,
+        LockMode::LOCK_WHILE_RUNNING,
+        0ms, Milliseconds::max(),
+        "2000 ms"
+    )
+    , wait(
+        "Wait Time (ms):", false,
+        LockMode::LOCK_WHILE_RUNNING,
+        0ms, Milliseconds::max(),
+        "2000 ms"
+    )
 {
     PA_ADD_STATIC(text);
     PA_ADD_OPTION(mount);
-    PA_ADD_OPTION(move_forward_ticks);
+    PA_ADD_OPTION(move_forward);
     PA_ADD_OPTION(move_speed);
     PA_ADD_OPTION(left_x);
     PA_ADD_OPTION(left_y);
-    PA_ADD_OPTION(jump_wait_ticks);
-    PA_ADD_OPTION(wait_ticks);
+    PA_ADD_OPTION(jump_wait);
+    PA_ADD_OPTION(wait);
 
     CustomPathCell::value_changed(this);
     action.add_listener(*this);
@@ -112,12 +129,12 @@ CustomPathCell::CustomPathCell(EnumDropdownCell<PathAction>& action)
 void CustomPathCell::value_changed(void* object){
     text.set_visibility(ConfigOptionState::HIDDEN);
     mount.set_visibility(ConfigOptionState::HIDDEN);
-    move_forward_ticks.set_visibility(ConfigOptionState::HIDDEN);
+    move_forward.set_visibility(ConfigOptionState::HIDDEN);
     move_speed.set_visibility(ConfigOptionState::HIDDEN);
     left_x.set_visibility(ConfigOptionState::HIDDEN);
     left_y.set_visibility(ConfigOptionState::HIDDEN);
-    jump_wait_ticks.set_visibility(ConfigOptionState::HIDDEN);
-    wait_ticks.set_visibility(ConfigOptionState::HIDDEN);
+    jump_wait.set_visibility(ConfigOptionState::HIDDEN);
+    wait.set_visibility(ConfigOptionState::HIDDEN);
     switch (m_action){
     case PathAction::NO_ACTION:
         break;
@@ -125,11 +142,11 @@ void CustomPathCell::value_changed(void* object){
         mount.set_visibility(ConfigOptionState::ENABLED);
         break;
     case PathAction::MOVE_FORWARD:
-        move_forward_ticks.set_visibility(ConfigOptionState::ENABLED);
+        move_forward.set_visibility(ConfigOptionState::ENABLED);
         move_speed.set_visibility(ConfigOptionState::ENABLED);
         break;
     case PathAction::MOVE_IN_DIRECTION:
-        move_forward_ticks.set_visibility(ConfigOptionState::ENABLED);
+        move_forward.set_visibility(ConfigOptionState::ENABLED);
         left_x.set_visibility(ConfigOptionState::ENABLED);
         left_y.set_visibility(ConfigOptionState::ENABLED);
         break;
@@ -138,10 +155,10 @@ void CustomPathCell::value_changed(void* object){
         text.set_visibility(ConfigOptionState::ENABLED);
         break;
     case PathAction::JUMP:
-        jump_wait_ticks.set_visibility(ConfigOptionState::ENABLED);
+        jump_wait.set_visibility(ConfigOptionState::ENABLED);
         break;
     case PathAction::WAIT:
-        wait_ticks.set_visibility(ConfigOptionState::ENABLED);
+        wait.set_visibility(ConfigOptionState::ENABLED);
         break;
     case PathAction::START_LISTEN:
         text.set_text("If shiny detected, use \"Destination Shiny Action\".");
@@ -194,8 +211,12 @@ void CustomPathTableRow2::load_json(const JsonValue& json){
         break;
     case PathAction::MOVE_FORWARD:
         value = obj->get_value("MoveForwardTicks");
+        if (value != nullptr && value->is_integer()){
+            parameters.move_forward.set(std::to_string(value->to_integer_default() * 8));
+        }
+        value = obj->get_value("MoveForwardMs");
         if (value != nullptr){
-            parameters.move_forward_ticks.load_json(*value);
+            parameters.move_forward.load_json(*value);
         }
         value = obj->get_value("Speed");
         if (value != nullptr){
@@ -204,8 +225,12 @@ void CustomPathTableRow2::load_json(const JsonValue& json){
         break;
     case PathAction::MOVE_IN_DIRECTION:
         value = obj->get_value("MoveForwardTicks");
+        if (value != nullptr && value->is_integer()){
+            parameters.move_forward.set(std::to_string(value->to_integer_default() * 8));
+        }
+        value = obj->get_value("MoveForwardMs");
         if (value != nullptr){
-            parameters.move_forward_ticks.load_json(*value);
+            parameters.move_forward.load_json(*value);
         }
 //        value = obj->get_value("Speed");
 //        if (value != nullptr){
@@ -222,14 +247,22 @@ void CustomPathTableRow2::load_json(const JsonValue& json){
         break;
     case PathAction::JUMP:
         value = obj->get_value("JumpWaitTicks");
+        if (value != nullptr && value->is_integer()){
+            parameters.jump_wait.set(std::to_string(value->to_integer_default() * 8));
+        }
+        value = obj->get_value("JumpWaitMs");
         if (value != nullptr){
-            parameters.jump_wait_ticks.load_json(*value);
+            parameters.jump_wait.load_json(*value);
         }
         break;
     case PathAction::WAIT:
         value = obj->get_value("WaitTicks");
+        if (value != nullptr && value->is_integer()){
+            parameters.wait.set(std::to_string(value->to_integer_default() * 8));
+        }
+        value = obj->get_value("WaitMs");
         if (value != nullptr){
-            parameters.wait_ticks.load_json(*value);
+            parameters.wait.load_json(*value);
         }
         break;
     default:
@@ -244,20 +277,20 @@ JsonValue CustomPathTableRow2::to_json() const{
         obj["Mount"] = parameters.mount.to_json();
         break;
     case PathAction::MOVE_FORWARD:
-        obj["MoveForwardTicks"] = parameters.move_forward_ticks.to_json();
+        obj["MoveForwardMs"] = parameters.move_forward.to_json();
         obj["Speed"] = parameters.move_speed.to_json();
         break;
     case PathAction::MOVE_IN_DIRECTION:
-        obj["MoveForwardTicks"] = parameters.move_forward_ticks.to_json();
+        obj["MoveForwardMs"] = parameters.move_forward.to_json();
 //        obj["Speed"] = parameters.move_speed.to_json();
         obj["MoveDirectionX"] = parameters.left_x.to_json();
         obj["MoveDirectionY"] = parameters.left_y.to_json();
         break;
     case PathAction::JUMP:
-        obj["JumpWaitTicks"] = parameters.jump_wait_ticks.to_json();
+        obj["JumpWaitMs"] = parameters.jump_wait.to_json();
         break;
     case PathAction::WAIT:
-        obj["WaitTicks"] = parameters.wait_ticks.to_json();
+        obj["WaitMs"] = parameters.wait.to_json();
         break;
     default:
         break;
@@ -294,7 +327,7 @@ std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults()
 
     row = std::make_unique<CustomPathTableRow2>(*this);
     row->action.set(PathAction::MOVE_IN_DIRECTION);
-    row->parameters.move_forward_ticks.set(400);
+    row->parameters.move_forward.set("3200 ms");
     row->parameters.left_x.set(-1.0);
     row->parameters.left_y.set(1.0);
     ret.emplace_back(std::move(row));
@@ -306,7 +339,7 @@ std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults()
     row = std::make_unique<CustomPathTableRow2>(*this);
     row->action.set(PathAction::MOVE_FORWARD);
     row->parameters.move_speed.set(PathSpeed::DASH);
-    row->parameters.move_forward_ticks.set(400);
+    row->parameters.move_forward.set("3200 ms");
     ret.emplace_back(std::move(row));
 
     return ret;
