@@ -59,10 +59,14 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
 
         if (!to_date_change){
+            //  Double up this A press in case one is dropped.
+            ssf_press_button(context, BUTTON_A, 3);
             ssf_press_button(context, BUTTON_A, 45);
             return;
         }
 
+        //  Double up this A press in case one is dropped.
+        ssf_press_button(context, BUTTON_A, 3);
         ssf_press_button(context, BUTTON_A, 3);
         {
             auto iterations = Milliseconds(240) / 24ms + 1;
