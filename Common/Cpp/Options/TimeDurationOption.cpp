@@ -22,6 +22,7 @@ namespace PokemonAutomation{
 template <typename Type>
 struct TimeDurationCell<Type>::Data{
     const std::string m_units;
+    const bool m_show_summary;
     const Type m_min_value;
     const Type m_max_value;
     const std::string m_default;
@@ -32,11 +33,12 @@ struct TimeDurationCell<Type>::Data{
     std::string m_error;
 
     Data(
-        std::string units,
+        std::string units, bool show_summary,
         Type min_value, Type max_value,
         std::string default_value
     )
         : m_units(units)
+        , m_show_summary(show_summary)
         , m_min_value(min_value)
         , m_max_value(max_value)
         , m_default(std::move(default_value))
@@ -122,7 +124,7 @@ template <typename Type>
 TimeDurationCell<Type>::~TimeDurationCell() = default;
 template <typename Type>
 TimeDurationCell<Type>::TimeDurationCell(
-    std::string units,
+    std::string units, bool show_summary,
     LockMode lock_while_running,
     Type min_value, Type max_value,
     std::string default_value
@@ -130,7 +132,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     : ConfigOption(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
-        std::move(units),
+        std::move(units), show_summary,
         min_value, max_value,
         std::move(default_value)
     )
@@ -145,7 +147,7 @@ TimeDurationCell<Type>::TimeDurationCell(
     : ConfigOption(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
-        std::move(units),
+        std::move(units), true,
         Type(0), Type::max(),
         std::move(default_value)
     )
@@ -160,8 +162,24 @@ TimeDurationCell<Type>::TimeDurationCell(
     : ConfigOption(lock_while_running)
     , m_data(
         CONSTRUCT_TOKEN,
-        std::move(units),
+        std::move(units), true,
         min_value, Type::max(),
+        std::move(default_value)
+    )
+{}
+
+template <typename Type>
+TimeDurationCell<Type>::TimeDurationCell(
+    std::string units,
+    LockMode lock_while_running,
+    Type min_value, Type max_value,
+    std::string default_value
+)
+    : ConfigOption(lock_while_running)
+    , m_data(
+        CONSTRUCT_TOKEN,
+        std::move(units), true,
+        min_value, max_value,
         std::move(default_value)
     )
 {}
@@ -170,6 +188,10 @@ TimeDurationCell<Type>::TimeDurationCell(
 template <typename Type>
 const std::string& TimeDurationCell<Type>::units() const{
     return m_data->m_units;
+}
+template <typename Type>
+bool TimeDurationCell<Type>::show_summary() const{
+    return m_data->m_show_summary;
 }
 template <typename Type>
 Type TimeDurationCell<Type>::min_value() const{

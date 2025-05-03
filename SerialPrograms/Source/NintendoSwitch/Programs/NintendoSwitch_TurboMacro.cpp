@@ -54,61 +54,61 @@ void TurboMacro::execute_action(
     const TurboMacroCell& cell = row.parameters;
     switch(row.action){
     case TurboMacroAction::LEFT_JOYSTICK:
-        pbf_move_left_joystick(context, cell.x_axis, cell.y_axis, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_move_left_joystick(context, cell.x_axis, cell.y_axis, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::RIGHT_JOYSTICK:
-        pbf_move_right_joystick(context, cell.x_axis, cell.y_axis, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_move_right_joystick(context, cell.x_axis, cell.y_axis, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::LEFT_JOY_CLICK:
-        pbf_press_button(context, BUTTON_LCLICK, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_LCLICK, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::RIGHT_JOY_CLICK:
-        pbf_press_button(context, BUTTON_RCLICK, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_RCLICK, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::B:
-        pbf_press_button(context, BUTTON_B, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_B, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::A:
-        pbf_press_button(context, BUTTON_A, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_A, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::Y:
-        pbf_press_button(context, BUTTON_Y, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_Y, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::X:
-        pbf_press_button(context, BUTTON_X, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_X, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::R:
-        pbf_press_button(context, BUTTON_R, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_R, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::L:
-        pbf_press_button(context, BUTTON_L, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_L, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::ZR:
-        pbf_press_button(context, BUTTON_ZR,cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_ZR,cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::ZL:
-        pbf_press_button(context, BUTTON_ZL, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_ZL, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::PLUS:
-        pbf_press_button(context, BUTTON_PLUS, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_PLUS, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::MINUS:
-        pbf_press_button(context, BUTTON_MINUS, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_button(context, BUTTON_MINUS, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::DPADLEFT:
-        pbf_press_dpad(context, DPAD_LEFT, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_dpad(context, DPAD_LEFT, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::DPADRIGHT:
-        pbf_press_dpad(context, DPAD_RIGHT, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_dpad(context, DPAD_RIGHT, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::DPADUP:
-        pbf_press_dpad(context, DPAD_UP, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_dpad(context, DPAD_UP, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::DPADDOWN:
-        pbf_press_dpad(context, DPAD_DOWN, cell.button_hold_ticks, cell.button_release_ticks);
+        pbf_press_dpad(context, DPAD_DOWN, cell.button_hold, cell.button_release);
         break;
     case TurboMacroAction::WAIT:
-        pbf_wait(context, cell.wait_ticks);
+        pbf_wait(context, cell.wait);
     default:
         break;
     }

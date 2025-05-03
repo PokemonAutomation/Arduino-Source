@@ -91,7 +91,9 @@ TimeDurationOptionWidget<Type>::TimeDurationOptionWidget(QWidget& parent, TimeDu
 
     m_box = new QLineEdit(QString::fromStdString(m_value.current_text()), this);
     row0->addWidget(m_box);
-    row0->addWidget(new QLabel(QString::fromStdString(value.units()), this));
+    if (value.show_summary()){
+        row0->addWidget(new QLabel(QString::fromStdString(value.units()), this));
+    }
     m_box->setToolTip(QString::fromStdString(
         "Time duration in " + value.units() +
         "<br><br>"
@@ -103,14 +105,20 @@ TimeDurationOptionWidget<Type>::TimeDurationOptionWidget(QWidget& parent, TimeDu
         "Wireless controllers have larger tick sizes and are imprecise due to wireless communication latency."
     ));
 
-    QLabel* description = new QLabel(QString::fromStdString(m_value.time_string()), this);
-    description->setAlignment(Qt::AlignHCenter);
-    row1->addWidget(description);
+    QLabel* description = nullptr;
+    if (value.show_summary()){
+        description = new QLabel(QString::fromStdString(m_value.time_string()), this);
+        description->setAlignment(Qt::AlignHCenter);
+        row1->addWidget(description);
+    }
 
     connect(
         m_box, &QLineEdit::editingFinished,
         this, [this, description](){
             std::string error = m_value.set(m_box->text().toStdString());
+            if (description == nullptr){
+                return;
+            }
             if (error.empty()){
                 description->setText(QString::fromStdString(m_value.time_string()));
             }else{
@@ -121,6 +129,9 @@ TimeDurationOptionWidget<Type>::TimeDurationOptionWidget(QWidget& parent, TimeDu
     connect(
         m_box, &QLineEdit::textChanged,
         this, [this, description](){
+            if (description == nullptr){
+                return;
+            }
             std::string text = m_value.time_string(m_box->text().toStdString());
             description->setText(QString::fromStdString(text));
         }
