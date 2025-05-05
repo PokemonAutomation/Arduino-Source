@@ -16,13 +16,13 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-class ImageFilter_RgbRange_arm64_NEON{
+class ImageFilterRunner_Rgb32Range_ARM64_NEON{
 public:
     static const size_t VECTOR_SIZE = 4;
     using Mask = size_t;
 
 public:
-    ImageFilter_RgbRange_arm64_NEON(uint32_t mins, uint32_t maxs, uint32_t replacement_color,
+    ImageFilterRunner_Rgb32Range_ARM64_NEON(uint32_t mins, uint32_t maxs, uint32_t replacement_color,
         bool replace_color_within_range)
         : m_mins_u8(vreinterpretq_u8_u32(vdupq_n_u32(mins)))
         , m_maxs_u8(vreinterpretq_u8_u32(vdupq_n_u32(maxs)))
@@ -30,6 +30,9 @@ public:
         , m_replacement_color_u32(vdupq_n_u32(replacement_color))
         , m_replace_color_within_range(replace_color_within_range)
         , m_count_u32(vdupq_n_u32(0))
+    {}
+    ImageFilterRunner_Rgb32Range_ARM64_NEON(FilterRgb32RangeFilter& filter)
+        : ImageFilterRunner_Rgb32Range_ARM64_NEON(filter.mins, filter.maxs, filter.replacement, filter.invert)
     {}
 
     PA_FORCE_INLINE size_t count() const{
@@ -86,7 +89,7 @@ size_t filter_rgb32_range_arm64_NEON(
     uint32_t mins, uint32_t maxs,
     uint32_t replacement_color, bool replace_color_within_range
 ){
-    ImageFilter_RgbRange_arm64_NEON filter(mins, maxs, replacement_color, replace_color_within_range);
+    ImageFilterRunner_Rgb32Range_ARM64_NEON filter(mins, maxs, replacement_color, replace_color_within_range);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
@@ -94,7 +97,7 @@ void filter_rgb32_range_arm64_NEON(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     FilterRgb32RangeFilter* filter, size_t filter_count
 ){
-    filter_per_pixel<ImageFilter_RgbRange_arm64_NEON>(
+    filter_per_pixel<ImageFilterRunner_Rgb32Range_ARM64_NEON>(
         image, bytes_per_row, width, height, filter, filter_count
     );
 }

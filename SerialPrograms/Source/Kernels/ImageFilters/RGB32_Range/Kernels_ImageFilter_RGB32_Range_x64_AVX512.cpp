@@ -8,7 +8,6 @@
 
 #include <immintrin.h>
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
-#include "Kernels_ImageFilter_RGB32_Range_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 
 namespace PokemonAutomation{
@@ -16,8 +15,6 @@ namespace Kernels{
 
 
 namespace{
-
-
 
 struct PartialWordMask{
     __mmask16 m;
@@ -27,20 +24,26 @@ struct PartialWordMask{
     {}
 };
 
+}
 
 
-class ImageFilterByMask_x64_AVX512{
+
+
+class ImageFilterRunner_Rgb32Range_x64_AVX512{
 public:
     static const size_t VECTOR_SIZE = 16;
     using Mask = PartialWordMask;
 
 public:
-    ImageFilterByMask_x64_AVX512(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
+    ImageFilterRunner_Rgb32Range_x64_AVX512(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
         : m_replacement(_mm512_set1_epi32(replacement))
         , m_invert(invert ? 0xffff : 0)
         , m_mins(_mm512_set1_epi32(mins))
         , m_maxs(_mm512_set1_epi32(maxs))
         , m_count(_mm512_setzero_si512())
+    {}
+    ImageFilterRunner_Rgb32Range_x64_AVX512(FilterRgb32RangeFilter& filter)
+        : ImageFilterRunner_Rgb32Range_x64_AVX512(filter.mins, filter.maxs, filter.replacement, filter.invert)
     {}
 
     PA_FORCE_INLINE size_t count() const{
@@ -86,15 +89,13 @@ private:
 
 
 
-}
-
 
 
 size_t filter_rgb32_range_x64_AVX512(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row, uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert
 ){
-    ImageFilterByMask_x64_AVX512 filter(mins, maxs, replacement, invert);
+    ImageFilterRunner_Rgb32Range_x64_AVX512 filter(mins, maxs, replacement, invert);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
@@ -102,7 +103,7 @@ void filter_rgb32_range_x64_AVX512(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     FilterRgb32RangeFilter* filter, size_t filter_count
 ){
-    filter_per_pixel<ImageFilterByMask_x64_AVX512>(
+    filter_per_pixel<ImageFilterRunner_Rgb32Range_x64_AVX512>(
         image, bytes_per_row, width, height, filter, filter_count
     );
 }

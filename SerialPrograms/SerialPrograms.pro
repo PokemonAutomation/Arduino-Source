@@ -374,6 +374,12 @@ SOURCES += \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Green_Default.cpp \
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.cpp \
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_ARM64_NEON.cpp \
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_Default.cpp \
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX2.cpp \
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX512.cpp \
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_SSE42.cpp \
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.cpp \
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_ARM64_NEON.cpp \
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_Default.cpp \
@@ -1577,6 +1583,7 @@ HEADERS += \
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h \
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.tpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h \
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h \
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h \
     Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_Routines.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h \

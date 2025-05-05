@@ -30,7 +30,7 @@ PA_FORCE_INLINE void filter_per_pixel(
     FixedLimitVector<Runner> entries(filter_count);
     for (size_t c = 0; c < filter_count; c++){
         FilterRgb32RangeFilter& filter = filters[c];
-        entries.emplace_back(filter.mins, filter.maxs, filter.replacement, filter.invert);
+        entries.emplace_back(filter);
     }
 
     const size_t VECTOR_SIZE = Runner::VECTOR_SIZE;

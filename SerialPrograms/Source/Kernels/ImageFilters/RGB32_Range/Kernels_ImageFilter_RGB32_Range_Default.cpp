@@ -6,20 +6,19 @@
 
 #include <immintrin.h>
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
-#include "Kernels_ImageFilter_RGB32_Range_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 
 
-class ImageFilter_RgbRange_Default{
+class ImageFilterRunner_Rgb32Range_Default{
 public:
     static const size_t VECTOR_SIZE = 1;
     using Mask = size_t;
 
 public:
-    ImageFilter_RgbRange_Default(uint32_t mins, uint32_t maxs, uint32_t replacement_color,
+    ImageFilterRunner_Rgb32Range_Default(uint32_t mins, uint32_t maxs, uint32_t replacement_color,
         bool replace_color_within_range)
         : m_replacement_color(replacement_color)
         , m_replace_color_within_range(replace_color_within_range ? 1 : 0)
@@ -32,6 +31,9 @@ public:
         , m_minA(mins & 0xff000000)
         , m_maxA(maxs & 0xff000000)
         , m_count(0)
+    {}
+    ImageFilterRunner_Rgb32Range_Default(FilterRgb32RangeFilter& filter)
+        : ImageFilterRunner_Rgb32Range_Default(filter.mins, filter.maxs, filter.replacement, filter.invert)
     {}
 
     PA_FORCE_INLINE size_t count() const{
@@ -88,7 +90,7 @@ size_t filter_rgb32_range_Default(
     uint32_t mins, uint32_t maxs,
     uint32_t replacement_color, bool replace_color_within_range
 ){
-    ImageFilter_RgbRange_Default filter(mins, maxs, replacement_color, replace_color_within_range);
+    ImageFilterRunner_Rgb32Range_Default filter(mins, maxs, replacement_color, replace_color_within_range);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
@@ -96,7 +98,7 @@ void filter_rgb32_range_Default(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     FilterRgb32RangeFilter* filter, size_t filter_count
 ){
-    filter_per_pixel<ImageFilter_RgbRange_Default>(
+    filter_per_pixel<ImageFilterRunner_Rgb32Range_Default>(
         image, bytes_per_row, width, height, filter, filter_count
     );
 }

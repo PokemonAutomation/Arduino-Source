@@ -10,7 +10,6 @@
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
-#include "Kernels_ImageFilter_RGB32_Range_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 
 namespace PokemonAutomation{
@@ -18,7 +17,6 @@ namespace Kernels{
 
 
 namespace{
-
 
 struct PartialWordMask{
     size_t left;
@@ -30,21 +28,26 @@ struct PartialWordMask{
     {}
 };
 
+}
 
 
 
-class ImageFilter_RgbRange_x64_SSE42{
+
+class ImageFilterRunner_Rgb32Range_x64_SSE42{
 public:
     static const size_t VECTOR_SIZE = 4;
     using Mask = PartialWordMask;
 
 public:
-    ImageFilter_RgbRange_x64_SSE42(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
+    ImageFilterRunner_Rgb32Range_x64_SSE42(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
         : m_replacement(_mm_set1_epi32(replacement))
         , m_invert(invert ? _mm_set1_epi32(-1) : _mm_setzero_si128())
         , m_mins(_mm_set1_epi32(mins ^ 0x80808080))
         , m_maxs(_mm_set1_epi32(maxs ^ 0x80808080))
         , m_count(_mm_setzero_si128())
+    {}
+    ImageFilterRunner_Rgb32Range_x64_SSE42(FilterRgb32RangeFilter& filter)
+        : ImageFilterRunner_Rgb32Range_x64_SSE42(filter.mins, filter.maxs, filter.replacement, filter.invert)
     {}
 
     PA_FORCE_INLINE size_t count() const{
@@ -87,8 +90,6 @@ private:
     __m128i m_count;
 };
 
-}
-
 
 
 
@@ -98,7 +99,7 @@ size_t filter_rgb32_range_x64_SSE42(
     uint32_t mins, uint32_t maxs,
     uint32_t replacement, bool invert
 ){
-    ImageFilter_RgbRange_x64_SSE42 filter(mins, maxs, replacement, invert);
+    ImageFilterRunner_Rgb32Range_x64_SSE42 filter(mins, maxs, replacement, invert);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
@@ -106,7 +107,7 @@ void filter_rgb32_range_x64_SSE42(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     FilterRgb32RangeFilter* filter, size_t filter_count
 ){
-    filter_per_pixel<ImageFilter_RgbRange_x64_SSE42>(
+    filter_per_pixel<ImageFilterRunner_Rgb32Range_x64_SSE42>(
         image, bytes_per_row, width, height, filter, filter_count
     );
 }
