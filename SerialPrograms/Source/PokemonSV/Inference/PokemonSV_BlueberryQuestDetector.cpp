@@ -52,7 +52,7 @@ std::string BlueberryQuestDetector::detect_quest(const ImageViewRGB32& screen) c
     ImageRGB32 quest_label = to_blackwhite_rgb32_range(
         extract_box_reference(screen, m_box),
         true,
-        combine_rgb(198, 198, 198), combine_rgb(255, 255, 255), nullptr
+        combine_rgb(198, 198, 198), combine_rgb(255, 255, 255)
     );
 
     //quest_label.save("quest_label.png");

@@ -31,7 +31,7 @@ ImageMatch::SilhouetteDictionaryMatcher make_TERA_RAID_SILHOUETTE_MATCHER(){
         ImageRGB32 filtered_image = to_blackwhite_rgb32_range(
             item.second.icon,
             true,
-            0xff000000, 0xff5f5f5f, nullptr
+            0xff000000, 0xff5f5f5f
         );
         matcher.add(item.first, filtered_image);
     }
@@ -84,7 +84,7 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
             preprocessed_image,
             // The filter is a lambda function that returns true on black silhouette pixels.
             [=](Color pixel){
-                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < threshold;
+                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() <= threshold;
             }
         );
 
@@ -98,7 +98,8 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
 //        processed_image.save("tera_processed_image-" + std::to_string(c++) + ".png");
 
 //        cout << "check4" << endl;
-        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, true, 0xff000000, 0xff5f5f5f, nullptr);
+//        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, true, 0xff000000, 0xff5f5f5f);
+        ImageRGB32 filtered_image = to_blackwhite_rgb32_brightness(processed_image, true, 0, threshold);
 //        filtered_image.save("tera_filtered_image-" + std::to_string(c++) + ".png");
 
 //        cout << "check5" << endl;

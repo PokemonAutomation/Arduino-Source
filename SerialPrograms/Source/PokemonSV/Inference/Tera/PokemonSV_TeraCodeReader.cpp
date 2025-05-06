@@ -155,7 +155,7 @@ std::vector<WaterfillOCRResult> waterfill_OCR(
     //  Direct OCR is unreliable. Instead, we will waterfill each character
     //  to isolate them, then OCR them individually.
 
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, true, 0xff000000, threshold, nullptr);
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, true, 0xff000000, threshold);
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff000000, threshold);
 
     std::map<size_t, WaterfillObject> map;

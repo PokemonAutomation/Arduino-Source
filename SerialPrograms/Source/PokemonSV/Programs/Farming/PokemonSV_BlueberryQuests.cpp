@@ -161,7 +161,7 @@ int read_BP(const ProgramInfo& info, VideoStream& stream, ProControllerContext& 
     ImageRGB32 BP_value = to_blackwhite_rgb32_range(
         extract_box_reference(screen, ImageFloatBox(0.866, 0.019, 0.091, 0.041)),
         true,
-        combine_rgb(198, 198, 198), combine_rgb(255, 255, 255), nullptr
+        combine_rgb(198, 198, 198), combine_rgb(255, 255, 255)
     );
 
     //Close panel

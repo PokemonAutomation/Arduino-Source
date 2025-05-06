@@ -111,7 +111,7 @@ ImageRGB32 filter_rgb32_euclidean(
 ImageRGB32 to_blackwhite_rgb32_range(
     const ImageViewRGB32& image,
     bool in_range_black,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 ){
     ImageRGB32 ret(image.width(), image.height());
     Kernels::to_blackwhite_rgb32_range(
@@ -126,7 +126,7 @@ ImageRGB32 to_blackwhite_rgb32_range(
     size_t& pixels_in_range,
     const ImageViewRGB32& image,
     bool in_range_black,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 ){
     ImageRGB32 ret(image.width(), image.height());
     pixels_in_range = Kernels::to_blackwhite_rgb32_range(

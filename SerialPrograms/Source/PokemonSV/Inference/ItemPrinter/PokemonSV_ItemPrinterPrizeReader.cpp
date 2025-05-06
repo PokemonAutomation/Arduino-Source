@@ -186,7 +186,7 @@ double ItemPrinterPrizeReader::average_sum_filtered(const ImageViewRGB32& screen
     ImageRGB32 filtered = to_blackwhite_rgb32_range(
         cropped,
         false,
-        0xff808000, 0xffffffff, nullptr
+        0xff808000, 0xffffffff
     );    
 
     return image_stats(filtered).average.sum();

@@ -108,7 +108,7 @@ uint16_t BattleBallReader::read_quantity(const ImageViewRGB32& screen) const{
     ImageRGB32 image = to_blackwhite_rgb32_range(
         extract_box_reference(screen, m_box_quantity),
         true,
-        0xff808080, 0xffffffff, nullptr
+        0xff808080, 0xffffffff
     );
     int qty = OCR::read_number(m_stream.logger(), image);
     return (uint16_t)std::max(qty, 0);

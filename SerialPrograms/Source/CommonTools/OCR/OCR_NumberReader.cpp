@@ -135,7 +135,7 @@ std::string  read_number_waterfill_no_normalization(
     ImageRGB32 filtered = to_blackwhite_rgb32_range(
         image,
         text_inside_range,
-        rgb32_min, rgb32_max, nullptr
+        rgb32_min, rgb32_max
     );
 
 //    static int c = 0;

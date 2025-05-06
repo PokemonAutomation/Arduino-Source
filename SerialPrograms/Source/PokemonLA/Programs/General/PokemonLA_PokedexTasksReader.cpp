@@ -48,7 +48,7 @@ public:
             ImageRGB32 image = to_blackwhite_rgb32_range(
                 extract_box_reference(screen, m_tasks_box[i]),
                 false,
-                0xff808080, 0xffffffff, nullptr
+                0xff808080, 0xffffffff
             );
             tasks[i] = OCR::read_number(m_stream.logger(), image);
         }

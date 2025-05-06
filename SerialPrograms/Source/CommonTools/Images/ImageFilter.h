@@ -87,7 +87,7 @@ ImageRGB32 filter_rgb32_euclidean(
 ImageRGB32 to_blackwhite_rgb32_range(
     const ImageViewRGB32& image,
     bool in_range_black,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 );
 //  Convert the image to black and white.
 //  Inside [mins, maxs] is white, otherwise it's black.
@@ -98,7 +98,7 @@ ImageRGB32 to_blackwhite_rgb32_range(
     size_t& pixels_in_range,
     const ImageViewRGB32& image,
     bool in_range_black,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 );
 
 

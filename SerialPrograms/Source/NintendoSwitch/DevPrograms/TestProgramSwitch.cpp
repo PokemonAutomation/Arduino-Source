@@ -326,13 +326,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         ImageMatch::ImageMatchResult results = reader.read(image);
         results.log(logger, 120);
     }
-#if 0
     {
         TeraSilhouetteReader reader;
         ImageMatch::ImageMatchResult results = reader.read(image);
         results.log(logger, 120);
     }
-#endif
 #endif
 
 #if 0

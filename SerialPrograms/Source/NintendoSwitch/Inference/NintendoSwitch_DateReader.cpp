@@ -252,7 +252,7 @@ ImageRGB32 DateReader::filter_image(const ImageViewRGB32& image, bool white_them
     ImageRGB32 filtered = to_blackwhite_rgb32_range(
         image,
         white_theme,
-        0xff000000, white_theme ? 0xffff7fff : 0xff7f7f7f, nullptr
+        0xff000000, white_theme ? 0xffff7fff : 0xff7f7f7f
     );
     return filtered;
 }

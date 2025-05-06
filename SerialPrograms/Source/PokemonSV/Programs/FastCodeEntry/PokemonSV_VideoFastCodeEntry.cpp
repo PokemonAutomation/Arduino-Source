@@ -91,13 +91,13 @@ void wait_for_video_code_and_join(
             env.log("OCR: " + code);
             break;
         case VideoFceOcrMethod::BLACK_TEXT:{
-            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, true, 0xff000000, 0xff7f7f7f, nullptr);
+            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, true, 0xff000000, 0xff7f7f7f);
             code = OCR::ocr_read(Language::English, filtered);
             env.log("OCR: " + code);
             break;
         }
         case VideoFceOcrMethod::WHITE_TEXT:{
-            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, true, 0xffc0c0c0, 0xffffffff, nullptr);
+            ImageRGB32 filtered = to_blackwhite_rgb32_range(snapshot, true, 0xffc0c0c0, 0xffffffff);
             code = OCR::ocr_read(Language::English, filtered);
             env.log("OCR: " + code);
             break;
