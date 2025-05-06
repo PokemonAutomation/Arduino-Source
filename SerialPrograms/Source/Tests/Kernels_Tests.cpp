@@ -375,7 +375,7 @@ int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         image_out.data(), image_out.bytes_per_row(),
         in_range_black,
-        mins, maxs, nullptr
+        mins, maxs
     );
     auto time_end = current_time();
     auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
@@ -386,7 +386,7 @@ int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         image_out_2.data(), image_out_2.bytes_per_row(),
         !in_range_black,
-        mins, maxs, nullptr
+        mins, maxs
     );
 
     TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
@@ -445,7 +445,7 @@ int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
             image.data(), image.bytes_per_row(), image.width(), image.height(),
             image_out.data(), image_out.bytes_per_row(),
             in_range_black,
-            mins, maxs, nullptr
+            mins, maxs
         );
     }
     time_end = current_time();

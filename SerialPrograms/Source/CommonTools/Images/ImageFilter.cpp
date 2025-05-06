@@ -117,7 +117,7 @@ ImageRGB32 to_blackwhite_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         ret.data(), ret.bytes_per_row(),
         in_range_black,
-        mins, maxs, nullptr
+        mins, maxs
     );
     return ret;
 }
@@ -131,7 +131,7 @@ ImageRGB32 to_blackwhite_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         ret.data(), ret.bytes_per_row(),
         in_range_black,
-        mins, maxs, nullptr
+        mins, maxs
     );
     return ret;
 }
