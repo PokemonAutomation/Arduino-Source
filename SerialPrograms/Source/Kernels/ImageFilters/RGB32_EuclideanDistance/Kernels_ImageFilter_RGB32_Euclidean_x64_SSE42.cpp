@@ -58,12 +58,20 @@ public:
 
     PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
         __m128i pixel = _mm_loadu_si128((const __m128i*)in);
-        pixel = process_word(pixel);
+        __m128i in_range_pixels = process_word(pixel);
+        m_count = _mm_sub_epi32(m_count, in_range_pixels);
         _mm_storeu_si128((__m128i*)out, pixel);
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m128i vmask = _mm_cmpgt_epi32(
+            _mm_set1_epi32((uint32_t)mask.left),
+            _mm_setr_epi32(0, 1, 2, 3)
+        );
+
         __m128i pixel = mask.loader.load(in);
-        pixel = process_word(pixel);
+        __m128i in_range_pixels = process_word(pixel);
+        in_range_pixels = _mm_and_si128(in_range_pixels, vmask);
+        m_count = _mm_sub_epi32(m_count, in_range_pixels);
         size_t left = mask.left;
         do{
             out[0] = _mm_cvtsi128_si32(pixel);
@@ -73,7 +81,9 @@ public:
     }
 
 private:
-    PA_FORCE_INLINE __m128i process_word(__m128i pixel){
+    //  Process the pixel in-place.
+    //  Return a mask indicating which lanes are in range.
+    PA_FORCE_INLINE __m128i process_word(__m128i& pixel) const{
         // _mm_srli_epi16: Shift 16-bit integers in pixels right by 8 while shifting in zeros,
         // ng: green channels of each pixel, but shifted right by 8 bits
         __m128i ng = _mm_and_si128(_mm_srli_epi16(pixel, 8), _mm_set1_epi32(0x000000ff));
@@ -98,10 +108,9 @@ private:
         sum_sqr = _mm_add_epi32(sum_sqr, b);
 
         __m128i cmp = _mm_cmpgt_epi32(m_distance_squared, sum_sqr);
+        pixel = _mm_blendv_epi8(m_replacement, pixel, _mm_xor_si128(cmp, m_invert));
 
-        m_count = _mm_sub_epi32(m_count, cmp);
-        cmp = _mm_xor_si128(cmp, m_invert);
-        return _mm_blendv_epi8(m_replacement, pixel, cmp);
+        return cmp;
     }
 
 private:

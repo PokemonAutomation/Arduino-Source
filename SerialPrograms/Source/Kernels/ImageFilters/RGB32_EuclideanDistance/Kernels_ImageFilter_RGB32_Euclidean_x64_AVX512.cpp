@@ -52,17 +52,22 @@ public:
 
     PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
         __m512i pixel = _mm512_loadu_si512((const __m512i*)in);
-        pixel = process_word(pixel);
+        __mmask16 in_range_pixels = process_word(pixel);
+        m_count = _mm512_mask_sub_epi32(m_count, in_range_pixels, m_count, _mm512_set1_epi32(-1));
         _mm512_storeu_si512((__m512i*)out, pixel);
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
         __m512i pixel = _mm512_maskz_loadu_epi32(mask.m, in);
-        pixel = process_word(pixel);
+        __mmask16 in_range_pixels = process_word(pixel);
+        in_range_pixels &= mask.m;
+        m_count = _mm512_mask_sub_epi32(m_count, in_range_pixels, m_count, _mm512_set1_epi32(-1));
         _mm512_mask_storeu_epi32(out, mask.m, pixel);
     }
 
 private:
-    PA_FORCE_INLINE __m512i process_word(__m512i pixel){
+    //  Process the pixel in-place.
+    //  Return a mask indicating which lanes are in range.
+    PA_FORCE_INLINE __mmask16 process_word(__m512i& pixel) const{
         __m512i ag = _mm512_and_si512(_mm512_srli_epi16(pixel, 8), _mm512_set1_epi32(0x000000ff));
         __m512i rb = _mm512_and_si512(pixel, _mm512_set1_epi32(0x00ff00ff));
 
@@ -78,10 +83,9 @@ private:
         sum_sqr = _mm512_add_epi32(sum_sqr, b);
 
         __mmask16 cmp = _mm512_cmpgt_epi32_mask(m_distance_squared, sum_sqr);
+        pixel = _mm512_mask_blend_epi32(cmp ^ m_invert, m_replacement, pixel);
 
-        m_count = _mm512_mask_sub_epi32(m_count, cmp, m_count, _mm512_set1_epi32(-1));
-        cmp ^= m_invert;
-        return _mm512_mask_blend_epi32(cmp, m_replacement, pixel);
+        return cmp;
     }
 
 private:

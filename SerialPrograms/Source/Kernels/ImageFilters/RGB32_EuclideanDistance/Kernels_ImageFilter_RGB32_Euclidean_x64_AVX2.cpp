@@ -40,17 +40,22 @@ public:
 
     PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
         __m256i pixel = _mm256_loadu_si256((const __m256i*)in);
-        pixel = process_word(pixel);
+        __m256i in_range_pixels = process_word(pixel);
+        m_count = _mm256_sub_epi32(m_count, in_range_pixels);
         _mm256_storeu_si256((__m256i*)out, pixel);
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
         __m256i pixel = mask.load_i32(in);
-        pixel = process_word(pixel);
+        __m256i in_range_pixels = process_word(pixel);
+        in_range_pixels = _mm256_and_si256(in_range_pixels, mask.mask());
+        m_count = _mm256_sub_epi32(m_count, in_range_pixels);
         mask.store(out, pixel);
     }
 
 private:
-    PA_FORCE_INLINE __m256i process_word(__m256i pixel){
+    //  Process the pixel in-place.
+    //  Return a mask indicating which lanes are in range.
+    PA_FORCE_INLINE __m256i process_word(__m256i& pixel) const{
         __m256i ag = _mm256_and_si256(_mm256_srli_epi16(pixel, 8), _mm256_set1_epi32(0x000000ff));
         __m256i rb = _mm256_and_si256(pixel, _mm256_set1_epi32(0x00ff00ff));
 
@@ -66,10 +71,9 @@ private:
         sum_sqr = _mm256_add_epi32(sum_sqr, b);
 
         __m256i cmp = _mm256_cmpgt_epi32(m_distance_squared, sum_sqr);
+        pixel = _mm256_blendv_epi8(m_replacement, pixel, _mm256_xor_si256(cmp, m_invert));
 
-        m_count = _mm256_sub_epi32(m_count, cmp);
-        cmp = _mm256_xor_si256(cmp, m_invert);
-        return _mm256_blendv_epi8(m_replacement, pixel, cmp);
+        return cmp;
     }
 
 private:

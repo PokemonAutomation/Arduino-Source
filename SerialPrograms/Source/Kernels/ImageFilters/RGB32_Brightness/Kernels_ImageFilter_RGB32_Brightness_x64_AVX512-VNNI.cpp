@@ -68,8 +68,9 @@ public:
     }
 
 private:
-    PA_FORCE_INLINE __mmask16 process_word(__m512i& pixel){
-//        cout << "asdf" << endl;
+    //  Process the pixel in-place.
+    //  Return a mask indicating which lanes are in range.
+    PA_FORCE_INLINE __mmask16 process_word(__m512i& pixel) const{
 //        __m512i r = _mm512_and_si512(_mm512_srli_epi32(pixel, 16), _mm512_set1_epi32(0x000000ff));
 //        __m512i g = _mm512_and_si512(_mm512_srli_epi32(pixel,  8), _mm512_set1_epi32(0x000000ff));
 //        __m512i b = _mm512_and_si512(pixel,                        _mm512_set1_epi32(0x000000ff));
@@ -85,7 +86,11 @@ private:
         __mmask16 cmp16 = _mm512_cmple_epu32_mask(pixel, m_threshold);
 
         //  Set to black or white.
-        pixel = _mm512_mask_blend_epi32(cmp16 ^ m_in_range_black, _mm512_set1_epi32(0xff000000), _mm512_set1_epi32(-1));
+        pixel = _mm512_mask_blend_epi32(
+            cmp16 ^ m_in_range_black,
+            _mm512_set1_epi32(0xff000000),
+            _mm512_set1_epi32(-1)
+        );
 
         return cmp16;
     }
