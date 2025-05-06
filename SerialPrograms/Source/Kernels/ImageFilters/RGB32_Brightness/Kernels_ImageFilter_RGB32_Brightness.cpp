@@ -39,6 +39,12 @@ size_t filter_rgb32_brightness(
 
 
 
+size_t to_blackwhite_rgb32_brightness_x64_AVX512VNNI(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    bool in_range_black,
+    uint32_t min_brightness, uint32_t max_brightness
+);
 size_t to_blackwhite_rgb32_brightness_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
@@ -54,7 +60,16 @@ size_t to_blackwhite_rgb32_brightness(
     if (width * height > 0xffffffff){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
     }
-
+#ifdef PA_AutoDispatch_x64_19_IceLake
+    if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
+        return to_blackwhite_rgb32_brightness_x64_AVX512VNNI(
+            in, in_bytes_per_row, width, height,
+            out, out_bytes_per_row,
+            in_range_black,
+            min_brightness, max_brightness
+        );
+    }
+#endif
     return to_blackwhite_rgb32_brightness_Default(
         in, in_bytes_per_row, width, height,
         out, out_bytes_per_row,
