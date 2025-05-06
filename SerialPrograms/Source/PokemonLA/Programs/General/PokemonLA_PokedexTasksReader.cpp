@@ -45,7 +45,11 @@ public:
         std::array<int, 9> tasks{};
         for (size_t i = 0; i < m_tasks_box.size(); ++i)
         {
-            ImageRGB32 image = to_blackwhite_rgb32_range(extract_box_reference(screen, m_tasks_box[i]), 0xff808080, 0xffffffff, false);
+            ImageRGB32 image = to_blackwhite_rgb32_range(
+                extract_box_reference(screen, m_tasks_box[i]),
+                false,
+                0xff808080, 0xffffffff, nullptr
+            );
             tasks[i] = OCR::read_number(m_stream.logger(), image);
         }
         return tasks;

@@ -38,10 +38,10 @@ ImageRGB32 filter_rgb32_range(
 
 
 struct FilterRgb32Range{
-    uint32_t mins;
-    uint32_t maxs;
     Color replacement_color;
     bool replace_color_within_range;
+    uint32_t mins;
+    uint32_t maxs;
 };
 //  Run multiple filters at once. This is more memory efficient than making
 //  multiple calls to one filter at a time.
@@ -86,7 +86,8 @@ ImageRGB32 filter_rgb32_euclidean(
 //  Both white and black colors have alpha=255.
 ImageRGB32 to_blackwhite_rgb32_range(
     const ImageViewRGB32& image,
-    uint32_t mins, uint32_t maxs, bool in_range_black
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs, void*
 );
 //  Convert the image to black and white.
 //  Inside [mins, maxs] is white, otherwise it's black.
@@ -96,7 +97,8 @@ ImageRGB32 to_blackwhite_rgb32_range(
 ImageRGB32 to_blackwhite_rgb32_range(
     size_t& pixels_in_range,
     const ImageViewRGB32& image,
-    uint32_t mins, uint32_t maxs, bool in_range_black
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs, void*
 );
 
 
@@ -109,9 +111,9 @@ ImageRGB32 to_blackwhite_rgb32_range(
 //  Both white and black colors have alpha=255.
 //  For each filter, return the filtered image and the # of pixels inside the [mins, maxs] range of the filter.
 struct BlackWhiteRgb32Range{
+    bool in_range_black;
     uint32_t mins;
     uint32_t maxs;
-    bool in_range_black;
 };
 std::vector<std::pair<ImageRGB32, size_t>> to_blackwhite_rgb32_range(
     const ImageViewRGB32& image,

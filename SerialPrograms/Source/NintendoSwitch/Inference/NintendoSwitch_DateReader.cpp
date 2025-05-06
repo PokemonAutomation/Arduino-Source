@@ -251,8 +251,8 @@ std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::share
 ImageRGB32 DateReader::filter_image(const ImageViewRGB32& image, bool white_theme){
     ImageRGB32 filtered = to_blackwhite_rgb32_range(
         image,
-        0xff000000, white_theme ? 0xffff7fff : 0xff7f7f7f,
-        white_theme
+        white_theme,
+        0xff000000, white_theme ? 0xffff7fff : 0xff7f7f7f, nullptr
     );
     return filtered;
 }

@@ -28,7 +28,11 @@ ImageMatch::SilhouetteDictionaryMatcher make_TERA_RAID_SILHOUETTE_MATCHER(){
             item.first == "error"){
             continue;
         }
-        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(item.second.icon, 0xff000000, 0xff5f5f5f, true);
+        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(
+            item.second.icon,
+            true,
+            0xff000000, 0xff5f5f5f, nullptr
+        );
         matcher.add(item.first, filtered_image);
     }
     return matcher;
@@ -94,7 +98,7 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
 //        processed_image.save("tera_processed_image-" + std::to_string(c++) + ".png");
 
 //        cout << "check4" << endl;
-        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, 0xff000000, 0xff5f5f5f, true);
+        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, true, 0xff000000, 0xff5f5f5f, nullptr);
 //        filtered_image.save("tera_filtered_image-" + std::to_string(c++) + ".png");
 
 //        cout << "check5" << endl;

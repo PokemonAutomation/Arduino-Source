@@ -46,8 +46,11 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
         auto cropped_image = extract_box_reference(screen, m_id_boxes[i]);
 
         const bool invert_blackwhite = true;
-        ImageRGB32 filterd_image = to_blackwhite_rgb32_range(cropped_image,
-            combine_rgb(180, 180, 180), combine_rgb(255, 255, 255), invert_blackwhite);
+        ImageRGB32 filterd_image = to_blackwhite_rgb32_range(
+            cropped_image,
+            invert_blackwhite,
+            combine_rgb(180, 180, 180), combine_rgb(255, 255, 255), nullptr
+        );
         
         // filterd_image.save("./tmp_fil_" + std::to_string(i) + ".png");
 
