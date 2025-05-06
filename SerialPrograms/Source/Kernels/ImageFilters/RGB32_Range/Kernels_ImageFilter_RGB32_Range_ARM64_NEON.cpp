@@ -6,7 +6,6 @@
 
 #ifdef PA_AutoDispatch_arm64_20_M1
 
-#include <immintrin.h>
 #include "Kernels/Kernels_arm64_NEON.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range_Routines.h"

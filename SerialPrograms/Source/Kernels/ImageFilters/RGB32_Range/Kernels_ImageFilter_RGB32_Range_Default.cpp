@@ -4,7 +4,6 @@
  *
  */
 
-#include <immintrin.h>
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 

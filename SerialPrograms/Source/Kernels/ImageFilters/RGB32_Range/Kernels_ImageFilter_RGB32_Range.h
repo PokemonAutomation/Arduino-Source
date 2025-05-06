@@ -32,7 +32,7 @@ size_t filter_rgb32_range(
 //  The purpose is to reduce passes over the entire image.
 //  All matricies must have the same dimensions.
 struct FilterRgb32RangeFilter{
-    uint32_t* const data;       //  Pointer will be overwritten.
+    uint32_t* data;       //  Pointer will be overwritten.
     const size_t bytes_per_row;
     const uint32_t replacement;
     const bool invert;
