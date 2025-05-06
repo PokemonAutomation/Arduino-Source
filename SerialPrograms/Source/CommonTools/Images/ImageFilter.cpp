@@ -161,7 +161,6 @@ std::vector<std::pair<ImageRGB32, size_t>> to_blackwhite_rgb32_range(
 
 
 
-#if 0
 ImageRGB32 to_blackwhite_rgb32_brightness(
     const ImageViewRGB32& image,
     bool in_range_black,
@@ -170,11 +169,12 @@ ImageRGB32 to_blackwhite_rgb32_brightness(
     ImageRGB32 ret(image.width(), image.height());
     Kernels::to_blackwhite_rgb32_brightness(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
-        ret.data(), ret.bytes_per_row(), mins, maxs, in_range_black
+        ret.data(), ret.bytes_per_row(),
+        in_range_black,
+        in_range_black, max_brightness
     );
     return ret;
 }
-#endif
 
 
 

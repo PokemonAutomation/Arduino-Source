@@ -66,7 +66,7 @@ ImageMatch::ImageMatchResult TeraTypeReader::read(const ImageViewRGB32& screen) 
             cropped_image,
             // The filter is a lambda function that returns true on black tera type pixels.
             [=](Color pixel){
-                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() < threshold;
+                return (uint32_t)pixel.red() + pixel.green() + pixel.blue() <= threshold;
             }
         );
 
@@ -77,14 +77,11 @@ ImageMatch::ImageMatchResult TeraTypeReader::read(const ImageViewRGB32& screen) 
         ImageRGB32 processed_image = extract_box_reference(cropped_image, tight_box).copy();
 //        processed_image.save("processed_image-" + std::to_string(threshold) + ".png");
 
-        uint32_t upper_filter = threshold / 3 * 0x00010101;
-        upper_filter |= 0xff000000;
-
-        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, 0xff000000, upper_filter, true);
+        ImageRGB32 filtered_image = to_blackwhite_rgb32_brightness(processed_image, true, 0, threshold);
 //        filtered_image.save("filtered_image-" + std::to_string(threshold) + ".png");
 
         ImageMatch::ImageMatchResult types = m_matcher.match(filtered_image, ALPHA_SPREAD);
-//        types.log(global_logger_tagged(), MAX_ALPHA);   //  REMOVE
+//        types.log(global_logger_tagged(), MAX_ALPHA);
         types.clear_beyond_alpha(MAX_ALPHA);
 
         if (types.results.size() == 1){
