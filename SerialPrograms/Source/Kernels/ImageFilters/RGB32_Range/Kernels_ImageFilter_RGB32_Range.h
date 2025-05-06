@@ -77,7 +77,7 @@ size_t to_blackwhite_rgb32_range(
 //  The purpose is to reduce passes over the entire image.
 //  All matricies must have the same dimensions.
 struct ToBlackWhiteRgb32RangeFilter{
-    uint32_t* data;     //  Pointer will be overwritten.
+    uint32_t* const data;
     const size_t bytes_per_row;
     const uint32_t mins;
     const uint32_t maxs;
