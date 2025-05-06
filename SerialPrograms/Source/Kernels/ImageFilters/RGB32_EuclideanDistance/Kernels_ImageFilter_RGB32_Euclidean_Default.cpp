@@ -20,8 +20,8 @@ public:
 
 public:
     ImageFilter_RgbEuclidean_Default(
-        uint32_t expected_color, double max_euclidean_distance,
-        uint32_t replacement_color, bool replace_color_within_range
+        uint32_t replacement_color, bool replace_color_within_range,
+        uint32_t expected_color, double max_euclidean_distance
     )
         : m_replacement_color(replacement_color)
         , m_replace_color_within_range(replace_color_within_range ? 1 : 0)
@@ -75,10 +75,13 @@ private:
 size_t filter_rgb32_euclidean_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
-    uint32_t expected_color, double max_euclidean_distance,
-    uint32_t replacement_color, bool replace_color_within_range
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t expected, double max_euclidean_distance, void*
 ){
-    ImageFilter_RgbEuclidean_Default filter(expected_color, max_euclidean_distance, replacement_color, replace_color_within_range);
+    ImageFilter_RgbEuclidean_Default filter(
+        replacement, replace_color_within_range,
+        expected, max_euclidean_distance
+    );
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }

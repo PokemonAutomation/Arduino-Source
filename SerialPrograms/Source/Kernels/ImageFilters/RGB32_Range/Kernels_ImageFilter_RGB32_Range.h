@@ -23,8 +23,8 @@ namespace Kernels{
 size_t filter_rgb32_range(
     const uint32_t* image_in, size_t image_in_bytes_per_row, size_t width, size_t height,
     uint32_t* image_out, size_t image_out_bytes_per_row,
-    uint32_t mins, uint32_t maxs,
-    uint32_t replacement, bool replace_color_within_range
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t mins, uint32_t maxs, void*
 );
 
 
@@ -34,23 +34,24 @@ size_t filter_rgb32_range(
 struct FilterRgb32RangeFilter{
     uint32_t* const data;       //  Pointer will be overwritten.
     const size_t bytes_per_row;
-    const uint32_t mins;
-    const uint32_t maxs;
     const uint32_t replacement;
     const bool invert;
+    const uint32_t mins;
+    const uint32_t maxs;
 
     size_t pixels_in_range;
 
     FilterRgb32RangeFilter(
         uint32_t* p_data, size_t p_bytes_per_row,
-        uint32_t p_mins, uint32_t p_maxs, uint32_t p_replacement, bool p_invert
+        uint32_t p_replacement, bool p_invert,
+        uint32_t p_mins, uint32_t p_maxs, void*
     )
         : data(p_data)
         , bytes_per_row(p_bytes_per_row)
-        , mins(p_mins)
-        , maxs(p_maxs)
         , replacement(p_replacement)
         , invert(p_invert)
+        , mins(p_mins)
+        , maxs(p_maxs)
     {}
 };
 void filter_rgb32_range(

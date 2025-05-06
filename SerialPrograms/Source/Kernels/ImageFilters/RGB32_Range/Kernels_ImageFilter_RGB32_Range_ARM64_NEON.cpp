@@ -23,8 +23,8 @@ public:
 
 public:
     ImageFilterRunner_Rgb32Range_ARM64_NEON(
-        uint32_t mins, uint32_t maxs,
-        uint32_t replacement_color, bool replace_color_within_range
+        uint32_t replacement_color, bool replace_color_within_range,
+        uint32_t mins, uint32_t maxs
     )
         : m_mins_u8(vreinterpretq_u8_u32(vdupq_n_u32(mins)))
         , m_maxs_u8(vreinterpretq_u8_u32(vdupq_n_u32(maxs)))
@@ -88,10 +88,13 @@ private:
 size_t filter_rgb32_range_arm64_NEON(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
-    uint32_t mins, uint32_t maxs,
-    uint32_t replacement_color, bool replace_color_within_range
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t mins, uint32_t maxs, void*
 ){
-    ImageFilterRunner_Rgb32Range_ARM64_NEON filter(mins, maxs, replacement_color, replace_color_within_range);
+    ImageFilterRunner_Rgb32Range_ARM64_NEON filter(
+        replacement, replace_color_within_range,
+        mins, maxs
+    );
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }

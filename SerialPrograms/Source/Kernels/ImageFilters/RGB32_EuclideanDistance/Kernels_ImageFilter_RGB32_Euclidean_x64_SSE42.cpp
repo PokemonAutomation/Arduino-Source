@@ -41,8 +41,8 @@ public:
 
 public:
     ImageFilter_RgbEuclidean_x64_SSE42(
-        uint32_t expected, double max_euclidean_distance,
-        uint32_t replacement, bool replace_color_within_range
+        uint32_t replacement, bool replace_color_within_range,
+        uint32_t expected, double max_euclidean_distance
     )
         : m_replacement(_mm_set1_epi32(replacement))
         , m_invert(replace_color_within_range ? _mm_set1_epi32(-1) : _mm_setzero_si128())
@@ -115,10 +115,13 @@ private:
 size_t filter_rgb32_euclidean_x64_SSE42(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
-    uint32_t expected, double max_euclidean_distance,
-    uint32_t replacement, bool replace_color_within_range
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t expected, double max_euclidean_distance, void*
 ){
-    ImageFilter_RgbEuclidean_x64_SSE42 filter(expected, max_euclidean_distance, replacement, replace_color_within_range);
+    ImageFilter_RgbEuclidean_x64_SSE42 filter(
+        replacement, replace_color_within_range,
+        expected, max_euclidean_distance
+    );
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
