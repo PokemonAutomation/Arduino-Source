@@ -161,7 +161,7 @@ int test_kernels_FilterRGB32Range(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         image_out.data(), image_out.bytes_per_row(),
         (uint32_t)COLOR_WHITE, replace_color_within_range,
-        mins, maxs, nullptr
+        mins, maxs
     );
     auto time_end = current_time();
     auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
@@ -172,7 +172,7 @@ int test_kernels_FilterRGB32Range(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         image_out_2.data(), image_out_2.bytes_per_row(),
         (uint32_t)COLOR_WHITE, !replace_color_within_range,
-        mins, maxs, nullptr
+        mins, maxs
     );
 
     TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
@@ -231,7 +231,7 @@ int test_kernels_FilterRGB32Range(const ImageViewRGB32& image){
             image.data(), image.bytes_per_row(), image.width(), image.height(),
             image_out.data(), image_out.bytes_per_row(),
             (uint32_t)COLOR_WHITE, replace_color_within_range,
-            mins, maxs, nullptr
+            mins, maxs
         );
     }
     time_end = current_time();
@@ -263,7 +263,7 @@ int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         image_out.data(), image_out.bytes_per_row(),
         (uint32_t)COLOR_WHITE, replace_color_within_range,
-        uint32_t(middle_color), max_dist, nullptr
+        uint32_t(middle_color), max_dist
     );
     auto time_end = current_time();
     auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
@@ -274,7 +274,7 @@ int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image){
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         image_out_2.data(), image_out_2.bytes_per_row(),
         (uint32_t)COLOR_WHITE, !replace_color_within_range,
-        uint32_t(middle_color), max_dist, nullptr
+        uint32_t(middle_color), max_dist
     );
 
     TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
@@ -342,7 +342,7 @@ int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image){
             image.data(), image.bytes_per_row(), image.width(), image.height(),
             image_out.data(), image_out.bytes_per_row(),
             (uint32_t)COLOR_WHITE, replace_color_within_range,
-            uint32_t(middle_color), max_dist, nullptr
+            uint32_t(middle_color), max_dist
         );
     }
     time_end = current_time();

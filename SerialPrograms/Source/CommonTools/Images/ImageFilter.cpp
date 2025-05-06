@@ -25,7 +25,7 @@ ImageRGB32 filter_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         ret.data(), ret.bytes_per_row(),
         (uint32_t)replace_with, replace_color_within_range,
-        mins, maxs, nullptr
+        mins, maxs
     );
     return ret;
 }
@@ -39,7 +39,7 @@ ImageRGB32 filter_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         ret.data(), ret.bytes_per_row(),
         (uint32_t)replace_with, replace_color_within_range,
-        mins, maxs, nullptr
+        mins, maxs
     );
     return ret;
 }
@@ -55,7 +55,7 @@ std::vector<std::pair<ImageRGB32, size_t>> filter_rgb32_range(
         subfilters.emplace_back(
             out.data(), out.bytes_per_row(),
             (uint32_t)filters[c].replacement_color, filters[c].replace_color_within_range,
-            filters[c].mins, filters[c].maxs, nullptr
+            filters[c].mins, filters[c].maxs
         );
     }
     Kernels::filter_rgb32_range(
@@ -82,7 +82,7 @@ ImageRGB32 filter_rgb32_euclidean(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         ret.data(), ret.bytes_per_row(),
         (uint32_t)replace_with, replace_color_within_range,
-        expected, max_euclidean_distance, nullptr
+        expected, max_euclidean_distance
     );
     return ret;
 }
@@ -97,7 +97,7 @@ ImageRGB32 filter_rgb32_euclidean(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         ret.data(), ret.bytes_per_row(),
         (uint32_t)replace_with, replace_color_within_range,
-        expected, max_euclidean_distance, nullptr
+        expected, max_euclidean_distance
     );
     return ret;
 }

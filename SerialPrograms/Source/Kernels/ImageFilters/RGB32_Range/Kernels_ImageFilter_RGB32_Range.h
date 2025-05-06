@@ -24,7 +24,7 @@ size_t filter_rgb32_range(
     const uint32_t* image_in, size_t image_in_bytes_per_row, size_t width, size_t height,
     uint32_t* image_out, size_t image_out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 );
 
 
@@ -44,7 +44,7 @@ struct FilterRgb32RangeFilter{
     FilterRgb32RangeFilter(
         uint32_t* p_data, size_t p_bytes_per_row,
         uint32_t p_replacement, bool p_invert,
-        uint32_t p_mins, uint32_t p_maxs, void*
+        uint32_t p_mins, uint32_t p_maxs
     )
         : data(p_data)
         , bytes_per_row(p_bytes_per_row)

@@ -77,7 +77,7 @@ size_t filter_rgb32_range_x64_AVX2(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 ){
     ImageFilterRunner_Rgb32Range_x64_AVX2 filter(
         replacement, replace_color_within_range,

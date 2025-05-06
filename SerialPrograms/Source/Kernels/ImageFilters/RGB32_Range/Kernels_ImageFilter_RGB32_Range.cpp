@@ -18,37 +18,37 @@ size_t filter_rgb32_range_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 );
 size_t filter_rgb32_range_x64_SSE42(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 );
 size_t filter_rgb32_range_x64_AVX2(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 );
 size_t filter_rgb32_range_x64_AVX512(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 );
 size_t filter_rgb32_range_arm64_NEON(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 );
 size_t filter_rgb32_range(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
-    uint32_t mins, uint32_t maxs, void*
+    uint32_t mins, uint32_t maxs
 ){
     if (width * height > 0xffffffff){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
@@ -59,7 +59,7 @@ size_t filter_rgb32_range(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
             replacement, replace_color_within_range,
-            mins, maxs, nullptr
+            mins, maxs
         );
     }
 #endif
@@ -69,7 +69,7 @@ size_t filter_rgb32_range(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
             replacement, replace_color_within_range,
-            mins, maxs, nullptr
+            mins, maxs
         );
     }
 #endif
@@ -79,7 +79,7 @@ size_t filter_rgb32_range(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
             replacement, replace_color_within_range,
-            mins, maxs, nullptr
+            mins, maxs
         );
     }
 #endif
@@ -89,7 +89,7 @@ size_t filter_rgb32_range(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
             replacement, replace_color_within_range,
-            mins, maxs, nullptr
+            mins, maxs
         );
     }
 #endif
@@ -97,7 +97,7 @@ size_t filter_rgb32_range(
         in, in_bytes_per_row, width, height,
         out, out_bytes_per_row,
         replacement, replace_color_within_range,
-        mins, maxs, nullptr
+        mins, maxs
     );
 }
 
