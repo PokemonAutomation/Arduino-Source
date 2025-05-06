@@ -16,37 +16,37 @@ size_t filter_rgb32_euclidean_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t expected, double max_euclidean_distance,
-    uint32_t replacement, bool invert
+    uint32_t replacement, bool replace_color_within_range
 );
 size_t filter_rgb32_euclidean_x64_SSE42(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t expected, double max_euclidean_distance,
-    uint32_t replacement, bool invert
+    uint32_t replacement, bool replace_color_within_range
 );
 size_t filter_rgb32_euclidean_x64_AVX2(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t expected, double max_euclidean_distance,
-    uint32_t replacement, bool invert
+    uint32_t replacement, bool replace_color_within_range
 );
 size_t filter_rgb32_euclidean_x64_AVX512(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t expected, double max_euclidean_distance,
-    uint32_t replacement, bool invert
+    uint32_t replacement, bool replace_color_within_range
 );
 size_t filter_rgb32_euclidean_arm64_NEON(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t expected, double max_euclidean_distance,
-    uint32_t replacement, bool invert
+    uint32_t replacement, bool replace_color_within_range
 );
 size_t filter_rgb32_euclidean(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t expected, double max_euclidean_distance,
-    uint32_t replacement, bool invert
+    uint32_t replacement, bool replace_color_within_range
 ){
     if (width * height > 0xffffffff){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
@@ -57,7 +57,7 @@ size_t filter_rgb32_euclidean(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
             expected, max_euclidean_distance,
-            replacement, invert
+            replacement, replace_color_within_range
         );
     }
 #endif
@@ -67,7 +67,7 @@ size_t filter_rgb32_euclidean(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
             expected, max_euclidean_distance,
-            replacement, invert
+            replacement, replace_color_within_range
         );
     }
 #endif
@@ -77,7 +77,7 @@ size_t filter_rgb32_euclidean(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
             expected, max_euclidean_distance,
-            replacement, invert
+            replacement, replace_color_within_range
         );
     }
 #endif
@@ -87,7 +87,7 @@ size_t filter_rgb32_euclidean(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
             expected, max_euclidean_distance,
-            replacement, invert
+            replacement, replace_color_within_range
         );
     }
 #endif
@@ -95,7 +95,7 @@ size_t filter_rgb32_euclidean(
         in, in_bytes_per_row, width, height,
         out, out_bytes_per_row,
         expected, max_euclidean_distance,
-        replacement, invert
+        replacement, replace_color_within_range
     );
 }
 

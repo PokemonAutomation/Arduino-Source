@@ -22,8 +22,10 @@ public:
     using Mask = size_t;
 
 public:
-    ImageFilterRunner_Rgb32Range_ARM64_NEON(uint32_t mins, uint32_t maxs, uint32_t replacement_color,
-        bool replace_color_within_range)
+    ImageFilterRunner_Rgb32Range_ARM64_NEON(
+        uint32_t mins, uint32_t maxs,
+        uint32_t replacement_color, bool replace_color_within_range
+    )
         : m_mins_u8(vreinterpretq_u8_u32(vdupq_n_u32(mins)))
         , m_maxs_u8(vreinterpretq_u8_u32(vdupq_n_u32(maxs)))
         , m_zeros_u8(vreinterpretq_u32_u8(vdupq_n_u8(0)))

@@ -21,8 +21,10 @@ public:
     using Mask = size_t;
 
 public:
-    ImageFilter_RgbEuclidean_arm64_NEON(uint32_t expected_color, double max_euclidean_distance,
-        uint32_t replacement_color, bool replace_color_within_range)
+    ImageFilter_RgbEuclidean_arm64_NEON(
+        uint32_t expected_color, double max_euclidean_distance,
+        uint32_t replacement_color, bool replace_color_within_range
+    )
         : m_expected_color_rgb_u8(vreinterpretq_u8_u32(vdupq_n_u32(expected_color & 0x00ffffff)))
         , m_distance_squared_u32(vdupq_n_u32((uint32_t)(max_euclidean_distance * max_euclidean_distance)))
         , m_replacement_color_u32(vdupq_n_u32(replacement_color))

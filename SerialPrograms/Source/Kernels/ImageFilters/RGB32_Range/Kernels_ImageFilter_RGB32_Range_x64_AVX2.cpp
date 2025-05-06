@@ -22,9 +22,12 @@ public:
     using Mask = PartialWordAccess32_x64_AVX2;
 
 public:
-    ImageFilterRunner_Rgb32Range_x64_AVX2(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
+    ImageFilterRunner_Rgb32Range_x64_AVX2(
+        uint32_t mins, uint32_t maxs,
+        uint32_t replacement, bool replace_color_within_range
+    )
         : m_replacement(_mm256_set1_epi32(replacement))
-        , m_invert(invert ? _mm256_set1_epi32(-1) : _mm256_setzero_si256())
+        , m_invert(replace_color_within_range ? _mm256_set1_epi32(-1) : _mm256_setzero_si256())
         , m_mins(_mm256_set1_epi32(mins ^ 0x80808080))
         , m_maxs(_mm256_set1_epi32(maxs ^ 0x80808080))
         , m_count(_mm256_setzero_si256())
@@ -74,9 +77,9 @@ size_t filter_rgb32_range_x64_AVX2(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t mins, uint32_t maxs,
-    uint32_t replacement, bool invert
+    uint32_t replacement, bool replace_color_within_range
 ){
-    ImageFilterRunner_Rgb32Range_x64_AVX2 filter(mins, maxs, replacement, invert);
+    ImageFilterRunner_Rgb32Range_x64_AVX2 filter(mins, maxs, replacement, replace_color_within_range);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }

@@ -19,7 +19,10 @@ public:
     using Mask = size_t;
 
 public:
-    ImageFilter_RgbEuclidean_Default(uint32_t expected_color, double max_euclidean_distance, uint32_t replacement_color, bool replace_color_within_range)
+    ImageFilter_RgbEuclidean_Default(
+        uint32_t expected_color, double max_euclidean_distance,
+        uint32_t replacement_color, bool replace_color_within_range
+    )
         : m_replacement_color(replacement_color)
         , m_replace_color_within_range(replace_color_within_range ? 1 : 0)
         , m_expected_r((expected_color & 0x00ff0000) >> 16)
@@ -35,7 +38,6 @@ public:
 
     PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
         uint32_t pixel = in[0];
-        uint32_t ret = 1;
         uint32_t sum_sqr = 0;
         {
             uint32_t p = (pixel & 0x00ff0000) >> 16;
@@ -52,7 +54,7 @@ public:
             p -= m_expected_b;
             sum_sqr += p * p;
         }
-        ret = sum_sqr <= m_max_distance_squared;
+        uint32_t ret = sum_sqr <= m_max_distance_squared;
         m_count += ret;
         ret ^= m_replace_color_within_range;
         out[0] = ret ? pixel : m_replacement_color;

@@ -18,8 +18,10 @@ public:
     using Mask = size_t;
 
 public:
-    ImageFilterRunner_Rgb32Range_Default(uint32_t mins, uint32_t maxs, uint32_t replacement_color,
-        bool replace_color_within_range)
+    ImageFilterRunner_Rgb32Range_Default(
+        uint32_t mins, uint32_t maxs,
+        uint32_t replacement_color, bool replace_color_within_range
+    )
         : m_replacement_color(replacement_color)
         , m_replace_color_within_range(replace_color_within_range ? 1 : 0)
         , m_minB(mins & 0x000000ff)
