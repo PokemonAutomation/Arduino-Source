@@ -128,7 +128,7 @@ public:
     using Mask = PartialWordMask;
 
 public:
-    ToBlackWhite_RgbRange_x64_SSE42(uint32_t mins, uint32_t maxs, bool in_range_black)
+    ToBlackWhite_RgbRange_x64_SSE42(bool in_range_black, uint32_t mins, uint32_t maxs)
         : m_in_range_black(in_range_black ? _mm_set1_epi32(-1) : _mm_setzero_si128())
         , m_mins(_mm_set1_epi32(mins ^ 0x80808080))
         , m_maxs(_mm_set1_epi32(maxs ^ 0x80808080))
@@ -180,9 +180,10 @@ private:
 size_t to_blackwhite_rgb32_range_x64_SSE42(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
-    uint32_t mins, uint32_t maxs, bool in_range_black
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs, void*
 ){
-    ToBlackWhite_RgbRange_x64_SSE42 filter(mins, maxs, in_range_black);
+    ToBlackWhite_RgbRange_x64_SSE42 filter(in_range_black, mins, maxs);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }

@@ -119,7 +119,7 @@ public:
     using Mask = size_t;
 
 public:
-    ToBlackWhite_RgbRange_arm64_NEON(uint32_t mins, uint32_t maxs, bool in_range_black)
+    ToBlackWhite_RgbRange_arm64_NEON(bool in_range_black, uint32_t mins, uint32_t maxs)
         : m_mins_u8(vreinterpretq_u8_u32(vdupq_n_u32(mins)))
         , m_maxs_u8(vreinterpretq_u8_u32(vdupq_n_u32(maxs)))
         , m_zeros_u8(vreinterpretq_u32_u8(vdupq_n_u8(0)))
@@ -177,9 +177,10 @@ private:
 size_t to_blackwhite_rgb32_range_arm64_NEON(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
-    uint32_t mins, uint32_t maxs, bool in_range_black
+    bool in_range_black,
+    uint32_t mins, uint32_t maxs, void*
 ){
-    ToBlackWhite_RgbRange_arm64_NEON filter(mins, maxs, in_range_black);
+    ToBlackWhite_RgbRange_arm64_NEON filter(in_range_black, mins, maxs);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }

@@ -119,6 +119,18 @@ std::vector<std::pair<ImageRGB32, size_t>> to_blackwhite_rgb32_range(
 );
 
 
+//  Similar to "to_blackwhite_rgb32_range()". But instead of checking if each of
+//  the RGB components are within a range, we check if the sum of them
+//  (the brightness) is in range.
+ImageRGB32 to_blackwhite_rgb32_brightness(
+    const ImageViewRGB32& image,
+    bool in_range_black,
+    uint32_t min_brightness, uint32_t max_brightness
+);
+
+
+
+
 // keep all pixels where green is the dominant RGB value. otherwise, replace the pixel with `replace_with`
 // `rgb_gap` is the amount that green has to exceed the red or blue value, in order to keep the pixel.
 ImageRGB32 filter_green(

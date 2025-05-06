@@ -8,6 +8,7 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
 #include "Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h"
+#include "Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "ImageFilter.h"
@@ -114,7 +115,9 @@ ImageRGB32 to_blackwhite_rgb32_range(
     ImageRGB32 ret(image.width(), image.height());
     Kernels::to_blackwhite_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
-        ret.data(), ret.bytes_per_row(), mins, maxs, in_range_black
+        ret.data(), ret.bytes_per_row(),
+        in_range_black,
+        mins, maxs, nullptr
     );
     return ret;
 }
@@ -126,7 +129,9 @@ ImageRGB32 to_blackwhite_rgb32_range(
     ImageRGB32 ret(image.width(), image.height());
     pixels_in_range = Kernels::to_blackwhite_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
-        ret.data(), ret.bytes_per_row(), mins, maxs, in_range_black
+        ret.data(), ret.bytes_per_row(),
+        in_range_black,
+        mins, maxs, nullptr
     );
     return ret;
 }
@@ -153,6 +158,25 @@ std::vector<std::pair<ImageRGB32, size_t>> to_blackwhite_rgb32_range(
     }
     return ret;
 }
+
+
+
+#if 0
+ImageRGB32 to_blackwhite_rgb32_brightness(
+    const ImageViewRGB32& image,
+    bool in_range_black,
+    uint32_t min_brightness, uint32_t max_brightness
+){
+    ImageRGB32 ret(image.width(), image.height());
+    Kernels::to_blackwhite_rgb32_brightness(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        ret.data(), ret.bytes_per_row(), mins, maxs, in_range_black
+    );
+    return ret;
+}
+#endif
+
+
 
 ImageRGB32 filter_green(
     const ImageViewRGB32& image,    
