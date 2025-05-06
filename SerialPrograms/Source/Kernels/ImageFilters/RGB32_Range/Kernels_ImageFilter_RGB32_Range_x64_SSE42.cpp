@@ -12,6 +12,10 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -59,12 +63,20 @@ public:
 
     PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
         __m128i pixel = _mm_loadu_si128((const __m128i*)in);
-        pixel = process_word(pixel);
+        __m128i in_range_pixels = process_word(pixel);
+        m_count = _mm_sub_epi32(m_count, in_range_pixels);
         _mm_storeu_si128((__m128i*)out, pixel);
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
+        __m128i vmask = _mm_cmpgt_epi32(
+            _mm_set1_epi32((uint32_t)mask.left),
+            _mm_setr_epi32(0, 1, 2, 3)
+        );
+
         __m128i pixel = mask.loader.load(in);
-        pixel = process_word(pixel);
+        __m128i in_range_pixels = process_word(pixel);
+        in_range_pixels = _mm_and_si128(in_range_pixels, vmask);
+        m_count = _mm_sub_epi32(m_count, in_range_pixels);
         size_t left = mask.left;
         do{
             out[0] = _mm_cvtsi128_si32(pixel);
@@ -74,15 +86,14 @@ public:
     }
 
 private:
-    PA_FORCE_INLINE __m128i process_word(__m128i pixel){
+    PA_FORCE_INLINE __m128i process_word(__m128i& pixel){
         __m128i adj = _mm_xor_si128(pixel, _mm_set1_epi8((uint8_t)0x80));
         __m128i cmp0 = _mm_cmpgt_epi8(m_mins, adj);
         __m128i cmp1 = _mm_cmpgt_epi8(adj, m_maxs);
         cmp0 = _mm_or_si128(cmp0, cmp1);
         cmp0 = _mm_cmpeq_epi32(cmp0, _mm_setzero_si128());
-        m_count = _mm_sub_epi32(m_count, cmp0);
-        cmp0 = _mm_xor_si128(cmp0, m_invert);
-        return _mm_blendv_epi8(m_replacement, pixel, cmp0);
+        pixel = _mm_blendv_epi8(m_replacement, pixel, _mm_xor_si128(cmp0, m_invert));
+        return cmp0;
     }
 
 private:

@@ -12,6 +12,10 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -42,25 +46,27 @@ public:
 
     PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
         __m256i pixel = _mm256_loadu_si256((const __m256i*)in);
-        pixel = process_word(pixel);
+        __m256i in_range_pixels = process_word(pixel);
+        m_count = _mm256_sub_epi32(m_count, in_range_pixels);
         _mm256_storeu_si256((__m256i*)out, pixel);
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
         __m256i pixel = mask.load_i32(in);
-        pixel = process_word(pixel);
+        __m256i in_range_pixels = process_word(pixel);
+        in_range_pixels = _mm256_and_si256(in_range_pixels, mask.mask());
+        m_count = _mm256_sub_epi32(m_count, in_range_pixels);
         mask.store(out, pixel);
     }
 
 private:
-    PA_FORCE_INLINE __m256i process_word(__m256i pixel){
+    PA_FORCE_INLINE __m256i process_word(__m256i& pixel){
         __m256i adj = _mm256_xor_si256(pixel, _mm256_set1_epi8((uint8_t)0x80));
         __m256i cmp0 = _mm256_cmpgt_epi8(m_mins, adj);
         __m256i cmp1 = _mm256_cmpgt_epi8(adj, m_maxs);
         cmp0 = _mm256_or_si256(cmp0, cmp1);
         cmp0 = _mm256_cmpeq_epi32(cmp0, _mm256_setzero_si256());
-        m_count = _mm256_sub_epi32(m_count, cmp0);
-        cmp0 = _mm256_xor_si256(cmp0, m_invert);
-        return _mm256_blendv_epi8(m_replacement, pixel, cmp0);
+        pixel = _mm256_blendv_epi8(m_replacement, pixel, _mm256_xor_si256(cmp0, m_invert));
+        return cmp0;
     }
 
 private:

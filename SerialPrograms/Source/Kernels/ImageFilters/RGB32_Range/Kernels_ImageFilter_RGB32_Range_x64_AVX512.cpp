@@ -10,6 +10,10 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -55,17 +59,20 @@ public:
 
     PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
         __m512i pixel = _mm512_loadu_si512((const __m512i*)in);
-        pixel = process_word(pixel);
+        __mmask16 in_range_pixels = process_word(pixel);
+        m_count = _mm512_mask_sub_epi32(m_count, in_range_pixels, m_count, _mm512_set1_epi32(-1));
         _mm512_storeu_si512((__m512i*)out, pixel);
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
         __m512i pixel = _mm512_maskz_loadu_epi32(mask.m, in);
-        pixel = process_word(pixel);
+        __mmask16 in_range_pixels = process_word(pixel);
+        in_range_pixels &= mask.m;
+        m_count = _mm512_mask_sub_epi32(m_count, in_range_pixels, m_count, _mm512_set1_epi32(-1));
         _mm512_mask_storeu_epi32(out, mask.m, pixel);
     }
 
 private:
-    PA_FORCE_INLINE __m512i process_word(__m512i pixel){
+    PA_FORCE_INLINE __mmask16 process_word(__m512i& pixel){
 #if 0
         __mmask64 cmp64A = _mm512_cmpgt_epu8_mask(m_mins, pixel);
         __mmask64 cmp64B = _mm512_cmpgt_epu8_mask(pixel, m_maxs);
@@ -77,9 +84,9 @@ private:
         __m512i mask = _mm512_movm_epi8(cmp64B);
         __mmask16 cmp16 = _mm512_cmpeq_epi32_mask(mask, _mm512_set1_epi32(-1));
 #endif
-        m_count = _mm512_mask_sub_epi32(m_count, cmp16, m_count, _mm512_set1_epi32(-1));
-        cmp16 ^= m_invert;
-        return _mm512_mask_blend_epi32(cmp16, m_replacement, pixel);
+        pixel = _mm512_mask_blend_epi32(cmp16 ^ m_invert, m_replacement, pixel);
+
+        return cmp16;
     }
 
 private:

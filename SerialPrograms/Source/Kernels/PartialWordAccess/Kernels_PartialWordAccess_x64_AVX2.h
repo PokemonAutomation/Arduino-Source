@@ -25,6 +25,9 @@ public:
         );
     }
 
+    PA_FORCE_INLINE __m256i mask() const{
+        return m_mask;
+    }
     PA_FORCE_INLINE __m256i load_i32(const void* ptr) const{
         return _mm256_maskload_epi32((const int*)ptr, m_mask);
     }
