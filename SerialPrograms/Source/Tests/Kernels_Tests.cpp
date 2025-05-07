@@ -358,8 +358,12 @@ int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
     cout << "Testing to_black_white_rgb32_range(), image size " << width << " x " << height << endl;
 
     Color min_color(0, 0, 0);
+    // Color min_color(0);
+
     Color max_color(63, 63, 63);
+    // Color max_color(255, 255, 255);
     // Color max_color(238, 24, 42);
+    cout << "min color: " << min_color.to_string() << " max color: " << max_color.to_string() << endl;
     
     const uint32_t mins = uint32_t(min_color);
     const uint32_t maxs = uint32_t(max_color);

@@ -10,6 +10,9 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
+#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
+
+
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -37,11 +40,17 @@ public:
     {}
 
     PA_FORCE_INLINE size_t count() const{
+        // long pairwise add
         uint64x2_t sum_u64 = vpaddlq_u32(m_count_u32);
         return sum_u64[0] + sum_u64[1];
     }
 
-    PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
+    // Given 4 pixels from in[4], apply color range comparison and count the pixels that are in range.
+    // The counts are stored in m_count_u32.
+    // If a per-pixel mask, cmp_mask_u32 is not nullptr, it only counts the pixels covered by the mask.
+    // It also changes pixels in or out of the range to have the new color m_replacement_color_u32.
+    // The resulting pixels are saved in out[4]
+    PA_FORCE_INLINE void process_full(uint32_t out[4], const uint32_t in[4], const uint32x4_t* cmp_mask_u32 = nullptr){
         uint8x16_t in_u8 = vreinterpretq_u8_u32(vld1q_u32(in));
 
         // Check if mins > pixel per color channel
@@ -50,9 +59,13 @@ public:
         uint8x16_t cmp1 = vcgtq_u8(in_u8, m_maxs_u8);
         // cmp: if mins > pixel or pixel > maxs per color channel
         uint8x16_t cmp_u8 = vorrq_u8(cmp0, cmp1);
+        // vceqq_u32: compare bitwise equal
         // cmp_u32: if each pixel is within the range
         // If a pixel is within [mins, maxs], its uint32_t in `cmp_u32` is all 1 bits, otherwise, all 0 bits
-        uint32x4_t cmp_u32 = vceqq_u32(vreinterpretq_u32_u8(cmp_u8), m_zeros_u8);
+        uint32x4_t cmp_u32 = vceqq_u32(vreinterpretq_u32_u8(cmp_u8), vreinterpretq_u32_u8(m_zeros_u8));
+        if (cmp_mask_u32) {
+            cmp_u32 = vandq_u32(cmp_u32, *cmp_mask_u32);
+        }
         // Increase count for each pixel in range. Each uint32 lane is counted separately.
         // We achieve +=1 by substracting 0xFFFFFFFF
         m_count_u32 = vsubq_u32(m_count_u32, cmp_u32);
@@ -66,10 +79,12 @@ public:
         }
         vst1q_u32(out, out_u32);
     }
+    // Same as `process_full()` but only process `left` (< 4) pixels
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
+        uint32x4_t cmp_mask_u32 = vreinterpretq_u32_u8(PartialWordAccess_arm64_NEON::create_front_mask(left * 4));
         uint32_t buffer_in[4], buffer_out[4];
         memcpy(buffer_in, in, sizeof(uint32_t) * left);
-        process_full(buffer_out, buffer_in);
+        process_full(buffer_out, buffer_in, &cmp_mask_u32);
         memcpy(out, buffer_out, sizeof(uint32_t) * left);
     }
 
@@ -135,7 +150,12 @@ public:
         return sum_u64[0] + sum_u64[1];
     }
 
-    PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
+    // Given 4 pixels from in[4], apply color range comparison and count the pixels that are in range.
+    // The counts are stored in m_count_u32.
+    // If a per-pixel mask, cmp_mask_u32 is not nullptr, it only counts the pixels covered by the mask.
+    // It also changes pixels into black or white depending on whether they are in range.
+    // The resulting pixels are saved in out[4]
+    PA_FORCE_INLINE void process_full(uint32_t out[4], const uint32_t in[4], const uint32x4_t* cmp_mask_u32 = nullptr){
         uint8x16_t in_u8 = vreinterpretq_u8_u32(vld1q_u32(in));
 
         // Check if mins > pixel per color channel
@@ -144,9 +164,13 @@ public:
         uint8x16_t cmp1 = vcgtq_u8(in_u8, m_maxs_u8);
         // cmp: if mins > pixel or pixel > maxs per color channel
         uint8x16_t cmp_u8 = vorrq_u8(cmp0, cmp1);
+        // vceqq_u32: compare bitwise equal
         // cmp_u32: if each pixel is within the range
         // If a pixel is within [mins, maxs], its uint32_t in `cmp_u32` is all 1 bits, otherwise, all 0 bits
-        uint32x4_t cmp_u32 = vceqq_u32(vreinterpretq_u32_u8(cmp_u8), m_zeros_u8);
+        uint32x4_t cmp_u32 = vceqq_u32(vreinterpretq_u32_u8(cmp_u8), vreinterpretq_u32_u8(m_zeros_u8));
+        if (cmp_mask_u32) {
+            cmp_u32 = vandq_u32(cmp_u32, *cmp_mask_u32);
+        }
         // Increase count for each pixel in range. Each uint32 lane is counted separately.
         // We achieve +=1 by substracting 0xFFFFFFFF
         m_count_u32 = vsubq_u32(m_count_u32, cmp_u32);
@@ -157,10 +181,12 @@ public:
 
         vst1q_u32(out, out_u32);
     }
+    // Same as `process_full()` but only process `left` (< 4) pixels
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
+        uint32x4_t cmp_mask_u32 = vreinterpretq_u32_u8(PartialWordAccess_arm64_NEON::create_front_mask(left * 4));
         uint32_t buffer_in[4], buffer_out[4];
         memcpy(buffer_in, in, sizeof(uint32_t) * left);
-        process_full(buffer_out, buffer_in);
+        process_full(buffer_out, buffer_in, &cmp_mask_u32);
         memcpy(out, buffer_out, sizeof(uint32_t) * left);
     }
 
