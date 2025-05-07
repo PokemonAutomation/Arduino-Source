@@ -24,16 +24,16 @@ public:
 
 public:
     PA_FORCE_INLINE PixelTest_Rgb32Range_Default(
-        PixelRGB32 mins, PixelRGB32 maxs
+        uint32_t mins, uint32_t maxs
     )
-        : m_shiftB(mins.u32 & 0x000000ff)
-        , m_shiftG(mins.u32 & 0x0000ff00)
-        , m_shiftR(mins.u32 & 0x00ff0000)
-        , m_shiftA(mins.u32 & 0xff000000)
-        , m_thresholdB((maxs.u32 & 0x000000ff) - m_shiftB)
-        , m_thresholdG((maxs.u32 & 0x0000ff00) - m_shiftG)
-        , m_thresholdR((maxs.u32 & 0x00ff0000) - m_shiftR)
-        , m_thresholdA((maxs.u32 & 0xff000000) - m_shiftA)
+        : m_shiftB(mins & 0x000000ff)
+        , m_shiftG(mins & 0x0000ff00)
+        , m_shiftR(mins & 0x00ff0000)
+        , m_shiftA(mins & 0xff000000)
+        , m_thresholdB((maxs & 0x000000ff) - m_shiftB)
+        , m_thresholdG((maxs & 0x0000ff00) - m_shiftG)
+        , m_thresholdR((maxs & 0x00ff0000) - m_shiftR)
+        , m_thresholdA((maxs & 0xff000000) - m_shiftA)
     {}
     PA_FORCE_INLINE PixelTest_Rgb32Range_Default(
         const ToBlackWhiteRgb32RangeFilter& filter

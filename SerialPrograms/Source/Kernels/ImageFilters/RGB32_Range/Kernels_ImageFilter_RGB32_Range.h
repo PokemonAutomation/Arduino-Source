@@ -11,7 +11,6 @@
 
 #include <stdint.h>
 #include <cstddef>
-#include "Common/Cpp/PixelRGB32.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

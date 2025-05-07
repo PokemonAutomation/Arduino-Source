@@ -28,7 +28,7 @@ public:
 
 public:
     PA_FORCE_INLINE PixelTest_Rgb32Range_ARM64_NEON(
-        PixelRGB32 mins, PixelRGB32 maxs
+        uint32_t mins, uint32_t maxs
     )
         : m_mins_u8(vreinterpretq_u8_u32(vdupq_n_u32(mins)))
         , m_maxs_u8(vreinterpretq_u8_u32(vdupq_n_u32(maxs)))

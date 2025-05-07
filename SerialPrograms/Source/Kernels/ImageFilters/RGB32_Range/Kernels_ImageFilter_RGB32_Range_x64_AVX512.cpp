@@ -30,10 +30,10 @@ public:
 
 public:
     PA_FORCE_INLINE PixelTest_Rgb32Range_x64_AVX512(
-        PixelRGB32 mins, PixelRGB32 maxs
+        uint32_t mins, uint32_t maxs
     )
-        : m_shift(_mm512_set1_epi32(mins.u32))
-        , m_threshold(_mm512_sub_epi8(_mm512_set1_epi32(maxs.u32), m_shift))
+        : m_shift(_mm512_set1_epi32(mins))
+        , m_threshold(_mm512_sub_epi8(_mm512_set1_epi32(maxs), m_shift))
     {}
     PA_FORCE_INLINE PixelTest_Rgb32Range_x64_AVX512(
         const ToBlackWhiteRgb32RangeFilter& filter
