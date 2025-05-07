@@ -10,29 +10,58 @@
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
+#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_SSE42.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
 
 
-namespace{
 
-struct PartialWordMask{
-    size_t left;
-    PartialWordAccess_x64_SSE41 loader;
 
-    PA_FORCE_INLINE PartialWordMask(size_t p_left)
-        : left(p_left)
-        , loader(left * sizeof(uint32_t))
+
+class PixelTest_Rgb32Range_x64_SSE42{
+public:
+    static const size_t VECTOR_SIZE = 4;
+    using Mask = PartialWordMask;
+
+public:
+    PA_FORCE_INLINE PixelTest_Rgb32Range_x64_SSE42(
+        PixelRGB32 mins, PixelRGB32 maxs
+    )
+        : m_mins(_mm_set1_epi32(mins.u32 ^ 0x80808080))
+        , m_maxs(_mm_set1_epi32(maxs.u32 ^ 0x80808080))
     {}
+    PA_FORCE_INLINE PixelTest_Rgb32Range_x64_SSE42(
+        const ToBlackWhiteRgb32RangeFilter& filter
+    )
+        : m_mins(_mm_set1_epi32(filter.mins ^ 0x80808080))
+        , m_maxs(_mm_set1_epi32(filter.maxs ^ 0x80808080))
+    {}
+
+    //  Return a mask indicating which lanes are in range.
+    PA_FORCE_INLINE __m128i test_word(__m128i pixel) const{
+        __m128i adj = _mm_xor_si128(pixel, _mm_set1_epi8((uint8_t)0x80));
+        __m128i cmp0 = _mm_cmpgt_epi8(m_mins, adj);
+        __m128i cmp1 = _mm_cmpgt_epi8(adj, m_maxs);
+        cmp0 = _mm_or_si128(cmp0, cmp1);
+        return _mm_cmpeq_epi32(cmp0, _mm_setzero_si128());
+    }
+
+private:
+    const __m128i m_mins;
+    const __m128i m_maxs;
 };
 
-}
+
+
+
+
 
 
 
@@ -135,6 +164,10 @@ void filter_rgb32_range_x64_SSE42(
 
 
 
+
+
+
+
 class ToBlackWhite_RgbRange_x64_SSE42{
 public:
     static const size_t VECTOR_SIZE = 4;
@@ -207,7 +240,12 @@ size_t to_blackwhite_rgb32_range_x64_SSE42(
     bool in_range_black,
     uint32_t mins, uint32_t maxs
 ){
-    ToBlackWhite_RgbRange_x64_SSE42 filter(in_range_black, mins, maxs);
+    PixelTest_Rgb32Range_x64_SSE42 tester(mins, maxs);
+    ToBlackWhite_Rgb32_x64_SSE42<PixelTest_Rgb32Range_x64_SSE42> filter(
+        tester, in_range_black
+    );
+
+//    ToBlackWhite_RgbRange_x64_SSE42 filter(in_range_black, mins, maxs);
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }

@@ -12,6 +12,7 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
+#if 0
 size_t filter_rgb32_brightness_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
@@ -35,7 +36,7 @@ size_t filter_rgb32_brightness(
         min_brightness, max_brightness
     );
 }
-
+#endif
 
 
 
