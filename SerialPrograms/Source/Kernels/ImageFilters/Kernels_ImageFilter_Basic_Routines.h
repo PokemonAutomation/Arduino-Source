@@ -88,6 +88,8 @@ PA_FORCE_INLINE void filter_per_pixel(
 }
 
 
+#if 0
+
 template <typename Runner, typename Filter>
 PA_FORCE_INLINE void filter_per_pixel(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
@@ -182,7 +184,7 @@ PA_FORCE_INLINE void filter_per_pixel(
     }
 }
 
-
+#endif
 
 
 

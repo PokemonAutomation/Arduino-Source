@@ -8,6 +8,11 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -102,7 +107,7 @@ size_t filter_rgb32_range(
 }
 
 
-
+#if 0
 void filter_rgb32_range_Default(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     FilterRgb32RangeFilter* filter, size_t filter_count
@@ -156,8 +161,23 @@ void filter_rgb32_range(
 #endif
     filter_rgb32_range_Default(image, bytes_per_row, width, height, filter, filter_count);
 }
+#endif
 
-
+void filter_rgb32_range(
+    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
+    FilterRgb32RangeFilter* filter, size_t filter_count
+){
+    for (size_t c = 0; c < filter_count; c++){
+        filter[c].pixels_in_range = filter_rgb32_range(
+            image, bytes_per_row, width, height,
+            filter[c].data, filter[c].bytes_per_row,
+            filter[c].replacement,
+            filter[c].pixels_in_range,
+            filter[c].mins,
+            filter[c].maxs
+        );
+    }
+}
 
 
 
@@ -200,6 +220,9 @@ size_t to_blackwhite_rgb32_range(
     bool in_range_black,
     uint32_t mins, uint32_t maxs
 ){
+    if (width * height > 0xffffffff){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is too large. more than 2^32 pixels.");
+    }
 #ifdef PA_AutoDispatch_x64_17_Skylake
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         return to_blackwhite_rgb32_range_x64_AVX512(
@@ -250,6 +273,7 @@ size_t to_blackwhite_rgb32_range(
 
 
 
+#if 0
 void to_blackwhite_rgb32_range_Default(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     ToBlackWhiteRgb32RangeFilter* filter, size_t filter_count
@@ -296,6 +320,28 @@ void to_blackwhite_rgb32_range(
 #endif
     return to_blackwhite_rgb32_range_Default(image, bytes_per_row, width, height, filter, filter_count);
 }
+#endif
+
+void to_blackwhite_rgb32_range(
+    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
+    ToBlackWhiteRgb32RangeFilter* filter, size_t filter_count
+){
+    for (size_t c = 0; c < filter_count; c++){
+        filter[c].pixels_in_range = to_blackwhite_rgb32_range(
+            image, bytes_per_row, width, height,
+            filter[c].data, filter[c].bytes_per_row,
+            filter[c].in_range_black,
+            filter[c].mins,
+            filter[c].maxs
+        );
+    }
+}
+
+
+
+
+
+
 
 
 
