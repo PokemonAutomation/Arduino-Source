@@ -6,6 +6,7 @@
 
 #ifdef PA_AutoDispatch_x64_08_Nehalem
 
+#include <limits>
 #include <immintrin.h>
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_SSE42.h"
