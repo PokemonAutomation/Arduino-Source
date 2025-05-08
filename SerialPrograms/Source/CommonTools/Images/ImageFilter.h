@@ -128,6 +128,16 @@ ImageRGB32 filter_rgb32_euclidean(
 
 
 
+//  Similar to "filter_rgb32_range()". But instead of checking if each of
+//  the RGB components are within a range, we check if the dot product of the
+//  components and a set of weights is within a range. By selecting the weights,
+//  you can pick which components to check the brightness of.
+ImageRGB32 filter_rgb32_brightness(
+    const ImageViewRGB32& image,
+    Color replacement_color, bool replace_color_within_range,
+    Kernels::Rgb32BrightnessWeights weights,
+    uint32_t min_brightness, uint32_t max_brightness
+);
 //  Similar to "to_blackwhite_rgb32_range()". But instead of checking if each of
 //  the RGB components are within a range, we check if the dot product of the
 //  components and a set of weights is within a range. By selecting the weights,

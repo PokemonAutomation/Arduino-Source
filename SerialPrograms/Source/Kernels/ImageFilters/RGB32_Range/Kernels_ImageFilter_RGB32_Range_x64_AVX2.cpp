@@ -77,11 +77,6 @@ size_t filter_rgb32_range_x64_AVX2(
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
-
-
-
-
-
 size_t to_blackwhite_rgb32_range_x64_AVX2(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,

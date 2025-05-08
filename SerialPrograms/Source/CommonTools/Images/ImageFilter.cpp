@@ -170,6 +170,22 @@ ImageRGB32 filter_rgb32_euclidean(
 
 
 
+ImageRGB32 filter_rgb32_brightness(
+    const ImageViewRGB32& image,
+    Color replacement_color, bool replace_color_within_range,
+    Kernels::Rgb32BrightnessWeights weights,
+    uint32_t min_brightness, uint32_t max_brightness
+){
+    ImageRGB32 ret(image.width(), image.height());
+    Kernels::filter_rgb32_brightness(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        ret.data(), ret.bytes_per_row(),
+        (uint32_t)replacement_color, replace_color_within_range,
+        weights,
+        min_brightness, max_brightness
+    );
+    return ret;
+}
 ImageRGB32 to_blackwhite_rgb32_brightness(
     const ImageViewRGB32& image,
     bool in_range_black,

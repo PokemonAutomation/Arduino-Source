@@ -122,6 +122,7 @@
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
+#include "CommonTools/Images/ImageFilter.h"
 
 
 #include <QPixmap>
@@ -317,8 +318,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 //    std::terminate();
+    ImageRGB32 image("20250503-121259857603.png");
 
-#if 1
+    image = filter_rgb32_brightness(image, COLOR_RED, false, 0x00ffff01, 0, 200);
+    image.save("temp.png");
+
+
+#if 0
     ImageRGB32 image("20250503-121259857603.png");
 
     {

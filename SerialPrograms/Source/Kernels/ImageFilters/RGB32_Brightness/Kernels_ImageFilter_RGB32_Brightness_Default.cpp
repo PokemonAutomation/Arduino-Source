@@ -52,6 +52,23 @@ private:
 
 
 
+size_t filter_rgb32_brightness_Default(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t replacement, bool replace_color_within_range,
+    Rgb32BrightnessWeights weights,
+    uint32_t min_brightness, uint32_t max_brightness
+){
+    PixelTest_Rgb32Brightness_Default tester(
+        weights,
+        min_brightness, max_brightness
+    );
+    FilterImage_Rgb32_Default<PixelTest_Rgb32Brightness_Default> filter(
+        tester, replacement, replace_color_within_range
+    );
+    filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
+    return filter.count();
+}
 size_t to_blackwhite_rgb32_brightness_Default(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
