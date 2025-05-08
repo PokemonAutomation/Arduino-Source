@@ -99,7 +99,10 @@ ImageMatch::ImageMatchResult TeraSilhouetteReader::read(const ImageViewRGB32& sc
 
 //        cout << "check4" << endl;
 //        ImageRGB32 filtered_image = to_blackwhite_rgb32_range(processed_image, true, 0xff000000, 0xff5f5f5f);
-        ImageRGB32 filtered_image = to_blackwhite_rgb32_brightness(processed_image, true, 0, threshold);
+        ImageRGB32 filtered_image = to_blackwhite_rgb32_brightness(
+            processed_image, true,
+            0x00010101, 0, threshold
+        );
 //        filtered_image.save("tera_filtered_image-" + std::to_string(c++) + ".png");
 
 //        cout << "check5" << endl;

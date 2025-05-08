@@ -87,6 +87,7 @@ size_t to_blackwhite_rgb32_range_x64_AVX512(
     ToBlackWhite_Rgb32_x64_AVX512<PixelTest_Rgb32Range_x64_AVX512> filter(
         tester, in_range_black
     );
+    filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
 

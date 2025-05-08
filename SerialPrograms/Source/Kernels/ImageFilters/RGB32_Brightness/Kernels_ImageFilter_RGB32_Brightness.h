@@ -61,6 +61,7 @@ size_t to_blackwhite_rgb32_brightness(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     bool in_range_black,
+    Rgb32BrightnessWeights weights,
     uint32_t min_brightness, uint32_t max_brightness
 );
 

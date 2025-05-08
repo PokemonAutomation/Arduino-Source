@@ -54,10 +54,11 @@ size_t to_blackwhite_rgb32_brightness_x64_AVX512VNNI(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     bool in_range_black,
+    Rgb32BrightnessWeights weights,
     uint32_t min_brightness, uint32_t max_brightness
 ){
     PixelTest_Rgb32Brightness_x64_AVX512VNNI tester(
-        Rgb32BrightnessWeights(0x00010101),
+        weights,
         min_brightness, max_brightness
     );
     ToBlackWhite_Rgb32_x64_AVX512<PixelTest_Rgb32Brightness_x64_AVX512VNNI> filter(

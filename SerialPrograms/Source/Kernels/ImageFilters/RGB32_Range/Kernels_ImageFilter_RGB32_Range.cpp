@@ -8,10 +8,9 @@
 #include "Common/Cpp/CpuId/CpuId.h"
 #include "Kernels_ImageFilter_RGB32_Range.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{

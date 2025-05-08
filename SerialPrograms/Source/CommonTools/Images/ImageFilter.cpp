@@ -71,43 +71,6 @@ std::vector<std::pair<ImageRGB32, size_t>> filter_rgb32_range(
 
 
 
-
-
-ImageRGB32 filter_rgb32_euclidean(
-    const ImageViewRGB32& image,
-    uint32_t expected, double max_euclidean_distance,
-    Color replace_with, bool replace_color_within_range
-){
-    ImageRGB32 ret(image.width(), image.height());
-    Kernels::filter_rgb32_euclidean(
-        image.data(), image.bytes_per_row(), image.width(), image.height(),
-        ret.data(), ret.bytes_per_row(),
-        (uint32_t)replace_with, replace_color_within_range,
-        expected, max_euclidean_distance
-    );
-    return ret;
-}
-ImageRGB32 filter_rgb32_euclidean(
-    size_t& pixels_in_range,
-    const ImageViewRGB32& image,
-    uint32_t expected, double max_euclidean_distance,
-    Color replace_with, bool replace_color_within_range
-){
-    ImageRGB32 ret(image.width(), image.height());
-    pixels_in_range = Kernels::filter_rgb32_euclidean(
-        image.data(), image.bytes_per_row(), image.width(), image.height(),
-        ret.data(), ret.bytes_per_row(),
-        (uint32_t)replace_with, replace_color_within_range,
-        expected, max_euclidean_distance
-    );
-    return ret;
-}
-
-
-
-
-
-
 ImageRGB32 to_blackwhite_rgb32_range(
     const ImageViewRGB32& image,
     bool in_range_black,
@@ -163,9 +126,54 @@ std::vector<std::pair<ImageRGB32, size_t>> to_blackwhite_rgb32_range(
 
 
 
+
+
+
+
+
+
+ImageRGB32 filter_rgb32_euclidean(
+    const ImageViewRGB32& image,
+    uint32_t expected, double max_euclidean_distance,
+    Color replace_with, bool replace_color_within_range
+){
+    ImageRGB32 ret(image.width(), image.height());
+    Kernels::filter_rgb32_euclidean(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        ret.data(), ret.bytes_per_row(),
+        (uint32_t)replace_with, replace_color_within_range,
+        expected, max_euclidean_distance
+    );
+    return ret;
+}
+ImageRGB32 filter_rgb32_euclidean(
+    size_t& pixels_in_range,
+    const ImageViewRGB32& image,
+    uint32_t expected, double max_euclidean_distance,
+    Color replace_with, bool replace_color_within_range
+){
+    ImageRGB32 ret(image.width(), image.height());
+    pixels_in_range = Kernels::filter_rgb32_euclidean(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        ret.data(), ret.bytes_per_row(),
+        (uint32_t)replace_with, replace_color_within_range,
+        expected, max_euclidean_distance
+    );
+    return ret;
+}
+
+
+
+
+
+
+
+
+
 ImageRGB32 to_blackwhite_rgb32_brightness(
     const ImageViewRGB32& image,
     bool in_range_black,
+    Kernels::Rgb32BrightnessWeights weights,
     uint32_t min_brightness, uint32_t max_brightness
 ){
     ImageRGB32 ret(image.width(), image.height());
@@ -173,7 +181,8 @@ ImageRGB32 to_blackwhite_rgb32_brightness(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         ret.data(), ret.bytes_per_row(),
         in_range_black,
-        in_range_black, max_brightness
+        weights,
+        min_brightness, max_brightness
     );
     return ret;
 }
