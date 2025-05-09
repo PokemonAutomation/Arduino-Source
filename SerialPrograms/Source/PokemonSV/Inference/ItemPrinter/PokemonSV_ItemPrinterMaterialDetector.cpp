@@ -91,8 +91,8 @@ int16_t ItemPrinterMaterialDetector::read_number(
     ImageViewRGB32 cropped = extract_box_reference(screen, box);
     ImageRGB32 filtered = to_blackwhite_rgb32_range(
         cropped,
-        0xff000000, 0xff808080,
-        true
+        true,
+        0xff000000, 0xff808080
     );
     // filtered.save("DebugDumps/test-one-filter-1.png");
     bool is_dark_text_light_background = image_stats(filtered).average.sum() > 400;

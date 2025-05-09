@@ -18,12 +18,14 @@
 #include "Common/Cpp/Json/JsonTools.h"
 #include "NintendoSwitch/Options/TurboMacroTable.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+using namespace std::chrono_literals;
 
 
 
@@ -63,24 +65,39 @@ TurboMacroCell::~TurboMacroCell(){
 void TurboMacroCell::operator=(const TurboMacroCell& x){
     x_axis.set(x.x_axis);
     y_axis.set(x.y_axis);
-    button_hold_ticks.set(x.button_hold_ticks);
-    button_release_ticks.set(x.button_release_ticks);
-    wait_ticks.set(x.wait_ticks);
+    button_hold.set(x.button_hold.current_text());
+    button_release.set(x.button_release.current_text());
+    wait.set(x.wait.current_text());
 }
 TurboMacroCell::TurboMacroCell(EnumDropdownCell<TurboMacroAction>& action)
     : BatchOption(LockMode::LOCK_WHILE_RUNNING, true)
     , m_action(action)
     , x_axis("X:", LockMode::LOCK_WHILE_RUNNING, 128)
     , y_axis("Y:", LockMode::LOCK_WHILE_RUNNING, 128)
-    , button_hold_ticks("Ticks to Hold:", LockMode::LOCK_WHILE_RUNNING, 250)
-    , button_release_ticks("Ticks to Release:", LockMode::LOCK_WHILE_RUNNING, 250)
-    , wait_ticks("Ticks to Wait:", LockMode::LOCK_WHILE_RUNNING, 125)
+    , button_hold(
+        "Hold (ms):", false,
+        LockMode::LOCK_WHILE_RUNNING,
+        0ms, Milliseconds::max(),
+        "2000 ms"
+    )
+    , button_release(
+        "Release (ms):", false,
+        LockMode::LOCK_WHILE_RUNNING,
+        0ms, Milliseconds::max(),
+        "2000 ms"
+    )
+    , wait(
+        "Wait (ms):", false,
+        LockMode::LOCK_WHILE_RUNNING,
+        0ms, Milliseconds::max(),
+        "1000 ms"
+    )
 {
     PA_ADD_OPTION(x_axis);
     PA_ADD_OPTION(y_axis);
-    PA_ADD_OPTION(button_hold_ticks);
-    PA_ADD_OPTION(button_release_ticks);
-    PA_ADD_OPTION(wait_ticks);
+    PA_ADD_OPTION(button_hold);
+    PA_ADD_OPTION(button_release);
+    PA_ADD_OPTION(wait);
 
     TurboMacroCell::value_changed(this);
     action.add_listener(*this);
@@ -88,17 +105,17 @@ TurboMacroCell::TurboMacroCell(EnumDropdownCell<TurboMacroAction>& action)
 void TurboMacroCell::value_changed(void* object){
     x_axis.set_visibility(ConfigOptionState::HIDDEN);
     y_axis.set_visibility(ConfigOptionState::HIDDEN);
-    button_hold_ticks.set_visibility(ConfigOptionState::HIDDEN);
-    button_release_ticks.set_visibility(ConfigOptionState::HIDDEN);
-    wait_ticks.set_visibility(ConfigOptionState::HIDDEN);
+    button_hold.set_visibility(ConfigOptionState::HIDDEN);
+    button_release.set_visibility(ConfigOptionState::HIDDEN);
+    wait.set_visibility(ConfigOptionState::HIDDEN);
     switch (m_action){
     case TurboMacroAction::LEFT_JOYSTICK:
     case TurboMacroAction::RIGHT_JOYSTICK:
         x_axis.set_visibility(ConfigOptionState::ENABLED);
         y_axis.set_visibility(ConfigOptionState::ENABLED);
-    case TurboMacroAction::B:
     case TurboMacroAction::LEFT_JOY_CLICK:
     case TurboMacroAction::RIGHT_JOY_CLICK:
+    case TurboMacroAction::B:
     case TurboMacroAction::A:
     case TurboMacroAction::Y:
     case TurboMacroAction::X:
@@ -112,11 +129,11 @@ void TurboMacroCell::value_changed(void* object){
     case TurboMacroAction::DPADRIGHT:
     case TurboMacroAction::DPADUP:
     case TurboMacroAction::DPADDOWN:
-        button_hold_ticks.set_visibility(ConfigOptionState::ENABLED);
-        button_release_ticks.set_visibility(ConfigOptionState::ENABLED);
+        button_hold.set_visibility(ConfigOptionState::ENABLED);
+        button_release.set_visibility(ConfigOptionState::ENABLED);
         break;
     case TurboMacroAction::WAIT:
-        wait_ticks.set_visibility(ConfigOptionState::ENABLED);
+        wait.set_visibility(ConfigOptionState::ENABLED);
         break;
     default:
         break;
@@ -165,14 +182,24 @@ void TurboMacroRow::load_json(const JsonValue& json){
             parameters.y_axis.load_json(*value);
         }
         value = obj->get_value("Hold");
+        if (value != nullptr && value->is_integer()){
+            parameters.button_hold.set(std::to_string(value->to_integer_default() * 8));
+        }
+        value = obj->get_value("HoldMs");
         if (value != nullptr){
-            parameters.button_hold_ticks.load_json(*value);
+            parameters.button_hold.load_json(*value);
         }
         value = obj->get_value("Release");
+        if (value != nullptr && value->is_integer()){
+            parameters.button_release.set(std::to_string(value->to_integer_default() * 8));
+        }
+        value = obj->get_value("ReleaseMs");
         if (value != nullptr){
-            parameters.button_release_ticks.load_json(*value);
+            parameters.button_release.load_json(*value);
         }
         break;
+    case TurboMacroAction::LEFT_JOY_CLICK:
+    case TurboMacroAction::RIGHT_JOY_CLICK:
     case TurboMacroAction::B:
     case TurboMacroAction::A:
     case TurboMacroAction::Y:
@@ -188,18 +215,30 @@ void TurboMacroRow::load_json(const JsonValue& json){
     case TurboMacroAction::DPADUP:
     case TurboMacroAction::DPADDOWN:
         value = obj->get_value("Hold");
+        if (value != nullptr && value->is_integer()){
+            parameters.button_hold.set(std::to_string(value->to_integer_default() * 8));
+        }
+        value = obj->get_value("HoldMs");
         if (value != nullptr){
-            parameters.button_hold_ticks.load_json(*value);
+            parameters.button_hold.load_json(*value);
         }
         value = obj->get_value("Release");
+        if (value != nullptr && value->is_integer()){
+            parameters.button_release.set(std::to_string(value->to_integer_default() * 8));
+        }
+        value = obj->get_value("ReleaseMs");
         if (value != nullptr){
-            parameters.button_release_ticks.load_json(*value);
+            parameters.button_release.load_json(*value);
         }
         break;
     case TurboMacroAction::WAIT:
         value = obj->get_value("Wait");
+        if (value != nullptr && value->is_integer()){
+            parameters.wait.set(std::to_string(value->to_integer_default() * 8));
+        }
+        value = obj->get_value("WaitMs");
         if (value != nullptr){
-            parameters.wait_ticks.load_json(*value);
+            parameters.wait.load_json(*value);
         }
         break;
     default:
@@ -210,6 +249,8 @@ JsonValue TurboMacroRow::to_json() const{
     JsonObject obj;
     obj["Action"] = action.to_json();
     switch (action){
+    case TurboMacroAction::LEFT_JOY_CLICK:
+    case TurboMacroAction::RIGHT_JOY_CLICK:
     case TurboMacroAction::B:
     case TurboMacroAction::A:
     case TurboMacroAction::Y:
@@ -224,18 +265,18 @@ JsonValue TurboMacroRow::to_json() const{
     case TurboMacroAction::DPADRIGHT:
     case TurboMacroAction::DPADUP:
     case TurboMacroAction::DPADDOWN:
-        obj["Hold"] = parameters.button_hold_ticks.to_json();
-        obj["Release"] = parameters.button_release_ticks.to_json();
+        obj["HoldMs"] = parameters.button_hold.to_json();
+        obj["ReleaseMs"] = parameters.button_release.to_json();
         break;
     case TurboMacroAction::LEFT_JOYSTICK:
     case TurboMacroAction::RIGHT_JOYSTICK:
         obj["MoveDirectionX"] = parameters.x_axis.to_json();
         obj["MoveDirectionY"] = parameters.y_axis.to_json();
-        obj["Hold"] = parameters.button_hold_ticks.to_json();
-        obj["Release"] = parameters.button_release_ticks.to_json();
+        obj["HoldMs"] = parameters.button_hold.to_json();
+        obj["ReleaseMs"] = parameters.button_release.to_json();
         break;
     case TurboMacroAction::WAIT:
-        obj["Wait"] = parameters.wait_ticks.to_json();
+        obj["WaitMs"] = parameters.wait.to_json();
         break;
     default:
         break;

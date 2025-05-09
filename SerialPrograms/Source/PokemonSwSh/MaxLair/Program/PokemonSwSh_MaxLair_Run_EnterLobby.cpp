@@ -109,7 +109,8 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
             arrow_count = 0;
             ImageRGB32 image = to_blackwhite_rgb32_range(
                 extract_box_reference(screen, ore_quantity),
-                0xff808080, 0xffffffff, true
+                true,
+                0xff808080, 0xffffffff
             );
             ImageRGB32 filtered = pad_image(image, 10, 0xffffffff);
             ore.update_with_ocr(stream.logger(), filtered);

@@ -167,6 +167,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/TimeExpressionOption.h
     ../Common/Cpp/PanicDump.cpp
     ../Common/Cpp/PanicDump.h
+    ../Common/Cpp/PixelRGB32.h
     ../Common/Cpp/PrettyPrint.cpp
     ../Common/Cpp/PrettyPrint.h
     ../Common/Cpp/PrintDebuggers.h
@@ -727,6 +728,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
+    Source/Kernels/BinaryImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h
@@ -760,11 +762,36 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_arm64_NEON.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_ARM64_NEON.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_Default.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_AVX2.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_AVX512.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_SSE42.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_ARM64_NEON.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Green_Default.cpp
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.cpp
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.h
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_Default.cpp
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_SSE42.cpp
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_AVX512-VNNI.cpp
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.cpp
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_ARM64_NEON.cpp
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_Default.cpp
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX512.cpp
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_SSE42.cpp
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.cpp
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_ARM64_NEON.cpp
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_Default.cpp
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX512.cpp
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_SSE42.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp
@@ -2416,6 +2443,9 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AudioStreamConversion/AudioStreamConversion_Core_x86_SSE41.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_SSE42.cpp
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_SSE42.cpp
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_SSE42.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
@@ -2431,6 +2461,9 @@ if (ARCH_FLAGS_13_Haswell)
 SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX2.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
@@ -2445,6 +2478,8 @@ endif()
 if (ARCH_FLAGS_17_Skylake)
 SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
+    Source/Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range_x64_AVX512.cpp
+    Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_x64_AVX512.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
@@ -2461,6 +2496,7 @@ SET_SOURCE_FILES_PROPERTIES(
 endif()
 if (ARCH_FLAGS_19_IceLake)
 SET_SOURCE_FILES_PROPERTIES(
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_AVX512-VNNI.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_19_IceLake}

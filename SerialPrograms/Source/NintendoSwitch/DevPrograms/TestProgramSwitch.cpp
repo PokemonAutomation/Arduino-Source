@@ -122,6 +122,7 @@
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
+#include "CommonTools/Images/ImageFilter.h"
 
 
 #include <QPixmap>
@@ -317,20 +318,37 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 //    std::terminate();
+    ImageRGB32 image("20250503-121259857603.png");
+
+    image = filter_rgb32_brightness(image, COLOR_RED, false, 0x00ffff01, 0, 200);
+    image.save("temp.png");
 
 
+#if 0
+    ImageRGB32 image("20250503-121259857603.png");
 
-    ImageRGB32 image("20250430-043221293730.png");
-
-#if 1
+    {
+        TeraTypeReader reader;
+        ImageMatch::ImageMatchResult results = reader.read(image);
+        results.log(logger, 120);
+    }
     {
         TeraSilhouetteReader reader;
         ImageMatch::ImageMatchResult results = reader.read(image);
-        results.log(logger, 110);
+        results.log(logger, 120);
     }
 #endif
 
+#if 0
+    Milliseconds unit = 24ms;
 
+    ssf_issue_scroll(context, DPAD_DOWN, 2*unit, 2*unit, unit);
+    ssf_issue_scroll(context, DPAD_LEFT, unit, 2*unit, unit);
+    ssf_issue_scroll(context, DPAD_LEFT, unit, 2*unit, unit);
+    ssf_issue_scroll(context, DPAD_LEFT, unit, 2*unit, unit);
+
+
+#endif
 
 
 

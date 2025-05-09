@@ -26,7 +26,9 @@ StringMatchResult multifiltered_OCR(
 
     std::vector<BlackWhiteRgb32Range> bw_filters;
     for (const auto& range : text_color_ranges){
-        bw_filters.emplace_back(BlackWhiteRgb32Range{range.mins, range.maxs, true});
+        bw_filters.emplace_back(
+            BlackWhiteRgb32Range{true, range.mins, range.maxs}
+        );
     }
     std::vector<std::pair<ImageRGB32, size_t>> filtered_images = to_blackwhite_rgb32_range(image, bw_filters);
 

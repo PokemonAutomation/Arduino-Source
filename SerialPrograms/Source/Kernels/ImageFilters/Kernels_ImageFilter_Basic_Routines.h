@@ -11,7 +11,6 @@
 #include <stdint.h>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "Kernels_ImageFilter_Basic.h"
 
 //#include <iostream>
 //using std::cout;
@@ -89,10 +88,12 @@ PA_FORCE_INLINE void filter_per_pixel(
 }
 
 
-template <typename Runner>
+#if 0
+
+template <typename Runner, typename Filter>
 PA_FORCE_INLINE void filter_per_pixel(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    FilterRgb32RangeFilter* filters, size_t filter_count
+    Filter* filters, size_t filter_count
 ){
     if (width == 0 || height == 0){
         return;
@@ -100,10 +101,16 @@ PA_FORCE_INLINE void filter_per_pixel(
 
 //    cout << "filter_per_pixel(" << filter_count << "): " << width << " x " << height << endl;
 
-    FixedLimitVector<Runner> entries(filter_count);
+    struct Entry{
+        Runner runner;
+        char* current_row;
+    };
+
+
+    FixedLimitVector<Entry> entries(filter_count);
     for (size_t c = 0; c < filter_count; c++){
-        FilterRgb32RangeFilter& filter = filters[c];
-        entries.emplace_back(filter.mins, filter.maxs, filter.replacement, filter.invert);
+        Filter& filter = filters[c];
+        entries.emplace_back(Entry{filter, (char*)filter.data});
     }
 
     const size_t VECTOR_SIZE = Runner::VECTOR_SIZE;
@@ -114,12 +121,11 @@ PA_FORCE_INLINE void filter_per_pixel(
             do{
                 const uint32_t* in = image;
                 for (size_t c = 0; c < filter_count; c++){
-                    entries[c].process_partial(filters[c].data, in, mask);
+                    entries[c].runner.process_partial((uint32_t*)entries[c].current_row, in, mask);
                 }
                 image = (const uint32_t*)((const char*)image + bytes_per_row);
                 for (size_t c = 0; c < filter_count; c++){
-                    FilterRgb32RangeFilter& filter = filters[c];
-                    filter.data = (uint32_t*)((const char*)filter.data + filter.bytes_per_row);
+                    entries[c].current_row += filters[c].bytes_per_row;
                 }
             }while (--height);
             break;
@@ -134,15 +140,14 @@ PA_FORCE_INLINE void filter_per_pixel(
                 size_t lc = width / VECTOR_SIZE;
                 do{
                     for (size_t c = 0; c < filter_count; c++){
-                        entries[c].process_full(filters[c].data + shift, in);
+                        entries[c].runner.process_full((uint32_t*)entries[c].current_row + shift, in);
                     }
                     in += VECTOR_SIZE;
                     shift += VECTOR_SIZE;
                 }while (--lc);
                 image = (const uint32_t*)((const char*)image + bytes_per_row);
                 for (size_t c = 0; c < filter_count; c++){
-                    FilterRgb32RangeFilter& filter = filters[c];
-                    filter.data = (uint32_t*)((const char*)filter.data + filter.bytes_per_row);
+                    entries[c].current_row += filters[c].bytes_per_row;
                 }
             }while (--height);
             break;
@@ -157,18 +162,17 @@ PA_FORCE_INLINE void filter_per_pixel(
                 size_t lc = width / VECTOR_SIZE;
                 do{
                     for (size_t c = 0; c < filter_count; c++){
-                        entries[c].process_full(filters[c].data + shift, in);
+                        entries[c].runner.process_full((uint32_t*)entries[c].current_row + shift, in);
                     }
                     in += VECTOR_SIZE;
                     shift += VECTOR_SIZE;
                 }while (--lc);
                 for (size_t c = 0; c < filter_count; c++){
-                    entries[c].process_partial(filters[c].data + shift, in, mask);
+                    entries[c].runner.process_partial((uint32_t*)entries[c].current_row + shift, in, mask);
                 }
                 image = (const uint32_t*)((const char*)image + bytes_per_row);
                 for (size_t c = 0; c < filter_count; c++){
-                    FilterRgb32RangeFilter& filter = filters[c];
-                    filter.data = (uint32_t*)((const char*)filter.data + filter.bytes_per_row);
+                    entries[c].current_row += filters[c].bytes_per_row;
                 }
             }while (--height);
             break;
@@ -176,103 +180,11 @@ PA_FORCE_INLINE void filter_per_pixel(
     }while (false);
 
     for (size_t c = 0; c < filter_count; c++){
-        filters[c].pixels_in_range = entries[c].count();
+        filters[c].pixels_in_range = entries[c].runner.count();
     }
 }
 
-
-template <typename Runner>
-PA_FORCE_INLINE void to_blackwhite_rbg32(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    ToBlackWhiteRgb32RangeFilter* filters, size_t filter_count
-){
-    if (width == 0 || height == 0){
-        return;
-    }
-
-//    cout << "to_blackwhite_rbg32(" << filter_count << "): " << width << " x " << height << endl;
-
-    FixedLimitVector<Runner> entries(filter_count);
-    for (size_t c = 0; c < filter_count; c++){
-        ToBlackWhiteRgb32RangeFilter& filter = filters[c];
-        entries.emplace_back(filter.mins, filter.maxs, filter.in_range_black);
-    }
-
-    const size_t VECTOR_SIZE = Runner::VECTOR_SIZE;
-    do{
-        //  Less than vector width. No need for steady-state loop.
-        if (width < VECTOR_SIZE){
-            typename Runner::Mask mask(width);
-            do{
-                const uint32_t* in = image;
-                for (size_t c = 0; c < filter_count; c++){
-                    entries[c].process_partial(filters[c].data, in, mask);
-                }
-                image = (const uint32_t*)((const char*)image + bytes_per_row);
-                for (size_t c = 0; c < filter_count; c++){
-                    ToBlackWhiteRgb32RangeFilter& filter = filters[c];
-                    filter.data = (uint32_t*)((const char*)filter.data + filter.bytes_per_row);
-                }
-            }while (--height);
-            break;
-        }
-
-        //  Divisible by vector width. No need for peel loop.
-        size_t left = width % VECTOR_SIZE;
-        if (left == 0){
-            do{
-                const uint32_t* in = image;
-                size_t shift = 0;
-                size_t lc = width / VECTOR_SIZE;
-                do{
-                    for (size_t c = 0; c < filter_count; c++){
-                        entries[c].process_full(filters[c].data + shift, in);
-                    }
-                    in += VECTOR_SIZE;
-                    shift += VECTOR_SIZE;
-                }while (--lc);
-                image = (const uint32_t*)((const char*)image + bytes_per_row);
-                for (size_t c = 0; c < filter_count; c++){
-                    ToBlackWhiteRgb32RangeFilter& filter = filters[c];
-                    filter.data = (uint32_t*)((const char*)filter.data + filter.bytes_per_row);
-                }
-            }while (--height);
-            break;
-        }
-
-        //  Need both steady-state and peel loops.
-        {
-            typename Runner::Mask mask(left);
-            do{
-                const uint32_t* in = image;
-                size_t shift = 0;
-                size_t lc = width / VECTOR_SIZE;
-                do{
-                    for (size_t c = 0; c < filter_count; c++){
-                        entries[c].process_full(filters[c].data + shift, in);
-                    }
-                    in += VECTOR_SIZE;
-                    shift += VECTOR_SIZE;
-                }while (--lc);
-                for (size_t c = 0; c < filter_count; c++){
-                    entries[c].process_partial(filters[c].data + shift, in, mask);
-                }
-                image = (const uint32_t*)((const char*)image + bytes_per_row);
-                for (size_t c = 0; c < filter_count; c++){
-                    ToBlackWhiteRgb32RangeFilter& filter = filters[c];
-                    filter.data = (uint32_t*)((const char*)filter.data + filter.bytes_per_row);
-                }
-            }while (--height);
-            break;
-        }
-    }while (false);
-
-    for (size_t c = 0; c < filter_count; c++){
-        filters[c].pixels_in_range = entries[c].count();
-    }
-}
-
-
+#endif
 
 
 

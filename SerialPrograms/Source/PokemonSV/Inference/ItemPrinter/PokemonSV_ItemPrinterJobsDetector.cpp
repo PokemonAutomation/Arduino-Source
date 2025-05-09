@@ -41,14 +41,14 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
     std::vector<std::pair<ImageRGB32, size_t>> filtered = to_blackwhite_rgb32_range(
         cropped,
         {
-            {0xff808080, 0xffffffff, true},
-            {0xff909090, 0xffffffff, true},
-            {0xffa0a0a0, 0xffffffff, true},
-            {0xffb0b0b0, 0xffffffff, true},
-            {0xffc0c0c0, 0xffffffff, true},
-            {0xffd0d0d0, 0xffffffff, true},
-            {0xffe0e0e0, 0xffffffff, true},
-            {0xfff0f0f0, 0xffffffff, true},
+            {true, 0xff808080, 0xffffffff},
+            {true, 0xff909090, 0xffffffff},
+            {true, 0xffa0a0a0, 0xffffffff},
+            {true, 0xffb0b0b0, 0xffffffff},
+            {true, 0xffc0c0c0, 0xffffffff},
+            {true, 0xffd0d0d0, 0xffffffff},
+            {true, 0xffe0e0e0, 0xffffffff},
+            {true, 0xfff0f0f0, 0xffffffff},
         }
     );
 

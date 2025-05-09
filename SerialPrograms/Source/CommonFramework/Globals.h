@@ -37,6 +37,8 @@ extern const size_t LOG_HISTORY_LINES;
 
 // Folder path (end with "/") to hold program setting files.
 const std::string& SETTINGS_PATH();
+// The setting JSON file path. This path is a child of the folder SETTINGS_PATH().
+const std::string& PROGRAM_SETTING_JSON_PATH();
 
 // Folder path (end with "/") to hold screenshots from the program "Screenshot" button.
 const std::string& SCREENSHOTS_PATH();
