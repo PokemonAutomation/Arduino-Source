@@ -152,6 +152,10 @@ const std::string& SETTINGS_PATH(){
     static std::string path = get_setting_path();
     return path;
 }
+const std::string& PROGRAM_SETTING_JSON_PATH(){
+    static std::string path = SETTINGS_PATH() + QCoreApplication::applicationName().toStdString() + "-Settings.json";
+    return path;
+}
 const std::string& SCREENSHOTS_PATH(){
     static std::string path = get_screenshot_path();
     return path;
