@@ -523,7 +523,6 @@ std::string closest_type(FloatPixel& color_box){
     return closest_type;
 }
 
-
 std::shared_ptr<Pokemon> home_read_pokemon_summary(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t box, size_t row, size_t col) {
     auto pokemon = std::make_shared<Pokemon>();
 
@@ -1000,14 +999,15 @@ bool home_exit_home(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     pbf_press_button(context, BUTTON_A, 10, 47);
     std::string text;
     int checks = 0;
+    pbf_wait(context, 5000ms);
     do{
-        pbf_wait(context, 300);
+        pbf_wait(context, 1000ms);
         box_render.add(COLOR_BLUE, save_msg_checker);
         char chars[] = "\n\r—";
+        context.wait_for_all_requests();
         text = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), save_msg_checker));
         for(auto a:chars){text.erase(std::remove(text.begin(),text.end(), a),text.end());}
-        env.console.log(text);
-        if(checks++ == 20){
+        if(checks++ == 200){
             return false;
         }
     }while(text!="Your Boxes have been saved!");
@@ -1823,6 +1823,67 @@ bool home_do_dirty_swap(SingleSwitchProgramEnvironment& env, ProControllerContex
     return ret;
 }
 
+bool home_read_main_menu(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string target){
+    ImageFloatBox menu_box(0.055, 0.015, 0.25, 0.04); // Header box
+
+    VideoSnapshot screen = env.console.video().snapshot();
+
+    VideoOverlaySet box_render(env.console);
+
+    std::ostringstream ss;
+
+    char chars[] = "\n\r—";
+    context.wait_for_all_requests();
+    box_render.add(COLOR_GREEN, menu_box);
+    std::string menu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), menu_box));
+    for(auto a:chars){menu_name.erase(std::remove(menu_name.begin(),menu_name.end(), a),menu_name.end());}
+    while(menu_name!=""){
+        pbf_wait(context,500ms);
+        context.wait_for_all_requests();
+        box_render.add(COLOR_GREEN, menu_box);
+        menu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), menu_box));
+        for(auto a:chars){menu_name.erase(std::remove(menu_name.begin(),menu_name.end(), a),menu_name.end());}
+    }
+    box_render.clear();
+    return menu_name==target;
+}
+
+bool home_read_filter_submenu(SingleSwitchProgramEnvironment& env, ProControllerContext& context, std::string target){
+    ImageFloatBox filter_menu(0.65, 0.095, 0.295, 0.06); // Header box
+
+    VideoSnapshot screen = env.console.video().snapshot();
+
+    VideoOverlaySet box_render(env.console);
+
+    std::ostringstream ss;
+
+    char chars[] = "\n\r—";
+    context.wait_for_all_requests();
+    box_render.add(COLOR_GREEN, filter_menu);
+    std::string submenu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu));
+    for(auto a:chars){submenu_name.erase(std::remove(submenu_name.begin(),submenu_name.end(), a),submenu_name.end());}
+    size_t count = 0;
+    while(submenu_name!=target){
+        pbf_press_button(context, BUTTON_B, 10, 50);
+        if(count==5){
+            context.wait_for_all_requests();
+            submenu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu));
+            for(auto a:chars){submenu_name.erase(std::remove(submenu_name.begin(),submenu_name.end(), a),submenu_name.end());}
+            if(submenu_name!="Filters"){
+                pbf_press_button(context, BUTTON_X,10, 50);
+            }
+        }
+        pbf_press_button(context, BUTTON_DOWN, 10, 50);
+        pbf_press_button(context, BUTTON_A, 10, 50);
+        context.wait_for_all_requests();
+        submenu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu));
+        for(auto a:chars){submenu_name.erase(std::remove(submenu_name.begin(),submenu_name.end(), a),submenu_name.end());}
+        count++;
+    }
+    box_render.clear();
+    return true;
+}
+
 void sv_run_ace(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ImageFloatBox sv_battle_button(0.82, 0.655, 0.1, 0.055);
     ImageFloatBox sv_keep_current_pokemon(0.645, 0.615, 0.2, 0.055);
@@ -2364,7 +2425,7 @@ void Enrichment::home_put_away_pokemon(SingleSwitchProgramEnvironment& env, ProC
 void Enrichment::home_dispose_of_go(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::vector<int> blacklist = {144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489,490,491,492,493,494,638,639,640,641,642,643,644,645,646,647,648,649,666,676,716,717,718,772,773,785,786,787,788,789,790,791,792,793,888,889,890,891,892,893,894,895,896,897,898,905,999,1000,1001,1002,1003,1004,1007,1008,1009,1010,1014,1015,1016,1017,1021,1022,1023,1024,1025}; // Take out legendaries, etc. that need to be preserved
 
-    std::vector<int> lv10_blacklist = {2, 3, 5, 6, 8, 9, 11, 12, 14, 15, 17, 18, 20, 22, 24, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 39, 42, 44, 45, 47, 48, 49, 51, 52, 53, 55, 57, 60, 61, 62, 64, 65, 67, 68, 70, 71, 73, 75, 76, 78, 79, 80, 81, 82, 85, 87, 89, 93, 94, 95, 97, 99, 100, 101, 104, 105, 106, 107, 110, 112, 117, 119, 124, 125, 126, 130, 134, 139, 141, 148, 149, 153, 154, 156, 157, 159, 160, 162, 164, 166, 168, 171, 176, 178, 180, 181, 182, 184, 185, 186, 187, 188, 189, 195, 202, 205, 210, 216, 217, 218, 219, 221, 224, 229, 230, 232, 237, 242, 245, 247, 248, 252, 253, 254, 256, 257, 259, 260, 262, 264, 265, 266, 267, 268, 269, 271, 272, 274, 275, 277, 279, 281, 282, 284, 286, 288, 289, 291, 292, 294, 295, 297, 305, 306, 308, 310, 317, 319, 321, 322, 323, 326, 329, 330, 332, 334, 340, 342, 344, 346, 348, 354, 356, 362, 364, 365, 372, 373, 375, 376, 388, 389, 391, 392, 394, 395, 397, 398, 400, 402, 404, 405, 409, 411, 414, 416, 419, 421, 423, 426, 432, 435, 437, 444, 445, 450, 452, 454, 457, 460, 462, 464, 466, 467, 473, 475, 477, 496, 497, 499, 500, 502, 503, 505, 507, 508, 510, 520, 521, 523, 525, 526, 530, 533, 534, 536, 537, 541, 544, 545, 552, 553, 558, 560, 563, 565, 567, 569, 571, 575, 576, 578, 579, 581, 583, 584, 586, 591, 593, 596, 598, 600, 601, 603, 604, 606, 608, 609, 611, 612, 614, 620, 623, 625, 628, 630, 634, 635, 637, 651, 652, 654, 655, 657, 658, 660, 662, 663, 665, 666, 668, 670, 671, 673, 675, 680, 687, 689, 691, 693, 697, 699, 705, 706, 713, 715, 723, 724, 726, 727, 729, 730, 732, 733, 735, 737, 738, 743, 748, 750, 752, 754, 756, 758, 760, 762, 763, 768, 770, 783, 784, 790, 791, 792, 811, 812, 814, 815, 817, 818, 820, 822, 823, 825, 826, 828, 830, 832, 834, 836, 838, 839, 844, 847, 851, 857, 858, 860, 861, 862, 863, 864, 866, 879, 886, 887, 901, 907, 908, 910, 911, 913, 914, 918, 920, 922, 923, 927, 929, 930, 933, 934, 941, 943, 945, 949, 956, 958, 959, 961, 966, 970, 972, 979, 980, 983, 997, 998, 1000};
+    std::vector<int> lv10_blacklist = {2, 3, 5, 6, 8, 9, 11, 12, 14, 15, 17, 18, 20, 22, 24, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 39, 42, 44, 45, 47, 48, 49, 51, 52, 53, 55, 57, 60, 61, 62, 64, 65, 67, 68, 70, 71, 73, 75, 76, 78, 79, 80, 81, 82, 85, 87, 89, 93, 94, 95, 97, 99, 100, 101, 104, 105, 106, 107, 110, 112, 117, 119, 124, 125, 126, 130, 134, 139, 141, 148, 149, 153, 154, 156, 157, 159, 160, 162, 164, 166, 168, 171, 176, 178, 180, 181, 182, 184, 185, 186, 187, 188, 189, 195, 202, 205, 210, 216, 217, 218, 219, 221, 224, 229, 230, 232, 237, 242, 245, 247, 248, 252, 253, 254, 256, 257, 259, 260, 262, 264, 265, 266, 267, 268, 269, 271, 272, 274, 275, 277, 279, 281, 282, 284, 286, 288, 289, 291, 292, 294, 295, 297, 305, 306, 308, 310, 317, 319, 321, 322, 323, 326, 329, 330, 332, 334, 340, 342, 344, 346, 348, 354, 356, 362, 364, 365, 372, 373, 375, 376, 388, 389, 391, 392, 394, 395, 397, 398, 400, 402, 404, 405, 409, 411, 414, 416, 419, 421, 423, 426, 432, 435, 437, 444, 445, 450, 452, 454, 457, 460, 462, 464, 466, 467, 468, 473, 475, 477, 496, 497, 499, 500, 502, 503, 505, 507, 508, 510, 520, 521, 523, 525, 526, 530, 533, 534, 536, 537, 541, 544, 545, 552, 553, 558, 560, 563, 565, 567, 569, 571, 575, 576, 578, 579, 581, 583, 584, 586, 591, 593, 596, 598, 600, 601, 603, 604, 606, 608, 609, 611, 612, 614, 620, 623, 625, 628, 630, 634, 635, 637, 651, 652, 654, 655, 657, 658, 660, 662, 663, 665, 666, 668, 670, 671, 673, 675, 680, 687, 689, 691, 693, 697, 699, 705, 706, 713, 715, 723, 724, 726, 727, 729, 730, 732, 733, 735, 737, 738, 743, 748, 750, 752, 754, 756, 758, 760, 762, 763, 768, 770, 783, 784, 790, 791, 792, 811, 812, 814, 815, 817, 818, 820, 822, 823, 825, 826, 828, 830, 832, 834, 836, 838, 839, 844, 847, 851, 857, 858, 860, 861, 862, 863, 864, 866, 879, 886, 887, 901, 907, 908, 910, 911, 913, 914, 918, 920, 922, 923, 927, 929, 930, 933, 934, 941, 943, 945, 949, 956, 958, 959, 961, 966, 970, 972, 979, 980, 983, 997, 998, 1000};
 
     ImageFloatBox national_dex_number_box(0.448, 0.245, 0.049, 0.04); //pokemon national dex number pos
     ImageFloatBox nature_box(0.157, 0.783, 0.212, 0.042); // Nature box
@@ -2388,15 +2449,16 @@ void Enrichment::home_dispose_of_go(SingleSwitchProgramEnvironment& env, ProCont
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
-            pbf_wait(context, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_A, 10, 50);
+            home_read_filter_submenu(env, context, "Filters"); // find markings menu
             pbf_press_button(context, BUTTON_A, 10, 50);
             pbf_press_button(context, BUTTON_UP, 10, 50);
             pbf_press_button(context, BUTTON_A, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_A, 10, 50);
+            home_read_filter_submenu(env, context, "Search by original game"); // find origin markings menu
             pbf_press_button(context, BUTTON_UP, 10, 30);
             pbf_press_button(context, BUTTON_UP, 10, 30);
             pbf_press_button(context, BUTTON_A, 10, 50);
@@ -2404,17 +2466,19 @@ void Enrichment::home_dispose_of_go(SingleSwitchProgramEnvironment& env, ProCont
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
-            pbf_wait(context, 50);
+            pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_A, 10, 50);
+            home_read_filter_submenu(env, context, "Search by being Shiny"); // find origin markings menu
             pbf_press_button(context, BUTTON_UP, 10, 30);
             pbf_press_button(context, BUTTON_A, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_A, 10, 50);
+            home_read_filter_submenu(env, context, "Search by compatible games"); // find origin markings menu
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_A, 10, 50);
@@ -2471,6 +2535,13 @@ void Enrichment::home_dispose_of_go(SingleSwitchProgramEnvironment& env, ProCont
         }while(more_go);
 
         pbf_press_button(context, BUTTON_B, 10, 240);
+        size_t count = 0;
+        while(home_read_main_menu(env, context, "POKEMON")){
+            if(++count==5){
+                return;
+            }
+            pbf_wait(context, 500ms);
+        }
         pbf_press_button(context, BUTTON_B, 10, 240);
 
 
@@ -2489,15 +2560,16 @@ void Enrichment::home_dispose_of_go(SingleSwitchProgramEnvironment& env, ProCont
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
-        pbf_wait(context, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 50);
+        home_read_filter_submenu(env, context, "Filters"); // find markings menu
         pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_press_button(context, BUTTON_UP, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 50);
+        home_read_filter_submenu(env, context, "Search by original game"); // find origin markings menu
         pbf_press_button(context, BUTTON_UP, 10, 30);
         pbf_press_button(context, BUTTON_UP, 10, 30);
         pbf_press_button(context, BUTTON_A, 10, 50);
@@ -2505,11 +2577,11 @@ void Enrichment::home_dispose_of_go(SingleSwitchProgramEnvironment& env, ProCont
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
-        pbf_wait(context, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 50);
+        home_read_filter_submenu(env, context, "Search by being Shiny"); // find origin markings menu
         pbf_press_button(context, BUTTON_UP, 10, 30);
         pbf_press_button(context, BUTTON_A, 10, 80);
         pbf_press_button(context, BUTTON_B, 10, 270);
@@ -2615,9 +2687,6 @@ void Enrichment::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     std::vector<bool> box_sorted(200, false); // To track untouched box pairs
     bool started = false;
     bool swaps_made = true;
-
-    ImageFloatBox game_checker(0.0455, 0.244, 0.442, 0.057);
-    ImageFloatBox switch_game_checker(0, 0.2, 1, 0.06);
 
     VideoSnapshot screen = env.console.video().snapshot();
 
