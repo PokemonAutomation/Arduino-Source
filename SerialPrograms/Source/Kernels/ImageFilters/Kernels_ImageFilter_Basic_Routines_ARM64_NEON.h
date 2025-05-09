@@ -16,13 +16,13 @@ namespace Kernels{
 
 
 template <typename PixelTester>
-class ToBlackWhite_Rgb32_ARM64_NEON{
+class FilterImage_Rgb32_ARM64_NEON{
 public:
     static const size_t VECTOR_SIZE = 4;
     using Mask = size_t;
 
 public:
-    ToBlackWhite_Rgb32_ARM64_NEON(
+    FilterImage_Rgb32_ARM64_NEON(
         const PixelTester& tester,
         uint32_t replacement_color, bool replace_color_within_range
     )
@@ -45,7 +45,8 @@ public:
     // The resulting pixels are saved in out[4]
     PA_FORCE_INLINE void process_full(uint32_t out[4], const uint32_t in[4], const uint32x4_t* cmp_mask_u32 = nullptr){
         uint32x4_t pixel = vld1q_u32(in);
-        uint32x4_t cmp_u32 = process_word(pixel);
+        // If a pixel is within [mins, maxs], its uint32_t in `cmp_u32` is all 1 bits, otherwise, all 0 bits
+        uint32x4_t cmp_u32 = m_tester.test_word(pixel);
         if (cmp_mask_u32) {
             cmp_u32 = vandq_u32(cmp_u32, *cmp_mask_u32);
         }
@@ -111,9 +112,10 @@ public:
     // If a per-pixel mask, cmp_mask_u32 is not nullptr, it only counts the pixels covered by the mask.
     // It also changes pixels into black or white depending on whether they are in range.
     // The resulting pixels are saved in out[4]
-    PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
+    PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in, const uint32x4_t* cmp_mask_u32 = nullptr){
         uint32x4_t pixel = vld1q_u32(in);
-        uint32x4_t cmp_u32 = process_word(pixel);
+        // If a pixel is within [mins, maxs], its uint32_t in `cmp_u32` is all 1 bits, otherwise, all 0 bits
+        uint32x4_t cmp_u32 = m_tester.test_word(pixel);
         if (cmp_mask_u32) {
             cmp_u32 = vandq_u32(cmp_u32, *cmp_mask_u32);
         }

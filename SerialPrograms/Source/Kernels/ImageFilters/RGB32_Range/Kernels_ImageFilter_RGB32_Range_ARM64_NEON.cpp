@@ -43,7 +43,7 @@ public:
     {}
 
     //  Return a mask indicating which lanes are in range.
-    PA_FORCE_INLINE uint32x4_t test_word(uint32x4_t pixel) const{
+    PA_FORCE_INLINE uint32x4_t test_word(uint32x4_t& pixel) const{
         uint8x16_t in_u8 = vreinterpretq_u8_u32(pixel);
 
         // Check if mins > pixel per color channel
