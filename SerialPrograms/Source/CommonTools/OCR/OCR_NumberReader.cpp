@@ -132,7 +132,11 @@ std::string  read_number_waterfill_no_normalization(
     //  Direct OCR is unreliable. Instead, we will waterfill each character
     //  to isolate them, then OCR them individually.
 
-    ImageRGB32 filtered = to_blackwhite_rgb32_range(image, rgb32_min, rgb32_max, text_inside_range);
+    ImageRGB32 filtered = to_blackwhite_rgb32_range(
+        image,
+        text_inside_range,
+        rgb32_min, rgb32_max
+    );
 
 //    static int c = 0;
 //    filtered.save("zztest-" + std::to_string(c++) + ".png");

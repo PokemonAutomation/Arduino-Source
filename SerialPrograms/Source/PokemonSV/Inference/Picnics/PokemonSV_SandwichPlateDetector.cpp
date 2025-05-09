@@ -58,7 +58,8 @@ std::string SandwichPlateDetector::detect_filling_name(const ImageViewRGB32& scr
     for (uint32_t image_filter_low_bound : image_filter_low_bounds){
         ImageRGB32 plate_label = to_blackwhite_rgb32_range(
             extract_box_reference(screen, m_box),
-            image_filter_low_bound, image_filter_high_bound, true
+            true,
+            image_filter_low_bound, image_filter_high_bound
         );
 
         // dump_debug_image(m_logger, "PokemonSV/SandwichPlateDetector", "blackwhite_input", plate_label);

@@ -123,6 +123,41 @@ enum class KeyboardEntryAction : uint8_t{
     WRAP_MOVE_DOWN  = 0x80 | (uint8_t)DpadPosition::DPAD_DOWN,
     WRAP_MOVE_LEFT  = 0x80 | (uint8_t)DpadPosition::DPAD_LEFT,
 };
+bool is_button_press(KeyboardEntryAction action){
+    switch (action){
+    case KeyboardEntryAction::ENTER_CHAR:
+    case KeyboardEntryAction::SCROLL_LEFT:
+        return true;
+    default:
+        return false;
+    }
+}
+bool is_move(KeyboardEntryAction action){
+    switch (action){
+    case KeyboardEntryAction::NORM_MOVE_UP:
+    case KeyboardEntryAction::NORM_MOVE_RIGHT:
+    case KeyboardEntryAction::NORM_MOVE_DOWN:
+    case KeyboardEntryAction::NORM_MOVE_LEFT:
+    case KeyboardEntryAction::WRAP_MOVE_UP:
+    case KeyboardEntryAction::WRAP_MOVE_RIGHT:
+    case KeyboardEntryAction::WRAP_MOVE_DOWN:
+    case KeyboardEntryAction::WRAP_MOVE_LEFT:
+        return true;
+    default:
+        return false;
+    }
+}
+bool is_wrap(KeyboardEntryAction action){
+    switch (action){
+    case KeyboardEntryAction::WRAP_MOVE_UP:
+    case KeyboardEntryAction::WRAP_MOVE_RIGHT:
+    case KeyboardEntryAction::WRAP_MOVE_DOWN:
+    case KeyboardEntryAction::WRAP_MOVE_LEFT:
+        return true;
+    default:
+        return false;
+    }
+}
 
 struct KeyboardEntryActionWithDelay{
     KeyboardEntryAction action;
@@ -260,11 +295,18 @@ Milliseconds keyboard_populate_delays(
     path_with_delays.resize(path.size());
     for (size_t c = 0; c < path_with_delays.size(); c++){
         KeyboardEntryAction action = path[c];
-        Milliseconds delay = (uint8_t)action >= (uint8_t)KeyboardEntryAction::ENTER_CHAR
+        Milliseconds delay = is_button_press(action)
             ? delays.press_delay
-            : (uint8_t)action & 0x80
-                ? delays.wrap_delay
-                : delays.move_delay;
+            : delays.move_delay;
+
+        //  If we are wrapping and the previous action is a move, then we can't
+        //  overlap.
+        if (is_wrap(action) && c != 0){
+            KeyboardEntryActionWithDelay& previous = path_with_delays[c - 1];
+            if (is_move(previous.action)){
+                previous.delay = delays.hold;
+            }
+        }
 
         path_with_delays[c].action = action;
         path_with_delays[c].delay = delay;

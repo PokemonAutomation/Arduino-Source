@@ -20,7 +20,7 @@ public:
     ~TimeDurationCell();
     TimeDurationCell(const TimeDurationCell& x) = delete;
     TimeDurationCell(
-        std::string units,
+        std::string units, bool show_summary,
         LockMode lock_while_running,
         Type min_value, Type max_value,
         std::string default_value
@@ -38,10 +38,17 @@ public:
         Type min_value,
         std::string default_value
     );
+    TimeDurationCell(
+        std::string units,
+        LockMode lock_while_running,
+        Type min_value, Type max_value,
+        std::string default_value
+    );
 
 
 public:
     const std::string& units() const;
+    bool show_summary() const;
     Type min_value() const;
     Type max_value() const;
     const std::string& default_value() const;

@@ -26,7 +26,7 @@ namespace PokemonAutomation{
 const bool IS_BETA_VERSION = true;
 const int PROGRAM_VERSION_MAJOR = 0;
 const int PROGRAM_VERSION_MINOR = 53;
-const int PROGRAM_VERSION_PATCH = 3;
+const int PROGRAM_VERSION_PATCH = 4;
 
 const std::string PROGRAM_VERSION_BASE =
     "v" + std::to_string(PROGRAM_VERSION_MAJOR) +
@@ -47,7 +47,7 @@ const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE + "-user";
 const std::string PROGRAM_NAME = "Pok\u00e9mon Automation";
 
 const std::string DISCORD_LINK = "discord.gg/PokemonAutomation";
-const std::string DISCORD_LINK_URL = "https://discord.gg/cQ4gWxN";
+const std::string DISCORD_LINK_URL = "https://discord.gg/BSjDp27";
 const std::string ONLINE_DOC_URL = "https://github.com/PokemonAutomation/";
 const std::string PROJECT_GITHUB = "github.com/PokemonAutomation";
 const std::string PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
@@ -150,6 +150,10 @@ std::string get_user_file_path(){
 
 const std::string& SETTINGS_PATH(){
     static std::string path = get_setting_path();
+    return path;
+}
+const std::string& PROGRAM_SETTING_JSON_PATH(){
+    static std::string path = SETTINGS_PATH() + QCoreApplication::applicationName().toStdString() + "-Settings.json";
     return path;
 }
 const std::string& SCREENSHOTS_PATH(){

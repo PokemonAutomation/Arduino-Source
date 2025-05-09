@@ -360,7 +360,12 @@ struct MountDetectorFilteredImage{
 std::vector<MountDetectorFilteredImage> run_filters(const ImageViewRGB32& image, const std::vector<std::pair<uint32_t, uint32_t>>& range){
     std::vector<FilterRgb32Range> filters;
     for (size_t c = 0; c < range.size(); c++){
-        filters.emplace_back(FilterRgb32Range{range[c].first, range[c].second, COLOR_BLACK, false});
+        filters.emplace_back(
+            FilterRgb32Range{
+                COLOR_BLACK, false,
+                range[c].first, range[c].second
+            }
+        );
     }
 
     std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(image, range);

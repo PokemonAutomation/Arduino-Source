@@ -24,6 +24,8 @@
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64xH_Default.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
+#include "Kernels/ImageFilters/RGB32_Range/Kernels_ImageFilter_RGB32_Range.h"
+#include "Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h"
 #include "Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
@@ -157,7 +159,9 @@ int test_kernels_FilterRGB32Range(const ImageViewRGB32& image){
     // auto new_image = filter_rgb32_range(image, mins, maxs, COLOR_WHITE, replace_color_within_range);
     pixels_in_range = Kernels::filter_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
-        image_out.data(), image_out.bytes_per_row(), mins, maxs, (uint32_t)COLOR_WHITE, replace_color_within_range
+        image_out.data(), image_out.bytes_per_row(),
+        (uint32_t)COLOR_WHITE, replace_color_within_range,
+        mins, maxs
     );
     auto time_end = current_time();
     auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
@@ -166,7 +170,9 @@ int test_kernels_FilterRGB32Range(const ImageViewRGB32& image){
 
     size_t pixels_in_range_2 = Kernels::filter_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
-        image_out_2.data(), image_out_2.bytes_per_row(), mins, maxs, (uint32_t)COLOR_WHITE, !replace_color_within_range
+        image_out_2.data(), image_out_2.bytes_per_row(),
+        (uint32_t)COLOR_WHITE, !replace_color_within_range,
+        mins, maxs
     );
 
     TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
@@ -223,7 +229,9 @@ int test_kernels_FilterRGB32Range(const ImageViewRGB32& image){
     for(size_t i = 0; i < num_iters; i++){
         Kernels::filter_rgb32_range(
             image.data(), image.bytes_per_row(), image.width(), image.height(),
-            image_out.data(), image_out.bytes_per_row(), mins, maxs, (uint32_t)COLOR_WHITE, replace_color_within_range
+            image_out.data(), image_out.bytes_per_row(),
+            (uint32_t)COLOR_WHITE, replace_color_within_range,
+            mins, maxs
         );
     }
     time_end = current_time();
@@ -254,7 +262,8 @@ int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image){
     pixels_in_range = Kernels::filter_rgb32_euclidean(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         image_out.data(), image_out.bytes_per_row(),
-        uint32_t(middle_color), max_dist, (uint32_t)COLOR_WHITE, replace_color_within_range
+        (uint32_t)COLOR_WHITE, replace_color_within_range,
+        uint32_t(middle_color), max_dist
     );
     auto time_end = current_time();
     auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
@@ -264,7 +273,8 @@ int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image){
     size_t pixels_in_range_2 = Kernels::filter_rgb32_euclidean(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
         image_out_2.data(), image_out_2.bytes_per_row(),
-        uint32_t(middle_color), max_dist, (uint32_t)COLOR_WHITE, !replace_color_within_range
+        (uint32_t)COLOR_WHITE, !replace_color_within_range,
+        uint32_t(middle_color), max_dist
     );
 
     TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
@@ -331,7 +341,8 @@ int test_kernels_FilterRGB32Euclidean(const ImageViewRGB32& image){
         pixels_in_range = Kernels::filter_rgb32_euclidean(
             image.data(), image.bytes_per_row(), image.width(), image.height(),
             image_out.data(), image_out.bytes_per_row(),
-            uint32_t(middle_color), max_dist, (uint32_t)COLOR_WHITE, replace_color_within_range
+            (uint32_t)COLOR_WHITE, replace_color_within_range,
+            uint32_t(middle_color), max_dist
         );
     }
     time_end = current_time();
@@ -347,8 +358,12 @@ int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
     cout << "Testing to_black_white_rgb32_range(), image size " << width << " x " << height << endl;
 
     Color min_color(0, 0, 0);
+    // Color min_color(0);
+
     Color max_color(63, 63, 63);
+    // Color max_color(255, 255, 255);
     // Color max_color(238, 24, 42);
+    cout << "min color: " << min_color.to_string() << " max color: " << max_color.to_string() << endl;
     
     const uint32_t mins = uint32_t(min_color);
     const uint32_t maxs = uint32_t(max_color);
@@ -362,7 +377,9 @@ int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
     // auto new_image = filter_rgb32_range(image, mins, maxs, COLOR_WHITE, replace_color_within_range);
     pixels_in_range = Kernels::to_blackwhite_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
-        image_out.data(), image_out.bytes_per_row(), mins, maxs, in_range_black
+        image_out.data(), image_out.bytes_per_row(),
+        in_range_black,
+        mins, maxs
     );
     auto time_end = current_time();
     auto ns = std::chrono::duration_cast<std::chrono::nanoseconds>(time_end - time_start).count();
@@ -371,7 +388,9 @@ int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
 
     size_t pixels_in_range_2 = Kernels::to_blackwhite_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
-        image_out_2.data(), image_out_2.bytes_per_row(), mins, maxs, !in_range_black
+        image_out_2.data(), image_out_2.bytes_per_row(),
+        !in_range_black,
+        mins, maxs
     );
 
     TEST_RESULT_EQUAL(pixels_in_range, pixels_in_range_2);
@@ -428,7 +447,9 @@ int test_kernels_ToBlackWhiteRGB32Range(const ImageViewRGB32& image){
     for(size_t i = 0; i < num_iters; i++){
         Kernels::to_blackwhite_rgb32_range(
             image.data(), image.bytes_per_row(), image.width(), image.height(),
-            image_out.data(), image_out.bytes_per_row(), mins, maxs, in_range_black
+            image_out.data(), image_out.bytes_per_row(),
+            in_range_black,
+            mins, maxs
         );
     }
     time_end = current_time();

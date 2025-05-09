@@ -130,7 +130,7 @@ SerialPABotBase_Connection::get_programs_for_protocol(uint32_t protocol){
         throw SerialProtocolException(
             m_logger, PA_CURRENT_FUNCTION,
             "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
-            "Please install the firmware that came with this version of the program."
+            "Please flash the .hex/.bin that came with this version of the program."
         );
     }
     --iter;
@@ -138,7 +138,7 @@ SerialPABotBase_Connection::get_programs_for_protocol(uint32_t protocol){
         throw SerialProtocolException(
             m_logger, PA_CURRENT_FUNCTION,
             "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
-            "Please install the firmware that came with this version of the program."
+            "Please flash the .hex/.bin that came with this version of the program."
         );
     }
 

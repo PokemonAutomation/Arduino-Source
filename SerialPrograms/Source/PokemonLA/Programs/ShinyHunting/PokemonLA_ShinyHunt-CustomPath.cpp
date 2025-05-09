@@ -164,22 +164,22 @@ void ShinyHuntCustomPath::do_non_listen_action(
     {
         switch(row.parameters.move_speed){
         case PathSpeed::NORMAL_SPEED:
-            pbf_move_left_joystick(context, 128, 0, row.parameters.move_forward_ticks, 0);
+            pbf_move_left_joystick(context, 128, 0, row.parameters.move_forward, 0ms);
             break;
         case PathSpeed::SLOW_SPEED:
-            pbf_move_left_joystick(context, 128, 64, row.parameters.move_forward_ticks, 0);
+            pbf_move_left_joystick(context, 128, 64, row.parameters.move_forward, 0ms);
             break;
         case PathSpeed::RUN:
-            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, row.parameters.move_forward_ticks);
+            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, row.parameters.move_forward);
             break;
         case PathSpeed::DASH:
-            pbf_press_button(context, BUTTON_B, row.parameters.move_forward_ticks, 0);
+            pbf_press_button(context, BUTTON_B, row.parameters.move_forward, 0ms);
             break;
         case PathSpeed::DASH_B_SPAM:
-            pbf_mash_button(context, BUTTON_B, row.parameters.move_forward_ticks);
+            pbf_mash_button(context, BUTTON_B, row.parameters.move_forward);
             break;
         case PathSpeed::DIVE:
-            pbf_press_button(context, BUTTON_Y, row.parameters.move_forward_ticks, 0);
+            pbf_press_button(context, BUTTON_Y, row.parameters.move_forward, 0ms);
             break;
         }
         break;
@@ -188,7 +188,7 @@ void ShinyHuntCustomPath::do_non_listen_action(
     {
         uint8_t x = (uint8_t)((row.parameters.left_x + 1.0) * 127.5 + 0.5);
         uint8_t y = (uint8_t)((-row.parameters.left_y + 1.0) * 127.5 + 0.5);
-        pbf_move_left_joystick(context, x, y, row.parameters.move_forward_ticks, 0);
+        pbf_move_left_joystick(context, x, y, row.parameters.move_forward, 0ms);
         break;
     }
     case PathAction::CENTER_CAMERA:
@@ -198,12 +198,12 @@ void ShinyHuntCustomPath::do_non_listen_action(
     }
     case PathAction::JUMP:
     {
-        pbf_press_button(context, BUTTON_Y, 10, row.parameters.jump_wait_ticks);
+        pbf_press_button(context, BUTTON_Y, 80ms, row.parameters.jump_wait);
         break;
     }
     case PathAction::WAIT:
     {
-        pbf_wait(context, row.parameters.wait_ticks);
+        pbf_wait(context, row.parameters.wait);
         break;
     }
     default:

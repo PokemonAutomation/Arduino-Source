@@ -60,6 +60,15 @@ enum class NumberEntryAction : uint8_t{
     MOVE_DOWN  =    (uint8_t)DpadPosition::DPAD_DOWN,
     MOVE_LEFT  =    (uint8_t)DpadPosition::DPAD_LEFT,
 };
+bool is_button_press(NumberEntryAction action){
+    switch (action){
+    case NumberEntryAction::ENTER_CHAR:
+    case NumberEntryAction::SCROLL_LEFT:
+        return true;
+    default:
+        return false;
+    }
+}
 
 struct NumberEntryActionWithDelay{
     NumberEntryAction action;
@@ -169,7 +178,7 @@ Milliseconds numberpad_populate_delays(
     path_with_delays.resize(path.size());
     for (size_t c = 0; c < path_with_delays.size(); c++){
         NumberEntryAction action = path[c];
-        Milliseconds delay = (uint8_t)action >= (uint8_t)NumberEntryAction::ENTER_CHAR
+        Milliseconds delay = is_button_press(action)
             ? delays.press_delay
             : delays.move_delay;
 

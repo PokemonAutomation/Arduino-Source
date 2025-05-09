@@ -41,18 +41,16 @@ void PersistentSettings::write() const{
     root["99-Panels"] = panels.clone();
 
     try{
-        std::string settings_path = SETTINGS_PATH() + QCoreApplication::applicationName().toStdString() + "-Settings.json";
-        root.dump(settings_path);
+        root.dump(PROGRAM_SETTING_JSON_PATH());
     }catch (FileException&){}
 }
 
 
 void PersistentSettings::read(){
-    std::string settings_path = SETTINGS_PATH() + QCoreApplication::applicationName().toStdString() + "-Settings.json";
-    JsonValue json = load_json_file(settings_path);
+    JsonValue json = load_json_file(PROGRAM_SETTING_JSON_PATH());
     JsonObject* obj = json.to_object();
     if (obj == nullptr){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid settings file.", settings_path);
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid settings file.", PROGRAM_SETTING_JSON_PATH());
     }
 
     //  Need to load this subset of settings first because they will affect how

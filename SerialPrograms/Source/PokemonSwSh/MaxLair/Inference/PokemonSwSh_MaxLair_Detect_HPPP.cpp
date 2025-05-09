@@ -141,7 +141,11 @@ int8_t read_pp_text(Logger& logger, const ImageViewRGB32& image){
 //    cout << "============" << endl;
     for (const auto& item : filters){
         size_t text_pixels;
-        processed = to_blackwhite_rgb32_range(text_pixels, image, item.first, item.second, false);
+        processed = to_blackwhite_rgb32_range(
+            text_pixels, image,
+            false,
+            item.first, item.second
+        );
         double text_ratio = 1.0 - (double)text_pixels / (image.width() * image.height());
 //        cout << "text_ratio = " << text_ratio << endl;
         if (0.02 <= text_ratio && text_ratio <= 0.50){

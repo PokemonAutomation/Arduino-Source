@@ -175,14 +175,16 @@ void TournamentFarmer::check_money(SingleSwitchProgramEnvironment& env, ProContr
 
         ImageRGB32 image_top = to_blackwhite_rgb32_range(
             extract_box_reference(screen, top_notif),
-            combine_rgb(215, 215, 215), combine_rgb(255, 255, 255), true
+            true,
+            combine_rgb(215, 215, 215), combine_rgb(255, 255, 255)
         );
         //image_top.save("./image_top.png");
 
         //Different color range on the bottom notif ~B0B5B8
         ImageRGB32 image_bottom = to_blackwhite_rgb32_range(
             extract_box_reference(screen, bottom_notif),
-            combine_rgb(130, 130, 130), combine_rgb(240, 240, 240), true
+            true,
+            combine_rgb(130, 130, 130), combine_rgb(240, 240, 240)
         );
         //image_bottom.save("./image_bottom.png");
         

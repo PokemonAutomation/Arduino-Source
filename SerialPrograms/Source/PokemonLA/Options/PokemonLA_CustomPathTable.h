@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "PokemonLA_TravelLocation.h"
@@ -72,12 +73,12 @@ private:
 public:
     StaticTextOption text;
     EnumDropdownCell<PathMount> mount;
-    SimpleIntegerOption<uint16_t> move_forward_ticks;
+    MillisecondsOption move_forward;
     EnumDropdownCell<PathSpeed> move_speed;
     FloatingPointOption left_x;
     FloatingPointOption left_y;
-    SimpleIntegerOption<uint16_t> jump_wait_ticks;
-    SimpleIntegerOption<uint16_t> wait_ticks;
+    MillisecondsOption jump_wait;
+    MillisecondsOption wait;
 };
 
 class CustomPathTableRow2 : public EditableTableRow{

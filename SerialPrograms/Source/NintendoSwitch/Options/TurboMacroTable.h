@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 
@@ -56,9 +57,12 @@ public:
     SimpleIntegerOption<uint8_t> x_axis;
     SimpleIntegerOption<uint8_t> y_axis;
 
-    SimpleIntegerOption<uint16_t> button_hold_ticks;
-    SimpleIntegerOption<uint16_t> button_release_ticks;
-    SimpleIntegerOption<uint16_t> wait_ticks;
+    MillisecondsOption button_hold;
+    MillisecondsOption button_release;
+    MillisecondsOption wait;
+//    SimpleIntegerOption<uint16_t> button_hold_ticks;
+//    SimpleIntegerOption<uint16_t> button_release_ticks;
+//    SimpleIntegerOption<uint16_t> wait_ticks;
 };
 
 
