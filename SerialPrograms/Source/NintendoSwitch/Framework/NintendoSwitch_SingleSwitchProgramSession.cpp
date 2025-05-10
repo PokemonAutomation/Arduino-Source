@@ -151,7 +151,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         env.console.overlay().add_log("- Program Finished -");
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
-        env.console.overlay().add_log("- Operation Cancelled -", COLOR_RED);
+        env.console.overlay().add_log("- Program Stopped -");
     }catch (ProgramCancelledException&){
         env.console.overlay().add_log("- Program Stopped -");
     }catch (ProgramFinishedException& e){

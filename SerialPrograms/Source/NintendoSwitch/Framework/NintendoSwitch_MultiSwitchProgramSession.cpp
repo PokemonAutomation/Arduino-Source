@@ -195,7 +195,7 @@ void MultiSwitchProgramSession::internal_run_program(){
         env.add_overlay_log_to_all_consoles("- Program Finished -");
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
-        env.add_overlay_log_to_all_consoles("- Operation Cancelled -", COLOR_RED);
+        env.add_overlay_log_to_all_consoles("- Program Stopped -");
     }catch (ProgramCancelledException&){
         env.add_overlay_log_to_all_consoles("- Program Stopped -");
     }catch (ProgramFinishedException& e){
