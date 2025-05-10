@@ -146,6 +146,7 @@ void SingleSwitchProgramSession::internal_run_program(){
 
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");
+        env.console.overlay().clear_log();
         env.console.overlay().add_log("- Starting Program -");
         run_program_instance(env, context);
         env.console.overlay().add_log("- Program Finished -");

@@ -63,6 +63,8 @@ public:
 
     // add video overlay log on all console video streams
     void add_overlay_log_to_all_consoles(const std::string& message, Color color = COLOR_WHITE);
+    // clear video overlay log on all console video streams
+    void clear_all_overlay_logs();
 };
 
 

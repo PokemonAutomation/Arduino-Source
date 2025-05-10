@@ -97,6 +97,12 @@ void MultiSwitchProgramEnvironment::add_overlay_log_to_all_consoles(const std::s
     }
 }
 
+void MultiSwitchProgramEnvironment::clear_all_overlay_logs(){
+    for (auto&console: consoles){
+        console.overlay().clear_log();
+    }
+}
+
 
 MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     std::string identifier,
