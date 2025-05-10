@@ -674,6 +674,14 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 }
 
 
+// Run one iteration of the outbreak finder loop and return true when one desired outbreak is found.
+// The iteration includes:
+// 1. Starting at Jubilife Village gate, go to check the map for outbreaks.
+// 2. If found desired outbreaks, stop.
+// 3. If need to check MMOs, save in front of gate, then go to each region with MMO and talk to Mai to
+//    reveal MMO pokemon. Reset if no desired MMO to conserve Aguav Berries. 
+// 4. If found desired MMO pokemon, stop.
+// 5. No desired outbreak in this iteration, go to an arbitrary region and return to village to refresh outbreaks.
 bool OutbreakFinder::run_iteration(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     const std::set<std::string>& desired_hisui_map_events,
@@ -712,8 +720,10 @@ bool OutbreakFinder::run_iteration(
                 os << "Found following desired outbreak" << (desired_outbreaks_found.size() > 1 ? "s: " : ": ");
                 for(const auto& outbreak: desired_outbreaks_found){
                     os << outbreak << ", ";
+                    env.console.overlay().add_log("Found " + outbreak);
                 }
                 env.log(os.str());
+
                 return true;
             }else{
                 env.log("No desired outbreak.");
@@ -728,7 +738,7 @@ bool OutbreakFinder::run_iteration(
         pbf_press_button(context, BUTTON_B, 50, 50);
         // Leave the guard.
         pbf_move_left_joystick(context, 128, 0, 100, 50);
-        // Checking MMO costs Aguav berries.
+        // Checking MMO costs Aguav Berries.
         // To not waste them, save here so that we can reset to get berries back.
         save_game_from_overworld(env, env.console, context);
 
@@ -756,7 +766,7 @@ bool OutbreakFinder::run_iteration(
     env.update_stats();
     send_program_status_notification(env, NOTIFICATION_STATUS);
 
-    //  Go to region and return.
+    //  Go to an arbitrary region and return to refresh outbreaks.
     goto_region_and_return(env, context, inside_travel_map);
 
     return false;
