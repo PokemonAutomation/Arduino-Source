@@ -140,6 +140,8 @@
 #endif
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 //#include "Common/SerialPABotBase/LightweightWallClock_StdChrono.h"
+#include "Common/Cpp/Options/MacAddressOption.h"
+
 
 //#include <opencv2/core.hpp>
 #include <random>
@@ -167,9 +169,11 @@ TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
 TestProgramComputer::TestProgramComputer()
     : STATIC_TEXT("test text")
     , SCREEN_WATCHER("Capture Box", 0, 0, 1, 1)
+    , MAC_ADDRESS(LockMode::UNLOCK_WHILE_RUNNING, 6, nullptr)
 {
     PA_ADD_OPTION(STATIC_TEXT);
 //    PA_ADD_OPTION(SCREEN_WATCHER);
+    PA_ADD_OPTION(MAC_ADDRESS);
 }
 
 WallClock REFERENCE = current_time();
@@ -290,6 +294,18 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace std::chrono_literals;
 
+
+    uint8_t address[] = {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc};
+
+    std::string str = write_MAC_address(6, address);
+    cout << str << endl;
+
+    parse_MAC_address(6, address, str);
+    str = write_MAC_address(6, address);
+    cout << str << endl;
+
+
+#if 0
     SparseArray data{
         {100, "0123456789"},
         {120, {'a', 0x20, 'd'}},
@@ -316,13 +332,13 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     scope.wait_for(std::chrono::seconds(60));
 #endif
 
-#if 1
-    int* ptr = nullptr;
-    cout << ptr[0] << endl;
 #endif
 
 
-
+#if 0
+    int* ptr = nullptr;
+    cout << ptr[0] << endl;
+#endif
 
 #if 0
     {
