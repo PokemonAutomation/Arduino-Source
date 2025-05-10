@@ -189,18 +189,24 @@ void MultiSwitchProgramSession::internal_run_program(){
 
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");
+        env.add_overlay_log_to_all_consoles("- Starting Program -");
         run_program_instance(env, scope);
 //        m_setup->wait_for_all_requests();
+        env.add_overlay_log_to_all_consoles("- Program Finished -");
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
+        env.add_overlay_log_to_all_consoles("- Operation Cancelled -", COLOR_RED);
     }catch (ProgramCancelledException&){
+        env.add_overlay_log_to_all_consoles("- Program Stopped -");
     }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
+        env.add_overlay_log_to_all_consoles("- Program Finished -");
         e.send_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH);
     }catch (InvalidConnectionStateException&){
+        env.add_overlay_log_to_all_consoles("- Invalid Connection -", COLOR_RED);
     }catch (ScreenshotException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
-
+        env.add_overlay_log_to_all_consoles("- Program Error -", COLOR_RED);
         //  If the exception doesn't already have console information,
         //  attach the 1st console here.
         e.add_stream_if_needed(env.consoles[0]);
@@ -213,6 +219,7 @@ void MultiSwitchProgramSession::internal_run_program(){
         e.send_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
+        env.add_overlay_log_to_all_consoles("- Program Error -", COLOR_RED);
         std::string message = e.message();
         if (message.empty()){
             message = e.name();
@@ -224,6 +231,7 @@ void MultiSwitchProgramSession::internal_run_program(){
         );
     }catch (std::exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
+        env.add_overlay_log_to_all_consoles("- Program Error -", COLOR_RED);
         std::string message = e.what();
         if (message.empty()){
             message = "Unknown std::exception.";
@@ -235,6 +243,7 @@ void MultiSwitchProgramSession::internal_run_program(){
         );
     }catch (...){
         logger().log("Program stopped with an exception!", COLOR_RED);
+        env.add_overlay_log_to_all_consoles("- Unknown Error -", COLOR_RED);
         report_error("Unknown error.");
         send_program_fatal_error_notification(
             env, m_option.instance().NOTIFICATION_ERROR_FATAL,

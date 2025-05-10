@@ -91,6 +91,11 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
     );
 }
 
+void MultiSwitchProgramEnvironment::add_overlay_log_to_all_consoles(const std::string& message, Color color){
+    for (auto&console: consoles){
+        console.overlay().add_log(message, color);
+    }
+}
 
 
 MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
@@ -197,6 +202,8 @@ std::string MultiSwitchProgramInstance::check_validity() const{
 void MultiSwitchProgramInstance::restore_defaults(){
     return m_options.restore_defaults();
 }
+
+
 
 
 
