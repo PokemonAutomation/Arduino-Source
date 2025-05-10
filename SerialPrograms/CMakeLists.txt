@@ -2242,7 +2242,6 @@ file(GLOB MAIN_SOURCES
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
 
 if (APPLE)
-    # TODO: set up the correct application icon
     set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../IconResource/icon.icns)
     # set_source_files_properties(SerialPrograms_ICON PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
@@ -2262,6 +2261,8 @@ if (APPLE)
         RESOURCE ${SerialPrograms_ICON}
     )
 
+    # make sure Packages repo, https://github.com/PokemonAutomation/Packages is placed in the same folder as this Arduino-Source repo
+    # so the post-build command can copy the resources folder Packages/SerialPrograms/Resources/ into the built app bundle
     add_custom_command(
         TARGET SerialPrograms
         POST_BUILD
