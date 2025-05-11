@@ -1090,11 +1090,13 @@ SOURCES += \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.cpp \
     Source/PokemonSwSh/ShinyHuntTracker.cpp \
+    Source/PokemonZLA/Inference/PokemonZLA_DialogDetector.cpp \
     Source/Tests/CommandLineTests.cpp \
     Source/Tests/CommonFramework_Tests.cpp \
     Source/Tests/Kernels_Tests.cpp \
     Source/Tests/NintendoSwitch_Tests.cpp \
     Source/Tests/PokemonLA_Tests.cpp \
+    Source/Tests/PokemonLZA_Tests.cpp \
     Source/Tests/PokemonSV_Tests.cpp \
     Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
@@ -2310,11 +2312,13 @@ HEADERS += \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h \
     Source/PokemonSwSh/ShinyHuntTracker.h \
+    Source/PokemonZLA/Inference/PokemonZLA_DialogDetector.h \
     Source/Tests/CommandLineTests.h \
     Source/Tests/CommonFramework_Tests.h \
     Source/Tests/Kernels_Tests.h \
     Source/Tests/NintendoSwitch_Tests.h \
     Source/Tests/PokemonLA_Tests.h \
+    Source/Tests/PokemonLZA_Tests.h \
     Source/Tests/PokemonSV_Tests.h \
     Source/Tests/PokemonSwSh_Tests.h \
     Source/Tests/TestMap.h \

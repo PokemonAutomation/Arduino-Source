@@ -1432,6 +1432,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
+    Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
@@ -2220,6 +2222,8 @@ file(GLOB MAIN_SOURCES
     Source/Tests/NintendoSwitch_Tests.h
     Source/Tests/PokemonLA_Tests.cpp
     Source/Tests/PokemonLA_Tests.h
+    Source/Tests/PokemonLZA_Tests.cpp
+    Source/Tests/PokemonLZA_Tests.h
     Source/Tests/PokemonSV_Tests.cpp
     Source/Tests/PokemonSV_Tests.h
     Source/Tests/PokemonSwSh_Tests.cpp

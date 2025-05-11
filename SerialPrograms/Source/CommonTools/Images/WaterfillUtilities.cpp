@@ -80,6 +80,12 @@ bool match_template_by_waterfill(
     std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object)
 {
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        dump_debug_image(
+            global_logger_command_line(), 
+            "CommonFramework/WaterfillTemplateMatcher", 
+            "match_template_by_waterfill_input_image", 
+            image
+        );
         std::cout << "Match template by waterfill, " << filters.size() << " filter(s), size range ("
                   << area_thresholds.first << ", ";
         if (area_thresholds.second == SIZE_MAX){
@@ -89,11 +95,12 @@ bool match_template_by_waterfill(
         }
         std::cout << ")" << std::endl;
     }
-    auto matrices = compress_rgb32_to_binary_range(image, filters);
+    std::vector<PokemonAutomation::PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(image, filters);
 
     bool detected = false;
     bool stop_match = false;
-    for (PokemonAutomation::PackedBinaryMatrix &matrix : matrices){
+    for (size_t i_matrix = 0; i_matrix < matrices.size(); i_matrix++){
+        PackedBinaryMatrix& matrix = matrices[i_matrix];
         if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
             ImageRGB32 binaryImage = image.copy();
             filter_by_mask(matrix, binaryImage, Color(COLOR_BLACK), true);
@@ -101,8 +108,9 @@ bool match_template_by_waterfill(
             dump_debug_image(
                 global_logger_command_line(), 
                 "CommonFramework/WaterfillTemplateMatcher", 
-                "binary_image", 
-                binaryImage);
+                "match_template_by_waterfill_filtered_image_" + std::to_string(i_matrix), 
+                binaryImage
+            );
         }
 
         std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();

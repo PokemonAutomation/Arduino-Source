@@ -40,7 +40,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
         dump_debug_image(
             global_logger_command_line(), 
             "CommonFramework/WaterfillTemplateMatcher", 
-            "binary_image", 
+            "waterfill_template_image_black_background", 
             binaryImage);
     }
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area);
@@ -66,7 +66,11 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
         const auto exact_image = extract_box_reference(reference, *best);
         cout << "Build waterfil template matcher from " << full_path << ", W x H: " << exact_image.width()
              << " x " << exact_image.height() <<  ", area ratio: " << m_area_ratio << ", Object area: " << best->area << endl;
-        dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher", "matcher_exact_image", exact_image);
+        dump_debug_image(
+            global_logger_command_line(),
+            "CommonFramework/WaterfillTemplateMatcher",
+            "waterfill_template_matcher_reference_image",
+        exact_image);
     }
 }
 
@@ -150,7 +154,12 @@ double WaterfillTemplateMatcher::rmsd_original(const ImageViewRGB32& original_im
 
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         cout << "rmsd_original()" << endl;
-        dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher", "rmsd_original_input", extract_box_reference(original_image, object));
+        dump_debug_image(
+            global_logger_command_line(),
+            "CommonFramework/WaterfillTemplateMatcher",
+            "waterfill_template_matcher_rmsd_original_input",
+            extract_box_reference(original_image, object)
+        );
     }
 
     if (!check_aspect_ratio(object.width(), object.height())){
