@@ -149,6 +149,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/IntegerRangeOption.h
     ../Common/Cpp/Options/KeyBindingOption.cpp
     ../Common/Cpp/Options/KeyBindingOption.h
+    ../Common/Cpp/Options/MacAddressOption.cpp
+    ../Common/Cpp/Options/MacAddressOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
@@ -235,6 +237,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/IntegerRangeWidget.h
     ../Common/Qt/Options/KeyBindingWidget.cpp
     ../Common/Qt/Options/KeyBindingWidget.h
+    ../Common/Qt/Options/MacAddressWidget.cpp
+    ../Common/Qt/Options/MacAddressWidget.h
     ../Common/Qt/Options/RandomCodeWidget.cpp
     ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
