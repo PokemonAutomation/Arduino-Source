@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  Based on Anubis' findings: https://docs.google.com/spreadsheets/u/0/d/1pNYtCJKRh_efX9LvzjCiA-0n2lGSFnVmSWwmPzgSOMw/htmlview
+ *  Based on Anubis' findings: https://docs.google.com/spreadsheets/u/0/d/1pNYtCJKRh_efX9LvzjCiA-0n2lGSFnVmSWwmPzgSOMw
  *
  */
 
@@ -11,13 +11,15 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
@@ -44,7 +46,8 @@ DailyHighlightRNG_Descriptor::DailyHighlightRNG_Descriptor()
         "Perform RNG manipulation to get rare items from the daily highlight trader.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        PABotBaseLevel::PABOTBASE_12KB
+          {ControllerFeature::NintendoSwitch_ProController},
+          FasterIfTickPrecise::MUCH_FASTER
     )
 {}
 
@@ -94,6 +97,11 @@ DailyHighlightRNG::DailyHighlightRNG()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
+    , MOVE_TIME("Move time:", LockMode::LOCK_WHILE_RUNNING, "1280 ms")
+    , LEFT_X("Left X:", LockMode::LOCK_WHILE_RUNNING, 207)
+    , LEFT_Y("Left Y:", LockMode::LOCK_WHILE_RUNNING, 1)
+    , RIGHT_X("Right X:", LockMode::LOCK_WHILE_RUNNING, 127)
+    , RIGHT_Y("Right Y:", LockMode::LOCK_WHILE_RUNNING, 127)
     , MAX_UNKNOWN_ADVANCES(
         "<b>Max Unknown advances:</b><br>How many advances to check when updating the rng state.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -102,12 +110,12 @@ DailyHighlightRNG::DailyHighlightRNG()
     , ADVANCE_PRESS_DURATION(
         "<b>Advance Press Duration:</b><br>Hold the button down for this long to advance once.",
         LockMode::LOCK_WHILE_RUNNING,
-        10
+        "80 ms"
     )
     , ADVANCE_RELEASE_DURATION(
         "<b>Advance Release Duration:</b><br>After releasing the button, wait this long before pressing it again.",
         LockMode::LOCK_WHILE_RUNNING,
-        10
+        "80 ms"
     )
     , SAVE_SCREENSHOTS(
         "<b>Save Debug Screenshots:</b>",
@@ -129,6 +137,11 @@ DailyHighlightRNG::DailyHighlightRNG()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
+    PA_ADD_OPTION(MOVE_TIME);
+    PA_ADD_OPTION(LEFT_X);
+    PA_ADD_OPTION(LEFT_Y);
+    PA_ADD_OPTION(RIGHT_X);
+    PA_ADD_OPTION(RIGHT_Y);
     PA_ADD_OPTION(MAX_UNKNOWN_ADVANCES);
     PA_ADD_OPTION(ADVANCE_PRESS_DURATION);
     PA_ADD_OPTION(ADVANCE_RELEASE_DURATION);
@@ -136,32 +149,38 @@ DailyHighlightRNG::DailyHighlightRNG()
     PA_ADD_OPTION(LOG_VALUES);
 }
 
-void DailyHighlightRNG::move_to_trader(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
-    pbf_move_left_joystick(context, 207, 1, 160, 10); // Magic numbers to barely reach the trader
-    pbf_press_button(context, BUTTON_A, 20, 20);
+void DailyHighlightRNG::move_to_trader(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+    pbf_move_right_joystick(context, LEFT_X, LEFT_Y, MOVE_TIME, Milliseconds(80)); // TODO: remove/combine with left stick
+    pbf_move_left_joystick(context, RIGHT_X, RIGHT_Y, MOVE_TIME, Milliseconds(80));
+    
+
+    pbf_press_button(context, BUTTON_A, Milliseconds(160), Milliseconds(160));
     
     //Check if NPC was reached
-    DialogTriangleDetector dialog_detector(env.console, ImageFloatBox(0.465, 0.195, 0.054, 0.57));
+    //DialogTriangleDetector dialog_detector(env.console, ImageFloatBox(0.465, 0.195, 0.054, 0.57));
+    VideoOverlaySet boxes(env.console);
+    BlackDialogBoxDetector dialog_detector(true);
     dialog_detector.make_overlays(boxes);
 
     int ret = wait_until(env.console, context, Milliseconds(3000), { dialog_detector });
     if (ret < 0) {
         OperationFailedException::fire(
-            env.console, ErrorReport::SEND_ERROR_REPORT,
-            "Failed to talk to the trader."
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to talk to the trader.",
+            env.console
         );
     }
 }
 
-void DailyHighlightRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND); // exit dialog
-    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+void DailyHighlightRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    pbf_mash_button(context, BUTTON_B, Milliseconds(2000)); // exit dialog
+    pbf_press_button(context, BUTTON_X, Milliseconds(80), GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     navigate_to_menu_app(env, env.console, context, 1, NOTIFICATION_ERROR_RECOVERABLE); // TODO: try-catch-block + error recovery
-    pbf_press_button(context, BUTTON_A, 10, 3*TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, Milliseconds(80), Milliseconds(3000));
     context.wait_for_all_requests();
 }
 
-uint8_t DailyHighlightRNG::calibrate_num_npc_from_party(SingleSwitchProgramEnvironment& env, BotBaseContext& context, Pokemon::Xoroshiro128Plus& rng){
+uint8_t DailyHighlightRNG::calibrate_num_npc_from_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Pokemon::Xoroshiro128Plus& rng){
     // TODO: implement
     return 2; // Usually either 1 or 2 -> higher numbers suggest bad npc state
 }
@@ -204,50 +223,50 @@ size_t DailyHighlightRNG::calculate_target(SingleSwitchProgramEnvironment& env, 
     return advances;
 }
 
-void DailyHighlightRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, BotBaseContext& context, bool buy_highlight) {
+void DailyHighlightRNG::leave_to_overworld_and_interact(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool buy_highlight) {
     // Close menu
-    pbf_press_button(context, BUTTON_B, 2 * TICKS_PER_SECOND, 5);
-    pbf_press_button(context, BUTTON_B, 10, 70);
+    pbf_press_button(context, BUTTON_B, Milliseconds(2000), Milliseconds(40));
+    pbf_press_button(context, BUTTON_B, Milliseconds(80), Milliseconds(560));
 
     // Quickly interact
-    pbf_press_button(context, BUTTON_A, 30, 30);
-    pbf_wait(context, 2*TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, Milliseconds(240), Milliseconds(240));
+    pbf_wait(context, Milliseconds(2000));
 
     // TODO: check if interaction worked -> see move_to_trader()
 
     // Buy highlight
     if (buy_highlight) {
-        pbf_press_button(context, BUTTON_ZL, 10, 40);
-        pbf_press_dpad(context, DPAD_DOWN, 10, 10);
-        pbf_mash_button(context, BUTTON_ZL, 400);
+        pbf_press_button(context, BUTTON_ZL, Milliseconds(80), Milliseconds(360));
+        pbf_press_dpad(context, DPAD_DOWN, Milliseconds(80), Milliseconds(80));
+        pbf_mash_button(context, BUTTON_ZL, Milliseconds(3200));
     }
 
     // Leave dialog
-    pbf_mash_button(context, BUTTON_B, 6 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_B, Milliseconds(6000));
 }
 
-void DailyHighlightRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+void DailyHighlightRNG::recover_from_wrong_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     // Mash the B button to exit potential menus or dialog boxes
-    pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_B, Seconds(30));
     
     // Open map
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_X, Milliseconds(160), GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
     navigate_to_menu_app(env, env.console, context, 5, NOTIFICATION_ERROR_RECOVERABLE);
 
     // Fly to Snowslide Slope
-    pbf_move_left_joystick(context, 200, 210, 20, 20);
-    pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(context, 200, 210, Milliseconds(160), Milliseconds(160));
+    pbf_mash_button(context, BUTTON_A, Milliseconds(1000));
 }
 
 
-void DailyHighlightRNG::advance_date(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t& year) {
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+void DailyHighlightRNG::advance_date(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t& year) {
+    pbf_press_button(context, BUTTON_HOME, Milliseconds(80), GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     home_roll_date_enter_game_autorollback(env.console, context, year);
     //resume_game_from_home(env.console, context, false);
 }
 
 
-void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
     env.update_stats();
 
@@ -260,7 +279,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         grip_menu_connect_go_home(context);
     }
     else {
-        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, Milliseconds(40), Milliseconds(40));
     }
 
     Xoroshiro128Plus rng(0, 0);
@@ -303,8 +322,9 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             state_errors++;
             if (state_errors >= 3){
                 OperationFailedException::fire(
-                    env.console, ErrorReport::SEND_ERROR_REPORT,
-                    "Detected invalid RNG state three times in a row."
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Detected invalid RNG state three times in a row.",
+                    env.console
                 );
             }
             VideoSnapshot screen = env.console.video().snapshot();

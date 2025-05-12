@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DailyHighlightDatabase_H
 
 #include <map>
-#include "CommonFramework/Options/StringSelectOption.h"
+#include "CommonTools/Options/StringSelectOption.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
