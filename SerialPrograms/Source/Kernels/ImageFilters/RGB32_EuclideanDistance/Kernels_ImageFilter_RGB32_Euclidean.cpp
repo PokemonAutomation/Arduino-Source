@@ -36,7 +36,7 @@ size_t filter_rgb32_euclidean_x64_AVX512(
     uint32_t replacement, bool replace_color_within_range,
     uint32_t expected, double max_euclidean_distance
 );
-size_t filter_rgb32_euclidean_arm64_NEON(
+size_t filter_rgb32_euclidean_ARM64_NEON(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
@@ -83,7 +83,7 @@ size_t filter_rgb32_euclidean(
 #endif
 #ifdef PA_AutoDispatch_arm64_20_M1
     if (CPU_CAPABILITY_CURRENT.OK_M1){
-        return filter_rgb32_euclidean_arm64_NEON(
+        return filter_rgb32_euclidean_ARM64_NEON(
             in, in_bytes_per_row, width, height,
             out, out_bytes_per_row,
             replacement, replace_color_within_range,

@@ -141,6 +141,7 @@
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 //#include "Common/SerialPABotBase/LightweightWallClock_StdChrono.h"
 #include "Common/Cpp/Options/MacAddressOption.h"
+#include "CommonTools/Images/ImageFilter.h"
 
 
 //#include <opencv2/core.hpp>
@@ -295,6 +296,17 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace std::chrono_literals;
 
 
+
+    ImageRGB32 image("20250503-121259857603.png");
+
+    image = filter_rgb32_euclidean(image, (uint32_t)COLOR_PURPLE, 100, COLOR_RED, true);
+    image.save("temp.png");
+
+
+
+
+
+#if 0
     uint8_t address[] = {0x12, 0x34, 0x56, 0x78, 0x9a, 0xbc};
 
     std::string str = write_MAC_address(6, address);
@@ -303,7 +315,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     parse_MAC_address(6, address, str);
     str = write_MAC_address(6, address);
     cout << str << endl;
-
+#endif
 
 #if 0
     SparseArray data{
