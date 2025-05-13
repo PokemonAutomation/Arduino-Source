@@ -106,11 +106,15 @@ std::unique_ptr<EditableTableRow> BBQuestTableRow::clone() const{
 BBQuestTable::BBQuestTable()
     : EditableTableOption_t<BBQuestTableRow>(
         "<b>Quest Exclusions:</b><br>"
-        "Exclude the quests in the table. If you are experiencing an issue or want to skip a quest, select it below. "
-        "Do not exclude too many quests, as rerolling will cost BP. "
+        "<b>Warning: Skipping Bonus quests will block the bonus slot.</b><br>"
+        "Exclude the quests in the table. If you want to skip a quest, select it below. "
+        "(Quests can be explicitly included, but this is not necessary.) "
+        "Do not exclude too many quests, as rerolling costs BP. "
         "The program will automatically reroll all quests if none are possible, but will not handle being out of BP. "
-        "Does not include egg hatching quest, as that is handled in the other options. "
-        "<b>Warning: Skipping Bonus quests will block the bonus slot.</b>",
+        "Does not include egg hatching or pickup quests, as eggs are handled in other options and pickup is not possible. ",
+        //"Duplicates of the same quest",
+        //duplicates will work in table order. might lead to weird behavior like rerolling and then marking a quest as complete.
+        //won't break the program though.
         LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
     )

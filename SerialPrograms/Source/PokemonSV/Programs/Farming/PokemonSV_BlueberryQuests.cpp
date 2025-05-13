@@ -293,7 +293,7 @@ std::vector<BBQuests> process_quest_list(
                 bool quest_in_table = false;
                 for(const std::unique_ptr<BBQuestTableRow>& row : exclusions_table){
                     if(n == row->quest) {
-                        stream.log("Quest found in exclusions table.");
+                        stream.log("Quest found in inclusions/exclusions table.");
                         quest_in_table = true;
 
                         WhiteButtonWatcher rp2(COLOR_BLUE, WhiteButton::ButtonB, {0.484, 0.117, 0.022, 0.037});
@@ -334,7 +334,7 @@ std::vector<BBQuests> process_quest_list(
                             pbf_wait(context, 100);
                             context.wait_for_all_requests();
 
-                            //Prevent error and allows program to reread the rerolled quests
+                            //Prevent error/rerolling again at the end (allows program to read the rerolled quests)
                             rerolled = true;
 
                             press_Bs_to_back_to_overworld(info, stream, context);
@@ -346,7 +346,7 @@ std::vector<BBQuests> process_quest_list(
                     }
                 }
                 if(!quest_in_table){
-                    stream.log("Quest not in exclusions table. Adding to list.");
+                    stream.log("Quest not in inclusion/exclusions table. Adding to list.");
                     quests_to_do.push_back(n);
                 }
             }
