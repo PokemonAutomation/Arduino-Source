@@ -7,9 +7,10 @@
 #ifdef PA_AutoDispatch_arm64_20_M1
 
 #include "Kernels/Kernels_arm64_NEON.h"
-#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Euclidean.h"
+#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
+#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_ARM64_NEON.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -23,7 +24,7 @@ public:
 
 public:
     PA_FORCE_INLINE PixelTest_Rgb32Euclidean_ARM64_NEON(
-        uint32_t expected, double max_euclidean_distance
+        uint32_t expected_color, double max_euclidean_distance
     )
         : m_expected_color_rgb_u8(vreinterpretq_u8_u32(vdupq_n_u32(expected_color & 0x00ffffff)))
         , m_distance_squared_u32(vdupq_n_u32((uint32_t)(max_euclidean_distance * max_euclidean_distance)))
@@ -31,7 +32,7 @@ public:
 
     //  Return a mask indicating which lanes are in range.
     PA_FORCE_INLINE uint32x4_t test_word(uint32x4_t& pixel) const{
-        uint32x4_t in_u32 = vld1q_u32(in);
+        uint32x4_t& in_u32 = pixel;
         // subtract the expected values
         uint32x4_t in_dif_u32 = vreinterpretq_u32_u8(vabdq_u8(vreinterpretq_u8_u32(in_u32), m_expected_color_rgb_u8));
 
