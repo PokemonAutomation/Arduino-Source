@@ -378,7 +378,7 @@ std::vector<BBQuests> process_quest_list(
         }
         context.wait_for_all_requests();
 
-        for (int i = 0; i < quest_list.size(); i++){
+        for (string::size_type i = 0; i < quest_list.size(); i++){
             pbf_press_button(context, BUTTON_A, 20, 50);
             pbf_press_button(context, BUTTON_A, 20, 50); //Yes.
             pbf_wait(context, 100);
