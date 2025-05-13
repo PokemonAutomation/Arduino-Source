@@ -33,6 +33,12 @@ enum class BBQuests{
     UnableToDetect
 };
 
+enum class BBQAction{
+    run,
+    skip,
+    reroll
+};
+
 //Quest exclusion table
 const EnumDropdownDatabase<BBQuests>& BBQuests_database();
 
@@ -43,6 +49,7 @@ public:
 
 public:
     EnumDropdownCell<BBQuests> quest;
+    EnumDropdownCell<BBQAction> action;
 };
 
 class BBQuestTable : public EditableTableOption_t<BBQuestTableRow>{

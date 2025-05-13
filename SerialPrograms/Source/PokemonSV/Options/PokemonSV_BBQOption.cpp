@@ -17,7 +17,7 @@ const EnumDropdownDatabase<BBQuests>& BBQuests_database(){
     static EnumDropdownDatabase<BBQuests> database{
         {BBQuests::auto_10,         "auto-10",          "Defeat 10 wild Pokemon using Auto Battle!"},
         {BBQuests::make_tm,         "make-tm",          "Make yourself a TM!"},
-        {BBQuests::pickup_10,       "pickup-10",        "Pick up items on the ground 10 times!"},
+        //{BBQuests::pickup_10,       "pickup-10",        "Pick up items on the ground 10 times!"},
         {BBQuests::sneak_up,        "sneak-up",         "Successfully sneak up on 1 Pokemon and surprise them with a battle!"},
         {BBQuests::photo_fly,       "photo-fly",        "Take a photo of a wild Pokemon in flight!"},
         {BBQuests::photo_swim,      "photo-swim",       "Take a photo of a wild Pokemon that is swimming!"},
@@ -79,24 +79,38 @@ const EnumDropdownDatabase<BBQuests>& BBQuests_database(){
     return database;
 }
 
+const EnumDropdownDatabase<BBQAction>& BBQAction_database(){
+    static EnumDropdownDatabase<BBQAction> database{
+        {BBQAction::run,    "run",      "Run Quest"},
+        {BBQAction::skip,   "skip",     "Skip"},
+        {BBQAction::reroll, "reroll",   "Reroll"},
+    };
+    return database;
+}
+
 BBQuestTableRow::BBQuestTableRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
     , quest(BBQuests_database(), LockMode::UNLOCK_WHILE_RUNNING, BBQuests::auto_10)
+    , action(BBQAction_database(), LockMode::UNLOCK_WHILE_RUNNING, BBQAction::skip)
 {
     PA_ADD_OPTION(quest);
+    PA_ADD_OPTION(action);
 }
 std::unique_ptr<EditableTableRow> BBQuestTableRow::clone() const{
     std::unique_ptr<BBQuestTableRow> ret(new BBQuestTableRow(parent()));
     ret->quest.set(quest);
+    ret->action.set(action);
     return ret;
 }
 
 BBQuestTable::BBQuestTable()
     : EditableTableOption_t<BBQuestTableRow>(
         "<b>Quest Exclusions:</b><br>"
-        "Exclude the quests in the table. "
-        "If you are experiencing an issue or want to skip a quest, select it below. "
-        "Does not include egg hatching quest, as that is handled in another option. ",
+        "Exclude the quests in the table. If you are experiencing an issue or want to skip a quest, select it below. "
+        "Do not exclude too many quests, as rerolling will cost BP. "
+        "The program will automatically reroll all quests if none are possible, but will not handle being out of BP. "
+        "Does not include egg hatching quest, as that is handled in the other options. "
+        "<b>Warning: Skipping Bonus quests will block the bonus slot.</b>",
         LockMode::LOCK_WHILE_RUNNING,
         make_defaults()
     )
@@ -105,6 +119,7 @@ BBQuestTable::BBQuestTable()
 std::vector<std::string> BBQuestTable::make_header() const{
     return {
         "Quest",
+        "Action",
     };
 }
 std::vector<std::unique_ptr<EditableTableRow>> BBQuestTable::make_defaults(){
