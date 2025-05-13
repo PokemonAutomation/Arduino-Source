@@ -285,20 +285,19 @@ std::vector<BBQuests> process_quest_list(
                     break;
                 }
             }else{
+                //TODO
+
+
                 stream.log("Quest possible");
                 quests_to_do.push_back(n);
             }
         }
     }
-
-    /*
-    Old logic that assumes most quests are not possible. Written when first starting on the program.
-    Should not be necessary anymore. Keeping around in case anyone wants to try making a multiplayer version.
     
     //Check that quests_to_do is not empty (after completing all quests on the list, be sure to erase it.
     //Lag might be a problem in multi - look into making slots like menu-left navigation
     if (quests_to_do.size() == 0){
-        console.log("No possible quests! Rerolling all quests.");
+        stream.log("No possible quests! Rerolling all quests.");
 
         //Open quest panel - see above
         //Reroll all.
@@ -313,7 +312,7 @@ std::vector<BBQuests> process_quest_list(
             context.wait_for_all_requests();
         }
         //Close quest panel - mash b
-    }*/
+    }
 
     if (quests_to_do.size() == 0){
         OperationFailedException::fire(
