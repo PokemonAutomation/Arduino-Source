@@ -66,8 +66,19 @@ Xoroshiro128PlusState find_rng_state(
     return rng.get_state();
 }
 
-
 Xoroshiro128PlusState refind_rng_state(
+    VideoStream& stream,
+    ProControllerContext& context,
+    Xoroshiro128PlusState last_known_state,
+    size_t min_advances,
+    size_t max_advances,
+    bool save_screenshots,
+    bool log_image_values
+) {
+    return refind_rng_state_and_animations(stream, context, last_known_state, min_advances, max_advances, save_screenshots, log_image_values).first;
+}
+
+std::pair<Xoroshiro128PlusState, uint64_t> refind_rng_state_and_animations(
     VideoStream& stream,
     ProControllerContext& context,
     Xoroshiro128PlusState last_known_state,
@@ -140,7 +151,7 @@ Xoroshiro128PlusState refind_rng_state(
     stream.log("RNG: state[0] = " + tostr_hex(rng.get_state().s0));
     stream.log("RNG: state[1] = " + tostr_hex(rng.get_state().s1));
 
-    return rng.get_state();
+    return { rng.get_state(), sequence.size() };
 }
 
 

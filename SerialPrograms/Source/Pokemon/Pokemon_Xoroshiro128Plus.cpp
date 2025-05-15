@@ -77,6 +77,22 @@ std::vector<bool> Xoroshiro128Plus::generate_last_bit_sequence(size_t max_advanc
     return sequence;
 }
 
+
+std::pair<bool, uint64_t> Xoroshiro128Plus::advances_to_state(Xoroshiro128PlusState other_state, uint64_t max_advances) {
+    Xoroshiro128Plus temp_rng(get_state());
+    uint64_t advances = 0;
+
+    while (advances <= max_advances) {
+        Xoroshiro128PlusState temp_state = temp_rng.get_state();
+        if (temp_state.s0 == other_state.s0 && temp_state.s1 == other_state.s1) {
+            return { true, advances };
+        }
+        temp_rng.next();
+        advances++;
+    }
+    return { false, advances };
+}
+
 // The generic solution to the system of equations to calculate the initial state from the last bits of 128 consecutive Xoroshiro128+ results.
 uint64_t Xoroshiro128Plus::last_bits_reverse_matrix[128][2] = {
     /*s0 bit 0*/ {0b0101001100100001111011111110111001010011111110101011100011001101, 0b0111010111110111000101010100001111101001111001011111001011010111} ,
