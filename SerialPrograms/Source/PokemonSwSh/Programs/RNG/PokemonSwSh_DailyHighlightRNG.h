@@ -45,7 +45,6 @@ public:
 private:
     StartInGripOrGameOption START_LOCATION;
     SimpleIntegerOption<uint16_t> NUM_HIGHLIGHTS;
-    BooleanCheckBoxOption CONTINUE;
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint16_t> SAVE_ITERATIONS;
@@ -55,13 +54,6 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    MillisecondsOption MOVE_TIME;
-    MillisecondsOption MOVE_TIME2;
-    SimpleIntegerOption<uint8_t> LEFT_X;
-    SimpleIntegerOption<uint8_t> LEFT_Y;
-    SimpleIntegerOption<uint8_t> RIGHT_X;
-    SimpleIntegerOption<uint8_t> RIGHT_Y;
-
     SimpleIntegerOption<uint32_t> MAX_UNKNOWN_ADVANCES;
     MillisecondsOption ADVANCE_PRESS_DURATION;
     MillisecondsOption ADVANCE_RELEASE_DURATION;

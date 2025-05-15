@@ -6,8 +6,6 @@
  *
  */
 
-#include <algorithm>
-#include <set>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
@@ -23,7 +21,6 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
@@ -84,9 +81,6 @@ DailyHighlightRNG::DailyHighlightRNG()
     : NUM_HIGHLIGHTS(
         "<b>Number of highlights:</b><br>How many daily highlights should be bought. <br>A value of 0 will run until you stop the program.",
         LockMode::UNLOCK_WHILE_RUNNING, 0)
-    , CONTINUE(
-        "<b>Continue from last time:</b><br>If the initial two daily highlights are already manipulated and should be bought.",
-        LockMode::UNLOCK_WHILE_RUNNING, false)
     , FIX_TIME_WHEN_DONE(
         "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.<br>Doesn't do anything if Number of highlights is 0.",
         LockMode::UNLOCK_WHILE_RUNNING, false)
@@ -146,7 +140,6 @@ DailyHighlightRNG::DailyHighlightRNG()
     PA_ADD_OPTION(START_LOCATION);
 
     PA_ADD_OPTION(NUM_HIGHLIGHTS);
-    PA_ADD_OPTION(CONTINUE);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(SAVE_ITERATIONS);
@@ -155,12 +148,6 @@ DailyHighlightRNG::DailyHighlightRNG()
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(MOVE_TIME);
-    PA_ADD_OPTION(MOVE_TIME2);
-    PA_ADD_OPTION(LEFT_X);
-    PA_ADD_OPTION(LEFT_Y);
-    PA_ADD_OPTION(RIGHT_X);
-    PA_ADD_OPTION(RIGHT_Y);
     PA_ADD_OPTION(MAX_UNKNOWN_ADVANCES);
     PA_ADD_OPTION(ADVANCE_PRESS_DURATION);
     PA_ADD_OPTION(ADVANCE_RELEASE_DURATION);
@@ -177,7 +164,7 @@ void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env
     pbf_press_button(context, BUTTON_A, 160ms, 600ms);
     pbf_press_button(context, BUTTON_A, 160ms, 160ms);
 
-    //Check if talking to the NPC was successfull
+    // Check if talking to the NPC was successfull
     VideoOverlaySet boxes(env.console);
     SelectionArrowFinder arrow_detector(env.console, ImageFloatBox(0.5, 0.58, 0.2, 0.08));
     arrow_detector.make_overlays(boxes);
@@ -185,6 +172,8 @@ void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env
     context.wait_for_all_requests();
     int ret = wait_until(env.console, context, 3000ms, { arrow_detector });
     if (ret < 0) {
+        DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
+        stats.errors++;
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to talk to the trader.",
@@ -194,6 +183,7 @@ void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env
 }
 
 void DailyHighlightRNG::buy_highlight(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+    // The player is expected to be in main dialog of the trader
     env.log("Buying Highlight.");
     env.console.overlay().add_log("Buying Highlight!", COLOR_WHITE);
     pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
@@ -215,6 +205,7 @@ void DailyHighlightRNG::buy_highlight(SingleSwitchProgramEnvironment& env, ProCo
     );
 
     if (ret < 0) {
+        env.
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Could not detect dialog.",
@@ -248,13 +239,14 @@ uint8_t DailyHighlightRNG::calibrate_num_npc_from_party(SingleSwitchProgramEnvir
     env.log("Calibrating NPC amount.");
     env.console.overlay().add_log("Calibrating NPC amount.", COLOR_WHITE);
 
-    env.current_stats<DailyHighlightRNG_Descriptor::Stats>().reads++;
+    DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
+    stats.reads++;
     std::pair<Xoroshiro128PlusState, uint64_t> result = refind_rng_state_and_animations(env.console, context, rng.get_state(), 0, 100, SAVE_SCREENSHOTS, LOG_VALUES);
     Xoroshiro128PlusState new_state = result.first;
     uint64_t additional_advances = result.second;
 
     // Calculate state for possible NPC amounts
-    const uint8_t MAX_NPCS = 4; // Usually either 1 or 2, maybe(?) 3 or 4 -> high numbers suggest bad npc state
+    const uint8_t MAX_NPCS = 6; // Usually either 1 or 2, sometimes 3 or 4, maybe 5 or 6 -> high numbers suggest bad npc state
     std::vector<Xoroshiro128PlusState> rng_states;
 
     for (size_t i = 0; i <= MAX_NPCS; i++) {
@@ -340,9 +332,6 @@ size_t DailyHighlightRNG::calculate_target(SingleSwitchProgramEnvironment& env, 
 void DailyHighlightRNG::prepare_game_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     env.log("Prepare player position.");
     env.console.overlay().add_log("Reset Player Position.", COLOR_WHITE);
-
-    // Return to overworld
-    return_to_overworld(env, context);
     
     // Open map
     pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
@@ -366,6 +355,8 @@ void DailyHighlightRNG::return_to_overworld(SingleSwitchProgramEnvironment& env,
         { {y_comm_icon_detector} }
     );
     if (ret != 0) {
+        DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
+        stats.errors++;
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect the Y-Comm icon.",
@@ -420,6 +411,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
         pbf_press_button(context, BUTTON_B, 40ms, 40ms);
     }
 
+
     Xoroshiro128Plus rng(0, 0);
     bool is_state_valid = false;
     size_t iteration = 0;
@@ -446,10 +438,13 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
         if (!is_state_valid) {
             successfull_iterations = 0;
             prepare_game_state(env, context);
+
+            // open and close the menu and immediately walk to the trader
             pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
             return_to_overworld(env, context);
             move_to_trader(env, context);
             interact_with_trader(env, context);
+
             return_to_overworld(env, context);
             navigate_to_party(env, context);
             context.wait_for_all_requests();
