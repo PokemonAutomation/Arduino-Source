@@ -57,6 +57,8 @@ void do_rng_advances(
     Milliseconds release_duration
 );
 
+Xoroshiro128PlusState predict_state_after_menu_close(Xoroshiro128PlusState current_state, uint8_t num_npcs);
+
 
 
 }

@@ -180,6 +180,18 @@ void do_rng_advances(
     pbf_wait(context, 1000ms);
 }
 
+Xoroshiro128PlusState predict_state_after_menu_close(Xoroshiro128PlusState current_state, uint8_t num_npcs) {
+    Xoroshiro128Plus rng(current_state);
+
+    for (size_t i = 0; i < num_npcs; i++) {
+        rng.nextInt(91);
+    }
+    rng.next();
+    rng.nextInt(61);
+
+    return rng.get_state();
+}
+
 
 }
 }

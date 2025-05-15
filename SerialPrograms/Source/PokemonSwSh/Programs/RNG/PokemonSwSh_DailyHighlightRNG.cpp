@@ -249,25 +249,14 @@ uint8_t DailyHighlightRNG::calibrate_num_npc_from_party(SingleSwitchProgramEnvir
     const uint8_t MAX_NPCS = 6; // Usually either 1 or 2, sometimes 3 or 4, maybe 5 or 6 -> high numbers suggest bad npc state
     std::vector<Xoroshiro128PlusState> rng_states;
 
-    for (size_t i = 0; i <= MAX_NPCS; i++) {
-        Xoroshiro128Plus temp_rng(rng.get_state());
-
-        for (size_t j = 0; j < i; j++) {
-            temp_rng.nextInt(91);
-        }
-        temp_rng.next();
-        temp_rng.nextInt(61);
+    for (size_t npcs = 0; npcs <= MAX_NPCS; npcs++) {
+        Xoroshiro128PlusState temp_state = predict_state_after_menu_close(rng.get_state(), npcs);
+        Xoroshiro128Plus temp_rng(temp_state);
 
         // Do advances that were needed to find current state
-        for (size_t j = 0; j < additional_advances; j++) {
+        for (size_t i = 0; i < additional_advances; i++) {
             temp_rng.next();
         }
-
-        env.console.log(std::to_string(i));
-        env.console.log(std::to_string(additional_advances));
-        env.console.log(tostr_hex(temp_rng.get_state().s0));
-        env.console.log(tostr_hex(temp_rng.get_state().s1));
-
         rng_states.push_back(temp_rng.get_state());
     }
 
@@ -305,12 +294,8 @@ size_t DailyHighlightRNG::calculate_target(SingleSwitchProgramEnvironment& env, 
     while (!found_advance_amount) {
         // Calculate the result for the current temp_rng state
 
-        Xoroshiro128Plus temp_rng(rng.get_state());
-        for (size_t i = 0; i < num_npcs; i++) {
-            temp_rng.nextInt(91);
-        }
-        temp_rng.next();
-        temp_rng.nextInt(61);
+        Xoroshiro128PlusState temp_state = predict_state_after_menu_close(rng.get_state(), num_npcs);
+        Xoroshiro128Plus temp_rng(temp_state);
 
         uint64_t highlight_roll = temp_rng.nextInt(1000);
 
