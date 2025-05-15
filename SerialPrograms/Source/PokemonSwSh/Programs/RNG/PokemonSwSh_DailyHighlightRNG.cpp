@@ -6,7 +6,6 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -105,12 +104,6 @@ DailyHighlightRNG::DailyHighlightRNG()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , MOVE_TIME("Move time:", LockMode::LOCK_WHILE_RUNNING, "1280 ms")
-    , MOVE_TIME2("Move time right:", LockMode::LOCK_WHILE_RUNNING, "1280 ms")
-    , LEFT_X("Left X:", LockMode::LOCK_WHILE_RUNNING, 207)
-    , LEFT_Y("Left Y:", LockMode::LOCK_WHILE_RUNNING, 1)
-    , RIGHT_X("Right X:", LockMode::LOCK_WHILE_RUNNING, 127)
-    , RIGHT_Y("Right Y:", LockMode::LOCK_WHILE_RUNNING, 127)
     , MAX_UNKNOWN_ADVANCES(
         "<b>Max Unknown advances:</b><br>How many advances to check when updating the rng state.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -205,7 +198,8 @@ void DailyHighlightRNG::buy_highlight(SingleSwitchProgramEnvironment& env, ProCo
     );
 
     if (ret < 0) {
-        env.
+        DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
+        stats.errors++;
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Could not detect dialog.",
@@ -249,7 +243,7 @@ uint8_t DailyHighlightRNG::calibrate_num_npc_from_party(SingleSwitchProgramEnvir
     const uint8_t MAX_NPCS = 6; // Usually either 1 or 2, sometimes 3 or 4, maybe 5 or 6 -> high numbers suggest bad npc state
     std::vector<Xoroshiro128PlusState> rng_states;
 
-    for (size_t npcs = 0; npcs <= MAX_NPCS; npcs++) {
+    for (uint8_t npcs = 0; npcs <= MAX_NPCS; npcs++) {
         Xoroshiro128PlusState temp_state = predict_state_after_menu_close(rng.get_state(), npcs);
         Xoroshiro128Plus temp_rng(temp_state);
 

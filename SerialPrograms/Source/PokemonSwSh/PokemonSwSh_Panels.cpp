@@ -180,7 +180,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- RNG ----");
     ret.emplace_back(make_single_switch_program<SeedFinder_Descriptor, SeedFinder>());
     ret.emplace_back(make_single_switch_program<CramomaticRNG_Descriptor, CramomaticRNG>());
-    ret.emplace_back(make_single_switch_program<DailyHighlightRNG_Descriptor, DailyHighlightRNG>());
 
     ret.emplace_back("---- Multi-Switch Programs ----");
     ret.emplace_back(make_multi_switch_program<SynchronizedSpinning_Descriptor, SynchronizedSpinning>());
@@ -202,7 +201,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedIoATrade_Descriptor, ShinyHuntUnattendedIoATrade>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
-//        ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back(make_single_switch_program<DailyHighlightRNG_Descriptor, DailyHighlightRNG>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
