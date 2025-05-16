@@ -1193,6 +1193,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonHome/Inference/PokemonHome_BallReader.h
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.cpp
     Source/PokemonHome/Inference/PokemonHome_BoxGenderDetector.h
+    Source/PokemonHome/Inference/PokemonHome_HomeApplicationDetector.cpp
+    Source/PokemonHome/Inference/PokemonHome_HomeApplicationDetector.h
     Source/PokemonHome/Options/PokemonHome_BoxSortingTable.cpp
     Source/PokemonHome/Options/PokemonHome_BoxSortingTable.h
     Source/PokemonHome/PokemonHome_Panels.cpp
