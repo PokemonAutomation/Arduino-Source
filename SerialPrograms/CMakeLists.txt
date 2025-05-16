@@ -149,6 +149,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/IntegerRangeOption.h
     ../Common/Cpp/Options/KeyBindingOption.cpp
     ../Common/Cpp/Options/KeyBindingOption.h
+    ../Common/Cpp/Options/MacAddressOption.cpp
+    ../Common/Cpp/Options/MacAddressOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
@@ -174,12 +176,12 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Rectangle.h
     ../Common/Cpp/Rectangle.tpp
     ../Common/Cpp/RecursiveThrottler.h
+    ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket_POSIX.h
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
-    ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
     ../Common/Cpp/StringTools.cpp
@@ -189,10 +191,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
-    ../Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h
-    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_Generic.h
-    ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
-    ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
     ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h
@@ -235,6 +233,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/IntegerRangeWidget.h
     ../Common/Qt/Options/KeyBindingWidget.cpp
     ../Common/Qt/Options/KeyBindingWidget.h
+    ../Common/Qt/Options/MacAddressWidget.cpp
+    ../Common/Qt/Options/MacAddressWidget.h
     ../Common/Qt/Options/RandomCodeWidget.cpp
     ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
@@ -247,10 +247,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/StringWidget.h
     ../Common/Qt/Options/TextEditWidget.cpp
     ../Common/Qt/Options/TextEditWidget.h
-    ../Common/Qt/Options/TimeExpressionWidget.cpp
-    ../Common/Qt/Options/TimeExpressionWidget.h
     ../Common/Qt/Options/TimeDurationWidget.cpp
     ../Common/Qt/Options/TimeDurationWidget.h
+    ../Common/Qt/Options/TimeExpressionWidget.cpp
+    ../Common/Qt/Options/TimeExpressionWidget.h
     ../Common/Qt/Redispatch.cpp
     ../Common/Qt/Redispatch.h
     ../Common/Qt/StringToolsQt.cpp
@@ -259,6 +259,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/TimeQt.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_Generic.h
+    ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
+    ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
     ../IconResource/IconResource.rc
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
@@ -381,6 +385,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Notifications/ProgramNotifications.h
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp
     Source/CommonFramework/Notifications/SenderNotificationTable.h
+    Source/CommonFramework/Options/CheckForUpdatesOption.h
     Source/CommonFramework/Options/Environment/PerformanceOptions.h
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
@@ -389,14 +394,13 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/Environment/SleepSuppressOption.h
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
-    Source/CommonFramework/Options/CheckForUpdatesOption.h
     Source/CommonFramework/Options/LabelCellOption.cpp
     Source/CommonFramework/Options/LabelCellOption.h
+    Source/CommonFramework/Options/QtWidget/LabelCellWidget.cpp
+    Source/CommonFramework/Options/QtWidget/LabelCellWidget.h
     Source/CommonFramework/Options/ResolutionOption.cpp
     Source/CommonFramework/Options/ResolutionOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
-    Source/CommonFramework/Options/QtWidget/LabelCellWidget.cpp
-    Source/CommonFramework/Options/QtWidget/LabelCellWidget.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
     Source/CommonFramework/Panels/PanelDescriptor.h
     Source/CommonFramework/Panels/PanelInstance.cpp
@@ -501,10 +505,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/Async/InferenceRoutines.h
     Source/CommonTools/Async/InferenceSession.cpp
     Source/CommonTools/Async/InferenceSession.h
-    Source/CommonTools/Async/InterruptableCommands.tpp
     Source/CommonTools/Async/InterruptableCommands.h
-    Source/CommonTools/Async/SuperControlSession.tpp
+    Source/CommonTools/Async/InterruptableCommands.tpp
     Source/CommonTools/Async/SuperControlSession.h
+    Source/CommonTools/Async/SuperControlSession.tpp
     Source/CommonTools/Audio/AudioPerSpectrumDetectorBase.cpp
     Source/CommonTools/Audio/AudioPerSpectrumDetectorBase.h
     Source/CommonTools/Audio/AudioTemplateCache.cpp
@@ -513,6 +517,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/Audio/SpectrogramMatcher.h
     Source/CommonTools/DetectionDebouncer.h
     Source/CommonTools/FailureWatchdog.h
+    Source/CommonTools/GlobalInferenceRunner.cpp
+    Source/CommonTools/GlobalInferenceRunner.h
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.cpp
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h
     Source/CommonTools/ImageMatch/ExactImageDictionaryMatcher.cpp
@@ -558,9 +564,9 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/InferencePivots/AudioInferencePivot.h
     Source/CommonTools/InferencePivots/VisualInferencePivot.cpp
     Source/CommonTools/InferencePivots/VisualInferencePivot.h
-    Source/CommonTools/GlobalInferenceRunner.cpp
-    Source/CommonTools/GlobalInferenceRunner.h
     Source/CommonTools/InferenceThrottler.h
+    Source/CommonTools/MultiConsoleErrors.cpp
+    Source/CommonTools/MultiConsoleErrors.h
     Source/CommonTools/OCR/OCR_DictionaryMatcher.cpp
     Source/CommonTools/OCR/OCR_DictionaryMatcher.h
     Source/CommonTools/OCR/OCR_DictionaryOCR.cpp
@@ -585,29 +591,27 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/OCR/OCR_TrainingTools.h
     Source/CommonTools/Options/LanguageOCROption.cpp
     Source/CommonTools/Options/LanguageOCROption.h
-    Source/CommonTools/Options/ScreenWatchOption.cpp
-    Source/CommonTools/Options/ScreenWatchOption.h
-    Source/CommonTools/Options/StringSelectOption.cpp
-    Source/CommonTools/Options/StringSelectOption.h
-    Source/CommonTools/Options/StringSelectTableOption.h
     Source/CommonTools/Options/QtWidgets/LanguageOCRWidget.cpp
     Source/CommonTools/Options/QtWidgets/LanguageOCRWidget.h
     Source/CommonTools/Options/QtWidgets/ScreenWatchWidget.cpp
     Source/CommonTools/Options/QtWidgets/ScreenWatchWidget.h
     Source/CommonTools/Options/QtWidgets/StringSelectWidget.cpp
     Source/CommonTools/Options/QtWidgets/StringSelectWidget.h
+    Source/CommonTools/Options/ScreenWatchOption.cpp
+    Source/CommonTools/Options/ScreenWatchOption.h
+    Source/CommonTools/Options/StringSelectOption.cpp
+    Source/CommonTools/Options/StringSelectOption.h
+    Source/CommonTools/Options/StringSelectTableOption.h
     Source/CommonTools/Options/TrainOCRModeOption.h
-    Source/CommonTools/MultiConsoleErrors.cpp
-    Source/CommonTools/MultiConsoleErrors.h
-    Source/CommonTools/TrendInference/AnomalyDetector.cpp
-    Source/CommonTools/TrendInference/AnomalyDetector.h
-    Source/CommonTools/TrendInference/TimeWindowStatTracker.h
     Source/CommonTools/Resources/SpriteDatabase.cpp
     Source/CommonTools/Resources/SpriteDatabase.h
     Source/CommonTools/StartupChecks/StartProgramChecks.cpp
     Source/CommonTools/StartupChecks/StartProgramChecks.h
     Source/CommonTools/StartupChecks/VideoResolutionCheck.cpp
     Source/CommonTools/StartupChecks/VideoResolutionCheck.h
+    Source/CommonTools/TrendInference/AnomalyDetector.cpp
+    Source/CommonTools/TrendInference/AnomalyDetector.h
+    Source/CommonTools/TrendInference/TimeWindowStatTracker.h
     Source/CommonTools/VisualDetector.h
     Source/CommonTools/VisualDetectors/BlackBorderDetector.cpp
     Source/CommonTools/VisualDetectors/BlackBorderDetector.h
@@ -628,17 +632,17 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/Controller.h
     Source/Controllers/ControllerCapability.cpp
     Source/Controllers/ControllerCapability.h
-    Source/Controllers/ControllerDescriptor.cpp
-    Source/Controllers/ControllerDescriptor.h
     Source/Controllers/ControllerConnection.cpp
     Source/Controllers/ControllerConnection.h
-    Source/Controllers/ControllerSession.cpp
-    Source/Controllers/ControllerSession.h
+    Source/Controllers/ControllerDescriptor.cpp
+    Source/Controllers/ControllerDescriptor.h
     Source/Controllers/ControllerSelectorWidget.cpp
     Source/Controllers/ControllerSelectorWidget.h
-    Source/Controllers/ControllerTypes.h
+    Source/Controllers/ControllerSession.cpp
+    Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
+    Source/Controllers/ControllerTypes.h
     Source/Controllers/JoystickTools.h
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
@@ -648,8 +652,6 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/KeyboardInput/KeyboardStateTracker.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
-    Source/Controllers/SuperscalarScheduler.cpp
-    Source/Controllers/SuperscalarScheduler.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
@@ -665,6 +667,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
+    Source/Controllers/SuperscalarScheduler.cpp
+    Source/Controllers/SuperscalarScheduler.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp
@@ -760,6 +764,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.tpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_ARM64_NEON.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_ARM64_NEON.h
@@ -767,7 +772,6 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_AVX2.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_AVX512.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_SSE42.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_ARM64_NEON.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
@@ -775,9 +779,9 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.cpp
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness.h
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_Default.cpp
-    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_SSE42.cpp
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_AVX2.cpp
     Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_AVX512-VNNI.cpp
+    Source/Kernels/ImageFilters/RGB32_Brightness/Kernels_ImageFilter_RGB32_Brightness_x64_SSE42.cpp
     Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.cpp
     Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean.h
     Source/Kernels/ImageFilters/RGB32_EuclideanDistance/Kernels_ImageFilter_RGB32_Euclidean_ARM64_NEON.cpp
@@ -871,14 +875,14 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
@@ -1031,6 +1035,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Pokemon_Strings.h
     Source/Pokemon/Pokemon_Types.cpp
     Source/Pokemon/Pokemon_Types.h
+    Source/Pokemon/Pokemon_Xoroshiro128Plus.cpp
+    Source/Pokemon/Pokemon_Xoroshiro128Plus.h
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp
     Source/Pokemon/Resources/Pokemon_BerryNames.h
     Source/Pokemon/Resources/Pokemon_BerrySprites.cpp
@@ -1043,8 +1049,6 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Resources/Pokemon_PokemonNames.h
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h
-    Source/Pokemon/Pokemon_Xoroshiro128Plus.cpp
-    Source/Pokemon/Pokemon_Xoroshiro128Plus.h
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.cpp
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.cpp
@@ -1408,12 +1412,18 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.h
     Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.cpp
     Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h
-    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.cpp
-    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h
+    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.cpp
+    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h
+    Source/PokemonLGPE/PokemonLGPE_Panels.cpp
+    Source/PokemonLGPE/PokemonLGPE_Panels.h
+    Source/PokemonLGPE/PokemonLGPE_Settings.cpp
+    Source/PokemonLGPE/PokemonLGPE_Settings.h
     Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.cpp
     Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.h
+    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp
+    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.cpp
@@ -1424,18 +1434,20 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
-    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp
-    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h
-    Source/PokemonLGPE/PokemonLGPE_Panels.cpp
-    Source/PokemonLGPE/PokemonLGPE_Panels.h
-    Source/PokemonLGPE/PokemonLGPE_Settings.cpp
-    Source/PokemonLGPE/PokemonLGPE_Settings.h
+    Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
-    Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp
-    Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h
+    Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp
+    Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h
+    Source/PokemonRSE/PokemonRSE_Navigation.cpp
+    Source/PokemonRSE/PokemonRSE_Navigation.h
+    Source/PokemonRSE/PokemonRSE_Panels.cpp
+    Source/PokemonRSE/PokemonRSE_Panels.h
+    Source/PokemonRSE/PokemonRSE_Settings.cpp
+    Source/PokemonRSE/PokemonRSE_Settings.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.cpp
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_AudioStarterReset.h
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_LegendaryHunt-Emerald.cpp
@@ -1448,12 +1460,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonRSE/Programs/ShinyHunting/PokemonRSE_StarterReset.h
     Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.cpp
     Source/PokemonRSE/Programs/TestPrograms/PokemonRSE_SoundListener.h
-    Source/PokemonRSE/PokemonRSE_Navigation.cpp
-    Source/PokemonRSE/PokemonRSE_Navigation.h
-    Source/PokemonRSE/PokemonRSE_Panels.cpp
-    Source/PokemonRSE/PokemonRSE_Panels.h
-    Source/PokemonRSE/PokemonRSE_Settings.cpp
-    Source/PokemonRSE/PokemonRSE_Settings.h
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h
     Source/PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.cpp
@@ -1495,7 +1501,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.cpp
     Source/PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterPrizeReader.h
     Source/PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.cpp
-    Source/PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.h    
+    Source/PokemonSV/Inference/Map/PokemonSV_DestinationMarkerDetector.h
     Source/PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.cpp
     Source/PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.h
     Source/PokemonSV/Inference/Map/PokemonSV_MapDetector.cpp
@@ -1515,11 +1521,11 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.cpp
-    Source/PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.h    
+    Source/PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.cpp
-    Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h    
+    Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.cpp
@@ -1545,13 +1551,13 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h
     Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.cpp
-    Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.h      
+    Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.h
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.cpp
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.h
-    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.cpp
-    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.h    
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h
+    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.cpp
+    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.h
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h
     Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp
@@ -1561,7 +1567,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.cpp
     Source/PokemonSV/Inference/PokemonSV_TournamentPrizeNameReader.h
     Source/PokemonSV/Inference/PokemonSV_TutorialDetector.cpp
-    Source/PokemonSV/Inference/PokemonSV_TutorialDetector.h    
+    Source/PokemonSV/Inference/PokemonSV_TutorialDetector.h
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.cpp
@@ -1583,10 +1589,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.cpp
     Source/PokemonSV/Options/PokemonSV_AuctionItemTable.h
     Source/PokemonSV/Options/PokemonSV_AutoHostOptions.h
-    Source/PokemonSV/Options/PokemonSV_BattleMoveTable.cpp
-    Source/PokemonSV/Options/PokemonSV_BattleMoveTable.h
     Source/PokemonSV/Options/PokemonSV_BBQOption.cpp
     Source/PokemonSV/Options/PokemonSV_BBQOption.h
+    Source/PokemonSV/Options/PokemonSV_BattleMoveTable.cpp
+    Source/PokemonSV/Options/PokemonSV_BattleMoveTable.h
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.cpp
     Source/PokemonSV/Options/PokemonSV_EggPowerSandwichOption.h
     Source/PokemonSV/Options/PokemonSV_EncounterActionsTable.cpp
@@ -1620,14 +1626,18 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/PokemonSV_Panels.h
     Source/PokemonSV/PokemonSV_Settings.cpp
     Source/PokemonSV/PokemonSV_Settings.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_00.cpp
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_00.h 
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_00.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_01.cpp
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_01.h 
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_01.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_02.cpp
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_02.h 
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_02.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_03.cpp
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_03.h 
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_03.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_04.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_04.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_05.cpp
@@ -1670,10 +1680,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_23.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_24.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_24.h
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.cpp
@@ -1722,9 +1728,9 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_LPFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmer.cpp
-    Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmer.h    
+    Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.cpp
-    Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h    
+    Source/PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h
     Source/PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer2.cpp
@@ -2145,6 +2151,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h
+    Source/PokemonSwSh/Programs/PokemonSwSh_ReleaseHelpers.h
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp
@@ -2157,7 +2164,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.cpp
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h
-    Source/PokemonSwSh/Programs/PokemonSwSh_ReleaseHelpers.h
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.cpp
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.cpp
@@ -2218,6 +2224,8 @@ file(GLOB MAIN_SOURCES
     Source/Tests/NintendoSwitch_Tests.h
     Source/Tests/PokemonLA_Tests.cpp
     Source/Tests/PokemonLA_Tests.h
+    Source/Tests/PokemonLZA_Tests.cpp
+    Source/Tests/PokemonLZA_Tests.h
     Source/Tests/PokemonSV_Tests.cpp
     Source/Tests/PokemonSV_Tests.h
     Source/Tests/PokemonSwSh_Tests.cpp
@@ -2244,7 +2252,6 @@ file(GLOB MAIN_SOURCES
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
 
 if (APPLE)
-    # TODO: set up the correct application icon
     set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../IconResource/icon.icns)
     # set_source_files_properties(SerialPrograms_ICON PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
 
@@ -2254,7 +2261,7 @@ if (APPLE)
     add_executable(SerialPrograms MACOSX_BUNDLE ${SerialPrograms_ICON} ${MAIN_SOURCES})
     set_target_properties(SerialPrograms PROPERTIES
         BUNDLE True
-        MACOSX_BUNDLE_GUI_IDENTIFIER PokemonAutomation.SerialPrograms 
+        MACOSX_BUNDLE_GUI_IDENTIFIER PokemonAutomation.SerialPrograms
         MACOSX_BUNDLE_BUNDLE_NAME SerialPrograms
         MACOSX_BUNDLE_BUNDLE_VERSION "0.1"
         MACOSX_BUNDLE_SHORT_VERSION_STRING "0.1"
@@ -2264,6 +2271,8 @@ if (APPLE)
         RESOURCE ${SerialPrograms_ICON}
     )
 
+    # make sure Packages repo, https://github.com/PokemonAutomation/Packages is placed in the same folder as this Arduino-Source repo
+    # so the post-build command can copy the resources folder Packages/SerialPrograms/Resources/ into the built app bundle
     add_custom_command(
         TARGET SerialPrograms
         POST_BUILD

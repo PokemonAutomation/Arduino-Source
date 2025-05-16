@@ -34,7 +34,15 @@ public:
 
 
 private:
-    // One iteration in the main program loop
+    // Run one iteration of the outbreak finder loop and return any found outbreaks.
+    // The iteration includes:
+    // 1. Starting at Jubilife Village gate, go to check the map for outbreaks.
+    // 2. If found desired outbreaks, stop.
+    // 3. If need to check MMOs, save in front of gate, then go to each region with MMO and talk to Mai to
+    //    reveal MMO pokemon. Reset if no desired MMO to conserve Aguav Berries. 
+    // 4. If found desired MMO pokemon, stop.
+    // 5. No desired outbreak in this iteration, go to an arbitrary region and return to village to refresh outbreaks.
+    //
     // - desired_hisui_map_events: desired events happening on the travel map of Hisui when leaving Jubilife Village.
     //   It contains desired pokemon outbreak names and MMO outbreak names (e.g. "fieldlands-mmo"). If there are
     //   desired MMO pokemon (including those with star symbols), the MMO outbreaks that may spawn them are also
@@ -46,7 +54,7 @@ private:
     // - desired_MMO_pokemon: user desired MMO pokemon selected by `DESIRED_MMO_SLUGS`.
     //   User selected MMO pokemon with star symbols, `DESIRED_STAR_MMO_SLUGS` do not affect `desired_MMO_pokemon`. 
     // - desired_star_MMO_pokemon: user desired MMO pokemon with star symbols.
-    bool run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    std::vector<std::string> run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
         const std::set<std::string>& desired_hisui_map_events,
         const std::set<std::string>& desired_outbreaks,
         const std::set<std::string>& desired_MMO_pokemon,

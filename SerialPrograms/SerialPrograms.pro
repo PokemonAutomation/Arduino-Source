@@ -114,6 +114,7 @@ SOURCES += \
     ../Common/Cpp/Options/GroupOption.cpp \
     ../Common/Cpp/Options/IntegerRangeOption.cpp \
     ../Common/Cpp/Options/KeyBindingOption.cpp \
+    ../Common/Cpp/Options/MacAddressOption.cpp \
     ../Common/Cpp/Options/RandomCodeOption.cpp \
     ../Common/Cpp/Options/SimpleIntegerOption.cpp \
     ../Common/Cpp/Options/StaticTableOption.cpp \
@@ -147,6 +148,7 @@ SOURCES += \
     ../Common/Qt/Options/GroupWidget.cpp \
     ../Common/Qt/Options/IntegerRangeWidget.cpp \
     ../Common/Qt/Options/KeyBindingWidget.cpp \
+    ../Common/Qt/Options/MacAddressWidget.cpp \
     ../Common/Qt/Options/RandomCodeWidget.cpp \
     ../Common/Qt/Options/SimpleIntegerWidget.cpp \
     ../Common/Qt/Options/StaticTableWidget.cpp \
@@ -213,8 +215,8 @@ SOURCES += \
     Source/CommonFramework/Options/Environment/SleepSuppressOption.cpp \
     Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/LabelCellOption.cpp \
-    Source/CommonFramework/Options/ResolutionOption.cpp \
     Source/CommonFramework/Options/QtWidget/LabelCellWidget.cpp \
+    Source/CommonFramework/Options/ResolutionOption.cpp \
     Source/CommonFramework/Panels/PanelDescriptor.cpp \
     Source/CommonFramework/Panels/PanelInstance.cpp \
     Source/CommonFramework/Panels/PanelList.cpp \
@@ -315,9 +317,9 @@ SOURCES += \
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp \
     Source/Controllers/ControllerCapability.cpp \
     Source/Controllers/ControllerConnection.cpp \
+    Source/Controllers/ControllerDescriptor.cpp \
     Source/Controllers/ControllerSelectorWidget.cpp \
     Source/Controllers/ControllerSession.cpp \
-    Source/Controllers/ControllerDescriptor.cpp \
     Source/Controllers/ControllerTypeStrings.cpp \
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp \
     Source/Controllers/KeyboardInput/KeyboardInput.cpp \
@@ -368,8 +370,8 @@ SOURCES += \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp \
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_ARM64_NEON.cpp \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp \
@@ -432,10 +434,10 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.cpp \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp \
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp \
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.cpp \
@@ -694,17 +696,17 @@ SOURCES += \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.cpp \
     Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.cpp \
     Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.cpp \
-    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.cpp \
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.cpp \
+    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.cpp \
+    Source/PokemonLGPE/PokemonLGPE_Panels.cpp \
+    Source/PokemonLGPE/PokemonLGPE_Settings.cpp \
     Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.cpp \
+    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.cpp \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.cpp \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.cpp \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.cpp \
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp \
-    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.cpp \
-    Source/PokemonLGPE/PokemonLGPE_Panels.cpp \
-    Source/PokemonLGPE/PokemonLGPE_Settings.cpp \
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp \
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp \
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.cpp \
@@ -764,8 +766,8 @@ SOURCES += \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.cpp \
     Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.cpp \
-    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.cpp \
+    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.cpp \
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.cpp \
@@ -799,6 +801,8 @@ SOURCES += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.cpp \
     Source/PokemonSV/PokemonSV_Panels.cpp \
     Source/PokemonSV/PokemonSV_Settings.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_00.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_01.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_02.cpp \
@@ -824,8 +828,6 @@ SOURCES += \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_22.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_23.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_24.cpp \
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.cpp \
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.cpp \
     Source/PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.cpp \
@@ -1089,11 +1091,13 @@ SOURCES += \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.cpp \
     Source/PokemonSwSh/ShinyHuntTracker.cpp \
+    Source/PokemonZLA/Inference/PokemonZLA_DialogDetector.cpp \
     Source/Tests/CommandLineTests.cpp \
     Source/Tests/CommonFramework_Tests.cpp \
     Source/Tests/Kernels_Tests.cpp \
     Source/Tests/NintendoSwitch_Tests.cpp \
     Source/Tests/PokemonLA_Tests.cpp \
+    Source/Tests/PokemonLZA_Tests.cpp \
     Source/Tests/PokemonSV_Tests.cpp \
     Source/Tests/PokemonSwSh_Tests.cpp \
     Source/Tests/TestMap.cpp \
@@ -1244,6 +1248,7 @@ HEADERS += \
     ../Common/Cpp/Options/GroupOption.h \
     ../Common/Cpp/Options/IntegerRangeOption.h \
     ../Common/Cpp/Options/KeyBindingOption.h \
+    ../Common/Cpp/Options/MacAddressOption.h \
     ../Common/Cpp/Options/RandomCodeOption.h \
     ../Common/Cpp/Options/SimpleIntegerOption.h \
     ../Common/Cpp/Options/StaticTableOption.h \
@@ -1291,6 +1296,7 @@ HEADERS += \
     ../Common/Qt/Options/GroupWidget.h \
     ../Common/Qt/Options/IntegerRangeWidget.h \
     ../Common/Qt/Options/KeyBindingWidget.h \
+    ../Common/Qt/Options/MacAddressWidget.h \
     ../Common/Qt/Options/RandomCodeWidget.h \
     ../Common/Qt/Options/SimpleIntegerWidget.h \
     ../Common/Qt/Options/StaticTableWidget.h \
@@ -1385,9 +1391,9 @@ HEADERS += \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.h \
     Source/CommonFramework/Options/Environment/SleepSuppressOption.h \
     Source/CommonFramework/Options/LabelCellOption.h \
+    Source/CommonFramework/Options/QtWidget/LabelCellWidget.h \
     Source/CommonFramework/Options/ResolutionOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
-    Source/CommonFramework/Options/QtWidget/LabelCellWidget.h \
     Source/CommonFramework/Panels/PanelDescriptor.h \
     Source/CommonFramework/Panels/PanelInstance.h \
     Source/CommonFramework/Panels/PanelList.h \
@@ -1513,9 +1519,9 @@ HEADERS += \
     Source/Controllers/Controller.h \
     Source/Controllers/ControllerCapability.h \
     Source/Controllers/ControllerConnection.h \
+    Source/Controllers/ControllerDescriptor.h \
     Source/Controllers/ControllerSelectorWidget.h \
     Source/Controllers/ControllerSession.h \
-    Source/Controllers/ControllerDescriptor.h \
     Source/Controllers/ControllerTypeStrings.h \
     Source/Controllers/ControllerTypes.h \
     Source/Controllers/JoystickTools.h \
@@ -1637,10 +1643,10 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h \
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h \
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h \
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h \
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.h \
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.h \
@@ -1655,7 +1661,6 @@ HEADERS += \
     Source/NintendoSwitch/DevPrograms/JoyconProgram.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
-    Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramSession.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemOption.h \
@@ -1671,6 +1676,7 @@ HEADERS += \
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h \
     Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.h \
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h \
+    Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h \
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
     Source/NintendoSwitch/NintendoSwitch_Settings.h \
@@ -1905,17 +1911,17 @@ HEADERS += \
     Source/PokemonLA/Resources/PokemonLA_WeatherAndTimeIcons.h \
     Source/PokemonLGPE/Commands/PokemonLGPE_DateSpam.h \
     Source/PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h \
-    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h \
     Source/PokemonLGPE/Inference/PokemonLGPE_ShinySymbolDetector.h \
+    Source/PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h \
+    Source/PokemonLGPE/PokemonLGPE_Panels.h \
+    Source/PokemonLGPE/PokemonLGPE_Settings.h \
     Source/PokemonLGPE/Programs/Farming/PokemonLGPE_DailyItemFarmer.h \
+    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_AlolanTrade.h \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_FossilRevival.h \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_GiftReset.h \
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h \
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h \
-    Source/PokemonLGPE/Programs/PokemonLGPE_GameEntry.h \
-    Source/PokemonLGPE/PokemonLGPE_Panels.h \
-    Source/PokemonLGPE/PokemonLGPE_Settings.h \
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h \
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.h \
     Source/PokemonRSE/Inference/Sounds/PokemonRSE_ShinySoundDetector.h \
@@ -1975,8 +1981,8 @@ HEADERS += \
     Source/PokemonSV/Inference/PokemonSV_MainMenuDetector.h \
     Source/PokemonSV/Inference/PokemonSV_MenuOptionReader.h \
     Source/PokemonSV/Inference/PokemonSV_MoneyReader.h \
-    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.h \
     Source/PokemonSV/Inference/PokemonSV_PokePortalDetector.h \
+    Source/PokemonSV/Inference/PokemonSV_PokemonMovesReader.h \
     Source/PokemonSV/Inference/PokemonSV_PokemonSummaryReader.h \
     Source/PokemonSV/Inference/PokemonSV_StatHexagonReader.h \
     Source/PokemonSV/Inference/PokemonSV_SweatBubbleDetector.h \
@@ -2012,6 +2018,8 @@ HEADERS += \
     Source/PokemonSV/Options/PokemonSV_TournamentPrizeTable.h \
     Source/PokemonSV/PokemonSV_Panels.h \
     Source/PokemonSV/PokemonSV_Settings.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h \
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_00.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_01.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_02.h \
@@ -2037,8 +2045,6 @@ HEADERS += \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_22.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_23.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_24.h \
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h \
-    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.h \
     Source/PokemonSV/Programs/AutoStory/PokemonSV_OliveActionFailedException.h \
@@ -2276,13 +2282,13 @@ HEADERS += \
     Source/PokemonSwSh/Programs/PokemonSwSh_Internet.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h \
+    Source/PokemonSwSh/Programs/PokemonSwSh_ReleaseHelpers.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_CramomaticRNG.h \
     Source/PokemonSwSh/Programs/RNG/PokemonSwSh_SeedFinder.h \
-    Source/PokemonSwSh/Programs/PokemonSwSh_ReleaseHelpers.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-IoATrade.h \
@@ -2308,11 +2314,13 @@ HEADERS += \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h \
     Source/PokemonSwSh/ShinyHuntTracker.h \
+    Source/PokemonZLA/Inference/PokemonZLA_DialogDetector.h \
     Source/Tests/CommandLineTests.h \
     Source/Tests/CommonFramework_Tests.h \
     Source/Tests/Kernels_Tests.h \
     Source/Tests/NintendoSwitch_Tests.h \
     Source/Tests/PokemonLA_Tests.h \
+    Source/Tests/PokemonLZA_Tests.h \
     Source/Tests/PokemonSV_Tests.h \
     Source/Tests/PokemonSwSh_Tests.h \
     Source/Tests/TestMap.h \

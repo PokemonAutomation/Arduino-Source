@@ -52,8 +52,10 @@ int main(int argc, char *argv[]){
 //#endif
     QApplication application(argc, argv);
 
-    global_logger_tagged().log("================================================================================");
-    global_logger_tagged().log("Starting Program...");
+    Logger& logger = global_logger_tagged();
+
+    logger.log("================================================================================");
+    logger.log("Starting Program...");
 
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<uint8_t>("uint8_t");
@@ -66,22 +68,28 @@ int main(int argc, char *argv[]){
     QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
     QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
 
+    //  Several novice developers struggled to build and run the program due to missing Resources folder.
+    //  Add this check to pop a message box when Resources folder is missing.
+    if (!check_resource_folder(logger)){
+        return 1;
+    }
+
     //  Read program settings from json file: SerialPrograms-Settings.json.
     try{
-        if (!migrate_settings(global_logger_tagged(), application.applicationName().toStdString() + "-Settings.json")){
+        if (!migrate_settings(logger, application.applicationName().toStdString() + "-Settings.json")){
             return 1;
         }
 
         std::cout << "Loading from program setting JSON: " << PROGRAM_SETTING_JSON_PATH() << std::endl;
         PERSISTENT_SETTINGS().read();
 
-        if (!migrate_stats(global_logger_tagged())){
+        if (!migrate_stats(logger)){
             return 1;
         }
     }catch (const FileException& error){
-        global_logger_tagged().log(error.message(), COLOR_RED);
+        logger.log(error.message(), COLOR_RED);
     }catch (const ParseException& error){
-        global_logger_tagged().log(error.message(), COLOR_RED);
+        logger.log(error.message(), COLOR_RED);
     }
 
     if (GlobalSettings::instance().COMMAND_LINE_TEST_MODE){
@@ -93,7 +101,7 @@ int main(int argc, char *argv[]){
         return 1;
     }
 
-    check_new_version(global_logger_tagged());
+    check_new_version(logger);
 
     Integration::DiscordIntegrationSettingsOption& discord_settings = GlobalSettings::instance().DISCORD->integration;
     if (discord_settings.run_on_start){
@@ -113,7 +121,7 @@ int main(int argc, char *argv[]){
     set_working_directory();
 
     //  Run this asynchronously to we don't block startup.
-    std::unique_ptr<AsyncTask> task = send_all_unsent_reports(global_logger_tagged(), true);
+    std::unique_ptr<AsyncTask> task = send_all_unsent_reports(logger, true);
 
     int ret = 0;
     {

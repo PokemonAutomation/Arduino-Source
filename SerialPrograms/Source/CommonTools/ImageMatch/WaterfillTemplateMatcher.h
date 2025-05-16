@@ -69,6 +69,9 @@ public:
     //  See `double rmsd(const ImageViewRGB32& image) const` on the details of comparing the image against the template.
     virtual double rmsd_original(const ImageViewRGB32& original_image, const WaterfillObject& object) const;
 
+    //  Return the image template mesh
+    const ImageRGB32& image_template() const { return m_matcher->image_template(); }
+
 protected:
     virtual bool check_image(const ImageViewRGB32& image) const{ return true; };
     bool check_aspect_ratio(size_t candidate_width, size_t candidate_height) const;

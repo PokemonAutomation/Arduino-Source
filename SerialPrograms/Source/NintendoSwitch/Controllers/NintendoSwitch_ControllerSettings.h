@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/ColorOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/MacAddressOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "CommonTools/Options/StringSelectOption.h"
 #include "Controllers/ControllerTypes.h"
@@ -53,6 +54,7 @@ public:
 
 public:
     StringCell name;
+    MacAddressCell controller_mac_address;
     EnumDropdownCell<ControllerType> controller;
     ColorCell button_color;
     ColorCell body_color;
@@ -72,6 +74,7 @@ public:
 
     static ControllerProfile random_profile(ControllerType controller);
     ControllerProfile get_or_make_profile(
+        const uint8_t mac_address[6],
         const std::string& name,
         ControllerType controller
     );

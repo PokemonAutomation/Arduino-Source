@@ -139,6 +139,7 @@ ControllerSettingsRow::~ControllerSettingsRow(){
 ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
     , name(false, LockMode::UNLOCK_WHILE_RUNNING, "", "COM3")
+    , controller_mac_address(LockMode::UNLOCK_WHILE_RUNNING, 6, nullptr)
     , controller(
         ControllerSettingsType_Database(),
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -172,6 +173,7 @@ ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table)
     , m_pending_official_load(0)
 {
     add_option(name, "Name");
+    add_option(controller_mac_address, "Controller MAC Address");
     add_option(controller, "Controller");
     add_option(button_color, "Button");
     add_option(body_color, "Body");
@@ -193,6 +195,7 @@ ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table)
 std::unique_ptr<EditableTableRow> ControllerSettingsRow::clone() const{
     std::unique_ptr<ControllerSettingsRow> ret(new ControllerSettingsRow(parent()));
     ret->name.set((std::string)name);
+    ret->controller_mac_address = controller_mac_address;
     ret->controller.set(controller);
     ret->button_color.set(button_color);
     ret->body_color.set(body_color);
@@ -261,6 +264,7 @@ ControllerSettingsTable::ControllerSettingsTable()
 std::vector<std::string> ControllerSettingsTable::make_header() const{
     return std::vector<std::string>{
         "Name",
+        "MAC Address",
         "Controller",
         "Button",
         "Body",
@@ -285,6 +289,7 @@ ControllerProfile ControllerSettingsTable::random_profile(ControllerType control
     return profile;
 }
 ControllerProfile ControllerSettingsTable::get_or_make_profile(
+    const uint8_t mac_address[6],
     const std::string& name,
     ControllerType controller
 ){
@@ -305,6 +310,14 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
 
     bool found = false;
     this->run_on_all_rows([&, controller](ControllerSettingsRow& row){
+        if (row.controller_mac_address == mac_address){
+//            row.name.set(name);
+            row.controller_mac_address.set(mac_address);
+            row.controller.set(controller);
+            found = true;
+            profile = row;
+            return true;
+        }
         if ((std::string)row.name != name){
             return false;
         }
@@ -312,6 +325,7 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
             return false;
         }
 
+        row.controller_mac_address.set(mac_address);
         found = true;
         profile = row;
         return true;
@@ -325,6 +339,7 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
 
     std::unique_ptr<ControllerSettingsRow> row(new ControllerSettingsRow(*this));
     row->name.set(name);
+    row->controller_mac_address.set(mac_address);
     row->controller.set(controller);
     row->set_profile(profile);
 

@@ -146,16 +146,24 @@ void SingleSwitchProgramSession::internal_run_program(){
 
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");
+        env.console.overlay().clear_log();
+        env.console.overlay().add_log("- Starting Program -");
         run_program_instance(env, context);
+        env.console.overlay().add_log("- Program Finished -");
         logger().log("Program finished normally!", COLOR_BLUE);
     }catch (OperationCancelledException&){
+        env.console.overlay().add_log("- Program Stopped -");
     }catch (ProgramCancelledException&){
+        env.console.overlay().add_log("- Program Stopped -");
     }catch (ProgramFinishedException& e){
         logger().log("Program finished early!", COLOR_BLUE);
+        env.console.overlay().add_log("- Program Finished -");
         e.send_notification(env, m_option.instance().NOTIFICATION_PROGRAM_FINISH);
     }catch (InvalidConnectionStateException&){
+        env.console.overlay().add_log("- Invalid Connection -", COLOR_RED);
     }catch (ScreenshotException& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
+        env.console.overlay().add_log("- Program Error -", COLOR_RED);
         e.add_stream_if_needed(env.console);
         std::string message = e.message();
         if (message.empty()){
@@ -165,6 +173,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         e.send_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
+        env.console.overlay().add_log("- Program Error -", COLOR_RED);
         std::string message = e.message();
         if (message.empty()){
             message = e.name();
@@ -178,6 +187,7 @@ void SingleSwitchProgramSession::internal_run_program(){
 #ifdef PA_CATCH_PROGRAM_SYSTEM_EXCEPTIONS
     catch (std::exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
+        env.console.overlay().add_log("- Program Error -", COLOR_RED);
         std::string message = e.what();
         if (message.empty()){
             message = "Unknown std::exception.";
@@ -189,6 +199,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         );
     }catch (...){
         logger().log("Program stopped with an exception!", COLOR_RED);
+        env.console.overlay().add_log("- Unknown Error -", COLOR_RED);
         report_error("Unknown error.");
         send_program_fatal_error_notification(
             env, m_option.instance().NOTIFICATION_ERROR_FATAL,

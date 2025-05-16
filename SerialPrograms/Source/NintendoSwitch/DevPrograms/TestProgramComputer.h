@@ -8,6 +8,7 @@
 #define PokemonAutomation_Computer_TestProgram_H
 
 #include "Common/Cpp/Options/StaticTextOption.h"
+#include "Common/Cpp/Options/MacAddressOption.h"
 #include "CommonTools/Options/ScreenWatchOption.h"
 #include "ComputerPrograms/ComputerProgram.h"
 
@@ -30,6 +31,7 @@ public:
 private:
     StaticTextOption STATIC_TEXT;
     ScreenWatchOption SCREEN_WATCHER;
+    MacAddressCell MAC_ADDRESS;
 };
 
 

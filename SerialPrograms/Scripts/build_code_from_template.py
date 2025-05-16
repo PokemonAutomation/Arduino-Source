@@ -16,6 +16,14 @@ import os
 
 from typing import Dict
 
+if len(sys.argv) == 1:
+	print(
+		"Usage:\n"
+		f"python3 {sys.argv[0]} VisualDetector PokemonSV Map PokeCenter Icon"
+		"  - Generates PokemonSV_MapPokeCenterIconDetector.h and PokemonSV_MapPokeCenterIconDetector.cpp"
+	)
+	exit(0)
+
 cur_folder_path = os.path.abspath(os.getcwd())
 
 split_path = cur_folder_path.split(os.sep)

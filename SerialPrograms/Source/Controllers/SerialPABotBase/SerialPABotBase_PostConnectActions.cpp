@@ -36,8 +36,32 @@ void run_post_connect_actions_ESP32(
     case ControllerType::NintendoSwitch_WirelessProController:
     case ControllerType::NintendoSwitch_LeftJoycon:
     case ControllerType::NintendoSwitch_RightJoycon:{
+        uint8_t controller_mac_address[6] = {};
+        {
+            BotBaseMessage response = botbase.issue_request_and_wait(
+                MessageControllerReadSpi(
+                    desired_controller,
+                    0x80000000, sizeof(controller_mac_address)
+                ),
+                nullptr
+            );
+            if (response.body.size() == sizeof(seqnum_t) + sizeof(controller_mac_address)){
+                memcpy(
+                    controller_mac_address,
+                    response.body.data() + sizeof(seqnum_t),
+                    sizeof(controller_mac_address)
+                );
+            }else{
+                logger.log(
+                    "Invalid response size to PABB_MSG_ESP32_REQUEST_READ_SPI: body = " + std::to_string(response.body.size()),
+                    COLOR_RED
+                );
+            }
+        }
+
         NintendoSwitch::ControllerProfile profile =
             PokemonAutomation::NintendoSwitch::ConsoleSettings::instance().CONTROLLER_SETTINGS.get_or_make_profile(
+                controller_mac_address,
                 device_name,
                 desired_controller
             );

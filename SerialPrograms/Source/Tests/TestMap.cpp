@@ -10,6 +10,7 @@
 #include "Kernels_Tests.h"
 #include "NintendoSwitch_Tests.h"
 #include "PokemonLA_Tests.h"
+#include "PokemonLZA_Tests.h"
 #include "PokemonSwSh_Tests.h"
 #include "PokemonSV_Tests.h"
 #include "TestMap.h"
@@ -286,7 +287,8 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonSV_ESPPressedEmotionDetector", std::bind(image_bool_detector_helper, test_pokemonSV_ESPPressedEmotionDetector, _1)},
     {"PokemonSV_MapFlyMenuDetector", std::bind(image_bool_detector_helper, test_pokemonSV_MapFlyMenuDetector, _1)},
     {"PokemonSV_SandwichPlateDetector", std::bind(image_words_detector_helper, test_pokemonSV_SandwichPlateDetector, _1)},
-    {"PokemonSV_RecentlyBattledDetector", std::bind(image_bool_detector_helper, test_pokemonSV_RecentlyBattledDetector, _1)}
+    {"PokemonSV_RecentlyBattledDetector", std::bind(image_bool_detector_helper, test_pokemonSV_RecentlyBattledDetector, _1)},
+    {"PokemonLZA_NormalDialogBoxDetector", std::bind(image_bool_detector_helper, test_pokemonZLA_NormalDialogBoxDetector, _1)},
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){

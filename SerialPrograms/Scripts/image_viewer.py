@@ -220,7 +220,7 @@ class ImageViewer:
 				if len(self.highlight_list) > 0:
 					self.cur_highlight_index = -1 if self.cur_highlight_index == len(self.highlight_list)-1 else self.cur_highlight_index+1
 					print(f"Change highlight index to {self.cur_highlight_index}/{len(self.highlight_list)}")
-			elif key == 127: # backspace, remove selected rectangle
+			elif key == 127 or key == 8: # DEL or backspace (BS), remove selected rectangle
 				mouse_down = False
 				mouse_move_counter = 0
 				if len(self.rects) > 0:

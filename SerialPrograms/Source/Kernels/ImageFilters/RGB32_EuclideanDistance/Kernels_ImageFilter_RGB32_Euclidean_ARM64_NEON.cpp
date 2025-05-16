@@ -7,13 +7,95 @@
 #ifdef PA_AutoDispatch_arm64_20_M1
 
 #include "Kernels/Kernels_arm64_NEON.h"
-#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels_ImageFilter_RGB32_Euclidean.h"
+#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_arm64_NEON.h"
+#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_ARM64_NEON.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 
+
+
+class PixelTest_Rgb32Euclidean_ARM64_NEON{
+public:
+    static const size_t VECTOR_SIZE = 4;
+    using Mask = size_t;
+
+public:
+    PA_FORCE_INLINE PixelTest_Rgb32Euclidean_ARM64_NEON(
+        uint32_t expected_color, double max_euclidean_distance
+    )
+        : m_expected_color_rgb_u8(vreinterpretq_u8_u32(vdupq_n_u32(expected_color & 0x00ffffff)))
+        , m_distance_squared_u32(vdupq_n_u32((uint32_t)(max_euclidean_distance * max_euclidean_distance)))
+    {}
+
+    //  Return a mask indicating which lanes are in range.
+    PA_FORCE_INLINE uint32x4_t test_word(uint32x4_t& pixel) const{
+        uint32x4_t& in_u32 = pixel;
+        // subtract the expected values
+        uint32x4_t in_dif_u32 = vreinterpretq_u32_u8(vabdq_u8(vreinterpretq_u8_u32(in_u32), m_expected_color_rgb_u8));
+
+        // Get green channel
+        uint32x4_t in_g_u32 = vandq_u32(in_dif_u32, vdupq_n_u32(0x0000ff00));
+        // Move green channel to the lower end of the 16-bit regions
+        uint16x8_t in_g_u16 = vshrq_n_u16(vreinterpretq_u16_u32(in_g_u32), 8);
+        // in_rb_u16 contains the red and blue channels. Each channel occupies a 16-bit region
+        uint16x8_t in_rb_u16 = vandq_u16(vreinterpretq_u16_u32(in_dif_u32), vdupq_n_u16(0x00ff));
+
+        // Square operation
+        uint16x8_t in_g2_u16 = vmulq_u16(in_g_u16, in_g_u16);
+        uint16x8_t in_r2b2_u16 = vmulq_u16(in_rb_u16, in_rb_u16);
+
+        uint32x4_t in_g2_u32 = vreinterpretq_u32_u16(in_g2_u16);
+        // Use pairwise addition and accumulate to add r2, g2, and b2 together
+        uint32x4_t sum_sqr_u32 = vpadalq_u16(in_g2_u32, in_r2b2_u16);
+
+        // cmp_u32: if each pixel is within the range, its uint32_t in `cmp_u32` is all 1 bits, otherwise, all 0 bits
+        return vcleq_u32(sum_sqr_u32, m_distance_squared_u32);
+    }
+
+private:
+    uint8x16_t m_expected_color_rgb_u8;
+    uint32x4_t m_distance_squared_u32;
+};
+
+
+
+size_t filter_rgb32_euclidean_ARM64_NEON(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    uint32_t replacement, bool replace_color_within_range,
+    uint32_t expected, double max_euclidean_distance
+){
+    PixelTest_Rgb32Euclidean_ARM64_NEON tester(
+        expected, max_euclidean_distance
+    );
+    FilterImage_Rgb32_ARM64_NEON<PixelTest_Rgb32Euclidean_ARM64_NEON> filter(
+        tester, replacement, replace_color_within_range
+    );
+    filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
+    return filter.count();
+}
+size_t to_blackwhite_rgb32_euclidean_ARM64_NEON(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    bool in_range_black,
+    uint32_t expected, double max_euclidean_distance
+){
+    PixelTest_Rgb32Euclidean_ARM64_NEON tester(
+        expected, max_euclidean_distance
+    );
+    ToBlackWhite_Rgb32_ARM64_NEON<PixelTest_Rgb32Euclidean_ARM64_NEON> filter(
+        tester, in_range_black
+    );
+    filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
+    return filter.count();
+}
+
+
+
+#if 0
 
 class ImageFilter_RgbEuclidean_arm64_NEON{
 public:
@@ -112,7 +194,7 @@ size_t filter_rgb32_euclidean_arm64_NEON(
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
-
+#endif
 
 
 

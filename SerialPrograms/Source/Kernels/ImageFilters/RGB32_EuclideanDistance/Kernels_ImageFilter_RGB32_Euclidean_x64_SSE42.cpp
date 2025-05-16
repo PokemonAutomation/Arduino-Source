@@ -7,83 +7,36 @@
 #ifdef PA_AutoDispatch_x64_08_Nehalem
 
 #include <immintrin.h>
-#include "Kernels/Kernels_x64_SSE41.h"
-#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h"
+#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines_x64_SSE42.h"
 #include "Kernels_ImageFilter_RGB32_Euclidean.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
 
 
-namespace {
-
-struct PartialWordMask{
-    size_t left;
-    PartialWordAccess_x64_SSE41 loader;
-
-    PA_FORCE_INLINE PartialWordMask(size_t p_left)
-        : left(p_left)
-        , loader(left * sizeof(uint32_t))
-    {}
-};
-
-}
 
 
-
-
-
-class ImageFilter_RgbEuclidean_x64_SSE42{
+class PixelTest_Rgb32Euclidean_x64_SSE42{
 public:
     static const size_t VECTOR_SIZE = 4;
     using Mask = PartialWordMask;
 
 public:
-    ImageFilter_RgbEuclidean_x64_SSE42(
-        uint32_t replacement, bool replace_color_within_range,
+    PA_FORCE_INLINE PixelTest_Rgb32Euclidean_x64_SSE42(
         uint32_t expected, double max_euclidean_distance
     )
-        : m_replacement(_mm_set1_epi32(replacement))
-        , m_invert(replace_color_within_range ? _mm_set1_epi32(-1) : _mm_setzero_si128())
-        , m_expected_g(_mm_set1_epi32((expected >> 8) & 0x000000ff))
+        : m_expected_g(_mm_set1_epi32((expected >> 8) & 0x000000ff))
         , m_expected_rb(_mm_set1_epi32(expected & 0x00ff00ff))
         , m_distance_squared(_mm_set1_epi32((uint32_t)(max_euclidean_distance * max_euclidean_distance)))
-        , m_count(_mm_setzero_si128())
     {}
 
-    PA_FORCE_INLINE size_t count() const{
-        return reduce32_x64_SSE41(m_count);
-    }
-
-    PA_FORCE_INLINE void process_full(uint32_t* out, const uint32_t* in){
-        __m128i pixel = _mm_loadu_si128((const __m128i*)in);
-        __m128i in_range_pixels = process_word(pixel);
-        m_count = _mm_sub_epi32(m_count, in_range_pixels);
-        _mm_storeu_si128((__m128i*)out, pixel);
-    }
-    PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, const Mask& mask){
-        __m128i vmask = _mm_cmpgt_epi32(
-            _mm_set1_epi32((uint32_t)mask.left),
-            _mm_setr_epi32(0, 1, 2, 3)
-        );
-
-        __m128i pixel = mask.loader.load(in);
-        __m128i in_range_pixels = process_word(pixel);
-        in_range_pixels = _mm_and_si128(in_range_pixels, vmask);
-        m_count = _mm_sub_epi32(m_count, in_range_pixels);
-        size_t left = mask.left;
-        do{
-            out[0] = _mm_cvtsi128_si32(pixel);
-            pixel = _mm_srli_si128(pixel, 4);
-            out++;
-        }while(--left);
-    }
-
-private:
-    //  Process the pixel in-place.
     //  Return a mask indicating which lanes are in range.
-    PA_FORCE_INLINE __m128i process_word(__m128i& pixel) const{
+    PA_FORCE_INLINE __m128i test_word(__m128i pixel) const{
         // _mm_srli_epi16: Shift 16-bit integers in pixels right by 8 while shifting in zeros,
         // ng: green channels of each pixel, but shifted right by 8 bits
         __m128i ng = _mm_and_si128(_mm_srli_epi16(pixel, 8), _mm_set1_epi32(0x000000ff));
@@ -107,33 +60,50 @@ private:
         __m128i sum_sqr = _mm_add_epi32(r, g);
         sum_sqr = _mm_add_epi32(sum_sqr, b);
 
-        __m128i cmp = _mm_cmpgt_epi32(m_distance_squared, sum_sqr);
-        pixel = _mm_blendv_epi8(m_replacement, pixel, _mm_xor_si128(cmp, m_invert));
-
-        return cmp;
+        return _mm_cmpgt_epi32(m_distance_squared, sum_sqr);
     }
 
 private:
-    const __m128i m_replacement;
-    const __m128i m_invert;
     const __m128i m_expected_g;
     const __m128i m_expected_rb;
     const __m128i m_distance_squared;
-    __m128i m_count;
 };
+
+
+
 size_t filter_rgb32_euclidean_x64_SSE42(
     const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
     uint32_t* out, size_t out_bytes_per_row,
     uint32_t replacement, bool replace_color_within_range,
     uint32_t expected, double max_euclidean_distance
 ){
-    ImageFilter_RgbEuclidean_x64_SSE42 filter(
-        replacement, replace_color_within_range,
+    PixelTest_Rgb32Euclidean_x64_SSE42 tester(
         expected, max_euclidean_distance
+    );
+    FilterImage_Rgb32_x64_SSE42<PixelTest_Rgb32Euclidean_x64_SSE42> filter(
+        tester, replacement, replace_color_within_range
     );
     filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
     return filter.count();
 }
+size_t to_blackwhite_rgb32_euclidean_x64_SSE42(
+    const uint32_t* in, size_t in_bytes_per_row, size_t width, size_t height,
+    uint32_t* out, size_t out_bytes_per_row,
+    bool in_range_black,
+    uint32_t expected, double max_euclidean_distance
+){
+    PixelTest_Rgb32Euclidean_x64_SSE42 tester(
+        expected, max_euclidean_distance
+    );
+    ToBlackWhite_Rgb32_x64_SSE42<PixelTest_Rgb32Euclidean_x64_SSE42> filter(
+        tester, in_range_black
+    );
+    filter_per_pixel(in, in_bytes_per_row, width, height, filter, out, out_bytes_per_row);
+    return filter.count();
+}
+
+
+
 
 
 
