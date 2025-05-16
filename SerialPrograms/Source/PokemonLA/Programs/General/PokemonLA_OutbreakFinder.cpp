@@ -674,15 +674,7 @@ std::set<std::string> OutbreakFinder::enter_region_and_read_MMO(
 }
 
 
-// Run one iteration of the outbreak finder loop and return true when one desired outbreak is found.
-// The iteration includes:
-// 1. Starting at Jubilife Village gate, go to check the map for outbreaks.
-// 2. If found desired outbreaks, stop.
-// 3. If need to check MMOs, save in front of gate, then go to each region with MMO and talk to Mai to
-//    reveal MMO pokemon. Reset if no desired MMO to conserve Aguav Berries. 
-// 4. If found desired MMO pokemon, stop.
-// 5. No desired outbreak in this iteration, go to an arbitrary region and return to village to refresh outbreaks.
-bool OutbreakFinder::run_iteration(
+std::vector<std::string> OutbreakFinder::run_iteration(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     const std::set<std::string>& desired_hisui_map_events,
     const std::set<std::string>& desired_outbreaks,
@@ -720,14 +712,14 @@ bool OutbreakFinder::run_iteration(
                 os << "Found following desired outbreak" << (desired_outbreaks_found.size() > 1 ? "s: " : ": ");
                 for(const auto& outbreak: desired_outbreaks_found){
                     os << outbreak << ", ";
-                    env.console.overlay().add_log("Found " + outbreak);
+                    env.console.overlay().add_log("Found " + outbreak, COLOR_GREEN);
                 }
-                env.log(os.str());
+                env.log(os.str(), COLOR_GREEN);
 
-                return true;
-            }else{
-                env.log("No desired outbreak.");
+                return desired_outbreaks_found;
             }
+            
+            env.log("No desired outbreak.");
         }
 
         // What we found is MMO symbols for MMO pokemon.
@@ -750,10 +742,10 @@ bool OutbreakFinder::run_iteration(
                 os << "Found desired MMO pokemon (including desired MMO pokemon with star symbols): ";
                 for (const auto& pokemon : found_pokemon){
                     os << pokemon << ", ";
-                    env.console.overlay().add_log("Found " + pokemon);
+                    env.console.overlay().add_log("Found " + pokemon, COLOR_GREEN);
                 }
-                env.log(os.str());
-                return true;
+                env.log(os.str(), COLOR_GREEN);
+                return std::vector<std::string>(found_pokemon.begin(), found_pokemon.end());
             }
 
             env.log("No target MMO sprite found. Reset game...");
@@ -769,7 +761,7 @@ bool OutbreakFinder::run_iteration(
     //  Go to an arbitrary region and return to refresh outbreaks.
     goto_region_and_return(env, context, inside_travel_map);
 
-    return false;
+    return std::vector<std::string>();
 }
 
 
@@ -849,9 +841,12 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerC
         desired_hisui_map_events.insert(p.first);
     }
 
+    std::vector<std::string> found_outbreaks;
     while (true){
-        if (run_iteration(env, context, desired_hisui_map_events, desired_outbreaks, desired_MMO_pokemon, 
-            desired_star_MMO_pokemon))
+        found_outbreaks = run_iteration(
+            env, context, desired_hisui_map_events, desired_outbreaks, desired_MMO_pokemon, 
+            desired_star_MMO_pokemon);
+        if (found_outbreaks.size() > 0)
         {
             break;
         }
@@ -859,11 +854,17 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
     env.update_stats();
 
-    send_program_notification(
+    os.str("");  // clear ostringstream
+    os << "Found ";
+    for (size_t i = 0; i < found_outbreaks.size(); i++){
+        os << found_outbreaks[i];
+        if (i + 1 != found_outbreaks.size()){
+            os << ", ";
+        }
+    }
+    send_program_finished_notification(
         env, NOTIFICATION_MATCHED,
-        COLOR_GREEN,
-        "Found Outbreak",
-        {}, "",
+        os.str(),
         env.console.video().snapshot()
     );
 
