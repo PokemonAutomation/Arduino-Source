@@ -41,14 +41,17 @@ struct AlolanTrade_Descriptor::Stats : public StatsTracker{
         : trades(m_stats["Trades"])
         , resets(m_stats["Resets"])
         , shinies(m_stats["Shinies"])
+        , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Trades");
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& trades;
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> AlolanTrade_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -79,6 +82,7 @@ AlolanTrade::AlolanTrade()
 }
 
 void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& context){
+    AlolanTrade_Descriptor::Stats& stats = env.current_stats<AlolanTrade_Descriptor::Stats>();
     //Talk to NPC, say Yes, select Pokemon from box.
     BlackScreenOverWatcher trade_started(COLOR_RED);
     int ret = run_until<JoyconContext>(
@@ -91,6 +95,8 @@ void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& 
     context.wait_for_all_requests();
     if (ret != 0){
         env.log("Failed to start trade.", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to start trade.",
@@ -110,6 +116,8 @@ void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& 
     );
     context.wait_for_all_requests();
     if (ret2 != 0){
+        stats.errors++;
+        env.update_stats();
         env.log("Did not detect end of trade.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
