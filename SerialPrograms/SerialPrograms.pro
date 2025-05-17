@@ -59,7 +59,7 @@ win32-msvc{
     DEFINES += PA_DPP
     LIBS += ../3rdPartyBinaries/dpp.lib
 
-    LIBS += ../3rdPartyBinaries/opencv_world460.lib
+    LIBS += ../3rdPartyBinaries/opencv_world4110.lib
 }
 macx{
     QMAKE_CXXFLAGS += -std=c++14
