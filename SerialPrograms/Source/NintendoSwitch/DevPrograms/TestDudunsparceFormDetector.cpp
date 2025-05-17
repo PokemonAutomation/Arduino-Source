@@ -21,6 +21,7 @@
 
 #include <onnxruntime_cxx_api.h>
 
+#include <limits>
 #include <vector>
 #include <iostream>
 using std::cout, std::endl;
@@ -116,7 +117,7 @@ bool DudunsparceFormDetector::process_frame(const ImageViewRGB32& frame, WallClo
 
     session.Run(runOptions, inputNames.data(), &inputTensor, 1, outputNames.data(), &outputTensor, 1);
 
-    double max_value = -DBL_MAX;
+    float max_value = -std::numeric_limits<float>::max();
     int max_value_label = 0;
     for (int i = 0; i < 3; i++){
         // cout << labels[i] << ": " << modelOutput[i] << ", ";
