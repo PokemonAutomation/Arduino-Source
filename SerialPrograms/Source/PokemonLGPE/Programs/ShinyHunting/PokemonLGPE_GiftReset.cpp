@@ -40,12 +40,15 @@ struct GiftReset_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , shinies(m_stats["Shinies"])
+        , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> GiftReset_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -104,6 +107,8 @@ void GiftReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& s
         );
         context.wait_for_all_requests();
         if (ret != 0){
+            stats.errors++;
+            env.update_stats();
             env.log("Failed to receive gift Pokemon.", COLOR_RED);
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
