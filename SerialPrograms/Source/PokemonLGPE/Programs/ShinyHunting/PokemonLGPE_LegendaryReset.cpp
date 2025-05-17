@@ -41,12 +41,15 @@ struct LegendaryReset_Descriptor::Stats : public StatsTracker{
     Stats()
         : resets(m_stats["Resets"])
         , shinies(m_stats["Shinies"])
+        , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -83,6 +86,7 @@ LegendaryReset::LegendaryReset()
 }
 
 bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconContext& context){
+    LegendaryReset_Descriptor::Stats& stats = env.current_stats<LegendaryReset_Descriptor::Stats>();
     float shiny_coefficient = 1.0;
     ShinySoundDetector shiny_detector(env.logger(), [&](float error_coefficient) -> bool{
         shiny_coefficient = error_coefficient;
@@ -94,10 +98,12 @@ bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconCo
     switch (TARGET) {
     case Target::mewtwo:
         pbf_mash_button(context, BUTTON_A, 3000ms);
-        pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+        context.wait_for_all_requests();
+        pbf_press_button(context, BUTTON_PLUS, 500ms, 100ms);
         break;
     case Target::snorlax:
         pbf_mash_button(context, BUTTON_A, 5000ms);
+        context.wait_for_all_requests();
         pbf_mash_button(context, BUTTON_B, 10000ms);
         break;
     case Target::electrode:
@@ -118,6 +124,8 @@ bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconCo
             if (ret == 0) {
                 env.log("HP boxes detected.");
             } else {
+                stats.errors++;
+                env.update_stats();
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "run_battle(): Did not detect battle start.",
@@ -171,6 +179,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
             env, NOTIFICATION_STATUS_UPDATE,
             "No shiny found. Resetting game."
         );
+        context.wait_for_all_requests();
 
         //Reset game
         pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
@@ -188,6 +197,8 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
         [&](JoyconContext& context) {
             while(true){
                 if (current_time() - start > std::chrono::minutes(5)){
+                    stats.errors++;
+                    env.update_stats();
                     env.log("Timed out during battle after 5 minutes.", COLOR_RED);
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
@@ -210,6 +221,8 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
                     context.wait_for_all_requests();
                     break;
                 default:
+                    stats.errors++;
+                    env.update_stats();
                     env.log("Timed out during battle. Stuck, crashed, or took more than 30 seconds for a turn.", COLOR_RED);
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
@@ -230,6 +243,8 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
         );
         break;
     default:
+        stats.errors++;
+        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Failed to detect catching menu.",

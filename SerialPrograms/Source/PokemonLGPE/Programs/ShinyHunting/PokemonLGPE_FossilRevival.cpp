@@ -41,14 +41,17 @@ struct FossilRevival_Descriptor::Stats : public StatsTracker{
         : revives(m_stats["Revives"])
         , resets(m_stats["Resets"])
         , shinies(m_stats["Shinies"])
+        , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Revives");
         m_display_order.emplace_back("Resets");
         m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
     std::atomic<uint64_t>& revives;
     std::atomic<uint64_t>& resets;
     std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> FossilRevival_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -90,6 +93,7 @@ FossilRevival::FossilRevival()
 }
 
 void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconContext& context){
+    FossilRevival_Descriptor::Stats& stats = env.current_stats<FossilRevival_Descriptor::Stats>();
     //Press A to get to selection
     env.log("Starting dialog.");
     pbf_press_button(context, BUTTON_A, 100ms, 800ms);
@@ -122,6 +126,8 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
     );
     context.wait_for_all_requests();
     if (ret != 0){
+        stats.errors++;
+        env.update_stats();
         env.log("Failed to revive fossil.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
@@ -144,6 +150,8 @@ void FossilRevival::run_revives(SingleSwitchProgramEnvironment& env, JoyconConte
     );
     context.wait_for_all_requests();
     if (ret2 != 0){
+        stats.errors++;
+        env.update_stats();
         env.log("Did not detect summary over.", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
