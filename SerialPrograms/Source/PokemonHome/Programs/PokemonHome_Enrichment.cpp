@@ -499,6 +499,13 @@ public:
     std::pair<size_t, size_t> first_poke_slot;
 };
 
+std::string sanitize_OCR(std::string str){
+    char chars[] = "\n\r—.,";
+    for(auto a:chars){str.erase(std::remove(str.begin(),str.end(), a),str.end());}
+    return str;
+}
+
+
 std::string closest_type(FloatPixel& color_box){
     std::vector<std::pair<std::string,Color>> type_color_list = {{"Grass",Color(62, 180, 86)},{"Fire",Color(201, 106, 83)}, {"Water",Color(31, 161, 243)}, {"Electric",Color(202, 207, 66)}, {"Rock",Color(164, 201, 169)}, {"Ground",Color(145, 130, 78)}, {"Poison",Color(142, 125, 234)}, {"Dark",Color(86, 118, 113)}, {"Steel",Color(91, 188, 211)}, {"Flying",Color(112, 206, 242)}, {"Normal",Color(146, 190, 186)}, {"Fighting",Color(203, 173, 82)}, {"Ghost",Color(116, 125, 157)}, {"Dragon",Color(80, 145, 241)}, {"Ice",Color(44, 224, 243)}, {"Fairy",Color(202, 166, 242)}, {"Bug",Color(140, 188, 87)}, {"Psychic",Color(202, 128, 156)}, {"None",Color(20, 191, 195)}};
 
@@ -798,10 +805,7 @@ void home_navigate_to_box(SingleSwitchProgramEnvironment& env, ProControllerCont
         env.console.log("Running hard check");
         context.wait_for_all_requests();
         VideoSnapshot screen = env.console.video().snapshot();
-        std::string text1 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-        char chars[] = "\n\r—.,";
-        for(auto a:chars){text1.erase(std::remove(text1.begin(),text1.end(), a),text1.end());}
-        home_box = std::stoull(text1);
+        home_box = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));
 
         if(home_box >= target){
             env.console.log("Initial read to right of target box "+std::to_string(target));
@@ -810,24 +814,18 @@ void home_navigate_to_box(SingleSwitchProgramEnvironment& env, ProControllerCont
             do{
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                text1 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-                for(auto a:chars){text1.erase(std::remove(text1.begin(),text1.end(), a),text1.end());}
-                home_box = std::stoull(text1);
+                home_box = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));
 
                 pbf_press_button(context, BUTTON_L, 10, 47);
                 context.wait_for_all_requests();
 
                 screen = env.console.video().snapshot();
-                std::string text2 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-                for(auto a:chars){text2.erase(std::remove(text2.begin(),text2.end(), a),text2.end());}
-                home_box2 = std::stoull(text2);
+                home_box2 = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));
                 pbf_press_button(context, BUTTON_L, 10, 47);
 
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                std::string text3 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-                for(auto a:chars){text3.erase(std::remove(text3.begin(),text3.end(), a),text3.end());}
-                home_box3 = std::stoull(text3);
+                home_box3 = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));
                 env.console.log("testing "+std::to_string(home_box2)+ "=="+std::to_string(home_box-1)+" && "+std::to_string(home_box3)+"=="+std::to_string(home_box-2));
             }while(!(home_box2==home_box-1&&home_box3==home_box-2));
             home_box-=2;
@@ -838,24 +836,18 @@ void home_navigate_to_box(SingleSwitchProgramEnvironment& env, ProControllerCont
             do{
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                text1 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-                for(auto a:chars){text1.erase(std::remove(text1.begin(),text1.end(), a),text1.end());}
-                home_box = std::stoull(text1);
+                home_box = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));
 
                 pbf_press_button(context, BUTTON_R, 10, 47);
                 context.wait_for_all_requests();
 
                 screen = env.console.video().snapshot();
-                std::string text2 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-                for(auto a:chars){text2.erase(std::remove(text2.begin(),text2.end(), a),text2.end());}
-                home_box2 = std::stoull(text2);
+                home_box2 = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));
                 pbf_press_button(context, BUTTON_R, 10, 47);
 
                 context.wait_for_all_requests();
                 screen = env.console.video().snapshot();
-                std::string text3 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-                for(auto a:chars){text3.erase(std::remove(text3.begin(),text3.end(), a),text3.end());}
-                home_box3 = std::stoull(text3);
+                home_box3 = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));
                 env.console.log("testing "+std::to_string(home_box2)+ "=="+std::to_string(home_box+1)+" && "+std::to_string(home_box3)+"=="+std::to_string(home_box+2));
             }while(!(home_box2==home_box+1&&home_box3==home_box+2));
             home_box+=2;
@@ -863,10 +855,7 @@ void home_navigate_to_box(SingleSwitchProgramEnvironment& env, ProControllerCont
     }else{
         context.wait_for_all_requests();
         VideoSnapshot screen = env.console.video().snapshot();
-        std::string text1 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-        char chars[] = "\n\r—.,";
-        for(auto a:chars){text1.erase(std::remove(text1.begin(),text1.end(), a),text1.end());}
-        home_box = std::stoull(text1);
+        home_box = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));
     }
 
     while(home_box!=target){
@@ -875,10 +864,7 @@ void home_navigate_to_box(SingleSwitchProgramEnvironment& env, ProControllerCont
             context.wait_for_all_requests();
             context.wait_for_all_requests();
             VideoSnapshot screen = env.console.video().snapshot();
-            std::string text1 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-            char chars[] = "\n\r—.,";
-            for(auto a:chars){text1.erase(std::remove(text1.begin(),text1.end(), a),text1.end());}
-            home_box = std::stoull(text1);            }
+            home_box = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));            }
         env.console.log("Home_box is " + std::to_string(home_box));
         context.wait_for_all_requests();
         box_render.clear();
@@ -894,10 +880,7 @@ void home_navigate_to_box(SingleSwitchProgramEnvironment& env, ProControllerCont
         box_render.add(COLOR_RED, home_box_checker);
         context.wait_for_all_requests();
         VideoSnapshot screen = env.console.video().snapshot();
-        std::string text1 = OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker));
-        char chars[] = "\n\r—.,";
-        for(auto a:chars){text1.erase(std::remove(text1.begin(),text1.end(), a),text1.end());}
-        home_box = std::stoull(text1);
+        home_box = std::stoull(sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_box_checker))));
     }
 }
 
@@ -908,16 +891,13 @@ void home_navigate_to_box_secondary(SingleSwitchProgramEnvironment& env, ProCont
     // Go to the first box in the program
     box_render.add(COLOR_RED, home_box_checker_secondary);
 
-    char chars[] = "\n\r—";
     box_render.add(COLOR_GREEN, home_box_checker_secondary);
     context.wait_for_all_requests();
-    std::string box_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), home_box_checker_secondary));
-    for(auto a:chars){box_name.erase(std::remove(box_name.begin(),box_name.end(), a),box_name.end());}
+    std::string box_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), home_box_checker_secondary)));
     while(target!=box_name){   // navigate to correct box
         pbf_press_button(context, BUTTON_L, 10, 80);
         context.wait_for_all_requests();
-        box_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), home_box_checker_secondary));
-        for(auto a:chars){box_name.erase(std::remove(box_name.begin(),box_name.end(), a),box_name.end());}
+        box_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), home_box_checker_secondary)));
     }
 }
 
@@ -960,9 +940,7 @@ void home_navigate_to_box_secondary(SingleSwitchProgramEnvironment& env, ProCont
 
 void home_navigate_to_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Game& game){
     ImageFloatBox game_checker(0.0455, 0.244, 0.435, 0.057);
-    std::string text = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), game_checker));
-    char chars[] = "\n\r—";
-    for(auto a:chars){text.erase(std::remove(text.begin(),text.end(), a),text.end());}
+    std::string text = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), game_checker)));
     VideoOverlaySet box_render(env.console);
     box_render.add(COLOR_BLUE, game_checker);
 
@@ -975,8 +953,7 @@ void home_navigate_to_game(SingleSwitchProgramEnvironment& env, ProControllerCon
             pbf_press_dpad(context, DPAD_RIGHT, 10, 40);
         }
         context.wait_for_all_requests();
-        text = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), game_checker));
-        for(auto a:chars){text.erase(std::remove(text.begin(),text.end(), a),text.end());}
+        text = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), game_checker)));
     }while(text!=game.name);
     pbf_press_button(context, BUTTON_A, 10, 100);
     pbf_press_button(context, BUTTON_A, 10, 150*15);
@@ -996,10 +973,8 @@ bool home_exit_home(SingleSwitchProgramEnvironment& env, ProControllerContext& c
     do{
         pbf_wait(context, 1000ms);
         box_render.add(COLOR_BLUE, save_msg_checker);
-        char chars[] = "\n\r—";
         context.wait_for_all_requests();
-        text = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), save_msg_checker));
-        for(auto a:chars){text.erase(std::remove(text.begin(),text.end(), a),text.end());}
+        text = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), save_msg_checker)));
         if(checks++ == 200){
             return false;
         }
@@ -1167,10 +1142,8 @@ bool home_request_next(SingleSwitchProgramEnvironment& env, ProControllerContext
     pbf_wait(context, 1500ms);
     context.wait_for_all_requests();
     screen = env.console.video().snapshot();
-    char chars[] = "\n\r—";
     box_render.add(COLOR_GREEN, home_filter_reader);
-    std::string filter_text = OCR::ocr_read(Language::English, extract_box_reference(screen, home_filter_reader));
-    for(auto a:chars){filter_text.erase(std::remove(filter_text.begin(),filter_text.end(), a),filter_text.end());}
+    std::string filter_text = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, home_filter_reader)));
     env.console.log(filter_text);
 
     if(filter_text=="No matches found!")return false;
@@ -1825,19 +1798,16 @@ bool home_read_main_menu(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     std::ostringstream ss;
 
-    char chars[] = "\n\r—";
     context.wait_for_all_requests();
     box_render.add(COLOR_GREEN, menu_box);
-    std::string menu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), menu_box));
-    for(auto a:chars){menu_name.erase(std::remove(menu_name.begin(),menu_name.end(), a),menu_name.end());}
+    std::string menu_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), menu_box)));
     env.console.log(menu_name);
     while(menu_name==""){
         env.console.log("menu_name==\"\"");
         pbf_wait(context,500ms);
         context.wait_for_all_requests();
         box_render.add(COLOR_GREEN, menu_box);
-        menu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), menu_box));
-        for(auto a:chars){menu_name.erase(std::remove(menu_name.begin(),menu_name.end(), a),menu_name.end());}
+        menu_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), menu_box)));
         env.console.log(menu_name);
     }
     box_render.clear();
@@ -1856,11 +1826,9 @@ bool home_read_filter_submenu(SingleSwitchProgramEnvironment& env, ProController
 
     std::ostringstream ss;
 
-    char chars[] = "\n\r—";
     context.wait_for_all_requests();
     box_render.add(COLOR_GREEN, filter_menu);
-    std::string submenu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu));
-    for(auto a:chars){submenu_name.erase(std::remove(submenu_name.begin(),submenu_name.end(), a),submenu_name.end());}
+    std::string submenu_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu)));
     size_t count = 0;
     while(submenu_name!=target){
 
@@ -1868,8 +1836,7 @@ bool home_read_filter_submenu(SingleSwitchProgramEnvironment& env, ProController
         // which results in weird behavior. This next block only allows the menu to back out if a menu has been selected successfully.
         box_render.add(COLOR_GREEN, filter_menu_markings);
         context.wait_for_all_requests();
-        std::string markings = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu_markings));
-        for(auto a:chars){markings.erase(std::remove(markings.begin(),markings.end(), a),markings.end());}
+        std::string markings = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu_markings)));
         if(markings=="Search by markings"){
             if(target=="Search by markings"){
                 return true;
@@ -1881,8 +1848,7 @@ bool home_read_filter_submenu(SingleSwitchProgramEnvironment& env, ProController
         // This block also checks for unexpected behavior, might be unnecessary with the addition of the above block
         if(count==5){
             context.wait_for_all_requests();
-            submenu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu));
-            for(auto a:chars){submenu_name.erase(std::remove(submenu_name.begin(),submenu_name.end(), a),submenu_name.end());}
+            submenu_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu)));
             if(submenu_name!="Filters"){
                 pbf_press_button(context, BUTTON_X,10, 50);
             }
@@ -1892,8 +1858,7 @@ bool home_read_filter_submenu(SingleSwitchProgramEnvironment& env, ProController
         pbf_press_button(context, BUTTON_DOWN, 10, 50);
         pbf_press_button(context, BUTTON_A, 10, 50);
         context.wait_for_all_requests();
-        submenu_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu));
-        for(auto a:chars){submenu_name.erase(std::remove(submenu_name.begin(),submenu_name.end(), a),submenu_name.end());}
+        submenu_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), filter_menu)));
         count++;
     }
     box_render.clear();
@@ -1915,7 +1880,6 @@ void sv_run_ace(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     VideoSnapshot screen = env.console.video().snapshot();
     PokemonSV::DialogBoxDetector dialog_detector;
     PokemonSV::DialogArrowDetector arrow_detector(Color(255,255,255), white_dialog_checker);
-    char chars[] = "\n\r—";
 
     int no_response_check = 0;
     int failsafe_checks = 0;
@@ -1923,42 +1887,34 @@ void sv_run_ace(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
     while(true){
         screen = env.console.video().snapshot();
         box_render.add(COLOR_BLUE, sv_battle_button);
-        std::string text1 = OCR::ocr_read(Language::English, extract_box_reference(screen, sv_battle_button));
-        for(auto a:chars){text1.erase(std::remove(text1.begin(),text1.end(), a),text1.end());}
+        std::string text1 = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, sv_battle_button)));
         env.console.log(text1);
         box_render.add(COLOR_BLUE, sv_keep_current_pokemon);
-        std::string text2 = OCR::ocr_read(Language::English, extract_box_reference(screen, sv_keep_current_pokemon));
-        for(auto a:chars){text2.erase(std::remove(text2.begin(),text2.end(), a),text2.end());}
+        std::string text2 = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, sv_keep_current_pokemon)));
         env.console.log(text2);
         box_render.add(COLOR_BLACK, sv_b_back);
-        std::string text3 = OCR::ocr_read(Language::English, extract_box_reference(screen, sv_b_back));
-        for(auto a:chars){text3.erase(std::remove(text3.begin(),text3.end(), a),text3.end());}
+        std::string text3 = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, sv_b_back)));
         env.console.log(text3);
-        std::string text4 = OCR::ocr_read(Language::English, extract_box_reference(screen, evolve_message));
-        for(auto a:chars){text4.erase(std::remove(text4.begin(),text4.end(), a),text4.end());}
+        std::string text4 = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, evolve_message)));
         env.console.log(text4);
-        std::string text5 = OCR::ocr_read(Language::English, extract_box_reference(screen, fainted_checker));
-        for(auto a:chars){text5.erase(std::remove(text5.begin(),text5.end(), a),text5.end());}
+        std::string text5 = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, fainted_checker)));
         env.console.log(text5);
-        std::string text_box = OCR::ocr_read(Language::English, extract_box_reference(screen, evolve_message3));
-        for(auto a:chars){text_box.erase(std::remove(text_box.begin(),text_box.end(), a),text_box.end());}
+        std::string text_box = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, evolve_message3)));
         env.console.log(text_box);
         box_render.add(COLOR_WHITE, white_dialog_checker);
         if(text5 == "FAINTED"||failsafe_checks==5){
             throw;
         }
-        if(text_box == "| hope to see you in the tournament again soon."){
+        if(text_box == "| hope to see you in the tournament again soon"){
             return;
         }
         if(text4 == "What?"){
             pbf_press_button(context, BUTTON_A, 10, 90);
-            std::string text6 = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), evolve_message2));
-            for(auto a:chars){text6.erase(std::remove(text6.begin(),text6.end(), a),text6.end());}
+            std::string text6 = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), evolve_message2)));
             env.console.log(text6);
             while(text6!="Congratulations!" && text6!="What? You gotta"){
                 pbf_wait(context, 500ms);
-                text6 = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), evolve_message2));
-                for(auto a:chars){text6.erase(std::remove(text6.begin(),text6.end(), a),text6.end());}
+                text6 = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), evolve_message2)));
                 env.console.log(text6);
             }
             // ___ wants to learn the move ___
@@ -1968,8 +1924,7 @@ void sv_run_ace(SingleSwitchProgramEnvironment& env, ProControllerContext& conte
                 context.wait_for_all_requests();
                 box_render.add(COLOR_GREEN, evolve_message3);
                 screen = env.console.video().snapshot();
-                evo_text = OCR::ocr_read(Language::English, extract_box_reference(screen, evolve_message3));
-                for(auto a:chars){evo_text.erase(std::remove(evo_text.begin(),evo_text.end(), a),evo_text.end());}
+                evo_text = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(screen, evolve_message3)));
                 env.console.log(evo_text.c_str() + evo_text.find(' ') + 1);
                 if(std::strncmp(evo_text.c_str() + evo_text.find(' ') + 1, "wants to learn the move", 23) == 0 || std::strncmp(evo_text.c_str() + evo_text.find(' ') + 1, "learned", 7) == 0){
                     pbf_press_button(context, BUTTON_B, 10, 90);
@@ -2027,21 +1982,18 @@ void sv_run_enrichment(SingleSwitchProgramEnvironment& env, ProControllerContext
 
     pbf_press_button(context, BUTTON_X, 10, 100); //open the menu out of the loop
 
-    char chars[] = "\n\r—";
     for(int runs = 0; runs < max_runs; runs++){
         pbf_press_button(context, BUTTON_RIGHT, 10, 150);
         pbf_press_button(context, BUTTON_DOWN, 10, 80);
         pbf_press_button(context, BUTTON_A, 10, 150);
 
         box_render.add(COLOR_GREEN, sv_box_name_read);
-        std::string box_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), sv_box_name_read));
-        for(auto a:chars){box_name.erase(std::remove(box_name.begin(),box_name.end(), a),box_name.end());}
+        std::string box_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), sv_box_name_read)));
         env.console.log(box_name);
         while(box_name!=sv_box_name){   // navigate to correct box
             pbf_press_button(context, BUTTON_L, 10, 80);
             context.wait_for_all_requests();
-            box_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), sv_box_name_read));
-            for(auto a:chars){box_name.erase(std::remove(box_name.begin(),box_name.end(), a),box_name.end());}
+            box_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), sv_box_name_read)));
             env.console.log(box_name);
         }
 
@@ -2076,14 +2028,12 @@ void sv_run_enrichment(SingleSwitchProgramEnvironment& env, ProControllerContext
             context.wait_for_all_requests();
 
             box_render.add(COLOR_GREEN, sv_box_name_read);
-            box_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), sv_box_name_read));
-            for(auto a:chars){box_name.erase(std::remove(box_name.begin(),box_name.end(), a),box_name.end());}
+            box_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), sv_box_name_read)));
             env.console.log(box_name);
             while(box_name!=sv_box_name){   // navigate to correct box
                 pbf_press_button(context, BUTTON_L, 10, 80);
                 context.wait_for_all_requests();
-                box_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), sv_box_name_read));
-                for(auto a:chars){box_name.erase(std::remove(box_name.begin(),box_name.end(), a),box_name.end());}
+                box_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), sv_box_name_read)));
                 env.console.log(box_name);
             }
             pbf_press_button(context, BUTTON_LEFT, 10, 50);    // move to party
@@ -2141,11 +2091,9 @@ void switch_close_game_and_open(SingleSwitchProgramEnvironment& env, ProControll
     pbf_press_button(context, BUTTON_A, 10, 240);
 
     for(int i = 0; i < 12; i++){
-        char chars[] = "\n\r—";
         box_render.add(COLOR_GREEN, switch_game_checker);
         context.wait_for_all_requests();
-        std::string box_name = OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), switch_game_checker));
-        for(auto a:chars){box_name.erase(std::remove(box_name.begin(),box_name.end(), a),box_name.end());}
+        std::string box_name = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), switch_game_checker)));
         if (box_name[0] != 'P'){
             size_t first_space = box_name.find(' ');
             if (first_space != std::string::npos && first_space + 1 < box_name.size()){
@@ -2443,7 +2391,7 @@ void Enrichment::home_put_away_pokemon(SingleSwitchProgramEnvironment& env, ProC
 void Enrichment::home_dispose_of_go(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::vector<int> blacklist = {144, 145, 146, 150, 151, 243, 244, 245, 249, 250, 251, 377, 378, 379, 380, 381, 382, 383, 384, 385, 386, 480, 481, 482, 483, 484, 485, 486, 487, 488, 489,490,491,492,493,494,638,639,640,641,642,643,644,645,646,647,648,649,666,676,716,717,718,772,773,785,786,787,788,789,790,791,792,793,888,889,890,891,892,893,894,895,896,897,898,905,999,1000,1001,1002,1003,1004,1007,1008,1009,1010,1014,1015,1016,1017,1021,1022,1023,1024,1025}; // Take out legendaries, etc. that need to be preserved
 
-    std::vector<int> lv10_blacklist = {2,3,5,6,8,9,11,12,14,15,17,18,20,22,24,28,30,33,42,44,47,49,51,53,55,57,61,64,67,70,73,75,78,80,82,85,87,89,93,97,99,101,105,106,107,110,112,117,119,124,125,126,130,139,141,148,149,153,154,156,157,159,160,162,164,166,168,171,178,180,181,184,188,189,195,202,205,210,217,219,221,224,229,232,237,247,248,253,254,256,257,259,260,262,264,266,267,268,269,271,274,277,279,281,282,284,286,288,289,291,292,294,295,297,305,306,308,310,317,319,321,323,326,329,330,332,334,340,342,344,346,348,354,356,362,364,365,372,373,375,376,388,389,391,392,394,395,397,398,400,402,404,405,409,411,414,416,419,421,423,426,432,435,437,444,445,450,452,454,457,460,496,497,499,500,502,503,505,507,508,510,520,521,523,525,530,533,536,537,541,544,545,552,553,558,560,563,565,567,569,571,575,576,578,579,581,583,584,586,591,593,596,598,600,601,603,606,608,611,612,614,620,623,625,628,630,634,635,637,651,652,654,655,657,658,660,662,663,665,666,668,670,673,675,680,687,689,691,693,697,699,705,706,713,715,723,724,726,727,729,730,732,733,735,737,743,748,750,752,754,756,758,760,762,768,770,783,784,790,791,792,811,812,814,815,817,818,820,822,823,825,826,828,830,832,834,836,838,839,844,847,851,857,858,860,861,862,863,864,866,879,886,887,907,908,910,911,913,914,918,920,922,927,929,930,933,934,941,943,945,949,956,958,959,961,966,970,972,980,997,998,678,745,849,916,925,964};
+    std::vector<int> lv10_blacklist = {2, 3, 5, 6, 8, 9, 11, 12, 14, 15, 17, 18, 20, 22, 24, 28, 30, 31, 33, 34, 42, 44, 45, 47, 49, 51, 53, 55, 57, 61, 62, 64, 65, 65, 67, 68, 68, 70, 71, 73, 75, 76, 76, 76, 78, 80, 82, 85, 87, 89, 93, 94, 94, 97, 99, 101, 105, 106, 107, 110, 112, 117, 119, 124, 125, 126, 130, 139, 141, 148, 149, 153, 154, 156, 157, 157, 159, 160, 162, 164, 166, 168, 171, 178, 180, 181, 182, 184, 186, 186, 188, 189, 195, 202, 205, 210, 217, 219, 221, 224, 229, 230, 230, 232, 237, 247, 248, 253, 254, 256, 257, 259, 260, 262, 264, 266, 267, 268, 269, 271, 272, 274, 275, 277, 279, 281, 282, 284, 286, 288, 289, 291, 292, 294, 295, 297, 305, 306, 308, 310, 317, 319, 321, 323, 326, 329, 330, 332, 334, 340, 342, 344, 346, 348, 354, 356, 362, 364, 365, 372, 373, 375, 376, 388, 389, 391, 392, 394, 395, 397, 398, 400, 402, 404, 405, 409, 411, 414, 415, 416, 419, 421, 423, 426, 432, 435, 437, 444, 445, 450, 452, 454, 457, 460, 462, 464, 464, 466, 466, 467, 468, 473, 475, 477, 496, 497, 499, 500, 502, 503, 503, 505, 507, 508, 510, 520, 521, 523, 525, 526, 526, 530, 533, 534, 534, 536, 537, 541, 544, 545, 552, 553, 555, 558, 560, 563, 565, 567, 569, 571, 575, 576, 578, 579, 581, 583, 584, 586, 591, 593, 596, 598, 600, 601, 603, 604, 606, 608, 609, 611, 612, 614, 620, 623, 625, 628, 630, 634, 635, 637, 651, 652, 654, 655, 657, 658, 660, 662, 663, 665, 666, 668, 670, 671, 673, 675, 678, 680, 687, 689, 691, 693, 697, 699, 705, 706, 706, 713, 715, 723, 724, 724, 726, 727, 729, 730, 732, 733, 735, 737, 738, 743, 745, 748, 750, 752, 754, 756, 758, 760, 762, 763, 768, 770, 783, 784, 790, 791, 791, 792, 792, 811, 812, 814, 815, 817, 818, 820, 822, 823, 825, 826, 828, 830, 832, 834, 836, 838, 839, 844, 847, 849, 851, 857, 858, 860, 861, 862, 862, 863, 864, 866, 879, 886, 887, 901, 907, 908, 910, 911, 913, 914, 916, 918, 920, 922, 923, 925, 927, 929};
 
     ImageFloatBox national_dex_number_box(0.448, 0.245, 0.049, 0.04); //pokemon national dex number pos
     ImageFloatBox nature_box(0.157, 0.783, 0.212, 0.042); // Nature box
@@ -2710,14 +2658,27 @@ void Enrichment::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     std::vector<Game> game_list = {Game("Pokémon Violet",0,false)/*,Game("Pokémon Sword",3,false),Game("Pokémon Legends: Arceus",1,false),Game("Pokémon: Let's Go, Eevee!",4,false)*/};
     std::vector<bool> box_sorted(200, false); // To track untouched box pairs
 
-    bool started = false;
-    bool swaps_made = true;
+    // bool started = false;
+    // bool swaps_made = true;
 
     VideoSnapshot screen = env.console.video().snapshot();
 
     VideoOverlaySet box_render(env.console);
 
     std::ostringstream ss;
+
+    ImageFloatBox minus_help_corner(0.03, 0.965, 0.06, 0.027); // Level box
+    std::string help_box = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), minus_help_corner)));
+    box_render.add(COLOR_GREEN, minus_help_corner);
+
+
+    env.console.log(help_box);
+
+    pbf_wait(context, 2000ms);
+
+    context.wait_for_all_requests();
+    box_render.clear();
+
 
 
     HomeApplicationWatcher homeWatcher(COLOR_BLUE);
@@ -2732,7 +2693,7 @@ void Enrichment::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     case 0:
         env.console.log("Found Pokemon Home appliciation open");
         send_program_notification(
-            env, NOTIFICATION_ERROR_FATAL,
+            env, NOTIFICATION_ERROR_RECOVERABLE,
             COLOR_GREEN,
             "Found Pokemon Home application",
             {}, "",
@@ -2752,20 +2713,20 @@ void Enrichment::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     }
 
 
-    block1(env, context, game_list);
-    block2(env, context, box_sorted, started, swaps_made);
-    block3(env, context, game_list);
+    // block1(env, context, game_list);
+    // block2(env, context, box_sorted, started, swaps_made);
+    // block3(env, context, game_list);
 
-    box_sorted = std::vector<bool>(200, false);
-    block2(env, context, box_sorted, started, swaps_made);
+    // box_sorted = std::vector<bool>(200, false);
+    // block2(env, context, box_sorted, started, swaps_made);
 
-    pbf_press_button(context, BUTTON_HOME,10, 150);
-    pbf_press_button(context, BUTTON_X, 10, 20);
-    pbf_press_button(context, BUTTON_A, 10, 320);
-    pbf_press_button(context, BUTTON_A, 10, 3150);
-    pbf_press_button(context, BUTTON_A, 10, 3150);
+    // pbf_press_button(context, BUTTON_HOME,10, 150);
+    // pbf_press_button(context, BUTTON_X, 10, 20);
+    // pbf_press_button(context, BUTTON_A, 10, 320);
+    // pbf_press_button(context, BUTTON_A, 10, 3150);
+    // pbf_press_button(context, BUTTON_A, 10, 3150);
 
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    // send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 
 
 
