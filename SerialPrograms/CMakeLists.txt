@@ -2297,10 +2297,10 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
 endif()
 
-#extract opencv_world460d.dll from archive on Windows Debug builds
+#extract opencv_world4110d.dll from archive on Windows Debug builds
 if (MSVC)
     file(ARCHIVE_EXTRACT
-      INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world460d.zip
+      INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110d.zip
       DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/
     )
 endif()
@@ -2316,8 +2316,8 @@ target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 if (MSVC)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
     set_target_properties(OpenCV_lib PROPERTIES
-        IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world460.lib
-        IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world460d.lib)
+        IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110.lib
+        IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110d.lib)
     set_target_properties(OpenCV_lib PROPERTIES
         MAP_IMPORTED_CONFIG_DEBUG           DEBUG
         MAP_IMPORTED_CONFIG_RELEASE         RELEASE
