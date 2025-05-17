@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_DialogDetector_H
 #define PokemonAutomation_PokemonLZA_DialogDetector_H
 
+#include <atomic>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
