@@ -2399,9 +2399,11 @@ if (MSVC)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else()
+    execute_process(COMMAND brew --prefix OUTPUT_VARIABLE HOMEBREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+
     # Find ONNX Runtime
-    target_include_directories(SerialPrograms PRIVATE /opt/homebrew/include/onnxruntime)
-    target_link_libraries(SerialPrograms PRIVATE /opt/homebrew/lib/libonnxruntime.dylib)
+    target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
+    target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
 
     # Find OpenCV
 
