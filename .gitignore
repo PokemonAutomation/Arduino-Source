@@ -26,19 +26,19 @@ build/
 *.pch
 
 # Compiled Dynamic libraries
-*.so
-*.dylib
-*.dll
+SerialPrograms/*.so
+SerialPrograms/*.dylib
+SerialPrograms/*.dll
 
 # Fortran module files
 *.mod
 *.smod
 
 # Compiled Static libraries
-*.lai
-*.la
-*.a
-*.lib
+SerialPrograms/*.lai
+SerialPrograms/*.la
+SerialPrograms/*.a
+SerialPrograms/*.lib
 
 # Executables
 *.exe
