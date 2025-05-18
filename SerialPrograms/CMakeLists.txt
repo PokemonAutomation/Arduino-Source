@@ -2399,12 +2399,17 @@ if (MSVC)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else()
-    # Find ONNX Runtime
-    target_include_directories(SerialPrograms PRIVATE /opt/homebrew/include/onnxruntime)
-    target_link_libraries(SerialPrograms PRIVATE /opt/homebrew/lib/libonnxruntime.dylib)
+    # Get root path where Homebrew installs libraries. Example root path: "/opt/homebrew/",
+    # where you can find libraries in "/opt/homebrew/lib/" and headers in "/opt/homebrew/include/".
+    # CMake does not support ONNX Runtime, so we have to add ONNX Runtime paths on our own.
+    # Save the root path as CMake variable HOMEBREW_PREFIX.
+    execute_process(COMMAND brew --prefix OUTPUT_VARIABLE HOMEBREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+
+    # Get ONNX Runtime paths
+    target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
+    target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
 
     # Find OpenCV
-
     # set(OPENCV_DIR, "/usr/local/opt/opencv/lib/cmake/opencv4")
     find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
     # set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/opt/opencv/lib/pkgconfig")
