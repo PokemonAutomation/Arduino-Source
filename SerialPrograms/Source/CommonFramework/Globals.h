@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_Globals_H
 #define PokemonAutomation_Globals_H
 
-#include <chrono>
 #include <string>
 
 namespace PokemonAutomation{
@@ -22,16 +21,18 @@ extern const std::string PROGRAM_VERSION;
 
 extern const std::string PROGRAM_NAME;
 
-extern const std::string DISCORD_LINK;
-extern const std::string DISCORD_LINK_URL;
-extern const std::string ONLINE_DOC_URL;
-extern const std::string PROJECT_GITHUB;
-extern const std::string PROJECT_GITHUB_URL;
+extern const std::string ONLINE_DOC_URL_BASE;
 extern const std::string PROJECT_SOURCE_URL;
+extern const std::string RESOURCES_URL_BASE;
+
+extern const std::string GITHUB_LINK_TEXT;
+extern const std::string GITHUB_LINK_URL;
+
+extern const std::string DISCORD_LINK_TEXT;
+extern const std::string DISCORD_LINK_URL_PROGRAM;
+extern const std::string DISCORD_LINK_URL_EMBED;
 
 extern const std::string COMPILER_VERSION;
-
-const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 
 extern const size_t LOG_HISTORY_LINES;
 

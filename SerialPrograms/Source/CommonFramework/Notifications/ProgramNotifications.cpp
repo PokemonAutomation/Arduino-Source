@@ -43,9 +43,9 @@ JsonObject make_credits_field(const ProgramInfo& info){
         ? PROGRAM_NAME + " CC " + PROGRAM_VERSION + "-dev"
         : PROGRAM_NAME + " CC " + PROGRAM_VERSION + "";
     if (GlobalSettings::instance().HIDE_NOTIF_DISCORD_LINK){
-        text += " ([GitHub](" + PROJECT_GITHUB_URL + "About/))";
+        text += " ([GitHub](" + GITHUB_LINK_URL + "))";
     }else{
-        text += " ([GitHub](" + PROJECT_GITHUB_URL + "About/)/[Discord](" + DISCORD_LINK_URL + "))";
+        text += " ([GitHub](" + GITHUB_LINK_URL + ")/[Discord](" + DISCORD_LINK_URL_EMBED + "))";
     }
     field["value"] = std::move(text);
     return field;

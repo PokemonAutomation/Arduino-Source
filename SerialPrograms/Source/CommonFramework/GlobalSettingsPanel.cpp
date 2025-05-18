@@ -140,7 +140,7 @@ GlobalSettings::GlobalSettings()
     , m_discord_settings(
         "<font size=4><b>Discord Settings:</b> Integrate with Discord. (" +
         make_text_url(
-            ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md",
+            ONLINE_DOC_URL_BASE + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md",
             "online documentation"
         ) + ")</font>"
     )
@@ -248,7 +248,7 @@ void GlobalSettings::load_json(const JsonValue& json){
     m_discord_settings.set_text(
         "<font size=4><b>Discord Settings:</b> Integrate with Discord. (" +
         make_text_url(
-            ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md",
+            ONLINE_DOC_URL_BASE + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md",
             "online documentation"
         ) + ")</font>"
     );

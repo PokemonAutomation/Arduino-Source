@@ -43,15 +43,34 @@ const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE + "-user";
 
 
 
-
 const std::string PROGRAM_NAME = "Pok\u00e9mon Automation";
 
-const std::string DISCORD_LINK = "discord.gg/PokemonAutomation";
-const std::string DISCORD_LINK_URL = "https://discord.gg/BSjDp27";
-const std::string ONLINE_DOC_URL = "https://github.com/PokemonAutomation/";
-const std::string PROJECT_GITHUB = "github.com/PokemonAutomation";
-const std::string PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
+const std::string ONLINE_DOC_URL_BASE = "https://github.com/PokemonAutomation/";
 const std::string PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
+const std::string RESOURCES_URL_BASE = "https://github.com/PokemonAutomation/Packages/";
+
+
+
+//  This the URL that we display. We don't actually use this for linking.
+const std::string GITHUB_LINK_TEXT = "github.com/PokemonAutomation";
+
+//  This is the URL that we actually link to.
+const std::string GITHUB_LINK_URL = "https://github.com/PokemonAutomation/About/blob/master/README.md";
+
+
+
+//  URL to display. (the vanity link)
+//  We don't actually use this URL for linking since the vanity link will go
+//  away if we lose too many nitro boosts.
+const std::string DISCORD_LINK_TEXT = "discord.gg/PokemonAutomation";
+
+//  URL to use inside the program.
+const std::string DISCORD_LINK_URL_PROGRAM = "https://discord.gg/BSjDp27";
+
+//  URL to use in the Discord notifications/embeds.
+const std::string DISCORD_LINK_URL_EMBED = "https://discord.gg/xMJcveK";
+
+
 
 #if 0
 #elif __INTEL_LLVM_COMPILER

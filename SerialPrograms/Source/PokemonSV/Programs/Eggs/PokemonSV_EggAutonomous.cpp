@@ -100,7 +100,7 @@ EggAutonomous::EggAutonomous()
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>" +
         make_text_url(
-            ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggAutonomous.md#auto-saving-mode",
+            ONLINE_DOC_URL_BASE + "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggAutonomous.md#auto-saving-mode",
             "See the wiki for the full explanations of each mode."
         ),
         {

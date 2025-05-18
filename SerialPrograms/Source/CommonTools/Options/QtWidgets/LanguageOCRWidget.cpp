@@ -98,7 +98,7 @@ void LanguageOCRCellWidget::update_value(){
         m_status->setText(
             QString::fromStdString(
                 "<font color=\"red\">No text recognition data found for " + language.name + ".</font>\n" +
-                "<a href=\"" + PROJECT_GITHUB_URL + "Packages/blob/master/SerialPrograms/Resources/Tesseract/\">Download from here.</a>"
+                "<a href=\"" + RESOURCES_URL_BASE + "blob/master/SerialPrograms/Resources/Tesseract/\">Download from here.</a>"
             )
         );
         m_status->setVisible(true);

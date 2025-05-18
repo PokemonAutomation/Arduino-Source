@@ -96,7 +96,7 @@ MainWindow::MainWindow(QWidget* parent)
         layout->addWidget(m_sleep_text, 2);
         m_sleep_box = new QCheckBox("Force On", support_box);
         layout->addWidget(m_sleep_box, 1, Qt::AlignHCenter);
-        sleep_suppress_state_changed(SystemSleepController::instance().current_state());
+        MainWindow::sleep_suppress_state_changed(SystemSleepController::instance().current_state());
 #if QT_VERSION < 0x060700
         connect(
             m_sleep_box, &QCheckBox::stateChanged,
@@ -131,7 +131,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
-        github->setText(QString::fromStdString(make_text_url(ONLINE_DOC_URL + "ComputerControl/", "Online Documentation")));
+        github->setText(QString::fromStdString(make_text_url(ONLINE_DOC_URL_BASE + "ComputerControl/", "Online Documentation")));
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
         github->setOpenExternalLinks(true);
@@ -139,7 +139,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* discord = new QLabel(support_box);
         links->addWidget(discord);
-        discord->setText(QString::fromStdString(make_text_url(DISCORD_LINK_URL, DISCORD_LINK)));
+        discord->setText(QString::fromStdString(make_text_url(DISCORD_LINK_URL_PROGRAM, DISCORD_LINK_TEXT)));
         discord->setTextFormat(Qt::RichText);
         discord->setTextInteractionFlags(Qt::TextBrowserInteraction);
         discord->setOpenExternalLinks(true);
@@ -147,7 +147,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
-        github->setText(QString::fromStdString(make_text_url(PROJECT_GITHUB_URL, PROJECT_GITHUB)));
+        github->setText(QString::fromStdString(make_text_url(GITHUB_LINK_URL, GITHUB_LINK_TEXT)));
 //        github->setText("<a href=\"" + GITHUB_REPO + "\">GitHub Repository</a>");
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
@@ -156,7 +156,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* about = new QLabel(support_box);
         links->addWidget(about);
-        about->setText(QString::fromStdString(make_text_url(PROJECT_GITHUB_URL, "About this Program")));
+        about->setText(QString::fromStdString(make_text_url(GITHUB_LINK_URL, "About this Program")));
         about->setTextFormat(Qt::RichText);
         connect(
             about, &QLabel::linkActivated,

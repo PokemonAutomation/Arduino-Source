@@ -31,7 +31,7 @@ CollapsibleGroupBox* make_panel_header(
 
     std::string name_text = "<b>Name:</b> " + display_name;
     if (!doc_link.empty()){
-        std::string path = ONLINE_DOC_URL + doc_link;
+        std::string path = ONLINE_DOC_URL_BASE + doc_link;
         name_text += " (" + make_text_url(path, "online documentation") + ")";
     }
     QLabel* name_label = new QLabel(QString::fromStdString(name_text), header);
