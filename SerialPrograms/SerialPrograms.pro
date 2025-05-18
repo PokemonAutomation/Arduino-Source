@@ -60,6 +60,8 @@ win32-msvc{
     LIBS += ../3rdPartyBinaries/dpp.lib
 
     LIBS += ../3rdPartyBinaries/opencv_world4110.lib
+    LIBS += ../3rdPartyBinaries/onnxruntime.lib
+    LIBS += ../3rdPartyBinaries/onnxruntime_providers_shared.lib
 }
 macx{
     QMAKE_CXXFLAGS += -std=c++14
@@ -449,6 +451,7 @@ SOURCES += \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.cpp \
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp \
     Source/NintendoSwitch/DevPrograms/JoyconProgram.cpp \
+    Source/NintendoSwitch/DevPrograms/TestDudunsparceFormDetector.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.cpp \
@@ -1112,6 +1115,7 @@ SOURCES += \
     Source/ZeldaTotK/ZeldaTotK_Settings.h
 
 HEADERS += \
+    ../3rdParty/ONNX/OnnxToolsPA.h \
     ../3rdParty/QtWavFile/WavFile.h \
     ../3rdParty/TesseractPA/TesseractPA.h \
     ../3rdParty/dpp/appcommand.h \
@@ -1658,6 +1662,7 @@ HEADERS += \
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h \
     Source/NintendoSwitch/DevPrograms/BoxDraw.h \
     Source/NintendoSwitch/DevPrograms/JoyconProgram.h \
+    Source/NintendoSwitch/DevPrograms/TestDudunsparceFormDetector.h \
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h \
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramOption.h \

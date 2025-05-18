@@ -35,6 +35,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 file(GLOB MAIN_SOURCES
+    ../3rdParty/ONNX/OnnxToolsPA.h
     ../3rdParty/QtWavFile/WavFile.cpp
     ../3rdParty/QtWavFile/WavFile.h
     ../3rdParty/TesseractPA/TesseractPA.cpp
@@ -906,6 +907,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/JoyconProgram.cpp
     Source/NintendoSwitch/DevPrograms/JoyconProgram.h
+    Source/NintendoSwitch/DevPrograms/TestDudunsparceFormDetector.cpp
+    Source/NintendoSwitch/DevPrograms/TestDudunsparceFormDetector.h
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.cpp
     Source/NintendoSwitch/DevPrograms/TestProgramComputer.h
     Source/NintendoSwitch/DevPrograms/TestProgramSwitch.cpp
@@ -2307,6 +2310,7 @@ endif()
 
 #add include directory
 target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/)
+target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/ONNX/)
 target_include_directories(SerialPrograms PRIVATE ../ ../../Internal/ Source/)
 target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 
@@ -2325,6 +2329,28 @@ if (MSVC)
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
 
+    add_library(ONNX_lib IMPORTED UNKNOWN)
+    set_target_properties(ONNX_lib PROPERTIES
+        IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/onnxruntime.lib
+        IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/onnxruntime.lib)
+    set_target_properties(ONNX_lib PROPERTIES
+        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
+        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
+        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
+    )
+
+    add_library(ONNX_Providers_lib IMPORTED UNKNOWN)
+    set_target_properties(ONNX_Providers_lib PROPERTIES
+        IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/onnxruntime_providers_shared.lib
+        IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/onnxruntime_providers_shared.lib)
+    set_target_properties(ONNX_Providers_lib PROPERTIES
+        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
+        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
+        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
+    )
+
     add_library(dpp_lib IMPORTED UNKNOWN)
     set_target_properties(dpp_lib PROPERTIES
         IMPORTED_LOCATION_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
@@ -2336,7 +2362,15 @@ if (MSVC)
         MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
 
-    target_link_libraries(SerialPrograms PRIVATE tesseractPA.lib OpenCV_lib Sleepy.lib dpp_lib)
+    target_link_libraries(
+        SerialPrograms PRIVATE
+        tesseractPA.lib
+        OpenCV_lib
+        ONNX_lib
+        ONNX_Providers_lib
+        Sleepy.lib
+        dpp_lib
+    )
     target_compile_definitions(
         SerialPrograms PRIVATE
         _CRT_SECURE_NO_WARNINGS
@@ -2365,6 +2399,10 @@ if (MSVC)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else()
+    # Find ONNX Runtime
+    target_include_directories(SerialPrograms PRIVATE /opt/homebrew/include/onnxruntime)
+    target_link_libraries(SerialPrograms PRIVATE /opt/homebrew/lib/libonnxruntime.dylib)
+
     # Find OpenCV
 
     # set(OPENCV_DIR, "/usr/local/opt/opencv/lib/cmake/opencv4")
@@ -2405,7 +2443,8 @@ else()
         # Add -Wno-c11-extensions to avoid clang gives
         # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
         # when compiling OpenCV
-        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
+        # target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
+        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror)
     else()
         # Assume GCC
         target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
