@@ -100,11 +100,13 @@ BurmyFinder::BurmyFinder()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while traveling in the overworld.",
+        "Enroute Shiny Action",
         "0 ms"
     )
     , MATCH_DETECTED_OPTIONS(
         "Match Action",
         "What to do when a Burmy is found that matches the \"Stop On\" parameter.",
+        "Found Shiny or Alpha",
         "0 ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

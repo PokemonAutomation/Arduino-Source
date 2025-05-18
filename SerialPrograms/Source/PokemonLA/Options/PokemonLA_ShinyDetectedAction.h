@@ -55,6 +55,12 @@ public:
         std::string default_delay,
         ShinyDetectedAction default_action = ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM
     );
+    ShinyDetectedActionOption(
+        std::string label, std::string description,
+        std::string notification_label,
+        std::string default_delay,
+        ShinyDetectedAction default_action = ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM
+    );
 
     bool stop_on_shiny() const;
 

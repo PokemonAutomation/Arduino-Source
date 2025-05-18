@@ -32,8 +32,23 @@ ShinyRequiresAudioText::ShinyRequiresAudioText()
 
 
 
+
 ShinyDetectedActionOption::ShinyDetectedActionOption(
     std::string label, std::string description,
+    std::string default_delay,
+    ShinyDetectedAction default_action
+)
+    : ShinyDetectedActionOption(
+        label,
+        std::move(description),
+        label,
+        std::move(default_delay),
+        std::move(default_action)
+    )
+{}
+ShinyDetectedActionOption::ShinyDetectedActionOption(
+    std::string label, std::string description,
+    std::string notification_label,
     std::string default_delay,
     ShinyDetectedAction default_action
 )
@@ -58,7 +73,12 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
         LockMode::LOCK_WHILE_RUNNING,
         std::move(default_delay)
     )
-    , NOTIFICATIONS(this->label(), true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
+    , NOTIFICATIONS(
+        std::move(notification_label),
+        true, true,
+        ImageAttachmentMode::JPG,
+        {"Notifs", "Showcase"}
+    )
 {
     if (!DESCRIPTION.text().empty()){
         PA_ADD_OPTION(DESCRIPTION);

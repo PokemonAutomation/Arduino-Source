@@ -113,11 +113,13 @@ LeapGrinder::LeapGrinder()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to destination.",
+        "Enroute Shiny Action",
         "0 ms"
     )
     , MATCH_DETECTED_OPTIONS(
         "Match Action",
         "What to do when the leaping Pokemon matches the *Stop On*.",
+        "Found Shiny or Alpha",
         "0 ms"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
