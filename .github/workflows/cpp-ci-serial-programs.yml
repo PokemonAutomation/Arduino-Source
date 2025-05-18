@@ -36,7 +36,7 @@ jobs:
     - name: Install dependencies
       if: startsWith(matrix.os, 'mac')
       run: |
-        brew install opencv
+        brew install opencv onnxruntime
     - uses: jurplel/install-qt-action@v4
       with:
         version: ${{ matrix.qt_version }}
