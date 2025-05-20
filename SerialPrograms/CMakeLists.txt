@@ -2273,12 +2273,21 @@ if (APPLE)
     )
 
     # make sure Packages repo, https://github.com/PokemonAutomation/Packages is placed in the same folder as this Arduino-Source repo
-    # so the post-build command can copy the resources folder Packages/SerialPrograms/Resources/ into the built app bundle
+    # so the post-build command can copy the resources folder Packages/SerialPrograms/Resources/ into the built app bundle:
+    string(FIND "${CMAKE_CURRENT_SOURCE_DIR}" "Arduino-Source-Internal" internal_repro_position)  # determine if this is an internal repo
+    if (internal_repro_position EQUAL -1)  # no "Arduino-Source-Internal" substr in the current source dir
+        # we are building the public repo
+        set(RESOURCES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../Packages/SerialPrograms/Resources")
+    else()
+        # we are building the internal repo
+        set(RESOURCES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../../Packages/SerialPrograms/Resources")
+    endif()
+    message(STATUS "Set Resources folder path from Packages repo: ${RESOURCES_PATH}")
     add_custom_command(
         TARGET SerialPrograms
         POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${CMAKE_CURRENT_SOURCE_DIR}/../../Packages/SerialPrograms/Resources"
+        "${RESOURCES_PATH}"
         "$<TARGET_FILE_DIR:SerialPrograms>/../Resources"
     )
 else() # WIN and Linux:
