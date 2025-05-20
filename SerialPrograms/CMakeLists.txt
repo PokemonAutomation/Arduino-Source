@@ -2408,15 +2408,48 @@ if (MSVC)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else()
-    # Get root path where Homebrew installs libraries. Example root path: "/opt/homebrew/",
-    # where you can find libraries in "/opt/homebrew/lib/" and headers in "/opt/homebrew/include/".
-    # CMake does not support ONNX Runtime, so we have to add ONNX Runtime paths on our own.
-    # Save the root path as CMake variable HOMEBREW_PREFIX.
-    execute_process(COMMAND brew --prefix OUTPUT_VARIABLE HOMEBREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+    if (APPLE)
+        # Get root path where Homebrew installs libraries. Example root path: "/opt/homebrew/",
+        # where you can find libraries in "/opt/homebrew/lib/" and headers in "/opt/homebrew/include/".
+        # CMake does not support ONNX Runtime, so we have to add ONNX Runtime paths on our own.
+        # Save the root path as CMake variable HOMEBREW_PREFIX.
+        execute_process(COMMAND brew --prefix OUTPUT_VARIABLE HOMEBREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-    # Get ONNX Runtime paths
-    target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
-    target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
+        # Get ONNX Runtime paths
+        target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
+        target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
+    else()
+        # Instructions took from https://github.com/microsoft/onnxruntime/discussions/6489
+        # Step 1: Download the file
+        file(DOWNLOAD
+            https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-x64-1.22.0.tgz
+            ${CMAKE_BINARY_DIR}/onnxruntime-linux-x64-1.22.0.tgz
+            SHOW_PROGRESS
+        )
+
+        # Step 2: Extract the archive
+        execute_process(
+            COMMAND tar -xzf onnxruntime-linux-x64-1.22.0.tgz
+            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        )
+
+        # Step 3: Copy files to /usr/local
+        execute_process(
+            COMMAND sudo cp -r ${CMAKE_BINARY_DIR}/onnxruntime-linux-x64-1.22.0/include /usr/local/
+        )
+        execute_process(
+            COMMAND sudo cp -r ${CMAKE_BINARY_DIR}/onnxruntime-linux-x64-1.22.0/lib /usr/local/
+        )
+
+        # Step 4: Run ldconfig
+        execute_process(
+            COMMAND sudo ldconfig
+            WORKING_DIRECTORY /usr/local/lib
+        )
+
+        # Link against ONNX Runtime
+        target_link_libraries(SerialPrograms PRIVATE onnxruntime)
+    endif()
 
     # Find OpenCV
     # set(OPENCV_DIR, "/usr/local/opt/opencv/lib/cmake/opencv4")
