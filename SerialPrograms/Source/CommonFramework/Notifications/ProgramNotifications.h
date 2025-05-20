@@ -50,7 +50,7 @@ void send_program_notification_with_file(
     const std::string& current_stats_addendum,
     const std::string& filepath
 );
-void send_program_notification(
+bool send_program_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     Color color,
     const std::string& title,

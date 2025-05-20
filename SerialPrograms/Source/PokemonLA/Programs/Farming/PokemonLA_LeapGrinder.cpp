@@ -13,6 +13,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Resources/PokemonLA_NameDatabase.h"
@@ -102,7 +103,7 @@ LeapGrinder::LeapGrinder()
     , POKEMON(
         "<b>Pokemon Species</b>",
         POKEMON_DATABASE,
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "cherubi"
     )
     , LEAPS(
@@ -112,20 +113,25 @@ LeapGrinder::LeapGrinder()
     )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
-        "This applies if a shiny is detected while enroute to destination.",
-        "Enroute Shiny Action",
+        "This applies if a shiny is detected while traveling in the overworld.",
         "0 ms"
+    )
+    , FOUND_SHINY_OR_ALPHA(
+        "Found Shiny or Alpha",
+        true, true,
+        ImageAttachmentMode::JPG,
+        {"Notifs", "Showcase"}
     )
     , MATCH_DETECTED_OPTIONS(
         "Match Action",
-        "What to do when the leaping Pokemon matches the *Stop On*.",
-        "Found Shiny or Alpha",
-        "0 ms"
+        "What to do when the leaping " + Pokemon::STRING_POKEMON + " matches the \"Stop On\" parameter.",
+        "Found Shiny or Alpha"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED_ENROUTE.NOTIFICATIONS,
+        &FOUND_SHINY_OR_ALPHA,
         &MATCH_DETECTED_OPTIONS.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
@@ -246,8 +252,33 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControll
             break;
         }
 
-        if (pokemon.is_alpha || pokemon.is_shiny){
-            on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
+        bool notification_sent = false;
+        do{
+            std::string str;
+            if (pokemon.is_shiny){
+                if (pokemon.is_alpha){
+                    str = "Found Shiny Alpha!";
+                }else{
+                    str = "Found Shiny!";
+                }
+            }else{
+                if (pokemon.is_alpha){
+                    str = "Found Alpha!";
+                }else{
+                    break;
+                }
+            }
+            notification_sent |= send_program_notification(
+                env, FOUND_SHINY_OR_ALPHA,
+                Pokemon::COLOR_STAR_SHINY,
+                std::move(str),
+                {}, "",
+                env.console.video().snapshot(), true
+            );
+        }while (false);
+
+        if (is_match){
+            on_battle_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, !notification_sent);
         }
 
         exit_battle(env.console, context, EXIT_METHOD);

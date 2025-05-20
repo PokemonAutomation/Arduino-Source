@@ -133,14 +133,14 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
     // start the shiny detection, there's nothing initially
     {
         float shiny_coefficient = 1.0;
-        std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
+        std::atomic<OverworldShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
         WallClock destination_time = WallClock::max();
 
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
-            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            OverworldShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
@@ -174,7 +174,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
         );
         shiny_detector.throw_if_no_sound();
         if (ret == 0 || shiny_detector.last_detection() > destination_time){
-            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            OverworldShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }
     };

@@ -105,14 +105,14 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
     env.console.log("Enabling Shiny Detection...");
     {
         float shiny_coefficient = 1.0;
-        std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
+        std::atomic<OverworldShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
         WallClock destination_time = WallClock::max();
 
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
-            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            OverworldShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
@@ -158,7 +158,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContro
         );
         shiny_detector.throw_if_no_sound();
         if (ret == 0 || shiny_detector.last_detection() > destination_time){
-            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            OverworldShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }
     };

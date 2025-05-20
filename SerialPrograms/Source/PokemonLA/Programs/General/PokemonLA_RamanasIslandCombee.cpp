@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -37,7 +38,7 @@ RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
         "PokemonLA:Ramanas Island Combee Finder",
         STRING_POKEMON + " LA", "Ramanas Combee Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/RamanasCombeeFinder.md",
-        "Check Ramanas Island Tree until a Combee is found",
+        "Check Ramanas Island Tree until a Combee is found.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController},
@@ -114,7 +115,7 @@ void RamanasCombeeFinder::check_tree_no_stop(SingleSwitchProgramEnvironment& env
     context.wait_for_all_requests();
     disable_shiny_sound(context);
     // Throw pokemon
-    pbf_press_button(context, BUTTON_ZR, (uint16_t)(0.5 * TICKS_PER_SECOND), (uint16_t)(1.5 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_ZR, 500ms, 1500ms);
     context.wait_for_all_requests();
     env.current_stats<RamanasCombeeFinder_Descriptor::Stats>().trees++;
     env.update_stats();
@@ -167,8 +168,11 @@ bool RamanasCombeeFinder::handle_battle(SingleSwitchProgramEnvironment& env, Pro
 
     env.console.log("Combee found");
     stats.found++;
-    on_match_found(env, env.console, context, SHINY_DETECTED_ENROUTE, true);
-    return true;
+
+    context.wait_for_all_requests();
+    throw ProgramFinishedException();
+//    on_battle_match_found(env, env.console, context, SHINY_DETECTED_ENROUTE, true);
+//    return true;
 }
 
 void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -181,7 +185,7 @@ void RamanasCombeeFinder::grouped_path(SingleSwitchProgramEnvironment& env, ProC
 
             env.console.log("Checking Tree 1");
             change_mount(env.console,context,MountState::BRAVIARY_ON);
-            pbf_move_left_joystick(context, 241, 0, 100, 20);
+            pbf_move_left_joystick(context, 239, 0, 100, 20);
             pbf_press_button(context, BUTTON_B, 2390, 0);
             pbf_press_button(context, BUTTON_Y, 380, 0);
             pbf_move_right_joystick(context, 127, 255, 90, 20);

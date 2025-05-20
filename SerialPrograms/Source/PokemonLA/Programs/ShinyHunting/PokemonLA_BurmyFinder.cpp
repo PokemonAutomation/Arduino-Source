@@ -15,6 +15,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
@@ -100,19 +101,24 @@ BurmyFinder::BurmyFinder()
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while traveling in the overworld.",
-        "Enroute Shiny Action",
         "0 ms"
+    )
+    , FOUND_SHINY_OR_ALPHA(
+        "Found Shiny or Alpha",
+        true, true,
+        ImageAttachmentMode::JPG,
+        {"Notifs", "Showcase"}
     )
     , MATCH_DETECTED_OPTIONS(
         "Match Action",
         "What to do when a Burmy is found that matches the \"Stop On\" parameter.",
-        "Found Shiny or Alpha",
-        "0 ms"
+        "Found Shiny or Alpha"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED_ENROUTE.NOTIFICATIONS,
+        &FOUND_SHINY_OR_ALPHA,
         &MATCH_DETECTED_OPTIONS.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_RECOVERABLE,
@@ -120,7 +126,7 @@ BurmyFinder::BurmyFinder()
     })
     , SAVE_DEBUG_VIDEO(
         "<b>Save debug videos to Switch:</b>",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
 {
@@ -156,9 +162,7 @@ bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, ProControll
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
 
     PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
-
     pbf_press_button(context, BUTTON_B, 20, 225);
-
     context.wait_for_all_requests();
 
     if (pokemon.name_candidates.find("burmy") == pokemon.name_candidates.end()){
@@ -201,8 +205,33 @@ bool BurmyFinder::handle_battle(SingleSwitchProgramEnvironment& env, ProControll
         break;
     }
 
-    if (pokemon.is_alpha || pokemon.is_shiny){
-        on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
+    bool notification_sent = false;
+    do{
+        std::string str;
+        if (pokemon.is_shiny){
+            if (pokemon.is_alpha){
+                str = "Found Shiny Alpha!";
+            }else{
+                str = "Found Shiny!";
+            }
+        }else{
+            if (pokemon.is_alpha){
+                str = "Found Alpha!";
+            }else{
+                break;
+            }
+        }
+        notification_sent |= send_program_notification(
+            env, FOUND_SHINY_OR_ALPHA,
+            Pokemon::COLOR_STAR_SHINY,
+            std::move(str),
+            {}, "",
+            env.console.video().snapshot(), true
+        );
+    }while (false);
+
+    if (is_match){
+        on_battle_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, !notification_sent);
     }
 
     exit_battle(env.console, context, EXIT_METHOD);

@@ -38,7 +38,7 @@ private:
 
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
-    ShinyDetectedActionOption SHINY_DETECTED;
+    OverworldShinyDetectedActionOption SHINY_DETECTED;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

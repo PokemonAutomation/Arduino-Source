@@ -92,8 +92,10 @@ private:
     OCR::LanguageOCROption LANGUAGE;
     StopOnOption STOP_ON;
     ExitBattleMethodOption EXIT_METHOD;
-    ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
-    ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
+
+    OverworldShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
+    EventNotificationOption FOUND_SHINY_OR_ALPHA;
+    BattleMatchActionOption MATCH_DETECTED_OPTIONS;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

@@ -285,7 +285,7 @@ void send_program_notification_with_file(
         filepath
     );
 }
-void send_program_notification(
+bool send_program_notification(
     ProgramEnvironment& env, EventNotificationOption& settings,
     Color color,
     const std::string& title,
@@ -294,7 +294,7 @@ void send_program_notification(
     const ImageViewRGB32& image, bool keep_file
 ){
     if (!settings.ok_to_send_now(env.logger())){
-        return;
+        return false;
     }
 #if 1
     messages.emplace_back(
@@ -331,6 +331,8 @@ void send_program_notification(
         messages,
         ImageAttachment(image, settings.screenshot(), keep_file)
     );
+
+    return true;
 }
 
 

@@ -48,8 +48,8 @@ private:
 
     ResetMethodOption RESET_METHOD;
 
-    ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
-    ShinyDetectedActionOption SHINY_DETECTED_DESTINATION;
+    OverworldShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
+    OverworldShinyDetectedActionOption SHINY_DETECTED_DESTINATION;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

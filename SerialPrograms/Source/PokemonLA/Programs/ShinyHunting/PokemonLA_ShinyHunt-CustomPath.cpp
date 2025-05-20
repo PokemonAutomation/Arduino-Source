@@ -235,7 +235,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, ProContr
 
     std::atomic<bool> listen_for_shiny(false);
     float shiny_coefficient = 1.0;
-    ShinyDetectedActionOption* shiny_action = nullptr;
+    OverworldShinyDetectedActionOption* shiny_action = nullptr;
     ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
         //  Warning: This callback will be run from a different thread than this function.
         stats.shinies++;

@@ -251,11 +251,9 @@ void exit_battle(VideoStream& stream, ProControllerContext& context, ExitBattleM
 
 PokemonDetails get_pokemon_details(VideoStream& stream, ProControllerContext& context, Language language){
     //  Open Info Screen
-    pbf_wait(context, (1 * TICKS_PER_SECOND));
-    pbf_press_button(context, BUTTON_PLUS, 20, 20);
-    pbf_wait(context, (1 * TICKS_PER_SECOND));
-    pbf_press_button(context, BUTTON_R, 20, 20);
-    pbf_wait(context, (1 * TICKS_PER_SECOND));
+    pbf_wait(context, 1000ms);
+    pbf_press_button(context, BUTTON_PLUS, 500ms, 1000ms);
+    pbf_press_button(context, BUTTON_R, 500ms, 1000ms);
 
     context.wait_for_all_requests();
     VideoSnapshot screen = stream.video().snapshot();

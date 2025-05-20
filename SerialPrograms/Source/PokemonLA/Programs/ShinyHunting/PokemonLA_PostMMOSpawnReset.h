@@ -41,7 +41,7 @@ private:
     MillisecondsOption FORWARD_DURATION0;
     MillisecondsOption WAIT_DURATION0;
 
-    ShinyDetectedActionOption SHINY_DETECTED;
+    OverworldShinyDetectedActionOption SHINY_DETECTED;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

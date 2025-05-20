@@ -47,7 +47,7 @@ private:
     std::atomic<bool> m_enable_shiny_sound{true};
 
     OCR::LanguageOCROption LANGUAGE;
-    ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
+    OverworldShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

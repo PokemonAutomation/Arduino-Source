@@ -282,6 +282,40 @@ struct RequestManagerConfig{
 
 
 
+struct Command{
+    uint64_t seqnum;
+    uint64_t milliseconds;
+    uint64_t buttons;
+    uint16_t left_joystick_x;
+    uint16_t left_joystick_y;
+    uint16_t right_joystick_x;
+    uint16_t right_joystick_y;
+
+    void write_to_hex(char str[64]) const{
+        const char HEX_DIGITS[] = "0123456789abcdef";
+        const char* ptr = (const char*)this;
+        for (size_t c = 0; c < 64; c += 2){
+            uint8_t hi = (uint8_t)ptr[0] >> 4;
+            uint8_t lo = (uint8_t)ptr[0] & 0x0f;
+            str[c + 0] = HEX_DIGITS[hi];
+            str[c + 1] = HEX_DIGITS[lo];
+            ptr++;
+        }
+    }
+    void parse_from_hex(const char str[64]){
+        char* ptr = (char*)this;
+        for (size_t c = 0; c < 64; c += 2){
+            char hi = str[c + 0];
+            char lo = str[c + 1];
+            hi = hi < 'a' ? hi - '0' : hi - 'a' + 10;
+            lo = lo < 'a' ? lo - '0' : lo - 'a' + 10;
+            ptr[0] = hi << 4 | lo;
+            ptr++;
+        }
+    }
+};
+
+
 
 
 
@@ -296,13 +330,35 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace std::chrono_literals;
 
+    Command command{
+        123,
+        100,
+        512,
+        2000, 3000,
+        4000, 5000
+    };
+
+    char str[65] = {};
+    command.write_to_hex(str);
+    cout << str << endl;
+    memset(&command, 0, sizeof(Command));
+
+    command.parse_from_hex(str);
+
+    cout << command.milliseconds << endl;
+    cout << command.buttons << endl;
+    cout << command.left_joystick_x << endl;
+    cout << command.left_joystick_y << endl;
+    cout << command.right_joystick_x << endl;
+    cout << command.right_joystick_y << endl;
 
 
+#if 0
     ImageRGB32 image("20250503-121259857603.png");
 
     image = filter_rgb32_euclidean(image, (uint32_t)COLOR_PURPLE, 100, COLOR_RED, true);
     image.save("temp.png");
-
+#endif
 
 
 
