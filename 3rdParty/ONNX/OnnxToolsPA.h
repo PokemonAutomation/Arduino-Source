@@ -26,7 +26,7 @@ inline std::wstring str_to_onnx_str(const std::string& str){
 
 
 inline std::string str_to_onnx_str(std::string str){
-    return std::move(str);
+    return str;
 }
 
 
