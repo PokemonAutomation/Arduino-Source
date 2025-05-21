@@ -29,7 +29,7 @@ ProController_SysbotBase::ProController_SysbotBase(
     , m_stopping(false)
     , m_replace_on_next(false)
     , m_command_queue(QUEUE_SIZE)
-    , m_is_active(false)
+    , m_next_state_change(WallClock::max())
 {
     if (!connection.is_ready()){
         return;
@@ -74,11 +74,9 @@ void ProController_SysbotBase::cancel_all_commands(){
 //    cout << "ProController_SysbotBase::cancel_all_commands()" << endl;
     std::lock_guard<std::mutex> lg(m_state_lock);
     size_t queue_size = m_command_queue.size();
-    if (queue_size > 0){
-        m_command_queue.clear();
-        m_is_active = false;
-        m_cv.notify_all();
-    }
+    m_next_state_change = WallClock::min();
+    m_command_queue.clear();
+    m_cv.notify_all();
     this->clear_on_next();
     m_logger.log("cancel_all_commands(): Command Queue Size = " + std::to_string(queue_size), COLOR_DARKGREEN);
 }
@@ -99,7 +97,7 @@ void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
     m_logger.log("wait_for_all(): Command Queue Size = " + std::to_string(m_command_queue.size()), COLOR_DARKGREEN);
     this->issue_wait_for_all(cancellable);
     m_cv.wait(lg1, [this]{
-        return m_command_queue.empty() || m_replace_on_next;
+        return m_next_state_change == WallClock::max() || m_replace_on_next;
     });
     if (cancellable){
         cancellable->throw_if_cancelled();
@@ -151,12 +149,16 @@ void ProController_SysbotBase::push_state(const Cancellable* cancellable, WallDu
     }
 
     if (m_replace_on_next){
-        m_command_queue.clear();
-        m_is_active = false;
+//        cout << "executing replace" << endl;
         m_replace_on_next = false;
+        m_command_queue.clear();
+        m_next_state_change = WallClock::min();
+        m_cv.notify_all();
     }
 
-    if (m_command_queue.empty()){
+    //  Enqueuing into empty+idle queue.
+    if (m_next_state_change == WallClock::max()){
+        m_next_state_change = WallClock::min();
         m_cv.notify_all();
     }
 
@@ -298,52 +300,34 @@ void ProController_SysbotBase::thread_body(){
 
     std::unique_lock<std::mutex> lg(m_state_lock);
     while (!m_stopping.load(std::memory_order_relaxed)){
-        if (m_command_queue.empty()){
-            m_is_active = false;
-            if (current_state.is_neutral()){
-                m_cv.wait(lg);
-                continue;
-            }
-
-            send_diff(current_state, ProControllerState());
-            current_state.clear();
-            continue;
-        }
-
         WallClock now = current_time();
 
-        //  Check the next item in the schedule.
-        Command& command = m_command_queue.front();
+        //  State change.
+        if (now >= m_next_state_change){
+            if (m_command_queue.empty()){
+                send_diff(current_state, ProControllerState());
+                current_state.clear();
+                m_next_state_change = WallClock::max();
+            }else{
+                Command& command = m_command_queue.front();
+                send_diff(current_state, command.state);
+                current_state = command.state;
+                if (m_next_state_change == WallClock::min()){
+                    m_next_state_change = now;
+                }
+                m_next_state_change += command.duration;
+                m_command_queue.pop_front();
+            }
+            m_cv.notify_all();
+            continue;
+        }
 
-        //  Waking up from idle.
-        if (!m_is_active){
-            m_is_active = true;
-            m_queue_start_time = now;
-
-            send_diff(current_state, command.state);
-            current_state = command.state;
-
-            WallClock expiration = m_queue_start_time + command.duration;
-            m_cv.wait_until(lg, expiration - EARLY_WAKE);
+        if (now + EARLY_WAKE >= m_next_state_change){
             pause();
             continue;
         }
 
-        //  Already running.
-        WallClock expiration = m_queue_start_time + command.duration;
-
-        //  Current command hasn't expired yet.
-        if (now < expiration){
-            m_cv.wait_until(lg, expiration - EARLY_WAKE);
-            pause();
-            continue;
-        }
-
-        //  Command has expired. We can pop it.
-        m_is_active = false;
-        m_queue_start_time = expiration;
-        m_command_queue.pop_front();
-        m_cv.notify_all();
+        m_cv.wait_until(lg, m_next_state_change - EARLY_WAKE);
 
         //  Check how much we shot passed the expiration time.
 //        WallDuration delay = now - expiration;

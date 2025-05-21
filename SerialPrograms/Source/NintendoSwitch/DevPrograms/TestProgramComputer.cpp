@@ -225,7 +225,6 @@ class WatchdogTest1 : public WatchdogCallback{
 
 
 
-
 template <typename Type>
 class CheckedObject{
 public:
@@ -282,41 +281,6 @@ struct RequestManagerConfig{
 
 
 
-struct Command{
-    uint64_t seqnum;
-    uint64_t milliseconds;
-    uint64_t buttons;
-    uint16_t left_joystick_x;
-    uint16_t left_joystick_y;
-    uint16_t right_joystick_x;
-    uint16_t right_joystick_y;
-
-    void write_to_hex(char str[64]) const{
-        const char HEX_DIGITS[] = "0123456789abcdef";
-        const char* ptr = (const char*)this;
-        for (size_t c = 0; c < 64; c += 2){
-            uint8_t hi = (uint8_t)ptr[0] >> 4;
-            uint8_t lo = (uint8_t)ptr[0] & 0x0f;
-            str[c + 0] = HEX_DIGITS[hi];
-            str[c + 1] = HEX_DIGITS[lo];
-            ptr++;
-        }
-    }
-    void parse_from_hex(const char str[64]){
-        char* ptr = (char*)this;
-        for (size_t c = 0; c < 64; c += 2){
-            char hi = str[c + 0];
-            char lo = str[c + 1];
-            hi = hi < 'a' ? hi - '0' : hi - 'a' + 10;
-            lo = lo < 'a' ? lo - '0' : lo - 'a' + 10;
-            ptr[0] = hi << 4 | lo;
-            ptr++;
-        }
-    }
-};
-
-
-
 
 
 
@@ -330,6 +294,47 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
     using namespace std::chrono_literals;
 
+
+#if 0
+    {
+        CommandQueue queue;
+
+        queue.enqueue_command(ControllerCommand{
+            .seqnum = 10,
+            .milliseconds = 1000,
+            .state = ControllerState{
+                .buttons = 123,
+            }
+        });
+        queue.enqueue_command(ControllerCommand{
+            .seqnum = 11,
+            .milliseconds = 2000,
+            .state = ControllerState{
+                .buttons = 456,
+            }
+        });
+
+        scope.wait_for(60s);
+    }
+#endif
+
+#if 0
+    HeapCircularBuffer<std::string> buffer(10);
+
+    buffer.try_push_back("asdf");
+    buffer.try_push_back("qwer");
+    buffer.try_push_back("zxcv");
+
+    cout << buffer[0] << endl;
+    cout << buffer[1] << endl;
+    cout << buffer[2] << endl;
+    cout << "--------------------" << endl;
+    buffer.pop_front();
+    cout << buffer[0] << endl;
+    cout << buffer[1] << endl;
+#endif
+
+#if 0
     Command command{
         123,
         100,
@@ -351,7 +356,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     cout << command.left_joystick_y << endl;
     cout << command.right_joystick_x << endl;
     cout << command.right_joystick_y << endl;
-
+#endif
 
 #if 0
     ImageRGB32 image("20250503-121259857603.png");

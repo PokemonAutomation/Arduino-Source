@@ -236,8 +236,10 @@ private:
         Milliseconds duration;
     };
     CircularBuffer<Command> m_command_queue;
-    WallClock m_queue_start_time;
-    bool m_is_active;
+
+    //  WallClock::max() means the queue is empty.
+    //  WallClock::min() means the state has suddently changed.
+    WallClock m_next_state_change;
 
     std::condition_variable m_cv;
     std::thread m_dispatch_thread;
