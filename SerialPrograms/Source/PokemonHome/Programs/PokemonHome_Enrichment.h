@@ -34,7 +34,7 @@ public:
     void home_dispose_of_go(SingleSwitchProgramEnvironment&, ProControllerContext&);
     bool initialize_home(SingleSwitchProgramEnvironment&, ProControllerContext&);
     void block1(SingleSwitchProgramEnvironment&, ProControllerContext&, std::vector<Game>&);
-    void block2(SingleSwitchProgramEnvironment&, ProControllerContext&, std::vector<bool>&, bool&, bool&);
+    void block2(SingleSwitchProgramEnvironment&, ProControllerContext&, bool&, bool&);
     void block3(SingleSwitchProgramEnvironment&, ProControllerContext&, std::vector<Game>&);
     virtual void program(SingleSwitchProgramEnvironment&, ProControllerContext&) override;
 
