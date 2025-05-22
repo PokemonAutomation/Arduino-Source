@@ -2319,7 +2319,6 @@ endif()
 
 #add include directory
 target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/)
-target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/ONNX/)
 target_include_directories(SerialPrograms PRIVATE ../ ../../Internal/ Source/)
 target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 
@@ -2328,6 +2327,7 @@ target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 
 if (MSVC)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
+    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/opencv-4.11.0/)
     set_target_properties(OpenCV_lib PROPERTIES
         IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110.lib
         IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110d.lib)
@@ -2339,6 +2339,7 @@ if (MSVC)
     )
 
     add_library(ONNX_lib IMPORTED UNKNOWN)
+    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/ONNX/)
     set_target_properties(ONNX_lib PROPERTIES
         IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/onnxruntime.lib
         IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/onnxruntime.lib)
