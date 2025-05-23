@@ -44,37 +44,68 @@ void PokemonHome_HomeEnvironment::DetectHome(SingleSwitchProgramEnvironment& env
 }
 
 void PokemonHome_HomeEnvironment::initialize_navigation_map(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
-    // Title screen to game selection
     navigation_map[PageID::TITLE_SCREEN] = {
-        {PageID::MAIN_MENU, [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::string&) {
+        {PageID::MAIN_MENU,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
             // Press A
         }},
     };
 
-    // Game selection to Main View Base
+    navigation_map[PageID::MAIN_MENU] = {
+        {PageID::GAME_SELECTION,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+            // Press A
+        }},
+    };
+
     navigation_map[PageID::GAME_SELECTION] = {
-        {PageID::MAIN_VIEW_BASE, [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::string& game) {
-             std::cout << "Selecting game: " << game << " and entering Main View Base.\n";
+        {PageID::MAIN_MENU,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+            // Press B
+        }},
+        {PageID::BOX_VIEW,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+            // Cycle through games until we see the correct game on screen, then press A and wait for login.
+        }},
+    };
+
+    navigation_map[PageID::BOX_VIEW] = {
+        {PageID::MAIN_MENU,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+            // Press Plus, then trigger logout sequence
+        }},
+        {PageID::SUMMARY_VIEW,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+            // Open menu, then go to summary. Assumes cursor is in the right position.
+        }},
+        {PageID::MARKINGS_VIEW,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+             // Open menu, then go to markings. Assumes cursor is in the right position.
+        }},
+        {PageID::LIST_VIEW,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+            // Press Y
+        }},
+    };
+
+    navigation_map[PageID::SUMMARY_VIEW] = {
+        {PageID::BOX_VIEW,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+             // Press B
          }},
     };
 
-    // Main View Base to other pages
-    navigation_map[PageID::MAIN_VIEW_BASE] = {
-        {PageID::LIST_VIEW, [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::string&) {
-             std::cout << "Navigating to List View from Main View Base.\n";
-         }},
-        {PageID::MAIN_VIEW_OPTION_MENU, [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::string&) {
-             std::cout << "Opening Option Menu in Main View.\n";
+    navigation_map[PageID::MARKINGS_VIEW] = {
+        {PageID::BOX_VIEW,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+             // Press B
          }},
     };
 
-    // Main View Option Menu to Summary or Markings
-    navigation_map[PageID::MAIN_VIEW_OPTION_MENU] = {
-        {PageID::SUMMARY_VIEW, [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::string&) {
-             std::cout << "Navigating to Summary View from Option Menu.\n";
-         }},
-        {PageID::MARKINGS_VIEW, [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const std::string&) {
-             std::cout << "Navigating to Markings View from Option Menu.\n";
+    navigation_map[PageID::LIST_VIEW] = {
+        {PageID::BOX_VIEW,
+         [](SingleSwitchProgramEnvironment& env, ProControllerContext& context, const GameStatus) {
+             // Press B
          }},
     };
 }

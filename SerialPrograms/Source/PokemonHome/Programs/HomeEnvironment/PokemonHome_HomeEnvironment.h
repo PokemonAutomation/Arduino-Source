@@ -38,8 +38,6 @@ namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonHome {
 
-// Continue with other enums, classes, and declarations
-using NavigationFunction = ::std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&, const std::string&)>;
 
 enum class GameStatus {
     NONE,
@@ -56,6 +54,9 @@ enum class GameStatus {
     CURRENT,
     UNKNOWN
 };
+
+// Continue with other enums, classes, and declarations
+using NavigationFunction = ::std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&, const GameStatus)>;
 
 enum class SecondaryBoxStatus {
     FALSE,
