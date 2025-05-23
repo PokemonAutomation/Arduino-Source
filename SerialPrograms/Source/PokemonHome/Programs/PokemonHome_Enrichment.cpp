@@ -13,6 +13,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
 #include "PokemonHome/Inference/PokemonHome_HomeApplicationDetector.h"
+#include "PokemonHome/Programs/HomeEnvironment/PokemonHome_HomeEnvironment.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogArrowDetector.h"
@@ -418,7 +419,6 @@ public:
     }
 };
 
-
 class PokemonBox {
 public:
 
@@ -535,6 +535,8 @@ public:
 };
 
 class BoxLayout {
+
+
 public:
     BoxLayout() : layout(200, nullptr), sorted(200, false) {
     }
@@ -604,7 +606,6 @@ private:
     std::vector<PokemonBox*> layout;
     std::vector<bool> sorted;
 };
-
 
 
 std::string sanitize_OCR(std::string str){
@@ -2999,8 +3000,8 @@ void Enrichment::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     std::vector<Game> game_list = {Game("Pokémon Violet",0,false)/*,Game("Pokémon Sword",3,false),Game("Pokémon Legends: Arceus",1,false),Game("Pokémon: Let's Go, Eevee!",4,false)*/};
 
-    bool started = false;
-    bool swaps_made = true;
+    // bool started = false;
+    // bool swaps_made = true;
 
     VideoSnapshot screen = env.console.video().snapshot();
 
@@ -3008,12 +3009,15 @@ void Enrichment::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
     std::ostringstream ss;
 
-    ImageFloatBox minus_help_corner(0.03, 0.965, 0.06, 0.027); // Level box
-    std::string help_box = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), minus_help_corner)));
-    box_render.add(COLOR_GREEN, minus_help_corner);
+    PokemonHome_HomeEnvironment(env, context);
+
+    ImageFloatBox top_white(0.36, 0.076, 0.001, 0.001);
+    FloatPixel current_box_value = image_stats(extract_box_reference(screen, top_white)).average;
+    // std::string help_box = sanitize_OCR(OCR::ocr_read(Language::English, extract_box_reference(env.console.video().snapshot(), top_green)));
+    box_render.add(COLOR_GREEN, top_white);
 
 
-    env.console.log(help_box);
+    env.console.log(std::to_string(current_box_value.r)+" "+std::to_string(current_box_value.g)+" "+std::to_string(current_box_value.b));
 
     pbf_wait(context, 2000ms);
 
@@ -3022,65 +3026,138 @@ void Enrichment::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
 
 
-    // HomeApplicationWatcher homeWatcher(COLOR_BLUE);
-    // int ret = wait_until(
-    //     env.console, context, 5000ms,
-    //     {
-    //         homeWatcher
-    //     }
-    // );
 
-    // switch(ret){
-    // case 0:
-    //     env.console.log("Found Pokemon Home appliciation open");
-    //     send_program_notification(
-    //         env, NOTIFICATION_ERROR_RECOVERABLE,
-    //         COLOR_GREEN,
-    //         "Found Pokemon Home application",
-    //         {}, "",
-    //         screen
-    //     );
-    //     break;
-    // default:
-    //     env.console.log("Did not find Pokemon Home application open");
-    //     send_program_notification(
-    //         env, NOTIFICATION_ERROR_FATAL,
-    //         COLOR_RED,
-    //         "Did not find Pokemon Home application",
-    //         {}, "",
-    //         screen
-    //     );
-    //     break;
-    // }
+    HomeTitleScreenWatcher titleWatcher(COLOR_BLUE);
+    HomeMainMenuWatcher mainMenuWatcher(COLOR_BLUE);
+    HomeGameSelectWatcher gameSelectWatcher(COLOR_BLUE);
+    HomeListViewWatcher listWatcher(COLOR_BLUE);
+    HomeSummaryViewWatcher summaryWatcher(COLOR_BLUE);
+    HomeMarkingsViewWatcher markingsWatcher(COLOR_BLUE);
+    HomeBoxViewWatcher boxWatcher(COLOR_BLUE);
+    int ret = wait_until(
+        env.console, context, 5000ms,
+        {
+            titleWatcher,
+            mainMenuWatcher,
+            gameSelectWatcher,
+            listWatcher,
+            summaryWatcher,
+            markingsWatcher,
+            boxWatcher
+        }
+    );
 
-
-    block1(env, context, game_list);
-    block2(env, context, started, swaps_made);
-    send_program_notification(
-            env, NOTIFICATION_ERROR_FATAL,
+    switch(ret){
+    case 0:
+        env.console.log("Found title screen");
+        send_program_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
             COLOR_GREEN,
-            "Finished Sorting Pokemon",
+            "Found title screen",
             {}, "",
             screen
         );
-    block3(env, context, game_list);
-    send_program_notification(
-        env, NOTIFICATION_ERROR_FATAL,
-        COLOR_GREEN,
-        "Finished Running Enhancements",
-        {}, "",
-        screen
+        break;
+    case 1:
+        env.console.log("Found main menu");
+        send_program_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            COLOR_GREEN,
+            "Found main menu",
+            {}, "",
+            screen
+            );
+        break;
+    case 2:
+        env.console.log("Found game select screen");
+        send_program_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            COLOR_GREEN,
+            "Found game select screen",
+            {}, "",
+            screen
+            );
+        break;
+    case 3:
+        env.console.log("Found list view screen");
+        send_program_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            COLOR_GREEN,
+            "Found list view screen",
+            {}, "",
+            screen
+            );
+        break;
+    case 4:
+        env.console.log("Found summary view screen");
+        send_program_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            COLOR_GREEN,
+            "Found list view screen",
+            {}, "",
+            screen
+            );
+        break;
+    case 5:
+        env.console.log("Found markings screen");
+        send_program_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            COLOR_GREEN,
+            "Found markings screen",
+            {}, "",
+            screen
+            );
+        break;
+    case 6:
+        env.console.log("Found box view");
+        send_program_notification(
+            env, NOTIFICATION_ERROR_RECOVERABLE,
+            COLOR_GREEN,
+            "Found box view",
+            {}, "",
+            screen
+            );
+        break;
+    default:
+        env.console.log("Did not find Pokemon Home application open");
+        send_program_notification(
+            env, NOTIFICATION_ERROR_FATAL,
+            COLOR_RED,
+            "Did not find Pokemon Home application",
+            {}, "",
+            screen
         );
+        break;
+    }
 
-    block2(env, context, started, swaps_made);
 
-    pbf_press_button(context, BUTTON_HOME,10, 150);
-    pbf_press_button(context, BUTTON_X, 10, 20);
-    pbf_press_button(context, BUTTON_A, 10, 320);
-    pbf_press_button(context, BUTTON_A, 10, 3150);
-    pbf_press_button(context, BUTTON_A, 10, 3150);
+    // block1(env, context, game_list);
+    // block2(env, context, started, swaps_made);
+    // send_program_notification(
+    //         env, NOTIFICATION_ERROR_FATAL,
+    //         COLOR_GREEN,
+    //         "Finished Sorting Pokemon",
+    //         {}, "",
+    //         screen
+    //     );
+    // block3(env, context, game_list);
+    // send_program_notification(
+    //     env, NOTIFICATION_ERROR_FATAL,
+    //     COLOR_GREEN,
+    //     "Finished Running Enhancements",
+    //     {}, "",
+    //     screen
+    //     );
 
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    // block2(env, context, started, swaps_made);
+
+    // pbf_press_button(context, BUTTON_HOME,10, 150);
+    // pbf_press_button(context, BUTTON_X, 10, 20);
+    // pbf_press_button(context, BUTTON_A, 10, 320);
+    // pbf_press_button(context, BUTTON_A, 10, 3150);
+    // pbf_press_button(context, BUTTON_A, 10, 3150);
+
+    // send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 
 
 
