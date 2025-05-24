@@ -61,7 +61,7 @@
 
 #include "Programs/TestPrograms/PokemonSV_SoundListener.h"
 
-#include "Programs/PokemonSV_ThreeSegmentDudunsparceFinder.h"
+#include "Programs/FormHunting/PokemonSV_ThreeSegmentDudunsparceFinder.h"
 
 #ifdef PA_OFFICIAL
 #include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"
