@@ -4,24 +4,30 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
+#include "PokemonSV/Programs/PokemonSV_Navigation.h"
 #include "PokemonSV_ThreeSegmentDudunsparceFinder.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+using namespace Pokemon;
 
 ThreeSegmentDudunsparceFinder_Descriptor::ThreeSegmentDudunsparceFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:ThreeSegmentDudunsparceFinder",
-        "Game Name", "Three-Segment Dudunsparce Finder",
+        STRING_POKEMON + " SV", "Three-Segment Dudunsparce Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ThreeSegmentDudunsparceFinder.md",
-        "<Description of this program>.",
+        "Check whether a box of Dunsparce contain at least one that evolves into Three-Segment Dudunsparce.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController},
@@ -47,6 +53,13 @@ std::unique_ptr<StatsTracker> ThreeSegmentDudunsparceFinder_Descriptor::make_sta
 
 ThreeSegmentDudunsparceFinder::ThreeSegmentDudunsparceFinder()
     : GO_HOME_WHEN_DONE(false)
+    , HAS_CLONE_RIDE_POKEMON(
+        "<b>Cloned Ride Legendary 2nd in Party:</b><br>"
+        "Ride legendary cannot be cloned after patch 1.0.1. To preserve the existing clone while hatching eggs, "
+        "place it as second in party before starting the program.</b>"
+        "The program will skip the first row of eggs in the box as a result.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -56,9 +69,28 @@ ThreeSegmentDudunsparceFinder::ThreeSegmentDudunsparceFinder()
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(HAS_CLONE_RIDE_POKEMON);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+void ThreeSegmentDudunsparceFinder::check_one_column(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int column_index){
+    enter_box_system_from_overworld(env.program_info(), env.console, context);
+    const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
+    if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
+        throw_and_log<FatalProgramException>(
+            env.console, ErrorReport::SEND_ERROR_REPORT,
+            "Your party should have " + std::to_string(expected_empty_slots_in_party) + " " + STRING_POKEMON + ".",
+            env.console
+        );
+    }
+
+    load_one_column_to_party(env, env.console, context, NOTIFICATION_ERROR_FATAL, column_index, HAS_CLONE_RIDE_POKEMON);
+    const int menu_index = 0;
+    // go to bag from box system
+    enter_menu_from_box_system(env.program_info(), env.console, context, menu_index, MenuSide::RIGHT);
+    context.wait_for_all_requests();
+    // BagWatcher bag_detector(BagWatcher::FinderType::PRESENT, COLOR_GREEN);
+}
 
 void ThreeSegmentDudunsparceFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -69,7 +101,10 @@ void ThreeSegmentDudunsparceFinder::program(SingleSwitchProgramEnvironment& env,
     pbf_press_button(context, BUTTON_L, 10, 100);
 
     try{
-        
+        for(int i = 0; i < 6; i++){
+            check_one_column(env, context, i);
+            break; // XXX
+        }
     } catch(OperationFailedException&){
         stats.m_errors++;
         env.update_stats();

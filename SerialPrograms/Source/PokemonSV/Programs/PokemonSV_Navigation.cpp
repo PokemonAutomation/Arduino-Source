@@ -999,10 +999,10 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
     bool success = false;
 
     while (true){
-        if (current_time() - start > std::chrono::minutes(3)){
+        if (current_time() - start > std::chrono::minutes(1)){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "enter_menu_from_overworld(): Failed to enter specified menu after 3 minutes.",
+                "enter_menu_from_overworld(): Failed to enter specified menu after 1 minute.",
                 stream
             );
         }
@@ -1054,6 +1054,64 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
                 "enter_menu_from_overworld(): Unexpectedly detected battle.",
                 stream
             );            
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "enter_menu_from_overworld(): No recognized state after 30 seconds.",
+                stream
+            );
+        }
+    }
+}
+
+void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+    int menu_index,
+    MenuSide side
+){
+    WallClock start = current_time();
+    bool success = false;
+
+    while (true){
+        if (current_time() - start > std::chrono::seconds(20)){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "enter_menu_from_box_system(): Failed to enter specified menu after 20 seconds.",
+                stream
+            );
+        }
+
+        MainMenuWatcher main_menu(COLOR_RED);
+        context.wait_for_all_requests();
+
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                // repeatedly pressing B and waiting for three seconds
+                for (int i = 0; i < 10; i++){
+                    pbf_press_button(context, BUTTON_B, 20, 3 * TICKS_PER_SECOND);
+                }
+            },
+            {main_menu}
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+
+        const bool fast_mode = false;
+        switch (ret){
+        case 0:
+            stream.log("Detected main menu.");
+            if (menu_index == -1){
+                return;
+            }
+            success = main_menu.move_cursor(info, stream, context, side, menu_index, fast_mode);
+            if (success == false){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "enter_menu_from_overworld(): Cannot move menu cursor to specified menu.",
+                    stream
+                );
+            }
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            return;     
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,

@@ -26,7 +26,8 @@ void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, Pr
 void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context);
 
 // Press B to return to the overworld
-void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, uint16_t seconds_between_b_presses = 3);
+void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+    uint16_t seconds_between_b_presses = 3);
 
 //  From overworld, open map. Will change map view from rotated to fixed if not already fixed.
 void open_map_from_overworld(
@@ -164,12 +165,19 @@ void fly_to_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, P
 // throw exception if there is a fly point/pokecenter that overlaps with the player on the map
 void confirm_no_overlapping_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
-// enter menu and move the cursor the given side, and index. then press the A button
+// enter menu and move the cursor to the given side and index, then press the A button (without wait for A button to press)
 // if menu_index is -1, return once the menu is detected.
 void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     int menu_index,
     MenuSide side = MenuSide::RIGHT,
     bool has_minimap = true
+);
+
+// enter menu and move the cursor to the given side and index, then press the A button (without wait for A button to press)
+// if menu_index is -1, return once the menu is detected.
+void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+    int menu_index,
+    MenuSide side = MenuSide::RIGHT
 );
 
 // press given button until gradient arrow appears in given box_area_to_check.

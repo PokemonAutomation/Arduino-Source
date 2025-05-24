@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_ThreeSegmentDudunsparceFinder_H
 #define PokemonAutomation_PokemonSV_ThreeSegmentDudunsparceFinder_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -33,10 +34,12 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+    void check_one_column(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int column_index);
     
 private:
-
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+
+    BooleanCheckBoxOption HAS_CLONE_RIDE_POKEMON;
 
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
