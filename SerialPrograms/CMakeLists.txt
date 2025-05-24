@@ -2410,7 +2410,7 @@ if (MSVC)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX2   /DPA_Arch_x64_AVX2)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
-else()
+else() # macOS and Linux
     if (APPLE)
         # Get root path where Homebrew installs libraries. Example root path: "/opt/homebrew/",
         # where you can find libraries in "/opt/homebrew/lib/" and headers in "/opt/homebrew/include/".
@@ -2421,7 +2421,7 @@ else()
         # Get ONNX Runtime paths
         target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
         target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
-    else()
+    else() # Linux
         # Instructions took from https://github.com/microsoft/onnxruntime/discussions/6489
         # Step 1: Download the file
         file(DOWNLOAD

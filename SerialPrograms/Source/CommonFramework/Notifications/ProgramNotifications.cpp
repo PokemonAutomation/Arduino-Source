@@ -89,7 +89,7 @@ void send_raw_notification(
     const std::vector<std::pair<std::string, std::string>>& messages,
     const ImageAttachment& image
 ){
-    std::shared_ptr<PendingFileSend> file(new PendingFileSend(logger, image));
+    std::shared_ptr<PendingFileSend> file = std::make_shared<PendingFileSend>(logger, image);
     bool hasFile = !file->filepath().empty();
 
     JsonObject embed;
@@ -147,7 +147,7 @@ void send_raw_notification(
     const std::vector<std::pair<std::string, std::string>>& messages,
     const std::string& filepath
 ){
-    std::shared_ptr<PendingFileSend> file(new PendingFileSend(filepath, true));
+    std::shared_ptr<PendingFileSend> file = std::make_shared<PendingFileSend>(filepath, true);
     bool hasFile = !file->filepath().empty();
 
     JsonObject embed;
