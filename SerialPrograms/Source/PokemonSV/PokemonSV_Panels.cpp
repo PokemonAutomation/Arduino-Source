@@ -61,6 +61,8 @@
 
 #include "Programs/TestPrograms/PokemonSV_SoundListener.h"
 
+#include "Programs/PokemonSV_ThreeSegmentDudunsparceFinder.h"
+
 #ifdef PA_OFFICIAL
 #include "../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h"
 #endif
@@ -152,11 +154,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 //        ret.emplace_back("---- Story Automation ----");
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
-
-    }
-    if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<SoundListener_Descriptor, SoundListener>());
+        ret.emplace_back(make_single_switch_program<ThreeSegmentDudunsparceFinder_Descriptor, ThreeSegmentDudunsparceFinder>());
     }
 
 #ifdef PA_OFFICIAL

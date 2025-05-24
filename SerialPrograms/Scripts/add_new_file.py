@@ -75,10 +75,10 @@ def get_code_file_range(file_lines: List[str], starting_line: str, ending_line: 
 
 
 
-cmakelists_path = code_root_path + os.sep + "SerialPrograms" + os.sep + "CMakeLists.txt"
-pro_path = code_root_path + os.sep + "SerialPrograms" + os.sep + "SerialPrograms.pro"
-print(f"Found CMakeLists path {cmakelists_path}")
-print(f"Found QT Pro project file path {pro_path}")
+cmakelists_path = os.path.join(code_root_path, "SerialPrograms", "CMakeLists.txt")
+pro_path = os.path.join(code_root_path, "SerialPrograms", "SerialPrograms.pro")
+print(f"CMakeLists path: {cmakelists_path}")
+print(f"QT Pro project file path: {pro_path}")
 
 file_lines = read_lines(cmakelists_path)
 old_file_lines = file_lines
@@ -105,6 +105,9 @@ with open(cmakelists_path, "w") as f:
 	f.writelines(file_lines)
 print(f"Writed changes back to {cmakelists_path}")
 
+if not os.path.exists(pro_path):
+	print(f"Pro file not found. End.")
+	exit(0)
 
 file_lines = read_lines(pro_path)
 

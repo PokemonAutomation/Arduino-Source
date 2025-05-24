@@ -1786,6 +1786,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h
     Source/PokemonSV/Programs/PokemonSV_Terarium.cpp
     Source/PokemonSV/Programs/PokemonSV_Terarium.h
+    Source/PokemonSV/Programs/PokemonSV_ThreeSegmentDudunsparceFinder.cpp
+    Source/PokemonSV/Programs/PokemonSV_ThreeSegmentDudunsparceFinder.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.cpp
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.cpp

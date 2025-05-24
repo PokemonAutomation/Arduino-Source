@@ -12,9 +12,6 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
-
-class OperationFailedException;
-
 namespace NintendoSwitch{
 namespace GameName{
 
