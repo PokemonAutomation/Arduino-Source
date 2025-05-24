@@ -28,7 +28,7 @@
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMaterialDetector.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV_ItemPrinterSeedCalc.h"
 #include "PokemonSV_ItemPrinterDatabase.h"
 #include "PokemonSV_ItemPrinterRNG.h"

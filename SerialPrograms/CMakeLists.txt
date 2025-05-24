@@ -1782,12 +1782,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/PokemonSV_ConnectToInternet.h
     Source/PokemonSV/Programs/PokemonSV_GameEntry.cpp
     Source/PokemonSV/Programs/PokemonSV_GameEntry.h
-    Source/PokemonSV/Programs/PokemonSV_Navigation.cpp
-    Source/PokemonSV/Programs/PokemonSV_Navigation.h
+    Source/PokemonSV/Programs/PokemonSV_MenuNavigation.cpp
+    Source/PokemonSV/Programs/PokemonSV_MenuNavigation.h
     Source/PokemonSV/Programs/PokemonSV_SaveGame.cpp
     Source/PokemonSV/Programs/PokemonSV_SaveGame.h
     Source/PokemonSV/Programs/PokemonSV_Terarium.cpp
     Source/PokemonSV/Programs/PokemonSV_Terarium.h
+    Source/PokemonSV/Programs/PokemonSV_WorldNavigation.cpp
+    Source/PokemonSV/Programs/PokemonSV_WorldNavigation.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.cpp
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h
     Source/PokemonSV/Programs/Sandwiches/PokemonSV_SandwichMaker.cpp

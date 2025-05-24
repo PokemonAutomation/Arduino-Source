@@ -13,7 +13,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
-#include "PokemonSV/Programs/PokemonSV_Navigation.h"
+#include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV_ThreeSegmentDudunsparceFinder.h"
 
 namespace PokemonAutomation{
