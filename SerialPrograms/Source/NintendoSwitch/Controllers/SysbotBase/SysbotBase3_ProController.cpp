@@ -76,12 +76,18 @@ void ProController_SysbotBase3::replace_on_next_command(){
 }
 void ProController_SysbotBase3::wait_for_all(const Cancellable* cancellable){
     std::unique_lock<std::mutex> lg(m_state_lock);
-    if (m_stopping){
-        throw InvalidConnectionStateException();
+    while (true){
+        if (m_stopping){
+            throw InvalidConnectionStateException();
+        }
+        if (cancellable){
+            cancellable->throw_if_cancelled();
+        }
+        if (m_next_seqnum == m_next_expected_seqnum_ack){
+            break;
+        }
+        m_cv.wait(lg);
     }
-    m_cv.wait(lg, [this]{
-        return m_stopping || m_next_seqnum == m_next_expected_seqnum_ack;
-    });
 }
 
 void ProController_SysbotBase3::on_receive_data(const void* data, size_t bytes){
@@ -194,7 +200,10 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     std::unique_lock<std::mutex> lg(m_state_lock, std::adopt_lock_t());
 
     //  Wait until there is space.
-    m_cv.wait(lg, [this]{
+    m_cv.wait(lg, [this, cancellable]{
+        if (cancellable && cancellable->cancelled()){
+            return true;
+        }
         return m_stopping || m_next_seqnum - m_next_expected_seqnum_ack < QUEUE_SIZE;
     });
 
