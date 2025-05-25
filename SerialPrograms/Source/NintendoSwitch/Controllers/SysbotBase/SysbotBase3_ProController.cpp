@@ -214,7 +214,7 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     std::string message;
     message.resize(64);
     command.write_to_hex(message.data());
-    message = "ccControllerState " + message + "\r\n";
+    message = "cqControllerState " + message + "\r\n";
     m_connection.write_data(message);
 
     if (GlobalSettings::instance().LOG_EVERYTHING){
