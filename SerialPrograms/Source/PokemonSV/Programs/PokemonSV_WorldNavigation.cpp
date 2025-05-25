@@ -19,7 +19,6 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"

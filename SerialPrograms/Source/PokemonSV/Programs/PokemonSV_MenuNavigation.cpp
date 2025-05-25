@@ -14,15 +14,11 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
-#include "PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
-#include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
-#include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
+#include "PokemonSV/Inference/PokemonSV_BagDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
-#include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
-#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_MenuNavigation.h"
@@ -533,17 +529,16 @@ void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, Pr
             [](ProControllerContext& context){
                 // repeatedly pressing B and waiting for three seconds
                 for (int i = 0; i < 10; i++){
-                    pbf_press_button(context, BUTTON_B, 20, 3 * TICKS_PER_SECOND);
+                    pbf_press_button(context, BUTTON_B, 200ms, 3s);
                 }
             },
             {main_menu}
         );
-        context.wait_for(std::chrono::milliseconds(100));
 
         const bool fast_mode = false;
         switch (ret){
         case 0:
-            stream.log("Detected main menu.");
+            stream.log("Detected main menu when going from box system to menu");
             if (menu_index == -1){
                 return;
             }
@@ -551,7 +546,7 @@ void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, Pr
             if (success == false){
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
-                    "enter_menu_from_overworld(): Cannot move menu cursor to specified menu.",
+                    "enter_menu_from_box_system(): Cannot move menu cursor to specified menu.",
                     stream
                 );
             }
@@ -560,12 +555,128 @@ void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, Pr
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "enter_menu_from_overworld(): No recognized state after 30 seconds.",
+                "enter_menu_from_box_system(): No recognized state after 30 seconds.",
                 stream
             );
         }
     }
 }
+
+
+void enter_menu_from_bag(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+    int menu_index,
+    MenuSide side
+){
+    WallClock start = current_time();
+    bool success = false;
+
+    while (true){
+        if (current_time() - start > std::chrono::seconds(20)){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "enter_menu_from_bag(): Failed to enter specified menu after 20 seconds.",
+                stream
+            );
+        }
+
+        MainMenuWatcher main_menu(COLOR_RED);
+        BagWatcher bag_watcher(BagWatcher::FinderType::PRESENT, COLOR_RED);
+        context.wait_for_all_requests();
+
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                // repeatedly pressing B and waiting for three seconds
+                for (int i = 0; i < 10; i++){
+                    pbf_press_button(context, BUTTON_B, 200ms, 3s);
+                }
+            },
+            {main_menu, bag_watcher}
+        );
+
+        const bool fast_mode = false;
+        switch (ret){
+        case 0:
+            stream.log("Detected main menu when going from box system to menu");
+            if (menu_index == -1){
+                return;
+            }
+            success = main_menu.move_cursor(info, stream, context, side, menu_index, fast_mode);
+            if (success == false){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "enter_menu_from_bag(): Cannot move menu cursor to specified menu.",
+                    stream
+                );
+            }
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            return;
+        case 1:
+            stream.log("still on bag.");
+            pbf_press_button(context, BUTTON_B, 20, 105);
+            continue;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "enter_menu_from_bag(): No recognized state after 30 seconds.",
+                stream
+            );
+        }
+    }
+}
+
+
+void enter_bag_from_menu(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+    WallClock start = current_time();
+    bool success = false;
+    stream.log("Entering bag from menu");
+
+    while (true){
+        if (current_time() - start > std::chrono::seconds(20)){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "enter_bag_from_menu(): Failed to enter specified menu after 20 seconds.",
+                stream
+            );
+        }
+
+        MainMenuWatcher main_menu(COLOR_RED);
+        BagWatcher bag_watcher(BagWatcher::FinderType::PRESENT, COLOR_RED);
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            stream, context,
+            Seconds(5),
+            {main_menu, bag_watcher}
+        );
+
+        const bool fast_mode = false;
+        switch (ret){
+        case 0:
+            stream.log("Detected main menu.");
+            success = main_menu.move_cursor(info, stream, context, MenuSide::RIGHT, 0, fast_mode);
+            if (success == false){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "enter_bag_from_menu(): Cannot move menu cursor to specified menu.",
+                    stream
+                );
+            }
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            continue;
+        case 1:
+            stream.overlay().add_log("Enter bag");
+            return;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "enter_bag_from_menu(): No recognized state after 30 seconds.",
+                stream
+            );
+        }
+    }
+}
+
 
 void press_button_until_gradient_arrow(
     const ProgramInfo& info, 

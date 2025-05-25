@@ -12,7 +12,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
-#include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
+
 
 namespace PokemonAutomation{
     struct ProgramInfo;
@@ -68,12 +68,24 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
     bool has_minimap = true
 );
 
-// enter menu and move the cursor to the given side and index, then press the A button (without wait for A button to press)
+// enter menu from box system and move the cursor to the given side and index, then press the A button (without wait for A
+// button to press)
 // if menu_index is -1, return once the menu is detected.
 void enter_menu_from_box_system(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     int menu_index,
-    MenuSide side = MenuSide::RIGHT
+    MenuSide side = MenuSide::NONE
 );
+
+// enter menu from bag and move the cursor to the given side and index, then press the A button (without wait for A
+// button to press)
+// if menu_index is -1, return once the menu is detected.
+void enter_menu_from_bag(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+    int menu_index,
+    MenuSide side = MenuSide::NONE
+);
+
+// enter bag from any place on the main menu
+void enter_bag_from_menu(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
 // press given button until gradient arrow appears in given box_area_to_check.
 void press_button_until_gradient_arrow(

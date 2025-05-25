@@ -21,7 +21,7 @@ namespace PokemonSV{
 bool is_summary_color(const ImageStats& stats);
 
 
-
+// Detect pokemon status summary page
 class PokemonSummaryDetector : public StaticScreenDetector{
 public:
     PokemonSummaryDetector(Color color = COLOR_RED);
