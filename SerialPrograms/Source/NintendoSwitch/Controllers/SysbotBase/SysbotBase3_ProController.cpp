@@ -198,6 +198,8 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
         return m_stopping || m_next_seqnum - m_next_expected_seqnum_ack < QUEUE_SIZE;
     });
 
+    lg.release();
+
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
