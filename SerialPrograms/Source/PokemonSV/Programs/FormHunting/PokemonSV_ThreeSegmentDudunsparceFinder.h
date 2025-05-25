@@ -34,7 +34,11 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void check_one_column(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int column_index);
+    void check_one_column(
+        SingleSwitchProgramEnvironment& env,
+        ProControllerContext& context,
+        uint8_t column_index
+    );
     
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

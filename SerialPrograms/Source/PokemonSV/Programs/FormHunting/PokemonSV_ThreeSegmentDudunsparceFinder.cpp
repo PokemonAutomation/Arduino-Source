@@ -75,7 +75,11 @@ ThreeSegmentDudunsparceFinder::ThreeSegmentDudunsparceFinder()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void ThreeSegmentDudunsparceFinder::check_one_column(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int column_index){
+void ThreeSegmentDudunsparceFinder::check_one_column(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    uint8_t column_index
+){
     enter_box_system_from_overworld(env.program_info(), env.console, context);
     const uint8_t expected_empty_slots_in_party = HAS_CLONE_RIDE_POKEMON ? 4 : 5;
     if (check_empty_slots_in_party(env.program_info(), env.console, context) != expected_empty_slots_in_party){
@@ -183,7 +187,7 @@ void ThreeSegmentDudunsparceFinder::program(SingleSwitchProgramEnvironment& env,
     pbf_press_button(context, BUTTON_L, 10, 100);
 
     try{
-        for(int i = 0; i < 6; i++){
+        for(uint8_t i = 0; i < 6; i++){
             check_one_column(env, context, i);
             break; // XXX
         }
