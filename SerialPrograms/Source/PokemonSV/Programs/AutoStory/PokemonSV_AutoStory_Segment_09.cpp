@@ -147,7 +147,8 @@ void checkpoint_17(
         // open school navigation screen
         press_button_until_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078});
         // go to staff room
-        basic_menu_navigation(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078}, {0.031, 0.193 + 0.074219, 0.047, 0.078}, DPAD_DOWN, 1);
+        navigate_school_layout_menu(env.program_info(), env.console, context, {0.031, 0.193, 0.047, 0.078},
+            {0.031, 0.193 + 0.074219, 0.047, 0.078}, DPAD_DOWN, 1);
         // enter staff room
         pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
         pbf_wait(context, 3 * TICKS_PER_SECOND);

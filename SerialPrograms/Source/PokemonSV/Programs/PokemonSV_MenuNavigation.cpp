@@ -597,7 +597,7 @@ void press_button_until_gradient_arrow(
     }     
 }
 
-void basic_menu_navigation(
+void navigate_school_layout_menu(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context,
@@ -612,7 +612,7 @@ void basic_menu_navigation(
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "basic_menu_navigation: Failed to detect gradient arrow at expected start position.",
+            "navigate_school_layout_menu: Failed to detect gradient arrow at expected start position.",
             stream
         );        
     }
@@ -634,11 +634,11 @@ void basic_menu_navigation(
     );
 
     if (ret == 0){
-        stream.log("basic_menu_navigation: Desired item selected.");
+        stream.log("navigate_school_layout_menu: Desired item selected.");
     }else{
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "basic_menu_navigation: Failed to detect gradient arrow at expected end position.",
+            "navigate_school_layout_menu: Failed to detect gradient arrow at expected end position.",
             stream
         );        
     }

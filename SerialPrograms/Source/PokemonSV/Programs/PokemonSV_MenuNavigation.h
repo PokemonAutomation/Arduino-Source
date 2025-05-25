@@ -29,6 +29,14 @@ void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context)
 void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     uint16_t seconds_between_b_presses = 3);
 
+// mashes A button by default
+void mash_button_till_overworld(
+    VideoStream& stream,
+    ProControllerContext& context,
+    Button button = BUTTON_A,
+    uint16_t seconds_run = 360
+);
+
 //  From overworld, open map. Will change map view from rotated to fixed if not already fixed.
 void open_map_from_overworld(
     const ProgramInfo& info,
@@ -51,14 +59,6 @@ void open_recently_battled_from_pokedex(const ProgramInfo& info, VideoStream& st
 
 //  From any of the rotom phone apps (Map/Pokédex/Profile) go to overworld.
 void leave_phone_to_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
-
-// mashes A button by default
-void mash_button_till_overworld(
-    VideoStream& stream,
-    ProControllerContext& context,
-    Button button = BUTTON_A,
-    uint16_t seconds_run = 360
-);
 
 // enter menu and move the cursor to the given side and index, then press the A button (without wait for A button to press)
 // if menu_index is -1, return once the menu is detected.
@@ -85,13 +85,13 @@ void press_button_until_gradient_arrow(
     GradientArrowType arrow_type = GradientArrowType::RIGHT
 );
 
-// navigate menus using only gradient arrow detection, without OCR
+// navigate school layout menu using only gradient arrow detection, without OCR
 // first, wait for the gradient arrow to appear within `arrow_box_start`.
 // then, press `dpad_button` a certain number of times, as per `num_button_presses`.
 // then, watch for the gradient arrow within `arrow_box_end`. 
 // If arrow not seen, press `dpad_button` a maximum of 3 times, while still watching for the gradient arrow
 // If arrow still not seen, throw exception.
-void basic_menu_navigation(
+void navigate_school_layout_menu(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context,
