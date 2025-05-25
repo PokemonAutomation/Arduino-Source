@@ -903,6 +903,9 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ControllerState.h
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.cpp
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/JoyconProgram.cpp

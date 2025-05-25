@@ -23,6 +23,14 @@ namespace SysbotBase{
 
 class TcpSysbotBase_Connection : public ControllerConnection, private ClientSocket::Listener{
 public:
+    void add_listener(Listener& listener){
+        m_listeners.add(listener);
+    }
+    void remove_listener(Listener& listener){
+        m_listeners.add(listener);
+    }
+
+public:
     TcpSysbotBase_Connection(
         Logger& logger,
         const std::string& url
@@ -30,6 +38,9 @@ public:
     ~TcpSysbotBase_Connection();
 
     virtual ControllerModeStatus controller_mode_status() const override;
+    bool supports_command_queue() const{
+        return m_supports_command_queue;
+    }
 
     void write_data(const std::string& data);
 
@@ -43,6 +54,8 @@ private:
     Logger& m_logger;
     ClientSocket m_socket;
 
+    bool m_supports_command_queue;
+
     std::string m_connecting_message;
 //    std::string m_version;
     WallClock m_last_receive;
@@ -51,6 +64,8 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
     std::thread m_thread;
+
+    ListenerSet<Listener> m_listeners;
 };
 
 

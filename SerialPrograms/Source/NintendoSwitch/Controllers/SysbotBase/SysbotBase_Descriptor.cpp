@@ -8,6 +8,7 @@
 #include "SysbotBase_Descriptor.h"
 #include "SysbotBase_Connection.h"
 #include "SysbotBase_ProController.h"
+#include "SysbotBase3_ProController.h"
 #include "SysbotBase_SelectorWidget.h"
 
 //#include <iostream>
@@ -59,12 +60,16 @@ std::unique_ptr<AbstractController> TcpSysbotBase_Descriptor::make_controller(
     ControllerConnection& connection,
     ControllerType controller_type
 ) const{
-    return std::unique_ptr<AbstractController>(
-        new NintendoSwitch::ProController_SysbotBase(
-            logger,
-            static_cast<TcpSysbotBase_Connection&>(connection)
-        )
-    );
+    TcpSysbotBase_Connection& sbb_connection = static_cast<TcpSysbotBase_Connection&>(connection);
+    if (sbb_connection.supports_command_queue()){
+        return std::unique_ptr<AbstractController>(
+            new NintendoSwitch::ProController_SysbotBase3(logger, sbb_connection)
+        );
+    }else{
+        return std::unique_ptr<AbstractController>(
+            new NintendoSwitch::ProController_SysbotBase(logger, sbb_connection)
+        );
+    }
 }
 
 

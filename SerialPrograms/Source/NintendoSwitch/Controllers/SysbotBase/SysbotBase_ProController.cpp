@@ -243,9 +243,9 @@ void ProController_SysbotBase::send_diff(
                 continue;
             }
             if (after){
-                message += "press " + button.second + "\n";
+                message += "press " + button.second + "\r\n";
             }else{
-                message += "release " + button.second + "\n";
+                message += "release " + button.second + "\r\n";
             }
         }
     }
@@ -263,7 +263,7 @@ void ProController_SysbotBase::send_diff(
         message += std::to_string(ix);
         message += " ";
         message += std::to_string(iy);
-        message += "\n";
+        message += "\r\n";
     }
     if (old_state.right_x != new_state.right_x ||
         old_state.right_y != new_state.right_y
@@ -276,7 +276,7 @@ void ProController_SysbotBase::send_diff(
         message += std::to_string(ix);
         message += " ";
         message += std::to_string(iy);
-        message += "\n";
+        message += "\r\n";
     }
 
     if (message.empty()){

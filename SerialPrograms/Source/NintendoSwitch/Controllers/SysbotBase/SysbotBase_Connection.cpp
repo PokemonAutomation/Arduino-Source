@@ -47,6 +47,7 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
     const std::string& url
 )
     : m_logger(logger)
+    , m_supports_command_queue(false)
     , m_last_receive(WallClock::min())
 {
     QHostAddress address;
@@ -77,7 +78,7 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
 
 TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
     try{
-        write_data("detachController\n");
+        write_data("detachController\r\n");
     }catch (...){}
     m_socket.remove_listener(*this);
     m_socket.close();
@@ -130,7 +131,7 @@ void TcpSysbotBase_Connection::thread_loop(){
 
         if (m_last_receive == WallClock::min()){
             send_time = now;
-            write_data("getVersion\n");
+            write_data("getVersion\r\n");
         }else if (send_time < m_last_receive && now - m_last_receive < std::chrono::seconds(1)){
             std::chrono::microseconds latency = std::chrono::duration_cast<std::chrono::microseconds>(m_last_receive - send_time);
             std::string str = "Response Time: " + pretty_print(latency.count()) + " ms";
@@ -142,14 +143,14 @@ void TcpSysbotBase_Connection::thread_loop(){
                 set_status_line1(str, COLOR_ORANGE);
             }
             send_time = current_time();
-            write_data("getVersion\n");
+            write_data("getVersion\r\n");
 //            cout << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - send_time) << endl;
         }else{
             std::chrono::milliseconds time_since = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_last_receive);
             std::string str = "Last Ack: " + pretty_print(time_since.count()) + " seconds ago";
             set_status_line1(str, COLOR_RED);
             send_time = current_time();
-            write_data("getVersion\n");
+            write_data("getVersion\r\n");
 //            cout << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - send_time) << endl;
         }
         m_cv.wait_for(lg, std::chrono::seconds(1));
@@ -168,9 +169,9 @@ void TcpSysbotBase_Connection::on_connect_finished(const std::string& error_mess
 
         m_logger.log(m_connecting_message + " (Success)", COLOR_BLUE);
 
-        write_data("configure echoCommands 0\n");
-        write_data("getVersion\n");
-        write_data("configure mainLoopSleepTime 0\n");
+        write_data("configure echoCommands 0\r\n");
+        write_data("getVersion\r\n");
+        write_data("configure mainLoopSleepTime 0\r\n");
 
         m_thread = std::thread(&TcpSysbotBase_Connection::thread_loop, this);
 
@@ -187,6 +188,7 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
     }
     try{
 //        cout << "sys-botbase Response: " << std::string((const char*)data, bytes) << endl;
+        m_listeners.run_method_unique(&Listener::on_receive_data, data, bytes);
 
         //  Version #
         std::string str((const char*)data, bytes);
