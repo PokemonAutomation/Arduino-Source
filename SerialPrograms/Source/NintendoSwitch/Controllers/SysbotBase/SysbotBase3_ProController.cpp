@@ -166,10 +166,12 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     if (m_buttons[15].is_busy()) nx_button |= (uint64_t)1 << 14;    //  Right
     if (m_buttons[16].is_busy()) nx_button |= (uint64_t)1 << 15;    //  Down
     if (m_buttons[17].is_busy()) nx_button |= (uint64_t)1 << 16;    //  Left
+#if 0   //  Don't exist on pro controller.
     if (m_buttons[18].is_busy()) nx_button |= (uint64_t)1 << 24;    //  Left SL
     if (m_buttons[19].is_busy()) nx_button |= (uint64_t)1 << 25;    //  Left SR
     if (m_buttons[20].is_busy()) nx_button |= (uint64_t)1 << 26;    //  Right SL
     if (m_buttons[21].is_busy()) nx_button |= (uint64_t)1 << 27;    //  Right SR
+#endif
 
     {
         DpadPosition dpad = m_dpad.is_busy() ? m_dpad.position : DPAD_NONE;
@@ -229,7 +231,7 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     m_connection.write_data(message);
 
     if (GlobalSettings::instance().LOG_EVERYTHING){
-        m_logger.log("sys-botbase: " + message);
+        m_logger.log("sys-botbase3: " + message);
     }
 }
 
