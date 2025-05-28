@@ -61,8 +61,8 @@ std::set<std::string> enter_region_and_read_MMO(
     // on map. But when you land in a region, the initial location is a camp, the map cursor
     // will show a text box "xxx Camp - Take a rest or do some crafting". This may occlude some
     // MMO question marks. So we have to move the map cursor away after we land in the region.
-    int map_cursor_move_x = 0;
-    int map_cursor_move_y = 0;
+    uint8_t map_cursor_move_x = 0;
+    uint8_t map_cursor_move_y = 0;
     const int map_cursor_move_duration = 50;
 
     for(size_t i = 0; i < 5; i++){
