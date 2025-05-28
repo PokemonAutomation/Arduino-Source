@@ -195,6 +195,18 @@ public:
         QFrame::resizeEvent(e);
     }
 
+    //  QGraphicsView doesn't like to propagate mouse events.
+    //  https://forum.qt.io/topic/152138/struggling-with-mouse-events/2
+    virtual void mousePressEvent(QMouseEvent* event) override{
+        QWidget::mousePressEvent(event);
+    }
+    virtual void mouseReleaseEvent(QMouseEvent* event) override{
+        QWidget::mouseReleaseEvent(event);
+    }
+    virtual void mouseMoveEvent(QMouseEvent* event) override{
+        QWidget::mouseMoveEvent(event);
+    }
+
 };
 
 

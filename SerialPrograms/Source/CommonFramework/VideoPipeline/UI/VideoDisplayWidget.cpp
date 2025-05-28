@@ -7,6 +7,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include <QMouseEvent>
 #include "Common/Cpp/PrettyPrint.h"
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
@@ -171,6 +172,24 @@ void VideoDisplayWidget::resizeEvent(QResizeEvent* event){
     m_height_box->setText(QString::number(m_last_height));
 }
 
+void VideoDisplayWidget::mousePressEvent(QMouseEvent* event){
+    WidgetStackFixedAspectRatio::mousePressEvent(event);
+    double x = (double)event->pos().x() / this->width();
+    double y = (double)event->pos().y() / this->height();
+    m_overlay_session.issue_mouse_press(x, y);
+}
+void VideoDisplayWidget::mouseReleaseEvent(QMouseEvent* event){
+    WidgetStackFixedAspectRatio::mouseReleaseEvent(event);
+    double x = (double)event->pos().x() / this->width();
+    double y = (double)event->pos().y() / this->height();
+    m_overlay_session.issue_mouse_release(x, y);
+}
+void VideoDisplayWidget::mouseMoveEvent(QMouseEvent* event){
+    WidgetStackFixedAspectRatio::mouseMoveEvent(event);
+    double x = (double)event->pos().x() / this->width();
+    double y = (double)event->pos().y() / this->height();
+    m_overlay_session.issue_mouse_move(x, y);
+}
 
 OverlayStatSnapshot VideoSourceFPS::get_current(){
     double fps = m_parent.m_video->camera().fps_source();

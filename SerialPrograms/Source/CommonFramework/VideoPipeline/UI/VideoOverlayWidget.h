@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoOverlayWidget_H
 #define PokemonAutomation_VideoPipeline_VideoOverlayWidget_H
 
-#include <map>
 #include <QWidget>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
@@ -17,7 +16,7 @@ namespace PokemonAutomation{
 
 struct OverlayText;
 
-class VideoOverlayWidget : public QWidget, private VideoOverlaySession::Listener, private WatchdogCallback{
+class VideoOverlayWidget : public QWidget, private VideoOverlaySession::ContentListener, private WatchdogCallback{
 public:
     static constexpr bool DEFAULT_ENABLE_BOXES  = true;
     static constexpr bool DEFAULT_ENABLE_TEXT   = true;

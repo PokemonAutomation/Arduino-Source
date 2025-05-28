@@ -1,4 +1,4 @@
-/*  Video Overlay Set
+/*  Video Overlay
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -8,7 +8,9 @@
 #define PokemonAutomation_VideoOverlaySet_H
 
 #include <string>
+#include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "VideoOverlayTypes.h"
 
 namespace PokemonAutomation{
@@ -16,7 +18,10 @@ namespace PokemonAutomation{
 
 class VideoOverlay{
 public:
-    
+    VideoOverlay();
+    virtual ~VideoOverlay();
+
+public:
     // Asychronously, add an inference box as part of the video overlay.
     // Once added, `box` cannot be destroyed until after `VideoOverlay::remove_box()` is called to remove it.
     // If a `box` with the same address is added, it will override the old box's position, shape and color. You only need to
@@ -25,7 +30,7 @@ public:
     // Can use `InferenceBoxScope: public ImageFloatBox` to handle box removal automatically when it's destroyed.
     // Can also use `VideoOverlay.h:VideoOverlaySet` to manage multiple boxes.
     virtual void add_box(const OverlayBox& box) = 0;
-    
+
     // Asychronously, remove an added inference box.
     // The box must be already added.
     // See `add_box()` for more info on managing boxes.
@@ -55,6 +60,22 @@ public:
     virtual void add_stat(OverlayStat& stat) = 0;
     virtual void remove_stat(OverlayStat& stat) = 0;
 
+
+public:
+    struct MouseListener{
+        virtual void on_mouse_press(double x, double y){}
+        virtual void on_mouse_release(double x, double y){};
+        virtual void on_mouse_move(double x, double y){};
+    };
+    void add_listener(MouseListener& listener);
+    void remove_listener(MouseListener& listener);
+    void issue_mouse_press(double x, double y);
+    void issue_mouse_release(double x, double y);
+    void issue_mouse_move(double x, double y);
+
+private:
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

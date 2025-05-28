@@ -92,6 +92,7 @@ void VideoOverlayWidget::on_watchdog_timeout(){
 //    cout << "VideoOverlayWidget::on_watchdog_timeout(): " << c++ << endl;
 }
 
+
 void VideoOverlayWidget::resizeEvent(QResizeEvent* event){}
 void VideoOverlayWidget::paintEvent(QPaintEvent*){
     QPainter painter(this);

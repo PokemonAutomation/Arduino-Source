@@ -14,22 +14,22 @@ namespace PokemonAutomation{
 
 
 
-void VideoOverlaySession::add_listener(Listener& listener){
+void VideoOverlaySession::add_listener(ContentListener& listener){
     WriteSpinLock lg(m_lock);
-    m_listeners.insert(&listener);
+    m_content_listeners.insert(&listener);
     listener.update_stats(&m_stats_order);
 }
-void VideoOverlaySession::remove_listener(Listener& listener){
+void VideoOverlaySession::remove_listener(ContentListener& listener){
     WriteSpinLock lg(m_lock);
 //    listener.update_stats(nullptr);
-    m_listeners.erase(&listener);
+    m_content_listeners.erase(&listener);
 }
 
 
 VideoOverlaySession::~VideoOverlaySession(){
     ReadSpinLock lg(m_lock);
-    for (Listener* listeners : m_listeners){
-        listeners->update_stats(nullptr);
+    for (ContentListener* listener : m_content_listeners){
+        listener->update_stats(nullptr);
     }
 }
 VideoOverlaySession::VideoOverlaySession(VideoOverlayOption& option)
@@ -57,11 +57,11 @@ void VideoOverlaySession::set(const VideoOverlayOption& option){
     m_option.text.store(text, std::memory_order_relaxed);
     m_option.log.store(log, std::memory_order_relaxed);
     m_option.stats.store(stats, std::memory_order_relaxed);
-    for (Listener* listeners : m_listeners){
-        listeners->enabled_boxes(boxes);
-        listeners->enabled_text(text);
-        listeners->enabled_log(log);
-        listeners->enabled_stats(stats);
+    for (ContentListener* listener : m_content_listeners){
+        listener->enabled_boxes(boxes);
+        listener->enabled_text(text);
+        listener->enabled_log(log);
+        listener->enabled_stats(stats);
     }
 }
 
@@ -69,29 +69,29 @@ void VideoOverlaySession::set(const VideoOverlayOption& option){
 void VideoOverlaySession::set_enabled_boxes(bool enabled){
     m_option.boxes.store(enabled, std::memory_order_relaxed);
     ReadSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_boxes()");
-    for (Listener* listeners : m_listeners){
-        listeners->enabled_boxes(enabled);
+    for (ContentListener* listener : m_content_listeners){
+        listener->enabled_boxes(enabled);
     }
 }
 void VideoOverlaySession::set_enabled_text(bool enabled){
     m_option.text.store(enabled, std::memory_order_relaxed);
     ReadSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_text()");
-    for (Listener* listeners : m_listeners){
-        listeners->enabled_text(enabled);
+    for (ContentListener* listener : m_content_listeners){
+        listener->enabled_text(enabled);
     }
 }
 void VideoOverlaySession::set_enabled_log(bool enabled){
     m_option.log.store(enabled, std::memory_order_relaxed);
     ReadSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_log()");
-    for (Listener* listeners : m_listeners){
-        listeners->enabled_log(enabled);
+    for (ContentListener* listener : m_content_listeners){
+        listener->enabled_log(enabled);
     }
 }
 void VideoOverlaySession::set_enabled_stats(bool enabled){
     m_option.stats.store(enabled, std::memory_order_relaxed);
     ReadSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_stats()");
-    for (Listener* listeners : m_listeners){
-        listeners->enabled_stats(enabled);
+    for (ContentListener* listener : m_content_listeners){
+        listener->enabled_stats(enabled);
     }
 }
 
@@ -109,18 +109,18 @@ void VideoOverlaySession::remove_box(const OverlayBox& box){
 }
 
 void VideoOverlaySession::push_box_update(){
-    if (m_listeners.empty()){
+    if (m_content_listeners.empty()){
         return;
     }
     
-    //  We create a newly allocated Box vector to avoid listeners accessing
+    //  We create a newly allocated Box vector to avoid listener accessing
     //  `m_boxes` asynchronously.
     std::shared_ptr<std::vector<OverlayBox>> ptr = std::make_shared<std::vector<OverlayBox>>();
     for (const auto& item : m_boxes){
         ptr->emplace_back(*item);
     }
-    for (Listener* listeners : m_listeners){
-        listeners->update_boxes(ptr);
+    for (ContentListener* listener : m_content_listeners){
+        listener->update_boxes(ptr);
     }
 }
 
@@ -145,18 +145,18 @@ void VideoOverlaySession::remove_text(const OverlayText& text){
 }
 
 void VideoOverlaySession::push_text_update(){
-    if (m_listeners.empty()){
+    if (m_content_listeners.empty()){
         return;
     }
 
-    //  We create a newly allocated Box vector to avoid listeners accessing
+    //  We create a newly allocated Box vector to avoid listener accessing
     //  `m_texts` asynchronously.
     std::shared_ptr<std::vector<OverlayText>> ptr = std::make_shared<std::vector<OverlayText>>();
     for (const auto& item : m_texts){
         ptr->emplace_back(*item);
     }
-    for (Listener* listeners : m_listeners){
-        listeners->update_text(ptr);
+    for (ContentListener* listener : m_content_listeners){
+        listener->update_text(ptr);
     }
 }
 
@@ -187,18 +187,18 @@ void VideoOverlaySession::clear_log(){
 }
 
 void VideoOverlaySession::push_log_text_update(){
-    if (m_listeners.empty()){
+    if (m_content_listeners.empty()){
         return;
     }
     
-    //  We create a newly allocated Box vector to avoid listeners accessing
+    //  We create a newly allocated Box vector to avoid listener accessing
     //  `m_log_texts` asynchronously.
     std::shared_ptr<std::vector<OverlayLogLine>> ptr = std::make_shared<std::vector<OverlayLogLine>>();
     for(const auto& item : m_log_texts){
         ptr->emplace_back(item);
     }
-    for (Listener* listeners : m_listeners){
-        listeners->update_log(ptr);
+    for (ContentListener* listener : m_content_listeners){
+        listener->update_log(ptr);
     }
 }
 
@@ -222,8 +222,8 @@ void VideoOverlaySession::add_stat(OverlayStat& stat){
     }
 
     //  Remove all stats so they aren't being referenced.
-    for (Listener* listeners : m_listeners){
-        listeners->update_stats(nullptr);
+    for (ContentListener* listener : m_content_listeners){
+        listener->update_stats(nullptr);
     }
 
     m_stats_order.emplace_back(&stat);
@@ -237,8 +237,8 @@ void VideoOverlaySession::add_stat(OverlayStat& stat){
     }
 
     //  Add all the stats back.
-    for (Listener* listeners : m_listeners){
-        listeners->update_stats(&m_stats_order);
+    for (ContentListener* listener : m_content_listeners){
+        listener->update_stats(&m_stats_order);
     }
 }
 void VideoOverlaySession::remove_stat(OverlayStat& stat){
@@ -249,16 +249,16 @@ void VideoOverlaySession::remove_stat(OverlayStat& stat){
     }
 
     //  Remove all stats so they aren't being referenced.
-    for (Listener* listeners : m_listeners){
-        listeners->update_stats(nullptr);
+    for (ContentListener* listener : m_content_listeners){
+        listener->update_stats(nullptr);
     }
 
     m_stats_order.erase(iter->second);
     m_stats.erase(iter);
 
     //  Add all the stats back.
-    for (Listener* listeners : m_listeners){
-        listeners->update_stats(&m_stats_order);
+    for (ContentListener* listener : m_content_listeners){
+        listener->update_stats(&m_stats_order);
     }
 }
 

@@ -37,7 +37,7 @@ public:
 public:
     // Video overlay UI class (e.g. VideoOverlayWidget) inherits this listener to listen
     // to the overlay session.
-    struct Listener{
+    struct ContentListener{
         //  VideoOverlaySession will call these when they change.
 
         virtual void enabled_boxes(bool enabled){}
@@ -63,9 +63,10 @@ public:
 
     //  Add a UI class to listen to any overlay change. The UI class needs to inherit Listener.
     //  Must call `remove_listener()` before listener is destroyed.
-    void add_listener(Listener& listener);
+    void add_listener(ContentListener& listener);
     //  Remove a UI class that listens to the overlay change, added by `add_listener()`.
-    void remove_listener(Listener& listener);
+    void remove_listener(ContentListener& listener);
+
 
 public:
     ~VideoOverlaySession();
@@ -100,11 +101,13 @@ public:
     virtual void add_stat(OverlayStat& stat) override;
     virtual void remove_stat(OverlayStat& stat) override;
 
+
 private:
     //  Push updates to the various listeners.
     void push_box_update();
     void push_text_update();
     void push_log_text_update();
+
 
 private:
     mutable SpinLock m_lock;
@@ -118,7 +121,7 @@ private:
     std::list<OverlayStat*> m_stats_order;
     std::map<OverlayStat*, std::list<OverlayStat*>::iterator> m_stats;
 
-    std::set<Listener*> m_listeners;
+    std::set<ContentListener*> m_content_listeners;
 };
 
 

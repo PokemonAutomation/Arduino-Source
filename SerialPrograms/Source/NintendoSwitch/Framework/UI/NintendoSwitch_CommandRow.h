@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 
 class CommandRow :
     public QWidget,
-    public VideoOverlaySession::Listener,
+    public VideoOverlaySession::ContentListener,
     public ControllerSession::Listener
 {
     Q_OBJECT
