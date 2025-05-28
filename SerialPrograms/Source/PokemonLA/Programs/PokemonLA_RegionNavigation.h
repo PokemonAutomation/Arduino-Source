@@ -33,6 +33,9 @@ void mash_A_to_enter_sub_area(
 void mash_A_to_change_region(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
 );
+
+// Start from Jubilife Village gate, with camera facing towards the village, run towards the gate
+// and travel to a location.
 void goto_camp_from_jubilife(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     const TravelLocation& location
