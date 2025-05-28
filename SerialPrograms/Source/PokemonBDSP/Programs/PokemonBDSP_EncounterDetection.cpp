@@ -244,6 +244,14 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
     m_stream.log(str_left);
     m_stream.log(str_right);
 
+    //  If either action is stop program, we stop program.
+    if (action_left.action == EncounterAction::StopProgram){
+        return action_left;
+    }
+    if (action_right.action == EncounterAction::StopProgram){
+        return action_right;
+    }
+
     if (action_left != action_right){
         throw_and_log<FatalProgramException>(
             m_stream.logger(), ErrorReport::NO_ERROR_REPORT,
