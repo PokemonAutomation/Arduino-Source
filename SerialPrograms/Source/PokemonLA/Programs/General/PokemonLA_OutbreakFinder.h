@@ -68,15 +68,6 @@ private:
         const std::set<std::string>& desired_events
     );
 
-    // Enter a map with MMO and read names of the pokemon appearing in the MMO.
-    // - mmo_name: MMO event slug, e.g. "fieldlands-mmo"
-    std::set<std::string> enter_region_and_read_MMO(
-        SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-        const std::string& mmo_name,
-        const std::set<std::string>& desired_MMOs,
-        const std::set<std::string>& desired_star_MMOs
-    );
-
     // Go to a random wild region and return to refresh outbreaks.
     // If `inside_map` is true, the function is called when the game is inside the travel map.
     // Otherwise, the function is called when the player character is standing at the program start location.

@@ -896,6 +896,9 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessJoycon.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessProController.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessProController.h
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ControllerState.h
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.cpp
+    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Connection.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_Descriptor.cpp
@@ -903,9 +906,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_ProController.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h
-    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ControllerState.h
-    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.cpp
-    Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.h
     Source/NintendoSwitch/DevPrograms/BoxDraw.cpp
     Source/NintendoSwitch/DevPrograms/BoxDraw.h
     Source/NintendoSwitch/DevPrograms/JoyconProgram.cpp
@@ -1342,6 +1342,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h
     Source/PokemonLA/Programs/General/PokemonLA_DistortionWaiter.cpp
     Source/PokemonLA/Programs/General/PokemonLA_DistortionWaiter.h
+    Source/PokemonLA/Programs/General/PokemonLA_MMORoutines.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_MMORoutines.h
     Source/PokemonLA/Programs/General/PokemonLA_OutbreakFinder.cpp
     Source/PokemonLA/Programs/General/PokemonLA_OutbreakFinder.h
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.cpp
