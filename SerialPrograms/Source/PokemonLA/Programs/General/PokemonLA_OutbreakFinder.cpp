@@ -511,10 +511,10 @@ std::set<std::string> OutbreakFinder::to_set(const StringSelectTableOption& opti
 }
 
 void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    // press a random button to let Switch register the wired controller
+    pbf_press_button(context, BUTTON_ZL, 10ms, 30ms);
 
     if (RESET_GAME_AND_CONTINUE_SEARCHING){
-        // press a random button to let Switch register the wired controller
-        pbf_press_button(context, BUTTON_ZL, 10ms, 30ms);
         // the outbreak found by the last program run did not yield what the user wants.
         // so we reset the game now and skip the ongoing outbreaks
         env.log("Reset game and skip ongoing outbreaks");
