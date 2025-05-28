@@ -464,7 +464,6 @@ std::vector<std::string> OutbreakFinder::run_iteration(
         save_game_from_overworld(env, env.console, context);
 
         for(const auto& mmo_name: found_hisui_map_events){
-            OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
             int num_new_mmo_pokemon_found = 0;
             int num_new_star_mmo_found = 0;
             std::set<std::string> found_pokemon = enter_region_and_read_MMO(
