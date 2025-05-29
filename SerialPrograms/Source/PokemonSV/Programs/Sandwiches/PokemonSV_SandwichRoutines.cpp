@@ -1238,7 +1238,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "SandwichMaker: Cannot detect grabing hand when waiting for upper bread.",
+            "SandwichMaker: Cannot detect grabbing hand when waiting for upper bread.",
             stream,
             grabbing_hand.last_snapshot()
         );
