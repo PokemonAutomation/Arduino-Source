@@ -130,7 +130,7 @@ bool RadialSparkleDetector::is_star() const{
         return false;
     }
 
-    //  Make sure dimentions are roughly square-ish.
+    //  Make sure dimensions are roughly square-ish.
     if (width > 2 * height || height > 2 * width){
         return false;
     }
