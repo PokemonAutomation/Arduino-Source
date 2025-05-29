@@ -23,7 +23,7 @@ namespace ImageMatch{
 
 // Generate candidate images to be matched against by translating the input image area
 // (`box` on `screen`) around.
-// The returned candidate images are scaled to match template shape `dimenstion`.
+// The returned candidate images are scaled to match template shape `dimension`.
 // `tolerance`: how much translation variances to produce.
 //   e.g. tolerance of 1 means translating the candidate images around so that it can match
 //   the template with at most 1 pixel off on the template image. 
