@@ -142,7 +142,7 @@ void do_egg_cycle_motion(
     }
 }
 
-} // annoymous namespace
+} // anonymous namespace
 
 void order_compote_du_fils(
     const ProgramInfo& info,
