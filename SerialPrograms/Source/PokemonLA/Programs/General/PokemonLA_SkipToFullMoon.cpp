@@ -101,7 +101,7 @@ void SkipToFullMoon::program(SingleSwitchProgramEnvironment& env, ProControllerC
         // if (ret != 0){
         //     std::cout << "ERROR! Cannot detect the dialogue ellipse" << std::endl;
         // }
-        // Press B to clear the "You Pokemon happy and healty" dialogue.
+        // Press B to clear the "You Pokemon happy and healthy" dialogue.
         // pbf_press_button(context, BUTTON_B, 20, 100);
 
 
