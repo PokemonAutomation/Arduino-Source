@@ -250,7 +250,7 @@ bool select_sandwich_recipe(
     }
 
     // we cannot find the receipt
-    stream.log("Max list travese attempt reached. Target recipe not found", COLOR_RED);
+    stream.log("Max list traverse attempt reached. Target recipe not found", COLOR_RED);
     stream.overlay().add_log("Recipe not found", COLOR_RED);
 
     return false;
