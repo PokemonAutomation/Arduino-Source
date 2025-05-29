@@ -248,7 +248,7 @@ std::vector<int> parse_multispawn_path(SingleSwitchProgramEnvironment& env, cons
     std::vector<int> path_despawns;
     std::string raw_path = path + "|";
     for(size_t pos = 0, next_pos = 0; (next_pos = raw_path.find('|', pos)) != std::string::npos; pos = next_pos + 1){
-        if (pos == next_pos){ // In the case it's jsut one "|"
+        if (pos == next_pos){ // In the case it's just one "|"
             continue;
         }
 
