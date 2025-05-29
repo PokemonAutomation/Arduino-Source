@@ -752,7 +752,7 @@ void make_two_herbs_sandwich(
     for(size_t i = first_herb_index_last+1; i < sweet_herb_index_last+1; i++){
         move_one_up_to_row(9 - i);
     }
-    press_a_to_determine_herb(1); // Press A to detemine the second herb
+    press_a_to_determine_herb(1); // Press A to determine the second herb
 
     {
         // Press button + to go to picks page
