@@ -278,7 +278,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             env.log("Resetting game since nothing found, saving sandwich ingredients.");
             reset_game(env.program_info(), env.console, context);
         }else{ // game_already_resetted == true
-            env.log("Game resetted back to egg fetching routine.");
+            env.log("Game reset back to egg fetching routine.");
         }
 
         if (m_num_sandwich_spent >= max_num_sandwiches){
