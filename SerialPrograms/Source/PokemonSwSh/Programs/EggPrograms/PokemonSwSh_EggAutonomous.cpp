@@ -319,7 +319,7 @@ bool EggAutonomous::run_batch(
         bool restart_bike_loop = false;
         for (size_t i_bike_loop = 0; i_bike_loop < this->LOOPS_PER_FETCH && bike_loop_count < MAX_BIKE_LOOP_COUNT;){
             context.wait_for_all_requests();
-            // +1 here because video overlay is for general users. Genearl users start counts at 1, while us programmers start count at 0.
+            // +1 here because video overlay is for general users. General users start counts at 1, while us programmers start count at 0.
             if (restart_bike_loop){
                 env.console.overlay().add_log("Restart loop " + std::to_string(bike_loop_count+1), COLOR_WHITE);
                 restart_bike_loop = false;
