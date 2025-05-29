@@ -565,7 +565,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, ProCon
             send_keep_notification();
 
             if (move_pokemon_to_keep(env, context, party_row) == false){
-                env.log("No empty slot availble to place new pokemon.");
+                env.log("No empty slot available to place new pokemon.");
                 env.console.overlay().add_log("No box space", COLOR_RED);
                 throw ProgramFinishedException();
             }
