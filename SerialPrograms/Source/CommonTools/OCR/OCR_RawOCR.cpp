@@ -137,7 +137,7 @@ public:
         // There is no way of using HomeBrew to reinstall the older version.
         // Fortunately this class TesseractPool will not get built and destroyed repeatedly in
         // runtime. It will only get initialized once for each supported language. So I am able
-        // to use this ugly workaround by not deleting the Tesseract API intances.
+        // to use this ugly workaround by not deleting the Tesseract API instances.
         std::cout << "Warning: not release Tesseract API istance due to mutex bug similar to https://github.com/tesseract-ocr/tesseract/issues/3655" << std::endl;
         for(auto& api : m_instances){
             api.release();
