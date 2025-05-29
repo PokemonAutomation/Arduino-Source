@@ -2,7 +2,7 @@
 
 """
 A script used to fine-tune detection box placements and check the color stats from those boxes.
-After using image_viewer.py to get an intial box placement, you can place the box values
+After using image_viewer.py to get an initial box placement, you can place the box values
 (x, y, width, height) into this script, repeating the line
 add_infer_box_to_image(raw_image, <x>, <y>, <width>, <height>, image) 
 to add a box onto the image.

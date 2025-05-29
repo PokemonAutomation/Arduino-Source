@@ -236,7 +236,7 @@ void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, ProContro
     MagikarpMoveGrinder_Descriptor::Stats& stats = env.current_stats<MagikarpMoveGrinder_Descriptor::Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){
-        throw UserSetupError(env.console, "No Pokemon sepecified to grind.");
+        throw UserSetupError(env.console, "No Pokemon specified to grind.");
     }
 
     //  Connect the controller.

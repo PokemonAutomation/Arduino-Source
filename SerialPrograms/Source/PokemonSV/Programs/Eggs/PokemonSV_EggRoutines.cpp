@@ -142,7 +142,7 @@ void do_egg_cycle_motion(
     }
 }
 
-} // annoymous namespace
+} // anonymous namespace
 
 void order_compote_du_fils(
     const ProgramInfo& info,
@@ -303,7 +303,7 @@ bool eat_egg_sandwich_at_picnic(
     case EggSandwichType::BITTER_SWEET_HERBS:
         enter_custom_sandwich_mode(env.program_info(), stream, context);
         if (language == Language::None){
-            throw UserSetupError(stream.logger(), "Must set game langauge option to read ingredient lists to make herb sandwich.");
+            throw UserSetupError(stream.logger(), "Must set game language option to read ingredient lists to make herb sandwich.");
         }
         make_two_herbs_sandwich(env.program_info(), env.realtime_dispatcher(), stream, context, sandwich_type, language);
         finish_sandwich_eating(env.program_info(), stream, context);

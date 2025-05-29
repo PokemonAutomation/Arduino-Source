@@ -55,7 +55,7 @@ std::unique_ptr<StatsTracker> MassPurchase_Descriptor::make_stats() const{
 
 MassPurchase::MassPurchase()
     : ITEMS(
-        "<b>Items to Buy:</b><br>The amount of Items to buy from the postion of the cursor.",
+        "<b>Items to Buy:</b><br>The amount of Items to buy from the position of the cursor.",
         LockMode::LOCK_WHILE_RUNNING,
         50
     )
