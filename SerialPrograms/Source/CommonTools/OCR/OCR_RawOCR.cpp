@@ -130,7 +130,7 @@ public:
 #ifdef UNIX_LINK_TESSERACT
     ~TesseractPool(){
         // As of Feb 05, 2022, the newest Tesseract (5.0.1) installed by HomeBrew on macOS
-        // has a bug that will crash the program when deleting internal Tesseract API intances,
+        // has a bug that will crash the program when deleting internal Tesseract API instances,
         // giving error: 
         // libc++abi.dylib: terminating with uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument
         // A similar issue is posted on Tesseract Github: https://github.com/tesseract-ocr/tesseract/issues/3655
