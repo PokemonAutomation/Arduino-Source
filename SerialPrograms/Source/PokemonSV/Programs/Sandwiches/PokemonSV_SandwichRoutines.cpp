@@ -739,7 +739,7 @@ void make_two_herbs_sandwich(
         DeterminedSandwichIngredientWatcher herb_watcher(SandwichIngredientType::CONDIMENT, herb_index);
         repeat_button_press_until(
             info, stream, context, BUTTON_A, 40, 60, {herb_watcher}, "CondimentsPageNotDetected",
-            "make_two_herbs_sandwich(): cannot detect detemined herb at cell " + std::to_string(herb_index) + " after 50 seconds."
+            "make_two_herbs_sandwich(): cannot detect determined herb at cell " + std::to_string(herb_index) + " after 50 seconds."
         );
     };
 
