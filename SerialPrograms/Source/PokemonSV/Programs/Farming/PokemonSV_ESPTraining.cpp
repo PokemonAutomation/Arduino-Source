@@ -181,7 +181,7 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
                     break;
                 case Detection::GREY:
                     //Press any button to start next round
-                    //Pressing A tends to make Dendra :D two extra times during the transistion so press B instead
+                    //Pressing A tends to make Dendra :D two extra times during the transition so press B instead
                     //Sometimes this is detected as blue, the B press there also works
                     env.log("ESPEmotionDetector: Grey - Mash though dialog", COLOR_BLACK);
                     emotion_button = BUTTON_B;
