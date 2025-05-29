@@ -53,7 +53,7 @@ bool EncounterWatcher::process_spectrums(
 
     WallClock threshold = current_time() - std::chrono::seconds(1);
 
-    //  Find the brighest frame.
+    //  Find the brightest frame.
     std::lock_guard<std::mutex> lg(m_lock);
 
     double best_bright_portion = 0;
