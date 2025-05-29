@@ -368,7 +368,7 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& new_spectrums)
         // Match the full template
         std::tie(score, m_lastScale) = match_sub_template(0);
     }else{
-        // Match each indivdual sub-template
+        // Match each individual sub-template
         for (size_t sub_template = 0; sub_template < m_templateRange.size(); sub_template++){
             float sub_template_score = FLT_MAX;
             float sub_template_scale = 1.0f;
