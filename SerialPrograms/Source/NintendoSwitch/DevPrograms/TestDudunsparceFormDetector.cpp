@@ -112,8 +112,6 @@ bool DudunsparceFormDetector::process_frame(const ImageViewRGB32& frame, WallClo
     Ort::AllocatedStringPtr outputName = session.GetOutputNameAllocated(0, ort_alloc);
     const std::array<const char*, 1> inputNames = {inputName.get()};
     const std::array<const char*, 1> outputNames = {outputName.get()};
-    inputName.release();
-    outputName.release();
 
     session.Run(runOptions, inputNames.data(), &inputTensor, 1, outputNames.data(), &outputTensor, 1);
 
