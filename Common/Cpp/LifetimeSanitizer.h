@@ -8,6 +8,7 @@
 #define PokemonAutomation_LifetimeSanitizer_H
 
 #include <stdint.h>
+#include <cstddef>
 
 #define PA_SANITIZER_ENABLE
 
