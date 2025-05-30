@@ -36,6 +36,7 @@ SwitchSystemWidget::~SwitchSystemWidget(){
     delete m_audio_display;
     delete m_audio_widget;
     delete m_video_display;
+    delete m_video_selector;
     delete m_controller;
 }
 

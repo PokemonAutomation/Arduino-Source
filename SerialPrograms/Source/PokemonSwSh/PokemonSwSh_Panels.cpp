@@ -28,6 +28,7 @@
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.h"
+#include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattTraderFarmer.h"
 
 #include "Programs/DenHunting/PokemonSwSh_BeamReset.h"
 #include "Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h"
@@ -127,6 +128,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<StowOnSideFarmer_Descriptor, StowOnSideFarmer>());
     ret.emplace_back(make_single_switch_program<DailyHighlightFarmer_Descriptor, DailyHighlightFarmer>());
     ret.emplace_back(make_single_switch_program<PokeJobsFarmer_Descriptor, PokeJobsFarmer>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<WattTraderFarmer_Descriptor, WattTraderFarmer>());
+    }
 
     ret.emplace_back("---- Den Hunting ----");
     ret.emplace_back(make_single_switch_program<PurpleBeamFinder_Descriptor, PurpleBeamFinder>());

@@ -2079,6 +2079,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.h
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.cpp
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattTraderFarmer.cpp
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattTraderFarmer.h
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.cpp
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.h
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperEU.cpp
