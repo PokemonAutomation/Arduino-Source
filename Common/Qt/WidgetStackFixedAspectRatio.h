@@ -35,6 +35,7 @@ public:
     void set_all(SizePolicy size_policy, double aspect_ratio);
 
     void add_widget(QWidget& widget);
+    void remove_widget(QWidget* widget);
 
     virtual void resizeEvent(QResizeEvent* event) override;
 

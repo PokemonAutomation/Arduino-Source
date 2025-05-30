@@ -6,9 +6,7 @@
 
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
-#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "Integrations/ProgramTracker.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 
@@ -26,16 +24,14 @@ SwitchSystemSession::~SwitchSystemSession(){
         m_logger.log("Shutting down SwitchSystemSession...");
     }catch (...){}
 
-    m_camera->remove_frame_listener(m_history);
-    m_camera->remove_state_listener(m_history);
+    m_video.remove_state_listener(m_history);
+    m_video.add_frame_listener(m_history);
     m_audio.remove_stream_listener(m_history);
     m_audio.remove_state_listener(m_history);
 
     ProgramTracker::instance().remove_console(m_console_id);
     m_overlay.remove_stat(*m_main_thread_utilization);
     m_overlay.remove_stat(*m_cpu_utilization);
-    m_option.m_camera.info = m_camera->current_device();
-    m_option.m_camera.current_resolution = m_camera->current_resolution();
 }
 SwitchSystemSession::SwitchSystemSession(
     SwitchSystemOption& option,
@@ -46,38 +42,35 @@ SwitchSystemSession::SwitchSystemSession(
     , m_logger(global_logger_raw(), "Console " + std::to_string(console_number))
     , m_option(option)
     , m_controller(m_logger, option.m_controller, option.m_required_features)
-//    , m_serial(m_logger, option.m_serial)
-    , m_camera(get_camera_backend().make_camera(m_logger, DEFAULT_RESOLUTION))
+    , m_video(m_logger, option.m_video)
     , m_audio(m_logger, option.m_audio)
     , m_overlay(option.m_overlay)
     , m_history(m_logger)
     , m_cpu_utilization(new CpuUtilizationStat())
     , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Qt Thread:"))
 {
-    m_camera->set_resolution(option.m_camera.current_resolution);
-    m_camera->set_source(option.m_camera.info);
     m_console_id = ProgramTracker::instance().add_console(program_id, *this);
     m_overlay.add_stat(*m_cpu_utilization);
     m_overlay.add_stat(*m_main_thread_utilization);
 
-    m_history.start(m_audio.input_format(), !option.m_camera.info.device_name().empty());
+    m_history.start(m_audio.input_format(), m_video.current_source() != nullptr);
 
     m_audio.add_state_listener(m_history);
     m_audio.add_stream_listener(m_history);
-    m_camera->add_state_listener(m_history);
-    m_camera->add_frame_listener(m_history);
+    m_video.add_state_listener(m_history);
+    m_video.add_frame_listener(m_history);
 }
 
 
 void SwitchSystemSession::get(SwitchSystemOption& option){
     m_controller.get(option.m_controller);
-    m_camera->get(option.m_camera);
+    m_video.get(option.m_video);
     m_audio.get(option.m_audio);
     m_overlay.get(option.m_overlay);
 }
 void SwitchSystemSession::set(const SwitchSystemOption& option){
     m_controller.set(option.m_controller);
-    m_camera->set(option.m_camera);
+    m_video.set(option.m_video);
     m_audio.set(option.m_audio);
     m_overlay.set(option.m_overlay);
 }

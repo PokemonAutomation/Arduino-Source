@@ -90,7 +90,6 @@ void ControllerOption::load_json(const JsonValue& json){
         }
 
         descriptor = iter->second;
-
     }while (false);
 
     if (descriptor == nullptr){
@@ -109,7 +108,6 @@ JsonValue ControllerOption::to_json() const{
     for (const auto& item : m_descriptor_cache){
         obj[CONTROLLER_INTERFACE_STRINGS.get_string(item.first)] = item.second->to_json();
     }
-
 
     return obj;
 }

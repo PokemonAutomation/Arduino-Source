@@ -8,7 +8,7 @@
 #define PokemonAutomation_VideoPipeline_CameraSelectorWidget_H
 
 #include <vector>
-#include <atomic>
+//#include <atomic>
 #include <mutex>
 #include <QWidget>
 #include "Common/Cpp/ImageResolution.h"

@@ -98,8 +98,8 @@ public:
 
     virtual VideoSnapshot snapshot() override{ return VideoSnapshot(); }
 
-    virtual double fps_source() override{ return 0; }
-    virtual double fps_display() override{ return 0; }
+    virtual double fps_source() const override{ return 0; }
+    virtual double fps_display() const override{ return 0; }
 };
 
 // Implement the dummy interface of VideoOverlay so that we can test

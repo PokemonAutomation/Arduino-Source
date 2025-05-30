@@ -16,6 +16,7 @@
 #include "CommonFramework/AudioPipeline/UI/AudioSelectorWidget.h"
 #include "CommonFramework/AudioPipeline/UI/AudioDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h"
+#include "CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "Controllers/ControllerSelectorWidget.h"
 #include "NintendoSwitch_CommandRow.h"
@@ -35,7 +36,6 @@ SwitchSystemWidget::~SwitchSystemWidget(){
     delete m_audio_display;
     delete m_audio_widget;
     delete m_video_display;
-    delete m_camera_widget;
     delete m_controller;
 }
 
@@ -68,7 +68,7 @@ SwitchSystemWidget::SwitchSystemWidget(
             *this, *video_holder,
             m_session.console_number(),
             *this,
-            m_session.camera_session(),
+            m_session.video_session(),
             m_session.overlay_session()
         );
         video_holder->addWidget(m_video_display);
@@ -81,12 +81,8 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_controller = new ControllerSelectorWidget(*this, m_session.controller_session());
         group_layout->addWidget(m_controller);
 
-        m_camera_widget = new CameraSelectorWidget(
-            m_session.camera_session(),
-            m_session.logger(),
-            *m_video_display
-        );
-        group_layout->addWidget(m_camera_widget);
+        m_video_selector = new VideoSourceSelectorWidget(m_session.logger(), m_session.video_session());
+        group_layout->addWidget(m_video_selector);
 
         m_audio_widget = new AudioSelectorWidget(*widget, m_session.audio_session());
         group_layout->addWidget(m_audio_widget);
@@ -165,7 +161,7 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_command, &CommandRow::screenshot_requested,
         m_video_display, [this](){
             global_dispatcher.dispatch([this]{
-                VideoSnapshot image = m_session.camera_session().snapshot();
+                VideoSnapshot image = m_session.video_session().snapshot();
                 if (!image){
                     return;
                 }

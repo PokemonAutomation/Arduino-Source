@@ -23,6 +23,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
+#include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
 #include "Controllers/ControllerSession.h"
@@ -54,7 +55,7 @@ public:
     bool allow_commands_while_running() const{ return m_option.m_allow_commands_while_running; }
 
     Logger& logger(){ return m_logger; }
-    virtual VideoFeed& video() override{ return *m_camera; }
+    virtual VideoFeed& video() override{ return m_video; }
     virtual AudioFeed& audio() override{ return m_audio; }
     virtual ControllerSession& controller() override{ return m_controller; };
     VideoOverlay& overlay(){ return m_overlay; }
@@ -65,7 +66,7 @@ public:
     void set(const SwitchSystemOption& option);
 
     ControllerSession& controller_session(){ return m_controller; }
-    CameraSession& camera_session(){ return *m_camera; }
+    VideoSession& video_session(){ return m_video; }
     AudioSession& audio_session(){ return m_audio; }
     VideoOverlaySession& overlay_session(){ return m_overlay; }
 
@@ -84,7 +85,7 @@ private:
     SwitchSystemOption& m_option;
 
     ControllerSession m_controller;
-    std::unique_ptr<CameraSession> m_camera;
+    VideoSession m_video;
     AudioSession m_audio;
     VideoOverlaySession m_overlay;
 

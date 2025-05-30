@@ -75,8 +75,8 @@ public:
 
     virtual VideoSnapshot snapshot() override;
 
-    virtual double fps_source() override;
-    virtual double fps_display() override;
+    virtual double fps_source() const override;
+    virtual double fps_display() const override;
 
     std::pair<QVideoFrame, uint64_t> latest_frame();
     void report_rendered_frame(WallClock timestamp);

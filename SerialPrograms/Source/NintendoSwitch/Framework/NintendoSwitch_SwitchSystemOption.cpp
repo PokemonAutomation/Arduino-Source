@@ -59,6 +59,7 @@ Color pick_color(
 
 const std::string SwitchSystemOption::JSON_CONTROLLER  = "Controller";
 const std::string SwitchSystemOption::JSON_CAMERA  = "Camera";
+const std::string SwitchSystemOption::JSON_VIDEO   = "Video";
 const std::string SwitchSystemOption::JSON_AUDIO   = "Audio";
 const std::string SwitchSystemOption::JSON_OVERLAY = "Overlay";
 
@@ -69,8 +70,6 @@ SwitchSystemOption::SwitchSystemOption(
 )
     : m_required_features(required_features)
     , m_allow_commands_while_running(allow_commands_while_running)
-    , m_camera(DEFAULT_RESOLUTION)
-//    , m_audio()
 {}
 SwitchSystemOption::SwitchSystemOption(
     const ControllerFeatures& required_features,
@@ -92,9 +91,9 @@ void SwitchSystemOption::load_json(const JsonValue& json){
     if (value){
         m_controller.load_json(*value);
     }
-    value = obj->get_value(JSON_CAMERA);
+    value = obj->get_value(JSON_VIDEO);
     if (value){
-        m_camera.load_json(*value);
+        m_video.load_json(*value);
     }
     value = obj->get_value(JSON_AUDIO);
     if (value){
@@ -109,7 +108,7 @@ JsonValue SwitchSystemOption::to_json() const{
     JsonObject root;
 //    root.insert("SettingsVisible", m_settings_visible);
     root[JSON_CONTROLLER] = m_controller.to_json();
-    root[JSON_CAMERA] = m_camera.to_json();
+    root[JSON_VIDEO] = m_video.to_json();
     root[JSON_AUDIO] = m_audio.to_json();
     root[JSON_OVERLAY] = m_overlay.to_json();
     return root;

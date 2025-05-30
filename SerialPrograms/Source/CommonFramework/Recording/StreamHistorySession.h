@@ -12,7 +12,7 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
-#include "CommonFramework/VideoPipeline/CameraSession.h"
+#include "CommonFramework/VideoPipeline/VideoSession.h"
 
 namespace PokemonAutomation{
 
@@ -21,7 +21,7 @@ class StreamHistorySession
     : public AudioFloatStreamListener
     , public VideoFrameListener
     , public AudioSession::StateListener
-    , public CameraSession::StateListener
+    , public VideoSession::StateListener
 {
 public:
     ~StreamHistorySession();
@@ -39,7 +39,7 @@ public:
 
     virtual void pre_shutdown() override;
     virtual void post_shutdown() override;
-    virtual void post_new_source(const CameraInfo& device, Resolution resolution) override;
+    virtual void post_startup(VideoSource* source) override;
     virtual void pre_resolution_change(Resolution resolution) override;
     virtual void post_resolution_change(Resolution resolution) override;
 

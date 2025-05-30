@@ -14,8 +14,8 @@
  *
  */
 
-#ifndef PokemonAutomation_VideoStream_H
-#define PokemonAutomation_VideoStream_H
+#ifndef PokemonAutomation_VideoPipeline_VideoStream_H
+#define PokemonAutomation_VideoPipeline_VideoStream_H
 
 #include <string>
 #include "Common/Cpp/AbstractLogger.h"

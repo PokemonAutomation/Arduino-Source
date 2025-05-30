@@ -483,6 +483,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWindow.h
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h
+    Source/CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.cpp
+    Source/CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoWidget.h
     Source/CommonFramework/VideoPipeline/VideoFeed.h
     Source/CommonFramework/VideoPipeline/VideoOverlay.cpp
@@ -495,6 +497,16 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/VideoOverlayTypes.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlayTypes.h
     Source/CommonFramework/VideoPipeline/VideoPipelineOptions.h
+    Source/CommonFramework/VideoPipeline/VideoSession.cpp
+    Source/CommonFramework/VideoPipeline/VideoSession.h
+    Source/CommonFramework/VideoPipeline/VideoSource.cpp
+    Source/CommonFramework/VideoPipeline/VideoSource.h
+    Source/CommonFramework/VideoPipeline/VideoSource_Camera.cpp
+    Source/CommonFramework/VideoPipeline/VideoSource_Camera.h
+    Source/CommonFramework/VideoPipeline/VideoSource_Null.cpp
+    Source/CommonFramework/VideoPipeline/VideoSource_Null.h
+    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.cpp
+    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
     Source/CommonFramework/Windows/DpiScaler.cpp

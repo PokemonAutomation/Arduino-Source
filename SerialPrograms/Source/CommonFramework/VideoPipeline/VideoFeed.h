@@ -55,8 +55,7 @@ struct VideoFrameListener{
 };
 
 
-//  Define basic interface of a video feed to be used
-//  by programs.
+//  Define basic interface of a video feed to be used by programs.
 class VideoFeed{
 public:
     virtual void add_frame_listener(VideoFrameListener& listener) = 0;
@@ -70,8 +69,8 @@ public:
 
     //  Returns the currently measured frames/second for the video source + display.
     //  Use this for diagnostic purposes.
-    virtual double fps_source() = 0;
-    virtual double fps_display() = 0;
+    virtual double fps_source() const = 0;
+    virtual double fps_display() const = 0;
 };
 
 

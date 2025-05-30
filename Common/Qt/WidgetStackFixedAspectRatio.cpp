@@ -38,6 +38,11 @@ WidgetStackFixedAspectRatio::WidgetStackFixedAspectRatio(
 void WidgetStackFixedAspectRatio::add_widget(QWidget& widget){
     widget.setParent(m_stack_holder);
     m_widgets.insert(&widget);
+    widget.show();
+}
+void WidgetStackFixedAspectRatio::remove_widget(QWidget* widget){
+    m_widgets.erase(widget);
+    delete widget;
 }
 double WidgetStackFixedAspectRatio::sanitize_aspect_ratio(double aspect_ratio) const{
     if (aspect_ratio == 0 || std::isnan(aspect_ratio)){

@@ -79,8 +79,8 @@ public:
     bool options_locked() const;
     void set_options_locked(bool locked);
 
-public:
 
+public:
     bool set_device(const std::shared_ptr<const ControllerDescriptor>& device);
     bool set_controller(ControllerType controller_type);
 

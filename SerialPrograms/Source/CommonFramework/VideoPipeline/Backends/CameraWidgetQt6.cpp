@@ -231,11 +231,11 @@ VideoSnapshot CameraSession::snapshot(){
 
     return VideoSnapshot(m_last_image, m_last_image_timestamp);
 }
-double CameraSession::fps_source(){
+double CameraSession::fps_source() const{
     SpinLockGuard lg(m_frame_lock);
     return m_fps_tracker_source.events_per_second();
 }
-double CameraSession::fps_display(){
+double CameraSession::fps_display() const{
     SpinLockGuard lg(m_frame_lock);
     return m_fps_tracker_display.events_per_second();
 }

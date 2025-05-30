@@ -25,6 +25,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
+#include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "CommonFramework/VideoPipeline/CameraSession.h"
 #include "CommonFramework/VideoPipeline/UI/VideoWidget.h"
@@ -83,8 +84,8 @@ public:
     virtual std::vector<Resolution> supported_resolutions() const override;
 
     virtual VideoSnapshot snapshot() override;
-    virtual double fps_source() override;
-    virtual double fps_display() override;
+    virtual double fps_source() const override;
+    virtual double fps_display() const override;
 
     std::pair<QVideoFrame, uint64_t> latest_frame();
     void report_rendered_frame(WallClock timestamp);
@@ -239,11 +240,99 @@ private:
     StaticQGraphicsView* m_view;
     QGraphicsScene m_scene;
     QGraphicsVideoItem m_video;
-    #endif
+#endif
 };
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+class CameraVideoSource : public QObject, public VideoSource{
+public:
+    virtual ~CameraVideoSource();
+    CameraVideoSource(
+        Logger& logger,
+        const CameraInfo& info,
+        Resolution desired_resolution
+    );
+
+    virtual Resolution current_resolution() const override;
+    virtual std::vector<Resolution> supported_resolutions() const override;
+
+    virtual VideoSnapshot snapshot() override;
+
+    virtual QWidget* make_QtWidget(QWidget* parent) override;
+
+private:
+    void set_video_output(QGraphicsVideoItem& item);
+
+
+private:
+    friend class CameraVideoDisplay;
+
+    Logger& m_logger;
+    Resolution m_resolution;
+
+    std::unique_ptr<QCamera> m_camera;
+    std::unique_ptr<QVideoSink> m_video_sink;
+    std::unique_ptr<QMediaCaptureSession> m_capture_session;
+
+    std::vector<Resolution> m_resolutions;
+
+private:
+    //  Last Cached Image: All accesses must be under this lock.
+
+    mutable std::mutex m_cache_lock;
+
+    QImage m_last_image;
+    WallClock m_last_image_timestamp;
+    uint64_t m_last_image_seqnum = 0;
+
+    PeriodicStatsReporterI32 m_stats_conversion;
+
+
+private:
+    //  Last Frame: All accesses must be under this lock.
+    //  These will be updated very rapidly by the main thread.
+    //  Holding the frame lock will block the main thread.
+    //  So accessors should minimize the time they hold the frame lock.
+
+    mutable SpinLock m_frame_lock;
+
+    QVideoFrame m_last_frame;
+    WallClock m_last_frame_timestamp;
+    std::atomic<uint64_t> m_last_frame_seqnum;
+
+};
+
+
+class CameraVideoDisplay : public QWidget{
+public:
+    CameraVideoDisplay(QWidget* parent, CameraVideoSource& source);
+
+private:
+    virtual void resizeEvent(QResizeEvent* event) override;
+
+private:
+    CameraVideoSource& m_source;
+
+    StaticQGraphicsView* m_view;
+    QGraphicsScene m_scene;
+    QGraphicsVideoItem m_video;
+
+    LifetimeSanitizer m_sanitizer;
+};
 
 
 

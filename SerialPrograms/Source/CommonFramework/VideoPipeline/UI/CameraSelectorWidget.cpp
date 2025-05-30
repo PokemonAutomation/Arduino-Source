@@ -8,7 +8,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
-#include "Common/Qt/Redispatch.h"
+//#include "Common/Qt/Redispatch.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "VideoDisplayWidget.h"

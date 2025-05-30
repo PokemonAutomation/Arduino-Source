@@ -216,11 +216,10 @@ void StreamHistorySession::post_shutdown(){
     data.m_has_video = false;
     initialize();
 }
-void StreamHistorySession::post_new_source(const CameraInfo& device, Resolution resolution){
-//    cout << "post_new_source()" << endl;
+void StreamHistorySession::post_startup(VideoSource* source){
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
-    data.m_has_video = !device.device_name().empty();
+    data.m_has_video = source != nullptr;
     initialize();
 }
 void StreamHistorySession::pre_resolution_change(Resolution resolution){

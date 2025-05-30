@@ -93,13 +93,16 @@ public:
         : interface_type(p_interface_type)
     {}
     virtual ~ControllerDescriptor() = default;
-    virtual bool operator==(const ControllerDescriptor& x) const = 0;
 
+public:
+    virtual bool operator==(const ControllerDescriptor& x) const = 0;
     virtual std::string display_name() const = 0;
 
+public:
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
 
+public:
     virtual std::unique_ptr<ControllerConnection> open_connection(
         Logger& logger,
         std::optional<ControllerType> change_controller
@@ -108,9 +111,7 @@ public:
         Logger& logger,
         ControllerConnection& connection,
         ControllerType controller_type
-    ) const{
-        return nullptr;
-    }
+    ) const = 0;
 
     virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const = 0;
 };
@@ -134,7 +135,9 @@ public:
     }
     void set_descriptor(std::shared_ptr<const ControllerDescriptor> descriptor);
 
-
+    //  Remember the last used descriptor for each interface type. That way when
+    //  the user switches back-and-forth between two interfaces, it will reload
+    //  the previous one.
     std::shared_ptr<const ControllerDescriptor> get_descriptor_from_cache(ControllerInterface interface_type) const;
 
 
@@ -145,7 +148,6 @@ public:
 
 private:
     std::shared_ptr<const ControllerDescriptor> m_descriptor;
-
     std::map<ControllerInterface, std::shared_ptr<const ControllerDescriptor>> m_descriptor_cache;
 };
 

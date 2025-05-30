@@ -29,6 +29,7 @@ class VideoWidget;
 class CameraOption;
 
 
+
 class CameraSession : public VideoFeed{
 public:
     struct StateListener{
