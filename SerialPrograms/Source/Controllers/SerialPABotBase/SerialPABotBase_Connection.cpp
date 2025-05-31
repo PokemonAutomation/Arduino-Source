@@ -52,7 +52,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
             nullptr,
             "Error",
             "Cannot select Prolific controller.<br><br>"
-            "Prolific controllers do not work for Arduino and similar microntrollers.<br>"
+            "Prolific controllers do not work for Arduino and similar microcontrollers.<br>"
             "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
         );
         std::string text = "Cannot connect to Prolific controller.";

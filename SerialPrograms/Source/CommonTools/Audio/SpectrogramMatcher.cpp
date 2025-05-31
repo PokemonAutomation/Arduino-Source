@@ -67,7 +67,7 @@ SpectrogramMatcher::SpectrogramMatcher(
 
     const size_t halfSampleRate = sample_rate / 2;
 
-    // The frquency range from [0.0, halfSampleRate / numFrequencies, 2.0 halfSampleRate / numFrequencies, ... (numFrequencies-1) halfSampleRate / numFrequencies]
+    // The frequency range from [0.0, halfSampleRate / numFrequencies, 2.0 halfSampleRate / numFrequencies, ... (numFrequencies-1) halfSampleRate / numFrequencies]
     // Since human can only hear as high as 20KHz sound, matching on frequencies >= 20KHz is meaningless.
     // So the index i of the max frequency we should be matching is the one with
     // i * halfSampleRate/numFrequencies  <= 20KHz
@@ -368,7 +368,7 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& new_spectrums)
         // Match the full template
         std::tie(score, m_lastScale) = match_sub_template(0);
     }else{
-        // Match each indivdual sub-template
+        // Match each individual sub-template
         for (size_t sub_template = 0; sub_template < m_templateRange.size(); sub_template++){
             float sub_template_score = FLT_MAX;
             float sub_template_scale = 1.0f;
