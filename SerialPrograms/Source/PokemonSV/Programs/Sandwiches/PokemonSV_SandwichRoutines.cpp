@@ -517,7 +517,7 @@ ImageFloatBox move_sandwich_hand(
     }
 }
 
-} // end anonymous namesapce
+} // end anonymous namespace
 
 void finish_sandwich_eating(
     const ProgramInfo& info,
