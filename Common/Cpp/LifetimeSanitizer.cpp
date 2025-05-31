@@ -189,7 +189,7 @@ void LifetimeSanitizer::internal_destruct(){
     sanitizer_map.erase(this);
 
     if (m_token != SANITIZER_TOKEN || m_self != this){
-        std::cerr << "LifetimeSanitizer - Free non-existant: " << this << " : " << m_name << std::endl;
+        std::cerr << "LifetimeSanitizer - Free non-existent: " << this << " : " << m_name << std::endl;
         terminate_with_dump();
     }
     if (m_use_counter != 0){
