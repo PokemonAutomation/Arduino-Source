@@ -223,7 +223,7 @@ std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const{
 
 MoveGrinderActionTable::MoveGrinderActionTable()
     : EditableTableOption_t<MoveGrinderActionRow>(
-        "For every move you want to perform, input the style and the number of attemps you want to achieve.",
+        "For every move you want to perform, input the style and the number of attempts you want to achieve.",
         LockMode::LOCK_WHILE_RUNNING
     )
 {}
