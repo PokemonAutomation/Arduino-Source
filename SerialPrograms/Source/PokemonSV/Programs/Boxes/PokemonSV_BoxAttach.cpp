@@ -21,7 +21,7 @@ namespace PokemonSV{
 
 
 //  With the cursor over the item you want to attach, attach to the current
-//  Pokemon, replacing if neccessary.
+//  Pokemon, replacing if necessary.
 void attach_item_from_bag(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
