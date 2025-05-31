@@ -654,7 +654,7 @@ void finish_two_herbs_sandwich(
     stream.overlay().add_log("Built sandwich", COLOR_WHITE);
 }
 
-} // anonymous namesapce
+} // anonymous namespace
 
 void make_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, ProControllerContext& context,
