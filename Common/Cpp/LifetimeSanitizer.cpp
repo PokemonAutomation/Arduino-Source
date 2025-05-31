@@ -183,7 +183,7 @@ void LifetimeSanitizer::internal_destruct(){
 
     auto iter = sanitizer_map.find(this);
     if (iter == sanitizer_map.end()){
-        std::cerr << "LifetimeSanitizer - Free non-existant: " << this << " : " << m_name << std::endl;
+        std::cerr << "LifetimeSanitizer - Free non-existent: " << this << " : " << m_name << std::endl;
         terminate_with_dump();
     }
     sanitizer_map.erase(this);
