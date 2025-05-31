@@ -59,17 +59,19 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
 
         if (!to_date_change){
-            //  Double up this A press in case one is dropped.
+            //  Triple up this A press to make sure it gets through.
+            ssf_press_button(context, BUTTON_A, 3);
             ssf_press_button(context, BUTTON_A, 3);
             ssf_press_button(context, BUTTON_A, 45);
             return;
         }
 
-        //  Double up this A press in case one is dropped.
+        //  Triple up this A press to make sure it gets through.
+        ssf_press_button(context, BUTTON_A, 3);
         ssf_press_button(context, BUTTON_A, 3);
         ssf_press_button(context, BUTTON_A, 3);
         {
-            auto iterations = Milliseconds(240) / 24ms + 1;
+            auto iterations = Milliseconds(250) / 24ms + 1;
             do{
                 ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
             }while (--iterations);
@@ -129,17 +131,19 @@ void home_to_date_time(ProControllerContext& context, bool to_date_change, bool 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
 
         if (!to_date_change){
-            //  Double up this A press in case one is dropped.
+            //  Triple up this A press to make sure it gets through.
+            ssf_press_button(context, BUTTON_A, unit);
             ssf_press_button(context, BUTTON_A, unit);
             ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
             return;
         }
 
-        //  Double up this A press in case one is dropped.
+        //  Triple up this A press to make sure it gets through.
+        ssf_press_button(context, BUTTON_A, unit);
         ssf_press_button(context, BUTTON_A, unit);
         ssf_press_button(context, BUTTON_A, unit);
         {
-            auto iterations = Milliseconds(240) / unit + 1;
+            auto iterations = Milliseconds(250) / unit + 1;
             do{
                 ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
             }while (--iterations);
