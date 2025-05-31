@@ -491,12 +491,12 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/VideoSession.h
     Source/CommonFramework/VideoPipeline/VideoSource.cpp
     Source/CommonFramework/VideoPipeline/VideoSource.h
+    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.cpp
+    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.h
     Source/CommonFramework/VideoPipeline/VideoSource_Camera.cpp
     Source/CommonFramework/VideoPipeline/VideoSource_Camera.h
     Source/CommonFramework/VideoPipeline/VideoSource_Null.cpp
     Source/CommonFramework/VideoPipeline/VideoSource_Null.h
-    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.cpp
-    Source/CommonFramework/VideoPipeline/VideoSourceDescriptor.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
     Source/CommonFramework/Windows/DpiScaler.cpp
