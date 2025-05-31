@@ -7,7 +7,6 @@
 #include "Backends/CameraImplementations.h"
 #include "VideoSource.h"
 #include "VideoSource_Camera.h"
-#include "Backends/CameraWidgetQt6.5.h"
 
 //#include <iostream>
 //using std::cout;
@@ -38,8 +37,7 @@ JsonValue VideoSourceDescriptor_Camera::to_json() const{
 }
 
 std::unique_ptr<VideoSource> VideoSourceDescriptor_Camera::make_VideoSource(Logger& logger, Resolution resolution) const{
-    //  TODO: REMOVE: Branch out the backends.
-    return std::make_unique<CameraQt65QMediaCaptureSession::CameraVideoSource>(logger, m_info, resolution);
+    return get_camera_backend().make_video_source(logger, m_info, resolution);
 }
 
 

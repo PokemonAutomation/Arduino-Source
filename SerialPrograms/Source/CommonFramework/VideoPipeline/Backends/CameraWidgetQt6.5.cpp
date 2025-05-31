@@ -64,6 +64,13 @@ std::string CameraBackend::get_camera_name(const CameraInfo& info) const{
     std::cout << "Error: no such camera for CameraInfo: " << info.device_name() << std::endl;
     return "";
 }
+std::unique_ptr<VideoSource> CameraBackend::make_video_source(
+    Logger& logger,
+    const CameraInfo& info,
+    Resolution resolution
+) const{
+    return std::make_unique<CameraVideoSource>(logger, info, resolution);
+}
 std::unique_ptr<PokemonAutomation::CameraSession> CameraBackend::make_camera(Logger& logger, Resolution default_resolution) const{
     return std::make_unique<CameraSession>(logger, default_resolution);
 }
@@ -616,7 +623,6 @@ CameraVideoSource::~CameraVideoSource(){
     if (!m_capture_session){
         return;
     }
-
     try{
         m_logger.log("Stopping Camera...");
     }catch (...){}
@@ -734,7 +740,6 @@ void CameraVideoSource::set_video_output(QGraphicsVideoItem& item){
                 seqnum++;
                 m_last_frame_seqnum.store(seqnum, std::memory_order_relaxed);
             }
-
             report_source_frame(std::make_shared<VideoFrame>(now, frame));
         },
         Qt::DirectConnection

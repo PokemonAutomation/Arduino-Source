@@ -49,6 +49,11 @@ public:
     virtual std::vector<CameraInfo> get_all_cameras() const override;
     virtual std::string get_camera_name(const CameraInfo& info) const override;
 
+    virtual std::unique_ptr<VideoSource> make_video_source(
+        Logger& logger,
+        const CameraInfo& info,
+        Resolution resolution
+    ) const override;
     virtual std::unique_ptr<PokemonAutomation::CameraSession> make_camera(Logger& logger, Resolution default_resolution) const override;
 };
 
