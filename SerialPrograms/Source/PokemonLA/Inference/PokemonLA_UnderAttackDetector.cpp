@@ -54,7 +54,7 @@ bool UnderAttackWatcher::process_frame(const ImageViewRGB32& frame, WallClock ti
     count++;
 
     //  Return most reported state in the last window.
-    UnderAttackState best_state = UnderAttackState::UNKONWN;
+    UnderAttackState best_state = UnderAttackState::UNKNOWN;
     size_t best_count = 0;
     for (const auto& item : m_counts){
         if (best_count < item.second){
