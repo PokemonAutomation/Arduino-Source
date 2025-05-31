@@ -50,7 +50,7 @@ EscapeFromAttack::EscapeFromAttack(
     const std::chrono::milliseconds GET_ON_BRAVIARY_TIME_MILLIS(GET_ON_BRAVIARY_TIME * 1000 / TICKS_PER_SECOND);
 
     register_state_command(State::UNKNOWN, [this](){
-        m_stream.log("Unknown state. Moving foward...");
+        m_stream.log("Unknown state. Moving forward...");
         m_active_command->dispatch([](ProControllerContext& context){
             pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
         });
