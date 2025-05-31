@@ -10,7 +10,7 @@ alpha channel value.
 
 - Press 'w', 's', 'a', 'd' to move the selected pixels around.
 
-To draw a box: left click and drag the rectange.
+To draw a box: left click and drag the rectangle.
 You can draw multiple boxes on the screen.
 
 - Press 'i' to dump the information of those boxes so you can copy them into the code,
