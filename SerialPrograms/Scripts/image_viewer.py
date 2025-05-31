@@ -8,7 +8,7 @@ PokemonAutomation visual inference methods.
 Single left clicking on a pixel shows you the info of that pixel. Note it may also print the
 alpha channel value.
 
-- Press 'w', 's', 'a', 'd' to move the slected pixels around.
+- Press 'w', 's', 'a', 'd' to move the selected pixels around.
 
 To draw a box: left click and drag the rectange.
 You can draw multiple boxes on the screen.
