@@ -99,7 +99,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     }
 
     const size_t sample_rate = new_spectrums[0].sample_rate;
-    // Lazy intialization of the spectrogram matcher.
+    // Lazy initialization of the spectrogram matcher.
     if (m_matcher == nullptr || m_matcher->sample_rate() != sample_rate){
         m_logger.log("Loading spectrogram...");
         m_matcher = build_spectrogram_matcher(sample_rate);
