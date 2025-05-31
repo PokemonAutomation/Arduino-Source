@@ -42,7 +42,7 @@ class ImageViewer:
 		self.mouse_down = False
 		self.mouse_move_counter = 0
 		self.nc = image.shape[2]  # num_channel
-		# The size of the cross used to highlight a slected pixel
+		# The size of the cross used to highlight a selected pixel
 		self.cross_size = max(1, min(self.width, self.height) // 200)
 
 	def _solid_color(self, color):
