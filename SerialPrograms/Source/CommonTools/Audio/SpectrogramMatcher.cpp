@@ -67,7 +67,7 @@ SpectrogramMatcher::SpectrogramMatcher(
 
     const size_t halfSampleRate = sample_rate / 2;
 
-    // The frquency range from [0.0, halfSampleRate / numFrequencies, 2.0 halfSampleRate / numFrequencies, ... (numFrequencies-1) halfSampleRate / numFrequencies]
+    // The frequency range from [0.0, halfSampleRate / numFrequencies, 2.0 halfSampleRate / numFrequencies, ... (numFrequencies-1) halfSampleRate / numFrequencies]
     // Since human can only hear as high as 20KHz sound, matching on frequencies >= 20KHz is meaningless.
     // So the index i of the max frequency we should be matching is the one with
     // i * halfSampleRate/numFrequencies  <= 20KHz
