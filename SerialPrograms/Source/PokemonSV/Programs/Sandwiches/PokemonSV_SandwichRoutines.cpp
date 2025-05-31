@@ -748,7 +748,7 @@ void make_two_herbs_sandwich(
         move_one_up_to_row(9 - i);
     }
     press_a_to_determine_herb(0); // Press A to determine one herb
-    // Press DPAD_UP againt to move to the second herb row
+    // Press DPAD_UP against to move to the second herb row
     for(size_t i = first_herb_index_last+1; i < sweet_herb_index_last+1; i++){
         move_one_up_to_row(9 - i);
     }
