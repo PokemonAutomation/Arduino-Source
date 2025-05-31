@@ -29,7 +29,7 @@ UnderAttackWatcher::UnderAttackWatcher(Logger& logger)
     : VisualInferenceCallback("UnderAttackWatcher")
     , m_logger(logger)
     , m_box(0.49, 0.07, 0.02, 0.03)
-    , m_state(UnderAttackState::UNKONWN)
+    , m_state(UnderAttackState::UNKNOWN)
 {}
 
 void UnderAttackWatcher::make_overlays(VideoOverlaySet& items) const{
