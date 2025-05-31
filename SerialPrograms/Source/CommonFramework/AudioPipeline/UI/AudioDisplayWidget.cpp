@@ -181,7 +181,7 @@ void AudioDisplayWidget::update_size(){
     }
 
     if (height > m_previous_height && height < m_previous_height + 10 && !m_debouncer.check(height)){
-//        cout << "Supressing potential infinite resizing loop." << endl;
+//        cout << "Suppressing potential infinite resizing loop." << endl;
         return;
     }
 
