@@ -110,7 +110,7 @@ void LifetimeSanitizer::check_usage() const{
     }
     auto iter = sanitizer_map.find(this);
     if (iter == sanitizer_map.end()){
-        std::cerr << "Use non-existant: " << this << " : " << m_name << std::endl;
+        std::cerr << "Use non-existent: " << this << " : " << m_name << std::endl;
         terminate_with_dump();
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
