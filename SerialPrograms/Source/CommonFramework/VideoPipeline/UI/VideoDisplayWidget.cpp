@@ -42,7 +42,7 @@ VideoDisplayWidget::VideoDisplayWidget(
 
     VideoSource* source = video_session.current_source();
     if (source){
-        m_video = source->make_QtWidget(this);
+        m_video = source->make_display_QtWidget(this);
         this->add_widget(*m_video);
     }
 
@@ -136,7 +136,7 @@ void VideoDisplayWidget::clear_video_source(){
 void VideoDisplayWidget::post_startup(VideoSource* source){
     clear_video_source();
     if (source){
-        m_video = source->make_QtWidget(this);
+        m_video = source->make_display_QtWidget(this);
         this->add_widget(*m_video);
         set_aspect_ratio(source->current_resolution().aspect_ratio());
         m_overlay->raise();

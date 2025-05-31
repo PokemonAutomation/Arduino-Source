@@ -42,11 +42,15 @@ public:
     virtual std::string display_name() const = 0;
 
 public:
+    virtual void run_post_select(){};
     virtual void load_json(const JsonValue& json) = 0;
     virtual JsonValue to_json() const = 0;
 
 public:
-    virtual std::unique_ptr<VideoSource> make_VideoSource(Logger& logger, Resolution resolution) const = 0;
+    virtual std::unique_ptr<VideoSource> make_VideoSource(
+        Logger& logger,
+        Resolution resolution
+    ) const = 0;
 };
 
 
@@ -56,15 +60,15 @@ class VideoSourceOption{
 public:
     VideoSourceOption();
 
-    std::shared_ptr<const VideoSourceDescriptor> descriptor() const{
+    std::shared_ptr<VideoSourceDescriptor> descriptor() const{
         return m_descriptor;
     }
-    void set_descriptor(std::shared_ptr<const VideoSourceDescriptor> descriptor);
+    void set_descriptor(std::shared_ptr<VideoSourceDescriptor> descriptor);
 
     //  Remember the last used descriptor for each interface type. That way when
     //  the user switches back-and-forth between two interfaces, it will reload
     //  the previous one.
-    std::shared_ptr<const VideoSourceDescriptor> get_descriptor_from_cache(VideoSourceType type) const;
+    std::shared_ptr<VideoSourceDescriptor> get_descriptor_from_cache(VideoSourceType type);
 
 
 public:
@@ -73,12 +77,12 @@ public:
 
 
 private:
-    std::shared_ptr<const VideoSourceDescriptor> m_descriptor;
+    std::shared_ptr<VideoSourceDescriptor> m_descriptor;
 public:
     Resolution m_resolution;
 
 private:
-    std::map<VideoSourceType, std::shared_ptr<const VideoSourceDescriptor>> m_descriptor_cache;
+    std::map<VideoSourceType, std::shared_ptr<VideoSourceDescriptor>> m_descriptor_cache;
 };
 
 

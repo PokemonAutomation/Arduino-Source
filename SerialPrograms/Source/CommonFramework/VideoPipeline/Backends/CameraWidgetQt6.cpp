@@ -84,7 +84,8 @@ CameraVideoSource::CameraVideoSource(
     const CameraInfo& info,
     Resolution desired_resolution
 )
-    : m_logger(logger)
+    : VideoSource(true)
+    , m_logger(logger)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
     , m_last_frame_seqnum(0)
@@ -174,15 +175,6 @@ CameraVideoSource::CameraVideoSource(
     m_camera->start();
 }
 
-Resolution CameraVideoSource::current_resolution() const{
-    //  No to lock since it doesn't change after construction.
-    return m_resolution;
-}
-std::vector<Resolution> CameraVideoSource::supported_resolutions() const{
-    //  No to lock since it doesn't change after construction.
-    return m_resolutions;
-}
-
 VideoSnapshot CameraVideoSource::snapshot(){
     //  Prevent multiple concurrent screenshots from entering here.
     std::lock_guard<std::mutex> lg(m_snapshot_lock);
@@ -229,7 +221,7 @@ VideoSnapshot CameraVideoSource::snapshot(){
     return VideoSnapshot(m_last_image, m_last_image_timestamp);
 }
 
-QWidget* CameraVideoSource::make_QtWidget(QWidget* parent){
+QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
     return new CameraVideoDisplay(parent, *this);
 }
 

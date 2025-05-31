@@ -56,12 +56,16 @@ public:
         Resolution desired_resolution
     );
 
-    virtual Resolution current_resolution() const override;
-    virtual std::vector<Resolution> supported_resolutions() const override;
+    virtual Resolution current_resolution() const override{
+        return m_resolution;
+    }
+    virtual const std::vector<Resolution>& supported_resolutions() const override{
+        return m_resolutions;
+    }
 
     virtual VideoSnapshot snapshot() override;
 
-    virtual QWidget* make_QtWidget(QWidget* parent) override;
+    virtual QWidget* make_display_QtWidget(QWidget* parent) override;
 
 private:
 //    void set_video_output(QGraphicsVideoItem& item);

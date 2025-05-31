@@ -12,8 +12,9 @@
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "VideoSourceSelectorWidget.h"
 
-#include "CommonFramework/VideoPipeline/VideoSource_Null.h"
-#include "CommonFramework/VideoPipeline/VideoSource_Camera.h"
+#include "CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.h"
+#include "CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h"
+#include "CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.h"
 
 //#include <iostream>
 //using std::cout;
@@ -55,6 +56,7 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
         m_sources_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [this](int index){
             if (0 <= index && index < (int)m_sources.size()){
+                m_sources[index]->run_post_select();
                 m_session.set_source(m_sources[index]);
             }else{
                 m_session.set_source(std::make_unique<VideoSourceDescriptor_Null>());
@@ -90,8 +92,16 @@ void VideoSourceSelectorWidget::update_source_list(){
     m_sources.clear();
 
     std::shared_ptr<const VideoSourceDescriptor> current_descriptor = m_session.descriptor();
-    m_sources.emplace_back(std::make_unique<VideoSourceDescriptor_Null>());
 
+    //  Add all the static options.
+    {
+        VideoSourceOption option;
+        m_session.get(option);
+        m_sources.emplace_back(option.get_descriptor_from_cache(VideoSourceType::None));
+        m_sources.emplace_back(option.get_descriptor_from_cache(VideoSourceType::StillImage));
+    }
+
+    //  Now add all the cameras.
     for (const CameraInfo& info : get_all_cameras()){
         m_sources.emplace_back(std::make_unique<VideoSourceDescriptor_Camera>(info));
     }

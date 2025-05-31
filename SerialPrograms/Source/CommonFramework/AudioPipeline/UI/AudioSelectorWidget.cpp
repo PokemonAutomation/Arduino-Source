@@ -17,9 +17,9 @@
 #include "AudioSelectorWidget.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -105,7 +105,7 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
             if (index <= 0 || index >= (int)m_input_audios.size() + 2){
                 m_session.clear_audio_input();
             }else if (index == 1){
-                std::string path = QFileDialog::getOpenFileName(this, tr("Open audio file"), ".", "*.wav *.mp3").toStdString();
+                std::string path = QFileDialog::getOpenFileName(this, "Open audio file", ".", "*.wav *.mp3").toStdString();
                 if (path.empty()){
                     m_session.clear_audio_input();
                 }else{

@@ -9,7 +9,7 @@
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
 #include "Backends/VideoFrameQt.h"
-#include "VideoSource_Null.h"
+#include "VideoSources/VideoSource_Null.h"
 #include "VideoSession.h"
 
 //#include <iostream>
@@ -119,7 +119,7 @@ void VideoSession::reset(){
         );
     });
 }
-void VideoSession::set_source(const std::shared_ptr<const VideoSourceDescriptor>& device){
+void VideoSession::set_source(const std::shared_ptr<VideoSourceDescriptor>& device){
     m_logger.log("Changing video...", COLOR_GREEN);
     dispatch_to_main_thread([this, device]{
         std::lock_guard<std::mutex> lg0(m_reset_lock);
@@ -225,7 +225,7 @@ void VideoSession::on_rendered_frame(WallClock timestamp){
 void VideoSession::on_watchdog_timeout(){
     {
         ReadSpinLock lg(m_state_lock);
-        if (!m_video_source){
+        if (!m_video_source || !m_video_source->allow_watchdog_reset()){
             return;
         }
     }

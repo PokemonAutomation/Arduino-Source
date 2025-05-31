@@ -9,8 +9,10 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "VideoSourceDescriptor.h"
-#include "VideoSource_Null.h"
-#include "VideoSource_Camera.h"
+
+#include "VideoSources/VideoSource_Null.h"
+#include "VideoSources/VideoSource_StillImage.h"
+#include "VideoSources/VideoSource_Camera.h"
 
 //#include <iostream>
 //using std::cout;
@@ -32,23 +34,38 @@ VideoSourceOption::VideoSourceOption()
     , m_resolution(1920, 1080)
 {}
 
-void VideoSourceOption::set_descriptor(std::shared_ptr<const VideoSourceDescriptor> descriptor){
+void VideoSourceOption::set_descriptor(std::shared_ptr<VideoSourceDescriptor> descriptor){
     m_descriptor_cache[descriptor->type] = descriptor;
     m_descriptor = std::move(descriptor);
 }
 
-std::shared_ptr<const VideoSourceDescriptor> VideoSourceOption::get_descriptor_from_cache(VideoSourceType type) const{
+std::shared_ptr<VideoSourceDescriptor> VideoSourceOption::get_descriptor_from_cache(VideoSourceType type){
     auto iter = m_descriptor_cache.find(type);
-    if (iter == m_descriptor_cache.end()){
-        return nullptr;
+    if (iter != m_descriptor_cache.end()){
+        return iter->second;
     }
-    return iter->second;
+    std::shared_ptr<VideoSourceDescriptor> descriptor;
+    switch (type){
+    case VideoSourceType::None:
+        descriptor.reset(new VideoSourceDescriptor_Null());
+        break;
+    case VideoSourceType::StillImage:
+        descriptor.reset(new VideoSourceDescriptor_StillImage());
+        break;
+    case VideoSourceType::Camera:
+        descriptor.reset(new VideoSourceDescriptor_Camera());
+        break;
+    default:;
+        descriptor.reset(new VideoSourceDescriptor_Null());
+    }
+    m_descriptor_cache[descriptor->type] = descriptor;
+    return descriptor;
 }
 
 
 
 void VideoSourceOption::load_json(const JsonValue& json){
-    std::shared_ptr<const VideoSourceDescriptor> descriptor;
+    std::shared_ptr<VideoSourceDescriptor> descriptor;
     do{
         if (json.is_null()){
             break;
@@ -91,7 +108,9 @@ void VideoSourceOption::load_json(const JsonValue& json){
         const JsonValue* params;
         params = obj->get_value(VIDEO_TYPE_STRINGS.get_string(VideoSourceType::StillImage));
         if (params != nullptr){
-//            m_descriptor_cache[VideoSourceType::StillImage] =
+            auto x = std::make_unique<VideoSourceDescriptor_StillImage>();
+            x->load_json(*params);
+            m_descriptor_cache[VideoSourceType::StillImage] = std::move(x);
         }
         params = obj->get_value(VIDEO_TYPE_STRINGS.get_string(VideoSourceType::VideoPlayback));
         if (params != nullptr){

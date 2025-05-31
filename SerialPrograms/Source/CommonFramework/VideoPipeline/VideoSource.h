@@ -40,13 +40,20 @@ public:
 
 
 public:
-    VideoSource()
-        : m_sanitizer("VideoSource")
+    VideoSource(bool allow_watchdog_reset)
+        : m_allow_watchdog_reset(allow_watchdog_reset)
+        , m_sanitizer("VideoSource")
     {}
     virtual ~VideoSource() = default;
 
+
+public:
+    bool allow_watchdog_reset() const{
+        return m_allow_watchdog_reset;
+    }
+
     virtual Resolution current_resolution() const = 0;
-    virtual std::vector<Resolution> supported_resolutions() const = 0;
+    virtual const std::vector<Resolution>& supported_resolutions() const = 0;
 
     virtual VideoSnapshot snapshot() = 0;
 
@@ -63,12 +70,14 @@ protected:
 
 
 public:
-    virtual QWidget* make_QtWidget(QWidget* parent) = 0;
+    virtual QWidget* make_display_QtWidget(QWidget* parent) = 0;
 
 
 private:
     ListenerSet<VideoFrameListener> m_source_frame_listeners;
     ListenerSet<RenderedFrameListener> m_rendered_frame_listeners;
+
+    const bool m_allow_watchdog_reset;
 
     LifetimeSanitizer m_sanitizer;
 };

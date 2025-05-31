@@ -91,7 +91,8 @@ CameraVideoSource::CameraVideoSource(
     const CameraInfo& info,
     Resolution desired_resolution
 )
-    : m_logger(logger)
+    : VideoSource(true)
+    , m_logger(logger)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
     , m_last_frame_seqnum(0)
@@ -205,15 +206,6 @@ void CameraVideoSource::set_video_output(QGraphicsVideoItem& item){
 
 
 
-Resolution CameraVideoSource::current_resolution() const{
-    //  No to lock since it doesn't change after construction.
-    return m_resolution;
-}
-std::vector<Resolution> CameraVideoSource::supported_resolutions() const{
-    //  No to lock since it doesn't change after construction.
-    return m_resolutions;
-}
-
 VideoSnapshot CameraVideoSource::snapshot(){
     //  This will be coming in from random threads. (not the main thread)
     //  So we efficiently grab the last frame to unblock the main thread.
@@ -263,7 +255,7 @@ VideoSnapshot CameraVideoSource::snapshot(){
     return VideoSnapshot(m_last_image, m_last_image_timestamp);
 }
 
-QWidget* CameraVideoSource::make_QtWidget(QWidget* parent){
+QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
     return new CameraVideoDisplay(parent, *this);
 }
 

@@ -73,7 +73,7 @@ public:
     void set(const VideoSourceOption& option);
 
     virtual void reset() override;
-    void set_source(const std::shared_ptr<const VideoSourceDescriptor>& device);
+    void set_source(const std::shared_ptr<VideoSourceDescriptor>& device);
     void set_resolution(Resolution resolution);
 
 
