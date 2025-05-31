@@ -554,7 +554,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
     ImageRGB32 sprite_image(mmo_revealed_image_path.toStdString());
     
     if (!question_mark_image){
-        cerr << "Error: cannot load MMO quesiton mark image file " << filepath << endl;
+        cerr << "Error: cannot load MMO question mark image file " << filepath << endl;
         return 1;
     }
     if (!sprite_image){
