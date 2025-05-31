@@ -84,7 +84,7 @@ bool DialogTriangleDetector::process_frame(const ImageViewRGB32& frame, WallCloc
     );
 
     if (detected){
-        m_logger.log("Detected dialog black traingle.", COLOR_PURPLE);
+        m_logger.log("Detected dialog black triangle.", COLOR_PURPLE);
     }
 
     m_detected.store(detected, std::memory_order_release);
