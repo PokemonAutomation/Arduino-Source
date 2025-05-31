@@ -10,7 +10,6 @@
 //#include "Common/Cpp/ValueDebouncer.h"
 #include "Common/Qt/WidgetStackFixedAspectRatio.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
-#include "VideoWidget.h"
 #include "VideoOverlayWidget.h"
 
 class QLineEdit;

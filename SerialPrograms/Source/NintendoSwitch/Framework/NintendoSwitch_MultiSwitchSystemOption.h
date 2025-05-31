@@ -15,6 +15,7 @@
 
 #include <memory>
 #include <vector>
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 

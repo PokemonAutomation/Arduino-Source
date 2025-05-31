@@ -16,9 +16,7 @@
 #define PokemonAutomation_NintendoSwitch_SwitchSystemOption_H
 
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
-#include "CommonFramework/VideoPipeline/CameraOption.h"
 #include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
 #include "Controllers/ControllerCapability.h"

@@ -14,10 +14,7 @@
 //using std::cout;
 //using std::endl;
 
-#if QT_VERSION_MAJOR == 5
-#include "VideoToolsQt5.h"
-#include "CameraWidgetQt5.h"
-//#include "CameraWidgetQt5v2.h"
+#if 0
 #elif QT_VERSION_MAJOR == 6
 #include "CameraWidgetQt6.h"
 #if QT_VERSION_MINOR >= 5
@@ -53,12 +50,6 @@ struct CameraBackends{
     }
 
     CameraBackends(){
-#if QT_VERSION_MAJOR == 5
-        m_backends.emplace_back(
-            "qt5-QCameraViewfinder", "Qt5: QCameraViewfinder",
-            std::make_unique<CameraQt5QCameraViewfinder::CameraBackend>()
-        );
-#endif
 #if QT_VERSION_MAJOR == 6
         m_backends.emplace_back(
             "qt6-QVideoSink", "Qt6: QVideoSink",
@@ -90,8 +81,7 @@ VideoBackendOption::VideoBackendOption()
         "<b>Video Pipeline Backend:</b>",
         CameraBackends::instance().m_database,
         LockMode::LOCK_WHILE_RUNNING,
-#if QT_VERSION_MAJOR == 5
-        0
+#if 0
 #elif QT_VERSION_MAJOR == 6
 #if QT_VERSION_MINOR >= 5
         1

@@ -457,8 +457,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/VideoStream.h
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraImplementations.h
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.cpp
-    Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt5.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.cpp
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.cpp
@@ -466,17 +464,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.h
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
-    Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.cpp
-    Source/CommonFramework/VideoPipeline/Backends/VideoToolsQt5.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
-    Source/CommonFramework/VideoPipeline/CameraOption.cpp
-    Source/CommonFramework/VideoPipeline/CameraOption.h
-    Source/CommonFramework/VideoPipeline/CameraSession.h
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h
     Source/CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.cpp
     Source/CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h
-    Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.cpp
-    Source/CommonFramework/VideoPipeline/UI/CameraSelectorWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWindow.cpp
@@ -485,7 +476,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/UI/VideoOverlayWidget.h
     Source/CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.cpp
     Source/CommonFramework/VideoPipeline/UI/VideoSourceSelectorWidget.h
-    Source/CommonFramework/VideoPipeline/UI/VideoWidget.h
     Source/CommonFramework/VideoPipeline/VideoFeed.h
     Source/CommonFramework/VideoPipeline/VideoOverlay.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlay.h
