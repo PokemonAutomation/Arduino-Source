@@ -118,7 +118,7 @@ NatureAdjustments get_nature_adjustments(NatureCheckerValue nature){
         return ret;
 
     default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unkwown Nature: " + std::to_string((int)nature));
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown Nature: " + std::to_string((int)nature));
     }
 }
 #endif
