@@ -88,7 +88,7 @@ void TurnClockwiseFast(ProControllerContext& context){ // Same as above, but fas
 }
 
 
-void TurnCounterClockwiseSlow(ProControllerContext& context){ // One turn of stiring poffin (counter-clockwise)
+void TurnCounterClockwiseSlow(ProControllerContext& context){ // One turn of stirring poffin (counter-clockwise)
     pbf_move_right_joystick(context, 128, 255, 5, 0);
     pbf_move_right_joystick(context, 202, 231, 5, 0);
     pbf_move_right_joystick(context, 249, 167, 5, 0);
