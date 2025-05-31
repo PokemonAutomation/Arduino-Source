@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 size_t count_horizontal_translucent_border_pixels(const ImageViewRGB32& image, const Color& threshold, bool dark_top){
     // Gradient on each color channel at each pixel in one row
     std::vector<int16_t> gradients(image.width() * 3, 0);
-    // Whetehr a color channel is zero for each pixel in one row
+    // Whether a color channel is zero for each pixel in one row
     std::vector<bool> is_zero(image.width() * 3, false);
 
     if (image.height() == 0 || image.width() == 0){
