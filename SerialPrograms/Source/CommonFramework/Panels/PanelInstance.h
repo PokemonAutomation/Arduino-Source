@@ -31,6 +31,8 @@ public:
     void save_settings() const;
 
 public:
+    // The implmentation is defined in "UI/PanelWidget.h" to avoid circular dependency
+    // Returns a UI/PanelWidget.h:PanelWidget
     virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder);
 
 public:

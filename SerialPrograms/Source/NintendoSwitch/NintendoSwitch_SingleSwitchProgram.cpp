@@ -40,7 +40,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
 {}
 std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{
-    return std::unique_ptr<PanelInstance>(new SingleSwitchProgramOption(*this));
+    return std::make_unique<SingleSwitchProgramOption>(*this);
 }
 
 

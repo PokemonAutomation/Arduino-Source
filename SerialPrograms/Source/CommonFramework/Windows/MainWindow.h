@@ -40,15 +40,22 @@ private:
 
     void close_panel() noexcept;
 
+    // implements PanelHolder::report_new_panel_intent()
     virtual bool report_new_panel_intent(const PanelDescriptor& descriptor) override;
+    // implements PanelHolder::load_panel()
     virtual void load_panel(
         std::shared_ptr<const PanelDescriptor> descriptor,
         std::unique_ptr<PanelInstance> panel
     ) override;
+    // implements PanelHolder::raw_logger()
     virtual Logger& raw_logger() override{ return global_logger_raw(); }
 
 private:
+    // implements PanelHolder::on_busy()
+    // called when an automation program is running
     virtual void on_busy() override;
+    // implements PanelHolder::on_idle()
+    // called when no automation program is not running
     virtual void on_idle() override;
     virtual void on_config_value_changed(void* object) override;
     virtual void sleep_suppress_state_changed(SleepSuppress new_state) override;

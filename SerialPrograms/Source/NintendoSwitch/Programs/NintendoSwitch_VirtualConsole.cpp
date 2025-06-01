@@ -28,13 +28,13 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
 
 VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
     : PanelInstance(descriptor)
-    , m_switch({}, false)
+    , m_switch_control_option({}, false)
 {}
 void VirtualConsole::from_json(const JsonValue& json){
-    m_switch.load_json(json);
+    m_switch_control_option.load_json(json);
 }
 JsonValue VirtualConsole::to_json() const{
-    return m_switch.to_json();
+    return m_switch_control_option.to_json();
 }
 QWidget* VirtualConsole::make_widget(QWidget& parent, PanelHolder& holder){
     return VirtualConsole_Widget::make(parent, *this, holder);
@@ -52,7 +52,7 @@ VirtualConsole_Widget* VirtualConsole_Widget::make(
     return widget;
 }
 VirtualConsole_Widget::~VirtualConsole_Widget(){
-    delete m_switch;
+    delete m_switch_widget;
 }
 VirtualConsole_Widget::VirtualConsole_Widget(
     QWidget& parent,
@@ -60,7 +60,7 @@ VirtualConsole_Widget::VirtualConsole_Widget(
     PanelHolder& holder
 )
     : PanelWidget(parent, instance, holder)
-    , m_session(instance.m_switch, 0, 0)
+    , m_session(instance.m_switch_control_option, 0, 0)
 {}
 void VirtualConsole_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -76,8 +76,8 @@ void VirtualConsole_Widget::construct(){
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);
 
-    m_switch = new SwitchSystemWidget(*this, m_session, 0);
-    scroll_layout->addWidget(m_switch);
+    m_switch_widget = new SwitchSystemWidget(*this, m_session, 0);
+    scroll_layout->addWidget(m_switch_widget);
 }
 
 

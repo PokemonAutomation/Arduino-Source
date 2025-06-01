@@ -34,6 +34,9 @@ Color pick_color(
 );
 
 
+// options to control and monitor a Switch. It inlcudes
+// what micro-controller and what video source to use and
+// what video overlay display option to set.
 class SwitchSystemOption{
     static const std::string JSON_CONTROLLER;
     static const std::string JSON_CAMERA;

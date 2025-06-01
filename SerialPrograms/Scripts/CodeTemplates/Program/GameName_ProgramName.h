@@ -16,7 +16,6 @@ namespace NintendoSwitch{
 namespace GameName{
 
 
-
 class ProgramName_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     ProgramName_Descriptor();
