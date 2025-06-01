@@ -47,7 +47,8 @@ struct PanelEntry{
 };
 
 
-
+// Used by `make_panel()` to link the panel instance to the panel descriptor.
+// For more details, see `make_panel()` defined below.
 template <typename Descriptor, typename Instance>
 class PanelDescriptorWrapper : public Descriptor{
 public:
@@ -56,6 +57,17 @@ public:
     }
 };
 
+// Called by a program panel list factory to create a panel descriptor.
+// A panel descriptor holds various info (title, title color, etc.) about a program panel
+// and can also create the corresponding panel.
+//
+// template type `Descriptor` a derived class of CommonFramework/Panels/PanelDescriptor.h:PanelDescriptor
+// and `Instance` is the program panel UI instance, derived class of 
+// CommonFramework/Panels/PanelInstance.h:Panelnstance.
+//
+// Each panel descriptor instance should have implemented `make_panel()` to create the panel instance.
+// But writing this creation for each unique program implementation is repetitive. In stead, this function
+// uses `PanelDescriptorWrapper` to implement `make_panel()`.
 template <typename Descriptor, typename Instance>
 std::unique_ptr<PanelDescriptor> make_panel(){
     return std::make_unique<PanelDescriptorWrapper<Descriptor, Instance>>();

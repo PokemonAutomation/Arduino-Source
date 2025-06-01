@@ -15,7 +15,9 @@ namespace PokemonAutomation{
 
 class PanelInstance;
 
-
+// Abstract base class that sets the interface for program descriptors.
+// A program descriptor contains various information (descriptions) of a program panel UI.
+// It can also use function `make_panel()` to create the corresponding panel.
 class PanelDescriptor{
 public:
     PanelDescriptor(

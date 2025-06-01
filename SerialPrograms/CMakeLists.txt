@@ -871,6 +871,10 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
+    Source/ML/ML_Panels.cpp
+    Source/ML/ML_Panels.h
+    Source/ML/Programs/ML_LabelImages.cpp
+    Source/ML/Programs/ML_LabelImages.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp

@@ -15,7 +15,7 @@ class QComboBox;
 namespace PokemonAutomation{
 
 
-
+// The program selection UI on the left side of the program window
 class ProgramSelect : public QGroupBox{
 public:
     ProgramSelect(QWidget& parent, PanelHolder& holder);
