@@ -20,7 +20,7 @@ namespace PokemonLA{
 
 
 enum class UnderAttackState{
-    UNKONWN,
+    UNKNOWN,
     SAFE,
     UNDER_ATTACK,
 };
