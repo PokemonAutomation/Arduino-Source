@@ -150,7 +150,7 @@ public:
             cmp_u32 = vandq_u32(cmp_u32, *cmp_mask_u32);
         }
         // Increase count for each pixel in range. Each uint32 lane is counted separately.
-        // We achieve +=1 by substracting 0xFFFFFFFF
+        // We achieve +=1 by subtracting 0xFFFFFFFF
         m_count_u32 = vsubq_u32(m_count_u32, cmp_u32);
         // select replacement color or in_u8 based on cmp_u32:
         uint32x4_t out_u32;

@@ -338,7 +338,7 @@ void AuctionFarmer::move_dialog_to_center(SingleSwitchProgramEnvironment& env, P
             center_y = offer.second.y + (0.5 * offer.second.height);
 
 
-            // check whether the stop condition is fullfilled by now.
+            // check whether the stop condition is fulfilled by now.
             if (!(center_x < 0.43 || center_x > 0.57)){
                 break;
             }

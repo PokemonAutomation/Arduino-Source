@@ -388,7 +388,7 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, ProControll
     //     return;
     // }
 
-    // pokemon index -> number of move attemps made so far
+    // pokemon index -> number of move attempts made so far
     std::map<size_t, size_t> pokemon_move_attempts;
 
     while (true){

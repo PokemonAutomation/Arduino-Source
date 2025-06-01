@@ -181,7 +181,7 @@ void change_held_mode(const ProgramInfo& info, VideoStream& stream, ProControlle
     }
 }
 
-} // anonymous namesapce
+} // anonymous namespace
 
 // Use box selection mode to hold one column of pokemon.
 // Use visual feedback to ensure button Minus is pressed to turn on box selection mode/

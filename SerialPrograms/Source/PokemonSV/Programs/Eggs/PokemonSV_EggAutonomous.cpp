@@ -278,7 +278,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             env.log("Resetting game since nothing found, saving sandwich ingredients.");
             reset_game(env.program_info(), env.console, context);
         }else{ // game_already_resetted == true
-            env.log("Game resetted back to egg fetching routine.");
+            env.log("Game reset back to egg fetching routine.");
         }
 
         if (m_num_sandwich_spent >= max_num_sandwiches){
@@ -565,7 +565,7 @@ void EggAutonomous::process_one_baby(SingleSwitchProgramEnvironment& env, ProCon
             send_keep_notification();
 
             if (move_pokemon_to_keep(env, context, party_row) == false){
-                env.log("No empty slot availble to place new pokemon.");
+                env.log("No empty slot available to place new pokemon.");
                 env.console.overlay().add_log("No box space", COLOR_RED);
                 throw ProgramFinishedException();
             }

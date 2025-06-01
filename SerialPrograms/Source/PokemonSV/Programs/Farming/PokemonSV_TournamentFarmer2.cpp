@@ -263,7 +263,7 @@ void TournamentFarmer2::program(SingleSwitchProgramEnvironment& env, ProControll
                 if (ret < 0){
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
-                        "Failed to return to overworld afer 2 minutes.",
+                        "Failed to return to overworld after 2 minutes.",
                         env.console
                     );
                 }

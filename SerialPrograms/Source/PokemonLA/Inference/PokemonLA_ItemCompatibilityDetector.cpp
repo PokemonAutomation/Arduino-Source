@@ -34,7 +34,7 @@ ItemCompatibility detect_item_compatibility(const ImageViewRGB32& screen){
     );
 
     ImageStats stats = image_stats(region);
-    // std::cout << "Compability color " << stats.average.r << " " << stats.average.g << " " << stats.average.b << std::endl;
+    // std::cout << "Compatibility color " << stats.average.r << " " << stats.average.g << " " << stats.average.b << std::endl;
     if (stats.average.r > stats.average.b + 50.0){
         return ItemCompatibility::INCOMPATIBLE;
     }

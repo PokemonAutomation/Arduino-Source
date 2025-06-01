@@ -130,15 +130,15 @@ public:
 #ifdef UNIX_LINK_TESSERACT
     ~TesseractPool(){
         // As of Feb 05, 2022, the newest Tesseract (5.0.1) installed by HomeBrew on macOS
-        // has a bug that will crash the program when deleting internal Tesseract API intances,
+        // has a bug that will crash the program when deleting internal Tesseract API instances,
         // giving error: 
         // libc++abi.dylib: terminating with uncaught exception of type std::__1::system_error: mutex lock failed: Invalid argument
         // A similar issue is posted on Tesseract Github: https://github.com/tesseract-ocr/tesseract/issues/3655
         // There is no way of using HomeBrew to reinstall the older version.
         // Fortunately this class TesseractPool will not get built and destroyed repeatedly in
         // runtime. It will only get initialized once for each supported language. So I am able
-        // to use this ugly workaround by not deleting the Tesseract API intances.
-        std::cout << "Warning: not release Tesseract API istance due to mutex bug similar to https://github.com/tesseract-ocr/tesseract/issues/3655" << std::endl;
+        // to use this ugly workaround by not deleting the Tesseract API instances.
+        std::cout << "Warning: not release Tesseract API instance due to mutex bug similar to https://github.com/tesseract-ocr/tesseract/issues/3655" << std::endl;
         for(auto& api : m_instances){
             api.release();
         }

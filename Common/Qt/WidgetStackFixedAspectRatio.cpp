@@ -118,7 +118,7 @@ void WidgetStackFixedAspectRatio::resize_to_width(int width){
 //    cout << "WidgetStackFixedAspectRatio::resize_to_width(): " << width << " <- " << previous_width << endl;
 
     if (width > previous_width && width < previous_width + 50 && !m_debouncer.check(width)){
-//        cout << "Supressing potential infinite resizing loop." << endl;
+//        cout << "Suppressing potential infinite resizing loop." << endl;
         return;
     }
 

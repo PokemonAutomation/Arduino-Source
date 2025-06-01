@@ -110,7 +110,7 @@ void LifetimeSanitizer::check_usage() const{
     }
     auto iter = sanitizer_map.find(this);
     if (iter == sanitizer_map.end()){
-        std::cerr << "Use non-existant: " << this << " : " << m_name << std::endl;
+        std::cerr << "Use non-existent: " << this << " : " << m_name << std::endl;
         terminate_with_dump();
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
@@ -128,7 +128,7 @@ void LifetimeSanitizer::start_using() const{
     }
     auto iter = sanitizer_map.find(this);
     if (iter == sanitizer_map.end()){
-        std::cerr << "Start using non-existant: " << this << " : " << m_name << std::endl;
+        std::cerr << "Start using non-existent: " << this << " : " << m_name << std::endl;
         terminate_with_dump();
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
@@ -147,7 +147,7 @@ void LifetimeSanitizer::done_using() const{
     }
     auto iter = sanitizer_map.find(this);
     if (iter == sanitizer_map.end()){
-        std::cerr << "Done using non-existant: " << this << " : " << m_name << std::endl;
+        std::cerr << "Done using non-existent: " << this << " : " << m_name << std::endl;
         terminate_with_dump();
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
@@ -183,13 +183,13 @@ void LifetimeSanitizer::internal_destruct(){
 
     auto iter = sanitizer_map.find(this);
     if (iter == sanitizer_map.end()){
-        std::cerr << "LifetimeSanitizer - Free non-existant: " << this << " : " << m_name << std::endl;
+        std::cerr << "LifetimeSanitizer - Free non-existent: " << this << " : " << m_name << std::endl;
         terminate_with_dump();
     }
     sanitizer_map.erase(this);
 
     if (m_token != SANITIZER_TOKEN || m_self != this){
-        std::cerr << "LifetimeSanitizer - Free non-existant: " << this << " : " << m_name << std::endl;
+        std::cerr << "LifetimeSanitizer - Free non-existent: " << this << " : " << m_name << std::endl;
         terminate_with_dump();
     }
     if (m_use_counter != 0){

@@ -250,7 +250,7 @@ bool select_sandwich_recipe(
     }
 
     // we cannot find the receipt
-    stream.log("Max list travese attempt reached. Target recipe not found", COLOR_RED);
+    stream.log("Max list traverse attempt reached. Target recipe not found", COLOR_RED);
     stream.overlay().add_log("Recipe not found", COLOR_RED);
 
     return false;
@@ -517,7 +517,7 @@ ImageFloatBox move_sandwich_hand(
     }
 }
 
-} // end anonymous namesapce
+} // end anonymous namespace
 
 void finish_sandwich_eating(
     const ProgramInfo& info,
@@ -654,7 +654,7 @@ void finish_two_herbs_sandwich(
     stream.overlay().add_log("Built sandwich", COLOR_WHITE);
 }
 
-} // anonymous namesapce
+} // anonymous namespace
 
 void make_two_herbs_sandwich(
     const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, ProControllerContext& context,
@@ -739,7 +739,7 @@ void make_two_herbs_sandwich(
         DeterminedSandwichIngredientWatcher herb_watcher(SandwichIngredientType::CONDIMENT, herb_index);
         repeat_button_press_until(
             info, stream, context, BUTTON_A, 40, 60, {herb_watcher}, "CondimentsPageNotDetected",
-            "make_two_herbs_sandwich(): cannot detect detemined herb at cell " + std::to_string(herb_index) + " after 50 seconds."
+            "make_two_herbs_sandwich(): cannot detect determined herb at cell " + std::to_string(herb_index) + " after 50 seconds."
         );
     };
 
@@ -747,12 +747,12 @@ void make_two_herbs_sandwich(
     for(size_t i = 0; i < first_herb_index_last+1; i++){
         move_one_up_to_row(9 - i);
     }
-    press_a_to_determine_herb(0); // Press A to detemine one herb
-    // Press DPAD_UP againt to move to the second herb row
+    press_a_to_determine_herb(0); // Press A to determine one herb
+    // Press DPAD_UP against to move to the second herb row
     for(size_t i = first_herb_index_last+1; i < sweet_herb_index_last+1; i++){
         move_one_up_to_row(9 - i);
     }
-    press_a_to_determine_herb(1); // Press A to detemine the second herb
+    press_a_to_determine_herb(1); // Press A to determine the second herb
 
     {
         // Press button + to go to picks page
@@ -1238,7 +1238,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "SandwichMaker: Cannot detect grabing hand when waiting for upper bread.",
+            "SandwichMaker: Cannot detect grabbing hand when waiting for upper bread.",
             stream,
             grabbing_hand.last_snapshot()
         );

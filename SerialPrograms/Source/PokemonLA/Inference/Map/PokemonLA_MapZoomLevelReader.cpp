@@ -59,7 +59,7 @@ int read_map_zoom_level(const ImageViewRGB32& screen){
                 max_yellow = yellow;
             }
         }
-        // std::cout << "Compability color " << stats.average << " " << stats.stddev << std::endl;
+        // std::cout << "Compatibility color " << stats.average << " " << stats.stddev << std::endl;
     }
 
     return max_yellow_index;
