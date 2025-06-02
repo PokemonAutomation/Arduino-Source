@@ -27,10 +27,10 @@ public:
     const std::string& name() const{ return m_name; }
     bool enabled() const{ return m_enabled; }
 
-    virtual std::vector<PanelEntry> make_panels() const = 0;
-
-public:
     PanelListWidget* make_QWidget(QWidget& parent, PanelHolder& holder) const;
+
+protected:
+    virtual std::vector<PanelEntry> make_panels() const = 0;
 
 protected:
     std::string m_name;

@@ -32,18 +32,33 @@ enum class ConfigOptionState{
 };
 
 
-// An option of a program, like the number of boxes of eggs to hatch,
-// the number of frames to skip, or what type of pokeballs to throw.
-// It is responsible for setting the UI (by calling make_ui()) of this option.
+// Abstract base class for An option of a program, like the number of boxes of
+// eggs to hatch, the number of frames to skip, or what type of pokeballs to throw.
+// It is responsible for setting the UI (by calling make_QtWidget()) of this option.
 // It also uses load_json() and to_json() to load and save the option to
 // a json file, so that the program can remember what user has selected.
 class ConfigOption{
 public:
+    // the objects that listen to changes on the ConfigOption should inherit
+    // this Listener struct and call ConfigOption::add_listener() to add themselves
+    // to the listener set.
+    // Afterwards, whenever the config state is changed, all added listeners'
+    // corresponding member functions (e.g. value_changed()) will get called by
+    // the config option.
     struct Listener{
-        //  Pass the object that initiated the change. This is mainly used to
-        //  identify yourself as the initiater to avoid infinite loops.
+        //  When the config option value is changed, all added listeners' 
+        //  value_changed() will get called. 
+        //  object: the object that initiated the change. e.g. If the user changes
+        //  a UI content, object would be the UI option that is changed. This is
+        //  mainly used to avoid infinite loops. So if the initial change triggers
+        //  the original UI option's value_changed() get called, it will know that
+        //  object == this and therefore a loop is formed.
         virtual void on_config_value_changed(void* object){}
+        //  When the config UI visibility is changed, all added listeners'
+        //  visibility_changed() will get called.
         virtual void on_config_visibility_changed(){}
+        //  When the program state is changed, all added listeners'
+        //  program_state_changed() will get called.
         virtual void on_program_state_changed(bool program_is_running){}
     };
     void add_listener(Listener& listener);

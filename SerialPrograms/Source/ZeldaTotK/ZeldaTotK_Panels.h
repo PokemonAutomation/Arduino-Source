@@ -18,7 +18,8 @@ namespace ZeldaTotK{
 class PanelListFactory : public PanelListDescriptor{
 public:
     PanelListFactory();
-    virtual std::vector<PanelEntry> make_panels() const;
+private:
+    virtual std::vector<PanelEntry> make_panels() const override;
 };
 
 

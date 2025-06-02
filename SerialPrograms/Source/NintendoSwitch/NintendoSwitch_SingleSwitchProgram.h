@@ -164,10 +164,11 @@ template <typename Descriptor, typename Instance>
 class SingleSwitchProgramWrapper : public Descriptor{
 public:
     virtual std::unique_ptr<SingleSwitchProgramInstance> make_instance() const override{
-        return std::unique_ptr<SingleSwitchProgramInstance>(new Instance());
+        return std::make_unique<Instance>();
     }
 };
 
+// Create a program PanelDescriptor
 template <typename Descriptor, typename Instance>
 std::unique_ptr<PanelDescriptor> make_single_switch_program(){
     return std::make_unique<SingleSwitchProgramWrapper<Descriptor, Instance>>();

@@ -52,9 +52,6 @@ public:
 };
 
 
-
-
-
 class StaticQGraphicsView : public QGraphicsView{
 public:
     StaticQGraphicsView(QWidget* parent)
@@ -88,16 +85,6 @@ public:
     }
 
 };
-
-
-
-
-
-
-
-
-
-
 
 
 class CameraVideoSource : public QObject, public VideoSource{
@@ -146,7 +133,6 @@ private:
     uint64_t m_last_image_seqnum = 0;
 
     PeriodicStatsReporterI32 m_stats_conversion;
-
 
 private:
     //  Last Frame: All accesses must be under this lock.

@@ -7,11 +7,27 @@
 #ifndef PokemonAutomation_ML_LabelImages_H
 #define PokemonAutomation_ML_LabelImages_H
 
+#include "Common/Cpp/Options/BatchOption.h"
+#include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include <QGraphicsScene>
 
+class QGraphicsView;
+class QGraphicsPixmapItem;
 
 namespace PokemonAutomation{
+
+
+class ConfigWidget;
+namespace NintendoSwitch{
+    class SwitchSystemWidget;
+}
+
+
 namespace ML{
 
 
@@ -20,7 +36,6 @@ class LabelImages_Descriptor : public PanelDescriptor{
 public:
     LabelImages_Descriptor();
 };
-
 
 
 class LabelImages : public PanelInstance{
@@ -35,28 +50,56 @@ public:
 
 private:
     friend class LabelImages_Widget;
+    friend class DrawnBoundingBox;
+    // switch control options like what micro-controller 
+    // and what video source to use
+    NintendoSwitch::SwitchSystemOption m_switch_control_option;
+    // the group option that holds rest of the options defined below:
+    BatchOption m_options;
+
+    FloatingPointOption X;
+    FloatingPointOption Y;
+    FloatingPointOption WIDTH;
+    FloatingPointOption HEIGHT;
 };
 
+
+class DrawnBoundingBox : public ConfigOption::Listener, public VideoOverlay::MouseListener{
+public:
+    ~DrawnBoundingBox();
+    DrawnBoundingBox(LabelImages& parent, VideoOverlay& overlay);
+    virtual void on_config_value_changed(void* object) override;
+    virtual void on_mouse_press(double x, double y) override;
+    virtual void on_mouse_release(double x, double y) override;
+    virtual void on_mouse_move(double x, double y) override;
+
+private:
+    void detach();
+
+private:
+    LabelImages& m_parent;
+    VideoOverlay& m_overlay;
+    VideoOverlaySet m_overlay_set;
+    std::mutex m_lock;
+
+    std::optional<std::pair<double, double>> m_mouse_start;
+};
 
 
 class LabelImages_Widget : public PanelWidget{
 public:
-    static LabelImages_Widget* make(
-        QWidget& parent,
-        LabelImages& instance,
-        PanelHolder& holder
-    );
-
-private:
     ~LabelImages_Widget();
     LabelImages_Widget(
         QWidget& parent,
         LabelImages& instance,
         PanelHolder& holder
     );
-    void construct();
 
 private:
+    NintendoSwitch::SwitchSystemSession m_session;
+    NintendoSwitch::SwitchSystemWidget* m_switch_widget;
+    DrawnBoundingBox m_drawn_box;
+    ConfigWidget* m_option_widget;
 };
 
 

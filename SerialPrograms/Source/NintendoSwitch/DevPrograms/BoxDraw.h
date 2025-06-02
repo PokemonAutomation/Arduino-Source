@@ -21,6 +21,7 @@ public:
 };
 
 
+// Draw box on the video stream
 class BoxDraw : public SingleSwitchProgramInstance{
 public:
     BoxDraw();
@@ -28,7 +29,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    class Overlay;
+    class DrawnBox;
 
 private:
     FloatingPointOption X;

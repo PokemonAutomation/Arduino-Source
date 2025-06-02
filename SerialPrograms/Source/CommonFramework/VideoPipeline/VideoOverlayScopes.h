@@ -107,14 +107,6 @@ private:
 };
 
 
-
-
-
-
-
-
-
-
 // Used by video inference sessions to manage inference boxes.
 // VideoOverlaySet will be passed to the inference callbacks in a session
 // to store inference boxes. When the session ends, VideoOverlaySet::clear()

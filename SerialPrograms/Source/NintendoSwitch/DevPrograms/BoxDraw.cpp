@@ -40,16 +40,18 @@ BoxDraw::BoxDraw()
     PA_ADD_OPTION(HEIGHT);
 }
 
-class BoxDraw::Overlay : public ConfigOption::Listener, public VideoOverlay::MouseListener{
+class BoxDraw::DrawnBox : public ConfigOption::Listener, public VideoOverlay::MouseListener{
 public:
-    ~Overlay(){
+    ~DrawnBox(){
         detach();
     }
-    Overlay(BoxDraw& parent, VideoOverlay& overlay)
+    DrawnBox(BoxDraw& parent, VideoOverlay& overlay)
         : m_parent(parent)
         , m_overlay(overlay)
         , m_overlay_set(overlay)
     {
+        // DrawnBox listens to changes in the config option (X, Y, WIDTH, HEIGHT)
+        // and mouse events on the video overlay layer.
         try{
             m_parent.X.add_listener(*this);
             m_parent.Y.add_listener(*this);
@@ -120,8 +122,8 @@ private:
 };
 
 void BoxDraw::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    Overlay overlay(*this, env.console.overlay());
-    overlay.on_config_value_changed(this);
+    DrawnBox drawn_box(*this, env.console.overlay());
+    drawn_box.on_config_value_changed(this);
     context.wait_until_cancel();
 }
 
