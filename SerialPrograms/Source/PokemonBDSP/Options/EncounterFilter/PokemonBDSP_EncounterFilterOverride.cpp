@@ -103,7 +103,7 @@ std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
     ret->ball_limit.set(ball_limit);
     return ret;
 }
-void EncounterFilterOverride::value_changed(void* object){
+void EncounterFilterOverride::on_config_value_changed(void* object){
     switch ((EncounterAction)action){
     case EncounterAction::StopProgram:
     case EncounterAction::RunAway:

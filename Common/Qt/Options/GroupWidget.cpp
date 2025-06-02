@@ -125,7 +125,7 @@ void GroupWidget::update_value(){
         item->update_value();
     }
 }
-void GroupWidget::value_changed(void* object){
+void GroupWidget::on_config_value_changed(void* object){
 //    cout << "GroupWidget::value_changed()" << endl;
     QMetaObject::invokeMethod(this, [this]{
         update_value();

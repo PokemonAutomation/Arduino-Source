@@ -82,7 +82,7 @@ PlatformResetSettings::PlatformResetSettings()
 
 //    PA_ADD_OPTION(RESET_DURATION_MINUTES);
 
-    PlatformResetSettings::value_changed(this);
+    PlatformResetSettings::on_config_value_changed(this);
 
     WINDOW_IN_MINUTES.add_listener(*this);
     KILLS_IN_WINDOW0.add_listener(*this);
@@ -97,7 +97,7 @@ std::string int_to_text(size_t value, const std::string& unit){
     }
     return str;
 }
-void PlatformResetSettings::value_changed(void* object){
+void PlatformResetSettings::on_config_value_changed(void* object){
     m_sliding_window.set_text(
         "<font color=\"red\">Perform a platform reset if there are fewer than " + int_to_text(KILLS_IN_WINDOW0, "kill") +
         " and " + int_to_text(ENCOUNTERS_IN_WINDOW, "encounter") +

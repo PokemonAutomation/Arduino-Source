@@ -76,7 +76,7 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
 void FixedCodeWidget::update_value(){
     m_box->setText(QString::fromStdString(m_value));
 }
-void FixedCodeWidget::value_changed(void* object){
+void FixedCodeWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(m_box, [this]{
         update_value();
     }, Qt::QueuedConnection);

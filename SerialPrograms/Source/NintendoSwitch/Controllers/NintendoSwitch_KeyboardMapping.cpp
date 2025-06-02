@@ -480,9 +480,9 @@ KeyboardMappingOption::KeyboardMappingOption()
 
 void KeyboardMappingOption::load_json(const JsonValue& json){
     BatchOption::load_json(json);
-    KeyboardMappingOption::value_changed(this);
+    KeyboardMappingOption::on_config_value_changed(this);
 }
-void KeyboardMappingOption::value_changed(void* object){
+void KeyboardMappingOption::on_config_value_changed(void* object){
     PRO_CONTROLLER.set_advanced_mode(ADVANCED_MODE);
     LEFT_JOYCON.set_advanced_mode(ADVANCED_MODE);
     RIGHT_JOYCON.set_advanced_mode(ADVANCED_MODE);

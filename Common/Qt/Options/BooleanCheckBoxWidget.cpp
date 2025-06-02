@@ -60,7 +60,7 @@ void BooleanCheckBoxCellWidget::update_value(){
         m_box->setChecked(m_value);
     }
 }
-void BooleanCheckBoxCellWidget::value_changed(void* object){
+void BooleanCheckBoxCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);
@@ -112,7 +112,7 @@ void BooleanCheckBoxOptionWidget::update_value(){
         m_box->setChecked(m_value);
     }
 }
-void BooleanCheckBoxOptionWidget::value_changed(void* object){
+void BooleanCheckBoxOptionWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(m_box, [this]{
         update_value();
     }, Qt::QueuedConnection);

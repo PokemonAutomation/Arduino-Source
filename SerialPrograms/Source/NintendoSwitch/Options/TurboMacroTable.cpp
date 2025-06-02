@@ -99,10 +99,10 @@ TurboMacroCell::TurboMacroCell(EnumDropdownCell<TurboMacroAction>& action)
     PA_ADD_OPTION(button_release);
     PA_ADD_OPTION(wait);
 
-    TurboMacroCell::value_changed(this);
+    TurboMacroCell::on_config_value_changed(this);
     action.add_listener(*this);
 }
-void TurboMacroCell::value_changed(void* object){
+void TurboMacroCell::on_config_value_changed(void* object){
     x_axis.set_visibility(ConfigOptionState::HIDDEN);
     y_axis.set_visibility(ConfigOptionState::HIDDEN);
     button_hold.set_visibility(ConfigOptionState::HIDDEN);

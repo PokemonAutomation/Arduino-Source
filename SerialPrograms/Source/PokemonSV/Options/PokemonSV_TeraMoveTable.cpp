@@ -85,7 +85,7 @@ TeraMoveTableRow::TeraMoveTableRow(EditableTableOption& parent_table)
     PA_ADD_OPTION(target);
     PA_ADD_OPTION(notes);
 
-    TeraMoveTableRow::value_changed(this);
+    TeraMoveTableRow::on_config_value_changed(this);
     type.add_listener(*this);
 }
 std::unique_ptr<EditableTableRow> TeraMoveTableRow::clone() const{
@@ -99,7 +99,7 @@ std::unique_ptr<EditableTableRow> TeraMoveTableRow::clone() const{
 TeraMoveEntry TeraMoveTableRow::snapshot() const{
     return TeraMoveEntry{type, seconds, target};
 }
-void TeraMoveTableRow::value_changed(void* object){
+void TeraMoveTableRow::on_config_value_changed(void* object){
     TeraMoveType type = this->type;
 //    cout << "Enter: type = " << (int)type << endl;
 

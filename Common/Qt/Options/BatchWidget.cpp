@@ -54,7 +54,7 @@ void BatchWidget::update_value(){
         item->update_value();
     }
 }
-void BatchWidget::value_changed(void* object){
+void BatchWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);

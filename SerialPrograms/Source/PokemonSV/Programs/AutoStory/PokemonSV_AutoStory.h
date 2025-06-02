@@ -53,7 +53,7 @@ public:
     void run_autostory(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
     std::string start_segment_description();
     std::string end_segment_description();

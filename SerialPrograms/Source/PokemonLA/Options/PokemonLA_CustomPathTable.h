@@ -65,7 +65,7 @@ public:
     void operator=(const CustomPathCell& x);
     CustomPathCell(EnumDropdownCell<PathAction>& action);
 
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
 private:
     EnumDropdownCell<PathAction>& m_action;

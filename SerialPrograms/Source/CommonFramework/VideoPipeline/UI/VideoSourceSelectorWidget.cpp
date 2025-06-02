@@ -13,7 +13,6 @@
 #include "VideoSourceSelectorWidget.h"
 
 #include "CommonFramework/VideoPipeline/VideoSources/VideoSource_Null.h"
-#include "CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h"
 #include "CommonFramework/VideoPipeline/VideoSources/VideoSource_Camera.h"
 
 //#include <iostream>

@@ -255,7 +255,7 @@ void EditableTableWidget::update_value(){
     }
 #endif
 }
-void EditableTableWidget::value_changed(void* object){
+void EditableTableWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(m_table, [this]{
         update_value();
     }, Qt::QueuedConnection);

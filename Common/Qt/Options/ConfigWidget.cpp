@@ -70,13 +70,13 @@ void ConfigWidget::update_all(bool program_is_running){
     update_visibility(program_is_running);
 }
 
-void ConfigWidget::visibility_changed(){
+void ConfigWidget::on_config_visibility_changed(){
     auto scope = m_value.check_scope();
     QMetaObject::invokeMethod(m_widget, [this]{
         update_visibility();
     }, Qt::QueuedConnection);
 }
-void ConfigWidget::program_state_changed(bool program_is_running){
+void ConfigWidget::on_program_state_changed(bool program_is_running){
     auto scope = m_value.check_scope();
     QMetaObject::invokeMethod(m_widget, [this, program_is_running]{
         update_visibility(program_is_running);

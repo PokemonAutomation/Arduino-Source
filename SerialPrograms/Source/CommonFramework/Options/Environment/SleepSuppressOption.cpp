@@ -50,7 +50,7 @@ SleepSuppressOptions::SleepSuppressOptions()
     PROGRAM_RUNNING.add_listener(*this);
 }
 
-void SleepSuppressOptions::value_changed(void* object){
+void SleepSuppressOptions::on_config_value_changed(void* object){
     if (object == &IDLE){
         m_idle_scope = IDLE;
         PROGRAM_RUNNING.set_value(std::max(IDLE.current_value(), PROGRAM_RUNNING.current_value()));

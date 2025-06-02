@@ -221,7 +221,7 @@ ItemPrinterRNG::ItemPrinterRNG()
 
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    ItemPrinterRNG::value_changed(this);
+    ItemPrinterRNG::on_config_value_changed(this);
 //    AUTO_MATERIAL_FARMING.add_listener(*this);
     DATE_SEED_TABLE.add_listener(*this);
     MODE.add_listener(*this);
@@ -229,7 +229,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     MATERIAL_FARMER_TRIGGER.add_listener(*this);
 }
 
-void ItemPrinterRNG::value_changed(void* object){
+void ItemPrinterRNG::on_config_value_changed(void* object){
 
     NUM_ITEM_PRINTER_ROUNDS.set_visibility(
         MODE == ItemPrinterMode::AUTO_MODE ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED

@@ -22,7 +22,7 @@ public:
     EditableTableWidget(QWidget& parent, EditableTableOption& value);
 
     virtual void update_value() override;
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
     void update_sizes();
 

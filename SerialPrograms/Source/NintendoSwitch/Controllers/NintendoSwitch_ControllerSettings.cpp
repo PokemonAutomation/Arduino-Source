@@ -204,7 +204,7 @@ std::unique_ptr<EditableTableRow> ControllerSettingsRow::clone() const{
     ret->official_color.set_by_index(official_color.index());
     return ret;
 }
-void ControllerSettingsRow::value_changed(void* object){
+void ControllerSettingsRow::on_config_value_changed(void* object){
     if (object == &button_color ||
 //        object == &body_color ||
         object == &left_grip ||

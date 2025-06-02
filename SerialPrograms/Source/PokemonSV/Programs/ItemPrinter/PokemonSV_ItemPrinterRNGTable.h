@@ -42,7 +42,7 @@ public:
     ItemPrinterRngRowSnapshot snapshot() const;
 
     virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
 //    void set_seed_based_on_desired_item();
 
@@ -87,7 +87,7 @@ public:
     ItemPrinterDesiredItemRowSnapshot snapshot() const;
 
     virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
 public:
     EnumDropdownCell<ItemPrinter::PrebuiltOptions> desired_item;

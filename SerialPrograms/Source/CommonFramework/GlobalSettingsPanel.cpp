@@ -230,7 +230,7 @@ GlobalSettings::GlobalSettings()
 
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 
-    GlobalSettings::value_changed(this);
+    GlobalSettings::on_config_value_changed(this);
     ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
 }
 
@@ -347,7 +347,7 @@ JsonValue GlobalSettings::to_json() const{
     return obj;
 }
 
-void GlobalSettings::value_changed(void* object){
+void GlobalSettings::on_config_value_changed(void* object){
     bool enabled = ENABLE_LIFETIME_SANITIZER0;
     if (enabled){
         global_logger_tagged().log("LifeTime Sanitizer: Enabled", COLOR_BLUE);

@@ -49,7 +49,7 @@ public:
 
 private:
     virtual std::string check_validity() const override;
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
     enum class Location{
         UNKNOWN,

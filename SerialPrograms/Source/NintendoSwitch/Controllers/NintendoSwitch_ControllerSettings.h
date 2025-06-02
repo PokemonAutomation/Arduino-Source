@@ -33,7 +33,7 @@ public:
     ~ControllerSettingsRow();
     ControllerSettingsRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
     operator ControllerProfile() const{
         return {

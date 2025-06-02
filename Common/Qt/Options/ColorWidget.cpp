@@ -55,7 +55,7 @@ void ColorCellWidget::update_value(){
     m_line_edit->setText(str);
     m_box->setText("<font color=\"#" + str + "\">&#x2b24;</font>");
 }
-void ColorCellWidget::value_changed(void* object){
+void ColorCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);

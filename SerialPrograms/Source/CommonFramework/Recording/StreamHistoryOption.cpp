@@ -88,7 +88,7 @@ StreamHistoryOption::StreamHistoryOption()
     PA_ADD_OPTION(VIDEO_QUALITY);
     PA_ADD_OPTION(VIDEO_BITRATE);
 
-    value_changed(this);
+    StreamHistoryOption::on_config_value_changed(this);
 
     ENCODING_MODE.add_listener(*this);
 }
@@ -96,7 +96,7 @@ StreamHistoryOption::~StreamHistoryOption(){
     ENCODING_MODE.remove_listener(*this);
 }
 
-void StreamHistoryOption::value_changed(void* object){
+void StreamHistoryOption::on_config_value_changed(void* object){
     switch (ENCODING_MODE){
     case EncodingMode::FIXED_QUALITY:
         VIDEO_QUALITY.set_visibility(ConfigOptionState::ENABLED);

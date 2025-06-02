@@ -72,7 +72,7 @@ EnumDropdownCellWidget::EnumDropdownCellWidget(QWidget& parent, IntegerEnumDropd
 void EnumDropdownCellWidget::update_value(){
     this->setCurrentIndex(m_value_to_index[m_value.current_value()]);
 }
-void EnumDropdownCellWidget::value_changed(void* object){
+void EnumDropdownCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);

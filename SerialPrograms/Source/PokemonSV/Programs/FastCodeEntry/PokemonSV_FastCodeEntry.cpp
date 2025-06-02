@@ -81,7 +81,7 @@ public:
         m_code_box.remove_listener(*this);
     }
 
-    virtual void value_changed(void* object) override{
+    virtual void on_config_value_changed(void* object) override{
         std::lock_guard<std::mutex> lg(m_lock);
         m_cv.notify_all();
     }

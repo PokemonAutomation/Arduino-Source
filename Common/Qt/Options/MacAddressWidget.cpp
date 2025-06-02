@@ -39,7 +39,7 @@ MacAddressCellWidget::MacAddressCellWidget(QWidget& parent, MacAddressCell& valu
 void MacAddressCellWidget::update_value(){
     this->setText(QString::fromStdString(m_value.to_string()));
 }
-void MacAddressCellWidget::value_changed(void* object){
+void MacAddressCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);

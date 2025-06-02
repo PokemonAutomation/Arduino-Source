@@ -46,7 +46,7 @@ public:
     SinglesMoveEntry snapshot() const;
 
 private:
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
 private:
     EnumDropdownCell<SinglesMoveType> type;

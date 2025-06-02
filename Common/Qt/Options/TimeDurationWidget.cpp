@@ -52,7 +52,7 @@ void TimeDurationCellWidget<Type>::update_value(){
     this->setText(QString::fromStdString(m_value.current_text()));
 }
 template <typename Type>
-void TimeDurationCellWidget<Type>::value_changed(void* object){
+void TimeDurationCellWidget<Type>::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         this->update_value();
     }, Qt::QueuedConnection);
@@ -144,7 +144,7 @@ void TimeDurationOptionWidget<Type>::update_value(){
     m_box->setText(QString::fromStdString(m_value.current_text()));
 }
 template <typename Type>
-void TimeDurationOptionWidget<Type>::value_changed(void* object){
+void TimeDurationOptionWidget<Type>::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(m_box, [this]{
         this->update_value();
     }, Qt::QueuedConnection);

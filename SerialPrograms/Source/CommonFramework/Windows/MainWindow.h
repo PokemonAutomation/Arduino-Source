@@ -50,7 +50,7 @@ private:
 private:
     virtual void on_busy() override;
     virtual void on_idle() override;
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
     virtual void sleep_suppress_state_changed(SleepSuppress new_state) override;
 
 private:

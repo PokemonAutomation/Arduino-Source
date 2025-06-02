@@ -22,7 +22,7 @@ public:
     TimeDurationCellWidget(QWidget& parent, TimeDurationCell<Type>& value);
 
     virtual void update_value() override;
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
 private:
     TimeDurationCell<Type>& m_value;
@@ -37,7 +37,7 @@ public:
     TimeDurationOptionWidget(QWidget& parent, TimeDurationOption<Type>& value);
 
     virtual void update_value() override;
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
 private:
     TimeDurationOption<Type>& m_value;

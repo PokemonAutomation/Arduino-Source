@@ -455,14 +455,14 @@ SandwichMakerOption::SandwichMakerOption(
 
     HERB_INCOMPATIBILITY_WARNING.set_visibility(ConfigOptionState::HIDDEN);
 
-    SandwichMakerOption::value_changed(this);
+    SandwichMakerOption::on_config_value_changed(this);
     BASE_RECIPE.add_listener(*this);
     TYPE.add_listener(*this);
     HERBA_ONE.add_listener(*this);
     HERBA_TWO.add_listener(*this);
 }
 
-void SandwichMakerOption::value_changed(void* object){
+void SandwichMakerOption::on_config_value_changed(void* object){
     if (BASE_RECIPE == BaseRecipe::custom){
         HERBA_ONE.set_visibility(ConfigOptionState::HIDDEN);
         HERBA_TWO.set_visibility(ConfigOptionState::HIDDEN);

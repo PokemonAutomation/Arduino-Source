@@ -67,7 +67,7 @@ EncounterActionsRow::EncounterActionsRow(EditableTableOption& parent_table)
     PA_ADD_OPTION(pokeball);
     PA_ADD_OPTION(ball_limit);
 
-    EncounterActionsRow::value_changed(this);
+    EncounterActionsRow::on_config_value_changed(this);
 
     action.add_listener(*this);
 }
@@ -89,7 +89,7 @@ EncounterActionsEntry EncounterActionsRow::snapshot() const{
         ball_limit,
     };
 }
-void EncounterActionsRow::value_changed(void* object){
+void EncounterActionsRow::on_config_value_changed(void* object){
     switch (action){
     case EncounterActionsAction::STOP_PROGRAM:
     case EncounterActionsAction::RUN_AWAY:

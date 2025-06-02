@@ -33,7 +33,7 @@ public:
     using GroupOption::check_validity;
     std::string check_validity(size_t consoles) const;
 
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
     EnumDropdownOption<HostingMode> MODE;
     RandomCodeOption RAID_CODE;

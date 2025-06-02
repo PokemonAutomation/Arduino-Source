@@ -101,7 +101,7 @@ DateTimeCellWidget::DateTimeCellWidget(QWidget& parent, DateTimeCell& value)
 void DateTimeCellWidget::update_value(){
     this->setDateTime(DateTime_to_QDateTime(m_value.get()));
 }
-void DateTimeCellWidget::value_changed(void* object){
+void DateTimeCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);

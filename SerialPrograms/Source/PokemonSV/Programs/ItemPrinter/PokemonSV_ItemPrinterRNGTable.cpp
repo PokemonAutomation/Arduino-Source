@@ -82,7 +82,7 @@ std::unique_ptr<EditableTableRow> ItemPrinterRngRow::clone() const{
 // and that chain is disabled. If so, set the desired item to the enum_value. Else set desired_item to NONE.
 //  - also, hide the date if chain enabled.
 // - trigger the listener for the parent table.
-void ItemPrinterRngRow::value_changed(void* object){
+void ItemPrinterRngRow::on_config_value_changed(void* object){
     //  This is really ugly due to the circular update dependency.
     //  TODO: Redesign this.
 
@@ -206,7 +206,7 @@ std::unique_ptr<EditableTableRow> ItemPrinterDesiredItemRow::clone() const{
 }
 
 
-void ItemPrinterDesiredItemRow::value_changed(void* object){
+void ItemPrinterDesiredItemRow::on_config_value_changed(void* object){
 
 }
 

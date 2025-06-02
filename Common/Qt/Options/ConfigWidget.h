@@ -30,8 +30,8 @@ public:
     void update_all(bool program_is_running);
 
 protected:
-    virtual void visibility_changed() override;
-    virtual void program_state_changed(bool program_is_running) override;
+    virtual void on_config_visibility_changed() override;
+    virtual void on_program_state_changed(bool program_is_running) override;
 
 protected:
     ConfigOption& m_value;

@@ -21,7 +21,7 @@ public:
     StreamHistoryOption();
     ~StreamHistoryOption();
 
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
     StaticTextOption DESCRIPTION;
     SimpleIntegerOption<uint16_t> HISTORY_SECONDS;

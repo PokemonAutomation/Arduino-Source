@@ -144,11 +144,11 @@ MaterialFarmerOptions::MaterialFarmerOptions(
         PA_ADD_OPTION(NUM_FORWARD_MOVES_PER_LETS_GO_ITERATION);
     }
 
-    MaterialFarmerOptions::value_changed(this);
+    MaterialFarmerOptions::on_config_value_changed(this);
 //    ENABLE_SANDWICH.add_listener(*this);
 }
 
-void MaterialFarmerOptions::value_changed(void* object){
+void MaterialFarmerOptions::on_config_value_changed(void* object){
 
 //    if (MaterialFarmerOptions::ENABLE_SANDWICH){
 //        SAVE_GAME_BEFORE_SANDWICH_STATIC_TEXT.set_text(

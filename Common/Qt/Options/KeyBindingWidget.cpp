@@ -44,7 +44,7 @@ void KeyBindingCellWidget::update_value(){
 //    cout << (uint32_t)m_value << endl;
     this->setText(seq.toString());
 }
-void KeyBindingCellWidget::value_changed(void* object){
+void KeyBindingCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);

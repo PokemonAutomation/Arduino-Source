@@ -104,7 +104,7 @@ void LanguageOCRCellWidget::update_value(){
         m_status->setVisible(true);
     }
 }
-void LanguageOCRCellWidget::value_changed(void* object){
+void LanguageOCRCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(m_box, [this]{
         update_value();
     }, Qt::QueuedConnection);
@@ -136,8 +136,8 @@ LanguageOCROptionWidget::LanguageOCROptionWidget(QWidget& parent, LanguageOCROpt
 void LanguageOCROptionWidget::update_value(){
     m_cell->update_value();
 }
-void LanguageOCROptionWidget::value_changed(void* object){
-    m_cell->value_changed(object);
+void LanguageOCROptionWidget::on_config_value_changed(void* object){
+    m_cell->on_config_value_changed(object);
 }
 
 

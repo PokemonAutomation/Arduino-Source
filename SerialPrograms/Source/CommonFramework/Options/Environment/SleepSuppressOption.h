@@ -26,7 +26,7 @@ public:
     ~SleepSuppressOptions();
     SleepSuppressOptions();
 
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
 public:
     SleepSuppressOption IDLE;

@@ -341,7 +341,7 @@ void MainWindow::on_idle(){
 }
 
 
-void MainWindow::value_changed(void* object){
+void MainWindow::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         if (!m_pending_resize){
             resize(

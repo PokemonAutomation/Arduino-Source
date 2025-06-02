@@ -72,7 +72,7 @@ SinglesMoveTableRow::SinglesMoveTableRow(EditableTableOption& parent_table)
     PA_ADD_OPTION(terastallize);
     PA_ADD_OPTION(notes);
 
-    SinglesMoveTableRow::value_changed(this);
+    SinglesMoveTableRow::on_config_value_changed(this);
     type.add_listener(*this);
 }
 std::unique_ptr<EditableTableRow> SinglesMoveTableRow::clone() const{
@@ -85,7 +85,7 @@ std::unique_ptr<EditableTableRow> SinglesMoveTableRow::clone() const{
 SinglesMoveEntry SinglesMoveTableRow::snapshot() const{
     return SinglesMoveEntry{type, terastallize};
 }
-void SinglesMoveTableRow::value_changed(void* object){
+void SinglesMoveTableRow::on_config_value_changed(void* object){
 
 }
 

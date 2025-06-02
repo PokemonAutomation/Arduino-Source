@@ -164,7 +164,7 @@ ShinyHuntAreaZeroPlatform::ShinyHuntAreaZeroPlatform()
     PA_ADD_OPTION(NAVIGATE_TO_PLATFORM);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    ShinyHuntAreaZeroPlatform::value_changed(this);
+    ShinyHuntAreaZeroPlatform::on_config_value_changed(this);
 
     MODE.add_listener(*this);
 }
@@ -179,7 +179,7 @@ std::string ShinyHuntAreaZeroPlatform::check_validity() const{
     }
     return "";
 }
-void ShinyHuntAreaZeroPlatform::value_changed(void* object){
+void ShinyHuntAreaZeroPlatform::on_config_value_changed(void* object){
     ConfigOptionState state = MODE == Mode::MAKE_SANDWICH
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;

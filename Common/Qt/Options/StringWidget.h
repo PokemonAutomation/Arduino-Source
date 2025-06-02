@@ -21,8 +21,8 @@ public:
     StringCellWidget(QWidget& parent, StringCell& value);
 
     virtual void update_value() override;
-    virtual void value_changed(void* object) override;
-    virtual void visibility_changed() override;
+    virtual void on_config_value_changed(void* object) override;
+    virtual void on_config_visibility_changed() override;
 
 private:
     StringCell& m_value;
@@ -36,8 +36,8 @@ public:
     StringOptionWidget(QWidget& parent, StringOption& value);
 
     virtual void update_value() override;
-    virtual void value_changed(void* object) override;
-    virtual void visibility_changed() override;
+    virtual void on_config_value_changed(void* object) override;
+    virtual void on_config_visibility_changed() override;
 
 private:
     StringOption& m_value;

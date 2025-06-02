@@ -439,7 +439,7 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(NOTIFICATIONS);
 
 
-    AutoStory::value_changed(this);
+    AutoStory::on_config_value_changed(this);
 
     STORY_SECTION.add_listener(*this);
     STARTPOINT_TUTORIAL.add_listener(*this);
@@ -455,7 +455,7 @@ AutoStory::AutoStory()
     TEST_CHANGE_DIRECTION.add_listener(*this);
 }
 
-void AutoStory::value_changed(void* object){
+void AutoStory::on_config_value_changed(void* object){
     ConfigOptionState state = (STARTPOINT_TUTORIAL.index() <= 1)
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;

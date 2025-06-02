@@ -143,7 +143,7 @@ void Consoles::set_active_consoles(size_t consoles){
     }
     m_active_consoles = consoles;
 }
-void Consoles::value_changed(void* object){
+void Consoles::on_config_value_changed(void* object){
     size_t host_index = HOST.current_value();
     for (size_t c = 0; c < 4; c++){
         PLAYERS[c]->set_host(c == host_index);

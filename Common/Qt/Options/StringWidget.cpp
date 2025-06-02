@@ -53,12 +53,12 @@ StringCellWidget::StringCellWidget(QWidget& parent, StringCell& value)
 void StringCellWidget::update_value(){
     this->setText(QString::fromStdString(m_value));
 }
-void StringCellWidget::value_changed(void* object){
+void StringCellWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(this, [this]{
         update_value();
     }, Qt::QueuedConnection);
 }
-void StringCellWidget::visibility_changed(){
+void StringCellWidget::on_config_visibility_changed(){
     QMetaObject::invokeMethod(this, [this]{
         setReadOnly(m_value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
     }, Qt::QueuedConnection);
@@ -102,12 +102,12 @@ StringOptionWidget::StringOptionWidget(QWidget& parent, StringOption& value)
 void StringOptionWidget::update_value(){
     m_box->setText(QString::fromStdString(m_value));
 }
-void StringOptionWidget::value_changed(void* object){
+void StringOptionWidget::on_config_value_changed(void* object){
     QMetaObject::invokeMethod(m_box, [this]{
         update_value();
     }, Qt::QueuedConnection);
 }
-void StringOptionWidget::visibility_changed(){
+void StringOptionWidget::on_config_visibility_changed(){
     QMetaObject::invokeMethod(m_box, [this]{
         m_box->setReadOnly(m_value.is_locked());
     }, Qt::QueuedConnection);

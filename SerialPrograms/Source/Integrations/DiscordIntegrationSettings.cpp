@@ -117,12 +117,12 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     PA_ADD_OPTION(allow_buttons_from_users);
     PA_ADD_OPTION(channels);
 
-    DiscordIntegrationSettingsOption::value_changed(this);
+    DiscordIntegrationSettingsOption::on_config_value_changed(this);
 
     this->add_listener(*this);
     library0.add_listener(*this);
 }
-void DiscordIntegrationSettingsOption::value_changed(void* object){
+void DiscordIntegrationSettingsOption::on_config_value_changed(void* object){
 //    cout << this->enabled() << endl;
 #if (defined PA_SLEEPY || defined PA_DPP)
     bool options_enabled = this->enabled();
@@ -221,7 +221,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
 #endif
             default:;
             }
-            value.value_changed(this);
+            value.on_config_value_changed(this);
         }
     );
     connect(
@@ -240,7 +240,7 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
 #endif
             default:;
             }
-            value.value_changed(this);
+            value.on_config_value_changed(this);
         }
     );
 

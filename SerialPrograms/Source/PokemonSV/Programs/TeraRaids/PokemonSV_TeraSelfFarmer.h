@@ -54,7 +54,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    virtual void value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
     bool run_raid(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
