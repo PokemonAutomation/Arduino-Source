@@ -20,6 +20,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h"
+#include "CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h"
 #include "ML_LabelImages.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Common/Qt/Options/ConfigWidget.h"
@@ -175,9 +176,23 @@ LabelImages_Widget::LabelImages_Widget(
 
     QPushButton* button = new QPushButton("This is a button", scroll_inner);
     scroll_layout->addWidget(button);
+    connect(button, &QPushButton::clicked, this, [&instance](bool){
+        const VideoSourceDescriptor* videoSource = instance.m_switch_control_option.m_video.descriptor().get();
+        auto imageSource = dynamic_cast<const VideoSourceDescriptor_StillImage*>(videoSource);
+        if (imageSource != nullptr){
+            cout << "Image source: " << imageSource->path() << endl;
+        }
+    });
 
     m_option_widget = instance.m_options.make_QtWidget(*scroll_inner);
     scroll_layout->addWidget(&m_option_widget->widget());
+
+    const VideoSourceDescriptor* videoSource = instance.m_switch_control_option.m_video.descriptor().get();
+    auto imageSource = dynamic_cast<const VideoSourceDescriptor_StillImage*>(videoSource);
+    if (imageSource != nullptr){
+        cout << "Image source: " << imageSource->path() << endl;
+    }
+    cout << "LabelImages_Widget built" << endl;
 }
 
 
