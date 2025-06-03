@@ -1,4 +1,4 @@
-/*  Virtual Game Console
+/*  ML Label Images
  *
  *  From: https://github.com/PokemonAutomation/
  *
