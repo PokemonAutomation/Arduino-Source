@@ -9,9 +9,9 @@
 #include "CommonFramework/GlobalServices.h"
 #include "VideoOverlayWidget.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 
@@ -33,6 +33,7 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_session(session)
     , m_boxes(std::make_shared<std::vector<OverlayBox>>(session.boxes()))
     , m_texts(std::make_shared<std::vector<OverlayText>>(session.texts()))
+    , m_images(std::make_shared<std::vector<OverlayImage>>(session.images()))
     , m_log(std::make_shared<std::vector<OverlayLogLine>>(session.log_texts()))
     , m_stats(nullptr)
 {
@@ -50,30 +51,29 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     }
 }
 
-void VideoOverlayWidget::enabled_boxes(bool enabled){
-    QMetaObject::invokeMethod(this, [this]{ this->update(); });
-}
-void VideoOverlayWidget::enabled_text(bool enabled){
-    QMetaObject::invokeMethod(this, [this]{ this->update(); });
-}
-void VideoOverlayWidget::enabled_log(bool enabled){
-    QMetaObject::invokeMethod(this, [this]{ this->update(); });
-}
-void VideoOverlayWidget::enabled_stats(bool enabled){
+void VideoOverlayWidget::async_update(){
+    // by using QMetaObject::invokeMethod, we can call this->update() on a non-main thread
+    // without trigger Qt crash, as normally this->update() can only be called on the main
+    // thread.
     QMetaObject::invokeMethod(this, [this]{ this->update(); });
 }
 
-void VideoOverlayWidget::update_boxes(const std::shared_ptr<const std::vector<OverlayBox>>& boxes){
+void VideoOverlayWidget::on_overlay_update_boxes(const std::shared_ptr<const std::vector<OverlayBox>>& boxes){
     WriteSpinLock lg(m_lock, "VideoOverlay::update_boxes()");
     m_boxes = boxes;
 }
-void VideoOverlayWidget::update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){
+void VideoOverlayWidget::on_overlay_update_text(const std::shared_ptr<const std::vector<OverlayText>>& texts){
     WriteSpinLock lg(m_lock, "VideoOverlay::update_text()");
     m_texts = texts;
 }
-void VideoOverlayWidget::update_log(const std::shared_ptr<const std::vector<OverlayLogLine>>& texts){
+void VideoOverlayWidget::on_overlay_update_images(const std::shared_ptr<const std::vector<OverlayImage>>& images){
+    WriteSpinLock lg(m_lock, "VideoOverlay::update_images()");
+    m_images = images;
+}
+
+void VideoOverlayWidget::on_overlay_update_log(const std::shared_ptr<const std::vector<OverlayLogLine>>& logs){
     WriteSpinLock lg(m_lock, "VideoOverlay::update_log_text()");
-    m_log = texts;
+    m_log = logs;
 }
 #if 0
 void VideoOverlayWidget::update_log_background(const std::shared_ptr<const std::vector<VideoOverlaySession::Box>>& bg_boxes){
@@ -81,7 +81,7 @@ void VideoOverlayWidget::update_log_background(const std::shared_ptr<const std::
     m_log_text_bg_boxes = bg_boxes;
 }
 #endif
-void VideoOverlayWidget::update_stats(const std::list<OverlayStat*>* stats){
+void VideoOverlayWidget::on_overlay_update_stats(const std::list<OverlayStat*>* stats){
     WriteSpinLock lg(m_lock, "VideoOverlay::update_stats()");
     m_stats = stats;
 }
@@ -94,6 +94,7 @@ void VideoOverlayWidget::on_watchdog_timeout(){
 
 
 void VideoOverlayWidget::resizeEvent(QResizeEvent* event){}
+
 void VideoOverlayWidget::paintEvent(QPaintEvent*){
     QPainter painter(this);
 
@@ -101,16 +102,19 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         WriteSpinLock lg(m_lock, "VideoOverlay::paintEvent()");
 
         if (m_session.enabled_boxes()){
-            update_boxes(painter);
+            render_boxes(painter);
         }
         if (m_session.enabled_text()){
-            update_text(painter);
+            render_text(painter);
+        }
+        if (m_session.enabled_images()){
+            render_images(painter);
         }
         if (m_session.enabled_log()){
-            update_log(painter);
+            render_log(painter);
         }
         if (m_session.enabled_stats() && m_stats){
-            update_stats(painter);
+            render_stats(painter);
         }
     }
 
@@ -118,9 +122,9 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
 }
 
 
-void VideoOverlayWidget::update_boxes(QPainter& painter){
-    int width = this->width();
-    int height = this->height();
+void VideoOverlayWidget::render_boxes(QPainter& painter){
+    const int width = this->width();
+    const int height = this->height();
     for (const auto& item : *m_boxes){
         QColor color = QColor((uint32_t)item.color);
         painter.setPen(color);
@@ -196,9 +200,9 @@ void VideoOverlayWidget::update_boxes(QPainter& painter){
         painter.drawText(QPoint(xmin + padding_width, ymin - 2*padding_height), text);
     }
 }
-void VideoOverlayWidget::update_text(QPainter& painter){
-    int width = this->width();
-    int height = this->height();
+void VideoOverlayWidget::render_text(QPainter& painter){
+    const int width = this->width();
+    const int height = this->height();
     for (const auto& item: *m_texts){
         painter.setPen(QColor((uint32_t)item.color));
         QFont text_font = this->font();
@@ -211,7 +215,25 @@ void VideoOverlayWidget::update_text(QPainter& painter){
         painter.drawText(QPoint(xmin, ymin), QString::fromStdString(item.message));
     }
 }
-void VideoOverlayWidget::update_log(QPainter& painter){
+void VideoOverlayWidget::render_images(QPainter& painter){
+    const double width = static_cast<double>(this->width());
+    const double height = static_cast<double>(this->height());
+
+    for(const auto& image_overlay: *m_images){
+        QImage q_image = image_overlay.image.to_QImage_ref();
+        // source rect is the entire portion of the q_image, in pixel units
+        QRectF source_rect(0.0, 0.0, static_cast<double>(q_image.width()), static_cast<double>(q_image.height()));
+        // build a target_rect. target_rect is what region the overlay image should appear inside the overlay viewport.
+        // target_rect is in pixel units of the viewport
+        const double target_start_x = width * image_overlay.x;
+        const double target_start_y = height * image_overlay.y;
+        const double target_width = width * image_overlay.width;
+        const double target_height = height * image_overlay.height;
+        QRectF target_rect(target_start_x, target_start_y, target_width, target_height);
+        painter.drawImage(target_rect, q_image, source_rect);
+    }
+}
+void VideoOverlayWidget::render_log(QPainter& painter){
     if (m_log->empty()){
         return;
     }
@@ -231,7 +253,9 @@ void VideoOverlayWidget::update_log(QPainter& painter){
 
     //  Draw the box.
     {
-        QColor box_color(10, 10, 10, 200);
+        // set a semi-transparent dark color so that user can see the log lines while can also see
+        // vaguely the video stream content behind it
+        QColor box_color(10, 10, 10, 200); // r=g=b=10, alpha=200
         painter.setPen(box_color);
         const int xmin = std::max((int)(width * LOG_MIN_X + 0.5), 1);
         const int ymin = std::max((int)(height * (LOG_MAX_Y - log_bg_height) + 0.5), 1);
@@ -257,7 +281,7 @@ void VideoOverlayWidget::update_log(QPainter& painter){
         y -= LOG_LINE_SPACING;
     }
 }
-void VideoOverlayWidget::update_stats(QPainter& painter){
+void VideoOverlayWidget::render_stats(QPainter& painter){
     const double TEXT_SIZE = 0.02;
     const double ROW_HEIGHT = 0.03;
 

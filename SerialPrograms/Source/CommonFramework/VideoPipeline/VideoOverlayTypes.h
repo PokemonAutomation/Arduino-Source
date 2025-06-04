@@ -12,10 +12,12 @@
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 
 namespace PokemonAutomation{
 
-
+// A bounding box as part of the video overlay
+// Check CommonFramework/VideoPipeline/VideoOverlay.h to see how it's used.
 struct OverlayBox{
     Color color;
     ImageFloatBox box;
@@ -33,6 +35,7 @@ struct OverlayBox{
 
 
 // A text as part of the video overlay.
+// Check CommonFramework/VideoPipeline/VideoOverlay.h to see how it's used.
 struct OverlayText{
     // Text color.
     Color color;
@@ -58,11 +61,38 @@ struct OverlayText{
         , x(x), y(y)
         , font_size(font_size)
     {}
+};
 
+// An image as part of the video overlay.
+// Allow transparency to create mask overlay.
+// Check CommonFramework/VideoPipeline/VideoOverlay.h to see how it's used.
+// e.g. OverlayImage(image, x=0.5, y=0.5, width=0.5, height=0.5) will render
+// an overlay image on the lower right quadrant of the view.
+struct OverlayImage{
+    // Image view. The image data must live longer than the OverlayImage.
+    // Its alpha channel will be used during rendering.
+    ImageViewRGB32 image;
+    // starting x coordinate of the image in the video window, range: 0.0-1.0.
+    double x = 0.0;
+    // starting y coordinate of the image in the video window, range: 0.0-1.0.
+    double y = 0.0;
+    // relative width of the image in the video window, range: 0.0-1.0
+    double width = 0.0;
+    // relative height of the image in the video window, range: 0.0-1.0
+    double height = 0.0;
+
+    OverlayImage(
+        ImageViewRGB32 image,
+        double x, double y, double width, double height
+    )
+        : image(std::move(image))
+        , x(x), y(y), width(width), height(height)
+    {}
 };
 
 
-
+// A log line to show as part of overlay.
+// Check CommonFramework/VideoPipeline/VideoOverlay.h to see how it's used.
 struct OverlayLogLine{
     Color color;
     std::string message;

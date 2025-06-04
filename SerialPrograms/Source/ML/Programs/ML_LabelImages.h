@@ -11,6 +11,8 @@
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
+#include "CommonFramework/ImageTypes/ImageViewRGB32.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -101,6 +103,9 @@ private:
     DrawnBoundingBox m_drawn_box;
     ConfigWidget* m_option_widget;
     std::vector<float> m_image_embedding;
+
+    std::unique_ptr<ImageRGB32> m_image_mask;
+    std::unique_ptr<OverlayImage> m_overlay_image;
 };
 
 

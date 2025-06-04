@@ -199,6 +199,15 @@ LabelImages_Widget::LabelImages_Widget(
         // if no such embedding file, m_iamge_embedding will be empty
         load_image_embedding(image_path, m_image_embedding);
     }
+
+    m_image_mask = std::make_unique<ImageRGB32>(960, 540);
+    for(size_t row = 0; row < m_image_mask->height(); row++){
+        for(size_t col = 0; col < m_image_mask->width(); col++){
+            m_image_mask->pixel(col, row) = combine_argb(200, 10, 10, 10);
+        }
+    }
+    m_overlay_image = std::make_unique<OverlayImage>(*m_image_mask, 0.0, 0.2, 0.5, 0.5);
+    m_session.overlay().add_image(*m_overlay_image);    
     cout << "LabelImages_Widget built" << endl;
 }
 

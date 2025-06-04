@@ -56,6 +56,11 @@ CommandRow::CommandRow(
     m_overlay_text->setChecked(session.enabled_text());
     command_row->addWidget(m_overlay_text);
 
+    m_overlay_images = new QCheckBox("Images/Masks", this);
+    m_overlay_images->setChecked(session.enabled_images());
+    command_row->addWidget(m_overlay_images);
+
+
     m_overlay_log = new QCheckBox("Log", this);
     m_overlay_log->setChecked(session.enabled_log());
     command_row->addWidget(m_overlay_log);
@@ -92,6 +97,10 @@ CommandRow::CommandRow(
         this, [this](bool checked){ m_session.set_enabled_text(checked); }
     );
     connect(
+        m_overlay_images, &QCheckBox::stateChanged,
+        this, [this](bool checked){ m_session.set_enabled_images(checked); }
+    );
+    connect(
         m_overlay_log, &QCheckBox::stateChanged,
         this, [this](bool checked){ m_session.set_enabled_log(checked); }
     );
@@ -103,6 +112,10 @@ CommandRow::CommandRow(
     connect(
         m_overlay_text, &QCheckBox::checkStateChanged,
         this, [this](Qt::CheckState state){ m_session.set_enabled_text(state == Qt::Checked); }
+    );
+    connect(
+        m_overlay_images, &QCheckBox::checkStateChanged,
+        this, [this](Qt::CheckState state){ m_session.set_enabled_images(state == Qt::Checked); }
     );
     connect(
         m_overlay_log, &QCheckBox::checkStateChanged,
@@ -248,22 +261,27 @@ void CommandRow::on_state_changed(ProgramState state){
 }
 
 
-void CommandRow::enabled_boxes(bool enabled){
+void CommandRow::on_overlay_enabled_boxes(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         this->m_overlay_boxes->setChecked(enabled);
     }, Qt::QueuedConnection);
 }
-void CommandRow::enabled_text(bool enabled){
+void CommandRow::on_overlay_enabled_text(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         this->m_overlay_text->setChecked(enabled);
     }, Qt::QueuedConnection);
 }
-void CommandRow::enabled_log(bool enabled){
+void CommandRow::on_overlay_enabled_images(bool enabled){
+    QMetaObject::invokeMethod(this, [this, enabled]{
+        this->m_overlay_images->setChecked(enabled);
+    }, Qt::QueuedConnection);
+}
+void CommandRow::on_overlay_enabled_log(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         this->m_overlay_log->setChecked(enabled);
     }, Qt::QueuedConnection);
 }
-void CommandRow::enabled_stats(bool enabled){
+void CommandRow::on_overlay_enabled_stats(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         this->m_overlay_stats->setChecked(enabled);
     }, Qt::QueuedConnection);
