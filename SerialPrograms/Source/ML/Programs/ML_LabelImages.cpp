@@ -14,6 +14,8 @@
 #include <QPushButton>
 #include <QResizeEvent>
 #include <iostream>
+#include <fstream>
+#include <filesystem>
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
@@ -24,6 +26,7 @@
 #include "ML_LabelImages.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Common/Qt/Options/ConfigWidget.h"
+#include "ML/DataLabeling/SegmentAnythingEmbedding.h"
 
 
 using std::cout;
@@ -52,7 +55,7 @@ DrawnBoundingBox::~DrawnBoundingBox(){
 void DrawnBoundingBox::on_config_value_changed(void* object){
     std::lock_guard<std::mutex> lg(m_lock);
     m_overlay_set.clear();
-    m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT});
+    m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT}, "Unknown");
 }
 void DrawnBoundingBox::on_mouse_press(double x, double y){
     m_parent.WIDTH.set(0);
@@ -107,6 +110,7 @@ LabelImages_Descriptor::LabelImages_Descriptor()
         "Label " + Pokemon::STRING_POKEMON + " on images" 
     )
 {}
+
 
 
 #define ADD_OPTION(x)    m_options.add_option(x, #x)
@@ -177,20 +181,23 @@ LabelImages_Widget::LabelImages_Widget(
     QPushButton* button = new QPushButton("This is a button", scroll_inner);
     scroll_layout->addWidget(button);
     connect(button, &QPushButton::clicked, this, [&instance](bool){
-        const VideoSourceDescriptor* videoSource = instance.m_switch_control_option.m_video.descriptor().get();
-        auto imageSource = dynamic_cast<const VideoSourceDescriptor_StillImage*>(videoSource);
-        if (imageSource != nullptr){
-            cout << "Image source: " << imageSource->path() << endl;
+        const VideoSourceDescriptor* video_source = instance.m_switch_control_option.m_video.descriptor().get();
+        auto image_source = dynamic_cast<const VideoSourceDescriptor_StillImage*>(video_source);
+        if (image_source != nullptr){
+            cout << "Image source: " << image_source->path() << endl;
         }
     });
 
     m_option_widget = instance.m_options.make_QtWidget(*scroll_inner);
     scroll_layout->addWidget(&m_option_widget->widget());
 
-    const VideoSourceDescriptor* videoSource = instance.m_switch_control_option.m_video.descriptor().get();
-    auto imageSource = dynamic_cast<const VideoSourceDescriptor_StillImage*>(videoSource);
-    if (imageSource != nullptr){
-        cout << "Image source: " << imageSource->path() << endl;
+    const VideoSourceDescriptor* video_source = instance.m_switch_control_option.m_video.descriptor().get();
+    auto image_source = dynamic_cast<const VideoSourceDescriptor_StillImage*>(video_source);
+    if (image_source != nullptr){
+        std::string image_path = image_source->path();
+        cout << "Image source: " << image_path << endl;
+        // if no such embedding file, m_iamge_embedding will be empty
+        load_image_embedding(image_path, m_image_embedding);
     }
     cout << "LabelImages_Widget built" << endl;
 }

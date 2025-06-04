@@ -100,6 +100,7 @@ private:
     NintendoSwitch::SwitchSystemWidget* m_switch_widget;
     DrawnBoundingBox m_drawn_box;
     ConfigWidget* m_option_widget;
+    std::vector<float> m_image_embedding;
 };
 
 
