@@ -13,10 +13,12 @@
 #include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+// #include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include <QGraphicsScene>
+#include "ML/DataLabeling/SegmentAnythingModel.h"
 
 class QGraphicsView;
 class QGraphicsPixmapItem;
@@ -28,10 +30,10 @@ class ConfigWidget;
 namespace NintendoSwitch{
     class SwitchSystemWidget;
 }
+struct OverlayImage;
 
 
 namespace ML{
-
 
 
 class LabelImages_Descriptor : public PanelDescriptor{
@@ -39,7 +41,7 @@ public:
     LabelImages_Descriptor();
 };
 
-
+// label image program
 class LabelImages : public PanelInstance{
 public:
     LabelImages(const LabelImages_Descriptor& descriptor);
@@ -63,6 +65,15 @@ private:
     FloatingPointOption Y;
     FloatingPointOption WIDTH;
     FloatingPointOption HEIGHT;
+
+    size_t source_image_height = 0;
+    size_t source_image_width = 0;
+    std::vector<float> m_image_embedding;
+    std::vector<bool> m_output_boolean_mask;
+
+    ImageRGB32 m_mask_image;
+    std::unique_ptr<OverlayImage> m_overlay_image;
+    SAMSession m_sam_session;
 };
 
 
@@ -79,7 +90,7 @@ private:
     void detach();
 
 private:
-    LabelImages& m_parent;
+    LabelImages& m_program;
     VideoOverlay& m_overlay;
     VideoOverlaySet m_overlay_set;
     std::mutex m_lock;
@@ -98,11 +109,11 @@ public:
     );
 
 private:
+    LabelImages& m_program;
     NintendoSwitch::SwitchSystemSession m_session;
     NintendoSwitch::SwitchSystemWidget* m_switch_widget;
     DrawnBoundingBox m_drawn_box;
     ConfigWidget* m_option_widget;
-    std::vector<float> m_image_embedding;
 
     std::unique_ptr<ImageRGB32> m_image_mask;
     std::unique_ptr<OverlayImage> m_overlay_image;

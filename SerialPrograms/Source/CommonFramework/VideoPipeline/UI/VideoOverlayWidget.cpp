@@ -97,7 +97,6 @@ void VideoOverlayWidget::resizeEvent(QResizeEvent* event){}
 
 void VideoOverlayWidget::paintEvent(QPaintEvent*){
     QPainter painter(this);
-
     {
         WriteSpinLock lg(m_lock, "VideoOverlay::paintEvent()");
 

@@ -35,6 +35,7 @@ std::string VideoSourceDescriptor_StillImage::path() const{
 void VideoSourceDescriptor_StillImage::set_path(std::string path){
     WriteSpinLock lg(m_lock);
     m_path = std::move(path);
+    m_source_image_height = m_source_image_width = 0;
 }
 
 void VideoSourceDescriptor_StillImage::run_post_select(){
@@ -52,6 +53,7 @@ void VideoSourceDescriptor_StillImage::load_json(const JsonValue& json){
     if (name != nullptr){
         WriteSpinLock lg(m_lock);
         m_path = *name;
+        m_source_image_height = m_source_image_width = 0;
     }
 }
 JsonValue VideoSourceDescriptor_StillImage::to_json() const{
@@ -61,8 +63,12 @@ JsonValue VideoSourceDescriptor_StillImage::to_json() const{
 
 std::unique_ptr<VideoSource> VideoSourceDescriptor_StillImage::make_VideoSource(Logger& logger, Resolution resolution) const{
 //    cout << "make_VideoSource: " << m_path << endl;
-    //  Intentionally copy the path so we release the lock.
-    return std::make_unique<VideoSource_StillImage>(path(), resolution);
+    auto video_source = std::make_unique<VideoSource_StillImage>(path(), resolution);
+
+    ReadSpinLock lg(m_lock);
+    m_source_image_width = video_source->original_image().width();
+    m_source_image_height = video_source->original_image().height();
+    return video_source;
 }
 
 

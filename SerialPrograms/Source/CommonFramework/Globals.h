@@ -57,7 +57,7 @@ const std::string& USER_FILE_PATH();
 // Resource folder path. Resources include JSON files, images, sound files and others required by
 // various automation programs.
 const std::string& RESOURCE_PATH();
-// Hold ML trainign data.
+// Hold ML training data.
 const std::string& TRAINING_PATH();
 
 
