@@ -7,12 +7,14 @@
 #include <QEventLoop>
 #include "Common/Cpp/Time.h"
 //#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "SysbotBase_Connection.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace SysbotBase{
@@ -171,38 +173,85 @@ void TcpSysbotBase_Connection::on_connect_finished(const std::string& error_mess
 
         write_data("configure echoCommands 0\r\n");
         write_data("getVersion\r\n");
-        write_data("configure mainLoopSleepTime 0\r\n");
 
-        m_thread = std::thread(&TcpSysbotBase_Connection::thread_loop, this);
+//        m_thread = std::thread(&TcpSysbotBase_Connection::thread_loop, this);
 
 //        set_status_line0(m_version);
 
-        declare_ready(controller_mode_status());
+//        declare_ready(controller_mode_status());
     }catch (...){}
 }
 void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
+//    cout << "on_receive_data(): " << std::string((const char*)data, bytes - 2) << endl;
+
     WallClock now = current_time();
     {
         std::lock_guard<std::mutex> lg(m_lock);
         m_last_receive = now;
     }
-    try{
-//        cout << "sys-botbase Response: " << std::string((const char*)data, bytes) << endl;
-        m_listeners.run_method_unique(&Listener::on_receive_data, data, bytes);
 
-        //  Version #
-        std::string str((const char*)data, bytes);
-        if (str.find('.') != std::string::npos){
-            while (!str.empty() && str.back() <= 32){
-                str.pop_back();
+
+    try{
+        const char* ptr = (const char*)data;
+        for (size_t c = 0; c < bytes; c++){
+            char ch = ptr[c];
+            if (ch == '\r'){
+                continue;
             }
-            set_status_line0("sys-botbase: Version " + str, COLOR_BLUE);
+            if (ch != '\n'){
+                m_receive_buffer.emplace_back(ch);
+                continue;
+            }
+            process_message(
+                std::string(
+                    m_receive_buffer.begin(),
+                    m_receive_buffer.end()
+                )
+            );
+            m_receive_buffer.clear();
         }
+
+//        m_listeners.run_method_unique(&Listener::on_receive_data, data, bytes);
 
     }catch (...){}
 }
+void TcpSysbotBase_Connection::process_message(const std::string& message){
+//    cout << "sys-botbase Response: " << message << endl;
 
+    m_listeners.run_method_unique(&Listener::on_message, message);
 
+    //  Version #
+    std::string str = message;
+    if (str.find('.') != std::string::npos){
+        while (!str.empty() && str.back() <= 32){
+            str.pop_back();
+        }
+        set_status_line0("sys-botbase: Version " + str, COLOR_BLUE);
+
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (!m_thread.joinable()){
+            set_mode(str);
+        }
+    }
+
+}
+void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
+    if (sbb_version.rfind("2.", 0) == 0){
+        m_logger.log("Detected sbb2. Using old (slow) command set.", COLOR_ORANGE);
+        write_data("configure mainLoopSleepTime 0\r\n");
+        m_supports_command_queue = false;
+    }else if (PreloadSettings::instance().DEVELOPER_MODE && sbb_version.rfind("3.", 0) == 0){
+        m_logger.log("Detected sbb3. Using CC command queue.", COLOR_BLUE);
+        write_data("configure enablePA 1\r\n");
+        m_supports_command_queue = true;
+    }else{
+        m_logger.log("Unrecognized sbb version: " + sbb_version, COLOR_RED);
+        return;
+    }
+
+    m_thread = std::thread(&TcpSysbotBase_Connection::thread_loop, this);
+    declare_ready(controller_mode_status());
+}
 
 
 
