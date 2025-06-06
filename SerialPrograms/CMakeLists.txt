@@ -973,6 +973,7 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.cpp
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h
+    Source/NintendoSwitch/Options/NintendoSwitch_ModelType.h
     Source/NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h
     Source/NintendoSwitch/Options/TurboMacroTable.cpp
     Source/NintendoSwitch/Options/TurboMacroTable.h

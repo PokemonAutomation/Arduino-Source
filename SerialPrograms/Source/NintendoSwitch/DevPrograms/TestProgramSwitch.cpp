@@ -121,6 +121,7 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "CommonTools/Images/ImageFilter.h"
+#include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 
 
 #include <QPixmap>
