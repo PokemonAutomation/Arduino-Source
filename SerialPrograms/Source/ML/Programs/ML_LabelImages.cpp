@@ -113,8 +113,8 @@ void DrawnBoundingBox::on_mouse_release(double, double){
         }
     }
     if (min_mask_x < INT_MAX && max_mask_x > min_mask_x && min_mask_y < INT_MAX && max_mask_y > min_mask_y){
-        const int mask_width = max_mask_x - min_mask_x;
-        const int mask_height = max_mask_y - min_mask_y;
+        const size_t mask_width = max_mask_x - min_mask_x;
+        const size_t mask_height = max_mask_y - min_mask_y;
         ImageFloatBox mask_box(
             min_mask_x/double(source_width), min_mask_y/double(source_height),
             mask_width/double(source_width), mask_height/double(source_height));
