@@ -16,6 +16,8 @@
 #include <iostream>
 #include <fstream>
 #include <filesystem>
+#include <cmath>
+#include "CommonFramework/Globals.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
@@ -26,7 +28,7 @@
 #include "ML_LabelImages.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Common/Qt/Options/ConfigWidget.h"
-#include "ML/DataLabeling/SegmentAnythingEmbedding.h"
+#include "ML/DataLabeling/SegmentAnythingModel.h"
 
 
 using std::cout;
@@ -36,15 +38,15 @@ namespace PokemonAutomation{
 namespace ML{
 
 
-DrawnBoundingBox::DrawnBoundingBox(LabelImages& parent, VideoOverlay& overlay)
-    : m_parent(parent)
+DrawnBoundingBox::DrawnBoundingBox(LabelImages& label_program, VideoOverlay& overlay)
+    : m_program(label_program)
     , m_overlay(overlay)
     , m_overlay_set(overlay)
 {
-    m_parent.X.add_listener(*this);
-    m_parent.Y.add_listener(*this);
-    m_parent.WIDTH.add_listener(*this);
-    m_parent.HEIGHT.add_listener(*this);
+    m_program.X.add_listener(*this);
+    m_program.Y.add_listener(*this);
+    m_program.WIDTH.add_listener(*this);
+    m_program.HEIGHT.add_listener(*this);
     overlay.add_listener(*this);
 }
 
@@ -55,19 +57,54 @@ DrawnBoundingBox::~DrawnBoundingBox(){
 void DrawnBoundingBox::on_config_value_changed(void* object){
     std::lock_guard<std::mutex> lg(m_lock);
     m_overlay_set.clear();
-    m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT}, "Unknown");
+    m_overlay_set.add(COLOR_RED, {m_program.X, m_program.Y, m_program.WIDTH, m_program.HEIGHT}, "Unknown");
 }
 void DrawnBoundingBox::on_mouse_press(double x, double y){
-    m_parent.WIDTH.set(0);
-    m_parent.HEIGHT.set(0);
-    m_parent.X.set(x);
-    m_parent.Y.set(y);
+    m_program.WIDTH.set(0);
+    m_program.HEIGHT.set(0);
+    m_program.X.set(x);
+    m_program.Y.set(y);
     m_mouse_start.emplace();
     m_mouse_start->first = x;
     m_mouse_start->second = y;
 }
 void DrawnBoundingBox::on_mouse_release(double x, double y){
     m_mouse_start.reset();
+
+    const size_t source_width = m_program.source_image_width;
+    const size_t source_height = m_program.source_image_height;
+    
+    const int box_x = int(m_program.X * source_width + 0.5);
+    const int box_y = int(m_program.Y * source_height + 0.5);
+    const int box_width = int(m_program.WIDTH * source_width + 0.5);
+    const int box_height = int(m_program.HEIGHT * source_height + 0.5);
+    if (box_width == 0 || box_height == 0){
+        return;
+    }
+
+    m_program.m_sam_session.run(m_program.m_image_embedding,
+        source_height, source_width, {}, {},
+        {box_x, box_y, box_x + box_width, box_y + box_height},
+        m_program.m_output_boolean_mask
+    );
+
+    for(size_t y = 0; y < source_height; y++){
+        for(size_t x = 0; x < source_width; x++){
+            uint32_t& pixel = m_program.m_mask_image.pixel(x, y);
+            // if the pixel's mask value is true, set a semi-transparent 45-degree blue strip color
+            // otherwise: fully transparent (alpha = 0)
+            uint32_t color = 0;
+            if (m_program.m_output_boolean_mask[y*source_width + x]){
+                color = (std::abs(int(x) - int(y)) % 4 <= 1) ? combine_argb(150, 30, 144, 255) : combine_argb(150, 0, 0, 60);
+            }
+            pixel = color;
+        }
+    }
+    if (m_program.m_overlay_image){
+        m_overlay.remove_image(*m_program.m_overlay_image);
+    }
+    m_program.m_overlay_image = std::make_unique<OverlayImage>(m_program.m_mask_image, 0.0, 0.0, 1.0, 1.0);
+    m_overlay.add_image(*m_program.m_overlay_image);
 }
 void DrawnBoundingBox::on_mouse_move(double x, double y){
     if (!m_mouse_start){
@@ -86,18 +123,18 @@ void DrawnBoundingBox::on_mouse_move(double x, double y){
         std::swap(yl, yh);
     }
 
-    m_parent.X.set(xl);
-    m_parent.Y.set(yl);
-    m_parent.WIDTH.set(xh - xl);
-    m_parent.HEIGHT.set(yh - yl);
+    m_program.X.set(xl);
+    m_program.Y.set(yl);
+    m_program.WIDTH.set(xh - xl);
+    m_program.HEIGHT.set(yh - yl);
 }
 
 void DrawnBoundingBox::detach(){
     m_overlay.remove_listener(*this);
-    m_parent.X.remove_listener(*this);
-    m_parent.Y.remove_listener(*this);
-    m_parent.WIDTH.remove_listener(*this);
-    m_parent.HEIGHT.remove_listener(*this);
+    m_program.X.remove_listener(*this);
+    m_program.Y.remove_listener(*this);
+    m_program.WIDTH.remove_listener(*this);
+    m_program.HEIGHT.remove_listener(*this);
 }
 
 
@@ -123,6 +160,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
     , HEIGHT("<b>Height:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
+    , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
 {
     ADD_OPTION(X);
     ADD_OPTION(Y);
@@ -159,9 +197,12 @@ LabelImages_Widget::LabelImages_Widget(
     PanelHolder& holder
 )
     : PanelWidget(parent, instance, holder)
+    , m_program(instance)
     , m_session(instance.m_switch_control_option, 0, 0)
     , m_drawn_box(instance, m_session.overlay())
 {
+    std::cout << &m_program << std::endl;
+
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header(*this));
@@ -181,6 +222,7 @@ LabelImages_Widget::LabelImages_Widget(
     QPushButton* button = new QPushButton("This is a button", scroll_inner);
     scroll_layout->addWidget(button);
     connect(button, &QPushButton::clicked, this, [&instance](bool){
+        cout << "Button clicked!" << endl;
         const VideoSourceDescriptor* video_source = instance.m_switch_control_option.m_video.descriptor().get();
         auto image_source = dynamic_cast<const VideoSourceDescriptor_StillImage*>(video_source);
         if (image_source != nullptr){
@@ -191,23 +233,22 @@ LabelImages_Widget::LabelImages_Widget(
     m_option_widget = instance.m_options.make_QtWidget(*scroll_inner);
     scroll_layout->addWidget(&m_option_widget->widget());
 
-    const VideoSourceDescriptor* video_source = instance.m_switch_control_option.m_video.descriptor().get();
-    auto image_source = dynamic_cast<const VideoSourceDescriptor_StillImage*>(video_source);
-    if (image_source != nullptr){
-        std::string image_path = image_source->path();
-        cout << "Image source: " << image_path << endl;
+    const VideoSourceDescriptor* video_source_desc = instance.m_switch_control_option.m_video.descriptor().get();
+    auto image_source_desc = dynamic_cast<const VideoSourceDescriptor_StillImage*>(video_source_desc);
+    if (image_source_desc != nullptr){
+        const std::string image_path = image_source_desc->path();
+        const size_t source_image_height = image_source_desc->source_image_height();
+        const size_t source_image_width = image_source_desc->source_image_width();
+        m_program.source_image_height = source_image_height;
+        m_program.source_image_width = source_image_width;
+        m_program.m_mask_image = ImageRGB32(source_image_width, source_image_height);
+        cout << "Image source: " << image_path << ", " << source_image_width << " x " << source_image_height << endl;
         // if no such embedding file, m_iamge_embedding will be empty
-        load_image_embedding(image_path, m_image_embedding);
+        load_image_embedding(image_path, m_program.m_image_embedding);
     }
 
-    m_image_mask = std::make_unique<ImageRGB32>(960, 540);
-    for(size_t row = 0; row < m_image_mask->height(); row++){
-        for(size_t col = 0; col < m_image_mask->width(); col++){
-            m_image_mask->pixel(col, row) = combine_argb(200, 10, 10, 10);
-        }
-    }
-    m_overlay_image = std::make_unique<OverlayImage>(*m_image_mask, 0.0, 0.2, 0.5, 0.5);
-    m_session.overlay().add_image(*m_overlay_image);    
+    // m_overlay_image = std::make_unique<OverlayImage>(*m_image_mask, 0.0, 0.2, 0.5, 0.5);
+    // m_session.overlay().add_image(*m_overlay_image);    
     cout << "LabelImages_Widget built" << endl;
 }
 

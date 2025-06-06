@@ -36,6 +36,15 @@ namespace NintendoSwitch{
 
 class CommandRow;
 
+// UI widget for controlling and monitoring a Nintendo Switch.
+// It includes:
+// - A micro-controller selection UI
+// - Video source selection UI
+// - Audio source selection UI
+// - Audio display
+// - Video stream display
+// It also owns a SwitchSystemSession that manages the life time of the controller,
+// audio and video streams that will be exposed to automation programs.
 class SwitchSystemWidget final : public QWidget, public CommandReceiver{
 public:
     virtual ~SwitchSystemWidget();

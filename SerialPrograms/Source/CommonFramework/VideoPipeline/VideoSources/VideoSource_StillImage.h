@@ -24,10 +24,17 @@ public:
         , m_path(std::move(path))
     {}
 
-
 public:
+    // get the image source path
     std::string path() const;
+    // set the image source path
     void set_path(std::string path);
+    // Get the source image width. Its value is only loaded after `make_VideoSource()` is called.
+    // Otherwise, return 0.
+    size_t source_image_width() const{return m_source_image_width;}
+    // Get the source image height. Its value is only loaded after `make_VideoSource()` is called.
+    // Otherwise, return 0.
+    size_t source_image_height() const{return m_source_image_height;}
 
     virtual bool operator==(const VideoSourceDescriptor& x) const override;
     virtual std::string display_name() const override{
@@ -44,6 +51,8 @@ public:
 private:
     mutable SpinLock m_lock;
     std::string m_path;
+    mutable size_t m_source_image_width = 0;
+    mutable size_t m_source_image_height = 0;
 };
 
 
@@ -69,7 +78,7 @@ public:
 
     virtual QWidget* make_display_QtWidget(QWidget* parent) override;
 
-
+    const QImage& original_image() const { return m_original_image;}
 private:
     friend class VideoWidget_StillImage;
 
