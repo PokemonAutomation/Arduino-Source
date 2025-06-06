@@ -35,7 +35,7 @@ bool is_setting_selected(VideoStream& stream, ProControllerContext& context, Ima
     overlays.add(COLOR_BLUE, unselected_box2);
     context.wait_for_all_requests();
     context.wait_for(Milliseconds(250));
-    size_t max_attempts = 5;  // multiple attempts because the highlighted icon/setting pulses. and sometimes there isn't enough contrast at the exact moment you take the snapshot.
+    size_t max_attempts = 10;  // multiple attempts because the highlighted icon/setting pulses. and sometimes there isn't enough contrast at the exact moment you take the snapshot.
     bool is_selected = false;
     for (size_t i = 0; i < max_attempts; i++){
         VideoSnapshot snapshot = stream.video().snapshot();
@@ -65,7 +65,7 @@ bool is_setting_selected(VideoStream& stream, ProControllerContext& context, Ima
         if(is_selected){
             return true;
         }
-        context.wait_for(Milliseconds(200));
+        context.wait_for(Milliseconds(100));
     }
 
     return false;
@@ -175,7 +175,7 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
             if (!is_setting_selected(stream, context, sync_clock, other_setting3, other_setting4)){
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
-                    "home_to_date_time(): Failed to reach settings gear on Home page after 2 attempts.",
+                    "home_to_date_time(): Failed to reach 'Synchronize Clock via Internet', within 'Date and Time', after 2 attempts.",
                     stream
                 );
             }            
