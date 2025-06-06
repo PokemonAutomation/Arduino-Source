@@ -34,7 +34,10 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
 
+        // if (i > 0){  // intentionally create a failure, for testing 
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
+        // }
+        
 
         // ImageFloatBox system_icon(0.685, 0.69, 0.05, 0.03);
         // ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
@@ -68,7 +71,7 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
             {system_setting_selected}
         );
         if (ret < 0){  // failed to detect System highlighted. press home and re-try
-            pbf_press_button(context, BUTTON_HOME, 100ms, 100ms);
+            pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
             continue;
         }
 
@@ -89,7 +92,9 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
         ssf_press_dpad(context, DPAD_DOWN, 45, 40);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        // if (i > 1){  // intentionally create a failure, for testing
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        // }
 
 
         //  double up this A press to make sure it gets through.
@@ -109,7 +114,7 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
             {sync_clock_selected}
         );
         if (ret < 0){  // failed to detect System highlighted. press home and re-try
-            pbf_press_button(context, BUTTON_HOME, 100ms, 100ms);
+            pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
             continue;
         }
 
