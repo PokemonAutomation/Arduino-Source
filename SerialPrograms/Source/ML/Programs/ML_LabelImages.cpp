@@ -68,7 +68,7 @@ void DrawnBoundingBox::on_mouse_press(double x, double y){
     m_mouse_start->first = x;
     m_mouse_start->second = y;
 }
-void DrawnBoundingBox::on_mouse_release(double x, double y){
+void DrawnBoundingBox::on_mouse_release(double, double){
     m_mouse_start.reset();
 
     const size_t source_width = m_program.source_image_width;
@@ -82,14 +82,15 @@ void DrawnBoundingBox::on_mouse_release(double x, double y){
         return;
     }
 
-    m_program.m_sam_session.run(m_program.m_image_embedding,
-        source_height, source_width, {}, {},
+    m_program.m_sam_session.run(
+        m_program.m_image_embedding,
+        (int)source_height, (int)source_width, {}, {},
         {box_x, box_y, box_x + box_width, box_y + box_height},
         m_program.m_output_boolean_mask
     );
 
-    for(size_t y = 0; y < source_height; y++){
-        for(size_t x = 0; x < source_width; x++){
+    for (size_t y = 0; y < source_height; y++){
+        for (size_t x = 0; x < source_width; x++){
             uint32_t& pixel = m_program.m_mask_image.pixel(x, y);
             // if the pixel's mask value is true, set a semi-transparent 45-degree blue strip color
             // otherwise: fully transparent (alpha = 0)

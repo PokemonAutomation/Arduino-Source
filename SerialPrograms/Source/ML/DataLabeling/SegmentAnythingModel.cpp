@@ -9,7 +9,7 @@
 #include <iostream>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/imgcodecs.hpp>
-
+#include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "SegmentAnythingModel.h"
 
 namespace PokemonAutomation{
@@ -52,14 +52,14 @@ template<typename T, class Buffer, class Shape> Ort::Value create_tensor(const O
 
 
 SAMEmbedderSession::SAMEmbedderSession(const std::string& model_path)
-: session_options(create_session_option())
-, session{env, model_path.c_str(), session_options}
-, memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
-, input_names{session.GetInputNames()}
-, output_names{session.GetOutputNames()}
-, input_shape{1, SAM_EMBEDDER_INPUT_IMAGE_HEIGHT, SAM_EMBEDDER_INPUT_IMAGE_WIDTH, 3}
-, output_shape{1, SAM_EMBEDDER_OUTPUT_N_CHANNELS, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE}
-, model_input(SAM_EMBEDDER_INPUT_SIZE)
+    : session_options(create_session_option())
+    , session{env, str_to_onnx_str(model_path).c_str(), session_options}
+    , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
+    , input_names{session.GetInputNames()}
+    , output_names{session.GetOutputNames()}
+    , input_shape{1, SAM_EMBEDDER_INPUT_IMAGE_HEIGHT, SAM_EMBEDDER_INPUT_IMAGE_WIDTH, 3}
+    , output_shape{1, SAM_EMBEDDER_OUTPUT_N_CHANNELS, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE}
+    , model_input(SAM_EMBEDDER_INPUT_SIZE)
 {
     std::cout << "Built SAM embedder session" << std::endl;
 }
@@ -92,17 +92,17 @@ void SAMEmbedderSession::run(cv::Mat& input_image, std::vector<float>& model_out
 
 
 SAMSession::SAMSession(const std::string& model_path)
-: session_options(create_session_option())
-, session{env, model_path.c_str(), session_options}
-, memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
-, input_names{session.GetInputNames()}
-, output_names{session.GetOutputNames()}
-, input_image_embedding_shape{1, SAM_EMBEDDER_OUTPUT_N_CHANNELS,
-    SAM_EMBEDDER_OUTPUT_IMAGE_SIZE, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE}
-, input_mask_shape{1, 1, SAM_LOW_RES_MASK_SIZE, SAM_LOW_RES_MASK_SIZE}
-, output_low_res_mask_shape{1, 1, SAM_LOW_RES_MASK_SIZE, SAM_LOW_RES_MASK_SIZE}
-, input_mask_buffer(SAM_LOW_RES_MASK_SIZE * SAM_LOW_RES_MASK_SIZE, 0.0)
-, output_low_res_mask_buffer(SAM_LOW_RES_MASK_SIZE * SAM_LOW_RES_MASK_SIZE, 0.0)
+    : session_options(create_session_option())
+    , session{env, str_to_onnx_str(model_path).c_str(), session_options}
+    , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
+    , input_names{session.GetInputNames()}
+    , output_names{session.GetOutputNames()}
+    , input_image_embedding_shape{1, SAM_EMBEDDER_OUTPUT_N_CHANNELS,
+        SAM_EMBEDDER_OUTPUT_IMAGE_SIZE, SAM_EMBEDDER_OUTPUT_IMAGE_SIZE}
+    , input_mask_shape{1, 1, SAM_LOW_RES_MASK_SIZE, SAM_LOW_RES_MASK_SIZE}
+    , output_low_res_mask_shape{1, 1, SAM_LOW_RES_MASK_SIZE, SAM_LOW_RES_MASK_SIZE}
+    , input_mask_buffer(SAM_LOW_RES_MASK_SIZE * SAM_LOW_RES_MASK_SIZE, 0.0)
+    , output_low_res_mask_buffer(SAM_LOW_RES_MASK_SIZE * SAM_LOW_RES_MASK_SIZE, 0.0)
 {
     std::cout << "Built SAM session" << std::endl;
 }
@@ -121,7 +121,7 @@ void SAMSession::run(
     assert(input_box.size() == 0 || input_box.size() == 4);  // 4 is x_min, y_min, x_max, y_max
     assert(input_points.size() > 0 || input_box.size() > 0);
 
-    int num_points = input_points.size() / 2;
+    size_t num_points = input_points.size() / 2;
     if(input_box.size() > 0){
         num_points += 2; // add the bounding box two corners
     }
