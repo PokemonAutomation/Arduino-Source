@@ -57,7 +57,7 @@ DrawnBoundingBox::~DrawnBoundingBox(){
 void DrawnBoundingBox::on_config_value_changed(void* object){
     std::lock_guard<std::mutex> lg(m_lock);
     m_overlay_set.clear();
-    m_overlay_set.add(COLOR_RED, {m_program.X, m_program.Y, m_program.WIDTH, m_program.HEIGHT}, "Unknown");
+    m_overlay_set.add(COLOR_RED, {m_program.X, m_program.Y, m_program.WIDTH, m_program.HEIGHT});
 }
 void DrawnBoundingBox::on_mouse_press(double x, double y){
     m_program.WIDTH.set(0);
@@ -73,7 +73,7 @@ void DrawnBoundingBox::on_mouse_release(double, double){
 
     const size_t source_width = m_program.source_image_width;
     const size_t source_height = m_program.source_image_height;
-
+    
     const int box_x = int(m_program.X * source_width + 0.5);
     const int box_y = int(m_program.Y * source_height + 0.5);
     const int box_width = int(m_program.WIDTH * source_width + 0.5);
@@ -82,6 +82,10 @@ void DrawnBoundingBox::on_mouse_release(double, double){
         return;
     }
 
+    if (m_program.m_image_embedding.size() == 0){
+        // no embedding file loaded
+        return;
+    }
     m_program.m_sam_session.run(
         m_program.m_image_embedding,
         (int)source_height, (int)source_width, {}, {},
@@ -89,17 +93,32 @@ void DrawnBoundingBox::on_mouse_release(double, double){
         m_program.m_output_boolean_mask
     );
 
+    size_t min_mask_x = INT_MAX, max_mask_x = 0;
+    size_t min_mask_y = INT_MAX, max_mask_y = 0;
     for (size_t y = 0; y < source_height; y++){
         for (size_t x = 0; x < source_width; x++){
+            bool mask = m_program.m_output_boolean_mask[y*source_width + x];
             uint32_t& pixel = m_program.m_mask_image.pixel(x, y);
             // if the pixel's mask value is true, set a semi-transparent 45-degree blue strip color
             // otherwise: fully transparent (alpha = 0)
             uint32_t color = 0;
-            if (m_program.m_output_boolean_mask[y*source_width + x]){
+            if (mask){
                 color = (std::abs(int(x) - int(y)) % 4 <= 1) ? combine_argb(150, 30, 144, 255) : combine_argb(150, 0, 0, 60);
+                min_mask_x = std::min(x, min_mask_x);
+                max_mask_x = std::max(x, max_mask_x);
+                min_mask_y = std::min(y, min_mask_y);
+                max_mask_y = std::max(y, max_mask_y);
             }
             pixel = color;
         }
+    }
+    if (min_mask_x < INT_MAX && max_mask_x > min_mask_x && min_mask_y < INT_MAX && max_mask_y > min_mask_y){
+        const int mask_width = max_mask_x - min_mask_x;
+        const int mask_height = max_mask_y - min_mask_y;
+        ImageFloatBox mask_box(
+            min_mask_x/double(source_width), min_mask_y/double(source_height),
+            mask_width/double(source_width), mask_height/double(source_height));
+        m_overlay_set.add(COLOR_BLUE, mask_box, "Unknown");
     }
     if (m_program.m_overlay_image){
         m_overlay.remove_image(*m_program.m_overlay_image);
@@ -251,6 +270,9 @@ LabelImages_Widget::LabelImages_Widget(
     // m_overlay_image = std::make_unique<OverlayImage>(*m_image_mask, 0.0, 0.2, 0.5, 0.5);
     // m_session.overlay().add_image(*m_overlay_image);    
     cout << "LabelImages_Widget built" << endl;
+
+    // TODO: create UI to choose pokemon labels: use UI class StringSelectOption
+    // TODO: create a custom table to display the annotated bounding boxes
 }
 
 
