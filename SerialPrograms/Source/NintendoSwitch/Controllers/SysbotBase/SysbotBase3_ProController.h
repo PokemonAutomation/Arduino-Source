@@ -9,7 +9,7 @@
 #define PokemonAutomation_NintendoSwitch_ProController_SysbotBase3_H
 
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
+//#include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h"
 #include "SysbotBase_Connection.h"
@@ -22,12 +22,12 @@ namespace NintendoSwitch{
 class ProController_SysbotBase3 final :
     public ProController,
     public ControllerWithScheduler,
-    private ClientSocket::Listener
+    private SysbotBase::TcpSysbotBase_Connection::Listener
 {
 public:
     using ContextType = ProControllerContext;
 
-    static constexpr size_t QUEUE_SIZE = 16;
+    static constexpr size_t QUEUE_SIZE = 128;
 
 
 public:
@@ -45,7 +45,8 @@ public:
     virtual const ControllerFeatures& controller_features() const override;
     virtual ControllerPerformanceClass performance_class() const override{
         //  TODO: Change to SerialPABotBase_Wired_125Hz when we prove it is stable.
-        return ControllerPerformanceClass::SysbotBase;
+        return ControllerPerformanceClass::SerialPABotBase_Wired_125Hz;
+//        return ControllerPerformanceClass::SysbotBase;
     }
 
     virtual Milliseconds ticksize() const override{
@@ -218,7 +219,7 @@ public:
 
 
 private:
-    virtual void on_receive_data(const void* data, size_t bytes) override;
+    virtual void on_message(const std::string& message) override;
     virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
 
 

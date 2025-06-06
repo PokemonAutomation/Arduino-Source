@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Controllers_SysbotBase_Connection_H
 #define PokemonAutomation_Controllers_SysbotBase_Connection_H
 
+#include <deque>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
@@ -23,6 +24,10 @@ namespace SysbotBase{
 
 class TcpSysbotBase_Connection : public ControllerConnection, private ClientSocket::Listener{
 public:
+    struct Listener{
+        virtual void on_message(const std::string& message) = 0;
+    };
+
     void add_listener(Listener& listener){
         m_listeners.add(listener);
     }
@@ -50,6 +55,9 @@ private:
     virtual void on_connect_finished(const std::string& error_message) override;
     virtual void on_receive_data(const void* data, size_t bytes) override;
 
+    void process_message(const std::string& message);
+    void set_mode(const std::string& sbb_version);
+
 private:
     Logger& m_logger;
     ClientSocket m_socket;
@@ -59,6 +67,7 @@ private:
     std::string m_connecting_message;
 //    std::string m_version;
     WallClock m_last_receive;
+    std::deque<char> m_receive_buffer;
 
     SpinLock m_send_lock;
     std::mutex m_lock;

@@ -73,7 +73,7 @@ void DrawnBoundingBox::on_mouse_release(double, double){
 
     const size_t source_width = m_program.source_image_width;
     const size_t source_height = m_program.source_image_height;
-    
+
     const int box_x = int(m_program.X * source_width + 0.5);
     const int box_y = int(m_program.Y * source_height + 0.5);
     const int box_width = int(m_program.WIDTH * source_width + 0.5);
