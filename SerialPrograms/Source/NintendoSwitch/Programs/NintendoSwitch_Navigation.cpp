@@ -5,6 +5,7 @@
  */
 
 #include "Controllers/ControllerTypes.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -32,8 +33,8 @@ bool is_setting_selected(VideoStream& stream, ProControllerContext& context, Ima
     overlays.add(COLOR_RED, selected_box);
     overlays.add(COLOR_BLUE, unselected_box1);
     overlays.add(COLOR_BLUE, unselected_box2);
-    context.wait_for(Milliseconds(100));
     context.wait_for_all_requests();
+    context.wait_for(Milliseconds(250));
     VideoSnapshot snapshot = stream.video().snapshot();
 
     ImageStats stats_unselected_box1 = image_stats(extract_box_reference(snapshot, unselected_box1));
@@ -72,7 +73,31 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
 
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
 
+        // we expect to be at Settings icon
+        ImageFloatBox system_settings(0.685, 0.69, 0.05, 0.03);
+        ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
+        ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
+        if (!is_setting_selected(stream, context, system_settings, other_setting1, other_setting2)){
+            // not at Settings Icon
+            // mash down, mash right. then left one
+            size_t iterations = Milliseconds(1200) / 24ms + 1;
+            for (size_t i = 0; i < iterations; i++){
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+            }
 
+            for (size_t i = 0; i < iterations; i++){
+                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
+            }
+            ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
+
+            if (!is_setting_selected(stream, context, system_settings, other_setting1, other_setting2)){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "home_to_date_time(): Failed to reach settings gear on Home page after 2 attempts.",
+                    stream
+                );
+            }
+        }
 
         //  Two A presses in case we drop the 1st one.
         ssf_press_button(context, BUTTON_A, 3);
@@ -105,18 +130,51 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
 
+
+        //  double up this A press to make sure it gets through.
+        ssf_press_button(context, BUTTON_A, 3);
+        ssf_press_button(context, BUTTON_A, 3);
+
+        context.wait_for_all_requests();
+        // we expect to be within "Date and Time", with "Synchronize Clock via Internet" being highlighted
+        ImageFloatBox sync_clock(0.168, 0.185, 0.01, 0.1);
+        ImageFloatBox other_setting3(0.1, 0.185, 0.01, 0.1);
+        ImageFloatBox other_setting4(0.05, 0.185, 0.01, 0.1);
+        if (!is_setting_selected(stream, context, sync_clock, other_setting3, other_setting4)){
+            // press B once, then mash Up. then try again to scroll down to Date and Time
+            pbf_press_button(context, BUTTON_B, 100ms, 100ms);
+            pbf_move_left_joystick(context, 128, 0, 3000ms, 100ms);
+
+            size_t iterations = Milliseconds(1200) / 24ms + 1;
+            for (size_t i = 0; i < iterations; i++){
+                ssf_issue_scroll(context, SSF_SCROLL_UP, 24ms);
+            }
+
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
+            ssf_press_dpad(context, DPAD_DOWN, 45, 40);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);            
+
+            //  double up this A press to make sure it gets through.
+            ssf_press_button(context, BUTTON_A, 3);
+            ssf_press_button(context, BUTTON_A, 3);
+
+            if (!is_setting_selected(stream, context, sync_clock, other_setting3, other_setting4)){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "home_to_date_time(): Failed to reach settings gear on Home page after 2 attempts.",
+                    stream
+                );
+            }            
+
+        }  
+
         if (!to_date_change){
-            //  Triple up this A press to make sure it gets through.
-            ssf_press_button(context, BUTTON_A, 3);
-            ssf_press_button(context, BUTTON_A, 3);
-            ssf_press_button(context, BUTTON_A, 45);
             return;
         }
 
-        //  Triple up this A press to make sure it gets through.
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
         {
             auto iterations = Milliseconds(250) / 24ms + 1;
             do{

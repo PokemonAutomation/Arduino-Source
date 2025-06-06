@@ -318,11 +318,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 1
-    ImageFloatBox box(0.060, 0.75, 0.02, 0.08);
-    ImageFloatBox system_settings(0.685, 0.69, 0.05, 0.03);
-    ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
-    ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
-    cout << is_setting_selected(console, context, system_settings, other_setting1, other_setting2) << endl;
+    home_to_date_time(console, context, true, false);
 #endif
 
 #if 0
