@@ -73,10 +73,6 @@ void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProContr
             continue;
         }
 
-        //  Scroll left and press A to exit the sleep menu if we happened to
-        //  land there.
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-        ssf_press_button(context, BUTTON_A, 3);
 
         {
             auto iterations = Milliseconds(312) / 24ms + 1;
@@ -95,12 +91,10 @@ void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProContr
         // }
 
 
-        //  double up this A press to make sure it gets through.
-        ssf_press_button(context, BUTTON_A, 3);
         ssf_press_button(context, BUTTON_A, 3);
 
         context.wait_for_all_requests();
-        context.wait_for(Milliseconds(250));
+        context.wait_for(Milliseconds(300));
         // we expect to be within "Date and Time", with "Synchronize Clock via Internet" being highlighted
         ImageFloatBox sync_clock_box(0.168, 0.185, 0.01, 0.1);
         ImageFloatBox other_setting3(0.1, 0.185, 0.01, 0.1);
