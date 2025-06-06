@@ -122,7 +122,7 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
-
+#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -316,11 +316,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+
+#if 1
+    ImageFloatBox box(0.060, 0.75, 0.02, 0.08);
+    ImageFloatBox system_settings(0.685, 0.69, 0.05, 0.03);
+    ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
+    ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
+    cout << is_setting_selected(console, context, system_settings, other_setting1, other_setting2) << endl;
+#endif
+
+#if 0
 //    std::terminate();
     ImageRGB32 image("20250503-121259857603.png");
 
     image = filter_rgb32_brightness(image, COLOR_RED, false, 0x00ffff01, 0, 200);
     image.save("temp.png");
+#endif
 
 
 #if 0
