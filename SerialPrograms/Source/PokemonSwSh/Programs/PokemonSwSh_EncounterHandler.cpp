@@ -33,18 +33,40 @@ void run_away(
     VideoStream& stream, ProControllerContext& context,
     Milliseconds exit_battle_time
 ){
+    pbf_press_dpad(context, DPAD_UP, 10, 0);
+    pbf_press_button(context, BUTTON_A, 250ms, 750ms);
+
     BlackScreenOverWatcher black_screen_detector;
-    run_until<ProControllerContext>(
-        stream, context,
-        [exit_battle_time](ProControllerContext& context){
-            pbf_press_dpad(context, DPAD_UP, 10, 0);
-            pbf_mash_button(context, BUTTON_A, 1000ms);
-            if (exit_battle_time > 1000ms){
-                pbf_mash_button(context, BUTTON_B, exit_battle_time - 1000ms);
+    StandardBattleMenuWatcher battle_menu(false, COLOR_GREEN);
+    while (true){
+        context.wait_for_all_requests();
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [exit_battle_time](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_B, exit_battle_time);
+            },
+            {
+                black_screen_detector,
+                battle_menu,
             }
-        },
-        {{black_screen_detector}}
-    );
+        );
+        switch (ret){
+        case 0:
+            context->logger().log("Detected end of battle!");
+            return;
+        case 1:
+            context->logger().log("Detected unexpected battle menu!", COLOR_RED);
+            pbf_press_dpad(context, DPAD_DOWN, 3000ms, 0ms);
+            pbf_press_button(context, BUTTON_A, 80ms, 0ms);
+            continue;
+        default:
+            throw OperationFailedException(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to run away. Are you stuck in the battle?",
+                stream
+            );
+        }
+    }
 }
 
 
@@ -82,10 +104,7 @@ void StandardEncounterHandler::run_away_and_update_stats(
     //  Read the name.
     const std::set<std::string>* candidates_ptr = encounter.candidates();
 
-    //  Initiate the run-away.
-    pbf_press_dpad(m_context, DPAD_UP, 10, 0);
-    pbf_mash_button(m_context, BUTTON_A, 60);
-    m_context.wait_for_all_requests();
+    run_away(m_stream, m_context, exit_battle_time);
 
     update_frequencies(encounter);
 
@@ -101,21 +120,6 @@ void StandardEncounterHandler::run_away_and_update_stats(
         result.get_best_screenshot(),
         &m_frequencies
     );
-
-    BlackScreenOverWatcher black_screen_detector;
-    int ret = run_until<ProControllerContext>(
-        m_stream, m_context,
-        [exit_battle_time](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, 1000ms);
-            if (exit_battle_time > 1000ms){
-                pbf_mash_button(context, BUTTON_B, exit_battle_time - 1000ms);
-            }
-        },
-        {{black_screen_detector}}
-    );
-    if (ret < 0){
-        m_stream.log("Timed out waiting for end of battle. Are you stuck in the battle?", COLOR_RED);
-    }
 }
 
 
