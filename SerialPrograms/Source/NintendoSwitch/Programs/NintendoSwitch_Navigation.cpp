@@ -35,29 +35,40 @@ bool is_setting_selected(VideoStream& stream, ProControllerContext& context, Ima
     overlays.add(COLOR_BLUE, unselected_box2);
     context.wait_for_all_requests();
     context.wait_for(Milliseconds(250));
-    VideoSnapshot snapshot = stream.video().snapshot();
+    size_t max_attempts = 5;  // multiple attempts because the highlighted icon/setting pulses. and sometimes there isn't enough contrast at the exact moment you take the snapshot.
+    bool is_selected = false;
+    for (size_t i = 0; i < max_attempts; i++){
+        VideoSnapshot snapshot = stream.video().snapshot();
 
-    ImageStats stats_unselected_box1 = image_stats(extract_box_reference(snapshot, unselected_box1));
-    double unselected1_average_sum = stats_unselected_box1.average.sum();
-    stream.log("unselected_average_sum1: " + std::to_string(unselected1_average_sum));
+        ImageStats stats_unselected_box1 = image_stats(extract_box_reference(snapshot, unselected_box1));
+        double unselected1_average_sum = stats_unselected_box1.average.sum();
+        stream.log("unselected_average_sum1: " + std::to_string(unselected1_average_sum));
 
-    ImageStats stats_unselected_box2 = image_stats(extract_box_reference(snapshot, unselected_box2));
-    double unselected2_average_sum = stats_unselected_box2.average.sum();
-    stream.log("unselected_average_sum2: " + std::to_string(unselected2_average_sum));
+        ImageStats stats_unselected_box2 = image_stats(extract_box_reference(snapshot, unselected_box2));
+        double unselected2_average_sum = stats_unselected_box2.average.sum();
+        stream.log("unselected_average_sum2: " + std::to_string(unselected2_average_sum));
 
-    double average_sum_unselected_diff = std::abs(unselected1_average_sum - unselected2_average_sum);
+        double average_sum_unselected_diff = std::abs(unselected1_average_sum - unselected2_average_sum);
 
-    ImageStats stats_selected_box = image_stats(extract_box_reference(snapshot, selected_box));
-    double selected_average_sum = stats_selected_box.average.sum();
-    stream.log("selected_average_sum: " + std::to_string(selected_average_sum));
+        ImageStats stats_selected_box = image_stats(extract_box_reference(snapshot, selected_box));
+        double selected_average_sum = stats_selected_box.average.sum();
+        stream.log("selected_average_sum: " + std::to_string(selected_average_sum));
 
-    if (is_white_theme(stream, context)){  // light mode
-        // unselected should be brighter than selected
-        return selected_average_sum < std::min(unselected1_average_sum, unselected2_average_sum) - average_sum_unselected_diff - 20 ;
-    }else{  // dark mode
-        // selected should be brighter than unselected
-        return selected_average_sum  > std::max(unselected1_average_sum, unselected2_average_sum) + average_sum_unselected_diff + 20;
+        if (is_white_theme(stream, context)){  // light mode
+            // unselected should be brighter than selected
+            is_selected = selected_average_sum < std::min(unselected1_average_sum, unselected2_average_sum) - average_sum_unselected_diff - 20 ;
+        }else{  // dark mode
+            // selected should be brighter than unselected
+            is_selected = selected_average_sum  > std::max(unselected1_average_sum, unselected2_average_sum) + average_sum_unselected_diff + 20;
+        }
+
+        if(is_selected){
+            return true;
+        }
+        context.wait_for(Milliseconds(200));
     }
+
+    return false;
 }
 
 void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change, bool fast){
