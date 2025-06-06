@@ -8,6 +8,8 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -72,6 +74,8 @@ bool is_setting_selected(VideoStream& stream, ProControllerContext& context, Ima
 }
 
 void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change, bool fast){
+    size_t max_attempts = 5;
+    for (size_t i = 0; i < max_attempts; i++){
     switch (context->performance_class()){
     case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
@@ -84,31 +88,9 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
 
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
 
-        // we expect to be at Settings icon
-        ImageFloatBox system_settings(0.685, 0.69, 0.05, 0.03);
-        ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
-        ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
-        if (!is_setting_selected(stream, context, system_settings, other_setting1, other_setting2)){
-            // not at Settings Icon
-            // mash down, mash right. then left one
-            size_t iterations = Milliseconds(1200) / 24ms + 1;
-            for (size_t i = 0; i < iterations; i++){
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-            }
-
-            for (size_t i = 0; i < iterations; i++){
-                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
-            }
-            ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
-
-            if (!is_setting_selected(stream, context, system_settings, other_setting1, other_setting2)){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "home_to_date_time(): Failed to reach settings gear on Home page after 2 attempts.",
-                    stream
-                );
-            }
-        }
+        // ImageFloatBox system_icon(0.685, 0.69, 0.05, 0.03);
+        // ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
+        // ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
 
         //  Two A presses in case we drop the 1st one.
         ssf_press_button(context, BUTTON_A, 3);
@@ -120,6 +102,25 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
             do{
                 ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
             }while (--iterations);
+        }
+
+        // Should now be in System Settings, with System highlighted
+        ImageFloatBox system_setting_box(0.056, 0.74, 0.01, 0.1);
+        ImageFloatBox other_setting1(0.04, 0.74, 0.01, 0.1);
+        ImageFloatBox other_setting2(0.02, 0.74, 0.01, 0.1);
+        SelectedSettingWatcher system_setting(system_setting_box, other_setting1, other_setting2);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                for (int i = 0; i < 10; i++){
+                    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+                }
+            },
+            {system_setting}
+        );
+        if (ret < 0){  // failed to detect System highlighted. press home and re-try
+            pbf_press_button(context, BUTTON_HOME, 100ms, 100ms);
+            continue;
         }
 
         //  Scroll left and press A to exit the sleep menu if we happened to
@@ -148,39 +149,20 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
 
         context.wait_for_all_requests();
         // we expect to be within "Date and Time", with "Synchronize Clock via Internet" being highlighted
-        ImageFloatBox sync_clock(0.168, 0.185, 0.01, 0.1);
+        ImageFloatBox sync_clock_box(0.168, 0.185, 0.01, 0.1);
         ImageFloatBox other_setting3(0.1, 0.185, 0.01, 0.1);
         ImageFloatBox other_setting4(0.05, 0.185, 0.01, 0.1);
-        if (!is_setting_selected(stream, context, sync_clock, other_setting3, other_setting4)){
-            // press B once, then mash Up. then try again to scroll down to Date and Time
-            pbf_press_button(context, BUTTON_B, 100ms, 100ms);
-            pbf_move_left_joystick(context, 128, 0, 3000ms, 100ms);
+        SelectedSettingWatcher sync_clock(sync_clock_box, other_setting3, other_setting4);
+        ret = wait_until(
+            stream, context,
+            Milliseconds(2000),
+            {sync_clock}
+        );
+        if (ret < 0){  // failed to detect System highlighted. press home and re-try
+            pbf_press_button(context, BUTTON_HOME, 100ms, 100ms);
+            continue;
+        }
 
-            size_t iterations = Milliseconds(1200) / 24ms + 1;
-            for (size_t i = 0; i < iterations; i++){
-                ssf_issue_scroll(context, SSF_SCROLL_UP, 24ms);
-            }
-
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
-            ssf_press_dpad(context, DPAD_DOWN, 45, 40);
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);            
-
-            //  double up this A press to make sure it gets through.
-            ssf_press_button(context, BUTTON_A, 3);
-            ssf_press_button(context, BUTTON_A, 3);
-
-            if (!is_setting_selected(stream, context, sync_clock, other_setting3, other_setting4)){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "home_to_date_time(): Failed to reach 'Synchronize Clock via Internet', within 'Date and Time', after 2 attempts.",
-                    stream
-                );
-            }            
-
-        }  
 
         if (!to_date_change){
             return;
@@ -198,7 +180,7 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
         //  confirmation menus.
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms);
 
-        break;
+        return;
     }
     case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
         Milliseconds tv = context->timing_variation();
@@ -269,7 +251,7 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
         //  confirmation menus.
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
 
-        break;
+        return;
     }
     default:{
         //  Slow version for tick-imprecise controllers.
@@ -308,10 +290,16 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
         ssf_press_button_ptv(context, BUTTON_A, 1000ms);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+        return;
+    }
     }
     }
 
-
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "home_to_date_time(): Failed to reach Date and Time after several attempts.",
+        stream
+    );
 
 }
 
