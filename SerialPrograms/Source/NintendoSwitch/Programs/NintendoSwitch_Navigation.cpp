@@ -21,58 +21,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-bool is_white_theme(VideoStream& stream, ProControllerContext& context){
-    context.wait_for_all_requests();
-    VideoSnapshot snapshot = stream.video().snapshot();
-    ImageFloatBox window_top(0.60, 0.02, 0.35, 0.05);
-    ImageStats stats_window_top = image_stats(extract_box_reference(snapshot, window_top));
-    bool white_theme = stats_window_top.average.sum() > 600;
-    return white_theme;
-}
-
-bool is_setting_selected(VideoStream& stream, ProControllerContext& context, ImageFloatBox selected_box, ImageFloatBox unselected_box1, ImageFloatBox unselected_box2){
-    VideoOverlaySet overlays(stream.overlay());
-    overlays.add(COLOR_RED, selected_box);
-    overlays.add(COLOR_BLUE, unselected_box1);
-    overlays.add(COLOR_BLUE, unselected_box2);
-    context.wait_for_all_requests();
-    context.wait_for(Milliseconds(250));
-    size_t max_attempts = 10;  // multiple attempts because the highlighted icon/setting pulses. and sometimes there isn't enough contrast at the exact moment you take the snapshot.
-    bool is_selected = false;
-    for (size_t i = 0; i < max_attempts; i++){
-        VideoSnapshot snapshot = stream.video().snapshot();
-
-        ImageStats stats_unselected_box1 = image_stats(extract_box_reference(snapshot, unselected_box1));
-        double unselected1_average_sum = stats_unselected_box1.average.sum();
-        stream.log("unselected_average_sum1: " + std::to_string(unselected1_average_sum));
-
-        ImageStats stats_unselected_box2 = image_stats(extract_box_reference(snapshot, unselected_box2));
-        double unselected2_average_sum = stats_unselected_box2.average.sum();
-        stream.log("unselected_average_sum2: " + std::to_string(unselected2_average_sum));
-
-        double average_sum_unselected_diff = std::abs(unselected1_average_sum - unselected2_average_sum);
-
-        ImageStats stats_selected_box = image_stats(extract_box_reference(snapshot, selected_box));
-        double selected_average_sum = stats_selected_box.average.sum();
-        stream.log("selected_average_sum: " + std::to_string(selected_average_sum));
-
-        if (is_white_theme(stream, context)){  // light mode
-            // unselected should be brighter than selected
-            is_selected = selected_average_sum < std::min(unselected1_average_sum, unselected2_average_sum) - average_sum_unselected_diff - 20 ;
-        }else{  // dark mode
-            // selected should be brighter than unselected
-            is_selected = selected_average_sum  > std::max(unselected1_average_sum, unselected2_average_sum) + average_sum_unselected_diff + 20;
-        }
-
-        if(is_selected){
-            return true;
-        }
-        context.wait_for(Milliseconds(100));
-    }
-
-    return false;
-}
-
 void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change, bool fast){
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
@@ -104,11 +52,12 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
             }while (--iterations);
         }
 
+        context.wait_for_all_requests();        
         // Should now be in System Settings, with System highlighted
         ImageFloatBox system_setting_box(0.056, 0.74, 0.01, 0.1);
         ImageFloatBox other_setting1(0.04, 0.74, 0.01, 0.1);
         ImageFloatBox other_setting2(0.02, 0.74, 0.01, 0.1);
-        SelectedSettingWatcher system_setting(system_setting_box, other_setting1, other_setting2);
+        SelectedSettingWatcher system_setting_selected(system_setting_box, other_setting1, other_setting2);
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
@@ -116,7 +65,7 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
                     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
                 }
             },
-            {system_setting}
+            {system_setting_selected}
         );
         if (ret < 0){  // failed to detect System highlighted. press home and re-try
             pbf_press_button(context, BUTTON_HOME, 100ms, 100ms);
@@ -148,15 +97,16 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
         ssf_press_button(context, BUTTON_A, 3);
 
         context.wait_for_all_requests();
+        context.wait_for(Milliseconds(250));
         // we expect to be within "Date and Time", with "Synchronize Clock via Internet" being highlighted
         ImageFloatBox sync_clock_box(0.168, 0.185, 0.01, 0.1);
         ImageFloatBox other_setting3(0.1, 0.185, 0.01, 0.1);
         ImageFloatBox other_setting4(0.05, 0.185, 0.01, 0.1);
-        SelectedSettingWatcher sync_clock(sync_clock_box, other_setting3, other_setting4);
+        SelectedSettingWatcher sync_clock_selected(sync_clock_box, other_setting3, other_setting4);
         ret = wait_until(
             stream, context,
             Milliseconds(2000),
-            {sync_clock}
+            {sync_clock_selected}
         );
         if (ret < 0){  // failed to detect System highlighted. press home and re-try
             pbf_press_button(context, BUTTON_HOME, 100ms, 100ms);

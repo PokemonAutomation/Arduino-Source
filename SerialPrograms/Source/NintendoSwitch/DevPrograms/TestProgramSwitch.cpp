@@ -318,7 +318,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 1
-    home_to_date_time(console, context, true, false);
+    home_to_date_time(console, context, false, false);
 #endif
 
 #if 0
