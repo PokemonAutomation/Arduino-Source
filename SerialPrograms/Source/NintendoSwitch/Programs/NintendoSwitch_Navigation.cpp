@@ -21,11 +21,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change, bool fast){
+void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProControllerContext& context, bool to_date_change){
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
-    switch (context->performance_class()){
-    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
@@ -129,125 +127,12 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
                 ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
             }while (--iterations);
         }
-//        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
 
         //  Left scroll in case we missed landed in the language change or sleep
         //  confirmation menus.
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms);
 
         return;
-    }
-    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
-        Milliseconds tv = context->timing_variation();
-        Milliseconds unit = 24ms + tv;
-
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-
-        //  Down twice in case we drop one.
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
-
-        //  Press A multiple times to make sure one goes through.
-        pbf_press_button(context, BUTTON_A, 2*unit, unit);
-        pbf_press_button(context, BUTTON_A, 2*unit, unit);
-        pbf_press_button(context, BUTTON_A, 2*unit, unit);
-
-        //  Just button mash it. lol
-        {
-            auto iterations = Milliseconds(1100) / unit + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-            }while (--iterations);
-        }
-
-        //  Scroll left and press A to exit the sleep menu if we happened to
-        //  land there.
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
-        ssf_press_button(context, BUTTON_A, unit, 2*unit, unit);
-
-        {
-            auto iterations = Milliseconds(312) / unit + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-            }while (--iterations);
-        }
-
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 400ms, 2*unit, unit);
-        ssf_press_dpad(context, DPAD_DOWN, 360ms, 304ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-
-        if (!to_date_change){
-            //  Triple up this A press to make sure it gets through.
-            ssf_press_button(context, BUTTON_A, unit);
-            ssf_press_button(context, BUTTON_A, unit);
-            ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
-            return;
-        }
-
-        //  Triple up this A press to make sure it gets through.
-        ssf_press_button(context, BUTTON_A, unit);
-        ssf_press_button(context, BUTTON_A, unit);
-        ssf_press_button(context, BUTTON_A, unit);
-        {
-            auto iterations = Milliseconds(250) / unit + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-            }while (--iterations);
-        }
-
-        //  Left scroll in case we missed landed in the language change or sleep
-        //  confirmation menus.
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
-
-        return;
-    }
-    default:{
-        //  Slow version for tick-imprecise controllers.
-
-        Milliseconds tv = context->timing_variation();
-//        ssf_do_nothing(context, 1500ms);
-
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-
-        //  Down twice in case we drop one.
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-//        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
-
-        //  Press A multiple times to make sure one goes through.
-        ssf_mash1_button(context, BUTTON_A, 200ms);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 2500ms, 2500ms);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 500ms, 500ms);
-
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 500ms, tv, tv);
-        ssf_press_right_joystick(context, 128, 224, 1000ms, 300ms, tv);
-//        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 250ms, tv);  //  Scroll down
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-
-        if (!to_date_change){
-            ssf_press_button_ptv(context, BUTTON_A);
-            return;
-        }
-
-        ssf_press_button_ptv(context, BUTTON_A, 1000ms);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        return;
-    }
-    }
     }
 
     OperationFailedException::fire(
@@ -259,187 +144,205 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
 }
 
 
+void home_to_date_time_Switch1_wired_blind(ProControllerContext& context, bool to_date_change, bool fast){
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
 
+    //  Down twice in case we drop one.
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
+
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
+
+    //  Two A presses in case we drop the 1st one.
+    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, 3);
+
+    //  Just button mash it. lol
+    {
+        auto iterations = Milliseconds(1200) / 24ms + 1;
+        do{
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+        }while (--iterations);
+    }
+
+    //  Scroll left and press A to exit the sleep menu if we happened to
+    //  land there.
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
+    ssf_press_button(context, BUTTON_A, 3);
+
+    {
+        auto iterations = Milliseconds(312) / 24ms + 1;
+        do{
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
+        }while (--iterations);
+    }
+
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
+    ssf_press_dpad(context, DPAD_DOWN, 45, 40);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+
+    if (!to_date_change){
+        //  Triple up this A press to make sure it gets through.
+        ssf_press_button(context, BUTTON_A, 3);
+        ssf_press_button(context, BUTTON_A, 3);
+        ssf_press_button(context, BUTTON_A, 45);
+        return;
+    }
+
+    //  Triple up this A press to make sure it gets through.
+    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, 3);
+    {
+        auto iterations = Milliseconds(250) / 24ms + 1;
+        do{
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+        }while (--iterations);
+    }
+//        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+
+    //  Left scroll in case we missed landed in the language change or sleep
+    //  confirmation menus.
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms);    
+}
+
+void home_to_date_time_Switch1_wireless_esp32_blind(ProControllerContext& context, bool to_date_change, bool fast){
+    Milliseconds tv = context->timing_variation();
+    Milliseconds unit = 24ms + tv;
+
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+
+    //  Down twice in case we drop one.
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
+
+    //  Press A multiple times to make sure one goes through.
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+
+    //  Just button mash it. lol
+    {
+        auto iterations = Milliseconds(1100) / unit + 1;
+        do{
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        }while (--iterations);
+    }
+
+    //  Scroll left and press A to exit the sleep menu if we happened to
+    //  land there.
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
+    ssf_press_button(context, BUTTON_A, unit, 2*unit, unit);
+
+    {
+        auto iterations = Milliseconds(312) / unit + 1;
+        do{
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+        }while (--iterations);
+    }
+
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 400ms, 2*unit, unit);
+    ssf_press_dpad(context, DPAD_DOWN, 360ms, 304ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+
+    if (!to_date_change){
+        //  Triple up this A press to make sure it gets through.
+        ssf_press_button(context, BUTTON_A, unit);
+        ssf_press_button(context, BUTTON_A, unit);
+        ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
+        return;
+    }
+
+    //  Triple up this A press to make sure it gets through.
+    ssf_press_button(context, BUTTON_A, unit);
+    ssf_press_button(context, BUTTON_A, unit);
+    ssf_press_button(context, BUTTON_A, unit);
+    {
+        auto iterations = Milliseconds(250) / unit + 1;
+        do{
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+        }while (--iterations);
+    }
+
+    //  Left scroll in case we missed landed in the language change or sleep
+    //  confirmation menus.
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
+
+}
+
+void home_to_date_time_Switch1_sbb_blind(ProControllerContext& context, bool to_date_change, bool fast){
+    Milliseconds tv = context->timing_variation();
+//        ssf_do_nothing(context, 1500ms);
+
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+
+    //  Down twice in case we drop one.
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+//        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
+
+    //  Press A multiple times to make sure one goes through.
+    ssf_mash1_button(context, BUTTON_A, 200ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 2500ms, 2500ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 500ms, 500ms);
+
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 500ms, tv, tv);
+    ssf_press_right_joystick(context, 128, 224, 1000ms, 300ms, tv);
+//        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 250ms, tv);  //  Scroll down
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+
+    if (!to_date_change){
+        ssf_press_button_ptv(context, BUTTON_A);
+        return;
+    }
+
+    ssf_press_button_ptv(context, BUTTON_A, 1000ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);    
+}
+
+
+void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change){
+    switch (context->performance_class()){
+        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
+            home_to_date_time_Switch1_wired_with_feedback(stream, context, to_date_change);
+            break;
+        }
+    }
+}
 
 void home_to_date_time(ProControllerContext& context, bool to_date_change, bool fast){
     switch (context->performance_class()){
-    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-
-        //  Down twice in case we drop one.
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
-
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
-
-        //  Two A presses in case we drop the 1st one.
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
-
-        //  Just button mash it. lol
-        {
-            auto iterations = Milliseconds(1200) / 24ms + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-            }while (--iterations);
+        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
+            home_to_date_time_Switch1_wired_blind(context, to_date_change, fast);
+            break;
         }
-
-        //  Scroll left and press A to exit the sleep menu if we happened to
-        //  land there.
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-        ssf_press_button(context, BUTTON_A, 3);
-
-        {
-            auto iterations = Milliseconds(312) / 24ms + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
-            }while (--iterations);
+        case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
+            home_to_date_time_Switch1_wireless_esp32_blind(context, to_date_change, fast);
+            break;
         }
-
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
-        ssf_press_dpad(context, DPAD_DOWN, 45, 40);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-
-        if (!to_date_change){
-            //  Triple up this A press to make sure it gets through.
-            ssf_press_button(context, BUTTON_A, 3);
-            ssf_press_button(context, BUTTON_A, 3);
-            ssf_press_button(context, BUTTON_A, 45);
-            return;
+        default:{
+            //  Slow version for tick-imprecise controllers.
+            home_to_date_time_Switch1_sbb_blind(context, to_date_change, fast);
         }
-
-        //  Triple up this A press to make sure it gets through.
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
-        {
-            auto iterations = Milliseconds(250) / 24ms + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-            }while (--iterations);
-        }
-//        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
-
-        //  Left scroll in case we missed landed in the language change or sleep
-        //  confirmation menus.
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms);
-
-        break;
-    }
-    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
-        Milliseconds tv = context->timing_variation();
-        Milliseconds unit = 24ms + tv;
-
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-
-        //  Down twice in case we drop one.
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
-
-        //  Press A multiple times to make sure one goes through.
-        pbf_press_button(context, BUTTON_A, 2*unit, unit);
-        pbf_press_button(context, BUTTON_A, 2*unit, unit);
-        pbf_press_button(context, BUTTON_A, 2*unit, unit);
-
-        //  Just button mash it. lol
-        {
-            auto iterations = Milliseconds(1100) / unit + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-            }while (--iterations);
-        }
-
-        //  Scroll left and press A to exit the sleep menu if we happened to
-        //  land there.
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
-        ssf_press_button(context, BUTTON_A, unit, 2*unit, unit);
-
-        {
-            auto iterations = Milliseconds(312) / unit + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-            }while (--iterations);
-        }
-
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 400ms, 2*unit, unit);
-        ssf_press_dpad(context, DPAD_DOWN, 360ms, 304ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-
-        if (!to_date_change){
-            //  Triple up this A press to make sure it gets through.
-            ssf_press_button(context, BUTTON_A, unit);
-            ssf_press_button(context, BUTTON_A, unit);
-            ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
-            return;
-        }
-
-        //  Triple up this A press to make sure it gets through.
-        ssf_press_button(context, BUTTON_A, unit);
-        ssf_press_button(context, BUTTON_A, unit);
-        ssf_press_button(context, BUTTON_A, unit);
-        {
-            auto iterations = Milliseconds(250) / unit + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
-            }while (--iterations);
-        }
-
-        //  Left scroll in case we missed landed in the language change or sleep
-        //  confirmation menus.
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
-
-        break;
-    }
-    default:{
-        //  Slow version for tick-imprecise controllers.
-
-        Milliseconds tv = context->timing_variation();
-//        ssf_do_nothing(context, 1500ms);
-
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-
-        //  Down twice in case we drop one.
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-//        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
-
-        //  Press A multiple times to make sure one goes through.
-        ssf_mash1_button(context, BUTTON_A, 200ms);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 2500ms, 2500ms);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 500ms, 500ms);
-
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 500ms, tv, tv);
-        ssf_press_right_joystick(context, 128, 224, 1000ms, 300ms, tv);
-//        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 250ms, tv);  //  Scroll down
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-
-        if (!to_date_change){
-            ssf_press_button_ptv(context, BUTTON_A);
-            return;
-        }
-
-        ssf_press_button_ptv(context, BUTTON_A, 1000ms);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-    }
     }
 
 

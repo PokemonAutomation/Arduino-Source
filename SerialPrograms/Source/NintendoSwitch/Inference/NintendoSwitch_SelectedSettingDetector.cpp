@@ -39,7 +39,7 @@ bool is_white_theme(const ImageViewRGB32& screen){
 
 bool SelectedSettingWatcher::process_frame(const ImageViewRGB32& screen, WallClock timestamp){
 
-ImageStats stats_unselected_box1 = image_stats(extract_box_reference(screen, m_not_selected_box1));
+    ImageStats stats_unselected_box1 = image_stats(extract_box_reference(screen, m_not_selected_box1));
     double unselected1_average_sum = stats_unselected_box1.average.sum();
     cout << "unselected_average_sum1: " << std::to_string(unselected1_average_sum) << endl;
 
