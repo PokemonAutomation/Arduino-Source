@@ -25,8 +25,8 @@ UpdateMenuDetector::UpdateMenuDetector(Color color)
     , m_switch2(color)
 {}
 void UpdateMenuDetector::make_overlays(VideoOverlaySet& items) const{
-//    m_type_detector.make_overlays(items);
-//    m_switch1.make_overlays(items);
+    m_type_detector.make_overlays(items);
+    m_switch1.make_overlays(items);
     m_switch2.make_overlays(items);
 }
 bool UpdateMenuDetector::detect(const ImageViewRGB32& screen) const{
