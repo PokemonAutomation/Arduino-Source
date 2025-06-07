@@ -957,6 +957,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.h
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
