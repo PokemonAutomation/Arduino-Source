@@ -4,18 +4,16 @@
  *
  */
 
-#include "Controllers/ControllerTypes.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonFramework/ImageTools/ImageStats.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch_Navigation.h"
-
-#include <cmath>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

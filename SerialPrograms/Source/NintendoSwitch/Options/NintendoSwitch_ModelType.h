@@ -27,7 +27,7 @@ public:
         : EnumDropdownOption<ConsoleModel>(
             std::move("Console Type:"),
             {
-               {ConsoleModel::Switch1,                  "switch1",          "Switch 1 + OLED."},
+               {ConsoleModel::Switch1,                  "switch1",          "Switch 1 + OLED"},
                {ConsoleModel::Switch2_International,    "switch2",          "Switch 2 (international)"},
                {ConsoleModel::Switch2_JapanLocked,      "switch2-japan",    "Switch 2 (Japan-locked)"},
             },

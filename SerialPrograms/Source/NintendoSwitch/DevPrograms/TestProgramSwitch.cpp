@@ -269,6 +269,7 @@ TestProgram::TestProgram()
 //    PA_ADD_OPTION(battle_AI);
     PA_ADD_OPTION(DATE0);
     PA_ADD_OPTION(DATE1);
+    PA_ADD_OPTION(CONSOLE_MODEL);
     PA_ADD_OPTION(DURATION);
     PA_ADD_OPTION(COLOR);
     PA_ADD_OPTION(CONTROLLER_TABLE);
@@ -317,7 +318,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-#if 1
+
+
+
+
+
+
+
+#if 0
     home_to_date_time(console, context, false);
 #endif
 
