@@ -1,11 +1,11 @@
-/*  Update Menu Detector
+/*  Update Popup Detector
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_UpdateMenuDetector_H
-#define PokemonAutomation_NintendoSwitch_UpdateMenuDetector_H
+#ifndef PokemonAutomation_NintendoSwitch_UpdatePopupDetector_H
+#define PokemonAutomation_NintendoSwitch_UpdatePopupDetector_H
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -18,9 +18,9 @@ namespace NintendoSwitch{
 
 
 
-class UpdateMenuDetector_Switch1 : public StaticScreenDetector{
+class UpdatePopupDetector_Switch1 : public StaticScreenDetector{
 public:
-    UpdateMenuDetector_Switch1(Color color = COLOR_RED);
+    UpdatePopupDetector_Switch1(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -34,9 +34,9 @@ private:
     ImageFloatBox m_bottom_solid;
     ImageFloatBox m_bottom_buttons;
 };
-class UpdateMenuDetector_Switch2 : public StaticScreenDetector{
+class UpdatePopupDetector_Switch2 : public StaticScreenDetector{
 public:
-    UpdateMenuDetector_Switch2(Color color = COLOR_RED);
+    UpdatePopupDetector_Switch2(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
@@ -56,19 +56,19 @@ private:
 
 
 //  Detect the Switch system update screen when you are about to enter a game from Switch Home screen
-class UpdateMenuDetector : public StaticScreenDetector{
+class UpdatePopupDetector : public StaticScreenDetector{
 public:
-    UpdateMenuDetector(Color color = COLOR_RED);
+    UpdatePopupDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) const override;
 
 private:
     ConsoleTypeDetector_Home m_type_detector;
-    UpdateMenuDetector_Switch1 m_switch1;
-    UpdateMenuDetector_Switch2 m_switch2;
+    UpdatePopupDetector_Switch1 m_switch1;
+    UpdatePopupDetector_Switch2 m_switch2;
 };
-class UpdateMenuWatcher : public DetectorToFinder<UpdateMenuDetector>{
+class UpdateMenuWatcher : public DetectorToFinder<UpdatePopupDetector>{
 public:
     UpdateMenuWatcher(Color color = COLOR_RED)
          : DetectorToFinder("UpdateMenuWatcher", std::chrono::milliseconds(250), color)

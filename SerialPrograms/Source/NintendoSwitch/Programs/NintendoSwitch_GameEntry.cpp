@@ -17,7 +17,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_UpdateMenuDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch_GameEntry.h"
 
 //#include <iostream>
@@ -57,7 +59,7 @@ void resume_game_from_home(
         }
 
         //  In case we failed to enter the game.
-        HomeWatcher home_detector;
+        HomeMenuWatcher home_detector;
         if (home_detector.detect(stream.video().snapshot())){
             stream.log("Failed to re-enter game. Trying again...", COLOR_RED);
             pbf_press_button(context, BUTTON_HOME, 10, 10);
@@ -99,7 +101,7 @@ void start_game_from_home_with_inference(
 ){
     context.wait_for_all_requests();
     {
-        HomeWatcher detector;
+        HomeMenuWatcher detector;
         int ret = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
@@ -130,7 +132,7 @@ void start_game_from_home_with_inference(
     pbf_press_button(context, BUTTON_A, 20, 105);
 
     while (true){
-        HomeWatcher home(std::chrono::milliseconds(2000));
+        HomeMenuWatcher home(std::chrono::milliseconds(2000));
         StartGameUserSelectWatcher user_select(COLOR_GREEN);
         UpdateMenuWatcher update_menu(COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);
@@ -341,7 +343,7 @@ void resume_game_from_home(
         }
 
         //  In case we failed to enter the game.
-        HomeWatcher home_detector;
+        HomeMenuWatcher home_detector;
         if (home_detector.detect(stream.video().snapshot())){
             stream.log("Failed to re-enter game. Trying again...", COLOR_RED);
             pbf_press_button(context, BUTTON_HOME, 20ms, 10ms);
@@ -381,7 +383,7 @@ void start_game_from_home_with_inference(
     }
 
     {
-        HomeWatcher detector;
+        HomeMenuWatcher detector;
         int ret = run_until<JoyconContext>(
             stream, context,
             [](JoyconContext& context){
@@ -412,7 +414,7 @@ void start_game_from_home_with_inference(
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
     while (true){
-        HomeWatcher home(std::chrono::milliseconds(2000));
+        HomeMenuWatcher home(std::chrono::milliseconds(2000));
         StartGameUserSelectWatcher user_select(COLOR_GREEN);
         UpdateMenuWatcher update_menu(COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);

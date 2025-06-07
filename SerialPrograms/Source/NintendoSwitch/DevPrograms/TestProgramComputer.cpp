@@ -650,7 +650,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 //    ImageRGB32 image("20230427-200550386826-OperationFailedException.png");
 
-//    NintendoSwitch::HomeDetector detector;
+//    NintendoSwitch::HomeMenuDetector detector;
 //    cout << detector.detect(image) << endl;
 
 

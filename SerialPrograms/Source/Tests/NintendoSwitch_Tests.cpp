@@ -9,7 +9,7 @@
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_UpdateMenuDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch_Tests.h"
 #include "TestUtils.h"
 
@@ -23,8 +23,8 @@ namespace PokemonAutomation{
 using namespace NintendoSwitch;
 
 // using namespace NintendoSwitch::PokemonLA;
-int test_NintendoSwitch_UpdateMenuDetector(const ImageViewRGB32& image, bool target){
-    UpdateMenuDetector detector;
+int test_NintendoSwitch_UpdatePopupDetector(const ImageViewRGB32& image, bool target){
+    UpdatePopupDetector detector;
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;

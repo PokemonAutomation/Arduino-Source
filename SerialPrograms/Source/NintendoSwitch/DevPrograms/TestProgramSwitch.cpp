@@ -124,7 +124,9 @@
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_UpdateMenuDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -320,6 +322,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+    HomeMenuDetector detector0;
+    StartGameUserSelectDetector detector1;
+    UpdatePopupDetector detector2;
+    detector0.make_overlays(overlays);
+    detector1.make_overlays(overlays);
+    detector2.make_overlays(overlays);
+    cout << detector1.detect(feed.snapshot()) << endl;
+
+
+
 #if 0
     ConsoleTypeDetector_Home detector;
     detector.make_overlays(overlays);
@@ -329,8 +342,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 1
-    UpdateMenuDetector detector;
+#if 0
+    UpdatePopupDetector detector;
     detector.make_overlays(overlays);
 
     cout << detector.detect(feed.snapshot()) << endl;
@@ -2269,7 +2282,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 //    YCommMenuDetector detector(true);
-//    HomeDetector detector;
+//    HomeMenuDetector detector;
 //    cout << detector.detect(image) << endl;
 //    cout << detector.detect(feed.snapshot()) << endl;
 
@@ -2336,8 +2349,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #if 0
     ImageRGB32 image("screenshot-20221107-210754107968.png");
 //    auto image = feed.snapshot();
-    HomeDetector detector;
-//    UpdateMenuDetector detector;
+    HomeMenuDetector detector;
+//    UpdatePopupDetector detector;
     VideoOverlaySet overlays(overlay);
     detector.make_overlays(overlays);
     cout << detector.detect(image) << endl;
@@ -2346,7 +2359,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    ImageRGB32 image("ExclamationFalsePositive.png");
 //    find_exclamation_marks(image);
 
-//    HomeDetector detector;
+//    HomeMenuDetector detector;
 //    cout << detector.detect(image) << endl;
 
 

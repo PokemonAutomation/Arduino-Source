@@ -22,7 +22,7 @@
 #include "NintendoSwitch_DateReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 
 //#include <iostream>
@@ -556,7 +556,7 @@ void change_date(
     while (true){
         context.wait_for_all_requests();
 
-        HomeWatcher home;
+        HomeMenuWatcher home;
         DateChangeWatcher date_reader;
         int ret = wait_until(
             env.console, context, std::chrono::seconds(10),

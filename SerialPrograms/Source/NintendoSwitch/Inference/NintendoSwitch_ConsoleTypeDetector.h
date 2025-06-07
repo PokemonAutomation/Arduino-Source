@@ -45,6 +45,18 @@ private:
     ImageFloatBox m_bottom_line;
 };
 
+class ConsoleTypeDetector_StartGameUserSelect{
+public:
+    ConsoleTypeDetector_StartGameUserSelect(Color color = COLOR_RED);
+
+    void make_overlays(VideoOverlaySet& items) const;
+    ConsoleTypeDetection detect(const ImageViewRGB32& screen) const;
+
+private:
+    Color m_color;
+    ImageFloatBox m_bottom_line;
+};
+
 
 
 

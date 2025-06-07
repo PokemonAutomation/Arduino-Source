@@ -1,4 +1,4 @@
-/*  Update Menu Detector
+/*  Update Popup Detector
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -7,29 +7,28 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "NintendoSwitch_UpdateMenuDetector.h"
+#include "NintendoSwitch_UpdatePopupDetector.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
 
-UpdateMenuDetector::UpdateMenuDetector(Color color)
+UpdatePopupDetector::UpdatePopupDetector(Color color)
     : m_type_detector(color)
     , m_switch1(color)
     , m_switch2(color)
 {}
-void UpdateMenuDetector::make_overlays(VideoOverlaySet& items) const{
+void UpdatePopupDetector::make_overlays(VideoOverlaySet& items) const{
     m_type_detector.make_overlays(items);
     m_switch1.make_overlays(items);
     m_switch2.make_overlays(items);
 }
-bool UpdateMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool UpdatePopupDetector::detect(const ImageViewRGB32& screen) const{
     ConsoleTypeDetection x = m_type_detector.detect(screen);
     switch (x){
     case ConsoleTypeDetection::Unknown:
@@ -54,7 +53,7 @@ bool UpdateMenuDetector::detect(const ImageViewRGB32& screen) const{
 
 
 
-UpdateMenuDetector_Switch1::UpdateMenuDetector_Switch1(Color color)
+UpdatePopupDetector_Switch1::UpdatePopupDetector_Switch1(Color color)
     : m_color(color)
     , m_box_top(0.25, 0.26, 0.50, 0.02)
     , m_box_mid(0.25, 0.52, 0.50, 0.02)
@@ -63,7 +62,7 @@ UpdateMenuDetector_Switch1::UpdateMenuDetector_Switch1(Color color)
     , m_bottom_solid(0.10, 0.84, 0.80, 0.04)
     , m_bottom_buttons(0.70, 0.92, 0.28, 0.05)
 {}
-void UpdateMenuDetector_Switch1::make_overlays(VideoOverlaySet& items) const{
+void UpdatePopupDetector_Switch1::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box_top);
     items.add(m_color, m_box_mid);
     items.add(m_color, m_top);
@@ -71,7 +70,7 @@ void UpdateMenuDetector_Switch1::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_solid);
     items.add(m_color, m_bottom_buttons);
 }
-bool UpdateMenuDetector_Switch1::detect(const ImageViewRGB32& screen) const{
+bool UpdatePopupDetector_Switch1::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_box_top = image_stats(extract_box_reference(screen, m_box_top));
 //    cout << stats_box_top.average << stats_box_top.stddev << endl;
     bool white;
@@ -138,7 +137,7 @@ bool UpdateMenuDetector_Switch1::detect(const ImageViewRGB32& screen) const{
 
 
 
-UpdateMenuDetector_Switch2::UpdateMenuDetector_Switch2(Color color)
+UpdatePopupDetector_Switch2::UpdatePopupDetector_Switch2(Color color)
     : m_color(color)
     , m_box_top(0.25, 0.31, 0.50, 0.02)
     , m_box_mid(0.25, 0.56, 0.50, 0.02)
@@ -148,7 +147,7 @@ UpdateMenuDetector_Switch2::UpdateMenuDetector_Switch2(Color color)
     , m_bottom_buttons(0.70, 0.92, 0.28, 0.05)
 {}
 
-void UpdateMenuDetector_Switch2::make_overlays(VideoOverlaySet& items) const{
+void UpdatePopupDetector_Switch2::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box_top);
     items.add(m_color, m_box_mid);
     items.add(m_color, m_top);
@@ -156,7 +155,7 @@ void UpdateMenuDetector_Switch2::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_solid);
     items.add(m_color, m_bottom_buttons);
 }
-bool UpdateMenuDetector_Switch2::detect(const ImageViewRGB32& screen) const{
+bool UpdatePopupDetector_Switch2::detect(const ImageViewRGB32& screen) const{
     ImageStats stats_box_top = image_stats(extract_box_reference(screen, m_box_top));
 //    cout << stats_box_top.average << stats_box_top.stddev << endl;
     bool white;

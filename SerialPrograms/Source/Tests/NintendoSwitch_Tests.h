@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 
 class ImageViewRGB32;
 
-int test_NintendoSwitch_UpdateMenuDetector(const ImageViewRGB32& image, bool target);
+int test_NintendoSwitch_UpdatePopupDetector(const ImageViewRGB32& image, bool target);
 
 }
 

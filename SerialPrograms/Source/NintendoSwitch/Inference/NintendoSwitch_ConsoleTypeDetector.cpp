@@ -20,13 +20,31 @@ ConsoleTypeDetector_Home::ConsoleTypeDetector_Home(Color color)
     : m_color(color)
     , m_bottom_line(0.10, 0.88, 0.80, 0.03)
 {}
-
 void ConsoleTypeDetector_Home::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_line);
 }
 ConsoleTypeDetection ConsoleTypeDetector_Home::detect(const ImageViewRGB32& screen) const{
     ImageStats stats = image_stats(extract_box_reference(screen, m_bottom_line));
-//    cout << stats.stddev.sum() << endl;
+//    cout << "ConsoleTypeDetector: " << stats.stddev.sum() << endl;
+    if (stats.stddev.sum() < 10){
+        return ConsoleTypeDetection::Switch2_Unknown;
+    }else{
+        return ConsoleTypeDetection::Switch1;
+    }
+}
+
+
+
+ConsoleTypeDetector_StartGameUserSelect::ConsoleTypeDetector_StartGameUserSelect(Color color)
+    : m_color(color)
+    , m_bottom_line(0.02, 0.53, 0.96, 0.03)
+{}
+void ConsoleTypeDetector_StartGameUserSelect::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_bottom_line);
+}
+ConsoleTypeDetection ConsoleTypeDetector_StartGameUserSelect::detect(const ImageViewRGB32& screen) const{
+    ImageStats stats = image_stats(extract_box_reference(screen, m_bottom_line));
+//    cout << "ConsoleTypeDetector: " << stats.stddev.sum() << endl;
     if (stats.stddev.sum() < 10){
         return ConsoleTypeDetection::Switch2_Unknown;
     }else{

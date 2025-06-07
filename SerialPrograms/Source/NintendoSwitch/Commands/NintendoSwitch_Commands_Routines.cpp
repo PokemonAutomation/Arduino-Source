@@ -12,7 +12,7 @@
 #include "NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 //#include "NintendoSwitch_Messages_Routines.h"
 
 //#include <iostream>
@@ -45,7 +45,7 @@ void close_game(VideoStream& stream, ProControllerContext& context){
     // send a second Home button press, if the first one is dropped
     bool video_available = (bool)stream.video().snapshot();
     if (video_available){
-        HomeWatcher detector;
+        HomeMenuWatcher detector;
         int ret = wait_until(
             stream, context,
             std::chrono::milliseconds(5000),
@@ -88,7 +88,7 @@ void close_game(VideoStream& stream, JoyconContext& context){
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     context.wait_for_all_requests();
 
-    HomeWatcher detector;
+    HomeMenuWatcher detector;
     int ret = wait_until(
         stream, context,
         std::chrono::milliseconds(5000),
