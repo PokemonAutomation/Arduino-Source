@@ -322,6 +322,10 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
             home_to_date_time_Switch1_wired_with_feedback(stream, context, to_date_change);
             break;
         }
+        default:{
+            //  Slow version for tick-imprecise controllers. Blind.
+            home_to_date_time_Switch1_sbb_blind(context, to_date_change, false);
+        }
     }
 }
 
