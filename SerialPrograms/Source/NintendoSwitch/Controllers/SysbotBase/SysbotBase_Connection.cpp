@@ -11,10 +11,9 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "SysbotBase_Connection.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace SysbotBase{
@@ -107,7 +106,7 @@ ControllerModeStatus TcpSysbotBase_Connection::controller_mode_status() const{
 
 void TcpSysbotBase_Connection::write_data(const std::string& data){
     WriteSpinLock lg(m_send_lock);
-    cout << "Sending: " << data << endl;    //  REMOVE
+//    cout << "Sending: " << data << endl;
     m_socket.blocking_send(data.data(), data.size());
 }
 
