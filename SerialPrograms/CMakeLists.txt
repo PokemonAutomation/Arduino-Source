@@ -959,10 +959,14 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.h
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h
-    Source/NintendoSwitch/Inference/NintendoSwitch_UpdateMenuDetector.cpp
-    Source/NintendoSwitch/Inference/NintendoSwitch_UpdateMenuDetector.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
