@@ -42,6 +42,7 @@ void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProContr
         // ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
 
         //  Two A presses in case we drop the 1st one.
+        //  the program can self recover even if the second button press is registered.
         ssf_press_button(context, BUTTON_A, 3);
         ssf_press_button(context, BUTTON_A, 3);
 
@@ -68,7 +69,7 @@ void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProContr
             },
             {system_setting_selected}
         );
-        if (ret < 0){  // failed to detect System highlighted. press home and re-try
+        if (ret < 0){  // failed to detect "System" being highlighted. press home and re-try
             pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
             continue;
         }
@@ -90,7 +91,8 @@ void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProContr
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
         // }
 
-
+        // only one ButtonA press since the program can self-recover if the button is dropped.
+        // furthermore, the program can't self-recover if a second button press is registered.
         ssf_press_button(context, BUTTON_A, 3);
 
         context.wait_for_all_requests();
@@ -105,7 +107,7 @@ void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProContr
             Milliseconds(2000),
             {sync_clock_selected}
         );
-        if (ret < 0){  // failed to detect System highlighted. press home and re-try
+        if (ret < 0){  // failed to detect "Synchronize clock" being highlighted. press home and re-try
             pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
             continue;
         }
