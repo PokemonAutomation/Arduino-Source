@@ -9,7 +9,7 @@
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_UpdateMenuDetector.h"
 #include "NintendoSwitch_Tests.h"
 #include "TestUtils.h"
 

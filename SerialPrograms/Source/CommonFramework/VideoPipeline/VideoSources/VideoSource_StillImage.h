@@ -38,7 +38,7 @@ public:
 
     virtual bool operator==(const VideoSourceDescriptor& x) const override;
     virtual std::string display_name() const override{
-        return "Display a Still Image";
+        return "Display Image";
     }
 
     virtual void run_post_select() override;

@@ -63,31 +63,6 @@ public:
 };
 
 
-//  Detect the Switch system update screen when you are about to enter a game from Switch Home screen
-class UpdateMenuDetector : public StaticScreenDetector{
-public:
-    UpdateMenuDetector(Color color = COLOR_RED, bool invert = false);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
-
-private:
-    Color m_color;
-    bool m_invert;
-    ImageFloatBox m_box_top;
-    ImageFloatBox m_box_mid;
-    ImageFloatBox m_top;
-    ImageFloatBox m_left;
-    ImageFloatBox m_bottom_solid;
-    ImageFloatBox m_bottom_buttons;
-};
-class UpdateMenuWatcher : public DetectorToFinder<UpdateMenuDetector>{
-public:
-    UpdateMenuWatcher(Color color = COLOR_RED, bool invert = false)
-         : DetectorToFinder("UpdateMenuWatcher", std::chrono::milliseconds(250), color, invert)
-    {}
-};
-
 
 
 //  Detect the "Checking if the software can be played..." menu.

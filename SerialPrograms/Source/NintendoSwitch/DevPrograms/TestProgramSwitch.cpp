@@ -123,6 +123,8 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_UpdateMenuDetector.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -318,8 +320,21 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+#if 0
+    ConsoleTypeDetector_Home detector;
+    detector.make_overlays(overlays);
+
+    cout << (int)detector.detect(feed.snapshot()) << endl;
+#endif
 
 
+
+#if 1
+    UpdateMenuDetector detector;
+    detector.make_overlays(overlays);
+
+    cout << detector.detect(feed.snapshot()) << endl;
+#endif
 
 
 

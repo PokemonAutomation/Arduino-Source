@@ -33,7 +33,7 @@ void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProContr
         // if (i > 0){  // intentionally create a failure, for testing 
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
         // }
-        
+
 
         // ImageFloatBox system_icon(0.685, 0.69, 0.05, 0.03);
         // ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
