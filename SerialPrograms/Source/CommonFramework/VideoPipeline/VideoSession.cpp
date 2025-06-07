@@ -123,7 +123,7 @@ void VideoSession::set_source(const std::shared_ptr<VideoSourceDescriptor>& devi
     m_logger.log("Changing video...", COLOR_GREEN);
     dispatch_to_main_thread([this, device]{
         std::lock_guard<std::mutex> lg0(m_reset_lock);
-        if (*m_descriptor == *device){
+        if (*m_descriptor == *device && !m_descriptor->should_reload()){
             return;
         }
 

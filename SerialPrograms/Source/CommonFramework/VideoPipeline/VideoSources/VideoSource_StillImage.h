@@ -36,6 +36,7 @@ public:
     // Otherwise, return 0.
     size_t source_image_height() const{return m_source_image_height;}
 
+    virtual bool should_reload() const override{ return true; }
     virtual bool operator==(const VideoSourceDescriptor& x) const override;
     virtual std::string display_name() const override{
         return "Display Image";

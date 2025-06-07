@@ -38,6 +38,7 @@ public:
     virtual ~VideoSourceDescriptor() = default;
 
 public:
+    virtual bool should_reload() const{ return false; }
     virtual bool operator==(const VideoSourceDescriptor& x) const = 0;
     virtual std::string display_name() const = 0;
 
