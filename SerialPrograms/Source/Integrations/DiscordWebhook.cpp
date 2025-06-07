@@ -176,7 +176,7 @@ void DiscordWebhookSender::process_reply(QNetworkReply* reply){
     }else{
         QString error_string = reply->errorString();
         QString url = reply->url().toString();
-        int index = error_string.indexOf(url);
+        size_t index = error_string.indexOf(url);
         if (index >= 0){
             error_string.replace(index, url.size(), "****************");
         }

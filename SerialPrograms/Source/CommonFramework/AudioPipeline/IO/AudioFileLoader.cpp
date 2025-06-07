@@ -186,7 +186,7 @@ void AudioFileLoader::sendBufferFromWavFileOnTimer(){
     const int wavBytesPerFrame = wavAudioFormat.bytesPerFrame();
     const int wavBytesToRead = (int)(wavBytesPerFrame * m_frames_per_timeout);
     m_rawBuffer.resize(wavBytesToRead);
-    const int wavBytesRead = m_wavFile->read(m_rawBuffer.data(), wavBytesToRead);
+    const int64_t wavBytesRead = m_wavFile->read(m_rawBuffer.data(), wavBytesToRead);
     m_rawBuffer.resize(wavBytesRead);
 
     if (wavBytesRead == 0){

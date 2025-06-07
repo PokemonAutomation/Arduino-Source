@@ -59,7 +59,7 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
         header << QString::fromStdString(name);
     }
     header << "" << "" << "";
-    m_table->setColumnCount(header.size());
+    m_table->setColumnCount(int(header.size()));
     m_table->setHorizontalHeaderLabels(header);
 
     QFont font;

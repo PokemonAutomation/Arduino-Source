@@ -115,7 +115,7 @@ struct EventNotificationOption::Data{
         , m_null_screenshot(LockMode::UNLOCK_WHILE_RUNNING, "---")
         , m_screenshot(ImageAttachmentMode::NO_SCREENSHOT)
         , m_tags(false, LockMode::UNLOCK_WHILE_RUNNING, "Notifs", "")
-        , m_rate_limit_seconds(LockMode::UNLOCK_WHILE_RUNNING, rate_limit.count())
+        , m_rate_limit_seconds(LockMode::UNLOCK_WHILE_RUNNING, uint32_t(rate_limit.count()))
         , m_last_sent(WallClock::min())
         , m_global_enable(true)
     {}
@@ -132,7 +132,7 @@ struct EventNotificationOption::Data{
         , m_null_screenshot(LockMode::UNLOCK_WHILE_RUNNING, "---")
         , m_screenshot(ImageAttachmentMode::NO_SCREENSHOT)
         , m_tags(false, LockMode::UNLOCK_WHILE_RUNNING, tags_to_str(tags), "")
-        , m_rate_limit_seconds(LockMode::UNLOCK_WHILE_RUNNING, rate_limit.count())
+        , m_rate_limit_seconds(LockMode::UNLOCK_WHILE_RUNNING, uint32_t(rate_limit.count()))
         , m_last_sent(WallClock::min())
         , m_global_enable(true)
     {}
@@ -150,7 +150,7 @@ struct EventNotificationOption::Data{
         , m_null_screenshot(LockMode::UNLOCK_WHILE_RUNNING, "---")
         , m_screenshot(screenshot)
         , m_tags(false, LockMode::UNLOCK_WHILE_RUNNING, tags_to_str(tags), "")
-        , m_rate_limit_seconds(LockMode::UNLOCK_WHILE_RUNNING, rate_limit.count())
+        , m_rate_limit_seconds(LockMode::UNLOCK_WHILE_RUNNING, uint32_t(rate_limit.count()))
         , m_last_sent(WallClock::min())
         , m_global_enable(true)
     {}

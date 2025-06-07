@@ -260,7 +260,7 @@ std::vector<int> parse_multispawn_path(SingleSwitchProgramEnvironment& env, cons
             );
         }
         raw_path[next_pos] = '\0';
-        int despawn_count = strtol(raw_path.data() + pos+1, nullptr, 10);
+        int despawn_count = static_cast<int>(strtol(raw_path.data() + pos+1, nullptr, 10));
         if (despawn_count <= 0 || despawn_count > max_num_despawn){
             throw InternalProgramError(
                 &env.console.logger(),

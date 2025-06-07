@@ -78,7 +78,7 @@ public:
 
         while (bytes > 0){
             size_t current = std::min<size_t>(bytes, BLOCK_SIZE);
-            int current_sent = ::send(m_socket, ptr, (int)current, MSG_DONTWAIT);
+            ssize_t current_sent = ::send(m_socket, ptr, (int)current, MSG_DONTWAIT);
             if (current_sent != -1){
                 sent += current;
                 if ((size_t)current_sent < current){
@@ -183,7 +183,7 @@ Connected:
         char buffer[BUFFER_SIZE];
 
         while (true){
-            int bytes;
+            ssize_t bytes;
             int error = 0;
             {
                 std::unique_lock<std::mutex> lg(m_lock);

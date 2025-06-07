@@ -34,7 +34,7 @@ int scale_dpi_height(int height){
 
 
 void scale_dpi_token(QString& str, int dpi){
-    int length = str.length();
+    size_t length = str.length();
     if (length < 3){
         return;
     }
@@ -44,7 +44,7 @@ void scale_dpi_token(QString& str, int dpi){
 
     //  Parse the integer in front.
     int64_t value = 0;
-    for (int c = 0; c < length - 2; c++){
+    for (size_t c = 0; c < length - 2; c++){
         QChar ch = str[c];
         if (!('0' <= ch && ch <= '9')){
             return;

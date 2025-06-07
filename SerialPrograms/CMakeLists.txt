@@ -2515,7 +2515,7 @@ else() # macOS and Linux
         # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
         # when compiling OpenCV
         # target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
-        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror)
+        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
     else()
         # Assume GCC
         target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
