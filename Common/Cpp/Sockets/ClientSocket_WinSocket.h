@@ -28,7 +28,7 @@ public:
         u_long non_blocking = 1;
         if (ioctlsocket(m_socket, FIONBIO, &non_blocking)){
 //            cout << "ioctlsocket() Failed" << endl;
-            closesocket(m_socket);
+            close_socket();
             return;
         }
     }
@@ -38,16 +38,7 @@ public:
         if (m_thread.joinable()){
             m_thread.join();
         }
-        if (m_socket == INVALID_SOCKET){
-            return;
-        }
-        int ret = closesocket(m_socket);
-        if (ret == 0){
-            return;
-        }
-        try{
-            std::cout << "Failed closesocket(): WSA Error Code = " + std::to_string(ret) << std::endl;
-        }catch (...){}
+        close_socket();
     }
     virtual void close() noexcept override{
         {
@@ -120,6 +111,19 @@ public:
 
 
 private:
+    void close_socket(){
+        if (m_socket == INVALID_SOCKET){
+            return;
+        }
+        int ret = closesocket(m_socket);
+        if (ret == 0){
+            return;
+        }
+        try{
+            std::cout << "Failed closesocket(): WSA Error Code = " + std::to_string(ret) << std::endl;
+        }catch (...){}
+    }
+
     void thread_loop(const std::string& address, uint16_t port){
         try{
             thread_loop_internal(address, port);
