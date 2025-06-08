@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_MenuStabilityTester_H
 #define PokemonAutomation_NintendoSwitch_MenuStabilityTester_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
@@ -45,6 +46,7 @@ private:
     EnumDropdownOption<TestType> TEST_TYPE;
     SimpleIntegerOption<uint8_t> VERTICAL_RANGE;
     SimpleIntegerOption<uint8_t> HORIZONTAL_RANGE;
+    BooleanCheckBoxOption PAUSE_BEFORE_UTURN;
 
     MillisecondsOption DELAY_TO_NEXT;
     MillisecondsOption HOLD_DURATION;

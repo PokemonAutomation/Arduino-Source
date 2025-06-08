@@ -321,8 +321,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+    while (true){
+        home_to_date_time_Switch2_wired_blind(context, true);
+        ssf_do_nothing(context, 1000ms);
+        pbf_press_button(context, BUTTON_HOME, 200ms, 1800ms);
+    }
 
 
+
+#if 0
     HomeMenuDetector detector0;
     StartGameUserSelectDetector detector1;
     UpdatePopupDetector detector2;
@@ -330,7 +337,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     detector1.make_overlays(overlays);
     detector2.make_overlays(overlays);
     cout << detector1.detect(feed.snapshot()) << endl;
-
+#endif
 
 
 #if 0

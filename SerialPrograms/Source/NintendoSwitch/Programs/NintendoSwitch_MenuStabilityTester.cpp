@@ -42,12 +42,17 @@ MenuStabilityTester::MenuStabilityTester()
     , VERTICAL_RANGE(
         "<b>Vertical Scroll Range:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        60
+        20
     )
     , HORIZONTAL_RANGE(
         "<b>Horizontal Scroll Range:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         4
+    )
+    , PAUSE_BEFORE_UTURN(
+        "<b>Pause Before Turning Around:</b>",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
     )
     , DELAY_TO_NEXT(
         "<b>Delay to Next Button:</b>",
@@ -69,6 +74,7 @@ MenuStabilityTester::MenuStabilityTester()
 
     PA_ADD_OPTION(VERTICAL_RANGE);
     PA_ADD_OPTION(HORIZONTAL_RANGE);
+    PA_ADD_OPTION(PAUSE_BEFORE_UTURN);
 
     PA_ADD_OPTION(DELAY_TO_NEXT);
     PA_ADD_OPTION(HOLD_DURATION);
@@ -83,14 +89,17 @@ void MenuStabilityTester::on_config_value_changed(void* object){
     case TestType::Vertical:
         VERTICAL_RANGE.set_visibility(ConfigOptionState::ENABLED);
         HORIZONTAL_RANGE.set_visibility(ConfigOptionState::HIDDEN);
+        PAUSE_BEFORE_UTURN.set_visibility(ConfigOptionState::ENABLED);
         break;
     case TestType::Horizontal:
         VERTICAL_RANGE.set_visibility(ConfigOptionState::HIDDEN);
         HORIZONTAL_RANGE.set_visibility(ConfigOptionState::ENABLED);
+        PAUSE_BEFORE_UTURN.set_visibility(ConfigOptionState::ENABLED);
         break;
     case TestType::SimultaneousScrollA:
         VERTICAL_RANGE.set_visibility(ConfigOptionState::HIDDEN);
         HORIZONTAL_RANGE.set_visibility(ConfigOptionState::HIDDEN);
+        PAUSE_BEFORE_UTURN.set_visibility(ConfigOptionState::HIDDEN);
         break;
     }
 }
@@ -105,21 +114,31 @@ void MenuStabilityTester::program(SingleSwitchProgramEnvironment& env, ProContro
             for (size_t c = 0; c < VERTICAL_RANGE; c++){
                 ssf_issue_scroll(context, DPAD_DOWN, DELAY_TO_NEXT, HOLD_DURATION, COOLDOWN);
             }
-            ssf_do_nothing(context, 1000ms);
+            if (PAUSE_BEFORE_UTURN){
+                ssf_do_nothing(context, 1000ms);
+            }
             for (size_t c = 0; c < VERTICAL_RANGE; c++){
                 ssf_issue_scroll(context, DPAD_UP, DELAY_TO_NEXT, HOLD_DURATION, COOLDOWN);
             }
-            ssf_do_nothing(context, 1000ms);
+            if (PAUSE_BEFORE_UTURN){
+                ssf_do_nothing(context, 1000ms);
+            }
         }
         break;
 
     case TestType::Horizontal:
-        for (size_t i = 0; i < 100; i++){
+        while (true){
             for (size_t c = 0; c < HORIZONTAL_RANGE; c++){
                 ssf_issue_scroll(context, DPAD_RIGHT, DELAY_TO_NEXT, HOLD_DURATION, COOLDOWN);
             }
+            if (PAUSE_BEFORE_UTURN){
+                ssf_do_nothing(context, 1000ms);
+            }
             for (size_t c = 0; c < HORIZONTAL_RANGE; c++){
                 ssf_issue_scroll(context, DPAD_LEFT, DELAY_TO_NEXT, HOLD_DURATION, COOLDOWN);
+            }
+            if (PAUSE_BEFORE_UTURN){
+                ssf_do_nothing(context, 1000ms);
             }
         }
         break;

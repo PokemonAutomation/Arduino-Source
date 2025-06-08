@@ -17,9 +17,11 @@ namespace NintendoSwitch{
 
 void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProControllerContext& context, bool to_date_change);
 
-void home_to_date_time_Switch1_wired_blind(ProControllerContext& context, bool to_date_change, bool fast);
-void home_to_date_time_Switch1_wireless_esp32_blind(ProControllerContext& context, bool to_date_change, bool fast);
-void home_to_date_time_Switch1_sbb_blind(ProControllerContext& context, bool to_date_change, bool fast);
+void home_to_date_time_Switch1_wired_blind(ProControllerContext& context, bool to_date_change);
+void home_to_date_time_Switch1_wireless_esp32_blind(ProControllerContext& context, bool to_date_change);
+void home_to_date_time_Switch1_sbb_blind(ProControllerContext& context, bool to_date_change);
+
+void home_to_date_time_Switch2_wired_blind(ProControllerContext& context, bool to_date_change);
 
 // Navigates from Home screen to the Date and Time screen. Using visual inference.
 void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change);

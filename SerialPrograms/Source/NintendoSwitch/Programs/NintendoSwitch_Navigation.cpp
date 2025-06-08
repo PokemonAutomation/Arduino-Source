@@ -138,7 +138,7 @@ void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProContr
 }
 
 
-void home_to_date_time_Switch1_wired_blind(ProControllerContext& context, bool to_date_change, bool fast){
+void home_to_date_time_Switch1_wired_blind(ProControllerContext& context, bool to_date_change){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
@@ -200,12 +200,11 @@ void home_to_date_time_Switch1_wired_blind(ProControllerContext& context, bool t
     }
 //        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
 
-    //  Left scroll in case we missed landed in the language change or sleep
+    //  Left scroll in case we missed and landed in the language change or sleep
     //  confirmation menus.
     ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms);    
 }
-
-void home_to_date_time_Switch1_wireless_esp32_blind(ProControllerContext& context, bool to_date_change, bool fast){
+void home_to_date_time_Switch1_wireless_esp32_blind(ProControllerContext& context, bool to_date_change){
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 
@@ -275,8 +274,7 @@ void home_to_date_time_Switch1_wireless_esp32_blind(ProControllerContext& contex
     ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 2*unit, unit);
 
 }
-
-void home_to_date_time_Switch1_sbb_blind(ProControllerContext& context, bool to_date_change, bool fast){
+void home_to_date_time_Switch1_sbb_blind(ProControllerContext& context, bool to_date_change){
     Milliseconds tv = context->timing_variation();
 //        ssf_do_nothing(context, 1500ms);
 
@@ -313,6 +311,67 @@ void home_to_date_time_Switch1_sbb_blind(ProControllerContext& context, bool to_
     ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);    
 }
 
+void home_to_date_time_Switch2_wired_blind(ProControllerContext& context, bool to_date_change){
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+
+    //  Down twice in case we drop one.
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+
+    //  Two A presses in case we drop the 1st one.
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+
+    for (size_t c = 0; c < 40; c++){
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+    }
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 1000ms, 24ms);
+
+    //  Scroll left and press A to exit the sleep menu if we happened to
+    //  land there.
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 3);
+
+    for (size_t c = 0; c < 2; c++){
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    }
+
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 192ms, 48ms, 24ms);
+
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
+
+    if (!to_date_change){
+        //  Triple up this A press to make sure it gets through.
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 360ms, 48ms, 24ms);
+        return;
+    }
+
+    //  Triple up this A press to make sure it gets through.
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+
+    for (size_t c = 0; c < 5; c++){
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+    }
+
+    //  Left scroll in case we missed and landed in the language change or sleep
+    //  confirmation menus.
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+}
+
+
+
 
 void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change){
     switch (context->performance_class()){
@@ -322,7 +381,7 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
         }
         default:{
             //  Slow version for tick-imprecise controllers. Blind.
-            home_to_date_time_Switch1_sbb_blind(context, to_date_change, false);
+            home_to_date_time_Switch1_sbb_blind(context, to_date_change);
         }
     }
 }
@@ -330,16 +389,16 @@ void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool 
 void home_to_date_time(ProControllerContext& context, bool to_date_change, bool fast){
     switch (context->performance_class()){
         case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
-            home_to_date_time_Switch1_wired_blind(context, to_date_change, fast);
+            home_to_date_time_Switch1_wired_blind(context, to_date_change);
             break;
         }
         case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
-            home_to_date_time_Switch1_wireless_esp32_blind(context, to_date_change, fast);
+            home_to_date_time_Switch1_wireless_esp32_blind(context, to_date_change);
             break;
         }
         default:{
             //  Slow version for tick-imprecise controllers.
-            home_to_date_time_Switch1_sbb_blind(context, to_date_change, fast);
+            home_to_date_time_Switch1_sbb_blind(context, to_date_change);
         }
     }
 
