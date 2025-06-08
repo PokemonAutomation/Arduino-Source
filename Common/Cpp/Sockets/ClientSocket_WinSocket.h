@@ -38,9 +38,16 @@ public:
         if (m_thread.joinable()){
             m_thread.join();
         }
-        if (m_socket != INVALID_SOCKET){
-            closesocket(m_socket);
+        if (m_socket == INVALID_SOCKET){
+            return;
         }
+        int ret = closesocket(m_socket);
+        if (ret == 0){
+            return;
+        }
+        try{
+            std::cout << "Failed closesocket(): WSA Error Code = " + std::to_string(ret) << std::endl;
+        }catch (...){}
     }
     virtual void close() noexcept override{
         {
