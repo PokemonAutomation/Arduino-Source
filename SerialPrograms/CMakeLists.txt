@@ -997,6 +997,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_MenuStabilityTester.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_MenuStabilityTester.h
     Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.h
     Source/NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.cpp
