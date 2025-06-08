@@ -9,6 +9,8 @@
 
 namespace PokemonAutomation{
 
+// The window that shows button mapping: which keyboard keys are mapped to which
+// Switch controller buttons.
 class ButtonDiagram : public QMainWindow{
 public:
     ButtonDiagram(QWidget* parent = nullptr);
