@@ -11,12 +11,16 @@
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 
 namespace PokemonAutomation{
+
+const char* PRO_CONTROLLER_MAPPING_PATH = "/NintendoSwitch/Layout-ProController.png";
+const char* JOYCON_VERTICAL_MAPPING_PATH = "/NintendoSwitch/Layout-JoyconVertical.png";
+const char* JOYCON_HORIZONTAL_MAPPING_PATH = "/NintendoSwitch/Layout-JoyconHorizontal.png";
 
 
 ButtonDiagram::ButtonDiagram(QWidget* parent)
@@ -34,24 +38,21 @@ ButtonDiagram::ButtonDiagram(QWidget* parent)
     connect(
         pro_controller, &QMenu::aboutToShow,
         this, [this](){
-            set_image("/NintendoSwitch/Layout-ProController.png");
+            set_image(PRO_CONTROLLER_MAPPING_PATH);
         }
     );
     connect(
         joycon_vertical, &QMenu::aboutToShow,
         this, [this](){
-            set_image("/NintendoSwitch/Layout-JoyconVertical.png");
+            set_image(JOYCON_VERTICAL_MAPPING_PATH);
         }
     );
     connect(
         joycon_horizontal, &QMenu::aboutToShow,
         this, [this](){
-            set_image("/NintendoSwitch/Layout-JoyconHorizontal.png");
+            set_image(JOYCON_HORIZONTAL_MAPPING_PATH);
         }
     );
-
-
-//    m_image = QPixmap(QString::fromStdString(RESOURCE_PATH() + "/NintendoSwitch/Layout-ProController.jpg"));
 
     m_image_label = new QLabel(this);
     setCentralWidget(m_image_label);
@@ -66,7 +67,7 @@ ButtonDiagram::ButtonDiagram(QWidget* parent)
 
     resize(800, 600 + menu->sizeHint().height());
 
-    set_image("/NintendoSwitch/Layout-ProController.jpg");
+    set_image(PRO_CONTROLLER_MAPPING_PATH);
 
     add_window(*this);
 }
@@ -75,7 +76,8 @@ ButtonDiagram::~ButtonDiagram(){
 }
 
 void ButtonDiagram::set_image(const std::string& resource_name){
-    m_image = QPixmap(QString::fromStdString(RESOURCE_PATH() + resource_name));
+    const std::string image_path = RESOURCE_PATH() + resource_name;
+    m_image = QPixmap(QString::fromStdString(image_path));
     ButtonDiagram::resizeEvent(nullptr);
 }
 void ButtonDiagram::resizeEvent(QResizeEvent*){

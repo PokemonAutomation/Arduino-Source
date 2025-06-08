@@ -46,6 +46,11 @@ void set_working_directory(){
 
 int main(int argc, char *argv[]){
     setup_crash_handler();
+#if defined(__linux) || defined(__APPLE__)
+    // fix for menubar not showing in macOS and potentially on Linux
+    // we use menubar in our ButtonDiagram window to choose which controller's button mapping image to show
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
+#endif
 
 //#if QT_VERSION_MAJOR == 5 // AA_EnableHighDpiScaling is deprecated in Qt6
 //    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
