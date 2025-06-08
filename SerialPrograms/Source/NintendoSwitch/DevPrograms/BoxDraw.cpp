@@ -69,10 +69,10 @@ public:
         m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT});
     }
     virtual void on_mouse_press(double x, double y) override{
-        m_parent.WIDTH.set(0);
-        m_parent.HEIGHT.set(0);
-        m_parent.X.set(x);
-        m_parent.Y.set(y);
+        // m_parent.WIDTH.set(0);
+        // m_parent.HEIGHT.set(0);
+        // m_parent.X.set(x);
+        // m_parent.Y.set(y);
         m_mouse_start.emplace();
         m_mouse_start->first = x;
         m_mouse_start->second = y;
