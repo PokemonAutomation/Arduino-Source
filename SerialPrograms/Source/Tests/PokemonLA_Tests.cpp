@@ -520,7 +520,7 @@ int test_pokemonLA_MMOSpriteMatcher(const std::string& filepath){
     const QString filename = fileinfo.fileName();
     const QDir parent_dir = fileinfo.dir();
 
-    std::string base_name = fileinfo.baseName().toStdString();
+    const std::string base_name = fileinfo.baseName().toStdString();
 
     const std::vector<std::string> filename_words = parse_words(base_name);
     MapRegion region = MapRegion::NONE;

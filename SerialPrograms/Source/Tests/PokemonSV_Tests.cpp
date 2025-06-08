@@ -5,6 +5,10 @@
  */
 
 
+#include <QDir>
+#include <QFileInfo>
+#include <QString>
+
 #include "Common/Compiler.h"
 #include "PokemonSV_Tests.h"
 #include "TestUtils.h"
@@ -389,14 +393,24 @@ int test_pokemonSV_SandwichIngredientsDetector(const ImageViewRGB32& image, cons
     return 0;
 }
 
-int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const std::vector<std::string>& words){
-    // four words: <current ingredient page "Fillings" or "Condiments"> <language> <current selected ingredient index 0 to 9>
-    //   <first ingredient> <second ingredient> ...
-    if (words.size() < 13){
+int test_pokemonSV_SandwichIngredientReader(const std::string& filepath){
+    // three words: <current ingredient page "Fillings" or "Condiments"> <language> <current selected ingredient index 0 to 9>
+    
+    // the target ingredient list is stored in an auxiliary txt file with filename: _<filepath_basename>.txt
+
+    const QString full_path(QString::fromStdString(filepath));
+    const QFileInfo fileinfo(full_path);
+    const QString filename = fileinfo.fileName();
+    const QDir parent_dir = fileinfo.dir();
+
+    const std::string base_name = fileinfo.baseName().toStdString();
+    const std::vector<std::string> words = parse_words(base_name);
+
+    if (words.size() < 3){
         cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
         return 1;
     }
-    std::string target_type = words[words.size() - 13];
+    std::string target_type = words[words.size() - 3];
     SandwichIngredientType sandwich_type;
     if (target_type == "Fillings"){
         sandwich_type = SandwichIngredientType::FILLING;
@@ -406,17 +420,28 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
         return 1;
     }
 
-    Language language = language_code_to_enum(words[words.size() - 12]);
+    Language language = language_code_to_enum(words[words.size() - 2]);
     if (language == Language::None || language == Language::EndOfList){
         cerr << "Error: language word " << words[words.size() - 2] << " is wrong." << endl;
         return 1;
     }
 
     size_t selected_ingredient = 0;
-    if (parse_size_t(words[words.size() - 11], selected_ingredient) == false){
-        cerr << "Error: word " << words[words.size() - 2] << " is wrong. Must be int of range [0, 9]. " << endl;
+    if (parse_size_t(words[words.size() - 1], selected_ingredient) == false){
+        cerr << "Error: word " << words[words.size() - 1] << " is wrong. Must be int of range [0, 9]. " << endl;
         return 1;
     }
+
+    const QString target_ingredients_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
+    std::vector<std::string> target_ingredients;
+    if (load_slug_list(target_ingredients_path.toStdString(), target_ingredients) == false){
+        return 1;
+    }
+    if (target_ingredients.size() != 10){
+        cerr << "Error: need to have exactly 10 ingredients in " << target_ingredients_path.toStdString() << endl;
+    }
+
+    ImageRGB32 image(filepath);
 
     SandwichIngredientReader reader(sandwich_type);
     for (size_t i = 0; i < 10; ++i){
@@ -429,7 +454,7 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
                 return 1;
             }
             std::string best_match_icon_matcher = results.results.begin()->second;
-            TEST_RESULT_COMPONENT_EQUAL(best_match_icon_matcher, words[words.size() - 10 + i], "image matcher : ingredient slot " + std::to_string(i));
+            TEST_RESULT_COMPONENT_EQUAL(best_match_icon_matcher, target_ingredients[i], "image matcher : ingredient slot " + std::to_string(i));
         }
         {
             OCR::StringMatchResult results = reader.read_ingredient_page_with_ocr(image, global_logger_command_line(), language, i);
@@ -439,7 +464,7 @@ int test_pokemonSV_SandwichIngredientReader(const ImageViewRGB32& image, const s
                 return 1;
             }
             std::string best_match_ocr = results.results.begin()->second.token;
-            TEST_RESULT_COMPONENT_EQUAL(best_match_ocr, words[words.size() - 10 + i], "ocr : ingredient slot " + std::to_string(i));
+            TEST_RESULT_COMPONENT_EQUAL(best_match_ocr, target_ingredients[i], "ocr : ingredient slot " + std::to_string(i));
         }
     }
 
