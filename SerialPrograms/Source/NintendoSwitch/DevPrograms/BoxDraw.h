@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_BoxDraw_H
 
 #include "Common/Cpp/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -26,6 +27,9 @@ class BoxDraw : public SingleSwitchProgramInstance{
 public:
     BoxDraw();
 
+    void update_box_coordinates();
+    void update_individual_coordinates();
+
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
@@ -36,6 +40,7 @@ private:
     FloatingPointOption Y;
     FloatingPointOption WIDTH;
     FloatingPointOption HEIGHT;
+    StringOption BOX_COORDINATES;
 };
 
 
