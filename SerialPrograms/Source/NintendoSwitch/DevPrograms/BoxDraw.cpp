@@ -8,9 +8,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "BoxDraw.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -179,9 +179,6 @@ void BoxDraw::update_individual_coordinates(){
     Y.set(y_coord);
     WIDTH.set(width_coord);
     HEIGHT.set(height_coord);
-
-    // double x_coord1 = std::stod("0a.4aasdf");
-    // cout << std::to_string(x_coord1) << endl;
 }
 
 void BoxDraw::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
