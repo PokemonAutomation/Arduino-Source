@@ -61,7 +61,7 @@ void SomethingInBoxSlotDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom);
     items.add(m_color, m_body);
 }
-bool SomethingInBoxSlotDetector::detect(const ImageViewRGB32& screen) const{
+bool SomethingInBoxSlotDetector::detect(const ImageViewRGB32& screen){
     ImageStats right = image_stats(extract_box_reference(screen, m_right));
 //    extract_box_reference(screen, m_right).save("test.png");
 //    cout << right.average << right.stddev << endl;
@@ -105,10 +105,10 @@ void BoxSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_dialog.make_overlays(items);
     m_gradient.make_overlays(items);
 }
-bool BoxSelectDetector::exists(const ImageViewRGB32& screen) const{
+bool BoxSelectDetector::exists(const ImageViewRGB32& screen){
     return m_exists.detect(screen);
 }
-bool BoxSelectDetector::detect(const ImageViewRGB32& screen) const{
+bool BoxSelectDetector::detect(const ImageViewRGB32& screen){
     if (!exists(screen)){
         return false;
     }
@@ -137,7 +137,7 @@ void BoxDetector::make_overlays(VideoOverlaySet& items) const{
     m_search.make_overlays(items);
     m_slots.make_overlays(items);
 }
-bool BoxDetector::detect(const ImageViewRGB32& screen) const{
+bool BoxDetector::detect(const ImageViewRGB32& screen){
     if (m_party.detect(screen)){
         return true;
     }
@@ -155,7 +155,7 @@ bool BoxDetector::detect(const ImageViewRGB32& screen) const{
     }
     return false;
 }
-std::pair<BoxCursorLocation, BoxCursorCoordinates> BoxDetector::detect_location(const ImageViewRGB32& screen) const{
+std::pair<BoxCursorLocation, BoxCursorCoordinates> BoxDetector::detect_location(const ImageViewRGB32& screen){
     if (m_box_change.detect(screen)){
         return {BoxCursorLocation::BOX_CHANGE, {0, 0}};
     }
@@ -251,7 +251,7 @@ void BoxDetector::move_horizontal(ProControllerContext& context, int current, in
 void BoxDetector::move_cursor(
     const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     BoxCursorLocation side, uint8_t row, uint8_t col
-) const{
+){
     int desired_x = 0, desired_y = 0;
     if (!to_coordinates(desired_x, desired_y, side, row, col)){
         throw InternalProgramError(
@@ -350,7 +350,7 @@ void BoxEmptySlotDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-bool BoxEmptySlotDetector::detect(const ImageViewRGB32& frame) const{
+bool BoxEmptySlotDetector::detect(const ImageViewRGB32& frame){
     const auto stats = image_stats(extract_box_reference(frame, m_box));
     return stats.stddev.sum() < 20.0;
 }

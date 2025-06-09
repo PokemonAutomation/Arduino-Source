@@ -11,6 +11,7 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 
 
@@ -23,7 +24,7 @@ namespace PokemonSV{
 void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
 //  Perform a No-op day skip that rolls over all the outbreaks and raids.
-void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context);
+void day_skip_from_overworld(ConsoleHandle& console, ProControllerContext& context);
 
 // Press B to return to the overworld
 void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,

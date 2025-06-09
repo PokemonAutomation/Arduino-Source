@@ -10,19 +10,20 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
 void resume_game_from_home(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool skip_home_press = false
 );
 
 
 void start_game_from_home(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -36,11 +37,11 @@ bool openedgame_to_gamemenu(
 
 
 void resume_game_from_home(
-    VideoStream& stream, JoyconContext& context,
+    ConsoleHandle& console, JoyconContext& context,
     bool skip_home_press = false
 );
 void start_game_from_home_with_inference(
-    VideoStream& stream, JoyconContext& context,
+    ConsoleHandle& console, JoyconContext& context,
     uint8_t game_slot,
     uint8_t user_slot,
     Milliseconds start_game_mash

@@ -26,17 +26,17 @@ public:
     PokePortalDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     //  Read where the cursor is. Returns -1 on failure.
-    int detect_location(const ImageViewRGB32& screen) const;
+    int detect_location(const ImageViewRGB32& screen);
 
     //  While sitting on the menu, move the cursor to the desired slot.
     //  Returns true if success.
     bool move_cursor(
         const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         int row
-    ) const;
+    );
 
 
 private:

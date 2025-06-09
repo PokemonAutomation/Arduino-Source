@@ -10,14 +10,15 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void close_game(VideoStream& stream, ProControllerContext& device);
+void close_game(ConsoleHandle& console, ProControllerContext& device);
 
-void close_game(VideoStream& stream, JoyconContext& device);
+void close_game(ConsoleHandle& console, JoyconContext& device);
 
 
 

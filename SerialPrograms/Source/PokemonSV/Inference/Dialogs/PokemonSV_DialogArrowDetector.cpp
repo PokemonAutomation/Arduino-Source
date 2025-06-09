@@ -85,7 +85,7 @@ DialogArrowDetector::DialogArrowDetector(Color color, const ImageFloatBox& box)
 void DialogArrowDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool DialogArrowDetector::detect(const ImageViewRGB32& screen) const{
+bool DialogArrowDetector::detect(const ImageViewRGB32& screen){
     std::vector<ImageFloatBox> hits = detect_all(screen);
     return !hits.empty();
 }

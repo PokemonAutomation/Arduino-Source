@@ -263,24 +263,24 @@ void roll_date_backward_N(ProControllerContext& context, uint8_t skips, bool fas
     }
 }
 void home_roll_date_enter_game_autorollback(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     uint8_t& year
 ){
     //  This version automatically handles the 2060 roll-back.
     if (year >= MAX_YEAR){
-        home_roll_date_enter_game(stream, context, true);
+        home_roll_date_enter_game(console, context, true);
         year = 0;
     }else{
-        home_roll_date_enter_game(stream, context, false);
+        home_roll_date_enter_game(console, context, false);
     }
     year++;
 }
 void home_roll_date_enter_game(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool rollback_year
 ){
     //  From the Switch home menu, roll the date, then re-enter the game.
-    home_to_date_time(context, true, true);
+    home_to_date_time(console, context, true);
 
     if (rollback_year){
         roll_date_backward_N(context, MAX_YEAR, true);
@@ -299,12 +299,12 @@ void home_roll_date_enter_game(
     }
 
     settings_to_enter_game(context, true);
-    resume_game_from_home(stream, context, true);
+    resume_game_from_home(console, context, true);
 }
-void touch_date_from_home(ProControllerContext& context, Milliseconds settings_to_home_delay){
+void touch_date_from_home(Logger& logger, ProControllerContext& context, Milliseconds settings_to_home_delay){
     //  Touch the date without changing it. This prevents unintentional rollovers.
 
-    home_to_date_time(context, true, true);
+    home_to_date_time(logger, context, true);
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 
     ssf_press_button_ptv(context, BUTTON_A, 0ms);
@@ -325,11 +325,11 @@ void touch_date_from_home(ProControllerContext& context, Milliseconds settings_t
     ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
 }
 void rollback_hours_from_home(
-    ProControllerContext& context,
+    Logger& logger, ProControllerContext& context,
     uint8_t hours,
     Milliseconds settings_to_home_delay
 ){
-    home_to_date_time(context, true, false);
+    home_to_date_time(logger, context, true);
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 
     ssf_press_button_ptv(context, BUTTON_A, 0ms);

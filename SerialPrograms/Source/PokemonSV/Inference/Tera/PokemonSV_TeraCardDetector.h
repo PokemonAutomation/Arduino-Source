@@ -32,7 +32,7 @@ public:
     TeraCardReader(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     uint8_t stars(
         Logger& logger, const ProgramInfo& info, const ImageViewRGB32& screen
@@ -91,7 +91,7 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
     //  Returns true if we are on an active lobby.
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     uint8_t total_players(const ImageViewRGB32& screen) const;
 //    uint8_t ready_players(const ImageViewRGB32& screen) const;

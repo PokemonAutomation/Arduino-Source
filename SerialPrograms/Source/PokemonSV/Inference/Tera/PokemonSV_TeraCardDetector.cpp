@@ -67,7 +67,7 @@ bool TeraCardReader::is_card_label(const ImageViewRGB32& screen){
         || is_solid(label, {0.258888, 0.369491, 0.371621}, 0.15, 15);   //  Kitakami Card
 }
 
-bool TeraCardReader::detect(const ImageViewRGB32& screen) const{
+bool TeraCardReader::detect(const ImageViewRGB32& screen){
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
 //    cout << top.average << top.stddev << endl;
     if (!is_solid(top, {0.354167, 0.345833, 0.3})){
@@ -299,7 +299,7 @@ void TeraLobbyReader::make_overlays(VideoOverlaySet& items) const{
         items.add(m_color, m_player_ready[c]);
     }
 }
-bool TeraLobbyReader::detect(const ImageViewRGB32& screen) const{
+bool TeraLobbyReader::detect(const ImageViewRGB32& screen){
     ImageStats bottom_right = image_stats(extract_box_reference(screen, m_bottom_right));
 //    cout << bottom_right.average << bottom_right.stddev << endl;
     if (!is_solid(bottom_right, {0.354167, 0.345833, 0.3})){

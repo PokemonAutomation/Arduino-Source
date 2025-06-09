@@ -27,7 +27,7 @@ public:
     double rmsd(const ImageViewRGB32& frame) const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     std::shared_ptr<const ImageRGB32> m_reference_image;

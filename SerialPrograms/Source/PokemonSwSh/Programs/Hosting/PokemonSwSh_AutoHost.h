@@ -10,6 +10,7 @@
 #include "Common/Cpp/Options/RandomCodeOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
@@ -40,7 +41,8 @@ void send_raid_notification(
 
 
 void run_autohost(
-    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    ProgramEnvironment& env,
+    ConsoleHandle& console, ProControllerContext& context,
     Catchability catchability, uint8_t skips,
     const RandomCodeOption* raid_code, Milliseconds lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,

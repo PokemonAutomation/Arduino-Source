@@ -405,7 +405,7 @@ std::vector<BBQuests> process_quest_list(
 
 bool process_and_do_quest(
     ProgramEnvironment& env,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     BBQOption& BBQ_OPTIONS,
     BBQuests current_quest,
     uint8_t& eggs_hatched
@@ -416,77 +416,119 @@ bool process_and_do_quest(
     while (!quest_completed){
         switch (current_quest){
         case BBQuests::make_tm:
-            quest_make_tm(env.program_info(), stream, context);
+            quest_make_tm(env.program_info(), console, context);
             break;
         case BBQuests::travel_500:
-            quest_travel_500(env.program_info(), stream, context);
+            quest_travel_500(env.program_info(), console, context);
             break;
         case BBQuests::tera_self_defeat:
-            quest_tera_self_defeat(env.program_info(), stream, context, BBQ_OPTIONS);
+            quest_tera_self_defeat(env.program_info(), console, context, BBQ_OPTIONS);
             break;
         case BBQuests::sneak_up:
-            quest_sneak_up(env.program_info(), stream, context, BBQ_OPTIONS);
+            quest_sneak_up(env.program_info(), console, context, BBQ_OPTIONS);
             break;
         case BBQuests::wild_tera:
-            quest_wild_tera(env.program_info(), stream, context, BBQ_OPTIONS);
+            quest_wild_tera(env.program_info(), console, context, BBQ_OPTIONS);
             break;
         case BBQuests::wash_pokemon:
-            quest_wash_pokemon(env.program_info(), stream, context);
+            quest_wash_pokemon(env.program_info(), console, context);
             break;
         case BBQuests::hatch_egg:
-            quest_hatch_egg(env.program_info(), stream, context, BBQ_OPTIONS);
+            quest_hatch_egg(env.program_info(), console, context, BBQ_OPTIONS);
             break;
-        case BBQuests::bitter_sandwich: case BBQuests::salty_sandwich: case BBQuests::sour_sandwich: case BBQuests::spicy_sandwich: case BBQuests::sweet_sandwich: case BBQuests::sandwich_three:
-            quest_sandwich(env, stream, context, BBQ_OPTIONS, current_quest);
+        case BBQuests::bitter_sandwich:
+        case BBQuests::salty_sandwich:
+        case BBQuests::sour_sandwich:
+        case BBQuests::spicy_sandwich:
+        case BBQuests::sweet_sandwich:
+        case BBQuests::sandwich_three:
+            quest_sandwich(env, console, context, BBQ_OPTIONS, current_quest);
             break;
         //case BBQuests::pickup_10:
         //    quest_pickup(env, env.program_info(), console, context, BBQ_OPTIONS);
         //    break;
         case BBQuests::tera_raid:
-            quest_tera_raid(env, stream, context, BBQ_OPTIONS);
+            quest_tera_raid(env, console, context, BBQ_OPTIONS);
             break;
-        case BBQuests::auto_10: case BBQuests::auto_30:
-            quest_auto_battle(env, stream, context, BBQ_OPTIONS, current_quest);
+        case BBQuests::auto_10:
+        case BBQuests::auto_30:
+            quest_auto_battle(env, console, context, BBQ_OPTIONS, current_quest);
             break;
         //All involve taking pictures
-        case BBQuests::photo_fly: case BBQuests::photo_swim: case BBQuests::photo_canyon: case BBQuests::photo_coastal: case BBQuests::photo_polar: case BBQuests::photo_savanna:
-        case BBQuests::photo_normal: case BBQuests::photo_fighting: case BBQuests::photo_flying: case BBQuests::photo_poison: case BBQuests::photo_ground:
-        case BBQuests::photo_rock: case BBQuests::photo_bug: case BBQuests::photo_ghost: case BBQuests::photo_steel: case BBQuests::photo_fire: case BBQuests::photo_water:case BBQuests::photo_grass:
-        case BBQuests::photo_electric: case BBQuests::photo_psychic: case BBQuests::photo_ice: case BBQuests::photo_dragon: case BBQuests::photo_dark: case BBQuests::photo_fairy:
-            quest_photo(env.program_info(), stream, context, BBQ_OPTIONS, current_quest);
+        case BBQuests::photo_fly:
+        case BBQuests::photo_swim:
+        case BBQuests::photo_canyon:
+        case BBQuests::photo_coastal:
+        case BBQuests::photo_polar:
+        case BBQuests::photo_savanna:
+        case BBQuests::photo_normal:
+        case BBQuests::photo_fighting:
+        case BBQuests::photo_flying:
+        case BBQuests::photo_poison:
+        case BBQuests::photo_ground:
+        case BBQuests::photo_rock:
+        case BBQuests::photo_bug:
+        case BBQuests::photo_ghost:
+        case BBQuests::photo_steel:
+        case BBQuests::photo_fire:
+        case BBQuests::photo_water:
+        case BBQuests::photo_grass:
+        case BBQuests::photo_electric:
+        case BBQuests::photo_psychic:
+        case BBQuests::photo_ice:
+        case BBQuests::photo_dragon:
+        case BBQuests::photo_dark:
+        case BBQuests::photo_fairy:
+            quest_photo(env.program_info(), console, context, BBQ_OPTIONS, current_quest);
             break;
         //All involve catching a pokemon
-        case BBQuests::catch_any: case BBQuests::catch_normal: case BBQuests::catch_fighting: case BBQuests::catch_flying: case BBQuests::catch_poison: case BBQuests::catch_ground:
-        case BBQuests::catch_rock: case BBQuests::catch_bug: case BBQuests::catch_ghost: case BBQuests::catch_steel: case BBQuests::catch_fire: case BBQuests::catch_water:case BBQuests::catch_grass:
-        case BBQuests::catch_electric: case BBQuests::catch_psychic: case BBQuests::catch_ice: case BBQuests::catch_dragon: case BBQuests::catch_dark: case BBQuests::catch_fairy:
-            quest_catch(env.program_info(), stream, context, BBQ_OPTIONS, current_quest);
+        case BBQuests::catch_any:
+        case BBQuests::catch_normal:
+        case BBQuests::catch_fighting:
+        case BBQuests::catch_flying:
+        case BBQuests::catch_poison:
+        case BBQuests::catch_ground:
+        case BBQuests::catch_rock:
+        case BBQuests::catch_bug:
+        case BBQuests::catch_ghost:
+        case BBQuests::catch_steel:
+        case BBQuests::catch_fire:
+        case BBQuests::catch_water:
+        case BBQuests::catch_grass:
+        case BBQuests::catch_electric:
+        case BBQuests::catch_psychic:
+        case BBQuests::catch_ice:
+        case BBQuests::catch_dragon:
+        case BBQuests::catch_dark:
+        case BBQuests::catch_fairy:
+            quest_catch(env.program_info(), console, context, BBQ_OPTIONS, current_quest);
             break;
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unknown quest selection.",
-                stream
+                console
             );
             break;
         }
 
         //Validate quest was completed by checking list
-        std::vector<BBQuests> quest_list = read_quests(env.program_info(), stream, context, BBQ_OPTIONS);
+        std::vector<BBQuests> quest_list = read_quests(env.program_info(), console, context, BBQ_OPTIONS);
         if (std::find(quest_list.begin(), quest_list.end(), current_quest) != quest_list.end()){
-            stream.log("Current quest exists on list. Quest did not complete.");
+            console.log("Current quest exists on list. Quest did not complete.");
             quest_attempts++;
         }else{
-            stream.log("Current quest was not found. Quest completed!");
+            console.log("Current quest was not found. Quest completed!");
             if (current_quest == BBQuests::hatch_egg){
                 eggs_hatched++;
-                stream.log("Eggs hatched: " + std::to_string(eggs_hatched));
+                console.log("Eggs hatched: " + std::to_string(eggs_hatched));
             }
 
             quest_completed = true;
         }
 
         if (quest_attempts > BBQ_OPTIONS.NUM_RETRIES){
-            stream.log("Failed to complete a quest multiple times. Skipping it for now.", COLOR_RED);
+            console.log("Failed to complete a quest multiple times. Skipping it for now.", COLOR_RED);
             break;
         }
     }
@@ -602,22 +644,22 @@ void quest_travel_500(const ProgramInfo& info, VideoStream& stream, ProControlle
 
 void quest_tera_self_defeat(
     const ProgramInfo& info,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
-    EncounterWatcher encounter_watcher(stream, COLOR_RED);
-    stream.log("Quest: Tera-self and defeat any wild.");
+    EncounterWatcher encounter_watcher(console, COLOR_RED);
+    console.log("Quest: Tera-self and defeat any wild.");
     //Navigate to target and start battle
     int ret = run_until<ProControllerContext>(
-        stream, context,
+        console, context,
         [&](ProControllerContext& context){
-            central_to_canyon_plaza(info, stream, context);
+            central_to_canyon_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 205, 64, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
-            jump_glide_fly(stream, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 300);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 300);
 
             ssf_press_button(context, BUTTON_ZR, 0, 200);
             ssf_press_button(context, BUTTON_ZL, 100, 50);
@@ -628,12 +670,12 @@ void quest_tera_self_defeat(
 
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
-                stream, context,
+                console, context,
                 std::chrono::seconds(15),
                 { battle_menu }
             );
             if (ret2 != 0){
-                stream.log("Did not enter battle. Did Kleavor spawn?");
+                console.log("Did not enter battle. Did Kleavor spawn?");
             }
         },
         {
@@ -644,68 +686,68 @@ void quest_tera_self_defeat(
     encounter_watcher.throw_if_no_sound();
 
     if (ret >= 0){
-        stream.log("Battle menu detected.");
+        console.log("Battle menu detected.");
     }
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny){
-        stream.log("Shiny detected!");
+        console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
     }else{
         bool tera_self = true;
-        wild_battle_tera(info, stream, context, tera_self);
+        wild_battle_tera(info, console, context, tera_self);
     }
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
-    return_to_plaza(info, stream, context);
+    return_to_plaza(info, console, context);
 
     //Day skip and attempt to respawn fixed encounters
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-    home_to_date_time(context, true, true);
+    home_to_date_time(console, context, true);
     PokemonSwSh::roll_date_forward_1(context, true);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-    resume_game_from_home(stream, context);
+    resume_game_from_home(console, context);
 
     //Heal up and then reset position again.
-    OverworldWatcher done_healing(stream.logger(), COLOR_BLUE);
+    OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
     pbf_move_left_joystick(context, 128, 0, 100, 20);
 
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
     int exit = run_until<ProControllerContext>(
-        stream, context,
+        console, context,
         [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
     );
     if (exit == 0){
-        stream.log("Overworld detected.");
+        console.log("Overworld detected.");
     }
-    open_map_from_overworld(info, stream, context);
+    open_map_from_overworld(info, console, context);
     pbf_press_button(context, BUTTON_ZL, 40, 100);
-    fly_to_overworld_from_map(info, stream, context);
+    fly_to_overworld_from_map(info, console, context);
 }
 
 void quest_sneak_up(
     const ProgramInfo& info,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
-    EncounterWatcher encounter_watcher(stream, COLOR_RED);
-    stream.log("Quest: Sneak up.");
+    EncounterWatcher encounter_watcher(console, COLOR_RED);
+    console.log("Quest: Sneak up.");
     //Navigate to target and start battle
     int ret = run_until<ProControllerContext>(
-        stream, context,
+        console, context,
         [&](ProControllerContext& context){
             //Savanna Plaza - Pride Rock
-            central_to_savanna_plaza(info, stream, context);
+            central_to_savanna_plaza(info, console, context);
 
             pbf_move_left_joystick(context, 220, 255, 10, 20);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(stream, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 600, 400, 400);
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 255, 128, 20, 50);
@@ -724,12 +766,12 @@ void quest_sneak_up(
 
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
-                stream, context,
+                console, context,
                 std::chrono::seconds(15),
                 { battle_menu }
             );
             if (ret2 != 0){
-                stream.log("Did not enter battle. Did target spawn?");
+                console.log("Did not enter battle. Did target spawn?");
             }
         },
         {
@@ -740,38 +782,38 @@ void quest_sneak_up(
     encounter_watcher.throw_if_no_sound();
 
     if (ret >= 0){
-        stream.log("Battle menu detected.");
+        console.log("Battle menu detected.");
 
         bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
         if (is_shiny){
-            stream.log("Shiny detected!");
+            console.log("Shiny detected!");
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             throw ProgramFinishedException();
         }else{
-            OverworldWatcher overworld(stream.logger(), COLOR_BLUE);
+            OverworldWatcher overworld(console.logger(), COLOR_BLUE);
 
             int ret2 = run_until<ProControllerContext>(
-                stream, context,
+                console, context,
                 [&](ProControllerContext& context){
                     while (true){
                         //Flee immediately. Keep trying to flee.
                         NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
                         int ret2 = wait_until(
-                            stream, context,
+                            console, context,
                             std::chrono::seconds(60),
                             { battle_menu }
                         );
                         switch (ret2){
                         case 0:
-                            battle_menu.move_to_slot(stream, context, 3);
+                            battle_menu.move_to_slot(console, context, 3);
                             pbf_press_button(context, BUTTON_A, 10, 50);
                             break;
                         default:
-                            stream.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
+                            console.log("Invalid state quest_sneak_up(). Smoke Ball equipped?");
                             OperationFailedException::fire(
                                 ErrorReport::SEND_ERROR_REPORT,
                                 "Invalid state quest_sneak_up(). Smoke Ball equipped?",
-                                stream
+                                console
                             );
                         }
                     }
@@ -781,47 +823,47 @@ void quest_sneak_up(
 
             switch (ret2){
             case 0:
-                stream.log("Overworld detected.");
+                console.log("Overworld detected.");
                 break;
             default:
-                stream.log("Invalid state in run_battle().");
+                console.log("Invalid state in run_battle().");
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "Invalid state in run_battle().",
-                    stream
+                    console
                 );
             }
         }
     }
-    return_to_plaza(info, stream, context);
+    return_to_plaza(info, console, context);
 
     //Day skip and attempt to respawn fixed encounters - in case quest failed
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-    home_to_date_time(context, true, true);
+    home_to_date_time(console, context, true);
     PokemonSwSh::roll_date_forward_1(context, true);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-    resume_game_from_home(stream, context);
+    resume_game_from_home(console, context);
     context.wait_for_all_requests();
 }
 
 void quest_wild_tera(
     const ProgramInfo& info,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
-    EncounterWatcher encounter_watcher(stream, COLOR_RED);
-    stream.log("Quest: Defeat a wild tera.");
+    EncounterWatcher encounter_watcher(console, COLOR_RED);
+    console.log("Quest: Defeat a wild tera.");
     //Navigate to target and start battle
     int ret = run_until<ProControllerContext>(
-        stream, context,
+        console, context,
         [&](ProControllerContext& context){
             //Canyon Rest Area
-            central_to_canyon_rest(info, stream, context);
+            central_to_canyon_rest(info, console, context);
 
             pbf_move_left_joystick(context, 255, 180, 20, 105);
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-            jump_glide_fly(stream, context, BBQ_OPTIONS.INVERTED_FLIGHT, 500, 1300, 150);
+            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 500, 1300, 150);
 
             //Skarmory is likely to attack but sometimes there is a different pokemon
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
@@ -839,12 +881,12 @@ void quest_wild_tera(
 
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
-                stream, context,
+                console, context,
                 std::chrono::seconds(15),
                 { battle_menu }
             );
             if (ret2 != 0){
-                stream.log("Did not enter battle.");
+                console.log("Did not enter battle.");
             }
         },
         {
@@ -855,47 +897,47 @@ void quest_wild_tera(
     encounter_watcher.throw_if_no_sound();
 
     if (ret >= 0){
-        stream.log("Battle menu detected.");
+        console.log("Battle menu detected.");
     }
 
     bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
     if (is_shiny){
-        stream.log("Shiny detected!");
+        console.log("Shiny detected!");
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         throw ProgramFinishedException();
     }else{
         bool tera_self = false;
-        wild_battle_tera(info, stream, context, tera_self);
+        wild_battle_tera(info, console, context, tera_self);
     }
-    return_to_plaza(info, stream, context);
+    return_to_plaza(info, console, context);
 
     //Day skip and attempt to respawn fixed encounters
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-    home_to_date_time(context, true, true);
+    home_to_date_time(console, context, true);
     PokemonSwSh::roll_date_forward_1(context, true);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-    resume_game_from_home(stream, context);
+    resume_game_from_home(console, context);
 
     //Heal up and then reset position again.
-    OverworldWatcher done_healing(stream.logger(), COLOR_BLUE);
+    OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
     pbf_move_left_joystick(context, 128, 0, 100, 20);
 
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
     int exit = run_until<ProControllerContext>(
-        stream, context,
+        console, context,
         [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
     );
     if (exit == 0){
-        stream.log("Overworld detected.");
+        console.log("Overworld detected.");
     }
-    open_map_from_overworld(info, stream, context);
+    open_map_from_overworld(info, console, context);
     pbf_press_button(context, BUTTON_ZL, 40, 100);
-    fly_to_overworld_from_map(info, stream, context);
+    fly_to_overworld_from_map(info, console, context);
 }
 
 void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
@@ -1002,23 +1044,23 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
 
 void quest_hatch_egg(
     const ProgramInfo& info,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS
 ){
-    stream.log("Quest: Hatch an Egg");
+    console.log("Quest: Hatch an Egg");
 
     //Fix time before hatching
     if (BBQ_OPTIONS.FIX_TIME_FOR_HATCH){
         pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-        home_to_date_time(context, false, false);
+        home_to_date_time(console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-        resume_game_from_home(stream, context);
+        resume_game_from_home(console, context);
     }
 
     //Fly to Savanna Plaza and navigate to the battle court
-    central_to_savanna_plaza(info, stream, context);
+    central_to_savanna_plaza(info, console, context);
 
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
     pbf_move_left_joystick(context, 128, 0, 500, 50);
@@ -1028,7 +1070,7 @@ void quest_hatch_egg(
 
     //Do this after navigating to prevent egg from hatchining enroute
     //Enter box system, navigate to left box, find the first egg, swap it with first pokemon in party
-    enter_box_system_from_overworld(info, stream, context);
+    enter_box_system_from_overworld(info, console, context);
     context.wait_for(std::chrono::milliseconds(400));
     
     //move_to_left_box(context);
@@ -1040,11 +1082,11 @@ void quest_hatch_egg(
     for ( ; row < 5; row++){
         for (uint8_t j_col = 0; j_col < 6; j_col++){
             col = (row % 2 == 0 ? j_col : 5 - j_col);
-            move_box_cursor(info, stream, context, BoxCursorLocation::SLOTS, row, col);
+            move_box_cursor(info, console, context, BoxCursorLocation::SLOTS, row, col);
             context.wait_for_all_requests();
-            auto snapshot = stream.video().snapshot();
+            auto snapshot = console.video().snapshot();
             if (sth_in_box_detector.detect(snapshot) && egg_detector.detect(snapshot)){
-                stream.log("Found egg.");
+                console.log("Found egg.");
                 egg_found = true;
                 break;
             }
@@ -1055,28 +1097,28 @@ void quest_hatch_egg(
     }
 
     if (!egg_found){
-        stream.log("No egg found during egg hatching quest!", COLOR_RED);
+        console.log("No egg found during egg hatching quest!", COLOR_RED);
     }else{
-        swap_two_box_slots(info, stream, context,
+        swap_two_box_slots(info, console, context,
             BoxCursorLocation::SLOTS, row, col,
             BoxCursorLocation::PARTY, 0, 0);
 
-        leave_box_system_to_overworld(info, stream, context);
+        leave_box_system_to_overworld(info, console, context);
 
-        hatch_eggs_anywhere(info, stream, context, true, 1);
+        hatch_eggs_anywhere(info, console, context, true, 1);
 
-        enter_box_system_from_overworld(info, stream, context);
+        enter_box_system_from_overworld(info, console, context);
         context.wait_for(std::chrono::milliseconds(400));
 
-        swap_two_box_slots(info, stream, context,
+        swap_two_box_slots(info, console, context,
             BoxCursorLocation::PARTY, 0, 0,
             BoxCursorLocation::SLOTS, row, col);
 
-        leave_box_system_to_overworld(info, stream, context);
+        leave_box_system_to_overworld(info, console, context);
 
         pbf_press_button(context, BUTTON_PLUS, 20, 50);
 
-        return_to_plaza(info, stream, context);
+        return_to_plaza(info, console, context);
         context.wait_for_all_requests();
     }
 }
@@ -1155,21 +1197,21 @@ void quest_sandwich(
 
 void quest_tera_raid(
     ProgramEnvironment& env,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     BBQOption& BBQ_OPTIONS
 ){
-    stream.log("Quest: Tera Raid");
+    console.log("Quest: Tera Raid");
 
     bool started_tera_raid = false;
     while (!started_tera_raid){
-        EncounterWatcher encounter_watcher(stream, COLOR_RED);
+        EncounterWatcher encounter_watcher(console, COLOR_RED);
         int ret = run_until<ProControllerContext>(
-            stream, context,
+            console, context,
             [&](ProControllerContext& context){
                 //Target is a tera raid crystal near the canyon plaza
-                stream.log("Navigating to tera crystal.");
+                console.log("Navigating to tera crystal.");
 
-                central_to_canyon_plaza(env.program_info(), stream, context);
+                central_to_canyon_plaza(env.program_info(), console, context);
 
                 pbf_move_left_joystick(context, 0, 128, 375, 20);
                 pbf_press_button(context, BUTTON_L, 10, 50);
@@ -1178,9 +1220,9 @@ void quest_tera_raid(
 
                 //Keep rolling until we get a raid
                 uint64_t rerolls = 0;
-                while (!open_raid(stream, context) && rerolls < 150){
+                while (!open_raid(console, context) && rerolls < 150){
                     env.log("No Tera raid found.", COLOR_ORANGE);
-                    day_skip_from_overworld(stream, context);
+                    day_skip_from_overworld(console, context);
                     pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY0);
                     rerolls++;
                 }
@@ -1194,27 +1236,27 @@ void quest_tera_raid(
         encounter_watcher.throw_if_no_sound();
 
         if (ret >= 0){
-            stream.log("Battle menu detected.");
+            console.log("Battle menu detected.");
 
             bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
             if (is_shiny){
-                stream.log("Shiny detected!");
+                console.log("Shiny detected!");
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
                 throw ProgramFinishedException();
             }else{
-                stream.log("Detected battle. Running from battle.");
+                console.log("Detected battle. Running from battle.");
                 try{
                     NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
-                    battle_menu.move_to_slot(stream, context, 3);
+                    battle_menu.move_to_slot(console, context, 3);
                     pbf_press_button(context, BUTTON_A, 10, 50);
-                    press_Bs_to_back_to_overworld(env.program_info(), stream, context);
-                    return_to_plaza(env.program_info(), stream, context);
+                    press_Bs_to_back_to_overworld(env.program_info(), console, context);
+                    return_to_plaza(env.program_info(), console, context);
                 }catch (...){
-                    stream.log("Unable to flee.");
+                    console.log("Unable to flee.");
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
                         "Unable to flee!",
-                        stream
+                        console
                     );
                 }
             }
@@ -1226,28 +1268,28 @@ void quest_tera_raid(
     pbf_press_dpad(context, DPAD_DOWN, 10, 10);
     pbf_press_button(context, BUTTON_A, 20, 105);
     context.wait_for(std::chrono::milliseconds(400));
-    move_box_cursor(env.program_info(), stream, context, BoxCursorLocation::PARTY, 1, 0);
+    move_box_cursor(env.program_info(), console, context, BoxCursorLocation::PARTY, 1, 0);
     pbf_press_button(context, BUTTON_A, 20, 105);
     pbf_press_button(context, BUTTON_A, 20, 105);
     pbf_press_dpad(context, DPAD_UP, 10, 10);
     pbf_mash_button(context, BUTTON_A, 250);
 
-    bool win = run_tera_battle(env, stream, context, BBQ_OPTIONS.BATTLE_AI);
+    bool win = run_tera_battle(env, console, context, BBQ_OPTIONS.BATTLE_AI);
     if (win){
         env.log("Won tera raid.");
         if (!BBQ_OPTIONS.CATCH_ON_WIN.enabled()){
-            exit_tera_win_without_catching(env.program_info(), stream, context, 0);
+            exit_tera_win_without_catching(env.program_info(), console, context, 0);
         }else{
             if (BBQ_OPTIONS.CATCH_ON_WIN.FIX_TIME_ON_CATCH){
                 pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-                home_to_date_time(context, false, false);
+                home_to_date_time(env.logger(), context, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-                resume_game_from_home(stream, context);
+                resume_game_from_home(console, context);
             }
             exit_tera_win_by_catching(
-                env, stream, context,
+                env, console, context,
                 BBQ_OPTIONS.LANGUAGE,
                 BBQ_OPTIONS.CATCH_ON_WIN.BALL_SELECT.slug(),
                 0
@@ -1259,8 +1301,8 @@ void quest_tera_raid(
     }
 
     context.wait_for_all_requests();
-    return_to_plaza(env.program_info(), stream, context);
-    day_skip_from_overworld(stream, context);
+    return_to_plaza(env.program_info(), console, context);
+    day_skip_from_overworld(console, context);
 }
 
 void quest_auto_battle(

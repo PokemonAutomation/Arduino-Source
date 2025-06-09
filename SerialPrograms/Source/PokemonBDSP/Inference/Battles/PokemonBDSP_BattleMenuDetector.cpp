@@ -61,7 +61,7 @@ bool BattleMenuDetector::is_battle_button(const ImageViewRGB32& screen) const{
     }
     return true;
 }
-bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     {
         bool left = is_white(extract_box_reference(screen, m_opponent_left));
         bool right = is_white(extract_box_reference(screen, m_opponent_right));

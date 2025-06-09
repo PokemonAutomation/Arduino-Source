@@ -18,8 +18,8 @@ namespace NintendoSwitch{
 
 
 
-UpdatePopupDetector::UpdatePopupDetector(Color color)
-    : m_type_detector(color)
+UpdatePopupDetector::UpdatePopupDetector(ConsoleState& state, Color color)
+    : m_type_detector(state, color)
     , m_switch1(color)
     , m_switch2(color)
 {}
@@ -28,21 +28,22 @@ void UpdatePopupDetector::make_overlays(VideoOverlaySet& items) const{
     m_switch1.make_overlays(items);
     m_switch2.make_overlays(items);
 }
-bool UpdatePopupDetector::detect(const ImageViewRGB32& screen) const{
-    ConsoleTypeDetection x = m_type_detector.detect(screen);
-    switch (x){
-    case ConsoleTypeDetection::Unknown:
+bool UpdatePopupDetector::detect(const ImageViewRGB32& screen){
+    ConsoleType type = m_type_detector.detect(screen);
+
+    if (type == ConsoleType::Unknown){
         return false;
-    case ConsoleTypeDetection::Switch1:
+    }
+    if (type == ConsoleType::Switch1){
         return m_switch1.detect(screen);
-    case ConsoleTypeDetection::Switch2_Unknown:
-    case ConsoleTypeDetection::Switch2_International:
-    case ConsoleTypeDetection::Switch2_JapanLocked:
+    }
+    if (is_switch2(type)){
         return m_switch2.detect(screen);
     }
+
     throw InternalProgramError(
         nullptr, PA_CURRENT_FUNCTION,
-        "Invalid ConsoleTypeDetection: " + std::to_string((int)x)
+        "Invalid ConsoleType: " + std::to_string((int)type)
     );
 }
 
@@ -70,7 +71,7 @@ void UpdatePopupDetector_Switch1::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_solid);
     items.add(m_color, m_bottom_buttons);
 }
-bool UpdatePopupDetector_Switch1::detect(const ImageViewRGB32& screen) const{
+bool UpdatePopupDetector_Switch1::detect(const ImageViewRGB32& screen){
     ImageStats stats_box_top = image_stats(extract_box_reference(screen, m_box_top));
 //    cout << stats_box_top.average << stats_box_top.stddev << endl;
     bool white;
@@ -155,7 +156,7 @@ void UpdatePopupDetector_Switch2::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_solid);
     items.add(m_color, m_bottom_buttons);
 }
-bool UpdatePopupDetector_Switch2::detect(const ImageViewRGB32& screen) const{
+bool UpdatePopupDetector_Switch2::detect(const ImageViewRGB32& screen){
     ImageStats stats_box_top = image_stats(extract_box_reference(screen, m_box_top));
 //    cout << stats_box_top.average << stats_box_top.stddev << endl;
     bool white;

@@ -19,7 +19,7 @@ class StaticScreenDetector{
 public:
     virtual ~StaticScreenDetector() = default;
     virtual void make_overlays(VideoOverlaySet& items) const = 0;
-    virtual bool detect(const ImageViewRGB32& screen) const = 0;
+    virtual bool detect(const ImageViewRGB32& screen) = 0;
 };
 
 

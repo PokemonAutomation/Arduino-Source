@@ -33,7 +33,7 @@ void DialogBoxDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_border_top);
     items.add(m_color, m_border_bot);
 }
-bool DialogBoxDetector::detect(const ImageViewRGB32& screen) const{
+bool DialogBoxDetector::detect(const ImageViewRGB32& screen){
     ImageStats stats_box_top = image_stats(extract_box_reference(screen, m_box_top));
 //    cout << stats_box_top.average << stats_box_top.stddev << endl;
     bool white;
@@ -91,7 +91,7 @@ void AdvanceDialogDetector::make_overlays(VideoOverlaySet& items) const{
     m_box.make_overlays(items);
     items.add(m_box.color(), m_arrow);
 }
-bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen) const{
+bool AdvanceDialogDetector::detect(const ImageViewRGB32& screen){
     if (!m_box.detect(screen)){
         return false;
     }
@@ -114,7 +114,7 @@ void PromptDialogDetector::make_overlays(VideoOverlaySet& items) const{
     m_box.make_overlays(items);
     items.add(m_box.color(), m_gradient);
 }
-bool PromptDialogDetector::detect(const ImageViewRGB32& screen) const{
+bool PromptDialogDetector::detect(const ImageViewRGB32& screen){
     if (!m_box.detect(screen)){
         return false;
     }

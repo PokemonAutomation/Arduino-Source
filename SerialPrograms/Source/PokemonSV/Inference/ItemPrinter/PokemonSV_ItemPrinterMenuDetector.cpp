@@ -22,7 +22,7 @@ void ItemPrinterMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom);
     m_buttons.make_overlays(items);
 }
-bool ItemPrinterMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool ItemPrinterMenuDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 bottom = extract_box_reference(screen, m_bottom);
     ImageStats bottom_stats = image_stats(bottom);
     if (!is_solid(bottom_stats, {0, 0.318898, 0.681102})){

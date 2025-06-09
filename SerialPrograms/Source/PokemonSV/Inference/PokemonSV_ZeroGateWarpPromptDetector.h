@@ -23,7 +23,7 @@ class ZeroGateWarpPromptDetector : public StaticScreenDetector{
 public:
     ZeroGateWarpPromptDetector(Color color = COLOR_RED);
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     int detect_location(const ImageViewRGB32& screen) const;
 

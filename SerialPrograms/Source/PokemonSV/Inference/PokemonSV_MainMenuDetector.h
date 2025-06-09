@@ -35,12 +35,12 @@ public:
     MainMenuDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     //  Read where the cursor is.
     //  The 2nd return value is the index. 0 is the top row. 6 is only valid on
     //  the left side and is Koraidon/Miraidon.
-    std::pair<MenuSide, int> detect_location(const ImageViewRGB32& screen) const;
+    std::pair<MenuSide, int> detect_location(const ImageViewRGB32& screen);
 
     //  While sitting on the menu, move the cursor to the desired slot.
     //  Returns true if success.
@@ -50,7 +50,7 @@ public:
         const ProgramInfo& info,
         VideoStream& stream, ProControllerContext& context,
         MenuSide side, int row, bool fast = false
-    ) const;
+    );
 
 
 protected:

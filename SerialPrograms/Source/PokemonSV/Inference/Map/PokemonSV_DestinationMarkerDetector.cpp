@@ -70,7 +70,7 @@ void DestinationMarkerDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-bool DestinationMarkerDetector::detect(const ImageViewRGB32& screen) const{
+bool DestinationMarkerDetector::detect(const ImageViewRGB32& screen){
     std::vector<ImageFloatBox> hits = detect_all(screen);
     if (!m_check_yellow){
         return !hits.empty();

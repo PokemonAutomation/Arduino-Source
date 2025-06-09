@@ -36,7 +36,7 @@ bool BoxShinyDetector::is_panel(const ImageViewRGB32& screen) const{
     }
     return true;
 }
-bool BoxShinyDetector::detect(const ImageViewRGB32& screen) const{
+bool BoxShinyDetector::detect(const ImageViewRGB32& screen){
     if (!is_panel(screen)){
         return false;
     }

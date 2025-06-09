@@ -58,7 +58,7 @@ void OverworldDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_radar);
     items.add(m_color, m_radar_inside);
 }
-bool OverworldDetector::detect(const ImageViewRGB32& screen) const{
+bool OverworldDetector::detect(const ImageViewRGB32& screen){
     return locate_ball(screen, false).first > 0;
 }
 

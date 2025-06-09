@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -46,8 +47,7 @@ void fast_reset_game(
     Milliseconds enter_game_wait
 );
 void reset_game_from_home(
-    VideoStream& stream,
-    ProControllerContext& device,
+    ConsoleHandle& console, ProControllerContext& device,
     bool tolerate_update_menu
 );
 

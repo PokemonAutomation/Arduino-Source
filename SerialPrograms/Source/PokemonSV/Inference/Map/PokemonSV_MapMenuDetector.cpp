@@ -31,7 +31,7 @@ void MapFlyMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_box);
 }
 
-bool MapFlyMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool MapFlyMenuDetector::detect(const ImageViewRGB32& screen){
     const ImageStats stats0 = image_stats(extract_box_reference(screen, m_middle_box));
     // The white menu background is actually a bit translucent. So we have to relax the `is_white()` condition.
     const double min_rgb_sum = 500.0;
@@ -71,7 +71,7 @@ void MapDestinationMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_fly_menu_box);
 }
 
-bool MapDestinationMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool MapDestinationMenuDetector::detect(const ImageViewRGB32& screen){
     const ImageStats stats0 = image_stats(extract_box_reference(screen, m_bottom_box));
     // The white menu background is actually a bit translucent. So we have to relax the `is_white()` condition.
     const double min_rgb_sum = 500.0;

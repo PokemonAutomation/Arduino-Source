@@ -29,18 +29,18 @@ namespace PokemonLGPE{
 
 
 bool reset_game_to_gamemenu(
-    VideoStream& stream, JoyconContext& context
+    ConsoleHandle& console, JoyconContext& context
 ){
-    close_game(stream, context);
+    close_game(console, context);
     start_game_from_home_with_inference(
-        stream,
+        console,
         context,
         0, 0,
         GameSettings::instance().START_GAME_MASH0
     );
 
     // Now the game has opened:
-    return openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT1);
+    return openedgame_to_gamemenu(console, context, GameSettings::instance().START_GAME_WAIT1);
 }
 
 bool gamemenu_to_ingame(
@@ -97,28 +97,29 @@ bool gamemenu_to_ingame(
 }
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, VideoStream& stream, JoyconContext& context,
+    ProgramEnvironment& env,
+    ConsoleHandle& console, JoyconContext& context,
     Milliseconds post_wait_time
 ){
     if (!(context.controller().controller_type() == ControllerType::NintendoSwitch_RightJoycon)) {
-        stream.log("Right Joycon required!", COLOR_RED);
+        console.log("Right Joycon required!", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "reset_game_from_home(): Right Joycon required.",
-            stream
+            console
         );
     }
     bool ok = true;
-    ok &= reset_game_to_gamemenu(stream, context);
+    ok &= reset_game_to_gamemenu(console, context);
     ok &= gamemenu_to_ingame(
-        stream, context,
+        console, context,
         GameSettings::instance().ENTER_GAME_MASH0,
         GameSettings::instance().ENTER_GAME_WAIT0
     );
     if (!ok){
-        dump_image(stream.logger(), env.program_info(), stream.video(), "StartGame");
+        dump_image(console.logger(), env.program_info(), console.video(), "StartGame");
     }
-    stream.log("Entered game! Waiting out grace period.");
+    console.log("Entered game! Waiting out grace period.");
     pbf_wait(context, post_wait_time);
     context.wait_for_all_requests();
     return ok;

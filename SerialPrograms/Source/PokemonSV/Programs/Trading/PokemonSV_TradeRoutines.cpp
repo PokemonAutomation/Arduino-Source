@@ -51,7 +51,7 @@ public:
         items.add(m_color, m_box_left);
         items.add(m_color, m_box_right);
     }
-    virtual bool detect(const ImageViewRGB32& screen) const override{
+    virtual bool detect(const ImageViewRGB32& screen) override{
         ImageStats box_top = image_stats(extract_box_reference(screen, m_box_left));
         if (!is_solid(box_top, {0.11424, 0.310539, 0.575221}, 0.30)){
             return false;
@@ -89,7 +89,7 @@ public:
         m_cursor.make_overlays(items);
         m_slot.make_overlays(items);
     }
-    virtual bool detect(const ImageViewRGB32& screen) const override{
+    virtual bool detect(const ImageViewRGB32& screen) override{
         bool cursor_ok = m_cursor.detect(screen);
         bool slot_ok = m_slot.detect(screen);
 //        cout << "cursor = " << cursor_ok << ", slot_ok = " << slot_ok << endl;

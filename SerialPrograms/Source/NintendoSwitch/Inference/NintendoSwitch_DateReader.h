@@ -33,7 +33,7 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
     //  Returns true if we are on the date change window.
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     //  Read the hours (0 - 23) while on the date change window.
     //  Returns -1 if unable to read.
@@ -42,14 +42,14 @@ public:
     void set_hours(
         const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         uint8_t hour    //  0 - 23
-    ) const;
+    );
 
 
-    std::pair<DateFormat, DateTime> read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
+    std::pair<DateFormat, DateTime> read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen);
     void set_date(
         const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         const DateTime& date    //  Seconds is ignored.
-    ) const;
+    );
 
 private:
     static ImageRGB32 filter_image(const ImageViewRGB32& image, bool white_theme);

@@ -88,7 +88,7 @@ LetsGoKillDetector::LetsGoKillDetector(
 void LetsGoKillDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool LetsGoKillDetector::detect(const ImageViewRGB32& screen) const{
+bool LetsGoKillDetector::detect(const ImageViewRGB32& screen){
     using namespace Kernels::Waterfill;
 
     ImageViewRGB32 region = extract_box_reference(screen, m_box);

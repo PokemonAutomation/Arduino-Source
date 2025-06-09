@@ -67,7 +67,7 @@ double ImageMatchDetector::rmsd(const ImageViewRGB32& frame) const{
 void ImageMatchDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool ImageMatchDetector::detect(const ImageViewRGB32& screen) const{
+bool ImageMatchDetector::detect(const ImageViewRGB32& screen){
     return rmsd(screen) <= m_max_rmsd;
 }
 

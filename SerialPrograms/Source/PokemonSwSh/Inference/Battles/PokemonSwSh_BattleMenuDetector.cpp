@@ -56,7 +56,7 @@ void StandardBattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_text_bag);
     items.add(m_color, m_text_run);
 }
-bool StandardBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool StandardBattleMenuDetector::detect(const ImageViewRGB32& screen){
     if (!m_den){
         if (!is_white(extract_box_reference(screen, m_ball_left))){
             return false;

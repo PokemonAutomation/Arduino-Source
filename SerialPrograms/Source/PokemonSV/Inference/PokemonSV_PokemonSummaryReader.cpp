@@ -45,7 +45,7 @@ void PokemonSummaryDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow_right.make_overlays(items);
     items.add(m_color, m_shiny_symbol);
 }
-bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen) const{
+bool PokemonSummaryDetector::detect(const ImageViewRGB32& screen){
     ImageStats top_blue_left = image_stats(extract_box_reference(screen, m_top_blue_left));
 //    cout << top_blue_left.average << top_blue_left.stddev << endl;
     if (!is_solid(top_blue_left, {0.0745162, 0.311321, 0.614163}, 0.30, 10)){

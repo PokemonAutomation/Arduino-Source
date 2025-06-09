@@ -181,13 +181,12 @@ WallClock new_start_time_after_reset(WallClock old_start_time, uint16_t run_time
 
 void run_material_farmer(
     ProgramEnvironment& env,
-    VideoStream& stream,
-    ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
     LetsGoEncounterBotTracker encounter_tracker(
-        env, stream, context,
+        env, console, context,
         stats,
         options.LANGUAGE
     );
@@ -198,7 +197,7 @@ void run_material_farmer(
     // ensure we save before running the material farmer.
     // but no need to save if already saving prior to each sandwich
     if (!(options.SANDWICH_OPTIONS.enabled() && options.SANDWICH_OPTIONS.SAVE_GAME_BEFORE_SANDWICH)){
-        save_game_from_overworld(env.program_info(), stream, context);
+        save_game_from_overworld(env.program_info(), console, context);
     }    
 
     /* 
@@ -212,39 +211,39 @@ void run_material_farmer(
         while (true){
             // check time left on material farming
             auto farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
-            stream.log(
+            console.log(
                 "Time left in Material Farming: " + 
                 std::to_string(farming_time_remaining.count()) + " min", 
                 COLOR_PURPLE
             );
             if (farming_time_remaining < std::chrono::minutes(0)){
-                stream.log("Time's up. Stop the Material farming program.", COLOR_RED);
+                console.log("Time's up. Stop the Material farming program.", COLOR_RED);
                 return;
             }
 
             // Check time left on sandwich
             if (options.SANDWICH_OPTIONS.enabled()){
                 auto sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
-                stream.log(
+                console.log(
                     "Time left on sandwich: " + 
                     std::to_string(sandwich_time_remaining.count()) + " min", 
                     COLOR_PURPLE
                 );                   
                 if (sandwich_time_remaining < std::chrono::minutes(0)){
-                    stream.log("Sandwich not active. Make a sandwich.");
-                    last_sandwich_time = make_sandwich_material_farm(env, stream, context, options, stats);
-                    stream.overlay().add_log("Sandwich made.");
+                    console.log("Sandwich not active. Make a sandwich.");
+                    last_sandwich_time = make_sandwich_material_farm(env, console, context, options, stats);
+                    console.overlay().add_log("Sandwich made.");
 
                     // Log time remaining in Material farming 
                     farming_time_remaining = minutes_remaining(start_time, std::chrono::minutes(options.RUN_TIME_IN_MINUTES));
-                    stream.log(
+                    console.log(
                         "Time left in Material Farming: " + 
                         std::to_string(farming_time_remaining.count()) + " min", 
                         COLOR_PURPLE
                     );
                     // Log time remaining on Sandwich
                     sandwich_time_remaining = minutes_remaining(last_sandwich_time, std::chrono::minutes(options.TIME_PER_SANDWICH));
-                    stream.log(
+                    console.log(
                         "Time left on sandwich: " + 
                         std::to_string(sandwich_time_remaining.count()) + " min", 
                         COLOR_PURPLE
@@ -253,9 +252,9 @@ void run_material_farmer(
             }
 
             // heal before starting Let's go
-            stream.log("Heal before starting Let's go", COLOR_PURPLE);
-            stream.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
-            check_hp(env, stream, context, options, hp_watcher, stats);
+            console.log("Heal before starting Let's go", COLOR_PURPLE);
+            console.log("Heal threshold: " + tostr_default(options.AUTO_HEAL_PERCENT), COLOR_PURPLE);
+            check_hp(env, console, context, options, hp_watcher, stats);
 
             /*
             - Starts from pokemon center.
@@ -263,7 +262,7 @@ void run_material_farmer(
             - Then returns to pokemon center, regardless of whether 
             it completes the action or gets caught in a battle 
             */
-            run_from_battles_and_back_to_pokecenter(env, stream, context, stats,
+            run_from_battles_and_back_to_pokecenter(env, console, context, stats,
                 [&](ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context){
                     // Move to starting position for Let's Go hunting path
                     stream.log("Move to starting position for Let's Go hunting path.", COLOR_PURPLE);
@@ -303,7 +302,7 @@ void run_material_farmer(
         }
 
         env.log("Reset game to handle recoverable error.");
-        reset_game(env.program_info(), stream, context);
+        reset_game(env.program_info(), console, context);
         stats.m_game_resets++;
         env.update_stats();
 

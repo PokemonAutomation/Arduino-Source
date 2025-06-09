@@ -69,7 +69,7 @@ MapFixedViewDetector::MapFixedViewDetector(Color color)
 void MapFixedViewDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_arrow_box);
 }
-bool MapFixedViewDetector::detect(const ImageViewRGB32& frame) const{
+bool MapFixedViewDetector::detect(const ImageViewRGB32& frame){
      const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(100, 100, 0), combine_rgb(255, 255, 200)}
     };
@@ -97,7 +97,7 @@ MapRotatedViewDetector::MapRotatedViewDetector(Color color)
 void MapRotatedViewDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_arrow_box);
 }
-bool MapRotatedViewDetector::detect(const ImageViewRGB32& frame) const{
+bool MapRotatedViewDetector::detect(const ImageViewRGB32& frame){
      const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(100, 100, 0), combine_rgb(255, 255, 200)}
     };

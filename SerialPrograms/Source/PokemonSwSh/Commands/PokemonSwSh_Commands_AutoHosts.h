@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -27,7 +28,7 @@ void home_to_add_friends(
     bool fix_cursor
 );
 void accept_FRs(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     uint8_t slot, bool fix_cursor,
     Milliseconds game_to_home_delay_safe,
     Milliseconds auto_fr_duration,

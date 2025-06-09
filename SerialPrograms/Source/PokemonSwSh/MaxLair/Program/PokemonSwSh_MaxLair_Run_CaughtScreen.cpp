@@ -69,7 +69,7 @@ void synchronize_caught_screen(
 StateMachineAction run_caught_screen(
     AdventureRuntime& runtime,
     ProgramEnvironment& env, size_t console_index,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider,
     const ImageViewRGB32& entrance
@@ -79,7 +79,7 @@ StateMachineAction run_caught_screen(
     pbf_wait(context, TICKS_PER_SECOND);
     context.wait_for_all_requests();
 
-    CaughtPokemonScreen tracker(stream, context);
+    CaughtPokemonScreen tracker(console, context);
     runtime.session_stats.add_run(tracker.total());
     if (is_host){
         runtime.path_stats.add_run(tracker.total() >= 4);
@@ -120,11 +120,11 @@ StateMachineAction run_caught_screen(
     for (size_t index : shinies){
         tracker.scroll_to(index);
         tracker.leave_summary();
-        VideoSnapshot screen = stream.video().snapshot();
+        VideoSnapshot screen = console.video().snapshot();
 
         WriteSpinLock lg(runtime.m_lock);
         send_shiny_notification(
-            env, stream.logger(),
+            env, console.logger(),
             runtime.notification_shiny,
             console_index, shinies.size(),
             nullptr,
@@ -145,8 +145,8 @@ StateMachineAction run_caught_screen(
 
     switch (action){
     case CaughtScreenAction::STOP_PROGRAM:
-        stream.log("Stopping program...", COLOR_PURPLE);
-        synchronize_caught_screen(console_index, stream, context, state_tracker);
+        console.log("Stopping program...", COLOR_PURPLE);
+        synchronize_caught_screen(console_index, console, context, state_tracker);
         return StateMachineAction::STOP_PROGRAM;
 
     case CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE:
@@ -154,42 +154,42 @@ StateMachineAction run_caught_screen(
             runtime.path_stats.clear();
         }
         if (shinies.empty() || shinies[0] == 3){
-            stream.log("Quitting back to entrance.", COLOR_PURPLE);
+            console.log("Quitting back to entrance.", COLOR_PURPLE);
             tracker.leave_summary();
-            synchronize_caught_screen(console_index, stream, context, state_tracker);
+            synchronize_caught_screen(console_index, console, context, state_tracker);
             pbf_press_dpad(context, DPAD_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
-            return mash_A_to_entrance(runtime, stream, context, entrance);
+            return mash_A_to_entrance(runtime, console, context, entrance);
         }else{
-            stream.log("Taking non-shiny boss and returning to entrance...", COLOR_BLUE);
+            console.log("Taking non-shiny boss and returning to entrance...", COLOR_BLUE);
             tracker.scroll_to(shinies[0]);
             tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
             tracker.leave_summary();
-            synchronize_caught_screen(console_index, stream, context, state_tracker);
-            StateMachineAction state = mash_A_to_entrance(runtime, stream, context, entrance);
+            synchronize_caught_screen(console_index, console, context, state_tracker);
+            StateMachineAction state = mash_A_to_entrance(runtime, console, context, entrance);
             if (state == StateMachineAction::RESET_RECOVER){
                 throw_and_log<FatalProgramException>(
-                    stream.logger(),
+                    console.logger(),
                     ErrorReport::NO_ERROR_REPORT,
                     "Unable to take " + Pokemon::STRING_POKEMON + ". Did you forget to disable nicknames?",
-                    stream
+                    console
                );
             }
             return state;
         }
 
     case CaughtScreenAction::RESET:
-        stream.log("Resetting game...", COLOR_BLUE);
-        synchronize_caught_screen(console_index, stream, context, state_tracker);
+        console.log("Resetting game...", COLOR_BLUE);
+        synchronize_caught_screen(console_index, console, context, state_tracker);
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
         reset_game_from_home_with_inference(
-            stream, context,
+            console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
         return StateMachineAction::DONE_WITH_ADVENTURE;
     }
 
-    throw InternalProgramError(&stream.logger(), PA_CURRENT_FUNCTION, "Invalid enum.");
+    throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Invalid enum.");
 }
 
 

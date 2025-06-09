@@ -100,7 +100,7 @@ GradientArrowDetector::GradientArrowDetector(
 void GradientArrowDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool GradientArrowDetector::detect(const ImageViewRGB32& screen) const{
+bool GradientArrowDetector::detect(const ImageViewRGB32& screen){
     ImageFloatBox box;
     return detect(box, screen);
 }

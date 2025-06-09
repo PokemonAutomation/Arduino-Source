@@ -42,7 +42,7 @@ void BlueberryQuestDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-bool BlueberryQuestDetector::detect(const ImageViewRGB32& screen) const{
+bool BlueberryQuestDetector::detect(const ImageViewRGB32& screen){
     return !detect_quest(screen).empty();
 }
 

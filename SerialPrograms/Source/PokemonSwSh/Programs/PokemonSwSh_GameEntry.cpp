@@ -27,23 +27,23 @@ namespace PokemonSwSh{
 
 
 void resume_game_no_interact(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu
 ){
-    bool video_available = (bool)stream.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available){
-        resume_game_from_home(stream, context);
+        resume_game_from_home(console, context);
     }else{
         resume_game_no_interact_old(context, tolerate_update_menu);
     }
 }
 void resume_game_back_out(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu, uint16_t mash_B_time
 ){
-    bool video_available = (bool)stream.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available){
-        resume_game_from_home(stream, context);
+        resume_game_from_home(console, context);
     }else{
         resume_game_back_out_old(context, tolerate_update_menu, mash_B_time);
     }
@@ -105,7 +105,7 @@ void enter_loading_game(
 }
 
 void start_game_from_home_with_inference(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -113,7 +113,7 @@ void start_game_from_home_with_inference(
     uint16_t post_wait_time
 ){
     NintendoSwitch::start_game_from_home(
-        stream,
+        console,
         context,
         tolerate_update_menu,
         game_slot,
@@ -122,26 +122,26 @@ void start_game_from_home_with_inference(
     );
 
     //  Wait for game to load.
-    enter_loading_game(stream, context, backup_save, post_wait_time);
+    enter_loading_game(console, context, backup_save, post_wait_time);
 }
 
 
 void reset_game_from_home_with_inference(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     bool backup_save,
     uint16_t post_wait_time
 ){
-    bool video_available = (bool)stream.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available ||
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu
     ){
 //        cout << "close game" << endl;
-        close_game(stream, context);
+        close_game(console, context);
 //        cout << "start_game_from_home_with_inference game" << endl;
         start_game_from_home_with_inference(
-            stream, context, tolerate_update_menu, 0, 0, backup_save, post_wait_time
+            console, context, tolerate_update_menu, 0, 0, backup_save, post_wait_time
         );
         return;
     }
@@ -150,28 +150,28 @@ void reset_game_from_home_with_inference(
     context.wait_for_all_requests();
 
     //  Wait for game to load.
-    enter_loading_game(stream, context, backup_save, post_wait_time);
+    enter_loading_game(console, context, backup_save, post_wait_time);
 }
 
 
 void start_game_from_home(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
     bool backup_save,
     uint16_t post_wait_time
 ){
-    bool video_available = (bool)stream.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available ||
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu
     ){
 //        cout << "close game" << endl;
-        close_game(stream, context);
+        close_game(console, context);
 //        cout << "start_game_from_home_with_inference game" << endl;
         start_game_from_home_with_inference(
-            stream, context, tolerate_update_menu, game_slot, user_slot, backup_save, post_wait_time
+            console, context, tolerate_update_menu, game_slot, user_slot, backup_save, post_wait_time
         );
         return;
     }
@@ -180,7 +180,7 @@ void start_game_from_home(
     context.wait_for_all_requests();
 
     //  Wait for game to load.
-    enter_loading_game(stream, context, backup_save, post_wait_time);
+    enter_loading_game(console, context, backup_save, post_wait_time);
 }
 
 

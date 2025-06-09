@@ -29,7 +29,7 @@ void AddToPartyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_right);
     m_dialog.make_overlays(items);
 }
-bool AddToPartyDetector::detect(const ImageViewRGB32& screen) const{
+bool AddToPartyDetector::detect(const ImageViewRGB32& screen){
     ImageStats top_left = image_stats(extract_box_reference(screen, m_top_left));
 //    cout << top_left.average << top_left.stddev << endl;
     if (!is_white(top_left)){

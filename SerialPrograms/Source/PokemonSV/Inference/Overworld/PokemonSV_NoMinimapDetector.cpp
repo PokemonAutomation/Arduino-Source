@@ -25,7 +25,7 @@ NoMinimapDetector::NoMinimapDetector(Logger& logger, Color color)
 void NoMinimapDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_ball);
 }
-bool NoMinimapDetector::detect(const ImageViewRGB32& screen) const{
+bool NoMinimapDetector::detect(const ImageViewRGB32& screen){
     return !m_overworld.detect(screen);
 }
 

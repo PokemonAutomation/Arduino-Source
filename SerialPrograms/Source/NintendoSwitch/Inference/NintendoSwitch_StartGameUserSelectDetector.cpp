@@ -19,8 +19,8 @@ namespace NintendoSwitch{
 
 
 
-StartGameUserSelectDetector::StartGameUserSelectDetector(Color color)
-    : m_type_detector(color)
+StartGameUserSelectDetector::StartGameUserSelectDetector(ConsoleState& state, Color color)
+    : m_type_detector(state, color)
     , m_switch1(color)
     , m_switch2(color)
 {}
@@ -29,22 +29,23 @@ void StartGameUserSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_switch1.make_overlays(items);
     m_switch2.make_overlays(items);
 }
-bool StartGameUserSelectDetector::detect(const ImageViewRGB32& screen) const{
-    ConsoleTypeDetection x = m_type_detector.detect(screen);
+bool StartGameUserSelectDetector::detect(const ImageViewRGB32& screen){
+    ConsoleType type = m_type_detector.detect(screen);
 //    cout << "detection: " << (int)x << endl;
-    switch (x){
-    case ConsoleTypeDetection::Unknown:
+
+    if (type == ConsoleType::Unknown){
         return false;
-    case ConsoleTypeDetection::Switch1:
+    }
+    if (type == ConsoleType::Switch1){
         return m_switch1.detect(screen);
-    case ConsoleTypeDetection::Switch2_Unknown:
-    case ConsoleTypeDetection::Switch2_International:
-    case ConsoleTypeDetection::Switch2_JapanLocked:
+    }
+    if (is_switch2(type)){
         return m_switch2.detect(screen);
     }
+
     throw InternalProgramError(
         nullptr, PA_CURRENT_FUNCTION,
-        "Invalid ConsoleTypeDetection: " + std::to_string((int)x)
+        "Invalid ConsoleType: " + std::to_string((int)type)
     );
 }
 
@@ -70,7 +71,7 @@ void StartGameUserSelectDetector_Switch1::make_overlays(VideoOverlaySet& items) 
     items.add(m_color, m_mid_row);
     items.add(m_color, m_user_slot);
 }
-bool StartGameUserSelectDetector_Switch1::detect(const ImageViewRGB32& screen) const{
+bool StartGameUserSelectDetector_Switch1::detect(const ImageViewRGB32& screen){
     ImageStats stats_bottom_row = image_stats(extract_box_reference(screen, m_bottom_row));
 //    cout << stats_bottom_row.average << stats_bottom_row.stddev << endl;
     if (stats_bottom_row.stddev.sum() > 10){
@@ -136,7 +137,7 @@ void StartGameUserSelectDetector_Switch2::make_overlays(VideoOverlaySet& items) 
     items.add(m_color, m_mid_row);
     items.add(m_color, m_user_slot);
 }
-bool StartGameUserSelectDetector_Switch2::detect(const ImageViewRGB32& screen) const{
+bool StartGameUserSelectDetector_Switch2::detect(const ImageViewRGB32& screen){
     ImageStats stats_bottom_row = image_stats(extract_box_reference(screen, m_bottom_row));
 //    cout << stats_bottom_row.average << stats_bottom_row.stddev << endl;
     if (stats_bottom_row.stddev.sum() > 10){

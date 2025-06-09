@@ -29,7 +29,7 @@ void PokePortalDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow_tera.make_overlays(items);
     m_arrow_bottom.make_overlays(items);
 }
-bool PokePortalDetector::detect(const ImageViewRGB32& screen) const{
+bool PokePortalDetector::detect(const ImageViewRGB32& screen){
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
     if (!is_solid(bottom, {0.582218, 0.417782, 0.})){
         return false;
@@ -47,7 +47,7 @@ bool PokePortalDetector::detect(const ImageViewRGB32& screen) const{
 
     return false;
 }
-int PokePortalDetector::detect_location(const ImageViewRGB32& screen) const{
+int PokePortalDetector::detect_location(const ImageViewRGB32& screen){
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
     if (!is_solid(bottom, {0.582218, 0.417782, 0.})){
         return -1;
@@ -78,7 +78,7 @@ int PokePortalDetector::detect_location(const ImageViewRGB32& screen) const{
 bool PokePortalDetector::move_cursor(
     const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     int row
-) const{
+){
     if (row < 0 || row >= 7){
         throw InternalProgramError(
             &stream.logger(), PA_CURRENT_FUNCTION,

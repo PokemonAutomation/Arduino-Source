@@ -48,7 +48,7 @@ public:
     BattleDialogDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     ImageFloatBox m_left_box;
@@ -69,7 +69,7 @@ public:
     BattleMenuDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     ImageFloatBox m_left_box;
@@ -92,7 +92,7 @@ public:
     AdvanceBattleDialogDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     ImageFloatBox m_dialog_box;

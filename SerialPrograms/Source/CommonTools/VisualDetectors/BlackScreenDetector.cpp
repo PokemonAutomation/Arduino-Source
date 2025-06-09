@@ -32,7 +32,7 @@ BlackScreenDetector::BlackScreenDetector(
 void BlackScreenDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool BlackScreenDetector::detect(const ImageViewRGB32& screen) const{
+bool BlackScreenDetector::detect(const ImageViewRGB32& screen){
     return is_black(extract_box_reference(screen, m_box), m_max_rgb_sum, m_max_stddev_sum);
 }
 
@@ -51,7 +51,7 @@ WhiteScreenDetector::WhiteScreenDetector(
 void WhiteScreenDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool WhiteScreenDetector::detect(const ImageViewRGB32& screen) const{
+bool WhiteScreenDetector::detect(const ImageViewRGB32& screen){
     return is_white(extract_box_reference(screen, m_box), m_min_rgb_sum, m_max_stddev_sum);
 }
 

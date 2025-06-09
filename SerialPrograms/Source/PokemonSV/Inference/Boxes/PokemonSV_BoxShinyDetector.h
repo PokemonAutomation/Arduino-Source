@@ -23,7 +23,7 @@ public:
     BoxShinyDetector(Color color = COLOR_YELLOW, const ImageFloatBox& box = {0.878, 0.081, 0.028, 0.046});
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     Color m_color;

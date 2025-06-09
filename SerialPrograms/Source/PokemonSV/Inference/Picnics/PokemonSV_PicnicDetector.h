@@ -23,7 +23,7 @@ public:
     PicnicDetector(Color color = COLOR_YELLOW);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     Color m_color;

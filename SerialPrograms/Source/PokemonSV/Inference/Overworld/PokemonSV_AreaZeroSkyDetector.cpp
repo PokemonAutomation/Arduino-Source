@@ -41,7 +41,7 @@ bool AreaZeroSkyDetector::detect(Kernels::Waterfill::WaterfillObject& object, co
     }
     return false;
 }
-bool AreaZeroSkyDetector::detect(const ImageViewRGB32& screen) const{
+bool AreaZeroSkyDetector::detect(const ImageViewRGB32& screen){
     using namespace Kernels::Waterfill;
 
     WaterfillObject object;

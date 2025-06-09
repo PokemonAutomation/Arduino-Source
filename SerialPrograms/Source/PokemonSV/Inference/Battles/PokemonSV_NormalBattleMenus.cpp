@@ -32,7 +32,7 @@ void NormalBattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_status_button.make_overlays(items);
     m_arrow.make_overlays(items);
 }
-bool NormalBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool NormalBattleMenuDetector::detect(const ImageViewRGB32& screen){
     if (!m_status_button.detect(screen)){
 //        cout << "status button" << endl;
         return false;
@@ -42,7 +42,7 @@ bool NormalBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     }
     return true;
 }
-int8_t NormalBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
+int8_t NormalBattleMenuDetector::detect_slot(const ImageViewRGB32& screen){
     if (!m_status_button.detect(screen)){
 //        cout << "status button" << endl;
         return -1;
@@ -58,7 +58,7 @@ int8_t NormalBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const
 //    cout << "slot = " << slot << endl;
     return (int8_t)(slot + 0.5);
 }
-bool NormalBattleMenuDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const{
+bool NormalBattleMenuDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot){
     if (slot > 3){
         return false;
     }
@@ -190,7 +190,7 @@ void MoveSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_info_button.make_overlays(items);
     m_arrow.make_overlays(items);
 }
-bool MoveSelectDetector::detect(const ImageViewRGB32& screen) const{
+bool MoveSelectDetector::detect(const ImageViewRGB32& screen){
     if (!m_info_button.detect(screen)){
 //        cout << "status" << endl;
         return false;
@@ -201,7 +201,7 @@ bool MoveSelectDetector::detect(const ImageViewRGB32& screen) const{
     }
     return true;
 }
-int8_t MoveSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
+int8_t MoveSelectDetector::detect_slot(const ImageViewRGB32& screen){
     if (!m_info_button.detect(screen)){
 //        cout << "status" << endl;
         return false;
@@ -219,7 +219,7 @@ int8_t MoveSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
 
     return (int8_t)(y + 0.5);
 }
-bool MoveSelectDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const{
+bool MoveSelectDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot){
     if (slot > 3){
         return false;
     }
@@ -264,7 +264,7 @@ TerastallizingDetector::TerastallizingDetector(Color color)
 void TerastallizingDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool TerastallizingDetector::detect(const ImageViewRGB32& screen) const{
+bool TerastallizingDetector::detect(const ImageViewRGB32& screen){
     ImageStats box = image_stats(extract_box_reference(screen, m_box));
     // dump_debug_image(
     //             global_logger_command_line(), 
@@ -285,7 +285,7 @@ SwapMenuDetector::SwapMenuDetector(Color color)
 void SwapMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow.make_overlays(items);
 }
-bool SwapMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool SwapMenuDetector::detect(const ImageViewRGB32& screen){
     if (!m_arrow.detect(screen)){
         return false;
     }
@@ -354,7 +354,7 @@ void WipeoutDetector::make_overlays(VideoOverlaySet& items) const{
     m_dialog.make_overlays(items);
     m_arrow_detector.make_overlays(items);
 }
-bool WipeoutDetector::detect(const ImageViewRGB32& screen) const{
+bool WipeoutDetector::detect(const ImageViewRGB32& screen){
     if (!m_blackscreen.detect(screen)){
         return false;
     }

@@ -33,7 +33,7 @@ public:
 private:
     const Color m_color;
     const ImageFloatBox m_box;
-    const OverworldDetector m_overworld_detector;
+    OverworldDetector m_overworld_detector;
     const std::chrono::milliseconds m_map_hold_duration;
     VideoSnapshot m_snapshot_start;
 };

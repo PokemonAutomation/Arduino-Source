@@ -35,7 +35,7 @@ void enter_summary(ProControllerContext& context, bool regi_move_right){
     pbf_press_button(context, BUTTON_A, 10, 10);    //  For Regi, this clears the dialog after running.
 }
 void close_game_if_overworld(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool touch_date,
     uint8_t rollback_hours
 ){
@@ -55,10 +55,10 @@ void close_game_if_overworld(
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
 
     if (touch_date){
-        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+        touch_date_from_home(console, context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     }
     if (rollback_hours > 0){
-        rollback_hours_from_home(context, rollback_hours, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+        rollback_hours_from_home(console, context, rollback_hours, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     }
 
     //  Enter profile.
@@ -71,7 +71,7 @@ void close_game_if_overworld(
     pbf_press_dpad(context, DPAD_DOWN, 10, 10);
 
     //  Close and restart game.
-    close_game(stream, context);
+    close_game(console, context);
     pbf_press_button(context, BUTTON_HOME, 10, 190);
 }
 

@@ -39,7 +39,7 @@ void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, Pr
     reader.make_overlays(overlays);
 
 //    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-    home_to_date_time(context, true, false);
+    home_to_date_time(stream, context, true);
     pbf_press_button(context, BUTTON_A, 20, 50);
     reader.set_hours(info, stream, context, 0);
     pbf_press_button(context, BUTTON_A, 20, 30);
@@ -47,9 +47,9 @@ void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, Pr
 //    resume_game_from_home(stream, context);
 }
 
-void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context){
+void day_skip_from_overworld(ConsoleHandle& console, ProControllerContext& context){
     pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-    home_to_date_time(context, true, true);
+    home_to_date_time(console, context, true);
 
     Milliseconds tv = context->timing_variation();
     if (tv == 0ms){
@@ -87,7 +87,7 @@ void day_skip_from_overworld(VideoStream& stream, ProControllerContext& context)
     }
 
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-    resume_game_from_home(stream, context);
+    resume_game_from_home(console, context);
 }
 
 void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, uint16_t seconds_between_b_presses){

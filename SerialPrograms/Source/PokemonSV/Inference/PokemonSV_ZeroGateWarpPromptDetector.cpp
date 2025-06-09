@@ -26,7 +26,7 @@ ZeroGateWarpPromptDetector::ZeroGateWarpPromptDetector(Color color)
 void ZeroGateWarpPromptDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow.make_overlays(items);
 }
-bool ZeroGateWarpPromptDetector::detect(const ImageViewRGB32& screen) const{
+bool ZeroGateWarpPromptDetector::detect(const ImageViewRGB32& screen){
     return detect_location(screen) >= 0;
 }
 int ZeroGateWarpPromptDetector::detect_location(const ImageViewRGB32& screen) const{

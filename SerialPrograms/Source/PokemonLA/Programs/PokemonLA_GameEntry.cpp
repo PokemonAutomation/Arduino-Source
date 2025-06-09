@@ -26,17 +26,17 @@ namespace PokemonLA{
 
 
 bool reset_game_to_gamemenu(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu
 ){
-    bool video_available = (bool)stream.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available ||
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu
     ){
-        close_game(stream, context);
+        close_game(console, context);
         start_game_from_home(
-            stream,
+            console,
             context,
             tolerate_update_menu,
             0, 0,
@@ -48,7 +48,7 @@ bool reset_game_to_gamemenu(
     }
 
     // Now the game has opened:
-    return openedgame_to_gamemenu(stream, context, GameSettings::instance().START_GAME_WAIT1);
+    return openedgame_to_gamemenu(console, context, GameSettings::instance().START_GAME_WAIT1);
 }
 
 bool gamemenu_to_ingame(
@@ -75,21 +75,22 @@ bool gamemenu_to_ingame(
 }
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    ProgramEnvironment& env,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     uint16_t post_wait_time
 ){
     bool ok = true;
-    ok &= reset_game_to_gamemenu(stream, context, tolerate_update_menu);
+    ok &= reset_game_to_gamemenu(console, context, tolerate_update_menu);
     ok &= gamemenu_to_ingame(
-        stream, context,
+        console, context,
         GameSettings::instance().ENTER_GAME_MASH0,
         GameSettings::instance().ENTER_GAME_WAIT0
     );
     if (!ok){
-        dump_image(stream.logger(), env.program_info(), stream.video(), "StartGame");
+        dump_image(console.logger(), env.program_info(), console.video(), "StartGame");
     }
-    stream.log("Entered game! Waiting out grace period.");
+    console.log("Entered game! Waiting out grace period.");
     pbf_wait(context, post_wait_time);
     context.wait_for_all_requests();
     return ok;

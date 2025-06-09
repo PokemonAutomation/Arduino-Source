@@ -69,18 +69,19 @@ bool openedgame_to_ingame(
 
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    ProgramEnvironment& env,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     Milliseconds post_wait_time
 ){
-    bool video_available = (bool)stream.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available ||
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
         tolerate_update_menu
     ){
-        close_game(stream, context);
+        close_game(console, context);
         start_game_from_home(
-            stream,
+            console,
             context,
             tolerate_update_menu,
             0, 0,
@@ -91,7 +92,7 @@ bool reset_game_from_home(
         pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH0);
     }
     bool ret = openedgame_to_ingame(
-        env, stream, context,
+        env, console, context,
         GameSettings::instance().START_GAME_WAIT0,
         GameSettings::instance().ENTER_GAME_MASH0,
         GameSettings::instance().ENTER_GAME_WAIT0,

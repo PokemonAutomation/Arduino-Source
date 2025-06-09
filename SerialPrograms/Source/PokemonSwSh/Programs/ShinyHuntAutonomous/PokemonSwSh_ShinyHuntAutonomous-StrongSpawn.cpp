@@ -98,7 +98,11 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     while (true){
         WallClock now = current_time();
         if (TIME_ROLLBACK_HOURS > 0 && now - last_touch >= PERIOD){
-            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+            rollback_hours_from_home(
+                env.logger(), context,
+                TIME_ROLLBACK_HOURS,
+                ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0
+            );
             last_touch += PERIOD;
         }
         reset_game_from_home_with_inference(

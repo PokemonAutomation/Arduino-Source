@@ -146,7 +146,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, ProControll
     }
 
     if (enable_touch){
-        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.logger(), context);
     }
 
     uint32_t raids = 0;
@@ -164,7 +164,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, ProControll
             env.log("Raids Attempted: " + tostr_u_commas(raids++));
 
             //  Start game.
-            rollback_date_from_home(context, game.skips);
+            rollback_date_from_home(env.logger(), context, game.skips);
 
             //  Sanitize game slot.
             uint8_t game_slot = (uint8_t)game.game_slot.current_value();
@@ -231,7 +231,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, ProControll
 
             //  Touch the date.
             if (enable_touch){
-                TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
+                TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.logger(), context);
             }
         }
     }

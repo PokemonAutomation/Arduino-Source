@@ -27,7 +27,7 @@ public:
     TeraRaidSearchDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     bool detect_search_location(ImageFloatBox& box, const ImageViewRGB32& screen) const;
     bool move_cursor_to_search(
@@ -55,7 +55,7 @@ public:
     CodeEntryDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     Color m_color;

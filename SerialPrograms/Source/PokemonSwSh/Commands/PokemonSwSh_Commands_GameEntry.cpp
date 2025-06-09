@@ -64,7 +64,7 @@ void fast_reset_game(
 }
 
 void reset_game_from_home(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu
 ){
     if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && !tolerate_update_menu){
@@ -78,7 +78,7 @@ void reset_game_from_home(
         return;
     }
 
-    close_game(stream, context);
+    close_game(console, context);
     start_game_from_home(context, tolerate_update_menu, 0, 0, false);
 }
 void settings_to_enter_game(ProControllerContext& context, bool fast){

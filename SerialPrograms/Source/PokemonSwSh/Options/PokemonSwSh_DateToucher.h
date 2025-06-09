@@ -37,7 +37,7 @@ public:
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     bool ok_to_touch_now();
-    void touch_now_from_home_if_needed(ProControllerContext& context);
+    void touch_now_from_home_if_needed(Logger& logger, ProControllerContext& context);
 
 private:
     SimpleIntegerOption<uint8_t> m_hours;

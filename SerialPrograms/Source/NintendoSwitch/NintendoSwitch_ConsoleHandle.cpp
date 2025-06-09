@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-ConsoleHandle::ConsoleHandle(ConsoleHandle&& x) = default;
+//ConsoleHandle::ConsoleHandle(ConsoleHandle&& x) = default;
 ConsoleHandle::~ConsoleHandle(){
     overlay().remove_stat(*m_thread_utilization);
 }

@@ -29,7 +29,7 @@ namespace PokemonSV{
 class AreaZeroSkyDetector : public StaticScreenDetector{
 public:
     virtual void make_overlays(VideoOverlaySet& items) const override{}
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     bool detect(Kernels::Waterfill::WaterfillObject& object, const ImageViewRGB32& screen) const;
 };

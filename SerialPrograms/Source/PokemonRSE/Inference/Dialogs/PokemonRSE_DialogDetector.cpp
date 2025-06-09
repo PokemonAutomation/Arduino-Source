@@ -48,7 +48,7 @@ void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_left_box);
     items.add(COLOR_RED, m_right_box);
 }
-bool BattleDialogDetector::detect(const ImageViewRGB32& screen) const{
+bool BattleDialogDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 left_image = extract_box_reference(screen, m_left_box);
     ImageViewRGB32 right_image = extract_box_reference(screen, m_right_box);
     if (is_solid(left_image, { 0.335, 0.331, 0.332 }) && is_solid(right_image, { 0.335, 0.331, 0.332 })){
@@ -66,7 +66,7 @@ void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_left_box);
     items.add(COLOR_RED, m_right_box);
 }
-bool BattleMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool BattleMenuDetector::detect(const ImageViewRGB32& screen){
     ImageViewRGB32 left_image = extract_box_reference(screen, m_left_box);
     ImageViewRGB32 right_image = extract_box_reference(screen, m_right_box);
     if (is_solid(left_image, { 0.335, 0.331, 0.332 }) && is_solid(right_image, { 0.25, 0.38, 0.369 })){
@@ -86,7 +86,7 @@ void AdvanceBattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_left_box);
     items.add(COLOR_RED, m_right_box);
 }
-bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen) const{
+bool AdvanceBattleDialogDetector::detect(const ImageViewRGB32& screen){
     const bool replace_color_within_range = false;
 
     //Filter out background

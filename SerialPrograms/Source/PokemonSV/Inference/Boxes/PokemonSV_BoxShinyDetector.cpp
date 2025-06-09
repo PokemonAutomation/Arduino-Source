@@ -25,7 +25,7 @@ void BoxShinyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-bool BoxShinyDetector::detect(const ImageViewRGB32& frame) const{
+bool BoxShinyDetector::detect(const ImageViewRGB32& frame){
     const auto stats = image_stats(extract_box_reference(frame, m_box));
     // cout << "stats.stddev.sum() " << stats.stddev.sum() << endl;
     // On screenshots collected from macOS-Mirabox, non-shiny has stddev of at most 3.0, while

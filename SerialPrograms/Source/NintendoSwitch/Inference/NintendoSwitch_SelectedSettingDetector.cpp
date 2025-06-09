@@ -8,9 +8,10 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "NintendoSwitch_SelectedSettingDetector.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,17 +42,17 @@ bool SelectedSettingWatcher::process_frame(const ImageViewRGB32& screen, WallClo
 
     ImageStats stats_unselected_box1 = image_stats(extract_box_reference(screen, m_not_selected_box1));
     double unselected1_average_sum = stats_unselected_box1.average.sum();
-    cout << "unselected_average_sum1: " << std::to_string(unselected1_average_sum) << endl;
+//    cout << "unselected_average_sum1: " << std::to_string(unselected1_average_sum) << endl;
 
     ImageStats stats_unselected_box2 = image_stats(extract_box_reference(screen, m_not_selected_box2));
     double unselected2_average_sum = stats_unselected_box2.average.sum();
-    cout << "unselected_average_sum2: " << std::to_string(unselected2_average_sum) << endl;
+//    cout << "unselected_average_sum2: " << std::to_string(unselected2_average_sum) << endl;
 
     double average_sum_unselected_diff = std::abs(unselected1_average_sum - unselected2_average_sum);
 
     ImageStats stats_selected_box = image_stats(extract_box_reference(screen, m_selected_box));
     double selected_average_sum = stats_selected_box.average.sum();
-    cout << "selected_average_sum: " << std::to_string(selected_average_sum) << endl;
+//    cout << "selected_average_sum: " << std::to_string(selected_average_sum) << endl;
 
     bool is_selected = false;
     if (is_white_theme(screen)){  // light mode

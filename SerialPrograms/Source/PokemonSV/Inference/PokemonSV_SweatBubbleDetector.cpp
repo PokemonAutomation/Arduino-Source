@@ -35,7 +35,7 @@ SweatBubbleDetector::SweatBubbleDetector(Color color, const ImageFloatBox& box)
 void SweatBubbleDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool SweatBubbleDetector::detect(const ImageViewRGB32& screen) const{
+bool SweatBubbleDetector::detect(const ImageViewRGB32& screen){
     using namespace Kernels::Waterfill;
 
     ImageViewRGB32 region = extract_box_reference(screen, m_box);

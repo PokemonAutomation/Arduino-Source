@@ -28,7 +28,7 @@ void TutorialDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 // detect solid beige color along the side and bottom of the tutorial
-bool TutorialDetector::detect(const ImageViewRGB32& screen) const{
+bool TutorialDetector::detect(const ImageViewRGB32& screen){
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
     // cout << "bottom.average.sum(): " << bottom.average.sum() << endl;

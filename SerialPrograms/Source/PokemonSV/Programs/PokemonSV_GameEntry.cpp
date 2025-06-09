@@ -61,10 +61,10 @@ private:
 };
 
 
-bool reset_game_to_gamemenu(VideoStream& stream, ProControllerContext& context){
-    close_game(stream, context);
+bool reset_game_to_gamemenu(ConsoleHandle& console, ProControllerContext& context){
+    close_game(console, context);
     start_game_from_home(
-        stream, context,
+        console, context,
         true,
         0, 0,
         GameSettings::instance().START_GAME_MASH0
@@ -73,28 +73,28 @@ bool reset_game_to_gamemenu(VideoStream& stream, ProControllerContext& context){
     Milliseconds timeout = GameSettings::instance().START_GAME_WAIT0;
 
     {
-        stream.log("Waiting to load game...");
+        console.log("Waiting to load game...");
         WaitforWhiteLoadScreen detector(false);
         int ret = wait_until(
-            stream, context,
+            console, context,
             timeout,
             {{detector}}
         );
         if (ret < 0){
-            stream.log("Timed out waiting to enter game.", COLOR_RED);
+            console.log("Timed out waiting to enter game.", COLOR_RED);
             return false;
         }
     }
     {
-        stream.log("Waiting for game menu...");
+        console.log("Waiting for game menu...");
         WaitforWhiteLoadScreen detector(true);
         int ret = wait_until(
-            stream, context,
+            console, context,
             timeout,
             {{detector}}
         );
         if (ret < 0){
-            stream.log("Timed out waiting for game menu.", COLOR_RED);
+            console.log("Timed out waiting for game menu.", COLOR_RED);
             return false;
         }
     }
@@ -125,27 +125,29 @@ bool gamemenu_to_ingame(VideoStream& stream, ProControllerContext& context){
 }
 
 bool reset_game_from_home(
-    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+    const ProgramInfo& info,
+    ConsoleHandle& console, ProControllerContext& context,
     uint16_t post_wait_time
 ){
-    stream.log("Resetting game from home...");
-    stream.overlay().add_log("Reset game", COLOR_WHITE);
+    console.log("Resetting game from home...");
+    console.overlay().add_log("Reset game", COLOR_WHITE);
     bool ok = true;
-    ok &= reset_game_to_gamemenu(stream, context);
-    ok &= gamemenu_to_ingame(stream, context);
+    ok &= reset_game_to_gamemenu(console, context);
+    ok &= gamemenu_to_ingame(console, context);
     if (!ok){
-        dump_image(stream.logger(), info, stream.video(), "StartGame");
+        dump_image(console.logger(), info, console.video(), "StartGame");
     }
-    stream.log("Entered game! Waiting out grace period.");
+    console.log("Entered game! Waiting out grace period.");
     pbf_wait(context, post_wait_time);
     context.wait_for_all_requests();
     return ok;
 }
 bool reset_game_from_home_zoom_out(
-    const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+    const ProgramInfo& info,
+    ConsoleHandle& console, ProControllerContext& context,
     uint16_t post_wait_time
 ){
-    bool ret = reset_game_from_home(info, stream, context, post_wait_time);
+    bool ret = reset_game_from_home(info, console, context, post_wait_time);
 
     //  5 zooms will guarantee that are fully zoomed out regardless of whether
     //  we are on the DLC update.
@@ -158,15 +160,18 @@ bool reset_game_from_home_zoom_out(
     return ret;
 }
 
-void reset_game(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+void reset_game(
+    const ProgramInfo& info,
+    ConsoleHandle& console, ProControllerContext& context
+){
     try{
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         context.wait_for_all_requests();
-        if (!reset_game_from_home(info, stream, context, 5 * TICKS_PER_SECOND)){
+        if (!reset_game_from_home(info, console, context, 5 * TICKS_PER_SECOND)){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to start game.",
-                stream
+                console
             );
         }
     }catch (OperationFailedException& e){

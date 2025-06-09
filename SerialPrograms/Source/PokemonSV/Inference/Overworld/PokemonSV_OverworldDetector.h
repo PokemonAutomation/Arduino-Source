@@ -25,7 +25,7 @@ public:
     OverworldDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     // return coordinates of the radar ball. return -1, -1 if unable to find the radar ball.
     // set strict_requirements to true for more accurate detection of radar ball,

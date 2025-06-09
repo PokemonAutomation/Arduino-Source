@@ -26,7 +26,7 @@ void TeraBattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_callouts_button.make_overlays(items);
     m_arrow.make_overlays(items);
 }
-bool TeraBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool TeraBattleMenuDetector::detect(const ImageViewRGB32& screen){
     if (!m_callouts_button.detect(screen)){
 //        cout << "status button" << endl;
         return false;
@@ -37,7 +37,7 @@ bool TeraBattleMenuDetector::detect(const ImageViewRGB32& screen) const{
     }
     return true;
 }
-int8_t TeraBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
+int8_t TeraBattleMenuDetector::detect_slot(const ImageViewRGB32& screen){
     if (!m_callouts_button.detect(screen)){
 //        cout << "status button" << endl;
         return -1;
@@ -55,7 +55,7 @@ int8_t TeraBattleMenuDetector::detect_slot(const ImageViewRGB32& screen) const{
 //    cout << "slot = " << slot << endl;
     return (int8_t)(slot + 0.5);
 }
-bool TeraBattleMenuDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const{
+bool TeraBattleMenuDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot){
     if (slot > 2){
         return false;
     }
@@ -98,7 +98,7 @@ void CheerSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_info_button.make_overlays(items);
     m_arrow.make_overlays(items);
 }
-bool CheerSelectDetector::detect(const ImageViewRGB32& screen) const{
+bool CheerSelectDetector::detect(const ImageViewRGB32& screen){
     if (m_info_button.detect(screen)){
 //        cout << "status" << endl;
         return false;
@@ -109,7 +109,7 @@ bool CheerSelectDetector::detect(const ImageViewRGB32& screen) const{
     }
     return true;
 }
-int8_t CheerSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
+int8_t CheerSelectDetector::detect_slot(const ImageViewRGB32& screen){
     if (m_info_button.detect(screen)){
 //        cout << "status" << endl;
         return false;
@@ -127,7 +127,7 @@ int8_t CheerSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
 
     return (int8_t)(y + 0.5);
 }
-bool CheerSelectDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const{
+bool CheerSelectDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot){
     if (slot > 2){
         return false;
     }
@@ -176,7 +176,7 @@ void TeraTargetSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_player2.make_overlays(items);
     m_player3.make_overlays(items);
 }
-bool TeraTargetSelectDetector::detect(const ImageViewRGB32& screen) const{
+bool TeraTargetSelectDetector::detect(const ImageViewRGB32& screen){
     if (m_opponent.detect(screen)){
         return true;
     }
@@ -194,7 +194,7 @@ bool TeraTargetSelectDetector::detect(const ImageViewRGB32& screen) const{
     }
     return false;
 }
-int8_t TeraTargetSelectDetector::detect_slot(const ImageViewRGB32& screen) const{
+int8_t TeraTargetSelectDetector::detect_slot(const ImageViewRGB32& screen){
     if (m_opponent.detect(screen)){
         return 0;
     }
@@ -212,7 +212,7 @@ int8_t TeraTargetSelectDetector::detect_slot(const ImageViewRGB32& screen) const
     }
     return -1;
 }
-bool TeraTargetSelectDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const{
+bool TeraTargetSelectDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot){
     if (slot > 4){
         return false;
     }
@@ -279,7 +279,7 @@ void TeraCatchDetector::make_overlays(VideoOverlaySet& items) const{
     }
 }
 
-bool TeraCatchDetector::detect_slot(const ImageViewRGB32& screen, size_t index) const{
+bool TeraCatchDetector::detect_slot(const ImageViewRGB32& screen, size_t index){
     ImageStats button = image_stats(extract_box_reference(screen, m_button[index]));
 //    cout << button.average << button.stddev << endl;
 //    extract_box_reference(screen, m_button).save("button.png");
@@ -302,7 +302,7 @@ bool TeraCatchDetector::detect_slot(const ImageViewRGB32& screen, size_t index) 
 
     return true;
 }
-bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
+bool TeraCatchDetector::detect(const ImageViewRGB32& screen){
     if (m_callouts_button.detect(screen)){
         return false;
     }
@@ -310,7 +310,7 @@ bool TeraCatchDetector::detect(const ImageViewRGB32& screen) const{
     return detect_slot(screen, 0) || detect_slot(screen, 1);
 }
 
-bool TeraCatchDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const{
+bool TeraCatchDetector::move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot){
     if (slot > 1){
         return false;
     }

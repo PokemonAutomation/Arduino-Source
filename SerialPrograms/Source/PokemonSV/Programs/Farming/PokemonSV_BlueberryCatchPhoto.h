@@ -63,7 +63,7 @@ void quest_catch_handle_battle(
 //Catch a pokemon
 void quest_catch(
     const ProgramInfo& info,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 );

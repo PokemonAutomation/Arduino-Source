@@ -38,7 +38,7 @@ public:
     virtual ~SandwichPlateDetector();
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     // Return detected sandwich filling name slug. Return empty string if not detected
     std::string detect_filling_name(const ImageViewRGB32& screen) const;

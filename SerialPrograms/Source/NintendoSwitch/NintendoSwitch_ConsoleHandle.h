@@ -11,6 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch_ConsoleState.h"
 
 namespace PokemonAutomation{
     class ThreadHandle;
@@ -19,11 +20,12 @@ namespace NintendoSwitch{
 
 class ConsoleHandle : public VideoStream{
 public:
-    ConsoleHandle(ConsoleHandle&& x);
-    void operator=(ConsoleHandle&& x) = delete;
+    ~ConsoleHandle();
+//    ConsoleHandle(ConsoleHandle&& x);
+//    void operator=(ConsoleHandle&& x) = delete;
     ConsoleHandle(const ConsoleHandle& x) = delete;
     void operator=(const ConsoleHandle& x) = delete;
-    ~ConsoleHandle();
+
 
 public:
     ConsoleHandle(
@@ -63,10 +65,15 @@ public:
     operator AudioFeed&() { return audio(); }
     operator const StreamHistorySession&() const{ return history(); }
 
+    ConsoleState& state(){ return m_console_state; }
+    operator ConsoleState&(){ return m_console_state; }
+
 
 private:
     size_t m_index;
     AbstractController& m_controller;
+
+    ConsoleState m_console_state;
 
     std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
 };

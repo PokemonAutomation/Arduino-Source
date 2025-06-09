@@ -183,7 +183,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     DexRecFinder_Descriptor::Stats& stats = env.current_stats<DexRecFinder_Descriptor::Stats>();
 
     while (true){
-        home_to_date_time(context, true, true);
+        home_to_date_time(env.logger(), context, true);
         neutral_date_skip(context);
         settings_to_enter_game(context, true);
         pbf_mash_button(context, BUTTON_B, 90);

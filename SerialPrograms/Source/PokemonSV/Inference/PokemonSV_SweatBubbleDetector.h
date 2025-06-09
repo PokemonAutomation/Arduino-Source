@@ -23,7 +23,7 @@ public:
     SweatBubbleDetector(Color color, const ImageFloatBox& box = {0.11, 0.81, 0.06, 0.10});
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 protected:
     Color m_color;

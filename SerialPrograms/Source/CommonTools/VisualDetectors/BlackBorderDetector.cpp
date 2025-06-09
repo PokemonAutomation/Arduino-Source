@@ -31,7 +31,7 @@ void BlackBorderDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_right);
 //        items.add(COLOR_RED, m_body);
 }
-bool BlackBorderDetector::detect(const ImageViewRGB32& screen) const{
+bool BlackBorderDetector::detect(const ImageViewRGB32& screen){
     const double MAX_SUM = 50;
     const double MAX_STDDEV = 20;
 

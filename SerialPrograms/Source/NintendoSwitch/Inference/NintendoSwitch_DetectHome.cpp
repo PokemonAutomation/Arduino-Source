@@ -47,7 +47,7 @@ void CheckOnlineDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_solid);
     items.add(m_color, m_bottom_buttons);
 }
-bool CheckOnlineDetector::detect(const ImageViewRGB32& screen) const{
+bool CheckOnlineDetector::detect(const ImageViewRGB32& screen){
     ImageStats stats_box_top = image_stats(extract_box_reference(screen, m_box_top));
 //    cout << stats_box_top.average << stats_box_top.stddev << endl;
     bool white;

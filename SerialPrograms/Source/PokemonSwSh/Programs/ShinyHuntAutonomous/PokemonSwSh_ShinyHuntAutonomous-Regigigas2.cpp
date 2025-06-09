@@ -165,7 +165,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
         }
 
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
-        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.logger(), context);
         reset_game_from_home_with_inference(
             env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST

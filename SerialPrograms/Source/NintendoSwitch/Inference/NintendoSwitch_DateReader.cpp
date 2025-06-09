@@ -76,7 +76,7 @@ void DateReader::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_PURPLE, m_jp_month);
     items.add(COLOR_PURPLE, m_jp_day);
 }
-bool DateReader::detect(const ImageViewRGB32& screen) const{
+bool DateReader::detect(const ImageViewRGB32& screen){
     ImageStats stats_background_top = image_stats(extract_box_reference(screen, m_background_top));
     if (stats_background_top.stddev.sum() > 10){
 //        cout << "asdf" << endl;
@@ -120,7 +120,7 @@ bool DateReader::detect(const ImageViewRGB32& screen) const{
 void DateReader::set_hours(
     const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     uint8_t hour
-) const{
+){
     context.wait_for_all_requests();
     {
         auto snapshot = stream.video().snapshot();
@@ -210,7 +210,7 @@ void DateReader::set_hours(
 }
 
 
-std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const{
+std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen){
     if (!detect(*screen)){
         throw_and_log<OperationFailedException>(
             logger, ErrorReport::SEND_ERROR_REPORT,
@@ -438,7 +438,7 @@ void DateReader::adjust_minute(ProControllerContext& context, int current, int d
 void DateReader::set_date(
     const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     const DateTime& date
-) const{
+){
     context.wait_for_all_requests();
 
     {
@@ -567,7 +567,7 @@ void change_date(
         );
         switch (ret){
         case 0:
-            home_to_date_time(context, true, false);
+            home_to_date_time(env.logger(), context, true);
             pbf_press_button(context, BUTTON_A, 80ms + timing_variation, 240ms + timing_variation);
             context.wait_for_all_requests();
             continue;

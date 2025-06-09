@@ -29,7 +29,7 @@ void PicnicDetector::make_overlays(VideoOverlaySet& items) const{
     m_button_y.make_overlays(items);
 }
 
-bool PicnicDetector::detect(const ImageViewRGB32& frame) const{
+bool PicnicDetector::detect(const ImageViewRGB32& frame){
     return m_button_b.detect(frame)
         && m_button_minus.detect(frame)
         && m_button_y.detect(frame);

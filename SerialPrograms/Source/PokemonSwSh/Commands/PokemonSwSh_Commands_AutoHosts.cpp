@@ -73,7 +73,7 @@ void home_to_add_friends(
     }
 }
 void accept_FRs(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     uint8_t slot, bool fix_cursor,
     Milliseconds game_to_home_delay_safe,
     Milliseconds auto_fr_duration,
@@ -92,12 +92,12 @@ void accept_FRs(
     pbf_mash_button(context, BUTTON_A, auto_fr_duration);
 
     //  Return to Switch Home menu. (or game)
-    if (stream.video().snapshot()){
-        stream.log("Entering game using inference...");
+    if (console.video().snapshot()){
+        console.log("Entering game using inference...");
         pbf_press_button(context, BUTTON_HOME, 20, 180);
-        NintendoSwitch::resume_game_from_home(stream, context);
+        NintendoSwitch::resume_game_from_home(console, context);
     }else{
-        stream.log("Entering game without inference...", COLOR_RED);
+        console.log("Entering game without inference...", COLOR_RED);
         settings_to_enter_game_den_lobby(
             context,
             tolerate_system_update_window_slow, false,

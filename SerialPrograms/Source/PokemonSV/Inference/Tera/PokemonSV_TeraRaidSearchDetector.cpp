@@ -46,7 +46,7 @@ void TeraRaidSearchDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, {0, 0, 1, 1});
 //    m_arrow_offline.make_overlays(items);
 }
-bool TeraRaidSearchDetector::detect(const ImageViewRGB32& screen) const{
+bool TeraRaidSearchDetector::detect(const ImageViewRGB32& screen){
     ImageFloatBox box;
     return detect_search_location(box, screen);
 }
@@ -163,7 +163,7 @@ void CodeEntryDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_right);
     items.add(m_color, m_center);
 }
-bool CodeEntryDetector::detect(const ImageViewRGB32& screen) const{
+bool CodeEntryDetector::detect(const ImageViewRGB32& screen){
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    cout << bottom.average << bottom.stddev << endl;
 

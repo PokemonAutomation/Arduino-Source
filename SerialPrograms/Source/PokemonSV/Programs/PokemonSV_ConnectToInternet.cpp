@@ -30,7 +30,7 @@ public:
     NewsDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     Color m_color;
@@ -46,7 +46,7 @@ void NewsDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_white);
     items.add(m_color, m_bottom_buttons);
 }
-bool NewsDetector::detect(const ImageViewRGB32& screen) const{
+bool NewsDetector::detect(const ImageViewRGB32& screen){
     ImageStats bottom_white = image_stats(extract_box_reference(screen, m_bottom_white));
     if (!is_white(bottom_white)){
         return false;

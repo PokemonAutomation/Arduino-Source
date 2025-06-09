@@ -25,7 +25,7 @@ namespace PokemonSwSh{
 
 
 static RaidLobbyState raid_lobby_wait(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool HOST_ONLINE,
     uint8_t accept_FR_slot,
     Milliseconds lobby_wait_delay
@@ -39,12 +39,12 @@ static RaidLobbyState raid_lobby_wait(
     WallClock start = current_time();
     WallClock deadline_start_time = start + lobby_wait_delay;
     WallClock deadline_lobby_limit = start + FULL_LOBBY_TIMER;
-    RaidLobbyReader inference(stream.logger(), stream.overlay());
+    RaidLobbyReader inference(console.logger(), console.overlay());
     RaidLobbyState state;
 
     if (HOST_ONLINE && accept_FR_slot > 0){
         accept_FRs(
-            stream, context,
+            console, context,
             accept_FR_slot - 1, true,
             GAME_TO_HOME_DELAY_SAFE,
             AUTO_FR_DURATION,
@@ -55,7 +55,7 @@ static RaidLobbyState raid_lobby_wait(
         WallDuration delay = time_elapsed;
 
         while (true){
-            state = inference.read(stream.video().snapshot());
+            state = inference.read(console.video().snapshot());
             if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
                 return state;
             }
@@ -64,7 +64,7 @@ static RaidLobbyState raid_lobby_wait(
                 break;
             }
             accept_FRs(
-                stream, context,
+                console, context,
                 accept_FR_slot - 1, false,
                 GAME_TO_HOME_DELAY_SAFE,
                 AUTO_FR_DURATION,
@@ -75,7 +75,7 @@ static RaidLobbyState raid_lobby_wait(
     }
 
     while (true){
-        state = inference.read(stream.video().snapshot());
+        state = inference.read(console.video().snapshot());
         if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
             return state;
         }
@@ -95,7 +95,7 @@ static RaidLobbyState raid_lobby_wait(
             return state;
         }
         context.wait_for(std::chrono::milliseconds(1000));
-        state = inference.read(stream.video().snapshot());
+        state = inference.read(console.video().snapshot());
     }
 }
 

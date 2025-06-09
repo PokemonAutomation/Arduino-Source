@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
@@ -86,8 +87,7 @@ public:
 
 void run_material_farmer(
     ProgramEnvironment& env,
-    VideoStream& stream,
-    ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 );

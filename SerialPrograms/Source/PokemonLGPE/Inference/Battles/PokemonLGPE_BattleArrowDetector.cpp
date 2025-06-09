@@ -32,7 +32,7 @@ BattleArrowDetector::BattleArrowDetector(Color color, const ImageFloatBox& box)
 void BattleArrowDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool BattleArrowDetector::detect(const ImageViewRGB32& screen) const{
+bool BattleArrowDetector::detect(const ImageViewRGB32& screen){
     using namespace Kernels::Waterfill;
 
     ImageViewRGB32 region = extract_box_reference(screen, m_box);

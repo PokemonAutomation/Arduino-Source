@@ -70,7 +70,7 @@ void SandwichIngredientArrowDetector::make_overlays(VideoOverlaySet& items) cons
     m_arrow.make_overlays(items);
 }
 
-bool SandwichIngredientArrowDetector::detect(const ImageViewRGB32& screen) const{
+bool SandwichIngredientArrowDetector::detect(const ImageViewRGB32& screen){
     return m_arrow.detect(screen);
 }
 
@@ -91,7 +91,7 @@ void DeterminedSandwichIngredientDetector::make_overlays(VideoOverlaySet& items)
     }
 }
 
-bool DeterminedSandwichIngredientDetector::detect(const ImageViewRGB32& screen) const{
+bool DeterminedSandwichIngredientDetector::detect(const ImageViewRGB32& screen){
     int yellow_count = 0;
     for(int i = 0; i < 4; i++){
         FloatPixel avg = image_stats(extract_box_reference(screen, m_edges[i])).average;
@@ -110,7 +110,7 @@ void SandwichCondimentsPageDetector::make_overlays(VideoOverlaySet& items) const
     items.add(m_color, m_box);
 }
 
-bool SandwichCondimentsPageDetector::detect(const ImageViewRGB32& screen) const{
+bool SandwichCondimentsPageDetector::detect(const ImageViewRGB32& screen){
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(150, 150, 150), combine_rgb(255, 255, 255)}
     };
@@ -137,7 +137,7 @@ void SandwichPicksPageDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-bool SandwichPicksPageDetector::detect(const ImageViewRGB32& screen) const{
+bool SandwichPicksPageDetector::detect(const ImageViewRGB32& screen){
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(150, 150, 150), combine_rgb(255, 255, 255)}
     };

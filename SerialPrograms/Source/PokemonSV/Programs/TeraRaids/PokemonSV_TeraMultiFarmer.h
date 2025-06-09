@@ -86,8 +86,8 @@ public:
     virtual void on_config_value_changed(void* object) override;
 
 private:
-    void reset_host(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
-    void reset_joiner(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+    void reset_host(const ProgramInfo& info, ConsoleHandle& console, ProControllerContext& context);
+    void reset_joiner(const ProgramInfo& info, ConsoleHandle& console, ProControllerContext& context);
 
     bool run_raid_host(ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context);
     void run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context);

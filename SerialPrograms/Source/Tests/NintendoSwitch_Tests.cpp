@@ -24,7 +24,8 @@ using namespace NintendoSwitch;
 
 // using namespace NintendoSwitch::PokemonLA;
 int test_NintendoSwitch_UpdatePopupDetector(const ImageViewRGB32& image, bool target){
-    UpdatePopupDetector detector;
+    ConsoleState state;
+    UpdatePopupDetector detector(state);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;

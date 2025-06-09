@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void close_game(VideoStream& stream, ProControllerContext& context){
+void close_game(ConsoleHandle& console, ProControllerContext& context){
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.
 
@@ -43,16 +43,16 @@ void close_game(VideoStream& stream, ProControllerContext& context){
 //    context.wait_for(10s);
 
     // send a second Home button press, if the first one is dropped
-    bool video_available = (bool)stream.video().snapshot();
+    bool video_available = (bool)console.video().snapshot();
     if (video_available){
         HomeMenuWatcher detector;
         int ret = wait_until(
-            stream, context,
+            console, context,
             std::chrono::milliseconds(5000),
             { detector }
         );
         if (ret == 0){
-            stream.log("Detected Home screen.");
+            console.log("Detected Home screen.");
         }else{  // if game initially open.  |  if game initially closed
             // initial Home button press was dropped
             // - Does nothing.          |  - goes back to home screen, from opened app
@@ -72,7 +72,7 @@ void close_game(VideoStream& stream, ProControllerContext& context){
     pbf_mash_button(context, BUTTON_B, 350);
 }
 
-void close_game(VideoStream& stream, JoyconContext& context){
+void close_game(ConsoleHandle& console, JoyconContext& context){
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.
 
@@ -90,12 +90,12 @@ void close_game(VideoStream& stream, JoyconContext& context){
 
     HomeMenuWatcher detector;
     int ret = wait_until(
-        stream, context,
+        console, context,
         std::chrono::milliseconds(5000),
         { detector }
     );
     if (ret == 0){
-        stream.log("Detected Home screen.");
+        console.log("Detected Home screen.");
     }else{  // if game initially open.  |  if game initially closed
         // initial Home button press was dropped
         // - Does nothing.          |  - goes back to home screen, from opened app

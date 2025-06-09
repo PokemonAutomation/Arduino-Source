@@ -112,7 +112,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
 
     WallClock last_touch = current_time();
     if (TOUCH_DATE_INTERVAL > 0ms){
-        touch_date_from_home(host, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+        touch_date_from_home(env.consoles[0], host, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
         last_touch = current_time();
     }
     env.run_in_parallel(
@@ -178,7 +178,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
 
                     //  Touch the date.
                     if (TOUCH_DATE_INTERVAL > 0ms && current_time() - last_touch >= TOUCH_DATE_INTERVAL){
-                        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+                        touch_date_from_home(console, context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
                         last_touch += TOUCH_DATE_INTERVAL;
                     }
                     start_game_from_home_with_inference(

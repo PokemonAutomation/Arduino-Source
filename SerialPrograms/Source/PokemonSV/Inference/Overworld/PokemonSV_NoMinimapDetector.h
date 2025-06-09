@@ -24,13 +24,13 @@ public:
     NoMinimapDetector(Logger& logger, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 
 protected:
     const Color m_color;
     const ImageFloatBox m_ball;
-    const OverworldDetector m_overworld;
+    OverworldDetector m_overworld;
 };
 
 class NoMinimapWatcher : public DetectorToFinder<NoMinimapDetector>{

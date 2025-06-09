@@ -94,7 +94,7 @@ void enter_lobby(
 
 
 void roll_den(
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     Milliseconds ENTER_ONLINE_DEN_DELAY,
     Milliseconds OPEN_ONLINE_DEN_LOBBY_DELAY,
     uint8_t skips, Catchability catchability
@@ -108,16 +108,16 @@ void roll_den(
 
         //  Skip forward.
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 80ms);
-        home_to_date_time(context, true, false);
+        home_to_date_time(console, context, true);
         roll_date_forward_1(context, false);
 
         //  Enter game
-        if (stream.video().snapshot()){
-            stream.log("Entering game using inference...");
+        if (console.video().snapshot()){
+            console.log("Entering game using inference...");
             pbf_press_button(context, BUTTON_HOME, 10, 90);
-            NintendoSwitch::resume_game_from_home(stream, context);
+            NintendoSwitch::resume_game_from_home(console, context);
         }else{
-            stream.log("Entering game without inference...", COLOR_RED);
+            console.log("Entering game without inference...", COLOR_RED);
             settings_to_enter_game_den_lobby(
                 context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW, true,
@@ -131,14 +131,14 @@ void roll_den(
         ssf_press_button(context, BUTTON_A, GameSettings::instance().REENTER_DEN_DELAY0, 400ms);
     }
 }
-void rollback_date_from_home(ProControllerContext& context, uint8_t skips){
+void rollback_date_from_home(Logger& logger, ProControllerContext& context, uint8_t skips){
     if (skips == 0){
         return;
     }
     if (skips > 60){
         skips = 60;
     }
-    home_to_date_time(context, true, false);
+    home_to_date_time(logger, context, true);
     roll_date_backward_N(context, skips, false);
 //    pbf_wait(5);
 

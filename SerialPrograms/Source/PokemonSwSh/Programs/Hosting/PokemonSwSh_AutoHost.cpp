@@ -111,7 +111,8 @@ void send_raid_notification(
 
 
 void run_autohost(
-    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    ProgramEnvironment& env,
+    ConsoleHandle& console, ProControllerContext& context,
     Catchability catchability, uint8_t skips,
     const RandomCodeOption* raid_code, Milliseconds lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,
@@ -126,7 +127,7 @@ void run_autohost(
     AutoHostStats& stats = env.current_stats<AutoHostStats>();
 
     roll_den(
-        stream, context,
+        console, context,
         enter_online_den_delay,
         open_online_den_lobby_delay,
         skips,
@@ -135,7 +136,7 @@ void run_autohost(
     context.wait_for_all_requests();
 
     if (!connect_to_internet(
-        stream, context,
+        console, context,
         host_online,
         connect_to_internet_delay
     )){
@@ -145,12 +146,12 @@ void run_autohost(
     }
 
     {
-        DenMonReader reader(stream.logger(), stream.overlay());
+        DenMonReader reader(console.logger(), console.overlay());
         enter_den(context, enter_online_den_delay, skips != 0, host_online);
         context.wait_for_all_requests();
 
         //  Make sure we're actually in a den.
-        VideoSnapshot screen = stream.video().snapshot();
+        VideoSnapshot screen = console.video().snapshot();
         DenMonReadResults results;
         if (screen){
             results = reader.read(screen);
@@ -159,7 +160,7 @@ void run_autohost(
             case DenMonReadResults::PURPLE_BEAM:
                 break;
             default:
-                stream.log("Failed to detect den lobby. Skipping raid.", COLOR_RED);
+                console.log("Failed to detect den lobby. Skipping raid.", COLOR_RED);
                 return;
             }
         }
@@ -175,16 +176,16 @@ void run_autohost(
             }
             env.log("Next Raid Code: " + std::string(str, sizeof(str)));
             pbf_press_button(context, BUTTON_PLUS, 5, 145);
-            numberpad_enter_code(stream.logger(), context, code, true);
+            numberpad_enter_code(console.logger(), context, code, true);
             pbf_wait(context, 180);
             pbf_press_button(context, BUTTON_A, 5, 95);
         }
         context.wait_for_all_requests();
 
-        screen = stream.video().snapshot();
+        screen = console.video().snapshot();
         send_raid_notification(
             env,
-            stream,
+            console,
             notifications,
             code,
             screen, results, stats
@@ -195,7 +196,7 @@ void run_autohost(
 
     //  Accept friend requests while we wait.
     RaidLobbyState raid_state = raid_lobby_wait(
-        stream, context,
+        console, context,
         host_online,
         accept_FR_slot,
         lobby_wait_delay
@@ -205,10 +206,10 @@ void run_autohost(
     pbf_press_dpad(context, DPAD_UP, 5, 45);
 
     //  Mash A until it's time to close the game.
-    if (stream.video().snapshot()){
+    if (console.video().snapshot()){
         BlackScreenOverWatcher black_screen;
         int ret = run_until<ProControllerContext>(
-            stream, context,
+            console, context,
             [&](ProControllerContext& context){
                 pbf_mash_button(context, BUTTON_A, raid_start_to_exit_delay);
             },

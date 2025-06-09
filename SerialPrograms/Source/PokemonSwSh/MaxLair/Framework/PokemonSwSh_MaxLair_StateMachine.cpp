@@ -69,7 +69,7 @@ AdventureRuntime::AdventureRuntime(
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
     ProgramEnvironment& env,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool save_path,
     GlobalStateTracker& global_state,
     const EndBattleDecider& decider,
@@ -89,15 +89,15 @@ StateMachineAction run_state_iteration(
     PokemonSwapMenuDetector pokemon_swap(false);
     PathSelectDetector path_select;
     ItemSelectDetector item_menu(false);
-    ProfessorSwapDetector professor_swap(stream.overlay(), !starting);
+    ProfessorSwapDetector professor_swap(console.overlay(), !starting);
     BattleMenuDetector battle_menu;
-    RaidCatchDetector catch_select(stream.overlay());
+    RaidCatchDetector catch_select(console.overlay());
     PokemonCaughtMenuDetector caught_menu;
     EntranceDetector entrance_detector(entrance);
     FrozenImageDetector frozen_screen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(30), 10);
 
     int result = wait_until(
-        stream, context,
+        console, context,
         std::chrono::seconds(300),
         {
             {starting
@@ -119,43 +119,43 @@ StateMachineAction run_state_iteration(
     switch (result){
     case 0:
         if (starting){
-            stream.log("Current State: " + STRING_POKEMON + " Select");
+            console.log("Current State: " + STRING_POKEMON + " Select");
             run_select_pokemon(
                 console_index,
-                stream, context,
+                console, context,
                 global_state,
                 runtime.ocr_watchdog[console_index],
                 runtime.console_settings[console_index]
             );
             return StateMachineAction::KEEP_GOING;
         }else{
-            stream.log("Current State: " + STRING_POKEMON + " Swap");
+            console.log("Current State: " + STRING_POKEMON + " Swap");
             run_swap_pokemon(
                 console_index,
                 runtime,
-                stream, context,
+                console, context,
                 global_state,
                 runtime.console_settings[console_index]
             );
             return StateMachineAction::KEEP_GOING;
         }
     case 1:
-        stream.log("Current State: Path Select");
-        run_path_select(env, console_index, stream, context, global_state);
+        console.log("Current State: Path Select");
+        run_path_select(env, console_index, console, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 2:
-        stream.log("Current State: Item Select");
-        run_item_select(console_index, stream, context, global_state);
+        console.log("Current State: Item Select");
+        run_item_select(console_index, console, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 3:
-        stream.log("Current State: Professor Swap");
-        run_professor_swap(console_index, runtime, stream, context, global_state);
+        console.log("Current State: Professor Swap");
+        run_professor_swap(console_index, runtime, console, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 4:
-        stream.log("Current State: Move Select");
+        console.log("Current State: Move Select");
         return run_move_select(
             env, console_index,
-            stream, context,
+            console, context,
             runtime.ocr_watchdog[console_index],
             global_state,
             runtime.console_settings[console_index],
@@ -163,44 +163,44 @@ StateMachineAction run_state_iteration(
             battle_menu.cheer()
         );
     case 5:
-        stream.log("Current State: Catch Select");
+        console.log("Current State: Catch Select");
         return throw_balls(
             runtime,
             env, console_index,
-            stream, context,
+            console, context,
             runtime.console_settings[console_index].language,
             runtime.ocr_watchdog[console_index],
             global_state,
             decider
         );
     case 6:
-        stream.log("Current State: Caught Menu");
+        console.log("Current State: Caught Menu");
         return run_caught_screen(
             runtime,
             env, console_index,
-            stream, context,
+            console, context,
             global_state, decider,
             entrance
         );
     case 7:
-        stream.log("Current State: Entrance");
+        console.log("Current State: Entrance");
         run_entrance(
             runtime,
             env, console_index,
-            stream, context,
+            console, context,
             save_path,
             global_state
         );
         return StateMachineAction::DONE_WITH_ADVENTURE;
     case 8:
-        stream.log("Current State: Frozen Screen", COLOR_RED);
+        console.log("Current State: Frozen Screen", COLOR_RED);
 //        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
 //        context.wait_for_all_requests();
 //        return StateMachineAction::KEEP_GOING;
         return StateMachineAction::RESET_RECOVER;
     default:
-        stream.log("Program hang. No state detected after 5 minutes.", COLOR_RED);
-        dump_image(stream.logger(), MODULE_NAME, stream.video(), "ProgramHang");
+        console.log("Program hang. No state detected after 5 minutes.", COLOR_RED);
+        dump_image(console.logger(), MODULE_NAME, console.video(), "ProgramHang");
         global_state.mark_as_dead(console_index);
         return StateMachineAction::RESET_RECOVER;
     }

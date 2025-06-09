@@ -251,20 +251,20 @@ void RideCloner101::setup(const ProgramInfo& info, VideoStream& stream, ProContr
 }
 bool RideCloner101::run_post_win(
     ProgramEnvironment& env,
-    VideoStream& stream,
+    ConsoleHandle& console,
     ProControllerContext& context
 ){
-    stream.log("Running post-win...");
+    console.log("Running post-win...");
 
     RideCloner101_Descriptor::Stats& stats = env.current_stats<RideCloner101_Descriptor::Stats>();
 
     if (FIX_TIME_ON_CATCH){
         pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-        home_to_date_time(context, false, false);
+        home_to_date_time(env.logger(), context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-        resume_game_from_home(stream, context);
+        resume_game_from_home(console, context);
     }
 
     TeraResult result = TeraResult::NO_DETECTION;
@@ -277,7 +277,7 @@ bool RideCloner101::run_post_win(
         if (current_time() - start > std::chrono::minutes(5)){
             dump_image_and_throw_recoverable_exception(
                 env.program_info(),
-                stream,
+                console,
                 "RideCloneReturnToOverworldFailed",
                 "Failed to return to overworld after 5 minutes."
             );
@@ -296,10 +296,10 @@ bool RideCloner101::run_post_win(
         PromptDialogWatcher nickname(COLOR_GREEN, {0.500, 0.545, 0.400, 0.100});
         PokemonSummaryWatcher summary(COLOR_MAGENTA);
         MainMenuWatcher main_menu(COLOR_BLUE);
-        OverworldWatcher overworld(stream.logger(), COLOR_RED);
+        OverworldWatcher overworld(console.logger(), COLOR_RED);
         context.wait_for_all_requests();
         int ret = wait_until(
-            stream, context,
+            console, context,
             std::chrono::seconds(60),
             {
                 catch_menu,
@@ -315,34 +315,34 @@ bool RideCloner101::run_post_win(
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
         case 0:{
-            stream.log("Detected catch prompt.");
-            screenshot = stream.video().snapshot();
+            console.log("Detected catch prompt.");
+            screenshot = console.video().snapshot();
 
             pbf_press_button(context, BUTTON_A, 20, 150);
             context.wait_for_all_requests();
 
-            BattleBallReader reader(stream, LANGUAGE);
-            int quantity = move_to_ball(reader, stream, context, BALL_SELECT.slug());
+            BattleBallReader reader(console, LANGUAGE);
+            int quantity = move_to_ball(reader, console, context, BALL_SELECT.slug());
             if (quantity == 0){
                 throw_and_log<FatalProgramException>(
-                    stream.logger(), ErrorReport::NO_ERROR_REPORT,
+                    console.logger(), ErrorReport::NO_ERROR_REPORT,
                     "Unable to find appropriate ball. Did you run out?",
-                    stream
+                    console
                 );
             }
             if (quantity < 0){
-                stream.log("Unable to read ball quantity.", COLOR_RED);
+                console.log("Unable to read ball quantity.", COLOR_RED);
             }
             pbf_mash_button(context, BUTTON_A, 125);
 
             continue;
         }
         case 2:
-            stream.log("Detected dialog.");
+            console.log("Detected dialog.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 3:
-            stream.log("Detected add-to-party prompt.");
+            console.log("Detected add-to-party prompt.");
             add_to_party_menu = true;
             if (result == TeraResult::NO_DETECTION){
                 pbf_press_dpad(context, DPAD_DOWN, 20, 60);
@@ -350,7 +350,7 @@ bool RideCloner101::run_post_win(
             pbf_press_button(context, BUTTON_A, 20, 105);
             continue;
         case 4:
-            stream.log("Detected prompt.");
+            console.log("Detected prompt.");
             pbf_press_button(context, BUTTON_B, 20, 105);
             if (add_to_party_menu){
                 success = true;
@@ -359,19 +359,19 @@ bool RideCloner101::run_post_win(
         case 1:
             //  Next button detector is unreliable. Check if the summary is
             //  open. If so, fall-through to that.
-            if (!summary.detect(stream.video().snapshot())){
-                stream.log("Detected possible (A) Next button.");
+            if (!summary.detect(console.video().snapshot())){
+                console.log("Detected possible (A) Next button.");
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_B, 20, 105);
                 continue;
             }
-            stream.log("Detected false positive (A) Next button.", COLOR_RED);
+            console.log("Detected false positive (A) Next button.", COLOR_RED);
         case 5:
-            stream.log("Detected summary.");
+            console.log("Detected summary.");
             if (result == TeraResult::NO_DETECTION){
                 context.wait_for(std::chrono::milliseconds(500));
                 result = run_tera_summary(
-                    env, stream, context,
+                    env, console, context,
                     NOTIFICATION_NONSHINY,
                     NOTIFICATION_SHINY,
                     MODE == Mode::SHINY_HUNT, screenshot,
@@ -381,10 +381,10 @@ bool RideCloner101::run_post_win(
             pbf_press_button(context, BUTTON_B, 20, 105);
             continue;
         case 6:
-            stream.log("Detected party swap.");
+            console.log("Detected party swap.");
 //            context.wait_for(std::chrono::milliseconds(150));
             try{
-                if (main_menu.move_cursor(env.program_info(), stream, context, MenuSide::LEFT, 5, false)){
+                if (main_menu.move_cursor(env.program_info(), console, context, MenuSide::LEFT, 5, false)){
                     ssf_press_button(context, BUTTON_A, A_TO_B_DELAY0, 160ms);
                     pbf_press_button(context, BUTTON_B, 20, 230);
                 }
@@ -393,11 +393,11 @@ bool RideCloner101::run_post_win(
             }
             continue;
         case 7:
-            stream.log("Detected overworld.");
+            console.log("Detected overworld.");
             break;
         default:
             dump_image_and_throw_recoverable_exception(
-                env.program_info(), stream, "FailedPostRaidWin",
+                env.program_info(), console, "FailedPostRaidWin",
                 "run_post_win(): No recognized state after 60 seconds."
             );
         }

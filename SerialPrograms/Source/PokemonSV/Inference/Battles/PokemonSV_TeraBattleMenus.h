@@ -25,11 +25,11 @@ public:
     TeraBattleMenuDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     //  Returns -1 if not found.
-    int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const;
+    int8_t detect_slot(const ImageViewRGB32& screen);
+    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot);
 
 private:
     WhiteButtonDetector m_callouts_button;
@@ -50,11 +50,11 @@ public:
     CheerSelectDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     //  Returns -1 if not found.
-    int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const;
+    int8_t detect_slot(const ImageViewRGB32& screen);
+    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot);
 
 private:
     WhiteButtonDetector m_info_button;
@@ -74,14 +74,14 @@ public:
     TeraTargetSelectDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     //  Returns -1 if not found.
     //  Returns 0 if opponent.
     //  Returns 1 if left-most player.
     //  Returns 4 if right-most player.
-    int8_t detect_slot(const ImageViewRGB32& screen) const;
-    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const;
+    int8_t detect_slot(const ImageViewRGB32& screen);
+    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot);
 
 private:
     GradientArrowDetector m_opponent;
@@ -104,12 +104,12 @@ public:
     TeraCatchDetector(Color color);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
-    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot) const;
+    bool move_to_slot(VideoStream& stream, ProControllerContext& context, uint8_t slot);
 
 private:
-    bool detect_slot(const ImageViewRGB32& screen, size_t index) const;
+    bool detect_slot(const ImageViewRGB32& screen, size_t index);
 
 private:
     Color m_color;

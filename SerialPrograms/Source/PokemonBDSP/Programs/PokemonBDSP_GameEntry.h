@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
@@ -29,7 +30,8 @@ bool openedgame_to_ingame(
     Milliseconds post_wait_time = 1000ms
 );
 bool reset_game_from_home(
-    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    ProgramEnvironment& env,
+    ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu,
     Milliseconds post_wait_time = 1000ms
 );

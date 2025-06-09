@@ -27,7 +27,7 @@ public:
     SomethingInBoxSlotDetector(Color color, bool true_if_exists = true);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     bool m_true_if_exists;
@@ -52,10 +52,10 @@ public:
     BoxSelectDetector(Color color);
 
     // If there is a pokemon/egg in the current slot in box or party, while in box system view
-    bool exists(const ImageViewRGB32& screen) const;
+    bool exists(const ImageViewRGB32& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     Color m_color;
@@ -99,14 +99,14 @@ public:
     BoxDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
-    std::pair<BoxCursorLocation, BoxCursorCoordinates> detect_location(const ImageViewRGB32& screen) const;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+    std::pair<BoxCursorLocation, BoxCursorCoordinates> detect_location(const ImageViewRGB32& screen);
 
     //  While in the box system view, move the cursor to the desired slot.
     void move_cursor(
         const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
         BoxCursorLocation side, uint8_t row, uint8_t col
-    ) const;
+    );
 
 private:
     bool to_coordinates(int& x, int& y, BoxCursorLocation side, uint8_t row, uint8_t col) const;
@@ -136,7 +136,7 @@ public:
     BoxEmptySlotDetector(BoxCursorLocation side, uint8_t row, uint8_t col, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 private:
     Color m_color;
     ImageFloatBox m_box;

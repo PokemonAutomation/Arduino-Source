@@ -33,7 +33,7 @@ void MainMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow_right.make_overlays(items);
     m_dlc_icon.make_overlays(items);
 }
-bool MainMenuDetector::detect(const ImageViewRGB32& screen) const{
+bool MainMenuDetector::detect(const ImageViewRGB32& screen){
     //  Disambiguate against the Poke Portal.
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    cout << bottom.average << bottom.stddev << endl;
@@ -55,7 +55,7 @@ bool MainMenuDetector::detect(const ImageViewRGB32& screen) const{
     return false;
 }
 
-std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32& screen) const{
+std::pair<MenuSide, int> MainMenuDetector::detect_location(const ImageViewRGB32& screen){
     //  Disambiguate against the Poke Portal.
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
     if (is_solid(bottom, {0.582218, 0.417782, 0.})){
@@ -94,7 +94,7 @@ bool MainMenuDetector::move_cursor(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     MenuSide side, int row, bool fast
-) const{
+){
     if (side == MenuSide::NONE){
         throw InternalProgramError(
             &stream.logger(), PA_CURRENT_FUNCTION,

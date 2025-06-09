@@ -44,7 +44,7 @@ private:
     void setup(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
     bool run_post_win(
         ProgramEnvironment& env,
-        VideoStream& stream,
+        ConsoleHandle& console,
         ProControllerContext& context
     );
 

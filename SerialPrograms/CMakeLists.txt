@@ -969,6 +969,7 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h
+    Source/NintendoSwitch/NintendoSwitch_ConsoleState.h
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.cpp
     Source/NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp

@@ -31,7 +31,7 @@ public:
     Color color() const{ return m_color; }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     Color m_color;
@@ -64,7 +64,7 @@ public:
     AdvanceDialogDetector(Color color = COLOR_RED, DialogType type = DialogType::DIALOG_ALL);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     DialogBoxDetector m_box;
@@ -90,7 +90,7 @@ public:
     PromptDialogDetector(Color color, const ImageFloatBox& arrow_box);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     DialogBoxDetector m_box;

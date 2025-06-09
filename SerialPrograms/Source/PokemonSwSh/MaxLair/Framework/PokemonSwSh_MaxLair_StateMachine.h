@@ -96,7 +96,7 @@ struct AdventureRuntime{
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
     ProgramEnvironment& env,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     bool save_path,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& boss_action,

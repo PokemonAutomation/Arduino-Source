@@ -42,7 +42,7 @@ void SandwichPlateDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-bool SandwichPlateDetector::detect(const ImageViewRGB32& screen) const{
+bool SandwichPlateDetector::detect(const ImageViewRGB32& screen){
     return !detect_filling_name(screen).empty();
 }
 

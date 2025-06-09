@@ -866,28 +866,28 @@ void quest_catch_handle_battle(
 
 void quest_catch(
     const ProgramInfo& info,
-    VideoStream& stream, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     const BBQOption& BBQ_OPTIONS,
     BBQuests current_quest
 ){
-    EncounterWatcher encounter_watcher(stream, COLOR_RED);
+    EncounterWatcher encounter_watcher(console, COLOR_RED);
 
     //Navigate to target and start battle
     int ret = run_until<ProControllerContext>(
-        stream, context,
+        console, context,
         [&](ProControllerContext& context){
             
-            quest_catch_navi(info, stream, context, BBQ_OPTIONS, current_quest);
+            quest_catch_navi(info, console, context, BBQ_OPTIONS, current_quest);
             context.wait_for_all_requests();
 
             NormalBattleMenuWatcher battle_menu(COLOR_YELLOW);
             int ret2 = wait_until(
-                stream, context,
+                console, context,
                 std::chrono::seconds(25),
                 { battle_menu }
             );
             if (ret2 != 0){
-                stream.log("Did not enter battle. Did target spawn?");
+                console.log("Did not enter battle. Did target spawn?");
             }
         },
         {
@@ -898,47 +898,47 @@ void quest_catch(
     encounter_watcher.throw_if_no_sound();
 
     if (ret >= 0){
-        stream.log("Battle menu detected.");
+        console.log("Battle menu detected.");
 
         bool is_shiny = (bool)encounter_watcher.shiny_screenshot();
         if (is_shiny){
-            stream.log("Shiny detected!");
+            console.log("Shiny detected!");
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             throw ProgramFinishedException();
         }else{
-            quest_catch_handle_battle(info, stream, context, BBQ_OPTIONS, current_quest);
+            quest_catch_handle_battle(info, console, context, BBQ_OPTIONS, current_quest);
         }
     }
 
-    return_to_plaza(info, stream, context);
+    return_to_plaza(info, console, context);
 
     //Day skip and attempt to respawn fixed encounters
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-    home_to_date_time(context, true, true);
+    home_to_date_time(console, context, true);
     PokemonSwSh::roll_date_forward_1(context, true);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-    resume_game_from_home(stream, context);
+    resume_game_from_home(console, context);
 
     //Heal up and then reset position again.
-    OverworldWatcher done_healing(stream.logger(), COLOR_BLUE);
+    OverworldWatcher done_healing(console.logger(), COLOR_BLUE);
     pbf_move_left_joystick(context, 128, 0, 100, 20);
 
     pbf_mash_button(context, BUTTON_A, 300);
     context.wait_for_all_requests();
 
     int exit = run_until<ProControllerContext>(
-        stream, context,
+        console, context,
         [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 2000);
         },
         {{ done_healing }}
     );
     if (exit == 0){
-        stream.log("Overworld detected.");
+        console.log("Overworld detected.");
     }
-    open_map_from_overworld(info, stream, context);
+    open_map_from_overworld(info, console, context);
     pbf_press_button(context, BUTTON_ZL, 40, 100);
-    fly_to_overworld_from_map(info, stream, context);
+    fly_to_overworld_from_map(info, console, context);
     context.wait_for_all_requests();
 }
 

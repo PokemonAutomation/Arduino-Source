@@ -31,7 +31,7 @@ public:
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool detect(const ImageViewRGB32& screen) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     //  If arrow is found, returns true and "box" contains the box for the arrow.
     //  Otherwise, returns false and "box" is undefined.
