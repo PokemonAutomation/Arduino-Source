@@ -67,9 +67,12 @@ public:
         }
     }
     virtual void on_config_value_changed(void* object) override{
-        // std::lock_guard<std::mutex> lg(m_lock);
-        m_overlay_set.clear();
-        m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT});
+        {
+            std::lock_guard<std::mutex> lg(m_lock);
+            m_overlay_set.clear();
+            m_overlay_set.add(COLOR_RED, {m_parent.X, m_parent.Y, m_parent.WIDTH, m_parent.HEIGHT});
+        }
+        
         if (object == &m_parent.X || object == &m_parent.Y || object == &m_parent.WIDTH || object == &m_parent.HEIGHT){
             m_parent.update_box_coordinates();
         }
