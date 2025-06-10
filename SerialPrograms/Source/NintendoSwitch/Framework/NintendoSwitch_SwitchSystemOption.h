@@ -21,6 +21,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
 #include "Controllers/ControllerCapability.h"
 #include "Controllers/ControllerDescriptor.h"
+#include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 
 namespace PokemonAutomation{
     class ControllerRequirements;
@@ -43,6 +44,7 @@ class SwitchSystemOption{
     static const std::string JSON_VIDEO;
     static const std::string JSON_AUDIO;
     static const std::string JSON_OVERLAY;
+    static const std::string JSON_CONSOLE_TYPE;
 
 public:
     SwitchSystemOption(
@@ -67,6 +69,7 @@ public:
     VideoSourceOption m_video;
     AudioOption m_audio;
     VideoOverlayOption m_overlay;
+    ConsoleModelCell m_console_type;
 };
 
 

@@ -174,6 +174,7 @@ void MultiSwitchProgramSession::internal_run_program(){
             session.audio(),
             session.stream_history()
         );
+        handles.back().state().set_console_type(session.console_type());
     }
 
 

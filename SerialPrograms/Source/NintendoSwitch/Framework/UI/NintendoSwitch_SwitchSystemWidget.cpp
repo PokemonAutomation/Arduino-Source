@@ -105,6 +105,7 @@ SwitchSystemWidget::SwitchSystemWidget(
             *widget,
             m_session.controller_session(),
             m_session.overlay_session(),
+            m_session.console_type(),
             m_session.allow_commands_while_running()
         );
         group_layout->addWidget(m_command);

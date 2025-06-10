@@ -78,7 +78,7 @@ private:
 //    PokemonSV::PlayerListTable PLAYER_LIST;
     DateTimeOption DATE0;
     DateTimeOption DATE1;
-    ConsoleModelOption CONSOLE_MODEL;
+//    ConsoleModelOption CONSOLE_MODEL;
 
     MillisecondsOption DURATION;
     ColorCell COLOR;

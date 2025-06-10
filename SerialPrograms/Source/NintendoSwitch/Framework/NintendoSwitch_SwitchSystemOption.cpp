@@ -57,11 +57,12 @@ Color pick_color(
 }
 
 
-const std::string SwitchSystemOption::JSON_CONTROLLER  = "Controller";
-const std::string SwitchSystemOption::JSON_CAMERA  = "Camera";
-const std::string SwitchSystemOption::JSON_VIDEO   = "Video";
-const std::string SwitchSystemOption::JSON_AUDIO   = "Audio";
-const std::string SwitchSystemOption::JSON_OVERLAY = "Overlay";
+const std::string SwitchSystemOption::JSON_CONTROLLER   = "Controller";
+const std::string SwitchSystemOption::JSON_CAMERA       = "Camera";
+const std::string SwitchSystemOption::JSON_VIDEO        = "Video";
+const std::string SwitchSystemOption::JSON_AUDIO        = "Audio";
+const std::string SwitchSystemOption::JSON_OVERLAY      = "Overlay";
+const std::string SwitchSystemOption::JSON_CONSOLE_TYPE = "ConsoleType";
 
 
 SwitchSystemOption::SwitchSystemOption(
@@ -103,6 +104,10 @@ void SwitchSystemOption::load_json(const JsonValue& json){
     if (value){
         m_overlay.load_json(*value);
     }
+    value = obj->get_value(JSON_CONSOLE_TYPE);
+    if (value){
+        m_console_type.load_json(*value);
+    }
 }
 JsonValue SwitchSystemOption::to_json() const{
     JsonObject root;
@@ -111,6 +116,8 @@ JsonValue SwitchSystemOption::to_json() const{
     root[JSON_VIDEO] = m_video.to_json();
     root[JSON_AUDIO] = m_audio.to_json();
     root[JSON_OVERLAY] = m_overlay.to_json();
+    root[JSON_CONSOLE_TYPE] = m_console_type.to_json();
+
     return root;
 }
 

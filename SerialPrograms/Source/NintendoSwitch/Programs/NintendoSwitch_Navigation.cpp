@@ -391,7 +391,10 @@ void home_to_date_time_Switch2_wired_blind(
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
         break;
     default:
-        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Expected a Switch 2 type.");
+        throw UserSetupError(
+            logger,
+            "You need to specify a specific Switch 2 model."
+        );
     }
 
 

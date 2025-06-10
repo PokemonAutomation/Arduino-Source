@@ -266,7 +266,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(BUTTON0);
     PA_ADD_OPTION(BUTTON1);
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(CONSOLE_MODEL);
+//    PA_ADD_OPTION(CONSOLE_MODEL);
     PA_ADD_OPTION(IMAGE_PATH);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(SELECT);
@@ -321,7 +321,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
-    console.state().set_console_type(CONSOLE_MODEL);
+//    console.state().set_console_type(CONSOLE_MODEL);
 
     while (true){
         home_to_date_time(console, context, true);

@@ -59,6 +59,7 @@ public:
     virtual ControllerSession& controller() override{ return m_controller; };
     VideoOverlay& overlay(){ return m_overlay; }
     const StreamHistorySession& stream_history() const{ return m_history; }
+    ConsoleModelCell& console_type(){ return m_option.m_console_type; }
 
 public:
     void get(SwitchSystemOption& option);

@@ -143,6 +143,7 @@ void SingleSwitchProgramSession::internal_run_program(){
         m_system.audio(),
         m_system.stream_history()
     );
+    env.console.state().set_console_type(m_system.console_type());
 
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");

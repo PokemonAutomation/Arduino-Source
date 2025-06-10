@@ -14,6 +14,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "Controllers/ControllerSession.h"
+#include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,6 +35,7 @@ public:
         QWidget& parent,
         ControllerSession& controller,
         VideoOverlaySession& session,
+        ConsoleModelCell& console_type,
         bool allow_commands_while_running
     );
 
