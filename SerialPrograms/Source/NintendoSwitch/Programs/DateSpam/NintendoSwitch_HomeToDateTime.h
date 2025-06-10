@@ -17,10 +17,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-// Navigates from Home screen to the Date and Time screen. Using visual inference.
-void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change);
-// Navigates from Home screen to the Date and Time screen. Done blind, without inference.
-void home_to_date_time(Logger& logger, ProControllerContext& context, bool to_date_change);
+//// Navigates from Home screen to the Date and Time screen. Using visual inference.
+//void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change);
+
+//// Navigates from Home screen to the Date and Time screen. Done blind, without inference.
+//void home_to_date_time(Logger& logger, ProControllerContext& context, bool to_date_change);
 
 void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bool to_date_change);
 

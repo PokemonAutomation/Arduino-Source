@@ -22,126 +22,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProControllerContext& context, bool to_date_change){
-    stream.log("home_to_date_time_Switch1_wired_with_feedback()");
-
-    size_t max_attempts = 5;
-    for (size_t i = 0; i < max_attempts; i++){
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-
-        //  Down twice in case we drop one.
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
-
-        // if (i > 0){  // intentionally create a failure, for testing 
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
-        // }
-
-
-        // ImageFloatBox system_icon(0.685, 0.69, 0.05, 0.03);
-        // ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
-        // ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
-
-        //  Two A presses in case we drop the 1st one.
-        //  the program can self recover even if the second button press is registered.
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
-
-        //  Just button mash it. lol
-        {
-            auto iterations = Milliseconds(1200) / 24ms + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-            }while (--iterations);
-        }
-
-        context.wait_for_all_requests();        
-        // Should now be in System Settings, with System highlighted
-        ImageFloatBox system_setting_box(0.056, 0.74, 0.01, 0.1);
-        ImageFloatBox other_setting1(0.04, 0.74, 0.01, 0.1);
-        ImageFloatBox other_setting2(0.02, 0.74, 0.01, 0.1);
-        SelectedSettingWatcher system_setting_selected(system_setting_box, other_setting1, other_setting2);
-        int ret = run_until<ProControllerContext>(
-            stream, context,
-            [](ProControllerContext& context){
-                for (int i = 0; i < 10; i++){
-                    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-                }
-            },
-            {system_setting_selected}
-        );
-        if (ret < 0){  // failed to detect "System" being highlighted. press home and re-try
-            pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
-            continue;
-        }
-
-
-        {
-            auto iterations = Milliseconds(312) / 24ms + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
-            }while (--iterations);
-        }
-
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
-        ssf_press_dpad(context, DPAD_DOWN, 45, 40);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        // if (i > 1){  // intentionally create a failure, for testing
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        // }
-
-        // only one ButtonA press since the program can self-recover if the button is dropped.
-        // furthermore, the program can't self-recover if a second button press is registered.
-        ssf_press_button(context, BUTTON_A, 3);
-
-        context.wait_for_all_requests();
-        context.wait_for(Milliseconds(300));
-        // we expect to be within "Date and Time", with "Synchronize Clock via Internet" being highlighted
-        ImageFloatBox sync_clock_box(0.168, 0.185, 0.01, 0.1);
-        ImageFloatBox other_setting3(0.1, 0.185, 0.01, 0.1);
-        ImageFloatBox other_setting4(0.05, 0.185, 0.01, 0.1);
-        SelectedSettingWatcher sync_clock_selected(sync_clock_box, other_setting3, other_setting4);
-        ret = wait_until(
-            stream, context,
-            Milliseconds(2000),
-            {sync_clock_selected}
-        );
-        if (ret < 0){  // failed to detect "Synchronize clock" being highlighted. press home and re-try
-            pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
-            continue;
-        }
-
-
-        if (!to_date_change){
-            return;
-        }
-
-        {
-            auto iterations = Milliseconds(250) / 24ms + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-            }while (--iterations);
-        }
-
-        //  Left scroll in case we missed landed in the language change or sleep
-        //  confirmation menus.
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms);
-
-        return;
-    }
-
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
-        "home_to_date_time(): Failed to reach Date and Time after several attempts.",
-        stream
-    );
-
-}
-
 
 void home_to_date_time_Switch1_wired_blind(
     Logger& logger, ProControllerContext& context, bool to_date_change
@@ -420,39 +300,153 @@ void home_to_date_time_Switch2_wired_blind(
     ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
 }
 
+void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProControllerContext& context, bool to_date_change){
+    stream.log("home_to_date_time_Switch1_wired_with_feedback()");
+
+    size_t max_attempts = 5;
+    for (size_t i = 0; i < max_attempts; i++){
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+
+        //  Down twice in case we drop one.
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
+
+        // if (i > 0){  // intentionally create a failure, for testing
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
+        // }
 
 
+        // ImageFloatBox system_icon(0.685, 0.69, 0.05, 0.03);
+        // ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
+        // ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
 
-void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change){
-    switch (context->performance_class()){
-        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
-            home_to_date_time_Switch1_wired_with_feedback(stream, context, to_date_change);
-            break;
+        //  Two A presses in case we drop the 1st one.
+        //  the program can self recover even if the second button press is registered.
+        ssf_press_button(context, BUTTON_A, 3);
+        ssf_press_button(context, BUTTON_A, 3);
+
+        //  Just button mash it. lol
+        {
+            auto iterations = Milliseconds(1200) / 24ms + 1;
+            do{
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+            }while (--iterations);
         }
-        default:{
-            //  Slow version for tick-imprecise controllers. Blind.
-            home_to_date_time_Switch1_sbb_blind(stream.logger(), context, to_date_change);
+
+        context.wait_for_all_requests();
+        // Should now be in System Settings, with System highlighted
+        ImageFloatBox system_setting_box(0.056, 0.74, 0.01, 0.1);
+        ImageFloatBox other_setting1(0.04, 0.74, 0.01, 0.1);
+        ImageFloatBox other_setting2(0.02, 0.74, 0.01, 0.1);
+        SelectedSettingWatcher system_setting_selected(system_setting_box, other_setting1, other_setting2);
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                for (int i = 0; i < 10; i++){
+                    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+                }
+            },
+            {system_setting_selected}
+        );
+        if (ret < 0){  // failed to detect "System" being highlighted. press home and re-try
+            pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
+            continue;
         }
+
+
+        {
+            auto iterations = Milliseconds(312) / 24ms + 1;
+            do{
+                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
+            }while (--iterations);
+        }
+
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
+        ssf_press_dpad(context, DPAD_DOWN, 45, 40);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        // if (i > 1){  // intentionally create a failure, for testing
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        // }
+
+        // only one ButtonA press since the program can self-recover if the button is dropped.
+        // furthermore, the program can't self-recover if a second button press is registered.
+        ssf_press_button(context, BUTTON_A, 3);
+
+        context.wait_for_all_requests();
+        context.wait_for(Milliseconds(300));
+        // we expect to be within "Date and Time", with "Synchronize Clock via Internet" being highlighted
+        ImageFloatBox sync_clock_box(0.168, 0.185, 0.01, 0.1);
+        ImageFloatBox other_setting3(0.1, 0.185, 0.01, 0.1);
+        ImageFloatBox other_setting4(0.05, 0.185, 0.01, 0.1);
+        SelectedSettingWatcher sync_clock_selected(sync_clock_box, other_setting3, other_setting4);
+        ret = wait_until(
+            stream, context,
+            Milliseconds(2000),
+            {sync_clock_selected}
+        );
+        if (ret < 0){  // failed to detect "Synchronize clock" being highlighted. press home and re-try
+            pbf_press_button(context, BUTTON_HOME, 100ms, 2000ms);
+            continue;
+        }
+
+
+        if (!to_date_change){
+            return;
+        }
+
+        {
+            auto iterations = Milliseconds(250) / 24ms + 1;
+            do{
+                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+            }while (--iterations);
+        }
+
+        //  Left scroll in case we missed landed in the language change or sleep
+        //  confirmation menus.
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms);
+
+        return;
     }
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "home_to_date_time(): Failed to reach Date and Time after several attempts.",
+        stream
+    );
+
 }
 
-void home_to_date_time(Logger& logger, ProControllerContext& context, bool to_date_change){
+
+
+
+
+void home_to_date_time_switch1_blind(Logger& logger, ProControllerContext& context, bool to_date_change){
     switch (context->performance_class()){
-        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
-            home_to_date_time_Switch1_wired_blind(logger, context, to_date_change);
-            break;
-        }
-        case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
-            home_to_date_time_Switch1_wireless_esp32_blind(logger, context, to_date_change);
-            break;
-        }
-        default:{
-            //  Slow version for tick-imprecise controllers.
-            home_to_date_time_Switch1_sbb_blind(logger, context, to_date_change);
-        }
+    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+        home_to_date_time_Switch1_wired_blind(logger, context, to_date_change);
+        return;
+    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+        home_to_date_time_Switch1_wireless_esp32_blind(logger, context, to_date_change);
+        return;
+    default:
+        //  Slow version for tick-imprecise controllers.
+        home_to_date_time_Switch1_sbb_blind(logger, context, to_date_change);
+        return;
     }
 }
-
+bool home_to_date_time_switch1_feedback(ConsoleHandle& console, ProControllerContext& context, bool to_date_change){
+    switch (context->performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+        home_to_date_time_Switch1_wired_with_feedback(console, context, to_date_change);
+        return true;
+    default:;
+        return false;
+    }
+}
 
 
 
@@ -481,15 +475,12 @@ bool home_to_date_time_with_feedback(ConsoleHandle& console, ProControllerContex
     ConsoleType console_type = detector.detect(console.video().snapshot());
     switch (console_type){
     case ConsoleType::Switch1:
-        home_to_date_time_Switch1_wired_with_feedback(console, context, to_date_change);
-        return true;
+        return home_to_date_time_switch1_feedback(console, context, to_date_change);
     default:;
     }
 
     return false;
 }
-
-
 void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bool to_date_change){
     if (console.video().snapshot() && home_to_date_time_with_feedback(console, context, to_date_change)){
         return;
@@ -503,7 +494,7 @@ void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bo
     case ConsoleType::Unknown:
         throw UserSetupError(console, "Switch type is not specified and feedback is not available.");
     case ConsoleType::Switch1:
-        home_to_date_time(console, context, to_date_change);
+        home_to_date_time_switch1_blind(console, context, to_date_change);
         return;
     case ConsoleType::Switch2_Unknown:
     case ConsoleType::Switch2_FW19_International:

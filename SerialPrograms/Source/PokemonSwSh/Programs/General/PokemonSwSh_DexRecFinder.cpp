@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_NeutralDateSkip.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -183,8 +184,8 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     DexRecFinder_Descriptor::Stats& stats = env.current_stats<DexRecFinder_Descriptor::Stats>();
 
     while (true){
-        home_to_date_time(env.logger(), context, true);
-        neutral_date_skip(context);
+        home_to_date_time(env.console, context, true);
+        neutral_date_skip(env.console, context);
         settings_to_enter_game(context, true);
         pbf_mash_button(context, BUTTON_B, 90);
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);

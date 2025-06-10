@@ -443,7 +443,7 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
             env.log("Touching date to prevent rollover.");
             ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
-            touch_date_from_home(env.logger(), context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+            touch_date_from_home(env.console, context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
 

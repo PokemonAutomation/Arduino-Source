@@ -992,6 +992,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h
+    Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_NeutralDateSkip.cpp
+    Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_NeutralDateSkip.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.cpp

@@ -19,6 +19,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+#if 0
 void neutral_date_skip(ProControllerContext& context){
     switch (context->performance_class()){
     case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
@@ -82,7 +83,7 @@ void neutral_date_skip(ProControllerContext& context){
     }
     }
 }
-
+#endif
 
 void rollback_year_skip_forward(
     ConsoleHandle& console, ProControllerContext& context
@@ -144,10 +145,13 @@ void home_roll_date_enter_game_autorollback(
     }
     year++;
 }
-void touch_date_from_home(Logger& logger, ProControllerContext& context, Milliseconds settings_to_home_delay){
+void touch_date_from_home(
+    ConsoleHandle& console, ProControllerContext& context,
+    Milliseconds settings_to_home_delay
+){
     //  Touch the date without changing it. This prevents unintentional rollovers.
 
-    home_to_date_time(logger, context, true);
+    home_to_date_time(console, context, true);
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 
     ssf_press_button_ptv(context, BUTTON_A, 0ms);
@@ -168,11 +172,11 @@ void touch_date_from_home(Logger& logger, ProControllerContext& context, Millise
     ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
 }
 void rollback_hours_from_home(
-    Logger& logger, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     uint8_t hours,
     Milliseconds settings_to_home_delay
 ){
-    home_to_date_time(logger, context, true);
+    home_to_date_time(console, context, true);
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 
     ssf_press_button_ptv(context, BUTTON_A, 0ms);

@@ -168,7 +168,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, ProController
     }
 
     if (SKIPS == 0){
-        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.logger(), context);
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console, context);
     }
     rollback_date_from_home(env.console, context, SKIPS);
     if (env.console.video().snapshot()){
@@ -204,7 +204,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, ProController
 
         //  Touch the date.
         if (SKIPS == 0){
-            TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.logger(), context);
+            TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console, context);
         }else{
             rollback_date_from_home(env.console, context, SKIPS);
         }

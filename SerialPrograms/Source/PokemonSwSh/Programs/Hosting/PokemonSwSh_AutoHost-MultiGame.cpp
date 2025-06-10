@@ -146,7 +146,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, ProControll
     }
 
     if (enable_touch){
-        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.logger(), context);
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console, context);
     }
 
     uint32_t raids = 0;
@@ -231,7 +231,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, ProControll
 
             //  Touch the date.
             if (enable_touch){
-                TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.logger(), context);
+                TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console, context);
             }
         }
     }

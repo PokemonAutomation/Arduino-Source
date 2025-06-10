@@ -23,28 +23,23 @@
 #include "PokemonSV_ConnectToInternet.h"
 #include "PokemonSV_MenuNavigation.h"
 
-#include <array>
-#include <cmath>
-#include <sstream>
-#include <cfloat>
-#include <iostream>
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, ProControllerContext& context){
     DateReader reader;
-    VideoOverlaySet overlays(stream.overlay());
+    VideoOverlaySet overlays(console.overlay());
     reader.make_overlays(overlays);
 
 //    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-    home_to_date_time(stream, context, true);
+    home_to_date_time(console, context, true);
     pbf_press_button(context, BUTTON_A, 20, 50);
-    reader.set_hours(info, stream, context, 0);
+    reader.set_hours(info, console, context, 0);
     pbf_press_button(context, BUTTON_A, 20, 30);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-//    resume_game_from_home(stream, context);
+//    resume_game_from_home(console, context);
 }
 
 void day_skip_from_overworld(ConsoleHandle& console, ProControllerContext& context){

@@ -10,6 +10,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -37,7 +38,7 @@ public:
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
     bool ok_to_touch_now();
-    void touch_now_from_home_if_needed(Logger& logger, ProControllerContext& context);
+    void touch_now_from_home_if_needed(ConsoleHandle& console, ProControllerContext& context);
 
 private:
     SimpleIntegerOption<uint8_t> m_hours;

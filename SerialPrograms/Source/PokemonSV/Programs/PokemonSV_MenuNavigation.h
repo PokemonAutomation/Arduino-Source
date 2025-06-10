@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-void set_time_to_12am_from_home(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, ProControllerContext& context);
 
 //  Perform a No-op day skip that rolls over all the outbreaks and raids.
 void day_skip_from_overworld(ConsoleHandle& console, ProControllerContext& context);

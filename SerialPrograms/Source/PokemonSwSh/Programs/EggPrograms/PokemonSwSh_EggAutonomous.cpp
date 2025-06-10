@@ -232,7 +232,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 env.log("Touching date to prevent rollover.");
                 env.console.overlay().add_log("Touching date", COLOR_WHITE);
                 pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
-                touch_date_from_home(env.logger(), context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+                touch_date_from_home(env.console, context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
                 resume_game_no_interact(env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             }
 

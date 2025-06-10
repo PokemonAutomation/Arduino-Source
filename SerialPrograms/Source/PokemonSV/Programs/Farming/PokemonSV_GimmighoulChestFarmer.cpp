@@ -258,7 +258,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
 
         //  Date skip - in-game day cycle is 72 mins, so 2 hours is fastest way
         //  This isn't perfect because 12 hour format but it works
-        home_to_date_time(env.logger(), context, true);
+        home_to_date_time(env.console, context, true);
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
         ssf_issue_scroll_ptv(context, DPAD_RIGHT, 0ms);
         ssf_press_button_ptv(context, BUTTON_A, 16ms);
@@ -280,7 +280,7 @@ void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProCont
 
     if (FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-        home_to_date_time(env.logger(), context, false);
+        home_to_date_time(env.console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);

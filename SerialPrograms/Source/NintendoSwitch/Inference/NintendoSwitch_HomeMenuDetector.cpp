@@ -38,8 +38,6 @@ void HomeMenuDetector::make_overlays(VideoOverlaySet& items) const{
 //  This miraculously works on both Switch 1 and Switch 2.
 //
 bool HomeMenuDetector::detect(const ImageViewRGB32& screen){
-    m_console_type.detect(screen);
-
     ImageStats stats_bottom_row = image_stats(extract_box_reference(screen, m_bottom_row));
 //    cout << stats_bottom_row.average << stats_bottom_row.stddev << endl;
     bool white;
@@ -102,6 +100,9 @@ bool HomeMenuDetector::detect(const ImageViewRGB32& screen){
     if (stats_game_slot.stddev.sum() < 50){
         return false;
     }
+
+    //  Read the console type only when we have confirmed the home menu.
+    m_console_type.detect(screen);
 
     return true;
 }

@@ -567,7 +567,7 @@ void change_date(
         );
         switch (ret){
         case 0:
-            home_to_date_time(env.logger(), context, true);
+            home_to_date_time(env.console, context, true);
             pbf_press_button(context, BUTTON_A, 80ms + timing_variation, 240ms + timing_variation);
             context.wait_for_all_requests();
             continue;
