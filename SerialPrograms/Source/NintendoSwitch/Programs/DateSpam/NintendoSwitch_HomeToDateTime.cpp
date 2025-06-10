@@ -1,4 +1,4 @@
-/*  Nintendo Switch Navigation
+/*  Nintendo Switch Home To Date-Time
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -16,7 +16,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
-#include "NintendoSwitch_Navigation.h"
+#include "NintendoSwitch_HomeToDateTime.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

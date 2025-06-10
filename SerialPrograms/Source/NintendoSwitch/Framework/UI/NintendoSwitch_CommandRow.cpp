@@ -59,9 +59,9 @@ CommandRow::CommandRow(
     row->addStretch(100);
 
     m_status = new QLabel(this);
-    m_status->setVisible(false);
-//    row->addWidget(m_status, 12);
-//    row->addSpacing(5);
+//    m_status->setVisible(false);
+    row->addWidget(m_status);
+    row->addSpacing(5);
 
 //    row->addWidget(new QLabel("<b>Overlays:<b>", this));
 
@@ -228,7 +228,7 @@ void CommandRow::update_ui(){
         if (!stopped){
             m_status->setText(
                 QString::fromStdString(
-                    html_color_text("Not Active. A program is running.", COLOR_PURPLE)
+                    "Keyboard: " + html_color_text("&#x2b24;", COLOR_PURPLE)
                 )
             );
             return;
@@ -239,7 +239,7 @@ void CommandRow::update_ui(){
     if (!m_controller.ready()){
         m_status->setText(
             QString::fromStdString(
-                html_color_text("The controller is not ready.", COLOR_RED)
+                "Keyboard: " + html_color_text("&#x2b24;", COLOR_RED)
             )
         );
         return;
@@ -254,7 +254,7 @@ void CommandRow::update_ui(){
     if (!m_last_known_focus){
         m_status->setText(
             QString::fromStdString(
-                html_color_text("Click on the video to enable.", COLOR_PURPLE)
+                "Keyboard: " + html_color_text("&#x2b24;", COLOR_PURPLE)
             )
         );
         return;
@@ -262,7 +262,7 @@ void CommandRow::update_ui(){
 
     m_status->setText(
         QString::fromStdString(
-            html_color_text("Keyboard Control Active!", COLOR_DARKGREEN)
+            "Keyboard: " + html_color_text("&#x2b24;", COLOR_DARKGREEN)
         )
     );
 }

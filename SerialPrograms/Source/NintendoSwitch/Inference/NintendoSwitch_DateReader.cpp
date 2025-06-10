@@ -23,7 +23,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
 
 //#include <iostream>
 //using std::cout;

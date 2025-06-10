@@ -990,6 +990,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/TurboMacroTable.h
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
+    Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.cpp
+    Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp
@@ -1000,8 +1002,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_MenuStabilityTester.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_MenuStabilityTester.h
-    Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.cpp
-    Source/NintendoSwitch/Programs/NintendoSwitch_Navigation.h
     Source/NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp

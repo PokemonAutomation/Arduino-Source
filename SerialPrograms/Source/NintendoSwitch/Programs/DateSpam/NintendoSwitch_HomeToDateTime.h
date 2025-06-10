@@ -1,11 +1,11 @@
-/*  Nintendo Switch Navigation
+/*  Nintendo Switch Home To Date-Time
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_Navigation_H
-#define PokemonAutomation_NintendoSwitch_Navigation_H
+#ifndef PokemonAutomation_NintendoSwitch_HomeToDateTime_H
+#define PokemonAutomation_NintendoSwitch_HomeToDateTime_H
 
 //#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/VideoStream.h"
