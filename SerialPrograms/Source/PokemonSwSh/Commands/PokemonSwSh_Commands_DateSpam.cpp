@@ -19,71 +19,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-#if 0
-void neutral_date_skip(ProControllerContext& context){
-    switch (context->performance_class()){
-    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:{
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
-        ssf_press_button(context, BUTTON_A, 2);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-//        ssf_press_button(context, BUTTON_A, 2);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        for (uint8_t c = 0; c < 6; c++){
-            ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-        }
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
-        break;
-    }
-    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:{
-        Milliseconds tv = context->timing_variation();
-        Milliseconds unit = 24ms + tv;
-
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
-        ssf_press_button(context, BUTTON_A, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-//        ssf_press_button(context, BUTTON_A, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        ssf_press_button(context, BUTTON_A, 20, 10);
-        for (uint8_t c = 0; c < 6; c++){
-            ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
-        }
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
-
-        break;
-    }
-    default:{
-        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
-        ssf_press_button_ptv(context, BUTTON_A);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
-        ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
-        for (uint8_t c = 0; c < 6; c++){
-            ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT);
-        }
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
-        ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);
-    }
-    }
-}
-#endif
 
 void rollback_year_skip_forward(
     ConsoleHandle& console, ProControllerContext& context
@@ -145,12 +80,15 @@ void home_roll_date_enter_game_autorollback(
     }
     year++;
 }
-void touch_date_from_home(
+
+
+
+
+
+void touch_date_from_home_switch1(
     ConsoleHandle& console, ProControllerContext& context,
     Milliseconds settings_to_home_delay
 ){
-    //  Touch the date without changing it. This prevents unintentional rollovers.
-
     home_to_date_time(console, context, true);
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 
@@ -171,6 +109,58 @@ void touch_date_from_home(
     ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN, 16ms);
     ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
 }
+void touch_date_from_home_switch2(
+    ConsoleHandle& console, ProControllerContext& context,
+    Milliseconds settings_to_home_delay
+){
+    home_to_date_time(console, context, true);
+
+    ssf_press_button(context, BUTTON_A, 240ms, 80ms);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 280ms, 80ms);
+
+    ssf_press_button(context, BUTTON_A, 240ms, 80ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 280ms, 80ms);
+
+    ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
+}
+void touch_date_from_home(
+    ConsoleHandle& console, ProControllerContext& context,
+    Milliseconds settings_to_home_delay
+){
+    ConsoleType type = console.state().console_type();
+
+    if (type == ConsoleType::Switch1){
+        touch_date_from_home_switch1(console, context, settings_to_home_delay);
+        return;
+    }
+
+    if (is_switch2(type)){
+        touch_date_from_home_switch2(console, context, settings_to_home_delay);
+        return;
+    }
+
+    throw UserSetupError(
+        console.logger(),
+        "Please select a valid Switch console type."
+    );
+}
+
+
+
 void rollback_hours_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     uint8_t hours,
