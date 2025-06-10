@@ -147,7 +147,6 @@ void touch_date_from_home(
         touch_date_from_home_switch1(console, context, settings_to_home_delay);
         return;
     }
-
     if (is_switch2(type)){
         touch_date_from_home_switch2(console, context, settings_to_home_delay);
         return;
@@ -161,7 +160,8 @@ void touch_date_from_home(
 
 
 
-void rollback_hours_from_home(
+
+void rollback_hours_from_home_switch1(
     ConsoleHandle& console, ProControllerContext& context,
     uint8_t hours,
     Milliseconds settings_to_home_delay
@@ -181,6 +181,50 @@ void rollback_hours_from_home(
 
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
     ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
+}
+void rollback_hours_from_home_switch2(
+    ConsoleHandle& console, ProControllerContext& context,
+    uint8_t hours,
+    Milliseconds settings_to_home_delay
+){
+    home_to_date_time(console, context, true);
+
+    ssf_press_button(context, BUTTON_A, 240ms, 80ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    for (uint8_t c = 0; c < hours; c++){
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 112ms, 48ms, 24ms);
+    }
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 280ms, 80ms);
+
+    ssf_press_button(context, BUTTON_HOME, settings_to_home_delay, 80ms);
+}
+
+
+void rollback_hours_from_home(
+    ConsoleHandle& console, ProControllerContext& context,
+    uint8_t hours,
+    Milliseconds settings_to_home_delay
+){
+    ConsoleType type = console.state().console_type();
+
+    if (type == ConsoleType::Switch1){
+        rollback_hours_from_home_switch1(console, context, hours, settings_to_home_delay);
+        return;
+    }
+    if (is_switch2(type)){
+        rollback_hours_from_home_switch2(console, context, hours, settings_to_home_delay);
+        return;
+    }
+
+    throw UserSetupError(
+        console.logger(),
+        "Please select a valid Switch console type."
+    );
 }
 
 

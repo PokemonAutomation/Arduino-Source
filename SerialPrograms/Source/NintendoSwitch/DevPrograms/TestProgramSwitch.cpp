@@ -326,6 +326,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    console.state().set_console_type(CONSOLE_MODEL);
 
+
+    rollback_hours_from_home(console, context, 3, 500ms);
+
+
+
 #if 0
     while (true){
         roll_date_backward_N_Switch2_wired(context, 60);
@@ -358,7 +363,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
     ConsoleTypeDetector_Home detector(console);
     detector.make_overlays(overlays);
 
