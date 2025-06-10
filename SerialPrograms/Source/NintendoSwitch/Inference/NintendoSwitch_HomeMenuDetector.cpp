@@ -14,8 +14,9 @@ namespace NintendoSwitch{
 
 
 
-HomeMenuDetector::HomeMenuDetector(Color color)
+HomeMenuDetector::HomeMenuDetector(ConsoleState& state, Color color)
     : m_color(color)
+    , m_console_type(state, color)
     , m_bottom_row(0.10, 0.92, 0.10, 0.05)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
     , m_bottom_left(0.02, 0.70, 0.15, 0.15)
@@ -24,6 +25,7 @@ HomeMenuDetector::HomeMenuDetector(Color color)
     , m_game_slot(0.08, 0.25, 0.10, 0.38)
 {}
 void HomeMenuDetector::make_overlays(VideoOverlaySet& items) const{
+    m_console_type.make_overlays(items);
     items.add(m_color, m_bottom_row);
     items.add(m_color, m_bottom_icons);
     items.add(m_color, m_bottom_left);
@@ -36,6 +38,8 @@ void HomeMenuDetector::make_overlays(VideoOverlaySet& items) const{
 //  This miraculously works on both Switch 1 and Switch 2.
 //
 bool HomeMenuDetector::detect(const ImageViewRGB32& screen){
+    m_console_type.detect(screen);
+
     ImageStats stats_bottom_row = image_stats(extract_box_reference(screen, m_bottom_row));
 //    cout << stats_bottom_row.average << stats_bottom_row.stddev << endl;
     bool white;

@@ -16,9 +16,9 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -31,7 +31,6 @@
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Inference/PokemonSV_BlueberryQuestDetector.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
@@ -704,7 +703,7 @@ void quest_tera_self_defeat(
     //Day skip and attempt to respawn fixed encounters
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(console, context, true);
-    PokemonSwSh::roll_date_forward_1(context, true);
+    roll_date_forward_1(console, context, true);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(console, context);
 
@@ -840,7 +839,7 @@ void quest_sneak_up(
     //Day skip and attempt to respawn fixed encounters - in case quest failed
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(console, context, true);
-    PokemonSwSh::roll_date_forward_1(context, true);
+    roll_date_forward_1(console, context, true);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(console, context);
     context.wait_for_all_requests();
@@ -914,7 +913,7 @@ void quest_wild_tera(
     //Day skip and attempt to respawn fixed encounters
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(console, context, true);
-    PokemonSwSh::roll_date_forward_1(context, true);
+    roll_date_forward_1(console, context, true);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(console, context);
 

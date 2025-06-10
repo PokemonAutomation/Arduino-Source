@@ -45,7 +45,7 @@ void close_game(ConsoleHandle& console, ProControllerContext& context){
     // send a second Home button press, if the first one is dropped
     bool video_available = (bool)console.video().snapshot();
     if (video_available){
-        HomeMenuWatcher detector;
+        HomeMenuWatcher detector(console);
         int ret = wait_until(
             console, context,
             std::chrono::milliseconds(5000),
@@ -88,7 +88,7 @@ void close_game(ConsoleHandle& console, JoyconContext& context){
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     context.wait_for_all_requests();
 
-    HomeMenuWatcher detector;
+    HomeMenuWatcher detector(console);
     int ret = wait_until(
         console, context,
         std::chrono::milliseconds(5000),

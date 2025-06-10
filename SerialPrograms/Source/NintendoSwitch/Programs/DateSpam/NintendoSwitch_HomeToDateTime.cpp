@@ -460,7 +460,7 @@ void home_to_date_time(Logger& logger, ProControllerContext& context, bool to_da
 //  Returns true if success. False if not supported.
 bool home_to_date_time_with_feedback(ConsoleHandle& console, ProControllerContext& context, bool to_date_change){
     for (size_t attempts = 0;; attempts++){
-        HomeMenuWatcher home_menu(100ms);
+        HomeMenuWatcher home_menu(console, 100ms);
         int ret = wait_until(
             console, context, 5000ms,
             {home_menu}

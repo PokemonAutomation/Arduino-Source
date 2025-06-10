@@ -11,6 +11,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -77,10 +79,10 @@ void GimmighoulRoamingFarmer::program(SingleSwitchProgramEnvironment& env, ProCo
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         home_to_date_time(env.logger(), context, true);
         if (year >= MAX_YEAR){
-            PokemonSwSh::roll_date_backward_N(context, MAX_YEAR, true);
+            roll_date_backward_N(env.console, context, MAX_YEAR, true);
             year = 0;
         }else{
-            PokemonSwSh::roll_date_forward_1(context, true);
+            roll_date_forward_1(env.console, context, true);
             year++;
         }
 

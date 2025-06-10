@@ -556,7 +556,7 @@ void change_date(
     while (true){
         context.wait_for_all_requests();
 
-        HomeMenuWatcher home;
+        HomeMenuWatcher home(env.console);
         DateChangeWatcher date_reader;
         int ret = wait_until(
             env.console, context, std::chrono::seconds(10),

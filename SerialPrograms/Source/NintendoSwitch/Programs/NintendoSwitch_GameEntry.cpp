@@ -59,7 +59,7 @@ void resume_game_from_home(
         }
 
         //  In case we failed to enter the game.
-        HomeMenuWatcher home_detector;
+        HomeMenuWatcher home_detector(console);
         if (home_detector.detect(console.video().snapshot())){
             console.log("Failed to re-enter game. Trying again...", COLOR_RED);
             pbf_press_button(context, BUTTON_HOME, 10, 10);
@@ -101,7 +101,7 @@ void start_game_from_home_with_inference(
 ){
     context.wait_for_all_requests();
     {
-        HomeMenuWatcher detector;
+        HomeMenuWatcher detector(console);
         int ret = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context){
@@ -132,7 +132,7 @@ void start_game_from_home_with_inference(
     pbf_press_button(context, BUTTON_A, 20, 105);
 
     while (true){
-        HomeMenuWatcher home(std::chrono::milliseconds(2000));
+        HomeMenuWatcher home(console, std::chrono::milliseconds(2000));
         StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
         UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);
@@ -347,7 +347,7 @@ void resume_game_from_home(
         }
 
         //  In case we failed to enter the game.
-        HomeMenuWatcher home_detector;
+        HomeMenuWatcher home_detector(console);
         if (home_detector.detect(console.video().snapshot())){
             console.log("Failed to re-enter game. Trying again...", COLOR_RED);
             pbf_press_button(context, BUTTON_HOME, 20ms, 10ms);
@@ -387,7 +387,7 @@ void start_game_from_home_with_inference(
     }
 
     {
-        HomeMenuWatcher detector;
+        HomeMenuWatcher detector(console);
         int ret = run_until<JoyconContext>(
             console, context,
             [](JoyconContext& context){
@@ -418,7 +418,7 @@ void start_game_from_home_with_inference(
     pbf_press_button(context, BUTTON_A, 160ms, 840ms);
 
     while (true){
-        HomeMenuWatcher home(std::chrono::milliseconds(2000));
+        HomeMenuWatcher home(console, std::chrono::milliseconds(2000));
         StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
         UpdateMenuWatcher update_menu(console, COLOR_PURPLE);
         CheckOnlineWatcher check_online(COLOR_CYAN);

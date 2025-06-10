@@ -14,6 +14,10 @@
 #include "PokemonSwSh_Commands_AutoHosts.h"
 //#include "PokemonSwSh_Messages_AutoHosts.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -44,6 +48,8 @@ void home_to_add_friends(
     uint8_t scroll_down,
     bool fix_cursor
 ){
+//    cout << "scroll_down = " << (int)scroll_down << endl;
+
     //  Scroll to correct user.
     //  Do 2 up-scrolls instead of one. In the event that an error leaves you in
     //  the game instead of the Switch Home, these button presses will actually

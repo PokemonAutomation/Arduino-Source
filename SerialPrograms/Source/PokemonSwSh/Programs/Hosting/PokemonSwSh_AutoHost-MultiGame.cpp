@@ -164,7 +164,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, ProControll
             env.log("Raids Attempted: " + tostr_u_commas(raids++));
 
             //  Start game.
-            rollback_date_from_home(env.logger(), context, game.skips);
+            rollback_date_from_home(env.console, context, game.skips);
 
             //  Sanitize game slot.
             uint8_t game_slot = (uint8_t)game.game_slot.current_value();

@@ -10,6 +10,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_DenTools.h"
@@ -109,7 +111,7 @@ void roll_den(
         //  Skip forward.
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_FAST0, 80ms);
         home_to_date_time(console, context, true);
-        roll_date_forward_1(context, false);
+        roll_date_forward_1(console, context, false);
 
         //  Enter game
         if (console.video().snapshot()){
@@ -131,15 +133,15 @@ void roll_den(
         ssf_press_button(context, BUTTON_A, GameSettings::instance().REENTER_DEN_DELAY0, 400ms);
     }
 }
-void rollback_date_from_home(Logger& logger, ProControllerContext& context, uint8_t skips){
+void rollback_date_from_home(ConsoleHandle& console, ProControllerContext& context, uint8_t skips){
     if (skips == 0){
         return;
     }
     if (skips > 60){
         skips = 60;
     }
-    home_to_date_time(logger, context, true);
-    roll_date_backward_N(context, skips, false);
+    home_to_date_time(console, context, true);
+    roll_date_backward_N(console, context, skips, false);
 //    pbf_wait(5);
 
     //  Note that it is possible for this return animation to run longer than

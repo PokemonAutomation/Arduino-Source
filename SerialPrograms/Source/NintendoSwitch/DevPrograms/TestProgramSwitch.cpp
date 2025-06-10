@@ -127,6 +127,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -302,6 +303,8 @@ void TestProgram::on_press(){
 
 
 
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -323,13 +326,25 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    console.state().set_console_type(CONSOLE_MODEL);
 
+#if 0
+    while (true){
+        roll_date_backward_N_Switch2_wired(context, 60);
+        for (size_t c = 0; c < 60; c++){
+            roll_date_forward_1(console, context, true);
+        }
+    }
+#endif
+
+
+
+#if 0
     while (true){
         home_to_date_time(console, context, true);
 //        home_to_date_time_Switch2_wired_blind(context, true);
         ssf_do_nothing(context, 1000ms);
         pbf_press_button(context, BUTTON_HOME, 200ms, 1800ms);
     }
-
+#endif
 
 
 #if 0
@@ -343,8 +358,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
-    ConsoleTypeDetector_Home detector;
+#if 1
+    ConsoleTypeDetector_Home detector(console);
     detector.make_overlays(overlays);
 
     cout << (int)detector.detect(feed.snapshot()) << endl;

@@ -12,9 +12,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -25,7 +25,6 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV/Programs/PokemonSV_Terarium.h"
 #include "PokemonSV_BlueberryQuests.h"
@@ -894,7 +893,7 @@ void quest_catch(
             static_cast<VisualInferenceCallback&>(encounter_watcher),
             static_cast<AudioInferenceCallback&>(encounter_watcher),
         }
-        );
+    );
     encounter_watcher.throw_if_no_sound();
 
     if (ret >= 0){
@@ -915,7 +914,7 @@ void quest_catch(
     //Day skip and attempt to respawn fixed encounters
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(console, context, true);
-    PokemonSwSh::roll_date_forward_1(context, true);
+    roll_date_forward_1(console, context, true);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(console, context);
 
