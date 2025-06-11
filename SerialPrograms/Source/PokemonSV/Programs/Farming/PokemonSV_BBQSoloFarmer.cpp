@@ -78,8 +78,8 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     }
     
     //Fly to plaza
-    //open_map_from_overworld(env.program_info(), env.console, context);
-    //fly_to_overworld_from_map(env.program_info(), env.console, context);
+    open_map_from_overworld(env.program_info(), env.console, context);
+    fly_to_overworld_from_map(env.program_info(), env.console, context);
 
     std::vector<BBQuests> quest_list; //all quests
     std::vector<BBQuests> quests_to_do; //do-able quests
@@ -87,13 +87,13 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     uint64_t num_completed_quests = 0;
 
     //Test a specific quest
-    
-    BBQuests test_quest = BBQuests::catch_any;
+    /*
+    BBQuests test_quest = BBQuests::catch_water;
     bool questTest = process_and_do_quest(env, env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest){
         env.log("Finished quest.");
     }
-    
+    */
 
     while (num_completed_quests < BBQ_OPTIONS.NUM_QUESTS){
         if (BBQ_OPTIONS.OUT_OF_EGGS == BBQOption::OOEggs::Stop && eggs_hatched >= BBQ_OPTIONS.NUM_EGGS){

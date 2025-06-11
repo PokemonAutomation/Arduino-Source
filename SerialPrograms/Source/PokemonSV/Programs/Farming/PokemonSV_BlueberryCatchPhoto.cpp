@@ -400,11 +400,8 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 100, 50);
 
-            //Turn slightly for switch 1
-            if (console.state().console_type() == ConsoleType::Switch1) {
-                pbf_move_left_joystick(context, 0, 0, 20, 50);
-                pbf_press_button(context, BUTTON_L, 20, 50);
-            }
+            pbf_move_left_joystick(context, 0, 0, 20, 50);
+            pbf_press_button(context, BUTTON_L, 20, 50);
 
             break;
 
@@ -522,13 +519,22 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 255, 0, 10, 20);
             pbf_press_button(context, BUTTON_L, 20, 50);
 
-            pbf_move_left_joystick(context, 128, 0, 200, 20);
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 128, 0, 200, 20);
+            } else {
+                pbf_move_left_joystick(context, 128, 0, 170, 20);
+            }
+
             pbf_press_button(context, BUTTON_L, 20, 50);
 
             pbf_move_left_joystick(context, 0, 0, 10, 20);
             pbf_press_button(context, BUTTON_L, 20, 50);
 
-            pbf_move_left_joystick(context, 128, 0, 100, 20);
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 128, 0, 100, 20);
+            } else {
+                pbf_move_left_joystick(context, 128, 0, 120, 20);
+            }
             pbf_wait(context, 400);
             context.wait_for_all_requests();
 
@@ -558,7 +564,12 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 0, 128, 20, 50);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 590, 200);
+
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 575, 200);
+            } else { //Switch 2
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 200, 500, 200);
+            }
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
             pbf_move_left_joystick(context, 0, 128, 20, 50);
@@ -574,7 +585,12 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 0, 128, 20, 50);
 
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1800, 300);
+
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1800, 300);
+            } else {
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1600, 300);
+            }
 
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
