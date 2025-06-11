@@ -658,7 +658,12 @@ void quest_tera_self_defeat(
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
-            jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 300);
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 300);
+            }
+            else { //All switch 2s
+                jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1600, 300);
+            }
 
             ssf_press_button(context, BUTTON_ZR, 0, 200);
             ssf_press_button(context, BUTTON_ZL, 100, 50);
@@ -704,16 +709,6 @@ void quest_tera_self_defeat(
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(console, context, true);
     roll_date_forward_1(console, context, true);
-    pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-    resume_game_from_home(console, context);
-
-    //Wait a bit and then fix the time to prevent running out of years
-    pbf_wait(context, 250);
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-    home_to_date_time(console, context, false);
-    pbf_press_button(context, BUTTON_A, 20, 105);
-    pbf_press_button(context, BUTTON_A, 20, 105);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(console, context);
 
@@ -763,8 +758,12 @@ void quest_sneak_up(
 
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 100, 50);
-            pbf_move_left_joystick(context, 0, 0, 20, 50);
-            pbf_press_button(context, BUTTON_L, 20, 50);
+
+            //Turn slightly for switch 1
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 0, 0, 20, 50);
+                pbf_press_button(context, BUTTON_L, 20, 50);
+            }
 
             ssf_press_button(context, BUTTON_ZR, 0, 200);
             ssf_press_button(context, BUTTON_ZL, 100, 50);
@@ -853,16 +852,6 @@ void quest_sneak_up(
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(console, context);
     context.wait_for_all_requests();
-
-    //Wait a bit and then fix the time to prevent running out of years
-    pbf_wait(context, 250);
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-    home_to_date_time(console, context, false);
-    pbf_press_button(context, BUTTON_A, 20, 105);
-    pbf_press_button(context, BUTTON_A, 20, 105);
-    pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-    resume_game_from_home(console, context);
 }
 
 void quest_wild_tera(
@@ -887,9 +876,15 @@ void quest_wild_tera(
             //Skarmory is likely to attack but sometimes there is a different pokemon
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
-            pbf_move_left_joystick(context, 50, 0, 20, 105);
-            pbf_press_button(context, BUTTON_L, 20, 50);
-            pbf_move_left_joystick(context, 128, 0, 100, 50);
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 50, 0, 20, 105);
+                pbf_press_button(context, BUTTON_L, 20, 50);
+                pbf_move_left_joystick(context, 128, 0, 100, 50);
+            }
+            else { //Switch 2
+                pbf_move_left_joystick(context, 20, 0, 20, 105);
+                pbf_press_button(context, BUTTON_L, 20, 50);
+            }
 
             ssf_press_button(context, BUTTON_ZR, 0, 200);
             ssf_press_button(context, BUTTON_ZL, 100, 50);
@@ -934,16 +929,6 @@ void quest_wild_tera(
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
     home_to_date_time(console, context, true);
     roll_date_forward_1(console, context, true);
-    pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-    resume_game_from_home(console, context);
-
-    //Wait a bit and then fix the time to prevent running out of years
-    pbf_wait(context, 250);
-    context.wait_for_all_requests();
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-    home_to_date_time(console, context, false);
-    pbf_press_button(context, BUTTON_A, 20, 105);
-    pbf_press_button(context, BUTTON_A, 20, 105);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_from_home(console, context);
 
