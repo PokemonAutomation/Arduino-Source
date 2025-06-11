@@ -88,7 +88,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
     //Test a specific quest
     
-    BBQuests test_quest = BBQuests::tera_raid;
+    BBQuests test_quest = BBQuests::catch_any;
     bool questTest = process_and_do_quest(env, env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest){
         env.log("Finished quest.");
@@ -140,11 +140,11 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         pbf_wait(context, 250);
         context.wait_for_all_requests();
         pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
-        home_to_date_time(console, context, false);
+        home_to_date_time(env.console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
-        resume_game_from_home(console, context);
+        resume_game_from_home(env.console, context);
 
         uint64_t temp_save_num_option = BBQ_OPTIONS.SAVE_NUM_QUESTS;
         if (temp_save_num_option != 0 && num_completed_quests % temp_save_num_option == 0){

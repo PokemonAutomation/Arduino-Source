@@ -660,8 +660,7 @@ void quest_tera_self_defeat(
             //Drop on top of Kleavor (plenty of Scyther in the area as well)
             if (console.state().console_type() == ConsoleType::Switch1) {
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 300);
-            }
-            else { //All switch 2s
+            } else { //All switch 2s
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1600, 300);
             }
 
@@ -880,8 +879,7 @@ void quest_wild_tera(
                 pbf_move_left_joystick(context, 50, 0, 20, 105);
                 pbf_press_button(context, BUTTON_L, 20, 50);
                 pbf_move_left_joystick(context, 128, 0, 100, 50);
-            }
-            else { //Switch 2
+            } else { //Switch 2
                 pbf_move_left_joystick(context, 20, 0, 20, 105);
                 pbf_press_button(context, BUTTON_L, 20, 50);
             }
