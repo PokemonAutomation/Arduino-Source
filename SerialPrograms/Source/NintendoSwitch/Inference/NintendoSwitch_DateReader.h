@@ -72,15 +72,6 @@ public:
     //  Returns true if we are on the date change window.
     virtual bool detect(const ImageViewRGB32& screen) override;
 
-    //  Read the hours (0 - 23) while on the date change window.
-    //  Returns -1 if unable to read.
-//    int8_t read_hours(Logger& logger, std::shared_ptr<const ImageRGB32> screen) const;
-
-    void set_hours(
-        const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
-        uint8_t hour    //  0 - 23
-    );
-
 
     std::pair<DateFormat, DateTime> read_date(Logger& logger, std::shared_ptr<const ImageRGB32> screen);
     void set_date(
