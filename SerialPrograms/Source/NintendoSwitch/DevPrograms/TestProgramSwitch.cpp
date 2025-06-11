@@ -128,6 +128,8 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
+#include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.h"
+#include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_24h.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -324,10 +326,64 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
-//    console.state().set_console_type(CONSOLE_MODEL);
+#if 0
+    DateReader reader;
+    reader.make_overlays(overlays);
+    auto date = reader.read_date(logger, feed.snapshot());
+
+    cout << "date format = " << (int)date.first << endl;
+//    cout << "date  = " << (int)date.second << endl;
+#endif
 
 
-    rollback_hours_from_home(console, context, 3, 500ms);
+
+#if 0
+//    DateReader_Switch2_US reader(COLOR_RED);
+    DateReader_Switch2_JP reader(COLOR_RED);
+    reader.make_overlays(overlays);
+    DateTime date = reader.read_date(logger, feed.snapshot());
+
+    cout << "Month = " << (int)date.month << endl;
+    cout << "Day = " << (int)date.day << endl;
+    cout << "Year = " << (int)date.year << endl;
+    cout << "Hour = " << (int)date.hour << endl;
+    cout << "Minute = " << (int)date.minute << endl;
+#endif
+
+
+#if 0
+    DateChangeDetector_Switch2 detector(COLOR_RED);
+    detector.make_overlays(overlays);
+    cout << detector.detect(feed.snapshot()) << endl;
+#endif
+
+
+#if 1
+    DateReader reader(console);
+    reader.make_overlays(overlays);
+    DateTime date = reader.read_date(logger, feed.snapshot()).second;
+
+    cout << "Month = " << (int)date.month << endl;
+    cout << "Day = " << (int)date.day << endl;
+    cout << "Year = " << (int)date.year << endl;
+    cout << "Hour = " << (int)date.hour << endl;
+    cout << "Minute = " << (int)date.minute << endl;
+
+    while (true){
+        reader.set_date(env.program_info(), console, context, DATE0);
+        for (int c = 0; c < 7; c++){
+            ssf_issue_scroll_ptv(context, DPAD_LEFT);
+        }
+        reader.set_date(env.program_info(), console, context, DATE1);
+        for (int c = 0; c < 7; c++){
+            ssf_issue_scroll_ptv(context, DPAD_LEFT);
+        }
+    }
+#endif
+
+
+
+//    rollback_hours_from_home(console, context, 3, 500ms);
 
 
 
@@ -894,22 +950,6 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     reader.read(logger, env.inference_dispatcher(), feed.snapshot());
 #endif
 
-#if 0
-    DateReader reader;
-    reader.make_overlays(overlays);
-    DateTime date = reader.read_date(logger, feed.snapshot()).second;
-
-    cout << "Month = " << (int)date.month << endl;
-    cout << "Day = " << (int)date.day << endl;
-    cout << "Year = " << (int)date.year << endl;
-    cout << "Hour = " << (int)date.hour << endl;
-    cout << "Minute = " << (int)date.minute << endl;
-
-    while (true){
-        reader.set_date(env.program_info(), console, context, DATE0);
-        reader.set_date(env.program_info(), console, context, DATE1);
-    }
-#endif
 
 //    SinglesAIOption battle_AI;
 //    run_singles_battle(env, console, context, battle_AI, false);

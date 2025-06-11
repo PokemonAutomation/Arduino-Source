@@ -328,7 +328,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
         OverworldWatcher overworld(env.console, COLOR_BLUE);
         AdvanceDialogWatcher dialog(COLOR_RED);
         PromptDialogWatcher prompt(COLOR_GREEN);
-        DateChangeWatcher date_reader;
+        DateChangeWatcher date_reader(env.console);
         WhiteButtonWatcher material(COLOR_GREEN, WhiteButton::ButtonX, {0.63, 0.93, 0.17, 0.06});
         int ret = wait_until(
             env.console, context, next_wait_time,
@@ -953,7 +953,7 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
         OverworldWatcher overworld(env.console, COLOR_BLUE);
         AdvanceDialogWatcher dialog(COLOR_RED);
         PromptDialogWatcher prompt(COLOR_GREEN);
-        DateChangeWatcher date_reader;
+        DateChangeWatcher date_reader(env.console);
         ItemPrinterMenuWatcher material(COLOR_GREEN);
         int ret = wait_until(
             env.console, context, std::chrono::seconds(120),

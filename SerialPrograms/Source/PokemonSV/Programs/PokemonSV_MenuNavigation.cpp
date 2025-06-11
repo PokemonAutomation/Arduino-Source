@@ -29,7 +29,7 @@ namespace PokemonSV{
 
 
 void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console, ProControllerContext& context){
-    DateReader reader;
+    DateReader reader (console);
     VideoOverlaySet overlays(console.overlay());
     reader.make_overlays(overlays);
 

@@ -214,37 +214,41 @@ void home_to_date_time_Switch2_wired_blind(
 ){
     logger.log("home_to_date_time_Switch2_wired_blind()");
 
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    Milliseconds delay = 24ms;
+    Milliseconds hold = 48ms;
+    Milliseconds cool = 24ms;
+
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
 
     //  Down twice in case we drop one.
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
 
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, delay, hold, cool);
 
     //  Two A presses in case we drop the 1st one.
-    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
-    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, delay, hold, cool);
+    ssf_press_button(context, BUTTON_A, delay, hold, cool);
 
     for (size_t c = 0; c < 40; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
     }
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 1000ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 1000ms, cool);
 
     //  Scroll left and press A to exit the sleep menu if we happened to
     //  land there.
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, delay, hold, cool);
     ssf_press_button(context, BUTTON_A, 3);
 
     for (size_t c = 0; c < 2; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
     }
 
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 192ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 192ms, hold, cool);
 
 
     if (console_type == ConsoleType::Switch2_Unknown){
@@ -253,22 +257,22 @@ void home_to_date_time_Switch2_wired_blind(
 
     switch (console_type){
     case ConsoleType::Switch2_FW19_International:
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
         break;
     case ConsoleType::Switch2_FW19_JapanLocked:
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
         break;
     case ConsoleType::Switch2_FW20_International:
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
         break;
     case ConsoleType::Switch2_FW20_JapanLocked:
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 48ms, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
         break;
     default:
         throw UserSetupError(
@@ -280,24 +284,24 @@ void home_to_date_time_Switch2_wired_blind(
 
     if (!to_date_change){
         //  Triple up this A press to make sure it gets through.
-        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
-        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
-        ssf_press_button(context, BUTTON_A, 360ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, delay, hold, cool);
+        ssf_press_button(context, BUTTON_A, delay, hold, cool);
+        ssf_press_button(context, BUTTON_A, 360ms, hold, cool);
         return;
     }
 
     //  Triple up this A press to make sure it gets through.
-    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
-    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
-    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, delay, hold, cool);
+    ssf_press_button(context, BUTTON_A, delay, hold, cool);
+    ssf_press_button(context, BUTTON_A, delay, hold, cool);
 
     for (size_t c = 0; c < 5; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms, 48ms, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
     }
 
     //  Left scroll in case we missed and landed in the language change or sleep
     //  confirmation menus.
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, delay, hold, cool);
 }
 
 void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProControllerContext& context, bool to_date_change){
