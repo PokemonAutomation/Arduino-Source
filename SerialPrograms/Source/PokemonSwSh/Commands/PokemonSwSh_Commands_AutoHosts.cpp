@@ -62,7 +62,7 @@ void home_to_add_friends(
     ssf_issue_scroll_ptv(context, SSF_SCROLL_UP);
 
     //  Enter user profile.
-    ssf_press_button_ptv(context, BUTTON_A, 1600ms);
+    ssf_press_button_ptv(context, BUTTON_A, 2000ms);
 
     if (fix_cursor){
         //  Force cursor to bottom, then up one to FRs.

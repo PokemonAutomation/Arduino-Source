@@ -9,7 +9,8 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
+#include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
+#include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardCodeEntry.h"
 #include "PokemonSV_CodeEntry.h"
 
 //#include <iostream>
@@ -149,7 +150,7 @@ void enter_code(
     }
 
     if (force_keyboard_mode){
-        keyboard_enter_code(
+        FastCodeEntry::keyboard_enter_code(
             console, context, keyboard_layout,
             normalized_code, include_plus
         );
@@ -159,17 +160,17 @@ void enter_code(
     switch (normalized_code.size()){
     case 4:
 //        enter_digits_str(context, 4, normalized_code.c_str());
-        numberpad_enter_code(console, context, normalized_code, include_plus);
+        FastCodeEntry::numberpad_enter_code(console, context, normalized_code, include_plus);
         break;
     case 6:
-        keyboard_enter_code(
+        FastCodeEntry::keyboard_enter_code(
             console, context, keyboard_layout,
             normalized_code, include_plus
         );
         break;
     case 8:
 //        enter_digits_str(context, 8, normalized_code.c_str());
-        numberpad_enter_code(console, context, normalized_code, include_plus);
+        FastCodeEntry::numberpad_enter_code(console, context, normalized_code, include_plus);
         break;
     }
 }

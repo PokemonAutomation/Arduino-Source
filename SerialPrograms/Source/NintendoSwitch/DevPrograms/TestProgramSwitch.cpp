@@ -47,7 +47,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h"
+#include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardCodeEntry.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -115,7 +115,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_MaterialFarmerTools.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_TournamentFarmer.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
+#include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
@@ -326,6 +326,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+//    ssf_issue_scroll(context, DPAD_LEFT, 48ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 96ms, 48ms, 24ms);
     ssf_press_button(context, BUTTON_L, 0ms, 48ms, 24ms);
     ssf_issue_scroll(context, DPAD_LEFT, 48ms, 48ms, 24ms);
 

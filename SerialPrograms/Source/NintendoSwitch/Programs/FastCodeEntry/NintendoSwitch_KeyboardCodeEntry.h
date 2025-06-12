@@ -1,30 +1,32 @@
-/*  Number Code Entry
+/*  Keyboard Code Entry
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_NumberCodeEntry_H
-#define PokemonAutomation_NintendoSwitch_NumberCodeEntry_H
+#ifndef PokemonAutomation_NintendoSwitch_KeyboardCodeEntry_H
+#define PokemonAutomation_NintendoSwitch_KeyboardCodeEntry_H
 
 #include <string>
+#include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
-    class Logger;
 namespace NintendoSwitch{
+namespace FastCodeEntry{
 
 
 
-void numberpad_enter_code(
+void keyboard_enter_code(
     ConsoleHandle& console, ProControllerContext& context,
-    const std::string& code,
+    KeyboardLayout keyboard_layout, const std::string& code,
     bool include_plus
 );
 
 
 
+}
 }
 }
 #endif

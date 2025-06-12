@@ -33,7 +33,7 @@ private:
     SimpleIntegerOption<uint8_t> USER_SLOT;
     FriendCodeListOption FRIEND_CODES;
     SectionDividerOption m_advanced_options;
-    MillisecondsOption OPEN_CODE_PAD_DELAY0;
+    MillisecondsOption OPEN_CODE_PAD_DELAY1;
     MillisecondsOption SEARCH_TIME0;
     MillisecondsOption TOGGLE_BEST_STATUS_DELAY0;
 };

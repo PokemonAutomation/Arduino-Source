@@ -10,6 +10,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
+#include "NintendoSwitch_CodeEntryTools.h"
 #include "NintendoSwitch_KeyboardCodeEntry.h"
 
 //#include <iostream>
@@ -18,6 +19,7 @@
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+namespace FastCodeEntry{
 
 
 struct KeyboardEntryPosition{
@@ -111,88 +113,25 @@ static const std::map<char, KeyboardEntryPosition>& KEYBOARD_POSITIONS_AZERTY(){
 
 
 
-enum class KeyboardEntryAction : uint8_t{
-    ENTER_CHAR  = 0xf0,
-    SCROLL_LEFT = 0xf1,
-    NORM_MOVE_UP    =        (uint8_t)DpadPosition::DPAD_UP,
-    NORM_MOVE_RIGHT =        (uint8_t)DpadPosition::DPAD_RIGHT,
-    NORM_MOVE_DOWN  =        (uint8_t)DpadPosition::DPAD_DOWN,
-    NORM_MOVE_LEFT  =        (uint8_t)DpadPosition::DPAD_LEFT,
-    WRAP_MOVE_UP    = 0x80 | (uint8_t)DpadPosition::DPAD_UP,
-    WRAP_MOVE_RIGHT = 0x80 | (uint8_t)DpadPosition::DPAD_RIGHT,
-    WRAP_MOVE_DOWN  = 0x80 | (uint8_t)DpadPosition::DPAD_DOWN,
-    WRAP_MOVE_LEFT  = 0x80 | (uint8_t)DpadPosition::DPAD_LEFT,
-};
-bool is_button_press(KeyboardEntryAction action){
-    switch (action){
-    case KeyboardEntryAction::ENTER_CHAR:
-    case KeyboardEntryAction::SCROLL_LEFT:
-        return true;
-    default:
-        return false;
-    }
-}
-bool is_move(KeyboardEntryAction action){
-    switch (action){
-    case KeyboardEntryAction::NORM_MOVE_UP:
-    case KeyboardEntryAction::NORM_MOVE_RIGHT:
-    case KeyboardEntryAction::NORM_MOVE_DOWN:
-    case KeyboardEntryAction::NORM_MOVE_LEFT:
-    case KeyboardEntryAction::WRAP_MOVE_UP:
-    case KeyboardEntryAction::WRAP_MOVE_RIGHT:
-    case KeyboardEntryAction::WRAP_MOVE_DOWN:
-    case KeyboardEntryAction::WRAP_MOVE_LEFT:
-        return true;
-    default:
-        return false;
-    }
-}
-bool is_wrap(KeyboardEntryAction action){
-    switch (action){
-    case KeyboardEntryAction::WRAP_MOVE_UP:
-    case KeyboardEntryAction::WRAP_MOVE_RIGHT:
-    case KeyboardEntryAction::WRAP_MOVE_DOWN:
-    case KeyboardEntryAction::WRAP_MOVE_LEFT:
-        return true;
-    default:
-        return false;
-    }
-}
-
-struct KeyboardEntryActionWithDelay{
-    KeyboardEntryAction action;
-    Milliseconds delay;
-};
-
-struct KeyboardEntryDelays{
-    Milliseconds hold;
-    Milliseconds cool;
-    Milliseconds press_delay;
-    Milliseconds move_delay;
-    Milliseconds wrap_delay;
-};
-
-
-
 
 
 //  Return the path from "source" to "destination".
-std::vector<KeyboardEntryAction> keyboard_get_path(
+std::vector<CodeEntryAction> keyboard_get_path(
     KeyboardEntryPosition source,
     KeyboardEntryPosition destination
 ){
-    std::vector<KeyboardEntryAction> path;
+    std::vector<CodeEntryAction> path;
 
     //  Vertical is easy since there's no wrapping and no hazards.
     if (source.row < destination.row){
         size_t diff = destination.row - source.row;
         for (size_t c = 0; c < diff; c++){
-            path.emplace_back(KeyboardEntryAction::NORM_MOVE_DOWN);
+            path.emplace_back(CodeEntryAction::NORM_MOVE_DOWN);
         }
     }else{
         size_t diff = source.row - destination.row;
         for (size_t c = 0; c < diff; c++){
-            path.emplace_back(KeyboardEntryAction::NORM_MOVE_UP);
+            path.emplace_back(CodeEntryAction::NORM_MOVE_UP);
         }
     }
 
@@ -203,21 +142,21 @@ std::vector<KeyboardEntryAction> keyboard_get_path(
             break;
         }
 
-        KeyboardEntryAction action;
+        CodeEntryAction action;
         if (destination.col > col){
             if (destination.col - col <= 6){
-                action = KeyboardEntryAction::NORM_MOVE_RIGHT;
+                action = CodeEntryAction::NORM_MOVE_RIGHT;
                 col++;
             }else{
-                action = KeyboardEntryAction::NORM_MOVE_LEFT;
+                action = CodeEntryAction::NORM_MOVE_LEFT;
                 col--;
             }
         }else{
             if (col - destination.col <= 6){
-                action = KeyboardEntryAction::NORM_MOVE_LEFT;
+                action = CodeEntryAction::NORM_MOVE_LEFT;
                 col--;
             }else{
-                action = KeyboardEntryAction::NORM_MOVE_RIGHT;
+                action = CodeEntryAction::NORM_MOVE_RIGHT;
                 col++;
             }
         }
@@ -225,24 +164,24 @@ std::vector<KeyboardEntryAction> keyboard_get_path(
         //  Wrap around the sides.
         if (col == (uint8_t)-1){
             col = 11;
-            action = (KeyboardEntryAction)((uint8_t)action | 0x80);
+            action = (CodeEntryAction)((uint8_t)action | 0x80);
         }
         if (col == 12){
             col = 0;
-            action = (KeyboardEntryAction)((uint8_t)action | 0x80);
+            action = (CodeEntryAction)((uint8_t)action | 0x80);
         }
 
         path.emplace_back(action);
     }
 
-    path.emplace_back(KeyboardEntryAction::ENTER_CHAR);
+    path.emplace_back(CodeEntryAction::ENTER_CHAR);
 
     return path;
 }
 
 
 //  Get all possible paths from "start" to cover everything [positions, positions + length).
-std::vector<std::vector<KeyboardEntryAction>> keyboard_get_all_paths(
+std::vector<std::vector<CodeEntryAction>> keyboard_get_all_paths(
     KeyboardEntryPosition start,
     const KeyboardEntryPosition* positions, size_t length,
     bool reordering
@@ -251,30 +190,30 @@ std::vector<std::vector<KeyboardEntryAction>> keyboard_get_all_paths(
         return {keyboard_get_path(start, positions[0])};
     }
 
-    std::vector<std::vector<KeyboardEntryAction>> paths;
+    std::vector<std::vector<CodeEntryAction>> paths;
     {
         KeyboardEntryPosition position = positions[0];
-        std::vector<KeyboardEntryAction> current = keyboard_get_path(start, position);
-        std::vector<std::vector<KeyboardEntryAction>> subpaths = keyboard_get_all_paths(
+        std::vector<CodeEntryAction> current = keyboard_get_path(start, position);
+        std::vector<std::vector<CodeEntryAction>> subpaths = keyboard_get_all_paths(
             position,
             positions + 1, length - 1,
             reordering
         );
-        for (std::vector<KeyboardEntryAction>& path : subpaths){
+        for (std::vector<CodeEntryAction>& path : subpaths){
             path.insert(path.begin(), current.begin(), current.end());
             paths.emplace_back(std::move(path));
         }
     }
     if (reordering){
         KeyboardEntryPosition position = positions[length - 1];
-        std::vector<KeyboardEntryAction> current = keyboard_get_path(start, position);
-        current.emplace_back(KeyboardEntryAction::SCROLL_LEFT);
-        std::vector<std::vector<KeyboardEntryAction>> subpaths = keyboard_get_all_paths(
+        std::vector<CodeEntryAction> current = keyboard_get_path(start, position);
+        current.emplace_back(CodeEntryAction::SCROLL_LEFT);
+        std::vector<std::vector<CodeEntryAction>> subpaths = keyboard_get_all_paths(
             position,
             positions, length - 1,
             reordering
         );
-        for (std::vector<KeyboardEntryAction>& path : subpaths){
+        for (std::vector<CodeEntryAction>& path : subpaths){
             path.insert(path.begin(), current.begin(), current.end());
             paths.emplace_back(std::move(path));
         }
@@ -284,75 +223,23 @@ std::vector<std::vector<KeyboardEntryAction>> keyboard_get_all_paths(
 }
 
 
-//  Given a path, optimize it and fully populate the delays.
-void keyboard_populate_delays(
-    std::vector<KeyboardEntryActionWithDelay>& path_with_delays,
-    const std::vector<KeyboardEntryAction>& path,
-    const KeyboardEntryDelays& delays,
-    bool optimize
-){
-    //  Populate and assign default delays first.
-    path_with_delays.resize(path.size());
-    for (size_t c = 0; c < path_with_delays.size(); c++){
-        KeyboardEntryAction action = path[c];
-        Milliseconds delay = is_button_press(action)
-            ? delays.press_delay
-            : delays.move_delay;
-
-        //  If we are wrapping and the previous action is a move, then we can't
-        //  overlap.
-        if (is_wrap(action) && c != 0){
-            KeyboardEntryActionWithDelay& previous = path_with_delays[c - 1];
-            if (is_move(previous.action)){
-                previous.delay = delays.hold;
-            }
-        }
-
-        path_with_delays[c].action = action;
-        path_with_delays[c].delay = delay;
-    }
-
-    //  Optimize
-
-    if (!optimize || path_with_delays.empty()){
-        return;
-    }
-
-    //  These only work on the Switch 1.
-    for (size_t c = 1; c < path_with_delays.size(); c++){
-        //  Zero the delay for any L press.
-        KeyboardEntryActionWithDelay& current = path_with_delays[c];
-        if (current.action == KeyboardEntryAction::SCROLL_LEFT){
-            current.delay = 0ms;
-            continue;
-        }
-
-        //  Zero the delay for any scroll immediately preceding an A press.
-        KeyboardEntryActionWithDelay& previous = path_with_delays[c - 1];
-        if (current.action == KeyboardEntryAction::ENTER_CHAR &&
-            previous.action != KeyboardEntryAction::ENTER_CHAR &&
-            previous.action != KeyboardEntryAction::SCROLL_LEFT
-        ){
-            previous.delay = 0ms;
-        }
-    }
-}
 
 
 //  Given a set of paths, find the best one and return it with fully populated
 //  delays.
-std::vector<KeyboardEntryActionWithDelay> keyboard_get_best_path(
-    const std::vector<std::vector<KeyboardEntryAction>>& paths,
-    const KeyboardEntryDelays& delays,
+std::vector<CodeEntryActionWithDelay> keyboard_get_best_path(
+    bool switch2,
+    const std::vector<std::vector<CodeEntryAction>>& paths,
+    const CodeEntryDelays& delays,
     bool optimize
 ){
-    std::vector<KeyboardEntryActionWithDelay> best_path;
+    std::vector<CodeEntryActionWithDelay> best_path;
     Milliseconds best_time = Milliseconds::max();
-    for (const std::vector<KeyboardEntryAction>& path : paths){
-        std::vector<KeyboardEntryActionWithDelay> current_path;
-        keyboard_populate_delays(current_path, path, delays, optimize);
+    for (const std::vector<CodeEntryAction>& path : paths){
+        std::vector<CodeEntryActionWithDelay> current_path;
+        codeboard_populate_delays(switch2, current_path, path, delays, optimize);
         Milliseconds current_time = 0ms;
-        for (KeyboardEntryActionWithDelay& action : current_path){
+        for (CodeEntryActionWithDelay& action : current_path){
             current_time += action.delay;
         }
         if (best_time > current_time){
@@ -363,31 +250,6 @@ std::vector<KeyboardEntryActionWithDelay> keyboard_get_best_path(
     return best_path;
 }
 
-
-//  Actually execute a path and enter it into the Switch.
-void keyboard_execute_path(
-    ProControllerContext& context,
-    const KeyboardEntryDelays& delays,
-    const std::vector<KeyboardEntryActionWithDelay>& path
-){
-    for (const KeyboardEntryActionWithDelay& action : path){
-        switch (action.action){
-        case KeyboardEntryAction::ENTER_CHAR:
-            ssf_press_button(context, BUTTON_A, action.delay, delays.hold, delays.cool);
-            break;
-        case KeyboardEntryAction::SCROLL_LEFT:
-            ssf_press_button(context, BUTTON_L, action.delay, delays.hold, delays.cool);
-            break;
-        default:
-            ssf_issue_scroll(
-                context,
-                (DpadPosition)((uint8_t)action.action & 0x7f),
-                action.delay, delays.hold, delays.cool
-            );
-            break;
-        }
-    }
-}
 
 
 
@@ -457,29 +319,31 @@ void keyboard_enter_code(
     Milliseconds tv = context->timing_variation();
     unit += tv;
 
-    KeyboardEntryDelays delays{
+    CodeEntryDelays delays{
         .hold = hold,
         .cool = cool,
         .press_delay = unit,
         .move_delay = unit,
+        .scroll_delay = unit,
         .wrap_delay = 2*unit,
     };
 
     //  Get all the possible paths.
-    std::vector<std::vector<KeyboardEntryAction>> all_paths = keyboard_get_all_paths(
+    std::vector<std::vector<CodeEntryAction>> all_paths = keyboard_get_all_paths(
         {0, 0},
         positions.data(), positions.size(),
         reordering
     );
 
     //  Pick the best path.
-    std::vector<KeyboardEntryActionWithDelay> best_path = keyboard_get_best_path(
+    std::vector<CodeEntryActionWithDelay> best_path = keyboard_get_best_path(
+        switch2,
         all_paths,
         delays,
         !switch2 && context->atomic_multibutton()
     );
 
-    keyboard_execute_path(context, delays, best_path);
+    codeboard_execute_path(context, delays, best_path);
 
     if (include_plus){
         ssf_press_button_ptv(context, BUTTON_PLUS);
@@ -500,6 +364,6 @@ void keyboard_enter_code(
 
 
 
-
+}
 }
 }

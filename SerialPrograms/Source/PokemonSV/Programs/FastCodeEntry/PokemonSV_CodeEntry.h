@@ -9,7 +9,8 @@
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h"
+#include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class CancellableScope;

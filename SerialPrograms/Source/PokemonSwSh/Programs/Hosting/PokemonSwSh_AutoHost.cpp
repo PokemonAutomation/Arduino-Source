@@ -9,7 +9,7 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
+#include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
@@ -176,7 +176,7 @@ void run_autohost(
             }
             env.log("Next Raid Code: " + std::string(str, sizeof(str)));
             pbf_press_button(context, BUTTON_PLUS, 5, 145);
-            numberpad_enter_code(console, context, code, true);
+            FastCodeEntry::numberpad_enter_code(console, context, code, true);
             pbf_wait(context, 180);
             pbf_press_button(context, BUTTON_A, 5, 95);
         }

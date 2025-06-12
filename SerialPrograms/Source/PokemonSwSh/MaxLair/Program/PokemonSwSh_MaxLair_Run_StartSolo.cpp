@@ -6,7 +6,7 @@
 
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
+#include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"
@@ -187,7 +187,7 @@ bool start_raid_host_solo(
     std::string code = settings.RAID_CODE.get_code();
     if (!code.empty()){
         pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
-        numberpad_enter_code(console, context, code, true);
+        FastCodeEntry::numberpad_enter_code(console, context, code, true);
         pbf_wait(context, 2 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         context.wait_for_all_requests();

@@ -1007,18 +1007,20 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h
+    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_CodeEntryTools.cpp
+    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_CodeEntryTools.h
+    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardCodeEntry.cpp
+    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardCodeEntry.h
+    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.cpp
+    Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h
-    Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.cpp
-    Source/NintendoSwitch/Programs/NintendoSwitch_KeyboardCodeEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_MenuStabilityTester.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_MenuStabilityTester.h
-    Source/NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.cpp
-    Source/NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp

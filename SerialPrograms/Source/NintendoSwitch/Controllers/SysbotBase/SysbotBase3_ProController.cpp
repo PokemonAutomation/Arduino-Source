@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 //#include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Controllers/JoystickTools.h"

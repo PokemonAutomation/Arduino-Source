@@ -7,7 +7,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_NumberCodeEntry.h"
+#include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
@@ -115,7 +115,7 @@ void TradeBot::trade_slot(
     ssf_press_button1(context, BUTTON_A, 5);
     ssf_press_button1(context, BUTTON_B, 5);
 
-    numberpad_enter_code(console, context, code, true);
+    FastCodeEntry::numberpad_enter_code(console, context, code, true);
     ssf_press_button1(context, BUTTON_PLUS, 200);
     ssf_press_button2(context, BUTTON_B, 125, 10);
     ssf_press_button2(context, BUTTON_A, 50, 10);
