@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_AbstractBotBase_H
 #define PokemonAutomation_AbstractBotBase_H
 
+#include <string>
 #include "Common/Cpp/CancellableScope.h"
 
 namespace PokemonAutomation{
