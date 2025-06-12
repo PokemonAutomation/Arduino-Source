@@ -210,15 +210,15 @@ double VideoSession::fps_display() const{
 }
 void VideoSession::on_frame(std::shared_ptr<const VideoFrame> frame){
     m_frame_listeners.run_method_unique(&VideoFrameListener::on_frame, frame);
-    WriteSpinLock lg(m_fps_lock);
-    m_fps_tracker_source.push_event(frame->timestamp);
-}
-void VideoSession::on_rendered_frame(WallClock timestamp){
     {
         WriteSpinLock lg(m_fps_lock);
-        m_fps_tracker_rendered.push_event(timestamp);
+        m_fps_tracker_source.push_event(frame->timestamp);
     }
     global_watchdog().delay(*this);
+}
+void VideoSession::on_rendered_frame(WallClock timestamp){
+    WriteSpinLock lg(m_fps_lock);
+    m_fps_tracker_rendered.push_event(timestamp);
 }
 
 

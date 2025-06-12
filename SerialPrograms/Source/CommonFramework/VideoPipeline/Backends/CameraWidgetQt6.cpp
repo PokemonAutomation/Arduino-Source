@@ -162,6 +162,7 @@ CameraVideoSource::CameraVideoSource(
             WallClock now = current_time();
             {
                 WriteSpinLock lg(m_frame_lock);
+//                cout << now << endl;
                 m_last_frame = frame;
                 m_last_frame_timestamp = now;
                 uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_relaxed);
