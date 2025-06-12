@@ -137,7 +137,7 @@ const char* normalize_code(std::string& normalized_code, const std::string& code
 }
 
 void enter_code(
-    Logger& logger, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     KeyboardLayout keyboard_layout,
     const std::string& normalized_code, bool force_keyboard_mode,
     bool include_plus,
@@ -150,7 +150,7 @@ void enter_code(
 
     if (force_keyboard_mode){
         keyboard_enter_code(
-            logger, context, keyboard_layout,
+            console, context, keyboard_layout,
             normalized_code, include_plus
         );
         return;
@@ -159,17 +159,17 @@ void enter_code(
     switch (normalized_code.size()){
     case 4:
 //        enter_digits_str(context, 4, normalized_code.c_str());
-        numberpad_enter_code(logger, context, normalized_code, include_plus);
+        numberpad_enter_code(console, context, normalized_code, include_plus);
         break;
     case 6:
         keyboard_enter_code(
-            logger, context, keyboard_layout,
+            console, context, keyboard_layout,
             normalized_code, include_plus
         );
         break;
     case 8:
 //        enter_digits_str(context, 8, normalized_code.c_str());
-        numberpad_enter_code(logger, context, normalized_code, include_plus);
+        numberpad_enter_code(console, context, normalized_code, include_plus);
         break;
     }
 }
@@ -187,7 +187,7 @@ const char* enter_code(
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         enter_code(
-            console.logger(), context,
+            console, context,
             settings.keyboard_layout[console.index()],
             normalized_code, force_keyboard_mode,
             !settings.skip_plus,

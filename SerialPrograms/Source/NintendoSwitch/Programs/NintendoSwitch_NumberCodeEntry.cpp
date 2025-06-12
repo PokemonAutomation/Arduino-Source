@@ -168,7 +168,7 @@ std::vector<std::vector<NumberEntryAction>> numberpad_get_all_paths(
 
 
 //  Given a path, optimize it and fully populate the delays.
-Milliseconds numberpad_populate_delays(
+void numberpad_populate_delays(
     std::vector<NumberEntryActionWithDelay>& path_with_delays,
     const std::vector<NumberEntryAction>& path,
     const NumberEntryDelays& delays,
@@ -187,32 +187,29 @@ Milliseconds numberpad_populate_delays(
     }
 
     //  Optimize
-    if (optimize){
-        for (size_t c = 1; c < path_with_delays.size(); c++){
-            //  Zero the delay for any L press.
-            NumberEntryActionWithDelay& current = path_with_delays[c];
-            if (current.action == NumberEntryAction::SCROLL_LEFT){
-                current.delay = 0ms;
-                continue;
-            }
 
-            //  Zero the delay for any scroll immediately preceding an A press.
-            NumberEntryActionWithDelay& previous = path_with_delays[c - 1];
-            if (current.action == NumberEntryAction::ENTER_CHAR &&
-                previous.action != NumberEntryAction::ENTER_CHAR &&
-                previous.action != NumberEntryAction::SCROLL_LEFT
-            ){
-                previous.delay = 0ms;
-            }
+    if (!optimize || path_with_delays.empty()){
+        return;
+    }
+
+    //  These only work on the Switch 1.
+    for (size_t c = 1; c < path_with_delays.size(); c++){
+        //  Zero the delay for any L press.
+        NumberEntryActionWithDelay& current = path_with_delays[c];
+        if (current.action == NumberEntryAction::SCROLL_LEFT){
+            current.delay = 0ms;
+            continue;
+        }
+
+        //  Zero the delay for any scroll immediately preceding an A press.
+        NumberEntryActionWithDelay& previous = path_with_delays[c - 1];
+        if (current.action == NumberEntryAction::ENTER_CHAR &&
+            previous.action != NumberEntryAction::ENTER_CHAR &&
+            previous.action != NumberEntryAction::SCROLL_LEFT
+        ){
+            previous.delay = 0ms;
         }
     }
-
-    Milliseconds total = 0ms;
-    for (NumberEntryActionWithDelay& action : path_with_delays){
-        total += action.delay;
-    }
-
-    return total;
 }
 
 
@@ -227,7 +224,11 @@ std::vector<NumberEntryActionWithDelay> keyboard_get_best_path(
     Milliseconds best_time = Milliseconds::max();
     for (const std::vector<NumberEntryAction>& path : paths){
         std::vector<NumberEntryActionWithDelay> current_path;
-        Milliseconds current_time = numberpad_populate_delays(current_path, path, delays, optimize);
+        numberpad_populate_delays(current_path, path, delays, optimize);
+        Milliseconds current_time = 0ms;
+        for (NumberEntryActionWithDelay& action : current_path){
+            current_time += action.delay;
+        }
         if (best_time > current_time){
             best_time = current_time;
             best_path = std::move(current_path);
@@ -265,7 +266,7 @@ void keyboard_execute_path(
 
 
 void numberpad_enter_code(
-    Logger& logger, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     const std::string& code,
     bool include_plus
 ){
@@ -276,7 +277,7 @@ void numberpad_enter_code(
         auto iter = POSITION_MAP.find(ch);
         if (iter == POSITION_MAP.end()){
             throw_and_log<OperationFailedException>(
-                logger, ErrorReport::NO_ERROR_REPORT,
+                console, ErrorReport::NO_ERROR_REPORT,
                 "Invalid code character."
             );
         }
@@ -284,15 +285,44 @@ void numberpad_enter_code(
     }
 
 
+    ConsoleType console_type = console.state().console_type();
+    bool switch2;
+    if (console_type == ConsoleType::Switch1){
+        switch2 = false;
+    }else if (is_switch2(console_type)){
+        switch2 = true;
+    }else{
+        throw UserSetupError(
+            console,
+            "Please select a valid Switch console type."
+        );
+    }
+
+
     //  Fetch the delays.
 
-    Milliseconds unit = ConsoleSettings::instance().DIGIT_ENTRY.TIME_UNIT;
+    Milliseconds unit;
+    Milliseconds hold;
+    Milliseconds cool;
+    bool reordering;
+    if (switch2){
+        unit        = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY.TIME_UNIT;
+        hold        = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY.HOLD;
+        cool        = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY.COOLDOWN;
+        reordering  = ConsoleSettings::instance().SWITCH2_DIGIT_ENTRY.REORDERING;
+    }else{
+        unit        = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY.TIME_UNIT;
+        hold        = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY.HOLD;
+        cool        = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY.COOLDOWN;
+        reordering  = ConsoleSettings::instance().SWITCH1_DIGIT_ENTRY.REORDERING;
+    }
+
     Milliseconds tv = context->timing_variation();
     unit += tv;
 
     NumberEntryDelays delays{
-        .hold = 2*unit,
-        .cool = unit,
+        .hold = hold,
+        .cool = cool,
         .press_delay = unit,
         .move_delay = unit,
     };
@@ -302,14 +332,14 @@ void numberpad_enter_code(
     std::vector<std::vector<NumberEntryAction>> all_paths = numberpad_get_all_paths(
         {0, 0},
         positions.data(), positions.size(),
-        ConsoleSettings::instance().DIGIT_ENTRY.DIGIT_REORDERING
+        reordering
     );
 
     //  Pick the best path.
     std::vector<NumberEntryActionWithDelay> best_path = keyboard_get_best_path(
         all_paths,
         delays,
-        context->atomic_multibutton()
+        !switch2 && context->atomic_multibutton()
     );
 
     keyboard_execute_path(context, delays, best_path);

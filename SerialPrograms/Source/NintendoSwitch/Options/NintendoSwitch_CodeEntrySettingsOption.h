@@ -38,20 +38,24 @@ public:
 
 class DigitEntryTimingsOption : public GroupOption{
 public:
-    DigitEntryTimingsOption();
+    DigitEntryTimingsOption(bool switch2);
 
 public:
-    BooleanCheckBoxOption DIGIT_REORDERING;
+    BooleanCheckBoxOption REORDERING;
     MillisecondsOption TIME_UNIT;
+    MillisecondsOption HOLD;
+    MillisecondsOption COOLDOWN;
 };
 
 class KeyboardEntryTimingsOption : public GroupOption{
 public:
-    KeyboardEntryTimingsOption();
+    KeyboardEntryTimingsOption(bool switch2);
 
 public:
-    BooleanCheckBoxOption DIGIT_REORDERING;
+    BooleanCheckBoxOption REORDERING;
     MillisecondsOption TIME_UNIT;
+    MillisecondsOption HOLD;
+    MillisecondsOption COOLDOWN;
 };
 
 

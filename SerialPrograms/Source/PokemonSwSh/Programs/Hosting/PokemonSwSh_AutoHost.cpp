@@ -176,7 +176,7 @@ void run_autohost(
             }
             env.log("Next Raid Code: " + std::string(str, sizeof(str)));
             pbf_press_button(context, BUTTON_PLUS, 5, 145);
-            numberpad_enter_code(console.logger(), context, code, true);
+            numberpad_enter_code(console, context, code, true);
             pbf_wait(context, 180);
             pbf_press_button(context, BUTTON_A, 5, 95);
         }

@@ -96,6 +96,10 @@ ConsoleSettings::ConsoleSettings()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , SWITCH1_DIGIT_ENTRY(false)
+    , SWITCH1_KEYBOARD_ENTRY(false)
+    , SWITCH2_DIGIT_ENTRY(true)
+    , SWITCH2_KEYBOARD_ENTRY(true)
     , KEYBOARD_SECTION("<font size=4><b>Keyboard to Controller Mappings:</b></font>")
 {
     PA_ADD_OPTION(CONTROLLER_SETTINGS);
@@ -106,8 +110,10 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     PA_ADD_OPTION(TIMING_OPTIONS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(DIGIT_ENTRY);
-        PA_ADD_OPTION(KEYBOARD_ENTRY);
+        PA_ADD_OPTION(SWITCH1_DIGIT_ENTRY);
+        PA_ADD_OPTION(SWITCH1_KEYBOARD_ENTRY);
+        PA_ADD_OPTION(SWITCH2_DIGIT_ENTRY);
+        PA_ADD_OPTION(SWITCH2_KEYBOARD_ENTRY);
     }
     PA_ADD_STATIC(KEYBOARD_SECTION);
     PA_ADD_OPTION(KEYBOARD_MAPPINGS);

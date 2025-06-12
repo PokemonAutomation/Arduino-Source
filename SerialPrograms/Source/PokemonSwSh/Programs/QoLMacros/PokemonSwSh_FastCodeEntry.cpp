@@ -53,7 +53,7 @@ void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
     pbf_press_button(context, BUTTON_PLUS, 5, 5);
     pbf_press_button(context, BUTTON_PLUS, 5, 5);
-    numberpad_enter_code(env.logger(), context, code, true);
+    numberpad_enter_code(env.console, context, code, true);
 }
 
 

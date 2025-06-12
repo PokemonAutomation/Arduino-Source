@@ -35,7 +35,7 @@ public:
 
 private:
     void trade_slot(
-        Logger& logger, ProControllerContext& context,
+        ConsoleHandle& console, ProControllerContext& context,
         const std::string& code, uint8_t slot
     ) const;
 

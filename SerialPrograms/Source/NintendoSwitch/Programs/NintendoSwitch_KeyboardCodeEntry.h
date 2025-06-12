@@ -10,6 +10,7 @@
 #include <string>
 #include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -18,7 +19,7 @@ namespace NintendoSwitch{
 
 
 void keyboard_enter_code(
-    Logger& logger, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     KeyboardLayout keyboard_layout, const std::string& code,
     bool include_plus
 );

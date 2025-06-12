@@ -50,8 +50,10 @@ public:
 
     TimingOptions TIMING_OPTIONS;
 
-    DigitEntryTimingsOption DIGIT_ENTRY;
-    KeyboardEntryTimingsOption KEYBOARD_ENTRY;
+    DigitEntryTimingsOption     SWITCH1_DIGIT_ENTRY;
+    KeyboardEntryTimingsOption  SWITCH1_KEYBOARD_ENTRY;
+    DigitEntryTimingsOption     SWITCH2_DIGIT_ENTRY;
+    KeyboardEntryTimingsOption  SWITCH2_KEYBOARD_ENTRY;
 
     SectionDividerOption KEYBOARD_SECTION;
     KeyboardMappingOption KEYBOARD_MAPPINGS;

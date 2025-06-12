@@ -177,7 +177,7 @@ bool start_raid_local(
         //  Enter code.
         if (!code.empty() && env.consoles.size() > 1){
             pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
-            numberpad_enter_code(console.logger(), context, code, true);
+            numberpad_enter_code(console, context, code, true);
             pbf_wait(context, 2 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         }
@@ -332,7 +332,7 @@ bool start_raid_host(
         //  Enter Code
         if (!code.empty()){
             pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
-            numberpad_enter_code(console.logger(), context, code, true);
+            numberpad_enter_code(console, context, code, true);
             pbf_wait(context, 2 * TICKS_PER_SECOND);
             pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         }

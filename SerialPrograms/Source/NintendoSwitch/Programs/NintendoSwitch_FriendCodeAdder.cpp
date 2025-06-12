@@ -83,7 +83,7 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, ProController
         first = false;
 
         ssf_press_button_ptv(context, BUTTON_A, OPEN_CODE_PAD_DELAY0);
-        numberpad_enter_code(env.logger(), context, code, true);
+        numberpad_enter_code(env.console, context, code, true);
 
         pbf_wait(context, SEARCH_TIME0);
         ssf_press_button(context, BUTTON_A, TOGGLE_BEST_STATUS_DELAY0);

@@ -100,7 +100,7 @@ TradeBot::TradeBot()
 
 
 void TradeBot::trade_slot(
-    Logger& logger, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     const std::string& code, uint8_t slot
 ) const{
     ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 400ms);
@@ -115,7 +115,7 @@ void TradeBot::trade_slot(
     ssf_press_button1(context, BUTTON_A, 5);
     ssf_press_button1(context, BUTTON_B, 5);
 
-    numberpad_enter_code(logger, context, code, true);
+    numberpad_enter_code(console, context, code, true);
     ssf_press_button1(context, BUTTON_PLUS, 200);
     ssf_press_button2(context, BUTTON_B, 125, 10);
     ssf_press_button2(context, BUTTON_A, 50, 10);
@@ -165,7 +165,7 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env, ProControllerContext
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         for (uint8_t c = 0; c < 30; c++){
-            trade_slot(env.logger(), context, code, c);
+            trade_slot(env.console, context, code, c);
         }
 
         //  If the previous trade isn't done, either wait to finish or cancel it.

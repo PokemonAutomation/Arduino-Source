@@ -9,6 +9,7 @@
 
 #include <string>
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{
     class Logger;
@@ -17,7 +18,7 @@ namespace NintendoSwitch{
 
 
 void numberpad_enter_code(
-    Logger& logger, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     const std::string& code,
     bool include_plus
 );

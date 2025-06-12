@@ -325,6 +325,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+
+    ssf_press_button(context, BUTTON_L, 0ms, 48ms, 24ms);
+    ssf_issue_scroll(context, DPAD_LEFT, 48ms, 48ms, 24ms);
+
+
 #if 0
     DateReader reader;
     reader.make_overlays(overlays);
@@ -357,7 +362,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
     DateReader reader(console);
     reader.make_overlays(overlays);
     DateTime date = reader.read_date(logger, feed.snapshot()).second;

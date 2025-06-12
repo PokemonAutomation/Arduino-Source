@@ -155,7 +155,7 @@ bool start_raid_self_solo(
 }
 
 bool start_raid_host_solo(
-    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
     HostingSettings& settings,
@@ -163,7 +163,7 @@ bool start_raid_host_solo(
     const StatsTracker& session_stats,
     ReadableQuantity999& ore
 ){
-    stream.log("Entering lobby...");
+    console.log("Entering lobby...");
 
     GlobalState& state = state_tracker[0];
 
@@ -172,7 +172,7 @@ bool start_raid_host_solo(
 
     //  Enter lobby.
     entrance = enter_lobby(
-        stream, context, boss_slot,
+        console, context, boss_slot,
         settings.MODE == HostingMode::HOST_ONLINE,
         ore
     );
@@ -181,13 +181,13 @@ bool start_raid_host_solo(
     }
 
     //  Read boss.
-    state.boss = read_boss_sprite(stream);
+    state.boss = read_boss_sprite(console);
 
     //  Enter code.
     std::string code = settings.RAID_CODE.get_code();
     if (!code.empty()){
         pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
-        numberpad_enter_code(env.logger(), context, code, true);
+        numberpad_enter_code(console, context, code, true);
         pbf_wait(context, 2 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         context.wait_for_all_requests();
@@ -195,7 +195,7 @@ bool start_raid_host_solo(
 
     send_raid_notification(
         env,
-        stream,
+        console,
         settings.NOTIFICATIONS,
         code,
         state.boss,
@@ -208,9 +208,9 @@ bool start_raid_host_solo(
 
     auto time_limit = current_time() + settings.LOBBY_WAIT_DELAY0.get();
 
-    if (!wait_for_a_player(stream, context, *entrance, time_limit)){
+    if (!wait_for_a_player(console, context, *entrance, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
-        return start_raid_self_solo(stream, context, state_tracker, entrance, boss_slot, ore);
+        return start_raid_self_solo(console, context, state_tracker, entrance, boss_slot, ore);
     }
 
     //  Ready up.
@@ -219,14 +219,14 @@ bool start_raid_host_solo(
     context.wait_for_all_requests();
 
     //  Wait
-    if (!wait_for_lobby_ready(stream, context, *entrance, 1, 4, time_limit)){
+    if (!wait_for_lobby_ready(console, context, *entrance, 1, 4, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }
 
     //  Start
     context.wait_for_all_requests();
-    if (!start_adventure(stream, context, 1)){
+    if (!start_adventure(console, context, 1)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }

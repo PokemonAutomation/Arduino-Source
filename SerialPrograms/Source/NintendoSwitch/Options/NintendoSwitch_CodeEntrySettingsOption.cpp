@@ -47,13 +47,15 @@ CodeEntrySkipPlusOption::CodeEntrySkipPlusOption()
 
 
 
-DigitEntryTimingsOption::DigitEntryTimingsOption()
+DigitEntryTimingsOption::DigitEntryTimingsOption(bool switch2)
     : GroupOption(
-        "Digit Entry Timings",
+        switch2
+            ? "Switch 2 Digit Entry Timings"
+            : "Switch 1 Digit Entry Timings",
         LockMode::UNLOCK_WHILE_RUNNING,
         GroupOption::EnableMode::ALWAYS_ENABLED, true
     )
-    , DIGIT_REORDERING(
+    , REORDERING(
         "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
@@ -62,23 +64,41 @@ DigitEntryTimingsOption::DigitEntryTimingsOption()
         "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.<br>"
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
+        switch2
+            ? "48ms"
+            : PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
+    )
+    , HOLD(
+        "<b>Hold:</b><br>Duration to hold each button press down.<br>"
+        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        PreloadSettings::instance().DEVELOPER_MODE ? "48 ms" : "80ms"
+    )
+    , COOLDOWN(
+        "<b>Hold:</b><br>Do not reuse a button until this long after it is reused.<br>"
+        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
+        LockMode::UNLOCK_WHILE_RUNNING,
         PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
     )
 {
-    PA_ADD_OPTION(DIGIT_REORDERING);
+    PA_ADD_OPTION(REORDERING);
     PA_ADD_OPTION(TIME_UNIT);
+    PA_ADD_OPTION(HOLD);
+    PA_ADD_OPTION(COOLDOWN);
 }
 
 
 
-KeyboardEntryTimingsOption::KeyboardEntryTimingsOption()
+KeyboardEntryTimingsOption::KeyboardEntryTimingsOption(bool switch2)
     : GroupOption(
-        "Keyboard Entry Timings",
+        switch2
+            ? "Switch 2 Keyboard Entry Timings"
+            : "Switch 1 Keyboard Entry Timings",
         LockMode::UNLOCK_WHILE_RUNNING,
         GroupOption::EnableMode::ALWAYS_ENABLED, true
     )
-    , DIGIT_REORDERING(
-        "<b>Digit Reordering:</b><br>Allow digits to be entered out of order.",
+    , REORDERING(
+        "<b>Character Reordering:</b><br>Allow characters to be entered out of order.",
         LockMode::UNLOCK_WHILE_RUNNING,
         PreloadSettings::instance().DEVELOPER_MODE
     )
@@ -86,11 +106,27 @@ KeyboardEntryTimingsOption::KeyboardEntryTimingsOption()
         "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.<br>"
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
+        switch2
+            ? "48ms"
+            : PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
+    )
+    , HOLD(
+        "<b>Hold:</b><br>Duration to hold each button press down.<br>"
+        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        PreloadSettings::instance().DEVELOPER_MODE ? "48 ms" : "80ms"
+    )
+    , COOLDOWN(
+        "<b>Hold:</b><br>Do not reuse a button until this long after it is reused.<br>"
+        "<font color=\"red\">Controller timing variation will be added to this number.</font>",
+        LockMode::UNLOCK_WHILE_RUNNING,
         PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
     )
 {
-    PA_ADD_OPTION(DIGIT_REORDERING);
+    PA_ADD_OPTION(REORDERING);
     PA_ADD_OPTION(TIME_UNIT);
+    PA_ADD_OPTION(HOLD);
+    PA_ADD_OPTION(COOLDOWN);
 }
 
 

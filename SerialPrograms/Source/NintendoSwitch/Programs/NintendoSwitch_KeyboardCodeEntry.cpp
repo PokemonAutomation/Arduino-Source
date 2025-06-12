@@ -285,7 +285,7 @@ std::vector<std::vector<KeyboardEntryAction>> keyboard_get_all_paths(
 
 
 //  Given a path, optimize it and fully populate the delays.
-Milliseconds keyboard_populate_delays(
+void keyboard_populate_delays(
     std::vector<KeyboardEntryActionWithDelay>& path_with_delays,
     const std::vector<KeyboardEntryAction>& path,
     const KeyboardEntryDelays& delays,
@@ -313,32 +313,29 @@ Milliseconds keyboard_populate_delays(
     }
 
     //  Optimize
-    if (optimize){
-        for (size_t c = 1; c < path_with_delays.size(); c++){
-            //  Zero the delay for any L press.
-            KeyboardEntryActionWithDelay& current = path_with_delays[c];
-            if (current.action == KeyboardEntryAction::SCROLL_LEFT){
-                current.delay = 0ms;
-                continue;
-            }
 
-            //  Zero the delay for any scroll immediately preceding an A press.
-            KeyboardEntryActionWithDelay& previous = path_with_delays[c - 1];
-            if (current.action == KeyboardEntryAction::ENTER_CHAR &&
-                previous.action != KeyboardEntryAction::ENTER_CHAR &&
-                previous.action != KeyboardEntryAction::SCROLL_LEFT
-            ){
-                previous.delay = 0ms;
-            }
+    if (!optimize || path_with_delays.empty()){
+        return;
+    }
+
+    //  These only work on the Switch 1.
+    for (size_t c = 1; c < path_with_delays.size(); c++){
+        //  Zero the delay for any L press.
+        KeyboardEntryActionWithDelay& current = path_with_delays[c];
+        if (current.action == KeyboardEntryAction::SCROLL_LEFT){
+            current.delay = 0ms;
+            continue;
+        }
+
+        //  Zero the delay for any scroll immediately preceding an A press.
+        KeyboardEntryActionWithDelay& previous = path_with_delays[c - 1];
+        if (current.action == KeyboardEntryAction::ENTER_CHAR &&
+            previous.action != KeyboardEntryAction::ENTER_CHAR &&
+            previous.action != KeyboardEntryAction::SCROLL_LEFT
+        ){
+            previous.delay = 0ms;
         }
     }
-
-    Milliseconds total = 0ms;
-    for (KeyboardEntryActionWithDelay& action : path_with_delays){
-        total += action.delay;
-    }
-
-    return total;
 }
 
 
@@ -353,7 +350,11 @@ std::vector<KeyboardEntryActionWithDelay> keyboard_get_best_path(
     Milliseconds best_time = Milliseconds::max();
     for (const std::vector<KeyboardEntryAction>& path : paths){
         std::vector<KeyboardEntryActionWithDelay> current_path;
-        Milliseconds current_time = keyboard_populate_delays(current_path, path, delays, optimize);
+        keyboard_populate_delays(current_path, path, delays, optimize);
+        Milliseconds current_time = 0ms;
+        for (KeyboardEntryActionWithDelay& action : current_path){
+            current_time += action.delay;
+        }
         if (best_time > current_time){
             best_time = current_time;
             best_path = std::move(current_path);
@@ -391,7 +392,7 @@ void keyboard_execute_path(
 
 
 void keyboard_enter_code(
-    Logger& logger, ProControllerContext& context,
+    ConsoleHandle& console, ProControllerContext& context,
     KeyboardLayout keyboard_layout, const std::string& code,
     bool include_plus
 ){
@@ -413,7 +414,7 @@ void keyboard_enter_code(
         auto iter = POSITION_MAP.find(ch);
         if (iter == POSITION_MAP.end()){
             throw_and_log<OperationFailedException>(
-                logger, ErrorReport::NO_ERROR_REPORT,
+                console, ErrorReport::NO_ERROR_REPORT,
                 "Invalid code character."
             );
         }
@@ -421,15 +422,44 @@ void keyboard_enter_code(
     }
 
 
+    ConsoleType console_type = console.state().console_type();
+    bool switch2;
+    if (console_type == ConsoleType::Switch1){
+        switch2 = false;
+    }else if (is_switch2(console_type)){
+        switch2 = true;
+    }else{
+        throw UserSetupError(
+            console,
+            "Please select a valid Switch console type."
+        );
+    }
+
+
     //  Compute the delays.
 
-    Milliseconds unit = ConsoleSettings::instance().KEYBOARD_ENTRY.TIME_UNIT;
+    Milliseconds unit;
+    Milliseconds hold;
+    Milliseconds cool;
+    bool reordering;
+    if (switch2){
+        unit        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY.TIME_UNIT;
+        hold        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY.HOLD;
+        cool        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY.COOLDOWN;
+        reordering  = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY.REORDERING;
+    }else{
+        unit        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY.TIME_UNIT;
+        hold        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY.HOLD;
+        cool        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY.COOLDOWN;
+        reordering  = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY.REORDERING;
+    }
+
     Milliseconds tv = context->timing_variation();
     unit += tv;
 
     KeyboardEntryDelays delays{
-        .hold = 2*unit,
-        .cool = unit,
+        .hold = hold,
+        .cool = cool,
         .press_delay = unit,
         .move_delay = unit,
         .wrap_delay = 2*unit,
@@ -439,14 +469,14 @@ void keyboard_enter_code(
     std::vector<std::vector<KeyboardEntryAction>> all_paths = keyboard_get_all_paths(
         {0, 0},
         positions.data(), positions.size(),
-        ConsoleSettings::instance().KEYBOARD_ENTRY.DIGIT_REORDERING
+        reordering
     );
 
     //  Pick the best path.
     std::vector<KeyboardEntryActionWithDelay> best_path = keyboard_get_best_path(
         all_paths,
         delays,
-        context->atomic_multibutton()
+        !switch2 && context->atomic_multibutton()
     );
 
     keyboard_execute_path(context, delays, best_path);
