@@ -48,7 +48,7 @@ const ControllerFeatures& ProController_SysbotBase3::controller_features() const
 void ProController_SysbotBase3::cancel_all_commands(){
     std::lock_guard<std::mutex> lg(m_state_lock);
     if (m_stopping){
-        throw InvalidConnectionStateException();
+        throw InvalidConnectionStateException("");
     }
 
     uint64_t queued = m_next_seqnum - m_next_expected_seqnum_ack;
@@ -63,7 +63,7 @@ void ProController_SysbotBase3::cancel_all_commands(){
 void ProController_SysbotBase3::replace_on_next_command(){
     std::lock_guard<std::mutex> lg(m_state_lock);
     if (m_stopping){
-        throw InvalidConnectionStateException();
+        throw InvalidConnectionStateException("");
     }
 
     uint64_t queued = m_next_seqnum - m_next_expected_seqnum_ack;
@@ -79,7 +79,7 @@ void ProController_SysbotBase3::wait_for_all(const Cancellable* cancellable){
     std::unique_lock<std::mutex> lg(m_state_lock);
     while (true){
         if (m_stopping){
-            throw InvalidConnectionStateException();
+            throw InvalidConnectionStateException("");
         }
         if (cancellable){
             cancellable->throw_if_cancelled();
@@ -144,7 +144,7 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
         cancellable->throw_if_cancelled();
     }
     if (m_stopping){
-        throw InvalidConnectionStateException();
+        throw InvalidConnectionStateException("");
     }
 
     //  Flags map to: https://github.com/switchbrew/libnx/blob/master/nx/include/switch/services/hid.h#L584

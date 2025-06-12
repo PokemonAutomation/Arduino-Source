@@ -31,6 +31,7 @@ public:
 
 public:
     virtual ~BotBaseController() = default;
+    virtual void stop(std::string error_message = "") = 0;
 
     virtual Logger& logger() = 0;
     virtual State state() const = 0;

@@ -56,7 +56,7 @@ SerialPABotBase_Controller::SerialPABotBase_Controller(
 void SerialPABotBase_Controller::cancel_all_commands(){
     std::lock_guard<std::mutex> lg(m_state_lock);
     if (!is_ready()){
-        throw InvalidConnectionStateException();
+        throw InvalidConnectionStateException(error_string());
     }
     m_serial->stop_all_commands();
     this->clear_on_next();
@@ -64,7 +64,7 @@ void SerialPABotBase_Controller::cancel_all_commands(){
 void SerialPABotBase_Controller::replace_on_next_command(){
     std::lock_guard<std::mutex> lg(m_state_lock);
     if (!is_ready()){
-        throw InvalidConnectionStateException();
+        throw InvalidConnectionStateException(error_string());
     }
     m_serial->next_command_interrupt();
     this->clear_on_next();
@@ -82,7 +82,7 @@ void SerialPABotBase_Controller::wait_for_all(const Cancellable* cancellable){
         }
 
         if (!is_ready()){
-            throw InvalidConnectionStateException();
+            throw InvalidConnectionStateException(error_string());
         }
 
         this->issue_wait_for_all(cancellable);

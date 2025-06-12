@@ -32,6 +32,7 @@ public:
     void clear() noexcept;
 
     size_t empty() const{ return m_front == m_back; }
+    size_t full() const{ return m_back - m_front >= m_capacity; }
     size_t size() const{ return m_back - m_front; }
 
     const Object& front() const;

@@ -91,13 +91,18 @@ void PABotBase::connect(){
         SerialPABotBase::DeviceRequest_seqnum_reset(), nullptr
     ).convert<PABB_MSG_ACK_REQUEST>(logger(), response);
 }
-void PABotBase::stop(){
+void PABotBase::stop(std::string error_message){
     auto scope_check = m_sanitizer.check_scope();
 
     //  Make sure only one thread can get in here.
     State expected = State::RUNNING;
     if (!m_state.compare_exchange_strong(expected, State::STOPPING)){
         return;
+    }
+
+    if (!error_message.empty()){
+        ReadSpinLock lg(m_state_lock);
+        m_error_message = std::move(error_message);
     }
 
     //  Wake everyone up.
@@ -149,7 +154,8 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
             throw OperationCancelledException();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
-            throw InvalidConnectionStateException();
+            ReadSpinLock lg0(m_state_lock);
+            throw InvalidConnectionStateException(m_error_message);
         }
         {
             ReadSpinLock lg1(m_state_lock, "PABotBase::wait_for_all_requests()");
@@ -488,8 +494,11 @@ void PABotBase::on_recv_message(BotBaseMessage message){
             return;
         }
         const pabb_MsgInfoInvalidType* params = (const pabb_MsgInfoInvalidType*)message.body.c_str();
-        m_error_message = "PABotBase incompatibility. Device does not recognize message type: " + std::to_string(params->type);
-        m_logger.log(m_error_message, COLOR_RED);
+        {
+            WriteSpinLock lg(m_state_lock);
+            m_error_message = "PABotBase incompatibility. Device does not recognize message type: " + std::to_string(params->type);
+            m_logger.log(m_error_message, COLOR_RED);
+        }
         m_error.store(true, std::memory_order_release);
         std::lock_guard<std::mutex> lg0(m_sleep_lock);
         m_cv.notify_all();
@@ -501,8 +510,11 @@ void PABotBase::on_recv_message(BotBaseMessage message){
         }
         const pabb_MsgInfoMissedRequest* params = (const pabb_MsgInfoMissedRequest*)message.body.c_str();
         if (params->seqnum == 1){
-            m_error_message = "Serial connection has been interrupted.";
-            m_logger.log(m_error_message, COLOR_RED);
+            {
+                WriteSpinLock lg(m_state_lock);
+                m_error_message = "Serial connection has been interrupted.";
+                m_logger.log(m_error_message, COLOR_RED);
+            }
             m_error.store(true, std::memory_order_release);
             std::lock_guard<std::mutex> lg0(m_sleep_lock);
             m_cv.notify_all();
@@ -511,7 +523,10 @@ void PABotBase::on_recv_message(BotBaseMessage message){
     }
     case PABB_MSG_ERROR_DISCONNECTED:{
         m_logger.log("The console has disconnected the controller.", COLOR_RED);
-        m_error_message = "Disconnected by console.";
+        {
+            WriteSpinLock lg(m_state_lock);
+            m_error_message = "Disconnected by console.";
+        }
         m_error.store(true, std::memory_order_release);
         std::lock_guard<std::mutex> lg0(m_sleep_lock);
         m_cv.notify_all();
@@ -630,7 +645,7 @@ uint64_t PABotBase::try_issue_request(
 
     State state = m_state.load(std::memory_order_acquire);
     if (state != State::RUNNING){
-        throw InvalidConnectionStateException();
+        throw InvalidConnectionStateException(m_error_message);
     }
     if (m_error.load(std::memory_order_acquire)){
         throw ConnectionException(&m_logger, m_error_message);
@@ -710,7 +725,7 @@ uint64_t PABotBase::try_issue_command(
 
     State state = m_state.load(std::memory_order_acquire);
     if (state != State::RUNNING){
-        throw InvalidConnectionStateException();
+        throw InvalidConnectionStateException(m_error_message);
     }
     if (m_error.load(std::memory_order_acquire)){
         throw ConnectionException(&m_logger, m_error_message);
@@ -803,9 +818,11 @@ uint64_t PABotBase::issue_request(
             throw OperationCancelledException();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
-            throw InvalidConnectionStateException();
+            ReadSpinLock lg0(m_state_lock);
+            throw InvalidConnectionStateException(m_error_message);
         }
         if (m_error.load(std::memory_order_acquire)){
+            ReadSpinLock lg0(m_state_lock);
             throw ConnectionException(&m_logger, m_error_message);
         }
         m_cv.wait(lg);
@@ -846,9 +863,11 @@ uint64_t PABotBase::issue_command(
             throw OperationCancelledException();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
-            throw InvalidConnectionStateException();
+            ReadSpinLock lg0(m_state_lock);
+            throw InvalidConnectionStateException(m_error_message);
         }
         if (m_error.load(std::memory_order_acquire)){
+            ReadSpinLock lg0(m_state_lock);
             throw ConnectionException(&m_logger, m_error_message);
         }
         m_cv.wait(lg);
@@ -914,7 +933,7 @@ BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum, const Cancellable* c
             if (state != State::RUNNING){
                 m_pending_requests.erase(iter);
                 m_cv.notify_all();
-                throw InvalidConnectionStateException();
+                throw InvalidConnectionStateException(m_error_message);
             }
             if (m_error.load(std::memory_order_acquire)){
                 m_pending_requests.erase(iter);

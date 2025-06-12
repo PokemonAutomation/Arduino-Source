@@ -23,8 +23,22 @@ public:
         SerialPABotBase::SerialPABotBase_Connection& connection
     );
 
+    void stop_with_error(std::string error_message){
+        {
+            WriteSpinLock lg(m_error_lock);
+            m_error_string = error_message;
+        }
+        m_serial->stop(std::move(error_message));
+    }
+
     bool is_ready() const{
-        return m_serial && m_handle.is_ready();
+        return m_serial
+            && m_serial->state() == BotBaseController::State::RUNNING
+            && m_handle.is_ready();
+    }
+    std::string error_string() const{
+        ReadSpinLock lg(m_error_lock);
+        return m_error_string;
     }
 
 
@@ -41,6 +55,9 @@ protected:
     SerialPABotBase::SerialPABotBase_Connection& m_handle;
     BotBaseController* m_serial;
     ControllerFeatures m_supported_features;
+
+    mutable SpinLock m_error_lock;
+    std::string m_error_string;
 };
 
 

@@ -111,7 +111,7 @@ void ProController_SysbotBase::push_state(const Cancellable* cancellable, WallDu
         cancellable->throw_if_cancelled();
     }
     if (!is_ready()){
-        throw InvalidConnectionStateException();
+        throw InvalidConnectionStateException("");
     }
 
     Button buttons = BUTTON_NONE;

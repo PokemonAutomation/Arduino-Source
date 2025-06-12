@@ -56,7 +56,7 @@ public:
     using PABotBaseConnection::set_sniffer;
 
     void connect();
-    void stop();
+    virtual void stop(std::string error_message = "") override;
 
     std::chrono::time_point<std::chrono::system_clock> last_ack() const{
         return m_last_ack.load(std::memory_order_acquire);
