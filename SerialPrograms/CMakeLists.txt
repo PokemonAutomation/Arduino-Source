@@ -955,8 +955,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h
-    Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.cpp
-    Source/NintendoSwitch/Inference/NintendoSwitch_DateReader.h
+    Source/NintendoSwitch/Inference/NintendoSwitch_DateChangeDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch_DateChangeDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_DetectHome.h
     Source/NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.cpp
@@ -990,6 +990,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/TurboMacroTable.h
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
+    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.cpp
+    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_24h.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_24h.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.cpp

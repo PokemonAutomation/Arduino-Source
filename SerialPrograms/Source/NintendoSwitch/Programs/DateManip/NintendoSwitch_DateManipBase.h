@@ -20,13 +20,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-enum class DateFormat{
-    US,
-    EU,
-    JP,
-};
-
-
 class DateReaderBase{
 public:
     virtual void make_overlays(VideoOverlaySet& items) const = 0;
