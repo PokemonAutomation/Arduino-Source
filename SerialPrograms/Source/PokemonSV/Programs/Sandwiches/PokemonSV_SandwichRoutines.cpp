@@ -1139,12 +1139,14 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
     //Find fillings and add them in order
     for (const std::string& i : fillings_sorted){
         //cout << "Placing " << i << endl;
+        stream.log("Placing " + i, COLOR_WHITE);
         stream.overlay().add_log("Placing " + i, COLOR_WHITE);
 
         int times_to_place = (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing) * (fillings.find(i)->second);
         int placement_number = 0;
 
         //cout << "Times to place: " << times_to_place << endl;
+        stream.log("Times to place: " + std::to_string(times_to_place), COLOR_WHITE);
         stream.overlay().add_log("Times to place: " + std::to_string(times_to_place), COLOR_WHITE);
 
         std::vector<int> plate_index;
@@ -1159,6 +1161,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
         for (int j = 0; j < (int)plate_index.size(); j++){
             //Navigate to plate and set target plate
             //cout << "Target plate: " << plate_index.at(j) << endl;
+            stream.log("Target plate: " + std::to_string(plate_index.at(j)), COLOR_WHITE);
             stream.overlay().add_log("Target plate: " + std::to_string(plate_index.at(j)), COLOR_WHITE);
             switch (plate_index.at(j)){
             case 0:
@@ -1184,7 +1187,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
             //Place the fillings until label does not light up yellow on grab/the piece count is not hit
             while (true){
                 //Break out after placing all pieces of the filling
-                if (placement_number == times_to_place){
+                if (placement_number == times_to_place){  // todo: maybe swap to piecesPerServing?
                     break;
                 }
 
@@ -1219,8 +1222,11 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                 if (!left_plate_detector.is_label_yellow(screen) && !middle_plate_detector.is_label_yellow(screen)
                     && !right_plate_detector.is_label_yellow(screen)){
                     context.wait_for_all_requests();
+                    stream.log("None of the labels are yellow, so we assume our current plate is empty and move on to the next plate.", COLOR_WHITE);
                     break;
                 }
+
+                stream.log("One of the labels are yellow, so we assume our current plate is not empty and we continue the current plate.", COLOR_WHITE);
 
                 //If the plate is empty the increment is skipped using the above break
                 placement_number++;
