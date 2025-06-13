@@ -149,15 +149,19 @@ void DaySkipperJPN::run_switch2(SingleSwitchProgramEnvironment& env, ProControll
     //  Setup starting state.
     init_view(context);
 
+    uint8_t day = 1;
     while (remaining_skips > 0){
         send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
 
         increment_day_jp(context);
 
-        remaining_skips--;
-        stats.issued++;
-//        env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
-        env.update_stats();
+        if (day == 31){
+            day = 1;
+        }else{
+            remaining_skips--;
+            stats.issued++;
+            env.update_stats();
+        }
     }
 
     //  Prevent the Switch from sleeping and the time from advancing.
