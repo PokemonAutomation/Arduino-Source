@@ -177,6 +177,7 @@ void DaySkipperEU::run_switch2(SingleSwitchProgramEnvironment& env, ProControlle
         if (day == 31){
             day = 1;
         }else{
+            day++;
             remaining_skips--;
             stats.issued++;
             env.update_stats();
