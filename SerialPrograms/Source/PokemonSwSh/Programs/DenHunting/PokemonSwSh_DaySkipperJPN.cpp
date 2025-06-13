@@ -26,13 +26,13 @@ DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
         "PokemonSwSh:DaySkipperJPN",
         STRING_POKEMON + " SwSh", "Day Skipper (JPN)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperJPN.md",
-        "A day skipper for Japanese date format. (7600 skips/hour)",
+        "A day skipper for Japanese date format. (Switch 1: 7600 skips/hour, Switch 2: 5730 skips/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {
             ControllerFeature::TickPrecise,
             ControllerFeature::NintendoSwitch_ProController,
-            ControllerFeature::NintendoSwitch_DateSkip,
+            // ControllerFeature::NintendoSwitch_DateSkip,
         }
     )
 {}
@@ -70,13 +70,12 @@ DaySkipperJPN::DaySkipperJPN()
     PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 
-void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz){
-        throw UserSetupError(
-            env.logger(),
-            "This program requires a tick precise wired controller."
-        );
-    }
+
+
+void DaySkipperJPN::run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    using namespace DateSkippers::Switch1;
+
+    bool needs_inference = context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz;
 
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
@@ -89,14 +88,18 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     pbf_press_button(context, BUTTON_ZR, 5, 5);
 
     //  Setup starting state.
-    DateSkippers::init_view(context);
+    init_view(context);
 
     uint8_t day = 1;
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
         send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
 
-        DateSkippers::increment_day(context, false);
+        if (needs_inference){
+            increment_day_with_feedback(env.console, context, false);
+        }else{
+            increment_day(context, false);
+        }
 
         if (day == 31){
             day = 1;
@@ -110,7 +113,7 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            DateSkippers::auto_recovery(context);
+            auto_recovery(context);
         }
 
     }
@@ -123,6 +126,69 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     while (true){
         ssf_press_button1(context, BUTTON_A, 15 * TICKS_PER_SECOND);
     }
+}
+void DaySkipperJPN::run_switch2(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    using namespace DateSkippers::Switch2;
+
+    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz){
+        throw UserSetupError(
+            env.logger(),
+            "This program requires a tick precise wired controller."
+        );
+    }
+
+    SkipperStats& stats = env.current_stats<SkipperStats>();
+    stats.total_skips = SKIPS;
+    stats.runs++;
+
+    uint32_t remaining_skips = SKIPS;
+
+    //  Connect
+    pbf_press_button(context, BUTTON_ZR, 5, 5);
+
+    //  Setup starting state.
+    init_view(context);
+
+    while (remaining_skips > 0){
+        send_program_status_notification(env, NOTIFICATION_PROGRESS_UPDATE);
+
+        increment_day_jp(context);
+
+        remaining_skips--;
+        stats.issued++;
+//        env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+        env.update_stats();
+    }
+
+    //  Prevent the Switch from sleeping and the time from advancing.
+    context.wait_for_all_requests();
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+
+    while (true){
+        ssf_press_button(context, BUTTON_A, 760ms);
+        for (int c = 0; c < 10; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+        }
+        ssf_press_button(context, BUTTON_A, 14000ms, 80ms);
+    }
+}
+
+
+
+void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    ConsoleType console_type = env.console.state().console_type();
+    if (console_type == ConsoleType::Switch1){
+        run_switch1(env, context);
+        return;
+    }
+    if (is_switch2(console_type)){
+        run_switch2(env, context);
+        return;
+    }
+    throw UserSetupError(
+        env.console,
+        "Please select a valid Switch console type."
+    );
 }
 
 

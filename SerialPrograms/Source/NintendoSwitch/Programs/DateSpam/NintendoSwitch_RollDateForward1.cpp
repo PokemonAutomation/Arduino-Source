@@ -71,7 +71,7 @@ void roll_date_forward_1_Switch1_sbb(ProControllerContext& context){
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 }
 void roll_date_forward_1_Switch2_wired(ProControllerContext& context){
-    ssf_press_button(context, BUTTON_A, 240ms, 80ms);
+    ssf_press_button(context, BUTTON_A, 216ms, 80ms);
     ssf_issue_scroll(context, SSF_SCROLL_UP, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
@@ -80,7 +80,7 @@ void roll_date_forward_1_Switch2_wired(ProControllerContext& context){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_press_button(context, BUTTON_A, 280ms, 80ms);
+    ssf_press_button(context, BUTTON_A, 264ms, 80ms);
 }
 void roll_date_forward_1(
     ConsoleHandle& console, ProControllerContext& context,

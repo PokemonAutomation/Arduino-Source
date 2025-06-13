@@ -107,10 +107,12 @@ bool is_start(const DateSmall* date){
     return date->year != 0 || date->month != 1 || date->day != 1;
 }
 bool date_increment_day(ProControllerContext& context, DateSmall* date, bool press){
+    using namespace DateSkippers::Switch1;
+
     uint8_t days = days_in_month(date->year, date->month);
     if (date->day != days){
         if (press){
-            DateSkippers::increment_day(context, false);
+            increment_day(context, false);
         }
         date->day++;
         return true;
@@ -131,20 +133,28 @@ bool date_increment_day(ProControllerContext& context, DateSmall* date, bool pre
     }
 
     if (date->month != 1){
-        DateSkippers::increment_month(context, DAYS_PER_MONTH[date->month - 1]);
+        increment_month(context, DAYS_PER_MONTH[date->month - 1]);
         return true;
     }
 
     if (date->year != 0){
-        DateSkippers::increment_all(context);
+        increment_all(context);
         return true;
     }
 
-    DateSkippers::increment_all_rollback(context);
+    increment_all_rollback(context);
     return false;
 }
 
 void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    using namespace DateSkippers::Switch1;
+
+    if (env.console.state().console_type() != ConsoleType::Switch1){
+        throw UserSetupError(
+            env.logger(),
+            "This program only works on the Switch 1."
+        );
+    }
     if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz){
         throw UserSetupError(
             env.logger(),
@@ -182,7 +192,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
     }
 
     //  Setup starting state.
-    DateSkippers::init_view(context);
+    init_view(context);
 
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
@@ -198,7 +208,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            DateSkippers::auto_recovery(context);
+            auto_recovery(context);
         }
 
     }

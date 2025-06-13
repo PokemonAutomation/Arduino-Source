@@ -116,7 +116,7 @@ void roll_date_backward_N_Switch1_sbb(ProControllerContext& context, uint8_t ski
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
 }
 void roll_date_backward_N_Switch2_wired(ProControllerContext& context, uint8_t skips){
-    ssf_press_button(context, BUTTON_A, 240ms, 80ms);
+    ssf_press_button(context, BUTTON_A, 216ms, 80ms);
     if (skips >= 60){
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4160ms, 4160ms, 24ms);
     }else{
@@ -137,7 +137,7 @@ void roll_date_backward_N_Switch2_wired(ProControllerContext& context, uint8_t s
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_press_button(context, BUTTON_A, 280ms, 80ms);
+    ssf_press_button(context, BUTTON_A, 264ms, 80ms);
 }
 void roll_date_backward_N(
     ConsoleHandle& console, ProControllerContext& context,

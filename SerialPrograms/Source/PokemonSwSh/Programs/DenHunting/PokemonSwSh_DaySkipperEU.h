@@ -32,6 +32,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+    void run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void run_switch2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+private:
     SimpleIntegerOption<uint32_t> SKIPS;
     SimpleIntegerOption<uint16_t> REAL_LIFE_YEAR;
 

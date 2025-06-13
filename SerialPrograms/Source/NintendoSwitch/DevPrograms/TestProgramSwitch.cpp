@@ -195,6 +195,8 @@ private:
 
 
 
+
+
 TestProgram_Descriptor::TestProgram_Descriptor()
     : MultiSwitchProgramDescriptor(
         "NintendoSwitch:TestProgram",
@@ -305,6 +307,39 @@ void TestProgram::on_press(){
 
 
 
+void increment_day(ProControllerContext& context, bool date_us){
+    ssf_press_button(context, BUTTON_A, 208ms, 80ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 256ms, 80ms);
+}
+void init_view(ProControllerContext& context){
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
+    ssf_press_button(context, BUTTON_A, 256ms, 80ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_press_button(context, BUTTON_A, 256ms, 80ms);
+}
+
+
+
 
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
@@ -325,12 +360,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+    init_view(context);
 
+//    while (true){
+//        increment_day(context, true);
+//    }
+
+
+
+#if 0
 //    ssf_issue_scroll(context, DPAD_LEFT, 48ms, 48ms, 24ms);
     ssf_press_button(context, BUTTON_A, 96ms, 48ms, 24ms);
     ssf_press_button(context, BUTTON_L, 0ms, 48ms, 24ms);
     ssf_issue_scroll(context, DPAD_LEFT, 48ms, 48ms, 24ms);
-
+#endif
 
 #if 0
     DateReader reader;
