@@ -25,6 +25,7 @@ void rollback_year_skip_forward(
 ){
     ConsoleType type = console.state().console_type();
     if (type == ConsoleType::Switch1){
+        roll_date_backward_N(console, context, MAX_YEAR, true);
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT, 24ms);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT, 24ms);
