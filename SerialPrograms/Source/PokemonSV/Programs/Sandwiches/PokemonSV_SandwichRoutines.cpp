@@ -32,6 +32,9 @@
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_IngredientSession.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h"
 
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -1013,7 +1016,8 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
     SandwichPlateDetector left_plate_detector(stream.logger(), COLOR_RED, language, SandwichPlateDetector::Side::LEFT);
     SandwichPlateDetector middle_plate_detector(stream.logger(), COLOR_RED, language, SandwichPlateDetector::Side::MIDDLE);
     SandwichPlateDetector right_plate_detector(stream.logger(), COLOR_RED, language, SandwichPlateDetector::Side::RIGHT);
-
+    bool left_plate_absent = false;
+    bool right_plate_absent = false;
     {
         VideoSnapshot screen = stream.video().snapshot();
 
@@ -1045,7 +1049,8 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
 
         //Get left (2nd) ingredient
         std::string left_filling = left_plate_detector.detect_filling_name(screen);
-        if (left_filling.empty()){
+        left_plate_absent = left_filling.empty();
+        if (left_plate_absent){
             stream.log("No ingredient found on left label.");
             stream.overlay().add_log("No left plate");
         }else{
@@ -1056,7 +1061,8 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
 
         //Get right (3rd) ingredient
         std::string right_filling = right_plate_detector.detect_filling_name(screen);
-        if (right_filling.empty()){
+        right_plate_absent = right_filling.empty();
+        if (right_plate_absent){
             stream.log("No ingredient found on right label.");
             stream.overlay().add_log("No right plate");
         }else{
@@ -1219,8 +1225,14 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                 auto screen = stream.video().snapshot();
 
                 //The label check is needed for ingredients with multiple plates as we don't know which plate has what amount
-                if (!left_plate_detector.is_label_yellow(screen) && !middle_plate_detector.is_label_yellow(screen)
-                    && !right_plate_detector.is_label_yellow(screen)){
+                // ensure the plates aren't absent to minimize false positives.
+                bool is_left_plate_yellow = !left_plate_absent && left_plate_detector.is_label_yellow(screen);
+                bool is_middle_plate_yellow = middle_plate_detector.is_label_yellow(screen);
+                bool is_right_plate_yellow = !right_plate_absent && right_plate_detector.is_label_yellow(screen);
+                // cout << "is_left_plate_yellow: " << is_left_plate_yellow << endl;
+                // cout << "is_middle_plate_yellow: " << is_middle_plate_yellow << endl;
+                // cout << "is_right_plate_yellow: " << is_right_plate_yellow << endl;
+                if (!is_left_plate_yellow && !is_middle_plate_yellow && !is_right_plate_yellow){
                     context.wait_for_all_requests();
                     stream.log("None of the labels are yellow, so we assume our current plate is empty and move on to the next plate.", COLOR_WHITE);
                     break;
@@ -1238,8 +1250,12 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
             }
         }
     }
+
+    context.wait_for_all_requests();
+    context.wait_for(Milliseconds(1000));
+    stream.log("All ingredients should now be empty. Wait for upper bread.", COLOR_YELLOW);
     // Handle top slice by tossing it away
-    SandwichHandWatcher grabbing_hand(SandwichHandType::FREE, { 0, 0, 1.0, 1.0 });
+    SandwichHandWatcher grabbing_hand(SandwichHandType::GRABBING, { 0, 0, 1.0, 1.0 });
     int ret = wait_until(stream, context, std::chrono::seconds(30), { grabbing_hand });
     if (ret < 0){
         OperationFailedException::fire(
