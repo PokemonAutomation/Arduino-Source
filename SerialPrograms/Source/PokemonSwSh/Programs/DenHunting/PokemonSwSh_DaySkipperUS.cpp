@@ -26,7 +26,7 @@ DaySkipperUS_Descriptor::DaySkipperUS_Descriptor()
         "PokemonSwSh:DaySkipperUS",
         STRING_POKEMON + " SwSh", "Day Skipper (US)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperUS.md",
-        "A day skipper for US date format that.  (Switch 1: ~7100 skips/hour, Switch 2: 5512 skips/hour)",
+        "A day skipper for US date format that.  (Switch 1: ~7100 skips/hour, Switch 2: 5443 skips/hour)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {
