@@ -350,6 +350,38 @@ bool move_then_recover_sandwich_hand_position(
     );
 }
 
+// return true if the current plate is empty.
+// i.e. the current plate label is not yellow.
+// Assumes that we are in a grabbing state.
+bool check_plate_empty(VideoStream& stream, SandwichPlateDetector::Side target_plate_label, Language language){
+    auto screen = stream.video().snapshot();
+    // screen.frame->save("test.png");
+
+    // switch(target_plate_label){
+    //     case SandwichPlateDetector::Side::LEFT:
+    //         cout << "left" << endl;
+    //         break;
+    //     case SandwichPlateDetector::Side::MIDDLE:
+    //         cout << "middle" << endl;
+    //         break;
+    //     case SandwichPlateDetector::Side::RIGHT:
+    //         cout << "right" << endl;
+    //         break;                        
+    //     default:
+    //         break;
+    // }
+
+    SandwichPlateDetector plate_detector = SandwichPlateDetector(stream.logger(), COLOR_RED, language, target_plate_label);
+              
+    return !plate_detector.is_label_yellow(screen);
+}
+
+struct HandMoveData{
+    ImageFloatBox end_box;
+    bool plate_empty;
+};
+
+
 /* 
 - moves the sandwich hand from start_box to end_box
 - It detects the location of the sandwich hand, from within the bounds of the last frame's 
@@ -357,7 +389,7 @@ expanded_hand_bb (i.e. m_box field in SandwichHandLocator).
 Then updates the current location of expanded_hand_bb. 
 Then moves the sandwich hand closer towards end_box. 
  */
-ImageFloatBox move_sandwich_hand(
+HandMoveData move_sandwich_hand_and_check_if_plates_empty(
     const ProgramInfo& info,
     AsyncDispatcher& dispatcher,
     VideoStream& stream,
@@ -365,7 +397,9 @@ ImageFloatBox move_sandwich_hand(
     SandwichHandType hand_type,
     bool pressing_A,
     const ImageFloatBox& start_box,
-    const ImageFloatBox& end_box
+    const ImageFloatBox& end_box,
+    SandwichPlateDetector::Side target_plate_label = SandwichPlateDetector::Side::NOT_APPLICABLE,
+    Language language = Language::None
 ){
     context.wait_for_all_requests();
     stream.log("Start moving sandwich hand: " + SANDWICH_HAND_TYPE_NAMES(hand_type)
@@ -457,14 +491,24 @@ ImageFloatBox move_sandwich_hand(
 
         std::pair<double, double> dif(target_loc.first - cur_loc.first, target_loc.second - cur_loc.second);
         // console.log("float diff to target: " + std::to_string(dif.first) + ", " + std::to_string(dif.second));
+
+
+        // Reached the Target
         if (std::fabs(dif.first) < end_box.width/2 && std::fabs(dif.second) < end_box.height/2){
             stream.log(SANDWICH_HAND_TYPE_NAMES(hand_type) + " hand reached target.");
+            bool plate_empty = false;
+
+            // check if the plate is empty. but only if the target_plate_label isn't NOT_APPLICABLE.
+            if (target_plate_label != SandwichPlateDetector::Side::NOT_APPLICABLE){
+                plate_empty = check_plate_empty(stream, target_plate_label, language);
+            }
+
             move_session.stop_session_and_rethrow(); // Stop the commands
             if (hand_type == SandwichHandType::GRABBING){
                 // wait for some time to let hand release ingredient
                 context.wait_for(std::chrono::milliseconds(100));
             }
-            return hand_bb;
+            return {hand_bb, plate_empty};
         }
 
         // Assume screen width is 16.0, then the screen height is 9.0
@@ -518,6 +562,19 @@ ImageFloatBox move_sandwich_hand(
         last_time = cur_time;
         context.wait_for(std::chrono::milliseconds(80));
     }
+}
+
+ImageFloatBox move_sandwich_hand(
+    const ProgramInfo& info,
+    AsyncDispatcher& dispatcher,
+    VideoStream& stream,
+    ProControllerContext& context,
+    SandwichHandType hand_type,
+    bool pressing_A,
+    const ImageFloatBox& start_box,
+    const ImageFloatBox& end_box
+){
+    return move_sandwich_hand_and_check_if_plates_empty(info, dispatcher, stream, context, hand_type, pressing_A, start_box, end_box, SandwichPlateDetector::Side::NOT_APPLICABLE, Language::None).end_box;
 }
 
 } // end anonymous namespace
@@ -1169,15 +1226,18 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
             //cout << "Target plate: " << plate_index.at(j) << endl;
             stream.log("Target plate: " + std::to_string(plate_index.at(j)), COLOR_WHITE);
             stream.overlay().add_log("Target plate: " + std::to_string(plate_index.at(j)), COLOR_WHITE);
+            SandwichPlateDetector::Side target_plate_label = SandwichPlateDetector::Side::MIDDLE;
             switch (plate_index.at(j)){
             case 0:
                 target_plate = center_plate;
                 break;
             case 1:
                 target_plate = left_plate;
+                target_plate_label = SandwichPlateDetector::Side::LEFT;
                 break;
             case 2:
                 target_plate = right_plate;
+                target_plate_label = SandwichPlateDetector::Side::RIGHT;
                 break;
             case 3: case 4: case 5: case 6:
                 //Press R the appropriate number of times
@@ -1190,10 +1250,11 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                 break;
             }
 
+            // place down all the ingredients for the current plate.
             //Place the fillings until label does not light up yellow on grab/the piece count is not hit
             while (true){
                 //Break out after placing all pieces of the filling
-                if (placement_number == times_to_place){  // todo: maybe swap to piecesPerServing?
+                if (placement_number == times_to_place){  // todo: maybe swap to current_plate_placement_number == piecesPerServing?
                     break;
                 }
 
@@ -1211,34 +1272,26 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                 ImageFloatBox placement_target = FillingsCoordinates::instance().get_filling_information(i).placementCoordinates.at(
                     (int)fillings.find(i)->second).at(placement_number);
 
-                end_box = move_sandwich_hand(
+                HandMoveData hand_move_data = move_sandwich_hand_and_check_if_plates_empty(
                     env.program_info(), env.realtime_dispatcher(),
                     stream, context,
                     SandwichHandType::GRABBING,
                     true,
                     expand_box(end_box),
-                    placement_target
+                    placement_target,
+                    target_plate_label
                 );
+                end_box = hand_move_data.end_box;
                 context.wait_for_all_requests();
 
-                //If any of the labels are yellow continue. Otherwise assume plate is empty move on to the next.
-                auto screen = stream.video().snapshot();
-
-                //The label check is needed for ingredients with multiple plates as we don't know which plate has what amount
-                // ensure the plates aren't absent to minimize false positives.
-                bool is_left_plate_yellow = !left_plate_absent && left_plate_detector.is_label_yellow(screen);
-                bool is_middle_plate_yellow = middle_plate_detector.is_label_yellow(screen);
-                bool is_right_plate_yellow = !right_plate_absent && right_plate_detector.is_label_yellow(screen);
-                // cout << "is_left_plate_yellow: " << is_left_plate_yellow << endl;
-                // cout << "is_middle_plate_yellow: " << is_middle_plate_yellow << endl;
-                // cout << "is_right_plate_yellow: " << is_right_plate_yellow << endl;
-                if (!is_left_plate_yellow && !is_middle_plate_yellow && !is_right_plate_yellow){
+                // If the current plate is empty, break out of the loop and move on to the next plate.
+                if (hand_move_data.plate_empty){
                     context.wait_for_all_requests();
-                    stream.log("None of the labels are yellow, so we assume our current plate is empty and move on to the next plate.", COLOR_WHITE);
+                    stream.log("Our current plate label is NOT yellow, so we assume our current plate is empty. Move on to the next plate.", COLOR_YELLOW);
                     break;
                 }
 
-                stream.log("One of the labels are yellow, so we assume our current plate is not empty and we continue the current plate.", COLOR_WHITE);
+                stream.log("Our current plate label is yellow, so we assume our current plate is NOT empty. Continue with the current plate.", COLOR_YELLOW);
 
                 //If the plate is empty the increment is skipped using the above break
                 placement_number++;
@@ -1252,7 +1305,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
     }
 
     context.wait_for_all_requests();
-    context.wait_for(Milliseconds(1000));
+    context.wait_for(Milliseconds(500));
     stream.log("All ingredients should now be empty. Wait for upper bread.", COLOR_YELLOW);
     // Handle top slice by tossing it away
     SandwichHandWatcher grabbing_hand(SandwichHandType::GRABBING, { 0, 0, 1.0, 1.0 });

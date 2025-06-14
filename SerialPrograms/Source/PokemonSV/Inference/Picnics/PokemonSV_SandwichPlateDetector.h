@@ -32,7 +32,8 @@ public:
     enum class Side{
         LEFT,
         MIDDLE,
-        RIGHT
+        RIGHT,
+        NOT_APPLICABLE,
     };
     SandwichPlateDetector(Logger& logger, Color color, Language language, Side side);
     virtual ~SandwichPlateDetector();
