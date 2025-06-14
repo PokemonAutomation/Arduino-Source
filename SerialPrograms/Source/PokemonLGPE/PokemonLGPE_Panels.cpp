@@ -38,9 +38,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<AlolanTrade_Descriptor, AlolanTrade>());
     ret.emplace_back(make_single_switch_program<FossilRevival_Descriptor, FossilRevival>());
     ret.emplace_back(make_single_switch_program<GiftReset_Descriptor, GiftReset>());
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE) {
-        ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
-    }
+    ret.emplace_back(make_single_switch_program<LegendaryReset_Descriptor, LegendaryReset>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");

@@ -247,7 +247,7 @@ private:
 };
 
 
-
+#if 0
 class TickRateTracker{
 public:
     TickRateTracker(double expected_ticks_per_second)
@@ -306,7 +306,7 @@ private:
 
 //    CircularBuffer<double> m_history;
 };
-
+#endif
 
 
 void SerialPABotBase_PokkenController::status_thread(){
@@ -345,7 +345,7 @@ void SerialPABotBase_PokkenController::status_thread(){
 
 
     ExtendedLengthCounter clock_tracker;
-    TickRateTracker tick_rate_tracker(m_use_milliseconds ? 1000 : TICKS_PER_SECOND);
+//    TickRateTracker tick_rate_tracker(m_use_milliseconds ? 1000 : TICKS_PER_SECOND);
     WallClock next_ping = current_time();
     while (true){
         if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
@@ -361,25 +361,16 @@ void SerialPABotBase_PokkenController::status_thread(){
             ).convert<PABB_MSG_ACK_REQUEST_I32>(logger(), response);
             last_ack.store(current_time(), std::memory_order_relaxed);
             uint64_t wallclock = clock_tracker.push_short_value(response.data);
-            double ticks_per_second = tick_rate_tracker.push_ticks(wallclock);
+//            double ticks_per_second = tick_rate_tracker.push_ticks(wallclock);
 
-            if (wallclock == 0){
-                m_handle.set_status_line1(
-                    "Not connected to Switch.",
-                    COLOR_RED
-                );
-            }else{
-                m_handle.set_status_line1(
-                    "Ticks / Second: " + tostr_fixed(ticks_per_second, 3),
-                    tick_rate_tracker.consecutive_off_readings() == 0
-                        ? theme_friendly_darkblue()
-                        : COLOR_RED
-                );
-            }
+            m_handle.set_status_line1(
+                "Device Clock: " + tostr_u_commas(wallclock),
+                theme_friendly_darkblue()
+            );
 
-            if (tick_rate_tracker.consecutive_off_readings() >= 10){
-                error = "Tick rate is erratic. Arduino/Teensy is not reliable on Switch 2.";
-            }
+//            if (tick_rate_tracker.consecutive_off_readings() >= 10){
+//                error = "Tick rate is erratic. Arduino/Teensy is not reliable on Switch 2.";
+//            }
 
         }catch (OperationCancelledException&){
             break;
