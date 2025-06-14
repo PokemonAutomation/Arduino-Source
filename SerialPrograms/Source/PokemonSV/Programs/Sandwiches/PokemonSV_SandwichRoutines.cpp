@@ -1254,7 +1254,8 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
             //Place the fillings until label does not light up yellow on grab/the piece count is not hit
             while (true){
                 //Break out after placing all pieces of the filling
-                if (placement_number == times_to_place){  // todo: maybe swap to current_plate_placement_number == piecesPerServing?
+                if (placement_number == times_to_place){
+                    stream.log("We have placed down enough ingredients of that type, so we assume our current plate is empty. Move on to the next plate/ingredient.", COLOR_ORANGE);
                     break;
                 }
 
@@ -1287,7 +1288,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                 // If the current plate is empty, break out of the loop and move on to the next plate.
                 if (hand_move_data.plate_empty){
                     context.wait_for_all_requests();
-                    stream.log("Our current plate label is NOT yellow, so we assume our current plate is empty. Move on to the next plate.", COLOR_YELLOW);
+                    stream.log("Our current plate label is NOT yellow, so we assume our current plate is empty. Move on to the next plate.", COLOR_ORANGE);
                     break;
                 }
 
