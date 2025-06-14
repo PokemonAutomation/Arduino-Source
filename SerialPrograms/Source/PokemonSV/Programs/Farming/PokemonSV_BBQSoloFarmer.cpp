@@ -71,6 +71,11 @@ BBQSoloFarmer::BBQSoloFarmer()
 void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
     BBQSoloFarmer_Descriptor::Stats& stats = env.current_stats<BBQSoloFarmer_Descriptor::Stats>();
+
+    //Make sure console type is set
+    if (env.console.state().console_type() == ConsoleType::Unknown) {
+        throw UserSetupError(env.console, "Console Type (Switch 1 or 2) must be specified.");
+    }
     
     //Fly to plaza
     open_map_from_overworld(env.program_info(), env.console, context);
@@ -83,7 +88,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
     //Test a specific quest
     /*
-    BBQuests test_quest = BBQuests::catch_bug;
+    BBQuests test_quest = BBQuests::catch_water;
     bool questTest = process_and_do_quest(env, env.console, context, BBQ_OPTIONS, test_quest, eggs_hatched);
     if (questTest){
         env.log("Finished quest.");
@@ -130,6 +135,16 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         }
         //Clear out the todo list
         quests_to_do.clear();
+
+        //Fix the time to prevent running out of years
+        pbf_wait(context, 250);
+        context.wait_for_all_requests();
+        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        home_to_date_time(env.console, context, false);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+        resume_game_from_home(env.console, context);
 
         uint64_t temp_save_num_option = BBQ_OPTIONS.SAVE_NUM_QUESTS;
         if (temp_save_num_option != 0 && num_completed_quests % temp_save_num_option == 0){
