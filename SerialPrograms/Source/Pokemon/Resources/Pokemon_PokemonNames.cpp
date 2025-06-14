@@ -70,7 +70,6 @@ const std::string& PokemonNames::display_name(Language language) const{
 }
 
 
-
 const PokemonNames& get_pokemon_name(const std::string& slug){
     const std::map<std::string, PokemonNames>& database = PokemonNameDatabase::instance().m_slug_to_data;
     auto iter = database.find(slug);

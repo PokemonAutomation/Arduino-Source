@@ -42,10 +42,6 @@ public:
     const Sprite& get_throw(const std::string& slug) const;
     const Sprite* get_nothrow(const std::string& slug) const;
 
-    const std::map<std::string, Sprite>& get() const{
-        return m_database;
-    }
-
 public:
     using const_iterator = std::map<std::string, Sprite>::const_iterator;
     using       iterator = std::map<std::string, Sprite>::iterator;

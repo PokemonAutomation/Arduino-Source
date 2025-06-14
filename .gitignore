@@ -52,3 +52,6 @@ opencv_world4110d.dll
 
 # Python cache
 __pycache__
+
+# Jupyter Notebooks
+*.ipynb
