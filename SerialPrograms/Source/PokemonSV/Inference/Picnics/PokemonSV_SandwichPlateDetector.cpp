@@ -5,6 +5,7 @@
  */
 
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
@@ -35,6 +36,9 @@ SandwichPlateDetector::SandwichPlateDetector(Logger& logger, Color color, Langua
     case Side::RIGHT:
         m_box = ImageFloatBox(0.699, 0.269, 0.201, 0.044);
         break;
+    default:
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION,
+            "Invalid Side for SandwichPlateDetector()");
     }
 }
 
