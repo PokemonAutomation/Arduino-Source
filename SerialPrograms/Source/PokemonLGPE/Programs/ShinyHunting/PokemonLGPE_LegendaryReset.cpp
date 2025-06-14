@@ -78,6 +78,8 @@ LegendaryReset::LegendaryReset()
         &NOTIFICATION_SHINY,
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(TARGET);
@@ -166,20 +168,40 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
     Don't do it on the first Snorlax, otherwise have to sit through fuji tutorial
     */
 
+    size_t consecutive_failures = 0;
+
     while (true) {
-        bool encounter_battle = run_encounter(env, context);
-        if (encounter_battle) {
-            stats.shinies++;
-            env.update_stats();
-            send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
-            break;
+        env.update_stats();
+
+        if (consecutive_failures >= 3){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed 3 times in the row.",
+                env.console
+            );
         }
-        env.log("No shiny found. Resetting game.");
-        send_program_status_notification(
-            env, NOTIFICATION_STATUS_UPDATE,
-            "No shiny found. Resetting game."
-        );
-        context.wait_for_all_requests();
+
+        try{
+            bool encounter_battle = run_encounter(env, context);
+            if (encounter_battle) {
+                stats.shinies++;
+                env.update_stats();
+                send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
+                break;
+            }
+
+            env.log("No shiny found. Resetting game.");
+            send_program_status_notification(
+                env, NOTIFICATION_STATUS_UPDATE,
+                "No shiny found. Resetting game."
+            );
+            context.wait_for_all_requests();
+        }catch (OperationFailedException& e){
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+            consecutive_failures++;
+            continue;
+        }
+        consecutive_failures = 0;
 
         //Reset game
         pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
@@ -187,7 +209,6 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
         context.wait_for_all_requests();
 
         stats.resets++;
-        env.update_stats();
     }
     //Shiny found, complete the battle
     WallClock start = current_time();
