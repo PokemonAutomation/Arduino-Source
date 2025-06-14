@@ -371,6 +371,8 @@ bool check_plate_empty(VideoStream& stream, SandwichPlateDetector::Side target_p
     //         break;
     // }
 
+    stream.log("Check if the plate is empty.");
+
     SandwichPlateDetector plate_detector = SandwichPlateDetector(stream.logger(), COLOR_RED, language, target_plate_label);
               
     return !plate_detector.is_label_yellow(screen);
@@ -1245,6 +1247,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                     pbf_press_button(context, BUTTON_R, 20, 80);
                 }
                 target_plate = left_plate;
+                target_plate_label = SandwichPlateDetector::Side::LEFT;
                 break;
             default:
                 break;
