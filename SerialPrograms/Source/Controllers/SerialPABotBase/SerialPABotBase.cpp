@@ -111,7 +111,7 @@ const std::map<
             }},
         }},
     }},
-    {2025061302, {
+    {2025061303, {
         {PABB_PID_PABOTBASE_ESP32S3, {
             {ControllerType::NintendoSwitch_WiredProController, {
                 ControllerFeature::TickPrecise,
@@ -121,7 +121,7 @@ const std::map<
             }},
         }},
     }},
-    {2025061402, {
+    {2025061403, {
         {PABB_PID_PABOTBASE_ArduinoUnoR3, {
             {ControllerType::NintendoSwitch_WiredProController, {
                 ControllerFeature::TickPrecise,

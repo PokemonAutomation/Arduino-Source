@@ -356,17 +356,43 @@ void SerialPABotBase_PokkenController::status_thread(){
         try{
             pabb_MsgAckRequestI32 response;
             m_serial->issue_request_and_wait(
+                SerialPABotBase::MessageControllerStatus(),
+                &m_scope
+            ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
+            last_ack.store(current_time(), std::memory_order_relaxed);
+
+            uint32_t status = response.data;
+            bool status_connected = status & 1;
+            bool status_ready     = status & 2;
+
+            std::string str;
+            str += "Connected: " + (status_connected
+                ? html_color_text("Yes", theme_friendly_darkblue())
+                : html_color_text("No", COLOR_RED)
+            );
+            str += " - Ready: " + (status_ready
+                ? html_color_text("Yes", theme_friendly_darkblue())
+                : html_color_text("No", COLOR_RED)
+            );
+
+            m_handle.set_status_line1(str);
+
+
+#if 0
+            pabb_MsgAckRequestI32 response;
+            m_serial->issue_request_and_wait(
                 SerialPABotBase::DeviceRequest_system_clock(),
                 &m_scope
             ).convert<PABB_MSG_ACK_REQUEST_I32>(logger(), response);
             last_ack.store(current_time(), std::memory_order_relaxed);
+
             uint64_t wallclock = clock_tracker.push_short_value(response.data);
 //            double ticks_per_second = tick_rate_tracker.push_ticks(wallclock);
-
             m_handle.set_status_line1(
                 "Device Clock: " + tostr_u_commas(wallclock),
                 theme_friendly_darkblue()
             );
+#endif
 
 //            if (tick_rate_tracker.consecutive_off_readings() >= 10){
 //                error = "Tick rate is erratic. Arduino/Teensy is not reliable on Switch 2.";

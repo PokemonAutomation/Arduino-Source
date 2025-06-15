@@ -17,16 +17,16 @@ namespace SerialPABotBase{
 
 int register_message_converters_ESP32(){
     register_message_converter(
-        PABB_MSG_ESP32_REQUEST_STATUS,
+        PABB_MSG_REQUEST_STATUS,
         [](const std::string& body){
             //  Disable this by default since it's very spammy.
             if (!GlobalSettings::instance().LOG_EVERYTHING){
                 return std::string();
             }
             std::ostringstream ss;
-            ss << "PABB_MSG_ESP32_REQUEST_STATUS() - ";
-            if (body.size() != sizeof(pabb_Message_ESP32_RequestStatus)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_Message_ESP32_RequestStatus*)body.c_str();
+            ss << "PABB_MSG_REQUEST_STATUS() - ";
+            if (body.size() != sizeof(pabb_Message_RequestStatus)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_RequestStatus*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
             return ss.str();
         }

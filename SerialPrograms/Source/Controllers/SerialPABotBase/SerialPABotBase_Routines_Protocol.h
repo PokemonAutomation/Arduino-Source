@@ -126,6 +126,18 @@ public:
         return BotBaseMessage(PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE, params);
     }
 };
+class MessageControllerStatus : public BotBaseRequest{
+public:
+    pabb_Message_RequestStatus params;
+    MessageControllerStatus()
+        : BotBaseRequest(false)
+    {
+        params.seqnum = 0;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_STATUS, params);
+    }
+};
 
 
 

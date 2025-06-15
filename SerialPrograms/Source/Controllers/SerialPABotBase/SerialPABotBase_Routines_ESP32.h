@@ -18,18 +18,6 @@ namespace SerialPABotBase{
 
 
 
-class MessageControllerStatus : public BotBaseRequest{
-public:
-    pabb_Message_ESP32_RequestStatus params;
-    MessageControllerStatus()
-        : BotBaseRequest(false)
-    {
-        params.seqnum = 0;
-    }
-    virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_ESP32_REQUEST_STATUS, params);
-    }
-};
 class MessageControllerReadSpi : public BotBaseRequest{
 public:
     pabb_Message_ESP32_ReadSpi params;

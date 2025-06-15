@@ -60,14 +60,6 @@ typedef struct{
 
 
 
-
-#define PABB_MSG_ESP32_REQUEST_STATUS   0x50
-typedef struct{
-    seqnum_t seqnum;
-} PABB_PACK pabb_Message_ESP32_RequestStatus;
-
-
-
 #define PABB_MSG_ESP32_REQUEST_READ_SPI         0x60
 typedef struct{
     seqnum_t seqnum;
