@@ -1,6 +1,5 @@
 #ifdef PA_DPP
 
-#include <dpp/DPP_SilenceWarnings.h>
 #include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppUtility.h>
 #include "CommonFramework/GlobalSettingsPanel.h"

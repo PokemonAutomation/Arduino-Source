@@ -7,7 +7,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <dpp/DPP_SilenceWarnings.h>
 #include "Common/Qt/StringToolsQt.h"
 //#include "CommonFramework/Globals.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
