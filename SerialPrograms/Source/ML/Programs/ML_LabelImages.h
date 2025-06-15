@@ -13,7 +13,7 @@
 #include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
-// #include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
+#include "Pokemon/Options/Pokemon_HomeSpriteSelectOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -65,6 +65,7 @@ private:
     FloatingPointOption Y;
     FloatingPointOption WIDTH;
     FloatingPointOption HEIGHT;
+    Pokemon::HomeSpriteSelectCell FORM_LABEL;
 
     size_t source_image_height = 0;
     size_t source_image_width = 0;

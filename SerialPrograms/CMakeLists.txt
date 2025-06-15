@@ -992,13 +992,13 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h
+    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManipBase.h
+    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManipTools.cpp
+    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManipTools.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_24h.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_24h.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.h
-    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManipBase.h
-    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManipTools.cpp
-    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManipTools.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_NeutralDateSkip.cpp
@@ -1058,6 +1058,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
+    Source/Pokemon/Options/Pokemon_HomeSpriteSelectOption.cpp
+    Source/Pokemon/Options/Pokemon_HomeSpriteSelectOption.h
     Source/Pokemon/Options/Pokemon_IvJudgeOption.cpp
     Source/Pokemon/Options/Pokemon_IvJudgeOption.h
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp
@@ -1093,6 +1095,10 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Resources/Pokemon_EggSteps.h
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp
     Source/Pokemon/Resources/Pokemon_PokeballNames.h
+    Source/Pokemon/Resources/Pokemon_PokemonForms.cpp
+    Source/Pokemon/Resources/Pokemon_PokemonForms.h
+    Source/Pokemon/Resources/Pokemon_PokemonHomeSprites.cpp
+    Source/Pokemon/Resources/Pokemon_PokemonHomeSprites.h
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp
     Source/Pokemon/Resources/Pokemon_PokemonNames.h
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp

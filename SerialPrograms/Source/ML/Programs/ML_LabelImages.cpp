@@ -180,12 +180,14 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
     , HEIGHT("<b>Height:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
+    , FORM_LABEL("bulbasaur")
     , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
 {
     ADD_OPTION(X);
     ADD_OPTION(Y);
     ADD_OPTION(WIDTH);
     ADD_OPTION(HEIGHT);
+    ADD_OPTION(FORM_LABEL);
 }
 void LabelImages::from_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
