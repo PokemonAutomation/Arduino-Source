@@ -5,7 +5,10 @@
  */
 
 #include <QImage>
+#pragma warning(push)
+#pragma warning(disable: 4127)
 #include <opencv2/core/mat.hpp>
+#pragma warning(pop)
 #include "Common/Cpp/Exceptions.h"
 #include "ImageRGB32.h"
 #include "ImageViewRGB32.h"

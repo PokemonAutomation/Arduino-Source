@@ -3,8 +3,10 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
-
+#pragma warning(push)
+#pragma warning(disable: 4127)
 #include <opencv2/imgproc.hpp>
+#pragma warning(pop)
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
