@@ -1,6 +1,7 @@
 #ifdef PA_DPP
 
 #include <format>
+#include <dpp/DPP_SilenceWarnings.h>
 #include <dpp/dpp.h>
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Globals.h"
