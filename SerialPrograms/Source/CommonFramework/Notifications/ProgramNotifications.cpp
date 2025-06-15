@@ -5,7 +5,6 @@
  */
 
 #include <QFile>
-#include <dpp/DPP_SilenceWarnings.h>
 #include <Integrations/DppIntegration/DppClient.h>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
