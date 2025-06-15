@@ -189,7 +189,6 @@ void ThreeSegmentDudunsparceFinder::program(SingleSwitchProgramEnvironment& env,
     try{
         for(uint8_t i = 0; i < 6; i++){
             check_one_column(env, context, i);
-            break; // XXX
         }
     } catch(OperationFailedException&){
         stats.m_errors++;
