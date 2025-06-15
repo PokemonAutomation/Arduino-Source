@@ -26,6 +26,8 @@
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_DailyHighlightRNG.h"
 
+#include "Common/Cpp/PrettyPrint.h"
+
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -78,16 +80,21 @@ std::unique_ptr<StatsTracker> DailyHighlightRNG_Descriptor::make_stats() const{
 
 DailyHighlightRNG::DailyHighlightRNG()
     : NUM_HIGHLIGHTS(
-        "<b>Number of highlights:</b><br>How many daily highlights should be bought. <br>A value of 0 will run until you stop the program.",
+        "<b>Number of highlights:</b><br>How many daily highlights should be bought. <br>Zero will run until you stop the program.",
         LockMode::UNLOCK_WHILE_RUNNING, 0)
     , FIX_TIME_WHEN_DONE(
         "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.<br>Doesn't do anything if Number of highlights is 0.",
         LockMode::UNLOCK_WHILE_RUNNING, false)
     , GO_HOME_WHEN_DONE(false)
-    , SAVE_ITERATIONS(
-        "<b>Save Every this Many Day Skips:</b><br>(zero disables saving): ",
-        LockMode::LOCK_WHILE_RUNNING,
+    , SAVE_INTERVAL(
+        "<b>Save Every this Many Day Skips:</b><br>(zero disables saving)",
+        LockMode::UNLOCK_WHILE_RUNNING,
         20
+    )
+    , CALIBRATION_INTERAVAL(
+        "<b>Calibrate the number of NPCs this many Day Skips:</b><br>Zero will only calibrate once.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        10
     )
     , HIGHLIGHT_SELECTION(
         "<b>Desired Highlights:</b>", 
@@ -104,8 +111,23 @@ DailyHighlightRNG::DailyHighlightRNG()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
+    , MAX_EXPECTED_NPCS(
+        "<b>Max Expected NPCs:</b><br>How many NPCs are expected in the area at most.",
+        LockMode::LOCK_WHILE_RUNNING,
+        8
+    )
+    , CALIBRATION_REPEATS(
+        "<b>Calibration Repeats:</b><br>How many times the number of NPCs is checked per calibration.",
+        LockMode::LOCK_WHILE_RUNNING,
+        5
+    )
+    , CALIBRATION_THRESHOLD(
+        "<b>Calibration Treshold:</b><br>How many NPC counts need to be the same.<br>This needs to be less than or equal to Calibration Repeats.",
+        LockMode::LOCK_WHILE_RUNNING,
+        3
+    )
     , MAX_UNKNOWN_ADVANCES(
-        "<b>Max Unknown advances:</b><br>How many advances to check when updating the rng state.",
+        "<b>Max Unknown Advances:</b><br>How many advances to check when updating the rng state.",
         LockMode::LOCK_WHILE_RUNNING,
         100000
     )
@@ -135,12 +157,16 @@ DailyHighlightRNG::DailyHighlightRNG()
     PA_ADD_OPTION(NUM_HIGHLIGHTS);
     PA_ADD_OPTION(FIX_TIME_WHEN_DONE);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
-    PA_ADD_OPTION(SAVE_ITERATIONS);
+    PA_ADD_OPTION(SAVE_INTERVAL);
+    PA_ADD_OPTION(CALIBRATION_INTERAVAL);
     PA_ADD_OPTION(HIGHLIGHT_SELECTION);
 
     PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_STATIC(m_advanced_options);
+    PA_ADD_OPTION(CALIBRATION_REPEATS);
+    PA_ADD_OPTION(CALIBRATION_THRESHOLD);
+    PA_ADD_OPTION(MAX_EXPECTED_NPCS);
     PA_ADD_OPTION(MAX_UNKNOWN_ADVANCES);
     PA_ADD_OPTION(ADVANCE_PRESS_DURATION);
     PA_ADD_OPTION(ADVANCE_RELEASE_DURATION);
@@ -149,29 +175,36 @@ DailyHighlightRNG::DailyHighlightRNG()
 }
 
 void DailyHighlightRNG::move_to_trader(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
-    pbf_move_right_joystick(context, 255, 128, 500ms, 80ms);
+    pbf_move_right_joystick(context, 255, 128, 460ms, 80ms);
     pbf_move_left_joystick(context, 128, 0, 1280ms, 80ms);
 }
 
 void DailyHighlightRNG::interact_with_trader(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
-    pbf_press_button(context, BUTTON_A, 160ms, 600ms);
-    pbf_press_button(context, BUTTON_A, 160ms, 160ms);
-
-    // Check if talking to the NPC was successfull
     VideoOverlaySet boxes(env.console);
     SelectionArrowFinder arrow_detector(env.console, ImageFloatBox(0.5, 0.58, 0.2, 0.08));
     arrow_detector.make_overlays(boxes);
+    YCommIconDetector y_comm_icon_detector(true);
+    size_t tries = 0;
 
-    context.wait_for_all_requests();
-    int ret = wait_until(env.console, context, 3000ms, { arrow_detector });
-    if (ret < 0) {
-        DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
-        stats.errors++;
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "Failed to talk to the trader.",
-            env.console
-        );
+    while (true) {
+        if (tries >= 5) {
+            DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
+            stats.errors++;
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to talk to the trader.",
+                env.console
+            );
+        }
+        context.wait_for_all_requests();
+        int ret = wait_until(env.console, context, 500ms, { y_comm_icon_detector, arrow_detector });
+        if (ret == -1 || ret == 0) {
+            tries++;
+            pbf_press_button(context, BUTTON_A, 80ms, 80ms);
+        }
+        else if (ret == 1) {
+            return;
+        }
     }
 }
 
@@ -179,7 +212,7 @@ void DailyHighlightRNG::buy_highlight(SingleSwitchProgramEnvironment& env, ProCo
     // The player is expected to be in main dialog of the trader
     env.log("Buying Highlight.");
     env.console.overlay().add_log("Buying Highlight!", COLOR_WHITE);
-    pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
+    pbf_press_dpad(context, DPAD_DOWN, 160ms, 160ms);
 
     pbf_press_button(context, BUTTON_A, 160ms, 160ms);
     context.wait_for_all_requests();
@@ -210,16 +243,16 @@ void DailyHighlightRNG::buy_highlight(SingleSwitchProgramEnvironment& env, ProCo
 
 void DailyHighlightRNG::navigate_to_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+    pbf_wait(context, 200ms);
     navigate_to_menu_app(env, env.console, context, 1, NOTIFICATION_ERROR_FATAL);
     pbf_press_button(context, BUTTON_A, 80ms, 3000ms);
-    context.wait_for_all_requests();
 }
 
 void DailyHighlightRNG::save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
-    context.wait_for_all_requests();
     env.log("Saving.");
     env.console.overlay().add_log("Saving!", COLOR_WHITE);
     pbf_press_button(context, BUTTON_X, 80ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+    pbf_wait(context, 200ms);
     pbf_press_button(context, BUTTON_R, 80ms, 2000ms);
     pbf_mash_button(context, BUTTON_A, 500ms);
 
@@ -227,52 +260,79 @@ void DailyHighlightRNG::save_game(SingleSwitchProgramEnvironment& env, ProContro
 }
 
 uint8_t DailyHighlightRNG::calibrate_num_npc_from_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Pokemon::Xoroshiro128Plus& rng) {
-    return_to_overworld(env, context);
-    navigate_to_party(env, context);
-
-    env.log("Calibrating NPC amount.");
-    env.console.overlay().add_log("Calibrating NPC amount.", COLOR_WHITE);
+    env.log("Calibrating NPC count.");
+    env.console.overlay().add_log("Calibrating NPC count.", COLOR_WHITE);
 
     DailyHighlightRNG_Descriptor::Stats& stats = env.current_stats<DailyHighlightRNG_Descriptor::Stats>();
-    stats.reads++;
-    std::pair<Xoroshiro128PlusState, uint64_t> result = refind_rng_state_and_animations(env.console, context, rng.get_state(), 0, 100, SAVE_SCREENSHOTS, LOG_VALUES);
-    Xoroshiro128PlusState new_state = result.first;
-    uint64_t additional_advances = result.second;
+    size_t max_expected_npcs = MAX_EXPECTED_NPCS;
+    size_t calibration_repeats = CALIBRATION_REPEATS;
+    size_t calibration_threshold = CALIBRATION_THRESHOLD;
+    size_t finished_calibration_steps = 0;
+    std::vector<size_t> npc_counts(max_expected_npcs, 0);
+    while (finished_calibration_steps < calibration_repeats) {
+        env.log("Calibration: " + std::to_string(finished_calibration_steps+1) + "/" + std::to_string(calibration_repeats));
+        env.console.overlay().add_log("Calibration: " + std::to_string(finished_calibration_steps+1) + "/" + std::to_string(calibration_repeats), COLOR_WHITE);
 
-    // Calculate state for possible NPC amounts
-    const uint8_t MAX_NPCS = 6; // Usually either 1 or 2, sometimes 3 or 4, maybe 5 or 6 -> high numbers suggest bad npc state
-    std::vector<Xoroshiro128PlusState> rng_states;
+        return_to_overworld(env, context);
+        navigate_to_party(env, context);
 
-    for (uint8_t npcs = 0; npcs <= MAX_NPCS; npcs++) {
-        Xoroshiro128PlusState temp_state = predict_state_after_menu_close(rng.get_state(), npcs);
-        Xoroshiro128Plus temp_rng(temp_state);
+        Xoroshiro128PlusState state_before_menu_close(rng.get_state());
+        std::pair<Xoroshiro128PlusState, uint64_t> result = refind_rng_state_and_animations(env.console, context, rng.get_state(), 0, 100, SAVE_SCREENSHOTS, LOG_VALUES);
+        Xoroshiro128PlusState new_state = result.first;
+        uint64_t additional_advances = result.second;
 
-        // Do advances that were needed to find current state
-        for (size_t i = 0; i < additional_advances; i++) {
-            temp_rng.next();
+        // Calculate state for possible NPC counts
+        std::vector<Xoroshiro128PlusState> rng_states;
+
+        for (uint8_t npcs = 0; npcs <= max_expected_npcs; npcs++) {
+            Xoroshiro128PlusState temp_state = predict_state_after_menu_close(state_before_menu_close, npcs);
+            Xoroshiro128Plus temp_rng(temp_state);
+
+            // Do advances that were needed to refind current state
+            for (size_t i = 0; i < additional_advances; i++) {
+                temp_rng.next();
+            }
+            rng_states.push_back(temp_rng.get_state());
         }
-        rng_states.push_back(temp_rng.get_state());
-    }
 
-    // Compare current state to expected states
-    uint8_t num_npcs = 0;
-    for (uint8_t i = 1; i <= MAX_NPCS; i++) {
-        if (rng_states[i].s0 == new_state.s0 && rng_states[i].s1 == new_state.s1) {
-            rng.state = new_state;
-            num_npcs = i;
+        // Compare current state to expected states
+        uint8_t num_npcs = 0;
+        uint8_t possible_choices = 0;
+        for (uint8_t i = 0; i <= max_expected_npcs; i++) {
+            if (rng_states[i].s0 == new_state.s0 && rng_states[i].s1 == new_state.s1) {
+                num_npcs = i;
+                possible_choices++;
+            }
+        }
+        rng.state = new_state;
+
+        stats.reads++;
+
+        // Add another calibration round if multiple npcs counts are possible
+        if (possible_choices > 1) {
+            env.log("NPC count is ambiguous.");
+            env.console.overlay().add_log("NPC count is ambiguous. Repeat calibration.", COLOR_WHITE);
+            continue;
+        }
+
+        env.console.log("Calculated there are " + std::to_string(num_npcs) + " NPCs.");
+        env.console.overlay().add_log(std::to_string(num_npcs) + " NPCs", COLOR_WHITE);
+        npc_counts[num_npcs]++;
+        finished_calibration_steps++;
+
+        if (npc_counts[num_npcs] >= calibration_threshold) {
+            env.console.log("Final Calibration: " + std::to_string(num_npcs) + " NPCs.");
+            env.console.overlay().add_log("Final Calibration: " + std::to_string(num_npcs) + " NPCs", COLOR_WHITE);
+
+            return num_npcs;
         }
     }
-    if (num_npcs == 0) {
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "NPC is in the wrong state or an unexpected amount of NPCs is in the area.",
-            env.console
-        );
-    }
 
-    env.console.log("Calculated there are " + std::to_string(num_npcs) + "NPCs.");
-    env.console.overlay().add_log(std::to_string(num_npcs) + " NPCs", COLOR_WHITE);
-    return num_npcs;
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "NPC is in the wrong state or an unexpected number of NPCs is in the area.",
+        env.console
+    );
 }
 
 size_t DailyHighlightRNG::calculate_target(SingleSwitchProgramEnvironment& env, Xoroshiro128PlusState state, uint8_t num_npcs, std::vector<std::string> wanted_highlights) {
@@ -294,8 +354,9 @@ size_t DailyHighlightRNG::calculate_target(SingleSwitchProgramEnvironment& env, 
         uint64_t highlight_roll = temp_rng.nextInt(1000);
 
         for (auto& range : ranges) {
-            if (range.first < highlight_roll && range.second > highlight_roll) {
+            if (range.first <= highlight_roll && range.second >= highlight_roll) {
                 found_advance_amount = true;
+                env.console.log("Target highlight roll: " + std::to_string(highlight_roll));
             }
         }
         
@@ -314,16 +375,20 @@ void DailyHighlightRNG::prepare_game_state(SingleSwitchProgramEnvironment& env, 
     
     // Open map
     pbf_press_button(context, BUTTON_X, 160ms, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0);
+    pbf_wait(context, 200ms);
     navigate_to_menu_app(env, env.console, context, 5, NOTIFICATION_ERROR_RECOVERABLE);
+    pbf_wait(context, 200ms);
     pbf_press_button(context, BUTTON_A, 160ms, 4000ms);
 
     // Fly to Snowslide Slope
     pbf_move_left_joystick(context, 200, 210, 160ms, 160ms);
-    pbf_mash_button(context, BUTTON_A, 1000ms);
+    pbf_move_left_joystick(context, 150, 165, 160ms, 160ms);
+    pbf_mash_button(context, BUTTON_A, 1500ms);
     return_to_overworld(env, context);
 }
 
-void DailyHighlightRNG::return_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void DailyHighlightRNG::return_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool wait_after_detection) {
+    context.wait_for_all_requests();
     env.console.log("Returning to the overworld.");
     YCommIconDetector y_comm_icon_detector(true);
     int ret = run_until<ProControllerContext>(
@@ -342,11 +407,16 @@ void DailyHighlightRNG::return_to_overworld(SingleSwitchProgramEnvironment& env,
             env.console
         );
     }
+
+    // Sometimes Y-Comm is detected before button presses are accepted again
+    if (wait_after_detection) {
+        context.wait_for(300ms); 
+    }
 }
 
-
 void DailyHighlightRNG::advance_date(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t& year) {
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+    context.wait_for(200ms);
+    pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     home_to_date_time(context, true, false);
     pbf_press_button(context, BUTTON_A, 160ms, 240ms);
     context.wait_for_all_requests();
@@ -355,7 +425,7 @@ void DailyHighlightRNG::advance_date(SingleSwitchProgramEnvironment& env, ProCon
     DateChangeWatcher date_reader;
     date_reader.make_overlays(overlays);
 
-    DateTime date{ 2000, 10, 31, 1, 0, 0 }; // 31st October for fixed Overcast weather
+    DateTime date{ 2000, 12, 31, 1, 0, 0 }; // 31st December for fixed Normal weather
     
     if (year >= MAX_YEAR) {
         date_reader.set_date(env.program_info(), env.console, context, date);
@@ -387,35 +457,33 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
         grip_menu_connect_go_home(context);
     }
     else {
-        pbf_press_button(context, BUTTON_B, 40ms, 40ms);
+        pbf_press_button(context, BUTTON_B, 80ms, 80ms);
     }
 
 
     Xoroshiro128Plus rng(0, 0);
-    bool is_state_valid = false;
-    size_t iteration = 0;
-    size_t successfull_iterations = 0;
+    uint8_t num_npcs = 0;
+    size_t iterations = 0;
+    size_t assumed_successful_iterations = 0;
     size_t bought_highlights = 0;
     uint8_t year = MAX_YEAR;
     uint16_t state_errors = 0;
 
     while (bought_highlights < NUM_HIGHLIGHTS || NUM_HIGHLIGHTS <= 0){
-        iteration++;
+        iterations++;
         stats.iterations++;
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        env.console.log("Daily Highlight RNG iteration: " + std::to_string(iteration));
-        env.console.overlay().add_log("Iteration: " + std::to_string(iteration), COLOR_WHITE);
+        env.console.log("Daily Highlight RNG iteration: " + std::to_string(iterations));
+        env.console.overlay().add_log("Iteration: " + std::to_string(iterations), COLOR_WHITE);
 
-        if (SAVE_ITERATIONS > 0 && iteration % SAVE_ITERATIONS == 0) {
+        if (SAVE_INTERVAL > 0 && iterations % SAVE_INTERVAL == 0) {
             save_game(env, context);
         }
 
         return_to_overworld(env, context);
-        advance_date(env, context, year);
 
-        if (!is_state_valid) {
-            successfull_iterations = 0;
+        if (assumed_successful_iterations <= 0) {
             prepare_game_state(env, context);
 
             // open and close the menu and immediately walk to the trader
@@ -425,20 +493,21 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
             interact_with_trader(env, context);
 
             return_to_overworld(env, context);
-            navigate_to_party(env, context);
-            context.wait_for_all_requests();
+        }
 
-            // Find RNG state
+        advance_date(env, context, year);
+        navigate_to_party(env, context);
+        context.wait_for_all_requests();
+
+        // (Re-)Find RNG state
+        if (assumed_successful_iterations <= 0) {
             env.log("Finding initial rng state.");
             env.console.overlay().add_log("Initial RNG state:", COLOR_WHITE);
             rng = Xoroshiro128Plus(find_rng_state(env.console, context, SAVE_SCREENSHOTS, LOG_VALUES));
             stats.reads++;
-            is_state_valid = true;
-            continue;
-        }else{
+        } else {
             env.log("Refinding rng state.");
             env.console.overlay().add_log("New RNG state:", COLOR_WHITE);
-            navigate_to_party(env, context);
             rng = Xoroshiro128Plus(refind_rng_state(env.console, context, rng.get_state(), 0, MAX_UNKNOWN_ADVANCES, SAVE_SCREENSHOTS, LOG_VALUES));
             stats.reads++;
         }
@@ -458,31 +527,32 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
             }
             VideoSnapshot screen = env.console.video().snapshot();
             send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, "Detected invalid RNG state.", screen);
-            is_state_valid = false;
+            assumed_successful_iterations = 0;
             continue;
         }
 
         // Calibrate number of NPCs in the area and check whether the trader is in the slow state
-        uint8_t num_npcs;
-        try {
-            num_npcs = calibrate_num_npc_from_party(env, context, rng);
-        }
-        catch (OperationFailedException& exception) {
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, exception.message(), exception.screenshot());
-            is_state_valid = false;
-            stats.errors++;
-            continue;
+        if ((CALIBRATION_INTERAVAL > 0 && assumed_successful_iterations % CALIBRATION_INTERAVAL == 0) || assumed_successful_iterations <= 0) {
+            try {
+                num_npcs = calibrate_num_npc_from_party(env, context, rng);
+            }
+            catch (OperationFailedException& exception) {
+                send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, exception.message(), exception.screenshot());
+                assumed_successful_iterations = 0;
+                stats.errors++;
+                continue;
+            }
         }
 
         // Do required advances
-        size_t target_advances = calculate_target(env, rng.get_state(), num_npcs, HIGHLIGHT_SELECTION.all_slugs());
+        size_t target_advances = calculate_target(env, rng.get_state(), num_npcs, HIGHLIGHT_SELECTION.all_slugs()); // TODO: make highlight selection 
         env.console.log("Needed advances: " + std::to_string(target_advances));
         do_rng_advances(env.console, context, rng, target_advances, ADVANCE_PRESS_DURATION, ADVANCE_RELEASE_DURATION);
 
         // Talk to NPC and buy highlight
-        return_to_overworld(env, context);
+        return_to_overworld(env, context, false);
         interact_with_trader(env, context);
-        if (successfull_iterations >= 2) {
+        if (assumed_successful_iterations >= 2) {
             buy_highlight(env, context);
             bought_highlights++;
             stats.highlights++;
@@ -490,12 +560,12 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
         return_to_overworld(env, context);
         
         env.update_stats();
-        successfull_iterations++;
+        assumed_successful_iterations++;
         state_errors = 0;
     }
 
     if (FIX_TIME_WHEN_DONE) {
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
         home_to_date_time(context, false, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
@@ -503,7 +573,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
         resume_game_from_home(env.console, context);
     }
     GO_HOME_WHEN_DONE.run_end_of_program(context);
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH, "Finished buying " + std::to_string(bought_highlights) + " daily highlights!", env.console.video().snapshot());
 }
 
 

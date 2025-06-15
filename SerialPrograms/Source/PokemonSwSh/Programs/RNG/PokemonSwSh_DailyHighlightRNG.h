@@ -47,13 +47,17 @@ private:
     SimpleIntegerOption<uint16_t> NUM_HIGHLIGHTS;
     BooleanCheckBoxOption FIX_TIME_WHEN_DONE;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-    SimpleIntegerOption<uint16_t> SAVE_ITERATIONS;
+    SimpleIntegerOption<uint16_t> SAVE_INTERVAL;
+    SimpleIntegerOption<uint16_t> CALIBRATION_INTERAVAL;
     StringSelectTableOption HIGHLIGHT_SELECTION;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
+    SimpleIntegerOption<uint8_t> MAX_EXPECTED_NPCS;
+    SimpleIntegerOption<uint8_t> CALIBRATION_REPEATS;
+    SimpleIntegerOption<uint8_t> CALIBRATION_THRESHOLD;
     SimpleIntegerOption<uint32_t> MAX_UNKNOWN_ADVANCES;
     MillisecondsOption ADVANCE_PRESS_DURATION;
     MillisecondsOption ADVANCE_RELEASE_DURATION;
@@ -62,7 +66,7 @@ private:
 
     void move_to_trader(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void interact_with_trader(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void return_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void return_to_overworld(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool wait_after_detection = true);
     void buy_highlight(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     uint8_t calibrate_num_npc_from_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Pokemon::Xoroshiro128Plus& rng);
     void navigate_to_party(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
