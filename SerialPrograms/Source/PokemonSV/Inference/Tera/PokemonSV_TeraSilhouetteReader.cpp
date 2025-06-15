@@ -4,7 +4,10 @@
  *
  */
 
+#pragma warning(push)
+#pragma warning(disable: 4127)
 #include <opencv2/imgproc.hpp>
+#pragma warning(pop)
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/ImageMatch/ImageCropper.h"

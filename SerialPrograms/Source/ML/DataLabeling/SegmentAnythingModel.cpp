@@ -8,7 +8,10 @@
 #include <fstream>
 #include <iostream>
 #include <onnxruntime_cxx_api.h>
+#pragma warning(push)
+#pragma warning(disable: 4127)
 #include <opencv2/imgcodecs.hpp>
+#pragma warning(pop)
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "SegmentAnythingModel.h"
 
