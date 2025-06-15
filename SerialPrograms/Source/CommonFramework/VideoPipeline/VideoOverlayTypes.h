@@ -66,27 +66,25 @@ struct OverlayText{
 // An image as part of the video overlay.
 // Allow transparency to create mask overlay.
 // Check CommonFramework/VideoPipeline/VideoOverlay.h to see how it's used.
-// e.g. OverlayImage(image, x=0.5, y=0.5, width=0.5, height=0.5) will render
+// e.g. OverlayImage(image, {x=0.5, y=0.5, width=0.5, height=0.5}) will render
 // an overlay image on the lower right quadrant of the view.
+// Note: for efficiency, the image stored is just a pointer. Be careful not to
+// modify the image data async or release it before the rendering code calls it.
 struct OverlayImage{
     // Image view. The image data must live longer than the OverlayImage.
     // Its alpha channel will be used during rendering.
     ImageViewRGB32 image;
     // starting x coordinate of the image in the video window, range: 0.0-1.0.
-    double x = 0.0;
     // starting y coordinate of the image in the video window, range: 0.0-1.0.
-    double y = 0.0;
     // relative width of the image in the video window, range: 0.0-1.0
-    double width = 0.0;
     // relative height of the image in the video window, range: 0.0-1.0
-    double height = 0.0;
-
+    ImageFloatBox box;
+    
     OverlayImage(
-        ImageViewRGB32 image,
-        double x, double y, double width, double height
+        ImageViewRGB32 image, const ImageFloatBox& box
     )
-        : image(std::move(image))
-        , x(x), y(y), width(width), height(height)
+        : image(image)
+        , box(box)
     {}
 };
 

@@ -46,9 +46,17 @@ public:
         virtual void on_overlay_enabled_log    (bool enabled){}
         virtual void on_overlay_enabled_stats  (bool enabled){}
 
+        // Returns a copy to avoid the caller (UI object) accessing the data async while the data
+        // is modified by VideoOverlaySession::add/remove_box().
         virtual void on_overlay_update_boxes  (const std::shared_ptr<const std::vector<OverlayBox>>& boxes){}
+        // Returns a copy to avoid the caller (UI object) accessing the data async while the data
+        // is modified by VideoOverlaySession::add/remove_text().
         virtual void on_overlay_update_text   (const std::shared_ptr<const std::vector<OverlayText>>& texts){}
+        // Returns a copy to avoid the caller (UI object) accessing the data async while the data
+        // is modified by VideoOverlaySession::add/remove_image().
         virtual void on_overlay_update_images (const std::shared_ptr<const std::vector<OverlayImage>>& images){}
+        // Returns a copy to avoid the caller (UI object) accessing the data async while the data
+        // is modified by VideoOverlaySession::add/remove_log().
         virtual void on_overlay_update_log    (const std::shared_ptr<const std::vector<OverlayLogLine>>& boxes){}
 
         //  This one is different from the others. The listeners will store this
@@ -89,13 +97,21 @@ public:
     void set_enabled_log   (bool enabled);
     void set_enabled_stats (bool enabled);
 
-    // Called by rendering infra to access the overlay boxes
+    // Called by rendering infra to access a copy of the stored overlay boxes.
+    // Returns a copy to avoid the caller (UI object) accessing the data async while the data
+    // is modified by VideoOverlaySession::add/remove_box().
     std::vector<OverlayBox> boxes() const;
-    // Called by rendering infra to access the overlay texts
+    // Called by rendering infra to access the overlay texts.
+    // Returns a copy to avoid the caller (UI object) accessing the data async while the data
+    // is modified by VideoOverlaySession::add/remove_text().
     std::vector<OverlayText> texts() const;
-    // Called by rendering infra to access the overlay images
+    // Called by rendering infra to access the overlay images.
+    // Returns a copy to avoid the caller (UI object) accessing the data async while the data
+    // is modified by VideoOverlaySession::add/remove_image().
     std::vector<OverlayImage> images() const;
-    // Called by rendering infra to access the overlay logs
+    // Called by rendering infra to access the overlay logs.
+    // Returns a copy to avoid the caller (UI object) accessing the data async while the data
+    // is modified by VideoOverlaySession::add/remove_log().
     std::vector<OverlayLogLine> log_texts() const;
 
     virtual void add_box(const OverlayBox& box) override;

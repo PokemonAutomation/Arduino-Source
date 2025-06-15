@@ -224,10 +224,10 @@ void VideoOverlayWidget::render_images(QPainter& painter){
         QRectF source_rect(0.0, 0.0, static_cast<double>(q_image.width()), static_cast<double>(q_image.height()));
         // build a target_rect. target_rect is what region the overlay image should appear inside the overlay viewport.
         // target_rect is in pixel units of the viewport
-        const double target_start_x = width * image_overlay.x;
-        const double target_start_y = height * image_overlay.y;
-        const double target_width = width * image_overlay.width;
-        const double target_height = height * image_overlay.height;
+        const double target_start_x = width * image_overlay.box.x;
+        const double target_start_y = height * image_overlay.box.y;
+        const double target_width = width * image_overlay.box.width;
+        const double target_height = height * image_overlay.box.height;
         QRectF target_rect(target_start_x, target_start_y, target_width, target_height);
         painter.drawImage(target_rect, q_image, source_rect);
     }

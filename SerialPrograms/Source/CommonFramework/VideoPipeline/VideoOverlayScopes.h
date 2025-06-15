@@ -7,9 +7,8 @@
 #ifndef PokemonAutomation_VideoOverlayScopes_H
 #define PokemonAutomation_VideoOverlayScopes_H
 
-//#include <vector>
 #include <deque>
-//#include "VideoOverlayTypes.h"
+#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "VideoOverlay.h"
 
 namespace PokemonAutomation{
@@ -55,8 +54,6 @@ private:
 };
 
 
-
-
 //  A text as part of the video overlay.
 //  It handles its own life time on video overlay: once it's destroyed, it removes itself from VideoOverlay.
 class OverlayTextScope : public OverlayText{
@@ -83,6 +80,54 @@ public:
 
 private:
     VideoOverlay& m_overlay;
+};
+
+
+//  An image as part of the video overlay.
+//  It owns the image data and handles its own life time on video overlay: once it's destroyed,
+//  it removes itself from VideoOverlay.
+class OverlayImageScope : public OverlayImage{
+    OverlayImageScope(const OverlayImageScope&) = delete;
+    void operator=(const OverlayImageScope&) = delete;
+
+public:
+    ~OverlayImageScope(){
+        m_overlay.remove_image(*this);
+    }
+
+public:
+    // the copied `image` is moved into OverlayImageScope
+    // so after this constructer, the caller can freely modify or delete `image`.
+    OverlayImageScope(
+        VideoOverlay& overlay,
+        ImageRGB32 image,
+        const ImageFloatBox& box
+    )
+        : OverlayImage(ImageViewRGB32(), box)
+        , m_overlay(overlay)
+        , m_image_data(std::move(image))
+    {
+        this->image = m_image_data;
+        overlay.add_image(*this);
+    }
+
+    OverlayImageScope(
+        VideoOverlay& overlay,
+        ImageViewRGB32 image,
+        const ImageFloatBox& box
+    )
+        : OverlayImage(ImageViewRGB32(), box)
+        , m_overlay(overlay)
+        , m_image_data(image.copy())
+    {
+        this->image = m_image_data;
+        overlay.add_image(*this);
+    }
+
+private:
+    VideoOverlay& m_overlay;
+    // owns image content, in contrast to OverlayImage::image which is just a pointer
+    ImageRGB32 m_image_data;
 };
 
 
@@ -114,8 +159,6 @@ private:
 // automatically when VideoOverlaySet is destroyed.
 // In this way, the user will see the inference boxes on the video overlay UI
 // and those boxes will leave the UI after the session ends.
-//
-// TODO: shall we add text management to this class, or rename this class to BoxOverleySet?
 class VideoOverlaySet{
 public:
     VideoOverlaySet(VideoOverlay& overlay)
@@ -124,14 +167,22 @@ public:
 
     void clear(){
         m_boxes.clear();
+        m_images.clear();
     }
     void add(Color color, const ImageFloatBox& box, std::string label = ""){
         m_boxes.emplace_back(m_overlay, color, box, std::move(label));
+    }
+    void add(ImageRGB32 image, const ImageFloatBox& box){
+        m_images.emplace_back(m_overlay, std::move(image), box);
+    }
+    void add(ImageViewRGB32 image, const ImageFloatBox& box){
+        m_images.emplace_back(m_overlay, image, box);
     }
 
 private:
     VideoOverlay& m_overlay;
     std::deque<OverlayBoxScope> m_boxes;
+    std::deque<OverlayImageScope> m_images;
 };
 
 

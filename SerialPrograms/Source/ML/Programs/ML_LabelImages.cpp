@@ -21,6 +21,7 @@
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "Pokemon/Resources/Pokemon_PokemonForms.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h"
@@ -31,6 +32,7 @@
 #include "ML/DataLabeling/SegmentAnythingModel.h"
 
 
+
 using std::cout;
 using std::endl;
 
@@ -38,15 +40,17 @@ namespace PokemonAutomation{
 namespace ML{
 
 
-DrawnBoundingBox::DrawnBoundingBox(LabelImages& label_program, VideoOverlay& overlay)
-    : m_program(label_program)
+ObjectAnnotation::ObjectAnnotation() {}
+
+DrawnBoundingBox::DrawnBoundingBox(LabelImages_Widget& widget, VideoOverlay& overlay)
+    : m_widget(widget)
     , m_overlay(overlay)
-    , m_overlay_set(overlay)
 {
-    m_program.X.add_listener(*this);
-    m_program.Y.add_listener(*this);
-    m_program.WIDTH.add_listener(*this);
-    m_program.HEIGHT.add_listener(*this);
+    auto& program = m_widget.m_program;
+    program.X.add_listener(*this);
+    program.Y.add_listener(*this);
+    program.WIDTH.add_listener(*this);
+    program.HEIGHT.add_listener(*this);
     overlay.add_listener(*this);
 }
 
@@ -54,22 +58,26 @@ DrawnBoundingBox::~DrawnBoundingBox(){
     detach();
 }
 
+// called when drawn bounding box changed
 void DrawnBoundingBox::on_config_value_changed(void* object){
+    auto& program = m_widget.m_program;
     std::lock_guard<std::mutex> lg(m_lock);
-    m_overlay_set.clear();
-    m_overlay_set.add(COLOR_RED, {m_program.X, m_program.Y, m_program.WIDTH, m_program.HEIGHT});
+    program.set_rendered_objects(m_widget.m_overlay_set);
 }
 void DrawnBoundingBox::on_mouse_press(double x, double y){
-    m_program.WIDTH.set(0);
-    m_program.HEIGHT.set(0);
-    m_program.X.set(x);
-    m_program.Y.set(y);
+    auto& program = m_widget.m_program;
+    program.WIDTH.set(0);
+    program.HEIGHT.set(0);
+    program.X.set(x);
+    program.Y.set(y);
     m_mouse_start.emplace();
     m_mouse_start->first = x;
     m_mouse_start->second = y;
 }
 void DrawnBoundingBox::on_mouse_release(double, double){
     m_mouse_start.reset();
+    auto& m_program = m_widget.m_program;
+    auto& m_overlay_set = m_widget.m_overlay_set;
 
     const size_t source_width = m_program.source_image_width;
     const size_t source_height = m_program.source_image_height;
@@ -113,20 +121,32 @@ void DrawnBoundingBox::on_mouse_release(double, double){
         }
     }
     if (min_mask_x < INT_MAX && max_mask_x > min_mask_x && min_mask_y < INT_MAX && max_mask_y > min_mask_y){
-        const size_t mask_width = max_mask_x - min_mask_x;
-        const size_t mask_height = max_mask_y - min_mask_y;
+        const size_t mask_width = max_mask_x - min_mask_x + 1;
+        const size_t mask_height = max_mask_y - min_mask_y + 1;
         ImageFloatBox mask_box(
             min_mask_x/double(source_width), min_mask_y/double(source_height),
             mask_width/double(source_width), mask_height/double(source_height));
-        m_overlay_set.add(COLOR_BLUE, mask_box, "Unknown");
+        const std::string label = m_program.FORM_LABEL.slug();
+        
+
+        ObjectAnnotation annotation;
+        annotation.user_box = ImagePixelBox(box_x, box_y, box_x + box_width + 1, box_y + box_height + 1);
+        annotation.mask_box = ImagePixelBox(min_mask_x, min_mask_y, max_mask_x+1, max_mask_y+1);
+        annotation.mask.resize(mask_width * mask_height);
+        for(size_t row = 0; row < mask_height; row++){
+            auto it = m_program.m_output_boolean_mask.begin() + (min_mask_y + row) * source_width + min_mask_x;
+            auto it2 = annotation.mask.begin() + row * mask_width;
+            std::copy(it, it + mask_width, it2);
+        }
+
+        annotation.label = label;
+        m_program.m_annotated_objects.emplace_back(std::move(annotation));
+
+        m_program.set_rendered_objects(m_overlay_set);
     }
-    if (m_program.m_overlay_image){
-        m_overlay.remove_image(*m_program.m_overlay_image);
-    }
-    m_program.m_overlay_image = std::make_unique<OverlayImage>(m_program.m_mask_image, 0.0, 0.0, 1.0, 1.0);
-    m_overlay.add_image(*m_program.m_overlay_image);
 }
 void DrawnBoundingBox::on_mouse_move(double x, double y){
+    auto& program = m_widget.m_program;
     if (!m_mouse_start){
         return;
     }
@@ -143,18 +163,19 @@ void DrawnBoundingBox::on_mouse_move(double x, double y){
         std::swap(yl, yh);
     }
 
-    m_program.X.set(xl);
-    m_program.Y.set(yl);
-    m_program.WIDTH.set(xh - xl);
-    m_program.HEIGHT.set(yh - yl);
+    program.X.set(xl);
+    program.Y.set(yl);
+    program.WIDTH.set(xh - xl);
+    program.HEIGHT.set(yh - yl);
 }
 
 void DrawnBoundingBox::detach(){
+    auto& program = m_widget.m_program;
     m_overlay.remove_listener(*this);
-    m_program.X.remove_listener(*this);
-    m_program.Y.remove_listener(*this);
-    m_program.WIDTH.remove_listener(*this);
-    m_program.HEIGHT.remove_listener(*this);
+    program.X.remove_listener(*this);
+    program.Y.remove_listener(*this);
+    program.WIDTH.remove_listener(*this);
+    program.HEIGHT.remove_listener(*this);
 }
 
 
@@ -209,8 +230,47 @@ QWidget* LabelImages::make_widget(QWidget& parent, PanelHolder& holder){
     return new LabelImages_Widget(parent, *this, holder);
 }
 
+void LabelImages::set_rendered_objects(VideoOverlaySet& overlay_set){
+    overlay_set.clear();
+    overlay_set.add(COLOR_RED, {X, Y, WIDTH, HEIGHT});
+
+    for(const auto& obj : m_annotated_objects){
+        // overlayset.add(COLOR_RED, pixelbox_to_floatbox(source_image_width, source_image_height, obj.user_box));
+        const auto mask_float_box = pixelbox_to_floatbox(source_image_width, source_image_height, obj.mask_box);
+        std::string label = obj.label;
+        const Pokemon::PokemonForm* form = Pokemon::get_pokemon_form(label);
+        if (form != nullptr){
+            label = form->display_name();
+        }
+        overlay_set.add(COLOR_BLUE, mask_float_box, label);
+        size_t mask_width = obj.mask_box.width();
+        size_t mask_height = obj.mask_box.height();
+        ImageRGB32 mask_image(mask_width, mask_height);
+        // cout << "in render, mask_box " << obj.mask_box.min_x << " " << obj.mask_box.min_y << " " << obj.mask_box.max_x << " " << obj.mask_box.max_y << endl;
+
+        // int count = 0;
+        for (size_t y = 0; y < mask_height; y++){
+            for (size_t x = 0; x < mask_width; x++){
+                const bool mask = obj.mask[y*mask_width + x];
+                uint32_t& pixel = mask_image.pixel(x, y);
+                // if the pixel's mask value is true, set a semi-transparent 45-degree blue strip color
+                // otherwise: fully transparent (alpha = 0)
+                uint32_t color = 0;
+                if (mask){
+                    color = (std::abs(int(x) - int(y)) % 4 <= 1) ? combine_argb(150, 30, 144, 255) : combine_argb(150, 0, 0, 60);
+                    // count++;
+                }
+                pixel = color;
+            }
+        }
+        // cout << " count " << count << endl;
+        overlay_set.add(std::move(mask_image), mask_float_box);
+    }
+}
+
 
 LabelImages_Widget::~LabelImages_Widget(){
+    m_program.FORM_LABEL.remove_listener(*this);
     delete m_switch_widget;
 }
 LabelImages_Widget::LabelImages_Widget(
@@ -221,9 +281,10 @@ LabelImages_Widget::LabelImages_Widget(
     : PanelWidget(parent, instance, holder)
     , m_program(instance)
     , m_session(instance.m_switch_control_option, 0, 0)
-    , m_drawn_box(instance, m_session.overlay())
+    , m_overlay_set(m_session.overlay())
+    , m_drawn_box(*this, m_session.overlay())
 {
-    std::cout << &m_program << std::endl;
+    m_program.FORM_LABEL.add_listener(*this);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -241,15 +302,13 @@ LabelImages_Widget::LabelImages_Widget(
     m_switch_widget = new NintendoSwitch::SwitchSystemWidget(*this, m_session, 0);
     scroll_layout->addWidget(m_switch_widget);
 
-    QPushButton* button = new QPushButton("This is a button", scroll_inner);
+    QPushButton* button = new QPushButton("Delete Last Mask", scroll_inner);
     scroll_layout->addWidget(button);
-    connect(button, &QPushButton::clicked, this, [&instance](bool){
-        cout << "Button clicked!" << endl;
-        const VideoSourceDescriptor* video_source = instance.m_switch_control_option.m_video.descriptor().get();
-        auto image_source = dynamic_cast<const VideoSourceDescriptor_StillImage*>(video_source);
-        if (image_source != nullptr){
-            cout << "Image source: " << image_source->path() << endl;
+    connect(button, &QPushButton::clicked, this, [this](bool){
+        if (this->m_program.m_annotated_objects.size() > 0){
+            this->m_program.m_annotated_objects.pop_back();
         }
+        this->m_program.set_rendered_objects(this->m_overlay_set);
     });
 
     m_option_widget = instance.m_options.make_QtWidget(*scroll_inner);
@@ -269,14 +328,18 @@ LabelImages_Widget::LabelImages_Widget(
         load_image_embedding(image_path, m_program.m_image_embedding);
     }
 
-    // m_overlay_image = std::make_unique<OverlayImage>(*m_image_mask, 0.0, 0.2, 0.5, 0.5);
-    // m_session.overlay().add_image(*m_overlay_image);    
     cout << "LabelImages_Widget built" << endl;
 
-    // TODO: create UI to choose pokemon labels: use UI class StringSelectOption
     // TODO: create a custom table to display the annotated bounding boxes
 }
 
+void LabelImages_Widget::on_config_value_changed(void* object){
+    if (m_program.m_annotated_objects.size() > 0){
+        std::string& cur_label = m_program.m_annotated_objects.back().label;
+        cur_label = m_program.FORM_LABEL.slug();
+        m_program.set_rendered_objects(m_overlay_set);
+    }
+}
 
 
 
