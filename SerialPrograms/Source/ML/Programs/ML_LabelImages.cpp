@@ -79,72 +79,9 @@ void DrawnBoundingBox::on_mouse_release(double, double){
     auto& m_program = m_widget.m_program;
     auto& m_overlay_set = m_widget.m_overlay_set;
 
-    const size_t source_width = m_program.source_image_width;
-    const size_t source_height = m_program.source_image_height;
-    
-    const int box_x = int(m_program.X * source_width + 0.5);
-    const int box_y = int(m_program.Y * source_height + 0.5);
-    const int box_width = int(m_program.WIDTH * source_width + 0.5);
-    const int box_height = int(m_program.HEIGHT * source_height + 0.5);
-    if (box_width == 0 || box_height == 0){
-        return;
-    }
-
-    if (m_program.m_image_embedding.size() == 0){
-        // no embedding file loaded
-        return;
-    }
-    m_program.m_sam_session.run(
-        m_program.m_image_embedding,
-        (int)source_height, (int)source_width, {}, {},
-        {box_x, box_y, box_x + box_width, box_y + box_height},
-        m_program.m_output_boolean_mask
-    );
-
-    size_t min_mask_x = INT_MAX, max_mask_x = 0;
-    size_t min_mask_y = INT_MAX, max_mask_y = 0;
-    for (size_t y = 0; y < source_height; y++){
-        for (size_t x = 0; x < source_width; x++){
-            bool mask = m_program.m_output_boolean_mask[y*source_width + x];
-            uint32_t& pixel = m_program.m_mask_image.pixel(x, y);
-            // if the pixel's mask value is true, set a semi-transparent 45-degree blue strip color
-            // otherwise: fully transparent (alpha = 0)
-            uint32_t color = 0;
-            if (mask){
-                color = (std::abs(int(x) - int(y)) % 4 <= 1) ? combine_argb(150, 30, 144, 255) : combine_argb(150, 0, 0, 60);
-                min_mask_x = std::min(x, min_mask_x);
-                max_mask_x = std::max(x, max_mask_x);
-                min_mask_y = std::min(y, min_mask_y);
-                max_mask_y = std::max(y, max_mask_y);
-            }
-            pixel = color;
-        }
-    }
-    if (min_mask_x < INT_MAX && max_mask_x > min_mask_x && min_mask_y < INT_MAX && max_mask_y > min_mask_y){
-        const size_t mask_width = max_mask_x - min_mask_x + 1;
-        const size_t mask_height = max_mask_y - min_mask_y + 1;
-        ImageFloatBox mask_box(
-            min_mask_x/double(source_width), min_mask_y/double(source_height),
-            mask_width/double(source_width), mask_height/double(source_height));
-        const std::string label = m_program.FORM_LABEL.slug();
-        
-
-        ObjectAnnotation annotation;
-        annotation.user_box = ImagePixelBox(box_x, box_y, box_x + box_width + 1, box_y + box_height + 1);
-        annotation.mask_box = ImagePixelBox(min_mask_x, min_mask_y, max_mask_x+1, max_mask_y+1);
-        annotation.mask.resize(mask_width * mask_height);
-        for(size_t row = 0; row < mask_height; row++){
-            auto it = m_program.m_output_boolean_mask.begin() + (min_mask_y + row) * source_width + min_mask_x;
-            auto it2 = annotation.mask.begin() + row * mask_width;
-            std::copy(it, it + mask_width, it2);
-        }
-
-        annotation.label = label;
-        m_program.m_annotated_objects.emplace_back(std::move(annotation));
-
-        m_program.set_rendered_objects(m_overlay_set);
-    }
+    m_program.compute_mask(m_overlay_set);
 }
+
 void DrawnBoundingBox::on_mouse_move(double x, double y){
     auto& program = m_widget.m_program;
     if (!m_mouse_start){
@@ -268,6 +205,73 @@ void LabelImages::set_rendered_objects(VideoOverlaySet& overlay_set){
     }
 }
 
+void LabelImages::compute_mask(VideoOverlaySet& overlay_set){
+    const size_t source_width = source_image_width;
+    const size_t source_height = source_image_height;
+    
+    const int box_x = int(X * source_width + 0.5);
+    const int box_y = int(Y * source_height + 0.5);
+    const int box_width = int(WIDTH * source_width + 0.5);
+    const int box_height = int(HEIGHT * source_height + 0.5);
+    if (box_width == 0 || box_height == 0){
+        return;
+    }
+
+    if (m_image_embedding.size() == 0){
+        // no embedding file loaded
+        return;
+    }
+    m_sam_session.run(
+        m_image_embedding,
+        (int)source_height, (int)source_width, {}, {},
+        {box_x, box_y, box_x + box_width, box_y + box_height},
+        m_output_boolean_mask
+    );
+
+    size_t min_mask_x = INT_MAX, max_mask_x = 0;
+    size_t min_mask_y = INT_MAX, max_mask_y = 0;
+    for (size_t y = 0; y < source_height; y++){
+        for (size_t x = 0; x < source_width; x++){
+            bool mask = m_output_boolean_mask[y*source_width + x];
+            uint32_t& pixel = m_mask_image.pixel(x, y);
+            // if the pixel's mask value is true, set a semi-transparent 45-degree blue strip color
+            // otherwise: fully transparent (alpha = 0)
+            uint32_t color = 0;
+            if (mask){
+                color = (std::abs(int(x) - int(y)) % 4 <= 1) ? combine_argb(150, 30, 144, 255) : combine_argb(150, 0, 0, 60);
+                min_mask_x = std::min(x, min_mask_x);
+                max_mask_x = std::max(x, max_mask_x);
+                min_mask_y = std::min(y, min_mask_y);
+                max_mask_y = std::max(y, max_mask_y);
+            }
+            pixel = color;
+        }
+    }
+    if (min_mask_x < INT_MAX && max_mask_x > min_mask_x && min_mask_y < INT_MAX && max_mask_y > min_mask_y){
+        const size_t mask_width = max_mask_x - min_mask_x + 1;
+        const size_t mask_height = max_mask_y - min_mask_y + 1;
+        ImageFloatBox mask_box(
+            min_mask_x/double(source_width), min_mask_y/double(source_height),
+            mask_width/double(source_width), mask_height/double(source_height));
+        const std::string label = FORM_LABEL.slug();
+        
+
+        ObjectAnnotation annotation;
+        annotation.user_box = ImagePixelBox(box_x, box_y, box_x + box_width + 1, box_y + box_height + 1);
+        annotation.mask_box = ImagePixelBox(min_mask_x, min_mask_y, max_mask_x+1, max_mask_y+1);
+        annotation.mask.resize(mask_width * mask_height);
+        for(size_t row = 0; row < mask_height; row++){
+            auto it = m_output_boolean_mask.begin() + (min_mask_y + row) * source_width + min_mask_x;
+            auto it2 = annotation.mask.begin() + row * mask_width;
+            std::copy(it, it + mask_width, it2);
+        }
+
+        annotation.label = label;
+        m_annotated_objects.emplace_back(std::move(annotation));
+
+        set_rendered_objects(overlay_set);
+    }
+}
 
 LabelImages_Widget::~LabelImages_Widget(){
     m_program.FORM_LABEL.remove_listener(*this);

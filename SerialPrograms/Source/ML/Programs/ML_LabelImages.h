@@ -72,6 +72,8 @@ public:
 
     void set_rendered_objects(VideoOverlaySet& overlayset);
 
+    void compute_mask(VideoOverlaySet& overlay_set);
+
 private:
     friend class LabelImages_Widget;
     friend class DrawnBoundingBox;
