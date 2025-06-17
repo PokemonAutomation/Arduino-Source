@@ -13,9 +13,9 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DateReader.h"
+#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
+#include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "NintendoSwitch/Programs/NintendoSwitch_Navigation.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -25,8 +25,6 @@
 #include "PokemonSwSh/Programs/PokemonSwSh_MenuNavigation.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_BasicRNG.h"
 #include "PokemonSwSh/Programs/RNG/PokemonSwSh_DailyHighlightRNG.h"
-
-#include "Common/Cpp/PrettyPrint.h"
 
 
 namespace PokemonAutomation{
@@ -80,19 +78,19 @@ std::unique_ptr<StatsTracker> DailyHighlightRNG_Descriptor::make_stats() const{
 
 DailyHighlightRNG::DailyHighlightRNG()
     : NUM_HIGHLIGHTS(
-        "<b>Number of highlights:</b><br>How many daily highlights should be bought. <br>Zero will run until you stop the program.",
+        "<b>Number of Highlights:</b><br>How many daily highlights should be bought. <br>Zero will run until you stop the program.",
         LockMode::UNLOCK_WHILE_RUNNING, 0)
     , FIX_TIME_WHEN_DONE(
-        "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.<br>Doesn't do anything if Number of highlights is 0.",
+        "<b>Fix Time when Done:</b><br>Fix the time after the program finishes.<br>Doesn't do anything if Number of Highlights is 0.",
         LockMode::UNLOCK_WHILE_RUNNING, false)
     , GO_HOME_WHEN_DONE(false)
     , SAVE_INTERVAL(
-        "<b>Save Every this Many Day Skips:</b><br>(zero disables saving)",
+        "<b>Save Every this Many Day Skips:</b><br>Zero disables saving.",
         LockMode::UNLOCK_WHILE_RUNNING,
         20
     )
     , CALIBRATION_INTERAVAL(
-        "<b>Calibrate the number of NPCs this many Day Skips:</b><br>Zero will only calibrate once.",
+        "<b>Calibrate the Number of NPCs this Many Day Skips:</b><br>Zero will only calibrate once.",
         LockMode::UNLOCK_WHILE_RUNNING,
         10
     )
@@ -100,7 +98,7 @@ DailyHighlightRNG::DailyHighlightRNG()
         "<b>Desired Highlights:</b>", 
         "Highlight", 
         DAILY_HIGHLIGHT_DATABASE().database(), 
-        "bottle-cap-1")
+        "dream-ball")
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -417,12 +415,12 @@ void DailyHighlightRNG::return_to_overworld(SingleSwitchProgramEnvironment& env,
 void DailyHighlightRNG::advance_date(SingleSwitchProgramEnvironment& env, ProControllerContext& context, uint8_t& year) {
     context.wait_for(200ms);
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
-    home_to_date_time(context, true, false);
+    home_to_date_time(env.console, context, true);
     pbf_press_button(context, BUTTON_A, 160ms, 240ms);
     context.wait_for_all_requests();
 
     VideoOverlaySet overlays(env.console.overlay());
-    DateChangeWatcher date_reader;
+    DateChangeWatcher date_reader(env.console);
     date_reader.make_overlays(overlays);
 
     DateTime date{ 2000, 12, 31, 1, 0, 0 }; // 31st December for fixed Normal weather
@@ -545,7 +543,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
         }
 
         // Do required advances
-        size_t target_advances = calculate_target(env, rng.get_state(), num_npcs, HIGHLIGHT_SELECTION.all_slugs()); // TODO: make highlight selection 
+        size_t target_advances = calculate_target(env, rng.get_state(), num_npcs, HIGHLIGHT_SELECTION.all_slugs());
         env.console.log("Needed advances: " + std::to_string(target_advances));
         do_rng_advances(env.console, context, rng, target_advances, ADVANCE_PRESS_DURATION, ADVANCE_RELEASE_DURATION);
 
@@ -566,7 +564,7 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
 
     if (FIX_TIME_WHEN_DONE) {
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
-        home_to_date_time(context, false, false);
+        home_to_date_time(env.console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
