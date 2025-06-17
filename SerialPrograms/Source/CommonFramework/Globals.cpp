@@ -200,7 +200,10 @@ const std::string& TRAINING_PATH(){
     return path;
 }
 
-
+const std::string& ML_ANNOTATION_PATH(){
+    static const std::string path = RUNTIME_BASE_PATH() + "DataAnnotation/";
+    return path;
+}
 
 }
 

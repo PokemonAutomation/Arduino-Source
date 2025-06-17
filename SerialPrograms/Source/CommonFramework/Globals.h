@@ -60,6 +60,9 @@ const std::string& RESOURCE_PATH();
 // Hold ML training data.
 const std::string& TRAINING_PATH();
 
+// Folder path (end with "/") to hold data annotation for ML labeling programs
+const std::string& ML_ANNOTATION_PATH();
+
 
 enum class ProgramState{
     NOT_READY,

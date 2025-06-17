@@ -160,7 +160,14 @@ private:
     } u;
 };
 
+// Given a string as a raw JSON, parse it into a `JsonValue`.
+// If there is error parsing the JSON, it will not throw exception.
+// The input string is usually loaded directly from a JSON file.
+// You can call JsonTools.h:file_to_string() to load a file as a raw JSON string.
 JsonValue parse_json(const std::string& str);
+// Load file from `filename` and parse it into a `JsonValue`.
+// If unable to open the file, FileException is thrown
+// If there is error parsing the JSON, it will not throw exception.
 JsonValue load_json_file(const std::string& filename);
 
 

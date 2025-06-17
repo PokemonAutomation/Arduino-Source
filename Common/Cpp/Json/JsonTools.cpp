@@ -38,12 +38,24 @@ void string_to_file(const std::string& filename, const std::string& str){
     }
     file.close();
 }
+
+
 std::string file_to_string(const std::string& filename){
     QFile file(QString::fromStdString(filename));
     if (!file.open(QFile::ReadOnly)){
         throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to open file.", filename);
     }
     return file.readAll().toStdString();
+}
+
+
+bool file_to_string(const std::string& filename, std::string& content){
+    QFile file(QString::fromStdString(filename));
+    if (!file.open(QFile::ReadOnly)){
+        return false;
+    }
+    content = file.readAll().toStdString();
+    return true;
 }
 
 
