@@ -70,7 +70,9 @@ public:
     virtual void from_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
-    void set_rendered_objects(VideoOverlaySet& overlayset);
+    void load_image_related_data(const std::string& image_path, const size_t source_image_width, const size_t source_image_height);
+
+    void update_rendered_objects(VideoOverlaySet& overlayset);
 
     void compute_mask(VideoOverlaySet& overlay_set);
 
@@ -94,9 +96,17 @@ private:
     std::vector<float> m_image_embedding;
     std::vector<bool> m_output_boolean_mask;
 
+    // buffer to compute SAM mask on
     ImageRGB32 m_mask_image;
+
     SAMSession m_sam_session;
     std::vector<ObjectAnnotation> m_annotated_objects;
+    size_t m_last_object_idx = 0;
+    std::string m_annotation_file_path;
+    // if we find an annotation file that is supposed to be created by user in a previous session, but
+    // we fail to load it, then we shouldn't overwrite this file to possibly erase the previous work.
+    // so this flag is used to denote if we fail to load an annotation file
+    bool m_fail_to_load_annotation_file = false;
 };
 
 
@@ -141,8 +151,6 @@ private:
     ConfigWidget* m_option_widget;
 
     friend class DrawnBoundingBox;
-    // std::unique_ptr<ImageRGB32> m_image_mask;
-    // std::unique_ptr<OverlayImage> m_overlay_image;
 };
 
 
