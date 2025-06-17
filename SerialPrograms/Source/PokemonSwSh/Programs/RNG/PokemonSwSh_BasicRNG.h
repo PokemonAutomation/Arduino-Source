@@ -8,7 +8,6 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_Xoroshiro128Plus.h"
 
-#include <optional>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
