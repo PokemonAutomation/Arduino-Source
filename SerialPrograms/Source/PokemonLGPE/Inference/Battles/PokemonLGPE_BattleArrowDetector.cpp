@@ -54,7 +54,7 @@ bool BattleArrowDetector::detect(const ImageViewRGB32& screen){
         //cropped.save("test-object-" + std::to_string(c++) + ".png");
         double rmsd = matcher.rmsd(cropped);
         //cout << rmsd << endl;
-        if (rmsd < 110){
+        if (rmsd < 116){
             return true;
         }
     }
