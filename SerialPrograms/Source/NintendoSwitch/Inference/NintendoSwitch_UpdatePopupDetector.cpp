@@ -18,8 +18,8 @@ namespace NintendoSwitch{
 
 
 
-UpdatePopupDetector::UpdatePopupDetector(ConsoleState& state, Color color)
-    : m_type_detector(state, color)
+UpdatePopupDetector::UpdatePopupDetector(ConsoleHandle& console, Color color)
+    : m_type_detector(console, color)
     , m_switch1(color)
     , m_switch2(color)
 {}
@@ -34,7 +34,7 @@ bool UpdatePopupDetector::detect(const ImageViewRGB32& screen){
     if (type == ConsoleType::Unknown){
         return false;
     }
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         return m_switch1.detect(screen);
     }
     if (is_switch2(type)){

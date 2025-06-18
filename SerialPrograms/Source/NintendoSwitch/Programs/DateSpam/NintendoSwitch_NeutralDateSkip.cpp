@@ -95,7 +95,7 @@ void neutral_date_skip_switch2_wired(ProControllerContext& context){
 void neutral_date_skip(ConsoleHandle& console, ProControllerContext& context){
     ConsoleType type = console.state().console_type();
 
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         switch (context->performance_class()){
         case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
             neutral_date_skip_switch1_wired(context);

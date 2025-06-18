@@ -74,7 +74,7 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, ProController
 
     ConsoleType type = env.console.state().console_type();
     uint8_t scroll_down_slots = 0;
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         scroll_down_slots = 3;
     }else if (is_switch2(type)){
         scroll_down_slots = 1;

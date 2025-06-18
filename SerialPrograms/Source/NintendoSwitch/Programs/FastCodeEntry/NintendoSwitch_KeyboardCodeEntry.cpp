@@ -286,7 +286,7 @@ void keyboard_enter_code(
 
     ConsoleType console_type = console.state().console_type();
     bool switch2;
-    if (console_type == ConsoleType::Switch1){
+    if (is_switch1(console_type)){
         switch2 = false;
     }else if (is_switch2(console_type)){
         switch2 = true;

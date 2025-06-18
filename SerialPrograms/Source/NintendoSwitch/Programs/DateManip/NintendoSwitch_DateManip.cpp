@@ -69,7 +69,7 @@ void DateReader::make_overlays(VideoOverlaySet& items) const{
 bool DateReader::detect(const ImageViewRGB32& screen){
     ConsoleType type = m_console.state().console_type();
 
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         return m_switch1.detect(screen);
     }
 
@@ -96,7 +96,7 @@ std::pair<DateFormat, DateTime> DateReader::read_date(Logger& logger, std::share
 
     ConsoleType type = m_console.state().console_type();
 
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         switch (m_switch1.detect_date_format(*screen)){
         case DateFormat::US:
             return {DateFormat::US, m_switch1_US.read_date(logger, std::move(screen))};
@@ -159,7 +159,7 @@ void DateReader::set_date(
 
     ConsoleType type = m_console.state().console_type();
 
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         switch (m_switch1.detect_date_format(snapshot)){
         case DateFormat::US:
             m_switch1_US.set_date(info, console, context, date);

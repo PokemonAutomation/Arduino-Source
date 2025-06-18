@@ -58,7 +58,7 @@ private:
 //  Detect the Switch system update screen when you are about to enter a game from Switch Home screen
 class UpdatePopupDetector : public StaticScreenDetector{
 public:
-    UpdatePopupDetector(ConsoleState& state, Color color = COLOR_RED);
+    UpdatePopupDetector(ConsoleHandle& console, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -70,8 +70,8 @@ private:
 };
 class UpdateMenuWatcher : public DetectorToFinder<UpdatePopupDetector>{
 public:
-    UpdateMenuWatcher(ConsoleState& state, Color color = COLOR_RED)
-         : DetectorToFinder("UpdateMenuWatcher", std::chrono::milliseconds(250), state, color)
+    UpdateMenuWatcher(ConsoleHandle& console, Color color = COLOR_RED)
+         : DetectorToFinder("UpdateMenuWatcher", std::chrono::milliseconds(250), console, color)
     {}
 };
 

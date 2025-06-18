@@ -145,7 +145,7 @@ void roll_date_backward_N(
 ){
     ConsoleType type = console.state().console_type();
 
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         switch (context->performance_class()){
         case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
             roll_date_backward_N_Switch1_wired(context, skips, fast);

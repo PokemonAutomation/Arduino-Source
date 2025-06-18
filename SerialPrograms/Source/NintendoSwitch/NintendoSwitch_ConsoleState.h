@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_ConsoleState_H
 #define PokemonAutomation_NintendoSwitch_ConsoleState_H
 
-#include <atomic>
+#include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,6 +24,11 @@ enum class ConsoleType{
     Switch2_FW20_International,
     Switch2_FW20_JapanLocked,
 };
+const char* ConsoleType_strings(ConsoleType type);
+
+inline bool is_switch1(ConsoleType type){
+    return type == ConsoleType::Switch1;
+}
 inline bool is_switch2(ConsoleType type){
     return type == ConsoleType::Switch2_Unknown
         || type == ConsoleType::Switch2_FW19_International
@@ -30,37 +36,32 @@ inline bool is_switch2(ConsoleType type){
         || type == ConsoleType::Switch2_FW20_International
         || type == ConsoleType::Switch2_FW20_JapanLocked;
 }
-
-
+void check_for_conflict(
+    Logger& logger,
+    ConsoleType user_type,
+    ConsoleType detected_type
+);
 
 
 
 
 class ConsoleState{
 public:
-    ConsoleState()
-        : m_console_type(ConsoleType::Unknown)
-        , m_text_size_standard(false)
-    {}
-
-    ConsoleType console_type() const{
-        return m_console_type.load(std::memory_order_relaxed);
-    }
-    bool text_size_ok() const{
-        return m_text_size_standard.load(std::memory_order_relaxed);
-    }
+    ~ConsoleState();
+    ConsoleState();
 
 
-    void set_console_type(ConsoleType type){
-        m_console_type.store(type, std::memory_order_relaxed);
-    }
-    void set_text_size_ok(bool ok){
-        m_text_size_standard.store(ok, std::memory_order_relaxed);
-    }
+    bool console_type_confirmed() const;
+    ConsoleType console_type() const;
+    void set_console_type_user(ConsoleType type);
+    void set_console_type(Logger& logger, ConsoleType type);
+
+    bool text_size_ok() const;
+    void set_text_size_ok(bool ok);
 
 private:
-    std::atomic<ConsoleType> m_console_type;
-    std::atomic<bool> m_text_size_standard;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 

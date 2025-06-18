@@ -202,7 +202,7 @@ void DaySkipperEU::run_switch2(SingleSwitchProgramEnvironment& env, ProControlle
 
 void DaySkipperEU::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ConsoleType console_type = env.console.state().console_type();
-    if (console_type == ConsoleType::Switch1){
+    if (is_switch1(console_type)){
         run_switch1(env, context);
         return;
     }

@@ -17,12 +17,12 @@ namespace NintendoSwitch{
 inline const EnumDropdownDatabase<ConsoleType>& CONSOLE_MODEL_DATABASE(){
     static const EnumDropdownDatabase<ConsoleType> database{
        {ConsoleType::Unknown,                       "unknown",                      "Auto-detect if possible."},
-       {ConsoleType::Switch1,                       "switch1",                      "Switch 1 + OLED"},
-       {ConsoleType::Switch2_Unknown,               "switch2-unknown",              "Switch 2 (unknown model)"},
-//       {ConsoleType::Switch2_FW19_International,    "switch2-FW19-international",   "Switch 2 (FW19, international)"},
-//       {ConsoleType::Switch2_FW19_JapanLocked,      "switch2-FW19-japan",           "Switch 2 (FW19, Japan-locked)"},
-       {ConsoleType::Switch2_FW20_International,    "switch2-FW20-international",   "Switch 2 (FW20, international)"},
-       {ConsoleType::Switch2_FW20_JapanLocked,      "switch2-FW20-japan",           "Switch 2 (FW20, Japan-locked)"},
+       {ConsoleType::Switch1,                       "switch1",                      ConsoleType_strings(ConsoleType::Switch1)},
+       {ConsoleType::Switch2_Unknown,               "switch2-unknown",              ConsoleType_strings(ConsoleType::Switch2_Unknown)},
+//       {ConsoleType::Switch2_FW19_International,    "switch2-FW19-international",   ConsoleType_strings(ConsoleType::Switch2_FW19_International)},
+//       {ConsoleType::Switch2_FW19_JapanLocked,      "switch2-FW19-japan",           ConsoleType_strings(ConsoleType::Switch2_FW19_JapanLocked)},
+       {ConsoleType::Switch2_FW20_International,    "switch2-FW20-international",   ConsoleType_strings(ConsoleType::Switch2_FW20_International)},
+       {ConsoleType::Switch2_FW20_JapanLocked,      "switch2-FW20-japan",           ConsoleType_strings(ConsoleType::Switch2_FW20_JapanLocked)},
     };
     return database;
 }

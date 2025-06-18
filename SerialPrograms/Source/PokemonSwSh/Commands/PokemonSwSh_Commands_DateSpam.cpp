@@ -24,7 +24,7 @@ void rollback_year_skip_forward(
     ConsoleHandle& console, ProControllerContext& context
 ){
     ConsoleType type = console.state().console_type();
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         roll_date_backward_N(console, context, MAX_YEAR, true);
         ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);
         ssf_issue_scroll_ptv(context, SSF_SCROLL_LEFT, 24ms);
@@ -144,7 +144,7 @@ void touch_date_from_home(
 ){
     ConsoleType type = console.state().console_type();
 
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         touch_date_from_home_switch1(console, context, settings_to_home_delay);
         return;
     }
@@ -213,7 +213,7 @@ void rollback_hours_from_home(
 ){
     ConsoleType type = console.state().console_type();
 
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         rollback_hours_from_home_switch1(console, context, hours, settings_to_home_delay);
         return;
     }

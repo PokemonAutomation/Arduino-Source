@@ -56,7 +56,7 @@ private:
 
 class StartGameUserSelectDetector : public StaticScreenDetector{
 public:
-    StartGameUserSelectDetector(ConsoleState& state, Color color = COLOR_RED);
+    StartGameUserSelectDetector(ConsoleHandle& console, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -68,8 +68,8 @@ private:
 };
 class StartGameUserSelectWatcher : public DetectorToFinder<StartGameUserSelectDetector>{
 public:
-    StartGameUserSelectWatcher(ConsoleState& state, Color color = COLOR_RED)
-         : DetectorToFinder("StartGameUserSelectWatcher", std::chrono::milliseconds(250), state, color)
+    StartGameUserSelectWatcher(ConsoleHandle& console, Color color = COLOR_RED)
+         : DetectorToFinder("StartGameUserSelectWatcher", std::chrono::milliseconds(250), console, color)
     {}
 };
 

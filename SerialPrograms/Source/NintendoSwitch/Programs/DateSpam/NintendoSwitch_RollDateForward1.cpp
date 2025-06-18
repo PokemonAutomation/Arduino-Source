@@ -88,7 +88,7 @@ void roll_date_forward_1(
 ){
     ConsoleType type = console.state().console_type();
 
-    if (type == ConsoleType::Switch1){
+    if (is_switch1(type)){
         switch (context->performance_class()){
         case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
             roll_date_forward_1_Switch1_wired(context, fast);

@@ -14,9 +14,9 @@ namespace NintendoSwitch{
 
 
 
-HomeMenuDetector::HomeMenuDetector(ConsoleState& state, Color color)
+HomeMenuDetector::HomeMenuDetector(ConsoleHandle& console, Color color)
     : m_color(color)
-    , m_console_type(state, color)
+    , m_console_type(console, color)
     , m_bottom_row(0.10, 0.92, 0.10, 0.05)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
     , m_bottom_left(0.02, 0.70, 0.15, 0.15)

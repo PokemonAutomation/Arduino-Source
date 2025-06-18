@@ -21,7 +21,7 @@ namespace NintendoSwitch{
 
 class HomeMenuDetector : public StaticScreenDetector{
 public:
-    HomeMenuDetector(ConsoleState& state, Color color = COLOR_RED);
+    HomeMenuDetector(ConsoleHandle& console, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -39,10 +39,10 @@ private:
 class HomeMenuWatcher : public DetectorToFinder<HomeMenuDetector>{
 public:
     HomeMenuWatcher(
-        ConsoleState& state,
+        ConsoleHandle& console,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("HomeMenuWatcher", hold_duration, state)
+         : DetectorToFinder("HomeMenuWatcher", hold_duration, console)
     {}
 };
 
