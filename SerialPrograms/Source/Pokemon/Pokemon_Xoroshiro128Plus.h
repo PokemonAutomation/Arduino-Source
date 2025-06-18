@@ -31,6 +31,13 @@ public:
     Xoroshiro128PlusState get_state();
     std::vector<bool> generate_last_bit_sequence(size_t max_advances);
 
+    // Calculates how many advances are required to reach the given state.
+    // The given state must be reachable within max_advances advances.
+    // Returns a pair:
+    // first: true if the state is reachable within max_advances, false otherwise
+    // second: the number of advances required (if first is true)
+    std::pair<bool, uint64_t> advances_to_state(Xoroshiro128PlusState other_state, uint64_t max_advances = 100000);
+
     static Xoroshiro128Plus xoroshiro128plus_from_last_bits(std::pair<uint64_t, uint64_t> last_bits);
 
 

@@ -75,6 +75,7 @@
 #include "Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h"
 
 #include "Programs/RNG/PokemonSwSh_CramomaticRNG.h"
+#include "Programs/RNG/PokemonSwSh_DailyHighlightRNG.h"
 #include "Programs/RNG/PokemonSwSh_SeedFinder.h"
 
 #include "Programs/PokemonSwSh_SynchronizedSpinning.h"
@@ -200,7 +201,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHuntUnattendedIoATrade_Descriptor, ShinyHuntUnattendedIoATrade>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
-//        ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back("---- Untested/Beta/WIP ----");
+        ret.emplace_back(make_single_switch_program<DailyHighlightRNG_Descriptor, DailyHighlightRNG>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
