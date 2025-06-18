@@ -2449,7 +2449,7 @@ if (MSVC)
         PA_DPP
     )
 
-    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /utf-8)
+    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialPrograms PRIVATE /wd4505)  # unreferenced local function has been removed
 

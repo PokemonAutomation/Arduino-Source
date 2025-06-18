@@ -1,7 +1,6 @@
 #ifdef PA_DPP
 
 #include <set>
-#include <dpp/DPP_SilenceWarnings.h>
 #include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppClient.h>
 #include <Integrations/DppIntegration/DppCommandHandler.h>
