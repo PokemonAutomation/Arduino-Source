@@ -196,12 +196,11 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
                 "No shiny found. Resetting game."
             );
             context.wait_for_all_requests();
+            consecutive_failures = 0;
         }catch (OperationFailedException& e){
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
             consecutive_failures++;
-            continue;
         }
-        consecutive_failures = 0;
 
         //Reset game
         pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
