@@ -38,7 +38,7 @@ public:
 public:
     //  Serialization
     void from_json();
-    virtual void from_json(const JsonValue& json){}
+    virtual void from_json([[maybe_unused]] const JsonValue& json){}
     virtual JsonValue to_json() const;
 
 protected:

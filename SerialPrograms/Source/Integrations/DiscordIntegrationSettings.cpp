@@ -7,7 +7,6 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QPushButton>
-#include <dpp/DPP_SilenceWarnings.h>
 #include "Common/Qt/StringToolsQt.h"
 //#include "CommonFramework/Globals.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
@@ -122,7 +121,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     this->add_listener(*this);
     library0.add_listener(*this);
 }
-void DiscordIntegrationSettingsOption::on_config_value_changed(void* object){
+void DiscordIntegrationSettingsOption::on_config_value_changed([[maybe_unused]] void* object){
 //    cout << this->enabled() << endl;
 #if (defined PA_SLEEPY || defined PA_DPP)
     bool options_enabled = this->enabled();

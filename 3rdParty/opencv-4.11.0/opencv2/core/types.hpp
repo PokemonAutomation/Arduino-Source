@@ -1851,10 +1851,8 @@ template<typename _Tp> inline
 _Tp Rect_<_Tp>::area() const
 {
     const _Tp result = width * height;
-    if constexpr (std::numeric_limits<_Tp>::is_integer)
-    {
-        CV_DbgAssert(width == 0 || result / width == height); // make sure the result fits in the return value
-    }
+    CV_DbgAssert(!std::numeric_limits<_Tp>::is_integer
+        || width == 0 || result / width == height); // make sure the result fits in the return value
     return result;
 }
 

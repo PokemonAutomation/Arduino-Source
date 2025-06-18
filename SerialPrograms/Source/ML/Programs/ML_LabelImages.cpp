@@ -251,7 +251,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
         return; // no embedding, then no way for us to annotate
     }
     // see if we can load the previously created labels
-    const std::string anno_filename = std::filesystem::path(image_path).filename().replace_extension(".json");
+    const std::string anno_filename = std::filesystem::path(image_path).filename().replace_extension(".json").string();
 
     // ensure the folder exists
     std::filesystem::create_directory(ML_ANNOTATION_PATH());
@@ -284,7 +284,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
         try{
             ObjectAnnotation anno_obj = json_to_object_annotation((*json_array)[i]);
             m_annotated_objects.emplace_back(std::move(anno_obj));
-        } catch(JsonParseException & e){
+        } catch([[maybe_unused]] JsonParseException & e){
             m_fail_to_load_annotation_file = true;
             QMessageBox box;
             box.warning(nullptr, "Unable to Load Annotation",
