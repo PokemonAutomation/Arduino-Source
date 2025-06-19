@@ -34,7 +34,7 @@ const char* ConsoleType_strings(ConsoleType type){
 ){
     throw UserSetupError(
         logger,
-        std::string("Conflicting console types:") +
+        std::string("Conflicting Console Types:") +
         "\n    User Selected: " + ConsoleType_strings(user_type) +
         "\n    Detected Type: " + ConsoleType_strings(detected_type)
     );
@@ -126,6 +126,8 @@ void ConsoleState::set_console_type(Logger& logger, ConsoleType type){
         }
 
     }while (false);
+
+    logger.log(std::string("Setting console type to: ") + ConsoleType_strings(type));
 
     m_data->m_console_type.store(type, std::memory_order_relaxed);
     m_data->m_console_type_confirmed.store(confirmed, std::memory_order_relaxed);

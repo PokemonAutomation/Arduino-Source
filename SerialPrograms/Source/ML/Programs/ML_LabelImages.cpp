@@ -284,12 +284,15 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
         try{
             ObjectAnnotation anno_obj = json_to_object_annotation((*json_array)[i]);
             m_annotated_objects.emplace_back(std::move(anno_obj));
-        } catch([[maybe_unused]] JsonParseException & e){
+        } catch(JsonParseException&){
             m_fail_to_load_annotation_file = true;
             QMessageBox box;
             box.warning(nullptr, "Unable to Load Annotation",
-                QString::fromStdString("Cannot load annotation file " + m_annotation_file_path + 
-                    ". Parsing object " + std::to_string(i) + " failed."));
+                QString::fromStdString(
+                    "Cannot load annotation file " + m_annotation_file_path + 
+                    ". Parsing object " + std::to_string(i) + " failed."
+                )
+            );
         }
     }
     m_last_object_idx = m_annotated_objects.size(); 
