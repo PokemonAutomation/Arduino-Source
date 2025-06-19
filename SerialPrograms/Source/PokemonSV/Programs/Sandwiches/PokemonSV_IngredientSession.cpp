@@ -212,6 +212,7 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
     size_t not_found_count = 0;
     while (true){
         m_context.wait_for_all_requests();
+        m_context.wait_for(std::chrono::milliseconds(180));
         PageIngredients page = read_current_page();
         std::string found_ingredient;
         if (run_move_iteration(found_ingredient, ingredients, page)){
@@ -231,6 +232,7 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
             }else{
                 m_stream.log("End of page reached without finding ingredient. Wrapping back to beginning.", COLOR_ORANGE);
                 pbf_press_dpad(m_context, DPAD_DOWN, 20, 105);
+                continue;
             }
         }
 
@@ -244,8 +246,6 @@ std::string IngredientSession::move_to_ingredient(const std::set<std::string>& i
         //     current++;
         // }
 
-        m_context.wait_for_all_requests();
-        m_context.wait_for(std::chrono::milliseconds(180));
     }
     return "";
 }
