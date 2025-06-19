@@ -149,7 +149,7 @@ bool UpdatePopupDetector_Switch1::detect(const ImageViewRGB32& screen){
 UpdatePopupDetector_Switch2::UpdatePopupDetector_Switch2(Color color)
     : m_color(color)
     , m_box_top(0.25, 0.31, 0.50, 0.02)
-    , m_box_mid(0.25, 0.56, 0.50, 0.02)
+    , m_box_mid(0.25, 0.482, 0.50, 0.02)
     , m_top(0.10, 0.17, 0.80, 0.03)
     , m_left(0.08, 0.25, 0.10, 0.38)
     , m_bottom_solid(0.10, 0.86, 0.80, 0.04)
