@@ -70,7 +70,6 @@ ConsoleType ConsoleTypeDetector_StartGameUserSelect::detect(const ImageViewRGB32
         state = ConsoleType::Switch1;
     }
 
-    m_console.state().set_console_type(m_console, state);
     return state;
 }
 

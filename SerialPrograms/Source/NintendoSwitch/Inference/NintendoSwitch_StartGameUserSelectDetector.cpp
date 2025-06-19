@@ -20,7 +20,8 @@ namespace NintendoSwitch{
 
 
 StartGameUserSelectDetector::StartGameUserSelectDetector(ConsoleHandle& console, Color color)
-    : m_type_detector(console, color)
+    : m_console(console)
+    , m_type_detector(console, color)
     , m_switch1(color)
     , m_switch2(color)
 {}
@@ -29,9 +30,10 @@ void StartGameUserSelectDetector::make_overlays(VideoOverlaySet& items) const{
     m_switch1.make_overlays(items);
     m_switch2.make_overlays(items);
 }
-bool StartGameUserSelectDetector::detect(const ImageViewRGB32& screen){
+bool StartGameUserSelectDetector::detect_only(const ImageViewRGB32& screen){
     ConsoleType type = m_type_detector.detect(screen);
 //    cout << "detection: " << (int)x << endl;
+    m_console_type = type;
 
     if (type == ConsoleType::Unknown){
         return false;
@@ -47,6 +49,14 @@ bool StartGameUserSelectDetector::detect(const ImageViewRGB32& screen){
         nullptr, PA_CURRENT_FUNCTION,
         "Invalid ConsoleType: " + std::to_string((int)type)
     );
+}
+bool StartGameUserSelectDetector::detect(const ImageViewRGB32& screen){
+    if (detect_only(screen)){
+        m_console.state().set_console_type(m_console, m_console_type);
+        return true;
+    }else{
+        return false;
+    }
 }
 
 

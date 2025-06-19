@@ -59,12 +59,16 @@ public:
     StartGameUserSelectDetector(ConsoleHandle& console, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
+    bool detect_only(const ImageViewRGB32& screen);
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
+    ConsoleHandle& m_console;
     ConsoleTypeDetector_StartGameUserSelect m_type_detector;
     StartGameUserSelectDetector_Switch1 m_switch1;
     StartGameUserSelectDetector_Switch2 m_switch2;
+
+    ConsoleType m_console_type;
 };
 class StartGameUserSelectWatcher : public DetectorToFinder<StartGameUserSelectDetector>{
 public:
