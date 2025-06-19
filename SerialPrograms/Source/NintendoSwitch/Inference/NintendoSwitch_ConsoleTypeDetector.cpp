@@ -28,7 +28,7 @@ void ConsoleTypeDetector_Home::make_overlays(VideoOverlaySet& items) const{
     }
     items.add(m_color, m_bottom_line);
 }
-ConsoleType ConsoleTypeDetector_Home::detect(const ImageViewRGB32& screen){
+ConsoleType ConsoleTypeDetector_Home::detect_only(const ImageViewRGB32& screen){
     if (m_console.state().console_type_confirmed()){
         return m_console.state().console_type();
     }
@@ -41,9 +41,11 @@ ConsoleType ConsoleTypeDetector_Home::detect(const ImageViewRGB32& screen){
     }else{
         state = ConsoleType::Switch1;
     }
-
-    m_console.state().set_console_type(m_console, state);
+    m_last = state;
     return state;
+}
+void ConsoleTypeDetector_Home::commit_to_cache(){
+    m_console.state().set_console_type(m_console, m_last);
 }
 
 
@@ -56,7 +58,7 @@ ConsoleTypeDetector_StartGameUserSelect::ConsoleTypeDetector_StartGameUserSelect
 void ConsoleTypeDetector_StartGameUserSelect::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_line);
 }
-ConsoleType ConsoleTypeDetector_StartGameUserSelect::detect(const ImageViewRGB32& screen){
+ConsoleType ConsoleTypeDetector_StartGameUserSelect::detect_only(const ImageViewRGB32& screen){
     if (m_console.state().console_type_confirmed()){
         return m_console.state().console_type();
     }
@@ -69,8 +71,11 @@ ConsoleType ConsoleTypeDetector_StartGameUserSelect::detect(const ImageViewRGB32
     }else{
         state = ConsoleType::Switch1;
     }
-
+    m_last = state;
     return state;
+}
+void ConsoleTypeDetector_StartGameUserSelect::commit_to_cache(){
+    m_console.state().set_console_type(m_console, m_last);
 }
 
 

@@ -11,7 +11,6 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleState.h"
 #include "NintendoSwitch_ConsoleTypeDetector.h"
 
 namespace PokemonAutomation{
@@ -25,6 +24,7 @@ public:
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
+    bool detect_only(const ImageViewRGB32& screen);
 
 private:
     Color m_color;

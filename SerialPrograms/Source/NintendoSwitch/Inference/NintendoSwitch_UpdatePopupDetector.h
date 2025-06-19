@@ -62,6 +62,7 @@ public:
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
+    bool detect_only(const ImageViewRGB32& screen);
 
 private:
     ConsoleTypeDetector_Home m_type_detector;

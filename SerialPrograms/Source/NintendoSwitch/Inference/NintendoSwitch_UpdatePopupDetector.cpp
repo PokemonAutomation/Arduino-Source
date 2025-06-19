@@ -29,7 +29,15 @@ void UpdatePopupDetector::make_overlays(VideoOverlaySet& items) const{
     m_switch2.make_overlays(items);
 }
 bool UpdatePopupDetector::detect(const ImageViewRGB32& screen){
-    ConsoleType type = m_type_detector.detect(screen);
+    if (detect_only(screen)){
+        m_type_detector.commit_to_cache();
+        return true;
+    }else{
+        return false;
+    }
+}
+bool UpdatePopupDetector::detect_only(const ImageViewRGB32& screen){
+    ConsoleType type = m_type_detector.detect_only(screen);
 
     if (type == ConsoleType::Unknown){
         return false;

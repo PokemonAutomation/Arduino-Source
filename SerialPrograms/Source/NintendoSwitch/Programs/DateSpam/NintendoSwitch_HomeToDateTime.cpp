@@ -476,7 +476,7 @@ bool home_to_date_time_with_feedback(ConsoleHandle& console, ProControllerContex
     }
 
     ConsoleTypeDetector_Home detector(console);
-    ConsoleType console_type = detector.detect(console.video().snapshot());
+    ConsoleType console_type = detector.detect_only(console.video().snapshot());
     switch (console_type){
     case ConsoleType::Switch1:
         return home_to_date_time_switch1_feedback(console, context, to_date_change);

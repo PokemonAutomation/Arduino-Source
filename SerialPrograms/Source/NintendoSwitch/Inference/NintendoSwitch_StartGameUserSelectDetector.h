@@ -59,8 +59,8 @@ public:
     StartGameUserSelectDetector(ConsoleHandle& console, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    bool detect_only(const ImageViewRGB32& screen);
     virtual bool detect(const ImageViewRGB32& screen) override;
+    bool detect_only(const ImageViewRGB32& screen);
 
 private:
     ConsoleHandle& m_console;

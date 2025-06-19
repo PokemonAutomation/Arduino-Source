@@ -24,12 +24,14 @@ public:
     ConsoleTypeDetector_Home(ConsoleHandle& console, Color color = COLOR_RED);
 
     void make_overlays(VideoOverlaySet& items) const;
-    ConsoleType detect(const ImageViewRGB32& screen);
+    ConsoleType detect_only(const ImageViewRGB32& screen);
+    void commit_to_cache();
 
 private:
     ConsoleHandle& m_console;
     Color m_color;
     ImageFloatBox m_bottom_line;
+    ConsoleType m_last;
 };
 
 class ConsoleTypeDetector_StartGameUserSelect{
@@ -37,12 +39,14 @@ public:
     ConsoleTypeDetector_StartGameUserSelect(ConsoleHandle& console, Color color = COLOR_RED);
 
     void make_overlays(VideoOverlaySet& items) const;
-    ConsoleType detect(const ImageViewRGB32& screen);
+    ConsoleType detect_only(const ImageViewRGB32& screen);
+    void commit_to_cache();
 
 private:
     ConsoleHandle& m_console;
     Color m_color;
     ImageFloatBox m_bottom_line;
+    ConsoleType m_last;
 };
 
 
