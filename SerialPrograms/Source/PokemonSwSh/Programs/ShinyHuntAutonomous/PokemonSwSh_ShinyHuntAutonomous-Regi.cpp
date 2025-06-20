@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -142,7 +143,9 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, ProCo
         if (result.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-            run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
+            try{
+                run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
+            }catch (OperationFailedException&){}
             error = true;
             continue;
         }
