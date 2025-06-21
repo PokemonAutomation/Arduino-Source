@@ -80,12 +80,10 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, ProC
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
-                while (true){
-                    ssf_press_dpad(context, DPAD_UP, 0ms, 10s, 0ms);
-                    for (size_t c = 0; c < 10; c++){
-                        pbf_press_button(context, BUTTON_ZL, 200ms, 800ms);
-                    }
-//                    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+                ssf_press_dpad(context, DPAD_UP, 0ms, 10s, 0ms);
+                for (size_t c = 0; c < 10; c++){
+                    pbf_press_button(context, BUTTON_ZL, 200ms, 300ms);
+                    pbf_mash_button(context, BUTTON_B, 400ms);
                 }
             },
             {
@@ -108,12 +106,10 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, ProC
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
-                while (true){
-                    ssf_press_dpad(context, DPAD_UP, 0ms, 10s, 0ms);
-                    for (size_t c = 0; c < 10; c++){
-                        pbf_press_button(context, BUTTON_ZL, 200ms, 800ms);
-                    }
-//                    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+                ssf_press_dpad(context, DPAD_UP, 0ms, 10s, 0ms);
+                for (size_t c = 0; c < 10; c++){
+                    pbf_press_button(context, BUTTON_ZL, 200ms, 400ms);
+                    pbf_mash_button(context, BUTTON_B, 400ms);
                 }
             },
             {
