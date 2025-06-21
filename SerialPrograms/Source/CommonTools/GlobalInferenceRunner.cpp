@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 ParallelTaskRunner& global_inference_runner(){
     static ParallelTaskRunner runner(
         [](){
-            GlobalSettings::instance().PERFORMANCE->INFERENCE_PRIORITY.set_on_this_thread();
+            GlobalSettings::instance().PERFORMANCE->NORMAL_INFERENCE_PRIORITY.set_on_this_thread();
         },
         0, std::thread::hardware_concurrency()
     );

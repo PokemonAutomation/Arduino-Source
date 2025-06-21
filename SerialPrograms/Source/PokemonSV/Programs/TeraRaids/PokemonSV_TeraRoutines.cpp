@@ -145,7 +145,7 @@ void open_hosting_lobby(
 
 //        AdvanceDialogWatcher dialog(COLOR_GREEN);
         TeraCardWatcher card_detector(COLOR_YELLOW);
-        TeraLobbyWatcher lobby(stream.logger(), env.realtime_dispatcher(), COLOR_BLUE);
+        TeraLobbyWatcher lobby(stream.logger(), env.normal_inference_dispatcher(), COLOR_BLUE);
         context.wait_for_all_requests();
         int ret = wait_until(
             stream, context,

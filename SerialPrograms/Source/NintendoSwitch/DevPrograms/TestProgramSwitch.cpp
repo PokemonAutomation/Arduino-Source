@@ -325,6 +325,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+    FastCodeEntry::numberpad_enter_code(console, context, "708538991006", true);
+
 
 
 #if 0
@@ -416,14 +418,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
-    HomeMenuDetector detector0;
-    StartGameUserSelectDetector detector1;
-    UpdatePopupDetector detector2;
-    detector0.make_overlays(overlays);
-    detector1.make_overlays(overlays);
+#if 1
+    HomeMenuDetector detector0(console);
+    StartGameUserSelectDetector detector1(console);
+    UpdatePopupDetector detector2(console);
+//    detector0.make_overlays(overlays);
+//    detector1.make_overlays(overlays);
     detector2.make_overlays(overlays);
-    cout << detector1.detect(feed.snapshot()) << endl;
+    cout << detector2.detect(feed.snapshot()) << endl;
 #endif
 
 

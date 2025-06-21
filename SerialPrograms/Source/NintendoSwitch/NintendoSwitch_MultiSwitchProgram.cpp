@@ -31,7 +31,7 @@ MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
     , consoles(std::move(p_switches))
 {
     for (ConsoleHandle& console : consoles){
-        console.initialize_inference_threads(scope, inference_dispatcher());
+        console.initialize_inference_threads(scope, realtime_inference_dispatcher());
     }
 }
 

@@ -198,7 +198,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         //     process_one_baby(env, context, i, 5);
         // }
 
-        // eat_egg_sandwich_at_picnic(env.program_info(), env.realtime_dispatcher(), env.console, context,
+        // eat_egg_sandwich_at_picnic(env.program_info(), env.normal_inference_dispatcher(), env.console, context,
         //     EGG_SANDWICH_TYPE, SWEET_HERB_INDEX_BACKWARDS.current_value());
         // return;
     }

@@ -40,10 +40,17 @@ public:
             "Restart the program for this to fully take effect.",
             DEFAULT_PRIORITY_REALTIME
         )
-        , INFERENCE_PRIORITY(
+        , REALTIME_INFERENCE_PRIORITY(
             "<b>Inference Priority:</b><br>"
-            "Thread priority of inference threads. (image/sound recognition)",
-            DEFAULT_PRIORITY_INFERENCE
+            "Thread priority of realtime inference threads that must run fast "
+            "enough to keep a program working properly.",
+            DEFAULT_PRIORITY_REALTIME_INFERENCE
+        )
+        , NORMAL_INFERENCE_PRIORITY(
+            "<b>normal Inference Priority:</b><br>"
+            "Thread priority of non-realtime inference threads that can be slow "
+            "without negatively affecting a program.",
+            DEFAULT_PRIORITY_NORMAL_INFERENCE
         )
         , COMPUTE_PRIORITY(
             "<b>Compute Priority:</b><br>"
@@ -53,7 +60,8 @@ public:
     {
         PA_ADD_OPTION(PRECISE_WAKE_MARGIN);
         PA_ADD_OPTION(REALTIME_THREAD_PRIORITY);
-        PA_ADD_OPTION(INFERENCE_PRIORITY);
+        PA_ADD_OPTION(REALTIME_INFERENCE_PRIORITY);
+        PA_ADD_OPTION(NORMAL_INFERENCE_PRIORITY);
         PA_ADD_OPTION(COMPUTE_PRIORITY);
         PA_ADD_OPTION(PROCESSOR_LEVEL);
     }
@@ -62,7 +70,8 @@ public:
     MicrosecondsOption PRECISE_WAKE_MARGIN;
 
     ThreadPriorityOption REALTIME_THREAD_PRIORITY;
-    ThreadPriorityOption INFERENCE_PRIORITY;
+    ThreadPriorityOption REALTIME_INFERENCE_PRIORITY;
+    ThreadPriorityOption NORMAL_INFERENCE_PRIORITY;
     ThreadPriorityOption COMPUTE_PRIORITY;
 
     ProcessorLevelOption PROCESSOR_LEVEL;

@@ -576,7 +576,14 @@ ImageFloatBox move_sandwich_hand(
     const ImageFloatBox& start_box,
     const ImageFloatBox& end_box
 ){
-    return move_sandwich_hand_and_check_if_plates_empty(info, dispatcher, stream, context, hand_type, pressing_A, start_box, end_box, SandwichPlateDetector::Side::NOT_APPLICABLE, Language::None).end_box;
+    return move_sandwich_hand_and_check_if_plates_empty(
+        info, dispatcher,
+        stream, context,
+        hand_type, pressing_A,
+        start_box, end_box,
+        SandwichPlateDetector::Side::NOT_APPLICABLE,
+        Language::None
+    ).end_box;
 }
 
 } // end anonymous namespace
@@ -1046,7 +1053,7 @@ void make_sandwich_preset(ProgramEnvironment& env, VideoStream& stream, ProContr
     std::map<std::string, uint8_t> fillings_copy(fillings); //Making a copy as we need the map for later
     enter_custom_sandwich_mode(env.program_info(), stream, context);
     add_sandwich_ingredients(
-        env.realtime_dispatcher(),
+        env.normal_inference_dispatcher(),
         stream, context,
         language,
         std::move(fillings_copy),
@@ -1184,7 +1191,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
     ImageFloatBox target_plate = center_plate;
     //Initial position handling
     auto end_box = move_sandwich_hand(
-        env.program_info(), env.realtime_dispatcher(),
+        env.program_info(), env.realtime_inference_dispatcher(),
         stream, context,
         SandwichHandType::FREE,
         false,
@@ -1192,7 +1199,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
         HAND_INITIAL_BOX
     );
     move_sandwich_hand(
-        env.program_info(), env.realtime_dispatcher(),
+        env.program_info(), env.realtime_inference_dispatcher(),
         stream, context,
         SandwichHandType::GRABBING,
         true,
@@ -1263,7 +1270,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                 }
 
                 end_box = move_sandwich_hand(
-                    env.program_info(), env.realtime_dispatcher(),
+                    env.program_info(), env.realtime_inference_dispatcher(),
                     stream, context,
                     SandwichHandType::FREE,
                     false,
@@ -1277,7 +1284,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                     (int)fillings.find(i)->second).at(placement_number);
 
                 HandMoveData hand_move_data = move_sandwich_hand_and_check_if_plates_empty(
-                    env.program_info(), env.realtime_dispatcher(),
+                    env.program_info(), env.realtime_inference_dispatcher(),
                     stream, context,
                     SandwichHandType::GRABBING,
                     true,
@@ -1326,7 +1333,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
     auto hand_box = hand_location_to_box(grabbing_hand.location());
 
     end_box = move_sandwich_hand(
-        env.program_info(), env.realtime_dispatcher(),
+        env.program_info(), env.realtime_inference_dispatcher(),
         stream, context,
         SandwichHandType::GRABBING,
         false,

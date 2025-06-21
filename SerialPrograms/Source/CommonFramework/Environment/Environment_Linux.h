@@ -20,9 +20,10 @@ enum class ThreadPriority{
     Min,
 };
 
-constexpr ThreadPriority DEFAULT_PRIORITY_REALTIME  = ThreadPriority::Max;
-constexpr ThreadPriority DEFAULT_PRIORITY_INFERENCE = ThreadPriority::Max;
-constexpr ThreadPriority DEFAULT_PRIORITY_COMPUTE   = ThreadPriority::Min;
+constexpr ThreadPriority DEFAULT_PRIORITY_REALTIME              = ThreadPriority::Max;
+constexpr ThreadPriority DEFAULT_PRIORITY_REALTIME_INFERENCE    = ThreadPriority::Max;
+constexpr ThreadPriority DEFAULT_PRIORITY_NORMAL_INFERENCE      = ThreadPriority::Min;
+constexpr ThreadPriority DEFAULT_PRIORITY_COMPUTE               = ThreadPriority::Min;
 
 
 

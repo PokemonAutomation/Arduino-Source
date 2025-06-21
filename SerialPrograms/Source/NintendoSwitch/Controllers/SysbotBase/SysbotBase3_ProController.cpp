@@ -37,10 +37,10 @@ ProController_SysbotBase3::~ProController_SysbotBase3(){
 
 const ControllerFeatures& ProController_SysbotBase3::controller_features() const{
     static const ControllerFeatures features{
-        ControllerFeature::TickPrecise,   //  TODO: Prove it is tick precise.
+        ControllerFeature::TickPrecise,
         ControllerFeature::TimingFlexibleMilliseconds,
         ControllerFeature::NintendoSwitch_ProController,
-        ControllerFeature::NintendoSwitch_DateSkip,   //  TODO: Prove this works
+        ControllerFeature::NintendoSwitch_DateSkip,
     };
     return features;
 }
