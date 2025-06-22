@@ -23,6 +23,18 @@ namespace NintendoSwitch{
 //// Navigates from Home screen to the Date and Time screen. Done blind, without inference.
 //void home_to_date_time(Logger& logger, ProControllerContext& context, bool to_date_change);
 
+
+void home_to_date_time_Switch2_wired_blind(
+    Logger& logger, ProControllerContext& context,
+    ConsoleType console_type, bool to_date_change
+);
+void home_to_date_time_Switch2_wired_feedback(
+    ConsoleHandle& console, ProControllerContext& context,
+    bool to_date_change
+);
+
+
+
 void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bool to_date_change);
 
 

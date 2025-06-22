@@ -8,7 +8,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 //#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -16,7 +16,6 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
-#include "NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h"
 #include "NintendoSwitch_HomeToDateTime.h"
 
 namespace PokemonAutomation{
@@ -209,143 +208,9 @@ void home_to_date_time_Switch1_sbb_blind(
     ssf_issue_scroll_ptv(context, SSF_SCROLL_DOWN);    
 }
 
-void home_to_date_time_Switch2_wired_blind(
-    ConsoleHandle& console, ProControllerContext& context,
-    bool to_date_change
-){
-    console.log("home_to_date_time_Switch2_wired_blind()");
-
-    Milliseconds delay = 24ms;
-    Milliseconds hold = 48ms;
-    Milliseconds cool = 24ms;
-
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
-
-    //  Down twice in case we drop one.
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
-
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, delay, hold, cool);
-
-    //  Two A presses in case we drop the 1st one.
-    ssf_press_button(context, BUTTON_A, delay, hold, cool);
-    ssf_press_button(context, BUTTON_A, delay, hold, cool);
-
-    for (size_t c = 0; c < 40; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
-    }
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 1000ms, cool);
-
-    //  Scroll left and press A to exit the sleep menu if we happened to
-    //  land there.
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, delay, hold, cool);
-    ssf_press_button(context, BUTTON_A, 3);
-
-    for (size_t c = 0; c < 2; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
-    }
-
-
-    //  If we don't know for sure what the Switch type is, detect it here.
-    ConsoleType console_type = console.state().console_type();
-    if (console_type == ConsoleType::Switch2_Unknown || !console.state().console_type_confirmed()){
-        console.log(std::string("Console Type: ") + ConsoleType_strings(console_type));
-        console.log("Console type unknown or not confirmed. Attempting to detect...");
-
-        VideoOverlaySet overlays(console.overlay());
-        BinarySliderDetector detector(COLOR_BLUE, {0.836431, 0.097521, 0.069703, 0.796694});
-        detector.make_overlays(overlays);
-
-        ssf_do_nothing(context, 500ms);
-        for (size_t c = 0; c < 5; c++){
-            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 200ms, 100ms, 100ms);
-        }
-        ssf_do_nothing(context, 500ms);
-        context.wait_for_all_requests();
-
-        auto snapshot = console.video().snapshot();
-        size_t sliders = detector.detect(snapshot).size();
-        switch (sliders){
-        case 2:
-            console.state().set_console_type(console, ConsoleType::Switch2_FW20_International);
-            break;
-        case 3:
-            console.state().set_console_type(console, ConsoleType::Switch2_FW20_JapanLocked);
-            break;
-        default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect if this Switch 2 model is international or Japan-locked.",
-                console, std::move(snapshot)
-            );
-        }
-        console_type = console.state().console_type();
-        console.log(std::string("Detected console type as: ") + ConsoleType_strings(console_type));
-
-        //  Scroll back up.
-        for (size_t c = 0; c < 6; c++){
-            ssf_issue_scroll(context, SSF_SCROLL_UP, 200ms, 100ms, 100ms);
-        }
-        ssf_do_nothing(context, 500ms);
-    }
 
 
 
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 192ms, hold, cool);
-
-
-    switch (console_type){
-    case ConsoleType::Switch2_FW19_International:
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        break;
-    case ConsoleType::Switch2_FW19_JapanLocked:
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        break;
-    case ConsoleType::Switch2_FW20_International:
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        break;
-    case ConsoleType::Switch2_FW20_JapanLocked:
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, hold, cool);
-        break;
-    default:
-        throw UserSetupError(
-            console,
-            "You need to specify a specific Switch 2 model."
-        );
-    }
-
-
-    if (!to_date_change){
-        //  Triple up this A press to make sure it gets through.
-        ssf_press_button(context, BUTTON_A, delay, hold, cool);
-        ssf_press_button(context, BUTTON_A, delay, hold, cool);
-        ssf_press_button(context, BUTTON_A, 360ms, hold, cool);
-        return;
-    }
-
-    //  Triple up this A press to make sure it gets through.
-    ssf_press_button(context, BUTTON_A, delay, hold, cool);
-    ssf_press_button(context, BUTTON_A, delay, hold, cool);
-    ssf_press_button(context, BUTTON_A, delay, hold, cool);
-
-    for (size_t c = 0; c < 5; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
-    }
-
-    //  Left scroll in case we missed and landed in the language change or sleep
-    //  confirmation menus.
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, delay, hold, cool);
-}
 
 void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProControllerContext& context, bool to_date_change){
     stream.log("home_to_date_time_Switch1_wired_with_feedback()");
@@ -471,7 +336,7 @@ void home_to_date_time_Switch1_wired_with_feedback(VideoStream& stream, ProContr
 
 
 
-void home_to_date_time_switch1_blind(Logger& logger, ProControllerContext& context, bool to_date_change){
+void home_to_date_time_Switch1_blind(Logger& logger, ProControllerContext& context, bool to_date_change){
     switch (context->performance_class()){
     case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
         home_to_date_time_Switch1_wired_blind(logger, context, to_date_change);
@@ -485,7 +350,7 @@ void home_to_date_time_switch1_blind(Logger& logger, ProControllerContext& conte
         return;
     }
 }
-bool home_to_date_time_switch1_feedback(ConsoleHandle& console, ProControllerContext& context, bool to_date_change){
+bool home_to_date_time_Switch1_feedback(ConsoleHandle& console, ProControllerContext& context, bool to_date_change){
     switch (context->performance_class()){
     case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
         home_to_date_time_Switch1_wired_with_feedback(console, context, to_date_change);
@@ -522,7 +387,14 @@ bool home_to_date_time_with_feedback(ConsoleHandle& console, ProControllerContex
     ConsoleType console_type = detector.detect_only(console.video().snapshot());
     switch (console_type){
     case ConsoleType::Switch1:
-        return home_to_date_time_switch1_feedback(console, context, to_date_change);
+        return home_to_date_time_Switch1_feedback(console, context, to_date_change);
+    case ConsoleType::Switch2_Unknown:
+    case ConsoleType::Switch2_FW19_International:
+    case ConsoleType::Switch2_FW19_JapanLocked:
+    case ConsoleType::Switch2_FW20_International:
+    case ConsoleType::Switch2_FW20_JapanLocked:
+        home_to_date_time_Switch2_wired_feedback(console, context, to_date_change);
+        return true;
     default:;
     }
 
@@ -541,14 +413,14 @@ void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bo
     case ConsoleType::Unknown:
         throw UserSetupError(console, "Switch type is not specified and feedback is not available.");
     case ConsoleType::Switch1:
-        home_to_date_time_switch1_blind(console, context, to_date_change);
+        home_to_date_time_Switch1_blind(console, context, to_date_change);
         return;
     case ConsoleType::Switch2_Unknown:
     case ConsoleType::Switch2_FW19_International:
     case ConsoleType::Switch2_FW19_JapanLocked:
     case ConsoleType::Switch2_FW20_International:
     case ConsoleType::Switch2_FW20_JapanLocked:
-        home_to_date_time_Switch2_wired_blind(console, context, to_date_change);
+        home_to_date_time_Switch2_wired_blind(console, context, console_type, to_date_change);
         return;
     }
 }
