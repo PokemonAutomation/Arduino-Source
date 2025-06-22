@@ -14,6 +14,10 @@
 #include "CommonTools/OCR/OCR_NumberReader.h"
 #include "PokemonSV_ItemPrinterPrizeReader.h"
 
+// #include <iostream>
+// using std::cout;
+// using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -136,10 +140,16 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
         total_average_sum_bonus += average_sum_filtered(screen, m_boxes_bonus[i]);
     }
 
-    // std::cout << "total_average_sum_normal: " << std::to_string(total_average_sum_normal) << std::endl;
-    // std::cout << "total_average_sum_bonus: " << std::to_string(total_average_sum_bonus) << std::endl;
+    logger.log("total_average_sum_normal: " + std::to_string(total_average_sum_normal));
+    logger.log("total_average_sum_bonus: " + std::to_string(total_average_sum_bonus));
 
-    const std::array<ImageFloatBox, 10>& boxes = (total_average_sum_normal > total_average_sum_bonus) 
+    if (total_average_sum_bonus > total_average_sum_normal){
+        logger.log("Read quantity with bonus mode.");
+    }else{
+        logger.log("Read quantity with normal mode.");
+    }
+
+    const std::array<ImageFloatBox, 10>& boxes = (total_average_sum_bonus > total_average_sum_normal) 
                                                     ? m_boxes_bonus_quantity 
                                                     : m_boxes_normal_quantity;
 
