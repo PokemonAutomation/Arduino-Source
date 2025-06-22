@@ -8,7 +8,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 //#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -16,6 +16,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h"
 #include "NintendoSwitch_HomeToDateTime.h"
 
 namespace PokemonAutomation{
@@ -209,10 +210,10 @@ void home_to_date_time_Switch1_sbb_blind(
 }
 
 void home_to_date_time_Switch2_wired_blind(
-    Logger& logger, ProControllerContext& context,
-    ConsoleType console_type, bool to_date_change
+    ConsoleHandle& console, ProControllerContext& context,
+    bool to_date_change
 ){
-    logger.log("home_to_date_time_Switch2_wired_blind()");
+    console.log("home_to_date_time_Switch2_wired_blind()");
 
     Milliseconds delay = 24ms;
     Milliseconds hold = 48ms;
@@ -246,14 +247,56 @@ void home_to_date_time_Switch2_wired_blind(
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
     }
 
+
+    //  If we don't know for sure what the Switch type is, detect it here.
+    ConsoleType console_type = console.state().console_type();
+    if (console_type == ConsoleType::Switch2_Unknown || !console.state().console_type_confirmed()){
+        console.log(std::string("Console Type: ") + ConsoleType_strings(console_type));
+        console.log("Console type unknown or not confirmed. Attempting to detect...");
+
+        VideoOverlaySet overlays(console.overlay());
+        BinarySliderDetector detector(COLOR_BLUE, {0.836431, 0.097521, 0.069703, 0.796694});
+        detector.make_overlays(overlays);
+
+        ssf_do_nothing(context, 500ms);
+        for (size_t c = 0; c < 5; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 200ms, 100ms, 100ms);
+        }
+        ssf_do_nothing(context, 500ms);
+        context.wait_for_all_requests();
+
+        auto snapshot = console.video().snapshot();
+        size_t sliders = detector.detect(snapshot).size();
+        switch (sliders){
+        case 2:
+            console.state().set_console_type(console, ConsoleType::Switch2_FW20_International);
+            break;
+        case 3:
+            console.state().set_console_type(console, ConsoleType::Switch2_FW20_JapanLocked);
+            break;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect if this Switch 2 model is international or Japan-locked.",
+                console, std::move(snapshot)
+            );
+        }
+        console_type = console.state().console_type();
+        console.log(std::string("Detected console type as: ") + ConsoleType_strings(console_type));
+
+        //  Scroll back up.
+        for (size_t c = 0; c < 6; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_UP, 200ms, 100ms, 100ms);
+        }
+        ssf_do_nothing(context, 500ms);
+    }
+
+
+
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay, hold, cool);
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 192ms, hold, cool);
 
-
-    if (console_type == ConsoleType::Switch2_Unknown){
-        //  TODO: Detect which Switch 2 type.
-    }
 
     switch (console_type){
     case ConsoleType::Switch2_FW19_International:
@@ -276,7 +319,7 @@ void home_to_date_time_Switch2_wired_blind(
         break;
     default:
         throw UserSetupError(
-            logger,
+            console,
             "You need to specify a specific Switch 2 model."
         );
     }
@@ -505,7 +548,7 @@ void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bo
     case ConsoleType::Switch2_FW19_JapanLocked:
     case ConsoleType::Switch2_FW20_International:
     case ConsoleType::Switch2_FW20_JapanLocked:
-        home_to_date_time_Switch2_wired_blind(console, context, console_type, to_date_change);
+        home_to_date_time_Switch2_wired_blind(console, context, to_date_change);
         return;
     }
 }

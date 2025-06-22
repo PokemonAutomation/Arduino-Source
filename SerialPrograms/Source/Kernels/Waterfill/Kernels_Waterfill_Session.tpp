@@ -339,7 +339,7 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
             popcount, sum_x, sum_y
         );
         if (!(tile_min_x < x && x < tile_max_x && tile_min_y < y && y < tile_max_y)){
-            // Get the min max of the 1-bits locaitons in the tile
+            // Get the min max of the 1-bits locations in the tile
             size_t cmin_x, cmax_x, cmin_y, cmax_y;
             TileRoutines::boundaries(recorded_tile, cmin_x, cmax_x, cmin_y, cmax_y);
             stats.accumulate_boundary(

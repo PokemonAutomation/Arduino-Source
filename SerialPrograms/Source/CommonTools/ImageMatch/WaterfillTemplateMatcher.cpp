@@ -32,7 +32,10 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     std::string full_path = RESOURCE_PATH() + path;
     ImageRGB32 reference(full_path);
 
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(reference, (uint32_t)min_color, (uint32_t)max_color);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        reference,
+        (uint32_t)min_color, (uint32_t)max_color
+    );
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         ImageRGB32 binaryImage = reference.copy();
         filter_by_mask(matrix, binaryImage, Color(COLOR_BLACK), true);

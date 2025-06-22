@@ -129,6 +129,8 @@
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_24h.h"
+#include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -146,51 +148,6 @@ using namespace PokemonAutomation::Kernels::Waterfill;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-uint16_t scroll_to(
-    ProControllerContext& context,
-    uint8_t start_digit, uint8_t end_digit, bool actually_scroll
-);
-
-
-namespace PokemonSwSh{
-    std::vector<ImagePixelBox> find_selection_arrows(const ImageViewRGB32& image, size_t min_area);
-}
-
-
-
-
-StringSelectDatabase make_database(){
-    StringSelectDatabase ret;
-    for (size_t c = 0; c < 1000; c++){
-        ret.add_entry(StringSelectEntry("slug" + std::to_string(c), "Display " + std::to_string(c)));
-    }
-    return ret;
-}
-const StringSelectDatabase& test_database(){
-    static StringSelectDatabase database = make_database();
-    return database;
-}
-
-
-
-
-
-
-class MacAddressCell : public StringCell{
-public:
-
-private:
-
-};
-
-
-
-
-
-
-
-
 
 
 
@@ -232,7 +189,6 @@ TestProgram::TestProgram()
     )
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
     , STATIC_TEXT("Test text...")
-    , SELECT("String Select", test_database(), LockMode::LOCK_WHILE_RUNNING, 0)
 //    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
     , DATE0(
         "Date",
@@ -273,7 +229,6 @@ TestProgram::TestProgram()
 //    PA_ADD_OPTION(CONSOLE_MODEL);
     PA_ADD_OPTION(IMAGE_PATH);
     PA_ADD_OPTION(STATIC_TEXT);
-    PA_ADD_OPTION(SELECT);
 //    PA_ADD_OPTION(PLAYER_LIST);
 //    PA_ADD_OPTION(battle_AI);
     PA_ADD_OPTION(DATE0);
@@ -306,6 +261,9 @@ void TestProgram::on_press(){
 
 
 
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -325,7 +283,45 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
-    FastCodeEntry::numberpad_enter_code(console, context, "708538991006", true);
+
+
+//    ImageRGB32 image0("menu-light.png");
+//    ImageRGB32 image1("menu-dark.png");
+//    ImageRGB32 image2("menu-jpn.png");
+
+    auto screenshot = feed.snapshot();
+
+
+    BinarySliderDetector detector(COLOR_RED, {0.831784, 0.140496, 0.088290, 0.671074});
+    auto sliders = detector.detect(screenshot);
+
+    for (auto& item : sliders){
+        cout << item.first << " : " << item.second.min_y << endl;
+    }
+
+
+#if 0
+    ImageFloatBox box(0.842007, 0.626446, 0.050186, 0.049587);
+    ImageViewRGB32 cropped = extract_box_reference(screenshot, box);
+
+    cropped.save("temp.png");
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        cropped, 0xffc0c0c0, 0xffffffff
+    );
+
+    cout << matrix.dump() << endl;
+
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 200);
+    cout << "objects.size() = " << objects.size() << endl;
+    for (auto& item : objects){
+        extract_box_reference(cropped, item).save("test.png");
+    }
+#endif
+
+
+
+//    FastCodeEntry::numberpad_enter_code(console, context, "708538991006", true);
 
 
 
@@ -418,7 +414,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
     HomeMenuDetector detector0(console);
     StartGameUserSelectDetector detector1(console);
     UpdatePopupDetector detector2(console);

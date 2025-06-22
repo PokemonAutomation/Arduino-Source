@@ -14,17 +14,24 @@ namespace NintendoSwitch{
 
 
 
-const char* ConsoleType_Strings[] = {
-    "Unknown",
-    "Switch 1 + OLED",
-    "Switch 2 (unknown model)",
-    "Switch 2 (FW19, international)",
-    "Switch 2 (FW19, Japan-locked)",
-    "Switch 2 (FW20, international)",
-    "Switch 2 (FW20, Japan-locked)",
-};
-const char* ConsoleType_strings(ConsoleType type){
-    return ConsoleType_Strings[(size_t)type];
+const std::string& ConsoleType_strings(ConsoleType type){
+    static std::string STRINGS[] = {
+        "Unknown",
+        "Switch 1 + OLED",
+        "Switch 2 (unknown model)",
+        "Switch 2 (FW19, international)",
+        "Switch 2 (FW19, Japan-locked)",
+        "Switch 2 (FW20, international)",
+        "Switch 2 (FW20, Japan-locked)",
+    };
+    size_t index = (size_t)type;
+    if (index < sizeof(STRINGS) / sizeof(std::string)){
+        return STRINGS[(size_t)type];
+    }
+    throw InternalProgramError(
+        nullptr, PA_CURRENT_FUNCTION,
+        "Invalid ConsoleType enum: " + std::to_string(index)
+    );
 }
 
 [[noreturn]] void throw_conflict(
@@ -130,7 +137,7 @@ void ConsoleState::set_console_type(Logger& logger, ConsoleType type){
     logger.log(std::string("Setting console type to: ") + ConsoleType_strings(type));
 
     m_data->m_console_type.store(type, std::memory_order_relaxed);
-    m_data->m_console_type_confirmed.store(confirmed, std::memory_order_relaxed);
+    m_data->m_console_type_confirmed.store(true, std::memory_order_relaxed);
 }
 
 

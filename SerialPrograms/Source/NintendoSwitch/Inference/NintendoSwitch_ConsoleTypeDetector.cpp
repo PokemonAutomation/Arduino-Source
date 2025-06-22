@@ -20,6 +20,7 @@ ConsoleTypeDetector_Home::ConsoleTypeDetector_Home(ConsoleHandle& console, Color
     : m_console(console)
     , m_color(color)
     , m_bottom_line(0.10, 0.88, 0.80, 0.03)
+    , m_last(ConsoleType::Unknown)
 {}
 void ConsoleTypeDetector_Home::make_overlays(VideoOverlaySet& items) const{
     ConsoleType known_state = m_console.state().console_type();
@@ -30,7 +31,9 @@ void ConsoleTypeDetector_Home::make_overlays(VideoOverlaySet& items) const{
 }
 ConsoleType ConsoleTypeDetector_Home::detect_only(const ImageViewRGB32& screen){
     if (m_console.state().console_type_confirmed()){
-        return m_console.state().console_type();
+        ConsoleType state = m_console.state().console_type();
+        m_last = state;
+        return state;
     }
 
     ImageStats stats = image_stats(extract_box_reference(screen, m_bottom_line));
@@ -45,7 +48,9 @@ ConsoleType ConsoleTypeDetector_Home::detect_only(const ImageViewRGB32& screen){
     return state;
 }
 void ConsoleTypeDetector_Home::commit_to_cache(){
-    m_console.state().set_console_type(m_console, m_last);
+    if (m_last != ConsoleType::Unknown){
+        m_console.state().set_console_type(m_console, m_last);
+    }
 }
 
 

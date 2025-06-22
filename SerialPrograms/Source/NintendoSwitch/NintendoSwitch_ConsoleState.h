@@ -24,7 +24,7 @@ enum class ConsoleType{
     Switch2_FW20_International,
     Switch2_FW20_JapanLocked,
 };
-const char* ConsoleType_strings(ConsoleType type);
+const std::string& ConsoleType_strings(ConsoleType type);
 
 inline bool is_switch1(ConsoleType type){
     return type == ConsoleType::Switch1;

@@ -967,6 +967,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h
+    Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleState.cpp

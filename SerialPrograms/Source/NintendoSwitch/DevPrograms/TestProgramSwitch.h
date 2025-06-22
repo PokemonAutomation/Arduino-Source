@@ -73,8 +73,6 @@ private:
 
     StaticTextOption STATIC_TEXT;
 
-    StringSelectOption SELECT;
-
 //    PokemonSV::PlayerListTable PLAYER_LIST;
     DateTimeOption DATE0;
     DateTimeOption DATE1;
