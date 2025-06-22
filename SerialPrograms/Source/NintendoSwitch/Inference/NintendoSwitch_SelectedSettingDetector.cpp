@@ -18,7 +18,11 @@ namespace NintendoSwitch{
 
 SelectedSettingWatcher::~SelectedSettingWatcher() = default;
 
-SelectedSettingWatcher::SelectedSettingWatcher(ImageFloatBox selected_box, ImageFloatBox not_selected_box1, ImageFloatBox not_selected_box2)
+SelectedSettingWatcher::SelectedSettingWatcher(
+    ImageFloatBox selected_box,
+    ImageFloatBox not_selected_box1,
+    ImageFloatBox not_selected_box2
+)
     : VisualInferenceCallback("SelectedSettingWatcher")
     , m_selected_box(selected_box)
     , m_not_selected_box1(not_selected_box1)

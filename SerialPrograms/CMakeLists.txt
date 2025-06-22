@@ -1010,6 +1010,7 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h
+    Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch1_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch2_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_CodeEntryTools.cpp
     Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_CodeEntryTools.h

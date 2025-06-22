@@ -24,6 +24,21 @@ namespace NintendoSwitch{
 //void home_to_date_time(Logger& logger, ProControllerContext& context, bool to_date_change);
 
 
+void home_to_date_time_Switch1_wired_blind(
+    Logger& logger, ProControllerContext& context, bool to_date_change
+);
+void home_to_date_time_Switch1_wireless_esp32_blind(
+    Logger& logger, ProControllerContext& context, bool to_date_change
+);
+void home_to_date_time_Switch1_sbb_blind(
+    Logger& logger, ProControllerContext& context, bool to_date_change
+);
+void home_to_date_time_Switch1_wired_feedback(
+    VideoStream& stream, ProControllerContext& context, bool to_date_change
+);
+
+
+
 void home_to_date_time_Switch2_wired_blind(
     Logger& logger, ProControllerContext& context,
     ConsoleType console_type, bool to_date_change

@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_SelectedSettingDetector_H
 #define PokemonAutomation_NintendoSwitch_SelectedSettingDetector_H
 
-#include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/VisualDetector.h"
@@ -18,7 +17,11 @@ namespace NintendoSwitch{
 
 class SelectedSettingWatcher : public VisualInferenceCallback{
 public:
-    SelectedSettingWatcher(ImageFloatBox selected_box, ImageFloatBox not_selected_box1, ImageFloatBox not_selected_box2);
+    SelectedSettingWatcher(
+        ImageFloatBox selected_box,
+        ImageFloatBox not_selected_box1,
+        ImageFloatBox not_selected_box2
+    );
     virtual ~SelectedSettingWatcher();
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
