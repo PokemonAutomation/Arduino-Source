@@ -27,10 +27,13 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language =
 //  This version attempts to improve reliability by first isolating each number
 //  via waterfill. Then it OCRs each number by itself and recombines them at the
 //  end. This requires specifying the color range for the text.
+//
+// line_index: specifies the current number's row. for logging purposes, when multithreaded.
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,
-    bool text_inside_range = true
+    bool text_inside_range = true,
+    int8_t line_index = -1
  );
 
 // run OCR on each individual character in the string of numbers.
@@ -53,12 +56,15 @@ int read_number_waterfill(
 // prioritize_numeric_only_results: 
 //  - if true: if OCR reads only numeric characters, the candidate gets 2 votes. If OCR reads non-numeric characters, the candidate gets only 1 vote.
 //  - if false: all reads only get 1 vote
+//
+// line_index: specifies the current number's row. for logging purposes, when multithreaded.
 int read_number_waterfill_multifilter(
     Logger& logger, const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,
     uint32_t width_max,
     bool text_inside_range = true,
-    bool prioritize_numeric_only_results = true
+    bool prioritize_numeric_only_results = true,
+    int8_t line_index = -1
  );
 
 

@@ -85,7 +85,8 @@ void ItemPrinterMaterialDetector::make_overlays(VideoOverlaySet& items) const{
 
 int16_t ItemPrinterMaterialDetector::read_number(
     Logger& logger, AsyncDispatcher& dispatcher,
-    const ImageViewRGB32& screen, const ImageFloatBox& box
+    const ImageViewRGB32& screen, const ImageFloatBox& box,
+    int8_t row_index
 ) const{
 
     ImageViewRGB32 cropped = extract_box_reference(screen, box);
@@ -98,39 +99,41 @@ int16_t ItemPrinterMaterialDetector::read_number(
     bool is_dark_text_light_background = image_stats(filtered).average.sum() > 400;
     // std::cout << "Average sum of filtered: "<< std::to_string(image_stats(filtered).average.sum()) << std::endl;
 
-    int16_t number;
-    if (is_dark_text_light_background){
-        const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-            // {0xff000000, 0xffb0b0b0},
-            {0xff000000, 0xffa0a0a0},
-            {0xff000000, 0xff959595},
-            {0xff000000, 0xff909090},
-            {0xff000000, 0xff858585},
-            {0xff000000, 0xff808080},
-            // {0xff000000, 0xff707070},
-            // {0xff000000, 0xff606060},
-            // {0xff000000, 0xff505050},
-            // {0xff000000, 0xff404040},
-            // {0xff000000, 0xff303030},
-            // {0xff000000, 0xff202020},
-            // {0xff000000, 0xff101010},
-        };
-        number = (int16_t)OCR::read_number_waterfill_multifilter(logger, cropped, filters, 24);
-    }else{
-        const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-            {0xff808080, 0xffffffff},
-            {0xff858585, 0xffffffff},
-            {0xff909090, 0xffffffff},
-            {0xff959595, 0xffffffff},
-            {0xffa0a0a0, 0xffffffff},
-            // {0xffb0b0b0, 0xffffffff},
-            // {0xffc0c0c0, 0xffffffff},
-            // {0xffd0d0d0, 0xffffffff},
-            // {0xffe0e0e0, 0xffffffff},
-            // {0xfff0f0f0, 0xffffffff},
-        };        
-        number = (int16_t)OCR::read_number_waterfill_multifilter(logger, cropped, filters, 24);
-    }
+    const std::vector<std::pair<uint32_t, uint32_t>> filters = 
+        [&](){
+            if (is_dark_text_light_background){
+                return std::vector<std::pair<uint32_t, uint32_t>>{
+                    // {0xff000000, 0xffb0b0b0},
+                    {0xff000000, 0xffa0a0a0},
+                    {0xff000000, 0xff959595},
+                    {0xff000000, 0xff909090},
+                    {0xff000000, 0xff858585},
+                    {0xff000000, 0xff808080},
+                    // {0xff000000, 0xff707070},
+                    // {0xff000000, 0xff606060},
+                    // {0xff000000, 0xff505050},
+                    // {0xff000000, 0xff404040},
+                    // {0xff000000, 0xff303030},
+                    // {0xff000000, 0xff202020},
+                    // {0xff000000, 0xff101010},
+                };
+            }else{
+                return std::vector<std::pair<uint32_t, uint32_t>>{
+                    {0xff808080, 0xffffffff},
+                    {0xff858585, 0xffffffff},
+                    {0xff909090, 0xffffffff},
+                    {0xff959595, 0xffffffff},
+                    {0xffa0a0a0, 0xffffffff},
+                    // {0xffb0b0b0, 0xffffffff},
+                    // {0xffc0c0c0, 0xffffffff},
+                    // {0xffd0d0d0, 0xffffffff},
+                    // {0xffe0e0e0, 0xffffffff},
+                    // {0xfff0f0f0, 0xffffffff},
+                };
+            }
+        }();
+    
+    int16_t number = (int16_t)OCR::read_number_waterfill_multifilter(logger, cropped, filters, 24, true, true, row_index);
 
     if (number < 1 || number > 999){
         number = -1;
@@ -225,7 +228,7 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
     std::vector<std::unique_ptr<AsyncTask>> tasks(total_rows);
     for (int8_t row_index = 0; row_index < total_rows; row_index++){
         tasks[row_index] = dispatcher.dispatch([&, row_index]{
-            int16_t value = read_number(stream.logger(), dispatcher, snapshot, m_box_mat_value[row_index]);
+            int16_t value = read_number(stream.logger(), dispatcher, snapshot, m_box_mat_value[row_index], row_index);
             if (value == material_value){
                 WriteSpinLock lg(lock);
                 row_indexes.push_back(row_index);
@@ -246,7 +249,7 @@ int16_t ItemPrinterMaterialDetector::detect_material_quantity(
 ) const{
     context.wait_for_all_requests();
     VideoSnapshot snapshot = stream.video().snapshot();
-    int16_t value = read_number(stream.logger(), dispatcher, snapshot, m_box_mat_quantity[row_index]);
+    int16_t value = read_number(stream.logger(), dispatcher, snapshot, m_box_mat_quantity[row_index], row_index);
     return value;
 }
 

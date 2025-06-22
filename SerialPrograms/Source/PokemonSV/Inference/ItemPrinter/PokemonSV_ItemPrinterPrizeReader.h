@@ -43,7 +43,8 @@ public:
     int16_t read_number(
         Logger& logger,
         const ImageViewRGB32& screen, 
-        const ImageFloatBox& box
+        const ImageFloatBox& box,
+        int8_t line_index = -1
     ) const;
 
     double average_sum_filtered(const ImageViewRGB32& screen, const ImageFloatBox& box) const;
