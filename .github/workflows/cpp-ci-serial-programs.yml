@@ -10,11 +10,15 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2025, macos-13, ubuntu-24.04]
+        toolset: ['']
         qt_version: ['6.9.0']
         include:
-        - qt_version: '6.9.0'
-          qt_version_major: '6'
-          qt_modules: 'qtmultimedia qtserialport'
+          - qt_version: '6.9.0'
+            qt_version_major: '6'
+            qt_modules: 'qtmultimedia qtserialport'
+
+          - os: 'windows-2025'
+            toolset: '-T ClangCL'
 
     steps:
     - uses: actions/checkout@v4
@@ -42,7 +46,7 @@ jobs:
         cd Arduino-Source/SerialPrograms
         mkdir bin
         cd bin
-        cmake .. -DQT_MAJOR:STRING=${{ matrix.qt_version_major }}
+        cmake .. -DQT_MAJOR:STRING=${{ matrix.qt_version_major }} ${{ matrix.toolset }}
         cmake --build . --config Release --parallel 10
     - name: Copy resources
       if: startsWith(matrix.os, 'windows')
