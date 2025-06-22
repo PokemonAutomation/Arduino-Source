@@ -164,7 +164,7 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
         // filtered.save("DebugDumps/test"+ std::to_string(i) +".png");   
 
         tasks[i] = dispatcher.dispatch([&, i]{
-            results[i] = read_number(logger, screen, boxes[i]);
+            results[i] = read_number(logger, screen, boxes[i], (int8_t)i);
         });
     }
 
@@ -179,11 +179,12 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
 int16_t ItemPrinterPrizeReader::read_number(
     Logger& logger, 
     const ImageViewRGB32& screen, 
-    const ImageFloatBox& box
+    const ImageFloatBox& box,
+    int8_t line_index
 ) const{
 
     ImageViewRGB32 cropped = extract_box_reference(screen, box);
-    int16_t number = (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff808000, 0xffffffff);
+    int16_t number = (int16_t)OCR::read_number_waterfill(logger, cropped, 0xff808000, 0xffffffff, true, line_index);
 
     if (number < 1 || number > 40){
         number = 1; // default to 1 if we can't read the prize quantity

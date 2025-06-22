@@ -102,19 +102,24 @@ int read_number(Logger& logger, const ImageViewRGB32& image, Language language){
 int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,    
-    bool text_inside_range
+    bool text_inside_range,
+    int8_t line_index
 ){
     std::string ocr_text = read_number_waterfill_no_normalization(logger, image, rgb32_min, rgb32_max, text_inside_range, UINT32_MAX, false);
 
     std::string normalized = run_number_normalization(ocr_text);
 
+    std::string line_index_str = "";
+    if (line_index != -1){
+        line_index_str = "Line " + std::to_string(line_index) + ": ";
+    }
     if (normalized.empty()){
-        logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
+        logger.log(line_index_str + "OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
         return -1;
     }
 
     int number = std::atoi(normalized.c_str());
-    logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
+    logger.log(line_index_str + "OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(number));
 
     return number;
 }
@@ -192,9 +197,13 @@ int read_number_waterfill_multifilter(
     std::vector<std::pair<uint32_t, uint32_t>> filters,    
     uint32_t width_max, 
     bool text_inside_range,
-    bool prioritize_numeric_only_results
+    bool prioritize_numeric_only_results, 
+    int8_t line_index
 ){
-    
+    std::string line_index_str = "";
+    if (line_index != -1){
+        line_index_str = "Line " + std::to_string(line_index) + ": ";
+    }
 
     std::map<int, uint8_t> candidates;
     for (std::pair<uint32_t, uint32_t> filter : filters){
@@ -210,7 +219,7 @@ int read_number_waterfill_multifilter(
         }
 
         int candidate = std::atoi(normalized.c_str());
-        logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(candidate));
+        logger.log(line_index_str + "OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(candidate));
 
         if (prioritize_numeric_only_results && is_digits(ocr_text)){
             candidates[candidate] += 2;
@@ -220,19 +229,19 @@ int read_number_waterfill_multifilter(
     }
 
     if (candidates.empty()){
-        logger.log("No valid OCR candidates. Unable to read number.", COLOR_ORANGE);
+        logger.log(line_index_str + "No valid OCR candidates. Unable to read number.", COLOR_ORANGE);
         return -1;
     }
 
     std::pair<int, uint8_t> best;
     for (const auto& item : candidates){
-        logger.log("Candidate " + std::to_string(item.first) + ": " + std::to_string(item.second) + " votes");
+        logger.log(line_index_str + "Candidate " + std::to_string(item.first) + ": " + std::to_string(item.second) + " votes");
         if (item.second > best.second){
             best = item;
         }
     }
 
-    logger.log("Best candidate: --------------------------> " + std::to_string(best.first));
+    logger.log(line_index_str + "Best candidate: --------------------------> " + std::to_string(best.first));
     return best.first;
 }
 

@@ -76,7 +76,8 @@ public:
 
     int16_t read_number(
         Logger& logger, AsyncDispatcher& dispatcher,
-        const ImageViewRGB32& screen, const ImageFloatBox& box
+        const ImageViewRGB32& screen, const ImageFloatBox& box,
+        int8_t row_index
     ) const;
 
 
