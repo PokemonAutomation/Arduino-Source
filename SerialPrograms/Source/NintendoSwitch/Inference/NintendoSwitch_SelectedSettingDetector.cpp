@@ -38,7 +38,7 @@ void SelectedSettingWatcher::make_overlays(VideoOverlaySet& items) const{
 bool is_white_theme(const ImageViewRGB32& screen){
     ImageFloatBox window_top(0.60, 0.02, 0.35, 0.05);
     ImageStats stats_window_top = image_stats(extract_box_reference(screen, window_top));
-    bool white_theme = stats_window_top.average.sum() > 600;
+    bool white_theme = stats_window_top.average.sum() > 500;
     return white_theme;
 }
 
