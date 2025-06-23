@@ -119,22 +119,35 @@ void ProController_SysbotBase3::on_message(const std::string& message){
 
     std::lock_guard<std::mutex> lg(m_state_lock);
 
+    if (GlobalSettings::instance().LOG_EVERYTHING){
+        m_logger.log(
+            "Command Finished: " + std::to_string(parsed) +
+            " (queue size = " + std::to_string(m_next_seqnum - m_next_expected_seqnum_ack) + ")"
+        );
+    }
+
     //  Old ack
-    if (parsed <= m_next_expected_seqnum_ack){
+    if (parsed < m_next_expected_seqnum_ack){
+        m_logger.log(
+            "Received Old Ack: Expected = " + std::to_string(m_next_expected_seqnum_ack) +
+            ", Actual = " + std::to_string(parsed),
+            COLOR_RED
+        );
         return;
     }
 
     //  Ack is ahead of what has been dispatched.
     if (parsed >= m_next_seqnum){
+        m_logger.log(
+            "Received Future Ack: Expected = " + std::to_string(m_next_expected_seqnum_ack) +
+            ", Actual = " + std::to_string(parsed),
+            COLOR_RED
+        );
         return;
     }
 
     m_next_expected_seqnum_ack = parsed + 1;
     m_cv.notify_all();
-
-    if (GlobalSettings::instance().LOG_EVERYTHING){
-        m_logger.log("Command Finished: " + std::to_string(parsed));
-    }
 }
 
 void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallDuration duration){
