@@ -154,7 +154,7 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannel
 
     m_writer = std::make_unique<AudioOutputDevice>(
         logger,
-        native_info, native_format,
+        native_info, target_format,
         sample_format, m_channels * m_multiplier,
         volume
     );
