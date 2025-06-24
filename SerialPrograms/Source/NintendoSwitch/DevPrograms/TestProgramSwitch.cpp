@@ -287,16 +287,28 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+#if 1
+//    HomeMenuDetector detector0(console);
+//    StartGameUserSelectDetector detector1(console);
+    UpdatePopupDetector detector2(console);
+//    detector0.make_overlays(overlays);
+//    detector1.make_overlays(overlays);
+    detector2.make_overlays(overlays);
+    cout << detector2.detect(feed.snapshot()) << endl;
+#endif
+
+
+
 //    ImageRGB32 image0("menu-light.png");
 //    ImageRGB32 image1("menu-dark.png");
 //    ImageRGB32 image2("menu-jpn.png");
 
-
+#if 0
     env.log("Touching date to prevent rollover.");
     pbf_press_button(context, BUTTON_HOME, 160ms, PokemonSwSh::GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
     touch_date_from_home(console, context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     resume_game_no_interact(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-
+#endif
 
 
 
@@ -426,15 +438,6 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
-    HomeMenuDetector detector0(console);
-    StartGameUserSelectDetector detector1(console);
-    UpdatePopupDetector detector2(console);
-//    detector0.make_overlays(overlays);
-//    detector1.make_overlays(overlays);
-    detector2.make_overlays(overlays);
-    cout << detector2.detect(feed.snapshot()) << endl;
-#endif
 
 
 #if 0

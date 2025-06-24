@@ -60,11 +60,15 @@ void run_away(
             pbf_press_button(context, BUTTON_A, 80ms, 0ms);
             continue;
         default:
+            context->logger().log("Unable to detect end of battle. Assume successful run away.", COLOR_ORANGE);
+            return;
+#if 0
             throw OperationFailedException(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to run away. Are you stuck in the battle?",
                 stream
             );
+#endif
         }
     }
 }

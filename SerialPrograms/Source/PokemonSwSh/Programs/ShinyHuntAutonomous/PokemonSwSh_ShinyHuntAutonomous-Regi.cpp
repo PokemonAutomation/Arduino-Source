@@ -143,9 +143,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, ProCo
         if (result.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-            try{
-                run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
-            }catch (OperationFailedException&){}
+            run_away(env.console, context, EXIT_BATTLE_TIMEOUT0);
             error = true;
             continue;
         }

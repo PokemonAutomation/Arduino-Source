@@ -149,7 +149,7 @@ bool UpdatePopupDetector_Switch1::detect(const ImageViewRGB32& screen){
 UpdatePopupDetector_Switch2::UpdatePopupDetector_Switch2(Color color)
     : m_color(color)
     , m_box_top(0.25, 0.31, 0.50, 0.02)
-    , m_box_mid(0.25, 0.482, 0.50, 0.02)
+//    , m_box_mid(0.25, 0.482, 0.50, 0.02)
     , m_top(0.10, 0.17, 0.80, 0.03)
     , m_left(0.08, 0.25, 0.10, 0.38)
     , m_bottom_solid(0.10, 0.86, 0.80, 0.04)
@@ -158,7 +158,7 @@ UpdatePopupDetector_Switch2::UpdatePopupDetector_Switch2(Color color)
 
 void UpdatePopupDetector_Switch2::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box_top);
-    items.add(m_color, m_box_mid);
+//    items.add(m_color, m_box_mid);
     items.add(m_color, m_top);
     items.add(m_color, m_left);
     items.add(m_color, m_bottom_solid);
@@ -181,6 +181,7 @@ bool UpdatePopupDetector_Switch2::detect(const ImageViewRGB32& screen){
 
 //    cout << "white: " << white << endl;
 
+#if 0
     ImageStats stats_box_mid = image_stats(extract_box_reference(screen, m_box_mid));
     if (stats_box_mid.stddev.sum() > 10){
         return false;
@@ -188,6 +189,7 @@ bool UpdatePopupDetector_Switch2::detect(const ImageViewRGB32& screen){
     if (euclidean_distance(stats_box_top.average, stats_box_mid.average) > 10){
         return false;
     }
+#endif
 
     ImageStats stats_left = image_stats(extract_box_reference(screen, m_left));
 //    cout << stats_left.stddev << endl;
