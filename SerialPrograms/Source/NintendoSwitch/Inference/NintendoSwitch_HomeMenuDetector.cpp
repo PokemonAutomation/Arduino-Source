@@ -8,6 +8,10 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "NintendoSwitch_HomeMenuDetector.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -17,6 +21,7 @@ namespace NintendoSwitch{
 HomeMenuDetector::HomeMenuDetector(ConsoleHandle& console, Color color)
     : m_color(color)
     , m_console_type(console, color)
+    , m_top(0.510223, 0.019835, 0.441450, 0.034711)
     , m_bottom_row(0.10, 0.92, 0.10, 0.05)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
     , m_bottom_left(0.02, 0.70, 0.15, 0.15)
@@ -26,6 +31,7 @@ HomeMenuDetector::HomeMenuDetector(ConsoleHandle& console, Color color)
 {}
 void HomeMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_console_type.make_overlays(items);
+    items.add(m_color, m_top);
     items.add(m_color, m_bottom_row);
     items.add(m_color, m_bottom_icons);
     items.add(m_color, m_bottom_left);
@@ -59,6 +65,12 @@ bool HomeMenuDetector::detect_only(const ImageViewRGB32& screen){
     }
 
 //    cout << "white: " << white << endl;
+
+    ImageStats stats_top = image_stats(extract_box_reference(screen, m_top));
+//    cout << stats_top.average << stats_top.stddev << endl;
+    if (stats_top.stddev.sum() > 20){
+        return false;
+    }
 
     ImageStats stats_bottom_icons = image_stats(extract_box_reference(screen, m_bottom_icons));
 //    cout << stats_bottom_icons.average << stats_bottom_icons.stddev << endl;
@@ -95,6 +107,11 @@ bool HomeMenuDetector::detect_only(const ImageViewRGB32& screen){
 //    cout << euclidean_distance(stats_bottom_left.average, stats_bottom_left.average) << endl;
     if (euclidean_distance(stats_bottom_left.average, stats_bottom_right.average) > 20){
 //        cout << "zxcv" << endl;
+        return false;
+    }
+//    cout << euclidean_distance(stats_top.average, stats_bottom_left.average) << endl;
+    if (euclidean_distance(stats_top.average, stats_bottom_left.average) > 20){
+//        cout << "xcvb" << endl;
         return false;
     }
 

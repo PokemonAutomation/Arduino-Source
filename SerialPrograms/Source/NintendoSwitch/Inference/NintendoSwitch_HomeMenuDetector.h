@@ -29,6 +29,7 @@ public:
 private:
     Color m_color;
     ConsoleTypeDetector_Home m_console_type;
+    ImageFloatBox m_top;
     ImageFloatBox m_bottom_row;
     ImageFloatBox m_bottom_icons;
     ImageFloatBox m_bottom_left;

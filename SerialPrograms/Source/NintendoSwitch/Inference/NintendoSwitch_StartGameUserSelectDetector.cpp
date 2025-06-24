@@ -40,7 +40,6 @@ bool StartGameUserSelectDetector::detect(const ImageViewRGB32& screen){
 }
 bool StartGameUserSelectDetector::detect_only(const ImageViewRGB32& screen){
     ConsoleType type = m_type_detector.detect_only(screen);
-//    cout << "detection: " << (int)x << endl;
     m_console_type = type;
 
     if (type == ConsoleType::Unknown){

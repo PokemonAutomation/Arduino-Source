@@ -134,7 +134,10 @@ void ConsoleState::set_console_type(Logger& logger, ConsoleType type){
 
     }while (false);
 
-    logger.log(std::string("Setting console type to: ") + ConsoleType_strings(type));
+    logger.log(
+        std::string("Setting console type to: ") + ConsoleType_strings(type),
+        COLOR_BLUE
+    );
 
     m_data->m_console_type.store(type, std::memory_order_relaxed);
     m_data->m_console_type_confirmed.store(true, std::memory_order_relaxed);

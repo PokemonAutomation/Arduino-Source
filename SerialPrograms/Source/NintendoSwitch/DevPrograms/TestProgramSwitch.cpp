@@ -287,13 +287,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+
 #if 1
-//    HomeMenuDetector detector0(console);
-//    StartGameUserSelectDetector detector1(console);
+    HomeMenuDetector detector0(console);
+    StartGameUserSelectDetector detector1(console);
     UpdatePopupDetector detector2(console);
-//    detector0.make_overlays(overlays);
-//    detector1.make_overlays(overlays);
+    detector0.make_overlays(overlays);
+    detector1.make_overlays(overlays);
     detector2.make_overlays(overlays);
+    cout << detector0.detect(feed.snapshot()) << endl;
+    cout << detector1.detect(feed.snapshot()) << endl;
     cout << detector2.detect(feed.snapshot()) << endl;
 #endif
 
