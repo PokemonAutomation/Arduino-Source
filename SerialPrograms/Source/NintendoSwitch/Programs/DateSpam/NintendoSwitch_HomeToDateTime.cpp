@@ -5,16 +5,17 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonFramework/Exceptions/OperationFailedException.h"
 //#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 //#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "CommonTools/Async/InferenceRoutines.h"
+//#include "CommonTools/Async/InferenceRoutines.h"
 #include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+//#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 //#include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
 #include "NintendoSwitch_HomeToDateTime.h"
 
@@ -53,23 +54,7 @@ bool home_to_date_time_Switch1_feedback(ConsoleHandle& console, ProControllerCon
 
 //  Returns true if success. False if not supported.
 bool home_to_date_time_with_feedback(ConsoleHandle& console, ProControllerContext& context, bool to_date_change){
-    for (size_t attempts = 0;; attempts++){
-        HomeMenuWatcher home_menu(console, 100ms);
-        int ret = wait_until(
-            console, context, 5000ms,
-            {home_menu}
-        );
-        if (ret == 0){
-            break;
-        }
-        if (attempts == 2){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Unable to find Switch Home",
-                console
-            );
-        }
-    }
+    wait_for_home(console, context);
 
     ConsoleTypeDetector_Home detector(console);
     ConsoleType console_type = detector.detect_only(console.video().snapshot());

@@ -16,6 +16,10 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+void wait_for_home(ConsoleHandle& console, ProControllerContext& context);
+
+
+
 void resume_game_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     bool skip_home_press = false

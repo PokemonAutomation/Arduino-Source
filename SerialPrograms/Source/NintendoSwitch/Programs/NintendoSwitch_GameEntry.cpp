@@ -31,6 +31,42 @@ namespace NintendoSwitch{
 
 
 
+
+
+
+void wait_for_home(ConsoleHandle& console, ProControllerContext& context){
+    //  Feedback not available. Just assume we're already on Home.
+    if (!console.video().snapshot()){
+        return;
+    }
+
+    for (size_t attempts = 0;; attempts++){
+        HomeMenuWatcher home_menu(console, 100ms);
+        int ret = wait_until(
+            console, context, 5000ms,
+            {home_menu}
+        );
+        if (ret == 0){
+            break;
+        }
+        if (attempts == 2){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to find Switch Home",
+                console
+            );
+        }
+    }
+}
+
+
+
+
+
+
+
+
+
 void resume_game_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     bool skip_home_press

@@ -131,6 +131,8 @@
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_24h.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -289,6 +291,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    ImageRGB32 image1("menu-dark.png");
 //    ImageRGB32 image2("menu-jpn.png");
 
+
+    env.log("Touching date to prevent rollover.");
+    pbf_press_button(context, BUTTON_HOME, 160ms, PokemonSwSh::GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0);
+    touch_date_from_home(console, context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+    resume_game_no_interact(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+
+
+
+
+#if 0
     auto screenshot = feed.snapshot();
 
 
@@ -298,7 +310,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     for (auto& item : sliders){
         cout << item.first << " : " << item.second.min_y << endl;
     }
-
+#endif
 
 #if 0
     ImageFloatBox box(0.842007, 0.626446, 0.050186, 0.049587);

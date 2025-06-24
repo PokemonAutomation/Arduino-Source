@@ -5,8 +5,10 @@
  */
 
 #include "ClientSource/Libraries/MessageConverter.h"
-#include "Controllers/ControllerTypes.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+//#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
@@ -142,6 +144,8 @@ void touch_date_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     Milliseconds settings_to_home_delay
 ){
+    wait_for_home(console, context);
+
     ConsoleType type = console.state().console_type();
 
     if (is_switch1(type)){
@@ -211,6 +215,8 @@ void rollback_hours_from_home(
     uint8_t hours,
     Milliseconds settings_to_home_delay
 ){
+    wait_for_home(console, context);
+
     ConsoleType type = console.state().console_type();
 
     if (is_switch1(type)){
