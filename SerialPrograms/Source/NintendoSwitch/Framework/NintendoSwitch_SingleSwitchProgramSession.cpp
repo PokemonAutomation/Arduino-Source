@@ -12,6 +12,7 @@
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SingleSwitchProgramOption.h"
 #include "NintendoSwitch_SingleSwitchProgramSession.h"
 
@@ -143,7 +144,13 @@ void SingleSwitchProgramSession::internal_run_program(){
         m_system.audio(),
         m_system.stream_history()
     );
-    env.console.state().set_console_type_user(m_system.console_type());
+
+    if (ConsoleSettings::instance().TRUST_USER_CONSOLE_SELECTION){
+        env.console.state().set_console_type(m_system.logger(), m_system.console_type());
+    }else{
+        env.console.state().set_console_type_user(m_system.console_type());
+    }
+
 
     try{
         logger().log("<b>Starting Program: " + identifier() + "</b>");

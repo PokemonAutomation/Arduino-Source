@@ -65,6 +65,14 @@ ConsoleSettings& ConsoleSettings::instance(){
 }
 ConsoleSettings::ConsoleSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
+    , TRUST_USER_CONSOLE_SELECTION(
+        "<b>Trust User Console Selection:</b><br>"
+        "Trust that the user's selection for the console type (Switch 1 vs. Switch 2) is correct.<br>"
+        "Do not cross-check it. Do not stop the program if it disagrees with the user selection.<br>"
+        "Don't enable this option unless you are encountering issues.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
     , SETTINGS_TO_HOME_DELAY0(
         "<b>Settings to Home Delay:</b><br>Delay from pressing home anywhere in the settings to return to the home menu.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -103,6 +111,7 @@ ConsoleSettings::ConsoleSettings()
     , KEYBOARD_SECTION("<font size=4><b>Keyboard to Controller Mappings:</b></font>")
 {
     PA_ADD_OPTION(CONTROLLER_SETTINGS);
+    PA_ADD_OPTION(TRUST_USER_CONSOLE_SELECTION);
     PA_ADD_OPTION(SETTINGS_TO_HOME_DELAY0);
     PA_ADD_OPTION(START_GAME_REQUIRES_INTERNET);
     PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY0);

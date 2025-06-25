@@ -43,7 +43,8 @@ const std::string& ConsoleType_strings(ConsoleType type){
         logger,
         std::string("Conflicting Console Types:") +
         "\n    User Selected: " + ConsoleType_strings(user_type) +
-        "\n    Detected Type: " + ConsoleType_strings(detected_type)
+        "\n    Detected Type: " + ConsoleType_strings(detected_type) +
+        "\n\nIf you think this is a bug, please report it to either our Github or our Discord server!"
     );
 }
 

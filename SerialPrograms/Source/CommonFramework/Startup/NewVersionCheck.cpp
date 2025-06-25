@@ -144,7 +144,7 @@ void show_update_box(
 ){
     QMessageBox box;
     QPushButton* ok = box.addButton(QMessageBox::Ok);
-    QPushButton* skip = box.addButton("Skip this version.", QMessageBox::NoRole);
+    QPushButton* skip = box.addButton("Skip this Version", QMessageBox::NoRole);
 
     box.setTextFormat(Qt::RichText);
     std::string text = header + "<br>";

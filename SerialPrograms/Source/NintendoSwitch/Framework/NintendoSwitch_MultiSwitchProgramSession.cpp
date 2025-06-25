@@ -13,6 +13,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
@@ -174,7 +175,13 @@ void MultiSwitchProgramSession::internal_run_program(){
             session.audio(),
             session.stream_history()
         );
-        handles.back().state().set_console_type_user(session.console_type());
+
+        ConsoleState& state = handles.back().state();
+        if (ConsoleSettings::instance().TRUST_USER_CONSOLE_SELECTION){
+            state.set_console_type(handles.back().logger(), session.console_type());
+        }else{
+            state.set_console_type_user(session.console_type());
+        }
     }
 
 
