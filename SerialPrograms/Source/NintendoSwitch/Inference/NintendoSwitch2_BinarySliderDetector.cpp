@@ -11,6 +11,10 @@
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "NintendoSwitch2_BinarySliderDetector.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -57,23 +61,23 @@ std::vector<std::pair<bool, ImagePixelBox>> BinarySliderDetector::detect(const I
         best_off_rmsd = std::min(best_off_rmsd, LIGHT_OFF_NOCURSOR.rmsd(cropped));
         best_off_rmsd = std::min(best_off_rmsd, DARK_OFF_CURSOR.rmsd(cropped));
         best_off_rmsd = std::min(best_off_rmsd, DARK_OFF_NOCURSOR.rmsd(cropped));
-        if (best_off_rmsd < 40){
-            ret.emplace_back(false, object);
-            continue;
-        }
 
         double best_on_rmsd = 9999;
         best_on_rmsd = std::min(best_on_rmsd, LIGHT_ON_CURSOR.rmsd(cropped));
         best_on_rmsd = std::min(best_on_rmsd, LIGHT_ON_NOCURSOR.rmsd(cropped));
         best_on_rmsd = std::min(best_on_rmsd, DARK_ON_CURSOR.rmsd(cropped));
         best_on_rmsd = std::min(best_on_rmsd, DARK_ON_NOCURSOR.rmsd(cropped));
-        if (best_on_rmsd < 40){
-            ret.emplace_back(true, object);
-            continue;
-        }
 
 //        cout << "best_off_rmsd = " << best_off_rmsd << endl;
 //        cout << "best_on_rmsd  = " << best_on_rmsd << endl;
+
+        bool on = best_on_rmsd < best_off_rmsd;
+        double best = on ? best_on_rmsd : best_off_rmsd;
+
+        if (best < 60){
+            ret.emplace_back(on, object);
+        }
+
     }
 
     return ret;
