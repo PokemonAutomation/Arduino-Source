@@ -35,6 +35,7 @@ public:
     PA_FORCE_INLINE size_t          bytes_per_row   () const{ return m_bytes_per_row; }
     PA_FORCE_INLINE size_t          width           () const{ return m_width; }
     PA_FORCE_INLINE size_t          height          () const{ return m_height; }
+    PA_FORCE_INLINE size_t          total_pixels    () const{ return m_width * m_height; }
 
     //  Direct Pixel Access
     PA_FORCE_INLINE uint32_t pixel(size_t x, size_t y) const{

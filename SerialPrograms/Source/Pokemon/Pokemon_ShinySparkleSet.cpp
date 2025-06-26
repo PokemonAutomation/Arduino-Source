@@ -31,7 +31,7 @@ void ShinySparkleTracker::make_overlays(VideoOverlaySet& items) const{
 }
 bool ShinySparkleTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     ImageViewRGB32 image = extract_box_reference(frame, m_box);
-    m_current_sparkles.read_from_image(image);
+    m_current_sparkles.read_from_image(frame.total_pixels(), image);
     m_overlays.clear();
     m_current_sparkles.draw_boxes(m_overlays, frame, m_box);
     std::string log_str = m_current_sparkles.to_str();

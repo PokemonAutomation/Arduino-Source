@@ -33,6 +33,7 @@ public:
     using ImageViewPlanar32::bytes_per_row;
     using ImageViewPlanar32::width;
     using ImageViewPlanar32::height;
+    using ImageViewPlanar32::total_pixels;
 
     //  Direct Pixel Access
     PA_FORCE_INLINE uint32_t pixel(size_t x, size_t y) const{

@@ -24,7 +24,7 @@ struct RadialSparkleDetector{
 
 public:
     ~RadialSparkleDetector();
-    RadialSparkleDetector(const WaterfillObject& obj);
+    RadialSparkleDetector(size_t screen_area, const WaterfillObject& obj);
 
     bool is_ball() const;
     bool is_star() const;

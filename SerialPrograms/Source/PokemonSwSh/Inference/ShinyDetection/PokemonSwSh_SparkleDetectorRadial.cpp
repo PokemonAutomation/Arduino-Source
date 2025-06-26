@@ -26,13 +26,16 @@ const double STAR_SPARKLE_ANGLE_TOLERANCE_DEGREES = 10.;
 
 
 RadialSparkleDetector::~RadialSparkleDetector(){}
-RadialSparkleDetector::RadialSparkleDetector(const WaterfillObject& object)
+RadialSparkleDetector::RadialSparkleDetector(size_t screen_area, const WaterfillObject& object)
     : m_object(object)
 {
     if (object.area < 20){
         return;
     }
-    if (object.area > 10000){
+
+    double area_1080p = 1920 * 1080;
+    double area_current = (double)screen_area;
+    if (object.area * area_1080p > 10000 * area_current){
         return;
     }
 

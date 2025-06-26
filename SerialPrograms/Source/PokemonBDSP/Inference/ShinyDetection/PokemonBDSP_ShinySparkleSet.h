@@ -29,7 +29,7 @@ public:
     ShinySparkleSetBDSP extract_subbox(const ImagePixelBox& subbox) const;
 
     virtual std::string to_str() const override;
-    virtual void read_from_image(const ImageViewRGB32& image) override;
+    virtual void read_from_image(size_t screen_area, const ImageViewRGB32& image) override;
 
     virtual void draw_boxes(
         VideoOverlaySet& overlays,

@@ -23,7 +23,7 @@ public:
 
     virtual std::string to_str() const = 0;
 
-    virtual void read_from_image(const ImageViewRGB32& image) = 0;
+    virtual void read_from_image(size_t screen_area, const ImageViewRGB32& image) = 0;
     virtual void draw_boxes(
         VideoOverlaySet& overlays,
         const ImageViewRGB32& frame,

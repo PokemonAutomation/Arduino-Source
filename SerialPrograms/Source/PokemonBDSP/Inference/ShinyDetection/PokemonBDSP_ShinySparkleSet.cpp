@@ -84,12 +84,12 @@ void ShinySparkleSetBDSP::update_alphas(){
 
 
 
-ShinySparkleSetBDSP find_sparkles(WaterfillSession& session){
+ShinySparkleSetBDSP find_sparkles(size_t screen_area, WaterfillSession& session){
     ShinySparkleSetBDSP sparkles;
     auto finder = session.make_iterator(20);
     WaterfillObject object;
     while (finder->find_next(object, true)){
-        PokemonSwSh::RadialSparkleDetector radial_sparkle(object);
+        PokemonSwSh::RadialSparkleDetector radial_sparkle(screen_area, object);
         if (radial_sparkle.is_ball()){
             sparkles.balls.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
             continue;
@@ -101,7 +101,7 @@ ShinySparkleSetBDSP find_sparkles(WaterfillSession& session){
     }
     return sparkles;
 }
-void ShinySparkleSetBDSP::read_from_image(const ImageViewRGB32& image){
+void ShinySparkleSetBDSP::read_from_image(size_t screen_area, const ImageViewRGB32& image){
     clear();
     if (!image){
         return;
@@ -121,7 +121,7 @@ void ShinySparkleSetBDSP::read_from_image(const ImageViewRGB32& image){
     double best_alpha = 0;
     for (PackedBinaryMatrix& matrix : matrices){
         session->set_source(matrix);
-        ShinySparkleSetBDSP sparkles = find_sparkles(*session);
+        ShinySparkleSetBDSP sparkles = find_sparkles(screen_area, *session);
         sparkles.update_alphas();
         double alpha = sparkles.alpha_overall();
         if (best_alpha < alpha){
