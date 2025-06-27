@@ -11,6 +11,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Windows/WindowTracker.h"
+#include "CommonFramework/Windows/MainWindow.h"
 #include "CommonFramework/Options/ResolutionOption.h"
 #include "FileWindowLogger.h"
 
@@ -240,6 +241,11 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
         }
     );
 
+    GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.add_listener(*this);
+    GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.add_listener(*this);
+    GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.add_listener(*this);
+    GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.add_listener(*this);  
+
     m_logger += *this;
     log("================================================================================");
     log("<b>Window Startup...</b>");
@@ -252,6 +258,10 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
 FileWindowLoggerWindow::~FileWindowLoggerWindow(){
     remove_window(*this);
     m_logger -= *this;
+    GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.remove_listener(*this);
+    GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.remove_listener(*this);
+    GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.remove_listener(*this);
+    GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.remove_listener(*this);      
 }
 
 void FileWindowLoggerWindow::log(QString msg){
@@ -260,15 +270,39 @@ void FileWindowLoggerWindow::log(QString msg){
 }
 
 void FileWindowLoggerWindow::resizeEvent(QResizeEvent* event){
-    // m_pending_resize = true;
+    m_pending_resize = true;
     GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.set(width());
     GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.set(height());
-    // m_pending_resize = false;
+    m_pending_resize = false;
 }
 
 void FileWindowLoggerWindow::moveEvent(QMoveEvent* event){
+    m_pending_move = true;    
     GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.set(x());
     GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.set(y());
+    m_pending_move = false;
+}
+
+void FileWindowLoggerWindow::on_config_value_changed(void* object){
+    if (object == &GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH || object == &GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT){
+        QMetaObject::invokeMethod(this, [this]{
+            if (!m_pending_resize){
+                resize(
+                    GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH,
+                    GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT
+                );
+            }
+        });
+    }else if (object == &GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS || object == &GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS){
+        QMetaObject::invokeMethod(this, [this]{
+            if (!m_pending_move){
+                move(
+                    move_x_within_screen_bounds(GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS),
+                    move_y_within_screen_bounds(GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS)
+                );
+            }
+        });        
+    }
 }
 
 

@@ -20,16 +20,14 @@ ResolutionOption::ResolutionOption(
     , DESCRIPTION(std::move(description))
     , WIDTH("<b>Width:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_width(default_width))
     , HEIGHT("<b>Height:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_height(default_height))
-    , X_POS("<b>X position:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_width(initial_x_pos))
-    , Y_POS("<b>Y position:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_height(initial_y_pos))
+    , X_POS("<b>X-position:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_width(initial_x_pos))
+    , Y_POS("<b>Y-position:</b>", LockMode::LOCK_WHILE_RUNNING, scale_dpi_height(initial_y_pos))
 {
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(WIDTH);
     PA_ADD_OPTION(HEIGHT);
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        PA_ADD_OPTION(X_POS);
-        PA_ADD_OPTION(Y_POS);
-    }
+    PA_ADD_OPTION(X_POS);
+    PA_ADD_OPTION(Y_POS);
 }
 
 

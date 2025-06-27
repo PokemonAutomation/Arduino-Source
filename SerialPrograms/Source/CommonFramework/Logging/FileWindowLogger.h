@@ -16,6 +16,7 @@
 #include <QTextEdit>
 #include <QMainWindow>
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Options/ConfigOption.h"
 //#include "Common/Cpp/LifetimeSanitizer.h"
 
 namespace PokemonAutomation{
@@ -72,7 +73,7 @@ private:
 };
 
 
-class FileWindowLoggerWindow : public QMainWindow{
+class FileWindowLoggerWindow : public QMainWindow, public ConfigOption::Listener{
     Q_OBJECT
 
 public:
@@ -87,10 +88,12 @@ signals:
     void signal_log(QString msg);
 
 private:
+    virtual void on_config_value_changed(void* object) override;
     FileWindowLogger& m_logger;
     QMenuBar* m_menubar;
     QTextEdit* m_text;
-    // bool m_pending_resize = false;
+    bool m_pending_resize = false;
+    bool m_pending_move = false;
 };
 
 
