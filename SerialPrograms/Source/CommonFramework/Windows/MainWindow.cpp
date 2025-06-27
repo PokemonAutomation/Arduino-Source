@@ -48,14 +48,14 @@ MainWindow::MainWindow(QWidget* parent)
         GlobalSettings::instance().WINDOW_SIZE->HEIGHT
     );
     // move main window to desired position on startup
-    auto const screen_geometry = QGuiApplication::primaryScreen()->availableGeometry();
-    uint32_t const screen_width = (uint32_t)screen_geometry.width();
-    uint32_t const screen_height = (uint32_t)screen_geometry.height();
-    int32_t initial_x_pos_main = GlobalSettings::instance().WINDOW_SIZE->INITIAL_X_POS;
-    int32_t initial_y_pos_main = GlobalSettings::instance().WINDOW_SIZE->INITIAL_Y_POS;
-    int32_t move_x_main = std::max(0, std::min(initial_x_pos_main, (int32_t)(screen_width*0.97)));
-    int32_t move_y_main = std::max(0, std::min(initial_y_pos_main, (int32_t)(screen_height*0.97)));
-    move(scale_dpi_width(move_x_main), scale_dpi_height(move_y_main));
+    // auto const screen_geometry = QGuiApplication::primaryScreen()->availableGeometry();
+    // uint32_t const screen_width = (uint32_t)screen_geometry.width();
+    // uint32_t const screen_height = (uint32_t)screen_geometry.height();
+    int32_t x_pos_main = GlobalSettings::instance().WINDOW_SIZE->X_POS;
+    int32_t y_pos_main = GlobalSettings::instance().WINDOW_SIZE->Y_POS;
+    int32_t move_x_main = move_x_within_screen_bounds(x_pos_main);
+    int32_t move_y_main = move_y_within_screen_bounds(y_pos_main);
+    move(move_x_main, move_y_main);
 
     centralwidget = new QWidget(this);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
@@ -222,8 +222,8 @@ MainWindow::MainWindow(QWidget* parent)
         );
         // get snapshot of the saved initial x/y position, since activating the window seems to change the window coordinates, 
         // which then causes initial x/y position to change, due to triggering moveEvent().
-        int32_t initial_x_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS;
-        int32_t initial_y_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS;    
+        int32_t x_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS;
+        int32_t y_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS;    
 
         if (GlobalSettings::instance().LOG_WINDOW_STARTUP){ // show the Output Window on startup
             m_output_window->show();
@@ -232,9 +232,9 @@ MainWindow::MainWindow(QWidget* parent)
         }
 
         // move the output window to desired position on startup
-        int32_t move_x_log = std::max(0, std::min(initial_x_pos_log, (int32_t)(screen_width*0.97))); // ensure move_x is greater than 0, but less than screen_width
-        int32_t move_y_log = std::max(0, std::min(initial_y_pos_log, (int32_t)(screen_height*0.97)));
-        m_output_window->move(scale_dpi_width(move_x_log), scale_dpi_height(move_y_log));
+        int32_t move_x_log = move_x_within_screen_bounds(x_pos_log);
+        int32_t move_y_log = move_y_within_screen_bounds(y_pos_log);
+        m_output_window->move(move_x_log, move_y_log);
     }
     {
         QPushButton* settings = new QPushButton("Settings", support_box);
@@ -260,6 +260,8 @@ MainWindow::MainWindow(QWidget* parent)
 
     GlobalSettings::instance().WINDOW_SIZE->WIDTH.add_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.add_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->X_POS.add_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->Y_POS.add_listener(*this);    
     SystemSleepController::instance().add_listener(*this);
 //    cout << "Done constructing" << endl;
 }
@@ -268,6 +270,24 @@ MainWindow::~MainWindow(){
     SystemSleepController::instance().remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->WIDTH.remove_listener(*this);
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.remove_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->X_POS.remove_listener(*this);
+    GlobalSettings::instance().WINDOW_SIZE->Y_POS.remove_listener(*this);    
+}
+
+int32_t move_x_within_screen_bounds(int32_t x_pos){
+    auto static const screen_geometry = QGuiApplication::primaryScreen()->availableGeometry();
+    uint32_t static const screen_width = (uint32_t)screen_geometry.width();    
+     // ensure move_x is greater than 0, but less than screen_width
+    return scale_dpi_width(std::max(0, std::min(x_pos, (int32_t)(screen_width*0.97))));
+
+}
+
+int32_t move_y_within_screen_bounds(int32_t y_pos){
+    auto static const screen_geometry = QGuiApplication::primaryScreen()->availableGeometry();
+    uint32_t const screen_height = (uint32_t)screen_geometry.height();  
+    // ensure move_y is greater than 0, but less than screen_height
+    return scale_dpi_width(std::max(0, std::min(y_pos, (int32_t)(screen_height*0.97))));
+
 }
 
 
@@ -283,8 +303,10 @@ void MainWindow::resizeEvent(QResizeEvent* event){
 }
 
 void MainWindow::moveEvent(QMoveEvent* event){
-    GlobalSettings::instance().WINDOW_SIZE->INITIAL_X_POS.set(x());
-    GlobalSettings::instance().WINDOW_SIZE->INITIAL_Y_POS.set(y());
+    m_pending_move = true;
+    GlobalSettings::instance().WINDOW_SIZE->X_POS.set(x());
+    GlobalSettings::instance().WINDOW_SIZE->Y_POS.set(y());
+    m_pending_move = false;
 }
 
 void MainWindow::close_panel() noexcept{
@@ -373,14 +395,25 @@ void MainWindow::on_idle(){
 
 
 void MainWindow::on_config_value_changed(void* object){
-    QMetaObject::invokeMethod(this, [this]{
-        if (!m_pending_resize){
-            resize(
-                GlobalSettings::instance().WINDOW_SIZE->WIDTH,
-                GlobalSettings::instance().WINDOW_SIZE->HEIGHT
-            );
-        }
-    });
+    if (object == &GlobalSettings::instance().WINDOW_SIZE->WIDTH || object == &GlobalSettings::instance().WINDOW_SIZE->HEIGHT){
+        QMetaObject::invokeMethod(this, [this]{
+            if (!m_pending_resize){
+                resize(
+                    GlobalSettings::instance().WINDOW_SIZE->WIDTH,
+                    GlobalSettings::instance().WINDOW_SIZE->HEIGHT
+                );
+            }
+        });
+    }else if (object == &GlobalSettings::instance().WINDOW_SIZE->X_POS || object == &GlobalSettings::instance().WINDOW_SIZE->Y_POS){
+        QMetaObject::invokeMethod(this, [this]{
+            if (!m_pending_move){
+                move(
+                    move_x_within_screen_bounds(GlobalSettings::instance().WINDOW_SIZE->X_POS),
+                    move_y_within_screen_bounds(GlobalSettings::instance().WINDOW_SIZE->Y_POS)
+                );
+            }
+        });        
+    }
 }
 void MainWindow::sleep_suppress_state_changed(SleepSuppress new_state){
     QMetaObject::invokeMethod(this, [=, this]{

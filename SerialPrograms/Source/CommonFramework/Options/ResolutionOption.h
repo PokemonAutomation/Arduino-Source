@@ -25,8 +25,8 @@ public:
     StaticTextOption DESCRIPTION;
     SimpleIntegerOption<uint32_t> WIDTH;
     SimpleIntegerOption<uint32_t> HEIGHT;
-    SimpleIntegerOption<int32_t> INITIAL_X_POS;
-    SimpleIntegerOption<int32_t> INITIAL_Y_POS;
+    SimpleIntegerOption<int32_t> X_POS;
+    SimpleIntegerOption<int32_t> Y_POS;
 };
 
 

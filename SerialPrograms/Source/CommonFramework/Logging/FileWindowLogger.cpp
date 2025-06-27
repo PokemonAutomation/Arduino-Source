@@ -267,8 +267,8 @@ void FileWindowLoggerWindow::resizeEvent(QResizeEvent* event){
 }
 
 void FileWindowLoggerWindow::moveEvent(QMoveEvent* event){
-    GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS.set(x());
-    GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS.set(y());
+    GlobalSettings::instance().LOG_WINDOW_SIZE->X_POS.set(x());
+    GlobalSettings::instance().LOG_WINDOW_SIZE->Y_POS.set(y());
 }
 
 
