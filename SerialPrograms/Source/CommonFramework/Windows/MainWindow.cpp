@@ -20,6 +20,7 @@
 #include "CommonFramework/Startup/NewVersionCheck.h"
 #include "CommonFramework/Options/ResolutionOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Windows/DpiScaler.h"
 #include "PanelLists.h"
 #include "WindowTracker.h"
 #include "ButtonDiagram.h"
@@ -201,14 +202,31 @@ MainWindow::MainWindow(QWidget* parent)
         m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger_raw()));
         QPushButton* output = new QPushButton("Output Window", support_box);
         buttons->addWidget(output);
+        auto show_output_window = [&](){
+            m_output_window->show();
+            m_output_window->raise(); // bring the window to front on macOS
+            m_output_window->activateWindow(); // bring the window to front on Windows
+        };        
         connect(
             output, &QPushButton::clicked,
-            this, [this](bool){
-                m_output_window->show();
-                m_output_window->raise(); // bring the window to front on macOS
-                m_output_window->activateWindow(); // bring the window to front on Windows
+            this, [&](bool){
+                show_output_window();
             }
         );
+
+        if (GlobalSettings::instance().LOG_WINDOW_STARTUP){ // show the Output Window on startup
+            show_output_window();
+        }
+
+        // move the output window to desired position on startup
+        uint32_t initial_x_pos = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS;
+        uint32_t initial_y_pos = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS;             
+        auto const screen_geometry = QGuiApplication::primaryScreen()->availableGeometry();
+        uint32_t const screen_width = (uint32_t)screen_geometry.width();
+        uint32_t const screen_height = (uint32_t)screen_geometry.height();
+        uint32_t move_x = std::min(initial_x_pos, screen_width-100);
+        uint32_t move_y = std::min(initial_y_pos, screen_height-100);
+        m_output_window->move(scale_dpi_width(move_x), scale_dpi_height(move_y));
     }
     {
         QPushButton* settings = new QPushButton("Settings", support_box);

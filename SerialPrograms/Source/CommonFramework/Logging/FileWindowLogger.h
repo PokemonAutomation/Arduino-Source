@@ -80,6 +80,7 @@ public:
     virtual ~FileWindowLoggerWindow();
 
     void log(QString msg);
+    virtual void resizeEvent(QResizeEvent* event) override;
 
 signals:
     void signal_log(QString msg);
@@ -88,6 +89,7 @@ private:
     FileWindowLogger& m_logger;
     QMenuBar* m_menubar;
     QTextEdit* m_text;
+    bool m_pending_resize = false;
 };
 
 

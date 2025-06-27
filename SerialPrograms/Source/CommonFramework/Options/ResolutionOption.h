@@ -18,12 +18,15 @@ class ResolutionOption : public GroupOption{
 public:
     ResolutionOption(
         std::string label, std::string description,
-        int default_width, int default_height
+        int default_width, int default_height,
+        int initial_x_pos, int initial_y_pos
     );
 
     StaticTextOption DESCRIPTION;
     SimpleIntegerOption<uint32_t> WIDTH;
     SimpleIntegerOption<uint32_t> HEIGHT;
+    SimpleIntegerOption<uint32_t> INITIAL_X_POS;
+    SimpleIntegerOption<uint32_t> INITIAL_Y_POS;
 };
 
 

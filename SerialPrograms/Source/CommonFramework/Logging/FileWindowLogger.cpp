@@ -8,8 +8,10 @@
 #include <QMenuBar>
 #include <QDir>
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "CommonFramework/Windows/WindowTracker.h"
+#include "CommonFramework/Options/ResolutionOption.h"
 #include "FileWindowLogger.h"
 
 //#include <iostream>
@@ -212,7 +214,9 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("TextWindow"));
     }
-    resize(scale_dpi_width(1200), scale_dpi_height(600));
+    uint32_t width = GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH;
+    uint32_t height = GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT;
+    resize(scale_dpi_width(width), scale_dpi_height(height));
     m_text = new QTextEdit(this);
     m_text->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(m_text);
@@ -254,6 +258,14 @@ void FileWindowLoggerWindow::log(QString msg){
 //    cout << "FileWindowLoggerWindow::log(): " << msg.toStdString() << endl;
     emit signal_log(msg);
 }
+
+void FileWindowLoggerWindow::resizeEvent(QResizeEvent* event){
+    m_pending_resize = true;
+    GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.set(width());
+    GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.set(height());
+    m_pending_resize = false;
+}
+
 
 
 
