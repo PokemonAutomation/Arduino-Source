@@ -260,12 +260,16 @@ void FileWindowLoggerWindow::log(QString msg){
 }
 
 void FileWindowLoggerWindow::resizeEvent(QResizeEvent* event){
-    m_pending_resize = true;
+    // m_pending_resize = true;
     GlobalSettings::instance().LOG_WINDOW_SIZE->WIDTH.set(width());
     GlobalSettings::instance().LOG_WINDOW_SIZE->HEIGHT.set(height());
-    m_pending_resize = false;
+    // m_pending_resize = false;
 }
 
+void FileWindowLoggerWindow::moveEvent(QMoveEvent* event){
+    GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS.set(x());
+    GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS.set(y());
+}
 
 
 

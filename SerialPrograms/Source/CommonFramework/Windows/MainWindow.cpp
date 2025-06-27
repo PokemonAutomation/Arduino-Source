@@ -27,9 +27,9 @@
 #include "MainWindow.h"
 
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -212,25 +212,26 @@ MainWindow::MainWindow(QWidget* parent)
         m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger_raw()));
         QPushButton* output = new QPushButton("Output Window", support_box);
         buttons->addWidget(output);
-        auto show_output_window = [&](){
-            m_output_window->show();
-            m_output_window->raise(); // bring the window to front on macOS
-            m_output_window->activateWindow(); // bring the window to front on Windows
-        };        
         connect(
             output, &QPushButton::clicked,
             this, [&](bool){
-                show_output_window();
+                m_output_window->show();
+                m_output_window->raise(); // bring the window to front on macOS
+                m_output_window->activateWindow(); // bring the window to front on Windows
             }
         );
+        // get snapshot of the saved initial x/y position, since activating the window seems to change the window coordinates, 
+        // which then causes initial x/y position to change, due to triggering moveEvent().
+        uint32_t initial_x_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS;
+        uint32_t initial_y_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS;    
 
         if (GlobalSettings::instance().LOG_WINDOW_STARTUP){ // show the Output Window on startup
-            show_output_window();
+            m_output_window->show();
+            m_output_window->raise(); // bring the window to front on macOS
+            m_output_window->activateWindow(); // bring the window to front on Windows
         }
 
         // move the output window to desired position on startup
-        uint32_t initial_x_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS;
-        uint32_t initial_y_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS;             
         uint32_t move_x_log = std::min(initial_x_pos_log, screen_width-100);
         uint32_t move_y_log = std::min(initial_y_pos_log, screen_height-100);
         m_output_window->move(scale_dpi_width(move_x_log), scale_dpi_height(move_y_log));
@@ -279,6 +280,11 @@ void MainWindow::resizeEvent(QResizeEvent* event){
     GlobalSettings::instance().WINDOW_SIZE->WIDTH.set(width());
     GlobalSettings::instance().WINDOW_SIZE->HEIGHT.set(height());
     m_pending_resize = false;
+}
+
+void MainWindow::moveEvent(QMoveEvent* event){
+    GlobalSettings::instance().WINDOW_SIZE->INITIAL_X_POS.set(x());
+    GlobalSettings::instance().WINDOW_SIZE->INITIAL_Y_POS.set(y());
 }
 
 void MainWindow::close_panel() noexcept{

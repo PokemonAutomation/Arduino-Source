@@ -37,6 +37,7 @@ public:
 private:
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
+    virtual void moveEvent(QMoveEvent* event) override;
 
     void close_panel() noexcept;
 

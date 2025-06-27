@@ -26,7 +26,7 @@ ResolutionOption::ResolutionOption(
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(WIDTH);
     PA_ADD_OPTION(HEIGHT);
-    if (PreloadSettings::instance().DEVELOPER_MODE){    
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(INITIAL_X_POS);
         PA_ADD_OPTION(INITIAL_Y_POS);
     }
