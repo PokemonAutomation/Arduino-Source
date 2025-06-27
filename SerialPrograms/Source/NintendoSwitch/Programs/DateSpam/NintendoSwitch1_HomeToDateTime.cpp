@@ -36,8 +36,8 @@ void home_to_date_time_Switch1_wired_blind(
     ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
 
     //  Two A presses in case we drop the 1st one.
-    ssf_press_button(context, BUTTON_A, 3);
-    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, 24ms, 40ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
     //  Just button mash it. lol
     {
@@ -50,7 +50,7 @@ void home_to_date_time_Switch1_wired_blind(
     //  Scroll left and press A to exit the sleep menu if we happened to
     //  land there.
     ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
     {
         auto iterations = Milliseconds(312) / 24ms + 1;
@@ -68,16 +68,16 @@ void home_to_date_time_Switch1_wired_blind(
 
     if (!to_date_change){
         //  Triple up this A press to make sure it gets through.
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 45);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 360ms, 48ms, 24ms);
         return;
     }
 
     //  Triple up this A press to make sure it gets through.
-    ssf_press_button(context, BUTTON_A, 3);
-    ssf_press_button(context, BUTTON_A, 3);
-    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
     {
         auto iterations = Milliseconds(250) / 24ms + 1;
         do{
@@ -235,8 +235,8 @@ void home_to_date_time_Switch1_wired_feedback(
 
         //  Two A presses in case we drop the 1st one.
         //  the program can self recover even if the second button press is registered.
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
+        ssf_press_button(context, BUTTON_A, 24ms, 40ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
         //  Just button mash it. lol
         {
@@ -285,7 +285,7 @@ void home_to_date_time_Switch1_wired_feedback(
 
         // only one ButtonA press since the program can self-recover if the button is dropped.
         // furthermore, the program can't self-recover if a second button press is registered.
-        ssf_press_button(context, BUTTON_A, 3);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
         context.wait_for_all_requests();
         context.wait_for(Milliseconds(300));

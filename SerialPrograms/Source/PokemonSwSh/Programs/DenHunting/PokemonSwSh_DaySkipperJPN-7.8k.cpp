@@ -219,7 +219,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
 
     pbf_wait(context, 15 * TICKS_PER_SECOND);
     while (true){
-        ssf_press_button1(context, BUTTON_A, 15 * TICKS_PER_SECOND);
+        ssf_press_button(context, BUTTON_A, 15000ms);
     }
 }
 

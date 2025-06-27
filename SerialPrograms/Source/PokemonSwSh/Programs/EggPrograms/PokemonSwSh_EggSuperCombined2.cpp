@@ -111,13 +111,13 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, ProControll
 
     //  Mass Release
     ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-    ssf_press_button1(context, BUTTON_A, 200);
-    ssf_press_button1(context, BUTTON_R, 250);
+    ssf_press_button(context, BUTTON_A, 200);
+    ssf_press_button(context, BUTTON_R, 250);
     release_boxes(context, BOXES_TO_RELEASE);
 
     //  Skip Boxes
     for (uint8_t c = 0; c <= BOXES_TO_SKIP; c++){
-        ssf_press_button1(context, BUTTON_R, 60);
+        ssf_press_button(context, BUTTON_R, 60);
     }
     pbf_mash_button(context, BUTTON_B, 600);
 

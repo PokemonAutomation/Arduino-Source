@@ -29,12 +29,13 @@ void ssf_do_nothing     (ProControllerContext& context, uint16_t ticks);
 void ssf_do_nothing     (ProControllerContext& context, Milliseconds duration);
 
 
-
+#if 1
 void ssf_press_button(
     ProControllerContext& context,
     Button button,
     uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );
+#endif
 void ssf_press_button(
     ProControllerContext& context,
     Button button,
@@ -184,60 +185,6 @@ inline void ssf_issue_scroll_ptv(
     ssf_issue_scroll(context, direction, delay, hold, cool);
 }
 
-
-
-
-
-//
-//  The C API used by the MC programs. (no overloading allowed there)
-//
-
-inline void ssf_press_button2(
-    ProControllerContext& context,
-    Button button, uint16_t duration, uint16_t hold
-){
-    ssf_press_button(context, button, duration, hold);
-}
-inline void ssf_press_button1(
-    ProControllerContext& context,
-    Button button, uint16_t duration
-){
-    ssf_press_button(context, button, duration);
-}
-inline void ssf_press_dpad2(
-    ProControllerContext& context,
-    DpadPosition dpad, uint16_t duration, uint16_t hold
-){
-    ssf_press_dpad(context, dpad, duration, hold);
-}
-inline void ssf_press_dpad1(
-    ProControllerContext& context,
-    DpadPosition dpad, uint16_t duration
-){
-    ssf_press_dpad(context, dpad, duration);
-}
-inline void ssf_press_joystick2(
-    ProControllerContext& context,
-    bool left, uint8_t x, uint8_t y,
-    uint16_t duration, uint16_t hold
-){
-    if (left){
-        ssf_press_left_joystick(context, x, y, duration, hold);
-    }else{
-        ssf_press_right_joystick(context, x, y, duration, hold);
-    }
-}
-inline void ssf_hold_joystick1(
-    ProControllerContext& context,
-    bool left, uint8_t x, uint8_t y,
-    uint16_t hold
-){
-    if (left){
-        ssf_press_left_joystick(context, x, y, hold, hold);
-    }else{
-        ssf_press_right_joystick(context, x, y, hold, hold);
-    }
-}
 
 
 

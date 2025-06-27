@@ -29,7 +29,7 @@ PreventSleep::PreventSleep(){}
 
 void PreventSleep::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     while (true){
-        ssf_press_button2(context, BUTTON_B, 15 * TICKS_PER_SECOND, 10);
+        ssf_press_button(context, BUTTON_B, 15000ms, 80ms);
     }
 }
 

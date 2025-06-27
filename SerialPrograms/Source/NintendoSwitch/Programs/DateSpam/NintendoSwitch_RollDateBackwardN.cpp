@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 void roll_date_backward_N_Switch1_wired(ProControllerContext& context, uint8_t skips, bool fast){
     uint8_t scroll_delay = fast ? 3 : 4;
     uint8_t up_delay = 3;
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
     for (uint8_t c = 0; c < skips - 1; c++){
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
     }
@@ -50,7 +50,7 @@ void roll_date_backward_N_Switch1_wired(ProControllerContext& context, uint8_t s
     ssf_press_button(context, BUTTON_A);
 #endif
 
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
 }
 void roll_date_backward_N_Switch1_wireless(ProControllerContext& context, uint8_t skips){
     Milliseconds tv = context->timing_variation();
