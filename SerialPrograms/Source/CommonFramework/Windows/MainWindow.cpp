@@ -51,10 +51,10 @@ MainWindow::MainWindow(QWidget* parent)
     auto const screen_geometry = QGuiApplication::primaryScreen()->availableGeometry();
     uint32_t const screen_width = (uint32_t)screen_geometry.width();
     uint32_t const screen_height = (uint32_t)screen_geometry.height();
-    uint32_t initial_x_pos_main = GlobalSettings::instance().WINDOW_SIZE->INITIAL_X_POS;
-    uint32_t initial_y_pos_main = GlobalSettings::instance().WINDOW_SIZE->INITIAL_Y_POS;
-    uint32_t move_x_main = std::min(initial_x_pos_main, screen_width-100);
-    uint32_t move_y_main = std::min(initial_y_pos_main, screen_height-100);
+    int32_t initial_x_pos_main = GlobalSettings::instance().WINDOW_SIZE->INITIAL_X_POS;
+    int32_t initial_y_pos_main = GlobalSettings::instance().WINDOW_SIZE->INITIAL_Y_POS;
+    int32_t move_x_main = std::max(0, std::min(initial_x_pos_main, (int32_t)(screen_width*0.97)));
+    int32_t move_y_main = std::max(0, std::min(initial_y_pos_main, (int32_t)(screen_height*0.97)));
     move(scale_dpi_width(move_x_main), scale_dpi_height(move_y_main));
 
     centralwidget = new QWidget(this);
@@ -222,8 +222,8 @@ MainWindow::MainWindow(QWidget* parent)
         );
         // get snapshot of the saved initial x/y position, since activating the window seems to change the window coordinates, 
         // which then causes initial x/y position to change, due to triggering moveEvent().
-        uint32_t initial_x_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS;
-        uint32_t initial_y_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS;    
+        int32_t initial_x_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS;
+        int32_t initial_y_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS;    
 
         if (GlobalSettings::instance().LOG_WINDOW_STARTUP){ // show the Output Window on startup
             m_output_window->show();
@@ -232,8 +232,8 @@ MainWindow::MainWindow(QWidget* parent)
         }
 
         // move the output window to desired position on startup
-        uint32_t move_x_log = std::min(initial_x_pos_log, screen_width-100);
-        uint32_t move_y_log = std::min(initial_y_pos_log, screen_height-100);
+        int32_t move_x_log = std::max(0, std::min(initial_x_pos_log, (int32_t)(screen_width*0.97))); // ensure move_x is greater than 0, but less than screen_width
+        int32_t move_y_log = std::max(0, std::min(initial_y_pos_log, (int32_t)(screen_height*0.97)));
         m_output_window->move(scale_dpi_width(move_x_log), scale_dpi_height(move_y_log));
     }
     {
