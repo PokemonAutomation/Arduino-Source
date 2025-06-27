@@ -47,6 +47,16 @@ MainWindow::MainWindow(QWidget* parent)
         GlobalSettings::instance().WINDOW_SIZE->WIDTH,
         GlobalSettings::instance().WINDOW_SIZE->HEIGHT
     );
+    // move main window to desired position on startup
+    auto const screen_geometry = QGuiApplication::primaryScreen()->availableGeometry();
+    uint32_t const screen_width = (uint32_t)screen_geometry.width();
+    uint32_t const screen_height = (uint32_t)screen_geometry.height();
+    uint32_t initial_x_pos_main = GlobalSettings::instance().WINDOW_SIZE->INITIAL_X_POS;
+    uint32_t initial_y_pos_main = GlobalSettings::instance().WINDOW_SIZE->INITIAL_Y_POS;
+    uint32_t move_x_main = std::min(initial_x_pos_main, screen_width-100);
+    uint32_t move_y_main = std::min(initial_y_pos_main, screen_height-100);
+    move(scale_dpi_width(move_x_main), scale_dpi_height(move_y_main));
+
     centralwidget = new QWidget(this);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
@@ -219,14 +229,11 @@ MainWindow::MainWindow(QWidget* parent)
         }
 
         // move the output window to desired position on startup
-        uint32_t initial_x_pos = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS;
-        uint32_t initial_y_pos = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS;             
-        auto const screen_geometry = QGuiApplication::primaryScreen()->availableGeometry();
-        uint32_t const screen_width = (uint32_t)screen_geometry.width();
-        uint32_t const screen_height = (uint32_t)screen_geometry.height();
-        uint32_t move_x = std::min(initial_x_pos, screen_width-100);
-        uint32_t move_y = std::min(initial_y_pos, screen_height-100);
-        m_output_window->move(scale_dpi_width(move_x), scale_dpi_height(move_y));
+        uint32_t initial_x_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_X_POS;
+        uint32_t initial_y_pos_log = GlobalSettings::instance().LOG_WINDOW_SIZE->INITIAL_Y_POS;             
+        uint32_t move_x_log = std::min(initial_x_pos_log, screen_width-100);
+        uint32_t move_y_log = std::min(initial_y_pos_log, screen_height-100);
+        m_output_window->move(scale_dpi_width(move_x_log), scale_dpi_height(move_y_log));
     }
     {
         QPushButton* settings = new QPushButton("Settings", support_box);
