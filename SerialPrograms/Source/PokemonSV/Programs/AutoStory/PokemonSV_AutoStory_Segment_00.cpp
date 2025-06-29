@@ -43,13 +43,11 @@ void AutoStory_Segment_00::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("Start Segment 00: Intro Cutscene", COLOR_ORANGE);
-    env.console.overlay().add_log("Start Segment 00: Intro Cutscene", COLOR_ORANGE);
 
     checkpoint_00(env, context);
 
     context.wait_for_all_requests();
     env.console.log("End Segment 00: Intro Cutscene", COLOR_GREEN);
-    env.console.overlay().add_log("End Segment 00: Intro Cutscene", COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 }

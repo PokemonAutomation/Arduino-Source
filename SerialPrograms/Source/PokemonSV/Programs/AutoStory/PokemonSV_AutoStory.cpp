@@ -187,7 +187,7 @@ AutoStory::AutoStory()
     , STARTPOINT_TUTORIAL(
         "<b>Start Point:</b><br>Program will start with this segment.",
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
-        LockMode::UNLOCK_WHILE_RUNNING,
+        LockMode::LOCK_WHILE_RUNNING,
         "0"
     )
     , ENDPOINT_TUTORIAL(
@@ -679,6 +679,30 @@ std::string AutoStory::end_segment_description(){
     return ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->end_text();
 }
 
+size_t AutoStory::get_start_segment_index(){
+    size_t start = 0;
+
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        start = STARTPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        start = (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1) + STARTPOINT_MAINSTORY.index();
+    }
+    
+    return start;
+}
+
+size_t AutoStory::get_end_segment_index(){
+    size_t end = 0;
+
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        end = ENDPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        end = (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1) + ENDPOINT_MAINSTORY.index();     
+    }
+    
+    return end;
+}
+
 
 void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     AutoStoryOptions options{
@@ -687,18 +711,7 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProController
         NOTIFICATION_STATUS_UPDATE
     };    
 
-    size_t start = STARTPOINT_TUTORIAL.index();
-    size_t end = ENDPOINT_TUTORIAL.index();
-
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        start = STARTPOINT_TUTORIAL.index();
-        end = ENDPOINT_TUTORIAL.index();
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        start = (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1) + STARTPOINT_MAINSTORY.index();
-        end = (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1) + ENDPOINT_MAINSTORY.index();     
-    }
-
-    for (size_t segment_index = start; segment_index <= end; segment_index++){
+    for (size_t segment_index = get_start_segment_index(); segment_index <= get_end_segment_index(); segment_index++){
         ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options);
     }
 }
@@ -777,7 +790,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
-        change_settings_prior_to_autostory(env, context, STARTPOINT_TUTORIAL.index(), LANGUAGE);
+        change_settings_prior_to_autostory(env, context, get_start_segment_index(), LANGUAGE);
     }
 
     run_autostory(env, context);
