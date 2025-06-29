@@ -70,7 +70,7 @@ DiscordSettingsOption::DiscordSettingsOption()
 {
     PA_ADD_OPTION(message);
     PA_ADD_OPTION(webhooks);
-#if defined PA_SLEEPY || defined PA_DPP
+#ifdef PA_DPP
     PA_ADD_OPTION(integration);
 #endif
 }

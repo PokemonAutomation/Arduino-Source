@@ -15,7 +15,6 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "Integrations/DiscordWebhook.h"
-#include "Integrations/SleepyDiscordRunner.h"
 #include "ProgramNotifications.h"
 
 //#include <iostream>
@@ -120,22 +119,11 @@ void send_raw_notification(
         hasFile ? file : nullptr
     );
 
-#ifdef PA_SLEEPY
-    if (GlobalSettings::instance().DISCORD->integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
-        Integration::SleepyDiscordRunner::send_embed_sleepy(
-            should_ping, tags, std::move(embed),
-            hasFile ? file : nullptr
-        );
-    }
-#endif
-
 #ifdef PA_DPP
-    if (GlobalSettings::instance().DISCORD->integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
-        Integration::DppClient::Client::instance().send_embed_dpp(
-            should_ping, color, tags, std::move(embed),
-            hasFile ? file : nullptr
-        );
-    }
+    Integration::DppClient::Client::instance().send_embed_dpp(
+        should_ping, color, tags, std::move(embed),
+        hasFile ? file : nullptr
+    );
 #endif
 }
 void send_raw_notification(
@@ -173,22 +161,11 @@ void send_raw_notification(
         hasFile ? file : nullptr
     );
 
-#ifdef PA_SLEEPY
-    if (GlobalSettings::instance().DISCORD->integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
-        Integration::SleepyDiscordRunner::send_embed_sleepy(
-            should_ping, tags, std::move(embed),
-            hasFile ? file : nullptr
-        );
-    }
-#endif
-
 #ifdef PA_DPP
-    if (GlobalSettings::instance().DISCORD->integration.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
-        Integration::DppClient::Client::instance().send_embed_dpp(
-            should_ping, color, tags, std::move(embed),
-            hasFile ? file : nullptr
-        );
-    }
+    Integration::DppClient::Client::instance().send_embed_dpp(
+        should_ping, color, tags, std::move(embed),
+        hasFile ? file : nullptr
+    );
 #endif
 }
 

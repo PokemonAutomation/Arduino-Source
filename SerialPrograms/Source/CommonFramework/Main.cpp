@@ -15,7 +15,6 @@
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
 //#include "Tools/StatsDatabase.h"
-#include "Integrations/SleepyDiscordRunner.h"
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
 //#include "Windows/DpiScaler.h"
@@ -111,15 +110,8 @@ int main(int argc, char *argv[]){
 
     Integration::DiscordIntegrationSettingsOption& discord_settings = GlobalSettings::instance().DISCORD->integration;
     if (discord_settings.run_on_start){
-#ifdef PA_SLEEPY
-        if (discord_settings.library0 == Integration::DiscordIntegrationSettingsOption::Library::SleepyDiscord){
-            Integration::SleepyDiscordRunner::sleepy_connect();
-        }
-#endif
 #ifdef PA_DPP
-        if (discord_settings.library0 == Integration::DiscordIntegrationSettingsOption::Library::DPP){
-            Integration::DppClient::Client::instance().connect();
-        }
+        Integration::DppClient::Client::instance().connect();
 #endif
         discord_settings.on_config_value_changed(nullptr);
     }
@@ -143,9 +135,6 @@ int main(int argc, char *argv[]){
 
 #ifdef PA_DPP
     Integration::DppClient::Client::instance().disconnect();
-#endif
-#ifdef PA_SLEEPY
-    Integration::SleepyDiscordRunner::sleepy_terminate();
 #endif
 
     return ret;
