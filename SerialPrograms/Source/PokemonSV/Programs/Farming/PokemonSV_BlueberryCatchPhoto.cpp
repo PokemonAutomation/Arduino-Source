@@ -126,7 +126,11 @@ CameraAngle quest_photo_navi(
 
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 100, 50);
-            pbf_move_left_joystick(context, 0, 0, 20, 50);
+
+            //Turn slightly for switch 1
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 0, 0, 20, 50);
+            }
 
             break;
         case BBQuests::photo_bug: case BBQuests::photo_rock:
@@ -400,8 +404,11 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 100, 50);
 
-            pbf_move_left_joystick(context, 0, 0, 20, 50);
-            pbf_press_button(context, BUTTON_L, 20, 50);
+            //Turn slightly for switch 1
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 0, 0, 20, 50);
+                pbf_press_button(context, BUTTON_L, 20, 50);
+            }
 
             break;
 
