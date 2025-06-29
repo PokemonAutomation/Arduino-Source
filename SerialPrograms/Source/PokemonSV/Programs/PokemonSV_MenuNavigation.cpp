@@ -59,7 +59,7 @@ void day_skip_from_overworld(ConsoleHandle& console, ProControllerContext& conte
 
         //  Left scroll in case we missed the date menu and landed in the
         //  language change.
-        ssf_issue_scroll(context, DPAD_LEFT, 0ms);
+        ssf_issue_scroll(context, DPAD_LEFT, 0ms, 48ms, 24ms);
 
         ssf_press_button(context, BUTTON_A, 24ms);
         ssf_issue_scroll(context, DPAD_RIGHT, 24ms);
@@ -68,7 +68,7 @@ void day_skip_from_overworld(ConsoleHandle& console, ProControllerContext& conte
         ssf_issue_scroll(context, DPAD_RIGHT, 24ms);
         ssf_issue_scroll(context, DPAD_RIGHT, 24ms);
         ssf_issue_scroll(context, DPAD_RIGHT, 24ms);
-        ssf_issue_scroll(context, DPAD_RIGHT, 0);
+        ssf_issue_scroll(context, DPAD_RIGHT, 0ms, 48ms, 24ms);
         ssf_press_button(context, BUTTON_A, 20, 10);
     }else{
         ssf_press_button_ptv(context, BUTTON_A, 160ms);

@@ -25,15 +25,15 @@ void home_to_date_time_Switch1_wired_blind(
 ){
     logger.log("home_to_date_time_Switch1_wired_blind()");
 
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
 
     //  Down twice in case we drop one.
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 32ms);
 
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 48ms, 24ms);
 
     //  Two A presses in case we drop the 1st one.
     ssf_press_button(context, BUTTON_A, 24ms, 40ms, 24ms);
@@ -49,7 +49,7 @@ void home_to_date_time_Switch1_wired_blind(
 
     //  Scroll left and press A to exit the sleep menu if we happened to
     //  land there.
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms);
     ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
     {
@@ -59,12 +59,12 @@ void home_to_date_time_Switch1_wired_blind(
         }while (--iterations);
     }
 
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 40ms, 24ms);
     ssf_press_dpad(context, DPAD_DOWN, 45, 40);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
 
     if (!to_date_change){
         //  Triple up this A press to make sure it gets through.
@@ -216,16 +216,16 @@ void home_to_date_time_Switch1_wired_feedback(
 
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
 
         //  Down twice in case we drop one.
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 32ms);
 
         // if (i > 0){  // intentionally create a failure, for testing
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 40ms, 24ms);
         // }
 
 
@@ -274,13 +274,13 @@ void home_to_date_time_Switch1_wired_feedback(
             }while (--iterations);
         }
 
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 40ms, 24ms);
         ssf_press_dpad(context, DPAD_DOWN, 45, 40);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
         // if (i > 1){  // intentionally create a failure, for testing
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
         // }
 
         // only one ButtonA press since the program can self-recover if the button is dropped.

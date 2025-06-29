@@ -16,21 +16,21 @@ namespace NintendoSwitch{
 
 void neutral_date_skip_switch1_wired(ProControllerContext& context){
     ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, 0ms, 40ms, 24ms);
     ssf_press_button(context, BUTTON_A, 2);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
 //    ssf_press_button(context, BUTTON_A, 2);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 48ms, 24ms);
     ssf_press_button(context, BUTTON_A, 20, 10);
     ssf_press_button(context, BUTTON_A, 20, 10);
     for (uint8_t c = 0; c < 6; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
     }
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0ms, 48ms, 24ms);
 }
 void neutral_date_skip_switch1_wireless(ProControllerContext& context){
     Milliseconds tv = context->timing_variation();
@@ -38,7 +38,7 @@ void neutral_date_skip_switch1_wireless(ProControllerContext& context){
 
     ssf_press_button(context, BUTTON_A, 20, 10);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, 0ms, 2*unit, unit);
     ssf_press_button(context, BUTTON_A, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
@@ -51,7 +51,7 @@ void neutral_date_skip_switch1_wireless(ProControllerContext& context){
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
     }
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0ms, 2*unit, unit);
 }
 void neutral_date_skip_switch1_sbb(ProControllerContext& context){
     ssf_press_button_ptv(context, BUTTON_A, 160ms, 80ms);

@@ -15,38 +15,37 @@ namespace NintendoSwitch{
 
 
 void roll_date_backward_N_Switch1_wired(ProControllerContext& context, uint8_t skips, bool fast){
-    uint8_t scroll_delay = fast ? 3 : 4;
-    uint8_t up_delay = 3;
+    Milliseconds delay = 24ms;
     ssf_press_button(context, BUTTON_A, 160ms, 80ms);
     for (uint8_t c = 0; c < skips - 1; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay);
     }
 #if 0
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
-//        ssf_press_button(context, BUTTON_A, up_delay);
+//        ssf_press_button(context, BUTTON_A, delay);
 #else
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
 #endif
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
     for (uint8_t c = 0; c < skips - 1; c++){
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay);
     }
 #if 0
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 0);
     ssf_press_button(context, BUTTON_A, up_delay);
 #else
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, up_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
 #endif
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
 
 #if 0
 //        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
 #else
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, scroll_delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, delay);
     ssf_press_button(context, BUTTON_A);
 #endif
 

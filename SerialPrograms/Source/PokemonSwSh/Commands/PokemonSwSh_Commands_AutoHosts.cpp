@@ -32,9 +32,9 @@ void connect_to_internet(
 
     //  Move the cursor as far away from Link Trade and Surprise Trade as possible.
     //  This is added safety in case connect to internet takes too long.
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 5);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 5);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 5);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, 40ms, 40ms, 40ms);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, 40ms, 40ms, 40ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 40ms, 40ms, 40ms);
 
     //  Connect to internet.
     ssf_press_button(context, BUTTON_PLUS, 3);

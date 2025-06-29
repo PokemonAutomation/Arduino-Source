@@ -14,20 +14,19 @@ namespace NintendoSwitch{
 
 
 void roll_date_forward_1_Switch1_wired(ProControllerContext& context, bool fast){
-    uint8_t scroll_delay = fast ? 3 : 4;
-    uint8_t up_delay = fast ? 2 : 3;
+    Milliseconds delay = 24ms;
 
     ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
-    ssf_press_button(context, BUTTON_A, up_delay);
-//    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, up_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, 0ms, 2*delay, delay);
+    ssf_press_button(context, BUTTON_A, delay);
+//    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
     ssf_press_button(context, BUTTON_A, 0);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 2*delay, delay);
     ssf_press_button(context, BUTTON_A, 20, 10);
 }
 void roll_date_forward_1_Switch1_wireless(ProControllerContext& context){

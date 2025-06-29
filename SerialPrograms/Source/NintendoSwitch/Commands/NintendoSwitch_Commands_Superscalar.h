@@ -95,11 +95,6 @@ void ssf_mash_AZs       (ProControllerContext& context, Milliseconds duration);
 void ssf_issue_scroll(
     ProControllerContext& context,
     DpadPosition direction,
-    uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
-);
-void ssf_issue_scroll(
-    ProControllerContext& context,
-    DpadPosition direction,
     Milliseconds delay
 );
 void ssf_issue_scroll(
