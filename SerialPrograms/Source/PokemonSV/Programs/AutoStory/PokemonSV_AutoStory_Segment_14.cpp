@@ -48,7 +48,7 @@ void AutoStory_Segment_14::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.overlay().add_log("Start Segment 11.2: Bombirdier Titan: Battle Bombirdier", COLOR_ORANGE);
+    env.console.log("Start Segment 11.2: Bombirdier Titan: Battle Bombirdier", COLOR_ORANGE);
 
     checkpoint_30(env, context, options.notif_status_update);
     checkpoint_31(env, context, options.notif_status_update);

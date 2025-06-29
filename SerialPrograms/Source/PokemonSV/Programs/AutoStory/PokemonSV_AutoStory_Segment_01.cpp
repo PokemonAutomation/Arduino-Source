@@ -55,15 +55,13 @@ void AutoStory_Segment_01::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("Start Segment 01: Pick Starter", COLOR_ORANGE);
-    env.console.overlay().add_log("Start Segment 01: Pick Starter", COLOR_ORANGE);
 
     checkpoint_01(env, context, options.notif_status_update, options.language);
     checkpoint_02(env, context, options.notif_status_update);
     checkpoint_03(env, context, options.notif_status_update, options.language, options.starter_choice);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 02: Pick Starter", COLOR_GREEN);
-    env.console.overlay().add_log("End Segment 02: Pick Starter", COLOR_GREEN);
+    env.console.log("End Segment 01: Pick Starter", COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();    
 
