@@ -189,9 +189,9 @@ void jump_glide_fly(
 ){
     stream.log("Jump, glide, fly.");
 
-    ssf_press_button(context, BUTTON_B, 0, 100);
-    ssf_press_button(context, BUTTON_B, 0, 20, 10);
-    ssf_press_button(context, BUTTON_B, 0, 20);
+    ssf_press_button(context, BUTTON_B, 0ms, 800ms);
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms);
     pbf_wait(context, 100);
     context.wait_for_all_requests();
     pbf_press_button(context, BUTTON_LCLICK, 50, 0);

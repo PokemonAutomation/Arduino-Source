@@ -62,7 +62,7 @@ void home_to_date_time_Switch1_wired_blind(
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 40ms, 24ms);
-    ssf_press_dpad(context, DPAD_DOWN, 45, 40);
+    ssf_press_dpad(context, DPAD_DOWN, 360ms, 320ms);
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
 
@@ -277,7 +277,7 @@ void home_to_date_time_Switch1_wired_feedback(
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 40ms, 24ms);
-        ssf_press_dpad(context, DPAD_DOWN, 45, 40);
+        ssf_press_dpad(context, DPAD_DOWN, 360ms, 320ms);
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
         // if (i > 1){  // intentionally create a failure, for testing
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);

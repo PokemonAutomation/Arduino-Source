@@ -105,17 +105,17 @@ void settings_to_enter_game_den_lobby(
         //  home                home
 //        ssf_press_button2(BUTTON_HOME, 100, 10);
         //  lobby-switch        update-yes
-        ssf_press_dpad(context, DPAD_DOWN, 10);
-        ssf_press_dpad(context, DPAD_UP, 10);
+        ssf_press_dpad(context, DPAD_DOWN, 80ms);
+        ssf_press_dpad(context, DPAD_UP, 80ms);
         //  lobby-switch        update-start
         ssf_press_button(context, BUTTON_A, enter_switch_pokemon_delay, 80ms);
         //  lobby-select        lobby-switch
-        ssf_press_dpad(context, DPAD_LEFT, 10);
+        ssf_press_dpad(context, DPAD_LEFT, 80ms);
         //  lobby-select        lobby-switch
         ssf_press_button(context, BUTTON_A, enter_switch_pokemon_delay);
         //  lobby-confirm       lobby-select
-        ssf_press_button(context, BUTTON_Y, 10);
-        ssf_press_dpad(context, DPAD_LEFT, 10);
+        ssf_press_button(context, BUTTON_Y, 80ms);
+        ssf_press_dpad(context, DPAD_LEFT, 80ms);
         //  lobby-confirm       lobby-select
         ssf_press_button(context, BUTTON_A, exit_switch_pokemon_delay);
         //  lobby-switch        lobby-switch

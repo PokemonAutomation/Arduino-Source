@@ -553,7 +553,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
             if (pressing_A){
                 // Note: joystick_x and joystick_y must be defined to outlive `move_session`.
 //                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 20);
-                ssf_press_button(context, BUTTON_A, 0, 1000, 0);
+                ssf_press_button(context, BUTTON_A, 0ms, 8000ms, 0ms);
             }
             pbf_move_left_joystick(context, joystick_x, joystick_y, 20, 0);
         });

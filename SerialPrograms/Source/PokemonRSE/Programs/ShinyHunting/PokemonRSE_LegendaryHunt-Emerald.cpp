@@ -85,7 +85,7 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            ssf_press_button(context, BUTTON_B, 0, 120);
+            ssf_press_button(context, BUTTON_B, 0ms, 960ms);
             pbf_press_dpad(context, DPAD_DOWN, 120, 20);
             pbf_wait(context, 300);
         },
@@ -129,7 +129,7 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
     }
 
     //walk back up to the regi
-    ssf_press_button(context, BUTTON_B, 0, 60);
+    ssf_press_button(context, BUTTON_B, 0ms, 480ms);
     pbf_press_dpad(context, DPAD_UP, 60, 20);
 
     context.wait_for_all_requests();
@@ -137,23 +137,23 @@ void LegendaryHuntEmerald::reset_regi(SingleSwitchProgramEnvironment& env, ProCo
 
 void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //Turn left. Take 10 steps.
-    ssf_press_button(context, BUTTON_B, 0, 180);
+    ssf_press_button(context, BUTTON_B, 0ms, 1440ms);
     pbf_press_dpad(context, DPAD_LEFT, 180, 20);
 
     //Turn up. Take 14 steps. (Bump into wall.)
-    ssf_press_button(context, BUTTON_B, 0, 240);
+    ssf_press_button(context, BUTTON_B, 0ms, 1920ms);
     pbf_press_dpad(context, DPAD_UP, 240, 20);
 
     //Turn right. Take 2 steps.
-    ssf_press_button(context, BUTTON_B, 0, 40);
+    ssf_press_button(context, BUTTON_B, 0ms, 320ms);
     pbf_press_dpad(context, DPAD_RIGHT, 40, 20);
 
     //Turn up. Take 8 steps (Bump into wall.)
-    ssf_press_button(context, BUTTON_B, 0, 140);
+    ssf_press_button(context, BUTTON_B, 0ms, 1120ms);
     pbf_press_dpad(context, DPAD_UP, 140, 20);
 
     //Turn left. Take 4 steps.
-    ssf_press_button(context, BUTTON_B, 0, 80);
+    ssf_press_button(context, BUTTON_B, 0ms, 640ms);
     pbf_press_dpad(context, DPAD_LEFT, 80, 20);
     context.wait_for_all_requests();
 
@@ -162,7 +162,7 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            ssf_press_button(context, BUTTON_B, 0, 90);
+            ssf_press_button(context, BUTTON_B, 0ms, 720ms);
             pbf_press_dpad(context, DPAD_DOWN, 90, 20);
             pbf_wait(context, 300);
         },
@@ -186,7 +186,7 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            ssf_press_button(context, BUTTON_B, 0, 90);
+            ssf_press_button(context, BUTTON_B, 0ms, 720ms);
             pbf_press_dpad(context, DPAD_UP, 90, 20);
             pbf_wait(context, 300);
         },
@@ -204,19 +204,19 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
     else {
         env.log("Entered area.");
     }
-    ssf_press_button(context, BUTTON_B, 0, 80);
+    ssf_press_button(context, BUTTON_B, 0ms, 640ms);
     pbf_press_dpad(context, DPAD_RIGHT, 80, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 140);
+    ssf_press_button(context, BUTTON_B, 0ms, 1120ms);
     pbf_press_dpad(context, DPAD_DOWN, 140, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 40);
+    ssf_press_button(context, BUTTON_B, 0ms, 320ms);
     pbf_press_dpad(context, DPAD_LEFT, 40, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 240);
+    ssf_press_button(context, BUTTON_B, 0ms, 1920ms);
     pbf_press_dpad(context, DPAD_DOWN, 240, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 180);
+    ssf_press_button(context, BUTTON_B, 0ms, 1440ms);
     pbf_press_dpad(context, DPAD_RIGHT, 180, 20);
 
     context.wait_for_all_requests();
@@ -224,27 +224,27 @@ void LegendaryHuntEmerald::reset_groudon(SingleSwitchProgramEnvironment& env, Pr
 
 void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     //Turn down. Take 1 step.
-    ssf_press_button(context, BUTTON_B, 0, 20);
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms);
     pbf_press_dpad(context, DPAD_DOWN, 20, 20);
 
     //Turn right. Take 9 steps.
-    ssf_press_button(context, BUTTON_B, 0, 160);
+    ssf_press_button(context, BUTTON_B, 0ms, 1280ms);
     pbf_press_dpad(context, DPAD_RIGHT, 160, 20);
 
     //Turn up. 13 steps. Wall.
-    ssf_press_button(context, BUTTON_B, 0, 220);
+    ssf_press_button(context, BUTTON_B, 0ms, 1760ms);
     pbf_press_dpad(context, DPAD_UP, 220, 20);
 
     //Turn left. 4 steps. Wall.
-    ssf_press_button(context, BUTTON_B, 0, 80);
+    ssf_press_button(context, BUTTON_B, 0ms, 640ms);
     pbf_press_dpad(context, DPAD_LEFT, 80, 20);
 
     //Turn up. 10 steps.
-    ssf_press_button(context, BUTTON_B, 0, 180);
+    ssf_press_button(context, BUTTON_B, 0ms, 1440ms);
     pbf_press_dpad(context, DPAD_UP, 180, 20);
 
     //Turn right. 6 steps.
-    ssf_press_button(context, BUTTON_B, 0, 110);
+    ssf_press_button(context, BUTTON_B, 0ms, 880ms);
     pbf_press_dpad(context, DPAD_RIGHT, 110, 20);
 
     //Turn down. Exit. Black screen over.
@@ -252,7 +252,7 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            ssf_press_button(context, BUTTON_B, 0, 90);
+            ssf_press_button(context, BUTTON_B, 0ms, 720ms);
             pbf_press_dpad(context, DPAD_DOWN, 90, 20);
             pbf_wait(context, 300);
         },
@@ -275,7 +275,7 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            ssf_press_button(context, BUTTON_B, 0, 90);
+            ssf_press_button(context, BUTTON_B, 0ms, 720ms);
             pbf_press_dpad(context, DPAD_UP, 90, 20);
             pbf_wait(context, 300);
         },
@@ -294,22 +294,22 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
         env.log("Entered area.");
     }
 
-    ssf_press_button(context, BUTTON_B, 0, 110);
+    ssf_press_button(context, BUTTON_B, 0ms, 880ms);
     pbf_press_dpad(context, DPAD_LEFT, 110, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 180);
+    ssf_press_button(context, BUTTON_B, 0ms, 1440ms);
     pbf_press_dpad(context, DPAD_DOWN, 180, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 80);
+    ssf_press_button(context, BUTTON_B, 0ms, 640ms);
     pbf_press_dpad(context, DPAD_RIGHT, 80, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 220);
+    ssf_press_button(context, BUTTON_B, 0ms, 1760ms);
     pbf_press_dpad(context, DPAD_DOWN, 220, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 160);
+    ssf_press_button(context, BUTTON_B, 0ms, 1280ms);
     pbf_press_dpad(context, DPAD_LEFT, 160, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 20);
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms);
     pbf_press_dpad(context, DPAD_UP, 20, 20);
 
     context.wait_for_all_requests();
@@ -318,14 +318,14 @@ void LegendaryHuntEmerald::reset_kyogre(SingleSwitchProgramEnvironment& env, Pro
 void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 10 steps down
-    ssf_press_button(context, BUTTON_B, 0, 180);
+    ssf_press_button(context, BUTTON_B, 0ms, 1440ms);
     pbf_press_dpad(context, DPAD_DOWN, 180, 20);
 
     //Turn right, take 1 step. Wait for black screen over.
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            ssf_press_button(context, BUTTON_B, 0, 30);
+            ssf_press_button(context, BUTTON_B, 0ms, 240ms);
             pbf_press_dpad(context, DPAD_RIGHT, 30, 20);
             pbf_wait(context, 300);
         },
@@ -349,10 +349,10 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProCo
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            ssf_press_button(context, BUTTON_B, 0, 40);
+            ssf_press_button(context, BUTTON_B, 0ms, 320ms);
             pbf_press_dpad(context, DPAD_LEFT, 40, 20);
 
-            ssf_press_button(context, BUTTON_B, 0, 40);
+            ssf_press_button(context, BUTTON_B, 0ms, 320ms);
             pbf_press_dpad(context, DPAD_RIGHT, 40, 20);
             pbf_wait(context, 300);
         },
@@ -373,10 +373,10 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProCo
 
     //reverse above steps, but only take 9 steps up
     //doesn't really matter since we want to trigger the encounter anyway
-    ssf_press_button(context, BUTTON_B, 0, 30);
+    ssf_press_button(context, BUTTON_B, 0ms, 240ms);
     pbf_press_dpad(context, DPAD_LEFT, 30, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 170);
+    ssf_press_button(context, BUTTON_B, 0ms, 1360ms);
     pbf_press_dpad(context, DPAD_UP, 170, 20);
 
     context.wait_for_all_requests();
@@ -385,14 +385,14 @@ void LegendaryHuntEmerald::reset_hooh(SingleSwitchProgramEnvironment& env, ProCo
 void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     BlackScreenOverWatcher exit_area(COLOR_RED, {0.282, 0.064, 0.448, 0.871});
     //Turn around, 5 steps down
-    ssf_press_button(context, BUTTON_B, 0, 90);
+    ssf_press_button(context, BUTTON_B, 0ms, 720ms);
     pbf_press_dpad(context, DPAD_DOWN, 90, 20);
 
     //Turn right, 3 steps right. Wait for black screen over.
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            ssf_press_button(context, BUTTON_B, 0, 90);
+            ssf_press_button(context, BUTTON_B, 0ms, 720ms);
             pbf_press_dpad(context, DPAD_RIGHT, 90, 20);
             pbf_wait(context, 300);
         },
@@ -416,10 +416,10 @@ void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProC
     int ret2 = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
-            ssf_press_button(context, BUTTON_B, 0, 40);
+            ssf_press_button(context, BUTTON_B, 0ms, 320ms);
             pbf_press_dpad(context, DPAD_UP, 40, 20);
 
-            ssf_press_button(context, BUTTON_B, 0, 40);
+            ssf_press_button(context, BUTTON_B, 0ms, 320ms);
             pbf_press_dpad(context, DPAD_DOWN, 40, 20);
             pbf_wait(context, 300);
         },
@@ -439,10 +439,10 @@ void LegendaryHuntEmerald::reset_lugia(SingleSwitchProgramEnvironment& env, ProC
     }
 
     //reverse above steps
-    ssf_press_button(context, BUTTON_B, 0, 70);
+    ssf_press_button(context, BUTTON_B, 0ms, 560ms);
     pbf_press_dpad(context, DPAD_LEFT, 70, 20);
 
-    ssf_press_button(context, BUTTON_B, 0, 90);
+    ssf_press_button(context, BUTTON_B, 0ms, 720ms);
     pbf_press_dpad(context, DPAD_UP, 90, 20);
 
     context.wait_for_all_requests();

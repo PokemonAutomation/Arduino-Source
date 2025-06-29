@@ -279,29 +279,29 @@ void inside_zero_gate_to_secret_cave_entrance(
 
 
     //  Leg 1
-    ssf_press_button(context, BUTTON_LCLICK, 0, 500);
+    ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
     ssf_press_left_joystick(context, 128, 0, 60, 1250);
 
     //  Jump
-    ssf_press_button(context, BUTTON_B, 125, 100);
+    ssf_press_button(context, BUTTON_B, 1000ms, 800ms);
 
     //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
-    ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);  //  Double up this press in
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
     pbf_move_left_joystick(context, 128, 0, 1125, 300);
 
 
     //  Leg 2
-    ssf_press_button(context, BUTTON_LCLICK, 0, 500);
+    ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
     ssf_press_left_joystick(context, 128, 0, 60, 250);
 
     //  Jump
-    ssf_press_button(context, BUTTON_B, 125, 100);
+    ssf_press_button(context, BUTTON_B, 1000ms, 800ms);
 
     //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
-    ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);  //  Double up this press in
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
     pbf_move_left_joystick(context, 128, 0, 250, 0);
     pbf_move_left_joystick(context, 112, 0, 250, 0);
@@ -313,12 +313,12 @@ void inside_zero_gate_to_secret_cave_entrance(
 
 
     //  Leg 3
-    ssf_press_button(context, BUTTON_LCLICK, 0, 500);
+    ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
     ssf_press_left_joystick(context, 128, 0, 180, 550);
 
     //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
-    ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);  //  Double up this press in
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
     pbf_move_left_joystick(context, 48, 0, 200, 0);
     pbf_move_left_joystick(context, 128, 0, 250, 0);

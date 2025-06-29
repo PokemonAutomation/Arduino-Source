@@ -37,7 +37,7 @@ void connect_to_internet(
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 40ms, 40ms, 40ms);
 
     //  Connect to internet.
-    ssf_press_button(context, BUTTON_PLUS, 3);
+    ssf_press_button(context, BUTTON_PLUS, 24ms);
 
     //  Mash B to get out of YCOMM.
     ssf_mash1_button(context, BUTTON_B, connect_to_internet_delay);

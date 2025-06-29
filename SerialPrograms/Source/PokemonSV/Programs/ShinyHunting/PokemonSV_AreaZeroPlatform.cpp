@@ -200,7 +200,7 @@ void inside_zero_gate_to_platform(
     pbf_move_left_joystick(context, 192, 0, 20, 105);
     pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
 
-    ssf_press_button(context, BUTTON_LCLICK, 0, 500);
+    ssf_press_button(context, BUTTON_LCLICK, 0ms, 4000ms);
     if (!flying_unlocked){
         ssf_press_left_joystick(context, 128, 0, 125, 1250);
     }else{
@@ -208,11 +208,11 @@ void inside_zero_gate_to_platform(
     }
 
     //  Jump
-    ssf_press_button(context, BUTTON_B, 125, 100);
+    ssf_press_button(context, BUTTON_B, 1000ms, 800ms);
 
     //  Fly
-    ssf_press_button(context, BUTTON_B, 0, 20, 10); //  Double up this press in
-    ssf_press_button(context, BUTTON_B, 0, 20);     //  case one is dropped.
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);  //  Double up this press in
+    ssf_press_button(context, BUTTON_B, 0ms, 160ms);        //  case one is dropped.
 
     if (!flying_unlocked){
 //        ssf_press_left_joystick(context, 128, 0, 375, 875);
@@ -334,7 +334,7 @@ void area_zero_platform_run_path0(
             break;
         }
 
-        ssf_press_button(context, BUTTON_L, 0, 20);
+        ssf_press_button(context, BUTTON_L, 0ms, 160ms);
         pbf_move_left_joystick(context, x, 0, duration, 0);
     });
     use_lets_go_to_clear_in_front(stream, context, tracker, true, [&](ProControllerContext& context){

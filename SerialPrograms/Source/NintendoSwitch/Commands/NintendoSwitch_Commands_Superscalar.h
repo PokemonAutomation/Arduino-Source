@@ -29,23 +29,10 @@ void ssf_do_nothing     (ProControllerContext& context, uint16_t ticks);
 void ssf_do_nothing     (ProControllerContext& context, Milliseconds duration);
 
 
-#if 1
-void ssf_press_button(
-    ProControllerContext& context,
-    Button button,
-    uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
-);
-#endif
 void ssf_press_button(
     ProControllerContext& context,
     Button button,
     Milliseconds delay = 24ms, Milliseconds hold = 48ms, Milliseconds cool = 24ms
-);
-
-void ssf_press_dpad(
-    ProControllerContext& context,
-    DpadPosition position,
-    uint16_t delay, uint16_t hold = 5, uint8_t cool = 3
 );
 void ssf_press_dpad(
     ProControllerContext& context,

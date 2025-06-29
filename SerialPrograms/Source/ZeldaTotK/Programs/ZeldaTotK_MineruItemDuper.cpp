@@ -112,8 +112,8 @@ void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, ProController
         }
 
         // Now press Y (sort) and B (exit) at the same time
-        ssf_press_button(context, BUTTON_B, 0, 10);
-        pbf_press_button(context, BUTTON_Y, 10, 40);
+        ssf_press_button(context, BUTTON_B, 0ms, 80ms);
+        pbf_press_button(context, BUTTON_Y, 80ms, 320ms);
 
         // There is no need to pick up Zonai devices 
         if (!IS_ZONAI_DEVICE){

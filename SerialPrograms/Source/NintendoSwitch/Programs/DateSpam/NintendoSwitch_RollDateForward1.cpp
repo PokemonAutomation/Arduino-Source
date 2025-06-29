@@ -16,18 +16,18 @@ namespace NintendoSwitch{
 void roll_date_forward_1_Switch1_wired(ProControllerContext& context, bool fast){
     Milliseconds delay = 24ms;
 
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
     ssf_issue_scroll(context, SSF_SCROLL_UP, 0ms, 2*delay, delay);
     ssf_press_button(context, BUTTON_A, delay);
 //    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
     ssf_issue_scroll(context, SSF_SCROLL_UP, delay);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
-    ssf_press_button(context, BUTTON_A, 0);
+    ssf_press_button(context, BUTTON_A, 0ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 2*delay, delay);
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
 }
 void roll_date_forward_1_Switch1_wireless(ProControllerContext& context){
     Milliseconds tv = context->timing_variation();

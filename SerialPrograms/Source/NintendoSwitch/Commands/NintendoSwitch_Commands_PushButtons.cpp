@@ -20,25 +20,13 @@ void pbf_wait(ProControllerContext& context, Milliseconds duration){
     ssf_do_nothing(context, duration);
 }
 void pbf_press_button(ProControllerContext& context, Button button, uint16_t hold_ticks, uint16_t release_ticks){
-    uint32_t delay = (uint32_t)hold_ticks + release_ticks;
-    if ((uint16_t)delay == delay){
-        ssf_press_button(context, button, (uint16_t)delay, hold_ticks, 0);
-    }else{
-        ssf_press_button(context, button, hold_ticks, hold_ticks, 0);
-        ssf_do_nothing(context, release_ticks);
-    }
+    ssf_press_button(context, button, (hold_ticks + release_ticks) * 8ms, hold_ticks * 8ms, 0ms);
 }
 void pbf_press_button(ProControllerContext& context, Button button, Milliseconds hold, Milliseconds release){
     ssf_press_button(context, button, hold + release, hold, 0ms);
 }
 void pbf_press_dpad(ProControllerContext& context, DpadPosition position, uint16_t hold_ticks, uint16_t release_ticks){
-    uint32_t delay = (uint32_t)hold_ticks + release_ticks;
-    if ((uint16_t)delay == delay){
-        ssf_press_dpad(context, position, (uint16_t)delay, hold_ticks, 0);
-    }else{
-        ssf_press_dpad(context, position, hold_ticks, hold_ticks, 0);
-        ssf_do_nothing(context, release_ticks);
-    }
+    ssf_press_dpad(context, position, (hold_ticks + release_ticks) * 8ms, hold_ticks * 8ms, 0ms);
 }
 void pbf_press_dpad(ProControllerContext& context, DpadPosition position, Milliseconds hold, Milliseconds release){
     ssf_press_dpad(context, position, hold + release, hold, 0ms);

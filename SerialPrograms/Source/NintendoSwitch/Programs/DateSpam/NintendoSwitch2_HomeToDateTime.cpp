@@ -45,7 +45,7 @@ void home_to_settings_Switch2_wired_blind(
     //  Scroll left and press A to exit the sleep menu if we happened to
     //  land there.
     ssf_issue_scroll(context, SSF_SCROLL_LEFT, delay, hold, cool);
-    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, delay, hold, cool);
 
     for (size_t c = 0; c < 2; c++){
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);

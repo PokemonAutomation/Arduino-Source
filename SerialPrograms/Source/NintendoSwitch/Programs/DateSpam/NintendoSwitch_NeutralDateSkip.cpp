@@ -15,17 +15,17 @@ namespace NintendoSwitch{
 
 
 void neutral_date_skip_switch1_wired(ProControllerContext& context){
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_UP, 0ms, 40ms, 24ms);
-    ssf_press_button(context, BUTTON_A, 2);
+    ssf_press_button(context, BUTTON_A, 16ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
 //    ssf_press_button(context, BUTTON_A, 2);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 48ms, 24ms);
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
     for (uint8_t c = 0; c < 6; c++){
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms, 48ms, 24ms);
     }
@@ -36,7 +36,7 @@ void neutral_date_skip_switch1_wireless(ProControllerContext& context){
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_UP, 0ms, 2*unit, unit);
     ssf_press_button(context, BUTTON_A, unit);
@@ -45,8 +45,8 @@ void neutral_date_skip_switch1_wireless(ProControllerContext& context){
 //    ssf_press_button(context, BUTTON_A, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
     for (uint8_t c = 0; c < 6; c++){
         ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
     }

@@ -29,7 +29,7 @@ void egg_spin(ProControllerContext& context, Milliseconds duration){
 }
 void egg_spin_with_A(ProControllerContext& context, Milliseconds duration){
     for (Milliseconds c = 0ms; c < duration; c += 42*8ms){
-        ssf_press_button(context, BUTTON_ZL, 0, 10);
+        ssf_press_button(context, BUTTON_ZL, 0ms, 80ms);
         pbf_move_left_joystick(context, 0, 0, 5, 0);
         pbf_move_left_joystick(context, 128, 0, 5, 0);
         pbf_move_left_joystick(context, 255, 0, 5, 0);
