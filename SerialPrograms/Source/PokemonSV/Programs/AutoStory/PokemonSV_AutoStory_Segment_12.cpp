@@ -52,7 +52,7 @@ void AutoStory_Segment_12::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.overlay().add_log("Start Segment 10.3: Cortondo Gym - Gym battle", COLOR_ORANGE);
+    env.console.log("Start Segment 10.3: Cortondo Gym - Gym battle", COLOR_ORANGE);
 
     checkpoint_28(env, context, options.notif_status_update);
 
