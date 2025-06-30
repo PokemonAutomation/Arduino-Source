@@ -249,6 +249,8 @@ void run_material_farmer(
                         COLOR_PURPLE
                     );                  
                 }
+            }else{
+                console.log("Sandwich making disabled. Skip sandwich checks.", COLOR_ORANGE);
             }
 
             // heal before starting Let's go
