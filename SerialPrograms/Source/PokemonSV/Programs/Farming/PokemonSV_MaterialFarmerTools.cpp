@@ -248,6 +248,8 @@ void run_material_farmer(
                         std::to_string(sandwich_time_remaining.count()) + " min", 
                         COLOR_PURPLE
                     );                  
+                }else{
+                    console.log("Sandwich is still active. Continue material farming.", COLOR_ORANGE);
                 }
             }else{
                 console.log("Sandwich making disabled. Skip sandwich checks.", COLOR_ORANGE);
