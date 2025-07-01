@@ -19,6 +19,7 @@
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
+#include "QVideoFrameCache.h"
 #include "CameraImplementations.h"
 
 class QCamera;
@@ -96,16 +97,7 @@ private:
 
 
 private:
-    //  Last Frame: All accesses must be under this lock.
-    //  These will be updated very rapidly by the main thread.
-    //  Holding the frame lock will block the main thread.
-    //  So accessors should minimize the time they hold the frame lock.
-
-    mutable SpinLock m_frame_lock;
-
-    QVideoFrame m_last_frame;
-    WallClock m_last_frame_timestamp;
-    std::atomic<uint64_t> m_last_frame_seqnum;
+    QVideoFrameCache m_last_frame;
 
 };
 

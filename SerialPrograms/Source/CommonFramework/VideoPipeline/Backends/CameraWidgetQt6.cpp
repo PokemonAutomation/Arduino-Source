@@ -88,7 +88,6 @@ CameraVideoSource::CameraVideoSource(
     , m_logger(logger)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
-    , m_last_frame_seqnum(0)
 {
     if (!info){
         return;
@@ -160,14 +159,8 @@ CameraVideoSource::CameraVideoSource(
             //  return immediately to unblock the main thread.
 
             WallClock now = current_time();
-            {
-                WriteSpinLock lg(m_frame_lock);
-//                cout << now << endl;
-                m_last_frame = frame;
-                m_last_frame_timestamp = now;
-                uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_relaxed);
-                seqnum++;
-                m_last_frame_seqnum.store(seqnum, std::memory_order_relaxed);
+            if (!m_last_frame.push_frame(frame, now)){
+                return;
             }
             report_source_frame(std::make_shared<VideoFrame>(now, frame));
         }
@@ -184,19 +177,16 @@ VideoSnapshot CameraVideoSource::snapshot(){
         return VideoSnapshot();
     }
 
-    //  Frame is already cached and is not stale.
+    //  Check the cached image frame. If it's not stale, return it immediately.
+    uint64_t frame_seqnum = m_last_frame.seqnum();
+    if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
+        return VideoSnapshot(m_last_image, m_last_image_timestamp);
+    }
+
+    //  Cached image is stale. Grab the latest frame.
     QVideoFrame frame;
     WallClock frame_timestamp;
-    uint64_t frame_seqnum;
-    {
-        SpinLockGuard lg0(m_frame_lock);
-        frame_seqnum = m_last_frame_seqnum;
-        if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
-            return VideoSnapshot(m_last_image, m_last_image_timestamp);
-        }
-        frame = m_last_frame;
-        frame_timestamp = m_last_frame_timestamp;
-    }
+    frame_seqnum = m_last_frame.get_latest(frame, frame_timestamp);
 
     if (!frame.isValid()){
         global_logger_tagged().log("QVideoFrame is null.", COLOR_RED);

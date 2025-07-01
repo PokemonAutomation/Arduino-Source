@@ -95,7 +95,6 @@ CameraVideoSource::CameraVideoSource(
     , m_logger(logger)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
-    , m_last_frame_seqnum(0)
 {
     if (!info){
         return;
@@ -182,19 +181,8 @@ void CameraVideoSource::set_video_output(QGraphicsVideoItem& item){
             //  return immediately to unblock the main thread.
 
             WallClock now = current_time();
-            {
-                WriteSpinLock lg(m_frame_lock);
-
-                //  Skip duplicate frames.
-                if (frame.startTime() != -1 && frame.startTime() <= m_last_frame.startTime()){
-                    return;
-                }
-
-                m_last_frame = frame;
-                m_last_frame_timestamp = now;
-                uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_relaxed);
-                seqnum++;
-                m_last_frame_seqnum.store(seqnum, std::memory_order_relaxed);
+            if (!m_last_frame.push_frame(frame, now)){
+                return;
             }
             report_source_frame(std::make_shared<VideoFrame>(now, frame));
         },
@@ -214,7 +202,7 @@ VideoSnapshot CameraVideoSource::snapshot(){
     std::lock_guard<std::mutex> lg(m_cache_lock);
 
     //  Check the cached image frame. If it's not stale, return it immediately.
-    uint64_t frame_seqnum = m_last_frame_seqnum.load(std::memory_order_relaxed);
+    uint64_t frame_seqnum = m_last_frame.seqnum();
     if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
         return VideoSnapshot(m_last_image, m_last_image_timestamp);
     }
@@ -222,12 +210,7 @@ VideoSnapshot CameraVideoSource::snapshot(){
     //  Cached image is stale. Grab the latest frame.
     QVideoFrame frame;
     WallClock frame_timestamp;
-    {
-        ReadSpinLock lg0(m_frame_lock);
-        frame_seqnum = m_last_frame_seqnum.load(std::memory_order_relaxed);
-        frame = m_last_frame;
-        frame_timestamp = m_last_frame_timestamp;
-    }
+    frame_seqnum = m_last_frame.get_latest(frame, frame_timestamp);
 
     if (!frame.isValid()){
         m_logger.log("QVideoFrame is null.", COLOR_RED);

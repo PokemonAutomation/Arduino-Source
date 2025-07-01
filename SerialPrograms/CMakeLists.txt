@@ -463,6 +463,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.h
+    Source/CommonFramework/VideoPipeline/Backends/QVideoFrameCache.h
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h
