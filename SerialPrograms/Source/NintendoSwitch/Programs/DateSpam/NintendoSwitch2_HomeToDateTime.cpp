@@ -139,6 +139,7 @@ ConsoleType settings_detect_console_type(
     context.wait_for_all_requests();
 
     auto snapshot = console.video().snapshot();
+//    snapshot->save("screenshot.png");
     size_t sliders = detector.detect(snapshot).size();
     switch (sliders){
     case 2:

@@ -49,6 +49,11 @@ void home_to_date_time_Switch2_wired_feedback(
 );
 
 
+ConsoleType settings_detect_console_type(
+    ConsoleHandle& console, ProControllerContext& context
+);
+
+
 
 void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bool to_date_change);
 
