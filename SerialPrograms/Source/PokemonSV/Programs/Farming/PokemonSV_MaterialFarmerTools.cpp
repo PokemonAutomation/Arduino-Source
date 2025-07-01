@@ -216,7 +216,7 @@ void run_material_farmer(
                 std::to_string(farming_time_remaining.count()) + " min", 
                 COLOR_PURPLE
             );
-            if (farming_time_remaining < std::chrono::minutes(0)){
+            if (farming_time_remaining <= std::chrono::minutes(0)){
                 console.log("Time's up. Stop the Material farming program.", COLOR_RED);
                 return;
             }
@@ -229,7 +229,7 @@ void run_material_farmer(
                     std::to_string(sandwich_time_remaining.count()) + " min", 
                     COLOR_PURPLE
                 );                   
-                if (sandwich_time_remaining < std::chrono::minutes(0)){
+                if (sandwich_time_remaining <= std::chrono::minutes(0)){
                     console.log("Sandwich not active. Make a sandwich.");
                     last_sandwich_time = make_sandwich_material_farm(env, console, context, options, stats);
                     console.overlay().add_log("Sandwich made.");
@@ -393,9 +393,14 @@ WallClock make_sandwich_material_farm(
 }
 
 // given the start time, and duration in minutes, return the number of remaining minutes
+// WARNING: this function may silently overflow if start_time is near WallClock::min() or WallClock::max()
 std::chrono::minutes minutes_remaining(WallClock start_time, std::chrono::minutes minutes_duration){
-    return std::chrono::minutes(minutes_duration) - 
-           std::chrono::duration_cast<std::chrono::minutes>(current_time() - start_time);
+    if (start_time == WallClock::min()){
+        return std::chrono::minutes(0);
+    }else{
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::minutes>(current_time() - start_time);
+        return minutes_duration - elapsed_time;
+    }
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
