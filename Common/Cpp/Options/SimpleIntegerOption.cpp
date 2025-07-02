@@ -200,7 +200,6 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
 
 
 
-
 template class SimpleIntegerCell<uint8_t>;
 template class SimpleIntegerCell<uint16_t>;
 template class SimpleIntegerCell<uint32_t>;
@@ -219,6 +218,12 @@ template class SimpleIntegerOption<int16_t>;
 template class SimpleIntegerOption<int32_t>;
 template class SimpleIntegerOption<int64_t>;
 
+
+//  This is stupid.
+#ifdef __APPLE__
+template class SimpleIntegerCell<size_t>;
+template class SimpleIntegerOption<size_t>;
+#endif
 
 
 }
