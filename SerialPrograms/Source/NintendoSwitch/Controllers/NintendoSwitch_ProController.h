@@ -54,7 +54,7 @@ class ProController : public AbstractController{
 public:
     using ContextType = ProControllerContext;
 
-    ProController();
+    ProController(Logger& logger);
     virtual ~ProController();
 
     //  Must call before destruction begins.

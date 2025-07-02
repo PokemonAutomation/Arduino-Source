@@ -49,7 +49,7 @@ private:
 private:
     friend class FireForgetDispatcher;
     friend class AsyncDispatcher;
-    friend class ParallelTaskRunner;
+    friend class ParallelTaskRunnerCore;
 
     std::function<void()> m_task;
     bool m_finished;

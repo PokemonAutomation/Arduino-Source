@@ -110,7 +110,12 @@ public:
         return m_resolutions;
     }
 
-    virtual VideoSnapshot snapshot() override;
+    virtual VideoSnapshot snapshot_latest_blocking() override{
+        return m_snapshot_manager.snapshot_latest_blocking();
+    }
+    virtual VideoSnapshot snapshot_recent_nonblocking() override{
+        return m_snapshot_manager.snapshot_recent_nonblocking();
+    }
 
     virtual QWidget* make_display_QtWidget(QWidget* parent) override;
 

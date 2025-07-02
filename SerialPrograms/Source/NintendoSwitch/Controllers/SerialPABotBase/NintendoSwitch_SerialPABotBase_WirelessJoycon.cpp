@@ -22,7 +22,7 @@ SerialPABotBase_WirelessJoycon::SerialPABotBase_WirelessJoycon(
     SerialPABotBase::SerialPABotBase_Connection& connection,
     ControllerType controller_type
 )
-    : JoyconController(controller_type)
+    : JoyconController(logger, controller_type)
     , SerialPABotBase_WirelessController(
         logger,
         connection,

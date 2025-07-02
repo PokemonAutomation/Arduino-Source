@@ -30,7 +30,8 @@ SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection
 )
-    : SerialPABotBase_Controller(
+    : ProController(logger)
+    , SerialPABotBase_Controller(
         logger,
         ControllerType::NintendoSwitch_WiredProController,
         connection

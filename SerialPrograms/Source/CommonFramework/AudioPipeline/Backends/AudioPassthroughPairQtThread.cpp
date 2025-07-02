@@ -57,7 +57,7 @@ AudioPassthroughPairQtThread::~AudioPassthroughPairQtThread(){
 }
 void AudioPassthroughPairQtThread::run(){
     auto scope_check = m_sanitizer.check_scope();
-    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
+    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(m_logger);
 
     AudioPassthroughPairQt body(m_logger);
     m_body.store(&body, std::memory_order_relaxed);

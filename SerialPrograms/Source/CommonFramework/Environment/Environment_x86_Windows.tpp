@@ -13,6 +13,9 @@
 #endif
 #endif
 
+#include <map>
+#include <thread>
+#include <nmmintrin.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Environment.h"
 

@@ -17,8 +17,9 @@ namespace PokemonAutomation{
 
 
 KeyboardInputController::~KeyboardInputController() = default;
-KeyboardInputController::KeyboardInputController(bool enabled)
-    : m_stop(false)
+KeyboardInputController::KeyboardInputController(Logger& logger, bool enabled)
+    : m_logger(logger)
+    , m_stop(false)
 {}
 
 void KeyboardInputController::start(){
@@ -80,7 +81,7 @@ void KeyboardInputController::on_key_release(const QKeyEvent& key){
 
 
 void KeyboardInputController::thread_loop(){
-    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
+    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(m_logger);
 
     std::unique_ptr<ControllerState> last = make_state();
     std::unique_ptr<ControllerState> current = make_state();

@@ -31,7 +31,7 @@ ThreadPoolOption::ThreadPoolOption(
     , MAX_THREADS(
         "<b>Maximum Threads:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        m_default_max_threads
+        m_default_max_threads, 1
     )
 {
     PA_ADD_OPTION(HARDWARE_THREADS);

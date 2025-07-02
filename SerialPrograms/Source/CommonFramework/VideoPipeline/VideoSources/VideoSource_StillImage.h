@@ -73,7 +73,10 @@ public:
         return m_resolutions;
     }
 
-    virtual VideoSnapshot snapshot() override{
+    virtual VideoSnapshot snapshot_latest_blocking() override{
+        return m_snapshot;
+    }
+    virtual VideoSnapshot snapshot_recent_nonblocking() override{
         return m_snapshot;
     }
 

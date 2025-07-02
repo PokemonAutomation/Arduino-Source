@@ -30,19 +30,19 @@ struct ProgramEnvironmentData{
         : m_program_info(program_info)
         , m_realtime_dispatcher(
             [](){
-                GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
+                GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(global_logger_tagged());
             },
             0
         )
         , m_realtime_inference_dispatcher(
             [](){
-                GlobalSettings::instance().PERFORMANCE->REALTIME_INFERENCE_PRIORITY.set_on_this_thread();
+                GlobalSettings::instance().PERFORMANCE->REALTIME_INFERENCE_PRIORITY.set_on_this_thread(global_logger_tagged());
             },
             0
         )
         , m_normal_inference_dispatcher(
             [](){
-                GlobalSettings::instance().PERFORMANCE->NORMAL_INFERENCE_PRIORITY.set_on_this_thread();
+                GlobalSettings::instance().PERFORMANCE->NORMAL_INFERENCE_PRIORITY.set_on_this_thread(global_logger_tagged());
             },
             0
         )

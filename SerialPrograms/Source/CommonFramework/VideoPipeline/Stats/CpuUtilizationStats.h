@@ -7,9 +7,10 @@
 #ifndef PokemonAutomation_CpuUtilizationStats_H
 #define PokemonAutomation_CpuUtilizationStats_H
 
+#include <mutex>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/EventRateTracker.h"
-#include "CommonFramework/Environment/Environment.h"
+#include "Common/Cpp/CpuUtilization/CpuUtilization.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
 
 //#include <iostream>
@@ -51,7 +52,7 @@ inline OverlayStatSnapshot CpuUtilizationStat::get_current(){
     if (m_last_clock.is_valid()){
         auto duration = current - m_last_clock;
         duration /= vcores;
-        m_tracker.push_event(std::chrono::duration_cast<WallClock::duration>(duration), now);
+        m_tracker.push_event(std::chrono::duration_cast<WallDuration>(duration), now);
     }
     m_last_clock = current;
 

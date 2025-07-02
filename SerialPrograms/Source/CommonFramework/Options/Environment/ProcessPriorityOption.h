@@ -26,8 +26,8 @@ public:
             default_priority
         )
     {}
-    void set_on_this_thread() const{
-        set_thread_priority(*this);
+    void set_on_this_thread(Logger& logger) const{
+        set_thread_priority(logger, *this);
     }
 };
 

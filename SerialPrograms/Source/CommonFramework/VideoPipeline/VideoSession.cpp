@@ -194,7 +194,15 @@ void VideoSession::set_resolution(Resolution resolution){
 VideoSnapshot VideoSession::snapshot(){
     ReadSpinLock lg(m_state_lock);
     if (m_video_source){
-        return m_video_source->snapshot();
+        return m_video_source->snapshot_latest_blocking();
+    }else{
+        return VideoSnapshot();
+    }
+}
+VideoSnapshot VideoSession::snapshot_recent_nonblocking(){
+    ReadSpinLock lg(m_state_lock);
+    if (m_video_source){
+        return m_video_source->snapshot_recent_nonblocking();
     }else{
         return VideoSnapshot();
     }

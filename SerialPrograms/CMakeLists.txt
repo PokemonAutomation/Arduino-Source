@@ -102,6 +102,12 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/CpuId/CpuId_arm64.tpp
     ../Common/Cpp/CpuId/CpuId_x86.h
     ../Common/Cpp/CpuId/CpuId_x86.tpp
+    ../Common/Cpp/CpuUtilization/CpuUtilization.cpp
+    ../Common/Cpp/CpuUtilization/CpuUtilization.h
+    ../Common/Cpp/CpuUtilization/CpuUtilization_Linux.h
+    ../Common/Cpp/CpuUtilization/CpuUtilization_Linux.tpp
+    ../Common/Cpp/CpuUtilization/CpuUtilization_Windows.h
+    ../Common/Cpp/CpuUtilization/CpuUtilization_Windows.tpp
     ../Common/Cpp/DateTime.h
     ../Common/Cpp/EnumStringMap.h
     ../Common/Cpp/EventRateTracker.h

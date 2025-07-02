@@ -111,7 +111,7 @@ void TrainingSession::generate_small_dictionary(
     OCR::SmallDictionaryMatcher trained(ocr_json_file, !incremental);
 
     ParallelTaskRunner task_runner(
-        [](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(); },
+        [&](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
         0, threads
     );
 
@@ -193,7 +193,7 @@ void TrainingSession::generate_large_dictionary(
     OCR::LargeDictionaryMatcher trained(ocr_json_directory + output_prefix, nullptr, !incremental);
 
     ParallelTaskRunner task_runner(
-        [](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(); },
+        [&](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
         0, threads
     );
 

@@ -21,7 +21,8 @@ SerialPABotBase_WirelessProController::SerialPABotBase_WirelessProController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection
 )
-    : SerialPABotBase_WirelessController(
+    : ProController(logger)
+    , SerialPABotBase_WirelessController(
         logger,
         connection,
         ControllerType::NintendoSwitch_WirelessProController

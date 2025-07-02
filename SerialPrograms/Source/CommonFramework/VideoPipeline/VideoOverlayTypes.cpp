@@ -38,8 +38,9 @@ void OverlayStat::set_text(std::string text, Color color){
 #endif
 
 
-OverlayStatUtilizationPrinter::OverlayStatUtilizationPrinter()
-    : m_last_active(WallClock::min())
+OverlayStatUtilizationPrinter::OverlayStatUtilizationPrinter(double max_utilization)
+    : m_max_utilization(max_utilization)
+    , m_last_active(WallClock::min())
 {}
 OverlayStatSnapshot OverlayStatUtilizationPrinter::get_snapshot(const std::string& label, double utilization){
     WallClock now = current_time();
@@ -56,11 +57,11 @@ OverlayStatSnapshot OverlayStatUtilizationPrinter::get_snapshot(const std::strin
     }
 
     Color color = COLOR_WHITE;
-    if (utilization > 0.90){
+    if (utilization > 0.90 * m_max_utilization){
         color = COLOR_RED;
-    }else if (utilization > 0.80){
+    }else if (utilization > 0.80 * m_max_utilization){
         color = COLOR_ORANGE;
-    }else if (utilization > 0.50){
+    }else if (utilization > 0.50 * m_max_utilization){
         color = COLOR_YELLOW;
     }
     return OverlayStatSnapshot{

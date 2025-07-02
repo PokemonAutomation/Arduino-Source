@@ -50,7 +50,6 @@ private:
     SpinLock m_lock;
     std::map<VisualInferenceCallback*, PeriodicCallback> m_map;
     VideoSnapshot m_last;
-    uint64_t m_seqnum = 0;
 
     OverlayStatUtilizationPrinter m_printer;
 };

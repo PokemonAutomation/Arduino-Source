@@ -29,8 +29,8 @@ class JoyconController::KeyboardManager final :
     public PokemonAutomation::KeyboardManager<JoyconState, JoyconDeltas>
 {
 public:
-    KeyboardManager(JoyconController& controller, ControllerType controller_type)
-        : PokemonAutomation::KeyboardManager<JoyconState, JoyconDeltas>(controller)
+    KeyboardManager(Logger& logger, JoyconController& controller, ControllerType controller_type)
+        : PokemonAutomation::KeyboardManager<JoyconState, JoyconDeltas>(logger, controller)
     {
         std::vector<std::shared_ptr<EditableTableRow>> mapping;
         switch (controller_type){
@@ -78,8 +78,8 @@ public:
 
 
 
-JoyconController::JoyconController(ControllerType controller_type)
-    : m_keyboard_manager(CONSTRUCT_TOKEN, *this, controller_type)
+JoyconController::JoyconController(Logger& logger, ControllerType controller_type)
+    : m_keyboard_manager(CONSTRUCT_TOKEN, logger, *this, controller_type)
 {
 
 }

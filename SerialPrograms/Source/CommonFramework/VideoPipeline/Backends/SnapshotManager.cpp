@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SnapshotManager.h"
 
 //#include <iostream>
@@ -38,33 +39,72 @@ QImage SnapshotManager::frame_to_image(const QVideoFrame& frame){
     }
     return image;
 }
+void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept{
+    VideoSnapshot snapshot;
+    snapshot.timestamp = timestamp;
+    try{
+        WallClock time0 = current_time();
+        snapshot.frame = std::make_shared<const ImageRGB32>(frame_to_image(frame));
+        WallClock time1 = current_time();
+        uint32_t microseconds = (uint32_t)std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
+        m_stats_conversion.report_data(m_logger, microseconds);
+    }catch (...){
+        try{
+            m_logger.log("Exception thrown while converting QVideoFrame -> QImage.", COLOR_RED);
+        }catch (...){}
+    }
+
+    std::lock_guard<std::mutex> lg(m_lock);
+//    cout << "SnapshotManager::convert() - post convert: " << seqnum << endl;
+
+    m_converted_seqnum = seqnum;
+    if (timestamp > m_converted_snapshot.timestamp){
+        m_converted_snapshot = std::move(snapshot);
+    }
+    m_active_conversions--;
+    m_cv.notify_all();
+}
+void SnapshotManager::dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp){
+    //  Must call under the lock.
+    std::function<void()> lambda = [=, this, frame = std::move(frame)](){
+        convert(seqnum, std::move(frame), timestamp);
+    };
+
+    auto task = GlobalThreadPools::realtime_inference().try_dispatch(lambda);
+    if (task){
+//        cout << "dispatch_conversion: Success..." << endl;
+        m_converting_seqnum = seqnum;
+    }else{
+//        cout << "dispatch_conversion: Failed..." << endl;
+        m_queued_convert = true;
+    }
+}
 
 
 
-
-VideoSnapshot SnapshotManager::screenshot_latest_blocking(){
+VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
     std::unique_lock<std::mutex> lg(m_lock);
 
-//    cout << "screenshot_latest_blocking()" << endl;
+//    cout << "snapshot_latest_blocking()" << endl;
 
     //  Already up-to-date. Return it.
     uint64_t seqnum = m_cache.seqnum();
     if (seqnum <= m_converted_seqnum){
-//        cout << "screenshot_latest_blocking(): Cached" << endl;
+//        cout << "snapshot_latest_blocking(): Cached" << endl;
         return m_converted_snapshot;
     }
 
     //  Check if we're already converting it.
     if (m_converting_seqnum >= seqnum){
-//        cout << "screenshot_latest_blocking(): Already Converting" << endl;
+//        cout << "snapshot_latest_blocking(): Already Converting" << endl;
         m_cv.wait(lg, [=, this]{ return m_converted_seqnum >= seqnum; });
-//        cout << "screenshot_latest_blocking(): Already Converting - Done" << endl;
+//        cout << "snapshot_latest_blocking(): Already Converting - Done" << endl;
         return m_converted_snapshot;
     }
 
 
     //  Otherwise, we use this thread to convert the latest frame.
-//    cout << "screenshot_latest_blocking(): Convert Now" << endl;
+//    cout << "snapshot_latest_blocking(): Convert Now" << endl;
 
     QVideoFrame frame;
     WallClock timestamp;
@@ -75,13 +115,12 @@ VideoSnapshot SnapshotManager::screenshot_latest_blocking(){
 
     VideoSnapshot snapshot;
     try{
-        WallClock time0, time1;
         uint32_t microseconds;
         {
             ReverseLockGuard<std::mutex> lg0(m_lock);
-            time0 = current_time();
+            WallClock time0 = current_time();
             snapshot = VideoSnapshot(frame_to_image(frame), timestamp);
-            time1 = current_time();
+            WallClock time1 = current_time();
             microseconds = (uint32_t)std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
         }
         m_stats_conversion.report_data(m_logger, microseconds);
@@ -92,15 +131,77 @@ VideoSnapshot SnapshotManager::screenshot_latest_blocking(){
         throw;
     }
 
+    m_converted_seqnum = seqnum;
+
     if (timestamp > m_converted_snapshot.timestamp){
-        m_converted_seqnum = seqnum;
         m_converted_snapshot = std::move(snapshot);
         m_cv.notify_all();
     }
 
-//    cout << "screenshot_latest_blocking(): Convert Now - Done" << endl;
+//    cout << "snapshot_latest_blocking(): Convert Now - Done" << endl;
     return m_converted_snapshot;
 }
+
+VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(){
+    WallClock now = current_time();
+
+    std::lock_guard<std::mutex> lg(m_lock);
+
+//    cout << "snapshot_recent_nonblocking()" << endl;
+
+    //  Already up-to-date. Return it.
+    uint64_t seqnum = m_cache.seqnum();
+    if (seqnum <= m_converted_seqnum){
+//        cout << "snapshot_recent_nonblocking(): Up-to-date" << endl;
+        return m_converted_snapshot;
+    }
+
+    QVideoFrame frame;
+    WallClock timestamp;
+    seqnum = m_cache.get_latest(frame, timestamp);
+
+    //  Dispatch this frame for conversion.
+    if (m_converting_seqnum < seqnum){
+//        cout << "snapshot_recent_nonblocking(): Dispatching..." << endl;
+        try{
+            m_active_conversions++;
+            dispatch_conversion(seqnum, std::move(frame), timestamp);
+        }catch (...){
+            m_active_conversions--;
+            throw;
+        }
+    }
+
+    //  Cached snapshot isn't too old. Return it.
+
+    std::chrono::milliseconds window(m_stats_conversion.max());
+//    cout << "window = " << window.count() << endl;
+
+    WallClock oldest_allowed = now - 2 * window;
+//    cout << "snapshot_recent_nonblocking(): " << m_converted_seqnum << endl;
+
+    if (m_converted_snapshot.timestamp >= oldest_allowed){
+//        cout << "snapshot_recent_nonblocking(): Good..." << endl;
+        return m_converted_snapshot;
+    }
+
+//    cout << "snapshot_recent_nonblocking(): Too old..." << endl;
+    return VideoSnapshot();
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

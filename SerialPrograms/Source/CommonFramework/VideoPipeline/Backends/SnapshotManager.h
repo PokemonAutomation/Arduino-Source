@@ -24,13 +24,13 @@ public:
     SnapshotManager(Logger& logger, QVideoFrameCache& cache);
 
 public:
-    VideoSnapshot screenshot_latest_blocking();
-    VideoSnapshot screenshot_recent_nonblocking(WallClock oldest_allowed);
+    VideoSnapshot snapshot_latest_blocking();
+    VideoSnapshot snapshot_recent_nonblocking();
 
 private:
     static QImage frame_to_image(const QVideoFrame& frame);
     void convert(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
-    void dispatch_convert(uint64_t seqnum, QVideoFrame frame, WallClock timestamp);
+    void dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp);
 
 private:
     Logger& m_logger;

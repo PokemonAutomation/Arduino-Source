@@ -55,7 +55,8 @@ public:
     virtual Resolution current_resolution() const = 0;
     virtual const std::vector<Resolution>& supported_resolutions() const = 0;
 
-    virtual VideoSnapshot snapshot() = 0;
+    virtual VideoSnapshot snapshot_latest_blocking() = 0;
+    virtual VideoSnapshot snapshot_recent_nonblocking() = 0;
 
 
 protected:

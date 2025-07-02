@@ -7,12 +7,17 @@
 #ifndef PokemonAutomation_ParallelTaskRunner_H
 #define PokemonAutomation_ParallelTaskRunner_H
 
+#include "Common/Cpp/Time.h"
+#include "Common/Cpp/Containers/Pimpl.h"
 #include "AsyncDispatcher.h"
 
 namespace PokemonAutomation{
 
 
-class ParallelTaskRunner{
+class ParallelTaskRunnerCore;
+
+
+class ParallelTaskRunner final{
 public:
     ParallelTaskRunner(
         std::function<void()>&& new_thread_callback,
@@ -20,6 +25,9 @@ public:
         size_t max_threads
     );
     ~ParallelTaskRunner();
+
+    size_t max_threads() const;
+    WallDuration cpu_time() const;
 
     void wait_for_everything();
 
@@ -39,21 +47,12 @@ public:
 
 
 private:
-//    void dispatch_task(AsyncTask& task);
-    void thread_loop();
-
-
-private:
-    std::function<void()> m_new_thread_callback;
-    size_t m_max_threads;
-    std::deque<std::shared_ptr<AsyncTask>> m_queue;
-    std::vector<std::thread> m_threads;
-    bool m_stopping;
-    size_t m_busy_count;
-    std::mutex m_lock;
-    std::condition_variable m_thread_cv;
-    std::condition_variable m_dispatch_cv;
+    Pimpl<ParallelTaskRunnerCore> m_core;
 };
+
+
+
+
 
 
 

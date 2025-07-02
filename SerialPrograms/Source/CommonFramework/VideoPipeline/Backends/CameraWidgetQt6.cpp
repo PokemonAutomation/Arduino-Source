@@ -168,9 +168,6 @@ CameraVideoSource::CameraVideoSource(
     m_camera->start();
 }
 
-VideoSnapshot CameraVideoSource::snapshot(){
-    return m_snapshot_manager.screenshot_latest_blocking();
-}
 
 QWidget* CameraVideoSource::make_display_QtWidget(QWidget* parent){
     return new CameraVideoDisplay(parent, *this);

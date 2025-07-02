@@ -94,7 +94,7 @@ public:
     //  function will begin prefetch conversions of frames so they are ready
     //  on future calls.
     //
-//    virtual VideoSnapshot screenshot_recent_nonblocking(WallClock oldest_allowed) = 0;
+    virtual VideoSnapshot snapshot_recent_nonblocking() = 0;
 
 
 public:

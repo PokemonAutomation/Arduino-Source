@@ -8,7 +8,7 @@
 #define PokemonAutomation_Environment_H
 
 #include <string>
-#include <QThread>
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
 
 #if _WIN32
@@ -24,7 +24,7 @@ namespace PokemonAutomation{
 
 const EnumDropdownDatabase<ThreadPriority>& PRIORITY_DATABASE();
 
-bool set_thread_priority(ThreadPriority priority);
+bool set_thread_priority(Logger& logger, ThreadPriority priority);
 
 
 class ThreadHandle;

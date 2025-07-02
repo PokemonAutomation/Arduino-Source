@@ -11,6 +11,10 @@
 #include "SysbotBase3_ControllerState.h"
 #include "SysbotBase3_ProController.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -20,7 +24,8 @@ ProController_SysbotBase3::ProController_SysbotBase3(
     Logger& logger,
     SysbotBase::TcpSysbotBase_Connection& connection
 )
-    : ControllerWithScheduler(logger)
+    : ProController(logger)
+    , ControllerWithScheduler(logger)
     , m_connection(connection)
     , m_stopping(false)
     , m_next_seqnum(1)
@@ -118,6 +123,10 @@ void ProController_SysbotBase3::on_message(const std::string& message){
     }
 
     std::lock_guard<std::mutex> lg(m_state_lock);
+
+//    cout << "parsed = " << parsed << endl;
+//    cout << "m_next_seqnum = " << m_next_seqnum << endl;
+//    cout << "m_next_expected_seqnum_ack = " << m_next_expected_seqnum_ack << endl;
 
     if (GlobalSettings::instance().LOG_EVERYTHING){
         m_logger.log(
