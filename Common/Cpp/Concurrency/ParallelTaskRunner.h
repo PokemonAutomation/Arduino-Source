@@ -23,7 +23,13 @@ public:
 
     void wait_for_everything();
 
-    std::shared_ptr<AsyncTask> dispatch(std::function<void()>&& func);
+    //  Dispatch the function. If there are no threads available, it waits until
+    //  there are.
+    std::shared_ptr<AsyncTask> blocking_dispatch(std::function<void()>&& func);
+
+    //  Dispatch the function. Returns null if no threads are available.
+    //  "func" will be moved-from only on success.
+    std::shared_ptr<AsyncTask> try_dispatch(std::function<void()>& func);
 
     void run_in_parallel(
         const std::function<void(size_t index)>& func,

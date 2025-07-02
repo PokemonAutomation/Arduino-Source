@@ -122,7 +122,7 @@ void TrainingSession::generate_small_dictionary(
         m_logger.log("Starting Language: " + language_info.name);
 //        cout << (int)item.first << " : " << item.second.size() << endl;
         for (const TrainingSample& sample : language.second){
-            task_runner.dispatch([&]{
+            task_runner.blocking_dispatch([&]{
                 ImageRGB32 image(m_directory + sample.filepath);
                 if (!image){
                     m_logger.log("Skipping: " + sample.filepath);
@@ -204,7 +204,7 @@ void TrainingSession::generate_large_dictionary(
         m_logger.log("Starting Language: " + language_info.name);
 //        cout << (int)item.first << " : " << item.second.size() << endl;
         for (const TrainingSample& sample : language.second){
-            task_runner.dispatch([&]{
+            task_runner.blocking_dispatch([&]{
                 ImageRGB32 image(m_directory + sample.filepath);
                 if (!image){
                     m_logger.log("Skipping: " + sample.filepath);

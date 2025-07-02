@@ -15,11 +15,11 @@
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "QVideoFrameCache.h"
+#include "SnapshotManager.h"
 #include "CameraImplementations.h"
 
 class QCamera;
@@ -86,19 +86,10 @@ private:
 
     std::vector<Resolution> m_resolutions;
 
-private:
-    //  Last Cached Image: All accesses must be under this lock.
-
-    QImage m_last_image;
-    WallClock m_last_image_timestamp;
-    uint64_t m_last_image_seqnum = 0;
-
-    PeriodicStatsReporterI32 m_stats_conversion;
-
 
 private:
     QVideoFrameCache m_last_frame;
-
+    SnapshotManager m_snapshot_manager;
 };
 
 

@@ -402,6 +402,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/ResolutionOption.cpp
     Source/CommonFramework/Options/ResolutionOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
+    Source/CommonFramework/Options/ThreadPoolOption.cpp
+    Source/CommonFramework/Options/ThreadPoolOption.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
     Source/CommonFramework/Panels/PanelDescriptor.h
     Source/CommonFramework/Panels/PanelInstance.cpp
@@ -449,6 +451,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/FileDownloader.cpp
     Source/CommonFramework/Tools/FileDownloader.h
+    Source/CommonFramework/Tools/GlobalThreadPools.cpp
+    Source/CommonFramework/Tools/GlobalThreadPools.h
     Source/CommonFramework/Tools/ProgramEnvironment.cpp
     Source/CommonFramework/Tools/ProgramEnvironment.h
     Source/CommonFramework/Tools/StatAccumulator.cpp
@@ -464,6 +468,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.h
     Source/CommonFramework/VideoPipeline/Backends/QVideoFrameCache.h
+    Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.cpp
+    Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.h
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h

@@ -1,6 +1,8 @@
-/*  Camera Widget (Qt6.5)
+/*  QVideoFrameCache
  *
  *  From: https://github.com/PokemonAutomation/
+ *
+ *      A simple cache that stores the last QVideoFrame from a stream.
  *
  */
 
@@ -57,6 +59,10 @@ private:
     WallClock m_last_frame_timestamp;
     std::atomic<uint64_t> m_last_frame_seqnum;
 };
+
+
+
+
 
 
 

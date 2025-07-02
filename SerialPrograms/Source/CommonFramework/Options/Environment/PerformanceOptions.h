@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
+#include "CommonFramework/Options/ThreadPoolOption.h"
 #include "ProcessPriorityOption.h"
 #include "ProcessorLevelOption.h"
 
@@ -47,7 +48,7 @@ public:
             DEFAULT_PRIORITY_REALTIME_INFERENCE
         )
         , NORMAL_INFERENCE_PRIORITY(
-            "<b>normal Inference Priority:</b><br>"
+            "<b>Normal Inference Priority:</b><br>"
             "Thread priority of non-realtime inference threads that can be slow "
             "without negatively affecting a program.",
             DEFAULT_PRIORITY_NORMAL_INFERENCE
@@ -57,12 +58,28 @@ public:
             "Thread priority of computation threads.",
             DEFAULT_PRIORITY_COMPUTE
         )
+        , THREAD_POOL_REALTIME_INFERENCE(
+            "Thread Pool: Real-time Inference",
+            DEFAULT_PRIORITY_REALTIME_INFERENCE,
+            0.5
+        )
+        , THREAD_POOL_NORMAL_INFERENCE(
+            "Thread Pool: Normal Inference",
+            DEFAULT_PRIORITY_NORMAL_INFERENCE,
+            1.0
+        )
     {
         PA_ADD_OPTION(PRECISE_WAKE_MARGIN);
+
         PA_ADD_OPTION(REALTIME_THREAD_PRIORITY);
         PA_ADD_OPTION(REALTIME_INFERENCE_PRIORITY);
         PA_ADD_OPTION(NORMAL_INFERENCE_PRIORITY);
         PA_ADD_OPTION(COMPUTE_PRIORITY);
+
+        //  TODO: REMOVE: Enable when these are actually used.
+//        PA_ADD_OPTION(THREAD_POOL_REALTIME_INFERENCE);
+//        PA_ADD_OPTION(THREAD_POOL_NORMAL_INFERENCE);
+
         PA_ADD_OPTION(PROCESSOR_LEVEL);
     }
 
@@ -73,6 +90,9 @@ public:
     ThreadPriorityOption REALTIME_INFERENCE_PRIORITY;
     ThreadPriorityOption NORMAL_INFERENCE_PRIORITY;
     ThreadPriorityOption COMPUTE_PRIORITY;
+
+    ThreadPoolOption THREAD_POOL_REALTIME_INFERENCE;
+    ThreadPoolOption THREAD_POOL_NORMAL_INFERENCE;
 
     ProcessorLevelOption PROCESSOR_LEVEL;
 };

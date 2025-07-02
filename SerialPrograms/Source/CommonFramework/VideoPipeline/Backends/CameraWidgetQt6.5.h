@@ -20,15 +20,14 @@
 #include <QGraphicsView>
 #include <QGraphicsVideoItem>
 #include <QKeyEvent>
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
 #include "QVideoFrameCache.h"
+#include "SnapshotManager.h"
 #include "CameraImplementations.h"
 
-//  REMOVE
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+//#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 //#include "Common/Cpp/Containers/CircularBuffer.h"
 
 //#include <iostream>
@@ -94,6 +93,7 @@ public:
 
 
 
+
 class CameraVideoSource : public QObject, public VideoSource{
 public:
     virtual ~CameraVideoSource();
@@ -130,20 +130,10 @@ private:
 
     std::vector<Resolution> m_resolutions;
 
-private:
-    //  Last Cached Image: All accesses must be under this lock.
-
-    mutable std::mutex m_cache_lock;
-
-    QImage m_last_image;
-    WallClock m_last_image_timestamp;
-    uint64_t m_last_image_seqnum = 0;
-
-    PeriodicStatsReporterI32 m_stats_conversion;
 
 private:
     QVideoFrameCache m_last_frame;
-
+    SnapshotManager m_snapshot_manager;
 };
 
 

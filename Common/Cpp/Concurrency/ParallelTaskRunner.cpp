@@ -54,7 +54,7 @@ void ParallelTaskRunner::wait_for_everything(){
     });
 }
 
-std::shared_ptr<AsyncTask> ParallelTaskRunner::dispatch(std::function<void()>&& func){
+std::shared_ptr<AsyncTask> ParallelTaskRunner::blocking_dispatch(std::function<void()>&& func){
     std::shared_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
 
     std::unique_lock<std::mutex> lg(m_lock);
@@ -62,6 +62,26 @@ std::shared_ptr<AsyncTask> ParallelTaskRunner::dispatch(std::function<void()>&& 
     m_dispatch_cv.wait(lg, [this]{
         return m_queue.size() + m_busy_count < m_max_threads;
     });
+
+    //  Enqueue task.
+    m_queue.emplace_back(task);
+
+    if (m_queue.size() + m_busy_count > m_threads.size()){
+        m_threads.emplace_back(run_with_catch, "ParallelTaskRunner::thread_loop()", [this]{ thread_loop(); });
+    }
+
+    m_thread_cv.notify_one();
+
+    return task;
+}
+std::shared_ptr<AsyncTask> ParallelTaskRunner::try_dispatch(std::function<void()>& func){
+    std::lock_guard<std::mutex> lg(m_lock);
+
+    if (m_queue.size() + m_busy_count >= m_max_threads){
+        return nullptr;
+    }
+
+    std::shared_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
 
     //  Enqueue task.
     m_queue.emplace_back(task);
@@ -89,7 +109,7 @@ void ParallelTaskRunner::run_in_parallel(
 
     std::vector<std::shared_ptr<AsyncTask>> tasks;
     for (size_t c = 0; c < blocks; c++){
-        tasks.emplace_back(dispatch([=, &func]{
+        tasks.emplace_back(blocking_dispatch([=, &func]{
             size_t s = start + c * block_size;
             size_t e = std::min(s + block_size, end);
 //            cout << "Running: [" << s << "," << e << ")" << endl;
@@ -108,9 +128,6 @@ void ParallelTaskRunner::run_in_parallel(
 
 
 void ParallelTaskRunner::thread_loop(){
-//#if _WIN32
-//    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_IDLE);
-//#endif
     if (m_new_thread_callback){
         m_new_thread_callback();
     }
