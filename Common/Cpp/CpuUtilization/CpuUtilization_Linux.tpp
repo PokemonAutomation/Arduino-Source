@@ -11,6 +11,10 @@
 #include <sched.h>
 #include "CpuUtilization_Linux.h"
 
+#if defined(__APPLE__)
+#include <libproc.h>
+#endif
+
 namespace PokemonAutomation{
 
 
