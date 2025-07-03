@@ -169,9 +169,17 @@ std::string  read_number_waterfill_no_normalization(
         ImageRGB32 cropped = extract_box_reference(filtered, object).copy();            
         PackedBinaryMatrix tmp(object.packed_matrix());
         filter_by_mask(tmp, cropped, Color(0xffffffff), true);
-        ImageRGB32 padded = pad_image(cropped, cropped.width(), 0xffffffff);
+
+        //  Tesseract doesn't like numbers that are too big. So scale it down.
+//        cout << "height = " << cropped.height() << endl;
+        if (cropped.height() > 60){
+            cropped = cropped.scale_to(cropped.width() * 60 / cropped.height(), 60);
+        }
+
+        ImageRGB32 padded = pad_image(cropped, 1 * cropped.width(), 0xffffffff);
         std::string ocr = OCR::ocr_read(Language::English, padded);
-        // padded.save("zztest-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
+
+//        padded.save("zztest-cropped" + std::to_string(c) + "-" + std::to_string(i++) + ".png");
         // std::cout << ocr[0] << std::endl;
         if (!ocr.empty()){
             ocr_text += ocr[0];

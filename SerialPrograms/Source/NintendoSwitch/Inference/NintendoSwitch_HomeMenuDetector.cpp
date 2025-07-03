@@ -44,13 +44,25 @@ void HomeMenuDetector::make_overlays(VideoOverlaySet& items) const{
 //  This miraculously works on both Switch 1 and Switch 2.
 //
 bool HomeMenuDetector::detect(const ImageViewRGB32& screen){
-    if (detect_only(screen)){
-        m_console_type.commit_to_cache();
-        return true;
-    }else{
+   return detect_only(screen);
+
+#if 0
+    if (!detect_only(screen)){
         return false;
     }
+    try{
+        m_console_type.commit_to_cache();
+    }catch (UserSetupError&){
+        screen.save("HomeMenuDetector-Failure.png");
+        throw;
+    }
+    return true;
+#endif
 }
+void HomeMenuDetector::commit_state(){
+    m_console_type.commit_to_cache();
+}
+
 bool HomeMenuDetector::detect_only(const ImageViewRGB32& screen){
     ImageStats stats_bottom_row = image_stats(extract_box_reference(screen, m_bottom_row));
 //    cout << stats_bottom_row.average << stats_bottom_row.stddev << endl;

@@ -22,6 +22,8 @@ public:
 
     //  This is not const so that detectors can save/cache state.
     virtual bool detect(const ImageViewRGB32& screen) = 0;
+
+    virtual void commit_state(){}
 };
 
 
@@ -85,7 +87,13 @@ public:
             if (m_start_of_detection == WallClock::min()){
                 m_start_of_detection = timestamp;
             }
-            return timestamp - m_start_of_detection >= m_duration;
+
+            if (timestamp - m_start_of_detection >= m_duration){
+                this->commit_state();
+                return true;
+            }else{
+                return false;
+            }
         case FinderType::CONSISTENT:{
             const bool result = this->detect(frame);
             const bool result_changed = (result && m_last_detected < 0) || (!result && m_last_detected > 0);
@@ -104,7 +112,12 @@ public:
             if (enough_time){
                 m_consistent_result = m_last_detected > 0;
             }
-            return enough_time;
+            if (enough_time){
+                this->commit_state();
+                return true;
+            }else{
+                return false;
+            }
         }
         default:;
         }
