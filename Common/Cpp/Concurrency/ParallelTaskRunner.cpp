@@ -250,6 +250,14 @@ void ParallelTaskRunnerCore::run_in_parallel(
         return;
     }
     size_t total = end - start;
+
+    if (block_size == 0){
+        block_size = total / m_max_threads / 2;
+        if (block_size == 0){
+            block_size = 1;
+        }
+    }
+
     size_t blocks = (total + block_size - 1) / block_size;
 
     std::vector<std::unique_ptr<AsyncTask>> tasks;
