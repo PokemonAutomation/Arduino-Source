@@ -5,6 +5,7 @@
  */
 
 #include <deque>
+#include <thread>
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/CpuUtilization/CpuUtilization.h"
