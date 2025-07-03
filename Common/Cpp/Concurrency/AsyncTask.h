@@ -9,6 +9,7 @@
 
 #include <functional>
 #include <atomic>
+#include <exception>
 #include <mutex>
 #include <condition_variable>
 
