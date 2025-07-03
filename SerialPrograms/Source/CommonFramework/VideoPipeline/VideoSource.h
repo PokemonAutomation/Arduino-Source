@@ -11,6 +11,7 @@
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include <vector>
 
 class QWidget;
 
