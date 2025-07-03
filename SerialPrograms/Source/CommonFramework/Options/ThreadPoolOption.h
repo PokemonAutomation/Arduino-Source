@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Options_ThreadPoolOption_H
 #define PokemonAutomation_Options_ThreadPoolOption_H
 
+#include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Environment/ProcessPriorityOption.h"
@@ -29,6 +30,7 @@ private:
     SimpleIntegerOption<size_t> HARDWARE_THREADS;
 
 public:
+    StaticTextOption m_description;
     ThreadPriorityOption PRIORITY;
     SimpleIntegerOption<size_t> MAX_THREADS;
 };

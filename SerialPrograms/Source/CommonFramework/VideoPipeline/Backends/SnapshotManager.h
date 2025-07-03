@@ -16,7 +16,7 @@
 
 namespace PokemonAutomation{
 
-
+class AsyncTask;
 
 class SnapshotManager{
 public:
@@ -40,6 +40,7 @@ private:
     std::condition_variable m_cv;
 
     size_t m_active_conversions;
+    std::map<uint64_t, std::unique_ptr<AsyncTask>> m_pending_conversions;
     bool m_queued_convert = false;
 
     uint64_t m_converting_seqnum;

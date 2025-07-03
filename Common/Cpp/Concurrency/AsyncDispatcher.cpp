@@ -19,6 +19,10 @@ AsyncTask::~AsyncTask(){
     std::unique_lock<std::mutex> lg(m_lock);
     m_cv.wait(lg, [this]{ return m_finished; });
 }
+bool AsyncTask::is_finished() const{
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_finished;
+}
 void AsyncTask::rethrow_exceptions(){
     if (!m_stopped_with_error.load(std::memory_order_acquire)){
         return;

@@ -23,6 +23,15 @@ ParallelTaskRunner& realtime_inference(){
     );
     return runner;
 }
+ParallelTaskRunner& normal_inference(){
+    static ParallelTaskRunner runner(
+        [](){
+            GlobalSettings::instance().PERFORMANCE->THREAD_POOL_NORMAL_INFERENCE.PRIORITY.set_on_this_thread(global_logger_tagged());
+        },
+        0, GlobalSettings::instance().PERFORMANCE->THREAD_POOL_NORMAL_INFERENCE.MAX_THREADS
+    );
+    return runner;
+}
 
 
 

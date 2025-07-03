@@ -11,6 +11,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
@@ -84,7 +85,7 @@ void ItemPrinterMaterialDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 int16_t ItemPrinterMaterialDetector::read_number(
-    Logger& logger, AsyncDispatcher& dispatcher,
+    Logger& logger,
     const ImageViewRGB32& screen, const ImageFloatBox& box,
     int8_t row_index
 ) const{
@@ -146,13 +147,12 @@ int16_t ItemPrinterMaterialDetector::read_number(
 // keep pressing DPAD_RIGHT until Happiny dust is on screen
 // check each row on the screen for Happiny Dust
 int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context
 ) const{
     int8_t value_68_row_index;
     for (size_t c = 0; c < 30; c++){
         context.wait_for_all_requests();
-        std::vector<int8_t> value_68_row_index_list = find_material_value_row_index(dispatcher, stream, context, 68);
+        std::vector<int8_t> value_68_row_index_list = find_material_value_row_index(stream, context, 68);
         for (size_t i = 0; i < value_68_row_index_list.size(); i++){
             value_68_row_index = value_68_row_index_list[i];
             if (detect_material_name(stream, context, value_68_row_index) == "happiny-dust"){
@@ -215,7 +215,6 @@ std::string ItemPrinterMaterialDetector::detect_material_name(
 
 // return vector of row index(es) that matches given material_value.
 std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream,
     ProControllerContext& context,
     int16_t material_value
@@ -227,8 +226,8 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
     SpinLock lock;
     std::vector<std::unique_ptr<AsyncTask>> tasks(total_rows);
     for (int8_t row_index = 0; row_index < total_rows; row_index++){
-        tasks[row_index] = dispatcher.dispatch([&, row_index]{
-            int16_t value = read_number(stream.logger(), dispatcher, snapshot, m_box_mat_value[row_index], row_index);
+        tasks[row_index] = GlobalThreadPools::normal_inference().blocking_dispatch([&, row_index]{
+            int16_t value = read_number(stream.logger(), snapshot, m_box_mat_value[row_index], row_index);
             if (value == material_value){
                 WriteSpinLock lg(lock);
                 row_indexes.push_back(row_index);
@@ -242,14 +241,13 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
 
 // detect the quantity of material at the given row number
 int16_t ItemPrinterMaterialDetector::detect_material_quantity(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream,
     ProControllerContext& context,
     int8_t row_index
 ) const{
     context.wait_for_all_requests();
     VideoSnapshot snapshot = stream.video().snapshot();
-    int16_t value = read_number(stream.logger(), dispatcher, snapshot, m_box_mat_quantity[row_index], row_index);
+    int16_t value = read_number(stream.logger(), snapshot, m_box_mat_quantity[row_index], row_index);
     return value;
 }
 

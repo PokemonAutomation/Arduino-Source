@@ -10,6 +10,7 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/CpuUtilization/CpuUtilization.h"
+#include "Common/Cpp/Stopwatch.h"
 #include "ParallelTaskRunner.h"
 
 //#include <iostream>
@@ -19,41 +20,6 @@
 namespace PokemonAutomation{
 
 
-class StopWatch{
-public:
-    StopWatch()
-        : m_total(WallDuration::zero())
-        , m_last_start(WallClock::max())
-    {}
-
-    void start(){
-//        cout << "start" << endl;
-        if (m_last_start != WallClock::max()){
-            return;
-        }
-        m_last_start = current_time();
-    }
-    void stop(){
-//        cout << "stop" << endl;
-        if (m_last_start == WallClock::max()){
-            return;
-        }
-        m_total += current_time() - m_last_start;
-        m_last_start = WallClock::max();
-    }
-    WallDuration total() const{
-        WallDuration ret = m_total;
-        if (m_last_start != WallClock::max()){
-            ret += current_time() - m_last_start;
-        }
-//        cout << "total: " << std::chrono::duration_cast<Milliseconds>(ret).count() << endl;
-        return ret;
-    }
-
-private:
-    WallDuration m_total;
-    WallClock m_last_start;
-};
 
 
 
@@ -68,20 +34,25 @@ public:
     );
     ~ParallelTaskRunnerCore();
 
+    size_t current_threads() const{
+        std::lock_guard<std::mutex> lg(m_lock);
+        return m_threads.size();
+    }
     size_t max_threads() const{
         return m_max_threads;
     }
     WallDuration cpu_time() const;
 
-    void wait_for_everything();
+    void ensure_threads(size_t threads);
+//    void wait_for_everything();
 
     //  Dispatch the function. If there are no threads available, it waits until
     //  there are.
-    std::shared_ptr<AsyncTask> blocking_dispatch(std::function<void()>&& func);
+    [[nodiscard]] std::unique_ptr<AsyncTask> blocking_dispatch(std::function<void()>&& func);
 
     //  Dispatch the function. Returns null if no threads are available.
     //  "func" will be moved-from only on success.
-    std::shared_ptr<AsyncTask> try_dispatch(std::function<void()>& func);
+    [[nodiscard]] std::unique_ptr<AsyncTask> try_dispatch(std::function<void()>& func);
 
     void run_in_parallel(
         const std::function<void(size_t index)>& func,
@@ -94,7 +65,7 @@ private:
     struct ThreadData{
         std::thread thread;
         ThreadHandle handle;
-        StopWatch runtime;
+        Stopwatch runtime;
     };
 
     void spawn_thread();
@@ -106,7 +77,7 @@ private:
 
     std::function<void()> m_new_thread_callback;
     size_t m_max_threads;
-    std::deque<std::shared_ptr<AsyncTask>> m_queue;
+    std::deque<AsyncTask*> m_queue;
 
     std::deque<ThreadData> m_threads;
 
@@ -136,19 +107,25 @@ ParallelTaskRunner::ParallelTaskRunner(
     )
 {}
 ParallelTaskRunner::~ParallelTaskRunner() = default;
+size_t ParallelTaskRunner::current_threads() const{
+    return m_core->current_threads();
+}
 size_t ParallelTaskRunner::max_threads() const{
     return m_core->max_threads();
 }
 WallDuration ParallelTaskRunner::cpu_time() const{
     return m_core->cpu_time();
 }
-void ParallelTaskRunner::wait_for_everything(){
-    m_core->wait_for_everything();
+void ParallelTaskRunner::ensure_threads(size_t threads){
+    m_core->ensure_threads(threads);
 }
-std::shared_ptr<AsyncTask> ParallelTaskRunner::blocking_dispatch(std::function<void()>&& func){
+//void ParallelTaskRunner::wait_for_everything(){
+//    m_core->wait_for_everything();
+//}
+std::unique_ptr<AsyncTask> ParallelTaskRunner::blocking_dispatch(std::function<void()>&& func){
     return m_core->blocking_dispatch(std::move(func));
 }
-std::shared_ptr<AsyncTask> ParallelTaskRunner::try_dispatch(std::function<void()>& func){
+std::unique_ptr<AsyncTask> ParallelTaskRunner::try_dispatch(std::function<void()>& func){
     return m_core->try_dispatch(func);
 }
 void ParallelTaskRunner::run_in_parallel(
@@ -206,15 +183,24 @@ WallDuration ParallelTaskRunnerCore::cpu_time() const{
     return ret;
 }
 
+
+void ParallelTaskRunnerCore::ensure_threads(size_t threads){
+    std::lock_guard<std::mutex> lg(m_lock);
+    while (m_threads.size() < threads){
+        spawn_thread();
+    }
+}
+#if 0
 void ParallelTaskRunnerCore::wait_for_everything(){
     std::unique_lock<std::mutex> lg(m_lock);
     m_dispatch_cv.wait(lg, [this]{
         return m_queue.size() + m_busy_count == 0;
     });
 }
+#endif
 
-std::shared_ptr<AsyncTask> ParallelTaskRunnerCore::blocking_dispatch(std::function<void()>&& func){
-    std::shared_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
+std::unique_ptr<AsyncTask> ParallelTaskRunnerCore::blocking_dispatch(std::function<void()>&& func){
+    std::unique_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
 
     std::unique_lock<std::mutex> lg(m_lock);
 
@@ -223,7 +209,7 @@ std::shared_ptr<AsyncTask> ParallelTaskRunnerCore::blocking_dispatch(std::functi
     });
 
     //  Enqueue task.
-    m_queue.emplace_back(task);
+    m_queue.emplace_back(task.get());
 
     if (m_queue.size() + m_busy_count > m_threads.size()){
         spawn_thread();
@@ -233,17 +219,17 @@ std::shared_ptr<AsyncTask> ParallelTaskRunnerCore::blocking_dispatch(std::functi
 
     return task;
 }
-std::shared_ptr<AsyncTask> ParallelTaskRunnerCore::try_dispatch(std::function<void()>& func){
+std::unique_ptr<AsyncTask> ParallelTaskRunnerCore::try_dispatch(std::function<void()>& func){
     std::lock_guard<std::mutex> lg(m_lock);
 
     if (m_queue.size() + m_busy_count >= m_max_threads){
         return nullptr;
     }
 
-    std::shared_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
+    std::unique_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
 
     //  Enqueue task.
-    m_queue.emplace_back(task);
+    m_queue.emplace_back(task.get());
 
     if (m_queue.size() + m_busy_count > m_threads.size()){
         spawn_thread();
@@ -266,7 +252,7 @@ void ParallelTaskRunnerCore::run_in_parallel(
     size_t total = end - start;
     size_t blocks = (total + block_size - 1) / block_size;
 
-    std::vector<std::shared_ptr<AsyncTask>> tasks;
+    std::vector<std::unique_ptr<AsyncTask>> tasks;
     for (size_t c = 0; c < blocks; c++){
         tasks.emplace_back(blocking_dispatch([=, &func]{
             size_t s = start + c * block_size;
@@ -278,7 +264,7 @@ void ParallelTaskRunnerCore::run_in_parallel(
         }));
     }
 
-    for (std::shared_ptr<AsyncTask>& task : tasks){
+    for (std::unique_ptr<AsyncTask>& task : tasks){
         task->wait_and_rethrow_exceptions();
     }
 }
@@ -304,7 +290,7 @@ void ParallelTaskRunnerCore::thread_loop(ThreadData& data){
 
     bool busy = false;
     while (true){
-        std::shared_ptr<AsyncTask> task;
+        AsyncTask* task;
         {
             std::unique_lock<std::mutex> lg(m_lock);
             if (busy){
@@ -334,10 +320,6 @@ void ParallelTaskRunnerCore::thread_loop(ThreadData& data){
             task->m_task();
         }catch (...){
             task->m_exception = std::current_exception();
-//            std::lock_guard<std::mutex> lg(m_lock);
-//            for (std::shared_ptr<AsyncTask>& t : m_queue){
-//                t->signal();
-//            }
         }
         task->signal();
     }

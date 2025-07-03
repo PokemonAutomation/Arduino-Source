@@ -50,10 +50,6 @@ public:
     //  program to encounter issues.
     AsyncDispatcher& realtime_inference_dispatcher();
 
-    //  A low-priority dispatcher for inference where starvation will not affect
-    //  the functionality of the program.
-    AsyncDispatcher& normal_inference_dispatcher();
-
 public:
     //  Stats Management
 

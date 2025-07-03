@@ -134,7 +134,7 @@ WallClock AutoHost::wait_for_lobby_open(
 ){
     VideoOverlaySet overlays(env.console.overlay());
 
-    TeraLobbyWatcher lobby(env.logger(), env.normal_inference_dispatcher(), COLOR_RED);
+    TeraLobbyWatcher lobby(env.logger(), COLOR_RED);
     lobby.make_overlays(overlays);
 
     int ret = wait_until(
@@ -153,8 +153,8 @@ WallClock AutoHost::wait_for_lobby_open(
     context.wait_for(std::chrono::seconds(1));
 
     VideoSnapshot snapshot = env.console.video().snapshot();
-    lobby_code = lobby.raid_code(env.logger(), env.normal_inference_dispatcher(), snapshot);
-    std::string code = lobby.raid_code(env.logger(), env.normal_inference_dispatcher(), snapshot);
+    lobby_code = lobby.raid_code(env.logger(), snapshot);
+    std::string code = lobby.raid_code(env.logger(), snapshot);
     normalize_code(lobby_code, code);
 
     send_host_announcement(

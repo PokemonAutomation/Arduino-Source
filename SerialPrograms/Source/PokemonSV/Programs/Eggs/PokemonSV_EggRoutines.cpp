@@ -306,7 +306,7 @@ bool eat_egg_sandwich_at_picnic(
             throw UserSetupError(stream.logger(), "Must set game language option to read ingredient lists to make herb sandwich.");
         }
         make_two_herbs_sandwich(
-            env.program_info(), env.realtime_inference_dispatcher(),
+            env,
             stream, context,
             sandwich_type,
             language

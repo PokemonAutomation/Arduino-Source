@@ -15,7 +15,12 @@ ThreadPoolOption::ThreadPoolOption(
     ThreadPriority default_priority,
     double default_max_thread_ratio
 )
-    : GroupOption(std::move(label), LockMode::UNLOCK_WHILE_RUNNING)
+    : GroupOption(
+        std::move(label),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        EnableMode::ALWAYS_ENABLED,
+        true
+    )
     , m_default_max_threads(
         std::max(
             (size_t)(std::thread::hardware_concurrency() * default_max_thread_ratio),
@@ -27,6 +32,7 @@ ThreadPoolOption::ThreadPoolOption(
         LockMode::UNLOCK_WHILE_RUNNING,
         std::thread::hardware_concurrency()
     )
+    , m_description("Restart program for changes to take full effect.")
     , PRIORITY("<b>Thread Priority:</b>", default_priority)
     , MAX_THREADS(
         "<b>Maximum Threads:</b>",
@@ -35,6 +41,7 @@ ThreadPoolOption::ThreadPoolOption(
     )
 {
     PA_ADD_OPTION(HARDWARE_THREADS);
+    PA_ADD_STATIC(m_description);
     PA_ADD_OPTION(PRIORITY);
     PA_ADD_OPTION(MAX_THREADS);
     HARDWARE_THREADS.set_visibility(ConfigOptionState::HIDDEN);

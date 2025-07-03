@@ -129,7 +129,7 @@ std::string  read_number_waterfill_no_normalization(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,    
     bool text_inside_range,
-    uint32_t width_max,
+    uint32_t width_max, //  TODO: REMOVE investigate for 4k
     bool check_empty_string
 ){
     using namespace Kernels::Waterfill;

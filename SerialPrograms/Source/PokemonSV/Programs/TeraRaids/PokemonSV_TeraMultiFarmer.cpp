@@ -344,7 +344,7 @@ void TeraMultiFarmer::join_lobby(
         }
 
         CodeEntryWatcher code_entry(COLOR_GREEN);
-        TeraLobbyWatcher lobby(console.logger(), env.normal_inference_dispatcher(), COLOR_RED);
+        TeraLobbyWatcher lobby(console.logger(), COLOR_RED);
         AdvanceDialogWatcher dialog(COLOR_YELLOW);
         TeraRaidSearchWatcher raid_search(COLOR_CYAN, std::chrono::seconds(5));
         context.wait_for_all_requests();
@@ -452,7 +452,7 @@ bool TeraMultiFarmer::run_raid(
     //  Open lobby and read code.
     WallClock lobby_start_time;
     try{
-        TeraLobbyReader lobby_reader(host_console.logger(), env.normal_inference_dispatcher());
+        TeraLobbyReader lobby_reader(host_console.logger());
         open_hosting_lobby(
             env, host_console, host_context,
             HOSTING_MODE == Mode::HOST_ONLINE
@@ -462,7 +462,6 @@ bool TeraMultiFarmer::run_raid(
         lobby_start_time = current_time();
         std::string code = lobby_reader.raid_code(
             env.logger(),
-            env.normal_inference_dispatcher(),
             host_console.video().snapshot()
         );
 

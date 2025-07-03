@@ -184,6 +184,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Rectangle.tpp
     ../Common/Cpp/RecursiveThrottler.h
     ../Common/Cpp/SIMDDebuggers.h
+    ../Common/Cpp/Stopwatch.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
@@ -536,8 +537,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/Audio/SpectrogramMatcher.h
     Source/CommonTools/DetectionDebouncer.h
     Source/CommonTools/FailureWatchdog.h
-    Source/CommonTools/GlobalInferenceRunner.cpp
-    Source/CommonTools/GlobalInferenceRunner.h
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.cpp
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h
     Source/CommonTools/ImageMatch/ExactImageDictionaryMatcher.cpp

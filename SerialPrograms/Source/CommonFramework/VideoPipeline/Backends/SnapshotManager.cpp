@@ -57,11 +57,15 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
     std::lock_guard<std::mutex> lg(m_lock);
 //    cout << "SnapshotManager::convert() - post convert: " << seqnum << endl;
 
-    m_converted_seqnum = seqnum;
-    if (timestamp > m_converted_snapshot.timestamp){
+    if (m_converted_seqnum < seqnum){
+        m_converted_seqnum = seqnum;
         m_converted_snapshot = std::move(snapshot);
     }
+
+//    if (timestamp > m_converted_snapshot.timestamp){
+//    }
     m_active_conversions--;
+//    m_pending_conversions.erase(seqnum);
     m_cv.notify_all();
 }
 void SnapshotManager::dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp){
@@ -74,9 +78,20 @@ void SnapshotManager::dispatch_conversion(uint64_t seqnum, QVideoFrame frame, Wa
     if (task){
 //        cout << "dispatch_conversion: Success..." << endl;
         m_converting_seqnum = seqnum;
+        m_pending_conversions[seqnum] = std::move(task);
     }else{
 //        cout << "dispatch_conversion: Failed..." << endl;
         m_queued_convert = true;
+    }
+
+    //  Cleanup finished tasks.
+    while (!m_pending_conversions.empty()){
+        auto iter = m_pending_conversions.begin();
+        if (iter->second->is_finished()){
+            m_pending_conversions.erase(iter);
+        }else{
+            break;
+        }
     }
 }
 
@@ -110,7 +125,7 @@ VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
     WallClock timestamp;
     seqnum = m_cache.get_latest(frame, timestamp);
 
-    m_active_conversions++;
+//    m_active_conversions++;
     m_converting_seqnum = seqnum;
 
     VideoSnapshot snapshot;
@@ -124,9 +139,9 @@ VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
             microseconds = (uint32_t)std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
         }
         m_stats_conversion.report_data(m_logger, microseconds);
-        m_active_conversions--;
+//        m_active_conversions--;
     }catch (...){
-        m_active_conversions--;
+//        m_active_conversions--;
         m_logger.log("Exception thrown while converting QVideoFrame -> QImage.", COLOR_RED);
         throw;
     }

@@ -4,9 +4,9 @@
  *
  */
 
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
@@ -78,14 +78,13 @@ void ItemPrinterPrizeReader::make_overlays(VideoOverlaySet& items) const{
     }
 }
 std::array<std::string, 10> ItemPrinterPrizeReader::read_prizes(
-    Logger& logger, AsyncDispatcher& dispatcher,
-    const ImageViewRGB32& screen
+    Logger& logger, const ImageViewRGB32& screen
 ) const{
     //  OCR 20 things in parallel.
     OCR::StringMatchResult results[20];
     std::unique_ptr<AsyncTask> tasks[20];
     for (size_t c = 0; c < 10; c++){
-        tasks[c] = dispatcher.dispatch([=, this, &results]{
+        tasks[c] = GlobalThreadPools::normal_inference().blocking_dispatch([=, this, &results]{
             results[c] = ItemPrinterPrizeOCR::instance().read_substring(
                 nullptr, m_language,
                 extract_box_reference(screen, m_boxes_normal[c]),
@@ -94,7 +93,7 @@ std::array<std::string, 10> ItemPrinterPrizeReader::read_prizes(
         });
     }
     for (size_t c = 0; c < 10; c++){
-        tasks[10 + c] = dispatcher.dispatch([=, this, &results]{
+        tasks[10 + c] = GlobalThreadPools::normal_inference().blocking_dispatch([=, this, &results]{
             results[10 + c] = ItemPrinterPrizeOCR::instance().read_substring(
                 nullptr, m_language,
                 extract_box_reference(screen, m_boxes_bonus[c]),
@@ -127,8 +126,7 @@ std::array<std::string, 10> ItemPrinterPrizeReader::read_prizes(
 
 
 std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
-    Logger& logger, AsyncDispatcher& dispatcher,
-    const ImageViewRGB32& screen
+    Logger& logger, const ImageViewRGB32& screen
 ) const{
     size_t total_rows = 10;
 
@@ -163,7 +161,7 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
         // );
         // filtered.save("DebugDumps/test"+ std::to_string(i) +".png");   
 
-        tasks[i] = dispatcher.dispatch([&, i]{
+        tasks[i] = GlobalThreadPools::normal_inference().blocking_dispatch([&, i]{
             results[i] = read_number(logger, screen, boxes[i], (int8_t)i);
         });
     }

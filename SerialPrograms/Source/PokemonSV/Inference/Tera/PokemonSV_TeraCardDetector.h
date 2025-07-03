@@ -86,7 +86,7 @@ struct TeraLobbyNameMatchResult{
 
 class TeraLobbyReader : public StaticScreenDetector{
 public:
-    TeraLobbyReader(Logger& logger, AsyncDispatcher& dispatcher, Color color = COLOR_RED);
+    TeraLobbyReader(Logger& logger, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
@@ -97,8 +97,8 @@ public:
 //    uint8_t ready_players(const ImageViewRGB32& screen) const;
     uint8_t ready_joiners(const ImageViewRGB32& screen, uint8_t host_players);
 
-    int16_t seconds_left(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const;
-    std::string raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const;
+    int16_t seconds_left(Logger& logger, const ImageViewRGB32& screen) const;
+    std::string raid_code(Logger& logger, const ImageViewRGB32& screen) const;
 
     //  OCR the player names in all the specified languages.
     //  The returned strings are raw OCR output and are unprocessed.
@@ -111,7 +111,6 @@ public:
 
 private:
     Logger& m_logger;
-    AsyncDispatcher& m_dispatcher;
     Color m_color;
     ImageFloatBox m_bottom_right;
     ImageFloatBox m_label;
@@ -129,10 +128,11 @@ private:
 class TeraLobbyWatcher : public DetectorToFinder<TeraLobbyReader>{
 public:
     TeraLobbyWatcher(
-        Logger& logger, AsyncDispatcher& dispatcher,
-        Color color = COLOR_RED, std::chrono::milliseconds duration = std::chrono::milliseconds(250)
+        Logger& logger,
+        Color color = COLOR_RED,
+        std::chrono::milliseconds duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("TeraLobbyFinder", duration, logger, dispatcher, color)
+         : DetectorToFinder("TeraLobbyFinder", duration, logger, color)
     {}
 };
 

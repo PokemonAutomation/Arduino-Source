@@ -33,12 +33,10 @@ struct ItemPrinterPrizeResult{
 
 
 void item_printer_start_print(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context,
     Language language, ItemPrinterJobs jobs
 );
 ItemPrinterPrizeResult item_printer_finish_print(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context,
     Language language
 );

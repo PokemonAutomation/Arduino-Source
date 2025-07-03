@@ -31,7 +31,6 @@ const EnumDropdownDatabase<ItemPrinterJobs>& ItemPrinterJobs_Database(){
 
 
 void item_printer_start_print(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context,
     Language language, ItemPrinterJobs jobs
 ){
@@ -61,7 +60,7 @@ void item_printer_start_print(
             ItemPrinterJobsDetector detector(COLOR_RED);
             VideoOverlaySet overlays(stream.overlay());
             detector.make_overlays(overlays);
-            detector.set_print_jobs(dispatcher, stream, context, (uint8_t)jobs);
+            detector.set_print_jobs(stream, context, (uint8_t)jobs);
             pbf_press_button(context, BUTTON_X, 20, 230);
             continue;
         }
@@ -75,7 +74,6 @@ void item_printer_start_print(
     }
 }
 ItemPrinterPrizeResult item_printer_finish_print(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context,
     Language language
 ){
@@ -116,8 +114,8 @@ ItemPrinterPrizeResult item_printer_finish_print(
                 VideoOverlaySet overlays(stream.overlay());
                 reader.make_overlays(overlays);
                 auto snapshot = stream.video().snapshot();
-                std::array<std::string, 10> prizes = reader.read_prizes(stream.logger(), dispatcher, snapshot);
-                std::array<int16_t, 10> quantities = reader.read_quantity(stream.logger(), dispatcher, snapshot);
+                std::array<std::string, 10> prizes = reader.read_prizes(stream.logger(), snapshot);
+                std::array<int16_t, 10> quantities = reader.read_quantity(stream.logger(), snapshot);
                 prize_result = {prizes, quantities};
 //                static int c = 0;
 //                snapshot->save("test-" + std::to_string(c) + ".png");

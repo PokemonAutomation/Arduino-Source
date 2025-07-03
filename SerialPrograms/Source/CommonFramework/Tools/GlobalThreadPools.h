@@ -15,6 +15,7 @@ namespace GlobalThreadPools{
 
 
 ParallelTaskRunner& realtime_inference();
+ParallelTaskRunner& normal_inference();
 
 
 

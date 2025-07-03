@@ -418,11 +418,11 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
                 pbf_press_button(context, BUTTON_B, 20, 30);
                 continue;
             }
-            item_printer_start_print(env.normal_inference_dispatcher(), env.console, context, LANGUAGE, jobs);
+            item_printer_start_print(env.console, context, LANGUAGE, jobs);
             stats.prints++;
             env.update_stats();
             printed = true;
-            prize_result = item_printer_finish_print(env.normal_inference_dispatcher(), env.console, context, LANGUAGE);
+            prize_result = item_printer_finish_print(env.console, context, LANGUAGE);
             std::array<std::string, 10> print_results = prize_result.prizes;
             uint64_t seed = to_seconds_since_epoch(date);
             int distance_from_target = get_distance_from_target(env.console, stats, print_results, seed);
@@ -609,11 +609,11 @@ void ItemPrinterRNG::print_again(
             if (printed){
                 return;
             }
-            item_printer_start_print(env.normal_inference_dispatcher(), env.console, context, LANGUAGE, jobs);
+            item_printer_start_print(env.console, context, LANGUAGE, jobs);
             stats.prints++;
             env.update_stats();
             printed = true;
-            item_printer_finish_print(env.normal_inference_dispatcher(), env.console, context, LANGUAGE);
+            item_printer_finish_print(env.console, context, LANGUAGE);
             continue;
         }
         default:
@@ -986,11 +986,9 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
             ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
             
             int8_t happiny_dust_row_num = detector.find_happiny_dust_row_index(
-                env.normal_inference_dispatcher(),
                 env.console, context
             );
             num_happiny_dust = detector.detect_material_quantity(
-                env.normal_inference_dispatcher(),
                 env.console, context,
                 happiny_dust_row_num
             );

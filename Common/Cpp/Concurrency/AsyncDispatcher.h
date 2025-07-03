@@ -29,6 +29,8 @@ public:
     //  Wait for the task to finish before destructing. Doesn't rethrow exceptions.
     ~AsyncTask();
 
+    bool is_finished() const;
+
     //  If the task ended with an exception, rethrow it here.
     //  This does not clear the exception.
     void rethrow_exceptions();
@@ -55,7 +57,7 @@ private:
     bool m_finished;
     std::atomic<bool> m_stopped_with_error;
     std::exception_ptr m_exception;
-    std::mutex m_lock;
+    mutable std::mutex m_lock;
     std::condition_variable m_cv;
 };
 

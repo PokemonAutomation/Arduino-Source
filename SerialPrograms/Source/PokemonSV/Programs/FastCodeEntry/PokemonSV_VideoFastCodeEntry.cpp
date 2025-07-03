@@ -8,6 +8,7 @@
 #include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
@@ -103,7 +104,7 @@ void wait_for_video_code_and_join(
             break;
         }
         case VideoFceOcrMethod::TERA_CARD:
-            code = read_raid_code(env.logger(), env.realtime_dispatcher(), snapshot);
+            code = read_raid_code(env.logger(), snapshot);
         }
         const char* error = enter_code(env, scope, settings, code, false, false);
         if (error == nullptr){
@@ -160,7 +161,8 @@ VideoFastCodeEntry::VideoFastCodeEntry()
     PA_ADD_OPTION(SETTINGS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    //  Preload the OCR data.
+    //  Preload
+    GlobalThreadPools::realtime_inference().ensure_threads(6);
     OCR::ensure_instances(Language::English, 6);
     preload_code_templates();
 }
@@ -171,7 +173,7 @@ void VideoFastCodeEntry::update_active_consoles(size_t switch_count){
 
 void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     if (MODE == Mode::MANUAL){
-        std::string code = read_raid_code(env.logger(), env.realtime_dispatcher(), SCREEN_WATCHER.screenshot());
+        std::string code = read_raid_code(env.logger(), SCREEN_WATCHER.screenshot());
         const char* error = enter_code(env, scope, SETTINGS, code, false, !SKIP_CONNECT_TO_CONTROLLER);
         if (error){
             env.log("No valid code found: " + std::string(error), COLOR_RED);

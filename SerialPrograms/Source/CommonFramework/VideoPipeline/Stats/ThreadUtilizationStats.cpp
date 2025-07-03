@@ -62,7 +62,10 @@ OverlayStatSnapshot ThreadPoolUtilizationStat::get_current(){
     }
     m_last_clock = clock;
 
-    return m_printer.get_snapshot(m_label, m_tracker.utilization());
+    return m_printer.get_snapshot(
+        m_label + " (x" + std::to_string(m_handle.current_threads()) + "):",
+        m_tracker.utilization()
+    );
 }
 
 
