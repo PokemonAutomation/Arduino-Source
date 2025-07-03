@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "SnapshotManager.h"
 

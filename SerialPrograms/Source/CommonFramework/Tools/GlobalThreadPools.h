@@ -7,15 +7,15 @@
 #ifndef PokemonAutomation_CommonTools_GlobalThreadPools_H
 #define PokemonAutomation_CommonTools_GlobalThreadPools_H
 
-#include "Common/Cpp/Concurrency/ParallelTaskRunner.h"
+#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
 
 namespace PokemonAutomation{
 namespace GlobalThreadPools{
 
 
 
-ParallelTaskRunner& realtime_inference();
-ParallelTaskRunner& normal_inference();
+ComputationThreadPool& realtime_inference();
+ComputationThreadPool& normal_inference();
 
 
 

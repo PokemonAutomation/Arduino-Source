@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -187,7 +186,7 @@ void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancellable
     });
 
     //  Preload 6 threads to OCR the code.
-    env.realtime_dispatcher().ensure_threads(6);
+//    env.realtime_dispatcher().ensure_threads(6);
 
     wait_for_video_code_and_join(env, scope, SCREEN_WATCHER, JOIN_METHOD, SETTINGS);
 

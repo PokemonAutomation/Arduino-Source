@@ -18,7 +18,6 @@
 
 namespace PokemonAutomation{
     class Logger;
-    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 

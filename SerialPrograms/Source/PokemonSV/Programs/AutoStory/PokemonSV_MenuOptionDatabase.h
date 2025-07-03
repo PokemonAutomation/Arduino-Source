@@ -10,7 +10,6 @@
 #include <string>
 
 namespace PokemonAutomation{
-    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 

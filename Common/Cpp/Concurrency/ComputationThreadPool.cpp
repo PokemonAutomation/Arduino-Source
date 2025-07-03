@@ -4,14 +4,13 @@
  *
  */
 
-#if _WIN32
-#include <Windows.h>
-#endif
+#include <deque>
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/CpuUtilization/CpuUtilization.h"
 #include "Common/Cpp/Stopwatch.h"
-#include "ParallelTaskRunner.h"
+#include "AsyncTask.h"
+#include "ComputationThreadPool.h"
 
 //#include <iostream>
 //using std::cout;
@@ -25,14 +24,14 @@ namespace PokemonAutomation{
 
 
 
-class ParallelTaskRunnerCore final{
+class ComputationThreadPoolCore final{
 public:
-    ParallelTaskRunnerCore(
+    ComputationThreadPoolCore(
         std::function<void()>&& new_thread_callback,
         size_t starting_threads,
         size_t max_threads
     );
-    ~ParallelTaskRunnerCore();
+    ~ComputationThreadPoolCore();
 
     size_t current_threads() const{
         std::lock_guard<std::mutex> lg(m_lock);
@@ -94,7 +93,7 @@ private:
 
 
 
-ParallelTaskRunner::ParallelTaskRunner(
+ComputationThreadPool::ComputationThreadPool(
     std::function<void()>&& new_thread_callback,
     size_t starting_threads,
     size_t max_threads
@@ -106,29 +105,29 @@ ParallelTaskRunner::ParallelTaskRunner(
         max_threads
     )
 {}
-ParallelTaskRunner::~ParallelTaskRunner() = default;
-size_t ParallelTaskRunner::current_threads() const{
+ComputationThreadPool::~ComputationThreadPool() = default;
+size_t ComputationThreadPool::current_threads() const{
     return m_core->current_threads();
 }
-size_t ParallelTaskRunner::max_threads() const{
+size_t ComputationThreadPool::max_threads() const{
     return m_core->max_threads();
 }
-WallDuration ParallelTaskRunner::cpu_time() const{
+WallDuration ComputationThreadPool::cpu_time() const{
     return m_core->cpu_time();
 }
-void ParallelTaskRunner::ensure_threads(size_t threads){
+void ComputationThreadPool::ensure_threads(size_t threads){
     m_core->ensure_threads(threads);
 }
 //void ParallelTaskRunner::wait_for_everything(){
 //    m_core->wait_for_everything();
 //}
-std::unique_ptr<AsyncTask> ParallelTaskRunner::blocking_dispatch(std::function<void()>&& func){
+std::unique_ptr<AsyncTask> ComputationThreadPool::blocking_dispatch(std::function<void()>&& func){
     return m_core->blocking_dispatch(std::move(func));
 }
-std::unique_ptr<AsyncTask> ParallelTaskRunner::try_dispatch(std::function<void()>& func){
+std::unique_ptr<AsyncTask> ComputationThreadPool::try_dispatch(std::function<void()>& func){
     return m_core->try_dispatch(func);
 }
-void ParallelTaskRunner::run_in_parallel(
+void ComputationThreadPool::run_in_parallel(
     const std::function<void(size_t index)>& func,
     size_t start, size_t end,
     size_t block_size
@@ -143,7 +142,7 @@ void ParallelTaskRunner::run_in_parallel(
 
 
 
-ParallelTaskRunnerCore::ParallelTaskRunnerCore(
+ComputationThreadPoolCore::ComputationThreadPoolCore(
     std::function<void()>&& new_thread_callback,
     size_t starting_threads,
     size_t max_threads
@@ -157,7 +156,7 @@ ParallelTaskRunnerCore::ParallelTaskRunnerCore(
         spawn_thread();
     }
 }
-ParallelTaskRunnerCore::~ParallelTaskRunnerCore(){
+ComputationThreadPoolCore::~ComputationThreadPoolCore(){
     {
         std::lock_guard<std::mutex> lg(m_lock);
         m_stopping = true;
@@ -172,7 +171,7 @@ ParallelTaskRunnerCore::~ParallelTaskRunnerCore(){
     }
 }
 
-WallDuration ParallelTaskRunnerCore::cpu_time() const{
+WallDuration ComputationThreadPoolCore::cpu_time() const{
     //  TODO: Don't lock the entire queue.
     WallDuration ret = WallDuration::zero();
     std::lock_guard<std::mutex> lg(m_lock);
@@ -184,14 +183,14 @@ WallDuration ParallelTaskRunnerCore::cpu_time() const{
 }
 
 
-void ParallelTaskRunnerCore::ensure_threads(size_t threads){
+void ComputationThreadPoolCore::ensure_threads(size_t threads){
     std::lock_guard<std::mutex> lg(m_lock);
     while (m_threads.size() < threads){
         spawn_thread();
     }
 }
 #if 0
-void ParallelTaskRunnerCore::wait_for_everything(){
+void ComputationThreadPoolCore::wait_for_everything(){
     std::unique_lock<std::mutex> lg(m_lock);
     m_dispatch_cv.wait(lg, [this]{
         return m_queue.size() + m_busy_count == 0;
@@ -199,7 +198,7 @@ void ParallelTaskRunnerCore::wait_for_everything(){
 }
 #endif
 
-std::unique_ptr<AsyncTask> ParallelTaskRunnerCore::blocking_dispatch(std::function<void()>&& func){
+std::unique_ptr<AsyncTask> ComputationThreadPoolCore::blocking_dispatch(std::function<void()>&& func){
     std::unique_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
 
     std::unique_lock<std::mutex> lg(m_lock);
@@ -219,7 +218,7 @@ std::unique_ptr<AsyncTask> ParallelTaskRunnerCore::blocking_dispatch(std::functi
 
     return task;
 }
-std::unique_ptr<AsyncTask> ParallelTaskRunnerCore::try_dispatch(std::function<void()>& func){
+std::unique_ptr<AsyncTask> ComputationThreadPoolCore::try_dispatch(std::function<void()>& func){
     std::lock_guard<std::mutex> lg(m_lock);
 
     if (m_queue.size() + m_busy_count >= m_max_threads){
@@ -241,7 +240,7 @@ std::unique_ptr<AsyncTask> ParallelTaskRunnerCore::try_dispatch(std::function<vo
 }
 
 
-void ParallelTaskRunnerCore::run_in_parallel(
+void ComputationThreadPoolCore::run_in_parallel(
     const std::function<void(size_t index)>& func,
     size_t start, size_t end,
     size_t block_size
@@ -261,6 +260,7 @@ void ParallelTaskRunnerCore::run_in_parallel(
     size_t blocks = (total + block_size - 1) / block_size;
 
     std::vector<std::unique_ptr<AsyncTask>> tasks;
+    tasks.reserve(blocks);
     for (size_t c = 0; c < blocks; c++){
         tasks.emplace_back(blocking_dispatch([=, &func]{
             size_t s = start + c * block_size;
@@ -279,7 +279,7 @@ void ParallelTaskRunnerCore::run_in_parallel(
 
 
 
-void ParallelTaskRunnerCore::spawn_thread(){
+void ComputationThreadPoolCore::spawn_thread(){
     ThreadData& handle = m_threads.emplace_back();
     handle.thread = std::thread(
         run_with_catch,
@@ -287,7 +287,7 @@ void ParallelTaskRunnerCore::spawn_thread(){
         [&, this]{ thread_loop(handle); }
     );
 }
-void ParallelTaskRunnerCore::thread_loop(ThreadData& data){
+void ComputationThreadPoolCore::thread_loop(ThreadData& data){
     data.handle = current_thread_handle();
 
     if (m_new_thread_callback){
@@ -336,7 +336,7 @@ void ParallelTaskRunnerCore::thread_loop(ThreadData& data){
 
 
 
-//template class Pimpl<ParallelTaskRunnerCore>;
+//template class Pimpl<ComputationThreadPoolCore>;
 
 
 

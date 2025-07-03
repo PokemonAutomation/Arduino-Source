@@ -1,30 +1,39 @@
-/*  Parallel Task Runner
+/*  Computation Thread Pool
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *      This is a thread pool for compute-heavy tasks.
+ *
+ *  This thread pool has a limited number of threads and should only be used for
+ *  compute-heavy tasks that do not block or yield. A blocked thread will still
+ *  count towards the thread limit.
+ *
+ *  Because the # of threads is capped, it is safe to spam this thread pool with
+ *  lots of smaller tasks.
+ *
  */
 
-#ifndef PokemonAutomation_ParallelTaskRunner_H
-#define PokemonAutomation_ParallelTaskRunner_H
+#ifndef PokemonAutomation_ComputationThreadPool_H
+#define PokemonAutomation_ComputationThreadPool_H
 
+#include <functional>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Containers/Pimpl.h"
-#include "AsyncDispatcher.h"
 
 namespace PokemonAutomation{
 
+class AsyncTask;
+class ComputationThreadPoolCore;
 
-class ParallelTaskRunnerCore;
 
-
-class ParallelTaskRunner final{
+class ComputationThreadPool final{
 public:
-    ParallelTaskRunner(
+    ComputationThreadPool(
         std::function<void()>&& new_thread_callback,
         size_t starting_threads,
         size_t max_threads
     );
-    ~ParallelTaskRunner();
+    ~ComputationThreadPool();
 
     size_t current_threads() const;
     size_t max_threads() const;
@@ -50,7 +59,7 @@ public:
 
 
 private:
-    Pimpl<ParallelTaskRunnerCore> m_core;
+    Pimpl<ComputationThreadPoolCore> m_core;
 };
 
 

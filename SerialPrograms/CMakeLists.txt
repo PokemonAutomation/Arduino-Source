@@ -69,10 +69,12 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Color.h
     ../Common/Cpp/Concurrency/AsyncDispatcher.cpp
     ../Common/Cpp/Concurrency/AsyncDispatcher.h
+    ../Common/Cpp/Concurrency/AsyncTask.cpp
+    ../Common/Cpp/Concurrency/AsyncTask.h
+    ../Common/Cpp/Concurrency/ComputationThreadPool.cpp
+    ../Common/Cpp/Concurrency/ComputationThreadPool.h
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h
-    ../Common/Cpp/Concurrency/ParallelTaskRunner.cpp
-    ../Common/Cpp/Concurrency/ParallelTaskRunner.h
     ../Common/Cpp/Concurrency/PeriodicScheduler.cpp
     ../Common/Cpp/Concurrency/PeriodicScheduler.h
     ../Common/Cpp/Concurrency/ReverseLockGuard.h

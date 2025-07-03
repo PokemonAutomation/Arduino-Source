@@ -13,7 +13,6 @@
 #include "CommonTools/OCR/OCR_SmallDictionaryMatcher.h"
 
 namespace PokemonAutomation{
-    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 

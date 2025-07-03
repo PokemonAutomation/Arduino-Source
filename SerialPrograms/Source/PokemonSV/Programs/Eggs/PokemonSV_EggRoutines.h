@@ -17,7 +17,6 @@
 namespace PokemonAutomation{
 
     struct ProgramInfo;
-    class AsyncDispatcher;
     class ImageViewRGB32;
 
     namespace OCR{

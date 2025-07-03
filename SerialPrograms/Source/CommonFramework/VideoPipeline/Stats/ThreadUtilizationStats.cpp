@@ -5,7 +5,7 @@
  */
 
 //#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Concurrency/ParallelTaskRunner.h"
+#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
 #include "ThreadUtilizationStats.h"
 
 //#include <iostream>
@@ -41,18 +41,18 @@ OverlayStatSnapshot ThreadUtilizationStat::get_current(){
 
 
 
-ThreadPoolUtilizationStat::ThreadPoolUtilizationStat(const ParallelTaskRunner& handle, std::string label)
-    : m_handle(handle)
+ThreadPoolUtilizationStat::ThreadPoolUtilizationStat(const ComputationThreadPool& thread_pool, std::string label)
+    : m_thread_pool(thread_pool)
     , m_label(std::move(label))
-    , m_last_clock(handle.cpu_time())
-    , m_printer((double)handle.max_threads())
+    , m_last_clock(thread_pool.cpu_time())
+    , m_printer((double)thread_pool.max_threads())
 {}
 
 OverlayStatSnapshot ThreadPoolUtilizationStat::get_current(){
     std::lock_guard<std::mutex> lg(m_lock);
 
     WallClock now = current_time();
-    WallDuration clock = m_handle.cpu_time();
+    WallDuration clock = m_thread_pool.cpu_time();
     if (clock <= WallDuration::zero()){
         return OverlayStatSnapshot();
     }
@@ -63,7 +63,7 @@ OverlayStatSnapshot ThreadPoolUtilizationStat::get_current(){
     m_last_clock = clock;
 
     return m_printer.get_snapshot(
-        m_label + " (x" + std::to_string(m_handle.current_threads()) + "):",
+        m_label + " (x" + std::to_string(m_thread_pool.current_threads()) + "):",
         m_tracker.utilization()
     );
 }

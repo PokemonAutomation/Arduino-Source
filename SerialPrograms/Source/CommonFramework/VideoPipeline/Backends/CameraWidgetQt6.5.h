@@ -27,9 +27,6 @@
 #include "SnapshotManager.h"
 #include "CameraImplementations.h"
 
-//#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-//#include "Common/Cpp/Containers/CircularBuffer.h"
-
 //#include <iostream>
 //using std::cout;
 //using std::endl;

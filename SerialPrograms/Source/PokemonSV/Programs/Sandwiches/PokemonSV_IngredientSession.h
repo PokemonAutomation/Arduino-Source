@@ -16,7 +16,6 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 
 namespace PokemonAutomation{
-    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 

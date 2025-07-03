@@ -6,7 +6,7 @@
 
 #include <map>
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"

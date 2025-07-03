@@ -14,7 +14,6 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
-    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 

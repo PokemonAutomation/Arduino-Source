@@ -16,7 +16,7 @@
 namespace PokemonAutomation{
 
 
-class ParallelTaskRunner;
+class ComputationThreadPool;
 
 
 
@@ -40,12 +40,12 @@ private:
 
 class ThreadPoolUtilizationStat : public OverlayStat{
 public:
-    ThreadPoolUtilizationStat(const ParallelTaskRunner& handle, std::string label);
+    ThreadPoolUtilizationStat(const ComputationThreadPool& thread_pool, std::string label);
 
     virtual OverlayStatSnapshot get_current() override;
 
 private:
-    const ParallelTaskRunner& m_handle;
+    const ComputationThreadPool& m_thread_pool;
     std::string m_label;
 
     std::mutex m_lock;

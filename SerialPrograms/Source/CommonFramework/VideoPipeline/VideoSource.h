@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoSource_H
 #define PokemonAutomation_VideoPipeline_VideoSource_H
 
+#include <vector>
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include <vector>
 
 class QWidget;
 

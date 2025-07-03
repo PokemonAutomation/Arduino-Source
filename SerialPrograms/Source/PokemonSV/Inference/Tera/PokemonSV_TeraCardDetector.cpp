@@ -456,32 +456,6 @@ std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
 
 
 
-#if 0
-TeraLobbyReadyWaiter::TeraLobbyReadyWaiter(
-    Logger& logger, AsyncDispatcher& dispatcher,
-    Color color, uint8_t desired_players
-)
-    : TeraLobbyReader(logger, dispatcher, color)
-    , VisualInferenceCallback("TeraLobbyReadyWaiter")
-    , m_desired_players(desired_players)
-    , m_last_known_total_players(-1)
-{}
-
-void TeraLobbyReadyWaiter::make_overlays(VideoOverlaySet& items) const{
-    TeraLobbyReader::make_overlays(items);
-}
-bool TeraLobbyReadyWaiter::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    if (!detect(frame)){
-        return false;
-    }
-    uint8_t total_players = this->total_players(frame);
-    uint8_t ready_players = this->ready_players(frame);
-    m_last_known_total_players.store(total_players);
-    return ready_players + 1 >= m_desired_players;
-}
-#endif
-
-
 
 
 
