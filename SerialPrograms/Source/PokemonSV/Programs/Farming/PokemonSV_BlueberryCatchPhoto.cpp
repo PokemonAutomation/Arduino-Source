@@ -126,7 +126,11 @@ CameraAngle quest_photo_navi(
 
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 100, 50);
-            pbf_move_left_joystick(context, 0, 0, 20, 50);
+
+            //Turn slightly for switch 1
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 0, 0, 20, 50);
+            }
 
             break;
         case BBQuests::photo_bug: case BBQuests::photo_rock:
@@ -179,8 +183,8 @@ CameraAngle quest_photo_navi(
             pbf_press_button(context, BUTTON_L, 20, 50);
 
             break;
-        case BBQuests::photo_flying: case BBQuests::photo_dark:
-            console.log("Photo: Dark/Flying");
+        case BBQuests::photo_flying:
+            console.log("Photo: Flying");
 
             //Vullaby/Mandibuzz
             central_to_savanna_plaza(info, console, context);
@@ -224,8 +228,8 @@ CameraAngle quest_photo_navi(
             context.wait_for_all_requests();
 
             break;
-        case BBQuests::photo_poison:
-            console.log("Photo: Poison");
+        case BBQuests::photo_poison: case BBQuests::photo_dark:
+            console.log("Photo: Poison/Dark");
 
             //Muk-A - area a bit laggy but consistently so
             central_to_coastal_plaza(info, console, context);
@@ -400,8 +404,11 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 100, 50);
 
-            pbf_move_left_joystick(context, 0, 0, 20, 50);
-            pbf_press_button(context, BUTTON_L, 20, 50);
+            //Turn slightly for switch 1
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 0, 0, 20, 50);
+                pbf_press_button(context, BUTTON_L, 20, 50);
+            }
 
             break;
 
@@ -504,8 +511,8 @@ void quest_catch_navi(
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 500);
             break;
-        case BBQuests::catch_dark: case BBQuests::catch_flying:
-            console.log("Catch: Dark/Flying");
+        case BBQuests::catch_flying:
+            console.log("Catch: Flying");
 
             //Vullaby/Mandibuzz
             central_to_savanna_plaza(info, console, context);
@@ -577,8 +584,8 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 128, 0, 50, 50);
 
             break;
-        case BBQuests::catch_poison:
-            console.log("Catch: Poison");
+        case BBQuests::catch_poison: case BBQuests::catch_dark: 
+            console.log("Catch: Poison/Dark");
 
             //Muk-A - area a bit laggy but consistently so
             central_to_coastal_plaza(info, console, context);
