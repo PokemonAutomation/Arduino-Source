@@ -6,38 +6,52 @@
 
 #include "AsyncTask.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
 
 AsyncTask::~AsyncTask(){
-    std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.wait(lg, [this]{ return m_finished; });
-}
-bool AsyncTask::is_finished() const{
-    std::lock_guard<std::mutex> lg(m_lock);
-    return m_finished;
-}
-void AsyncTask::rethrow_exceptions(){
-    if (!m_stopped_with_error.load(std::memory_order_acquire)){
+    State state = m_state.load(std::memory_order_acquire);
+    if (state == State::NOT_STARTED || state == State::SAFE_TO_DESTRUCT){
+//        cout << "Already Done: " << (int)state << endl;
         return;
     }
-    std::unique_lock<std::mutex> lg(m_lock);
-    if (m_exception){
-        std::rethrow_exception(m_exception);
+
+    {
+        std::unique_lock<std::mutex> lg(m_lock);
+        m_cv.wait(lg, [this]{
+            return m_state.load(std::memory_order_relaxed) != State::RUNNING;
+        });
     }
-}
-void AsyncTask::wait_and_rethrow_exceptions(){
-    std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.wait(lg, [this]{ return m_finished; });
-    if (m_exception){
-        std::rethrow_exception(m_exception);
+
+    while (m_state.load(std::memory_order_acquire) != State::SAFE_TO_DESTRUCT){
+        //  pause
     }
+
+//    cout << "Late Finish" << endl;
 }
-void AsyncTask::signal(){
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_finished = true;
+
+
+void AsyncTask::report_cancelled() noexcept{
+    m_state.store(State::FINISHED, std::memory_order_release);
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+    }
     m_cv.notify_all();
+    m_state.store(State::SAFE_TO_DESTRUCT, std::memory_order_release);
+}
+void AsyncTask::run() noexcept{
+    try{
+        m_task();
+    }catch (...){
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_exception = std::current_exception();
+    }
+    report_cancelled();
 }
 
 

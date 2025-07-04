@@ -42,7 +42,8 @@ AsyncDispatcher::~AsyncDispatcher(){
         thread.join();
     }
     for (AsyncTask* task : m_queue){
-        task->signal();
+        task->report_cancelled();
+//        task->signal();
     }
 }
 
@@ -58,7 +59,7 @@ void AsyncDispatcher::dispatch_task(AsyncTask& task){
     std::lock_guard<std::mutex> lg(m_lock);
 
     //  Enqueue task.
-    m_queue.emplace_back(&task);
+    m_queue.emplace_back(&task)->report_started();
 
     //  Make sure a thread is ready for it.
     if (m_queue.size() > m_threads.size() - m_busy_count){
@@ -97,7 +98,7 @@ void AsyncDispatcher::run_in_parallel(
 
         //  Enqueue tasks.
         for (std::unique_ptr<AsyncTask>& task : tasks){
-            m_queue.emplace_back(task.get());
+            m_queue.emplace_back(task.get())->report_started();
         }
 
         //  Make sure there are enough threads.
@@ -153,18 +154,7 @@ void AsyncDispatcher::thread_loop(){
             m_busy_count++;
         }
 
-        try{
-            task->m_task();
-        }catch (...){
-            task->m_exception = std::current_exception();
-            task->m_stopped_with_error.store(true, std::memory_order_release);
-//            cout << "Task threw an exception." << endl;
-//            std::lock_guard<std::mutex> lg(m_lock);
-//            for (AsyncTask* t : m_queue){
-//                t->signal();
-//            }
-        }
-        task->signal();
+        task->run();
     }
 //    cout << "AsyncDispatcher::thread_loop() End (outside) = " << GetCurrentThreadId() << endl;
 }

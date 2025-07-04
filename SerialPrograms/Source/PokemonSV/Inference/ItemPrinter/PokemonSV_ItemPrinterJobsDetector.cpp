@@ -55,10 +55,10 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
 
     SpinLock lock;
     std::map<uint8_t, uint8_t> candidates;
-    std::vector<std::unique_ptr<AsyncTask>> tasks(filtered.size());
-    for (size_t c = 0; c < filtered.size(); c++){
-        tasks[c] = GlobalThreadPools::normal_inference().blocking_dispatch([&, c]{
-            int num = OCR::read_number(logger, filtered[c].first);
+
+    GlobalThreadPools::normal_inference().run_in_parallel(
+        [&](size_t index){
+            int num = OCR::read_number(logger, filtered[index].first);
             std::string str = std::to_string(num);
             WriteSpinLock lg(lock);
             if (str == "1"){
@@ -75,13 +75,9 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
             }else if (str[0] == '1'){
                 candidates[1]++;
             }
-        });
-    }
-
-    //  Wait for everything.
-    for (auto& task : tasks){
-        task->wait_and_rethrow_exceptions();
-    }
+        },
+        0, filtered.size(), 1
+    );
 
     std::pair<uint8_t, uint8_t> best;
     for (const auto& item : candidates){

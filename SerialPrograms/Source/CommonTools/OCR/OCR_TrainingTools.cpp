@@ -122,10 +122,13 @@ void TrainingSession::generate_small_dictionary(
         const LanguageData& language_info = language_data(language.first);
         m_logger.log("Starting Language: " + language_info.name);
 //        cout << (int)item.first << " : " << item.second.size() << endl;
-        std::vector<std::unique_ptr<AsyncTask>> tasks;
 
-        for (const TrainingSample& sample : language.second){
-            tasks.emplace_back(task_runner.blocking_dispatch([&]{
+        task_runner.run_in_parallel(
+            [&](size_t index){
+                m_scope.throw_if_cancelled();
+
+                const TrainingSample& sample = language.second[index];
+
                 ImageRGB32 image(m_directory + sample.filepath);
                 if (!image){
                     m_logger.log("Skipping: " + sample.filepath);
@@ -166,13 +169,10 @@ void TrainingSession::generate_small_dictionary(
                     language.first, sample.token,
                     result0.results.begin()->second.normalized_text
                 );
-            }));
-            m_scope.throw_if_cancelled();
-        }
-        for (auto& task : tasks){
-            task->wait_and_rethrow_exceptions();
-        }
-//        task_runner.wait_for_everything();
+            },
+            0, language.second.size(), 1
+        );
+
         m_scope.throw_if_cancelled();
     }
 
@@ -209,10 +209,13 @@ void TrainingSession::generate_large_dictionary(
         const LanguageData& language_info = language_data(language.first);
         m_logger.log("Starting Language: " + language_info.name);
 //        cout << (int)item.first << " : " << item.second.size() << endl;
-        std::vector<std::unique_ptr<AsyncTask>> tasks;
 
-        for (const TrainingSample& sample : language.second){
-            tasks.emplace_back(task_runner.blocking_dispatch([&]{
+        task_runner.run_in_parallel(
+            [&](size_t index){
+                m_scope.throw_if_cancelled();
+
+                const TrainingSample& sample = language.second[index];
+
                 ImageRGB32 image(m_directory + sample.filepath);
                 if (!image){
                     m_logger.log("Skipping: " + sample.filepath);
@@ -253,13 +256,9 @@ void TrainingSession::generate_large_dictionary(
                     language.first, sample.token,
                     result0.results.begin()->second.normalized_text
                 );
-            }));
-            m_scope.throw_if_cancelled();
-        }
-        for (auto& task : tasks){
-            task->wait_and_rethrow_exceptions();
-        }
-//        task_runner.wait_for_everything();
+            },
+            0, language.second.size(), 1
+        );
 
         std::string json = output_prefix + language_info.code + ".json";
         trained.save(language.first, json);

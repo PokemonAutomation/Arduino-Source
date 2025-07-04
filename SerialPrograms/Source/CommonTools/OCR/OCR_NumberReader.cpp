@@ -105,7 +105,12 @@ int read_number_waterfill(
     bool text_inside_range,
     int8_t line_index
 ){
-    std::string ocr_text = read_number_waterfill_no_normalization(logger, image, rgb32_min, rgb32_max, text_inside_range, UINT32_MAX, false);
+    std::string ocr_text = read_number_waterfill_no_normalization(
+        logger,
+        image,
+        rgb32_min, rgb32_max,
+        text_inside_range
+    );
 
     std::string normalized = run_number_normalization(ocr_text);
 
@@ -125,11 +130,11 @@ int read_number_waterfill(
 }
 
 
-std::string  read_number_waterfill_no_normalization(
+std::string read_number_waterfill_no_normalization(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,    
     bool text_inside_range,
-    uint32_t width_max, //  TODO: REMOVE investigate for 4k
+    size_t width_max,
     bool check_empty_string
 ){
     using namespace Kernels::Waterfill;
@@ -203,7 +208,7 @@ bool is_digits(const std::string &str)
 int read_number_waterfill_multifilter(
     Logger& logger, const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,    
-    uint32_t width_max, 
+    size_t width_max,
     bool text_inside_range,
     bool prioritize_numeric_only_results, 
     int8_t line_index
@@ -218,7 +223,14 @@ int read_number_waterfill_multifilter(
 
         uint32_t rgb32_min = filter.first;
         uint32_t rgb32_max = filter.second;
-        std::string ocr_text = read_number_waterfill_no_normalization(logger, image, rgb32_min, rgb32_max, text_inside_range, width_max, true);
+        std::string ocr_text = read_number_waterfill_no_normalization(
+            logger,
+            image,
+            rgb32_min, rgb32_max,
+            text_inside_range,
+            width_max,
+            true
+        );
 
         std::string normalized = run_number_normalization(ocr_text);
         if (normalized.empty()){

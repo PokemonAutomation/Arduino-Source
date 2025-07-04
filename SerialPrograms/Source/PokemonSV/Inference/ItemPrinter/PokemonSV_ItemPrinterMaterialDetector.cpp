@@ -19,7 +19,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_ItemPrinterMaterialDetector.h"
 
-// #include <iostream>
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -134,7 +136,15 @@ int16_t ItemPrinterMaterialDetector::read_number(
             }
         }();
     
-    int16_t number = (int16_t)OCR::read_number_waterfill_multifilter(logger, cropped, filters, 24, true, true, row_index);
+    size_t max_width = (size_t)((double)24 * screen.width() / 1080);
+
+    int16_t number = (int16_t)OCR::read_number_waterfill_multifilter(
+        logger,
+        cropped, filters,
+        max_width,
+        true, true,
+        row_index
+    );
 
     if (number < 1 || number > 999){
         number = -1;
@@ -224,16 +234,17 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
     int8_t total_rows = 10;
     std::vector<int8_t> row_indexes;
     SpinLock lock;
-    std::vector<std::unique_ptr<AsyncTask>> tasks(total_rows);
-    for (int8_t row_index = 0; row_index < total_rows; row_index++){
-        tasks[row_index] = GlobalThreadPools::normal_inference().blocking_dispatch([&, row_index]{
-            int16_t value = read_number(stream.logger(), snapshot, m_box_mat_value[row_index], row_index);
+
+    GlobalThreadPools::normal_inference().run_in_parallel(
+        [&](size_t index){
+            int16_t value = read_number(stream.logger(), snapshot, m_box_mat_value[index], (int8_t)index);
             if (value == material_value){
                 WriteSpinLock lg(lock);
-                row_indexes.push_back(row_index);
+                row_indexes.push_back((int8_t)index);
             }
-        });
-    }
+        },
+        0, total_rows, 1
+    );
 
     return row_indexes;    
 

@@ -18,36 +18,57 @@ namespace PokemonAutomation{
 
 class AsyncTask{
 public:
-    //  Wait for the task to finish before destructing. Doesn't rethrow exceptions.
+    enum class State{
+        NOT_STARTED,
+        RUNNING,
+        FINISHED,
+        SAFE_TO_DESTRUCT,
+    };
+
+
+public:
+    //  If the task has already started, this will wait for it to finish.
+    //  This will not rethrow exceptions.
     ~AsyncTask();
 
-    bool is_finished() const;
 
-    //  If the task ended with an exception, rethrow it here.
-    //  This does not clear the exception.
-    void rethrow_exceptions();
-
-    //  Wait for the task to finish. Will rethrow any exceptions.
-    void wait_and_rethrow_exceptions();
-
-
-private:
+public:
     template <class... Args>
     AsyncTask(Args&&... args)
         : m_task(std::forward<Args>(args)...)
-        , m_finished(false)
-        , m_stopped_with_error(false)
+        , m_state(State::NOT_STARTED)
     {}
-    void signal();
+
+    bool is_finished() const noexcept{
+        State state = m_state.load(std::memory_order_acquire);
+        return state == State::FINISHED || state == State::SAFE_TO_DESTRUCT;
+    }
+
+    //  Wait for the task to finish. Will rethrow any exceptions.
+    void wait_and_rethrow_exceptions(){
+        if (!is_finished()){
+            std::unique_lock<std::mutex> lg(m_lock);
+            m_cv.wait(lg, [this]{ return is_finished(); });
+        }
+        if (m_exception){
+            std::rethrow_exception(m_exception);
+        }
+    }
+
+
+public:
+    //  These should only be called inside a parallel framework.
+    //  These are not thread-safe with each other.
+    void report_started(){
+        m_state.store(State::RUNNING, std::memory_order_release);
+    }
+    void report_cancelled() noexcept;
+    void run() noexcept;
+
 
 private:
-    friend class FireForgetDispatcher;
-    friend class AsyncDispatcher;
-    friend class ComputationThreadPoolCore;
-
     std::function<void()> m_task;
-    bool m_finished;
-    std::atomic<bool> m_stopped_with_error;
+    std::atomic<State> m_state;
     std::exception_ptr m_exception;
     mutable std::mutex m_lock;
     std::condition_variable m_cv;

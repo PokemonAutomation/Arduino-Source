@@ -73,6 +73,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Concurrency/AsyncTask.h
     ../Common/Cpp/Concurrency/ComputationThreadPool.cpp
     ../Common/Cpp/Concurrency/ComputationThreadPool.h
+    ../Common/Cpp/Concurrency/ComputationThreadPoolCore.cpp
+    ../Common/Cpp/Concurrency/ComputationThreadPoolCore.h
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h
     ../Common/Cpp/Concurrency/PeriodicScheduler.cpp
