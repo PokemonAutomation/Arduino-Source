@@ -54,7 +54,7 @@ bool home_to_date_time_Switch1_feedback(ConsoleHandle& console, ProControllerCon
 
 //  Returns true if success. False if not supported.
 bool home_to_date_time_with_feedback(ConsoleHandle& console, ProControllerContext& context, bool to_date_change){
-    wait_for_home(console, context);
+    ensure_at_home(console, context);
 
     ConsoleTypeDetector_Home detector(console);
     ConsoleType console_type = detector.detect_only(console.video().snapshot());

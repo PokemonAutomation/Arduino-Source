@@ -144,7 +144,7 @@ void touch_date_from_home(
     ConsoleHandle& console, ProControllerContext& context,
     Milliseconds settings_to_home_delay
 ){
-    wait_for_home(console, context);
+    ensure_at_home(console, context);
 
     ConsoleType type = console.state().console_type();
 
@@ -215,7 +215,7 @@ void rollback_hours_from_home(
     uint8_t hours,
     Milliseconds settings_to_home_delay
 ){
-    wait_for_home(console, context);
+    ensure_at_home(console, context);
 
     ConsoleType type = console.state().console_type();
 
