@@ -7,11 +7,13 @@
 #include <algorithm>
 #include <map>
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/ImageManip.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
@@ -218,35 +220,42 @@ int read_number_waterfill_multifilter(
         line_index_str = "Line " + std::to_string(line_index) + ": ";
     }
 
+    SpinLock lock;
     std::map<int, uint8_t> candidates;
-    for (std::pair<uint32_t, uint32_t> filter : filters){
+    GlobalThreadPools::normal_inference().run_in_parallel(
+        [&](size_t index){
+            std::pair<uint32_t, uint32_t> filter = filters[index];
 
-        uint32_t rgb32_min = filter.first;
-        uint32_t rgb32_max = filter.second;
-        std::string ocr_text = read_number_waterfill_no_normalization(
-            logger,
-            image,
-            rgb32_min, rgb32_max,
-            text_inside_range,
-            width_max,
-            true
-        );
+            uint32_t rgb32_min = filter.first;
+            uint32_t rgb32_max = filter.second;
+            std::string ocr_text = read_number_waterfill_no_normalization(
+                logger,
+                image,
+                rgb32_min, rgb32_max,
+                text_inside_range,
+                width_max,
+                true
+            );
 
-        std::string normalized = run_number_normalization(ocr_text);
-        if (normalized.empty()){
-            // logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
-            continue;
-        }
+            std::string normalized = run_number_normalization(ocr_text);
+            if (normalized.empty()){
+                // logger.log("OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> Unable to read.", COLOR_RED);
+                return;
+            }
 
-        int candidate = std::atoi(normalized.c_str());
-        logger.log(line_index_str + "OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(candidate));
+            int candidate = std::atoi(normalized.c_str());
+            logger.log(line_index_str + "OCR Text: \"" + ocr_text + "\" -> \"" + normalized + "\" -> " + std::to_string(candidate));
 
-        if (prioritize_numeric_only_results && is_digits(ocr_text)){
-            candidates[candidate] += 2;
-        }else{
-            candidates[candidate]++;
-        }
-    }
+            uint8_t weight = prioritize_numeric_only_results && is_digits(ocr_text)
+                ? 2
+                : 1;
+
+            WriteSpinLock lg(lock);
+            candidates[candidate] += weight;
+
+        },
+        0, filters.size(), 1
+    );
 
     if (candidates.empty()){
         logger.log(line_index_str + "No valid OCR candidates. Unable to read number.", COLOR_ORANGE);

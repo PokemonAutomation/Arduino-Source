@@ -4,6 +4,7 @@
  *
  */
 
+#include "SpinPause.h"
 #include "AsyncTask.h"
 
 //#include <iostream>
@@ -29,7 +30,7 @@ AsyncTask::~AsyncTask(){
     }
 
     while (m_state.load(std::memory_order_acquire) != State::SAFE_TO_DESTRUCT){
-        //  pause
+        pause();
     }
 
 //    cout << "Late Finish" << endl;
