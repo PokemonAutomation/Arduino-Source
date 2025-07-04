@@ -17,18 +17,18 @@ namespace GlobalThreadPools{
 ComputationThreadPool& realtime_inference(){
     static ComputationThreadPool runner(
         [](){
-            GlobalSettings::instance().PERFORMANCE->THREAD_POOL_REALTIME_INFERENCE.PRIORITY.set_on_this_thread(global_logger_tagged());
+            GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },
-        0, GlobalSettings::instance().PERFORMANCE->THREAD_POOL_REALTIME_INFERENCE.MAX_THREADS
+        0, GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_POOL.MAX_THREADS
     );
     return runner;
 }
 ComputationThreadPool& normal_inference(){
     static ComputationThreadPool runner(
         [](){
-            GlobalSettings::instance().PERFORMANCE->THREAD_POOL_NORMAL_INFERENCE.PRIORITY.set_on_this_thread(global_logger_tagged());
+            GlobalSettings::instance().PERFORMANCE->NORMAL_THREAD_POOL.PRIORITY.set_on_this_thread(global_logger_tagged());
         },
-        0, GlobalSettings::instance().PERFORMANCE->THREAD_POOL_NORMAL_INFERENCE.MAX_THREADS
+        0, GlobalSettings::instance().PERFORMANCE->NORMAL_THREAD_POOL.MAX_THREADS
     );
     return runner;
 }

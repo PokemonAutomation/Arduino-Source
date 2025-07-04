@@ -67,7 +67,7 @@ bool set_thread_priority(Logger& logger, ThreadPriority priority){
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Priority: " + std::to_string((int)priority));
     }
-    if (SetPriorityClass(GetCurrentProcess(), native_priority)){
+    if (SetPriorityClass(GetCurrentThread(), native_priority)){
 //        cout << "Thread priority set to: " + PRIORITY_DATABASE().find(priority)->display << endl;
         logger.log("Thread priority set to: " + PRIORITY_DATABASE().find(priority)->display, COLOR_BLUE);
         return true;

@@ -19,6 +19,7 @@ class ThreadPoolOption : public GroupOption{
 public:
     ThreadPoolOption(
         std::string label,
+        std::string description,
         ThreadPriority default_priority,
         double default_max_thread_ratio = 1.0
     );

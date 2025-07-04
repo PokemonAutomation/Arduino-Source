@@ -24,6 +24,38 @@ public:
             LockMode::LOCK_WHILE_RUNNING,
             GroupOption::EnableMode::ALWAYS_ENABLED, true
         )
+        , REALTIME_THREAD_PRIORITY(
+            "<b>Realtime Thread Priority:</b><br>"
+            "Thread priority of real-time threads. (UI thread, audio threads)<br>"
+            "Restart the program for this to fully take effect.",
+            DEFAULT_PRIORITY_REALTIME
+        )
+        , INFERENCE_PIVOT_PRIORITY(
+            "<b>Inference Pivot Priority:</b><br>"
+            "Thread priority of inference dispatcher threads.",
+            DEFAULT_PRIORITY_REALTIME_INFERENCE
+        )
+        , COMPUTE_PRIORITY(
+            "<b>Compute Priority:</b><br>"
+            "Thread priority of computation threads.",
+            DEFAULT_PRIORITY_COMPUTE
+        )
+        , REALTIME_THREAD_POOL(
+            "Real-time Thread Pool",
+            "Thread pool for tasks that must run fast enough to keep a "
+            "program running properly.<br>"
+            "Restart program for changes to take full effect.",
+            DEFAULT_PRIORITY_REALTIME_INFERENCE,
+            0.5
+        )
+        , NORMAL_THREAD_POOL(
+            "Normal Thread Pool",
+            "Thread pool for tasks that can be slow without negatively "
+            "affecting a program.<br>"
+            "Restart program for changes to take full effect.",
+            DEFAULT_PRIORITY_NORMAL_INFERENCE,
+            1.0
+        )
         , PRECISE_WAKE_MARGIN(
             "<b>Precise Wake Time Margin:</b><br>"
             "Some operations require a thread to wake up at a very precise time - "
@@ -35,65 +67,30 @@ public:
             LockMode::UNLOCK_WHILE_RUNNING,
             "2000 us"
         )
-        , REALTIME_THREAD_PRIORITY(
-            "<b>Realtime Thread Priority:</b><br>"
-            "Thread priority of real-time threads. (UI thread, audio threads)<br>"
-            "Restart the program for this to fully take effect.",
-            DEFAULT_PRIORITY_REALTIME
-        )
-        , REALTIME_INFERENCE_PRIORITY(
-            "<b>Inference Priority:</b><br>"
-            "Thread priority of realtime inference threads that must run fast "
-            "enough to keep a program working properly.",
-            DEFAULT_PRIORITY_REALTIME_INFERENCE
-        )
-        , NORMAL_INFERENCE_PRIORITY(
-            "<b>Normal Inference Priority:</b><br>"
-            "Thread priority of non-realtime inference threads that can be slow "
-            "without negatively affecting a program.",
-            DEFAULT_PRIORITY_NORMAL_INFERENCE
-        )
-        , COMPUTE_PRIORITY(
-            "<b>Compute Priority:</b><br>"
-            "Thread priority of computation threads.",
-            DEFAULT_PRIORITY_COMPUTE
-        )
-        , THREAD_POOL_REALTIME_INFERENCE(
-            "Thread Pool: Real-time Inference",
-            DEFAULT_PRIORITY_REALTIME_INFERENCE,
-            0.5
-        )
-        , THREAD_POOL_NORMAL_INFERENCE(
-            "Thread Pool: Normal Inference",
-            DEFAULT_PRIORITY_NORMAL_INFERENCE,
-            1.0
-        )
     {
-        PA_ADD_OPTION(PRECISE_WAKE_MARGIN);
+        PA_ADD_OPTION(PROCESSOR_LEVEL);
 
         PA_ADD_OPTION(REALTIME_THREAD_PRIORITY);
-        PA_ADD_OPTION(REALTIME_INFERENCE_PRIORITY);
-        PA_ADD_OPTION(NORMAL_INFERENCE_PRIORITY);
+        PA_ADD_OPTION(INFERENCE_PIVOT_PRIORITY);
         PA_ADD_OPTION(COMPUTE_PRIORITY);
 
-        PA_ADD_OPTION(THREAD_POOL_REALTIME_INFERENCE);
-        PA_ADD_OPTION(THREAD_POOL_NORMAL_INFERENCE);
+        PA_ADD_OPTION(REALTIME_THREAD_POOL);
+        PA_ADD_OPTION(NORMAL_THREAD_POOL);
 
-        PA_ADD_OPTION(PROCESSOR_LEVEL);
+        PA_ADD_OPTION(PRECISE_WAKE_MARGIN);
     }
 
 public:
-    MicrosecondsOption PRECISE_WAKE_MARGIN;
+    ProcessorLevelOption PROCESSOR_LEVEL;
 
     ThreadPriorityOption REALTIME_THREAD_PRIORITY;
-    ThreadPriorityOption REALTIME_INFERENCE_PRIORITY;
-    ThreadPriorityOption NORMAL_INFERENCE_PRIORITY;
+    ThreadPriorityOption INFERENCE_PIVOT_PRIORITY;
     ThreadPriorityOption COMPUTE_PRIORITY;
 
-    ThreadPoolOption THREAD_POOL_REALTIME_INFERENCE;
-    ThreadPoolOption THREAD_POOL_NORMAL_INFERENCE;
+    ThreadPoolOption REALTIME_THREAD_POOL;
+    ThreadPoolOption NORMAL_THREAD_POOL;
 
-    ProcessorLevelOption PROCESSOR_LEVEL;
+    MicrosecondsOption PRECISE_WAKE_MARGIN;
 };
 
 

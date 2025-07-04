@@ -12,6 +12,7 @@ namespace PokemonAutomation{
 
 ThreadPoolOption::ThreadPoolOption(
     std::string label,
+    std::string description,
     ThreadPriority default_priority,
     double default_max_thread_ratio
 )
@@ -32,7 +33,7 @@ ThreadPoolOption::ThreadPoolOption(
         LockMode::UNLOCK_WHILE_RUNNING,
         std::thread::hardware_concurrency()
     )
-    , m_description("Restart program for changes to take full effect.")
+    , m_description(std::move(description))
     , PRIORITY("<b>Thread Priority:</b>", default_priority)
     , MAX_THREADS(
         "<b>Maximum Threads:</b>",

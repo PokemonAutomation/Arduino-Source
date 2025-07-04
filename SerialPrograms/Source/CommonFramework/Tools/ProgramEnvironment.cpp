@@ -35,7 +35,7 @@ struct ProgramEnvironmentData{
         )
         , m_realtime_inference_dispatcher(
             [](){
-                GlobalSettings::instance().PERFORMANCE->REALTIME_INFERENCE_PRIORITY.set_on_this_thread(global_logger_tagged());
+                GlobalSettings::instance().PERFORMANCE->INFERENCE_PIVOT_PRIORITY.set_on_this_thread(global_logger_tagged());
             },
             0
         )
