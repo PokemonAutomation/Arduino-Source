@@ -711,8 +711,6 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/IntegrationsAPI.h
     Source/Integrations/ProgramTracker.cpp
     Source/Integrations/ProgramTracker.h
-    Source/Integrations/SleepyDiscordRunner.cpp
-    Source/Integrations/SleepyDiscordRunner.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
@@ -2462,7 +2460,6 @@ if (MSVC)
         OpenCV_lib
         ONNX_lib
         ONNX_Providers_lib
-        Sleepy.lib
         dpp_lib
     )
     target_compile_definitions(
@@ -2470,7 +2467,6 @@ if (MSVC)
         _CRT_SECURE_NO_WARNINGS
         _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
         PA_TESSERACT
-        PA_SLEEPY
         PA_DPP
     )
 

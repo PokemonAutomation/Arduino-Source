@@ -11,7 +11,6 @@
 //#include "CommonFramework/Globals.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
 #include "DppIntegration/DppClient.h"
-#include "SleepyDiscordRunner.h"
 #include "DiscordIntegrationSettings.h"
 
 //#include <iostream>
@@ -23,7 +22,6 @@ namespace Integration{
 
 
 DiscordIntegrationSettingsOption::~DiscordIntegrationSettingsOption(){
-    library0.remove_listener(*this);
     this->remove_listener(*this);
 }
 DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
@@ -37,15 +35,6 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         "<b>Run Discord Integration on Launch:</b><br>Automatically connect to Discord as soon as the program is launched.",
         LockMode::LOCK_WHILE_RUNNING,
         false
-    )
-    , library0(
-        "<b>Discord Integration Library:</b><br>Restart the program for this to take effect.",
-        {
-            {Library::SleepyDiscord, "sleepy", "Sleepy Discord (normal commands, deprecated)"},
-            {Library::DPP, "dpp", "D++ (slash commands and normal commands)"},
-        },
-        LockMode::LOCK_WHILE_RUNNING,
-        Library::DPP
     )
     , command_type(
         "<b>Discord Integration Command Type:</b><br>Restart the program for this to take effect.",
@@ -68,11 +57,6 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         LockMode::LOCK_WHILE_RUNNING,
         "^", "^"
     )
-    , use_suffix(
-        "<b>Use Suffix (Sleepy):</b><br>Use a suffix instead of a prefix for commands.",
-        LockMode::LOCK_WHILE_RUNNING,
-        false
-    )
     , game_status(
         false,
         "<b>Discord Game Status:</b><br>Enter a status message your bot would display.",
@@ -85,18 +69,6 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
         LockMode::LOCK_WHILE_RUNNING,
         "", "Automation at your service!"
     )
-    , sudo(
-        false,
-        "<b>Discord Sudo (Sleepy):</b><br>Enter user ID(s) to grant sudo access to.",
-        LockMode::LOCK_WHILE_RUNNING,
-        "", "123456789012345678"
-    )
-    , owner(
-        false,
-        "<b>Discord Owner (Sleepy):</b><br>Enter the bot owner's ID (your own ID).",
-        LockMode::LOCK_WHILE_RUNNING,
-        "", "123456789012345678"
-    )
     , allow_buttons_from_users(
         "<b>Allow Buttons from Users:</b><br>Allow other users to issue button presses.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -104,68 +76,32 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     )
 {
     PA_ADD_OPTION(run_on_start);
-    PA_ADD_OPTION(library0);
     PA_ADD_OPTION(command_type);
     PA_ADD_OPTION(token);
     PA_ADD_OPTION(command_prefix);
-    PA_ADD_OPTION(use_suffix);
     PA_ADD_OPTION(game_status);
     PA_ADD_OPTION(hello_message);
-    PA_ADD_OPTION(sudo);
-    PA_ADD_OPTION(owner);
     PA_ADD_OPTION(allow_buttons_from_users);
     PA_ADD_OPTION(channels);
 
     DiscordIntegrationSettingsOption::on_config_value_changed(this);
 
     this->add_listener(*this);
-    library0.add_listener(*this);
 }
 void DiscordIntegrationSettingsOption::on_config_value_changed([[maybe_unused]] void* object){
 //    cout << this->enabled() << endl;
-#if (defined PA_SLEEPY || defined PA_DPP)
-    bool options_enabled = this->enabled();
-    switch (library0){
-#ifdef PA_SLEEPY
-    case Library::SleepyDiscord:{
-        options_enabled &= !SleepyDiscordRunner::is_running();
-        ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
-
-        library0.set_visibility(state);
-        command_type.set_visibility(ConfigOptionState::HIDDEN);
-        token.set_visibility(state);
-        game_status.set_visibility(state);
-        hello_message.set_visibility(state);
-
-        command_prefix.set_visibility(state);
-        use_suffix.set_visibility(state);
-        sudo.set_visibility(state);
-        owner.set_visibility(state);
-        allow_buttons_from_users.set_visibility(ConfigOptionState::HIDDEN);
-        break;
-    }
-#endif
 #ifdef PA_DPP
-    case Library::DPP:{
-        options_enabled &= !DppClient::Client::instance().is_initialized();
-        ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
+    bool options_enabled = this->enabled();
+    options_enabled &= !DppClient::Client::instance().is_initialized();
+    ConfigOptionState state = options_enabled ? ConfigOptionState::ENABLED : ConfigOptionState::DISABLED;
 
-        library0.set_visibility(state);
-        command_type.set_visibility(state);
-        token.set_visibility(state);
-        game_status.set_visibility(state);
-        hello_message.set_visibility(state);
-        allow_buttons_from_users.set_visibility(state);
+    command_type.set_visibility(state);
+    token.set_visibility(state);
+    game_status.set_visibility(state);
+    hello_message.set_visibility(state);
+    allow_buttons_from_users.set_visibility(state);
 
-        command_prefix.set_visibility(state);
-        use_suffix.set_visibility(ConfigOptionState::HIDDEN);
-        sudo.set_visibility(ConfigOptionState::HIDDEN);
-        owner.set_visibility(ConfigOptionState::HIDDEN);
-        break;
-    }
-#endif
-    default:;
-    }
+    command_prefix.set_visibility(state);
 #endif
 }
 
@@ -181,7 +117,7 @@ ConfigWidget* DiscordIntegrationSettingsOption::make_QtWidget(QWidget& parent){
 DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& parent, DiscordIntegrationSettingsOption& value)
     : GroupWidget(parent, value)
 {
-#if (defined PA_SLEEPY || defined PA_DPP)
+#ifdef PA_DPP
 
     QWidget* control_buttons = new QWidget(this);
     m_options_layout->insertWidget(0, control_buttons);
@@ -207,38 +143,14 @@ DiscordIntegrationSettingsWidget::DiscordIntegrationSettingsWidget(QWidget& pare
     connect(
         button_start, &QPushButton::clicked,
         this, [this, &value](bool){
-            switch (value.library0){
-#ifdef PA_SLEEPY
-            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
-                SleepyDiscordRunner::sleepy_connect();
-                break;
-#endif
-#ifdef PA_DPP
-            case DiscordIntegrationSettingsOption::Library::DPP:
-                DppClient::Client::instance().connect();
-                break;
-#endif
-            default:;
-            }
+            DppClient::Client::instance().connect();
             value.on_config_value_changed(this);
         }
     );
     connect(
         button_stop, &QPushButton::clicked,
         this, [this, &value](bool){
-            switch (value.library0){
-#ifdef PA_SLEEPY
-            case DiscordIntegrationSettingsOption::Library::SleepyDiscord:
-                SleepyDiscordRunner::sleepy_terminate();
-                break;
-#endif
-#ifdef PA_DPP
-            case DiscordIntegrationSettingsOption::Library::DPP:
-                DppClient::Client::instance().disconnect();
-                break;
-#endif
-            default:;
-            }
+            DppClient::Client::instance().disconnect();
             value.on_config_value_changed(this);
         }
     );

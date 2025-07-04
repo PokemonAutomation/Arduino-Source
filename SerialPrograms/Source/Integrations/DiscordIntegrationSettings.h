@@ -29,12 +29,6 @@ public:
 
     BooleanCheckBoxOption run_on_start;
 
-    enum class Library{
-        SleepyDiscord,
-        DPP,
-    };
-    EnumDropdownOption<Library> library0;
-
     enum class CommandType{
         SlashCommands,
         MessageCommands,
@@ -43,11 +37,8 @@ public:
 
     StringOption token;
     StringOption command_prefix;
-    BooleanCheckBoxOption use_suffix;
     StringOption game_status;
     StringOption hello_message;
-    StringOption sudo;
-    StringOption owner;
     BooleanCheckBoxOption allow_buttons_from_users;
     DiscordIntegrationTable channels;
 };
