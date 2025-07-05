@@ -281,15 +281,15 @@ void VideoOverlayWidget::render_log(QPainter& painter){
     }
 }
 void VideoOverlayWidget::render_stats(QPainter& painter){
-    const double TEXT_SIZE = 0.02;
-    const double ROW_HEIGHT = 0.03;
+    const double TEXT_SIZE = 0.018;
+    const double ROW_HEIGHT = 0.025;
 
     QColor box_color(10, 10, 10, 200);
     painter.setPen(box_color);
 
     int width = this->width();
     int height = this->height();
-    int start_x = (int)(width * 0.75);
+    int start_x = (int)(width * 0.78);
 
     std::vector<OverlayStatSnapshot> lines;
     for (const auto& stat : *m_stats){
