@@ -44,36 +44,36 @@ const EnumDropdownDatabase<ThreadPriority>& PRIORITY_DATABASE(){
 }
 
 bool set_thread_priority(Logger& logger, ThreadPriority priority){
-    DWORD native_priority;
+    int native_priority;
     switch (priority){
     case ThreadPriority::Realtime:
-        native_priority = REALTIME_PRIORITY_CLASS;
+        native_priority = THREAD_PRIORITY_TIME_CRITICAL;
         break;
     case ThreadPriority::High:
-        native_priority = HIGH_PRIORITY_CLASS;
+        native_priority = THREAD_PRIORITY_HIGHEST;
         break;
     case ThreadPriority::AboveNormal:
-        native_priority = ABOVE_NORMAL_PRIORITY_CLASS;
+        native_priority = THREAD_PRIORITY_ABOVE_NORMAL;
         break;
     case ThreadPriority::Normal:
-        native_priority = NORMAL_PRIORITY_CLASS;
+        native_priority = THREAD_PRIORITY_NORMAL;
         break;
     case ThreadPriority::BelowNormal:
-        native_priority = BELOW_NORMAL_PRIORITY_CLASS;
+        native_priority = THREAD_PRIORITY_BELOW_NORMAL;
         break;
     case ThreadPriority::Low:
-        native_priority = IDLE_PRIORITY_CLASS;
+        native_priority = THREAD_PRIORITY_IDLE;
         break;
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Priority: " + std::to_string((int)priority));
     }
-    if (SetPriorityClass(GetCurrentThread(), native_priority)){
+    if (SetThreadPriority(GetCurrentThread(), native_priority)){
 //        cout << "Thread priority set to: " + PRIORITY_DATABASE().find(priority)->display << endl;
         logger.log("Thread priority set to: " + PRIORITY_DATABASE().find(priority)->display, COLOR_BLUE);
         return true;
     }
     DWORD error = GetLastError();
-    logger.log("Unable to set process priority. Error Code = " + std::to_string(error), COLOR_RED);
+    logger.log("Unable to set thread priority. Error Code = " + std::to_string(error), COLOR_RED);
     return false;
 }
 
