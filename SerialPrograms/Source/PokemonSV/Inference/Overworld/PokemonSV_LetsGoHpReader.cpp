@@ -23,7 +23,7 @@ using namespace Pokemon;
 LetsGoHpWatcher::LetsGoHpWatcher(Color color)
     : VisualInferenceCallback("LetsGoHpWatcher")
     , m_color(color)
-    , m_box(0.055, 0.928, 0.067, 0.012)
+    , m_box(0.057, 0.930, 0.065, 0.010)
 //    , m_last_known_value(-1)
 {}
 
