@@ -65,6 +65,14 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
 
     m_active_conversions--;
     m_cv.notify_all();
+
+    if (m_queued_convert){
+        m_queued_convert = false;
+        seqnum = m_cache.get_latest(frame, timestamp);
+        if (m_converting_seqnum < seqnum){
+            dispatch_conversion(seqnum, std::move(frame), timestamp);
+        }
+    }
 }
 bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept{
     //  Must call under the lock.
@@ -84,17 +92,6 @@ bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame
     try{
         std::function<void()> lambda = [=, this, frame = std::move(frame)](){
             convert(seqnum, std::move(frame), timestamp);
-
-            std::lock_guard<std::mutex> lg(m_lock);
-            if (m_queued_convert){
-                m_queued_convert = false;
-                QVideoFrame frame;
-                WallClock timestamp;
-                uint64_t seqnum = m_cache.get_latest(frame, timestamp);
-                if (m_converting_seqnum < seqnum){
-                    dispatch_conversion(seqnum, std::move(frame), timestamp);
-                }
-            }
         };
 
         *task = GlobalThreadPools::realtime_inference().try_dispatch(lambda);
@@ -106,9 +103,9 @@ bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame
 
         //  Dispatch failed. Queue it for later.
         m_queued_convert = true;
-    }catch (...){
-        m_pending_conversions.erase(seqnum);
-    }
+    }catch (...){}
+
+    m_pending_conversions.erase(seqnum);
 
     return false;
 }

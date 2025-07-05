@@ -38,6 +38,9 @@ AsyncTask::~AsyncTask(){
 
 
 void AsyncTask::report_cancelled() noexcept{
+#ifdef PA_SANITIZE_AsyncTask
+    auto scope = m_sanitizer.check_scope();
+#endif
     m_state.store(State::FINISHED, std::memory_order_release);
     {
         std::lock_guard<std::mutex> lg(m_lock);
@@ -46,6 +49,9 @@ void AsyncTask::report_cancelled() noexcept{
     m_state.store(State::SAFE_TO_DESTRUCT, std::memory_order_release);
 }
 void AsyncTask::run() noexcept{
+#ifdef PA_SANITIZE_AsyncTask
+    auto scope = m_sanitizer.check_scope();
+#endif
     try{
         m_task();
     }catch (...){
