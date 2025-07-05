@@ -42,8 +42,8 @@ void return_to_plaza(const ProgramInfo& info, VideoStream& stream, ProController
                     [&](ProControllerContext& context){
                         pbf_mash_button(context, BUTTON_B, 10000);
                     },
-                    { overworld }
-                    );
+                    {overworld}
+                );
                 if (ret_overworld == 0){
                     stream.log("Overworld detected.");
                 }

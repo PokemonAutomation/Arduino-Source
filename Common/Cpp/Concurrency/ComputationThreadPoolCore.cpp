@@ -8,10 +8,9 @@
 #include "ReverseLockGuard.h"
 #include "ComputationThreadPoolCore.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
