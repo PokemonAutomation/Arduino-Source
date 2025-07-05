@@ -603,6 +603,68 @@ void hatch_eggs_at_zero_gate(
     } // end hatching each egg
 }
 
+void hatch_eggs_at_area_three_lighthouse(
+    const ProgramInfo& info,
+    VideoStream& stream, ProControllerContext& context,
+    uint8_t num_eggs_in_party,
+    std::function<void(uint8_t)> egg_hatched_callback)
+{
+    bool got_off_ramp = false;
+    for(uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+        stream.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
+        stream.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
+
+        // Orient camera to look at same direction as player character
+        // This is needed because when save-load the game, the camera is reset
+        // to this location.
+        pbf_press_button(context, BUTTON_L, 50, 40);
+
+        context.wait_for_all_requests();
+
+        if (got_off_ramp == false){
+            AdvanceDialogWatcher dialog(COLOR_RED);
+            // first, navigate to a clear area in the team star base for circling motions
+            int ret = run_until<ProControllerContext>(
+                stream, context,
+                [&](ProControllerContext& context){
+                    if (egg_idx == 0){
+                        //Run forward a bit
+                        pbf_move_left_joystick(context, 128, 0, 150, 20);
+                        //Face at an angle, to avoid the tent to the left
+                        pbf_move_left_joystick(context, 0, 0, 50, 50);
+                        //Get on your mount
+                        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+                        //Press L
+                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        //Move forward
+                        pbf_move_left_joystick(context, 128, 0, 250, 0);
+                    }
+                },
+                {dialog}
+            );
+            if (ret == 0){
+                // egg hatching when going off ramp:
+                handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
+
+                stream.log("Reset location by flying back to lighthouse.");
+                // Use map to fly back to the flying spot
+                open_map_from_overworld(info, stream, context);
+                pbf_move_left_joystick(context, 255, 0, 20, 50);
+                fly_to_overworld_from_map(info, stream, context);
+                continue;
+            }
+
+            got_off_ramp = true;
+            stream.log("Got off ramp");
+        }
+
+        // Circular motions:
+        do_egg_cycle_motion(info, stream, context);
+
+        handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
+    } // end hatching each egg
+}
+
 void hatch_eggs_anywhere(
     const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,

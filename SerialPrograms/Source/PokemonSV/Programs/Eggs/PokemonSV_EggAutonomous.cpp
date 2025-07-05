@@ -185,6 +185,11 @@ EggAutonomous::EggAutonomous()
 void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    //Console Type is now required.
+    if (env.console.state().console_type() == ConsoleType::Unknown) {
+        throw UserSetupError(env.console, "Switch 1 or 2 must be set.");
+    }
+
     //  Connect the controller.
     pbf_press_button(context, BUTTON_L, 10, 100);
 
@@ -298,7 +303,12 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
-    picnic_at_zero_gate(env.program_info(), env.console, context);
+    if (env.console.state().console_type() == ConsoleType::Switch1) {
+        picnic_at_zero_gate(env.program_info(), env.console, context);
+    } else {
+        pbf_press_button(context, BUTTON_L, 50, 40);
+        picnic_from_overworld(env.program_info(), env.console, context);
+    }
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
     bool can_make_sandwich = eat_egg_sandwich_at_picnic(env, env.console, context,
         EGG_SANDWICH.EGG_SANDWICH_TYPE, LANGUAGE);
@@ -422,7 +432,11 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             stats.m_hatched++;
             env.update_stats();
         };
-        hatch_eggs_at_zero_gate(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+        if (env.console.state().console_type() == ConsoleType::Switch1) {
+            hatch_eggs_at_zero_gate(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+        } else {
+            hatch_eggs_at_area_three_lighthouse(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+        }
         reset_position_to_flying_spot(env, context);
 
         enter_box_system_from_overworld(env.program_info(), env.console, context);
@@ -633,7 +647,9 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Pr
 void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // Use map to fly back to the flying spot
     open_map_from_overworld(env.program_info(), env.console, context);
-    pbf_move_left_joystick(context, 128, 160, 20, 50);
+    if (env.console.state().console_type() == ConsoleType::Switch1) {
+        pbf_move_left_joystick(context, 128, 160, 20, 50);
+    }
     fly_to_overworld_from_map(env.program_info(), env.console, context);
 }
 
