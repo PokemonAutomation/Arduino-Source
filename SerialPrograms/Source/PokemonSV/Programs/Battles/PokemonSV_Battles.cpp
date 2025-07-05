@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
