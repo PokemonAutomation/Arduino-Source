@@ -116,10 +116,9 @@ class LetsGoEncounterBotTracker{
 public:
     LetsGoEncounterBotTracker(
         ProgramEnvironment& env,
-        VideoStream& stream, ProControllerContext& context,
+        VideoStream& stream,
         LetsGoEncounterBotStats& stats,
-        LetsGoKillSoundDetector& kill_sound,
-        OCR::LanguageOCROption& language
+        LetsGoKillSoundDetector& kill_sound
     );
 
     void throw_if_no_sound(std::chrono::milliseconds min_duration = std::chrono::milliseconds(10000)) const{
@@ -152,12 +151,7 @@ public:
     }
 
 private:
-    ProgramEnvironment& m_env;
-    VideoStream& m_stream;
-    ProControllerContext& m_context;
-    LetsGoEncounterBotStats& m_stats;
     LetsGoKillSoundDetector& m_kill_sound;
-    OCR::LanguageOCROption& m_language;
 
     EncounterRateTracker m_encounter_rate;
     EncounterFrequencies m_encounter_frequencies;

@@ -152,17 +152,11 @@ void DiscontiguousTimeTracker::add_block(WallClock start, WallClock end){
 
 LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
     ProgramEnvironment& env,
-    VideoStream& stream, ProControllerContext& context,
+    VideoStream& stream,
     LetsGoEncounterBotStats& stats,
-    LetsGoKillSoundDetector& kill_sound,
-    OCR::LanguageOCROption& language
+    LetsGoKillSoundDetector& kill_sound
 )
-    : m_env(env)
-    , m_stream(stream)
-    , m_context(context)
-    , m_stats(stats)
-    , m_kill_sound(kill_sound)
-    , m_language(language)
+    : m_kill_sound(kill_sound)
 {
     m_kill_sound.set_detected_callback([&](float){
         stream.log("Detected kill.");

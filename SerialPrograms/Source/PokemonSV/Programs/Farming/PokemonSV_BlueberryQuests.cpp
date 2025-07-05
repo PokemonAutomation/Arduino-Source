@@ -1333,10 +1333,9 @@ void quest_auto_battle(
 
     LetsGoEncounterBotStats stats;
     LetsGoEncounterBotTracker tracker(
-        env, stream, context,
+        env, stream,
         stats,
-        sensors.lets_go_kill,
-        BBQ_OPTIONS.LANGUAGE
+        sensors.lets_go_kill
     );
 
     uint64_t target_number = 10;

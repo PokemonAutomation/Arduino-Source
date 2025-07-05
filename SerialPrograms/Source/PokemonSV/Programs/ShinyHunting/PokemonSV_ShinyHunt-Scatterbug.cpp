@@ -178,10 +178,9 @@ void ShinyHuntScatterbug::program(SingleSwitchProgramEnvironment& env, ProContro
     m_battle_tracker = &battle_tracker;
 
     LetsGoEncounterBotTracker encounter_tracker(
-        env, env.console, context,
+        env, env.console,
         stats,
-        sensors.lets_go_kill,
-        LANGUAGE
+        sensors.lets_go_kill
     );
     m_encounter_tracker = &encounter_tracker;
 

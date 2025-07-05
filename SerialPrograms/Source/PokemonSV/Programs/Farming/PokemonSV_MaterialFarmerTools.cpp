@@ -190,10 +190,9 @@ void run_material_farmer(
         env.logger(), console, context
     );
     LetsGoEncounterBotTracker encounter_tracker(
-        env, console, context,
+        env, console,
         stats,
-        sensors.lets_go_kill,
-        options.LANGUAGE
+        sensors.lets_go_kill
     );
     WallClock start_time = current_time();
     WallClock last_sandwich_time = WallClock::min();

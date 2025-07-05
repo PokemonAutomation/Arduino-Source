@@ -499,10 +499,9 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Pro
     m_time_tracker = &time_tracker;
 
     LetsGoEncounterBotTracker encounter_tracker(
-        env, env.console, context,
+        env, env.console,
         stats,
-        sensors.lets_go_kill,
-        LANGUAGE
+        sensors.lets_go_kill
     );
     m_encounter_tracker = &encounter_tracker;
 
