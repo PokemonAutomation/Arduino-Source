@@ -64,7 +64,6 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
     }
 
     m_active_conversions--;
-    m_cv.notify_all();
 
     if (m_queued_convert){
         m_queued_convert = false;
@@ -73,6 +72,14 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
             dispatch_conversion(seqnum, std::move(frame), timestamp);
         }
     }
+
+    //  Warning: The moment we release the lock with (m_active_conversions == 0),
+    //  this class can be immediately destructed.
+
+    //  Therefore it is not safe to notify after releasing the lock.
+    m_cv.notify_all();
+
+    //  Lock is implicitly released here.
 }
 bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept{
     //  Must call under the lock.
