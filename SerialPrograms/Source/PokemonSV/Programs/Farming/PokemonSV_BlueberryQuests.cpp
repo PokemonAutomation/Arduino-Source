@@ -27,6 +27,7 @@
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
@@ -1325,8 +1326,18 @@ void quest_auto_battle(
 ){
     stream.log("Quest: Auto Battle 10/30");
 
+
+    OverworldSensors sensors(
+        env.logger(), stream, context
+    );
+
     LetsGoEncounterBotStats stats;
-    LetsGoEncounterBotTracker tracker(env, stream, context, stats, BBQ_OPTIONS.LANGUAGE);
+    LetsGoEncounterBotTracker tracker(
+        env, stream, context,
+        stats,
+        sensors.lets_go_kill,
+        BBQ_OPTIONS.LANGUAGE
+    );
 
     uint64_t target_number = 10;
 

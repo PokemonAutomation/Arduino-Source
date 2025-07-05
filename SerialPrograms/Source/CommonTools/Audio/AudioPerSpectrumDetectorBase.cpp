@@ -38,6 +38,9 @@ AudioPerSpectrumDetectorBase::AudioPerSpectrumDetectorBase(
     , m_start_timestamp(current_time())
     , m_spectrums_processed(0)
 {}
+void AudioPerSpectrumDetectorBase::set_detected_callback(DetectedCallback detected_callback){
+    m_detected_callback = std::move(detected_callback);
+}
 AudioPerSpectrumDetectorBase::~AudioPerSpectrumDetectorBase(){
     try{
         log_results();

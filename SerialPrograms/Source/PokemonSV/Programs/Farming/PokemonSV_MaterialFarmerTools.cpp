@@ -17,6 +17,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
@@ -185,9 +186,13 @@ void run_material_farmer(
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
+    OverworldSensors sensors(
+        env.logger(), console, context
+    );
     LetsGoEncounterBotTracker encounter_tracker(
         env, console, context,
         stats,
+        sensors.lets_go_kill,
         options.LANGUAGE
     );
     WallClock start_time = current_time();
@@ -623,7 +628,7 @@ void run_from_battles_and_back_to_pokecenter(
             stream.log("Detected battle. Now running away.", COLOR_PURPLE);
             stream.overlay().add_log("Detected battle. Now running away.");
             try{
-                run_from_battle(env.program_info(), stream, context);
+                run_from_battle(stream, context);
             }catch (OperationFailedException& e){
                 throw FatalProgramException(std::move(e));
             }

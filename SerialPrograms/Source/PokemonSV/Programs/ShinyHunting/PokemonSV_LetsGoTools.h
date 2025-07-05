@@ -18,6 +18,10 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoKillDetector.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
     class CancellableScope;
     class ProgramEnvironment;
@@ -114,6 +118,7 @@ public:
         ProgramEnvironment& env,
         VideoStream& stream, ProControllerContext& context,
         LetsGoEncounterBotStats& stats,
+        LetsGoKillSoundDetector& kill_sound,
         OCR::LanguageOCROption& language
     );
 
@@ -127,7 +132,10 @@ public:
     WallClock last_kill() const{
         return m_kill_sound.last_kill();
     }
-    const EncounterFrequencies& encounter_frequencies() const{
+    EncounterRateTracker& encounter_rate_tracker(){
+        return m_encounter_rate;
+    }
+    EncounterFrequencies& encounter_frequencies(){
         return m_encounter_frequencies;
     }
 
@@ -143,25 +151,17 @@ public:
         m_encounter_rate.report_start();
     }
 
-    //  Returns true if you should save the game.
-    void process_battle(
-        bool& caught, bool& should_save,
-        EncounterWatcher& watcher, EncounterBotCommonOptions& settings
-    );
-
 private:
     ProgramEnvironment& m_env;
     VideoStream& m_stream;
     ProControllerContext& m_context;
     LetsGoEncounterBotStats& m_stats;
-
+    LetsGoKillSoundDetector& m_kill_sound;
     OCR::LanguageOCROption& m_language;
 
     EncounterRateTracker m_encounter_rate;
     EncounterFrequencies m_encounter_frequencies;
 
-    LetsGoKillSoundDetector m_kill_sound;
-    InferenceSession m_session;
 };
 
 
@@ -178,6 +178,32 @@ bool use_lets_go_to_clear_in_front(
     bool throw_ball_if_bubble,
     std::function<void(ProControllerContext& context)>&& command
 );
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

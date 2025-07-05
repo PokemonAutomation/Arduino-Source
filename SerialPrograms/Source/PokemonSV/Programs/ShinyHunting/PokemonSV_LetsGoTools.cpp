@@ -154,155 +154,24 @@ LetsGoEncounterBotTracker::LetsGoEncounterBotTracker(
     ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
     LetsGoEncounterBotStats& stats,
+    LetsGoKillSoundDetector& kill_sound,
     OCR::LanguageOCROption& language
 )
     : m_env(env)
     , m_stream(stream)
     , m_context(context)
     , m_stats(stats)
+    , m_kill_sound(kill_sound)
     , m_language(language)
-    , m_kill_sound(stream.logger(), [&](float){
+{
+    m_kill_sound.set_detected_callback([&](float){
         stream.log("Detected kill.");
         m_encounter_rate.report_kill();
         stats.m_kills++;
         env.update_stats();
         return false;
-    })
-    , m_session(context, stream, {m_kill_sound})
-{}
-void LetsGoEncounterBotTracker::process_battle(
-    bool& caught, bool& should_save,
-    EncounterWatcher& watcher, EncounterBotCommonOptions& settings
-){
-    m_encounter_rate.report_encounter();
-    m_stats.m_encounters++;
-
-    Language language = m_language;
-
-    std::set<std::string> slugs;
-    if (language != Language::None){
-        slugs = read_singles_opponent(m_env.program_info(), m_stream, m_context, language);
-        m_encounter_frequencies += slugs;
-        m_env.log(m_encounter_frequencies.dump_sorted_map("Encounter Stats:\n"));
-    }
-
-    bool is_shiny = (bool)watcher.shiny_screenshot();
-    if (is_shiny){
-        m_stats.m_shinies++;
-        if (settings.VIDEO_ON_SHINY){
-            m_context.wait_for(std::chrono::seconds(3));
-            pbf_press_button(m_context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
-        }
-    }
-    m_env.update_stats();
-
-    send_encounter_notification(
-        m_env,
-        settings.NOTIFICATION_NONSHINY,
-        settings.NOTIFICATION_SHINY,
-        language != Language::None,
-        is_shiny,
-        {{slugs, is_shiny ? ShinyType::UNKNOWN_SHINY : ShinyType::NOT_SHINY}},
-        watcher.lowest_error_coefficient(),
-        watcher.shiny_screenshot(),
-        &m_encounter_frequencies
-    );
-
-    //  Set default action: stop program if shiny, otherwise run away.
-    EncounterActionsEntry action;
-    action.action = is_shiny
-        ? EncounterActionsAction::STOP_PROGRAM
-        : EncounterActionsAction::RUN_AWAY;
-
-    //  Iterate the actions table. If found an entry matches the pokemon species,
-    //  set the action to be what specified in the entry.
-    for (EncounterActionsEntry& entry : settings.ACTIONS_TABLE.snapshot()){
-        if (language == Language::None){
-            throw UserSetupError(m_stream.logger(), "You must set the game language to use the actions table.");
-        }
-
-        //  See if Pokemon name matches.
-        auto iter = slugs.find(entry.pokemon);
-        if (iter == slugs.end()){
-            continue;
-        }
-
-        switch (entry.shininess){
-        case EncounterActionsShininess::ANYTHING:
-            break;
-        case EncounterActionsShininess::NOT_SHINY:
-            if (is_shiny){
-                continue;
-            }
-            break;
-        case EncounterActionsShininess::SHINY:
-            if (!is_shiny){
-                continue;
-            }
-            break;
-        }
-
-        action = std::move(entry);
-    }
-
-    //  Run the chosen action.
-    switch (action.action){
-    case EncounterActionsAction::RUN_AWAY:
-        try{
-            run_from_battle(m_env.program_info(), m_stream, m_context);
-        }catch (OperationFailedException& e){
-            throw FatalProgramException(std::move(e));
-        }
-        caught = false;
-        should_save = false;
-        return;
-    case EncounterActionsAction::STOP_PROGRAM:
-        throw ProgramFinishedException();
-//        throw ProgramFinishedException(m_stream, "", true);
-    case EncounterActionsAction::THROW_BALLS:
-    case EncounterActionsAction::THROW_BALLS_AND_SAVE:
-        if (language == Language::None){
-            throw InternalProgramError(&m_stream.logger(), PA_CURRENT_FUNCTION, "Language is not set.");
-        }
-
-        CatchResults result = basic_catcher(
-            m_stream, m_context,
-            language,
-            action.ball, action.ball_limit,
-            settings.USE_FIRST_MOVE_IF_CANNOT_THROW_BALL
-        );
-        send_catch_notification(
-            m_env,
-            settings.NOTIFICATION_CATCH_SUCCESS,
-            settings.NOTIFICATION_CATCH_FAILED,
-            &slugs,
-            action.ball,
-            result.balls_used,
-            result.result
-        );
-
-        switch (result.result){
-        case CatchResult::POKEMON_CAUGHT:
-        case CatchResult::POKEMON_FAINTED:
-            break;
-        default:
-            throw_and_log<FatalProgramException>(
-                m_stream.logger(), ErrorReport::NO_ERROR_REPORT,
-                "Unable to recover from failed catch.",
-                m_stream
-            );
-        }
-
-        caught = result.result == CatchResult::POKEMON_CAUGHT;
-        should_save = caught && action.action == EncounterActionsAction::THROW_BALLS_AND_SAVE;
-        return;
-    }
-
-    caught = false;
-    should_save = false;
+    });
 }
-
-
 
 
 

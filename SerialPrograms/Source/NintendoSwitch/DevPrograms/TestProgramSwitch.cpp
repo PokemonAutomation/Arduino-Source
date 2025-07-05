@@ -133,6 +133,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_StartBattleYellowBar.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -286,9 +287,25 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    auto screenshot = feed.snapshot();
 
 
-#if 1
+
+    StartBattleYellowBarDetector detector(COLOR_RED);
+    cout << detector.detect(screenshot) << endl;
+
+
+
+
+//    cout << "asdf" << endl;
+//    cout << (int)settings_detect_console_type(console, context) << endl;
+
+
+
+//    DateReader_Switch2_US reader(COLOR_RED);
+//    reader.read_date(logger, screenshot);
+
+#if 0
     HomeMenuDetector detector0(console);
     StartGameUserSelectDetector detector1(console);
     UpdatePopupDetector detector2(console);

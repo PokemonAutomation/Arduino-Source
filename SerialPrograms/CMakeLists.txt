@@ -1543,6 +1543,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h
     Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.h
+    Source/PokemonSV/Inference/Battles/PokemonSV_StartBattleYellowBar.cpp
+    Source/PokemonSV/Inference/Battles/PokemonSV_StartBattleYellowBar.h
     Source/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp
@@ -1597,6 +1599,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h
+    Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.cpp
+    Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp
