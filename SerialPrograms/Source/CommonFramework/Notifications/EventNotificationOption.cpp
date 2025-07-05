@@ -226,7 +226,7 @@ EventNotificationOption::EventNotificationOption(
     add_option(m_data->m_enabled, "Enabled");
     add_option(m_data->m_label, "");
     add_option(m_data->m_ping, "Ping");
-    add_option(m_data->m_screenshot, "Screenshot");
+    add_option(m_data->m_screenshot, "Screenshot0");
     add_option(m_data->m_tags, "Tags");
     add_option(m_data->m_rate_limit_seconds, "RateLimitSeconds");
     add_option(m_test_button, "");

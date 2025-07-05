@@ -59,14 +59,14 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(
     , NOTIFICATION_ERROR_RECOVERABLE(
         "Program Error (Recoverable)",
         true, false,
-        ImageAttachmentMode::PNG,
+        ImageAttachmentMode::JPG,
         error_notification_tags
 
     )
     , NOTIFICATION_ERROR_FATAL(
         "Program Error (Fatal)",
         true, true,
-        ImageAttachmentMode::PNG,
+        ImageAttachmentMode::JPG,
         error_notification_tags
     )
 {}
