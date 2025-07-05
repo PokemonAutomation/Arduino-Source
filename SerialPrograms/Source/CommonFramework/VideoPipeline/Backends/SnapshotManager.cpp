@@ -63,26 +63,61 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
         m_converted_snapshot = std::move(snapshot);
     }
 
-//    if (timestamp > m_converted_snapshot.timestamp){
-//    }
     m_active_conversions--;
-//    m_pending_conversions.erase(seqnum);
     m_cv.notify_all();
 }
-void SnapshotManager::dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp){
+bool SnapshotManager::try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept{
     //  Must call under the lock.
-    std::function<void()> lambda = [=, this, frame = std::move(frame)](){
-        convert(seqnum, std::move(frame), timestamp);
-    };
 
-    auto task = GlobalThreadPools::realtime_inference().try_dispatch(lambda);
-    if (task){
-//        cout << "dispatch_conversion: Success..." << endl;
-        m_converting_seqnum = seqnum;
-        m_pending_conversions[seqnum] = std::move(task);
-    }else{
-//        cout << "dispatch_conversion: Failed..." << endl;
+    std::unique_ptr<AsyncTask>* task;
+    try{
+        task = &m_pending_conversions[seqnum];
+
+        //  This frame is already being converted.
+        if (*task){
+            return false;
+        }
+    }catch (...){
+        return false;
+    }
+
+    try{
+        std::function<void()> lambda = [=, this, frame = std::move(frame)](){
+            convert(seqnum, std::move(frame), timestamp);
+
+            std::lock_guard<std::mutex> lg(m_lock);
+            if (m_queued_convert){
+                m_queued_convert = false;
+                QVideoFrame frame;
+                WallClock timestamp;
+                uint64_t seqnum = m_cache.get_latest(frame, timestamp);
+                if (m_converting_seqnum < seqnum){
+                    dispatch_conversion(seqnum, std::move(frame), timestamp);
+                }
+            }
+        };
+
+        *task = GlobalThreadPools::realtime_inference().try_dispatch(lambda);
+
+        //  Dispatch was successful. We're done.
+        if (*task){
+            return true;
+        }
+
+        //  Dispatch failed. Queue it for later.
         m_queued_convert = true;
+    }catch (...){
+        m_pending_conversions.erase(seqnum);
+    }
+
+    return false;
+}
+void SnapshotManager::dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept{
+    //  Must call under the lock.
+    m_active_conversions++;
+
+    if (!try_dispatch_conversion(seqnum, std::move(frame), timestamp)){
+        m_active_conversions--;
     }
 
     //  Cleanup finished tasks.
@@ -179,13 +214,7 @@ VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(){
     //  Dispatch this frame for conversion.
     if (m_converting_seqnum < seqnum){
 //        cout << "snapshot_recent_nonblocking(): Dispatching..." << endl;
-        try{
-            m_active_conversions++;
-            dispatch_conversion(seqnum, std::move(frame), timestamp);
-        }catch (...){
-            m_active_conversions--;
-            throw;
-        }
+        dispatch_conversion(seqnum, std::move(frame), timestamp);
     }
 
     //  Cached snapshot isn't too old. Return it.
