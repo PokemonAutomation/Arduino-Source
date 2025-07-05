@@ -257,8 +257,12 @@ void SendableErrorReport::save(Logger* logger) const{
         report["Messages"] = std::move(messages);
     }
     if (m_image){
-        if (m_image.save(m_directory + "Screenshot.png")){
-            report["Screenshot"] = "Screenshot.png";
+        //  4k .png images are too big for current Discord limits.
+        std::string extension = m_image.width() > 1920
+            ? ".jpg"
+            : ".png";
+        if (m_image.save(m_directory + "Screenshot" + extension)){
+            report["Screenshot"] = "Screenshot" + extension;
         }
     }
     if (!m_video_name.empty()){
