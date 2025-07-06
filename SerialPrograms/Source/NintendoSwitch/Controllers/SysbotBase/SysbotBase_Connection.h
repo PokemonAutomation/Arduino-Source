@@ -55,7 +55,7 @@ private:
     virtual void on_connect_finished(const std::string& error_message) override;
     virtual void on_receive_data(const void* data, size_t bytes) override;
 
-    void process_message(const std::string& message);
+    void process_message(const std::string& message, WallClock timestamp);
     void set_mode(const std::string& sbb_version);
 
 private:
@@ -66,7 +66,8 @@ private:
 
     std::string m_connecting_message;
 //    std::string m_version;
-    WallClock m_last_receive;
+    WallClock m_last_ping_send;
+    WallClock m_last_ping_receive;
     std::deque<char> m_receive_buffer;
 
     SpinLock m_send_lock;

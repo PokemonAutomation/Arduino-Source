@@ -49,7 +49,8 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
 )
     : m_logger(logger)
     , m_supports_command_queue(false)
-    , m_last_receive(WallClock::min())
+    , m_last_ping_send(WallClock::min())
+    , m_last_ping_receive(WallClock::min())
 {
     QHostAddress address;
     int port;
@@ -122,7 +123,7 @@ std::string pretty_print(uint64_t x){
 
 void TcpSysbotBase_Connection::thread_loop(){
     std::unique_lock<std::mutex> lg(m_lock);
-    WallClock send_time = current_time();
+    m_last_ping_send = current_time();
     while (true){
         ClientSocket::State state = m_socket.state();
         if (state == ClientSocket::State::DESTRUCTING || state == ClientSocket::State::NOT_RUNNING){
@@ -131,30 +132,14 @@ void TcpSysbotBase_Connection::thread_loop(){
 
         WallClock now = current_time();
 
-        if (m_last_receive == WallClock::min()){
-            send_time = now;
-            write_data("getVersion\r\n");
-        }else if (send_time < m_last_receive && now - m_last_receive < std::chrono::seconds(1)){
-            std::chrono::microseconds latency = std::chrono::duration_cast<std::chrono::microseconds>(m_last_receive - send_time);
-            std::string str = "Response Time: " + pretty_print(latency.count()) + " ms";
-            if (latency < 10ms){
-                set_status_line1(str, COLOR_BLUE);
-            }else if (latency < 50ms){
-                set_status_line1(str, COLOR_DARKGREEN);
-            }else{
-                set_status_line1(str, COLOR_ORANGE);
-            }
-            send_time = current_time();
-            write_data("getVersion\r\n");
-//            cout << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - send_time) << endl;
-        }else{
-            std::chrono::milliseconds time_since = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_last_receive);
+        std::chrono::milliseconds time_since = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_last_ping_receive);
+        if (time_since > std::chrono::seconds(5)){
             std::string str = "Last Ack: " + pretty_print(time_since.count()) + " seconds ago";
             set_status_line1(str, COLOR_RED);
-            send_time = current_time();
-            write_data("getVersion\r\n");
-//            cout << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - send_time) << endl;
         }
+
+        m_last_ping_send = current_time();
+        write_data("getVersion\r\n");
         m_cv.wait_for(lg, std::chrono::seconds(1));
     }
 }
@@ -185,11 +170,6 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
 //    cout << "on_receive_data(): " << std::string((const char*)data, bytes - 2) << endl;
 
     WallClock now = current_time();
-    {
-        std::lock_guard<std::mutex> lg(m_lock);
-        m_last_receive = now;
-    }
-
 
     try{
         const char* ptr = (const char*)data;
@@ -206,7 +186,8 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
                 std::string(
                     m_receive_buffer.begin(),
                     m_receive_buffer.end()
-                )
+                ),
+                now
             );
             m_receive_buffer.clear();
         }
@@ -215,7 +196,7 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
 
     }catch (...){}
 }
-void TcpSysbotBase_Connection::process_message(const std::string& message){
+void TcpSysbotBase_Connection::process_message(const std::string& message, WallClock timestamp){
 //    cout << "sys-botbase Response: " << message << endl;
 
     m_listeners.run_method_unique(&Listener::on_message, message);
@@ -229,6 +210,20 @@ void TcpSysbotBase_Connection::process_message(const std::string& message){
         set_status_line0("sys-botbase: Version " + str, COLOR_BLUE);
 
         std::lock_guard<std::mutex> lg(m_lock);
+        m_last_ping_receive = timestamp;
+
+        if (m_last_ping_send != WallClock::min()){
+            std::chrono::microseconds latency = std::chrono::duration_cast<std::chrono::microseconds>(timestamp - m_last_ping_send);
+            std::string text = "Response Time: " + pretty_print(latency.count()) + " ms";
+            if (latency < 10ms){
+                set_status_line1(text, COLOR_BLUE);
+            }else if (latency < 50ms){
+                set_status_line1(text, COLOR_DARKGREEN);
+            }else{
+                set_status_line1(text, COLOR_ORANGE);
+            }
+        }
+
         if (!m_thread.joinable()){
             set_mode(str);
         }
