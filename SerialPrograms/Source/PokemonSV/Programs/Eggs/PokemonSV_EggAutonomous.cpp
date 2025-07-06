@@ -334,7 +334,13 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     leave_picnic(env.program_info(), env.console, context);
 
     // Reset position to flying spot:
-    reset_position_to_flying_spot(env, context);
+    if (env.console.state().console_type() == ConsoleType::Switch1) {
+        reset_position_to_flying_spot(env, context);
+    } else {
+        //Switch 2: We haven't moved much so just fly.
+        open_map_from_overworld(env.program_info(), env.console, context);
+        fly_to_overworld_from_map(env.program_info(), env.console, context);
+    }
 
     return picnic_party_to_hatch_party(env, context);
 }
@@ -649,6 +655,9 @@ void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment
     open_map_from_overworld(env.program_info(), env.console, context);
     if (env.console.state().console_type() == ConsoleType::Switch1) {
         pbf_move_left_joystick(context, 128, 160, 20, 50);
+    } else { //Switch 2
+        pbf_move_left_joystick(context, 140, 0, 150ms, 50ms);
+        pbf_press_button(context, BUTTON_ZL, 40, 100);
     }
     fly_to_overworld_from_map(env.program_info(), env.console, context);
 }
