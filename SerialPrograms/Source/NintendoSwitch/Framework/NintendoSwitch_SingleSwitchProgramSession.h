@@ -15,7 +15,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramSession_H
 
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ProgramSession.h"
 #include "NintendoSwitch_SwitchSystemSession.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -50,7 +49,6 @@ private:
     SingleSwitchProgramOption& m_option;
     SwitchSystemSession m_system;
 
-    SpinLock m_lock;
     std::atomic<CancellableScope*> m_scope;
 };
 

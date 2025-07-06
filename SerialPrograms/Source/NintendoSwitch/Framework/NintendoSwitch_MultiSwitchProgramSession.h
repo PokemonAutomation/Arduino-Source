@@ -59,10 +59,9 @@ private:
     MultiSwitchProgramOption& m_option;
     MultiSwitchSystemSession m_system;
 
-    SpinLock m_lock;
     std::atomic<CancellableScope*> m_scope;
 
-    std::set<Listener*> m_listeners;
+    ListenerSet<Listener> m_listeners;
 
     LifetimeSanitizer m_sanitizer;
 };
