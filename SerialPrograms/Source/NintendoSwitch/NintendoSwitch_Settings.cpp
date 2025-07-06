@@ -98,10 +98,16 @@ ConsoleSettings::ConsoleSettings()
         true
     )
     , TOLERATE_SYSTEM_UPDATE_MENU_SLOW(
-        "<b>Tolerate System Update Menu (slow):</b><br"
-        ">Some programs can bypass the system update menu, but will take a noticeable performance hit. "
+        "<b>Tolerate System Update Menu (slow):</b><br>"
+        "Some programs can bypass the system update menu, but will take a noticeable performance hit. "
         "Setting this to true enables this.",
         LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
+    , ENABLE_SBB3_PINGS(
+        "<b>Enable sys-botbase 3 Pings:</b><br>"
+        "Use sys-botbase's ping command for latency measurement instead of \"getVersion\".",
+        LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
     , SWITCH1_DIGIT_ENTRY(false)
@@ -119,6 +125,7 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     PA_ADD_OPTION(TIMING_OPTIONS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(ENABLE_SBB3_PINGS);
         PA_ADD_OPTION(SWITCH1_DIGIT_ENTRY);
         PA_ADD_OPTION(SWITCH1_KEYBOARD_ENTRY);
         PA_ADD_OPTION(SWITCH2_DIGIT_ENTRY);

@@ -9,11 +9,14 @@
 //#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "SysbotBase_Connection.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
+
+
 
 namespace PokemonAutomation{
 namespace SysbotBase{
@@ -139,7 +142,18 @@ void TcpSysbotBase_Connection::thread_loop(){
         }
 
         m_last_ping_send = current_time();
-        write_data("getVersion\r\n");
+        if (supports_command_queue() && NintendoSwitch::ConsoleSettings::instance().ENABLE_SBB3_PINGS){
+            //  If we're more than 60 pings behind, just start clearing them.
+            while (m_active_pings.size() > 60){
+                m_active_pings.erase(m_active_pings.begin());
+            }
+
+            m_active_pings[m_ping_seqnum] = m_last_ping_send;
+            write_data("ping " + std::to_string(m_ping_seqnum) + "\r\n");
+            m_ping_seqnum++;
+        }else{
+            write_data("getVersion\r\n");
+        }
         m_cv.wait_for(lg, std::chrono::seconds(1));
     }
 }
@@ -229,16 +243,50 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
         }
     }
 
+    size_t pos = str.find("ping");
+    if (pos != std::string::npos){
+        const char* ptr = &str[pos];
+        while (true){
+            char ch = ptr[0];
+            if (ch < 32 || ch == ' ' || ch == '\t'){
+                ptr++;
+                continue;
+            }
+            break;
+        }
+        size_t ping_seqnum = atoll(ptr);
+
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_last_ping_receive = timestamp;
+        auto iter = m_active_pings.find(ping_seqnum);
+        if (iter == m_active_pings.end()){
+            m_logger.log("Received Unexpected Ping: " + std::to_string(ping_seqnum));
+            return;
+        }
+
+        std::chrono::microseconds latency = std::chrono::duration_cast<std::chrono::microseconds>(timestamp - iter->second);
+        std::string text = "Response Time: " + pretty_print(latency.count()) + " ms";
+        if (latency < 10ms){
+            set_status_line1(text, COLOR_BLUE);
+        }else if (latency < 50ms){
+            set_status_line1(text, COLOR_DARKGREEN);
+        }else{
+            set_status_line1(text, COLOR_ORANGE);
+        }
+
+        m_active_pings.erase(iter);
+    }
+
 }
 void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
     if (sbb_version.rfind("2.", 0) == 0){
         m_logger.log("Detected sbb2. Using old (slow) command set.", COLOR_ORANGE);
         write_data("configure mainLoopSleepTime 0\r\n");
-        m_supports_command_queue = false;
+        m_supports_command_queue.store(false, std::memory_order_relaxed);
     }else if (PreloadSettings::instance().DEVELOPER_MODE && sbb_version.rfind("3.", 0) == 0){
         m_logger.log("Detected sbb3. Using CC command queue.", COLOR_BLUE);
         write_data("configure enablePA 1\r\n");
-        m_supports_command_queue = true;
+        m_supports_command_queue.store(true, std::memory_order_relaxed);
     }else{
         m_logger.log("Unrecognized sbb version: " + sbb_version, COLOR_RED);
         return;
