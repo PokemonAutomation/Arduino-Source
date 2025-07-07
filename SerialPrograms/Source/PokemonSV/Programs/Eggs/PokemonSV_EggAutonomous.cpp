@@ -440,10 +440,14 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
         };
         if (env.console.state().console_type() == ConsoleType::Switch1) {
             hatch_eggs_at_zero_gate(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+            reset_position_to_flying_spot(env, context);
         } else {
             hatch_eggs_at_area_three_lighthouse(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+            reset_position_to_flying_spot(env, context);
+            //Clear spawns - over time floette/vivillon drift over past the fence (usually aroudn the 3rd batch)
+            picnic_from_overworld(env.program_info(), env.console, context);
+            leave_picnic(env.program_info(), env.console, context);
         }
-        reset_position_to_flying_spot(env, context);
 
         enter_box_system_from_overworld(env.program_info(), env.console, context);
         
@@ -656,7 +660,7 @@ void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment
     if (env.console.state().console_type() == ConsoleType::Switch1) {
         pbf_move_left_joystick(context, 128, 160, 20, 50);
     } else { //Switch 2
-        pbf_move_left_joystick(context, 140, 0, 150ms, 50ms);
+        pbf_move_left_joystick(context, 130, 0, 150ms, 50ms);
         pbf_press_button(context, BUTTON_ZL, 40, 100);
     }
     fly_to_overworld_from_map(env.program_info(), env.console, context);
