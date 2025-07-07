@@ -245,7 +245,7 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
 
     size_t pos = str.find("ping");
     if (pos != std::string::npos){
-        const char* ptr = &str[pos];
+        const char* ptr = &str[pos + 4];
         while (true){
             char ch = ptr[0];
             if (ch < 32 || ch == ' ' || ch == '\t'){
