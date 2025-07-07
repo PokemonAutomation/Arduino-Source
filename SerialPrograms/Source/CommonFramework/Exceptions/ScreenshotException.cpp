@@ -73,12 +73,15 @@ void ScreenshotException::add_stream_if_needed(VideoStream& stream){
     }
 }
 
-ImageViewRGB32 ScreenshotException::screenshot() const{
+ImageViewRGB32 ScreenshotException::screenshot_view() const{
     if (m_screenshot){
         return *m_screenshot;
     }else{
         return ImageViewRGB32();
     }
+}
+std::shared_ptr<const ImageRGB32> ScreenshotException::screenshot() const{
+    return m_screenshot;
 }
 
 
@@ -94,7 +97,7 @@ void ScreenshotException::send_notification(ProgramEnvironment& env, EventNotifi
             env.program_info(),
             name(),
             embeds,
-            screenshot(),
+            screenshot_view(),
             m_stream ? &m_stream->history() : nullptr
         );
     }
@@ -104,7 +107,7 @@ void ScreenshotException::send_notification(ProgramEnvironment& env, EventNotifi
         color(),
         name(),
         std::move(embeds), "",
-        screenshot()
+        screenshot_view()
     );
 }
 

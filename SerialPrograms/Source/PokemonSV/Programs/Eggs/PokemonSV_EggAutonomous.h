@@ -61,7 +61,7 @@ private:
     void handle_recoverable_error(
         SingleSwitchProgramEnvironment& env, ProControllerContext& context,
         EventNotificationOption& notification,
-        OperationFailedException& e,
+        const OperationFailedException& e,
         size_t& consecutive_failures
     );
 

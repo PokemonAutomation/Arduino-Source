@@ -9,6 +9,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -231,6 +232,18 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             try{
                 num_party_eggs = fetch_eggs_full_routine(env, context);
                 break;
+            }catch (UnexpectedBattleException& e){
+                handle_recoverable_error(
+                    env, context,
+                    NOTIFICATION_ERROR_RECOVERABLE,
+                    OperationFailedException(
+                        ErrorReport::NO_ERROR_REPORT,
+                        e.message(),
+                        nullptr,
+                        e.screenshot()
+                    ),
+                    consecutive_failures
+                );
             }catch (OperationFailedException& e){
                 handle_recoverable_error(env, context, NOTIFICATION_ERROR_RECOVERABLE, e, consecutive_failures);
             } // end try catch
@@ -692,7 +705,7 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
 void EggAutonomous::handle_recoverable_error(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     EventNotificationOption& notification,
-    OperationFailedException& e,
+    const OperationFailedException& e,
     size_t& consecutive_failures
 ){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();

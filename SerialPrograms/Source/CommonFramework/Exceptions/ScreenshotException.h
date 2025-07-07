@@ -67,7 +67,8 @@ public:
 public:
 //    virtual const char* name() const override{ return "ScreenshotException"; }
     virtual std::string message() const override{ return m_message; }
-    ImageViewRGB32 screenshot() const;
+    ImageViewRGB32 screenshot_view() const;
+    std::shared_ptr<const ImageRGB32> screenshot() const;
 
     virtual Color color() const{ return COLOR_RED; }
     virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const;
