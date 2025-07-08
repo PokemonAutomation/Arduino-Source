@@ -132,10 +132,12 @@ CommandRow::CommandRow(
         m_overlay_text, &QCheckBox::checkStateChanged,
         this, [this](Qt::CheckState state){ m_session.set_enabled_text(state == Qt::Checked); }
     );
-    connect(
-        m_overlay_images, &QCheckBox::checkStateChanged,
-        this, [this](Qt::CheckState state){ m_session.set_enabled_images(state == Qt::Checked); }
-    );
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        connect(
+            m_overlay_images, &QCheckBox::checkStateChanged,
+            this, [this](Qt::CheckState state){ m_session.set_enabled_images(state == Qt::Checked); }
+        );
+    }
     connect(
         m_overlay_log, &QCheckBox::checkStateChanged,
         this, [this](Qt::CheckState state){ m_session.set_enabled_log(state == Qt::Checked); }
