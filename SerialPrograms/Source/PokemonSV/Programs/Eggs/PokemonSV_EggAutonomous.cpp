@@ -232,20 +232,15 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             try{
                 num_party_eggs = fetch_eggs_full_routine(env, context);
                 break;
-            }catch (UnexpectedBattleException& e){
-                handle_recoverable_error(
+            }catch (ScreenshotException& e){
+                if (handle_recoverable_error(
                     env, context,
                     NOTIFICATION_ERROR_RECOVERABLE,
-                    OperationFailedException(
-                        ErrorReport::NO_ERROR_REPORT,
-                        e.message(),
-                        nullptr,
-                        e.screenshot()
-                    ),
+                    e,
                     consecutive_failures
-                );
-            }catch (OperationFailedException& e){
-                handle_recoverable_error(env, context, NOTIFICATION_ERROR_RECOVERABLE, e, consecutive_failures);
+                )){
+                    throw;
+                }
             } // end try catch
         } // end recoverable loop to fetch eggs:
 
@@ -256,8 +251,19 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 hatch_eggs_full_routine(env, context, num_party_eggs);
                 consecutive_failures = 0;
                 break;
-            }catch (OperationFailedException& e){
-                handle_recoverable_error(env, context, NOTIFICATION_ERROR_RECOVERABLE, e, consecutive_failures);
+            }catch (ProgramFinishedException&){
+                env.update_stats();
+                GO_HOME_WHEN_DONE.run_end_of_program(context);
+                send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+                return;
+            }catch (ScreenshotException& e){
+                if (handle_recoverable_error(
+                    env, context,
+                    NOTIFICATION_ERROR_RECOVERABLE,
+                    e, consecutive_failures
+                )){
+                    throw;
+                }
                 // After resetting the game, we don't know how many eggs in party
                 num_party_eggs = -1;
 
@@ -268,11 +274,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                     game_already_resetted = true;
                     break;
                 }
-            }catch (ProgramFinishedException&){
-                env.update_stats();
-                GO_HOME_WHEN_DONE.run_end_of_program(context);
-                send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-                return;
             } // end try catch
         } // end recoverable loop to hatch eggs
 
@@ -702,10 +703,10 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
 }
 
 
-void EggAutonomous::handle_recoverable_error(
+bool EggAutonomous::handle_recoverable_error(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     EventNotificationOption& notification,
-    const OperationFailedException& e,
+    const ScreenshotException& e,
     size_t& consecutive_failures
 ){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
@@ -720,7 +721,7 @@ void EggAutonomous::handle_recoverable_error(
     }
     // if there is no auto save, then we shouldn't reset game to lose previous progress.
     if (AUTO_SAVING == AutoSave::NoAutoSave){
-        throw std::move(e);
+        return true;
     }
 
     if (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage){
@@ -730,7 +731,7 @@ void EggAutonomous::handle_recoverable_error(
         // in this auto saving mode, every batch of eggs have been saved beforehand.
         env.log("Found an error before we can save the game to protect the newly kept pokemon.", COLOR_RED);
         env.log("Don't reset game to protect it.", COLOR_RED);
-        throw std::move(e);
+        return true;
     }
 
     consecutive_failures++;
@@ -744,6 +745,8 @@ void EggAutonomous::handle_recoverable_error(
 
     env.log("Reset game to handle recoverable error");
     reset_game(env.program_info(), env.console, context);
+
+    return false;
 }
 
 
