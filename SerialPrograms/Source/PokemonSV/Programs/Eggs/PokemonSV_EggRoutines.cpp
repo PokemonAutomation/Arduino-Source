@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -22,6 +23,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
@@ -122,6 +124,7 @@ void do_egg_cycle_motion(
     VideoStream& stream, ProControllerContext& context
 ){
     AdvanceDialogWatcher dialog(COLOR_RED);
+    NormalBattleMenuWatcher battle_menu(COLOR_GREEN);
     int ret = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
@@ -132,9 +135,22 @@ void do_egg_cycle_motion(
             ssf_press_right_joystick(context, 255, 128, 0ms, std::chrono::minutes(10));
             pbf_press_button(context, BUTTON_LCLICK, std::chrono::minutes(10), 0ms);
         },
-        {dialog}
+        {
+            dialog,
+            battle_menu,
+        }
     );
-    if (ret < 0){
+    switch (ret){
+    case 0:
+        break;
+    case 1:
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
+            "Detected battle menu. You got attacked!",
+            stream
+        );
+        break;
+    case 2:
         dump_image_and_throw_recoverable_exception(
             info, stream, "NoEggToHatch",
             "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes."

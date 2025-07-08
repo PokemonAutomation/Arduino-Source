@@ -204,7 +204,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
             hatch_one_box(env, context);
         }
-    } catch(OperationFailedException&){
+    } catch(Exception&){
         stats.m_errors++;
         env.update_stats();
         throw;

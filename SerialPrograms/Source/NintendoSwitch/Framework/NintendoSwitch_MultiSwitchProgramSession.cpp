@@ -25,13 +25,11 @@ namespace NintendoSwitch{
 
 void MultiSwitchProgramSession::add_listener(Listener& listener){
     auto ScopeCheck = m_sanitizer.check_scope();
-    WriteSpinLock lg(m_lock);
-    m_listeners.insert(&listener);
+    m_listeners.add(listener);
 }
 void MultiSwitchProgramSession::remove_listener(Listener& listener){
     auto ScopeCheck = m_sanitizer.check_scope();
-    WriteSpinLock lg(m_lock);
-    m_listeners.erase(&listener);
+    m_listeners.remove(listener);
 }
 
 
@@ -100,7 +98,13 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
         );
     }
 
-    m_scope.store(&scope, std::memory_order_release);
+    {
+        std::lock_guard<std::mutex> lg(program_lock());
+        if (current_state() != ProgramState::RUNNING){
+            return;
+        }
+        m_scope.store(&scope, std::memory_order_release);
+    }
 
     try{
         m_option.instance().program(env, scope);
@@ -114,31 +118,28 @@ void MultiSwitchProgramSession::run_program_instance(MultiSwitchProgramEnvironme
                 env.consoles[c].controller().cancel_all_commands();
             }catch (...){}
         }
+        std::lock_guard<std::mutex> lg(program_lock());
         m_scope.store(nullptr, std::memory_order_release);
         throw;
     }
+
+    std::lock_guard<std::mutex> lg(program_lock());
     m_scope.store(nullptr, std::memory_order_release);
 }
 void MultiSwitchProgramSession::internal_stop_program(){
     auto ScopeCheck = m_sanitizer.check_scope();
-    WriteSpinLock lg(m_lock);
-//    size_t consoles = m_system.count();
-//    for (size_t c = 0; c < consoles; c++){
-//        m_system[c].serial_session().stop();
-//    }
-    CancellableScope* scope = m_scope.load(std::memory_order_acquire);
-    if (scope != nullptr){
-        scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+    {
+        std::lock_guard<std::mutex> lg(program_lock());
+        CancellableScope* scope = m_scope.load(std::memory_order_acquire);
+        if (scope != nullptr){
+            scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+        }
     }
 
     //  Wait for program thread to finish.
     while (m_scope.load(std::memory_order_acquire) != nullptr){
         pause();
     }
-
-//    for (size_t c = 0; c < consoles; c++){
-//        m_system[c].serial_session().reset();
-//    }
 }
 void MultiSwitchProgramSession::internal_run_program(){
     auto ScopeCheck = m_sanitizer.check_scope();
@@ -273,11 +274,8 @@ void MultiSwitchProgramSession::shutdown(){
 }
 void MultiSwitchProgramSession::startup(size_t switch_count){
     auto ScopeCheck = m_sanitizer.check_scope();
-    WriteSpinLock lg(m_lock);
     m_option.instance().update_active_consoles(switch_count);
-    for (Listener* listener : m_listeners){
-        listener->redraw_options();
-    }
+    m_listeners.run_method_unique(&Listener::redraw_options);
 }
 
 

@@ -340,6 +340,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
                 material,
             }
         );
+        context.wait_for(std::chrono::milliseconds(250));
         next_wait_time = std::chrono::seconds(120);
         switch (ret){
         case 0:
@@ -396,8 +397,12 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_from_home(env.console, context, false);
 
-            if (!prompt.detect(env.console.video().snapshot())){
+            context.wait_for(250ms);
+
+            VideoSnapshot snapshot = env.console.video().snapshot();
+            if (!prompt.detect(snapshot)){
                 env.log("Expected to be on prompt menu. Backing out.", COLOR_RED);
+//                snapshot->save("noprompt.png");
                 stats.errors++;
                 env.update_stats();
                 pbf_mash_button(context, BUTTON_B, 500);
@@ -406,7 +411,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
 
             //  Wait for trigger time.
             context.wait_until(trigger_time);
-            pbf_press_button(context, BUTTON_A, 10, 10);
+            pbf_press_button(context, BUTTON_A, 80ms, 500ms);
             continue;
         }
         case 4:{

@@ -5,7 +5,9 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
 #include "PokemonBDSP_ShinySparkleSet.h"
@@ -116,19 +118,25 @@ void ShinySparkleSetBDSP::read_from_image(size_t screen_area, const ImageViewRGB
             {0xff909000, 0xffffffff},
         }
     );
-    auto session = make_WaterfillSession();
 
+    SpinLock lock;
     double best_alpha = 0;
-    for (PackedBinaryMatrix& matrix : matrices){
-        session->set_source(matrix);
-        ShinySparkleSetBDSP sparkles = find_sparkles(screen_area, *session);
-        sparkles.update_alphas();
-        double alpha = sparkles.alpha_overall();
-        if (best_alpha < alpha){
-            best_alpha = alpha;
-            *this = std::move(sparkles);
-        }
-    }
+    GlobalThreadPools::realtime_inference().run_in_parallel(
+        [&](size_t index){
+            auto session = make_WaterfillSession();
+            session->set_source(matrices[index]);
+            ShinySparkleSetBDSP sparkles = find_sparkles(screen_area, *session);
+            sparkles.update_alphas();
+            double alpha = sparkles.alpha_overall();
+
+            WriteSpinLock lg(lock);
+            if (best_alpha < alpha){
+                best_alpha = alpha;
+                *this = std::move(sparkles);
+            }
+        },
+        0, matrices.size(), 1
+    );
 }
 
 

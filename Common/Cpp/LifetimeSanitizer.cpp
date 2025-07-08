@@ -105,13 +105,13 @@ void LifetimeSanitizer::check_usage() const{
         return;
     }
     ReadSpinLock lg(sanitizer_lock);
-    if (SANITIZER_FILTER.contains(m_name)){
-        std::cout << "LifetimeSanitizer - Using: " << this << " : " << m_name << std::endl;
-    }
     auto iter = sanitizer_map.find(this);
     if (iter == sanitizer_map.end()){
-        std::cerr << "Use non-existent: " << this << " : " << m_name << std::endl;
+        std::cerr << "Use non-existent: " << this << std::endl;
         terminate_with_dump();
+    }
+    if (SANITIZER_FILTER.contains(m_name)){
+        std::cout << "LifetimeSanitizer - Using: " << this << " : " << m_name << std::endl;
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
         std::cerr << "Use corrupted: " << this << " : " << m_name << std::endl;
@@ -123,13 +123,13 @@ void LifetimeSanitizer::start_using() const{
         return;
     }
     ReadSpinLock lg(sanitizer_lock);
-    if (SANITIZER_FILTER.contains(m_name)){
-        std::cout << "LifetimeSanitizer - Start using: " << this << " : " << m_name << std::endl;
-    }
     auto iter = sanitizer_map.find(this);
     if (iter == sanitizer_map.end()){
-        std::cerr << "Start using non-existent: " << this << " : " << m_name << std::endl;
+        std::cerr << "Start using non-existent: " << this << std::endl;
         terminate_with_dump();
+    }
+    if (SANITIZER_FILTER.contains(m_name)){
+        std::cout << "LifetimeSanitizer - Start using: " << this << " : " << m_name << std::endl;
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
         std::cerr << "Start using corrupted: " << this << " : " << m_name << std::endl;
@@ -142,13 +142,13 @@ void LifetimeSanitizer::done_using() const{
         return;
     }
     ReadSpinLock lg(sanitizer_lock);
-    if (SANITIZER_FILTER.contains(m_name)){
-        std::cout << "LifetimeSanitizer - Done using: " << this << " : " << m_name << std::endl;
-    }
     auto iter = sanitizer_map.find(this);
     if (iter == sanitizer_map.end()){
-        std::cerr << "Done using non-existent: " << this << " : " << m_name << std::endl;
+        std::cerr << "Done using non-existent: " << this << std::endl;
         terminate_with_dump();
+    }
+    if (SANITIZER_FILTER.contains(m_name)){
+        std::cout << "LifetimeSanitizer - Done using: " << this << " : " << m_name << std::endl;
     }
     if (m_token != SANITIZER_TOKEN || m_self != this){
         std::cerr << "Done using corrupted: " << this << " : " << m_name << std::endl;

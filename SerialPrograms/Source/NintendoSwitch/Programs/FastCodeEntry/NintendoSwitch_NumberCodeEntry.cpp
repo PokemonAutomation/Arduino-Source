@@ -228,7 +228,7 @@ void numberpad_enter_code(
     unit += tv;
 
     CodeEntryDelays delays{
-        .hold = hold,
+        .hold = hold + tv,
         .cool = cool,
         .press_delay = unit,
         .move_delay = unit,

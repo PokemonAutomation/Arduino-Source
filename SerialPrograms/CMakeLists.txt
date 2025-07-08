@@ -193,6 +193,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket_POSIX.h
+    ../Common/Cpp/Sockets/ClientSocket_Qt.h
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h

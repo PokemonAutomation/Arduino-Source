@@ -9,6 +9,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -216,7 +217,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     m_num_sandwich_spent = 0;
     m_num_kept = 0;
     size_t consecutive_failures = 0;
-    while(true){
+    while (true){
         m_saved_after_fetched_eggs = false;
         m_in_critical_to_save_stage = false;
 
@@ -232,24 +233,42 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
         // Recoverable loop to fetch eggs:
         int num_party_eggs = -1;
-        while(true){
+        while (true){
             try{
                 num_party_eggs = fetch_eggs_full_routine(env, context);
                 break;
-            }catch (OperationFailedException& e){
-                handle_recoverable_error(env, context, NOTIFICATION_ERROR_RECOVERABLE, e, consecutive_failures);
+            }catch (ScreenshotException& e){
+                if (handle_recoverable_error(
+                    env, context,
+                    NOTIFICATION_ERROR_RECOVERABLE,
+                    e,
+                    consecutive_failures
+                )){
+                    throw;
+                }
             } // end try catch
         } // end recoverable loop to fetch eggs:
 
         // Recoverable loop to hatch eggs
         bool game_already_resetted = false;
-        while(true){
+        while (true){
             try{
                 hatch_eggs_full_routine(env, context, num_party_eggs);
                 consecutive_failures = 0;
                 break;
-            }catch (OperationFailedException& e){
-                handle_recoverable_error(env, context, NOTIFICATION_ERROR_RECOVERABLE, e, consecutive_failures);
+            }catch (ProgramFinishedException&){
+                env.update_stats();
+                GO_HOME_WHEN_DONE.run_end_of_program(context);
+                send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+                return;
+            }catch (ScreenshotException& e){
+                if (handle_recoverable_error(
+                    env, context,
+                    NOTIFICATION_ERROR_RECOVERABLE,
+                    e, consecutive_failures
+                )){
+                    throw;
+                }
                 // After resetting the game, we don't know how many eggs in party
                 num_party_eggs = -1;
 
@@ -260,11 +279,6 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                     game_already_resetted = true;
                     break;
                 }
-            }catch (ProgramFinishedException&){
-                env.update_stats();
-                GO_HOME_WHEN_DONE.run_end_of_program(context);
-                send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-                return;
             } // end try catch
         } // end recoverable loop to hatch eggs
 
@@ -718,10 +732,10 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
 }
 
 
-void EggAutonomous::handle_recoverable_error(
+bool EggAutonomous::handle_recoverable_error(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
     EventNotificationOption& notification,
-    OperationFailedException& e,
+    const ScreenshotException& e,
     size_t& consecutive_failures
 ){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
@@ -736,7 +750,7 @@ void EggAutonomous::handle_recoverable_error(
     }
     // if there is no auto save, then we shouldn't reset game to lose previous progress.
     if (AUTO_SAVING == AutoSave::NoAutoSave){
-        throw std::move(e);
+        return true;
     }
 
     if (AUTO_SAVING == AutoSave::AfterStartAndKeep && m_in_critical_to_save_stage){
@@ -746,7 +760,7 @@ void EggAutonomous::handle_recoverable_error(
         // in this auto saving mode, every batch of eggs have been saved beforehand.
         env.log("Found an error before we can save the game to protect the newly kept pokemon.", COLOR_RED);
         env.log("Don't reset game to protect it.", COLOR_RED);
-        throw std::move(e);
+        return true;
     }
 
     consecutive_failures++;
@@ -760,6 +774,8 @@ void EggAutonomous::handle_recoverable_error(
 
     env.log("Reset game to handle recoverable error");
     reset_game(env.program_info(), env.console, context);
+
+    return false;
 }
 
 

@@ -19,6 +19,7 @@
 
 namespace PokemonAutomation{
 
+class ScreenshotException;
 class OperationFailedException;
 
 namespace NintendoSwitch{
@@ -58,10 +59,11 @@ private:
 
     void save_game(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool from_overworld);
 
-    void handle_recoverable_error(
+    //  Return true if you should rethrow.
+    bool handle_recoverable_error(
         SingleSwitchProgramEnvironment& env, ProControllerContext& context,
         EventNotificationOption& notification,
-        OperationFailedException& e,
+        const ScreenshotException& e,
         size_t& consecutive_failures
     );
 

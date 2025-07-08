@@ -535,7 +535,12 @@ void DailyHighlightRNG::program(SingleSwitchProgramEnvironment& env, ProControll
                 num_npcs = calibrate_num_npc_from_party(env, context, rng);
             }
             catch (OperationFailedException& exception) {
-                send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, exception.message(), exception.screenshot());
+                send_program_recoverable_error_notification(
+                    env,
+                    NOTIFICATION_ERROR_RECOVERABLE,
+                    exception.message(),
+                    exception.screenshot_view()
+                );
                 assumed_successful_iterations = 0;
                 stats.errors++;
                 continue;

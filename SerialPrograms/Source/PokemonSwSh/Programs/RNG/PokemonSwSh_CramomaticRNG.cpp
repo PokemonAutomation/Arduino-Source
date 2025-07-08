@@ -507,7 +507,12 @@ void CramomaticRNG::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 env.console
                 );
             }
-            send_program_recoverable_error_notification(env, NOTIFICATION_ERROR_RECOVERABLE, e.message(), e.screenshot());
+            send_program_recoverable_error_notification(
+                env,
+                NOTIFICATION_ERROR_RECOVERABLE,
+                e.message(),
+                e.screenshot_view()
+            );
             is_state_valid = false;
             recover_from_wrong_state(env, context);
             continue;

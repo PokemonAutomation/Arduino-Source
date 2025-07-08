@@ -30,7 +30,8 @@ public:
 private:
     static QImage frame_to_image(const QVideoFrame& frame);
     void convert(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
-    void dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp);
+    bool try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
+    void dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
 
 private:
     Logger& m_logger;
