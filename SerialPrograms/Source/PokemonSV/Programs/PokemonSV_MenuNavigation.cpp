@@ -165,12 +165,13 @@ void open_map_from_overworld(
             {overworld, battle}
         );
         context.wait_for(std::chrono::milliseconds(100));
+
         if (ret == 0){
             stream.log("Detected overworld.");
             pbf_press_button(context, BUTTON_Y, 20, 105); // open map
         }else if (ret == 1){
             throw_and_log<UnexpectedBattleException>(
-                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+                stream.logger(), ErrorReport::NO_ERROR_REPORT,
                 "open_map_from_overworld(): Unexpectedly detected battle.",
                 stream
             );              
@@ -206,6 +207,7 @@ void open_map_from_overworld(
             {overworld, advance_dialog, prompt_dialog, map, battle}
         );
         context.wait_for(std::chrono::milliseconds(100));
+
         switch (ret){
         case 0:
             stream.log("Detected overworld.");
@@ -236,7 +238,7 @@ void open_map_from_overworld(
         case 4:
             stream.log("Detected battle.");
             throw_and_log<UnexpectedBattleException>(
-                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+                stream.logger(), ErrorReport::NO_ERROR_REPORT,
                 "open_map_from_overworld(): Unexpectedly detected battle.",
                 stream
             ); 
