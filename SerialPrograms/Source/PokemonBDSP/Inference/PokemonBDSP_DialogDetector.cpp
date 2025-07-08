@@ -59,17 +59,6 @@ bool ShortDialogDetector::detect(const ImageViewRGB32& screen){
 }
 
 
-ShortDialogWatcher::ShortDialogWatcher(Color color)
-    : ShortDialogDetector(color)
-    , VisualInferenceCallback("ShortDialogWatcher")
-{}
-void ShortDialogWatcher::make_overlays(VideoOverlaySet& items) const{
-    ShortDialogDetector::make_overlays(items);
-}
-bool ShortDialogWatcher::process_frame(const ImageViewRGB32& frame, WallClock){
-    return detect(frame);
-}
-
 
 
 
