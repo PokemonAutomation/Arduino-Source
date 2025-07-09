@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_ClientSocket_Qt_H
 #define PokemonAutomation_ClientSocket_Qt_H
 
+#include <iostream>
 #include <mutex>
 #include <condition_variable>
 #include <QThread>
@@ -14,7 +15,6 @@
 //#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "AbstractClientSocket.h"
 
-//#include <iostream>
 //using std::cout;
 //using std::endl;
 
@@ -27,7 +27,8 @@ class ClientSocket_Qt final : public QThread, public AbstractClientSocket{
 
     struct SendData{
         const void* data;
-        size_t bytes;
+        size_t total_bytes;
+        size_t bytes_sent;
         std::mutex lock;
         std::condition_variable cv;
     };
@@ -66,7 +67,8 @@ public:
 
         SendData send_data;
         send_data.data = data;
-        send_data.bytes = bytes;
+        send_data.total_bytes = bytes;
+        send_data.bytes_sent = 0;
 
         emit send(&send_data);
 
@@ -76,7 +78,7 @@ public:
         });
 
 //        cout << "blocking_send() - end: " << std::string((const char*)data, bytes) << endl;
-        return send_data.bytes;
+        return send_data.bytes_sent;
     }
 
 
@@ -94,6 +96,22 @@ private:
 //                cout << "connected()" << endl;
                 m_state.store(State::CONNECTED, std::memory_order_release);
                 m_listeners.run_method_unique(&Listener::on_connect_finished, "");
+            }
+        );
+        QThread::connect(
+            &socket, &QTcpSocket::disconnected,
+            &socket, [this]{
+                std::cout << "QTcpSocket::disconnected()" << std::endl;
+                m_state.store(State::DESTRUCTING, std::memory_order_release);
+                quit();
+            }
+        );
+        QThread::connect(
+            &socket, &QTcpSocket::errorOccurred,
+            &socket, [this](QAbstractSocket::SocketError error){
+                std::cout << "QTcpSocket::errorOccurred(): error = " << (int)error <<  std::endl;
+                m_state.store(State::DESTRUCTING, std::memory_order_release);
+                quit();
             }
         );
         QThread::connect(
@@ -124,7 +142,7 @@ private:
                 SendData& data = *(SendData*)params;
                 size_t sent = 0;
 
-                size_t bytes = data.bytes;
+                size_t bytes = data.total_bytes;
 
                 const char* ptr = (const char*)data.data;
                 while (bytes > 0 && m_socket->state() == QAbstractSocket::ConnectedState){
@@ -135,14 +153,13 @@ private:
                     sent += current_sent;
                     ptr += current_sent;
                     bytes -= current_sent;
-                    data.bytes = sent;
                 }
 
                 m_socket->flush();
 
                 std::lock_guard<std::mutex> lg(data.lock);
                 data.data = nullptr;
-                data.bytes = sent;
+                data.bytes_sent = sent;
                 data.cv.notify_all();
 
 //                cout << "internal_send() - exit " << endl;
@@ -152,6 +169,9 @@ private:
 
         {
             std::lock_guard<std::mutex> lg(m_lock);
+            if (this->state() == State::DESTRUCTING){
+                return;
+            }
             m_socket = &socket;
         }
         m_cv.notify_all();
