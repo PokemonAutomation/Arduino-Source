@@ -17,7 +17,7 @@
 namespace PokemonAutomation{
 
 
-class MessageLogger : public MessageSniffer{
+class MessageLogger : public Logger, public MessageSniffer{
 public:
     MessageLogger(bool log_everything = false)
         : m_log_everything_owner(log_everything)
@@ -29,7 +29,6 @@ public:
     {}
 
 
-//    virtual void log(std::string msg) override;
     virtual void on_send(const BotBaseMessage& message, bool is_retransmit) override;
     virtual void on_recv(const BotBaseMessage& message) override;
 
@@ -40,13 +39,12 @@ private:
 
 
 
-class SerialLogger : public Logger, public MessageLogger{
+class SerialLogger : public MessageLogger{
 public:
     SerialLogger(Logger& logger, bool log_everything);
 
-    virtual void log(const char* msg, Color color = Color()) override;
-    virtual void log(const std::string& msg, Color color = Color()) override;
-    virtual void log(std::string msg) override;
+    virtual void log(const char* msg, Color color = COLOR_DARKGREEN) override;
+    virtual void log(const std::string& msg, Color color = COLOR_DARKGREEN) override;
 
 private:
     bool ok_to_log();
