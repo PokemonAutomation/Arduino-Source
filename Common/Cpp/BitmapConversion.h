@@ -18,6 +18,7 @@
 #ifndef PokemonAutomation_BitmapCompression_H
 #define PokemonAutomation_BitmapCompression_H
 
+#include <string>
 #include <vector>
 
 std::string pack_bits_to_string(const std::vector<bool> &vec);

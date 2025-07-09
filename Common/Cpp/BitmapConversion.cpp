@@ -6,8 +6,7 @@
 // 2. Proper padding handling
 // 3. Explicit character validation
 
-#include <string>
-#include <vector>
+#include "BitmapConversion.h"
 
 static const std::string BASE64_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ"
                                         "abcdefghijklmnopqrstuvwxyz"
@@ -74,7 +73,7 @@ bool base64_decode(std::string &out, const std::string &in) {
     char_array_4[i++] = c;
     if (i == 4) {
       for (i = 0; i < 4; i++)
-        char_array_4[i] = BASE64_CHARS.find(char_array_4[i]);
+        char_array_4[i] = (unsigned char)BASE64_CHARS.find(char_array_4[i]);
 
       char_array_3[0] =
           (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
@@ -93,7 +92,7 @@ bool base64_decode(std::string &out, const std::string &in) {
       char_array_4[j] = 0;
 
     for (j = 0; j < 4; j++)
-      char_array_4[j] = BASE64_CHARS.find(char_array_4[j]);
+      char_array_4[j] = (unsigned char)BASE64_CHARS.find(char_array_4[j]);
 
     char_array_3[0] = (char_array_4[0] << 2) + ((char_array_4[1] & 0x30) >> 4);
     char_array_3[1] =
