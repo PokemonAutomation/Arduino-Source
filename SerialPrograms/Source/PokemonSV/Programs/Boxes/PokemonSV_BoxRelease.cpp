@@ -40,12 +40,15 @@ void release_one_pokemon(
             );
         }
 
+        //  The advance dialog is ambiguous against 2 other states. Therefore,
+        //  if we see it, we do not decide that is the state unless it holds for
+        //  1 second without any of the other states firing.
         SomethingInBoxSlotDetector exists(COLOR_BLUE);
 //        GradientArrowDetector change_marks(COLOR_MAGENTA, GradientArrowType::DOWN, {0.28, 0.38, 0.30, 0.10});
         BoxWatcher box_detector(COLOR_RED);
         BoxSelectWatcher selected(COLOR_YELLOW, std::chrono::milliseconds(100));
         PromptDialogWatcher confirm(COLOR_CYAN, std::chrono::milliseconds(100));
-        AdvanceDialogWatcher advance_dialog(COLOR_GREEN, DialogType::DIALOG_ALL, std::chrono::milliseconds(250));
+        AdvanceDialogWatcher advance_dialog(COLOR_GREEN, DialogType::DIALOG_ALL, std::chrono::milliseconds(1000));
 
         context.wait_for_all_requests();
         int ret = wait_until(
@@ -58,7 +61,8 @@ void release_one_pokemon(
                 advance_dialog
             }
         );
-        context.wait_for(std::chrono::milliseconds(50));
+//        cout << "ret0 = " << ret << endl;
+        context.wait_for(std::chrono::milliseconds(100));
         if (ret == 3){
             //  Make sure we're not mistakening this for the other dialogs.
             auto screenshot = stream.video().snapshot();
@@ -68,6 +72,7 @@ void release_one_pokemon(
                 ret = 2;
             }
         }
+//        cout << "ret1 = " << ret << endl;
 //        cout << "consecutive_box_neutrals = " << consecutive_box_neutrals << endl;
 
         switch (ret){
@@ -101,6 +106,7 @@ void release_one_pokemon(
 
             if (exists.detect(screenshot)){
                 if (release_attempted && release_completed){
+//                    cout << "return 0" << endl;
                     return;
                 }
                 release_attempted = false;
@@ -110,6 +116,7 @@ void release_one_pokemon(
                 continue;
             }else{
                 stream.log("Slot is empty.");
+//                cout << "return 1" << endl;
                 return;
             }
         }
@@ -148,6 +155,7 @@ void release_one_pokemon(
                 stream.log("Detected advance dialog. (unexpected)", COLOR_RED);
                 errors++;
             }
+            pbf_press_dpad(context, DPAD_UP, 10, 10);
             pbf_press_button(context, BUTTON_A, 20, 20);
             release_completed = true;
             expected = 0;

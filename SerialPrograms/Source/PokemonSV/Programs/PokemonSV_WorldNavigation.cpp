@@ -210,7 +210,7 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "leave_picnic(): Failed to detecxt overworld after 20 seconds.",
+            "leave_picnic(): Failed to detect overworld after 20 seconds.",
             stream
         );
     }
