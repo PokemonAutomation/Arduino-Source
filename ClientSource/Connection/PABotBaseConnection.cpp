@@ -67,7 +67,7 @@ void PABotBaseConnection::send_message(const BotBaseMessage& message, bool is_re
     m_sniffer->on_send(message, is_retransmit);
 
     size_t total_bytes = PABB_PROTOCOL_OVERHEAD + message.body.size();
-    if (total_bytes > MAX_MESSAGE_SIZE){
+    if (total_bytes > PABB_PROTOCOL_MAX_PACKET_SIZE){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too long.");
     }
 
@@ -105,7 +105,7 @@ void PABotBaseConnection::on_recv(const void* data, size_t bytes){
         }
 
         //  Message is too long.
-        if (length > MAX_MESSAGE_SIZE){
+        if (length > PABB_PROTOCOL_MAX_PACKET_SIZE){
             char ascii = ~length;
             std::string text = ascii < 32
                 ? ", ascii = " + std::to_string(ascii)

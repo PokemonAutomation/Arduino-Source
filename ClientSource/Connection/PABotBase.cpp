@@ -634,7 +634,7 @@ uint64_t PABotBase::try_issue_request(
     if (message.body.size() < sizeof(uint32_t)){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too short.");
     }
-    if (message.body.size() > MAX_MESSAGE_SIZE){
+    if (message.body.size() > PABB_PROTOCOL_MAX_PACKET_SIZE){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too long.");
     }
 
@@ -714,7 +714,7 @@ uint64_t PABotBase::try_issue_command(
     if (message.body.size() < sizeof(uint32_t)){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too short.");
     }
-    if (message.body.size() > MAX_MESSAGE_SIZE){
+    if (message.body.size() > PABB_PROTOCOL_MAX_PACKET_SIZE){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too long.");
     }
 

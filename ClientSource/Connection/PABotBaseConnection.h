@@ -16,7 +16,7 @@
 
 #include <memory>
 #include <deque>
-//#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "BotBase.h"
 #include "MessageSniffer.h"
 #include "StreamInterface.h"
@@ -28,16 +28,13 @@ namespace PokemonAutomation{
 //  the child class to wrap and make them thread-safe.
 class PABotBaseConnection : public StreamListener{
 public:
-    static const size_t MAX_MESSAGE_SIZE = 64;
-
-public:
     PABotBaseConnection(Logger& logger, std::unique_ptr<StreamConnection> connection);
     virtual ~PABotBaseConnection();
 
     void set_sniffer(MessageSniffer* sniffer);
 
 public:
-    void send_zeros(uint8_t bytes = MAX_MESSAGE_SIZE);
+    void send_zeros(uint8_t bytes = PABB_PROTOCOL_MAX_PACKET_SIZE);
     void send_message(const BotBaseMessage& message, bool is_retransmit);
 
 protected:
