@@ -76,6 +76,13 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     OCR::LanguageOCROption LANGUAGE;
+
+    enum class EggAutoLocation{
+        ZeroGate,
+        NorthLighthouse,
+    };
+    EnumDropdownOption<EggAutoLocation> LOCATION;
+
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
 
     enum class AutoSave{

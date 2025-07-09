@@ -93,6 +93,15 @@ EggAutonomous::EggAutonomous()
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
+    , LOCATION(
+        "<b>Location:</b><br>The location to hatch eggs.",
+        {
+            {EggAutoLocation::ZeroGate,         "zero-gate",        "Zero Gate"},
+            {EggAutoLocation::NorthLighthouse,  "north-lighthouse", "North Province (Area Three) Lighthouse"}
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        EggAutoLocation::ZeroGate
+    )
     , MAX_KEEPERS(
         "<b>Max Keepers:</b><br>Stop the program after keeping this many " + STRING_POKEMON + ". "
         "The program will put them into a box neighboring the current box.",
@@ -173,6 +182,7 @@ EggAutonomous::EggAutonomous()
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(EGG_SANDWICH);
+    PA_ADD_OPTION(LOCATION);
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(KEEP_BOX_LOCATION);
@@ -312,7 +322,12 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
 
-    picnic_at_zero_gate(env.program_info(), env.console, context);
+    if (LOCATION == EggAutoLocation::ZeroGate) {
+        picnic_at_zero_gate(env.program_info(), env.console, context);
+    } else {
+        pbf_press_button(context, BUTTON_L, 50, 40);
+        picnic_from_overworld(env.program_info(), env.console, context);
+    }
     // Now we are at picnic. We are at one end of picnic table while the egg basket is at the other end
     bool can_make_sandwich = eat_egg_sandwich_at_picnic(env, env.console, context,
         EGG_SANDWICH.EGG_SANDWICH_TYPE, LANGUAGE);
@@ -338,7 +353,13 @@ int EggAutonomous::fetch_eggs_full_routine(SingleSwitchProgramEnvironment& env, 
     leave_picnic(env.program_info(), env.console, context);
 
     // Reset position to flying spot:
-    reset_position_to_flying_spot(env, context);
+    if (LOCATION == EggAutoLocation::ZeroGate) {
+        reset_position_to_flying_spot(env, context);
+    } else {
+        //Lighthouse: We haven't moved much so just fly.
+        open_map_from_overworld(env.program_info(), env.console, context);
+        fly_to_overworld_from_map(env.program_info(), env.console, context);
+    }
 
     return picnic_party_to_hatch_party(env, context);
 }
@@ -436,8 +457,16 @@ void EggAutonomous::hatch_eggs_full_routine(SingleSwitchProgramEnvironment& env,
             stats.m_hatched++;
             env.update_stats();
         };
-        hatch_eggs_at_zero_gate(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
-        reset_position_to_flying_spot(env, context);
+        if (LOCATION == EggAutoLocation::ZeroGate) {
+            hatch_eggs_at_zero_gate(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+            reset_position_to_flying_spot(env, context);
+        } else {
+            hatch_eggs_at_area_three_lighthouse(env.program_info(), env.console, context, (uint8_t)num_eggs_in_party, hatched_callback);
+            reset_position_to_flying_spot(env, context);
+            //Clear spawns - over time floette/vivillon drift over past the fence (usually aroudn the 3rd batch)
+            picnic_from_overworld(env.program_info(), env.console, context);
+            leave_picnic(env.program_info(), env.console, context);
+        }
 
         enter_box_system_from_overworld(env.program_info(), env.console, context);
         
@@ -647,7 +676,12 @@ bool EggAutonomous::move_pokemon_to_keep(SingleSwitchProgramEnvironment& env, Pr
 void EggAutonomous::reset_position_to_flying_spot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     // Use map to fly back to the flying spot
     open_map_from_overworld(env.program_info(), env.console, context);
-    pbf_move_left_joystick(context, 128, 160, 20, 50);
+    if (LOCATION == EggAutoLocation::ZeroGate) {
+        pbf_move_left_joystick(context, 128, 160, 20, 50);
+    } else { //lighthouse
+        pbf_move_left_joystick(context, 130, 0, 150ms, 50ms);
+        pbf_press_button(context, BUTTON_ZL, 40, 100);
+    }
     fly_to_overworld_from_map(env.program_info(), env.console, context);
 }
 

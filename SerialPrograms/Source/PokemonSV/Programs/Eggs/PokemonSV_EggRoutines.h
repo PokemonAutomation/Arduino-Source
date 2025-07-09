@@ -76,6 +76,18 @@ void hatch_eggs_at_zero_gate(
     std::function<void(uint8_t)> egg_hatched_callback = nullptr
 );
 
+// Start at North Province (Area Three) Lighthouse flying spot, go in circles in Ruchbah (fairy) Squad's base to hatch eggs.
+// Switch 2 only, this is an alternate egg hatch spot as Zero Gate now has spawns in the way.
+// Switch 1 is untested in this location but the area is extremely laggy.
+// This is a minor modification to hatch_eggs_at_zero_gate
+// `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed)
+void hatch_eggs_at_area_three_lighthouse(
+    const ProgramInfo& info,
+    VideoStream& stream, ProControllerContext& context,
+    uint8_t num_eggs_in_party,
+    std::function<void(uint8_t)> egg_hatched_callback = nullptr
+);
+
 // From overworld, go in circles to hatch eggs.
 // `egg_hatched_callback` will be called after each egg hatched, with egg index (0-indexed)
 // `already_on_ride`: whether the player character is on ride when starting the function.
