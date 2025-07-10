@@ -27,7 +27,7 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Pokemon/Resources/Pokemon_PokemonForms.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
+#include "ML/UI/ML_ImageDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h"
 #include "CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h"
 #include "ML_LabelImages.h"
@@ -437,7 +437,7 @@ LabelImages_Widget::LabelImages_Widget(
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);
 
-    m_switch_widget = new NintendoSwitch::SwitchSystemWidget(*this, m_session, 0);
+    m_switch_widget = new ImageDisplayWidget(*this, m_session, 0);
     scroll_layout->addWidget(m_switch_widget);
 
     QPushButton* button = new QPushButton("Delete Last Mask", scroll_inner);

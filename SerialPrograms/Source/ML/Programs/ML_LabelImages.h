@@ -28,14 +28,12 @@ namespace PokemonAutomation{
 
 
 class ConfigWidget;
-namespace NintendoSwitch{
-    class SwitchSystemWidget;
-}
 
 
 namespace ML{
 
 
+class ImageDisplayWidget;
 class LabelImages_Widget;
 
 
@@ -146,7 +144,7 @@ public:
 private:
     LabelImages& m_program;
     NintendoSwitch::SwitchSystemSession m_session;
-    NintendoSwitch::SwitchSystemWidget* m_switch_widget;
+    ImageDisplayWidget* m_switch_widget;
     VideoOverlaySet m_overlay_set;
     DrawnBoundingBox m_drawn_box;
     ConfigWidget* m_option_widget;

@@ -1,31 +1,20 @@
-/*  Switch System
+/*  ML Image Display Widget
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  This is the Qt Widget implementation of the UI for SwitchSystemSession.
- *
- *  On construction, this class attaches itself to the session it is constructed
- *  with and automatically detaches on destruction. Therefore, this class must
- *  not outlive the session it is constructed with. While not useful, it is also
- *  safe to construct multiple UI classes attached to the same session.
- *
- *  Modifications directly to the session object will automatically update this
- *  UI class. For example, if you use Discord to change the volume of the
- *  audio playback, it will move the slider as shown by this UI.
- *
+ *  This is the Qt Widget for displaying images for ML annotation purposes.
+ *  This is modified from NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
-#define PokemonAutomation_NintendoSwitch_SwitchSystemWidget_H
+#ifndef ML_ImageDisplayWidget_H
+#define ML_ImageDisplayWidget_H
 
 #include <QWidget>
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 
 namespace PokemonAutomation{
     class CollapsibleGroupBox;
     class AudioFeed;
-    class ControllerSelectorWidget;
     class CameraSelectorWidget;
     class VideoSourceSelectorWidget;
     class VideoDisplayWidget;
@@ -34,8 +23,13 @@ namespace PokemonAutomation{
     class VideoOverlay;
 
 namespace NintendoSwitch{
+    class CommandRow;
+    class SwitchSystemSession;
+}
 
-class CommandRow;
+namespace ML{
+
+
 
 // UI widget for controlling and monitoring a Nintendo Switch.
 // It includes:
@@ -46,12 +40,12 @@ class CommandRow;
 // - Video stream display
 // It also owns a SwitchSystemSession that manages the life time of the controller,
 // audio and video streams that will be exposed to automation programs.
-class SwitchSystemWidget final : public QWidget, public CommandReceiver{
+class ImageDisplayWidget final : public QWidget, public CommandReceiver{
 public:
-    virtual ~SwitchSystemWidget();
-    SwitchSystemWidget(
+    virtual ~ImageDisplayWidget();
+    ImageDisplayWidget(
         QWidget& parent,
-        SwitchSystemSession& session,
+        NintendoSwitch::SwitchSystemSession& session,
         uint64_t program_id
     );
 
@@ -74,19 +68,15 @@ private:
     virtual void focusOutEvent(QFocusEvent* event) override;
 
 private:
-    SwitchSystemSession& m_session;
+    NintendoSwitch::SwitchSystemSession& m_session;
 
     CollapsibleGroupBox* m_group_box;
 
-    ControllerSelectorWidget* m_controller;
-
     VideoDisplayWidget* m_video_display;
-    AudioDisplayWidget* m_audio_display;
 
-    CommandRow* m_command;
+    NintendoSwitch::CommandRow* m_command;
 
     VideoSourceSelectorWidget* m_video_selector;
-    AudioSelectorWidget* m_audio_widget;
 };
 
 
