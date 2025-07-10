@@ -109,7 +109,7 @@ ControllerModeStatus TcpSysbotBase_Connection::controller_mode_status() const{
 }
 
 void TcpSysbotBase_Connection::write_data(const std::string& data){
-    WriteSpinLock lg(m_send_lock);
+    WriteSpinLock lg(m_send_lock, "TcpSysbotBase_Connection::write_data()");
 //    cout << "Sending: " << data << endl;
     m_socket.blocking_send(data.data(), data.size());
 }
