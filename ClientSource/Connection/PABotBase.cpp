@@ -157,6 +157,10 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
             ReadSpinLock lg0(m_state_lock);
             throw InvalidConnectionStateException(m_error_message);
         }
+        if (m_error.load(std::memory_order_acquire)){
+            ReadSpinLock lg0(m_state_lock);
+            throw ConnectionException(&m_logger, m_error_message);
+        }
         {
             ReadSpinLock lg1(m_state_lock, "PABotBase::wait_for_all_requests()");
 #if 0
