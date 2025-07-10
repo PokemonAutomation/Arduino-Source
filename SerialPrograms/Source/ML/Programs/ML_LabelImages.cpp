@@ -228,7 +228,7 @@ JsonValue LabelImages::to_json() const{
     // m_annotation_file_path
     if (m_annotation_file_path.size() > 0 && !m_fail_to_load_annotation_file){
         JsonArray anno_json_arr;
-        for(const auto& anno_obj: m_annotated_objects){
+        for(const auto& anno_obj: m_annotations){
             anno_json_arr.push_back(object_annotation_to_json(anno_obj));
         }
         cout << "Saving annotation to " << m_annotation_file_path << endl;
@@ -284,7 +284,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     for(size_t i = 0; i < json_array->size(); i++){
         try{
             ObjectAnnotation anno_obj = json_to_object_annotation((*json_array)[i]);
-            m_annotated_objects.emplace_back(std::move(anno_obj));
+            m_annotations.emplace_back(std::move(anno_obj));
         } catch(JsonParseException&){
             m_fail_to_load_annotation_file = true;
             QMessageBox box;
@@ -296,7 +296,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
             );
         }
     }
-    m_last_object_idx = m_annotated_objects.size(); 
+    m_last_object_idx = m_annotations.size(); 
     cout << "Loaded existing annotation file " << m_annotation_file_path << endl;
 }
 
@@ -304,8 +304,8 @@ void LabelImages::update_rendered_objects(VideoOverlaySet& overlay_set){
     overlay_set.clear();
     overlay_set.add(COLOR_RED, {X, Y, WIDTH, HEIGHT});
 
-    for(size_t i_obj = 0; i_obj < m_annotated_objects.size(); i_obj++){
-        const auto& obj = m_annotated_objects[i_obj];
+    for(size_t i_obj = 0; i_obj < m_annotations.size(); i_obj++){
+        const auto& obj = m_annotations[i_obj];
         // overlayset.add(COLOR_RED, pixelbox_to_floatbox(source_image_width, source_image_height, obj.user_box));
         const auto mask_float_box = pixelbox_to_floatbox(source_image_width, source_image_height, obj.mask_box);
         std::string label = obj.label;
@@ -400,8 +400,8 @@ void LabelImages::compute_mask(VideoOverlaySet& overlay_set){
         }
 
         annotation.label = label;
-        m_last_object_idx = m_annotated_objects.size();
-        m_annotated_objects.emplace_back(std::move(annotation));
+        m_last_object_idx = m_annotations.size();
+        m_annotations.emplace_back(std::move(annotation));
 
         update_rendered_objects(overlay_set);
     }
@@ -444,11 +444,11 @@ LabelImages_Widget::LabelImages_Widget(
     scroll_layout->addWidget(button);
     connect(button, &QPushButton::clicked, this, [this](bool){
         auto& program = this->m_program;
-        if (program.m_annotated_objects.size() > 0){
-            program.m_annotated_objects.pop_back();
+        if (program.m_annotations.size() > 0){
+            program.m_annotations.pop_back();
         }
-        if (program.m_annotated_objects.size() > 0){
-            program.m_last_object_idx = program.m_annotated_objects.size() - 1;
+        if (program.m_annotations.size() > 0){
+            program.m_last_object_idx = program.m_annotations.size() - 1;
         }
         program.update_rendered_objects(this->m_overlay_set);
     });
@@ -470,8 +470,8 @@ LabelImages_Widget::LabelImages_Widget(
 }
 
 void LabelImages_Widget::on_config_value_changed(void* object){
-    if (m_program.m_annotated_objects.size() > 0 && m_program.m_last_object_idx < m_program.m_annotated_objects.size()){
-        std::string& cur_label = m_program.m_annotated_objects[m_program.m_last_object_idx].label;
+    if (m_program.m_annotations.size() > 0 && m_program.m_last_object_idx < m_program.m_annotations.size()){
+        std::string& cur_label = m_program.m_annotations[m_program.m_last_object_idx].label;
         cur_label = m_program.FORM_LABEL.slug();
         m_program.update_rendered_objects(m_overlay_set);
     }

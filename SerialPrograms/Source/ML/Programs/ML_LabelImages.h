@@ -43,7 +43,8 @@ class LabelImages_Widget;
 // also include the related overlay rendering.
 // Since it owns rendering objects and the rendering framework needs
 // the address of the rendering objects to keep track of them,
-// never copy or move this ObjectAnnotation object!
+// never copy or move these ObjectAnnotation objects after rendering code has
+// access to them!
 struct ObjectAnnotation{
     ImagePixelBox user_box; // user drawn loose bounding box
     ImagePixelBox mask_box;
@@ -100,7 +101,7 @@ private:
     ImageRGB32 m_mask_image;
 
     SAMSession m_sam_session;
-    std::vector<ObjectAnnotation> m_annotated_objects;
+    std::vector<ObjectAnnotation> m_annotations;
     size_t m_last_object_idx = 0;
     std::string m_annotation_file_path;
     // if we find an annotation file that is supposed to be created by user in a previous session, but
