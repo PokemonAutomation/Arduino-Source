@@ -50,6 +50,40 @@ bool home_to_date_time_Switch1_feedback(ConsoleHandle& console, ProControllerCon
 }
 
 
+void home_to_date_time_Switch2_blind(
+    Logger& logger, ProControllerContext& context,
+    ConsoleType console_type, bool to_date_change
+){
+    switch (context->performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+        home_to_date_time_Switch2_wired_blind(logger, context, console_type, to_date_change);
+        return;
+    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+        home_to_date_time_Switch2_wireless_blind(logger, context, console_type, to_date_change);
+        return;
+    default:
+        //  Slow version for tick-imprecise controllers.
+        home_to_date_time_Switch1_sbb_blind(logger, context, to_date_change);
+        return;
+    }
+}
+bool home_to_date_time_Switch2_feedback(
+    ConsoleHandle& console, ProControllerContext& context,
+    ConsoleType console_type, bool to_date_change
+){
+    switch (context->performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+        home_to_date_time_Switch2_wired_feedback(console, context, to_date_change);
+        return true;
+    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+        home_to_date_time_Switch2_wireless_feedback(console, context, to_date_change);
+        return true;
+    default:;
+        return false;
+    }
+}
+
+
 
 
 //  Returns true if success. False if not supported.
@@ -66,7 +100,7 @@ bool home_to_date_time_with_feedback(ConsoleHandle& console, ProControllerContex
     case ConsoleType::Switch2_FW19_JapanLocked:
     case ConsoleType::Switch2_FW20_International:
     case ConsoleType::Switch2_FW20_JapanLocked:
-        home_to_date_time_Switch2_wired_feedback(console, context, to_date_change);
+        home_to_date_time_Switch2_feedback(console, context, console_type, to_date_change);
         return true;
     default:;
     }
@@ -93,7 +127,7 @@ void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bo
     case ConsoleType::Switch2_FW19_JapanLocked:
     case ConsoleType::Switch2_FW20_International:
     case ConsoleType::Switch2_FW20_JapanLocked:
-        home_to_date_time_Switch2_wired_blind(console, context, console_type, to_date_change);
+        home_to_date_time_Switch2_blind(console, context, console_type, to_date_change);
         return;
     }
 }

@@ -51,6 +51,42 @@ void home_to_settings_Switch2_wired_blind(
         ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay, hold, cool);
     }
 }
+void home_to_settings_Switch2_wireless_blind(
+    ProControllerContext& context
+){
+    Milliseconds tv = context->timing_variation();
+    Milliseconds unit = 24ms + tv;
+
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+
+    //  Down twice in case we drop one.
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
+
+    //  Two A presses in case we drop the 1st one.
+    ssf_press_button(context, BUTTON_A, unit);
+    ssf_press_button(context, BUTTON_A, unit);
+
+    for (size_t c = 0; c < 40; c++){
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+    }
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 1000ms, 1000ms, unit);
+
+    //  Scroll left and press A to exit the sleep menu if we happened to
+    //  land there.
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit);
+    ssf_press_button(context, BUTTON_A, unit);
+
+    for (size_t c = 0; c < 2; c++){
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    }
+}
+
+
 void settings_to_date_time_Switch2_wired_blind(
     Logger& logger, ProControllerContext& context,
     ConsoleType console_type, bool to_date_change
@@ -112,6 +148,77 @@ void settings_to_date_time_Switch2_wired_blind(
     //  confirmation menus.
     ssf_issue_scroll(context, SSF_SCROLL_LEFT, delay, hold, cool);
 }
+void settings_to_date_time_Switch2_wireless_blind(
+    Logger& logger, ProControllerContext& context,
+    ConsoleType console_type, bool to_date_change
+){
+    Milliseconds tv = context->timing_variation();
+    Milliseconds unit = 24ms + tv;
+
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 192ms, 2*unit, unit);
+
+
+    switch (console_type){
+    case ConsoleType::Switch2_FW19_International:
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        break;
+    case ConsoleType::Switch2_FW19_JapanLocked:
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        break;
+    case ConsoleType::Switch2_FW20_International:
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        break;
+    case ConsoleType::Switch2_FW20_JapanLocked:
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
+        break;
+    default:
+        throw UserSetupError(
+            logger,
+            "You need to specify a specific Switch 2 model."
+        );
+    }
+
+
+    if (!to_date_change){
+        //  Triple up this A press to make sure it gets through.
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 360ms, 48ms, 24ms);
+        return;
+    }
+
+    //  Triple up this A press to make sure it gets through.
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+
+    for (size_t c = 0; c < 5; c++){
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit, 2*unit, unit);
+    }
+
+    //  Left scroll in case we missed and landed in the language change or sleep
+    //  confirmation menus.
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, unit, 2*unit, unit);
+}
+
+
+
+
+
+
+
+
+
+
+
 ConsoleType settings_detect_console_type(
     ConsoleHandle& console, ProControllerContext& context
 ){
@@ -175,6 +282,17 @@ void home_to_date_time_Switch2_wired_blind(
     home_to_settings_Switch2_wired_blind(context);
     settings_to_date_time_Switch2_wired_blind(logger, context, console_type, to_date_change);
 }
+void home_to_date_time_Switch2_wireless_blind(
+    Logger& logger, ProControllerContext& context,
+    ConsoleType console_type, bool to_date_change
+){
+    logger.log("home_to_date_time_Switch2_wireless_blind()");
+    home_to_settings_Switch2_wireless_blind(context);
+    settings_to_date_time_Switch2_wireless_blind(logger, context, console_type, to_date_change);
+}
+
+
+
 void home_to_date_time_Switch2_wired_feedback(
     ConsoleHandle& console, ProControllerContext& context,
     bool to_date_change
@@ -183,6 +301,15 @@ void home_to_date_time_Switch2_wired_feedback(
     home_to_settings_Switch2_wired_blind(context);
     ConsoleType console_type = settings_detect_console_type(console, context);
     settings_to_date_time_Switch2_wired_blind(console, context, console_type, to_date_change);
+}
+void home_to_date_time_Switch2_wireless_feedback(
+    ConsoleHandle& console, ProControllerContext& context,
+    bool to_date_change
+){
+    console.log("home_to_date_time_Switch2_wireless_feedback()");
+    home_to_settings_Switch2_wireless_blind(context);
+    ConsoleType console_type = settings_detect_console_type(console, context);
+    settings_to_date_time_Switch2_wireless_blind(console, context, console_type, to_date_change);
 }
 
 

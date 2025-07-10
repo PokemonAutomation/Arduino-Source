@@ -43,7 +43,15 @@ void home_to_date_time_Switch2_wired_blind(
     Logger& logger, ProControllerContext& context,
     ConsoleType console_type, bool to_date_change
 );
+void home_to_date_time_Switch2_wireless_blind(
+    Logger& logger, ProControllerContext& context,
+    ConsoleType console_type, bool to_date_change
+);
 void home_to_date_time_Switch2_wired_feedback(
+    ConsoleHandle& console, ProControllerContext& context,
+    bool to_date_change
+);
+void home_to_date_time_Switch2_wireless_feedback(
     ConsoleHandle& console, ProControllerContext& context,
     bool to_date_change
 );
