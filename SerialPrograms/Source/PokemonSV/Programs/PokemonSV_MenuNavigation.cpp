@@ -91,12 +91,12 @@ void neutral_day_skip_switch2(ConsoleHandle& console, ProControllerContext& cont
     console.log("PokemonSV::neutral_day_skip_switch2()");
 
     ssf_press_button(context, BUTTON_A, 216ms, 80ms);
-    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
-    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
+    ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
     ssf_press_button(context, BUTTON_A, 264ms, 80ms);
 }
 

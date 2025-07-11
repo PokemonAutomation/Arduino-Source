@@ -138,6 +138,33 @@ void roll_date_backward_N_Switch2_wired(ProControllerContext& context, uint8_t s
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_press_button(context, BUTTON_A, 264ms, 80ms);
 }
+void roll_date_backward_N_Switch2_wireless(ProControllerContext& context, uint8_t skips){
+    Milliseconds tv = context->timing_variation();
+    Milliseconds unit = 24ms + tv;
+
+    ssf_press_button(context, BUTTON_A, 216ms, 80ms);
+    if (skips >= 60){
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4160ms, 4160ms, unit);
+    }else{
+        for (uint8_t c = 0; c < skips; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 112ms, 2*unit, unit);
+        }
+    }
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    if (skips >= 60){
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4160ms, 4160ms, unit);
+    }else{
+        for (uint8_t c = 0; c < skips; c++){
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 112ms, 2*unit, unit);
+        }
+    }
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_press_button(context, BUTTON_A, 264ms, 80ms);
+}
 void roll_date_backward_N(
     ConsoleHandle& console, ProControllerContext& context,
     uint8_t skips, bool fast
@@ -164,7 +191,19 @@ void roll_date_backward_N(
     }
 
     if (is_switch2(type)){
-        roll_date_backward_N_Switch2_wired(context, skips);
+        switch (context->performance_class()){
+        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+            roll_date_backward_N_Switch2_wired(context, skips);
+            return;
+        case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+            roll_date_backward_N_Switch2_wireless(context, skips);
+            return;
+        default:
+            throw InternalProgramError(
+                &console.logger(), PA_CURRENT_FUNCTION,
+                "Unsupported ControllerPerformanceClass: " + std::to_string((int)context->performance_class())
+            );
+        }
         return;
     }
 

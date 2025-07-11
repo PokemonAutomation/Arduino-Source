@@ -81,6 +81,21 @@ void roll_date_forward_1_Switch2_wired(ProControllerContext& context){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_press_button(context, BUTTON_A, 264ms, 80ms);
 }
+void roll_date_forward_1_Switch2_wireless(ProControllerContext& context){
+    Milliseconds tv = context->timing_variation();
+    Milliseconds unit = 24ms + tv;
+
+    ssf_press_button(context, BUTTON_A, 216ms, 80ms);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_press_button(context, BUTTON_A, 264ms, 80ms);
+}
 void roll_date_forward_1(
     ConsoleHandle& console, ProControllerContext& context,
     bool fast
@@ -107,7 +122,19 @@ void roll_date_forward_1(
     }
 
     if (is_switch2(type)){
-        roll_date_forward_1_Switch2_wired(context);
+        switch (context->performance_class()){
+        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+            roll_date_forward_1_Switch2_wired(context);
+            return;
+        case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+            roll_date_forward_1_Switch2_wireless(context);
+            return;
+        default:
+            throw InternalProgramError(
+                &console.logger(), PA_CURRENT_FUNCTION,
+                "Unsupported ControllerPerformanceClass: " + std::to_string((int)context->performance_class())
+            );
+        }
         return;
     }
 
