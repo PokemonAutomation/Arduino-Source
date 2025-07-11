@@ -48,7 +48,7 @@ public:
         return m_supported_features;
     }
     virtual ControllerPerformanceClass performance_class() const override{
-        return ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32;
+        return ControllerPerformanceClass::SerialPABotBase_Wireless;
     }
 
     virtual Milliseconds ticksize() const override{

@@ -173,10 +173,10 @@ void roll_date_backward_N(
 
     if (is_switch1(type)){
         switch (context->performance_class()){
-        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+        case ControllerPerformanceClass::SerialPABotBase_Wired:
             roll_date_backward_N_Switch1_wired(context, skips, fast);
             return;
-        case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+        case ControllerPerformanceClass::SerialPABotBase_Wireless:
             roll_date_backward_N_Switch1_wireless(context, skips);
             return;
         case ControllerPerformanceClass::SysbotBase:
@@ -192,10 +192,10 @@ void roll_date_backward_N(
 
     if (is_switch2(type)){
         switch (context->performance_class()){
-        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+        case ControllerPerformanceClass::SerialPABotBase_Wired:
             roll_date_backward_N_Switch2_wired(context, skips);
             return;
-        case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+        case ControllerPerformanceClass::SerialPABotBase_Wireless:
             roll_date_backward_N_Switch2_wireless(context, skips);
             return;
         default:

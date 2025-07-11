@@ -51,7 +51,7 @@ public:
         return m_supported_features;
     }
     virtual ControllerPerformanceClass performance_class() const override{
-        return ControllerPerformanceClass::SerialPABotBase_Wired_125Hz;
+        return ControllerPerformanceClass::SerialPABotBase_Wired;
     }
 
     virtual Milliseconds ticksize() const override{

@@ -75,7 +75,7 @@ DaySkipperJPN::DaySkipperJPN()
 void DaySkipperJPN::run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     using namespace DateSkippers::Switch1;
 
-    bool needs_inference = context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz;
+    bool needs_inference = context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired;
 
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
@@ -130,7 +130,7 @@ void DaySkipperJPN::run_switch1(SingleSwitchProgramEnvironment& env, ProControll
 void DaySkipperJPN::run_switch2(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     using namespace DateSkippers::Switch2;
 
-    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz){
+    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired){
         throw UserSetupError(
             env.logger(),
             "This program requires a tick precise wired controller."

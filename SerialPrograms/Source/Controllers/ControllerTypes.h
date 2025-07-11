@@ -60,8 +60,8 @@ enum class ControllerFeature{
 
 enum class ControllerPerformanceClass{
     Unknown,
-    SerialPABotBase_Wired_125Hz,
-    SerialPABotBase_Wireless_ESP32,
+    SerialPABotBase_Wired,
+    SerialPABotBase_Wireless,
     SysbotBase,
 };
 

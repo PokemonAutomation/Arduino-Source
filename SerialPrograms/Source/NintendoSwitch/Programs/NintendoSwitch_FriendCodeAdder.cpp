@@ -8,6 +8,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_FriendCodeAdder.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
 
@@ -71,6 +72,8 @@ FriendCodeAdder::FriendCodeAdder()
 
 void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     grip_menu_connect_go_home(context);
+
+    ensure_at_home(env.console, context);
 
     ConsoleType type = env.console.state().console_type();
     uint8_t scroll_down_slots = 0;

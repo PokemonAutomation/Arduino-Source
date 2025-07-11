@@ -155,7 +155,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
             "This program only works on the Switch 1."
         );
     }
-    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz){
+    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired){
         throw UserSetupError(
             env.logger(),
             "This program requires a tick precise wired controller."

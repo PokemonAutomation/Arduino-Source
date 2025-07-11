@@ -120,10 +120,10 @@ void neutral_date_skip(ConsoleHandle& console, ProControllerContext& context){
 
     if (is_switch1(type)){
         switch (context->performance_class()){
-        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+        case ControllerPerformanceClass::SerialPABotBase_Wired:
             neutral_date_skip_switch1_wired(context);
             return;
-        case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+        case ControllerPerformanceClass::SerialPABotBase_Wireless:
             neutral_date_skip_switch1_wireless(context);
             return;
         case ControllerPerformanceClass::SysbotBase:
@@ -139,10 +139,10 @@ void neutral_date_skip(ConsoleHandle& console, ProControllerContext& context){
 
     if (is_switch2(type)){
         switch (context->performance_class()){
-        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+        case ControllerPerformanceClass::SerialPABotBase_Wired:
             neutral_date_skip_switch2_wired(context);
             return;
-        case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+        case ControllerPerformanceClass::SerialPABotBase_Wireless:
             neutral_date_skip_switch2_wireless(context);
             return;
         default:

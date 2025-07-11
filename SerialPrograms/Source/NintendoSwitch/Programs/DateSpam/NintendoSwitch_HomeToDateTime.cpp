@@ -27,10 +27,10 @@ namespace NintendoSwitch{
 
 void home_to_date_time_Switch1_blind(Logger& logger, ProControllerContext& context, bool to_date_change){
     switch (context->performance_class()){
-    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+    case ControllerPerformanceClass::SerialPABotBase_Wired:
         home_to_date_time_Switch1_wired_blind(logger, context, to_date_change);
         return;
-    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+    case ControllerPerformanceClass::SerialPABotBase_Wireless:
         home_to_date_time_Switch1_wireless_esp32_blind(logger, context, to_date_change);
         return;
     default:
@@ -41,7 +41,7 @@ void home_to_date_time_Switch1_blind(Logger& logger, ProControllerContext& conte
 }
 bool home_to_date_time_Switch1_feedback(ConsoleHandle& console, ProControllerContext& context, bool to_date_change){
     switch (context->performance_class()){
-    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+    case ControllerPerformanceClass::SerialPABotBase_Wired:
         home_to_date_time_Switch1_wired_feedback(console, context, to_date_change);
         return true;
     default:;
@@ -55,10 +55,10 @@ void home_to_date_time_Switch2_blind(
     ConsoleType console_type, bool to_date_change
 ){
     switch (context->performance_class()){
-    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+    case ControllerPerformanceClass::SerialPABotBase_Wired:
         home_to_date_time_Switch2_wired_blind(logger, context, console_type, to_date_change);
         return;
-    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+    case ControllerPerformanceClass::SerialPABotBase_Wireless:
         home_to_date_time_Switch2_wireless_blind(logger, context, console_type, to_date_change);
         return;
     default:
@@ -72,10 +72,10 @@ bool home_to_date_time_Switch2_feedback(
     ConsoleType console_type, bool to_date_change
 ){
     switch (context->performance_class()){
-    case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+    case ControllerPerformanceClass::SerialPABotBase_Wired:
         home_to_date_time_Switch2_wired_feedback(console, context, to_date_change);
         return true;
-    case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+    case ControllerPerformanceClass::SerialPABotBase_Wireless:
         home_to_date_time_Switch2_wireless_feedback(console, context, to_date_change);
         return true;
     default:;
@@ -150,7 +150,7 @@ void home_to_date_time(JoyconContext& context, bool to_date_change){
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 100ms + tv;
 
-    //From ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32
+    //From ControllerPerformanceClass::SerialPABotBase_Wireless
     //as Joycon will only have that controller type
 
     pbf_move_joystick(context, 255, 128, 2*unit, unit);
