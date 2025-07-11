@@ -32,7 +32,7 @@ public:
         m_listeners.add(listener);
     }
     void remove_listener(Listener& listener){
-        m_listeners.add(listener);
+        m_listeners.remove(listener);
     }
 
 public:
