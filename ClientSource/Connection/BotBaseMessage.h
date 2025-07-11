@@ -40,13 +40,13 @@ struct BotBaseMessage{
         if (type != MessageType){
             throw SerialProtocolException(
                 logger, PA_CURRENT_FUNCTION,
-                "Received incorrect response type: " + std::to_string(type)
+                "Received Incorrect Response Type: Expected = " + std::to_string(MessageType) + ", Actual = " + std::to_string(type)
             );
         }
         if (body.size() != sizeof(MessageBody)){
             throw SerialProtocolException(
                 logger, PA_CURRENT_FUNCTION,
-                "Received incorrect response size: " + std::to_string(body.size())
+                "Received Incorrect Response Size: Expected = " + std::to_string(sizeof(MessageBody)) + ", Actual = " + std::to_string(body.size())
             );
         }
         memcpy(&params, body.c_str(), body.size());
