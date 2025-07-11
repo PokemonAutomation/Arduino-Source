@@ -62,9 +62,12 @@ public:
         emit internal_connect(address, port);
     }
 
-    virtual size_t blocking_send(const void* data, size_t bytes) override{
-//        cout << "blocking_send() - start: " << std::string((const char*)data, bytes) << endl;
+    virtual size_t send(const void* data, size_t bytes) override{
+//        cout << "send() - start: " << std::string((const char*)data, bytes) << endl;
+        emit internal_send(std::string((const char*)data, bytes));
+        return bytes;
 
+#if 0
         SendData send_data;
         send_data.data = data;
         send_data.total_bytes = bytes;
@@ -77,14 +80,15 @@ public:
             return send_data.data == nullptr || m_socket == nullptr;
         });
 
-//        cout << "blocking_send() - end: " << std::string((const char*)data, bytes) << endl;
+//        cout << "send() - end: " << std::string((const char*)data, bytes) << endl;
         return send_data.bytes_sent;
+#endif
     }
 
 
 signals:
     void internal_connect(const std::string& address, uint16_t port);
-    void send(void* data);
+    void internal_send(std::string packet);
 
 private:
     virtual void run() override{
@@ -135,6 +139,29 @@ private:
             }
         );
         QThread::connect(
+            this, &ClientSocket_Qt::internal_send,
+            &socket, [this](std::string packet){
+//                cout << "internal_send() - enter: " << packet.data() << endl;
+
+                size_t bytes = packet.size();
+
+                const char* ptr = (const char*)packet.data();
+                while (bytes > 0 && m_socket->state() == QAbstractSocket::ConnectedState){
+                    qint64 current_sent = m_socket->write(ptr, bytes);
+                    if (current_sent <= 0){
+                        break;
+                    }
+                    ptr += current_sent;
+                    bytes -= current_sent;
+                }
+
+                m_socket->flush();
+
+//                cout << "internal_send() - exit " << endl;
+            }
+        );
+#if 0
+        QThread::connect(
             this, &ClientSocket_Qt::send,
             &socket, [this](void* params){
 //                cout << "internal_send() - enter " << endl;
@@ -165,6 +192,7 @@ private:
 //                cout << "internal_send() - exit " << endl;
             }
         );
+#endif
 
 
         {
