@@ -45,9 +45,21 @@ private:
     virtual void on_recv(const void* data, size_t bytes) override;
     virtual void on_recv_message(BotBaseMessage message) = 0;
 
+    enum class ErrorBatchType{
+        NO_ERROR_,
+        ZERO_BYTES,
+        FF_BYTES,
+        ASCII_BYTES,
+        OTHER,
+    };
+    void push_error_byte(ErrorBatchType type, char byte);
+
 private:
     std::unique_ptr<StreamConnection> m_connection;
     std::deque<char> m_recv_buffer;
+
+    ErrorBatchType m_current_error_type;
+    std::string m_current_error_batch;
 
 protected:
     Logger& m_logger;

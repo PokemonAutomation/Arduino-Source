@@ -82,6 +82,33 @@ void PABotBaseConnection::send_message(const BotBaseMessage& message, bool is_re
 }
 
 
+void PABotBaseConnection::push_error_byte(ErrorBatchType type, char byte){
+    if (m_current_error_type == type){
+        m_current_error_batch.push_back(byte);
+        return;
+    }
+
+    switch (m_current_error_type){
+    case ErrorBatchType::NO_ERROR_:
+        break;
+    case ErrorBatchType::ZERO_BYTES:
+        m_sniffer->log("Skipped " + std::to_string(m_current_error_batch.size()) + " zero byte(s).");
+        break;
+    case ErrorBatchType::FF_BYTES:
+        m_sniffer->log("Skipped " + std::to_string(m_current_error_batch.size()) + " 0xff byte(s).");
+        break;
+    case ErrorBatchType::ASCII_BYTES:
+        m_sniffer->log("Received possible ASCII: " + m_current_error_batch);
+        break;
+    case ErrorBatchType::OTHER:
+//        m_sniffer->log("Skipped " + std::to_string(m_current_error_batch.size()) + " invalid length byte(s).");
+        break;
+    }
+
+    m_current_error_batch.clear();
+    m_current_error_batch.push_back(byte);
+    m_current_error_type = type;
+}
 void PABotBaseConnection::on_recv(const void* data, size_t bytes){
     //  Push into receive buffer.
     for (size_t c = 0; c < bytes; c++){
@@ -92,25 +119,32 @@ void PABotBaseConnection::on_recv(const void* data, size_t bytes){
         uint8_t length = ~m_recv_buffer[0];
 
         if (m_recv_buffer[0] == 0){
-            m_sniffer->log("Skipping zero byte.");
+//            m_sniffer->log("Skipping zero byte.");
+            push_error_byte(ErrorBatchType::ZERO_BYTES, 0);
             m_recv_buffer.pop_front();
             continue;
         }
 
         //  Message is too short.
         if (length < PABB_PROTOCOL_OVERHEAD){
-            m_sniffer->log("Message is too short: bytes = " + std::to_string(length));
+            if (length == 0){
+                push_error_byte(ErrorBatchType::FF_BYTES, ~length);
+            }else{
+                m_sniffer->log("Message is too short: bytes = " + std::to_string(length));
+                push_error_byte(ErrorBatchType::OTHER, ~length);
+            }
             m_recv_buffer.pop_front();
             continue;
         }
 
         //  Message is too long.
         if (length > PABB_PROTOCOL_MAX_PACKET_SIZE){
-            char ascii = ~length;
-            std::string text = ascii < 32
-                ? ", ascii = " + std::to_string(ascii)
-                : std::string(", char = ") + ascii;
-            m_sniffer->log("Message is too long: bytes = " + std::to_string(length) + text);
+//            char ascii = ~length;
+//            std::string text = ascii < 32
+//                ? ", ascii = " + std::to_string(ascii)
+//                : std::string(", char = ") + ascii;
+//            m_sniffer->log("Message is too long: bytes = " + std::to_string(length) + text);
+            push_error_byte(ErrorBatchType::ASCII_BYTES, ~length);
             m_recv_buffer.pop_front();
             continue;
         }
@@ -119,6 +153,9 @@ void PABotBaseConnection::on_recv(const void* data, size_t bytes){
         if (length > m_recv_buffer.size()){
             return;
         }
+
+        m_current_error_type = ErrorBatchType::NO_ERROR_;
+        m_current_error_batch.clear();
 
         std::string message(m_recv_buffer.begin(), m_recv_buffer.begin() + length);
 

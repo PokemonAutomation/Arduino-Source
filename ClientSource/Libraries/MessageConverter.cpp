@@ -420,7 +420,7 @@ int register_message_converters_custom_info(){
         PABB_MSG_INFO_H32_LABEL,
         [](const std::string& body){
             std::ostringstream ss;
-            ss << "PABB_MSG_INFO_I32_LABEL - ";
+            ss << "PABB_MSG_INFO_H32_LABEL - ";
             if (body.size() < sizeof(uint32_t)){
                 ss << "(invalid size)" << std::endl;
                 return ss.str();
