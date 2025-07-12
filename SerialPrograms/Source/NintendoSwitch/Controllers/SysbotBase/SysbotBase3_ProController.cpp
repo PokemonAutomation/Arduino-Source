@@ -212,12 +212,14 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     if (m_left_joystick.is_busy()){
         double fx = JoystickTools::linear_u8_to_float(m_left_joystick.x);
         double fy = -JoystickTools::linear_u8_to_float(m_left_joystick.y);
+        JoystickTools::clip_magnitude(fx, fy);
         left_x = JoystickTools::linear_float_to_s16(fx);
         left_y = JoystickTools::linear_float_to_s16(fy);
     }
     if (m_right_joystick.is_busy()){
         double fx = JoystickTools::linear_u8_to_float(m_right_joystick.x);
         double fy = -JoystickTools::linear_u8_to_float(m_right_joystick.y);
+        JoystickTools::clip_magnitude(fx, fy);
         right_x = JoystickTools::linear_float_to_s16(fx);
         right_y = JoystickTools::linear_float_to_s16(fy);
     }

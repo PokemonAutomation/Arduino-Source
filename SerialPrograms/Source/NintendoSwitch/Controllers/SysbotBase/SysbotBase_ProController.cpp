@@ -256,6 +256,7 @@ void ProController_SysbotBase::send_diff(
     ){
         double fx = JoystickTools::linear_u8_to_float(new_state.left_x);
         double fy = -JoystickTools::linear_u8_to_float(new_state.left_y);
+        JoystickTools::clip_magnitude(fx, fy);
 //        cout << "fx = " << fx << ", fy = " << fy << endl;
         int16_t ix = JoystickTools::linear_float_to_s16(fx);
         int16_t iy = JoystickTools::linear_float_to_s16(fy);
@@ -271,6 +272,7 @@ void ProController_SysbotBase::send_diff(
     ){
         double fx = JoystickTools::linear_u8_to_float(new_state.right_x);
         double fy = -JoystickTools::linear_u8_to_float(new_state.right_y);
+        JoystickTools::clip_magnitude(fx, fy);
         int16_t ix = JoystickTools::linear_float_to_s16(fx);
         int16_t iy = JoystickTools::linear_float_to_s16(fy);
         message += "setStick RIGHT ";
