@@ -174,7 +174,7 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
     //Roll the date back before doing anything else.
     start_local_trade(env, context);
     pbf_press_button(context, BUTTON_HOME, 160ms, 1000ms);
-    home_to_date_time(context, true);
+    home_to_date_time(env.console, context, true);
     env.log("Rolling date back.");
     roll_date_backward_N(context, MAX_YEAR);
     year = 0;
@@ -193,7 +193,7 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
 
         //Dateskip
         pbf_press_button(context, BUTTON_HOME, 160ms, 1000ms);
-        home_to_date_time(context, true);
+        home_to_date_time(env.console, context, true);
         if (year >= MAX_YEAR){
             env.log("Rolling date back.");
             roll_date_backward_N(context, MAX_YEAR);
@@ -216,7 +216,7 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
 
     if (FIX_TIME_WHEN_DONE){
         pbf_press_button(context, BUTTON_HOME, 80ms, 1000ms);
-        home_to_date_time(context, false);
+        home_to_date_time(env.console, context, false);
         pbf_press_button(context, BUTTON_A, 50ms, 500ms);
         pbf_press_button(context, BUTTON_A, 50ms, 500ms);
         pbf_wait(context, 100ms);

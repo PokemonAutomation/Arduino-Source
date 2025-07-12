@@ -17,11 +17,24 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-//// Navigates from Home screen to the Date and Time screen. Using visual inference.
-//void home_to_date_time(VideoStream& stream, ProControllerContext& context, bool to_date_change);
 
-//// Navigates from Home screen to the Date and Time screen. Done blind, without inference.
-//void home_to_date_time(Logger& logger, ProControllerContext& context, bool to_date_change);
+void home_to_date_time(
+    ConsoleHandle& console, ProControllerContext& context,
+    bool to_date_change
+);
+
+void home_to_date_time(
+    ConsoleHandle& console, JoyconContext& context,
+    bool to_date_change
+);
+
+
+
+
+
+//
+//  Internal Headers
+//
 
 
 void home_to_date_time_Switch1_wired_blind(
@@ -39,19 +52,11 @@ void home_to_date_time_Switch1_wired_feedback(
 
 
 
-void home_to_date_time_Switch2_wired_blind(
+void home_to_date_time_Switch2_procon_blind(
     Logger& logger, ProControllerContext& context,
     ConsoleType console_type, bool to_date_change
 );
-void home_to_date_time_Switch2_wireless_blind(
-    Logger& logger, ProControllerContext& context,
-    ConsoleType console_type, bool to_date_change
-);
-void home_to_date_time_Switch2_wired_feedback(
-    ConsoleHandle& console, ProControllerContext& context,
-    bool to_date_change
-);
-void home_to_date_time_Switch2_wireless_feedback(
+void home_to_date_time_Switch2_procon_feedback(
     ConsoleHandle& console, ProControllerContext& context,
     bool to_date_change
 );
@@ -63,12 +68,18 @@ ConsoleType settings_detect_console_type(
 
 
 
-void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bool to_date_change);
 
 
 
-//Joycon must not be sideways
-void home_to_date_time(JoyconContext& context, bool to_date_change);
+//  Joycon must not be sideways
+void home_to_date_time_Switch1_joycon_blind(
+    JoyconContext& context, bool to_date_change
+);
+void home_to_date_time_Switch2_joycon_feedback(
+    ConsoleHandle& console, JoyconContext& context,
+    bool to_date_change
+);
+
 
 
 

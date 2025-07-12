@@ -185,6 +185,16 @@ void ssf_press_joystick(
     Milliseconds delay, Milliseconds hold, Milliseconds cool = 0ms
 );
 void ssf_mash1_button   (JoyconContext& context, Button button, Milliseconds duration);
+void ssf_issue_scroll(
+    JoyconContext& context,
+    DpadPosition direction,
+    Milliseconds delay
+);
+void ssf_issue_scroll(
+    JoyconContext& context,
+    DpadPosition direction,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+);
 
 
 

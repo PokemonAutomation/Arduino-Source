@@ -43,7 +43,8 @@ void go_home(ConsoleHandle& console, ProControllerContext& context){
 }
 
 
-void ensure_at_home(ConsoleHandle& console, ProControllerContext& context){
+template <typename ControllerContext>
+void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
     //  Feedback not available. Just assume we're already on Home.
     if (!console.video().snapshot()){
         pbf_wait(context, 640ms);
@@ -67,6 +68,14 @@ void ensure_at_home(ConsoleHandle& console, ProControllerContext& context){
         "Unable to find Switch Home",
         console
     );
+}
+
+
+void ensure_at_home(ConsoleHandle& console, ProControllerContext& context){
+    ensure_at_home<ProControllerContext>(console, context);
+}
+void ensure_at_home(ConsoleHandle& console, JoyconContext& context){
+    ensure_at_home<JoyconContext>(console, context);
 }
 
 

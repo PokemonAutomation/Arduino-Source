@@ -171,6 +171,46 @@ void ssf_press_joystick(
 void ssf_mash1_button(JoyconContext& context, Button button, Milliseconds duration){
     context->issue_mash_button(&context, button, duration);
 }
+void ssf_issue_scroll(
+    JoyconContext& context,
+    DpadPosition direction,
+    Milliseconds delay
+){
+    ssf_issue_scroll(context, direction, delay, 2*delay, delay);
+}
+void ssf_issue_scroll(
+    JoyconContext& context,
+    DpadPosition direction,
+    Milliseconds delay, Milliseconds hold, Milliseconds cool
+){
+    switch (direction){
+    case DpadPosition::DPAD_UP:
+        ssf_press_joystick(context, 128, 0, delay, hold, cool);
+        break;
+    case DpadPosition::DPAD_UP_RIGHT:
+        ssf_press_joystick(context, 255, 0, delay, hold, cool);
+        break;
+    case DpadPosition::DPAD_RIGHT:
+        ssf_press_joystick(context, 255, 128, delay, hold, cool);
+        break;
+    case DpadPosition::DPAD_DOWN_RIGHT:
+        ssf_press_joystick(context, 255, 255, delay, hold, cool);
+        break;
+    case DpadPosition::DPAD_DOWN:
+        ssf_press_joystick(context, 128, 255, delay, hold, cool);
+        break;
+    case DpadPosition::DPAD_DOWN_LEFT:
+        ssf_press_joystick(context, 0, 255, delay, hold, cool);
+        break;
+    case DpadPosition::DPAD_LEFT:
+        ssf_press_joystick(context, 0, 128, delay, hold, cool);
+        break;
+    case DpadPosition::DPAD_UP_LEFT:
+        ssf_press_joystick(context, 0, 0, delay, hold, cool);
+        break;
+    default:;
+    }
+}
 
 
 

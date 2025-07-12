@@ -11,8 +11,8 @@
 //#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 //#include "CommonTools/Async/InferenceRoutines.h"
 #include "Controllers/ControllerTypes.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 //#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
@@ -56,15 +56,14 @@ void home_to_date_time_Switch2_blind(
 ){
     switch (context->performance_class()){
     case ControllerPerformanceClass::SerialPABotBase_Wired:
-        home_to_date_time_Switch2_wired_blind(logger, context, console_type, to_date_change);
-        return;
     case ControllerPerformanceClass::SerialPABotBase_Wireless:
-        home_to_date_time_Switch2_wireless_blind(logger, context, console_type, to_date_change);
+        home_to_date_time_Switch2_procon_blind(logger, context, console_type, to_date_change);
         return;
     default:
-        //  Slow version for tick-imprecise controllers.
-        home_to_date_time_Switch1_sbb_blind(logger, context, to_date_change);
-        return;
+        throw InternalProgramError(
+            &logger, PA_CURRENT_FUNCTION,
+            "Unsupported ControllerPerformanceClass: " + std::to_string((int)context->performance_class())
+        );
     }
 }
 bool home_to_date_time_Switch2_feedback(
@@ -73,10 +72,8 @@ bool home_to_date_time_Switch2_feedback(
 ){
     switch (context->performance_class()){
     case ControllerPerformanceClass::SerialPABotBase_Wired:
-        home_to_date_time_Switch2_wired_feedback(console, context, to_date_change);
-        return true;
     case ControllerPerformanceClass::SerialPABotBase_Wireless:
-        home_to_date_time_Switch2_wireless_feedback(console, context, to_date_change);
+        home_to_date_time_Switch2_procon_feedback(console, context, to_date_change);
         return true;
     default:;
         return false;
@@ -146,59 +143,30 @@ void home_to_date_time(ConsoleHandle& console, ProControllerContext& context, bo
 
 
 
-void home_to_date_time(JoyconContext& context, bool to_date_change){
-    Milliseconds tv = context->timing_variation();
-    Milliseconds unit = 100ms + tv;
 
-    //From ControllerPerformanceClass::SerialPABotBase_Wireless
-    //as Joycon will only have that controller type
+void home_to_date_time(ConsoleHandle& console, JoyconContext& context, bool to_date_change){
+    ensure_at_home(console, context);
 
-    pbf_move_joystick(context, 255, 128, 2*unit, unit);
-    pbf_move_joystick(context, 255, 128, 2*unit, unit);
-    pbf_move_joystick(context, 255, 128, 2*unit, unit);
-
-    //  Down twice in case we drop one.
-    pbf_move_joystick(context, 128, 255, 2*unit, unit);
-    pbf_move_joystick(context, 128, 255, 2*unit, unit);
-
-    pbf_move_joystick(context, 0, 128, 2*unit, unit);
-
-    //  Press A multiple times to make sure one goes through.
-    pbf_press_button(context, BUTTON_A, 2*unit, unit);
-    pbf_press_button(context, BUTTON_A, 2*unit, unit);
-    pbf_press_button(context, BUTTON_A, 2*unit, unit);
-
-    // Scroll to System, move right to top option (update)
-    pbf_move_joystick(context, 128, 255, 2500ms, unit);
-    pbf_move_joystick(context, 255, 128, 500ms, unit);
-    
-    // To date/time
-    pbf_move_joystick(context, 128, 255, 2*unit, unit);
-    pbf_move_joystick(context, 128, 255, 2*unit, unit);
-    context.wait_for_all_requests();
-    pbf_move_joystick(context, 128, 255, 525ms, unit);
-    //pbf_move_joystick(context, 128, 255, 365ms, 305ms);
-    pbf_move_joystick(context, 128, 255, 2*unit, unit);
-    //pbf_move_joystick(context, 128, 255, 2*unit, unit);
-    context.wait_for_all_requests();
-    
-    if (!to_date_change){
-        ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
+    ConsoleTypeDetector_Home detector(console);
+    ConsoleType console_type = detector.detect_only(console.video().snapshot());
+    switch (console_type){
+    case ConsoleType::Switch1:
+        home_to_date_time_Switch1_joycon_blind(context, to_date_change);
         return;
+    case ConsoleType::Switch2_Unknown:
+    case ConsoleType::Switch2_FW19_International:
+    case ConsoleType::Switch2_FW19_JapanLocked:
+    case ConsoleType::Switch2_FW20_International:
+    case ConsoleType::Switch2_FW20_JapanLocked:
+        home_to_date_time_Switch2_joycon_feedback(console, context, to_date_change);
+        return;
+    default:;
     }
-
-    //ssf_press_button(context, BUTTON_A, unit);
-    pbf_press_button(context, BUTTON_A, 2*unit, unit);
-    context.wait_for_all_requests();
-    {
-        auto iterations = Milliseconds(216) / unit + 1;
-        do{
-            pbf_move_joystick(context, 128, 255, 2*unit, unit);
-        }while (--iterations);
-    }
-    pbf_move_joystick(context, 128, 255, 2*unit, 0ms);
+    throw UserSetupError(
+        console.logger(),
+        "Unsupported console type: " + ConsoleType_strings(console_type)
+    );
 }
-
 
 
 

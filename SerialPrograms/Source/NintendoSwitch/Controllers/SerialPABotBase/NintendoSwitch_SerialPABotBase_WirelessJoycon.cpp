@@ -175,6 +175,8 @@ void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* 
         );
     }
 
+//    cout << (int)m_right_joystick.x << " - " << (int)m_right_joystick.y << ": " << std::chrono::duration_cast<Milliseconds>(duration).count() << endl;
+
     PABB_NintendoSwitch_GyroState gyro{};
     bool gyro_active = populate_report_gyro(gyro);
 
