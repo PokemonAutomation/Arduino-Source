@@ -20,6 +20,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include <QGraphicsScene>
 #include "ML/DataLabeling/SegmentAnythingModel.h"
+#include "ML/UI/ML_ImageDisplayOption.h"
+#include "ML/UI/ML_ImageDisplaySession.h"
 
 class QGraphicsView;
 class QGraphicsPixmapItem;
@@ -78,9 +80,8 @@ public:
 private:
     friend class LabelImages_Widget;
     friend class DrawnBoundingBox;
-    // switch control options like what micro-controller 
-    // and what video source to use
-    NintendoSwitch::SwitchSystemOption m_switch_control_option;
+    // image display options like what image file is loaded
+    ImageDisplayOption m_switch_control_option;
     // the group option that holds rest of the options defined below:
     BatchOption m_options;
 
@@ -143,7 +144,7 @@ public:
 
 private:
     LabelImages& m_program;
-    NintendoSwitch::SwitchSystemSession m_session;
+    ImageDisplaySession m_session;
     ImageDisplayWidget* m_switch_widget;
     VideoOverlaySet m_overlay_set;
     DrawnBoundingBox m_drawn_box;

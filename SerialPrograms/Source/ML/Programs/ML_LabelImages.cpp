@@ -195,7 +195,6 @@ LabelImages_Descriptor::LabelImages_Descriptor()
 
 LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
-    , m_switch_control_option({}, false)
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
     , X("<b>X Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
@@ -413,12 +412,12 @@ LabelImages_Widget::~LabelImages_Widget(){
 }
 LabelImages_Widget::LabelImages_Widget(
     QWidget& parent,
-    LabelImages& instance,
+    LabelImages& program,
     PanelHolder& holder
 )
-    : PanelWidget(parent, instance, holder)
-    , m_program(instance)
-    , m_session(instance.m_switch_control_option, 0, 0)
+    : PanelWidget(parent, program, holder)
+    , m_program(program)
+    , m_session(program.m_switch_control_option, 0, 0)
     , m_overlay_set(m_session.overlay())
     , m_drawn_box(*this, m_session.overlay())
 {
@@ -453,10 +452,10 @@ LabelImages_Widget::LabelImages_Widget(
         program.update_rendered_objects(this->m_overlay_set);
     });
 
-    m_option_widget = instance.m_options.make_QtWidget(*scroll_inner);
+    m_option_widget = program.m_options.make_QtWidget(*scroll_inner);
     scroll_layout->addWidget(&m_option_widget->widget());
 
-    const VideoSourceDescriptor* video_source_desc = instance.m_switch_control_option.m_video.descriptor().get();
+    const VideoSourceDescriptor* video_source_desc = program.m_switch_control_option.m_video.descriptor().get();
     auto image_source_desc = dynamic_cast<const VideoSourceDescriptor_StillImage*>(video_source_desc);
     if (image_source_desc != nullptr){
         const std::string image_path = image_source_desc->path();

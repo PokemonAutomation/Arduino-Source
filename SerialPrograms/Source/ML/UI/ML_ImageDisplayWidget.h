@@ -11,6 +11,7 @@
 
 #include <QWidget>
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
+#include "CommonFramework/Globals.h"
 
 namespace PokemonAutomation{
     class CollapsibleGroupBox;
@@ -22,14 +23,10 @@ namespace PokemonAutomation{
     class AudioSelectorWidget;
     class VideoOverlay;
 
-namespace NintendoSwitch{
-    class CommandRow;
-    class SwitchSystemSession;
-}
-
 namespace ML{
 
-
+class ImageDisplaySession;
+class ImageDisplayCommandRow;
 
 // UI widget for controlling and monitoring a Nintendo Switch.
 // It includes:
@@ -38,14 +35,14 @@ namespace ML{
 // - Audio source selection UI
 // - Audio display
 // - Video stream display
-// It also owns a SwitchSystemSession that manages the life time of the controller,
+// It also owns an ImageDisplaySession that manages the life time of the controller,
 // audio and video streams that will be exposed to automation programs.
 class ImageDisplayWidget final : public QWidget, public CommandReceiver{
 public:
     virtual ~ImageDisplayWidget();
     ImageDisplayWidget(
         QWidget& parent,
-        NintendoSwitch::SwitchSystemSession& session,
+        ImageDisplaySession& session,
         uint64_t program_id
     );
 
@@ -68,13 +65,13 @@ private:
     virtual void focusOutEvent(QFocusEvent* event) override;
 
 private:
-    NintendoSwitch::SwitchSystemSession& m_session;
+    ImageDisplaySession& m_session;
 
     CollapsibleGroupBox* m_group_box;
 
     VideoDisplayWidget* m_video_display;
 
-    NintendoSwitch::CommandRow* m_command;
+    ImageDisplayCommandRow* m_command;
 
     VideoSourceSelectorWidget* m_video_selector;
 };

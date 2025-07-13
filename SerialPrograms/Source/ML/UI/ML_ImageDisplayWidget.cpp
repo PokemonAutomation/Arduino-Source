@@ -19,6 +19,9 @@
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch/Framework/UI/NintendoSwitch_CommandRow.h"
 #include "ML_ImageDisplayWidget.h"
+#include "ML_ImageDisplaySession.h"
+#include "ML_ImageDisplayOption.h"
+#include "ML_ImageDisplayCommandRow.h"
 
 //#include <iostream>
 //using std::cout;
@@ -36,7 +39,7 @@ ImageDisplayWidget::~ImageDisplayWidget(){
 
 ImageDisplayWidget::ImageDisplayWidget(
     QWidget& parent,
-    NintendoSwitch::SwitchSystemSession& session,
+    ImageDisplaySession& session,
     uint64_t program_id
 )
     : QWidget(&parent)
@@ -58,7 +61,7 @@ ImageDisplayWidget::ImageDisplayWidget(
 
         m_video_display = new VideoDisplayWidget(
             *this, *video_holder,
-            m_session.console_number(),
+            0,  // dummy console ID
             *this,
             m_session.video_session(),
             m_session.overlay_session()
@@ -73,12 +76,9 @@ ImageDisplayWidget::ImageDisplayWidget(
         m_video_selector = new VideoSourceSelectorWidget(m_session.logger(), m_session.video_session());
         group_layout->addWidget(m_video_selector);
 
-        m_command = new NintendoSwitch::CommandRow(
+        m_command = new ImageDisplayCommandRow(
             *widget,
-            m_session.controller_session(),
-            m_session.overlay_session(),
-            m_session.console_type(),
-            m_session.allow_commands_while_running()
+            m_session.overlay_session()
         );
         group_layout->addWidget(m_command);
     }
@@ -86,18 +86,14 @@ ImageDisplayWidget::ImageDisplayWidget(
     setFocusPolicy(Qt::StrongFocus);
 
     connect(
-        m_command, &NintendoSwitch::CommandRow::load_profile,
+        m_command, &ImageDisplayCommandRow::load_profile,
         m_command, [this](){
             std::string path = QFileDialog::getOpenFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();
             if (path.empty()){
                 return;
             }
 
-            NintendoSwitch::SwitchSystemOption option(
-                m_session.required_features(),
-                m_session.allow_commands_while_running()
-            );
-
+            ImageDisplayOption option;
             //  Deserialize into this local option instance.
             option.load_json(load_json_file(path));
 
@@ -105,7 +101,7 @@ ImageDisplayWidget::ImageDisplayWidget(
         }
     );
     connect(
-        m_command, &NintendoSwitch::CommandRow::save_profile,
+        m_command, &ImageDisplayCommandRow::save_profile,
         m_command, [this](){
             std::string path = QFileDialog::getSaveFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();
             if (path.empty()){
@@ -113,24 +109,18 @@ ImageDisplayWidget::ImageDisplayWidget(
             }
 
             //  Create a copy of option, to be able to serialize it later on
-            NintendoSwitch::SwitchSystemOption option(
-                m_session.required_features(),
-                m_session.allow_commands_while_running()
-            );
-
+            ImageDisplayOption option;
             m_session.get(option);
-
             option.to_json().dump(path);
         }
     );
     
     connect(
-        m_command, &NintendoSwitch::CommandRow::video_requested,
+        m_command, &ImageDisplayCommandRow::video_requested,
         m_video_display, [this](){
             global_dispatcher.dispatch([this]{
                 std::string filename = SCREENSHOTS_PATH() + "video-" + now_to_filestring() + ".mp4";
                 m_session.logger().log("Saving screenshot to: " + filename, COLOR_PURPLE);
-                m_session.save_history(filename);
             });
         }
     );
@@ -138,23 +128,6 @@ ImageDisplayWidget::ImageDisplayWidget(
 
 
 void ImageDisplayWidget::update_ui(ProgramState state){
-    m_session.controller_session().set_options_locked(state != ProgramState::STOPPED);
-    if (m_session.allow_commands_while_running()){
-        m_session.set_allow_user_commands("");
-    }else{
-        switch (state){
-        case ProgramState::NOT_READY:
-            m_session.set_allow_user_commands("Program is not ready.");
-            break;
-        case ProgramState::STOPPED:
-            m_session.set_allow_user_commands("");
-            break;
-        case ProgramState::RUNNING:
-        case ProgramState::STOPPING:
-            m_session.set_allow_user_commands("Program is running.");
-            break;
-        }
-    }
     m_command->on_state_changed(state);
 }
 

@@ -1,0 +1,83 @@
+/*  ML Image Display Command Row
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef ML_ImageDisplayCommandRow_H
+#define ML_ImageDisplayCommandRow_H
+
+#include <QComboBox>
+#include <QLabel>
+#include <QPushButton>
+#include <QCheckBox>
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
+#include "Controllers/ControllerSession.h"
+#include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
+
+namespace PokemonAutomation{
+namespace ML{
+
+
+// UI that shows the checkerboxes to control whether to show video overlay elements.
+// e.g. checkerbox to toggle on/off overlay boxes
+class ImageDisplayCommandRow :
+    public QWidget,
+    public VideoOverlaySession::ContentListener,
+    public ControllerSession::Listener
+{
+    Q_OBJECT
+
+public:
+    ~ImageDisplayCommandRow();
+    ImageDisplayCommandRow(
+        QWidget& parent,
+        VideoOverlaySession& session
+    );
+
+    void on_key_press(const QKeyEvent& key);
+    void on_key_release(const QKeyEvent& key);
+
+signals:
+    void load_profile();
+    void save_profile();
+    void screenshot_requested();
+    void video_requested();
+
+public:
+    void set_focus(bool focused);
+    void update_ui();
+    void on_state_changed(ProgramState state);
+
+private:
+    virtual void on_overlay_enabled_boxes  (bool enabled) override;
+    virtual void on_overlay_enabled_text   (bool enabled) override;
+    virtual void on_overlay_enabled_images (bool enabled) override;
+    virtual void on_overlay_enabled_log    (bool enabled) override;
+    virtual void on_overlay_enabled_stats  (bool enabled) override;
+    virtual void ready_changed(bool ready) override;
+
+private:
+    VideoOverlaySession& m_session;
+    QComboBox* m_command_box;
+    QLabel* m_status;
+
+    QCheckBox* m_overlay_log;
+    QCheckBox* m_overlay_text;
+    QCheckBox* m_overlay_images;
+    QCheckBox* m_overlay_boxes;
+    QCheckBox* m_overlay_stats;
+
+    QPushButton* m_load_profile_button;
+    QPushButton* m_save_profile_button;
+    QPushButton* m_screenshot_button;
+    QPushButton* m_video_button;
+    bool m_last_known_focus;
+    ProgramState m_last_known_state;
+};
+
+
+}
+}
+#endif
