@@ -1,16 +1,16 @@
-/*  ML Image Display Option
+/*  ML Image Annotation Display Option
  *
  *  From: https://github.com/PokemonAutomation/
  *
  *  This class represents the serializable state of an image display and label UI.
  * 
  *  This class is not thread-safe. To access internal state of an image display session
- *  in a thread-safe way, use ImageDisplaySession.
+ *  in a thread-safe way, use ImageAnnotationDisplaySession.
  *
  */
 
-#ifndef ML_ImageDisplayOption_H
-#define ML_ImageDisplayOption_H
+#ifndef POKEMON_AUTOMATION_ML_ImageAnnotationDisplayOption_H
+#define POKEMON_AUTOMATION_ML_ImageAnnotationDisplayOption_H
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
@@ -26,26 +26,17 @@ namespace ML{
 
 
 // options to load an image for image labeling purposes
-class ImageDisplayOption{
-    static const std::string JSON_CONTROLLER;
-    static const std::string JSON_CAMERA;
-    static const std::string JSON_VIDEO;
-    static const std::string JSON_AUDIO;
-    static const std::string JSON_OVERLAY;
-    static const std::string JSON_CONSOLE_TYPE;
-
+class ImageAnnotationDisplayOption{
 public:
-    ImageDisplayOption();
-    ImageDisplayOption(const JsonValue& json);
+    ImageAnnotationDisplayOption();
+    ImageAnnotationDisplayOption(const JsonValue& json);
 
     void load_json(const JsonValue& json);
     JsonValue to_json() const;
 
-
+    
 public:
-    ControllerOption m_controller;
-    VideoSourceOption m_video;
-    AudioOption m_audio;
+    std::string m_image_path;
     VideoOverlayOption m_overlay;
 };
 

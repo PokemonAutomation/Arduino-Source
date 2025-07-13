@@ -1,4 +1,4 @@
-/*  ML Image Display Session
+/*  ML Image Annotation Display Session
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -12,17 +12,19 @@
  *
  */
 
-#ifndef ML_ImageDisplaySession_H
-#define ML_ImageDisplaySession_H
+#ifndef POKEMON_AUTOMATION_ML_ImageAnnotationDisplaySession_H
+#define POKEMON_AUTOMATION_ML_ImageAnnotationDisplaySession_H
 
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/VideoPipeline/VideoSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
+#include "CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h"
 #include "Controllers/ControllerSession.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
-#include "ML_ImageDisplayOption.h"
+#include "ML_ImageAnnotationDisplayOption.h"
+
 
 namespace PokemonAutomation{
     class CpuUtilizationStat;
@@ -32,32 +34,36 @@ namespace ML{
 
 
 
-class ImageDisplaySession {
+class ImageAnnotationDisplaySession {
 public:
-    ~ImageDisplaySession();
-    ImageDisplaySession(
-        ImageDisplayOption& option,
-        uint64_t program_id,
-        size_t console_number
-    );
+    ~ImageAnnotationDisplaySession();
+    ImageAnnotationDisplaySession(ImageAnnotationDisplayOption& option);
 
 public:
     Logger& logger(){ return m_logger; }
-    virtual VideoFeed& video() { return m_video; }
+    virtual VideoFeed& video() { return m_video_session; }
     VideoOverlay& overlay(){ return m_overlay; }
 
-public:
-    void get(ImageDisplayOption& option);
-    void set(const ImageDisplayOption& option);
+    void set_image_source(const std::string& path);
 
-    VideoSession& video_session(){ return m_video; }
+    const ImageAnnotationDisplayOption& option() const { return m_display_option; }
+
+public:
+    void get(ImageAnnotationDisplayOption& option);
+    void set(const ImageAnnotationDisplayOption& option);
+
+    VideoSession& video_session(){ return m_video_session; }
     VideoOverlaySession& overlay_session(){ return m_overlay; }
 
 private:
     TaggedLogger m_logger;
 
-    VideoSession m_video;
+    ImageAnnotationDisplayOption& m_display_option;
+    VideoSourceOption m_still_image_option;
+    VideoSession m_video_session;
     VideoOverlaySession m_overlay;
+
+    std::shared_ptr<VideoSourceDescriptor_StillImage> m_still_image_descriptor;
 
     std::unique_ptr<CpuUtilizationStat> m_cpu_utilization;
     std::unique_ptr<ThreadUtilizationStat> m_main_thread_utilization;

@@ -101,9 +101,11 @@ public:
 
 
 public:
-    //  Returns the currently measured frames/second for the video source + display.
+    //  Returns the currently measured frames/second for the video source.
     //  Use this for diagnostic purposes.
     virtual double fps_source() const = 0;
+    //  Returns the currently measured frames/second for the video display thread.
+    //  Use this for diagnostic purposes.
     virtual double fps_display() const = 0;
 };
 

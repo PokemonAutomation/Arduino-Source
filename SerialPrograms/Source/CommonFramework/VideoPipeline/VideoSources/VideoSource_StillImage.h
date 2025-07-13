@@ -29,12 +29,6 @@ public:
     std::string path() const;
     // set the image source path
     void set_path(std::string path);
-    // Get the source image width. Its value is only loaded after `make_VideoSource()` is called.
-    // Otherwise, return 0.
-    size_t source_image_width() const{return m_source_image_width;}
-    // Get the source image height. Its value is only loaded after `make_VideoSource()` is called.
-    // Otherwise, return 0.
-    size_t source_image_height() const{return m_source_image_height;}
 
     virtual bool should_reload() const override{ return true; }
     virtual bool operator==(const VideoSourceDescriptor& x) const override;
@@ -52,8 +46,6 @@ public:
 private:
     mutable SpinLock m_lock;
     std::string m_path;
-    mutable size_t m_source_image_width = 0;
-    mutable size_t m_source_image_height = 0;
 };
 
 

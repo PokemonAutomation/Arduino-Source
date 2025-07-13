@@ -51,6 +51,7 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
     update_source_list();
     update_resolution_list();
 
+    // Set the action for the video source selection box
     connect(
         m_sources_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [this](int index){
@@ -62,6 +63,8 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
             }
         }
     );
+
+    // Set the action for the video resolution selection box
     connect(
         m_resolution_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [this](int index){
@@ -72,6 +75,8 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
             m_session.set_resolution(resolution);
         }
     );
+
+    //  Set the action for the video reset button
     connect(
         m_reset_button, &QPushButton::clicked,
         this, [this](bool){

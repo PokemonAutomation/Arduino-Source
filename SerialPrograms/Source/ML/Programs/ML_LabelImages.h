@@ -20,8 +20,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include <QGraphicsScene>
 #include "ML/DataLabeling/SegmentAnythingModel.h"
-#include "ML/UI/ML_ImageDisplayOption.h"
-#include "ML/UI/ML_ImageDisplaySession.h"
+#include "ML/UI/ML_ImageAnnotationDisplayOption.h"
+#include "ML/UI/ML_ImageAnnotationDisplaySession.h"
 
 class QGraphicsView;
 class QGraphicsPixmapItem;
@@ -35,7 +35,7 @@ class ConfigWidget;
 namespace ML{
 
 
-class ImageDisplayWidget;
+class ImageAnnotationDisplayWidget;
 class LabelImages_Widget;
 
 
@@ -80,8 +80,11 @@ public:
 private:
     friend class LabelImages_Widget;
     friend class DrawnBoundingBox;
+
     // image display options like what image file is loaded
-    ImageDisplayOption m_switch_control_option;
+    ImageAnnotationDisplayOption m_display_option;
+    // handles image display session, holding a reference to m_display_option
+    ImageAnnotationDisplaySession m_display_session;
     // the group option that holds rest of the options defined below:
     BatchOption m_options;
 
@@ -144,8 +147,8 @@ public:
 
 private:
     LabelImages& m_program;
-    ImageDisplaySession m_session;
-    ImageDisplayWidget* m_switch_widget;
+    ImageAnnotationDisplaySession& m_display_session;
+    ImageAnnotationDisplayWidget* m_switch_widget;
     VideoOverlaySet m_overlay_set;
     DrawnBoundingBox m_drawn_box;
     ConfigWidget* m_option_widget;

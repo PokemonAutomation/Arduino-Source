@@ -69,6 +69,7 @@ protected:
         auto scope_check = m_sanitizer.check_scope();
         m_source_frame_listeners.run_method_unique(&VideoFrameListener::on_frame, frame);
     }
+    // Called by UI to report a frame is rendered
     void report_rendered_frame(WallClock timestamp){
         auto scope_check = m_sanitizer.check_scope();
         m_rendered_frame_listeners.run_method_unique(&RenderedFrameListener::on_rendered_frame, timestamp);

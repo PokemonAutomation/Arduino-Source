@@ -1,4 +1,4 @@
-/*  ML Image Display Widget
+/*  ML Image Annotation Display Widget
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -6,8 +6,8 @@
  *  This is modified from NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.
  */
 
-#ifndef ML_ImageDisplayWidget_H
-#define ML_ImageDisplayWidget_H
+#ifndef POKEMON_AUTOMATION_ML_ImageAnnotationDisplayWidget_H
+#define POKEMON_AUTOMATION_ML_ImageAnnotationDisplayWidget_H
 
 #include <QWidget>
 #include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
@@ -17,32 +17,27 @@ namespace PokemonAutomation{
     class CollapsibleGroupBox;
     class AudioFeed;
     class CameraSelectorWidget;
-    class VideoSourceSelectorWidget;
     class VideoDisplayWidget;
-    class AudioDisplayWidget;
-    class AudioSelectorWidget;
     class VideoOverlay;
 
 namespace ML{
 
-class ImageDisplaySession;
-class ImageDisplayCommandRow;
+class ImageAnnotationSourceSelectorWidget;
+class ImageAnnotationDisplaySession;
+class ImageAnnotationCommandRow;
 
 // UI widget for controlling and monitoring a Nintendo Switch.
 // It includes:
-// - A micro-controller selection UI
 // - Video source selection UI
-// - Audio source selection UI
-// - Audio display
 // - Video stream display
-// It also owns an ImageDisplaySession that manages the life time of the controller,
+// It also owns an ImageAnnotationDisplaySession that manages the life time of the controller,
 // audio and video streams that will be exposed to automation programs.
-class ImageDisplayWidget final : public QWidget, public CommandReceiver{
+class ImageAnnotationDisplayWidget final : public QWidget, public CommandReceiver{
 public:
-    virtual ~ImageDisplayWidget();
-    ImageDisplayWidget(
+    virtual ~ImageAnnotationDisplayWidget();
+    ImageAnnotationDisplayWidget(
         QWidget& parent,
-        ImageDisplaySession& session,
+        ImageAnnotationDisplaySession& session,
         uint64_t program_id
     );
 
@@ -65,15 +60,15 @@ private:
     virtual void focusOutEvent(QFocusEvent* event) override;
 
 private:
-    ImageDisplaySession& m_session;
+    ImageAnnotationDisplaySession& m_session;
 
     CollapsibleGroupBox* m_group_box;
 
     VideoDisplayWidget* m_video_display;
 
-    ImageDisplayCommandRow* m_command;
+    ImageAnnotationCommandRow* m_command;
 
-    VideoSourceSelectorWidget* m_video_selector;
+    ImageAnnotationSourceSelectorWidget* m_selector_widget;
 };
 
 

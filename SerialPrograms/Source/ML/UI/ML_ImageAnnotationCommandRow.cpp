@@ -9,7 +9,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
-#include "ML_ImageDisplayCommandRow.h"
+#include "ML_ImageAnnotationCommandRow.h"
 
 //#include <iostream>
 //using std::cout;
@@ -19,10 +19,10 @@ namespace PokemonAutomation{
 namespace ML{
 
 
-ImageDisplayCommandRow::~ImageDisplayCommandRow(){
+ImageAnnotationCommandRow::~ImageAnnotationCommandRow(){
     m_session.remove_listener(*this);
 }
-ImageDisplayCommandRow::ImageDisplayCommandRow(
+ImageAnnotationCommandRow::ImageAnnotationCommandRow(
     QWidget& parent,
     VideoOverlaySession& session
 )
@@ -169,15 +169,15 @@ ImageDisplayCommandRow::ImageDisplayCommandRow(
     m_session.add_listener(*this);
 }
 
-void ImageDisplayCommandRow::on_key_press(const QKeyEvent& key){
+void ImageAnnotationCommandRow::on_key_press(const QKeyEvent& key){
     if (!m_last_known_focus){
         m_session.add_log("Keyboard Command Suppressed: Not in focus.", COLOR_RED);
         return;
     }
 }
-void ImageDisplayCommandRow::on_key_release(const QKeyEvent& key){}
+void ImageAnnotationCommandRow::on_key_release(const QKeyEvent& key){}
 
-void ImageDisplayCommandRow::set_focus(bool focused){
+void ImageAnnotationCommandRow::set_focus(bool focused){
     if (m_last_known_focus == focused){
         return;
     }
@@ -185,8 +185,8 @@ void ImageDisplayCommandRow::set_focus(bool focused){
     update_ui();
 }
 
-void ImageDisplayCommandRow::update_ui(){
-//    cout << "ImageDisplayCommandRow::update_ui(): focus = " << m_last_known_focus << endl;
+void ImageAnnotationCommandRow::update_ui(){
+//    cout << "ImageAnnotationCommandRow::update_ui(): focus = " << m_last_known_focus << endl;
 
     bool stopped = m_last_known_state == ProgramState::STOPPED;
     m_load_profile_button->setEnabled(stopped);
@@ -207,39 +207,39 @@ void ImageDisplayCommandRow::update_ui(){
     );
 }
 
-void ImageDisplayCommandRow::on_state_changed(ProgramState state){
+void ImageAnnotationCommandRow::on_state_changed(ProgramState state){
     m_last_known_state = state;
     update_ui();
 }
 
 
-void ImageDisplayCommandRow::on_overlay_enabled_boxes(bool enabled){
+void ImageAnnotationCommandRow::on_overlay_enabled_boxes(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         this->m_overlay_boxes->setChecked(enabled);
     }, Qt::QueuedConnection);
 }
-void ImageDisplayCommandRow::on_overlay_enabled_text(bool enabled){
+void ImageAnnotationCommandRow::on_overlay_enabled_text(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         this->m_overlay_text->setChecked(enabled);
     }, Qt::QueuedConnection);
 }
-void ImageDisplayCommandRow::on_overlay_enabled_images(bool enabled){
+void ImageAnnotationCommandRow::on_overlay_enabled_images(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         this->m_overlay_images->setChecked(enabled);
     }, Qt::QueuedConnection);
 }
-void ImageDisplayCommandRow::on_overlay_enabled_log(bool enabled){
+void ImageAnnotationCommandRow::on_overlay_enabled_log(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         this->m_overlay_log->setChecked(enabled);
     }, Qt::QueuedConnection);
 }
-void ImageDisplayCommandRow::on_overlay_enabled_stats(bool enabled){
+void ImageAnnotationCommandRow::on_overlay_enabled_stats(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         this->m_overlay_stats->setChecked(enabled);
     }, Qt::QueuedConnection);
 }
-void ImageDisplayCommandRow::ready_changed(bool ready){
-//    cout << "ImageDisplayCommandRow::ready_changed(): " << ready << endl;
+void ImageAnnotationCommandRow::ready_changed(bool ready){
+//    cout << "ImageAnnotationCommandRow::ready_changed(): " << ready << endl;
     QMetaObject::invokeMethod(this, [this]{
         update_ui();
     }, Qt::QueuedConnection);

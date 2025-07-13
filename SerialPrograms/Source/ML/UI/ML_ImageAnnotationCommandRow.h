@@ -1,11 +1,11 @@
-/*  ML Image Display Command Row
+/*  ML Image Annotation Command Row
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef ML_ImageDisplayCommandRow_H
-#define ML_ImageDisplayCommandRow_H
+#ifndef POKEMON_AUTOMATION_ML_ImageAnnotationCommandRow_H
+#define POKEMON_AUTOMATION_ML_ImageAnnotationCommandRow_H
 
 #include <QComboBox>
 #include <QLabel>
@@ -22,7 +22,7 @@ namespace ML{
 
 // UI that shows the checkerboxes to control whether to show video overlay elements.
 // e.g. checkerbox to toggle on/off overlay boxes
-class ImageDisplayCommandRow :
+class ImageAnnotationCommandRow :
     public QWidget,
     public VideoOverlaySession::ContentListener,
     public ControllerSession::Listener
@@ -30,8 +30,8 @@ class ImageDisplayCommandRow :
     Q_OBJECT
 
 public:
-    ~ImageDisplayCommandRow();
-    ImageDisplayCommandRow(
+    ~ImageAnnotationCommandRow();
+    ImageAnnotationCommandRow(
         QWidget& parent,
         VideoOverlaySession& session
     );

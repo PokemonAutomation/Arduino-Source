@@ -894,14 +894,16 @@ file(GLOB MAIN_SOURCES
     Source/ML/ML_Panels.h
     Source/ML/Programs/ML_LabelImages.cpp
     Source/ML/Programs/ML_LabelImages.h
-    Source/ML/UI/ML_ImageDisplayCommandRow.cpp
-    Source/ML/UI/ML_ImageDisplayCommandRow.h
-    Source/ML/UI/ML_ImageDisplayOption.cpp
-    Source/ML/UI/ML_ImageDisplayOption.h
-    Source/ML/UI/ML_ImageDisplaySession.cpp
-    Source/ML/UI/ML_ImageDisplaySession.h
-    Source/ML/UI/ML_ImageDisplayWidget.cpp
-    Source/ML/UI/ML_ImageDisplayWidget.h
+    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.cpp
+    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.h
+    Source/ML/UI/ML_ImageAnnotationCommandRow.cpp
+    Source/ML/UI/ML_ImageAnnotationCommandRow.h
+    Source/ML/UI/ML_ImageAnnotationDisplayOption.cpp
+    Source/ML/UI/ML_ImageAnnotationDisplayOption.h
+    Source/ML/UI/ML_ImageAnnotationDisplaySession.cpp
+    Source/ML/UI/ML_ImageAnnotationDisplaySession.h
+    Source/ML/UI/ML_ImageAnnotationDisplayWidget.cpp
+    Source/ML/UI/ML_ImageAnnotationDisplayWidget.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp

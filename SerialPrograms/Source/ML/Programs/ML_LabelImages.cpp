@@ -27,7 +27,7 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Pokemon/Resources/Pokemon_PokemonForms.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "ML/UI/ML_ImageDisplayWidget.h"
+#include "ML/UI/ML_ImageAnnotationDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h"
 #include "CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h"
 #include "ML_LabelImages.h"
@@ -195,6 +195,7 @@ LabelImages_Descriptor::LabelImages_Descriptor()
 
 LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
+    , m_display_session(m_display_option)
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
     , X("<b>X Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
@@ -214,15 +215,15 @@ void LabelImages::from_json(const JsonValue& json){
     if (obj == nullptr){
         return;
     }
-    const JsonValue* value = obj->get_value("SwitchSetup");
+    const JsonValue* value = obj->get_value("ImageSetup");
     if (value){
-        m_switch_control_option.load_json(*value);
+        m_display_option.load_json(*value);
     }
     m_options.load_json(json);
 }
 JsonValue LabelImages::to_json() const{
     JsonObject obj = std::move(*m_options.to_json().to_object());
-    obj["SwitchSetup"] = m_switch_control_option.to_json();
+    obj["ImageSetup"] = m_display_option.to_json();
 
     // m_annotation_file_path
     if (m_annotation_file_path.size() > 0 && !m_fail_to_load_annotation_file){
@@ -417,9 +418,9 @@ LabelImages_Widget::LabelImages_Widget(
 )
     : PanelWidget(parent, program, holder)
     , m_program(program)
-    , m_session(program.m_switch_control_option, 0, 0)
-    , m_overlay_set(m_session.overlay())
-    , m_drawn_box(*this, m_session.overlay())
+    , m_display_session(m_program.m_display_session)
+    , m_overlay_set(m_display_session.overlay())
+    , m_drawn_box(*this, m_display_session.overlay())
 {
     m_program.FORM_LABEL.add_listener(*this);
 
@@ -436,7 +437,7 @@ LabelImages_Widget::LabelImages_Widget(
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);
 
-    m_switch_widget = new ImageDisplayWidget(*this, m_session, 0);
+    m_switch_widget = new ImageAnnotationDisplayWidget(*this, m_display_session, 0);
     scroll_layout->addWidget(m_switch_widget);
 
     QPushButton* button = new QPushButton("Delete Last Mask", scroll_inner);
@@ -455,15 +456,13 @@ LabelImages_Widget::LabelImages_Widget(
     m_option_widget = program.m_options.make_QtWidget(*scroll_inner);
     scroll_layout->addWidget(&m_option_widget->widget());
 
-    const VideoSourceDescriptor* video_source_desc = program.m_switch_control_option.m_video.descriptor().get();
-    auto image_source_desc = dynamic_cast<const VideoSourceDescriptor_StillImage*>(video_source_desc);
-    if (image_source_desc != nullptr){
-        const std::string image_path = image_source_desc->path();
-        const size_t source_image_height = image_source_desc->source_image_height();
-        const size_t source_image_width = image_source_desc->source_image_width();
-        m_program.load_image_related_data(image_path, source_image_width, source_image_height);
+    const auto cur_res = m_display_session.video_session().current_resolution();
+    if (cur_res.width > 0 && cur_res.height > 0){
+        const std::string& image_path = m_display_session.option().m_image_path;
+        m_program.load_image_related_data(image_path, cur_res.width, cur_res.height);
         m_program.update_rendered_objects(m_overlay_set);
     }
+
 
     cout << "LabelImages_Widget built" << endl;
 }
