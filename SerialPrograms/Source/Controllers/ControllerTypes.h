@@ -43,7 +43,6 @@ enum class ControllerType{
 
 enum class ControllerFeature{
     TickPrecise,
-    TimingFlexibleMilliseconds,
 
     //  If we add support gyro or rumble, we will need to split this feature
     //  since the Pokken controller doesn't support those.

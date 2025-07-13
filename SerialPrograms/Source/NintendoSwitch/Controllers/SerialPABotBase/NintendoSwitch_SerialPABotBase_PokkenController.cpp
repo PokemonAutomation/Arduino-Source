@@ -36,7 +36,6 @@ SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
         ControllerType::NintendoSwitch_WiredProController,
         connection
     )
-    , m_use_milliseconds(m_supported_features.contains(ControllerFeature::TimingFlexibleMilliseconds))
     , m_stopping(false)
     , m_status_thread(&SerialPABotBase_PokkenController::status_thread, this)
 {}
@@ -190,37 +189,19 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
     //  duration.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
 
-    if (m_use_milliseconds){
-        while (time_left > Milliseconds::zero()){
-            Milliseconds current = std::min(time_left, 65535ms);
-            m_serial->issue_request(
-                SerialPABotBase::DeviceRequest_NS_Generic_ControllerStateMs(
-                    (uint16_t)current.count(),
-                    buttons,
-                    dpad,
-                    left_x, left_y,
-                    right_x, right_y
-                ),
-                cancellable
-            );
-            time_left -= current;
-        }
-    }else{
-        while (time_left > Milliseconds::zero()){
-            Milliseconds current_ms = std::min(time_left, 255 * 8ms);
-            uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_8ms(current_ms.count());
-            m_serial->issue_request(
-                SerialPABotBase::DeviceRequest_NS_Generic_ControllerStateTicks(
-                    buttons,
-                    dpad,
-                    left_x, left_y,
-                    right_x, right_y,
-                    current_ticks
-                ),
-                cancellable
-            );
-            time_left -= current_ms;
-        }
+    while (time_left > Milliseconds::zero()){
+        Milliseconds current = std::min(time_left, 65535ms);
+        m_serial->issue_request(
+            SerialPABotBase::DeviceRequest_NS_Generic_ControllerStateMs(
+                (uint16_t)current.count(),
+                buttons,
+                dpad,
+                left_x, left_y,
+                right_x, right_y
+            ),
+            cancellable
+        );
+        time_left -= current;
     }
 }
 
