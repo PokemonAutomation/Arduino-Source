@@ -93,6 +93,8 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
         case BUTTON_RCLICK:     buttons |= 1 << 11; break;
         case BUTTON_HOME:       buttons |= 1 << 12; break;
         case BUTTON_CAPTURE:    buttons |= 1 << 13; break;
+        case BUTTON_GR:         buttons |= 1 << 14; break;
+        case BUTTON_GL:         buttons |= 1 << 15; break;
         case BUTTON_UP:         dpad_y--; break;
         case BUTTON_RIGHT:      dpad_x++; break;
         case BUTTON_DOWN:       dpad_y++; break;

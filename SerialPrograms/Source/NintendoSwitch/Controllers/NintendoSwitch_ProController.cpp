@@ -35,7 +35,7 @@ public:
         : PokemonAutomation::KeyboardManager<ProControllerState, ProControllerDeltas>(logger, controller)
     {
         std::vector<std::shared_ptr<EditableTableRow>> mapping =
-            ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER.current_refs();
+            ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER0.current_refs();
         for (const auto& deltas : mapping){
             const ProControllerKeyMapTableRow& row = static_cast<const ProControllerKeyMapTableRow&>(*deltas);
             m_mapping[(Qt::Key)(uint32_t)row.key] += row.snapshot();

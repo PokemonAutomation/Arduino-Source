@@ -35,10 +35,10 @@ public:
         std::vector<std::shared_ptr<EditableTableRow>> mapping;
         switch (controller_type){
         case ControllerType::NintendoSwitch_LeftJoycon:
-            mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.LEFT_JOYCON.current_refs();
+            mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.LEFT_JOYCON0.current_refs();
             break;
         case ControllerType::NintendoSwitch_RightJoycon:
-            mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.RIGHT_JOYCON.current_refs();
+            mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.RIGHT_JOYCON0.current_refs();
             break;
         default:;
         }

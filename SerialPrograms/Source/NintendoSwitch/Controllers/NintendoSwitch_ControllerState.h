@@ -20,7 +20,7 @@ constexpr uint16_t TICKS_PER_SECOND = 125;
 
 
 //  Buttons
-constexpr size_t TOTAL_BUTTONS = 22;
+constexpr size_t TOTAL_BUTTONS = 24;
 using ButtonFlagType = uint32_t;
 enum Button : ButtonFlagType{
     BUTTON_NONE     =   0,
@@ -38,14 +38,16 @@ enum Button : ButtonFlagType{
     BUTTON_RCLICK   =   ((uint32_t)1 << 11),
     BUTTON_HOME     =   ((uint32_t)1 << 12),
     BUTTON_CAPTURE  =   ((uint32_t)1 << 13),
-    BUTTON_UP       =   ((uint32_t)1 << 14),
-    BUTTON_RIGHT    =   ((uint32_t)1 << 15),
-    BUTTON_DOWN     =   ((uint32_t)1 << 16),
-    BUTTON_LEFT     =   ((uint32_t)1 << 17),
-    BUTTON_LEFT_SL  =   ((uint32_t)1 << 18),
-    BUTTON_LEFT_SR  =   ((uint32_t)1 << 19),
-    BUTTON_RIGHT_SL =   ((uint32_t)1 << 20),
-    BUTTON_RIGHT_SR =   ((uint32_t)1 << 21),
+    BUTTON_GR       =   ((uint32_t)1 << 14),
+    BUTTON_GL       =   ((uint32_t)1 << 15),
+    BUTTON_UP       =   ((uint32_t)1 << 16),
+    BUTTON_RIGHT    =   ((uint32_t)1 << 17),
+    BUTTON_DOWN     =   ((uint32_t)1 << 18),
+    BUTTON_LEFT     =   ((uint32_t)1 << 19),
+    BUTTON_LEFT_SL  =   ((uint32_t)1 << 20),
+    BUTTON_LEFT_SR  =   ((uint32_t)1 << 21),
+    BUTTON_RIGHT_SL =   ((uint32_t)1 << 22),
+    BUTTON_RIGHT_SR =   ((uint32_t)1 << 23),
 };
 inline constexpr Button operator|(Button x, Button y){
     return (Button)((ButtonFlagType)x | (ButtonFlagType)y);

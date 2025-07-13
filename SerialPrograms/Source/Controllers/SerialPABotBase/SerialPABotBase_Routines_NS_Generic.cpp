@@ -28,7 +28,7 @@ int register_message_converters_push_button_framework(){
             if (body.size() != sizeof(pabb_Message_NS_Generic_ControllerStateTicks)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_Message_NS_Generic_ControllerStateTicks*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", buttons = " << params->buttons << "(" << button_to_string((NintendoSwitch::Button)params->buttons) << ")";
+            ss << ", buttons = " << params->buttons << " (" << button_to_string((NintendoSwitch::Button)params->buttons) << ")";
             ss << ", dpad = " << dpad_to_string((NintendoSwitch::DpadPosition)params->dpad);
             ss << ", LJ = (" << (int)params->left_joystick_x << "," << (int)params->left_joystick_y << ")";
             ss << ", RJ = (" << (int)params->right_joystick_x << "," << (int)params->right_joystick_y << ")";
@@ -48,7 +48,7 @@ int register_message_converters_push_button_framework(){
             if (body.size() != sizeof(pabb_Message_NS_Generic_ControllerStateMs)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_Message_NS_Generic_ControllerStateMs*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", buttons = " << params->buttons << "(" << button_to_string((NintendoSwitch::Button)params->buttons) << ")";
+            ss << ", buttons = " << params->buttons << " (" << button_to_string((NintendoSwitch::Button)params->buttons) << ")";
             ss << ", dpad = " << dpad_to_string((NintendoSwitch::DpadPosition)params->dpad);
             ss << ", LJ = (" << (int)params->left_joystick_x << "," << (int)params->left_joystick_y << ")";
             ss << ", RJ = (" << (int)params->right_joystick_x << "," << (int)params->right_joystick_y << ")";
