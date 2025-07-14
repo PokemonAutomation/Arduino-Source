@@ -16,7 +16,7 @@
 //using std::cout;
 //using std::endl;
 
-#define PA_DEBUG_ListenerSet
+//#define PA_DEBUG_ListenerSet
 
 
 namespace PokemonAutomation{

@@ -27,15 +27,19 @@ public:
     };
 
     void add_source_frame_listener(VideoFrameListener& listener){
+        auto scope_check = m_sanitizer.check_scope();
         m_source_frame_listeners.add(listener);
     }
     void remove_source_frame_listener(VideoFrameListener& listener){
+        auto scope_check = m_sanitizer.check_scope();
         m_source_frame_listeners.remove(listener);
     }
     void add_rendered_frame_listener(RenderedFrameListener& listener){
+        auto scope_check = m_sanitizer.check_scope();
         m_rendered_frame_listeners.add(listener);
     }
     void remove_rendered_frame_listener(RenderedFrameListener& listener){
+        auto scope_check = m_sanitizer.check_scope();
         m_rendered_frame_listeners.remove(listener);
     }
 
