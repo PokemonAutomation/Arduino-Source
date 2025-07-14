@@ -10,9 +10,9 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2025, macos-13, ubuntu-24.04]
-        qt_version: ['6.9.0']
+        qt_version: ['6.9.1']
         include:
-        - qt_version: '6.9.0'
+        - qt_version: '6.9.1'
           qt_version_major: '6'
           qt_modules: 'qtmultimedia qtserialport'
 
@@ -20,23 +20,25 @@ jobs:
     - uses: actions/checkout@v4
       with:
         path: Arduino-Source
+        submodules: 'recursive'
     - uses: actions/checkout@v4
       with:
         repository: 'PokemonAutomation/Packages'
         path: Packages
+    - uses: jurplel/install-qt-action@v4
+      with:
+        version: ${{ matrix.qt_version }}
+        modules: ${{ matrix.qt_modules }}
     - name: Install dependencies
       if: startsWith(matrix.os, 'ubuntu')
       run: |
         sudo apt update
+        sudo apt upgrade
         sudo apt install libopencv-dev
     - name: Install dependencies
       if: startsWith(matrix.os, 'mac')
       run: |
         brew install opencv onnxruntime
-    - uses: jurplel/install-qt-action@v4
-      with:
-        version: ${{ matrix.qt_version }}
-        modules: ${{ matrix.qt_modules }}
     - name: Generate binaries
       run: |
         cd Arduino-Source/SerialPrograms
