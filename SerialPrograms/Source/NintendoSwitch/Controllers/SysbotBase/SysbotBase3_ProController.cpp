@@ -59,6 +59,9 @@ void ProController_SysbotBase3::cancel_all_commands(){
     m_next_expected_seqnum_ack = m_next_seqnum;
 
     m_connection.write_data("cqCancel\r\n");
+    if (GlobalSettings::instance().LOG_EVERYTHING){
+        m_logger.log("sys-botbase3: cqCancel");
+    }
 
     this->clear_on_next();
     m_cv.notify_all();
@@ -74,6 +77,9 @@ void ProController_SysbotBase3::replace_on_next_command(){
     m_next_expected_seqnum_ack = m_next_seqnum;
 
     m_connection.write_data("cqReplaceOnNext\r\n");
+    if (GlobalSettings::instance().LOG_EVERYTHING){
+        m_logger.log("sys-botbase3: cqReplaceOnNext");
+    }
 
     this->clear_on_next();
     m_cv.notify_all();
