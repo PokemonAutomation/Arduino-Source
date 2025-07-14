@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 class Logger{
 public:
-    virtual void log(const std::string& msg, Color color = Color()) = 0;
+    virtual void log([[maybe_unused]] const std::string& msg, [[maybe_unused]] Color color = Color()){};
     virtual void log(std::string&& msg, Color color = Color()){
         log((const std::string&)msg, color);
     }

@@ -40,13 +40,12 @@ private:
 
 
 
-class SerialLogger : public Logger, public MessageLogger{
+class SerialLogger : public MessageLogger{
 public:
     SerialLogger(Logger& logger, bool log_everything);
 
     virtual void log(const char* msg, Color color = Color()) override;
     virtual void log(const std::string& msg, Color color = Color()) override;
-    virtual void log(std::string msg) override;
 
 private:
     bool ok_to_log();
