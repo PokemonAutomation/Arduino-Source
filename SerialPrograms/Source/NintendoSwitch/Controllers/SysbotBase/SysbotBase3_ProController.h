@@ -27,7 +27,7 @@ class ProController_SysbotBase3 final :
 public:
     using ContextType = ProControllerContext;
 
-    static constexpr size_t QUEUE_SIZE = 256;
+    static constexpr size_t QUEUE_SIZE = 64;
 
 
 public:
