@@ -17,7 +17,6 @@
 //using std::endl;
 
 
-
 namespace PokemonAutomation{
 namespace SysbotBase{
 
@@ -173,6 +172,10 @@ void TcpSysbotBase_Connection::on_connect_finished(const std::string& error_mess
         write_data("configure echoCommands 0\r\n");
         write_data("getVersion\r\n");
 
+        if (NintendoSwitch::ConsoleSettings::instance().ENABLE_SBB3_LOGGING){
+            write_data("configure enableLogs 1\r\n");
+        }
+
 //        m_thread = std::thread(&TcpSysbotBase_Connection::thread_loop, this);
 
 //        set_status_line0(m_version);
@@ -211,7 +214,9 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
     }catch (...){}
 }
 void TcpSysbotBase_Connection::process_message(const std::string& message, WallClock timestamp){
-//    cout << "sys-botbase Response: " << message << endl;
+    if (GlobalSettings::instance().LOG_EVERYTHING){
+        m_logger.log("Received: " + message, COLOR_DARKGREEN);
+    }
 
     m_listeners.run_method_unique(&Listener::on_message, message);
 

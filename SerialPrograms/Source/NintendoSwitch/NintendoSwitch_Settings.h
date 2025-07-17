@@ -52,6 +52,7 @@ public:
     TimingOptions TIMING_OPTIONS;
 
     BooleanCheckBoxOption ENABLE_SBB3_PINGS;
+    BooleanCheckBoxOption ENABLE_SBB3_LOGGING;
 
     DigitEntryTimingsOption     SWITCH1_DIGIT_ENTRY;
     KeyboardEntryTimingsOption  SWITCH1_KEYBOARD_ENTRY;

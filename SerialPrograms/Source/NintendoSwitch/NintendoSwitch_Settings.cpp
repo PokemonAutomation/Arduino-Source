@@ -108,6 +108,12 @@ ConsoleSettings::ConsoleSettings()
         "<b>Enable sys-botbase 3 Pings:</b><br>"
         "Use sys-botbase's ping command for latency measurement instead of \"getVersion\".",
         LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , ENABLE_SBB3_LOGGING(
+        "<b>Enable sys-botbase 3 Logging:</b><br>"
+        "Tell sys-botbase 3 to log its activity to its own log.",
+        LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
     , SWITCH1_DIGIT_ENTRY(false)
@@ -126,6 +132,7 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(TIMING_OPTIONS);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(ENABLE_SBB3_PINGS);
+        PA_ADD_OPTION(ENABLE_SBB3_LOGGING);
         PA_ADD_OPTION(SWITCH1_DIGIT_ENTRY);
         PA_ADD_OPTION(SWITCH1_KEYBOARD_ENTRY);
         PA_ADD_OPTION(SWITCH2_DIGIT_ENTRY);
