@@ -49,10 +49,10 @@ public:
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_FAST;
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_SLOW;
 
-    TimingOptions TIMING_OPTIONS;
-
     BooleanCheckBoxOption ENABLE_SBB3_PINGS;
     BooleanCheckBoxOption ENABLE_SBB3_LOGGING;
+
+    TimingOptions TIMING_OPTIONS;
 
     DigitEntryTimingsOption     SWITCH1_DIGIT_ENTRY;
     KeyboardEntryTimingsOption  SWITCH1_KEYBOARD_ENTRY;

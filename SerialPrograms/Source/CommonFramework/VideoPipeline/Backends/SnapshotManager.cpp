@@ -198,7 +198,7 @@ VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
 }
 
 VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(WallClock min_time){
-    WallClock now = current_time();
+//    WallClock now = current_time();
 
     std::lock_guard<std::mutex> lg(m_lock);
 
