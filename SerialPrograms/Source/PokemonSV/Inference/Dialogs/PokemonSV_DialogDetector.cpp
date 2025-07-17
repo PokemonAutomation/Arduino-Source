@@ -85,7 +85,7 @@ bool DialogBoxDetector::detect(const ImageViewRGB32& screen){
 
 AdvanceDialogDetector::AdvanceDialogDetector(Color color, DialogType type)
     : m_box(color, true, type)
-    , m_arrow(0.710, 0.850, 0.030, 0.042)
+    , m_arrow(0.710, 0.850, 0.030, 0.045)
 {}
 void AdvanceDialogDetector::make_overlays(VideoOverlaySet& items) const{
     m_box.make_overlays(items);
