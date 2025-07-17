@@ -67,8 +67,8 @@ public:
     virtual VideoSnapshot snapshot_latest_blocking() override{
         return m_snapshot_manager.snapshot_latest_blocking();
     }
-    virtual VideoSnapshot snapshot_recent_nonblocking() override{
-        return m_snapshot_manager.snapshot_recent_nonblocking();
+    virtual VideoSnapshot snapshot_recent_nonblocking(WallClock min_time) override{
+        return m_snapshot_manager.snapshot_recent_nonblocking(min_time);
     }
 
     virtual QWidget* make_display_QtWidget(QWidget* parent) override;

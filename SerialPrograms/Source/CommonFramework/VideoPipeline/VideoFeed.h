@@ -77,14 +77,17 @@ public:
     //  Implementations must be able to handle calls to this at high rate from
     //  many different threads simultaneously. So it should perform caching.
     //
-    virtual VideoSnapshot snapshot() = 0;
+    VideoSnapshot snapshot(){
+        return snapshot_latest_blocking();
+    }
+    virtual VideoSnapshot snapshot_latest_blocking() = 0;
 
     //
     //  This is a non-blocking snapshot function. It will never block, but it
     //  is not guaranteed to return the absolute latest snapshot.
     //
     //  If this returns a null snapshot, it can mean either that the video
-    //  isn't available or that no snapshot is ready to be given right now.
+    //  isn't available or that no snapshot (>= min_time) is ready.
     //
     //  Implementations must be able to handle calls to this at high rate from
     //  many different threads simultaneously. So it should perform caching.
@@ -94,7 +97,7 @@ public:
     //  function will begin prefetch conversions of frames so they are ready
     //  on future calls.
     //
-    virtual VideoSnapshot snapshot_recent_nonblocking() = 0;
+    virtual VideoSnapshot snapshot_recent_nonblocking(WallClock min_time) = 0;
 
 
 public:

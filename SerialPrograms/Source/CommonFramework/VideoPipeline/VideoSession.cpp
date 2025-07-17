@@ -191,7 +191,7 @@ void VideoSession::set_resolution(Resolution resolution){
 }
 
 
-VideoSnapshot VideoSession::snapshot(){
+VideoSnapshot VideoSession::snapshot_latest_blocking(){
     ReadSpinLock lg(m_state_lock);
     if (m_video_source){
         return m_video_source->snapshot_latest_blocking();
@@ -199,10 +199,10 @@ VideoSnapshot VideoSession::snapshot(){
         return VideoSnapshot();
     }
 }
-VideoSnapshot VideoSession::snapshot_recent_nonblocking(){
+VideoSnapshot VideoSession::snapshot_recent_nonblocking(WallClock min_time){
     ReadSpinLock lg(m_state_lock);
     if (m_video_source){
-        return m_video_source->snapshot_recent_nonblocking();
+        return m_video_source->snapshot_recent_nonblocking(min_time);
     }else{
         return VideoSnapshot();
     }

@@ -197,7 +197,7 @@ VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
     return m_converted_snapshot;
 }
 
-VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(){
+VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(WallClock min_time){
     WallClock now = current_time();
 
     std::lock_guard<std::mutex> lg(m_lock);
@@ -223,7 +223,16 @@ VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(){
 
     //  Cached snapshot isn't too old. Return it.
 
-    std::chrono::milliseconds window(m_stats_conversion.max());
+    if (min_time <= m_converted_snapshot.timestamp){
+//        cout << "snapshot_recent_nonblocking(): Good..." << endl;
+        return m_converted_snapshot;
+    }else{
+//        cout << "snapshot_recent_nonblocking(): Too old..." << endl;
+        return VideoSnapshot();
+    }
+
+#if 0
+    std::chrono::microseconds window(m_stats_conversion.max());
 //    cout << "window = " << window.count() << endl;
 
     WallClock oldest_allowed = now - 2 * window;
@@ -236,6 +245,7 @@ VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(){
 
 //    cout << "snapshot_recent_nonblocking(): Too old..." << endl;
     return VideoSnapshot();
+#endif
 }
 
 

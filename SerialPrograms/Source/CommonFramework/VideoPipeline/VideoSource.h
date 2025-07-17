@@ -61,7 +61,7 @@ public:
     virtual const std::vector<Resolution>& supported_resolutions() const = 0;
 
     virtual VideoSnapshot snapshot_latest_blocking() = 0;
-    virtual VideoSnapshot snapshot_recent_nonblocking() = 0;
+    virtual VideoSnapshot snapshot_recent_nonblocking(WallClock min_time) = 0;
 
 
 protected:

@@ -25,7 +25,7 @@ public:
 
 public:
     VideoSnapshot snapshot_latest_blocking();
-    VideoSnapshot snapshot_recent_nonblocking();
+    VideoSnapshot snapshot_recent_nonblocking(WallClock min_time);
 
 private:
     static QImage frame_to_image(const QVideoFrame& frame);

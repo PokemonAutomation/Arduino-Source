@@ -62,8 +62,8 @@ public:
     Resolution current_resolution();
     std::vector<Resolution> supported_resolutions() const;
 
-    virtual VideoSnapshot snapshot() override;
-    virtual VideoSnapshot snapshot_recent_nonblocking() override;
+    virtual VideoSnapshot snapshot_latest_blocking() override;
+    virtual VideoSnapshot snapshot_recent_nonblocking(WallClock min_time) override;
 
     virtual double fps_source() const override;
     virtual double fps_display() const override;

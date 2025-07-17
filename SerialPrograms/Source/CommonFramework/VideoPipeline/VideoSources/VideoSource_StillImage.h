@@ -76,7 +76,7 @@ public:
     virtual VideoSnapshot snapshot_latest_blocking() override{
         return m_snapshot;
     }
-    virtual VideoSnapshot snapshot_recent_nonblocking() override{
+    virtual VideoSnapshot snapshot_recent_nonblocking(WallClock min_time) override{
         return m_snapshot;
     }
 

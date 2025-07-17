@@ -91,7 +91,13 @@ void VisualInferencePivot::run(void* event, bool is_back_to_back) noexcept{
         if (!is_back_to_back || callback.last_timestamp == m_last.timestamp){
 //            cout << "back-to-back" << endl;
 //            m_last = m_feed.snapshot();
-            m_last = m_feed.snapshot_recent_nonblocking();
+
+            WallClock min_time = callback.last_timestamp;
+            if (min_time == WallClock::min()){
+                min_time = current_time() - 2 * callback.period;
+            }
+
+            m_last = m_feed.snapshot_recent_nonblocking(min_time);
         }
 
         if (!m_last){
