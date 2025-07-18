@@ -71,7 +71,6 @@ private:
 
     QPushButton* m_load_profile_button;
     QPushButton* m_save_profile_button;
-    QPushButton* m_screenshot_button;
     QPushButton* m_video_button;
     bool m_last_known_focus;
     ProgramState m_last_known_state;

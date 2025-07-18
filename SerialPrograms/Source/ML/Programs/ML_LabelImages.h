@@ -60,22 +60,33 @@ public:
     LabelImages_Descriptor();
 };
 
-// label image program
+
+// Program to annoatation images for training ML models
 class LabelImages : public PanelInstance{
 public:
     LabelImages(const LabelImages_Descriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
 
 public:
-    //  Serialization
+    // Serialization
     virtual void from_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    // Load image related data:
+    // - Image SAM embedding data file, which has the same file path but with a name suffix ".embedding"
+    // - Existing annotation file, which is stored in a pre-defined ML_ANNOTATION_PATH() and with the same filename as
+    //   the image but with name extension replaced to be ".json".
     void load_image_related_data(const std::string& image_path, const size_t source_image_width, const size_t source_image_height);
 
+    // Update rendering data reflect the current annotation
     void update_rendered_objects(VideoOverlaySet& overlayset);
 
+    // Use user currently drawn box to compute per-pixel masks on the image using SAM model
     void compute_mask(VideoOverlaySet& overlay_set);
+
+    // Compute embeddings for all images in a folder.
+    // This can be very slow!
+    void compute_embeddings_for_folder(const std::string& image_folder);
 
 private:
     friend class LabelImages_Widget;

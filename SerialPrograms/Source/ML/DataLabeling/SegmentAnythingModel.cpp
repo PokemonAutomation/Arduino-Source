@@ -5,6 +5,8 @@
  *  Run Segment Anything Model (SAM) to segment objects on images
  */
 
+#include <QDir>
+#include <QDirIterator>
 #include <fstream>
 #include <iostream>
 #include <onnxruntime_cxx_api.h>
@@ -245,6 +247,21 @@ bool load_image_embedding(const std::string& image_filepath, std::vector<float>&
     return true;
 }
 
+
+void compute_embeddings_for_folder(const std::string& image_folder_path){
+    QDir image_dir(image_folder_path.c_str());
+    if (!image_dir.exists()){
+        std::cerr << "Error: input image folder path " << image_folder_path << " does not exist." << std::endl;
+        return;
+    }
+
+    QDirIterator image_file_iter(image_dir.absolutePath(), {"*.png", "*.jpg", "*.jpeg"}, QDir::Files, QDirIterator::Subdirectories);
+    std::vector<std::string> all_image_paths;
+    while (image_file_iter.hasNext()){
+        all_image_paths.emplace_back(image_file_iter.next().toStdString());
+    }
+    std::cout << "Found " << all_image_paths.size() << " images recursively in folder " << image_folder_path << std::endl;
+}
 
 }
 }

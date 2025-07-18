@@ -86,11 +86,6 @@ ImageAnnotationCommandRow::ImageAnnotationCommandRow(
     m_save_profile_button = new QPushButton("Save Profile", this);
     row->addWidget(m_save_profile_button, 2);
 
-    m_screenshot_button = new QPushButton("Screenshot", this);
-//    m_screenshot_button->setToolTip("Take a screenshot of the console and save to disk.");
-    row->addWidget(m_screenshot_button, 2);
-
-
 //    m_test_button = new QPushButton("Test Button", this);
 //    row->addWidget(m_test_button, 3);
 
@@ -145,11 +140,7 @@ ImageAnnotationCommandRow::ImageAnnotationCommandRow(
         m_save_profile_button, &QPushButton::clicked,
         this, [this](bool) { emit save_profile(); }
     );
-    connect(
-        m_screenshot_button, &QPushButton::clicked,
-        this, [this](bool){ emit screenshot_requested(); }
-    );
-
+    
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         m_video_button = new QPushButton("Video Capture", this);

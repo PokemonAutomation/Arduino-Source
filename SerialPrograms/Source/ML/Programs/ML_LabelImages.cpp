@@ -4,8 +4,10 @@
  *
  */
 
+#include <QFileDialog>
 #include <QLabel>
 #include <QDir>
+#include <QDirIterator>
 #include <QVBoxLayout>
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -407,6 +409,12 @@ void LabelImages::compute_mask(VideoOverlaySet& overlay_set){
     }
 }
 
+void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
+    ML::compute_embeddings_for_folder(image_folder_path);
+}
+
+
+
 LabelImages_Widget::~LabelImages_Widget(){
     m_program.FORM_LABEL.remove_listener(*this);
     delete m_switch_widget;
@@ -453,8 +461,20 @@ LabelImages_Widget::LabelImages_Widget(
         program.update_rendered_objects(this->m_overlay_set);
     });
 
+    // Add all option UI elements defined by LabelImage program.
     m_option_widget = program.m_options.make_QtWidget(*scroll_inner);
     scroll_layout->addWidget(&m_option_widget->widget());
+
+    button = new QPushButton("Compute Image Embeddings (SLOW!)", scroll_inner);
+    scroll_layout->addWidget(button);
+    connect(button, &QPushButton::clicked, this, [this](bool){
+        std::string folder_path = QFileDialog::getExistingDirectory(
+            nullptr, "Open image folder", ".").toStdString();
+
+        if (folder_path.size() > 0){
+            this->m_program.compute_embeddings_for_folder(folder_path);
+        }
+    });
 
     const auto cur_res = m_display_session.video_session().current_resolution();
     if (cur_res.width > 0 && cur_res.height > 0){

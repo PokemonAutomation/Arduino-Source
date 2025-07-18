@@ -55,11 +55,13 @@ ImageAnnotationSourceSelectorWidget::ImageAnnotationSourceSelectorWidget(ImageAn
         m_reset_button, &QPushButton::clicked,
         this, [this](bool){
             std::string path = QFileDialog::getOpenFileName(
-                nullptr, "Open image file", ".", "*.png *.jpg"
+                nullptr, "Open image file", ".", "*.png *.jpg *.jpeg"
             ).toStdString();
-        
-            m_source_file_path_label->setText(QString::fromStdString(path));
-            m_session.set_image_source(path);
+
+            if (path.size() > 0){
+                m_source_file_path_label->setText(QString::fromStdString(path));
+                m_session.set_image_source(path);
+            }
         }
     );
 
