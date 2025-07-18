@@ -75,7 +75,7 @@ void ProController_SysbotBase3::replace_on_next_command(){
     }
 
     uint64_t queued = m_next_seqnum - m_next_expected_seqnum_ack;
-    m_next_expected_seqnum_ack = m_next_seqnum;
+//    m_next_expected_seqnum_ack = m_next_seqnum;
 
     m_pending_replace = true;
 
@@ -91,7 +91,16 @@ void ProController_SysbotBase3::replace_on_next_command(){
     m_logger.log("replace_on_next_command(): Command Queue Size = " + std::to_string(queued), COLOR_DARKGREEN);
 }
 void ProController_SysbotBase3::wait_for_all(const Cancellable* cancellable){
-    std::unique_lock<std::mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::unique_lock<std::mutex> lg1(m_state_lock);
+
+//    cout << "wait_for_all() - start" << endl;
+
+    if (m_stopping){
+        throw InvalidConnectionStateException("");
+    }
+    this->issue_wait_for_all(cancellable);
+
     while (true){
         if (m_stopping){
             throw InvalidConnectionStateException("");
@@ -102,8 +111,10 @@ void ProController_SysbotBase3::wait_for_all(const Cancellable* cancellable){
         if (m_next_seqnum == m_next_expected_seqnum_ack){
             break;
         }
-        m_cv.wait(lg);
+        m_cv.wait(lg1);
     }
+
+//    cout << "wait_for_all() - done" << endl;
 }
 
 
@@ -237,6 +248,7 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     std::string message;
     if (m_pending_replace){
         m_pending_replace = false;
+        m_next_expected_seqnum_ack = m_next_seqnum;
         message += "cqReplaceOnNext\r\n";
     }
 
