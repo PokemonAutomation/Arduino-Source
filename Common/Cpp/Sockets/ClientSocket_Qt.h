@@ -155,7 +155,7 @@ private:
                     bytes -= current_sent;
                 }
 
-                m_socket->flush();
+//                m_socket->flush();
 
 //                cout << "internal_send() - exit " << endl;
             }
