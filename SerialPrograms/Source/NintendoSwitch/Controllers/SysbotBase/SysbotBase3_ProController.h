@@ -227,6 +227,7 @@ private:
     SysbotBase::TcpSysbotBase_Connection& m_connection;
 
     bool m_stopping;
+    bool m_pending_replace;
     uint64_t m_next_seqnum;
     uint64_t m_next_expected_seqnum_ack;
 

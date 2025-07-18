@@ -28,6 +28,7 @@ ProController_SysbotBase3::ProController_SysbotBase3(
     , ControllerWithScheduler(logger)
     , m_connection(connection)
     , m_stopping(false)
+    , m_pending_replace(false)
     , m_next_seqnum(1)
     , m_next_expected_seqnum_ack(1)
 {
@@ -76,10 +77,14 @@ void ProController_SysbotBase3::replace_on_next_command(){
     uint64_t queued = m_next_seqnum - m_next_expected_seqnum_ack;
     m_next_expected_seqnum_ack = m_next_seqnum;
 
+    m_pending_replace = true;
+
+#if 0
     m_connection.write_data("cqReplaceOnNext\r\n");
     if (GlobalSettings::instance().LOG_EVERYTHING){
         m_logger.log("sys-botbase3: cqReplaceOnNext");
     }
+#endif
 
     this->clear_on_next();
     m_cv.notify_all();
@@ -229,6 +234,12 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
         right_y = JoystickTools::linear_float_to_s16(fy);
     }
 
+    std::string message;
+    if (m_pending_replace){
+        m_pending_replace = false;
+        message += "cqReplaceOnNext\r\n";
+    }
+
     std::unique_lock<std::mutex> lg(m_state_lock, std::adopt_lock_t());
 
     //  Wait until there is space.
@@ -254,10 +265,12 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     command.state.right_joystick_x = right_x;
     command.state.right_joystick_y = right_y;
 
-    std::string message;
-    message.resize(64);
-    command.write_to_hex(message.data());
-    message = "cqControllerState " + message + "\r\n";
+    {
+        std::string command_message;
+        command_message.resize(64);
+        command.write_to_hex(command_message.data());
+        message += "cqControllerState " + command_message + "\r\n";
+    }
 
     m_connection.write_data(message);
 
