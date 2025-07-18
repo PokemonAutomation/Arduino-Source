@@ -35,6 +35,7 @@ private:
     ImageFloatBox m_bottom_icons;
     ImageFloatBox m_bottom_left;
     ImageFloatBox m_bottom_right;
+    ImageFloatBox m_bottom_middle;
     ImageFloatBox m_user_icons;
     ImageFloatBox m_game_slot;
 };

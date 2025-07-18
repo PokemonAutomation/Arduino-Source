@@ -26,6 +26,7 @@ HomeMenuDetector::HomeMenuDetector(ConsoleHandle& console, Color color)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
     , m_bottom_left(0.02, 0.70, 0.15, 0.15)
     , m_bottom_right(0.83, 0.70, 0.15, 0.15)
+    , m_bottom_middle(0.20, 0.70, 0.60, 0.15)
     , m_user_icons(0.05, 0.05, 0.2, 0.08)
     , m_game_slot(0.08, 0.25, 0.10, 0.38)
 {}
@@ -36,6 +37,7 @@ void HomeMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_icons);
     items.add(m_color, m_bottom_left);
     items.add(m_color, m_bottom_right);
+    items.add(m_color, m_bottom_middle);
     items.add(m_color, m_user_icons);
     items.add(m_color, m_game_slot);
 }
@@ -104,6 +106,11 @@ bool HomeMenuDetector::detect_only(const ImageViewRGB32& screen){
 //            cout << "qwer" << endl;
             return false;
         }
+    }
+
+    ImageStats stats_bottom_middle = image_stats(extract_box_reference(screen, m_bottom_middle));
+    if (stats_bottom_middle.stddev.sum() < 50){
+        return false;
     }
 
 //    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) << endl;
