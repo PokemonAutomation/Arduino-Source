@@ -227,6 +227,11 @@ JsonValue LabelImages::to_json() const{
     JsonObject obj = std::move(*m_options.to_json().to_object());
     obj["ImageSetup"] = m_display_option.to_json();
 
+    save_annotation_to_file();
+    return obj;
+}
+
+void LabelImages::save_annotation_to_file() const{
     // m_annotation_file_path
     if (m_annotation_file_path.size() > 0 && !m_fail_to_load_annotation_file){
         JsonArray anno_json_arr;
@@ -236,7 +241,6 @@ JsonValue LabelImages::to_json() const{
         cout << "Saving annotation to " << m_annotation_file_path << endl;
         anno_json_arr.dump(m_annotation_file_path);
     }
-    return obj;
 }
 
 void LabelImages::clear_for_new_image(){
@@ -265,6 +269,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     if (!embedding_loaded){
         return; // no embedding, then no way for us to annotate
     }
+    
     // see if we can load the previously created labels
     const std::string anno_filename = std::filesystem::path(image_path).filename().replace_extension(".json").string();
 
@@ -518,6 +523,7 @@ void LabelImages_Widget::on_config_value_changed(void* object){
 void LabelImages_Widget::post_startup(VideoSource* source){
     const std::string& image_path = m_display_session.option().m_image_path;
 
+    m_program.save_annotation_to_file();  // save the current annotation file
     clear_for_new_image();
     if (image_path.size() == 0){
         m_embedding_info_label->setText("");

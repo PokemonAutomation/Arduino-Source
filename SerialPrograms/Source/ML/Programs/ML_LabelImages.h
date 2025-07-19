@@ -73,6 +73,8 @@ public:
     virtual void from_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    void save_annotation_to_file() const;
+
     // called after loading a new image, clean up all internal data 
     void clear_for_new_image();
 
