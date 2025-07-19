@@ -25,6 +25,7 @@
 
 class QGraphicsView;
 class QGraphicsPixmapItem;
+class QLabel;
 
 namespace PokemonAutomation{
 
@@ -71,6 +72,9 @@ public:
     // Serialization
     virtual void from_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+
+    // called after loading a new image, clean up all internal data 
+    void clear_for_new_image();
 
     // Load image related data:
     // - Image SAM embedding data file, which has the same file path but with a name suffix ".embedding"
@@ -145,7 +149,7 @@ private:
 };
 
 
-class LabelImages_Widget : public PanelWidget, public ConfigOption::Listener{
+class LabelImages_Widget : public PanelWidget, public ConfigOption::Listener, public VideoSession::StateListener{
 public:
     ~LabelImages_Widget();
     LabelImages_Widget(
@@ -154,14 +158,24 @@ public:
         PanelHolder& holder
     );
 
+    // called after loading a new image, clean up all internal data 
+    void clear_for_new_image();
+
     virtual void on_config_value_changed(void* object) override;
+
+    //  Overwrites VideoSession::StateListener::post_startup().
+    virtual void post_startup(VideoSource* source) override;
 
 private:
     LabelImages& m_program;
     ImageAnnotationDisplaySession& m_display_session;
-    ImageAnnotationDisplayWidget* m_switch_widget;
+
+    ImageAnnotationDisplayWidget* m_image_display_widget;
+
     VideoOverlaySet m_overlay_set;
     DrawnBoundingBox m_drawn_box;
+    
+    QLabel* m_embedding_info_label = nullptr;
     ConfigWidget* m_option_widget;
 
     friend class DrawnBoundingBox;

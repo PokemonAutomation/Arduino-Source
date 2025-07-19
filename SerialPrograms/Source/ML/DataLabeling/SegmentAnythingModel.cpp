@@ -208,7 +208,7 @@ void SAMSession::run(
 
 // save the image embedding as a file with path <image_filepath>.embedding
 void save_image_embedding_to_disk(const std::string& image_filepath, const std::vector<float>& embedding){
-    std::string embedding_path = image_filepath + ".embedding";
+    const std::string embedding_path = image_filepath + ".embedding";
     std::ofstream fout(embedding_path, std::ios::binary);
     // write embedding shape
     fout.write(reinterpret_cast<const char*>(&SAM_EMBEDDER_OUTPUT_N_CHANNELS), sizeof(SAM_EMBEDDER_OUTPUT_N_CHANNELS));
@@ -249,6 +249,7 @@ bool load_image_embedding(const std::string& image_filepath, std::vector<float>&
 }
 
 
+// TODO: skip already computed embedding
 void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path){
     QDir image_dir(image_folder_path.c_str());
     if (!image_dir.exists()){

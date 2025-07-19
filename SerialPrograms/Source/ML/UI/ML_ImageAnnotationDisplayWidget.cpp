@@ -84,46 +84,6 @@ ImageAnnotationDisplayWidget::ImageAnnotationDisplayWidget(
     }
 
     setFocusPolicy(Qt::StrongFocus);
-
-    connect(
-        m_command, &ImageAnnotationCommandRow::load_profile,
-        m_command, [this](){
-            std::string path = QFileDialog::getOpenFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();
-            if (path.empty()){
-                return;
-            }
-
-            ImageAnnotationDisplayOption option;
-            //  Deserialize into this local option instance.
-            option.load_json(load_json_file(path));
-
-            m_session.set(option);
-        }
-    );
-    connect(
-        m_command, &ImageAnnotationCommandRow::save_profile,
-        m_command, [this](){
-            std::string path = QFileDialog::getSaveFileName(this, tr("Choose the name of your profile file"), "", tr("JSON files (*.json)")).toStdString();
-            if (path.empty()){
-                return;
-            }
-
-            //  Create a copy of option, to be able to serialize it later on
-            ImageAnnotationDisplayOption option;
-            m_session.get(option);
-            option.to_json().dump(path);
-        }
-    );
-    
-    connect(
-        m_command, &ImageAnnotationCommandRow::video_requested,
-        m_video_display, [this](){
-            global_dispatcher.dispatch([this]{
-                std::string filename = SCREENSHOTS_PATH() + "video-" + now_to_filestring() + ".mp4";
-                m_session.logger().log("Saving screenshot to: " + filename, COLOR_PURPLE);
-            });
-        }
-    );
 }
 
 

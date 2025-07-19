@@ -29,9 +29,6 @@ public:
 
 
 private:
-    //  Query the OS to get all the possible image sources and update the UI to show them.
-    void update_source_list();
-
     //  Overwrites VideoSession::StateListener::post_startup().
     virtual void post_startup(VideoSource* source) override;
 
@@ -40,10 +37,6 @@ private:
     ImageAnnotationDisplaySession& m_session;
 
     QLabel* m_source_file_path_label;
-
-    // QComboBox* m_sources_box;
-    // QComboBox* m_resolution_box;
-    QPushButton* m_reset_button;
 };
 
 

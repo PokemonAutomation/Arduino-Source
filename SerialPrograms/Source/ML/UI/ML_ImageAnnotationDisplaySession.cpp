@@ -10,9 +10,9 @@
 #include "ML_ImageAnnotationDisplayOption.h"
 #include "ML_ImageAnnotationDisplaySession.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace ML{
@@ -47,19 +47,10 @@ ImageAnnotationDisplaySession::ImageAnnotationDisplaySession(ImageAnnotationDisp
 }
 
 
-void ImageAnnotationDisplaySession::get(ImageAnnotationDisplayOption& option){
-    option.m_image_path = m_display_option.m_image_path;
-    m_overlay.get(option.m_overlay);
-}
-void ImageAnnotationDisplaySession::set(const ImageAnnotationDisplayOption& option){
-    set_image_source(option.m_image_path);
-    m_overlay.set(option.m_overlay);
-}
-
 void ImageAnnotationDisplaySession::set_image_source(const std::string& path){
+    m_display_option.m_image_path = path;
     m_still_image_descriptor->set_path(path);
     m_video_session.set_source(m_still_image_descriptor);
-    m_display_option.m_image_path = path;
 }
 
 
