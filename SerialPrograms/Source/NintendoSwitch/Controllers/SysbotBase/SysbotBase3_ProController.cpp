@@ -161,7 +161,7 @@ void ProController_SysbotBase3::on_message(const std::string& message){
         m_logger.log(
             "Received Old Ack: Expected = " + std::to_string(m_next_expected_seqnum_ack) +
             ", Actual = " + std::to_string(parsed),
-            COLOR_RED
+            COLOR_DARKGREEN
         );
         return;
     }
