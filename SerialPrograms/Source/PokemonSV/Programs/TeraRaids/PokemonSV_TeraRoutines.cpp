@@ -685,13 +685,22 @@ void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProContr
         }
 
         TeraBattleMenuWatcher battle_menu(COLOR_GREEN);
+        GradientArrowWatcher leave_confirm(
+            COLOR_RED,
+            GradientArrowType::RIGHT,
+            {0.557621, 0.471074, 0.388476, 0.247934}
+        );
         OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         context.wait_for_all_requests();
 
         int ret = wait_until(
             stream, context,
             std::chrono::minutes(1),
-            {battle_menu, overworld}
+            {
+                battle_menu,
+                leave_confirm,
+                overworld,
+            }
         );
 
         context.wait_for(std::chrono::milliseconds(100));
@@ -700,9 +709,13 @@ void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProContr
             stream.log("Detected tera raid battle menu, running away...");
             stream.overlay().add_log("Running away...", COLOR_WHITE);
             battle_menu.move_to_slot(stream, context, 2);
-            pbf_mash_button(context, BUTTON_A, 800);
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             continue;
         case 1:
+            stream.log("Detected leave confirm.");
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+            continue;
+        case 2:
             stream.log("Detected overworld.");
             return;
         default:
