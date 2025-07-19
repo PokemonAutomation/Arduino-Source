@@ -33,10 +33,6 @@ ImageAnnotationCommandRow::ImageAnnotationCommandRow(
 {
     QHBoxLayout* command_row = new QHBoxLayout(this);
     command_row->setContentsMargins(0, 0, 0, 0);
-
-    command_row->addWidget(new QLabel("<b>Console Type:</b>", this), 2);
-    command_row->addSpacing(5);
-
     QHBoxLayout* row = new QHBoxLayout();
     command_row->addLayout(row, 12);
 
@@ -79,12 +75,6 @@ ImageAnnotationCommandRow::ImageAnnotationCommandRow(
     row->addWidget(m_overlay_stats);
 
     row->addSpacing(5);
-
-    m_load_profile_button = new QPushButton("Load Profile", this);
-    row->addWidget(m_load_profile_button, 2);
-
-    m_save_profile_button = new QPushButton("Save Profile", this);
-    row->addWidget(m_save_profile_button, 2);
 
 //    m_test_button = new QPushButton("Test Button", this);
 //    row->addWidget(m_test_button, 3);
@@ -132,30 +122,6 @@ ImageAnnotationCommandRow::ImageAnnotationCommandRow(
         this, [this](Qt::CheckState state){ m_session.set_enabled_stats(state == Qt::Checked); }
     );
 #endif
-    connect(
-        m_load_profile_button, &QPushButton::clicked,
-        this, [this](bool) { emit load_profile(); }
-    );
-    connect(
-        m_save_profile_button, &QPushButton::clicked,
-        this, [this](bool) { emit save_profile(); }
-    );
-    
-#if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
-    if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
-        m_video_button = new QPushButton("Video Capture", this);
-        command_row->addWidget(m_video_button, 2);
-        if (GlobalSettings::instance().STREAM_HISTORY->enabled()){
-            connect(
-                m_video_button, &QPushButton::clicked,
-                this, [this](bool){ emit video_requested(); }
-            );
-        }else{
-            m_video_button->setEnabled(false);
-            m_video_button->setToolTip("Please turn on Stream History to enable video capture.");
-        }
-    }
-#endif
 
     m_session.add_listener(*this);
 }
@@ -177,11 +143,6 @@ void ImageAnnotationCommandRow::set_focus(bool focused){
 }
 
 void ImageAnnotationCommandRow::update_ui(){
-//    cout << "ImageAnnotationCommandRow::update_ui(): focus = " << m_last_known_focus << endl;
-
-    bool stopped = m_last_known_state == ProgramState::STOPPED;
-    m_load_profile_button->setEnabled(stopped);
-
     if (!m_last_known_focus){
         m_status->setText(
             QString::fromStdString(

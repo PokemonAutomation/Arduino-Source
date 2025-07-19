@@ -39,12 +39,6 @@ public:
     void on_key_press(const QKeyEvent& key);
     void on_key_release(const QKeyEvent& key);
 
-signals:
-    void load_profile();
-    void save_profile();
-    void screenshot_requested();
-    void video_requested();
-
 public:
     void set_focus(bool focused);
     void update_ui();
@@ -69,9 +63,6 @@ private:
     QCheckBox* m_overlay_boxes;
     QCheckBox* m_overlay_stats;
 
-    QPushButton* m_load_profile_button;
-    QPushButton* m_save_profile_button;
-    QPushButton* m_video_button;
     bool m_last_known_focus;
     ProgramState m_last_known_state;
 };

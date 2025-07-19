@@ -9,8 +9,10 @@
 #include <QDirIterator>
 #include <fstream>
 #include <iostream>
+#include <QMessageBox>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "SegmentAnythingModel.h"
 
@@ -207,7 +209,7 @@ void SAMSession::run(
 
 // save the image embedding as a file with path <image_filepath>.embedding
 void save_image_embedding_to_disk(const std::string& image_filepath, const std::vector<float>& embedding){
-    std::string embedding_path = image_filepath + ".embedding";
+    const std::string embedding_path = image_filepath + ".embedding";
     std::ofstream fout(embedding_path, std::ios::binary);
     // write embedding shape
     fout.write(reinterpret_cast<const char*>(&SAM_EMBEDDER_OUTPUT_N_CHANNELS), sizeof(SAM_EMBEDDER_OUTPUT_N_CHANNELS));
@@ -248,7 +250,7 @@ bool load_image_embedding(const std::string& image_filepath, std::vector<float>&
 }
 
 
-void compute_embeddings_for_folder(const std::string& image_folder_path){
+void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path){
     QDir image_dir(image_folder_path.c_str());
     if (!image_dir.exists()){
         std::cerr << "Error: input image folder path " << image_folder_path << " does not exist." << std::endl;
@@ -261,6 +263,48 @@ void compute_embeddings_for_folder(const std::string& image_folder_path){
         all_image_paths.emplace_back(image_file_iter.next().toStdString());
     }
     std::cout << "Found " << all_image_paths.size() << " images recursively in folder " << image_folder_path << std::endl;
+
+    SAMEmbedderSession embedding_session(embedding_model_path);
+    std::vector<float> output_image_embedding;
+    for (size_t i = 0; i < all_image_paths.size(); i++){
+        const auto& image_path = all_image_paths[i];
+        std::cout << (i+1) << "/" << all_image_paths.size() << ": ";
+        const std::string embedding_path = image_path + ".embedding";
+        if (std::filesystem::exists(embedding_path)){
+            std::cout << "skip already computed embedding " << embedding_path << "." << std::endl;
+            continue;
+        }
+        std::cout << "computing embedding for " << image_path << "..." << std::endl;
+        cv::Mat image_bgr = cv::imread(image_path);
+        if (image_bgr.empty()){
+            std::cerr << "Error: image empty. Probably the file is not an image?" << std::endl;
+            QMessageBox box;
+            box.warning(nullptr, "Unable To Open Image",
+                QString::fromStdString("Cannot open image file " + image_path + ". Probably not an actual image?"));
+            return;
+        }
+        cv::Mat image;
+        if (image_bgr.channels() == 4){
+            cv::cvtColor(image_bgr, image, cv::COLOR_BGRA2RGB);
+        } else if (image_bgr.channels() == 3){
+            cv::cvtColor(image_bgr, image, cv::COLOR_BGR2RGB);
+        } else{
+            std::cerr << "Error: wrong image channels. Only work with RGB or RGBA images." << std::endl;
+            QMessageBox box;
+            box.warning(nullptr, "Wrong Image Channels",
+                QString::fromStdString("Image has " + std::to_string(image_bgr.channels()) + " channels. Only support 3 or 4 channels."));
+            return;
+        }
+
+        cv::Mat resized_mat;  // resize to the shape for the ML model input
+        cv::resize(image, resized_mat, cv::Size(SAM_EMBEDDER_INPUT_IMAGE_WIDTH, SAM_EMBEDDER_INPUT_IMAGE_HEIGHT));
+
+        output_image_embedding.clear();
+        embedding_session.run(resized_mat, output_image_embedding);
+        save_image_embedding_to_disk(image_path, output_image_embedding);
+    }
+
+
 }
 
 }

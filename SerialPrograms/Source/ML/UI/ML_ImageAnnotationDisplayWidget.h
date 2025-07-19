@@ -15,8 +15,6 @@
 
 namespace PokemonAutomation{
     class CollapsibleGroupBox;
-    class AudioFeed;
-    class CameraSelectorWidget;
     class VideoDisplayWidget;
     class VideoOverlay;
 
@@ -26,12 +24,14 @@ class ImageAnnotationSourceSelectorWidget;
 class ImageAnnotationDisplaySession;
 class ImageAnnotationCommandRow;
 
-// UI widget for controlling and monitoring a Nintendo Switch.
+// UI widget for loading and displaying an image for image annotation for training ML models
 // It includes:
-// - Video source selection UI
-// - Video stream display
-// It also owns an ImageAnnotationDisplaySession that manages the life time of the controller,
-// audio and video streams that will be exposed to automation programs.
+// - Image file selection UI
+// - Image display window
+// It also owns an ImageAnnotationDisplaySession that manages the life time of the image display
+// session.
+// It inherits `CommandReceiver` to handle keyboard and focus events happened on the image display
+// window.
 class ImageAnnotationDisplayWidget final : public QWidget, public CommandReceiver{
 public:
     virtual ~ImageAnnotationDisplayWidget();

@@ -227,6 +227,11 @@ JsonValue LabelImages::to_json() const{
     JsonObject obj = std::move(*m_options.to_json().to_object());
     obj["ImageSetup"] = m_display_option.to_json();
 
+    save_annotation_to_file();
+    return obj;
+}
+
+void LabelImages::save_annotation_to_file() const{
     // m_annotation_file_path
     if (m_annotation_file_path.size() > 0 && !m_fail_to_load_annotation_file){
         JsonArray anno_json_arr;
@@ -236,8 +241,19 @@ JsonValue LabelImages::to_json() const{
         cout << "Saving annotation to " << m_annotation_file_path << endl;
         anno_json_arr.dump(m_annotation_file_path);
     }
-    return obj;
 }
+
+void LabelImages::clear_for_new_image(){
+    source_image_height = source_image_height = 0;
+    m_image_embedding.clear();
+    m_output_boolean_mask.clear();
+    m_mask_image = ImageRGB32();
+    m_annotations.clear();
+    m_last_object_idx = 0;
+    m_annotation_file_path = "";
+    m_fail_to_load_annotation_file = false;
+}
+
 QWidget* LabelImages::make_widget(QWidget& parent, PanelHolder& holder){
     return new LabelImages_Widget(parent, *this, holder);
 }
@@ -253,6 +269,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     if (!embedding_loaded){
         return; // no embedding, then no way for us to annotate
     }
+    
     // see if we can load the previously created labels
     const std::string anno_filename = std::filesystem::path(image_path).filename().replace_extension(".json").string();
 
@@ -410,14 +427,16 @@ void LabelImages::compute_mask(VideoOverlaySet& overlay_set){
 }
 
 void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
-    ML::compute_embeddings_for_folder(image_folder_path);
+    std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
+    std::cout << "Use SAM Embedding model " << embedding_model_path << std::endl;
+    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path);
 }
 
 
 
 LabelImages_Widget::~LabelImages_Widget(){
     m_program.FORM_LABEL.remove_listener(*this);
-    delete m_switch_widget;
+    delete m_image_display_widget;
 }
 LabelImages_Widget::LabelImages_Widget(
     QWidget& parent,
@@ -431,6 +450,9 @@ LabelImages_Widget::LabelImages_Widget(
     , m_drawn_box(*this, m_display_session.overlay())
 {
     m_program.FORM_LABEL.add_listener(*this);
+    m_display_session.video_session().add_state_listener(*this);
+
+    m_embedding_info_label = new QLabel(this);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -445,8 +467,13 @@ LabelImages_Widget::LabelImages_Widget(
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);
 
-    m_switch_widget = new ImageAnnotationDisplayWidget(*this, m_display_session, 0);
-    scroll_layout->addWidget(m_switch_widget);
+    m_image_display_widget = new ImageAnnotationDisplayWidget(*this, m_display_session, 0);
+    scroll_layout->addWidget(m_image_display_widget);
+
+    QHBoxLayout* embedding_info_row = new QHBoxLayout();
+    scroll_layout->addLayout(embedding_info_row);
+    embedding_info_row->addWidget(new QLabel("<b>Image Embedding File:</b> ", this));    
+    embedding_info_row->addWidget(m_embedding_info_label);
 
     QPushButton* button = new QPushButton("Delete Last Mask", scroll_inner);
     scroll_layout->addWidget(button);
@@ -476,15 +503,12 @@ LabelImages_Widget::LabelImages_Widget(
         }
     });
 
-    const auto cur_res = m_display_session.video_session().current_resolution();
-    if (cur_res.width > 0 && cur_res.height > 0){
-        const std::string& image_path = m_display_session.option().m_image_path;
-        m_program.load_image_related_data(image_path, cur_res.width, cur_res.height);
-        m_program.update_rendered_objects(m_overlay_set);
-    }
-
-
     cout << "LabelImages_Widget built" << endl;
+}
+
+void LabelImages_Widget::clear_for_new_image(){
+    m_overlay_set.clear();
+    m_program.clear_for_new_image();
 }
 
 void LabelImages_Widget::on_config_value_changed(void* object){
@@ -493,6 +517,40 @@ void LabelImages_Widget::on_config_value_changed(void* object){
         cur_label = m_program.FORM_LABEL.slug();
         m_program.update_rendered_objects(m_overlay_set);
     }
+}
+
+// This callback function will be called whenever the display source (the image source) is loaded or reloaded:
+void LabelImages_Widget::post_startup(VideoSource* source){
+    const std::string& image_path = m_display_session.option().m_image_path;
+
+    m_program.save_annotation_to_file();  // save the current annotation file
+    clear_for_new_image();
+    if (image_path.size() == 0){
+        m_embedding_info_label->setText("");
+        return;
+    }
+
+    const std::string embedding_path = image_path + ".embedding";
+    const std::string embedding_path_display = "<IMAGE_FOLDER>/" + std::filesystem::path(embedding_path).filename().string();
+    if (!std::filesystem::exists(embedding_path)){
+        m_embedding_info_label->setText(QString::fromStdString(embedding_path_display + " Dose Not Exist. Cannot Annotate The Image!"));
+        m_embedding_info_label->setStyleSheet("color: red");
+        return;
+    }
+        
+    m_embedding_info_label->setText(QString::fromStdString(embedding_path_display));
+    m_embedding_info_label->setStyleSheet("color: blue");
+
+    const auto cur_res = m_display_session.video_session().current_resolution();
+    if (cur_res.width == 0 || cur_res.height == 0){
+        QMessageBox box;
+        box.warning(nullptr, "Invalid Image Dimension",
+            QString::fromStdString("Loaded image " + image_path + " has invalid dimension: " + cur_res.to_string()));
+        return;
+    }
+    
+    m_program.load_image_related_data(image_path, cur_res.width, cur_res.height);
+    m_program.update_rendered_objects(m_overlay_set);
 }
 
 

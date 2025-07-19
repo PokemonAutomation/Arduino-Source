@@ -49,8 +49,6 @@ public:
     const ImageAnnotationDisplayOption& option() const { return m_display_option; }
 
 public:
-    void get(ImageAnnotationDisplayOption& option);
-    void set(const ImageAnnotationDisplayOption& option);
 
     VideoSession& video_session(){ return m_video_session; }
     VideoOverlaySession& overlay_session(){ return m_overlay; }
