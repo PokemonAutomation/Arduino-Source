@@ -240,7 +240,7 @@ void checkpoint_44(
         // align to corner 4.2
         direction.change_direction(env.program_info(), env.console, context, 6.056);
         pbf_move_left_joystick(context, 128, 0, 670, 100);
-        direction.change_direction(env.program_info(), env.console, context, 1.22);
+        direction.change_direction(env.program_info(), env.console, context, 1.55);
         pbf_move_left_joystick(context, 128, 0, 200, 100);
         direction.change_direction(env.program_info(), env.console, context, 1.69);
         pbf_move_left_joystick(context, 0, 0, 500, 100);
@@ -294,9 +294,9 @@ void checkpoint_44(
         pbf_move_left_joystick(context, 0, 0, 700, 100);        
 
         direction.change_direction(env.program_info(), env.console, context, 0.96);
-        pbf_move_left_joystick(context, 128, 0, 300, 100);
+        pbf_move_left_joystick(context, 128, 90, 800, 100);
         direction.change_direction(env.program_info(), env.console, context, 5.17);        
-        pbf_move_left_joystick(context, 128, 0, 100, 100);
+        pbf_move_left_joystick(context, 128, 90, 400, 100);
         direction.change_direction(env.program_info(), env.console, context, 3.86);
         handle_failed_action(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
