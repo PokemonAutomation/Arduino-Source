@@ -65,7 +65,8 @@ CaughtScreenActionsOption::CaughtScreenActionsOption(
         "<b>Boss/Legendary is Shiny:</b><br>If there are multiple shinies where one is the boss, this option still applies.<br><br>"
         "<font color=\"red\">For safety reasons, this program will <i>NEVER</i> automatically take a boss. "
         "Likewise, the settings here are intentionally worded so that it's impossible to ask the program to take a boss. "
-        "Because taking a boss is irreversible, we refuse to automate it and require you to do it manually to avoid any mistakes.</font>",
+        "Taking a boss is irreversible, therefore we refuse to automate it. We require you to do it manually to avoid any mistakes.<br><br>"
+        "<b>Please DO NOT ask us to implement the ability to automatically take a boss. Thank you.</b></font>",
         default_shiny_boss
     )
     , description(
