@@ -158,7 +158,7 @@ void checkpoint_29(
         realign_player_from_landmark(
             env.program_info(), env.console, context, 
             {ZoomChange::ZOOM_IN, 0, 128, 100},
-            {ZoomChange::KEEP_ZOOM, 255, 67, 90} //{ZoomChange::KEEP_ZOOM, 255, 70, 90}
+            {ZoomChange::KEEP_ZOOM, 255, 67, 85} //{ZoomChange::KEEP_ZOOM, 255, 70, 90}
         );
 
 
@@ -199,7 +199,7 @@ void checkpoint_29(
                 realign_player_from_landmark(
                     env.program_info(), env.console, context, 
                     {ZoomChange::ZOOM_IN, 255, 255, 180},
-                    {ZoomChange::KEEP_ZOOM, 33, 0, 180}
+                    {ZoomChange::KEEP_ZOOM, 33, 0, 175}
                 );
 
                 overworld_navigation(env.program_info(), env.console, context, 
