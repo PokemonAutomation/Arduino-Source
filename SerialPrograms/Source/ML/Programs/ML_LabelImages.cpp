@@ -410,7 +410,9 @@ void LabelImages::compute_mask(VideoOverlaySet& overlay_set){
 }
 
 void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
-    ML::compute_embeddings_for_folder(image_folder_path);
+    std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
+    std::cout << "Use SAM Embedding model " << embedding_model_path << std::endl;
+    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path);
 }
 
 

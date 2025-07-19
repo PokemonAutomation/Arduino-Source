@@ -29,9 +29,9 @@ bool load_image_embedding(const std::string& image_filepath, std::vector<float>&
 // Save the image embedding as a file with path <image_filepath>.embedding.
 void save_image_embedding_to_disk(const std::string& image_filepath, const std::vector<float>& embedding);
 
-// Compute embeddings for all images in a folder.
+// Compute embeddings for all images in a folder. Only support .png, .jpg and .jpeg filename extensions so far.
 // This can be very slow!
-void compute_embeddings_for_folder(const std::string& image_folder_path);
+void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path);
 
 
 class SAMEmbedderSession{

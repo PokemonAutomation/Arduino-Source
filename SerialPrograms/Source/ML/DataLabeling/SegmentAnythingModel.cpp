@@ -11,6 +11,7 @@
 #include <iostream>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "SegmentAnythingModel.h"
 
@@ -248,7 +249,7 @@ bool load_image_embedding(const std::string& image_filepath, std::vector<float>&
 }
 
 
-void compute_embeddings_for_folder(const std::string& image_folder_path){
+void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path){
     QDir image_dir(image_folder_path.c_str());
     if (!image_dir.exists()){
         std::cerr << "Error: input image folder path " << image_folder_path << " does not exist." << std::endl;
@@ -261,6 +262,22 @@ void compute_embeddings_for_folder(const std::string& image_folder_path){
         all_image_paths.emplace_back(image_file_iter.next().toStdString());
     }
     std::cout << "Found " << all_image_paths.size() << " images recursively in folder " << image_folder_path << std::endl;
+
+    SAMEmbedderSession embedding_session(embedding_model_path);
+    std::vector<float> output_image_embedding;
+    for (size_t i = 0; i < all_image_paths.size(); i++){
+        const auto& image_path = all_image_paths[i];
+        std::cout << (i+1) << "/" << all_image_paths.size();
+        std::cout << ": computing embedding for " << image_path << "..." << std::endl;
+        cv::Mat image_bgr = cv::imread(image_path);
+        cv::Mat image;
+        cv::cvtColor(image_bgr, image, cv::COLOR_BGRA2RGB);
+        output_image_embedding.clear();
+        embedding_session.run(image, output_image_embedding);
+        save_image_embedding_to_disk(image_path, output_image_embedding);
+    }
+
+
 }
 
 }
