@@ -177,8 +177,7 @@ bool PathSelectDetector::process_frame(const ImageViewRGB32& frame, WallClock ti
 
 
 PathReader::PathReader(VideoOverlay& overlay, size_t player_index)
-    : m_player_index(player_index)
-    , m_path(overlay, {0.150, 0.020, 0.800, 0.780})
+    : m_path(overlay, {0.150, 0.020, 0.800, 0.780})
     , m_sprite0(overlay, {0.002, 0.345 + 0*0.16315, 0.071, 0.102})
     , m_sprite1(overlay, {0.002, 0.345 + 1*0.16315, 0.071, 0.102})
     , m_sprite2(overlay, {0.002, 0.345 + 2*0.16315, 0.071, 0.102})

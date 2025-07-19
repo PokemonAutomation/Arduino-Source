@@ -101,7 +101,7 @@ public:
     void read_hp(Logger& logger, const ImageViewRGB32& screen, double hp[4]) const;
 
 private:
-    size_t m_player_index;
+//    size_t m_player_index;
     OverlayBoxScope m_path;
     OverlayBoxScope m_sprite0;
     OverlayBoxScope m_sprite1;
