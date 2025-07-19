@@ -35,7 +35,8 @@
 #include "ML_LabelImages.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Common/Qt/Options/ConfigWidget.h"
-#include "ML/DataLabeling/SegmentAnythingModel.h"
+#include "ML/DataLabeling/ML_SegmentAnythingModel.h"
+#include "ML/DataLabeling/ML_AnnotationIO.h"
 
 
 
@@ -244,7 +245,7 @@ void LabelImages::save_annotation_to_file() const{
 }
 
 void LabelImages::clear_for_new_image(){
-    source_image_height = source_image_height = 0;
+    source_image_width = source_image_height = 0;
     m_image_embedding.clear();
     m_output_boolean_mask.clear();
     m_mask_image = ImageRGB32();

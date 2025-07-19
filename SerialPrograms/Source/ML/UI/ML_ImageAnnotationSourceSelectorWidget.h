@@ -37,6 +37,10 @@ private:
     ImageAnnotationDisplaySession& m_session;
 
     QLabel* m_source_file_path_label;
+    QLabel* m_folder_info_label;
+
+    std::vector<std::string> m_image_paths_in_folder;
+    std::size_t m_cur_image_file_idx_in_folder = 0;
 };
 
 

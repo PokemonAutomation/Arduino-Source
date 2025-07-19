@@ -888,14 +888,15 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
-    Source/ML/DataLabeling/SegmentAnythingModel.cpp
-    Source/ML/DataLabeling/SegmentAnythingModel.h
+    Source/ML/DataLabeling/ML_AnnotationIO.cpp
+    Source/ML/DataLabeling/ML_AnnotationIO.h
+    Source/ML/DataLabeling/ML_SegmentAnythingModel.cpp
+    Source/ML/DataLabeling/ML_SegmentAnythingModel.h
+    Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
     Source/ML/ML_Panels.cpp
     Source/ML/ML_Panels.h
     Source/ML/Programs/ML_LabelImages.cpp
     Source/ML/Programs/ML_LabelImages.h
-    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.cpp
-    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.h
     Source/ML/UI/ML_ImageAnnotationCommandRow.cpp
     Source/ML/UI/ML_ImageAnnotationCommandRow.h
     Source/ML/UI/ML_ImageAnnotationDisplayOption.cpp
@@ -904,6 +905,8 @@ file(GLOB MAIN_SOURCES
     Source/ML/UI/ML_ImageAnnotationDisplaySession.h
     Source/ML/UI/ML_ImageAnnotationDisplayWidget.cpp
     Source/ML/UI/ML_ImageAnnotationDisplayWidget.h
+    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.cpp
+    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp

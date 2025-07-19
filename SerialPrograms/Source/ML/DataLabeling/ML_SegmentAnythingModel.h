@@ -5,8 +5,8 @@
  *  Run Segment Anything Model (SAM) to segment objects on images
  */
 
-#ifndef PokemonAutomation_ML_SEGMENTANYTHINGMODEL_H
-#define PokemonAutomation_ML_SEGMENTANYTHINGMODEL_H
+#ifndef PokemonAutomation_ML_SegmentAnythingModel_H
+#define PokemonAutomation_ML_SegmentAnythingModel_H
 
 
 #include <string>
@@ -20,14 +20,6 @@ namespace cv{
 namespace PokemonAutomation{
 namespace ML{
 
-
-// Load pre-computed image embedding from disk
-// Return true if there is the embedding file.
-// The embedding is stored in a file in the same folder as the image, having the same name but with a suffix ".embedding".
-bool load_image_embedding(const std::string& image_filepath, std::vector<float>& image_embedding);
-
-// Save the image embedding as a file with path <image_filepath>.embedding.
-void save_image_embedding_to_disk(const std::string& image_filepath, const std::vector<float>& embedding);
 
 // Compute embeddings for all images in a folder. Only support .png, .jpg and .jpeg filename extensions so far.
 // This can be very slow!

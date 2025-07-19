@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_ML_LabelImages_H
 #define PokemonAutomation_ML_LabelImages_H
 
+#include <QGraphicsScene>
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
@@ -18,8 +19,8 @@
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include <QGraphicsScene>
-#include "ML/DataLabeling/SegmentAnythingModel.h"
+
+#include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ML/UI/ML_ImageAnnotationDisplayOption.h"
 #include "ML/UI/ML_ImageAnnotationDisplaySession.h"
 
