@@ -29,8 +29,7 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         "Repeatedly throw a ball and reset until you catch the pokemon.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct AutonomousBallThrower_Descriptor::Stats : public StatsTracker{

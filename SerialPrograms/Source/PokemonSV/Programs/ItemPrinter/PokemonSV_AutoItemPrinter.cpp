@@ -37,7 +37,8 @@ AutoItemPrinter_Descriptor::AutoItemPrinter_Descriptor()
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        FasterIfTickPrecise::NOT_FASTER,
+        true
     )
 {}
 struct AutoItemPrinter_Descriptor::Stats : public StatsTracker{

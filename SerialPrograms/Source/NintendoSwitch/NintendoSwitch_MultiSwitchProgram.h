@@ -82,13 +82,15 @@ public:
         FasterIfTickPrecise faster_if_tick_precise,
         size_t min_switches,
         size_t max_switches,
-        size_t default_switches
+        size_t default_switches,
+        bool deprecated = false
     );
 
     FeedbackType feedback() const{ return m_feedback; }
     const ControllerFeatures& required_features() const{ return m_required_features; }
     FasterIfTickPrecise faster_if_tick_precise() const{ return m_faster_if_tick_precise; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
+    bool deprecated() const{ return m_deprecated; }
 
     size_t min_switches() const{ return m_min_switches; }
     size_t max_switches() const{ return m_max_switches; }
@@ -102,6 +104,7 @@ private:
     const ControllerFeatures m_required_features;
     const FasterIfTickPrecise m_faster_if_tick_precise;
     const bool m_allow_commands_while_running;
+    const bool m_deprecated;
 
     const size_t m_min_switches;
     const size_t m_max_switches;

@@ -115,7 +115,8 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     FasterIfTickPrecise faster_if_tick_precise,
     size_t min_switches,
     size_t max_switches,
-    size_t default_switches
+    size_t default_switches,
+    bool deprecated
 )
     : ProgramDescriptor(
         pick_color(required_features, faster_if_tick_precise),
@@ -128,6 +129,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     , m_required_features(std::move(required_features))
     , m_faster_if_tick_precise(faster_if_tick_precise)
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
+    , m_deprecated(deprecated)
     , m_min_switches(min_switches)
     , m_max_switches(max_switches)
     , m_default_switches(default_switches)

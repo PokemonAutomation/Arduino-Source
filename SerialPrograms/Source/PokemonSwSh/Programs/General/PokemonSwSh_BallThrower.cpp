@@ -24,7 +24,8 @@ BallThrower_Descriptor::BallThrower_Descriptor()
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        FasterIfTickPrecise::NOT_FASTER,
+        true
     )
 {}
 

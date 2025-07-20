@@ -57,6 +57,15 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
     );
     layout->addWidget(header);
 
+    if (descriptor.deprecated()){
+        QMessageBox box;
+        box.warning(
+            nullptr,
+            "Deprecation Notice",
+            "This program is deprecated and no longer maintained. Please consider using a newer alternative."
+        );
+    }
+
 
     {
         QScrollArea* scroll_outer = new QScrollArea(this);

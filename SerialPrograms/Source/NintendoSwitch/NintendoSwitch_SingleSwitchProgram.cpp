@@ -25,7 +25,8 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
     ControllerFeatures required_features,
-    FasterIfTickPrecise faster_if_tick_precise
+    FasterIfTickPrecise faster_if_tick_precise,
+    bool deprecated
 )
     : ProgramDescriptor(
         pick_color(required_features, faster_if_tick_precise),
@@ -38,6 +39,7 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     , m_required_features(std::move(required_features))
     , m_faster_if_tick_precise(faster_if_tick_precise)
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
+    , m_deprecated(deprecated)
 {}
 std::unique_ptr<PanelInstance> SingleSwitchProgramDescriptor::make_panel() const{
     return std::make_unique<SingleSwitchProgramOption>(*this);

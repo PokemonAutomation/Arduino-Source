@@ -26,7 +26,9 @@ EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        FasterIfTickPrecise::NOT_FASTER,
+        true
     )
 {}
 

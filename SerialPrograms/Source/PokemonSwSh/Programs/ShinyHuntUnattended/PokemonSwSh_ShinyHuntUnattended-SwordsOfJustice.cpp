@@ -28,7 +28,9 @@ ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustic
         "Hunt for shiny SOJs. Stop when a shiny is found.",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        FasterIfTickPrecise::NOT_FASTER,
+        true
     )
 {}
 
