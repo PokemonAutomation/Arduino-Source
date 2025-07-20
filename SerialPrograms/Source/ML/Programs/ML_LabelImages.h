@@ -8,6 +8,7 @@
 #define PokemonAutomation_ML_LabelImages_H
 
 #include <QGraphicsScene>
+#include <memory>
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
@@ -120,7 +121,7 @@ private:
     // buffer to compute SAM mask on
     ImageRGB32 m_mask_image;
 
-    SAMSession m_sam_session;
+    std::unique_ptr<SAMSession> m_sam_session;
     std::vector<ObjectAnnotation> m_annotations;
     size_t m_last_object_idx = 0;
     std::string m_annotation_file_path;

@@ -73,7 +73,7 @@ ImageAnnotationSourceSelectorWidget::ImageAnnotationSourceSelectorWidget(ImageAn
     folder_info_row->addSpacing(2);
     folder_info_row->addWidget(next_image_button, 2);
     folder_info_row->addSpacing(10);
-    folder_info_row->addWidget(new QLabel("     ", this), 10);
+    folder_info_row->addWidget(new QLabel("     ", this), 10);  // empty label to push the buttons above to the left
 
 
     //  Set the action for the video reset button

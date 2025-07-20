@@ -205,14 +205,25 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
     , HEIGHT("<b>Height:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
     , FORM_LABEL("bulbasaur")
-    , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
 {
     ADD_OPTION(X);
     ADD_OPTION(Y);
     ADD_OPTION(WIDTH);
     ADD_OPTION(HEIGHT);
     ADD_OPTION(FORM_LABEL);
+
+    // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
+    const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
+    if (std::filesystem::exists(sam_model_path)){
+        m_sam_session = std::make_unique<SAMSession>(sam_model_path);
+    } else{
+        std::cerr << "Error: no such SAM model path " << sam_model_path << "." << std::endl;
+        QMessageBox box;
+        box.critical(nullptr, "SAM Model Does Not Exist",
+            QString::fromStdString("SAM model path" + sam_model_path + " does not exist."));
+    }
 }
+
 void LabelImages::from_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
@@ -370,11 +381,11 @@ void LabelImages::compute_mask(VideoOverlaySet& overlay_set){
         return;
     }
 
-    if (m_image_embedding.size() == 0){
+    if (!m_sam_session || m_image_embedding.size() == 0){
         // no embedding file loaded
         return;
     }
-    m_sam_session.run(
+    m_sam_session->run(
         m_image_embedding,
         (int)source_height, (int)source_width, {}, {},
         {box_x, box_y, box_x + box_width, box_y + box_height},
