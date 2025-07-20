@@ -37,9 +37,16 @@ bool is_kill_icon(
     WaterfillObject& object,
     const WaterfillObject& red, const WaterfillObject& white
 ){
+//    cout << "is_kill_icon" << endl;
 //    cout << red.min_x << "-" << red.max_x << ", " << white.min_y << "-" << white.max_y << endl;
 
-//    cout << "is_kill_icon" << endl;
+#if 0
+    static int c = 0;
+    object = red;
+    object.merge_assume_no_overlap(white);
+    extract_box_reference(image, object).save("test-" + std::to_string(c++) + ".png");
+#endif
+
     if (red.max_y >= white.min_y){
 //        cout << "bad y" << endl;
         return false;
@@ -55,8 +62,6 @@ bool is_kill_icon(
 
     object = red;
     object.merge_assume_no_overlap(white);
-
-//    extract_box_reference(image, object).save("test.png");
 
     if (object.width() < 18 || object.height() < 18){
 //        cout << "too small: " << object.width() << endl;
@@ -91,6 +96,8 @@ void LetsGoKillDetector::make_overlays(VideoOverlaySet& items) const{
 bool LetsGoKillDetector::detect(const ImageViewRGB32& screen){
     using namespace Kernels::Waterfill;
 
+    size_t size_threshold = (size_t)(10. * screen.total_pixels() / 2073600);
+
     ImageViewRGB32 region = extract_box_reference(screen, m_box);
     std::vector<WaterfillObject> reds;
     std::vector<WaterfillObject> whites;
@@ -99,14 +106,24 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen){
         std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
             region,
             {
+                {0xff801e1e, 0xffff5f5f},
+                {0xff901e1e, 0xffff5f5f},
+                {0xffa01e1e, 0xffff5f5f},
+                {0xffb01e1e, 0xffff5f5f},
+                {0xffc01e1e, 0xffff5f5f},
+                {0xffd01e1e, 0xffff5f5f},
                 {0xff801e1e, 0xffff7f7f},
-                {0xffb31e1e, 0xffff7f7f},
+                {0xff901e1e, 0xffff7f7f},
+                {0xffa01e1e, 0xffff7f7f},
+                {0xffb01e1e, 0xffff7f7f},
+                {0xffc01e1e, 0xffff7f7f},
+                {0xffd01e1e, 0xffff7f7f},
             }
         );
 //        size_t c = 0;
         for (PackedBinaryMatrix& matrix : matrices){
             session->set_source(matrix);
-            auto iter = session->make_iterator(10);
+            auto iter = session->make_iterator(size_threshold);
             WaterfillObject object;
             while (iter->find_next(object, false)){
                 double aspect_ratio = object.aspect_ratio();
@@ -123,13 +140,16 @@ bool LetsGoKillDetector::detect(const ImageViewRGB32& screen){
         std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
             region,
             {
+                {0xffb0b0b0, 0xffffffff},
                 {0xffc0c0c0, 0xffffffff},
+                {0xffd0d0d0, 0xffffffff},
+                {0xffe0e0e0, 0xffffffff},
             }
         );
 //        size_t c = 0;
         for (PackedBinaryMatrix& matrix : matrices){
             session->set_source(matrix);
-            auto iter = session->make_iterator(10);
+            auto iter = session->make_iterator(size_threshold);
             WaterfillObject object;
             while (iter->find_next(object, false)){
                 double aspect_ratio = object.aspect_ratio();
