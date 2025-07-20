@@ -26,11 +26,11 @@ StringSelectDatabase make_all_balls_database(){
 //        cout << "slug = " << slug << endl;
         const PokeballNames& data = get_pokeball_name(slug);
         const SpriteDatabase::Sprite* sprite = ALL_POKEBALL_SPRITES().get_nothrow(slug);
-        if (sprite == nullptr){
-            ret.add_entry(StringSelectEntry(slug, data.display_name()));
-            global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
-        }else{
+        if (sprite != nullptr){
             ret.add_entry(StringSelectEntry(slug, data.display_name(), sprite->icon));
+        }else{
+//            ret.add_entry(StringSelectEntry(slug, data.display_name()));
+//            global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }
     }
     return ret;

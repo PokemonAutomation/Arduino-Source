@@ -22,19 +22,20 @@ namespace PokemonAutomation{
 VideoDisplayWindow::VideoDisplayWindow(VideoDisplayWidget* display_widget)
     : m_display_widget(display_widget)
 {
-//    m_display_widget->setParent(this);
     setWindowTitle("Console: " + QString::number(m_display_widget->id()));
     this->setWindowIcon(QIcon(QString::fromStdString(RESOURCE_PATH() + "icon.png")));
 
-//    this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    // Sets m_display_widget to be the VideoDisplayWindow's central widget.
+    // VideoDisplayWindow now takes ownership of m_display_widget as a QWidget
     this->setCentralWidget(m_display_widget);
-//    m_display_widget->setAlignment(Qt::AlignCenter);
+    
+    // this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
+    // m_display_widget->setAlignment(Qt::AlignCenter);
 
-//    cout << "Display Widget: " << m_display_widget->width() << " x " << m_display_widget->height() << endl;
-
+    // cout << "Display Widget: " << m_display_widget->width() << " x " << m_display_widget->height() << endl;
     m_normal_size = m_display_widget->size();
     this->resize(m_normal_size);
-//    cout << this->width() << " x " << this->height() << endl;
+    // cout << this->width() << " x " << this->height() << endl;
 
     this->show();
     this->raise(); // bring the window to front on macOS

@@ -155,7 +155,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
             "This program only works on the Switch 1."
         );
     }
-    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired_125Hz){
+    if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired){
         throw UserSetupError(
             env.logger(),
             "This program requires a tick precise wired controller."
@@ -219,7 +219,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
 
     pbf_wait(context, 15 * TICKS_PER_SECOND);
     while (true){
-        ssf_press_button1(context, BUTTON_A, 15 * TICKS_PER_SECOND);
+        ssf_press_button(context, BUTTON_A, 15000ms);
     }
 }
 

@@ -107,6 +107,7 @@ protected:
 
 private:
     void clear() noexcept;
+    void update_busy_states();
     bool iterate_schedule(const Cancellable* cancellable);
     void process_schedule(const Cancellable* cancellable);
 

@@ -130,10 +130,23 @@ GlobalSettings::GlobalSettings()
     , THEME(CONSTRUCT_TOKEN)
     , WINDOW_SIZE(
         CONSTRUCT_TOKEN,
-        "Window Size:",
-        "Set the size of the window. Takes effect immediately.<br>"
+        "Window Size/Position:",
+        "Set the size/position of the window. Takes effect immediately.<br>"
         "Use this to easily set the window to a specific resolution for streaming alignment.",
-        1280, 1000
+        1280, 1000,
+        0, 0
+    )
+    , LOG_WINDOW_SIZE(
+        CONSTRUCT_TOKEN,
+        "Output Window Size/Position:",
+        "Set the size/position of the output window. Takes effect immediately.<br>",
+        600, 1200,
+        0, 0
+    )
+    , LOG_WINDOW_STARTUP(
+        "<b>Open Output Window at startup:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
     )
     , STREAM_HISTORY(CONSTRUCT_TOKEN)
     , SLEEP_SUPPRESS(CONSTRUCT_TOKEN)
@@ -196,6 +209,8 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(TEMP_FOLDER);
     PA_ADD_OPTION(THEME);
     PA_ADD_OPTION(WINDOW_SIZE);
+    PA_ADD_OPTION(LOG_WINDOW_SIZE);
+    PA_ADD_OPTION(LOG_WINDOW_STARTUP);
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(STREAM_HISTORY);

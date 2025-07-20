@@ -18,7 +18,6 @@ This is the source code for all the main Arduino programs.
 | [QDarkStyleSheet](https://github.com/ColinDuquesnoy/QDarkStyleSheet) | MIT |
 | [Qt Wav Reader](https://code.qt.io/cgit/qt/qtmultimedia.git/tree/examples/multimedia/spectrum/app/wavfile.cpp?h=5.15) | BSD |
 | [nlohmann json](https://github.com/nlohmann/json) | MIT |
-| [Sleepy Discord](https://github.com/yourWaifu/sleepy-discord) | MIT |
 | [D++](https://github.com/brainboxdotcc/DPP) | Apache 2.0 |
 | [LUFA](https://github.com/abcminiuser/lufa) | MIT |
 | [Tesseract](https://github.com/tesseract-ocr/tesseract) | Apache 2.0 |

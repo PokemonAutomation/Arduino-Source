@@ -66,7 +66,7 @@ public:
     }
 
 
-    virtual size_t blocking_send(const void* data, size_t bytes) override{
+    virtual size_t send(const void* data, size_t bytes) override{
         if (m_socket == INVALID_SOCKET){
             return 0;
         }

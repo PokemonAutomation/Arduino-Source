@@ -27,7 +27,7 @@ class ProController_SysbotBase3 final :
 public:
     using ContextType = ProControllerContext;
 
-    static constexpr size_t QUEUE_SIZE = 256;
+    static constexpr size_t QUEUE_SIZE = 64;
 
 
 public:
@@ -44,8 +44,8 @@ public:
     }
     virtual const ControllerFeatures& controller_features() const override;
     virtual ControllerPerformanceClass performance_class() const override{
-        //  TODO: Change to SerialPABotBase_Wired_125Hz when we prove it is stable.
-        return ControllerPerformanceClass::SerialPABotBase_Wired_125Hz;
+        //  TODO: Change to SerialPABotBase_Wired when we prove it is stable.
+        return ControllerPerformanceClass::SerialPABotBase_Wired;
 //        return ControllerPerformanceClass::SysbotBase;
     }
 
@@ -227,6 +227,7 @@ private:
     SysbotBase::TcpSysbotBase_Connection& m_connection;
 
     bool m_stopping;
+    bool m_pending_replace;
     uint64_t m_next_seqnum;
     uint64_t m_next_expected_seqnum_ack;
 

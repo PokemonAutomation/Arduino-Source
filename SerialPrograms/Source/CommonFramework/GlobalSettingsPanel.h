@@ -96,6 +96,8 @@ public:
 
     Pimpl<ThemeSelectorOption> THEME;
     Pimpl<ResolutionOption> WINDOW_SIZE;
+    Pimpl<ResolutionOption> LOG_WINDOW_SIZE;
+    BooleanCheckBoxOption LOG_WINDOW_STARTUP;
 
     Pimpl<StreamHistoryOption> STREAM_HISTORY;
     Pimpl<SleepSuppressOptions> SLEEP_SUPPRESS;

@@ -4,9 +4,10 @@
  *
  */
 
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
@@ -78,35 +79,29 @@ void ItemPrinterPrizeReader::make_overlays(VideoOverlaySet& items) const{
     }
 }
 std::array<std::string, 10> ItemPrinterPrizeReader::read_prizes(
-    Logger& logger, AsyncDispatcher& dispatcher,
-    const ImageViewRGB32& screen
+    Logger& logger, const ImageViewRGB32& screen
 ) const{
     //  OCR 20 things in parallel.
     OCR::StringMatchResult results[20];
-    std::unique_ptr<AsyncTask> tasks[20];
-    for (size_t c = 0; c < 10; c++){
-        tasks[c] = dispatcher.dispatch([=, this, &results]{
-            results[c] = ItemPrinterPrizeOCR::instance().read_substring(
-                nullptr, m_language,
-                extract_box_reference(screen, m_boxes_normal[c]),
-                OCR::WHITE_TEXT_FILTERS()
-            );
-        });
-    }
-    for (size_t c = 0; c < 10; c++){
-        tasks[10 + c] = dispatcher.dispatch([=, this, &results]{
-            results[10 + c] = ItemPrinterPrizeOCR::instance().read_substring(
-                nullptr, m_language,
-                extract_box_reference(screen, m_boxes_bonus[c]),
-                OCR::WHITE_TEXT_FILTERS()
-            );
-        });
-    }
 
-    //  Wait for everything.
-    for (size_t c = 0; c < 20; c++){
-        tasks[c]->wait_and_rethrow_exceptions();
-    }
+    GlobalThreadPools::normal_inference().run_in_parallel(
+        [&](size_t index){
+            if (index < 10){
+                results[index] = ItemPrinterPrizeOCR::instance().read_substring(
+                    nullptr, m_language,
+                    extract_box_reference(screen, m_boxes_normal[index]),
+                    OCR::WHITE_TEXT_FILTERS()
+                );
+            }else{
+                results[index] = ItemPrinterPrizeOCR::instance().read_substring(
+                    nullptr, m_language,
+                    extract_box_reference(screen, m_boxes_bonus[index - 10]),
+                    OCR::WHITE_TEXT_FILTERS()
+                );
+            }
+        },
+        0, 20, 1
+    );
 
     std::array<std::string, 10> ret;
     for (size_t c = 0; c < 10; c++){
@@ -127,8 +122,7 @@ std::array<std::string, 10> ItemPrinterPrizeReader::read_prizes(
 
 
 std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
-    Logger& logger, AsyncDispatcher& dispatcher,
-    const ImageViewRGB32& screen
+    Logger& logger, const ImageViewRGB32& screen
 ) const{
     size_t total_rows = 10;
 
@@ -154,23 +148,13 @@ std::array<int16_t, 10> ItemPrinterPrizeReader::read_quantity(
                                                     : m_boxes_normal_quantity;
 
     std::array<int16_t, 10> results;
-    std::vector<std::unique_ptr<AsyncTask>> tasks(total_rows);
-    for (size_t i = 0; i < total_rows; i++){
-        // ImageRGB32 filtered = to_blackwhite_rgb32_range(
-        //     extract_box_reference(screen, m_boxes_bonus_quantity[i]),
-        //     0xff808000, 0xffffffff,
-        //     true
-        // );
-        // filtered.save("DebugDumps/test"+ std::to_string(i) +".png");   
 
-        tasks[i] = dispatcher.dispatch([&, i]{
-            results[i] = read_number(logger, screen, boxes[i], (int8_t)i);
-        });
-    }
-
-    for (size_t c = 0; c < total_rows; c++){
-        tasks[c]->wait_and_rethrow_exceptions();
-    }
+    GlobalThreadPools::normal_inference().run_in_parallel(
+        [&](size_t index){
+            results[index] = read_number(logger, screen, boxes[index], (int8_t)index);
+        },
+        0, total_rows, 1
+    );
 
     return results;
 }

@@ -246,6 +246,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             switch (result){
             case 0:
                 stream.log("Unexpected Battle.", COLOR_RED);
+                run_away(stream, context, EXIT_BATTLE_TIMEOUT0);
                 return false;
             case 1:
                 stream.log("Battle started!");

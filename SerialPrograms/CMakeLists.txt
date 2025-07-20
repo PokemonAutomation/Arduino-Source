@@ -63,16 +63,22 @@ file(GLOB MAIN_SOURCES
     ../Common/CRC32.h
     ../Common/Compiler.h
     ../Common/Cpp/AbstractLogger.h
+    ../Common/Cpp/BitmapConversion.cpp
+    ../Common/Cpp/BitmapConversion.h
     ../Common/Cpp/CancellableScope.cpp
     ../Common/Cpp/CancellableScope.h
     ../Common/Cpp/Color.cpp
     ../Common/Cpp/Color.h
     ../Common/Cpp/Concurrency/AsyncDispatcher.cpp
     ../Common/Cpp/Concurrency/AsyncDispatcher.h
+    ../Common/Cpp/Concurrency/AsyncTask.cpp
+    ../Common/Cpp/Concurrency/AsyncTask.h
+    ../Common/Cpp/Concurrency/ComputationThreadPool.cpp
+    ../Common/Cpp/Concurrency/ComputationThreadPool.h
+    ../Common/Cpp/Concurrency/ComputationThreadPoolCore.cpp
+    ../Common/Cpp/Concurrency/ComputationThreadPoolCore.h
     ../Common/Cpp/Concurrency/FireForgetDispatcher.cpp
     ../Common/Cpp/Concurrency/FireForgetDispatcher.h
-    ../Common/Cpp/Concurrency/ParallelTaskRunner.cpp
-    ../Common/Cpp/Concurrency/ParallelTaskRunner.h
     ../Common/Cpp/Concurrency/PeriodicScheduler.cpp
     ../Common/Cpp/Concurrency/PeriodicScheduler.h
     ../Common/Cpp/Concurrency/ReverseLockGuard.h
@@ -102,6 +108,12 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/CpuId/CpuId_arm64.tpp
     ../Common/Cpp/CpuId/CpuId_x86.h
     ../Common/Cpp/CpuId/CpuId_x86.tpp
+    ../Common/Cpp/CpuUtilization/CpuUtilization.cpp
+    ../Common/Cpp/CpuUtilization/CpuUtilization.h
+    ../Common/Cpp/CpuUtilization/CpuUtilization_Linux.h
+    ../Common/Cpp/CpuUtilization/CpuUtilization_Linux.tpp
+    ../Common/Cpp/CpuUtilization/CpuUtilization_Windows.h
+    ../Common/Cpp/CpuUtilization/CpuUtilization_Windows.tpp
     ../Common/Cpp/DateTime.h
     ../Common/Cpp/EnumStringMap.h
     ../Common/Cpp/EventRateTracker.h
@@ -182,7 +194,9 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket_POSIX.h
+    ../Common/Cpp/Sockets/ClientSocket_Qt.h
     ../Common/Cpp/Sockets/ClientSocket_WinSocket.h
+    ../Common/Cpp/Stopwatch.h
     ../Common/Cpp/StreamConverters.cpp
     ../Common/Cpp/StreamConverters.h
     ../Common/Cpp/StringTools.cpp
@@ -402,6 +416,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/ResolutionOption.cpp
     Source/CommonFramework/Options/ResolutionOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.h
+    Source/CommonFramework/Options/ThreadPoolOption.cpp
+    Source/CommonFramework/Options/ThreadPoolOption.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
     Source/CommonFramework/Panels/PanelDescriptor.h
     Source/CommonFramework/Panels/PanelInstance.cpp
@@ -449,6 +465,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/FileDownloader.cpp
     Source/CommonFramework/Tools/FileDownloader.h
+    Source/CommonFramework/Tools/GlobalThreadPools.cpp
+    Source/CommonFramework/Tools/GlobalThreadPools.h
     Source/CommonFramework/Tools/ProgramEnvironment.cpp
     Source/CommonFramework/Tools/ProgramEnvironment.h
     Source/CommonFramework/Tools/StatAccumulator.cpp
@@ -463,6 +481,9 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.h
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.cpp
     Source/CommonFramework/VideoPipeline/Backends/MediaServicesQt6.h
+    Source/CommonFramework/VideoPipeline/Backends/QVideoFrameCache.h
+    Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.cpp
+    Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.h
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h
@@ -523,8 +544,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonTools/Audio/SpectrogramMatcher.h
     Source/CommonTools/DetectionDebouncer.h
     Source/CommonTools/FailureWatchdog.h
-    Source/CommonTools/GlobalInferenceRunner.cpp
-    Source/CommonTools/GlobalInferenceRunner.h
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.cpp
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.h
     Source/CommonTools/ImageMatch/ExactImageDictionaryMatcher.cpp
@@ -695,8 +714,6 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/IntegrationsAPI.h
     Source/Integrations/ProgramTracker.cpp
     Source/Integrations/ProgramTracker.h
-    Source/Integrations/SleepyDiscordRunner.cpp
-    Source/Integrations/SleepyDiscordRunner.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
@@ -871,12 +888,25 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
-    Source/ML/DataLabeling/SegmentAnythingModel.cpp
-    Source/ML/DataLabeling/SegmentAnythingModel.h
+    Source/ML/DataLabeling/ML_AnnotationIO.cpp
+    Source/ML/DataLabeling/ML_AnnotationIO.h
+    Source/ML/DataLabeling/ML_SegmentAnythingModel.cpp
+    Source/ML/DataLabeling/ML_SegmentAnythingModel.h
+    Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
     Source/ML/ML_Panels.cpp
     Source/ML/ML_Panels.h
     Source/ML/Programs/ML_LabelImages.cpp
     Source/ML/Programs/ML_LabelImages.h
+    Source/ML/UI/ML_ImageAnnotationCommandRow.cpp
+    Source/ML/UI/ML_ImageAnnotationCommandRow.h
+    Source/ML/UI/ML_ImageAnnotationDisplayOption.cpp
+    Source/ML/UI/ML_ImageAnnotationDisplayOption.h
+    Source/ML/UI/ML_ImageAnnotationDisplaySession.cpp
+    Source/ML/UI/ML_ImageAnnotationDisplaySession.h
+    Source/ML/UI/ML_ImageAnnotationDisplayWidget.cpp
+    Source/ML/UI/ML_ImageAnnotationDisplayWidget.h
+    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.cpp
+    Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp
@@ -953,6 +983,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SingleSwitchProgramWidget.h
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.cpp
     Source/NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h
+    Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
+    Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_DateChangeDetector.cpp
@@ -967,8 +999,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h
     Source/NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.cpp
     Source/NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h
-    Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.cpp
-    Source/NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.cpp
     Source/NintendoSwitch/NintendoSwitch_ConsoleHandle.h
     Source/NintendoSwitch/NintendoSwitch_ConsoleState.cpp
@@ -1002,6 +1032,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_24h.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.h
+    Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch1_HomeToDateTime.cpp
+    Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch2_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_NeutralDateSkip.cpp
@@ -1010,8 +1042,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateBackwardN.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h
-    Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch1_HomeToDateTime.cpp
-    Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch2_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_CodeEntryTools.cpp
     Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_CodeEntryTools.h
     Source/NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardCodeEntry.cpp
@@ -1264,6 +1294,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonHome/Programs/PokemonHome_GenerateNameOCR.h
     Source/PokemonHome/Programs/PokemonHome_PageSwap.cpp
     Source/PokemonHome/Programs/PokemonHome_PageSwap.h
+    Source/PokemonHome/Resources/PokemonHome_PokeballSprites.cpp
+    Source/PokemonHome/Resources/PokemonHome_PokeballSprites.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp
@@ -1529,6 +1561,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Battles/PokemonSV_PostCatchDetector.h
     Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_ShinySoundDetector.h
+    Source/PokemonSV/Inference/Battles/PokemonSV_StartBattleYellowBar.cpp
+    Source/PokemonSV/Inference/Battles/PokemonSV_StartBattleYellowBar.h
     Source/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp
@@ -1583,6 +1617,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Overworld/PokemonSV_OliveDetector.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h
+    Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.cpp
+    Source/PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h
     Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.cpp
     Source/PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h
     Source/PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.cpp
@@ -2446,7 +2482,6 @@ if (MSVC)
         OpenCV_lib
         ONNX_lib
         ONNX_Providers_lib
-        Sleepy.lib
         dpp_lib
     )
     target_compile_definitions(
@@ -2454,7 +2489,6 @@ if (MSVC)
         _CRT_SECURE_NO_WARNINGS
         _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
         PA_TESSERACT
-        PA_SLEEPY
         PA_DPP
     )
 

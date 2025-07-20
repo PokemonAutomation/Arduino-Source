@@ -14,21 +14,20 @@ namespace NintendoSwitch{
 
 
 void roll_date_forward_1_Switch1_wired(ProControllerContext& context, bool fast){
-    uint8_t scroll_delay = fast ? 3 : 4;
-    uint8_t up_delay = fast ? 2 : 3;
+    Milliseconds delay = 24ms;
 
-    ssf_press_button(context, BUTTON_A, 20, 10);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, 0);
-    ssf_press_button(context, BUTTON_A, up_delay);
-//    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_UP, up_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_press_button(context, BUTTON_A, 0);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, scroll_delay);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0);
-    ssf_press_button(context, BUTTON_A, 20, 10);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, 0ms, 2*delay, delay);
+    ssf_press_button(context, BUTTON_A, delay);
+//    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_press_button(context, BUTTON_A, 0ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, delay);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 0ms, 2*delay, delay);
+    ssf_press_button(context, BUTTON_A, 160ms, 80ms);
 }
 void roll_date_forward_1_Switch1_wireless(ProControllerContext& context){
     Milliseconds tv = context->timing_variation();
@@ -82,6 +81,21 @@ void roll_date_forward_1_Switch2_wired(ProControllerContext& context){
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms, 48ms, 24ms);
     ssf_press_button(context, BUTTON_A, 264ms, 80ms);
 }
+void roll_date_forward_1_Switch2_wireless(ProControllerContext& context){
+    Milliseconds tv = context->timing_variation();
+    Milliseconds unit = 24ms + tv;
+
+    ssf_press_button(context, BUTTON_A, 216ms, 80ms);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_UP, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, unit);
+    ssf_press_button(context, BUTTON_A, 264ms, 80ms);
+}
 void roll_date_forward_1(
     ConsoleHandle& console, ProControllerContext& context,
     bool fast
@@ -90,10 +104,10 @@ void roll_date_forward_1(
 
     if (is_switch1(type)){
         switch (context->performance_class()){
-        case ControllerPerformanceClass::SerialPABotBase_Wired_125Hz:
+        case ControllerPerformanceClass::SerialPABotBase_Wired:
             roll_date_forward_1_Switch1_wired(context, fast);
             return;
-        case ControllerPerformanceClass::SerialPABotBase_Wireless_ESP32:
+        case ControllerPerformanceClass::SerialPABotBase_Wireless:
             roll_date_forward_1_Switch1_wireless(context);
             return;
         case ControllerPerformanceClass::SysbotBase:
@@ -108,7 +122,19 @@ void roll_date_forward_1(
     }
 
     if (is_switch2(type)){
-        roll_date_forward_1_Switch2_wired(context);
+        switch (context->performance_class()){
+        case ControllerPerformanceClass::SerialPABotBase_Wired:
+            roll_date_forward_1_Switch2_wired(context);
+            return;
+        case ControllerPerformanceClass::SerialPABotBase_Wireless:
+            roll_date_forward_1_Switch2_wireless(context);
+            return;
+        default:
+            throw InternalProgramError(
+                &console.logger(), PA_CURRENT_FUNCTION,
+                "Unsupported ControllerPerformanceClass: " + std::to_string((int)context->performance_class())
+            );
+        }
         return;
     }
 

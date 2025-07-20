@@ -43,7 +43,9 @@ constexpr Button VALID_PRO_CONTROLLER_BUTTONS =
     BUTTON_UP |
     BUTTON_RIGHT |
     BUTTON_DOWN |
-    BUTTON_LEFT;
+    BUTTON_LEFT |
+    BUTTON_GR |
+    BUTTON_GL;
 
 
 
@@ -54,7 +56,7 @@ class ProController : public AbstractController{
 public:
     using ContextType = ProControllerContext;
 
-    ProController();
+    ProController(Logger& logger);
     virtual ~ProController();
 
     //  Must call before destruction begins.

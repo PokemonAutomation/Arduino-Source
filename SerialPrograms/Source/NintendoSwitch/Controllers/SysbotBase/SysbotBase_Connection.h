@@ -32,7 +32,7 @@ public:
         m_listeners.add(listener);
     }
     void remove_listener(Listener& listener){
-        m_listeners.add(listener);
+        m_listeners.remove(listener);
     }
 
 public:
@@ -44,7 +44,7 @@ public:
 
     virtual ControllerModeStatus controller_mode_status() const override;
     bool supports_command_queue() const{
-        return m_supports_command_queue;
+        return m_supports_command_queue.load(std::memory_order_relaxed);
     }
 
     void write_data(const std::string& data);
@@ -55,18 +55,23 @@ private:
     virtual void on_connect_finished(const std::string& error_message) override;
     virtual void on_receive_data(const void* data, size_t bytes) override;
 
-    void process_message(const std::string& message);
+    void process_message(const std::string& message, WallClock timestamp);
     void set_mode(const std::string& sbb_version);
 
 private:
     Logger& m_logger;
     ClientSocket m_socket;
 
-    bool m_supports_command_queue;
+    std::atomic<bool> m_supports_command_queue;
 
     std::string m_connecting_message;
 //    std::string m_version;
-    WallClock m_last_receive;
+    WallClock m_last_ping_send;
+    WallClock m_last_ping_receive;
+
+    uint64_t m_ping_seqnum = 0;
+    std::map<uint64_t, WallClock> m_active_pings;
+
     std::deque<char> m_receive_buffer;
 
     SpinLock m_send_lock;

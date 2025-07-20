@@ -340,6 +340,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
                 material,
             }
         );
+        context.wait_for(std::chrono::milliseconds(250));
         next_wait_time = std::chrono::seconds(120);
         switch (ret){
         case 0:
@@ -396,8 +397,12 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
             pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
             resume_game_from_home(env.console, context, false);
 
-            if (!prompt.detect(env.console.video().snapshot())){
+            context.wait_for(250ms);
+
+            VideoSnapshot snapshot = env.console.video().snapshot();
+            if (!prompt.detect(snapshot)){
                 env.log("Expected to be on prompt menu. Backing out.", COLOR_RED);
+//                snapshot->save("noprompt.png");
                 stats.errors++;
                 env.update_stats();
                 pbf_mash_button(context, BUTTON_B, 500);
@@ -406,7 +411,7 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
 
             //  Wait for trigger time.
             context.wait_until(trigger_time);
-            pbf_press_button(context, BUTTON_A, 10, 10);
+            pbf_press_button(context, BUTTON_A, 80ms, 500ms);
             continue;
         }
         case 4:{
@@ -418,11 +423,11 @@ ItemPrinterPrizeResult ItemPrinterRNG::run_print_at_date(
                 pbf_press_button(context, BUTTON_B, 20, 30);
                 continue;
             }
-            item_printer_start_print(env.normal_inference_dispatcher(), env.console, context, LANGUAGE, jobs);
+            item_printer_start_print(env.console, context, LANGUAGE, jobs);
             stats.prints++;
             env.update_stats();
             printed = true;
-            prize_result = item_printer_finish_print(env.normal_inference_dispatcher(), env.console, context, LANGUAGE);
+            prize_result = item_printer_finish_print(env.console, context, LANGUAGE);
             std::array<std::string, 10> print_results = prize_result.prizes;
             uint64_t seed = to_seconds_since_epoch(date);
             int distance_from_target = get_distance_from_target(env.console, stats, print_results, seed);
@@ -609,11 +614,11 @@ void ItemPrinterRNG::print_again(
             if (printed){
                 return;
             }
-            item_printer_start_print(env.normal_inference_dispatcher(), env.console, context, LANGUAGE, jobs);
+            item_printer_start_print(env.console, context, LANGUAGE, jobs);
             stats.prints++;
             env.update_stats();
             printed = true;
-            item_printer_finish_print(env.normal_inference_dispatcher(), env.console, context, LANGUAGE);
+            item_printer_finish_print(env.console, context, LANGUAGE);
             continue;
         }
         default:
@@ -986,11 +991,9 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
             ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
             
             int8_t happiny_dust_row_num = detector.find_happiny_dust_row_index(
-                env.normal_inference_dispatcher(),
                 env.console, context
             );
             num_happiny_dust = detector.detect_material_quantity(
-                env.normal_inference_dispatcher(),
                 env.console, context,
                 happiny_dust_row_num
             );

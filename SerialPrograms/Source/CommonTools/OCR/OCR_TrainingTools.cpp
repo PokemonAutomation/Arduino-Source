@@ -6,7 +6,8 @@
 
 #include <QDirIterator>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Concurrency/ParallelTaskRunner.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/ComputationThreadPool.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
@@ -110,8 +111,8 @@ void TrainingSession::generate_small_dictionary(
     OCR::SmallDictionaryMatcher baseline(ocr_json_file, !incremental);
     OCR::SmallDictionaryMatcher trained(ocr_json_file, !incremental);
 
-    ParallelTaskRunner task_runner(
-        [](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(); },
+    ComputationThreadPool task_runner(
+        [&](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
         0, threads
     );
 
@@ -121,8 +122,13 @@ void TrainingSession::generate_small_dictionary(
         const LanguageData& language_info = language_data(language.first);
         m_logger.log("Starting Language: " + language_info.name);
 //        cout << (int)item.first << " : " << item.second.size() << endl;
-        for (const TrainingSample& sample : language.second){
-            task_runner.dispatch([&]{
+
+        task_runner.run_in_parallel(
+            [&](size_t index){
+                m_scope.throw_if_cancelled();
+
+                const TrainingSample& sample = language.second[index];
+
                 ImageRGB32 image(m_directory + sample.filepath);
                 if (!image){
                     m_logger.log("Skipping: " + sample.filepath);
@@ -163,10 +169,10 @@ void TrainingSession::generate_small_dictionary(
                     language.first, sample.token,
                     result0.results.begin()->second.normalized_text
                 );
-            });
-            m_scope.throw_if_cancelled();
-        }
-        task_runner.wait_for_everything();
+            },
+            0, language.second.size(), 1
+        );
+
         m_scope.throw_if_cancelled();
     }
 
@@ -192,8 +198,8 @@ void TrainingSession::generate_large_dictionary(
     OCR::LargeDictionaryMatcher baseline(ocr_json_directory + output_prefix, nullptr, !incremental);
     OCR::LargeDictionaryMatcher trained(ocr_json_directory + output_prefix, nullptr, !incremental);
 
-    ParallelTaskRunner task_runner(
-        [](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(); },
+    ComputationThreadPool task_runner(
+        [&](){ GlobalSettings::instance().PERFORMANCE->COMPUTE_PRIORITY.set_on_this_thread(m_logger); },
         0, threads
     );
 
@@ -203,8 +209,13 @@ void TrainingSession::generate_large_dictionary(
         const LanguageData& language_info = language_data(language.first);
         m_logger.log("Starting Language: " + language_info.name);
 //        cout << (int)item.first << " : " << item.second.size() << endl;
-        for (const TrainingSample& sample : language.second){
-            task_runner.dispatch([&]{
+
+        task_runner.run_in_parallel(
+            [&](size_t index){
+                m_scope.throw_if_cancelled();
+
+                const TrainingSample& sample = language.second[index];
+
                 ImageRGB32 image(m_directory + sample.filepath);
                 if (!image){
                     m_logger.log("Skipping: " + sample.filepath);
@@ -245,10 +256,9 @@ void TrainingSession::generate_large_dictionary(
                     language.first, sample.token,
                     result0.results.begin()->second.normalized_text
                 );
-            });
-            m_scope.throw_if_cancelled();
-        }
-        task_runner.wait_for_everything();
+            },
+            0, language.second.size(), 1
+        );
 
         std::string json = output_prefix + language_info.code + ".json";
         trained.save(language.first, json);

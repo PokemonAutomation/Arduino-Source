@@ -56,6 +56,7 @@ private:
     ImageFloatBox m_dialog_middle;
 //    ImageFloatBox m_dialog_right;
     ImageFloatBox m_left;
+    ImageFloatBox m_path_box;
 };
 
 
@@ -99,10 +100,8 @@ public:
     void read_sprites(Logger& logger, const ImageViewRGB32& screen, std::string slugs[4]) const;
     void read_hp(Logger& logger, const ImageViewRGB32& screen, double hp[4]) const;
 
-    static int8_t read_side(const ImageViewRGB32& image, int p_min_rgb_sum);
-
 private:
-    size_t m_player_index;
+//    size_t m_player_index;
     OverlayBoxScope m_path;
     OverlayBoxScope m_sprite0;
     OverlayBoxScope m_sprite1;

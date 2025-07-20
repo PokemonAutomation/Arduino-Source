@@ -8,7 +8,7 @@
 #define PokemonAutomation_ProcessPriorityOption_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/GroupOption.h"
+//#include "Common/Cpp/Options/GroupOption.h"
 #include "CommonFramework/Environment/Environment.h"
 
 namespace PokemonAutomation{
@@ -26,8 +26,8 @@ public:
             default_priority
         )
     {}
-    void set_on_this_thread() const{
-        set_thread_priority(*this);
+    void set_on_this_thread(Logger& logger) const{
+        set_thread_priority(logger, *this);
     }
 };
 

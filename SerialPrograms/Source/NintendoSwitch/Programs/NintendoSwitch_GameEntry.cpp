@@ -32,31 +32,50 @@ namespace NintendoSwitch{
 
 
 
-
-
-void wait_for_home(ConsoleHandle& console, ProControllerContext& context){
-    //  Feedback not available. Just assume we're already on Home.
+void go_home(ConsoleHandle& console, ProControllerContext& context){
+    pbf_press_button(context, BUTTON_HOME, 160ms, 0ms);
     if (!console.video().snapshot()){
+        pbf_wait(context, 640ms);
         return;
     }
 
-    for (size_t attempts = 0;; attempts++){
+    ensure_at_home(console, context);
+}
+
+
+template <typename ControllerContext>
+void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
+    //  Feedback not available. Just assume we're already on Home.
+    if (!console.video().snapshot()){
+        pbf_wait(context, 640ms);
+        return;
+    }
+
+    for (size_t attempts = 0; attempts < 10; attempts++){
         HomeMenuWatcher home_menu(console, 100ms);
         int ret = wait_until(
             console, context, 5000ms,
             {home_menu}
         );
         if (ret == 0){
-            break;
+            return;
         }
-        if (attempts == 2){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Unable to find Switch Home",
-                console
-            );
-        }
+        console.log("Unable to detect Home. Pressing Home button...", COLOR_RED);
+        pbf_press_button(context, BUTTON_HOME, 160ms, 0ms);
     }
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "Unable to find Switch Home",
+        console
+    );
+}
+
+
+void ensure_at_home(ConsoleHandle& console, ProControllerContext& context){
+    ensure_at_home<ProControllerContext>(console, context);
+}
+void ensure_at_home(ConsoleHandle& console, JoyconContext& context){
+    ensure_at_home<JoyconContext>(console, context);
 }
 
 

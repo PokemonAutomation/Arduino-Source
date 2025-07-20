@@ -25,19 +25,19 @@ void home_to_date_time_Switch1_wired_blind(
 ){
     logger.log("home_to_date_time_Switch1_wired_blind()");
 
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
 
     //  Down twice in case we drop one.
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 32ms);
 
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 48ms, 24ms);
 
     //  Two A presses in case we drop the 1st one.
-    ssf_press_button(context, BUTTON_A, 3);
-    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, 24ms, 40ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
     //  Just button mash it. lol
     {
@@ -49,8 +49,8 @@ void home_to_date_time_Switch1_wired_blind(
 
     //  Scroll left and press A to exit the sleep menu if we happened to
     //  land there.
-    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 3);
-    ssf_press_button(context, BUTTON_A, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_LEFT, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
     {
         auto iterations = Milliseconds(312) / 24ms + 1;
@@ -59,25 +59,25 @@ void home_to_date_time_Switch1_wired_blind(
         }while (--iterations);
     }
 
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
-    ssf_press_dpad(context, DPAD_DOWN, 45, 40);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 40ms, 24ms);
+    ssf_press_dpad(context, DPAD_DOWN, 360ms, 320ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
 
     if (!to_date_change){
         //  Triple up this A press to make sure it gets through.
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 45);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 360ms, 48ms, 24ms);
         return;
     }
 
     //  Triple up this A press to make sure it gets through.
-    ssf_press_button(context, BUTTON_A, 3);
-    ssf_press_button(context, BUTTON_A, 3);
-    ssf_press_button(context, BUTTON_A, 3);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+    ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
     {
         auto iterations = Milliseconds(250) / 24ms + 1;
         do{
@@ -206,9 +206,6 @@ void home_to_date_time_Switch1_sbb_blind(
 }
 
 
-
-
-
 void home_to_date_time_Switch1_wired_feedback(
     VideoStream& stream, ProControllerContext& context, bool to_date_change
 ){
@@ -216,16 +213,16 @@ void home_to_date_time_Switch1_wired_feedback(
 
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 4);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
 
         //  Down twice in case we drop one.
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 4);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 32ms);
 
         // if (i > 0){  // intentionally create a failure, for testing
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0);
+        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 40ms, 24ms);
         // }
 
 
@@ -235,8 +232,8 @@ void home_to_date_time_Switch1_wired_feedback(
 
         //  Two A presses in case we drop the 1st one.
         //  the program can self recover even if the second button press is registered.
-        ssf_press_button(context, BUTTON_A, 3);
-        ssf_press_button(context, BUTTON_A, 3);
+        ssf_press_button(context, BUTTON_A, 24ms, 40ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
         //  Just button mash it. lol
         {
@@ -274,18 +271,18 @@ void home_to_date_time_Switch1_wired_feedback(
             }while (--iterations);
         }
 
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 10);
-        ssf_press_dpad(context, DPAD_DOWN, 45, 40);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 40ms, 24ms);
+        ssf_press_dpad(context, DPAD_DOWN, 360ms, 320ms);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
         // if (i > 1){  // intentionally create a failure, for testing
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 3);
+        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
         // }
 
         // only one ButtonA press since the program can self-recover if the button is dropped.
         // furthermore, the program can't self-recover if a second button press is registered.
-        ssf_press_button(context, BUTTON_A, 3);
+        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
         context.wait_for_all_requests();
         context.wait_for(Milliseconds(300));
@@ -330,6 +327,70 @@ void home_to_date_time_Switch1_wired_feedback(
     );
 
 }
+
+
+
+
+
+
+void home_to_date_time_Switch1_joycon_blind(JoyconContext& context, bool to_date_change){
+    Milliseconds tv = context->timing_variation();
+    Milliseconds unit = 100ms + tv;
+
+    //From ControllerPerformanceClass::SerialPABotBase_Wireless
+    //as Joycon will only have that controller type
+
+    pbf_move_joystick(context, 255, 128, 2*unit, unit);
+    pbf_move_joystick(context, 255, 128, 2*unit, unit);
+    pbf_move_joystick(context, 255, 128, 2*unit, unit);
+
+    //  Down twice in case we drop one.
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+
+    pbf_move_joystick(context, 0, 128, 2*unit, unit);
+
+    //  Press A multiple times to make sure one goes through.
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+
+    // Scroll to System, move right to top option (update)
+    pbf_move_joystick(context, 128, 255, 2500ms, unit);
+    pbf_move_joystick(context, 255, 128, 500ms, unit);
+
+    // To date/time
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    context.wait_for_all_requests();
+    pbf_move_joystick(context, 128, 255, 525ms, unit);
+    //pbf_move_joystick(context, 128, 255, 365ms, 305ms);
+    pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    //pbf_move_joystick(context, 128, 255, 2*unit, unit);
+    context.wait_for_all_requests();
+
+    if (!to_date_change){
+        ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
+        return;
+    }
+
+    //ssf_press_button(context, BUTTON_A, unit);
+    pbf_press_button(context, BUTTON_A, 2*unit, unit);
+    context.wait_for_all_requests();
+    {
+        auto iterations = Milliseconds(216) / unit + 1;
+        do{
+            pbf_move_joystick(context, 128, 255, 2*unit, unit);
+        }while (--iterations);
+    }
+    pbf_move_joystick(context, 128, 255, 2*unit, 0ms);
+}
+
+
+
+
+
+
 
 
 

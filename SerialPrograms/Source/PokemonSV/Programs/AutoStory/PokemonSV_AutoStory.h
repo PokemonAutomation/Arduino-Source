@@ -50,6 +50,9 @@ public:
         int loop, int start_loop, int end_loop
     );
 
+    size_t get_start_segment_index();
+    size_t get_end_segment_index();
+
     void run_autostory(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:

@@ -89,9 +89,9 @@ void SurfItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         env.log("Current Attempts: " + tostr_u_commas(c));
 
         //Initiate Shield Surf
-        ssf_press_button(context, BUTTON_ZL, 0, 80);
-        ssf_press_button(context, BUTTON_X, 5, 30);
-        ssf_press_button(context, BUTTON_A, 10, 80);
+        ssf_press_button(context, BUTTON_ZL, 0ms, 640ms);
+        ssf_press_button(context, BUTTON_X, 40ms, 240ms);
+        ssf_press_button(context, BUTTON_A, 80ms, 640ms);
 
         //Open menu
         pbf_press_button(context, BUTTON_PLUS, 20, 100);

@@ -15,7 +15,6 @@
 
 namespace PokemonAutomation{
     class Logger;
-    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -24,18 +23,17 @@ public:
     ItemPrinterJobsDetector(Color color);
 
     void make_overlays(VideoOverlaySet& items) const;
-    uint8_t detect_jobs(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const;
+    uint8_t detect_jobs(Logger& logger, const ImageViewRGB32& screen) const;
 
     //  "jobs" jobs must be 1, 5, or 10.
     void set_print_jobs(
-        AsyncDispatcher& dispatcher,
         VideoStream& stream, ProControllerContext& context, uint8_t jobs
     ) const;
 
 
 private:
     std::pair<uint8_t, uint8_t> read_box(
-        Logger& logger, AsyncDispatcher& dispatcher,
+        Logger& logger,
         const ImageViewRGB32& screen, const ImageFloatBox& box
     ) const;
 

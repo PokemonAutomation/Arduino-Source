@@ -19,7 +19,6 @@
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_LetsGoHpReader.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
-#include "PokemonSV/Inference/Battles/PokemonSV_EncounterWatcher.h"
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
@@ -189,6 +188,15 @@ void ShinyHuntAreaZeroPlatform::on_config_value_changed(void* object){
 
 
 
+
+
+
+
+
+
+
+
+
 bool ShinyHuntAreaZeroPlatform::run_traversal(ProControllerContext& context){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
 
@@ -201,7 +209,7 @@ bool ShinyHuntAreaZeroPlatform::run_traversal(ProControllerContext& context){
 //        m_last_save = SavedLocation::AREA_ZERO;
 //    }
 
-    double hp = m_hp_watcher->last_known_value() * 100;
+    double hp = m_sensors->lets_go_hp.last_known_value() * 100;
     if (0 < hp){
         stream.log("Last Known HP: " + tostr_default(hp) + "%", COLOR_BLUE);
     }else{
@@ -333,7 +341,9 @@ void ShinyHuntAreaZeroPlatform::set_flags(SingleSwitchProgramEnvironment& env){
     );
 
 }
-void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void ShinyHuntAreaZeroPlatform::run_state(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context
+){
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
     const ProgramInfo& info = m_env->program_info();
     VideoStream& stream = m_env->console;
@@ -437,7 +447,9 @@ void ShinyHuntAreaZeroPlatform::run_state(SingleSwitchProgramEnvironment& env, P
         return;
     }
 }
-void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context
+){
     set_flags(env);
 
     ShinyHuntAreaZeroPlatform_Descriptor::Stats& stats = m_env->current_stats<ShinyHuntAreaZeroPlatform_Descriptor::Stats>();
@@ -461,6 +473,12 @@ void ShinyHuntAreaZeroPlatform::set_flags_and_run_state(SingleSwitchProgramEnvir
     }
 }
 
+
+
+
+
+
+
 void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     m_env = &env;
 
@@ -470,16 +488,20 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Pro
 
     m_iterations = 0;
 
-    LetsGoHpWatcher hp_watcher(COLOR_RED);
-    m_hp_watcher = &hp_watcher;
+    OverworldSensors sensors(
+        env.logger(), env.console, context
+    );
+    m_sensors = &sensors;
+
+    OverworldBattleTracker battle_tracker(env.logger(), sensors);
 
     DiscontiguousTimeTracker time_tracker;
     m_time_tracker = &time_tracker;
 
     LetsGoEncounterBotTracker encounter_tracker(
-        env, env.console, context,
+        env, env.console,
         stats,
-        LANGUAGE
+        sensors.lets_go_kill
     );
     m_encounter_tracker = &encounter_tracker;
 
@@ -519,7 +541,7 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Pro
     while (true){
         try{
             env.console.log("Starting encounter loop...", COLOR_PURPLE);
-            EncounterWatcher encounter_watcher(env.console, COLOR_RED);
+            NormalBattleMenuWatcher battle_menu(COLOR_RED);
             run_until<ProControllerContext>(
                 env.console, context,
                 [&](ProControllerContext& context){
@@ -528,20 +550,27 @@ void ShinyHuntAreaZeroPlatform::program(SingleSwitchProgramEnvironment& env, Pro
                         set_flags_and_run_state(env, context);
                     }
                 },
-                {
-                    static_cast<VisualInferenceCallback&>(encounter_watcher),
-                    static_cast<AudioInferenceCallback&>(encounter_watcher),
-                    hp_watcher,
-                }
+                {battle_menu}
             );
-            encounter_watcher.throw_if_no_sound();
+            sensors.throw_if_no_sound();
 
             env.console.log("Detected battle.", COLOR_PURPLE);
+            stats.m_encounters++;
+            env.update_stats();
+            encounter_tracker.encounter_rate_tracker().report_encounter();
+
             bool caught, should_save;
-            encounter_tracker.process_battle(
+            process_battle(
                 caught, should_save,
-                encounter_watcher, ENCOUNTER_BOT_OPTIONS
+                env,
+                ENCOUNTER_BOT_OPTIONS,
+                env.console, context,
+                battle_tracker,
+                encounter_tracker.encounter_frequencies(),
+                stats.m_shinies,
+                LANGUAGE
             );
+
             m_pending_save |= should_save;
             if (caught){
                 m_reset_on_next_sandwich = false;

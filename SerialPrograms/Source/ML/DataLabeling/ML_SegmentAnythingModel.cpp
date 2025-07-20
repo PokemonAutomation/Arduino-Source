@@ -5,32 +5,21 @@
  *  Run Segment Anything Model (SAM) to segment objects on images
  */
 
+#include <QDir>
+#include <QDirIterator>
 #include <fstream>
 #include <iostream>
+#include <QMessageBox>
 #include <onnxruntime_cxx_api.h>
 #include <opencv2/imgcodecs.hpp>
+#include <opencv2/imgproc.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
-#include "SegmentAnythingModel.h"
+#include "ML_SegmentAnythingModelConstants.h"
+#include "ML_SegmentAnythingModel.h"
+#include "ML_AnnotationIO.h"
 
 namespace PokemonAutomation{
 namespace ML{
-
-
-
-
-const int SAM_EMBEDDER_INPUT_IMAGE_WIDTH = 1024;
-const int SAM_EMBEDDER_INPUT_IMAGE_HEIGHT = 576;
-const int SAM_EMBEDDER_OUTPUT_N_CHANNELS = 256;
-const int SAM_EMBEDDER_OUTPUT_IMAGE_SIZE = 64;
-
-const int SAM_EMBEDDER_INPUT_SIZE = SAM_EMBEDDER_INPUT_IMAGE_HEIGHT * SAM_EMBEDDER_INPUT_IMAGE_WIDTH * 3;
-const int SAM_EMBEDDER_OUTPUT_SIZE = SAM_EMBEDDER_OUTPUT_N_CHANNELS * SAM_EMBEDDER_OUTPUT_IMAGE_SIZE * SAM_EMBEDDER_OUTPUT_IMAGE_SIZE;
-
-const int SAM_N_INPUT_TENSORS = 6;
-const int SAM_N_OUTPUT_TENSORS = 3;
-const int SAM_LOW_RES_MASK_SIZE = 256;
-const float SAM_OUTPUT_MASK_THRESHOLD = 0.0;
-
 
 Ort::SessionOptions create_session_option(){
     return Ort::SessionOptions{};
@@ -203,48 +192,55 @@ void SAMSession::run(
 }
 
 
-// save the image embedding as a file with path <image_filepath>.embedding
-void save_image_embedding_to_disk(const std::string& image_filepath, const std::vector<float>& embedding){
-    std::string embedding_path = image_filepath + ".embedding";
-    std::ofstream fout(embedding_path, std::ios::binary);
-    // write embedding shape
-    fout.write(reinterpret_cast<const char*>(&SAM_EMBEDDER_OUTPUT_N_CHANNELS), sizeof(SAM_EMBEDDER_OUTPUT_N_CHANNELS));
-    fout.write(reinterpret_cast<const char*>(&SAM_EMBEDDER_OUTPUT_IMAGE_SIZE), sizeof(SAM_EMBEDDER_OUTPUT_IMAGE_SIZE));
-    fout.write(reinterpret_cast<const char*>(&SAM_EMBEDDER_OUTPUT_IMAGE_SIZE), sizeof(SAM_EMBEDDER_OUTPUT_IMAGE_SIZE));
-    fout.write(reinterpret_cast<const char*>(embedding.data()), sizeof(float) * embedding.size());
-    fout.close();
-    std::cout << "Saved image embedding as " << embedding_path << std::endl;
-}
+void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path){
+    const bool recursive_search = true;
+    std::vector<std::string> all_image_paths = find_images_in_folder(image_folder_path, recursive_search);
+    if (all_image_paths.size() == 0){
+        return;
+    }
+    
+    SAMEmbedderSession embedding_session(embedding_model_path);
+    std::vector<float> output_image_embedding;
+    for (size_t i = 0; i < all_image_paths.size(); i++){
+        const auto& image_path = all_image_paths[i];
+        std::cout << (i+1) << "/" << all_image_paths.size() << ": ";
+        const std::string embedding_path = image_path + ".embedding";
+        if (std::filesystem::exists(embedding_path)){
+            std::cout << "skip already computed embedding " << embedding_path << "." << std::endl;
+            continue;
+        }
+        std::cout << "computing embedding for " << image_path << "..." << std::endl;
+        cv::Mat image_bgr = cv::imread(image_path);
+        if (image_bgr.empty()){
+            std::cerr << "Error: image empty. Probably the file is not an image?" << std::endl;
+            QMessageBox box;
+            box.warning(nullptr, "Unable To Open Image",
+                QString::fromStdString("Cannot open image file " + image_path + ". Probably not an actual image?"));
+            return;
+        }
+        cv::Mat image;
+        if (image_bgr.channels() == 4){
+            cv::cvtColor(image_bgr, image, cv::COLOR_BGRA2RGB);
+        } else if (image_bgr.channels() == 3){
+            cv::cvtColor(image_bgr, image, cv::COLOR_BGR2RGB);
+        } else{
+            std::cerr << "Error: wrong image channels. Only work with RGB or RGBA images." << std::endl;
+            QMessageBox box;
+            box.warning(nullptr, "Wrong Image Channels",
+                QString::fromStdString("Image has " + std::to_string(image_bgr.channels()) + " channels. Only support 3 or 4 channels."));
+            return;
+        }
 
+        cv::Mat resized_mat;  // resize to the shape for the ML model input
+        cv::resize(image, resized_mat, cv::Size(SAM_EMBEDDER_INPUT_IMAGE_WIDTH, SAM_EMBEDDER_INPUT_IMAGE_HEIGHT));
 
-bool load_image_embedding(const std::string& image_filepath, std::vector<float>& image_embedding){
-    std::string emebdding_path = image_filepath + ".embedding";
-    std::ifstream fin(emebdding_path, std::ios::binary);
-    if (!fin.is_open()){
-        std::cout << "No embedding for image " << image_filepath << std::endl;
-        return false;
+        output_image_embedding.clear();
+        embedding_session.run(resized_mat, output_image_embedding);
+        save_image_embedding_to_disk(image_path, output_image_embedding);
     }
 
-    int embedding_n_channels = 0, embedding_height = 0, emebedding_width = 0;
-    fin.read(reinterpret_cast<char*>(&embedding_n_channels), sizeof(int));
-    fin.read(reinterpret_cast<char*>(&embedding_height), sizeof(int));
-    fin.read(reinterpret_cast<char*>(&emebedding_width), sizeof(int));
 
-    std::cout << "Image embedding shape [" << embedding_n_channels << ", " << embedding_height
-              << ", " << emebedding_width << "]" << std::endl;
-    if (embedding_n_channels <= 0 || embedding_height <= 0 || emebedding_width <= 0){
-        std::string err_msg = "Image embedding wrong dimension from " + emebdding_path;
-        std::cerr << err_msg << std::endl;
-        throw std::runtime_error(err_msg);
-    }
-
-    const int size = embedding_n_channels * embedding_height * emebedding_width;
-    image_embedding.resize(size);
-    fin.read(reinterpret_cast<char*>(image_embedding.data()), sizeof(float) * size);
-    std::cout << "Loaded image embedding from " << emebdding_path << std::endl;
-    return true;
 }
-
 
 }
 }

@@ -133,6 +133,10 @@
 #include "NintendoSwitch/Inference/NintendoSwitch2_BinarySliderDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_StartBattleYellowBar.h"
+#include "PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
+#include "PokemonHome/Inference/PokemonHome_BallReader.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -192,32 +196,6 @@ TestProgram::TestProgram()
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
     , STATIC_TEXT("Test text...")
 //    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
-    , DATE0(
-        "Date",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        DateTimeOption::DATE_HOUR_MIN,
-        DateTime{2000, 1, 1, 0, 0, 0},
-        DateTime{2060, 12, 31, 23, 59, 59},
-        DateTime{2024, 4, 12, 2, 16, 30}
-    )
-    , DATE1(
-        "Date",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        DateTimeOption::DATE_HOUR_MIN,
-        DateTime{2000, 1, 1, 0, 0, 0},
-        DateTime{2060, 12, 31, 23, 59, 59},
-        DateTime{2048, 1, 13, 20, 48}
-    )
-    , DURATION(
-        "Duration",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        "100"
-    )
-    , COLOR(
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false,
-        0x000000, 0x000000
-    )
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -233,11 +211,6 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(STATIC_TEXT);
 //    PA_ADD_OPTION(PLAYER_LIST);
 //    PA_ADD_OPTION(battle_AI);
-    PA_ADD_OPTION(DATE0);
-    PA_ADD_OPTION(DATE1);
-    PA_ADD_OPTION(DURATION);
-    PA_ADD_OPTION(COLOR);
-    PA_ADD_OPTION(CONTROLLER_TABLE);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);
     BUTTON1.add_listener(*this);
@@ -256,10 +229,6 @@ void TestProgram::on_press(){
     BUTTON0.set_text("Button Pressed");
     BUTTON1.set_text("Button Pressed");
 }
-
-
-
-
 
 
 
@@ -285,19 +254,80 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+    auto screenshot = feed.snapshot();
+
+    PokemonSwSh::MaxLairInternal::PathSelectDetector detector;
+    detector.detect(screenshot);
+
+//    int ret = PokemonSwSh::MaxLairInternal::read_side(screenshot);
+//    cout << "ret = " << ret << endl;
 
 
 
-#if 1
+
+#if 0
+    ImageRGB32 image("20250717-121112090631.png");
+
+    AdvanceDialogDetector detector;
+    detector.make_overlays(overlays);
+    cout << detector.detect(image) << endl;
+#endif
+
+#if 0
+    ImageRGB32 image(RESOURCE_PATH() + "PokemonHome/PokeballSprites.png");
+    image = remove_white_border(image);
+    image.save("test.png");
+#endif
+
+
+#if 0
+    auto screenshot = feed.snapshot();
+
+    PokemonHome::BallReader reader(console);
+
+    reader.read_ball(screenshot);
+#endif
+
+
+
+//    pbf_press_button(context, );
+
+
+
+
+//    PokemonLA::detect_selected_region(console, scope);
+
+
+
+
+#if 0
+    auto screenshot = feed.snapshot();
+
+
+    StartBattleYellowBarDetector detector(COLOR_RED);
+    cout << detector.detect(screenshot) << endl;
+#endif
+
+
+
+//    cout << "asdf" << endl;
+//    cout << (int)settings_detect_console_type(console, context) << endl;
+
+
+
+//    DateReader_Switch2_US reader(COLOR_RED);
+//    reader.read_date(logger, screenshot);
+
+#if 0
     HomeMenuDetector detector0(console);
-    StartGameUserSelectDetector detector1(console);
-    UpdatePopupDetector detector2(console);
+//    StartGameUserSelectDetector detector1(console);
+//    UpdatePopupDetector detector2(console);
     detector0.make_overlays(overlays);
-    detector1.make_overlays(overlays);
-    detector2.make_overlays(overlays);
+//    detector1.make_overlays(overlays);
+//    detector2.make_overlays(overlays);
     cout << detector0.detect(feed.snapshot()) << endl;
-    cout << detector1.detect(feed.snapshot()) << endl;
-    cout << detector2.detect(feed.snapshot()) << endl;
+//    cout << detector1.detect(feed.snapshot()) << endl;
+//    cout << detector2.detect(feed.snapshot()) << endl;
 #endif
 
 
@@ -319,7 +349,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     auto screenshot = feed.snapshot();
 
 
-    BinarySliderDetector detector(COLOR_RED, {0.831784, 0.140496, 0.088290, 0.671074});
+    BinarySliderDetector detector(COLOR_RED, {0.836431, 0.097521, 0.069703, 0.796694});
     auto sliders = detector.detect(screenshot);
 
     for (auto& item : sliders){

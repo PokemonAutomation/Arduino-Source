@@ -43,7 +43,6 @@ enum class ControllerType{
 
 enum class ControllerFeature{
     TickPrecise,
-    TimingFlexibleMilliseconds,
 
     //  If we add support gyro or rumble, we will need to split this feature
     //  since the Pokken controller doesn't support those.
@@ -60,8 +59,8 @@ enum class ControllerFeature{
 
 enum class ControllerPerformanceClass{
     Unknown,
-    SerialPABotBase_Wired_125Hz,
-    SerialPABotBase_Wireless_ESP32,
+    SerialPABotBase_Wired,
+    SerialPABotBase_Wireless,
     SysbotBase,
 };
 

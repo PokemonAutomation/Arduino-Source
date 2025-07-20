@@ -16,7 +16,6 @@
 #include "PokemonSV_MenuOptionDatabase.h"
 
 namespace PokemonAutomation{
-    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 

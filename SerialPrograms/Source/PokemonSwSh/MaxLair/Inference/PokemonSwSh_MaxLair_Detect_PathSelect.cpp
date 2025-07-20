@@ -98,6 +98,7 @@ PathSelectDetector::PathSelectDetector()
     , m_dialog_middle(0.500, 0.880, 0.180, 0.050)
 //    , m_dialog_right(0.710, 0.880, 0.030, 0.050)
     , m_left(0.050, 0.100, 0.200, 0.700)
+    , m_path_box(0.150, 0.020, 0.800, 0.780)
 {}
 void PathSelectDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_CYAN, m_bottom_right);
@@ -147,6 +148,14 @@ bool PathSelectDetector::detect(const ImageViewRGB32& screen) const{
 //    if (dialog_right.average.sum() > dialog_middle.average.sum()){
 //        return false;
 //    }
+
+    ImageViewRGB32 path_box = extract_box_reference(screen, m_path_box);
+    if (read_side(path_box) < 0){
+//        cout << "PathSelectDetector(): read_side(screen) < 0" << endl;
+        return false;
+    }
+
+//    cout << "PathSelectDetector(): Passed" << endl;
     return true;
 }
 bool PathSelectDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
@@ -168,8 +177,7 @@ bool PathSelectDetector::process_frame(const ImageViewRGB32& frame, WallClock ti
 
 
 PathReader::PathReader(VideoOverlay& overlay, size_t player_index)
-    : m_player_index(player_index)
-    , m_path(overlay, {0.150, 0.020, 0.800, 0.780})
+    : m_path(overlay, {0.150, 0.020, 0.800, 0.780})
     , m_sprite0(overlay, {0.002, 0.345 + 0*0.16315, 0.071, 0.102})
     , m_sprite1(overlay, {0.002, 0.345 + 1*0.16315, 0.071, 0.102})
     , m_sprite2(overlay, {0.002, 0.345 + 2*0.16315, 0.071, 0.102})

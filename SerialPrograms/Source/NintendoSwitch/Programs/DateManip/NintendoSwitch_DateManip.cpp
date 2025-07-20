@@ -77,10 +77,7 @@ bool DateReader::detect(const ImageViewRGB32& screen){
         return m_switch2.detect(screen);
     }
 
-    throw UserSetupError(
-        m_console,
-        "Please select a valid Switch console type."
-    );
+    return false;
 }
 
 

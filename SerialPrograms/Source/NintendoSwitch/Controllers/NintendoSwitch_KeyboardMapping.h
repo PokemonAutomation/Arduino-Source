@@ -142,9 +142,9 @@ private:
 public:
     StaticTextOption DESCRIPTION;
     BooleanCheckBoxOption ADVANCED_MODE;
-    ProControllerKeyboardMappingTable PRO_CONTROLLER;
-    JoyconKeyboardMappingTable LEFT_JOYCON;
-    JoyconKeyboardMappingTable RIGHT_JOYCON;
+    ProControllerKeyboardMappingTable PRO_CONTROLLER0;
+    JoyconKeyboardMappingTable LEFT_JOYCON0;
+    JoyconKeyboardMappingTable RIGHT_JOYCON0;
 };
 
 

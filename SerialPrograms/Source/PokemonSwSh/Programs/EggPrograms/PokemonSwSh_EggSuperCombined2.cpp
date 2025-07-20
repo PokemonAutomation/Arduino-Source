@@ -26,7 +26,9 @@ EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        FasterIfTickPrecise::NOT_FASTER,
+        true
     )
 {}
 
@@ -111,13 +113,13 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, ProControll
 
     //  Mass Release
     ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-    ssf_press_button1(context, BUTTON_A, 200);
-    ssf_press_button1(context, BUTTON_R, 250);
+    ssf_press_button(context, BUTTON_A, 1600ms);
+    ssf_press_button(context, BUTTON_R, 2000ms);
     release_boxes(context, BOXES_TO_RELEASE);
 
     //  Skip Boxes
     for (uint8_t c = 0; c <= BOXES_TO_SKIP; c++){
-        ssf_press_button1(context, BUTTON_R, 60);
+        ssf_press_button(context, BUTTON_R, 480ms);
     }
     pbf_mash_button(context, BUTTON_B, 600);
 

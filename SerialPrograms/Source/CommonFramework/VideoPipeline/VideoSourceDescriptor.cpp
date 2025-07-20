@@ -30,8 +30,8 @@ const EnumStringMap<VideoSourceType> VIDEO_TYPE_STRINGS{
 
 
 VideoSourceOption::VideoSourceOption()
-    : m_descriptor(new VideoSourceDescriptor_Null())
-    , m_resolution(1920, 1080)
+    : m_resolution(1920, 1080)
+    , m_descriptor(new VideoSourceDescriptor_Null())
 {}
 
 void VideoSourceOption::set_descriptor(std::shared_ptr<VideoSourceDescriptor> descriptor){

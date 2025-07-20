@@ -29,16 +29,16 @@ class JoyconController::KeyboardManager final :
     public PokemonAutomation::KeyboardManager<JoyconState, JoyconDeltas>
 {
 public:
-    KeyboardManager(JoyconController& controller, ControllerType controller_type)
-        : PokemonAutomation::KeyboardManager<JoyconState, JoyconDeltas>(controller)
+    KeyboardManager(Logger& logger, JoyconController& controller, ControllerType controller_type)
+        : PokemonAutomation::KeyboardManager<JoyconState, JoyconDeltas>(logger, controller)
     {
         std::vector<std::shared_ptr<EditableTableRow>> mapping;
         switch (controller_type){
         case ControllerType::NintendoSwitch_LeftJoycon:
-            mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.LEFT_JOYCON.current_refs();
+            mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.LEFT_JOYCON0.current_refs();
             break;
         case ControllerType::NintendoSwitch_RightJoycon:
-            mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.RIGHT_JOYCON.current_refs();
+            mapping = ConsoleSettings::instance().KEYBOARD_MAPPINGS.RIGHT_JOYCON0.current_refs();
             break;
         default:;
         }
@@ -78,8 +78,8 @@ public:
 
 
 
-JoyconController::JoyconController(ControllerType controller_type)
-    : m_keyboard_manager(CONSTRUCT_TOKEN, *this, controller_type)
+JoyconController::JoyconController(Logger& logger, ControllerType controller_type)
+    : m_keyboard_manager(CONSTRUCT_TOKEN, logger, *this, controller_type)
 {
 
 }

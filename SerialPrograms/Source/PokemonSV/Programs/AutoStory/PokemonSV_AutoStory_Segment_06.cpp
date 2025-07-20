@@ -48,13 +48,11 @@ void AutoStory_Segment_06::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
-    env.console.overlay().add_log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
 
     checkpoint_11(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
     env.console.log("End Segment 06: Go to Los Platos", COLOR_GREEN);
-    env.console.overlay().add_log("End Segment 06: Go to Los Platos", COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

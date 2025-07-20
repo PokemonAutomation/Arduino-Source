@@ -12,6 +12,10 @@
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLA_SelectedRegionDetector.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -42,6 +46,7 @@ public:
             reload_reference(frame.frame);
         }
 
+        MapRegion current_region = MapRegion::NONE;
         for (RegionState& region : m_regions){
             ImageViewRGB32 current = extract_box_reference(frame, region.box);
 
@@ -52,11 +57,19 @@ public:
 
             double rmsd = ImageMatch::pixel_RMSD(region.start, current);
             if (rmsd > 20){
-                m_current_region = region.region;
-                return true;
+                if (current_region == MapRegion::NONE){
+                    current_region = region.region;
+                }else{
+                    //  Multiple large diffs. Frame isn't stable.
+//                    cout << "Multiple diffs: " << rmsd << endl;
+                    reload_reference(frame.frame);
+                    return false;
+                }
             }
         }
-        return false;
+
+        m_current_region = current_region;
+        return current_region != MapRegion::NONE;
     }
 
     void reload_reference(std::shared_ptr<const ImageRGB32> screen){

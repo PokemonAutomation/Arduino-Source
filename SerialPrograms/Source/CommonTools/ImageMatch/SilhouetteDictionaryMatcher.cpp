@@ -8,7 +8,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTools/ImageDiff.h"
-#include "CommonTools/GlobalInferenceRunner.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "ImageCropper.h"
 #include "SilhouetteDictionaryMatcher.h"
 
@@ -49,7 +49,7 @@ ImageMatchResult SilhouetteDictionaryMatcher::match(
     }
 
     SpinLock lock;
-    global_inference_runner().run_in_parallel(
+    GlobalThreadPools::normal_inference().run_in_parallel(
         [&](size_t index){
             const auto& matcher = *m_database_vector[index];
             double alpha = matcher.second.rmsd_masked(image);

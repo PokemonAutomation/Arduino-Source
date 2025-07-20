@@ -104,29 +104,29 @@ void TradeBot::trade_slot(
     const std::string& code, uint8_t slot
 ) const{
     ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 400ms);
-    ssf_press_button2(context, BUTTON_A, 150, 20);
-    ssf_press_dpad1(context, DPAD_DOWN, 10);
-    ssf_press_button2(context, BUTTON_A, 200, 20);
+    ssf_press_button(context, BUTTON_A, 1200ms, 160ms);
+    ssf_press_dpad(context, DPAD_DOWN, 80ms);
+    ssf_press_button(context, BUTTON_A, 1600ms, 160ms);
     if (LINK_TRADE_EXTRA_LINE){
-        ssf_press_button2(context, BUTTON_B, 50, 20);
+        ssf_press_button(context, BUTTON_B, 400ms, 160ms);
     }
-    ssf_press_button2(context, BUTTON_B, 200, 20);
-    ssf_press_dpad1(context, DPAD_UP, 10);
-    ssf_press_button1(context, BUTTON_A, 5);
-    ssf_press_button1(context, BUTTON_B, 5);
+    ssf_press_button(context, BUTTON_B, 1600ms, 160ms);
+    ssf_press_dpad(context, DPAD_UP, 80ms);
+    ssf_press_button(context, BUTTON_A, 40ms);
+    ssf_press_button(context, BUTTON_B, 40ms);
 
     FastCodeEntry::numberpad_enter_code(console, context, code, true);
-    ssf_press_button1(context, BUTTON_PLUS, 200);
-    ssf_press_button2(context, BUTTON_B, 125, 10);
-    ssf_press_button2(context, BUTTON_A, 50, 10);
+    ssf_press_button(context, BUTTON_PLUS, 1600ms);
+    ssf_press_button(context, BUTTON_B, 1000ms, 80ms);
+    ssf_press_button(context, BUTTON_A, 400ms, 80ms);
     pbf_mash_button(context, BUTTON_B, 400);
 
     pbf_wait(context, SEARCH_DELAY0);
 
     //  If we're not in a trade, enter Y-COMM to avoid a connection at this point.
     ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 400ms);
-    ssf_press_button2(context, BUTTON_A, 200, 20);
-    ssf_press_button2(context, BUTTON_B, 80, 10);
+    ssf_press_button(context, BUTTON_A, 1600ms, 160ms);
+    ssf_press_button(context, BUTTON_B, 640ms, 80ms);
 
     //  Move to slot
     while (slot >= 6){
@@ -139,7 +139,7 @@ void TradeBot::trade_slot(
     }
 
     //  Select Pokemon
-    ssf_press_button1(context, BUTTON_A, 100);
+    ssf_press_button(context, BUTTON_A, 800ms);
     ssf_press_button(context, BUTTON_A, CONFIRM_DELAY0);
 
     //  Start Trade
@@ -177,11 +177,11 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env, ProControllerContext
         //          because the trade is in progress. The 2nd iteration finishes it.
         //      4.  No partner was ever found. The 1st iteration will cancel the trade.
         for (uint8_t c = 0; c < 2; c++){
-            ssf_press_button1(context, BUTTON_Y, 250);
-            ssf_press_button1(context, BUTTON_A, 280);
-            ssf_press_button1(context, BUTTON_B, 280);
-            ssf_press_button1(context, BUTTON_B, 200);
-            ssf_press_button1(context, BUTTON_A, 100);
+            ssf_press_button(context, BUTTON_Y, 2000ms);
+            ssf_press_button(context, BUTTON_A, 2240ms);
+            ssf_press_button(context, BUTTON_B, 2240ms);
+            ssf_press_button(context, BUTTON_B, 1600ms);
+            ssf_press_button(context, BUTTON_A, 800ms);
             pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION0);
         }
 

@@ -6,10 +6,10 @@
 
 #include <algorithm>
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Resources/PokemonSV_Ingredients.h"
 #include "PokemonSV_IngredientSession.h"
 #include "Common/Cpp/PrettyPrint.h"
@@ -25,12 +25,10 @@ namespace PokemonSV{
 IngredientSession::~IngredientSession() = default;
 
 IngredientSession::IngredientSession(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context,
     Language language, SandwichIngredientType type
 )
-    : m_dispatcher(dispatcher)
-    , m_stream(stream)
+    : m_stream(stream)
     , m_context(context)
     , m_language(language)
     , m_overlays(stream.overlay())
@@ -71,23 +69,26 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
     //  Read the names of every line and the sprite of the selected line.
     ImageMatch::ImageMatchResult image_result;
     SandwichIngredientReader reader(m_type);
-    m_dispatcher.run_in_parallel(0, SandwichIngredientReader::INGREDIENT_PAGE_LINES + 1, [&](size_t index){
-        if (index < SandwichIngredientReader::INGREDIENT_PAGE_LINES){
-            // Read text at line `index`
-            OCR::StringMatchResult result = reader.read_ingredient_page_with_ocr(*screen, m_stream.logger(), m_language, index);
-            result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
-            result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
-            for (auto& item : result.results){
-                ret.item[index].insert(item.second.token);
+    GlobalThreadPools::normal_inference().run_in_parallel(
+        [&](size_t index){
+            if (index < SandwichIngredientReader::INGREDIENT_PAGE_LINES){
+                // Read text at line `index`
+                OCR::StringMatchResult result = reader.read_ingredient_page_with_ocr(*screen, m_stream.logger(), m_language, index);
+                result.clear_beyond_log10p(SandwichFillingOCR::MAX_LOG10P);
+                result.clear_beyond_spread(SandwichFillingOCR::MAX_LOG10P_SPREAD);
+                for (auto& item : result.results){
+                    ret.item[index].insert(item.second.token);
+                }
+            }else{
+                // Read current selected icon
+                image_result = reader.read_ingredient_page_with_icon_matcher(*screen, ret.selected);
+                image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
+                image_result.log(m_stream.logger(), SandwichIngredientReader::MAX_ALPHA);
+                image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
             }
-        }else{
-            // Read current selected icon
-            image_result = reader.read_ingredient_page_with_icon_matcher(*screen, ret.selected);
-            image_result.clear_beyond_spread(SandwichIngredientReader::ALPHA_SPREAD);
-            image_result.log(m_stream.logger(), SandwichIngredientReader::MAX_ALPHA);
-            image_result.clear_beyond_alpha(SandwichIngredientReader::MAX_ALPHA);
-        }
-    });
+        },
+        0, SandwichIngredientReader::INGREDIENT_PAGE_LINES + 1
+    );
 
 #if 1
     do{
@@ -316,20 +317,19 @@ void IngredientSession::add_ingredients(
 
 
 void add_sandwich_ingredients(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context,
     Language language,
     std::map<std::string, uint8_t>&& fillings,
     std::map<std::string, uint8_t>&& condiments
 ){
     {
-        IngredientSession session(dispatcher, stream, context, language, SandwichIngredientType::FILLING);
+        IngredientSession session(stream, context, language, SandwichIngredientType::FILLING);
         session.add_ingredients(stream, context, std::move(fillings));
         pbf_press_button(context, BUTTON_PLUS, 20, 230);
     }
 
     {
-        IngredientSession session(dispatcher, stream, context, language, SandwichIngredientType::CONDIMENT);
+        IngredientSession session(stream, context, language, SandwichIngredientType::CONDIMENT);
         // If there are herbs, we search first from bottom
         if (std::any_of(condiments.begin(), condiments.end(), [&](const auto& p){return p.first.find("herba") != std::string::npos;})){
             pbf_press_dpad(context, DPAD_UP, 20, 105);

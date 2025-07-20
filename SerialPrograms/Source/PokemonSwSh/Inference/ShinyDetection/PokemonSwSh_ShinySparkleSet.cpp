@@ -5,7 +5,9 @@
  */
 
 #include <sstream>
+#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_SparkleDetectorRadial.h"
@@ -124,6 +126,27 @@ void ShinySparkleSetSwSh::read_from_image(size_t screen_area, const ImageViewRGB
             {0xffd0d000, 0xffffffff},
         }
     );
+
+    SpinLock lock;
+    double best_alpha = 0;
+    GlobalThreadPools::realtime_inference().run_in_parallel(
+        [&](size_t index){
+            auto session = make_WaterfillSession();
+            session->set_source(matrices[index]);
+            ShinySparkleSetSwSh sparkles = find_sparkles(screen_area, *session);
+            sparkles.update_alphas();
+            double alpha = sparkles.alpha_overall();
+
+            WriteSpinLock lg(lock);
+            if (best_alpha < alpha){
+                best_alpha = alpha;
+                *this = std::move(sparkles);
+            }
+        },
+        0, matrices.size(), 1
+    );
+
+#if 0
     auto session = make_WaterfillSession();
 
     double best_alpha = 0;
@@ -137,6 +160,7 @@ void ShinySparkleSetSwSh::read_from_image(size_t screen_area, const ImageViewRGB
             *this = std::move(sparkles);
         }
     }
+#endif
 }
 
 

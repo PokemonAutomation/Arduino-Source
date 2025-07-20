@@ -17,7 +17,9 @@ class QPushButton;
 namespace PokemonAutomation{
 
 
-
+//  UI to select what video source to use for an Switch automation program
+//  This class inherits VideoSession::StateListener so it has callbacks for state change
+//  in the video session.
 class VideoSourceSelectorWidget : public QWidget, public VideoSession::StateListener{
 public:
     ~VideoSourceSelectorWidget();
@@ -25,9 +27,16 @@ public:
 
 
 private:
+    //  Query the OS to get all the possible video sources and update the UI to show them.
     void update_source_list();
+    //  Load all possible video resolutions from the current video source.
     void update_resolution_list();
 
+    //  Overwrites VideoSession::StateListener::post_startup().
+    //  This function is called after setting a new video source or resetting the
+    //  existing video source.
+    //  This also includes after the video resolution is changed as we need to rebuild the video
+    //  source with the new resolution.
     virtual void post_startup(VideoSource* source) override;
 
 

@@ -9,7 +9,6 @@
 #include <sstream>
 #include <unordered_map>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -392,8 +391,7 @@ Then updates the current location of expanded_hand_bb.
 Then moves the sandwich hand closer towards end_box. 
  */
 HandMoveData move_sandwich_hand_and_check_if_plates_empty(
-    const ProgramInfo& info,
-    AsyncDispatcher& dispatcher,
+    ProgramEnvironment& env,
     VideoStream& stream,
     ProControllerContext& context,
     SandwichHandType hand_type,
@@ -416,7 +414,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
     AsyncCommandSession<ProController> move_session(
         context,
         stream.logger(),
-        dispatcher,
+        env.realtime_dispatcher(),
         context.controller()
     );
     
@@ -472,7 +470,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
             );
 
             if(move_then_recover_sandwich_hand_position(
-                info, stream, context, hand_type, hand_watcher, move_session
+                env.program_info(), stream, context, hand_type, hand_watcher, move_session
             )){
                 continue;
             }
@@ -553,7 +551,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
             if (pressing_A){
                 // Note: joystick_x and joystick_y must be defined to outlive `move_session`.
 //                pbf_controller_state(context, BUTTON_A, DPAD_NONE, joystick_x, joystick_y, 128, 128, 20);
-                ssf_press_button(context, BUTTON_A, 0, 1000, 0);
+                ssf_press_button(context, BUTTON_A, 0ms, 8000ms, 0ms);
             }
             pbf_move_left_joystick(context, joystick_x, joystick_y, 20, 0);
         });
@@ -567,8 +565,7 @@ HandMoveData move_sandwich_hand_and_check_if_plates_empty(
 }
 
 ImageFloatBox move_sandwich_hand(
-    const ProgramInfo& info,
-    AsyncDispatcher& dispatcher,
+    ProgramEnvironment& env,
     VideoStream& stream,
     ProControllerContext& context,
     SandwichHandType hand_type,
@@ -577,7 +574,7 @@ ImageFloatBox move_sandwich_hand(
     const ImageFloatBox& end_box
 ){
     return move_sandwich_hand_and_check_if_plates_empty(
-        info, dispatcher,
+        env,
         stream, context,
         hand_type, pressing_A,
         start_box, end_box,
@@ -706,16 +703,16 @@ void enter_custom_sandwich_mode(
 namespace{
 
 void finish_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher,
+    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context
 ){
     stream.log("Finish determining ingredients for two-sweet-herb sandwich.");
     stream.overlay().add_log("Finish picking ingredients", COLOR_WHITE);
 
-    wait_for_initial_hand(info, stream, context);
+    wait_for_initial_hand(env.program_info(), stream, context);
 
     stream.overlay().add_log("Start making sandwich", COLOR_WHITE);
-    move_sandwich_hand(info, dispatcher, stream, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
+    move_sandwich_hand(env, stream, context, SandwichHandType::FREE, false, HAND_INITIAL_BOX, INGREDIENT_BOX);
     // Mash button A to pick and drop ingredients, upper bread and pick.
     // Egg Power 3 is applied with only two sweet herb condiments!
     pbf_mash_button(context, BUTTON_A, 8 * TICKS_PER_SECOND);
@@ -726,7 +723,8 @@ void finish_two_herbs_sandwich(
 } // anonymous namespace
 
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, ProControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
     EggSandwichType sandwich_type, size_t sweet_herb_index_last, size_t salty_herb_index_last, size_t bitter_herb_index_last
 ){
     // The game has at most 5 herbs, in the order of sweet, salty, sour, bitter, spicy:
@@ -766,7 +764,7 @@ void make_two_herbs_sandwich(
         // Press button A to add first filling, assumed to be lettuce
         DeterminedSandwichIngredientWatcher filling_watcher(SandwichIngredientType::FILLING, 0);
         repeat_button_press_until(
-            info, stream, context, BUTTON_A, 40, 50, {filling_watcher},
+            env.program_info(), stream, context, BUTTON_A, 40, 50, {filling_watcher},
             "DeterminedIngredientNotDetected", "make_two_herbs_sandwich(): cannot detect determined lettuce after 50 seconds."
         );
     }
@@ -775,7 +773,7 @@ void make_two_herbs_sandwich(
         // Press button + to go to condiments page
         SandwichCondimentsPageWatcher condiments_page_watcher;
         repeat_button_press_until(
-            info, stream, context, BUTTON_PLUS, 40, 60, {condiments_page_watcher},
+            env.program_info(), stream, context, BUTTON_PLUS, 40, 60, {condiments_page_watcher},
             "CondimentsPageNotDetected", "make_two_herbs_sandwich(): cannot detect condiments page after 50 seconds."
         );
     }
@@ -799,7 +797,7 @@ void make_two_herbs_sandwich(
     auto move_one_up_to_row = [&](size_t row){
         stream.log("Move arrow to row " + std::to_string(row));
         SandwichIngredientArrowWatcher arrow(row);
-        repeat_dpad_press_until(info, stream, context, DPAD_UP, 10, 30, {arrow}, "IngredientArrowNotDetected",
+        repeat_dpad_press_until(env.program_info(), stream, context, DPAD_UP, 10, 30, {arrow}, "IngredientArrowNotDetected",
             "make_two_herbs_sandwich(): cannot detect ingredient selection arrow at row " + std::to_string(row) + " after 50 seconds."
         );
     };
@@ -807,7 +805,7 @@ void make_two_herbs_sandwich(
     auto press_a_to_determine_herb = [&](size_t herb_index){
         DeterminedSandwichIngredientWatcher herb_watcher(SandwichIngredientType::CONDIMENT, herb_index);
         repeat_button_press_until(
-            info, stream, context, BUTTON_A, 40, 60, {herb_watcher}, "CondimentsPageNotDetected",
+            env.program_info(), stream, context, BUTTON_A, 40, 60, {herb_watcher}, "CondimentsPageNotDetected",
             "make_two_herbs_sandwich(): cannot detect determined herb at cell " + std::to_string(herb_index) + " after 50 seconds."
         );
     };
@@ -827,7 +825,7 @@ void make_two_herbs_sandwich(
         // Press button + to go to picks page
         SandwichPicksPageWatcher picks_page_watcher;
         repeat_button_press_until(
-            info, stream, context, BUTTON_PLUS, 40, 60, {picks_page_watcher},
+            env.program_info(), stream, context, BUTTON_PLUS, 40, 60, {picks_page_watcher},
             "CondimentsPageNotDetected", "make_two_herbs_sandwich(): cannot detect picks page after 50 seconds."
         );
     }
@@ -836,11 +834,12 @@ void make_two_herbs_sandwich(
     pbf_mash_button(context, BUTTON_A, 80);
     context.wait_for_all_requests();
 
-    finish_two_herbs_sandwich(info, dispatcher, stream, context);
+    finish_two_herbs_sandwich(env, stream, context);
 }
 
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher, VideoStream& stream, ProControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
     EggSandwichType sandwich_type, Language language
 ){
     std::map<std::string, uint8_t> fillings = {{"lettuce", (uint8_t)1}};
@@ -862,14 +861,13 @@ void make_two_herbs_sandwich(
         );
     }
     add_sandwich_ingredients(
-        dispatcher,
         stream, context,
         language,
         std::move(fillings),
         std::move(condiments)
     );
 
-    finish_two_herbs_sandwich(info, dispatcher, stream, context);
+    finish_two_herbs_sandwich(env, stream, context);
 }
 
 void make_sandwich_option(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, SandwichMakerOption& SANDWICH_OPTIONS){
@@ -1053,7 +1051,6 @@ void make_sandwich_preset(ProgramEnvironment& env, VideoStream& stream, ProContr
     std::map<std::string, uint8_t> fillings_copy(fillings); //Making a copy as we need the map for later
     enter_custom_sandwich_mode(env.program_info(), stream, context);
     add_sandwich_ingredients(
-        env.normal_inference_dispatcher(),
         stream, context,
         language,
         std::move(fillings_copy),
@@ -1063,7 +1060,14 @@ void make_sandwich_preset(ProgramEnvironment& env, VideoStream& stream, ProContr
     run_sandwich_maker(env, stream, context, language, fillings, fillings_sorted, plates);
 }
 
-void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, Language language, std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted, int& plates){
+void run_sandwich_maker(
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
+    Language language,
+    std::map<std::string, uint8_t>& fillings,
+    std::vector<std::string>& fillings_sorted,
+    int& plates
+){
 
     wait_for_initial_hand(env.program_info(), stream, context);
 
@@ -1191,7 +1195,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
     ImageFloatBox target_plate = center_plate;
     //Initial position handling
     auto end_box = move_sandwich_hand(
-        env.program_info(), env.realtime_inference_dispatcher(),
+        env,
         stream, context,
         SandwichHandType::FREE,
         false,
@@ -1199,7 +1203,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
         HAND_INITIAL_BOX
     );
     move_sandwich_hand(
-        env.program_info(), env.realtime_inference_dispatcher(),
+        env,
         stream, context,
         SandwichHandType::GRABBING,
         true,
@@ -1270,7 +1274,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                 }
 
                 end_box = move_sandwich_hand(
-                    env.program_info(), env.realtime_inference_dispatcher(),
+                    env,
                     stream, context,
                     SandwichHandType::FREE,
                     false,
@@ -1284,7 +1288,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
                     (int)fillings.find(i)->second).at(placement_number);
 
                 HandMoveData hand_move_data = move_sandwich_hand_and_check_if_plates_empty(
-                    env.program_info(), env.realtime_inference_dispatcher(),
+                    env,
                     stream, context,
                     SandwichHandType::GRABBING,
                     true,
@@ -1333,7 +1337,7 @@ void run_sandwich_maker(ProgramEnvironment& env, VideoStream& stream, ProControl
     auto hand_box = hand_location_to_box(grabbing_hand.location());
 
     end_box = move_sandwich_hand(
-        env.program_info(), env.realtime_inference_dispatcher(),
+        env,
         stream, context,
         SandwichHandType::GRABBING,
         false,

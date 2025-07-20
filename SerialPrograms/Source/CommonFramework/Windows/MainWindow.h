@@ -34,9 +34,11 @@ public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
+
 private:
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
+    virtual void moveEvent(QMoveEvent* event) override;
 
     void close_panel() noexcept;
 
@@ -85,10 +87,14 @@ private:
     std::unique_ptr<SleepSuppressScope> m_sleep_scope;
 
     bool m_pending_resize = false;
+    bool m_pending_move = false;
     bool m_panel_transition = false;
 };
 
-
+// returns given X value, but bounded by 0 and screen_width
+int32_t move_x_within_screen_bounds(int32_t x_pos);
+// returns given y value, but bounded by 0 and screen_height
+int32_t move_y_within_screen_bounds(int32_t y_pos);
 
 
 }

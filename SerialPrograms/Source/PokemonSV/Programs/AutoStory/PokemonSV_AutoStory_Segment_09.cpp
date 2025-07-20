@@ -45,7 +45,7 @@ void AutoStory_Segment_09::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.overlay().add_log("Start Segment 09: Complete tutorial", COLOR_ORANGE);
+    env.console.log("Start Segment 09: Complete tutorial", COLOR_ORANGE);
 
     checkpoint_16(env, context, options.notif_status_update);
     checkpoint_17(env, context, options.notif_status_update);

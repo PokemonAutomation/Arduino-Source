@@ -31,11 +31,11 @@ class ProController::KeyboardManager final :
     public PokemonAutomation::KeyboardManager<ProControllerState, ProControllerDeltas>
 {
 public:
-    KeyboardManager(ProController& controller)
-        : PokemonAutomation::KeyboardManager<ProControllerState, ProControllerDeltas>(controller)
+    KeyboardManager(Logger& logger, ProController& controller)
+        : PokemonAutomation::KeyboardManager<ProControllerState, ProControllerDeltas>(logger, controller)
     {
         std::vector<std::shared_ptr<EditableTableRow>> mapping =
-            ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER.current_refs();
+            ConsoleSettings::instance().KEYBOARD_MAPPINGS.PRO_CONTROLLER0.current_refs();
         for (const auto& deltas : mapping){
             const ProControllerKeyMapTableRow& row = static_cast<const ProControllerKeyMapTableRow&>(*deltas);
             m_mapping[(Qt::Key)(uint32_t)row.key] += row.snapshot();
@@ -77,8 +77,8 @@ public:
 
 
 
-ProController::ProController()
-    : m_keyboard_manager(CONSTRUCT_TOKEN, *this)
+ProController::ProController(Logger& logger)
+    : m_keyboard_manager(CONSTRUCT_TOKEN, logger, *this)
 {
 
 }

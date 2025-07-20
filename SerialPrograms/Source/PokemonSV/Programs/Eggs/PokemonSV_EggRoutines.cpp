@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -22,6 +23,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxNatureDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
@@ -122,6 +124,7 @@ void do_egg_cycle_motion(
     VideoStream& stream, ProControllerContext& context
 ){
     AdvanceDialogWatcher dialog(COLOR_RED);
+    NormalBattleMenuWatcher battle_menu(COLOR_GREEN);
     int ret = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
@@ -132,9 +135,22 @@ void do_egg_cycle_motion(
             ssf_press_right_joystick(context, 255, 128, 0ms, std::chrono::minutes(10));
             pbf_press_button(context, BUTTON_LCLICK, std::chrono::minutes(10), 0ms);
         },
-        {dialog}
+        {
+            dialog,
+            battle_menu,
+        }
     );
-    if (ret < 0){
+    switch (ret){
+    case 0:
+        break;
+    case 1:
+        OperationFailedException::fire(
+            ErrorReport::NO_ERROR_REPORT,
+            "Detected battle menu. You got attacked!",
+            stream
+        );
+        break;
+    case 2:
         dump_image_and_throw_recoverable_exception(
             info, stream, "NoEggToHatch",
             "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes."
@@ -306,7 +322,7 @@ bool eat_egg_sandwich_at_picnic(
             throw UserSetupError(stream.logger(), "Must set game language option to read ingredient lists to make herb sandwich.");
         }
         make_two_herbs_sandwich(
-            env.program_info(), env.realtime_inference_dispatcher(),
+            env,
             stream, context,
             sandwich_type,
             language
@@ -589,6 +605,70 @@ void hatch_eggs_at_zero_gate(
                 // egg hatching when going off ramp:
                 handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
                 reset_position_at_zero_gate(info, stream, context);
+                continue;
+            }
+
+            got_off_ramp = true;
+            stream.log("Got off ramp");
+        }
+
+        // Circular motions:
+        do_egg_cycle_motion(info, stream, context);
+
+        handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
+    } // end hatching each egg
+}
+
+void hatch_eggs_at_area_three_lighthouse(
+    const ProgramInfo& info,
+    VideoStream& stream, ProControllerContext& context,
+    uint8_t num_eggs_in_party,
+    std::function<void(uint8_t)> egg_hatched_callback)
+{
+    bool got_off_ramp = false;
+    for(uint8_t egg_idx = 0; egg_idx < num_eggs_in_party; egg_idx++){
+        stream.log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party) + ".");
+        stream.overlay().add_log("Hatching egg " + std::to_string(egg_idx+1) + "/" + std::to_string(num_eggs_in_party), COLOR_BLUE);
+
+        // Orient camera to look at same direction as player character
+        // This is needed because when save-load the game, the camera is reset
+        // to this location.
+        pbf_press_button(context, BUTTON_L, 50, 40);
+
+        context.wait_for_all_requests();
+
+        if (got_off_ramp == false){
+            AdvanceDialogWatcher dialog(COLOR_RED);
+            // first, navigate to a clear area in the team star base for circling motions
+            int ret = run_until<ProControllerContext>(
+                stream, context,
+                [&](ProControllerContext& context){
+                    if (egg_idx == 0){
+                        //Run forward a bit
+                        pbf_move_left_joystick(context, 128, 0, 150, 20);
+                        //Face at an angle, to avoid the tent to the left
+                        pbf_move_left_joystick(context, 0, 0, 50, 50);
+                        //Get on your mount
+                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        pbf_press_button(context, BUTTON_PLUS, 50, 100);
+                        //Go in deep, spawns outside the fence like to come in otherwise
+                        pbf_move_left_joystick(context, 128, 0, 750, 0);
+                        pbf_move_left_joystick(context, 0, 0, 50, 50);
+                        pbf_press_button(context, BUTTON_L, 50, 40);
+                        pbf_move_left_joystick(context, 128, 0, 550, 0);
+                    }
+                },
+                {dialog}
+            );
+            if (ret == 0){
+                // egg hatching when going off ramp:
+                handle_egg_hatching(info, stream, context, num_eggs_in_party, egg_idx, egg_hatched_callback);
+
+                stream.log("Reset location by flying back to lighthouse.");
+                // Use map to fly back to the flying spot
+                open_map_from_overworld(info, stream, context);
+                pbf_move_left_joystick(context, 200, 0, 20, 50);
+                fly_to_overworld_from_map(info, stream, context);
                 continue;
             }
 

@@ -51,11 +51,11 @@ public:
         return m_supported_features;
     }
     virtual ControllerPerformanceClass performance_class() const override{
-        return ControllerPerformanceClass::SerialPABotBase_Wired_125Hz;
+        return ControllerPerformanceClass::SerialPABotBase_Wired;
     }
 
     virtual Milliseconds ticksize() const override{
-        return m_use_milliseconds ? Milliseconds(0) : Milliseconds(8);
+        return Milliseconds(0);
     }
     virtual Milliseconds cooldown() const override{
         return Milliseconds(8);
@@ -228,7 +228,6 @@ private:
 
 
 private:
-    bool m_use_milliseconds;
     CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;
     std::mutex m_sleep_lock;

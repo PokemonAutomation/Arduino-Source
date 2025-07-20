@@ -583,29 +583,65 @@ void change_settings_prior_to_autostory(
     size_t current_segment_num,
     Language language
 ){
-    if (current_segment_num == 0){  // can't change settings in the intro cutscene
-        return;
-    }
 
     // get index of `Options` in the Main Menu, which depends on where you are in Autostory
     int8_t options_index;  
     switch(current_segment_num){
         case 0:
+            return; // can't change settings in the intro cutscene
+        case 1:
+        // after Intro cutscene done, in room
+            // Menu
+            // - Options
+            // - Save        
             options_index = 0;
             break;
-        case 1:
+        case 2:
+            // Menu
+            // - Bag  --> unlocked after picked up bag/hat in room. Segment 01, checkpoint 02
+            // - Options
+            // - Save
             options_index = 1;
             break;
+        case 3:
+        case 4:
+        case 5:
+        case 6:
+            // Menu
+            // - Bag
+            // - Boxes --> unlocked after battling Nemona and receiving Pokedex app. Segment 02, checkpoint 04
+            // - Options
+            // - Save        
+            options_index = 2;
+            break;
+        case 7:
+        case 8:
+        case 9:
+            // Menu
+            // - Bag
+            // - Boxes
+            // - Poke Portal --> unlocked after arriving at Los Platos and talking to Nemona. Segment 06, checkpoint 11
+            // - Options
+            // - Save  
+            options_index = 3;
+            break;                    
         default:
-            options_index = 2;        
+            // Menu
+            // - Bag
+            // - Boxes
+            // - Picnic --> unlocked after finishing tutorial. Segment 09, checkpoint 20
+            // - Poke Portal
+            // - Options
+            // - Save          
+            options_index = 4;        
             break;
     }
     
-    bool has_minimap = current_segment_num > 1;  // the minimap only shows up in segment 2 and beyond
+    bool has_minimap = current_segment_num >= 2;  // the minimap only shows up in segment 2 and beyond
 
     enter_menu_from_overworld(env.program_info(), env.console, context, options_index, MenuSide::RIGHT, has_minimap);
     change_settings(env, context, language);
-    if(has_minimap){
+    if(!has_minimap){
         pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
     }else{
         press_Bs_to_back_to_overworld(env.program_info(), env.console, context);    

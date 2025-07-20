@@ -17,6 +17,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_IvJudgeReader.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
@@ -185,10 +186,13 @@ void run_material_farmer(
     MaterialFarmerOptions& options,
     MaterialFarmerStats& stats
 ){
+    OverworldSensors sensors(
+        env.logger(), console, context
+    );
     LetsGoEncounterBotTracker encounter_tracker(
-        env, console, context,
+        env, console,
         stats,
-        options.LANGUAGE
+        sensors.lets_go_kill
     );
     WallClock start_time = current_time();
     WallClock last_sandwich_time = WallClock::min();
@@ -216,7 +220,7 @@ void run_material_farmer(
                 std::to_string(farming_time_remaining.count()) + " min", 
                 COLOR_PURPLE
             );
-            if (farming_time_remaining < std::chrono::minutes(0)){
+            if (farming_time_remaining <= std::chrono::minutes(0)){
                 console.log("Time's up. Stop the Material farming program.", COLOR_RED);
                 return;
             }
@@ -229,7 +233,7 @@ void run_material_farmer(
                     std::to_string(sandwich_time_remaining.count()) + " min", 
                     COLOR_PURPLE
                 );                   
-                if (sandwich_time_remaining < std::chrono::minutes(0)){
+                if (sandwich_time_remaining <= std::chrono::minutes(0)){
                     console.log("Sandwich not active. Make a sandwich.");
                     last_sandwich_time = make_sandwich_material_farm(env, console, context, options, stats);
                     console.overlay().add_log("Sandwich made.");
@@ -248,7 +252,11 @@ void run_material_farmer(
                         std::to_string(sandwich_time_remaining.count()) + " min", 
                         COLOR_PURPLE
                     );                  
+                }else{
+                    console.log("Sandwich is still active. Continue material farming.", COLOR_ORANGE);
                 }
+            }else{
+                console.log("Sandwich making disabled. Skip sandwich checks.", COLOR_ORANGE);
             }
 
             // heal before starting Let's go
@@ -391,9 +399,14 @@ WallClock make_sandwich_material_farm(
 }
 
 // given the start time, and duration in minutes, return the number of remaining minutes
+// WARNING: this function may silently overflow if start_time is near WallClock::min() or WallClock::max()
 std::chrono::minutes minutes_remaining(WallClock start_time, std::chrono::minutes minutes_duration){
-    return std::chrono::minutes(minutes_duration) - 
-           std::chrono::duration_cast<std::chrono::minutes>(current_time() - start_time);
+    if (start_time == WallClock::min()){
+        return std::chrono::minutes(0);
+    }else{
+        auto elapsed_time = std::chrono::duration_cast<std::chrono::minutes>(current_time() - start_time);
+        return minutes_duration - elapsed_time;
+    }
 }
 
 // from the North Province (Area 3) pokecenter, move to start position for Happiny dust farming
@@ -614,7 +627,7 @@ void run_from_battles_and_back_to_pokecenter(
             stream.log("Detected battle. Now running away.", COLOR_PURPLE);
             stream.overlay().add_log("Detected battle. Now running away.");
             try{
-                run_from_battle(env.program_info(), stream, context);
+                run_from_battle(stream, context);
             }catch (OperationFailedException& e){
                 throw FatalProgramException(std::move(e));
             }

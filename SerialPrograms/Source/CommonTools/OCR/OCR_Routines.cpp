@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "OCR_RawOCR.h"
 #include "OCR_DictionaryMatcher.h"
@@ -35,24 +36,35 @@ StringMatchResult multifiltered_OCR(
     double pixels_inv = 1. / (image.width() * image.height());
 
     //  Run all the filters.
+    SpinLock lock;
     StringMatchResult ret;
+    GlobalThreadPools::normal_inference().run_in_parallel(
+        [&](size_t index){
+            const std::pair<ImageRGB32, size_t>& filtered = filtered_images[index];
+
+            std::string text = ocr_read(language, filtered.first);
+//            cout << text.toStdString() << endl;
+//            filtered.first.save("test" + QString::number(c++) + ".png");
+
+            //  Compute ratio of image that matches text color. Skip if it's out of range.
+            double ratio = filtered.second * pixels_inv;
+//            cout << "ratio = " << ratio << endl;
+            if (ratio < min_text_ratio || ratio > max_text_ratio){
+                return;
+            }
+
+            StringMatchResult current = dictionary.match_substring(language, text, log10p_spread);
+
+            WriteSpinLock lg(lock);
+            ret.exact_match |= current.exact_match;
+            ret.results.insert(current.results.begin(), current.results.end());
+
+        },
+        0, filtered_images.size(), 1
+    );
 //    int c = 0;
-    for (const auto& filtered : filtered_images){
-        std::string text = ocr_read(language, filtered.first);
-//        cout << text.toStdString() << endl;
-//        filtered.first.save("test" + QString::number(c++) + ".png");
-
-        //  Compute ratio of image that matches text color. Skip if it's out of range.
-        double ratio = filtered.second * pixels_inv;
-//        cout << "ratio = " << ratio << endl;
-        if (ratio < min_text_ratio || ratio > max_text_ratio){
-            continue;
-        }
-
-        StringMatchResult current = dictionary.match_substring(language, text, log10p_spread);
-        ret.exact_match |= current.exact_match;
-        ret.results.insert(current.results.begin(), current.results.end());
-    }
+//    for (const auto& filtered : filtered_images){
+//    }
 
 //    ret.log(global_logger_tagged(), -1.5);
 

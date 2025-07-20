@@ -22,8 +22,6 @@ PokeballSpriteMatcher::PokeballSpriteMatcher(double min_euclidean_distance)
         add(item.first, item.second.sprite);
     }
 }
-
-
 auto PokeballSpriteMatcher::get_crop_candidates(const ImageViewRGB32& image) const -> std::vector<ImageViewRGB32>{
     ImageStats border = image_border_stats(image);
     ImagePixelBox box = ImageMatch::enclosing_rectangle_with_pixel_filter(

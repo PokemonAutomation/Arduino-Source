@@ -8,12 +8,24 @@
 #define PokemonAutomation_Controllers_JoystickTools_H
 
 #include <stdint.h>
+#include <cmath>
 #include <algorithm>
 
 namespace PokemonAutomation{
 namespace JoystickTools{
 
 
+inline void clip_magnitude(double& x, double& y){
+    double mag = x*x + y*y;
+    if (mag <= 1.0){
+        return;
+    }
+
+    double scale = 1 / std::sqrt(mag);
+
+    x *= scale;
+    y *= scale;
+}
 inline void max_out_magnitude(double& x, double& y){
     double mag = x*x + y*y;
     if (mag == 0){

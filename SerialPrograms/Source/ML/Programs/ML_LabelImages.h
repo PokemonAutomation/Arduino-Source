@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_ML_LabelImages_H
 #define PokemonAutomation_ML_LabelImages_H
 
+#include <QGraphicsScene>
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
@@ -18,24 +19,25 @@
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include <QGraphicsScene>
-#include "ML/DataLabeling/SegmentAnythingModel.h"
+
+#include "ML/DataLabeling/ML_SegmentAnythingModel.h"
+#include "ML/UI/ML_ImageAnnotationDisplayOption.h"
+#include "ML/UI/ML_ImageAnnotationDisplaySession.h"
 
 class QGraphicsView;
 class QGraphicsPixmapItem;
+class QLabel;
 
 namespace PokemonAutomation{
 
 
 class ConfigWidget;
-namespace NintendoSwitch{
-    class SwitchSystemWidget;
-}
 
 
 namespace ML{
 
 
+class ImageAnnotationDisplayWidget;
 class LabelImages_Widget;
 
 
@@ -43,7 +45,8 @@ class LabelImages_Widget;
 // also include the related overlay rendering.
 // Since it owns rendering objects and the rendering framework needs
 // the address of the rendering objects to keep track of them,
-// never copy or move this ObjectAnnotation object!
+// never copy or move these ObjectAnnotation objects after rendering code has
+// access to them!
 struct ObjectAnnotation{
     ImagePixelBox user_box; // user drawn loose bounding box
     ImagePixelBox mask_box;
@@ -59,29 +62,47 @@ public:
     LabelImages_Descriptor();
 };
 
-// label image program
+
+// Program to annoatation images for training ML models
 class LabelImages : public PanelInstance{
 public:
     LabelImages(const LabelImages_Descriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
 
 public:
-    //  Serialization
+    // Serialization
     virtual void from_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
 
+    void save_annotation_to_file() const;
+
+    // called after loading a new image, clean up all internal data 
+    void clear_for_new_image();
+
+    // Load image related data:
+    // - Image SAM embedding data file, which has the same file path but with a name suffix ".embedding"
+    // - Existing annotation file, which is stored in a pre-defined ML_ANNOTATION_PATH() and with the same filename as
+    //   the image but with name extension replaced to be ".json".
     void load_image_related_data(const std::string& image_path, const size_t source_image_width, const size_t source_image_height);
 
+    // Update rendering data reflect the current annotation
     void update_rendered_objects(VideoOverlaySet& overlayset);
 
+    // Use user currently drawn box to compute per-pixel masks on the image using SAM model
     void compute_mask(VideoOverlaySet& overlay_set);
+
+    // Compute embeddings for all images in a folder.
+    // This can be very slow!
+    void compute_embeddings_for_folder(const std::string& image_folder);
 
 private:
     friend class LabelImages_Widget;
     friend class DrawnBoundingBox;
-    // switch control options like what micro-controller 
-    // and what video source to use
-    NintendoSwitch::SwitchSystemOption m_switch_control_option;
+
+    // image display options like what image file is loaded
+    ImageAnnotationDisplayOption m_display_option;
+    // handles image display session, holding a reference to m_display_option
+    ImageAnnotationDisplaySession m_display_session;
     // the group option that holds rest of the options defined below:
     BatchOption m_options;
 
@@ -100,7 +121,7 @@ private:
     ImageRGB32 m_mask_image;
 
     SAMSession m_sam_session;
-    std::vector<ObjectAnnotation> m_annotated_objects;
+    std::vector<ObjectAnnotation> m_annotations;
     size_t m_last_object_idx = 0;
     std::string m_annotation_file_path;
     // if we find an annotation file that is supposed to be created by user in a previous session, but
@@ -131,7 +152,7 @@ private:
 };
 
 
-class LabelImages_Widget : public PanelWidget, public ConfigOption::Listener{
+class LabelImages_Widget : public PanelWidget, public ConfigOption::Listener, public VideoSession::StateListener{
 public:
     ~LabelImages_Widget();
     LabelImages_Widget(
@@ -140,14 +161,24 @@ public:
         PanelHolder& holder
     );
 
+    // called after loading a new image, clean up all internal data 
+    void clear_for_new_image();
+
     virtual void on_config_value_changed(void* object) override;
+
+    //  Overwrites VideoSession::StateListener::post_startup().
+    virtual void post_startup(VideoSource* source) override;
 
 private:
     LabelImages& m_program;
-    NintendoSwitch::SwitchSystemSession m_session;
-    NintendoSwitch::SwitchSystemWidget* m_switch_widget;
+    ImageAnnotationDisplaySession& m_display_session;
+
+    ImageAnnotationDisplayWidget* m_image_display_widget;
+
     VideoOverlaySet m_overlay_set;
     DrawnBoundingBox m_drawn_box;
+    
+    QLabel* m_embedding_info_label = nullptr;
     ConfigWidget* m_option_widget;
 
     friend class DrawnBoundingBox;

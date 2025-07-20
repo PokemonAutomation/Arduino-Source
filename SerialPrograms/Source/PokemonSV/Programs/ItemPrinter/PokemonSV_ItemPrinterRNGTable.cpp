@@ -172,7 +172,6 @@ ItemPrinterDesiredItemRow::ItemPrinterDesiredItemRow(EditableTableOption& parent
         ItemPrinter::PrebuiltOptions::ABILITY_PATCH
     )
     , desired_quantity(
-        "",
         LockMode::UNLOCK_WHILE_RUNNING,
         999, 1, 999
     )

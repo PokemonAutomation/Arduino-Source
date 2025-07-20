@@ -59,7 +59,7 @@ public:
     virtual void close() noexcept = 0;
     virtual void connect(const std::string& address, uint16_t port) = 0;
 
-    virtual size_t blocking_send(const void* data, size_t bytes) = 0;
+    virtual size_t send(const void* data, size_t bytes) = 0;
 
 
 protected:

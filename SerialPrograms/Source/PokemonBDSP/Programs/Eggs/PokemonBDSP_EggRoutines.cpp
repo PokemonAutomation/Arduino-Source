@@ -29,7 +29,7 @@ void egg_spin(ProControllerContext& context, Milliseconds duration){
 }
 void egg_spin_with_A(ProControllerContext& context, Milliseconds duration){
     for (Milliseconds c = 0ms; c < duration; c += 42*8ms){
-        ssf_press_button(context, BUTTON_ZL, 0, 10);
+        ssf_press_button(context, BUTTON_ZL, 0ms, 80ms);
         pbf_move_left_joystick(context, 0, 0, 5, 0);
         pbf_move_left_joystick(context, 128, 0, 5, 0);
         pbf_move_left_joystick(context, 255, 0, 5, 0);
@@ -45,7 +45,7 @@ void pickup_column(ProControllerContext& context){
 //    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     pbf_press_button(context, BUTTON_ZL, 20, 50);
     for (size_t c = 0; c < 30; c++){
-        ssf_issue_scroll(context, DPAD_DOWN, 3);
+        ssf_issue_scroll(context, DPAD_DOWN, 24ms);
     }
     pbf_press_button(context, BUTTON_ZL, 160ms, GameSettings::instance().BOX_PICKUP_DROP_DELAY0);
 }

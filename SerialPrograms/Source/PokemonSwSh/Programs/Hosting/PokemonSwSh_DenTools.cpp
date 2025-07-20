@@ -40,7 +40,7 @@ void enter_den(
             ssf_press_button(context, BUTTON_A, ENTER_ONLINE_DEN_DELAY, 400ms);
         }else{
             ssf_press_button(context, BUTTON_A, GameSettings::instance().COLLECT_WATTS_ONLINE_DELAY0, 400ms);
-            ssf_press_button(context, BUTTON_B, 100, 50);
+            ssf_press_button(context, BUTTON_B, 800ms, 400ms);
             ssf_press_button(context, BUTTON_B, ENTER_ONLINE_DEN_DELAY, 400ms);
         }
     }
@@ -76,12 +76,12 @@ void enter_lobby(
 
         if (!GameSettings::instance().DODGE_UNCATCHABLE_PROMPT_FAST){
             //  lobby-switch        switch-box
-            ssf_press_dpad1(context, DPAD_LEFT, 10);
+            ssf_press_dpad(context, DPAD_LEFT, 80ms);
             //  lobby-switch        switch-party-red
             ssf_press_button(context, BUTTON_A, GameSettings::instance().ENTER_SWITCH_POKEMON0);
             //  switch-box          switch-confirm
-            ssf_press_button1(context, BUTTON_Y, 10);
-            ssf_press_dpad1(context, DPAD_LEFT, 10);
+            ssf_press_button(context, BUTTON_Y, 80ms);
+            ssf_press_dpad(context, DPAD_LEFT, 80ms);
             //  switch-party-blue   switch-confirm
             ssf_press_button(context, BUTTON_A, GameSettings::instance().EXIT_SWITCH_POKEMON0);
             //  lobby-switch        lobby-switch
@@ -129,7 +129,7 @@ void roll_den(
         }
 
         //  Exit Raid
-        ssf_press_button2(context, BUTTON_B, 120, 50);
+        ssf_press_button(context, BUTTON_B, 960ms, 400ms);
         ssf_press_button(context, BUTTON_A, GameSettings::instance().REENTER_DEN_DELAY0, 400ms);
     }
 }

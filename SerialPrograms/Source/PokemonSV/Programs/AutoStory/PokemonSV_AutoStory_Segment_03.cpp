@@ -45,7 +45,6 @@ void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ProC
 
     context.wait_for_all_requests();
     env.console.log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
-    env.console.overlay().add_log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
 
     checkpoint_05(env, context, options.notif_status_update);
     checkpoint_06(env, context, options.notif_status_update);
@@ -53,7 +52,6 @@ void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ProC
 
     context.wait_for_all_requests();
     env.console.log("End Segment 03: Catch Tutorial", COLOR_GREEN);
-    env.console.overlay().add_log("End Segment 03: Catch Tutorial", COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

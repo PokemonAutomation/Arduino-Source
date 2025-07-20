@@ -51,10 +51,29 @@ void SuperscalarScheduler::clear() noexcept{
     m_pending_clear.store(false, std::memory_order_release);
 }
 
+void SuperscalarScheduler::update_busy_states(){
+    WallClock device_sent_time = m_device_sent_time;
+    for (ExecutionResource* resource : m_resources){
+        resource->m_is_busy = resource->m_busy_time <= device_sent_time && device_sent_time < resource->m_done_time;
+
+#if 0
+        if (resource->m_done_time >m_local_start){
+            cout << "------------" << endl;
+            cout << "m_busy_time        = " << std::chrono::duration_cast<Milliseconds>(resource->m_busy_time - m_local_start) << endl;
+            cout << "m_done_time        = " << std::chrono::duration_cast<Milliseconds>(resource->m_done_time - m_local_start) << endl;
+            cout << "m_device_sent_time = " << std::chrono::duration_cast<Milliseconds>(m_device_sent_time - m_local_start) << endl;
+            cout << "m_is_busy = " << resource->m_is_busy << endl;
+        }
+#endif
+    }
+}
 bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
+
+//    cout << "----------------------------> " << m_state_changes.size() << endl;
+//    cout << "m_device_sent_time = " << std::chrono::duration_cast<Milliseconds>(m_device_sent_time - m_local_start) << endl;
 
     if (m_state_changes.empty()){
 //        cout << "State is empty." << endl;
@@ -92,12 +111,10 @@ bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
     }
 
     //  Compute the resource state at this timestamp.
-    for (ExecutionResource* resource : m_resources){
-        resource->m_is_busy = resource->m_busy_time <= m_device_sent_time && m_device_sent_time < resource->m_done_time;
-    }
+    update_busy_states();
 
     m_device_sent_time = next_state_change;
-    if (next_state_change >= *iter){
+    if (next_state_change > *iter){
         m_state_changes.erase(iter);
     }
 
@@ -224,13 +241,15 @@ void SuperscalarScheduler::issue_to_resource(
     hold     = std::max(hold, WallDuration::zero());
     cooldown = std::max(cooldown, WallDuration::zero());
 
-//    cout << "issue_to_resource(): delay = " << std::chrono::duration_cast<Milliseconds>(delay).count()
-//         << ", hold = " << std::chrono::duration_cast<Milliseconds>(hold).count()
-//         << ", cooldown = " << std::chrono::duration_cast<Milliseconds>(cooldown).count()
-//         << endl;
-//    cout << "issue_time = " << std::chrono::duration_cast<Milliseconds>((m_device_issue_time - m_local_start)).count()
-//         << ", sent_time = " << std::chrono::duration_cast<Milliseconds>((m_device_sent_time - m_local_start)).count()
-//         << endl;
+#if 0
+    cout << "issue_to_resource(): delay = " << std::chrono::duration_cast<Milliseconds>(delay).count()
+         << ", hold = " << std::chrono::duration_cast<Milliseconds>(hold).count()
+         << ", cooldown = " << std::chrono::duration_cast<Milliseconds>(cooldown).count()
+         << endl;
+    cout << "issue_time = " << std::chrono::duration_cast<Milliseconds>((m_device_issue_time - m_local_start)).count()
+         << ", sent_time = " << std::chrono::duration_cast<Milliseconds>((m_device_sent_time - m_local_start)).count()
+         << endl;
+#endif
 
     WallClock release_time = m_device_issue_time + hold;
     WallClock free_time = release_time + cooldown;

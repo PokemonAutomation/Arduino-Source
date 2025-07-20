@@ -73,15 +73,6 @@ private:
 
     StaticTextOption STATIC_TEXT;
 
-//    PokemonSV::PlayerListTable PLAYER_LIST;
-    DateTimeOption DATE0;
-    DateTimeOption DATE1;
-//    ConsoleModelOption CONSOLE_MODEL;
-
-    MillisecondsOption DURATION;
-    ColorCell COLOR;
-    ControllerSettingsTable CONTROLLER_TABLE;
-
 
 //    PokemonSV::SinglesAIOption battle_AI;
 

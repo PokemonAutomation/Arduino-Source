@@ -126,10 +126,11 @@ public:
 
 class OverlayStatUtilizationPrinter{
 public:
-    OverlayStatUtilizationPrinter();
+    OverlayStatUtilizationPrinter(double max_utilization = 1.0);
     OverlayStatSnapshot get_snapshot(const std::string& label, double utilization);
 
 private:
+    double m_max_utilization;
     WallClock m_last_active;
 };
 

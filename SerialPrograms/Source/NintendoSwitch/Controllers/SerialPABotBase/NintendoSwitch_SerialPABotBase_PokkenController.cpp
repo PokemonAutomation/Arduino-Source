@@ -30,12 +30,12 @@ SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection
 )
-    : SerialPABotBase_Controller(
+    : ProController(logger)
+    , SerialPABotBase_Controller(
         logger,
         ControllerType::NintendoSwitch_WiredProController,
         connection
     )
-    , m_use_milliseconds(m_supported_features.contains(ControllerFeature::TimingFlexibleMilliseconds))
     , m_stopping(false)
     , m_status_thread(&SerialPABotBase_PokkenController::status_thread, this)
 {}
@@ -92,6 +92,8 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
         case BUTTON_RCLICK:     buttons |= 1 << 11; break;
         case BUTTON_HOME:       buttons |= 1 << 12; break;
         case BUTTON_CAPTURE:    buttons |= 1 << 13; break;
+        case BUTTON_GR:         buttons |= 1 << 14; break;
+        case BUTTON_GL:         buttons |= 1 << 15; break;
         case BUTTON_UP:         dpad_y--; break;
         case BUTTON_RIGHT:      dpad_x++; break;
         case BUTTON_DOWN:       dpad_y++; break;
@@ -187,37 +189,19 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
     //  duration.
     Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
 
-    if (m_use_milliseconds){
-        while (time_left > Milliseconds::zero()){
-            Milliseconds current = std::min(time_left, 65535ms);
-            m_serial->issue_request(
-                SerialPABotBase::DeviceRequest_NS_Generic_ControllerStateMs(
-                    (uint16_t)current.count(),
-                    buttons,
-                    dpad,
-                    left_x, left_y,
-                    right_x, right_y
-                ),
-                cancellable
-            );
-            time_left -= current;
-        }
-    }else{
-        while (time_left > Milliseconds::zero()){
-            Milliseconds current_ms = std::min(time_left, 255 * 8ms);
-            uint8_t current_ticks = (uint8_t)milliseconds_to_ticks_8ms(current_ms.count());
-            m_serial->issue_request(
-                SerialPABotBase::DeviceRequest_NS_Generic_ControllerStateTicks(
-                    buttons,
-                    dpad,
-                    left_x, left_y,
-                    right_x, right_y,
-                    current_ticks
-                ),
-                cancellable
-            );
-            time_left -= current_ms;
-        }
+    while (time_left > Milliseconds::zero()){
+        Milliseconds current = std::min(time_left, 65535ms);
+        m_serial->issue_request(
+            SerialPABotBase::DeviceRequest_NS_Generic_ControllerStateMs(
+                (uint16_t)current.count(),
+                buttons,
+                dpad,
+                left_x, left_y,
+                right_x, right_y
+            ),
+            cancellable
+        );
+        time_left -= current;
     }
 }
 

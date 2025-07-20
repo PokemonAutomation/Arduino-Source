@@ -18,7 +18,6 @@
 namespace PokemonAutomation{
     
     struct ProgramInfo;
-    class AsyncDispatcher;
     class ProgramEnvironment;
 
 namespace NintendoSwitch{
@@ -72,7 +71,7 @@ enum class EggSandwichType{
 // It will use the first sandwich pick in the sandwich pick selection list.
 // After entering sandiwich mini game, it will drop the filling to quickly make a two-herb only sandwich to gain egg power lv 3.
 void make_two_herbs_sandwich(
-    const ProgramInfo& info, AsyncDispatcher& dispatcher,
+    ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
     EggSandwichType sandwich_type,
     size_t sweet_herb_index_last,
@@ -84,9 +83,8 @@ void make_two_herbs_sandwich(
 // It will use the first sandwich pick in the sandwich pick selection list.
 // After entering sandiwich mini game, it will drop the filling to quickly make a two-herb only sandwich to gain egg power lv 3.
 void make_two_herbs_sandwich(
-    const ProgramInfo& info,
-    AsyncDispatcher& dispatcher, VideoStream& stream,
-    ProControllerContext& context,
+    ProgramEnvironment& env,
+    VideoStream& stream, ProControllerContext& context,
     EggSandwichType sandwich_type,
     Language language
 );
@@ -119,7 +117,8 @@ void run_sandwich_maker(
     ProgramEnvironment& env,
     VideoStream& stream, ProControllerContext& context,
     Language language,
-    std::map<std::string, uint8_t>& fillings, std::vector<std::string>& fillings_sorted,
+    std::map<std::string, uint8_t>& fillings,
+    std::vector<std::string>& fillings_sorted,
     int& plates
 );
 

@@ -136,4 +136,11 @@ template class SimpleIntegerOptionWidget<int32_t>;
 template class SimpleIntegerOptionWidget<int64_t>;
 
 
+//  This is stupid.
+#ifdef __APPLE__
+template class SimpleIntegerCellWidget<size_t>;
+template class SimpleIntegerOptionWidget<size_t>;
+#endif
+
+
 }

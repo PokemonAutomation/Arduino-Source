@@ -16,7 +16,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void wait_for_home(ConsoleHandle& console, ProControllerContext& context);
+void go_home(ConsoleHandle& console, ProControllerContext& context);
+void ensure_at_home(ConsoleHandle& console, ProControllerContext& context);
+void ensure_at_home(ConsoleHandle& console, JoyconContext& context);
 
 
 

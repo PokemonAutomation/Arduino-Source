@@ -18,7 +18,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-
+//
+//  This class is now deprecated.
+//
 class EncounterWatcher : public VisualInferenceCallback, public AudioInferenceCallback{
 public:
     EncounterWatcher(VideoStream& stream, Color color = COLOR_RED);

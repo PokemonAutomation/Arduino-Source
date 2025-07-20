@@ -47,6 +47,8 @@ class SpectrogramMatcher;
 // - std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sample_rate)
 class AudioPerSpectrumDetectorBase : public AudioInferenceCallback{
 public:
+    virtual ~AudioPerSpectrumDetectorBase();
+
     using DetectedCallback = std::function<bool(float error_coefficient)>;
     // label: a name for this detector. Used for logging and profiling.
     // audio_name: the name of the audio to be detected (shiny sound etc). Capitalize first letter.
@@ -61,10 +63,10 @@ public:
         std::string label,
         std::string audio_name,
         Color detection_color,
-        DetectedCallback detected_callback
+        DetectedCallback detected_callback = nullptr
     );
 
-    virtual ~AudioPerSpectrumDetectorBase();
+    void set_detected_callback(DetectedCallback detected_callback);
 
     WallClock last_detection() const{
         return m_last_timestamp;

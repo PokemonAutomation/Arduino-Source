@@ -210,7 +210,7 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
     if (ret < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "leave_picnic(): Failed to detecxt overworld after 20 seconds.",
+            "leave_picnic(): Failed to detect overworld after 20 seconds.",
             stream
         );
     }
@@ -264,8 +264,8 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(
     }
 
     // Convert the vector from center to the PokeCenter icon into a left joystick movement
-    const double dif_x = closest_icon_x - center_x;
-    const double dif_y = closest_icon_y - center_y;
+    const double dif_x = (closest_icon_x - center_x) * 1920/ screen_width;
+    const double dif_y = (closest_icon_y - center_y) * 1080/ screen_height;
     const double magnitude = std::max(std::sqrt(max_dist), 1.0);
     const double push_x = dif_x * 64 / magnitude, push_y = dif_y * 64 / magnitude;
 

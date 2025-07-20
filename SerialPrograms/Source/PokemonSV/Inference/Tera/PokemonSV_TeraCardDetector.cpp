@@ -268,9 +268,8 @@ std::string TeraLobbyNameMatchResult::to_str() const{
 
 
 
-TeraLobbyReader::TeraLobbyReader(Logger& logger, AsyncDispatcher& dispatcher, Color color)
+TeraLobbyReader::TeraLobbyReader(Logger& logger, Color color)
     : m_logger(logger)
-    , m_dispatcher(dispatcher)
     , m_color(color)
     , m_bottom_right(0.73, 0.85, 0.12, 0.02)
     , m_label(TeraCardReader::CARD_LABEL_BOX())
@@ -317,7 +316,7 @@ bool TeraLobbyReader::detect(const ImageViewRGB32& screen){
         return false;
     }
 
-    if (seconds_left(m_logger, m_dispatcher, screen) < 0){
+    if (seconds_left(m_logger, screen) < 0){
         return false;
     }
 
@@ -359,13 +358,13 @@ uint8_t TeraLobbyReader::ready_joiners(const ImageViewRGB32& screen, uint8_t hos
     return total;
 }
 
-int16_t TeraLobbyReader::seconds_left(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const{
+int16_t TeraLobbyReader::seconds_left(Logger& logger, const ImageViewRGB32& screen) const{
     ImageViewRGB32 image = extract_box_reference(screen, m_timer);
-    return read_raid_timer(logger, dispatcher, image);
+    return read_raid_timer(logger, image);
 }
-std::string TeraLobbyReader::raid_code(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const{
+std::string TeraLobbyReader::raid_code(Logger& logger, const ImageViewRGB32& screen) const{
     ImageViewRGB32 image = extract_box_reference(screen, m_code);
-    return read_raid_code(logger, dispatcher, image);
+    return read_raid_code(logger, image);
 }
 
 ImageRGB32 filter_name_image(const ImageViewRGB32& image){
@@ -455,32 +454,6 @@ std::array<std::map<Language, std::string>, 4> TeraLobbyReader::read_names(
 
 
 
-
-
-#if 0
-TeraLobbyReadyWaiter::TeraLobbyReadyWaiter(
-    Logger& logger, AsyncDispatcher& dispatcher,
-    Color color, uint8_t desired_players
-)
-    : TeraLobbyReader(logger, dispatcher, color)
-    , VisualInferenceCallback("TeraLobbyReadyWaiter")
-    , m_desired_players(desired_players)
-    , m_last_known_total_players(-1)
-{}
-
-void TeraLobbyReadyWaiter::make_overlays(VideoOverlaySet& items) const{
-    TeraLobbyReader::make_overlays(items);
-}
-bool TeraLobbyReadyWaiter::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    if (!detect(frame)){
-        return false;
-    }
-    uint8_t total_players = this->total_players(frame);
-    uint8_t ready_players = this->ready_players(frame);
-    m_last_known_total_players.store(total_players);
-    return ready_players + 1 >= m_desired_players;
-}
-#endif
 
 
 

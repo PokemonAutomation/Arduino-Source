@@ -31,6 +31,8 @@ public:
     PanelInstance& instance(){ return m_instance; }
 
 protected:
+    //  Generate a collapsible UI element that shows the program panel header.
+    //  It contains the name of the program and its description.
     virtual CollapsibleGroupBox* make_header(QWidget& parent);
 
 protected:

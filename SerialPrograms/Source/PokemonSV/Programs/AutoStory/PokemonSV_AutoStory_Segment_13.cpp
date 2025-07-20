@@ -47,7 +47,7 @@ void AutoStory_Segment_13::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.overlay().add_log("Start Segment 11.1: Bombirdier Titan: Go to West Province Area One Central Pokecenter", COLOR_ORANGE);
+    env.console.log("Start Segment 11.1: Bombirdier Titan: Go to West Province Area One Central Pokecenter", COLOR_ORANGE);
 
     checkpoint_29(env, context, options.notif_status_update);
 

@@ -22,7 +22,7 @@ struct VisualInferencePivot::PeriodicCallback{
     VisualInferenceCallback& callback;
     std::chrono::milliseconds period;
     StatAccumulatorI32 stats;
-    uint64_t last_seqnum;
+    WallClock last_timestamp;
 
     PeriodicCallback(
         Cancellable& p_scope,
@@ -34,7 +34,7 @@ struct VisualInferencePivot::PeriodicCallback{
         , set_when_triggered(p_set_when_triggered)
         , callback(p_callback)
         , period(p_period)
-        , last_seqnum(0)
+        , last_timestamp(WallClock::min())
     {}
 };
 
@@ -88,17 +88,28 @@ void VisualInferencePivot::run(void* event, bool is_back_to_back) noexcept{
     PeriodicCallback& callback = *(PeriodicCallback*)event;
     try{
         //  Reuse the cached screenshot.
-        if (!is_back_to_back || callback.last_seqnum == m_seqnum){
+        if (!is_back_to_back || callback.last_timestamp == m_last.timestamp){
 //            cout << "back-to-back" << endl;
-            m_last = m_feed.snapshot();
-            m_seqnum++;
+//            m_last = m_feed.snapshot();
+
+            WallClock min_time = callback.last_timestamp;
+            if (min_time == WallClock::min()){
+                min_time = current_time() - 2 * callback.period;
+            }
+
+            m_last = m_feed.snapshot_recent_nonblocking(min_time);
+        }
+
+        if (!m_last){
+            return;
         }
 
         WallClock time0 = current_time();
         bool stop = callback.callback.process_frame(m_last);
         WallClock time1 = current_time();
         callback.stats += (uint32_t)std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
-        callback.last_seqnum = m_seqnum;
+        callback.last_timestamp = m_last.timestamp;
+
         if (stop){
             if (callback.set_when_triggered){
                 InferenceCallback* expected = nullptr;

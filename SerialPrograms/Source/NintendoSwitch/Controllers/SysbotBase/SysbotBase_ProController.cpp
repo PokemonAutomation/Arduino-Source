@@ -24,7 +24,8 @@ ProController_SysbotBase::ProController_SysbotBase(
     Logger& logger,
     SysbotBase::TcpSysbotBase_Connection& connection
 )
-    : ControllerWithScheduler(logger)
+    : ProController(logger)
+    , ControllerWithScheduler(logger)
     , m_connection(connection)
     , m_stopping(false)
     , m_replace_on_next(false)
@@ -255,6 +256,7 @@ void ProController_SysbotBase::send_diff(
     ){
         double fx = JoystickTools::linear_u8_to_float(new_state.left_x);
         double fy = -JoystickTools::linear_u8_to_float(new_state.left_y);
+        JoystickTools::clip_magnitude(fx, fy);
 //        cout << "fx = " << fx << ", fy = " << fy << endl;
         int16_t ix = JoystickTools::linear_float_to_s16(fx);
         int16_t iy = JoystickTools::linear_float_to_s16(fy);
@@ -270,6 +272,7 @@ void ProController_SysbotBase::send_diff(
     ){
         double fx = JoystickTools::linear_u8_to_float(new_state.right_x);
         double fy = -JoystickTools::linear_u8_to_float(new_state.right_y);
+        JoystickTools::clip_magnitude(fx, fy);
         int16_t ix = JoystickTools::linear_float_to_s16(fx);
         int16_t iy = JoystickTools::linear_float_to_s16(fy);
         message += "setStick RIGHT ";
@@ -293,7 +296,7 @@ void ProController_SysbotBase::send_diff(
 
 
 void ProController_SysbotBase::thread_body(){
-    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread();
+    GlobalSettings::instance().PERFORMANCE->REALTIME_THREAD_PRIORITY.set_on_this_thread(m_logger);
     std::chrono::microseconds EARLY_WAKE = GlobalSettings::instance().PERFORMANCE->PRECISE_WAKE_MARGIN;
 
     ProControllerState current_state;

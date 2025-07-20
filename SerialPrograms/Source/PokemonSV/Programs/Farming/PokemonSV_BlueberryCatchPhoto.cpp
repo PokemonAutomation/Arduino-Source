@@ -82,9 +82,9 @@ CameraAngle quest_photo_navi(
 
             //Jump down
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
+            ssf_press_button(context, BUTTON_B, 0ms, 800ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 160ms);
 
             pbf_wait(context, 100);
             context.wait_for_all_requests();
@@ -126,7 +126,11 @@ CameraAngle quest_photo_navi(
 
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 100, 50);
-            pbf_move_left_joystick(context, 0, 0, 20, 50);
+
+            //Turn slightly for switch 1
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 0, 0, 20, 50);
+            }
 
             break;
         case BBQuests::photo_bug: case BBQuests::photo_rock:
@@ -179,8 +183,8 @@ CameraAngle quest_photo_navi(
             pbf_press_button(context, BUTTON_L, 20, 50);
 
             break;
-        case BBQuests::photo_flying: case BBQuests::photo_dark:
-            console.log("Photo: Dark/Flying");
+        case BBQuests::photo_flying:
+            console.log("Photo: Flying");
 
             //Vullaby/Mandibuzz
             central_to_savanna_plaza(info, console, context);
@@ -224,8 +228,8 @@ CameraAngle quest_photo_navi(
             context.wait_for_all_requests();
 
             break;
-        case BBQuests::photo_poison:
-            console.log("Photo: Poison");
+        case BBQuests::photo_poison: case BBQuests::photo_dark:
+            console.log("Photo: Poison/Dark");
 
             //Muk-A - area a bit laggy but consistently so
             central_to_coastal_plaza(info, console, context);
@@ -400,8 +404,11 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_L, 20, 50);
             pbf_move_left_joystick(context, 128, 0, 100, 50);
 
-            pbf_move_left_joystick(context, 0, 0, 20, 50);
-            pbf_press_button(context, BUTTON_L, 20, 50);
+            //Turn slightly for switch 1
+            if (console.state().console_type() == ConsoleType::Switch1) {
+                pbf_move_left_joystick(context, 0, 0, 20, 50);
+                pbf_press_button(context, BUTTON_L, 20, 50);
+            }
 
             break;
 
@@ -430,9 +437,9 @@ void quest_catch_navi(
 
             //Jump down
             pbf_press_button(context, BUTTON_L | BUTTON_PLUS, 20, 105);
-            ssf_press_button(context, BUTTON_B, 0, 100);
-            ssf_press_button(context, BUTTON_B, 0, 20, 10);
-            ssf_press_button(context, BUTTON_B, 0, 20);
+            ssf_press_button(context, BUTTON_B, 0ms, 800ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 160ms, 80ms);
+            ssf_press_button(context, BUTTON_B, 0ms, 160ms);
 
             pbf_wait(context, 100);
             context.wait_for_all_requests();
@@ -504,8 +511,8 @@ void quest_catch_navi(
 
             jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1650, 500);
             break;
-        case BBQuests::catch_dark: case BBQuests::catch_flying:
-            console.log("Catch: Dark/Flying");
+        case BBQuests::catch_flying:
+            console.log("Catch: Flying");
 
             //Vullaby/Mandibuzz
             central_to_savanna_plaza(info, console, context);
@@ -577,8 +584,8 @@ void quest_catch_navi(
             pbf_move_left_joystick(context, 128, 0, 50, 50);
 
             break;
-        case BBQuests::catch_poison:
-            console.log("Catch: Poison");
+        case BBQuests::catch_poison: case BBQuests::catch_dark: 
+            console.log("Catch: Poison/Dark");
 
             //Muk-A - area a bit laggy but consistently so
             central_to_coastal_plaza(info, console, context);
@@ -595,18 +602,18 @@ void quest_catch_navi(
             pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
             //Extra throws for this one
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
+            ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
+            ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
+            ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
             pbf_wait(context, 200);
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZR, 20, 50); //Withdraw pokemon
 
             pbf_move_left_joystick(context, 255, 128, 20, 50);
             pbf_press_button(context, BUTTON_L, 20, 50);
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
+            ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
+            ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
+            ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
             pbf_wait(context, 200);
             context.wait_for_all_requests();
             pbf_press_button(context, BUTTON_ZR, 20, 50); //Withdraw pokemon
@@ -641,9 +648,9 @@ void quest_catch_navi(
     }
 
     //Lock on and throw ball
-    ssf_press_button(context, BUTTON_ZR, 0, 200);
-    ssf_press_button(context, BUTTON_ZL, 100, 50);
-    ssf_press_button(context, BUTTON_ZL, 150, 50);
+    ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
+    ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
+    ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
 
     pbf_wait(context, 300);
     context.wait_for_all_requests();

@@ -103,23 +103,23 @@ void GodEggItemDupe::collect_godegg(
 
     if (DETACH_BEFORE_RELEASE){
         //  Detach item
-        ssf_press_button(context, BUTTON_A, 50, 20);
+        ssf_press_button(context, BUTTON_A, 400ms, 160ms);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
-        ssf_press_button(context, BUTTON_A, 150, 20);
-        ssf_press_button(context, BUTTON_A, 150, 20);
-        ssf_press_button(context, BUTTON_A, 100, 20);
+        ssf_press_button(context, BUTTON_A, 1200ms, 160ms);
+        ssf_press_button(context, BUTTON_A, 1200ms, 160ms);
+        ssf_press_button(context, BUTTON_A, 800ms, 160ms);
 
         //  Release
         release(context);
     }else{
         //  Release (item detaches automatically)
-        ssf_press_button(context, BUTTON_A, 60, 20);
+        ssf_press_button(context, BUTTON_A, 480ms, 160ms);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
         ssf_press_dpad_ptv(context, DPAD_DOWN, 120ms);
-        ssf_press_button(context, BUTTON_A, 125, 20);
+        ssf_press_button(context, BUTTON_A, 1000ms, 160ms);
         ssf_press_dpad_ptv(context, DPAD_UP, 80ms);
         ssf_mash_AZs(context, 180);
     }

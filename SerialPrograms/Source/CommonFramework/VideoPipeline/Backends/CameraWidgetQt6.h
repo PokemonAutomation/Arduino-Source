@@ -15,10 +15,11 @@
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
-#include "Common/Cpp/Concurrency/SpinLock.h"
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
+#include "QVideoFrameCache.h"
+#include "SnapshotManager.h"
 #include "CameraImplementations.h"
 
 class QCamera;
@@ -63,7 +64,12 @@ public:
         return m_resolutions;
     }
 
-    virtual VideoSnapshot snapshot() override;
+    virtual VideoSnapshot snapshot_latest_blocking() override{
+        return m_snapshot_manager.snapshot_latest_blocking();
+    }
+    virtual VideoSnapshot snapshot_recent_nonblocking(WallClock min_time) override{
+        return m_snapshot_manager.snapshot_recent_nonblocking(min_time);
+    }
 
     virtual QWidget* make_display_QtWidget(QWidget* parent) override;
 
@@ -85,28 +91,10 @@ private:
 
     std::vector<Resolution> m_resolutions;
 
-private:
-    //  Last Cached Image: All accesses must be under this lock.
-
-    QImage m_last_image;
-    WallClock m_last_image_timestamp;
-    uint64_t m_last_image_seqnum = 0;
-
-    PeriodicStatsReporterI32 m_stats_conversion;
-
 
 private:
-    //  Last Frame: All accesses must be under this lock.
-    //  These will be updated very rapidly by the main thread.
-    //  Holding the frame lock will block the main thread.
-    //  So accessors should minimize the time they hold the frame lock.
-
-    mutable SpinLock m_frame_lock;
-
-    QVideoFrame m_last_frame;
-    WallClock m_last_frame_timestamp;
-    std::atomic<uint64_t> m_last_frame_seqnum;
-
+    QVideoFrameCache m_last_frame;
+    SnapshotManager m_snapshot_manager;
 };
 
 

@@ -30,6 +30,7 @@ namespace PokemonAutomation{
     class VideoSourceSelectorWidget;
     class VideoDisplayWidget;
     class AudioDisplayWidget;
+    class AudioSelectorWidget;
     class VideoOverlay;
 
 namespace NintendoSwitch{

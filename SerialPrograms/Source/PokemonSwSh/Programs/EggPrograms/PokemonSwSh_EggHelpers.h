@@ -23,11 +23,11 @@ namespace PokemonSwSh{
 
 //  Collect egg.
 static void collect_egg(ProControllerContext& context){
-    ssf_press_button(context, BUTTON_A, 120);
+    ssf_press_button(context, BUTTON_A, 960ms);
     if (GameSettings::instance().EGG_FETCH_EXTRA_LINE){
-        ssf_press_button(context, BUTTON_A, 120);
+        ssf_press_button(context, BUTTON_A, 960ms);
     }
-    ssf_press_button(context, BUTTON_A, 10, 10);
+    ssf_press_button(context, BUTTON_A, 80ms, 80ms);
 }
 static void collect_egg_mash_out(ProControllerContext& context, bool deposit_automatically){
     Milliseconds FETCH_EGG_MASH_DELAY = GameSettings::instance().FETCH_EGG_MASH_DELAY0;
@@ -42,12 +42,12 @@ static void collect_egg_mash_out(ProControllerContext& context, bool deposit_aut
 
 
 //  Fly Home: Used by everything.
-//  Assume the selected app in the menu is Twon Map.
+//  Assume the selected app in the menu is Town Map.
 static void fly_home(ProControllerContext& context, char from_overworld){
     if (from_overworld){
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
     }
-    ssf_press_button(context, BUTTON_A, 400, 20);
+    ssf_press_button(context, BUTTON_A, 3200ms, 160ms);
     ssf_press_right_joystick(context, 160, 96, 160ms, 160ms);
     pbf_mash_button(context, BUTTON_A, 480);
 }

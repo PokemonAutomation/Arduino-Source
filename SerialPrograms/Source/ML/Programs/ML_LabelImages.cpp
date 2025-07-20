@@ -4,8 +4,10 @@
  *
  */
 
+#include <QFileDialog>
 #include <QLabel>
 #include <QDir>
+#include <QDirIterator>
 #include <QVBoxLayout>
 #include <QGraphicsView>
 #include <QGraphicsScene>
@@ -19,6 +21,7 @@
 #include <filesystem>
 #include <cmath>
 #include "CommonFramework/Globals.h"
+#include "Common/Cpp/BitmapConversion.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Json/JsonValue.h"
@@ -26,13 +29,14 @@
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Pokemon/Resources/Pokemon_PokemonForms.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
-#include "NintendoSwitch/Framework/UI/NintendoSwitch_SwitchSystemWidget.h"
+#include "ML/UI/ML_ImageAnnotationDisplayWidget.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraWidgetQt6.5.h"
 #include "CommonFramework/VideoPipeline/VideoSources/VideoSource_StillImage.h"
 #include "ML_LabelImages.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Common/Qt/Options/ConfigWidget.h"
-#include "ML/DataLabeling/SegmentAnythingModel.h"
+#include "ML/DataLabeling/ML_SegmentAnythingModel.h"
+#include "ML/DataLabeling/ML_AnnotationIO.h"
 
 
 
@@ -64,11 +68,15 @@ ObjectAnnotation json_to_object_annotation(const JsonValue& value){
         size_t(mask_box_array[2].to_integer_throw()),
         size_t(mask_box_array[3].to_integer_throw())
     );
-    size_t mask_width = anno_obj.mask_box.width(), mask_height = anno_obj.mask_box.height();
-    anno_obj.mask.resize(mask_width * mask_height);
-    const JsonArray& mask_values = json_obj.get_array_throw("Mask");
-    for(size_t i = 0; i < anno_obj.mask.size(); i++){
-        anno_obj.mask[i] = bool(mask_values[i].to_integer_throw());
+    const size_t mask_width = anno_obj.mask_box.width(), mask_height = anno_obj.mask_box.height();
+    const size_t num_mask_ele = mask_width * mask_height;
+    
+    const std::string mask_base64 = json_obj.get_string_throw("Mask");
+    anno_obj.mask = unpack_bit_vector_from_base64(mask_base64, num_mask_ele);
+    if (anno_obj.mask.size() != num_mask_ele){
+        std::string err_msg = "wrong decoded object annotation mask size: decoded " + std::to_string(anno_obj.mask.size())
+            + " but should be " + std::to_string(num_mask_ele);
+        throw ParseException(err_msg);
     }
 
     anno_obj.label = json_obj.get_string_throw("Label");
@@ -92,11 +100,7 @@ JsonObject object_annotation_to_json(const ObjectAnnotation& object_annotation){
     mask_box_arr.push_back(int64_t(object_annotation.mask_box.max_y));
     json_obj["MaskBox"] = std::move(mask_box_arr);
 
-    JsonArray mask_arr;
-    for(size_t i = 0; i < object_annotation.mask.size(); i++){
-        mask_arr.push_back(int64_t(object_annotation.mask[i]));
-    }
-    json_obj["Mask"] = std::move(mask_arr);
+    json_obj["Mask"] = pack_bit_vector_to_base64(object_annotation.mask);
 
     json_obj["Label"] = object_annotation.label;
 
@@ -194,7 +198,7 @@ LabelImages_Descriptor::LabelImages_Descriptor()
 
 LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
-    , m_switch_control_option({}, false)
+    , m_display_session(m_display_option)
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
     , X("<b>X Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
@@ -214,27 +218,43 @@ void LabelImages::from_json(const JsonValue& json){
     if (obj == nullptr){
         return;
     }
-    const JsonValue* value = obj->get_value("SwitchSetup");
+    const JsonValue* value = obj->get_value("ImageSetup");
     if (value){
-        m_switch_control_option.load_json(*value);
+        m_display_option.load_json(*value);
     }
     m_options.load_json(json);
 }
 JsonValue LabelImages::to_json() const{
     JsonObject obj = std::move(*m_options.to_json().to_object());
-    obj["SwitchSetup"] = m_switch_control_option.to_json();
+    obj["ImageSetup"] = m_display_option.to_json();
 
+    save_annotation_to_file();
+    return obj;
+}
+
+void LabelImages::save_annotation_to_file() const{
     // m_annotation_file_path
     if (m_annotation_file_path.size() > 0 && !m_fail_to_load_annotation_file){
         JsonArray anno_json_arr;
-        for(const auto& anno_obj: m_annotated_objects){
+        for(const auto& anno_obj: m_annotations){
             anno_json_arr.push_back(object_annotation_to_json(anno_obj));
         }
         cout << "Saving annotation to " << m_annotation_file_path << endl;
         anno_json_arr.dump(m_annotation_file_path);
     }
-    return obj;
 }
+
+void LabelImages::clear_for_new_image(){
+    source_image_width = source_image_height = 0;
+    m_image_embedding.clear();
+    m_output_boolean_mask.clear();
+    m_mask_image = ImageRGB32();
+    m_annotations.clear();
+    m_last_object_idx = 0;
+    m_annotation_file_path = "";
+    m_fail_to_load_annotation_file = false;
+}
+
 QWidget* LabelImages::make_widget(QWidget& parent, PanelHolder& holder){
     return new LabelImages_Widget(parent, *this, holder);
 }
@@ -250,6 +270,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     if (!embedding_loaded){
         return; // no embedding, then no way for us to annotate
     }
+    
     // see if we can load the previously created labels
     const std::string anno_filename = std::filesystem::path(image_path).filename().replace_extension(".json").string();
 
@@ -270,7 +291,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
         return;
     }
 
-    JsonValue loaded_json = parse_json(json_content);
+    const JsonValue loaded_json = parse_json(json_content);
     const JsonArray* json_array = loaded_json.to_array();
     if (json_array == nullptr){
         m_fail_to_load_annotation_file = true;
@@ -283,7 +304,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     for(size_t i = 0; i < json_array->size(); i++){
         try{
             ObjectAnnotation anno_obj = json_to_object_annotation((*json_array)[i]);
-            m_annotated_objects.emplace_back(std::move(anno_obj));
+            m_annotations.emplace_back(std::move(anno_obj));
         } catch(JsonParseException&){
             m_fail_to_load_annotation_file = true;
             QMessageBox box;
@@ -295,7 +316,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
             );
         }
     }
-    m_last_object_idx = m_annotated_objects.size(); 
+    m_last_object_idx = m_annotations.size(); 
     cout << "Loaded existing annotation file " << m_annotation_file_path << endl;
 }
 
@@ -303,8 +324,8 @@ void LabelImages::update_rendered_objects(VideoOverlaySet& overlay_set){
     overlay_set.clear();
     overlay_set.add(COLOR_RED, {X, Y, WIDTH, HEIGHT});
 
-    for(size_t i_obj = 0; i_obj < m_annotated_objects.size(); i_obj++){
-        const auto& obj = m_annotated_objects[i_obj];
+    for(size_t i_obj = 0; i_obj < m_annotations.size(); i_obj++){
+        const auto& obj = m_annotations[i_obj];
         // overlayset.add(COLOR_RED, pixelbox_to_floatbox(source_image_width, source_image_height, obj.user_box));
         const auto mask_float_box = pixelbox_to_floatbox(source_image_width, source_image_height, obj.mask_box);
         std::string label = obj.label;
@@ -399,29 +420,40 @@ void LabelImages::compute_mask(VideoOverlaySet& overlay_set){
         }
 
         annotation.label = label;
-        m_last_object_idx = m_annotated_objects.size();
-        m_annotated_objects.emplace_back(std::move(annotation));
+        m_last_object_idx = m_annotations.size();
+        m_annotations.emplace_back(std::move(annotation));
 
         update_rendered_objects(overlay_set);
     }
 }
 
+void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
+    std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
+    std::cout << "Use SAM Embedding model " << embedding_model_path << std::endl;
+    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path);
+}
+
+
+
 LabelImages_Widget::~LabelImages_Widget(){
     m_program.FORM_LABEL.remove_listener(*this);
-    delete m_switch_widget;
+    delete m_image_display_widget;
 }
 LabelImages_Widget::LabelImages_Widget(
     QWidget& parent,
-    LabelImages& instance,
+    LabelImages& program,
     PanelHolder& holder
 )
-    : PanelWidget(parent, instance, holder)
-    , m_program(instance)
-    , m_session(instance.m_switch_control_option, 0, 0)
-    , m_overlay_set(m_session.overlay())
-    , m_drawn_box(*this, m_session.overlay())
+    : PanelWidget(parent, program, holder)
+    , m_program(program)
+    , m_display_session(m_program.m_display_session)
+    , m_overlay_set(m_display_session.overlay())
+    , m_drawn_box(*this, m_display_session.overlay())
 {
     m_program.FORM_LABEL.add_listener(*this);
+    m_display_session.video_session().add_state_listener(*this);
+
+    m_embedding_info_label = new QLabel(this);
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -436,44 +468,90 @@ LabelImages_Widget::LabelImages_Widget(
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);
 
-    m_switch_widget = new NintendoSwitch::SwitchSystemWidget(*this, m_session, 0);
-    scroll_layout->addWidget(m_switch_widget);
+    m_image_display_widget = new ImageAnnotationDisplayWidget(*this, m_display_session, 0);
+    scroll_layout->addWidget(m_image_display_widget);
+
+    QHBoxLayout* embedding_info_row = new QHBoxLayout();
+    scroll_layout->addLayout(embedding_info_row);
+    embedding_info_row->addWidget(new QLabel("<b>Image Embedding File:</b> ", this));    
+    embedding_info_row->addWidget(m_embedding_info_label);
 
     QPushButton* button = new QPushButton("Delete Last Mask", scroll_inner);
     scroll_layout->addWidget(button);
     connect(button, &QPushButton::clicked, this, [this](bool){
         auto& program = this->m_program;
-        if (program.m_annotated_objects.size() > 0){
-            program.m_annotated_objects.pop_back();
+        if (program.m_annotations.size() > 0){
+            program.m_annotations.pop_back();
         }
-        if (program.m_annotated_objects.size() > 0){
-            program.m_last_object_idx = program.m_annotated_objects.size() - 1;
+        if (program.m_annotations.size() > 0){
+            program.m_last_object_idx = program.m_annotations.size() - 1;
         }
         program.update_rendered_objects(this->m_overlay_set);
     });
 
-    m_option_widget = instance.m_options.make_QtWidget(*scroll_inner);
+    // Add all option UI elements defined by LabelImage program.
+    m_option_widget = program.m_options.make_QtWidget(*scroll_inner);
     scroll_layout->addWidget(&m_option_widget->widget());
 
-    const VideoSourceDescriptor* video_source_desc = instance.m_switch_control_option.m_video.descriptor().get();
-    auto image_source_desc = dynamic_cast<const VideoSourceDescriptor_StillImage*>(video_source_desc);
-    if (image_source_desc != nullptr){
-        const std::string image_path = image_source_desc->path();
-        const size_t source_image_height = image_source_desc->source_image_height();
-        const size_t source_image_width = image_source_desc->source_image_width();
-        m_program.load_image_related_data(image_path, source_image_width, source_image_height);
-        m_program.update_rendered_objects(m_overlay_set);
-    }
+    button = new QPushButton("Compute Image Embeddings (SLOW!)", scroll_inner);
+    scroll_layout->addWidget(button);
+    connect(button, &QPushButton::clicked, this, [this](bool){
+        std::string folder_path = QFileDialog::getExistingDirectory(
+            nullptr, "Open image folder", ".").toStdString();
+
+        if (folder_path.size() > 0){
+            this->m_program.compute_embeddings_for_folder(folder_path);
+        }
+    });
 
     cout << "LabelImages_Widget built" << endl;
 }
 
+void LabelImages_Widget::clear_for_new_image(){
+    m_overlay_set.clear();
+    m_program.clear_for_new_image();
+}
+
 void LabelImages_Widget::on_config_value_changed(void* object){
-    if (m_program.m_annotated_objects.size() > 0 && m_program.m_last_object_idx < m_program.m_annotated_objects.size()){
-        std::string& cur_label = m_program.m_annotated_objects[m_program.m_last_object_idx].label;
+    if (m_program.m_annotations.size() > 0 && m_program.m_last_object_idx < m_program.m_annotations.size()){
+        std::string& cur_label = m_program.m_annotations[m_program.m_last_object_idx].label;
         cur_label = m_program.FORM_LABEL.slug();
         m_program.update_rendered_objects(m_overlay_set);
     }
+}
+
+// This callback function will be called whenever the display source (the image source) is loaded or reloaded:
+void LabelImages_Widget::post_startup(VideoSource* source){
+    const std::string& image_path = m_display_session.option().m_image_path;
+
+    m_program.save_annotation_to_file();  // save the current annotation file
+    clear_for_new_image();
+    if (image_path.size() == 0){
+        m_embedding_info_label->setText("");
+        return;
+    }
+
+    const std::string embedding_path = image_path + ".embedding";
+    const std::string embedding_path_display = "<IMAGE_FOLDER>/" + std::filesystem::path(embedding_path).filename().string();
+    if (!std::filesystem::exists(embedding_path)){
+        m_embedding_info_label->setText(QString::fromStdString(embedding_path_display + " Dose Not Exist. Cannot Annotate The Image!"));
+        m_embedding_info_label->setStyleSheet("color: red");
+        return;
+    }
+        
+    m_embedding_info_label->setText(QString::fromStdString(embedding_path_display));
+    m_embedding_info_label->setStyleSheet("color: blue");
+
+    const auto cur_res = m_display_session.video_session().current_resolution();
+    if (cur_res.width == 0 || cur_res.height == 0){
+        QMessageBox box;
+        box.warning(nullptr, "Invalid Image Dimension",
+            QString::fromStdString("Loaded image " + image_path + " has invalid dimension: " + cur_res.to_string()));
+        return;
+    }
+    
+    m_program.load_image_related_data(image_path, cur_res.width, cur_res.height);
+    m_program.update_rendered_objects(m_overlay_set);
 }
 
 

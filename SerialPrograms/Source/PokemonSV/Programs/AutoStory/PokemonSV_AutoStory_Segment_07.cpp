@@ -48,7 +48,6 @@ void AutoStory_Segment_07::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("Start Segment 07: Go to Mesagoza South", COLOR_ORANGE);
-    env.console.overlay().add_log("Start Segment 07: Go to Mesagoza South", COLOR_ORANGE);
 
     checkpoint_12(env, context, options.notif_status_update);
 
@@ -64,7 +63,6 @@ void AutoStory_Segment_07::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("End Segment 07: Go to Mesagoza South", COLOR_GREEN);
-    env.console.overlay().add_log("End Segment 07: Go to Mesagoza South", COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

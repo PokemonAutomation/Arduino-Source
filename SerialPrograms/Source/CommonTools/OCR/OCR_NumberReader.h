@@ -46,7 +46,7 @@ int read_number_waterfill(
     Logger& logger, const ImageViewRGB32& image,
     uint32_t rgb32_min, uint32_t rgb32_max,
     bool text_inside_range = true,
-    uint32_t width_max = UINT32_MAX,
+    size_t width_max = (size_t)-1,
     bool check_empty_string = false
  );
 
@@ -61,7 +61,7 @@ int read_number_waterfill(
 int read_number_waterfill_multifilter(
     Logger& logger, const ImageViewRGB32& image,
     std::vector<std::pair<uint32_t, uint32_t>> filters,
-    uint32_t width_max,
+    size_t width_max = (size_t)-1,
     bool text_inside_range = true,
     bool prioritize_numeric_only_results = true,
     int8_t line_index = -1

@@ -11,6 +11,10 @@
 #include "SysbotBase3_ControllerState.h"
 #include "SysbotBase3_ProController.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -20,9 +24,11 @@ ProController_SysbotBase3::ProController_SysbotBase3(
     Logger& logger,
     SysbotBase::TcpSysbotBase_Connection& connection
 )
-    : ControllerWithScheduler(logger)
+    : ProController(logger)
+    , ControllerWithScheduler(logger)
     , m_connection(connection)
     , m_stopping(false)
+    , m_pending_replace(false)
     , m_next_seqnum(1)
     , m_next_expected_seqnum_ack(1)
 {
@@ -38,7 +44,6 @@ ProController_SysbotBase3::~ProController_SysbotBase3(){
 const ControllerFeatures& ProController_SysbotBase3::controller_features() const{
     static const ControllerFeatures features{
         ControllerFeature::TickPrecise,
-        ControllerFeature::TimingFlexibleMilliseconds,
         ControllerFeature::NintendoSwitch_ProController,
         ControllerFeature::NintendoSwitch_DateSkip,
     };
@@ -55,6 +60,9 @@ void ProController_SysbotBase3::cancel_all_commands(){
     m_next_expected_seqnum_ack = m_next_seqnum;
 
     m_connection.write_data("cqCancel\r\n");
+    if (GlobalSettings::instance().LOG_EVERYTHING){
+        m_logger.log("sys-botbase3: cqCancel");
+    }
 
     this->clear_on_next();
     m_cv.notify_all();
@@ -67,16 +75,32 @@ void ProController_SysbotBase3::replace_on_next_command(){
     }
 
     uint64_t queued = m_next_seqnum - m_next_expected_seqnum_ack;
-    m_next_expected_seqnum_ack = m_next_seqnum;
+//    m_next_expected_seqnum_ack = m_next_seqnum;
 
+    m_pending_replace = true;
+
+#if 0
     m_connection.write_data("cqReplaceOnNext\r\n");
+    if (GlobalSettings::instance().LOG_EVERYTHING){
+        m_logger.log("sys-botbase3: cqReplaceOnNext");
+    }
+#endif
 
     this->clear_on_next();
     m_cv.notify_all();
     m_logger.log("replace_on_next_command(): Command Queue Size = " + std::to_string(queued), COLOR_DARKGREEN);
 }
 void ProController_SysbotBase3::wait_for_all(const Cancellable* cancellable){
-    std::unique_lock<std::mutex> lg(m_state_lock);
+    std::lock_guard<std::mutex> lg0(m_issue_lock);
+    std::unique_lock<std::mutex> lg1(m_state_lock);
+
+//    cout << "wait_for_all() - start" << endl;
+
+    if (m_stopping){
+        throw InvalidConnectionStateException("");
+    }
+    this->issue_wait_for_all(cancellable);
+
     while (true){
         if (m_stopping){
             throw InvalidConnectionStateException("");
@@ -87,8 +111,10 @@ void ProController_SysbotBase3::wait_for_all(const Cancellable* cancellable){
         if (m_next_seqnum == m_next_expected_seqnum_ack){
             break;
         }
-        m_cv.wait(lg);
+        m_cv.wait(lg1);
     }
+
+//    cout << "wait_for_all() - done" << endl;
 }
 
 
@@ -119,6 +145,10 @@ void ProController_SysbotBase3::on_message(const std::string& message){
 
     std::lock_guard<std::mutex> lg(m_state_lock);
 
+//    cout << "parsed = " << parsed << endl;
+//    cout << "m_next_seqnum = " << m_next_seqnum << endl;
+//    cout << "m_next_expected_seqnum_ack = " << m_next_expected_seqnum_ack << endl;
+
     if (GlobalSettings::instance().LOG_EVERYTHING){
         m_logger.log(
             "Command Finished: " + std::to_string(parsed) +
@@ -131,7 +161,7 @@ void ProController_SysbotBase3::on_message(const std::string& message){
         m_logger.log(
             "Received Old Ack: Expected = " + std::to_string(m_next_expected_seqnum_ack) +
             ", Actual = " + std::to_string(parsed),
-            COLOR_RED
+            COLOR_DARKGREEN
         );
         return;
     }
@@ -203,14 +233,23 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     if (m_left_joystick.is_busy()){
         double fx = JoystickTools::linear_u8_to_float(m_left_joystick.x);
         double fy = -JoystickTools::linear_u8_to_float(m_left_joystick.y);
+        JoystickTools::clip_magnitude(fx, fy);
         left_x = JoystickTools::linear_float_to_s16(fx);
         left_y = JoystickTools::linear_float_to_s16(fy);
     }
     if (m_right_joystick.is_busy()){
         double fx = JoystickTools::linear_u8_to_float(m_right_joystick.x);
         double fy = -JoystickTools::linear_u8_to_float(m_right_joystick.y);
+        JoystickTools::clip_magnitude(fx, fy);
         right_x = JoystickTools::linear_float_to_s16(fx);
         right_y = JoystickTools::linear_float_to_s16(fy);
+    }
+
+    std::string message;
+    if (m_pending_replace){
+        m_pending_replace = false;
+        m_next_expected_seqnum_ack = m_next_seqnum;
+        message += "cqReplaceOnNext\r\n";
     }
 
     std::unique_lock<std::mutex> lg(m_state_lock, std::adopt_lock_t());
@@ -238,10 +277,12 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     command.state.right_joystick_x = right_x;
     command.state.right_joystick_y = right_y;
 
-    std::string message;
-    message.resize(64);
-    command.write_to_hex(message.data());
-    message = "cqControllerState " + message + "\r\n";
+    {
+        std::string command_message;
+        command_message.resize(64);
+        command.write_to_hex(command_message.data());
+        message += "cqControllerState " + command_message + "\r\n";
+    }
 
     m_connection.write_data(message);
 

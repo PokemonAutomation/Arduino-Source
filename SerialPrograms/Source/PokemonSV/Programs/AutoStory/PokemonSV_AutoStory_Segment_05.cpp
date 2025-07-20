@@ -49,14 +49,12 @@ void AutoStory_Segment_05::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
-    env.console.overlay().add_log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
 
     checkpoint_09(env, context, options.notif_status_update);
     checkpoint_10(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
     env.console.log("End Segment 05: First Arven Battle", COLOR_GREEN);
-    env.console.overlay().add_log("End Segment 05: First Arven Battle", COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

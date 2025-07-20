@@ -325,15 +325,19 @@ int8_t read_side(WaterfillSession& session, const ImageViewRGB32& image, uint8_t
 //    cout << "pixel_threshold = " << (int)pixel_threshold << endl;
     session.set_source(matrix);
 
-    auto finder = session.make_iterator(300);
+    size_t min_area = image.total_pixels();
+    min_area = (size_t)((double)300 * min_area / 1293312);
+
+    auto finder = session.make_iterator(min_area);
     WaterfillObject arrow;
     WaterfillObject object;
     size_t count = 0;
     while (finder->find_next(object, true)){
-        if (is_arrow(image, object)){
-            count++;
-            arrow = object;
+        if (!is_arrow(image, object)){
+            continue;
         }
+        count++;
+        arrow = object;
     }
 //    cout << "count = " << count << endl;
     if (count != 1){
@@ -348,6 +352,7 @@ int8_t read_side(WaterfillSession& session, const ImageViewRGB32& image, uint8_t
 }
 
 int8_t read_side(const ImageViewRGB32& image){
+//    cout << image.width() * image.height() << endl;
     auto session = make_WaterfillSession();
     int8_t ret;
     if ((ret = read_side(*session, image, 160)) != -1) return ret;

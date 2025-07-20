@@ -76,7 +76,6 @@ struct ItemPrinterDesiredItemRowSnapshot{
 
 class ItemPrinterDesiredItemRow : public EditableTableRow, public ConfigOption::Listener{
 public:
-
     ItemPrinterDesiredItemRow(EditableTableOption& parent_table);
 
     ItemPrinterDesiredItemRow(
@@ -91,7 +90,7 @@ public:
 
 public:
     EnumDropdownCell<ItemPrinter::PrebuiltOptions> desired_item;
-    SimpleIntegerOption<uint16_t> desired_quantity;
+    SimpleIntegerCell<uint16_t> desired_quantity;
 
 };
 

@@ -16,6 +16,7 @@
 namespace PokemonAutomation{
     class ThreadHandle;
     class ThreadUtilizationStat;
+    class ThreadPoolUtilizationStat;
 namespace NintendoSwitch{
 
 class ConsoleHandle : public VideoStream{
@@ -75,6 +76,8 @@ private:
 
     ConsoleState m_console_state;
 
+    std::unique_ptr<ThreadPoolUtilizationStat> m_realtime_inference_utilization;
+    std::unique_ptr<ThreadPoolUtilizationStat> m_normal_inference_utilization;
     std::unique_ptr<ThreadUtilizationStat> m_thread_utilization;
 };
 

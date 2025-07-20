@@ -25,31 +25,22 @@ namespace SerialPABotBase{
 #endif
 
 
-
-#define PABB_MSG_NS_GENERIC_CONTROLLER_STATE_TICKS  0x9f
+#define PABB_MSG_NS_GENERIC_CONTROLLER_STATE_MS     0x90
 typedef struct{
-    seqnum_t seqnum;
-    uint16_t buttons;
+    uint8_t buttons0;
+    uint8_t buttons1;
+//    uint8_t buttons2;
+//    uint8_t buttons3;
     uint8_t dpad;
     uint8_t left_joystick_x;
     uint8_t left_joystick_y;
     uint8_t right_joystick_x;
     uint8_t right_joystick_y;
-    uint8_t ticks;
-} PABB_PACK pabb_Message_NS_Generic_ControllerStateTicks;
-
-
-
-#define PABB_MSG_NS_GENERIC_CONTROLLER_STATE_MS     0x90
+} pabb_ControllerReport_NS_Generic_Controller;
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    uint16_t buttons;
-    uint8_t dpad;
-    uint8_t left_joystick_x;
-    uint8_t left_joystick_y;
-    uint8_t right_joystick_x;
-    uint8_t right_joystick_y;
+    pabb_ControllerReport_NS_Generic_Controller report;
 } PABB_PACK pabb_Message_NS_Generic_ControllerStateMs;
 
 

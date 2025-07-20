@@ -16,7 +16,6 @@
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichIngredientDetector.h"
 
 namespace PokemonAutomation{
-    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -36,7 +35,6 @@ class IngredientSession{
 public:
     ~IngredientSession();
     IngredientSession(
-        AsyncDispatcher& dispatcher,
         VideoStream& stream, ProControllerContext& context,
         Language language, SandwichIngredientType type
     );
@@ -61,7 +59,6 @@ public:
 
 
 private:
-    AsyncDispatcher& m_dispatcher;
     VideoStream& m_stream;
     ProControllerContext& m_context;
     Language m_language;
@@ -78,7 +75,6 @@ private:
 //  user must stack the fillings.
 //  If any ingredient is not found or insuffient, it will OperationFailedException::fire.
 void add_sandwich_ingredients(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context,
     Language language,
     std::map<std::string, uint8_t>&& fillings,  //  {slug, quantity}

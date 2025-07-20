@@ -70,8 +70,8 @@ SurpriseTrade::SurpriseTrade()
 
 void SurpriseTrade::trade_slot(ProControllerContext& context, uint8_t slot, bool next_box) const{
     ssf_press_button(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY0, 400ms);
-    ssf_press_dpad1(context, DPAD_DOWN, 10);
-    ssf_press_button2(context, BUTTON_A, 280, 20);
+    ssf_press_dpad(context, DPAD_DOWN, 80ms);
+    ssf_press_button(context, BUTTON_A, 2240ms, 160ms);
 
     if (next_box){
         ssf_press_button(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY0);
@@ -87,10 +87,10 @@ void SurpriseTrade::trade_slot(ProControllerContext& context, uint8_t slot, bool
         slot--;
     }
 
-    ssf_press_button1(context, BUTTON_A, 50);
-    ssf_press_button1(context, BUTTON_A, 500);
-    ssf_press_button1(context, BUTTON_A, 100);
-    ssf_press_button1(context, BUTTON_A, 100);
+    ssf_press_button(context, BUTTON_A, 400ms);
+    ssf_press_button(context, BUTTON_A, 4000ms);
+    ssf_press_button(context, BUTTON_A, 800ms);
+    ssf_press_button(context, BUTTON_A, 800ms);
 
     pbf_mash_button(context, BUTTON_B, INITIAL_WAIT0);
 
@@ -129,12 +129,12 @@ void SurpriseTrade::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         //          because the trade is in progress. The 2nd iteration finishes it.
         //      4.  No partner was ever found. The 1st iteration will cancel the trade.
         for (uint8_t c = 0; c < 2; c++){
-            ssf_press_button1(context, BUTTON_Y, 250);
-            ssf_press_dpad1(context, DPAD_DOWN, 20);
-            ssf_press_button1(context, BUTTON_A, 280);
-            ssf_press_button1(context, BUTTON_B, 280);
-            ssf_press_button1(context, BUTTON_B, 200);
-            ssf_press_button1(context, BUTTON_A, 100);
+            ssf_press_button(context, BUTTON_Y, 2000ms);
+            ssf_press_dpad(context, DPAD_DOWN, 160ms);
+            ssf_press_button(context, BUTTON_A, 2240ms);
+            ssf_press_button(context, BUTTON_B, 2240ms);
+            ssf_press_button(context, BUTTON_B, 1600ms);
+            ssf_press_button(context, BUTTON_A, 800ms);
             pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION0);
         }
 

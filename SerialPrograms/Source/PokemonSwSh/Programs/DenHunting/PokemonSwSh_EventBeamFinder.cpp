@@ -46,27 +46,27 @@ EventBeamFinder::EventBeamFinder()
 
 
 void EventBeamFinder::goto_near_den(ProControllerContext& context) const{
-    ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 375);
+    ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 375, 375);
     pbf_wait(context, 50);
-    ssf_press_button1(context, BUTTON_PLUS, 100);
-    ssf_press_joystick2(context, true, STICK_MAX, STICK_CENTER, 100, 5);
-    ssf_press_button1(context, BUTTON_L, 100);
-    ssf_press_button1(context, BUTTON_PLUS, 100);
-    ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 370);
+    ssf_press_button(context, BUTTON_PLUS, 800ms);
+    ssf_press_left_joystick(context, STICK_MAX, STICK_CENTER, 100, 5);
+    ssf_press_button(context, BUTTON_L, 800ms);
+    ssf_press_button(context, BUTTON_PLUS, 800ms);
+    ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 370, 370);
 }
 void EventBeamFinder::goto_far_den(ProControllerContext& context) const{
-    ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 992);
+    ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 992, 992);
     pbf_wait(context, 50);
-    ssf_press_button1(context, BUTTON_PLUS, 100);
-    ssf_press_joystick2(context, true, STICK_MIN, STICK_CENTER, 100, 5);
-    ssf_press_button1(context, BUTTON_L, 100);
-    ssf_press_button1(context, BUTTON_PLUS, 100);
-    ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 300);
+    ssf_press_button(context, BUTTON_PLUS, 800ms);
+    ssf_press_left_joystick(context, STICK_MIN, STICK_CENTER, 100, 5);
+    ssf_press_button(context, BUTTON_L, 800ms);
+    ssf_press_button(context, BUTTON_PLUS, 800ms);
+    ssf_press_left_joystick(context, STICK_CENTER, STICK_MIN, 300, 300);
 }
 void EventBeamFinder::drop_wishing_piece(ProControllerContext& context) const{
-    ssf_press_button(context, BUTTON_A, 200, 10);
-    ssf_press_button(context, BUTTON_A, 150, 10);
-    ssf_press_button(context, BUTTON_A, 5);
+    ssf_press_button(context, BUTTON_A, 1600ms, 80ms);
+    ssf_press_button(context, BUTTON_A, 1200ms, 80ms);
+    ssf_press_button(context, BUTTON_A, 40ms);
     pbf_mash_button(context, BUTTON_B, 500);
     ssf_press_button(context, BUTTON_A, WAIT_TIME_IN_DEN0, 80ms);
     pbf_mash_button(context, BUTTON_B, 600);

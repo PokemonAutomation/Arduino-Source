@@ -6,10 +6,11 @@
 
 #include <map>
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/AsyncDispatcher.h"
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
@@ -33,7 +34,7 @@ void ItemPrinterJobsDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box_bonus);
 }
 std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
-    Logger& logger, AsyncDispatcher& dispatcher,
+    Logger& logger,
     const ImageViewRGB32& screen, const ImageFloatBox& box
 ) const{
     ImageViewRGB32 cropped = extract_box_reference(screen, box);
@@ -54,10 +55,10 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
 
     SpinLock lock;
     std::map<uint8_t, uint8_t> candidates;
-    std::vector<std::unique_ptr<AsyncTask>> tasks(filtered.size());
-    for (size_t c = 0; c < filtered.size(); c++){
-        tasks[c] = dispatcher.dispatch([&, c]{
-            int num = OCR::read_number(logger, filtered[c].first);
+
+    GlobalThreadPools::normal_inference().run_in_parallel(
+        [&](size_t index){
+            int num = OCR::read_number(logger, filtered[index].first);
             std::string str = std::to_string(num);
             WriteSpinLock lg(lock);
             if (str == "1"){
@@ -74,13 +75,9 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
             }else if (str[0] == '1'){
                 candidates[1]++;
             }
-        });
-    }
-
-    //  Wait for everything.
-    for (auto& task : tasks){
-        task->wait_and_rethrow_exceptions();
-    }
+        },
+        0, filtered.size(), 1
+    );
 
     std::pair<uint8_t, uint8_t> best;
     for (const auto& item : candidates){
@@ -112,12 +109,12 @@ std::pair<uint8_t, uint8_t> ItemPrinterJobsDetector::read_box(
     return 0;
 #endif
 }
-uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, AsyncDispatcher& dispatcher, const ImageViewRGB32& screen) const{
-    std::pair<uint8_t, uint8_t> normal = read_box(logger, dispatcher, screen, m_box_normal);
+uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, const ImageViewRGB32& screen) const{
+    std::pair<uint8_t, uint8_t> normal = read_box(logger, screen, m_box_normal);
     if (normal.second > 6){
         return normal.first;
     }
-    std::pair<uint8_t, uint8_t> bonus = read_box(logger, dispatcher, screen, m_box_bonus);
+    std::pair<uint8_t, uint8_t> bonus = read_box(logger, screen, m_box_bonus);
     if (normal.second + 2 > bonus.second){
         return normal.first;
     }else{
@@ -127,14 +124,13 @@ uint8_t ItemPrinterJobsDetector::detect_jobs(Logger& logger, AsyncDispatcher& di
 
 
 void ItemPrinterJobsDetector::set_print_jobs(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context, uint8_t jobs
 ) const{
     VideoSnapshot snapshot;
     for (size_t c = 0; c < 10; c++){
         context.wait_for_all_requests();
         snapshot = stream.video().snapshot();
-        uint8_t current_jobs = detect_jobs(stream.logger(), dispatcher, snapshot);
+        uint8_t current_jobs = detect_jobs(stream.logger(), snapshot);
         if (current_jobs == jobs){
             return;
         }

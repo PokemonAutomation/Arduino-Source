@@ -58,13 +58,13 @@ private:
 
 class UtilizationTracker{
 public:
-    UtilizationTracker(WallClock::duration window = std::chrono::milliseconds(1000))
+    UtilizationTracker(WallDuration window = std::chrono::milliseconds(1000))
         : m_window(window)
         , m_min_window(window / 2)
         , m_running_usage(0)
     {}
 
-    void push_event(WallClock::duration usage_since_last, WallClock timestamp = current_time()){
+    void push_event(WallDuration usage_since_last, WallClock timestamp = current_time()){
         WallClock threshold = timestamp - m_window;
         while (m_history.size() > 1){
             if (m_history.front().timestamp >= threshold){
@@ -78,13 +78,13 @@ public:
     }
     void push_idle(){
         m_history.clear();
-        m_running_usage = WallClock::duration(0);
+        m_running_usage = WallDuration(0);
     }
 
     size_t events_in_window() const{
         return m_history.size();
     }
-    WallClock::duration usage_in_window() const{
+    WallDuration usage_in_window() const{
         return m_running_usage;
     }
     double utilization() const{
@@ -107,14 +107,14 @@ public:
 private:
     struct Entry{
         WallClock timestamp;
-        WallClock::duration usage;
+        WallDuration usage;
     };
 
-    WallClock::duration m_window;
-    WallClock::duration m_min_window;
+    WallDuration m_window;
+    WallDuration m_min_window;
 
     std::deque<Entry> m_history;
-    WallClock::duration m_running_usage;
+    WallDuration m_running_usage;
 };
 
 

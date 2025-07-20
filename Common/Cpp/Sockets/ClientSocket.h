@@ -10,9 +10,11 @@
 
 
 #ifdef _WIN32
-#include "ClientSocket_WinSocket.h"
+//#include "ClientSocket_WinSocket.h"
+#include "ClientSocket_Qt.h"
 namespace PokemonAutomation{
-    using ClientSocket = ClientSocket_WinSocket;
+//    using ClientSocket = ClientSocket_WinSocket;
+    using ClientSocket = ClientSocket_Qt;
 }
 #else
 #include "ClientSocket_POSIX.h"

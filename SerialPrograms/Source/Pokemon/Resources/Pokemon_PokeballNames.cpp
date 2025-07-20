@@ -42,11 +42,17 @@ PokeballNameDatabase::PokeballNameDatabase(){
         std::string& slug = item.to_string_throw(path_slugs);
         ordered_list.emplace_back(slug);
 
-        JsonObject& languages = item_disp.get_object_throw(slug, path_disp);
-        std::string& display_name = languages.get_string_throw("eng", path_disp);
+        JsonObject* languages = item_disp.get_object(slug);
+        std::string* display_name;
+        if (languages != nullptr){
+            //  TODO: REMOVE: Display names for PLA balls.
+            display_name = &languages->get_string_throw("eng", path_disp);
+        }else{
+            display_name = &slug;
+        }
 
-        database[slug].m_display_name = display_name;
-        reverse_lookup[std::move(display_name)] = std::move(slug);
+        database[slug].m_display_name = *display_name;
+        reverse_lookup[*display_name] = slug;
     }
 }
 

@@ -9,11 +9,13 @@
 //#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "SysbotBase_Connection.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
+
 
 namespace PokemonAutomation{
 namespace SysbotBase{
@@ -49,7 +51,8 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
 )
     : m_logger(logger)
     , m_supports_command_queue(false)
-    , m_last_receive(WallClock::min())
+    , m_last_ping_send(WallClock::min())
+    , m_last_ping_receive(WallClock::min())
 {
     QHostAddress address;
     int port;
@@ -105,9 +108,9 @@ ControllerModeStatus TcpSysbotBase_Connection::controller_mode_status() const{
 }
 
 void TcpSysbotBase_Connection::write_data(const std::string& data){
-    WriteSpinLock lg(m_send_lock);
+    WriteSpinLock lg(m_send_lock, "TcpSysbotBase_Connection::write_data()");
 //    cout << "Sending: " << data << endl;
-    m_socket.blocking_send(data.data(), data.size());
+    m_socket.send(data.data(), data.size());
 }
 
 
@@ -122,7 +125,7 @@ std::string pretty_print(uint64_t x){
 
 void TcpSysbotBase_Connection::thread_loop(){
     std::unique_lock<std::mutex> lg(m_lock);
-    WallClock send_time = current_time();
+    m_last_ping_send = current_time();
     while (true){
         ClientSocket::State state = m_socket.state();
         if (state == ClientSocket::State::DESTRUCTING || state == ClientSocket::State::NOT_RUNNING){
@@ -131,29 +134,24 @@ void TcpSysbotBase_Connection::thread_loop(){
 
         WallClock now = current_time();
 
-        if (m_last_receive == WallClock::min()){
-            send_time = now;
-            write_data("getVersion\r\n");
-        }else if (send_time < m_last_receive && now - m_last_receive < std::chrono::seconds(1)){
-            std::chrono::microseconds latency = std::chrono::duration_cast<std::chrono::microseconds>(m_last_receive - send_time);
-            std::string str = "Response Time: " + pretty_print(latency.count()) + " ms";
-            if (latency < 10ms){
-                set_status_line1(str, COLOR_BLUE);
-            }else if (latency < 50ms){
-                set_status_line1(str, COLOR_DARKGREEN);
-            }else{
-                set_status_line1(str, COLOR_ORANGE);
-            }
-            send_time = current_time();
-            write_data("getVersion\r\n");
-//            cout << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - send_time) << endl;
-        }else{
-            std::chrono::milliseconds time_since = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_last_receive);
+        std::chrono::milliseconds time_since = std::chrono::duration_cast<std::chrono::milliseconds>(now - m_last_ping_receive);
+        if (time_since > std::chrono::seconds(5)){
             std::string str = "Last Ack: " + pretty_print(time_since.count()) + " seconds ago";
             set_status_line1(str, COLOR_RED);
-            send_time = current_time();
+        }
+
+        m_last_ping_send = current_time();
+        if (supports_command_queue() && NintendoSwitch::ConsoleSettings::instance().ENABLE_SBB3_PINGS){
+            //  If we're more than 60 pings behind, just start clearing them.
+            while (m_active_pings.size() > 60){
+                m_active_pings.erase(m_active_pings.begin());
+            }
+
+            m_active_pings[m_ping_seqnum] = m_last_ping_send;
+            write_data("ping " + std::to_string(m_ping_seqnum) + "\r\n");
+            m_ping_seqnum++;
+        }else{
             write_data("getVersion\r\n");
-//            cout << std::chrono::duration_cast<std::chrono::microseconds>(current_time() - send_time) << endl;
         }
         m_cv.wait_for(lg, std::chrono::seconds(1));
     }
@@ -185,11 +183,6 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
 //    cout << "on_receive_data(): " << std::string((const char*)data, bytes - 2) << endl;
 
     WallClock now = current_time();
-    {
-        std::lock_guard<std::mutex> lg(m_lock);
-        m_last_receive = now;
-    }
-
 
     try{
         const char* ptr = (const char*)data;
@@ -206,7 +199,8 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
                 std::string(
                     m_receive_buffer.begin(),
                     m_receive_buffer.end()
-                )
+                ),
+                now
             );
             m_receive_buffer.clear();
         }
@@ -215,8 +209,10 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
 
     }catch (...){}
 }
-void TcpSysbotBase_Connection::process_message(const std::string& message){
-//    cout << "sys-botbase Response: " << message << endl;
+void TcpSysbotBase_Connection::process_message(const std::string& message, WallClock timestamp){
+    if (GlobalSettings::instance().LOG_EVERYTHING){
+        m_logger.log("Received: " + message, COLOR_DARKGREEN);
+    }
 
     m_listeners.run_method_unique(&Listener::on_message, message);
 
@@ -229,9 +225,57 @@ void TcpSysbotBase_Connection::process_message(const std::string& message){
         set_status_line0("sys-botbase: Version " + str, COLOR_BLUE);
 
         std::lock_guard<std::mutex> lg(m_lock);
+        m_last_ping_receive = timestamp;
+
+        if (m_last_ping_send != WallClock::min()){
+            std::chrono::microseconds latency = std::chrono::duration_cast<std::chrono::microseconds>(timestamp - m_last_ping_send);
+            std::string text = "Response Time: " + pretty_print(latency.count()) + " ms";
+            if (latency < 10ms){
+                set_status_line1(text, COLOR_BLUE);
+            }else if (latency < 50ms){
+                set_status_line1(text, COLOR_DARKGREEN);
+            }else{
+                set_status_line1(text, COLOR_ORANGE);
+            }
+        }
+
         if (!m_thread.joinable()){
             set_mode(str);
         }
+    }
+
+    size_t pos = str.find("ping");
+    if (pos != std::string::npos){
+        const char* ptr = &str[pos + 4];
+        while (true){
+            char ch = ptr[0];
+            if (ch < 32 || ch == ' ' || ch == '\t'){
+                ptr++;
+                continue;
+            }
+            break;
+        }
+        size_t ping_seqnum = atoll(ptr);
+
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_last_ping_receive = timestamp;
+        auto iter = m_active_pings.find(ping_seqnum);
+        if (iter == m_active_pings.end()){
+            m_logger.log("Received Unexpected Ping: " + std::to_string(ping_seqnum));
+            return;
+        }
+
+        std::chrono::microseconds latency = std::chrono::duration_cast<std::chrono::microseconds>(timestamp - iter->second);
+        std::string text = "Response Time: " + pretty_print(latency.count()) + " ms";
+        if (latency < 10ms){
+            set_status_line1(text, COLOR_BLUE);
+        }else if (latency < 50ms){
+            set_status_line1(text, COLOR_DARKGREEN);
+        }else{
+            set_status_line1(text, COLOR_ORANGE);
+        }
+
+        m_active_pings.erase(iter);
     }
 
 }
@@ -239,11 +283,14 @@ void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
     if (sbb_version.rfind("2.", 0) == 0){
         m_logger.log("Detected sbb2. Using old (slow) command set.", COLOR_ORANGE);
         write_data("configure mainLoopSleepTime 0\r\n");
-        m_supports_command_queue = false;
-    }else if (PreloadSettings::instance().DEVELOPER_MODE && sbb_version.rfind("3.", 0) == 0){
+        m_supports_command_queue.store(false, std::memory_order_relaxed);
+    }else if (sbb_version.rfind("3.", 0) == 0){
         m_logger.log("Detected sbb3. Using CC command queue.", COLOR_BLUE);
+        if (NintendoSwitch::ConsoleSettings::instance().ENABLE_SBB3_LOGGING){
+            write_data("configure enableLogs 1\r\n");
+        }
         write_data("configure enablePA 1\r\n");
-        m_supports_command_queue = true;
+        m_supports_command_queue.store(true, std::memory_order_relaxed);
     }else{
         m_logger.log("Unrecognized sbb version: " + sbb_version, COLOR_RED);
         return;

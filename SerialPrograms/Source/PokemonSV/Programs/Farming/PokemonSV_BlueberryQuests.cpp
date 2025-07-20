@@ -27,6 +27,7 @@
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
@@ -664,9 +665,9 @@ void quest_tera_self_defeat(
                 jump_glide_fly(console, context, BBQ_OPTIONS.INVERTED_FLIGHT, 1000, 1600, 300);
             }
 
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
+            ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
+            ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
+            ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
 
             pbf_wait(context, 300);
             context.wait_for_all_requests();
@@ -764,9 +765,9 @@ void quest_sneak_up(
                 pbf_press_button(context, BUTTON_L, 20, 50);
             }
 
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
+            ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
+            ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
+            ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
 
             pbf_wait(context, 300);
             context.wait_for_all_requests();
@@ -884,9 +885,9 @@ void quest_wild_tera(
                 pbf_press_button(context, BUTTON_L, 20, 50);
             }
 
-            ssf_press_button(context, BUTTON_ZR, 0, 200);
-            ssf_press_button(context, BUTTON_ZL, 100, 50);
-            ssf_press_button(context, BUTTON_ZL, 150, 50);
+            ssf_press_button(context, BUTTON_ZR, 0ms, 1600ms);
+            ssf_press_button(context, BUTTON_ZL, 800ms, 400ms);
+            ssf_press_button(context, BUTTON_ZL, 1200ms, 400ms);
 
             pbf_wait(context, 300);
             context.wait_for_all_requests();
@@ -1001,12 +1002,12 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
         case 2:
             stream.log("In wash. Scrubbing.");
 
-            ssf_press_button(context, BUTTON_A, 0, 200, 0);
+            ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
             ssf_press_left_joystick(context, 0, 128, 0, 50);
             ssf_press_left_joystick(context, 255, 128, 50, 100);
             ssf_press_left_joystick(context, 0, 128, 150, 50);
 
-            ssf_press_button(context, BUTTON_A, 0, 200, 0);
+            ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
             ssf_press_left_joystick(context, 128, 0, 0, 50);
             ssf_press_left_joystick(context, 128, 255, 50, 100);
             ssf_press_left_joystick(context, 128, 0, 150, 50);
@@ -1026,12 +1027,12 @@ void quest_wash_pokemon(const ProgramInfo& info, VideoStream& stream, ProControl
                     stream.log("Failed to finish rinse after 1 minute.", COLOR_RED);
                     break;
                 }
-                ssf_press_button(context, BUTTON_A, 0, 200, 0);
+                ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
                 ssf_press_left_joystick(context, 0, 128, 0, 50);
                 ssf_press_left_joystick(context, 255, 128, 50, 100);
                 ssf_press_left_joystick(context, 0, 128, 150, 50);
 
-                ssf_press_button(context, BUTTON_A, 0, 200, 0);
+                ssf_press_button(context, BUTTON_A, 0ms, 1600ms, 0ms);
                 ssf_press_left_joystick(context, 128, 0, 0, 50);
                 ssf_press_left_joystick(context, 128, 255, 50, 100);
                 ssf_press_left_joystick(context, 128, 0, 150, 50);
@@ -1325,8 +1326,17 @@ void quest_auto_battle(
 ){
     stream.log("Quest: Auto Battle 10/30");
 
+
+    OverworldSensors sensors(
+        env.logger(), stream, context
+    );
+
     LetsGoEncounterBotStats stats;
-    LetsGoEncounterBotTracker tracker(env, stream, context, stats, BBQ_OPTIONS.LANGUAGE);
+    LetsGoEncounterBotTracker tracker(
+        env, stream,
+        stats,
+        sensors.lets_go_kill
+    );
 
     uint64_t target_number = 10;
 

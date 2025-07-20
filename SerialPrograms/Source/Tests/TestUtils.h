@@ -98,7 +98,8 @@ public:
     //  Can call from anywhere.
     virtual void reset() override{}
 
-    virtual VideoSnapshot snapshot() override{ return VideoSnapshot(); }
+    virtual VideoSnapshot snapshot_latest_blocking() override{ return VideoSnapshot(); }
+    virtual VideoSnapshot snapshot_recent_nonblocking(WallClock min_time) override{ return VideoSnapshot(); }
 
     virtual double fps_source() const override{ return 0; }
     virtual double fps_display() const override{ return 0; }

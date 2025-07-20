@@ -52,7 +52,7 @@ class JoyconController : public AbstractController{
 public:
     using ContextType = JoyconContext;
 
-    JoyconController(ControllerType controller_type);
+    JoyconController(Logger& logger, ControllerType controller_type);
     virtual ~JoyconController();
 
     //  Must call before destruction begins.

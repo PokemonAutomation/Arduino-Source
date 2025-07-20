@@ -143,6 +143,7 @@ extern "C" {
 
 #define PABB_BAUD_RATE                  115200
 #define PABB_PROTOCOL_OVERHEAD          (2 + sizeof(uint32_t))
+#define PABB_PROTOCOL_MAX_PACKET_SIZE   64
 
 //  Must be a power-of-two.
 #define PABB_DEVICE_MINIMUM_QUEUE_SIZE  4

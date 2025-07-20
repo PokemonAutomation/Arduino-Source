@@ -43,7 +43,7 @@ public:
 
 class KeyboardInputController{
 public:
-    KeyboardInputController(bool enabled);
+    KeyboardInputController(Logger& logger, bool enabled);
     virtual ~KeyboardInputController();
 
 
@@ -69,6 +69,8 @@ private:
 
 
 private:
+    Logger& m_logger;
+
     //  Controller State
     SpinLock m_state_lock;
     KeyboardStateTracker m_state_tracker;
@@ -86,8 +88,8 @@ private:
 template <typename StateType, typename DeltaType>
 class KeyboardManager : public KeyboardInputController{
 public:
-    KeyboardManager(AbstractController& controller)
-        : KeyboardInputController(true)
+    KeyboardManager(Logger& logger, AbstractController& controller)
+        : KeyboardInputController(logger, true)
         , m_controller(&controller)
     {}
     void stop() noexcept{

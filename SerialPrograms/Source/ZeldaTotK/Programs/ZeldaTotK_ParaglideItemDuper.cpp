@@ -122,8 +122,8 @@ void ParaglideItemDuper::program(SingleSwitchProgramEnvironment& env, ProControl
         pbf_press_button(context, BUTTON_A, 20, 20);
 
         //Now press Y (sort) and B (exit) at the same time
-        ssf_press_button(context, BUTTON_B, 0, 10);
-        pbf_press_button(context, BUTTON_Y, 10, 40);
+        ssf_press_button(context, BUTTON_B, 0ms, 80ms);
+        pbf_press_button(context, BUTTON_Y, 80ms, 320ms);
 
         //Close paraglider and drop to the ground
         pbf_press_button(context, BUTTON_B, 20, 50);

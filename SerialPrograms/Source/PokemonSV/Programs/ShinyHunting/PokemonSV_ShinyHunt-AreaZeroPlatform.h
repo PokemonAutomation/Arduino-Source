@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_ShinyHuntAreaZeroPlatform_H
 #define PokemonAutomation_PokemonSV_ShinyHuntAreaZeroPlatform_H
 
-#include <functional>
+//#include <functional>
 //#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 //#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
@@ -18,6 +18,8 @@
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonSV/Options/PokemonSV_EncounterBotCommon.h"
 #include "PokemonSV/Options/PokemonSV_SandwichMakerOption.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h"
+#include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
 #include "PokemonSV_AreaZeroPlatform.h"
 
 namespace PokemonAutomation{
@@ -66,8 +68,12 @@ private:
 //    };
 
     void set_flags(SingleSwitchProgramEnvironment& env);
-    void run_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void set_flags_and_run_state(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void run_state(
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context
+    );
+    void set_flags_and_run_state(
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context
+    );
 
     //  Returns true on success.
     bool run_traversal(ProControllerContext& context);
@@ -107,7 +113,8 @@ private:
 
     SingleSwitchProgramEnvironment* m_env;
 
-    LetsGoHpWatcher* m_hp_watcher;
+    OverworldSensors* m_sensors;
+//    LetsGoHpWatcher* m_hp_watcher;
     DiscontiguousTimeTracker* m_time_tracker;
     LetsGoEncounterBotTracker* m_encounter_tracker;
 

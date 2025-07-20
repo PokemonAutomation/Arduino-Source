@@ -318,10 +318,10 @@ void MultiLanguageJoinTracker::dump(const std::string& filename) const{
 
 
 TeraLobbyJoinWatcher2::TeraLobbyJoinWatcher2(
-    Logger& logger, AsyncDispatcher& dispatcher, Color color,
+    Logger& logger, Color color,
     uint8_t host_players
 )
-    : TeraLobbyReader(logger, dispatcher, color)
+    : TeraLobbyReader(logger, color)
     , VisualInferenceCallback("TeraLobbyJoinWatcher2")
     , m_host_players(host_players)
 {}
@@ -346,13 +346,13 @@ bool TeraLobbyJoinWatcher2::process_frame(const ImageViewRGB32& frame, WallClock
 
 
 TeraLobbyNameWatcher::TeraLobbyNameWatcher(
-    Logger& logger, AsyncDispatcher& dispatcher,
+    Logger& logger,
     Color color,
     RaidJoinReportOption& report_settings,
     RaidPlayerBanList& ban_settings,
     uint8_t host_players
 )
-    : TeraLobbyReader(logger, dispatcher, color)
+    : TeraLobbyReader(logger, color)
     , VisualInferenceCallback("TeraLobbyNameWatcher")
     , m_logger(logger)
     , m_report_settings(report_settings)

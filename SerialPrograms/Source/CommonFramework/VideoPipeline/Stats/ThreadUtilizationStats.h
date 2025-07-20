@@ -7,12 +7,17 @@
 #ifndef PokemonAutomation_ThreadUtilizationStats_H
 #define PokemonAutomation_ThreadUtilizationStats_H
 
+#include <mutex>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/EventRateTracker.h"
-#include "CommonFramework/Environment/Environment.h"
+#include "Common/Cpp/CpuUtilization/CpuUtilization.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayTypes.h"
 
 namespace PokemonAutomation{
+
+
+class ComputationThreadPool;
+
 
 
 class ThreadUtilizationStat : public OverlayStat{
@@ -26,11 +31,30 @@ private:
     std::string m_label;
 
     std::mutex m_lock;
-    WallClock::duration m_last_clock;
+    WallDuration m_last_clock;
     UtilizationTracker m_tracker;
 
     OverlayStatUtilizationPrinter m_printer;
 };
+
+
+class ThreadPoolUtilizationStat : public OverlayStat{
+public:
+    ThreadPoolUtilizationStat(const ComputationThreadPool& thread_pool, std::string label);
+
+    virtual OverlayStatSnapshot get_current() override;
+
+private:
+    const ComputationThreadPool& m_thread_pool;
+    std::string m_label;
+
+    std::mutex m_lock;
+    WallDuration m_last_clock;
+    UtilizationTracker m_tracker;
+
+    OverlayStatUtilizationPrinter m_printer;
+};
+
 
 
 

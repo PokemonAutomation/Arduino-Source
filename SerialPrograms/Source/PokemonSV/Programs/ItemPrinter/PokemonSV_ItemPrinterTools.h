@@ -14,7 +14,6 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
-    class AsyncDispatcher;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -33,12 +32,10 @@ struct ItemPrinterPrizeResult{
 
 
 void item_printer_start_print(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context,
     Language language, ItemPrinterJobs jobs
 );
 ItemPrinterPrizeResult item_printer_finish_print(
-    AsyncDispatcher& dispatcher,
     VideoStream& stream, ProControllerContext& context,
     Language language
 );

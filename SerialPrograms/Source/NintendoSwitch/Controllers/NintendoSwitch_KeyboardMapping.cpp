@@ -196,6 +196,10 @@ std::vector<std::unique_ptr<EditableTableRow>> ProControllerKeyboardMappingTable
     ret.emplace_back(make_mapping("ZR",             Qt::Key::Key_Backslash,     ProControllerDeltas{.buttons = BUTTON_ZR}));
     ret.emplace_back(make_mapping("ZR",             Qt::Key::Key_Bar,           ProControllerDeltas{.buttons = BUTTON_ZR}));
 
+    ret.emplace_back(make_mapping("GL (Switch 2)",  Qt::Key::Key_V,             ProControllerDeltas{.buttons = BUTTON_GL}));
+    ret.emplace_back(make_mapping("GR (Switch 2)",  Qt::Key::Key_Period,        ProControllerDeltas{.buttons = BUTTON_GR}));
+    ret.emplace_back(make_mapping("GR (Switch 2)",  Qt::Key::Key_Greater,       ProControllerDeltas{.buttons = BUTTON_GR}));
+
     ret.emplace_back(make_mapping("-",              Qt::Key::Key_Minus,         ProControllerDeltas{.buttons = BUTTON_MINUS}));
     ret.emplace_back(make_mapping("-",              Qt::Key::Key_Underscore,    ProControllerDeltas{.buttons = BUTTON_MINUS}));
     ret.emplace_back(make_mapping("+",              Qt::Key::Key_Plus,          ProControllerDeltas{.buttons = BUTTON_PLUS}));
@@ -466,14 +470,14 @@ KeyboardMappingOption::KeyboardMappingOption()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
-    , LEFT_JOYCON(true)
-    , RIGHT_JOYCON(false)
+    , LEFT_JOYCON0(true)
+    , RIGHT_JOYCON0(false)
 {
     PA_ADD_STATIC(DESCRIPTION);
     PA_ADD_OPTION(ADVANCED_MODE);
-    PA_ADD_OPTION(PRO_CONTROLLER);
-    PA_ADD_OPTION(LEFT_JOYCON);
-    PA_ADD_OPTION(RIGHT_JOYCON);
+    PA_ADD_OPTION(PRO_CONTROLLER0);
+    PA_ADD_OPTION(LEFT_JOYCON0);
+    PA_ADD_OPTION(RIGHT_JOYCON0);
     ADVANCED_MODE.add_listener(*this);
 }
 
@@ -483,9 +487,9 @@ void KeyboardMappingOption::load_json(const JsonValue& json){
     KeyboardMappingOption::on_config_value_changed(this);
 }
 void KeyboardMappingOption::on_config_value_changed(void* object){
-    PRO_CONTROLLER.set_advanced_mode(ADVANCED_MODE);
-    LEFT_JOYCON.set_advanced_mode(ADVANCED_MODE);
-    RIGHT_JOYCON.set_advanced_mode(ADVANCED_MODE);
+    PRO_CONTROLLER0.set_advanced_mode(ADVANCED_MODE);
+    LEFT_JOYCON0.set_advanced_mode(ADVANCED_MODE);
+    RIGHT_JOYCON0.set_advanced_mode(ADVANCED_MODE);
 }
 
 

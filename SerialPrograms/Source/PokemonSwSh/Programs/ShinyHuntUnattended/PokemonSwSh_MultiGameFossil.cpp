@@ -135,8 +135,8 @@ void run_fossil_batch(
 
     //  Save game.
     ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
-    ssf_press_button(context, BUTTON_R, 150, 20);
-    ssf_press_button(context, BUTTON_A, 500, 10);
+    ssf_press_button(context, BUTTON_R, 1200ms, 160ms);
+    ssf_press_button(context, BUTTON_A, 4000ms, 80ms);
 
     //  Exit game.
     ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);

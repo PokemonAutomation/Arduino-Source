@@ -116,7 +116,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<SurpriseTrade_Descriptor, SurpriseTrade>());
     ret.emplace_back(make_single_switch_program<TradeBot_Descriptor, TradeBot>());
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
-    ret.emplace_back(make_single_switch_program<BallThrower_Descriptor, BallThrower>());
     ret.emplace_back(make_single_switch_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>());
     ret.emplace_back(make_single_switch_program<DexRecFinder_Descriptor, DexRecFinder>());
     ret.emplace_back(make_single_switch_program<BoxReorderNationalDex_Descriptor, BoxReorderNationalDex>());
@@ -191,6 +190,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_multi_switch_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>());
 
     ret.emplace_back("---- Deprecated Programs ----");
+    ret.emplace_back(make_single_switch_program<BallThrower_Descriptor, BallThrower>());
     ret.emplace_back(make_single_switch_program<BeamReset_Descriptor, BeamReset>());
     ret.emplace_back(make_single_switch_program<EggCombined2_Descriptor, EggCombined2>());
     ret.emplace_back(make_single_switch_program<EggSuperCombined2_Descriptor, EggSuperCombined2>());
