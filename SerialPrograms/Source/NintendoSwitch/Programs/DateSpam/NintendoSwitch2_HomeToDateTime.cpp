@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/RecursiveThrottler.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -81,6 +82,11 @@ ConsoleType settings_detect_console_type(
 void home_to_settings_Switch2_procon_blind(
     ProControllerContext& context
 ){
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("NintendoSwitch::home_to_settings_Switch2_procon_blind()");
+    }
+
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 
@@ -115,6 +121,11 @@ void home_to_settings_Switch2_procon_blind(
 void home_to_settings_Switch2_joycon_blind(
     JoyconContext& context
 ){
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("NintendoSwitch::home_to_settings_Switch2_joycon_blind()");
+    }
+
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 
@@ -151,6 +162,11 @@ void settings_to_date_time_Switch2_all_blind(
     Logger& logger, ControllerContext& context,
     ConsoleType console_type, bool to_date_change
 ){
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("NintendoSwitch::settings_to_date_time_Switch2_all_blind()");
+    }
+
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
 

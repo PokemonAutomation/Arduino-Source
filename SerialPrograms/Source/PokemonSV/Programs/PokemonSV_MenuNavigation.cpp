@@ -2,6 +2,7 @@
  *
  */
 
+#include "Common/Cpp/RecursiveThrottler.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -10,6 +11,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
+//#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
+//#include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_NeutralDateSkip.h"
 #include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
@@ -50,7 +53,10 @@ void set_time_to_12am_from_home(const ProgramInfo& info, ConsoleHandle& console,
 }
 
 void neutral_day_skip_switch1(ConsoleHandle& console, ProControllerContext& context){
-    console.log("PokemonSV::neutral_day_skip_switch1()");
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("PokemonSV::neutral_day_skip_switch1()");
+    }
 
     Milliseconds tv = context->timing_variation();
     if (tv == 0ms){
@@ -88,7 +94,10 @@ void neutral_day_skip_switch1(ConsoleHandle& console, ProControllerContext& cont
     }
 }
 void neutral_day_skip_switch2(ConsoleHandle& console, ProControllerContext& context){
-    console.log("PokemonSV::neutral_day_skip_switch2()");
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("PokemonSV::neutral_day_skip_switch2()");
+    }
 
     ssf_press_button(context, BUTTON_A, 216ms, 80ms);
     ssf_issue_scroll_ptv(context, SSF_SCROLL_RIGHT);
@@ -109,6 +118,13 @@ void day_skip_from_overworld(ConsoleHandle& console, ProControllerContext& conte
         neutral_day_skip_switch1(console, context);
     }else if (is_switch2(console_type)){
         neutral_day_skip_switch2(console, context);
+
+#if 0
+        for (int c = 0; c < 10; c++){
+            NintendoSwitch::roll_date_forward_1(console, context, true);
+//            NintendoSwitch::neutral_date_skip(console, context);
+        }
+#endif
     }else{
         throw UserSetupError(
             console,

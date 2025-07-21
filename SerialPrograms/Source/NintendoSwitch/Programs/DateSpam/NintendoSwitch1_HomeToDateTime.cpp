@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/RecursiveThrottler.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -23,7 +24,10 @@ namespace NintendoSwitch{
 void home_to_date_time_Switch1_wired_blind(
     Logger& logger, ProControllerContext& context, bool to_date_change
 ){
-    logger.log("home_to_date_time_Switch1_wired_blind()");
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("NintendoSwitch::home_to_date_time_Switch1_wired_blind()");
+    }
 
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
     ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
@@ -93,7 +97,10 @@ void home_to_date_time_Switch1_wired_blind(
 void home_to_date_time_Switch1_wireless_esp32_blind(
     Logger& logger, ProControllerContext& context, bool to_date_change
 ){
-    logger.log("home_to_date_time_Switch1_wireless_esp32_blind()");
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("NintendoSwitch::home_to_date_time_Switch1_wireless_esp32_blind()");
+    }
 
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 24ms + tv;
@@ -167,7 +174,10 @@ void home_to_date_time_Switch1_wireless_esp32_blind(
 void home_to_date_time_Switch1_sbb_blind(
     Logger& logger, ProControllerContext& context, bool to_date_change
 ){
-    logger.log("home_to_date_time_Switch1_sbb_blind()");
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("NintendoSwitch::home_to_date_time_Switch1_sbb_blind()");
+    }
 
     Milliseconds tv = context->timing_variation();
 //        ssf_do_nothing(context, 1500ms);
@@ -213,34 +223,41 @@ void home_to_date_time_Switch1_wired_feedback(
 
     size_t max_attempts = 5;
     for (size_t i = 0; i < max_attempts; i++){
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
-        ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
-
-        //  Down twice in case we drop one.
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 32ms);
-
-        // if (i > 0){  // intentionally create a failure, for testing
-        ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 40ms, 24ms);
-        // }
-
-
-        // ImageFloatBox system_icon(0.685, 0.69, 0.05, 0.03);
-        // ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
-        // ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
-
-        //  Two A presses in case we drop the 1st one.
-        //  the program can self recover even if the second button press is registered.
-        ssf_press_button(context, BUTTON_A, 24ms, 40ms, 24ms);
-        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
-
-        //  Just button mash it. lol
         {
-            auto iterations = Milliseconds(1200) / 24ms + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-            }while (--iterations);
+            ThrottleScope scope(context->logging_throttler());
+            if (scope){
+                context->logger().log("NintendoSwitch::home_to_date_time_Switch1_wired_feedback() - Part 1/3");
+            }
+
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+            ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 32ms);
+
+            //  Down twice in case we drop one.
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 32ms);
+
+            // if (i > 0){  // intentionally create a failure, for testing
+            ssf_issue_scroll(context, SSF_SCROLL_LEFT, 0ms, 40ms, 24ms);
+            // }
+
+
+            // ImageFloatBox system_icon(0.685, 0.69, 0.05, 0.03);
+            // ImageFloatBox other_setting1(0.615, 0.69, 0.05, 0.03);
+            // ImageFloatBox other_setting2(0.545, 0.69, 0.05, 0.03);
+
+            //  Two A presses in case we drop the 1st one.
+            //  the program can self recover even if the second button press is registered.
+            ssf_press_button(context, BUTTON_A, 24ms, 40ms, 24ms);
+            ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+
+            //  Just button mash it. lol
+            {
+                auto iterations = Milliseconds(1200) / 24ms + 1;
+                do{
+                    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+                }while (--iterations);
+            }
         }
 
         context.wait_for_all_requests();
@@ -263,26 +280,33 @@ void home_to_date_time_Switch1_wired_feedback(
             continue;
         }
 
-
         {
-            auto iterations = Milliseconds(312) / 24ms + 1;
-            do{
-                ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
-            }while (--iterations);
+            ThrottleScope scope(context->logging_throttler());
+            if (scope){
+                context->logger().log("NintendoSwitch::home_to_date_time_Switch1_wired_feedback() - Part 2/3");
+            }
+
+            {
+                auto iterations = Milliseconds(312) / 24ms + 1;
+                do{
+                    ssf_issue_scroll(context, SSF_SCROLL_RIGHT, 24ms);
+                }while (--iterations);
+            }
+
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 40ms, 24ms);
+            ssf_press_dpad(context, DPAD_DOWN, 360ms, 320ms);
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+            // if (i > 1){  // intentionally create a failure, for testing
+            ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+            // }
+
+            // only one ButtonA press since the program can self-recover if the button is dropped.
+            // furthermore, the program can't self-recover if a second button press is registered.
+            ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
         }
 
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 80ms, 40ms, 24ms);
-        ssf_press_dpad(context, DPAD_DOWN, 360ms, 320ms);
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-        // if (i > 1){  // intentionally create a failure, for testing
-        ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
-        // }
-
-        // only one ButtonA press since the program can self-recover if the button is dropped.
-        // furthermore, the program can't self-recover if a second button press is registered.
-        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
 
         context.wait_for_all_requests();
         context.wait_for(Milliseconds(300));
@@ -305,6 +329,12 @@ void home_to_date_time_Switch1_wired_feedback(
         if (!to_date_change){
             return;
         }
+
+        ThrottleScope scope(context->logging_throttler());
+        if (scope){
+            context->logger().log("NintendoSwitch::home_to_date_time_Switch1_wired_feedback() - Part 3/3");
+        }
+
 
         {
             auto iterations = Milliseconds(250) / 24ms + 1;
@@ -334,6 +364,11 @@ void home_to_date_time_Switch1_wired_feedback(
 
 
 void home_to_date_time_Switch1_joycon_blind(JoyconContext& context, bool to_date_change){
+    ThrottleScope scope(context->logging_throttler());
+    if (scope){
+        context->logger().log("NintendoSwitch::home_to_date_time_Switch1_joycon_blind()");
+    }
+
     Milliseconds tv = context->timing_variation();
     Milliseconds unit = 100ms + tv;
 
