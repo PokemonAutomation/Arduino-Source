@@ -158,7 +158,6 @@ void settings_to_date_time_Switch2_all_blind(
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
     ssf_issue_scroll(context, SSF_SCROLL_DOWN, 192ms, 2*unit, unit);
 
-
     switch (console_type){
     case ConsoleType::Switch2_FW19_International:
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 128ms, 2*unit, unit);
@@ -184,7 +183,6 @@ void settings_to_date_time_Switch2_all_blind(
             "You need to specify a specific Switch 2 model."
         );
     }
-
 
     if (!to_date_change){
         //  Triple up this A press to make sure it gets through.
