@@ -122,12 +122,23 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     bool first = true;
     uint32_t skip_counter = 0;
 
+    //  Keep track of when we last reset.
+    //  Day skips too soon out of a reset may fail.
+    WallClock last_reset = WallClock::min();
+
     while (true){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         if (!first){
             day_skip_from_overworld(env.console, context);
+
+            //  Do it again if we're fresh out of a reset.
+            while (last_reset + std::chrono::seconds(20) > current_time()){
+                env.log("Fresh out of a reset. Skipping again.");
+                day_skip_from_overworld(env.console, context);
+            }
+
             pbf_wait(context, GameSettings::instance().RAID_SPAWN_DELAY0);
             context.wait_for_all_requests();
             stats.m_skips++;
@@ -141,6 +152,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             env.log("Resetting game to clear framerate.");
             save_game_from_overworld(env.program_info(), env.console, context);
             reset_game(env.program_info(), env.console, context);
+            last_reset = current_time();
             skip_counter = 0;
             stats.m_resets++;
         }
