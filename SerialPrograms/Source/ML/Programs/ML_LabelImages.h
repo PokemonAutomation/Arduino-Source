@@ -20,6 +20,7 @@
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ML/UI/ML_ImageAnnotationDisplayOption.h"
@@ -96,9 +97,11 @@ public:
     // This can be very slow!
     void compute_embeddings_for_folder(const std::string& image_folder);
 
+    // Delete the last object annotation.
+    void delete_last_annotation();
+
 private:
     friend class LabelImages_Widget;
-    friend class DrawnBoundingBox;
 
     // image display options like what image file is loaded
     ImageAnnotationDisplayOption m_display_option;
@@ -132,28 +135,11 @@ private:
 };
 
 
-class DrawnBoundingBox : public ConfigOption::Listener, public VideoOverlay::MouseListener{
-public:
-    ~DrawnBoundingBox();
-    DrawnBoundingBox(LabelImages_Widget& widget, VideoOverlay& overlay);
-    virtual void on_config_value_changed(void* object) override;
-    virtual void on_mouse_press(double x, double y) override;
-    virtual void on_mouse_release(double x, double y) override;
-    virtual void on_mouse_move(double x, double y) override;
-
-private:
-    void detach();
-
-private:
-    LabelImages_Widget& m_widget;
-    VideoOverlay& m_overlay;
-    std::mutex m_lock;
-
-    std::optional<std::pair<double, double>> m_mouse_start;
-};
-
-
-class LabelImages_Widget : public PanelWidget, public ConfigOption::Listener, public VideoSession::StateListener{
+class LabelImages_Widget : public PanelWidget,
+                           public ConfigOption::Listener,
+                           public VideoSession::StateListener,
+                           public CommandReceiver,
+                           public VideoOverlay::MouseListener{
 public:
     ~LabelImages_Widget();
     LabelImages_Widget(
@@ -165,10 +151,27 @@ public:
     // called after loading a new image, clean up all internal data 
     void clear_for_new_image();
 
+    //  Overwrites ConfigOption::Listener::on_config_value_changed().
     virtual void on_config_value_changed(void* object) override;
 
     //  Overwrites VideoSession::StateListener::post_startup().
     virtual void post_startup(VideoSource* source) override;
+
+    //  Overwrites CommandReceiver::key_press().
+    virtual void key_press(QKeyEvent* event) override {}
+    //  Overwrites CommandReceiver::key_release().
+    virtual void key_release(QKeyEvent* event) override;
+    //  Overwrites CommandReceiver::focus_in().
+    virtual void focus_in(QFocusEvent* event) override {}
+    //  Overwrites CommandReceiver::focus_out().
+    virtual void focus_out(QFocusEvent* event) override {}
+
+    //  Overwrites VideoOverlay::MouseListener::on_mouse_press().
+    virtual void on_mouse_press(double x, double y) override;
+    //  Overwrites VideoOverlay::MouseListener::on_mouse_release().
+    virtual void on_mouse_release(double x, double y) override;
+    //  Overwrites VideoOverlay::MouseListener::on_mouse_move().
+    virtual void on_mouse_move(double x, double y) override;
 
 private:
     LabelImages& m_program;
@@ -177,12 +180,15 @@ private:
     ImageAnnotationDisplayWidget* m_image_display_widget;
 
     VideoOverlaySet m_overlay_set;
-    DrawnBoundingBox m_drawn_box;
     
+    // show the info about the loaded image embedding data corresponding to the currently
+    // displayed image
     QLabel* m_embedding_info_label = nullptr;
+    // a UI widget that holds all the editable UI elements defined in LabelImage program.
     ConfigWidget* m_option_widget;
 
-    friend class DrawnBoundingBox;
+    std::optional<std::pair<double, double>> m_mouse_start;
+    std::optional<std::pair<double, double>> m_mouse_end;
 };
 
 

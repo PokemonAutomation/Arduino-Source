@@ -20,6 +20,7 @@
 #include <fstream>
 #include <filesystem>
 #include <cmath>
+#include <iomanip>
 #include "CommonFramework/Globals.h"
 #include "Common/Cpp/BitmapConversion.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -107,79 +108,6 @@ JsonObject object_annotation_to_json(const ObjectAnnotation& object_annotation){
     return json_obj;
 }
 
-
-DrawnBoundingBox::DrawnBoundingBox(LabelImages_Widget& widget, VideoOverlay& overlay)
-    : m_widget(widget)
-    , m_overlay(overlay)
-{
-    auto& program = m_widget.m_program;
-    program.X.add_listener(*this);
-    program.Y.add_listener(*this);
-    program.WIDTH.add_listener(*this);
-    program.HEIGHT.add_listener(*this);
-    overlay.add_listener(*this);
-}
-
-DrawnBoundingBox::~DrawnBoundingBox(){
-    detach();
-}
-
-// called when drawn bounding box changed
-void DrawnBoundingBox::on_config_value_changed(void* object){
-    auto& program = m_widget.m_program;
-    std::lock_guard<std::mutex> lg(m_lock);
-    program.update_rendered_objects(m_widget.m_overlay_set);
-}
-void DrawnBoundingBox::on_mouse_press(double x, double y){
-    auto& program = m_widget.m_program;
-    program.WIDTH.set(0);
-    program.HEIGHT.set(0);
-    program.X.set(x);
-    program.Y.set(y);
-    m_mouse_start.emplace();
-    m_mouse_start->first = x;
-    m_mouse_start->second = y;
-}
-void DrawnBoundingBox::on_mouse_release(double, double){
-    m_mouse_start.reset();
-    auto& m_program = m_widget.m_program;
-    auto& m_overlay_set = m_widget.m_overlay_set;
-
-    m_program.compute_mask(m_overlay_set);
-}
-
-void DrawnBoundingBox::on_mouse_move(double x, double y){
-    auto& program = m_widget.m_program;
-    if (!m_mouse_start){
-        return;
-    }
-
-    double xl = m_mouse_start->first;
-    double xh = x;
-    double yl = m_mouse_start->second;
-    double yh = y;
-
-    if (xl > xh){
-        std::swap(xl, xh);
-    }
-    if (yl > yh){
-        std::swap(yl, yh);
-    }
-
-    program.X.set(xl);
-    program.Y.set(yl);
-    program.WIDTH.set(xh - xl);
-    program.HEIGHT.set(yh - yl);
-}
-
-void DrawnBoundingBox::detach(){
-    auto& program = m_widget.m_program;
-    m_overlay.remove_listener(*this);
-    program.X.remove_listener(*this);
-    program.Y.remove_listener(*this);
-    program.WIDTH.remove_listener(*this);
-    program.HEIGHT.remove_listener(*this);
-}
 
 
 LabelImages_Descriptor::LabelImages_Descriptor()
@@ -444,10 +372,26 @@ void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_
     ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path);
 }
 
+void LabelImages::delete_last_annotation(){
+    if (m_annotations.size() > 0){
+        m_annotations.pop_back();
+    }
+    if (m_annotations.size() > 0){
+        m_last_object_idx = m_annotations.size() - 1;
+    }
+}
 
 
 LabelImages_Widget::~LabelImages_Widget(){
+    m_program.X.remove_listener(*this);
+    m_program.Y.remove_listener(*this);
+    m_program.WIDTH.remove_listener(*this);
+    m_program.HEIGHT.remove_listener(*this);
     m_program.FORM_LABEL.remove_listener(*this);
+
+    m_display_session.overlay().remove_listener(*this);
+    m_display_session.video_session().remove_state_listener(*this);
+
     delete m_image_display_widget;
 }
 LabelImages_Widget::LabelImages_Widget(
@@ -459,9 +403,14 @@ LabelImages_Widget::LabelImages_Widget(
     , m_program(program)
     , m_display_session(m_program.m_display_session)
     , m_overlay_set(m_display_session.overlay())
-    , m_drawn_box(*this, m_display_session.overlay())
 {
+    m_program.X.add_listener(*this);
+    m_program.Y.add_listener(*this);
+    m_program.WIDTH.add_listener(*this);
+    m_program.HEIGHT.add_listener(*this);
     m_program.FORM_LABEL.add_listener(*this);
+
+    m_display_session.overlay().add_listener(*this);
     m_display_session.video_session().add_state_listener(*this);
 
     m_embedding_info_label = new QLabel(this);
@@ -479,7 +428,7 @@ LabelImages_Widget::LabelImages_Widget(
     QVBoxLayout* scroll_layout = new QVBoxLayout(scroll_inner);
     scroll_layout->setAlignment(Qt::AlignTop);
 
-    m_image_display_widget = new ImageAnnotationDisplayWidget(*this, m_display_session, 0);
+    m_image_display_widget = new ImageAnnotationDisplayWidget(*this, m_display_session, this);
     scroll_layout->addWidget(m_image_display_widget);
 
     QHBoxLayout* embedding_info_row = new QHBoxLayout();
@@ -491,12 +440,7 @@ LabelImages_Widget::LabelImages_Widget(
     scroll_layout->addWidget(button);
     connect(button, &QPushButton::clicked, this, [this](bool){
         auto& program = this->m_program;
-        if (program.m_annotations.size() > 0){
-            program.m_annotations.pop_back();
-        }
-        if (program.m_annotations.size() > 0){
-            program.m_last_object_idx = program.m_annotations.size() - 1;
-        }
+        program.delete_last_annotation();
         program.update_rendered_objects(this->m_overlay_set);
     });
 
@@ -527,8 +471,8 @@ void LabelImages_Widget::on_config_value_changed(void* object){
     if (m_program.m_annotations.size() > 0 && m_program.m_last_object_idx < m_program.m_annotations.size()){
         std::string& cur_label = m_program.m_annotations[m_program.m_last_object_idx].label;
         cur_label = m_program.FORM_LABEL.slug();
-        m_program.update_rendered_objects(m_overlay_set);
     }
+    m_program.update_rendered_objects(m_overlay_set);
 }
 
 // This callback function will be called whenever the display source (the image source) is loaded or reloaded:
@@ -565,7 +509,56 @@ void LabelImages_Widget::post_startup(VideoSource* source){
     m_program.update_rendered_objects(m_overlay_set);
 }
 
+void LabelImages_Widget::key_release(QKeyEvent* event){
+    const auto key = Qt::Key(event->key());
+    if (key == Qt::Key::Key_Delete || key == Qt::Key::Key_Backspace){
+        m_program.delete_last_annotation();
+        m_program.update_rendered_objects(m_overlay_set);
+    }
+}
 
+void LabelImages_Widget::on_mouse_press(double x, double y){
+    m_program.WIDTH.set(0);
+    m_program.HEIGHT.set(0);
+    m_program.X.set(x);
+    m_program.Y.set(y);
+    m_mouse_start.emplace();
+    m_mouse_end.emplace();
+    m_mouse_start->first = m_mouse_end->first = x;
+    m_mouse_start->second = m_mouse_end->second = y;
+}
+
+void LabelImages_Widget::on_mouse_release(double x, double y){
+    m_mouse_start.reset();
+    m_mouse_end.reset();
+    m_program.compute_mask(m_overlay_set);
+}
+
+void LabelImages_Widget::on_mouse_move(double x, double y){
+    if (!m_mouse_start){
+        return;
+    }
+
+    m_mouse_end->first = x;
+    m_mouse_end->second = y;
+
+    double xl = m_mouse_start->first;
+    double yl = m_mouse_start->second;
+    double xh = x;
+    double yh = y;
+
+    if (xl > xh){
+        std::swap(xl, xh);
+    }
+    if (yl > yh){
+        std::swap(yl, yh);
+    }
+
+    m_program.X.set(xl);
+    m_program.Y.set(yl);
+    m_program.WIDTH.set(xh - xl);
+    m_program.HEIGHT.set(yh - yl);
+}
 
 }
 }
