@@ -184,7 +184,7 @@ void TeraRoller::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         env.console.overlay().add_log("Entering tera raid...", COLOR_WHITE);
 
         // Run away from the tera raid battle
-        run_from_tera_battle(env.program_info(), env.console, context);
+        run_from_tera_battle(env, env.console, context, &stats.m_errors);
         context.wait_for_all_requests();
 
         env.console.log("Checking if tera raid is shiny...");

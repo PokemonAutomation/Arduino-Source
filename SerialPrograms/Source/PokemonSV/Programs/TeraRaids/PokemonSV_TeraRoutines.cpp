@@ -670,7 +670,12 @@ TeraResult run_tera_summary(
 }
 
 
-void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+void run_from_tera_battle(
+    ProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::atomic<uint64_t>* stat_errors
+){
     stream.log("Running away from tera raid battle...");
 
     WallClock start = current_time();
@@ -688,9 +693,10 @@ void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProContr
         GradientArrowWatcher leave_confirm(
             COLOR_RED,
             GradientArrowType::RIGHT,
-            {0.557621, 0.471074, 0.388476, 0.247934}
+            {0.557621, 0.471074, 0.25, 0.247934}
         );
         OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
+        TeraCardWatcher tera_card(COLOR_BLUE);
         context.wait_for_all_requests();
 
         int ret = wait_until(
@@ -700,6 +706,7 @@ void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProContr
                 battle_menu,
                 leave_confirm,
                 overworld,
+                tera_card,
             }
         );
 
@@ -718,7 +725,19 @@ void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProContr
         case 2:
             stream.log("Detected overworld.");
             return;
+        case 3:
+            stream.log("Detected a raid. (unexpected)", COLOR_RED);
+            if (stat_errors){
+                (*stat_errors)++;
+                env.update_stats();
+            }
+            pbf_press_button(context, BUTTON_B, 160ms, 80ms);
+            continue;
         default:
+            if (stat_errors){
+                (*stat_errors)++;
+                env.update_stats();
+            }
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "run_from_tera_battle(): No recognized state after 1 minutes.",

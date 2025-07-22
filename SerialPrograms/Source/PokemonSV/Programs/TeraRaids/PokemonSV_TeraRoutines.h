@@ -112,7 +112,12 @@ TeraResult run_tera_summary(
 );
 
 //  Run away from tera battle.
-void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+void run_from_tera_battle(
+    ProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::atomic<uint64_t>* stat_errors
+);
 
 bool is_sparkling_raid(VideoStream& stream, ProControllerContext& context);
 

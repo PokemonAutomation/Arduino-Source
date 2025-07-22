@@ -37,6 +37,7 @@ const ImageMatch::ExactImageMatcher& GRADIENT_ARROW_VERTICAL(){
 
 bool is_gradient_arrow(
     GradientArrowType type,
+    const ImageViewRGB32& original_screen,
     const ImageViewRGB32& image,
     WaterfillObject& object,
     const WaterfillObject& yellow, const WaterfillObject& blue
@@ -44,7 +45,9 @@ bool is_gradient_arrow(
     object = yellow;
     object.merge_assume_no_overlap(blue);
 
-    if (object.width() < 20){
+    size_t object_box_area = object.width() * object.height();
+    double min_area = original_screen.total_pixels() * (2000. / (1920*1080));
+    if (object_box_area < min_area){
         return false;
     }
 
@@ -66,6 +69,9 @@ bool is_gradient_arrow(
         }
         double rmsd = GRADIENT_ARROW_HORIZONTAL().rmsd(cropped);
 //        cout << "rmsd = " << rmsd << endl;
+//        if (rmsd <= THRESHOLD){
+//            cout << "object_box_area = " << object_box_area << endl;
+//        }
         return rmsd <= THRESHOLD;
     }
     case GradientArrowType::DOWN:{
@@ -223,7 +229,7 @@ bool GradientArrowDetector::detect(ImageFloatBox& box, const ImageViewRGB32& scr
     for (WaterfillObject& yellow : yellows){
         for (WaterfillObject& blue : blues){
             WaterfillObject object;
-            if (is_gradient_arrow(m_type, region, object, yellow, blue)){
+            if (is_gradient_arrow(m_type, screen, region, object, yellow, blue)){
 //                hits.emplace_back(translate_to_parent(screen, m_box, object));
 //                extract_box_reference(region, object).save("object.png");
                 box = translate_to_parent(screen, m_box, object);
