@@ -52,7 +52,7 @@ class LabelImages_Widget;
 struct ObjectAnnotation{
     ImagePixelBox user_box; // user drawn loose bounding box
     ImagePixelBox mask_box;
-    std::vector<bool> mask;
+    std::vector<bool> mask; // size() equals the total pixels in mask_box
     std::string label = "unknown";
 
     ObjectAnnotation();
@@ -97,8 +97,10 @@ public:
     // This can be very slow!
     void compute_embeddings_for_folder(const std::string& image_folder);
 
-    // Delete the last object annotation.
-    void delete_last_annotation();
+    // Delete the currently selected object annotation.
+    void delete_selected_annotation();
+
+    void change_annotation_selection_by_mouse(double x, double y);
 
 private:
     friend class LabelImages_Widget;
@@ -126,7 +128,10 @@ private:
 
     std::unique_ptr<SAMSession> m_sam_session;
     std::vector<ObjectAnnotation> m_annotations;
-    size_t m_last_object_idx = 0;
+    
+    // currently selected annotated object's index
+    // if this value == m_annotations.size(), it means the user is not selecting anything
+    size_t m_selected_obj_idx = 0;
     std::string m_annotation_file_path;
     // if we find an annotation file that is supposed to be created by user in a previous session, but
     // we fail to load it, then we shouldn't overwrite this file to possibly erase the previous work.

@@ -7,6 +7,7 @@
 #include <QFileDialog>
 #include <QLabel>
 #include <QDir>
+#include <cfloat>
 #include <QDirIterator>
 #include <QVBoxLayout>
 #include <QGraphicsView>
@@ -189,7 +190,7 @@ void LabelImages::clear_for_new_image(){
     m_output_boolean_mask.clear();
     m_mask_image = ImageRGB32();
     m_annotations.clear();
-    m_last_object_idx = 0;
+    m_selected_obj_idx = 0;
     m_annotation_file_path = "";
     m_fail_to_load_annotation_file = false;
 }
@@ -255,7 +256,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
             );
         }
     }
-    m_last_object_idx = m_annotations.size(); 
+    m_selected_obj_idx = m_annotations.size(); 
     cout << "Loaded existing annotation file " << m_annotation_file_path << endl;
 }
 
@@ -272,7 +273,7 @@ void LabelImages::update_rendered_objects(VideoOverlaySet& overlay_set){
         if (form != nullptr){
             label = form->display_name();
         }
-        Color mask_box_color = (i_obj == m_last_object_idx) ? COLOR_BLACK : COLOR_BLUE;
+        Color mask_box_color = (i_obj == m_selected_obj_idx) ? COLOR_BLACK : COLOR_BLUE;
         overlay_set.add(mask_box_color, mask_float_box, label);
         size_t mask_width = obj.mask_box.width();
         size_t mask_height = obj.mask_box.height();
@@ -359,7 +360,7 @@ void LabelImages::compute_mask(VideoOverlaySet& overlay_set){
         }
 
         annotation.label = label;
-        m_last_object_idx = m_annotations.size();
+        m_selected_obj_idx = m_annotations.size();
         m_annotations.emplace_back(std::move(annotation));
 
         update_rendered_objects(overlay_set);
@@ -372,12 +373,54 @@ void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_
     ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path);
 }
 
-void LabelImages::delete_last_annotation(){
-    if (m_annotations.size() > 0){
-        m_annotations.pop_back();
+void LabelImages::delete_selected_annotation(){
+    if (m_annotations.size() == 0 || m_selected_obj_idx >= m_annotations.size()){
+        return;
     }
-    if (m_annotations.size() > 0){
-        m_last_object_idx = m_annotations.size() - 1;
+
+    m_annotations.erase(m_annotations.begin() + m_selected_obj_idx);
+
+    if (m_annotations.size() == 0){
+        m_selected_obj_idx = 0;
+        return;
+    }
+
+    if (m_selected_obj_idx >= m_annotations.size()){
+        m_selected_obj_idx = m_annotations.size() - 1;
+    } else{
+        // no change to the currently selected index
+    }
+
+    std::string& cur_label = m_annotations[m_selected_obj_idx].label;
+    FORM_LABEL.set_by_slug(cur_label);
+}
+
+void LabelImages::change_annotation_selection_by_mouse(double x, double y){
+    if (m_annotations.size() == 0){
+        return;
+    }
+    // no annotation image loaded
+    if (source_image_width == 0 || source_image_height == 0){
+        return;
+    }
+
+    auto& cur_ui_label = FORM_LABEL.slug();
+
+    double closest_distance = DBL_MAX;
+    for(size_t i = 0; i < m_annotations.size(); i++){
+        ImageFloatBox float_box = pixelbox_to_floatbox(source_image_width, source_image_height, m_annotations[i].mask_box);
+        double center_x = float_box.x + float_box.width/2.0;
+        double center_y = float_box.y + float_box.height/2.0;
+        double d2 = (center_x-x)*(center_x-x) + (center_y-y)*(center_y-y);
+        if (d2 < closest_distance){
+            closest_distance = d2;
+            m_selected_obj_idx = i;
+        }
+    }
+
+    auto new_label = m_annotations[m_selected_obj_idx].label;
+    if (cur_ui_label != new_label){
+        FORM_LABEL.set_by_slug(new_label);
     }
 }
 
@@ -440,7 +483,7 @@ LabelImages_Widget::LabelImages_Widget(
     scroll_layout->addWidget(button);
     connect(button, &QPushButton::clicked, this, [this](bool){
         auto& program = this->m_program;
-        program.delete_last_annotation();
+        program.delete_selected_annotation();
         program.update_rendered_objects(this->m_overlay_set);
     });
 
@@ -468,9 +511,13 @@ void LabelImages_Widget::clear_for_new_image(){
 }
 
 void LabelImages_Widget::on_config_value_changed(void* object){
-    if (m_program.m_annotations.size() > 0 && m_program.m_last_object_idx < m_program.m_annotations.size()){
-        std::string& cur_label = m_program.m_annotations[m_program.m_last_object_idx].label;
-        cur_label = m_program.FORM_LABEL.slug();
+    // TODO: the logic here should be part of LabelImage program
+    if (m_program.m_annotations.size() > 0 && m_program.m_selected_obj_idx < m_program.m_annotations.size()){
+        std::string& cur_label = m_program.m_annotations[m_program.m_selected_obj_idx].label;
+        const std::string& ui_slug = m_program.FORM_LABEL.slug();
+        if (ui_slug != cur_label){
+            cur_label = m_program.FORM_LABEL.slug();    
+        }
     }
     m_program.update_rendered_objects(m_overlay_set);
 }
@@ -495,7 +542,7 @@ void LabelImages_Widget::post_startup(VideoSource* source){
     }
         
     m_embedding_info_label->setText(QString::fromStdString(embedding_path_display));
-    m_embedding_info_label->setStyleSheet("color: blue");
+    m_embedding_info_label->setStyleSheet("color: green");
 
     const auto cur_res = m_display_session.video_session().current_resolution();
     if (cur_res.width == 0 || cur_res.height == 0){
@@ -512,7 +559,7 @@ void LabelImages_Widget::post_startup(VideoSource* source){
 void LabelImages_Widget::key_release(QKeyEvent* event){
     const auto key = Qt::Key(event->key());
     if (key == Qt::Key::Key_Delete || key == Qt::Key::Key_Backspace){
-        m_program.delete_last_annotation();
+        m_program.delete_selected_annotation();
         m_program.update_rendered_objects(m_overlay_set);
     }
 }
@@ -529,6 +576,12 @@ void LabelImages_Widget::on_mouse_press(double x, double y){
 }
 
 void LabelImages_Widget::on_mouse_release(double x, double y){
+    if (m_mouse_start == m_mouse_end){
+        // process mouse clicking
+        // change currently selected annotation
+        // also change the option values in the UI
+        m_program.change_annotation_selection_by_mouse(x, y);
+    }
     m_mouse_start.reset();
     m_mouse_end.reset();
     m_program.compute_mask(m_overlay_set);
