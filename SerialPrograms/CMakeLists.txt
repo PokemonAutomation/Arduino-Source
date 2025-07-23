@@ -140,6 +140,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/ButtonOption.cpp
     ../Common/Cpp/Options/ButtonOption.h
+    ../Common/Cpp/Options/BoxFloatOption.cpp
+    ../Common/Cpp/Options/BoxFloatOption.h
     ../Common/Cpp/Options/ColorOption.cpp
     ../Common/Cpp/Options/ColorOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
@@ -226,6 +228,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/BatchWidget.h
     ../Common/Qt/Options/BooleanCheckBoxWidget.cpp
     ../Common/Qt/Options/BooleanCheckBoxWidget.h
+    ../Common/Qt/Options/BoxFloatWidget.cpp
+    ../Common/Qt/Options/BoxFloatWidget.h
     ../Common/Qt/Options/ButtonWidget.cpp
     ../Common/Qt/Options/ButtonWidget.h
     ../Common/Qt/Options/ColorWidget.cpp
