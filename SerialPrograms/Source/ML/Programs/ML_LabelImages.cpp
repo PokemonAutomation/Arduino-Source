@@ -396,16 +396,11 @@ void LabelImages::delete_selected_annotation(){
 }
 
 void LabelImages::change_annotation_selection_by_mouse(double x, double y){
-    if (m_annotations.size() == 0){
+    // no image or no annotation
+    if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0){
         return;
     }
-    // no annotation image loaded
-    if (source_image_width == 0 || source_image_height == 0){
-        return;
-    }
-
-    auto& cur_ui_label = FORM_LABEL.slug();
-
+    
     double closest_distance = DBL_MAX;
     for(size_t i = 0; i < m_annotations.size(); i++){
         ImageFloatBox float_box = pixelbox_to_floatbox(source_image_width, source_image_height, m_annotations[i].mask_box);
@@ -419,7 +414,46 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
     }
 
     auto new_label = m_annotations[m_selected_obj_idx].label;
-    if (cur_ui_label != new_label){
+    if (FORM_LABEL.slug() != new_label){
+        FORM_LABEL.set_by_slug(new_label);
+    }
+}
+
+void LabelImages::select_prev_annotation(){
+    // no image or no annotation
+    if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0){
+        return;
+    }
+    
+    if (m_selected_obj_idx >= m_annotations.size()){
+        m_selected_obj_idx = m_annotations.size() - 1;
+    } else if (m_selected_obj_idx == 0){
+        m_selected_obj_idx = m_annotations.size() - 1;
+    } else {
+        m_selected_obj_idx--;
+    }
+
+    auto new_label = m_annotations[m_selected_obj_idx].label;
+    if (FORM_LABEL.slug() != new_label){
+        FORM_LABEL.set_by_slug(new_label);
+    }
+}
+void LabelImages::select_next_annotation(){
+    // no image or no annotation
+    if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0){
+        return;
+    }
+    
+    if (m_selected_obj_idx >= m_annotations.size()){
+        m_selected_obj_idx = 0;
+    } else if (m_selected_obj_idx + 1 == m_annotations.size()){
+        m_selected_obj_idx = 0;
+    } else {
+        m_selected_obj_idx++;
+    }
+
+    auto new_label = m_annotations[m_selected_obj_idx].label;
+    if (FORM_LABEL.slug() != new_label){
         FORM_LABEL.set_by_slug(new_label);
     }
 }
@@ -479,21 +513,44 @@ LabelImages_Widget::LabelImages_Widget(
     embedding_info_row->addWidget(new QLabel("<b>Image Embedding File:</b> ", this));    
     embedding_info_row->addWidget(m_embedding_info_label);
 
-    QPushButton* button = new QPushButton("Delete Last Mask", scroll_inner);
-    scroll_layout->addWidget(button);
-    connect(button, &QPushButton::clicked, this, [this](bool){
-        auto& program = this->m_program;
-        program.delete_selected_annotation();
-        program.update_rendered_objects(this->m_overlay_set);
-    });
+    QHBoxLayout* button_row = new QHBoxLayout();
+    scroll_layout->addLayout(button_row);
+
+    QPushButton* delete_anno_button = new QPushButton("Delete Selected Annotation", scroll_inner);
+    button_row->addWidget(delete_anno_button, 1);
+
+    QPushButton* pre_anno_button = new QPushButton("Prev Annotation", scroll_inner);
+    button_row->addWidget(pre_anno_button, 1);
+
+    QPushButton* next_anno_button = new QPushButton("Next Annotation", scroll_inner);
+    button_row->addWidget(next_anno_button, 1);
+
 
     // Add all option UI elements defined by LabelImage program.
     m_option_widget = program.m_options.make_QtWidget(*scroll_inner);
     scroll_layout->addWidget(&m_option_widget->widget());
 
-    button = new QPushButton("Compute Image Embeddings (SLOW!)", scroll_inner);
-    scroll_layout->addWidget(button);
-    connect(button, &QPushButton::clicked, this, [this](bool){
+    QPushButton* compute_embedding_button = new QPushButton("Compute Image Embeddings (SLOW!)", scroll_inner);
+    scroll_layout->addWidget(compute_embedding_button);
+
+    connect(delete_anno_button, &QPushButton::clicked, this, [this](bool){
+        auto& program = this->m_program;
+        program.delete_selected_annotation();
+        program.update_rendered_objects(this->m_overlay_set);
+    });
+
+    connect(pre_anno_button, &QPushButton::clicked, this, [this](bool){
+        auto& program = this->m_program;
+        program.select_prev_annotation();
+        program.update_rendered_objects(this->m_overlay_set);
+    });
+    connect(next_anno_button, &QPushButton::clicked, this, [this](bool){
+        auto& program = this->m_program;
+        program.select_next_annotation();
+        program.update_rendered_objects(this->m_overlay_set);
+    });
+
+    connect(compute_embedding_button, &QPushButton::clicked, this, [this](bool){
         std::string folder_path = QFileDialog::getExistingDirectory(
             nullptr, "Open image folder", ".").toStdString();
 

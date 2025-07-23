@@ -101,6 +101,8 @@ public:
     void delete_selected_annotation();
 
     void change_annotation_selection_by_mouse(double x, double y);
+    void select_prev_annotation();
+    void select_next_annotation();
 
 private:
     friend class LabelImages_Widget;
