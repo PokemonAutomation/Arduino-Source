@@ -17,7 +17,6 @@ struct BotBaseMessage;
 
 class MessageSniffer{
 public:
-    virtual void log(std::string msg){}
     virtual void on_send(const BotBaseMessage& message, bool is_retransmit){}
     virtual void on_recv(const BotBaseMessage& message){}
 };

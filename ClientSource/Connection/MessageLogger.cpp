@@ -96,11 +96,6 @@ void SerialLogger::log(const std::string& msg, Color color){
         m_logger.log(msg, color);
     }
 }
-void SerialLogger::log(std::string msg){
-    if (ok_to_log()){
-        m_logger.log(msg, COLOR_DARKGREEN);
-    }
-}
 
 bool SerialLogger::ok_to_log(){
     WallClock now = current_time();
