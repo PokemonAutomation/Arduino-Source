@@ -46,7 +46,6 @@ ImageAnnotationDisplayWidget::ImageAnnotationDisplayWidget(
     , m_session(session)
     , m_command_receiver(command_receiver)
 {
-    
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);

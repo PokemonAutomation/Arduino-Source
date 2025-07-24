@@ -492,6 +492,7 @@ LabelImages_Widget::LabelImages_Widget(
 
     m_embedding_info_label = new QLabel(this);
 
+    // Main layout
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header(*this));
@@ -513,6 +514,8 @@ LabelImages_Widget::LabelImages_Widget(
     embedding_info_row->addWidget(new QLabel("<b>Image Embedding File:</b> ", this));    
     embedding_info_row->addWidget(m_embedding_info_label);
 
+    // add a row for buttons
+
     QHBoxLayout* button_row = new QHBoxLayout();
     scroll_layout->addLayout(button_row);
 
@@ -525,10 +528,15 @@ LabelImages_Widget::LabelImages_Widget(
     QPushButton* next_anno_button = new QPushButton("Next Annotation", scroll_inner);
     button_row->addWidget(next_anno_button, 1);
 
+    // add a row for user annotation
+    QHBoxLayout* annotation_row = new QHBoxLayout();
+    scroll_layout->addLayout(annotation_row);
+    annotation_row->addWidget(new QLabel("<b>Select Label:</b>", scroll_inner), 0);
 
-    // Add all option UI elements defined by LabelImage program.
-    m_option_widget = program.m_options.make_QtWidget(*scroll_inner);
-    scroll_layout->addWidget(&m_option_widget->widget());
+    ConfigWidget* option_widget = program.FORM_LABEL.make_QtWidget(*scroll_inner);
+    annotation_row->addWidget(&option_widget->widget(), 5);
+
+    // add compute embedding button
 
     QPushButton* compute_embedding_button = new QPushButton("Compute Image Embeddings (SLOW!)", scroll_inner);
     scroll_layout->addWidget(compute_embedding_button);

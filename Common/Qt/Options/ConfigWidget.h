@@ -12,6 +12,17 @@
 namespace PokemonAutomation{
 
 
+//  Base class for all config widgets that control a program option.
+//
+//  It is intuitive to let ConfigWidget inherit QWidget, base class of Qt UI element,
+//  But some derived classes of ConfigWidget, e.g. StringCellWidget, needs to inherit
+//  QWidget's derived classes, e.g. QLineEdit. To avoid nasty diamond inheritance,
+//  ConfigWidget does not inherit QWidget. User has to call ConfigWidget::widget()
+//  to get the actual QWidget.
+//
+//  ConfigWidget's derived classes need to inherit a QWidget or its derived class
+//  and pass *this as the widget in ConfigWidget(m_valuie, widget) so a ConfigWidget
+//  pointer can get the actual QWidget.
 class ConfigWidget : protected ConfigOption::Listener{
 public:
     virtual ~ConfigWidget();

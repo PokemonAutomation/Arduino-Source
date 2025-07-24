@@ -65,7 +65,8 @@ private:
 };
 
 
-
+//  Config option that creates a cell where users can select a string from
+//  its dropdown menu. It is best to put this cell in a table widget.
 class StringSelectCell : public ConfigOption{
 public:
     ~StringSelectCell();
@@ -117,7 +118,10 @@ private:
 };
 
 
-
+//  Config option that creates a dropdown menu for users to select
+//  a sring. Different from StringSelectCell which is typically used 
+//  in a table, StringSelectOption is considered a standalone option
+//  that comes with its own label.
 class StringSelectOption : public StringSelectCell{
 public:
     StringSelectOption(

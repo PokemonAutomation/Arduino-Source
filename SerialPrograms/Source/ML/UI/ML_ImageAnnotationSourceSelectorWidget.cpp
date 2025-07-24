@@ -39,7 +39,7 @@ ImageAnnotationSourceSelectorWidget::ImageAnnotationSourceSelectorWidget(ImageAn
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
     
-    QHBoxLayout* image_path_row = new QHBoxLayout(this);
+    QHBoxLayout* image_path_row = new QHBoxLayout();
     layout->addLayout(image_path_row);
 
     image_path_row->setContentsMargins(0, 0, 0, 0);
@@ -60,12 +60,12 @@ ImageAnnotationSourceSelectorWidget::ImageAnnotationSourceSelectorWidget(ImageAn
     QPushButton* reload_image_button = new QPushButton("Reload Image", this);
     image_path_row->addWidget(reload_image_button, 0);
 
-    QHBoxLayout* folder_info_row = new QHBoxLayout(this);
+    // add folder info row to show the index of the current image in the folder and buttons to move between images in this folder
+    QHBoxLayout* folder_info_row = new QHBoxLayout();
     layout->addLayout(folder_info_row);
 
     m_folder_info_label = new QLabel(this);
-    folder_info_row->addWidget(m_folder_info_label, 3);
-    folder_info_row->addSpacing(3);
+    folder_info_row->addWidget(m_folder_info_label, 1);
 
     QPushButton* prev_image_button = new QPushButton("Prev Image in Folder", this);
     QPushButton* next_image_button = new QPushButton("Next Image in Folder", this);

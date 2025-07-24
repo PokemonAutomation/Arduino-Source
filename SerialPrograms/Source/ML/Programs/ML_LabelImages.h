@@ -191,8 +191,9 @@ private:
     // show the info about the loaded image embedding data corresponding to the currently
     // displayed image
     QLabel* m_embedding_info_label = nullptr;
-    // a UI widget that holds all the editable UI elements defined in LabelImage program.
-    ConfigWidget* m_option_widget;
+
+    // TODO: see if we can use
+    // Common/Cpp/Options/BoxFloatOption.h and Common/Qt/Options/BoxFloatWidget.h as UI options
 
     std::optional<std::pair<double, double>> m_mouse_start;
     std::optional<std::pair<double, double>> m_mouse_end;
