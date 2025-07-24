@@ -119,6 +119,8 @@ private:
     FloatingPointOption WIDTH;
     FloatingPointOption HEIGHT;
     Pokemon::HomeSpriteSelectCell FORM_LABEL;
+    StringSelectDatabase CUSTOM_LABEL_DATABASE;
+    StringSelectCell CUSTOM_LABEL;
 
     size_t source_image_height = 0;
     size_t source_image_width = 0;

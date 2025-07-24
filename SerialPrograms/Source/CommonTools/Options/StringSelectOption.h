@@ -15,6 +15,7 @@
 
 namespace PokemonAutomation{
 
+class JsonValue;
 
 
 
@@ -64,6 +65,15 @@ private:
     Pimpl<Data> m_data;
 };
 
+// Create a simple StringSelectDatabase from a list of slugs.
+// The display names of each entry will be the same as their slugs.
+StringSelectDatabase create_string_select_database(const std::vector<std::string>& slugs);
+// Load a simple list of JSON strings to a StringSelectDatabase.
+// Previous content of the StringSelectDatabase is removed if loading is successful.
+// The display names of each loaded entry will be the same as their slugs.
+// Return whether we successfully loaded from the JSON. If loading failed, the initial content
+// of the database is not removed.
+bool load_json_to_string_select_database(const JsonValue& json, StringSelectDatabase& database);
 
 //  Config option that creates a cell where users can select a string from
 //  its dropdown menu. It is best to put this cell in a table widget.

@@ -7,6 +7,8 @@
 #include <QFileDialog>
 #include <QLabel>
 #include <QDir>
+#include <QGroupBox>
+#include <QRadioButton>
 #include <cfloat>
 #include <QDirIterator>
 #include <QVBoxLayout>
@@ -29,6 +31,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonForms.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "ML/UI/ML_ImageAnnotationDisplayWidget.h"
@@ -134,12 +137,18 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
     , HEIGHT("<b>Height:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
     , FORM_LABEL("bulbasaur")
+    , CUSTOM_LABEL_DATABASE(create_string_select_database({
+        "sun",
+        "mc"
+    }))
+    , CUSTOM_LABEL(CUSTOM_LABEL_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
 {
     ADD_OPTION(X);
     ADD_OPTION(Y);
     ADD_OPTION(WIDTH);
     ADD_OPTION(HEIGHT);
     ADD_OPTION(FORM_LABEL);
+    ADD_OPTION(CUSTOM_LABEL);
 
     // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
     const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
@@ -529,12 +538,35 @@ LabelImages_Widget::LabelImages_Widget(
     button_row->addWidget(next_anno_button, 1);
 
     // add a row for user annotation
+    // the user can annotate in two modes:
+    // - set a pokemon form label
+    // - load a predefined custom string list and select from the list
+    // The custom list cannot contain pokemon form name. Otherwise it will be set to the pokemon form label
+    // so underlying data is only a single string. The UI reflects on what dropdown menu is set.
+    // the UI needs to have a 
     QHBoxLayout* annotation_row = new QHBoxLayout();
     scroll_layout->addLayout(annotation_row);
+
     annotation_row->addWidget(new QLabel("<b>Select Label:</b>", scroll_inner), 0);
 
-    ConfigWidget* option_widget = program.FORM_LABEL.make_QtWidget(*scroll_inner);
-    annotation_row->addWidget(&option_widget->widget(), 5);
+    // add a group box for user to pick whether to choose from pokemon form label or custom label
+    QGroupBox* label_type_group = new QGroupBox();
+    QRadioButton* pokemon_radio_button = new QRadioButton(QString::fromStdString(Pokemon::STRING_POKEMON + " Forms"));
+    QRadioButton* custom_label_radio_button = new QRadioButton("Custom Set");
+    pokemon_radio_button->setChecked(true);
+
+    QHBoxLayout* group_box_layout = new QHBoxLayout;
+    group_box_layout->addWidget(pokemon_radio_button);
+    group_box_layout->addWidget(custom_label_radio_button);
+    label_type_group->setLayout(group_box_layout);
+    annotation_row->addWidget(label_type_group);
+
+    ConfigWidget* pokemon_label_widget = program.FORM_LABEL.make_QtWidget(*scroll_inner);
+    annotation_row->addWidget(&pokemon_label_widget->widget(), 2);
+    ConfigWidget* custom_label_widget = program.CUSTOM_LABEL.make_QtWidget(*scroll_inner);
+    annotation_row->addWidget(&custom_label_widget->widget(), 2);
+    // disable the custom label widget to correpsond to the default selection of label_type_group
+    custom_label_widget->widget().setEnabled(false);
 
     // add compute embedding button
 
@@ -556,6 +588,15 @@ LabelImages_Widget::LabelImages_Widget(
         auto& program = this->m_program;
         program.select_next_annotation();
         program.update_rendered_objects(this->m_overlay_set);
+    });
+
+    connect(pokemon_radio_button, &QPushButton::clicked, this, [pokemon_label_widget, custom_label_widget](bool){
+        pokemon_label_widget->widget().setEnabled(true);
+        custom_label_widget->widget().setEnabled(false);
+    });
+    connect(custom_label_radio_button, &QPushButton::clicked, this, [pokemon_label_widget, custom_label_widget](bool){
+        pokemon_label_widget->widget().setEnabled(false);
+        custom_label_widget->widget().setEnabled(true);
     });
 
     connect(compute_embedding_button, &QPushButton::clicked, this, [this](bool){
