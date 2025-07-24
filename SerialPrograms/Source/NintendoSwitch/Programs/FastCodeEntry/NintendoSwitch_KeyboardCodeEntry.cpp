@@ -305,15 +305,15 @@ void keyboard_enter_code(
     Milliseconds cool;
     bool reordering;
     if (switch2){
-        unit        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY.TIME_UNIT;
-        hold        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY.HOLD;
-        cool        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY.COOLDOWN;
-        reordering  = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY.REORDERING;
+        unit        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY0.TIME_UNIT;
+        hold        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY0.HOLD;
+        cool        = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY0.COOLDOWN;
+        reordering  = ConsoleSettings::instance().SWITCH2_KEYBOARD_ENTRY0.REORDERING;
     }else{
-        unit        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY.TIME_UNIT;
-        hold        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY.HOLD;
-        cool        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY.COOLDOWN;
-        reordering  = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY.REORDERING;
+        unit        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY0.TIME_UNIT;
+        hold        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY0.HOLD;
+        cool        = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY0.COOLDOWN;
+        reordering  = ConsoleSettings::instance().SWITCH1_KEYBOARD_ENTRY0.REORDERING;
     }
 
     Milliseconds tv = context->timing_variation();
