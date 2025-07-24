@@ -195,6 +195,7 @@ TestProgram::TestProgram()
     )
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
     , STATIC_TEXT("Test text...")
+    , BOX("Test box", LockMode::UNLOCK_WHILE_RUNNING, 0.0, 0.0, 0.0, 0.0)
 //    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
