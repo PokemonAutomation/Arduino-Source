@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -37,6 +38,20 @@ DateTime DateReader_24h::read_date(Logger& logger, std::shared_ptr<const ImageRG
     date.year = (int16_t)DateReaderTools::read_box(logger, 2000, 2060, *screen, m_year);
     date.hour = (int8_t)DateReaderTools::read_box(logger, 0, 23, *screen, m_hour);
     date.minute = (int8_t)DateReaderTools::read_box(logger, 0, 59, *screen, m_minute);
+
+    if (date.day < 0 ||
+        date.month < 0 ||
+        date.year < 0 ||
+        date.hour < 0 ||
+        date.minute < 0
+    ){
+        report_error(
+            &logger, ProgramInfo(),
+            "Failed to read date.",
+            {},
+            *screen
+        );
+    }
 
     return date;
 }
@@ -71,19 +86,39 @@ void DateReader_EU::set_date(
         }
 
         move_horizontal(context, cursor_position, 0);
-        adjust_no_wrap(context, current.day, date.day);
+        if (current.day < 0){
+            stream.log("Failed to read day. Will not adjust.", COLOR_RED);
+        }else{
+            adjust_no_wrap(context, current.day, date.day);
+        }
 
         move_horizontal(context, cursor_position, 1);
-        adjust_wrap(context, 1, 12, current.month, date.month);
+        if (current.month < 0){
+            stream.log("Failed to read month. Will not adjust.", COLOR_RED);
+        }else{
+            adjust_wrap(context, 1, 12, current.month, date.month);
+        }
 
         move_horizontal(context, cursor_position, 2);
-        adjust_no_wrap(context, current.year, date.year);
+        if (current.year < 0){
+            stream.log("Failed to read year. Will not adjust.", COLOR_RED);
+        }else{
+            adjust_no_wrap(context, current.year, date.year);
+        }
 
         move_horizontal(context, cursor_position, 3);
-        adjust_wrap(context, 0, 23, current.hour, date.hour);
+        if (current.hour < 0){
+            stream.log("Failed to read hour. Will not adjust.", COLOR_RED);
+        }else{
+            adjust_wrap(context, 0, 23, current.hour, date.hour);
+        }
 
         move_horizontal(context, cursor_position, 4);
-        adjust_wrap(context, 0, 59, current.minute, date.minute);
+        if (current.minute < 0){
+            stream.log("Failed to read minutes. Will not adjust.", COLOR_RED);
+        }else{
+            adjust_wrap(context, 0, 59, current.minute, date.minute);
+        }
 
         move_horizontal(context, cursor_position, 5);
     }

@@ -24,7 +24,7 @@ namespace DateReaderTools{
 
 ImageRGB32 filter_image(const ImageViewRGB32& image){
     double brightness = image_stats(image).average.sum();
-    bool white_theme = brightness > 600;
+    bool white_theme = brightness > 500;
 
     ImageRGB32 filtered = to_blackwhite_rgb32_range(
         image,
@@ -39,8 +39,12 @@ int read_box(
     const ImageViewRGB32& screen, const ImageFloatBox& box
 ){
     ImageViewRGB32 cropped = extract_box_reference(screen, box);
+
+//    static int c = 0;
+//    cropped.save("image-" + std::to_string(c++) + ".png");
+
     double brightness = image_stats(cropped).average.sum();
-    bool white_theme = brightness > 600;
+    bool white_theme = brightness > 500;
 
     int value;
     if (white_theme){
