@@ -10,6 +10,7 @@
 #include <QWidget>
 #include <QPainter>
 #include "Common/Cpp/Containers/Pimpl.tpp"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "ScreenWatchOption.h"
 
@@ -60,7 +61,7 @@ ScreenWatchOption::ScreenWatchOption(
     )
     , m_display(*this)
     , m_buttons(*this)
-    , m_overlay(m_overlay_option)
+    , m_overlay(global_logger_tagged(), m_overlay_option)
 {
     PA_ADD_OPTION(m_display);
     PA_ADD_OPTION(MONITOR_INDEX);

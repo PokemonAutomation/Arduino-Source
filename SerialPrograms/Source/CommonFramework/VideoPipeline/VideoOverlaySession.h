@@ -19,6 +19,10 @@
 #include <set>
 #include <map>
 #include <deque>
+#include <mutex>
+#include <condition_variable>
+#include <thread>
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "VideoOverlay.h"
@@ -59,16 +63,6 @@ public:
         // is modified by VideoOverlaySession::add/remove_log().
         virtual void on_overlay_update_log    (const std::shared_ptr<const std::vector<OverlayLogLine>>& boxes){}
 
-        //  This one is different from the others. The listeners will store this
-        //  pointer and access it directly and asynchronously. If you need to
-        //  change the structure of the list itself, you must first call this
-        //  with null to remove it from all the listeners. Then add the updated
-        //  one back when you're done.
-        //  This is called immediately when attaching a listener to give the
-        //  current stats. The listener must drop all references to the stats
-        //  before detaching.
-        virtual void on_overlay_update_stats(const std::list<OverlayStat*>* stats){}
-
     };
 
     //  Add a UI class to listen to any overlay change. The UI class needs to inherit Listener.
@@ -80,7 +74,9 @@ public:
 
 public:
     ~VideoOverlaySession();
-    VideoOverlaySession(VideoOverlayOption& option);
+    VideoOverlaySession(Logger& logger, VideoOverlayOption& option);
+
+    Logger& logger() const{ return m_logger; }
 
     void get(VideoOverlayOption& option);
     void set(const VideoOverlayOption& option);
@@ -114,6 +110,9 @@ public:
     // is modified by VideoOverlaySession::add/remove_log().
     std::vector<OverlayLogLine> log_texts() const;
 
+    std::vector<OverlayStatSnapshot> stats() const;
+
+
     virtual void add_box(const OverlayBox& box) override;
     virtual void remove_box(const OverlayBox& box) override;
 
@@ -131,17 +130,19 @@ public:
 
 
 private:
+    void stats_thread();
+
     //  Push updates to the various listeners.
     void push_box_update();
     void push_text_update();
     void push_image_update();
     void push_log_text_update();
 
-
 private:
-    mutable SpinLock m_lock;
-
+    Logger& m_logger;
     VideoOverlayOption& m_option;
+
+    mutable SpinLock m_lock;
 
     std::set<const OverlayBox*> m_boxes;
     std::set<const OverlayText*> m_texts;
@@ -152,6 +153,12 @@ private:
     std::map<OverlayStat*, std::list<OverlayStat*>::iterator> m_stats;
 
     std::set<ContentListener*> m_content_listeners;
+
+    bool m_stopping = false;
+    std::vector<OverlayStatSnapshot> m_stat_lines;
+    std::mutex m_stats_lock;
+    std::condition_variable m_stats_cv;
+    std::thread m_stats_updater;
 };
 
 

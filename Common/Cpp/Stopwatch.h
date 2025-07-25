@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_VideoPipeline_SnapshotManager_H
-#define PokemonAutomation_VideoPipeline_SnapshotManager_H
+#ifndef PokemonAutomation_VideoPipeline_Stopwatch_H
+#define PokemonAutomation_VideoPipeline_Stopwatch_H
 
 #include "Time.h"
 

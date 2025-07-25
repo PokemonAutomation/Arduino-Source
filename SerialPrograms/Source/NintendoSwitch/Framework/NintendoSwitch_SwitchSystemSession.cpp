@@ -44,7 +44,7 @@ SwitchSystemSession::SwitchSystemSession(
     , m_controller(m_logger, option.m_controller, option.m_required_features)
     , m_video(m_logger, option.m_video)
     , m_audio(m_logger, option.m_audio)
-    , m_overlay(option.m_overlay)
+    , m_overlay(m_logger, option.m_overlay)
     , m_history(m_logger)
     , m_cpu_utilization(new CpuUtilizationStat())
     , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Qt Thread:"))

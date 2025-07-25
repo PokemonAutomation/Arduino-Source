@@ -35,7 +35,8 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_texts(std::make_shared<std::vector<OverlayText>>(session.texts()))
     , m_images(std::make_shared<std::vector<OverlayImage>>(session.images()))
     , m_log(std::make_shared<std::vector<OverlayLogLine>>(session.log_texts()))
-    , m_stats(nullptr)
+//    , m_stats(nullptr)
+    , m_stats_paint("VideoOverlayWidget::paintEvent", "ms", 1000, std::chrono::seconds(10))
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TranslucentBackground);
@@ -81,10 +82,6 @@ void VideoOverlayWidget::update_log_background(const std::shared_ptr<const std::
     m_log_text_bg_boxes = bg_boxes;
 }
 #endif
-void VideoOverlayWidget::on_overlay_update_stats(const std::list<OverlayStat*>* stats){
-    WriteSpinLock lg(m_lock, "VideoOverlay::update_stats()");
-    m_stats = stats;
-}
 
 void VideoOverlayWidget::on_watchdog_timeout(){
     QMetaObject::invokeMethod(this, [this]{ this->update(); });
@@ -96,6 +93,8 @@ void VideoOverlayWidget::on_watchdog_timeout(){
 void VideoOverlayWidget::resizeEvent(QResizeEvent* event){}
 
 void VideoOverlayWidget::paintEvent(QPaintEvent*){
+    WallClock time0 = current_time();
+
     QPainter painter(this);
     {
         WriteSpinLock lg(m_lock, "VideoOverlay::paintEvent()");
@@ -112,12 +111,16 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         if (m_session.enabled_log()){
             render_log(painter);
         }
-        if (m_session.enabled_stats() && m_stats){
+        if (m_session.enabled_stats()){
             render_stats(painter);
         }
     }
 
     global_watchdog().delay(*this);
+
+    WallClock time1 = current_time();
+    uint32_t microseconds = (uint32_t)std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
+    m_stats_paint.report_data(m_session.logger(), microseconds);
 }
 
 
@@ -291,14 +294,7 @@ void VideoOverlayWidget::render_stats(QPainter& painter){
     int height = this->height();
     int start_x = (int)(width * 0.78);
 
-    std::vector<OverlayStatSnapshot> lines;
-    for (const auto& stat : *m_stats){
-        OverlayStatSnapshot snapshot = stat->get_current();
-        if (!snapshot.text.empty()){
-            lines.emplace_back(std::move(snapshot));
-        }
-    }
-
+    std::vector<OverlayStatSnapshot> lines = m_session.stats();
 
     painter.fillRect(
         start_x,
