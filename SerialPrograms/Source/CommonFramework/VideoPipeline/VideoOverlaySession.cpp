@@ -80,8 +80,8 @@ void VideoOverlaySession::stats_thread(){
         {
             std::vector<OverlayStatSnapshot> lines;
             ReadSpinLock lg0(m_lock);
-            for (const auto& stat : m_stats){
-                OverlayStatSnapshot snapshot = stat.first->get_current();
+            for (const auto& stat : m_stats_order){
+                OverlayStatSnapshot snapshot = stat->get_current();
                 if (!snapshot.text.empty()){
                     lines.emplace_back(std::move(snapshot));
                 }
