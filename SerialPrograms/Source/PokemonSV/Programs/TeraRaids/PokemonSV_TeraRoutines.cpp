@@ -220,7 +220,7 @@ void enter_tera_search(
         OverworldWatcher overworld(stream.logger(), COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         PokePortalWatcher poke_portal(COLOR_GREEN);
-        TeraRaidSearchWatcher raid_search(COLOR_CYAN);
+        TeraRaidSearchWatcher raid_search(COLOR_CYAN, std::chrono::milliseconds(500));
         CodeEntryWatcher code_entry(COLOR_PURPLE);
         AdvanceDialogWatcher dialog(COLOR_BLUE);
         context.wait_for_all_requests();

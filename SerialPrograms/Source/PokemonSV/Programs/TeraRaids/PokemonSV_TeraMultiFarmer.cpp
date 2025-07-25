@@ -457,7 +457,7 @@ bool TeraMultiFarmer::run_raid(
     CancellableHolder<RaidWaiter> raid_waiter(scope);
     CancellableHolder<CancellableScope> joiner_scope((CancellableScope&)raid_waiter);
 
-    env.run_in_parallel(raid_waiter, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         try{
             if (console.index() == host_index){
                 start_sequence_host(
