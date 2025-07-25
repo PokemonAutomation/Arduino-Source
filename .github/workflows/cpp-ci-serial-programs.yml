@@ -80,5 +80,5 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: startsWith(matrix.os, 'windows')
       with:
-        name: Serial Programs ( os:${{ matrix.os }} - qt_version${{ matrix.qt_version }} - compiler:${{ matrix.compiler }})
+        name: Serial Programs ( os=${{ matrix.os }} - qt_version=${{ matrix.qt_version }} - compiler=${{ matrix.compiler }})
         path: Output
