@@ -72,6 +72,7 @@ class LabelImages : public PanelInstance, public ConfigOption::Listener {
 public:
     LabelImages(const LabelImages_Descriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
+    ~LabelImages();
 
 public:
     // Serialization
@@ -90,10 +91,10 @@ public:
     void load_image_related_data(const std::string& image_path, const size_t source_image_width, const size_t source_image_height);
 
     // Update rendering data reflect the current annotation
-    void update_rendered_objects(VideoOverlaySet& overlayset);
+    void update_rendered_objects();
 
     // Use user currently drawn box to compute per-pixel masks on the image using SAM model
-    void compute_mask(VideoOverlaySet& overlay_set);
+    void compute_mask();
 
     // Compute embeddings for all images in a folder.
     // This can be very slow!
@@ -115,6 +116,7 @@ private:
     ImageAnnotationDisplayOption m_display_option;
     // handles image display session, holding a reference to m_display_option
     ImageAnnotationDisplaySession m_display_session;
+    VideoOverlaySet m_overlay_set;
     // the group option that holds rest of the options defined below:
     BatchOption m_options;
 
@@ -164,9 +166,6 @@ public:
         PanelHolder& holder
     );
 
-    // called after loading a new image, clean up all internal data 
-    void clear_for_new_image();
-
     //  Overwrites ConfigOption::Listener::on_config_value_changed().
     virtual void on_config_value_changed(void* object) override;
 
@@ -194,8 +193,6 @@ private:
     ImageAnnotationDisplaySession& m_display_session;
 
     ImageAnnotationDisplayWidget* m_image_display_widget;
-
-    VideoOverlaySet m_overlay_set;
     
     // show the info about the loaded image embedding data corresponding to the currently
     // displayed image
