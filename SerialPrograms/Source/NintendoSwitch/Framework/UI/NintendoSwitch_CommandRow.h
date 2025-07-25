@@ -65,19 +65,19 @@ private:
     ControllerSession& m_controller;
     VideoOverlaySession& m_session;
     bool m_allow_commands_while_running;
-    QComboBox* m_command_box;
-    QLabel* m_status;
+    QComboBox* m_command_box = nullptr;
+    QLabel* m_status = nullptr;
 
-    QCheckBox* m_overlay_log;
-    QCheckBox* m_overlay_text;
-    QCheckBox* m_overlay_images;
-    QCheckBox* m_overlay_boxes;
-    QCheckBox* m_overlay_stats;
+    QCheckBox* m_overlay_log = nullptr;
+    QCheckBox* m_overlay_text = nullptr;
+    QCheckBox* m_overlay_images = nullptr;
+    QCheckBox* m_overlay_boxes = nullptr;
+    QCheckBox* m_overlay_stats = nullptr;
 
-    QPushButton* m_load_profile_button;
-    QPushButton* m_save_profile_button;
-    QPushButton* m_screenshot_button;
-    QPushButton* m_video_button;
+    QPushButton* m_load_profile_button = nullptr;
+    QPushButton* m_save_profile_button = nullptr;
+    QPushButton* m_screenshot_button = nullptr;
+    QPushButton* m_video_button = nullptr;
     bool m_last_known_focus;
     ProgramState m_last_known_state;
 };
