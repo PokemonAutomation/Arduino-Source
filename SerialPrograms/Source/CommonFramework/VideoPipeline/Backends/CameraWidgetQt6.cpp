@@ -84,8 +84,9 @@ CameraVideoSource::CameraVideoSource(
     const CameraInfo& info,
     Resolution desired_resolution
 )
-    : VideoSource(true)
+    : VideoSource(logger, true)
     , m_logger(logger)
+    , m_last_frame(logger)
     , m_snapshot_manager(logger, m_last_frame)
 {
     if (!info){

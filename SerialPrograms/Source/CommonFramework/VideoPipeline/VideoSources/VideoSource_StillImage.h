@@ -52,7 +52,7 @@ private:
 
 class VideoSource_StillImage : public VideoSource{
 public:
-    VideoSource_StillImage(const std::string& path, Resolution resolution);
+    VideoSource_StillImage(Logger& logger, const std::string& path, Resolution resolution);
 
     const std::string path() const{
         return m_path;
