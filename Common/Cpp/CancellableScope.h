@@ -111,7 +111,7 @@ class CancellableScope : public Cancellable{
 public:
     virtual ~CancellableScope() override;
 
-    virtual bool cancel(std::exception_ptr exception) noexcept override;
+    virtual bool cancel(std::exception_ptr exception = nullptr) noexcept override;
 
     void wait_for(std::chrono::milliseconds duration);
     void wait_until(WallClock stop);
