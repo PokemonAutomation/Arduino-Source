@@ -11,6 +11,8 @@
 #include <memory>
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -66,7 +68,7 @@ public:
 
 
 // Program to annoatation images for training ML models
-class LabelImages : public PanelInstance{
+class LabelImages : public PanelInstance, public ConfigOption::Listener {
 public:
     LabelImages(const LabelImages_Descriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
@@ -105,6 +107,8 @@ public:
     void select_next_annotation();
 
 private:
+    void on_config_value_changed(void* object) override;
+
     friend class LabelImages_Widget;
 
     // image display options like what image file is loaded
@@ -118,6 +122,9 @@ private:
     FloatingPointOption Y;
     FloatingPointOption WIDTH;
     FloatingPointOption HEIGHT;
+
+    IntegerEnumDropdownDatabase LABEL_TYPE_DATABASE;
+    IntegerEnumDropdownOption LABEL_TYPE;
     Pokemon::HomeSpriteSelectCell FORM_LABEL;
     StringSelectDatabase CUSTOM_LABEL_DATABASE;
     StringSelectCell CUSTOM_LABEL;

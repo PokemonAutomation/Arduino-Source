@@ -128,6 +128,13 @@ LabelImages_Descriptor::LabelImages_Descriptor()
 
 #define ADD_OPTION(x)    m_options.add_option(x, #x)
 
+IntegerEnumDropdownDatabase create_label_type_database(){
+    IntegerEnumDropdownDatabase database;
+    database.add(0, "pokemon-form", Pokemon::STRING_POKEMON + " Forms");
+    database.add(1, "custom-set", "Custom Set");
+    return database;
+}
+
 LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_display_session(m_display_option)
@@ -136,6 +143,8 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
     , HEIGHT("<b>Height:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
+    , LABEL_TYPE_DATABASE(create_label_type_database())
+    , LABEL_TYPE("<b>Select Label:</b>", LABEL_TYPE_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
     , FORM_LABEL("bulbasaur")
     , CUSTOM_LABEL_DATABASE(create_string_select_database({
         "sun",
@@ -147,8 +156,11 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     ADD_OPTION(Y);
     ADD_OPTION(WIDTH);
     ADD_OPTION(HEIGHT);
+    ADD_OPTION(LABEL_TYPE);
     ADD_OPTION(FORM_LABEL);
     ADD_OPTION(CUSTOM_LABEL);
+
+    LABEL_TYPE.add_listener(*this);
 
     // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
     const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
@@ -467,6 +479,19 @@ void LabelImages::select_next_annotation(){
     }
 }
 
+void LabelImages::on_config_value_changed(void* object){
+    // cout << "LabelImages::on_config_value_changed" << endl;
+    if (object == &LABEL_TYPE){
+        if (LABEL_TYPE.current_value() == 0){
+            FORM_LABEL.set_visibility(ConfigOptionState::ENABLED);
+            CUSTOM_LABEL.set_visibility(ConfigOptionState::DISABLED);
+        } else{
+            FORM_LABEL.set_visibility(ConfigOptionState::DISABLED);
+            CUSTOM_LABEL.set_visibility(ConfigOptionState::ENABLED);
+        }
+    }
+}
+
 
 LabelImages_Widget::~LabelImages_Widget(){
     m_program.X.remove_listener(*this);
@@ -547,26 +572,15 @@ LabelImages_Widget::LabelImages_Widget(
     QHBoxLayout* annotation_row = new QHBoxLayout();
     scroll_layout->addLayout(annotation_row);
 
-    annotation_row->addWidget(new QLabel("<b>Select Label:</b>", scroll_inner), 0);
-
-    // add a group box for user to pick whether to choose from pokemon form label or custom label
-    QGroupBox* label_type_group = new QGroupBox();
-    QRadioButton* pokemon_radio_button = new QRadioButton(QString::fromStdString(Pokemon::STRING_POKEMON + " Forms"));
-    QRadioButton* custom_label_radio_button = new QRadioButton("Custom Set");
-    pokemon_radio_button->setChecked(true);
-
-    QHBoxLayout* group_box_layout = new QHBoxLayout;
-    group_box_layout->addWidget(pokemon_radio_button);
-    group_box_layout->addWidget(custom_label_radio_button);
-    label_type_group->setLayout(group_box_layout);
-    annotation_row->addWidget(label_type_group);
+    // add a dropdown menu for user to pick whether to choose from pokemon form label or custom label
+    ConfigWidget* label_type_widget = program.LABEL_TYPE.make_QtWidget(*scroll_inner);
+    annotation_row->addWidget(&label_type_widget->widget(), 0);
 
     ConfigWidget* pokemon_label_widget = program.FORM_LABEL.make_QtWidget(*scroll_inner);
     annotation_row->addWidget(&pokemon_label_widget->widget(), 2);
     ConfigWidget* custom_label_widget = program.CUSTOM_LABEL.make_QtWidget(*scroll_inner);
     annotation_row->addWidget(&custom_label_widget->widget(), 2);
-    // disable the custom label widget to correpsond to the default selection of label_type_group
-    custom_label_widget->widget().setEnabled(false);
+    annotation_row->addWidget(new QLabel(scroll_inner), 10); // an empty label to push other UIs to the left
 
     // add compute embedding button
 
@@ -588,15 +602,6 @@ LabelImages_Widget::LabelImages_Widget(
         auto& program = this->m_program;
         program.select_next_annotation();
         program.update_rendered_objects(this->m_overlay_set);
-    });
-
-    connect(pokemon_radio_button, &QPushButton::clicked, this, [pokemon_label_widget, custom_label_widget](bool){
-        pokemon_label_widget->widget().setEnabled(true);
-        custom_label_widget->widget().setEnabled(false);
-    });
-    connect(custom_label_radio_button, &QPushButton::clicked, this, [pokemon_label_widget, custom_label_widget](bool){
-        pokemon_label_widget->widget().setEnabled(false);
-        custom_label_widget->widget().setEnabled(true);
     });
 
     connect(compute_embedding_button, &QPushButton::clicked, this, [this](bool){
