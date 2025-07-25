@@ -2418,7 +2418,7 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.
 endif()
 
 #extract opencv_world4110d.dll from archive on Windows Debug builds
-if (MSVC)
+if (WIN32)
     file(ARCHIVE_EXTRACT
       INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110d.zip
       DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/
@@ -2433,7 +2433,7 @@ target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 
 
 
-if (MSVC)
+if (WIN32)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
     target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/opencv-4.11.0/)
     set_target_properties(OpenCV_lib PROPERTIES
@@ -2504,6 +2504,15 @@ if (MSVC)
     set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
     set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
     set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
+
+    if(CMAKE_GENERATOR_TOOLSET MATCHES "ClangCL")
+        target_compile_options(SerialPrograms PRIVATE -Wno-unused-function)
+        target_compile_options(SerialPrograms PRIVATE -march=nehalem)
+        set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
+        set(ARCH_FLAGS_13_Haswell       -march=haswell)
+        set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
+        set(ARCH_FLAGS_19_IceLake       -march=icelake-client)
+    endif()
 
     #   Run-time ISA dispatching
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_08_Nehalem)
@@ -2619,7 +2628,7 @@ else() # macOS and Linux
 
     else()
         # Intel CPU
-        target_compile_options(SerialPrograms PRIVATE -msse4.2)
+        target_compile_options(SerialPrograms PRIVATE -march=nehalem)
         set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
         set(ARCH_FLAGS_13_Haswell       -march=haswell)
         set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)

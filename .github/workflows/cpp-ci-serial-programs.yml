@@ -10,11 +10,25 @@ jobs:
       fail-fast: false
       matrix:
         os: [windows-2025, macos-13, ubuntu-24.04]
+        compiler: ['default', 'clang']
         qt_version: ['6.9.1']
         include:
-        - qt_version: '6.9.1'
-          qt_version_major: '6'
-          qt_modules: 'qtmultimedia qtserialport'
+          - qt_version: '6.9.1'
+            qt_version_major: '6'
+            qt_modules: 'qtmultimedia qtserialport'
+
+          - os: 'windows-2025'
+            compiler: 'clang'
+            cmake_additional_param: '-T ClangCL'
+
+          - os: 'ubuntu-24.04'
+            compiler: 'clang'
+            cmake_additional_param: '-DCMAKE_C_COMPILER=clang -DCMAKE_CXX_COMPILER=clang++'
+
+        exclude:
+          - os: 'macos-13'
+            compiler: 'clang'
+            # Excluded because macos default toolset is already clang
 
     steps:
     - uses: actions/checkout@v4
@@ -44,7 +58,7 @@ jobs:
         cd Arduino-Source/SerialPrograms
         mkdir bin
         cd bin
-        cmake .. -DQT_MAJOR:STRING=${{ matrix.qt_version_major }}
+        cmake .. -DQT_MAJOR:STRING=${{ matrix.qt_version_major }} ${{ matrix.cmake_additional_param }}
         cmake --build . --config Release --parallel 10
     - name: Copy resources
       if: startsWith(matrix.os, 'windows')
@@ -66,5 +80,5 @@ jobs:
     - uses: actions/upload-artifact@v4
       if: startsWith(matrix.os, 'windows')
       with:
-        name: Serial Programs for windows (${{ matrix.qt_version }})
+        name: Serial Programs ( os=${{ matrix.os }} - qt_version=${{ matrix.qt_version }} - compiler=${{ matrix.compiler }})
         path: Output
