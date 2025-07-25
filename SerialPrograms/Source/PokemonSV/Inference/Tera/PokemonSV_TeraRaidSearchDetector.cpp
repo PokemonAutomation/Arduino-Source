@@ -58,7 +58,7 @@ bool TeraRaidSearchDetector::detect_search_location(ImageFloatBox& box, const Im
     auto iter = session->make_iterator(100);
     WaterfillObject object;
 
-//    size_t c = 0;
+//    static size_t c = 0;
     const TeraSearchGlassMatcher& MATCHER = TeraSearchGlassMatcher::instance();
     while (iter->find_next(object, false)){
 //        cout << "yellow = " << object.area << endl;
@@ -67,6 +67,10 @@ bool TeraRaidSearchDetector::detect_search_location(ImageFloatBox& box, const Im
         double rmsd = MATCHER.rmsd(extract_box_reference(screen, object));
 //        cout << "rmsd = " << rmsd << endl;
         if (rmsd < 100){
+
+//            cout << "rmsd = " << rmsd << endl;
+//            extract_box_reference(screen, object).save("object-" + std::to_string(c++) + ".png");
+
             box = translate_to_parent(screen, {0, 0, 1, 1}, object);
             return true;
         }
@@ -97,8 +101,10 @@ bool TeraRaidSearchDetector::move_cursor_to_search(
         ok &= arrow.detect(arrow_location, screen);
         if (!ok){
             consecutive_detection_fails++;
-            if (consecutive_detection_fails > 10){
-                dump_image_and_throw_recoverable_exception(info, stream, "UnableToDetectTeraSearch", "Unable to detect Tera Raid Search menu.");
+            if (consecutive_detection_fails > 3){
+//                dump_image_and_throw_recoverable_exception(info, stream, "UnableToDetectTeraSearch", "Unable to detect Tera Raid Search menu.");
+                stream.log("Unable to detect Tera Raid Search menu.", COLOR_RED);
+                return false;
             }
             context.wait_for(std::chrono::milliseconds(1000));
             continue;

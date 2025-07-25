@@ -16,7 +16,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
+//#include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -285,15 +285,15 @@ bool TeraMultiFarmer::run_raid_host(ProgramEnvironment& env, ConsoleHandle& cons
             exit_tera_win_without_catching(env.program_info(), console, context, 0);
         }
         reset_host(env.program_info(), console, context);
-        if (HOSTING_MODE == Mode::HOST_ONLINE){
-            connect_to_internet_from_overworld(env.program_info(), console, context);
-        }
+//        if (HOSTING_MODE == Mode::HOST_ONLINE){
+//            connect_to_internet_from_overworld(env.program_info(), console, context);
+//        }
     }else{
         stats.m_losses++;
         env.update_stats();
     }
 
-    open_raid(console, context);
+//    open_raid(console, context);
 
     return win;
 }
@@ -315,135 +315,25 @@ void TeraMultiFarmer::run_raid_joiner(ProgramEnvironment& env, ConsoleHandle& co
         save_game_from_menu(env.program_info(), console, context);
     }
 
-    enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
+//    enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
 }
-void TeraMultiFarmer::join_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context,
-    size_t host_index, const std::string& normalized_code
-){
-    if (console.index() == host_index){
-        return;
-    }
 
-    TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
 
-//    cout << "Joining Lobby" << endl;
-
-    bool seen_code_entry = false;
-//    bool seen_dialog = false;
-    size_t attempts = 0;
-    while (true){
-//        cout << "Looping..." << endl;
-
-        if (attempts >= 3){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Failed to join lobby 3 times.",
-                console
-            );
-        }
-
-        CodeEntryWatcher code_entry(COLOR_GREEN);
-        TeraLobbyWatcher lobby(console.logger(), COLOR_RED);
-        AdvanceDialogWatcher dialog(COLOR_YELLOW);
-        TeraRaidSearchWatcher raid_search(COLOR_CYAN, std::chrono::seconds(5));
-        context.wait_for_all_requests();
-        context.wait_for(std::chrono::seconds(3));
-        int ret = wait_until(
-            console, context, std::chrono::seconds(60),
-            {
-                code_entry,
-                lobby,
-                dialog,
-                raid_search,
-            }
-        );
-        switch (ret){
-        case 0:
-            console.log("Detected code entry.", COLOR_RED);
-            if (seen_code_entry){
-                console.log("Failed to enter code! Backing out and trying again...", COLOR_RED);
-                stats.m_errors++;
-                attempts++;
-                pbf_press_button(context, BUTTON_X, 20, 480);
-                enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
-                seen_code_entry = false;
-                continue;
-            }
-            seen_code_entry = true;
-            enter_code(
-                console, context,
-                PLAYERS[console.index()]->keyboard_layout,
-                normalized_code,
-                false,
-                true,
-                false
-            );
-            context.wait_for(std::chrono::seconds(1));
-            continue;
-        case 1:
-            console.log("Entered raid lobby!");
-            pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
-            break;
-        case 2:
-            console.log("Detected dialog...", COLOR_ORANGE);
-//            seen_dialog = true;
-            pbf_press_button(context, BUTTON_B, 20, 230);
-            continue;
-        case 3:
-#if 0
-            if (!seen_dialog){
-                context.wait_for(std::chrono::seconds(1));
-                continue;
-            }
-#endif
-            console.log("Wrong code! Backing out and trying again...", COLOR_RED);
-            stats.m_errors++;
-            attempts++;
-            pbf_press_button(context, BUTTON_B, 20, 230);
-            enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
-            seen_code_entry = false;
-            continue;
-        default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Unable to join lobby.",
-                console
-            );
-        }
-        break;
-    }
-}
-bool TeraMultiFarmer::run_raid(
-    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+bool TeraMultiFarmer::start_sequence_host(
+    MultiSwitchProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context,
+    RaidWaiter& raid_waiter, CancellableScope& joiner_scope,
     std::string& lobby_code,
     std::array<std::map<Language, std::string>, 4>& player_names
 ){
     TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
-    size_t host_index = HOSTING_SWITCH.current_value();
-    ConsoleHandle& host_console = env.consoles[host_index];
-    ProControllerContext host_context(scope, host_console.pro_controller());
 
-    //  Get everyone ready.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-        try{
-            if (console.index() == host_index){
-                TeraCardReader card_detector(COLOR_RED);
-                if (!card_detector.detect(console.video().snapshot())){
-                    if (HOSTING_MODE == Mode::HOST_ONLINE){
-                        connect_to_internet_from_overworld(env.program_info(), console, context);
-                    }
-                    open_raid(console, context);
-                }
-            }else{
-                enter_tera_search(env.program_info(), console, context, HOSTING_MODE == Mode::HOST_ONLINE);
-            }
-        }catch (OperationFailedException&){
-            stats.m_errors++;
-            m_reset_required[console.index()] = true;
-            throw;
+    TeraCardReader card_detector(COLOR_RED);
+    if (!card_detector.detect(console.video().snapshot())){
+        if (HOSTING_MODE == Mode::HOST_ONLINE){
+            connect_to_internet_from_overworld(env.program_info(), console, context);
         }
-    });
+        open_raid(console, context);
+    }
 
     if (HOSTING_MODE != Mode::FARM_ALONE){
         BAN_LIST.refresh_online_table(env.logger());
@@ -452,9 +342,9 @@ bool TeraMultiFarmer::run_raid(
     //  Open lobby and read code.
     WallClock lobby_start_time;
     try{
-        TeraLobbyReader lobby_reader(host_console.logger());
+        TeraLobbyReader lobby_reader(console.logger());
         open_hosting_lobby(
-            env, host_console, host_context,
+            env, console, context,
             HOSTING_MODE == Mode::HOST_ONLINE
                 ? HostingMode::ONLINE_CODED
                 : HostingMode::LOCAL
@@ -462,7 +352,7 @@ bool TeraMultiFarmer::run_raid(
         lobby_start_time = current_time();
         std::string code = lobby_reader.raid_code(
             env.logger(),
-            host_console.video().snapshot()
+            console.video().snapshot()
         );
 
 //        code.back() = '0';
@@ -472,36 +362,23 @@ bool TeraMultiFarmer::run_raid(
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Unable to read raid code.",
-                host_console
+                console
             );
         }
     }catch (OperationFailedException&){
         stats.m_errors++;
-        m_reset_required[host_index] = true;
+        m_reset_required[console.index()] = true;
         throw;
     }
 
-//    normalized_code[0] = '0';
-
-    //  Join the lobby with local joiners. If anything throws, we need to reset everyone.
-    try{
-        env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-            join_lobby(env, console, context, host_index, lobby_code);
-        });
-    }catch (OperationFailedException&){
-        stats.m_errors++;
-        m_reset_required[0] = true;
-        m_reset_required[1] = true;
-        m_reset_required[2] = true;
-        m_reset_required[3] = true;
-        throw;
-    }
+    raid_waiter.signal_raid_code_is_ready(lobby_code);
+    raid_waiter.wait_for_joiners(env.consoles.size() - 1);
 
 #if 1
     //  Put it up on auto-host.
     if (HOSTING_MODE != Mode::FARM_ALONE){
         send_host_announcement(
-            env, host_console,
+            env, console,
             lobby_code,
             HOSTING_OPTIONS.SHOW_RAID_CODE,
             HOSTING_OPTIONS.DESCRIPTION,
@@ -509,7 +386,7 @@ bool TeraMultiFarmer::run_raid(
         );
 
         TeraLobbyWaiter waiter(
-            env, host_console, host_context,
+            env, console, context,
             (uint8_t)env.consoles.size(),
             lobby_code, lobby_start_time,
             HOSTING_OPTIONS.LOBBY_WAIT_DELAY,
@@ -541,13 +418,83 @@ bool TeraMultiFarmer::run_raid(
         }else if (players == hosts){
             stats.m_empty++;
         }
+
+
     }
 #endif
 
-    bool win = false;
-
     //  Start the raid.
-    pbf_mash_button(host_context, BUTTON_A, 10 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_A, 10 * TICKS_PER_SECOND);
+
+    return true;
+}
+void TeraMultiFarmer::start_sequence_joiner(
+    ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context,
+    RaidWaiter& raid_waiter
+){
+    join_raid(
+        env.program_info(), console, context,
+        HOSTING_MODE == Mode::HOST_ONLINE,
+        PLAYERS[console.index()]->keyboard_layout,
+        raid_waiter
+    );
+
+    raid_waiter.signal_joiner_is_ready();
+
+    //  Mash A to ready up. Even though this runs for 3 minutes, it will
+    //  automatically be cancelled by the host when the host starts the raid.
+    pbf_mash_button(context, BUTTON_A, std::chrono::minutes(3));
+}
+
+bool TeraMultiFarmer::run_raid(
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+    std::string& lobby_code,
+    std::array<std::map<Language, std::string>, 4>& player_names
+){
+    TeraMultiFarmer_Descriptor::Stats& stats = env.current_stats<TeraMultiFarmer_Descriptor::Stats>();
+    size_t host_index = HOSTING_SWITCH.current_value();
+
+    CancellableHolder<RaidWaiter> raid_waiter(scope);
+    CancellableHolder<CancellableScope> joiner_scope((CancellableScope&)raid_waiter);
+
+    env.run_in_parallel(raid_waiter, [&](ConsoleHandle& console, ProControllerContext& context){
+        try{
+            if (console.index() == host_index){
+                start_sequence_host(
+                    env, console, context,
+                    raid_waiter,
+                    joiner_scope,
+                    lobby_code,
+                    player_names
+                );
+                joiner_scope.cancel();
+                return;
+            }
+
+            ProControllerContext sub_context(joiner_scope, context.controller());
+            start_sequence_joiner(
+                env, console, sub_context,
+                raid_waiter
+            );
+            sub_context.wait_for_all_requests();
+
+        }catch (OperationCancelledException&){
+        }catch (OperationFailedException&){
+            stats.m_errors++;
+            m_reset_required[console.index()] = true;
+            raid_waiter.cancel();
+//            cout << "OperationFailedException: " << console.index() << endl;
+            throw;
+        }catch (...){
+            raid_waiter.cancel();
+//            cout << "General Exception: " << console.index() << endl;
+            throw;
+        }
+//        cout << "Finishing: " << console.index() << endl;
+    });
+
+
+    bool win = false;
 
     //  Run the raid.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
@@ -660,6 +607,8 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
             }
             fail_tracker.report_successful_raid();
         }catch (OperationFailedException& e){
+//            cout << "caught: TeraMultiFarmer::program" << endl;
+
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
             if (RECOVERY_MODE != RecoveryMode::SAVE_AND_RESET){
                 //  Iterate the errored Switches. If a non-host has errored,

@@ -70,6 +70,7 @@ void TeraFailTracker::on_raid_start(){
     }
     m_current_raid_error.store(false, std::memory_order_relaxed);
 
+#if 1
     if (m_consecutive_failures > 0 && !m_completed_one){
         throw_and_log<FatalProgramException>(
             m_env.logger(),
@@ -77,6 +78,8 @@ void TeraFailTracker::on_raid_start(){
             "Failed 1st raid attempt. Will not retry due to risk of ban."
         );
     }
+#endif
+
     size_t fail_threshold = m_consecutive_failure_pause;
     if (m_consecutive_failures >= fail_threshold){
         uint16_t minutes = m_failure_pause_minutes;
