@@ -24,6 +24,7 @@
 #include <thread>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "VideoOverlay.h"
 #include "VideoOverlayOption.h"
@@ -132,11 +133,6 @@ public:
 private:
     void stats_thread();
 
-    //  Push updates to the various listeners.
-    void push_box_update();
-    void push_text_update();
-    void push_image_update();
-    void push_log_text_update();
 
 private:
     Logger& m_logger;
@@ -152,7 +148,7 @@ private:
     std::list<OverlayStat*> m_stats_order;
     std::map<OverlayStat*, std::list<OverlayStat*>::iterator> m_stats;
 
-    std::set<ContentListener*> m_content_listeners;
+    ListenerSet<ContentListener> m_listeners;
 
     bool m_stopping = false;
     std::vector<OverlayStatSnapshot> m_stat_lines;
