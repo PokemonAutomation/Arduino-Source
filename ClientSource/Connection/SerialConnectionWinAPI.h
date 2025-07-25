@@ -44,7 +44,7 @@ public:
             throw ConnectionException(nullptr, "Unable to open serial connection (" + name + "). Error = " + std::to_string(error));
         }
 
-        DCB serial_params{0};
+        DCB serial_params{};
         serial_params.DCBlength = sizeof(serial_params);
 
         if (!GetCommState(m_handle, &serial_params)){
@@ -67,7 +67,7 @@ public:
         }
 
 #if 1
-        COMMTIMEOUTS timeouts{0};
+        COMMTIMEOUTS timeouts{};
         if (!GetCommTimeouts(m_handle, &timeouts)){
             DWORD error = GetLastError();
             CloseHandle(m_handle);
