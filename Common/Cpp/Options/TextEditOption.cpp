@@ -37,12 +37,12 @@ struct TextEditOption::Data{
     {}
 };
 
-void TextEditOption::add_listener(FocusListener& listener){
+void TextEditOption::add_focus_listener(FocusListener& listener){
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
     data.listeners.insert(&listener);
 }
-void TextEditOption::remove_listener(FocusListener& listener){
+void TextEditOption::remove_focus_listener(FocusListener& listener){
     Data& data = *m_data;
     WriteSpinLock lg(data.m_lock);
     data.listeners.erase(&listener);

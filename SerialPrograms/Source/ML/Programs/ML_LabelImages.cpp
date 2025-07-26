@@ -132,6 +132,7 @@ IntegerEnumDropdownDatabase create_label_type_database(){
     IntegerEnumDropdownDatabase database;
     database.add(0, "pokemon-form", Pokemon::STRING_POKEMON + " Forms");
     database.add(1, "custom-set", "Custom Set");
+    database.add(2, "manual-input", "Manual Input");
     return database;
 }
 
@@ -151,7 +152,8 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
         "sun",
         "mc"
     }))
-    , CUSTOM_LABEL(CUSTOM_LABEL_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
+    , CUSTOM_SET_LABEL(CUSTOM_LABEL_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
+    , MANUAL_LABEL(false, "Input: ", LockMode::UNLOCK_WHILE_RUNNING, "", "Custom Label")
 {
     ADD_OPTION(X);
     ADD_OPTION(Y);
@@ -159,7 +161,8 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     ADD_OPTION(HEIGHT);
     ADD_OPTION(LABEL_TYPE);
     ADD_OPTION(FORM_LABEL);
-    ADD_OPTION(CUSTOM_LABEL);
+    ADD_OPTION(CUSTOM_SET_LABEL);
+    ADD_OPTION(MANUAL_LABEL);
 
     X.add_listener(*this);
     Y.add_listener(*this);
@@ -167,7 +170,8 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     HEIGHT.add_listener(*this);
     LABEL_TYPE.add_listener(*this);
     FORM_LABEL.add_listener(*this);
-    CUSTOM_LABEL.add_listener(*this);
+    CUSTOM_SET_LABEL.add_listener(*this);
+    MANUAL_LABEL.add_listener(*this);
 
     // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
     const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
@@ -385,7 +389,7 @@ void LabelImages::compute_mask(){
         ImageFloatBox mask_box(
             min_mask_x/double(source_width), min_mask_y/double(source_height),
             mask_width/double(source_width), mask_height/double(source_height));
-        const std::string label = FORM_LABEL.slug();
+        const std::string label = this->selected_label();
         
 
         ObjectAnnotation annotation;
@@ -432,7 +436,7 @@ void LabelImages::delete_selected_annotation(){
     }
 
     std::string& cur_label = m_annotations[m_selected_obj_idx].label;
-    FORM_LABEL.set_by_slug(cur_label);
+    set_selected_label(cur_label);
     update_rendered_objects();
 }
 
@@ -455,9 +459,7 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
     }
 
     auto new_label = m_annotations[m_selected_obj_idx].label;
-    if (FORM_LABEL.slug() != new_label){
-        FORM_LABEL.set_by_slug(new_label);
-    }
+    set_selected_label(new_label);
 }
 
 void LabelImages::select_prev_annotation(){
@@ -475,9 +477,7 @@ void LabelImages::select_prev_annotation(){
     }
 
     auto new_label = m_annotations[m_selected_obj_idx].label;
-    if (FORM_LABEL.slug() != new_label){
-        FORM_LABEL.set_by_slug(new_label);
-    }
+    set_selected_label(new_label);
     update_rendered_objects();
 }
 void LabelImages::select_next_annotation(){
@@ -495,34 +495,71 @@ void LabelImages::select_next_annotation(){
     }
 
     auto new_label = m_annotations[m_selected_obj_idx].label;
-    if (FORM_LABEL.slug() != new_label){
-        FORM_LABEL.set_by_slug(new_label);
-    }
+    set_selected_label(new_label);
     update_rendered_objects();
 }
 
 void LabelImages::on_config_value_changed(void* object){
     // cout << "LabelImages::on_config_value_changed" << endl;
     if (object == &LABEL_TYPE){
-        if (LABEL_TYPE.current_value() == 0){
+        const size_t value = LABEL_TYPE.current_value();
+        // cout << "LABEL_TYPE value changed to " << value << endl;
+        // label type changed
+        if (value == 0){
             FORM_LABEL.set_visibility(ConfigOptionState::ENABLED);
-            CUSTOM_LABEL.set_visibility(ConfigOptionState::DISABLED);
-        } else{
-            FORM_LABEL.set_visibility(ConfigOptionState::DISABLED);
-            CUSTOM_LABEL.set_visibility(ConfigOptionState::ENABLED);
+            CUSTOM_SET_LABEL.set_visibility(ConfigOptionState::HIDDEN);
+            MANUAL_LABEL.set_visibility(ConfigOptionState::HIDDEN);
+        } else if (value == 1){
+            FORM_LABEL.set_visibility(ConfigOptionState::HIDDEN);
+            CUSTOM_SET_LABEL.set_visibility(ConfigOptionState::ENABLED);
+            MANUAL_LABEL.set_visibility(ConfigOptionState::HIDDEN);
+        } else {
+            FORM_LABEL.set_visibility(ConfigOptionState::HIDDEN);
+            CUSTOM_SET_LABEL.set_visibility(ConfigOptionState::HIDDEN);
+            MANUAL_LABEL.set_visibility(ConfigOptionState::ENABLED);
+            // cout << "MANUAL_LABEL enabeld" << endl;
         }
     }
 
-    if (object == &FORM_LABEL || object == &CUSTOM_LABEL || object == &LABEL_TYPE){
+    if (object == &LABEL_TYPE || object == &FORM_LABEL || object == &CUSTOM_SET_LABEL || object == &MANUAL_LABEL){
+        // label changed
         if (m_annotations.size() > 0 && m_selected_obj_idx < m_annotations.size()){
             std::string& cur_label = m_annotations[m_selected_obj_idx].label;
-            const std::string& ui_slug = FORM_LABEL.slug();
+            const std::string ui_slug = this->selected_label();
             if (ui_slug != cur_label){
-                cur_label = FORM_LABEL.slug();    
+                cur_label = ui_slug;
             }
         }
         update_rendered_objects();
     }
+}
+
+std::string LabelImages::selected_label() const{
+    const size_t label_type = LABEL_TYPE.current_value();
+    if (label_type == 0){
+        return FORM_LABEL.slug();
+    }
+    if (label_type == 1){
+        return CUSTOM_SET_LABEL.slug();
+    }
+    return MANUAL_LABEL;
+}
+
+void LabelImages::set_selected_label(const std::string& slug){
+    size_t index = FORM_LABEL.database().search_index_by_slug(slug);
+    if (index != SIZE_MAX){
+        LABEL_TYPE.set_value(0);
+        FORM_LABEL.set_by_index(index);
+        return;
+    }
+    index = CUSTOM_SET_LABEL.database().search_index_by_slug(slug);
+    if (index != SIZE_MAX){
+        LABEL_TYPE.set_value(1);
+        CUSTOM_SET_LABEL.set_by_index(index);
+        return;
+    }
+    LABEL_TYPE.set_value(2);
+    MANUAL_LABEL.set(slug);
 }
 
 
@@ -598,8 +635,10 @@ LabelImages_Widget::LabelImages_Widget(
 
     ConfigWidget* pokemon_label_widget = program.FORM_LABEL.make_QtWidget(*scroll_inner);
     annotation_row->addWidget(&pokemon_label_widget->widget(), 2);
-    ConfigWidget* custom_label_widget = program.CUSTOM_LABEL.make_QtWidget(*scroll_inner);
+    ConfigWidget* custom_label_widget = program.CUSTOM_SET_LABEL.make_QtWidget(*scroll_inner);
     annotation_row->addWidget(&custom_label_widget->widget(), 2);
+    ConfigWidget* manual_input_label_widget = program.MANUAL_LABEL.make_QtWidget(*scroll_inner);
+    annotation_row->addWidget(&manual_input_label_widget->widget(), 4);
     annotation_row->addWidget(new QLabel(scroll_inner), 10); // an empty label to push other UIs to the left
 
     // add compute embedding button
@@ -724,6 +763,8 @@ void LabelImages_Widget::on_mouse_move(double x, double y){
     m_program.Y.set(yl);
     m_program.WIDTH.set(xh - xl);
     m_program.HEIGHT.set(yh - yl);
+
+    m_program.update_rendered_objects();
 }
 
 }

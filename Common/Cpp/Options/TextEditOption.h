@@ -19,8 +19,8 @@ public:
     struct FocusListener{
         virtual void focus_in(){}
     };
-    void add_listener(FocusListener& listener);
-    void remove_listener(FocusListener& listener);
+    void add_focus_listener(FocusListener& listener);
+    void remove_focus_listener(FocusListener& listener);
 
     void report_focus_in();
 

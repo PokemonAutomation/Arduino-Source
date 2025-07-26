@@ -57,7 +57,9 @@ public:
     size_t longest_text_length() const;
 
     const StringSelectEntry& operator[](size_t index) const;
+    // if not found, return SIZE_MAX
     size_t search_index_by_slug(const std::string& slug) const;
+    // if not found, return SIZE_MAX
     size_t search_index_by_name(const std::string& display_name) const;
 
 private:

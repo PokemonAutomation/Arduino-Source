@@ -13,6 +13,7 @@
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -107,6 +108,10 @@ public:
     void select_prev_annotation();
     void select_next_annotation();
 
+    // return the label selected on UI
+    std::string selected_label() const;
+    void set_selected_label(const std::string& label);
+
 private:
     void on_config_value_changed(void* object) override;
 
@@ -125,11 +130,18 @@ private:
     FloatingPointOption WIDTH;
     FloatingPointOption HEIGHT;
 
+    // the database to initialize LABEL_TYPE
     IntegerEnumDropdownDatabase LABEL_TYPE_DATABASE;
+    // a dropdown menu to choose which source below to set label from
     IntegerEnumDropdownOption LABEL_TYPE;
+    // source 1: a dropdown menu for all pokemon forms
     Pokemon::HomeSpriteSelectCell FORM_LABEL;
+    // the database to initialize CUSTOM_SET_LABEL
     StringSelectDatabase CUSTOM_LABEL_DATABASE;
-    StringSelectCell CUSTOM_LABEL;
+    // source 2: a dropdown menu for custom labels
+    StringSelectCell CUSTOM_SET_LABEL;
+    // source 3: editable text input
+    StringOption MANUAL_LABEL;
 
     size_t source_image_height = 0;
     size_t source_image_width = 0;
