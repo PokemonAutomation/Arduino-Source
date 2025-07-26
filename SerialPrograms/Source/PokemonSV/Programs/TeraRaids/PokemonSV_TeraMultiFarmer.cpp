@@ -367,7 +367,7 @@ bool TeraMultiFarmer::start_sequence_host(
         }
     }catch (OperationFailedException&){
         stats.m_errors++;
-        m_reset_required[console.index()] = true;
+        m_reset_required[console.index()].store(true, std::memory_order_relaxed);
         throw;
     }
 
@@ -401,10 +401,10 @@ bool TeraMultiFarmer::start_sequence_host(
 
         if (result == TeraLobbyWaiter::LobbyResult::BANNED_PLAYER){
             stats.m_banned++;
-            m_reset_required[0] = true;
-            m_reset_required[1] = true;
-            m_reset_required[2] = true;
-            m_reset_required[3] = true;
+            m_reset_required[0].store(true, std::memory_order_relaxed);
+            m_reset_required[1].store(true, std::memory_order_relaxed);
+            m_reset_required[2].store(true, std::memory_order_relaxed);
+            m_reset_required[3].store(true, std::memory_order_relaxed);
         }
         if (result != TeraLobbyWaiter::LobbyResult::RAID_STARTED){
             return false;
@@ -481,7 +481,14 @@ bool TeraMultiFarmer::run_raid(
         }catch (OperationCancelledException&){
         }catch (OperationFailedException&){
             stats.m_errors++;
-            m_reset_required[console.index()] = true;
+#if 0
+            m_reset_required[console.index()].store(true, std::memory_order_relaxed);
+#else
+            m_reset_required[0].store(true, std::memory_order_relaxed);
+            m_reset_required[1].store(true, std::memory_order_relaxed);
+            m_reset_required[2].store(true, std::memory_order_relaxed);
+            m_reset_required[3].store(true, std::memory_order_relaxed);
+#endif
             raid_waiter.cancel();
 //            cout << "OperationFailedException: " << console.index() << endl;
             throw;
@@ -508,7 +515,7 @@ bool TeraMultiFarmer::run_raid(
             //  Host throws. Reset the host and keep going.
             stats.m_errors++;
             env.update_stats();
-            m_reset_required[console.index()] = true;
+            m_reset_required[console.index()].store(true, std::memory_order_relaxed);
             throw;
         }
     });
@@ -531,10 +538,10 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
     std::string report_name = "PokemonSV-AutoHost-JoinReport-" + now_to_filestring() + ".txt";
     MultiLanguageJoinTracker join_tracker((uint8_t)env.consoles.size());
 
-    m_reset_required[0] = false;
-    m_reset_required[1] = false;
-    m_reset_required[2] = false;
-    m_reset_required[3] = false;
+    m_reset_required[0].store(false, std::memory_order_relaxed);
+    m_reset_required[1].store(false, std::memory_order_relaxed);
+    m_reset_required[2].store(false, std::memory_order_relaxed);
+    m_reset_required[3].store(false, std::memory_order_relaxed);
 
     if (RECOVERY_MODE == RecoveryMode::SAVE_AND_RESET){
         env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
@@ -570,7 +577,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
         //  Reset all errored Switches.
         env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
             size_t index = console.index();
-            if (!m_reset_required[index]){
+            if (!m_reset_required[index].load(std::memory_order_relaxed)){
                 return;
             }
             if (index == host_index){
@@ -578,7 +585,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
             }else{
                 reset_joiner(env.program_info(), console, context);
             }
-            m_reset_required[index] = false;
+            m_reset_required[index].store(false, std::memory_order_relaxed);
         });
 
         //  Check kill-switch now before we go online.
@@ -614,7 +621,7 @@ void TeraMultiFarmer::program(MultiSwitchProgramEnvironment& env, CancellableSco
                 //  Iterate the errored Switches. If a non-host has errored,
                 //  rethrow the exception to stop the program.
                 for (size_t c = 0; c < 4; c++){
-                    if (m_reset_required[c] && c != host_index){
+                    if (m_reset_required[c].load(std::memory_order_relaxed) && c != host_index){
                         throw;
                     }
                 }

@@ -149,7 +149,7 @@ private:
 
     WallClock m_last_time_fix;
 //    std::atomic<bool> m_raid_error;
-    bool m_reset_required[4];
+    std::atomic<bool> m_reset_required[4];
 };
 
 
