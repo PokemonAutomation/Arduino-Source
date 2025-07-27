@@ -60,6 +60,7 @@ void StringCellWidget::on_config_value_changed(void* object){
 }
 void StringCellWidget::on_config_visibility_changed(){
     QMetaObject::invokeMethod(this, [this]{
+        update_visibility();
         setReadOnly(m_value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
     }, Qt::QueuedConnection);
 }
@@ -109,6 +110,7 @@ void StringOptionWidget::on_config_value_changed(void* object){
 }
 void StringOptionWidget::on_config_visibility_changed(){
     QMetaObject::invokeMethod(m_box, [this]{
+        update_visibility();
         m_box->setReadOnly(m_value.is_locked());
     }, Qt::QueuedConnection);
 }

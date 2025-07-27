@@ -93,6 +93,10 @@ public:
     }
 
 public:
+    // Return the lock mode: how locking works on this option. It can be:
+    // - UNLOCK_WHILE_RUNNING,
+    // - LOCK_WHILE_RUNNING,
+    // - READ_ONLY,
     LockMode lock_mode() const;
 
     //  Returns error message if invalid. Otherwise returns empty string.
