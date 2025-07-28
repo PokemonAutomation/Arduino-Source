@@ -513,11 +513,10 @@ void LabelImages::on_config_value_changed(void* object){
             FORM_LABEL.set_visibility(ConfigOptionState::HIDDEN);
             CUSTOM_SET_LABEL.set_visibility(ConfigOptionState::ENABLED);
             MANUAL_LABEL.set_visibility(ConfigOptionState::HIDDEN);
-        } else {
+        } else { // value == 2
             FORM_LABEL.set_visibility(ConfigOptionState::HIDDEN);
             CUSTOM_SET_LABEL.set_visibility(ConfigOptionState::HIDDEN);
             MANUAL_LABEL.set_visibility(ConfigOptionState::ENABLED);
-            // cout << "MANUAL_LABEL enabeld" << endl;
         }
     }
 

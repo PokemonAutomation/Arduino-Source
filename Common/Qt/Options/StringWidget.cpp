@@ -9,9 +9,9 @@
 #include <QLineEdit>
 #include "StringWidget.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 
@@ -59,9 +59,22 @@ void StringCellWidget::on_config_value_changed(void* object){
     }, Qt::QueuedConnection);
 }
 void StringCellWidget::on_config_visibility_changed(){
+    // Overwrite ConfigWidget::on_config_visibility_changed() because ConfigWidget cannot handle
+    // READ_ONLY state.
+    this->setEnabled(true);
     QMetaObject::invokeMethod(this, [this]{
-        update_visibility();
-        setReadOnly(m_value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
+        const ConfigOptionState visibility = m_value.visibility();
+        this->setReadOnly(visibility != ConfigOptionState::ENABLED || 
+            m_value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
+        switch (visibility){
+        case ConfigOptionState::ENABLED:
+        case ConfigOptionState::DISABLED:
+            this->setVisible(true);
+            break;
+        case ConfigOptionState::HIDDEN:
+            this->setVisible(false);
+            break;
+        }
     }, Qt::QueuedConnection);
 }
 
@@ -109,9 +122,22 @@ void StringOptionWidget::on_config_value_changed(void* object){
     }, Qt::QueuedConnection);
 }
 void StringOptionWidget::on_config_visibility_changed(){
-    QMetaObject::invokeMethod(m_box, [this]{
-        update_visibility();
-        m_box->setReadOnly(m_value.is_locked());
+    // Overwrite ConfigWidget::on_config_visibility_changed() because ConfigWidget cannot handle
+    // READ_ONLY state.
+    this->setEnabled(true);
+    QMetaObject::invokeMethod(this, [this]{
+        const ConfigOptionState visibility = m_value.visibility();
+        m_box->setReadOnly(visibility != ConfigOptionState::ENABLED || 
+            m_value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
+        switch (visibility){
+        case ConfigOptionState::ENABLED:
+        case ConfigOptionState::DISABLED:
+            this->setVisible(true);
+            break;
+        case ConfigOptionState::HIDDEN:
+            this->setVisible(false);
+            break;
+        }
     }, Qt::QueuedConnection);
 }
 

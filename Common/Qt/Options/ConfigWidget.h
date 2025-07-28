@@ -36,11 +36,23 @@ public:
 
     //  Needs to be called on the UI thread.
     virtual void update_value(){}
+    //  Needs to be called on the UI thread. Update QWidget's visibility based on
+    //  ConfigOption m_value's visibility setting.
+    //  Note this function is unable to set READ_ONLY visibility state. The derived
+    //  classes of ConfigWidget who have the functionality to set read-only should
+    //  overwrite on_config_visibility_changed() to handle that.
     virtual void update_visibility();
     void update_visibility(bool program_is_running);
     void update_all(bool program_is_running);
 
 protected:
+    //  Overwrite ConfigOption::Listener::on_config_visibility_changed().
+    //  Called when the listened config option's visibility is changed.
+    //  This function invokes this->update_visibility() on the Qt UI thread.
+    //  Note due to update_visibility() is unable to set READ_ONLY visbility state.
+    //  It is up to the derived classes of ConfigWidget who have the functionality
+    //  to set read-only (e.g. StringOptionWidget) to overwrite this function to
+    //  handle read-only.
     virtual void on_config_visibility_changed() override;
     virtual void on_program_state_changed(bool program_is_running) override;
 
