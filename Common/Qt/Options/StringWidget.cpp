@@ -47,6 +47,19 @@ StringCellWidget::StringCellWidget(QWidget& parent, StringCell& value)
             m_value.set(this->text().toStdString());
         }
     );
+    if (m_value.signal_all_text_changes()){
+        connect(
+            this, &QLineEdit::textChanged,
+            [this]{
+                std::string old_value = (std::string)m_value;
+                std::string text = this->text().toStdString();
+                if (old_value == text){
+                    return;
+                }
+                m_value.set(std::move(text));
+            }
+        );
+    }
 
     m_value.add_listener(*this);
 }
@@ -110,6 +123,19 @@ StringOptionWidget::StringOptionWidget(QWidget& parent, StringOption& value)
             m_value.set(m_box->text().toStdString());
         }
     );
+    if (m_value.signal_all_text_changes()){
+        connect(
+            m_box, &QLineEdit::textChanged,
+            [this]{
+                const std::string old_value = (std::string)m_value;
+                std::string text = m_box->text().toStdString();
+                if (old_value == text){
+                    return;
+                }
+                m_value.set(std::move(text));
+            }
+        );
+    }
 
     m_value.add_listener(*this);
 }

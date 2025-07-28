@@ -45,9 +45,9 @@ public:
             connect(
                 this, &QTextEdit::textChanged,
                 [this]{
-                    std::string new_value = (std::string)m_parent.m_value;
+                    const std::string old_value = (std::string)m_parent.m_value;
                     std::string text = this->toPlainText().toStdString();
-                    if (new_value == text){
+                    if (old_value == text){
                         return;
                     }
 //                    cout << new_value << " : " << text << endl;

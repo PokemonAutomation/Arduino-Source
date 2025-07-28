@@ -51,6 +51,7 @@ public:
 public:
     StringSelectDatabase();
     void add_entry(StringSelectEntry entry);
+    size_t size() const;
 
 public:
     const std::vector<StringSelectEntry>& case_list() const;

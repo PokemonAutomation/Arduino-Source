@@ -112,6 +112,8 @@ public:
     std::string selected_label() const;
     void set_selected_label(const std::string& label);
 
+    void load_custom_label_set(const std::string& json_path);
+
 private:
     void on_config_value_changed(void* object) override;
 
@@ -141,7 +143,7 @@ private:
     // source 2: a dropdown menu for custom labels
     StringSelectCell CUSTOM_SET_LABEL;
     // source 3: editable text input
-    StringOption MANUAL_LABEL;
+    StringCell MANUAL_LABEL;
 
     size_t source_image_height = 0;
     size_t source_image_width = 0;
@@ -162,6 +164,8 @@ private:
     // we fail to load it, then we shouldn't overwrite this file to possibly erase the previous work.
     // so this flag is used to denote if we fail to load an annotation file
     bool m_fail_to_load_annotation_file = false;
+
+    std::string m_custom_label_set_file_path;
 };
 
 

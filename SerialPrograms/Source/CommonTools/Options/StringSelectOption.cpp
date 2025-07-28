@@ -75,6 +75,7 @@ struct StringSelectDatabase::Data{
 
         m_longest_text_length = std::max(m_longest_text_length, item.display_name.size());
     }
+    size_t size() const { return m_list.size(); }
 };
 
 
@@ -105,6 +106,9 @@ size_t StringSelectDatabase::search_index_by_name(const std::string& display_nam
 }
 void StringSelectDatabase::add_entry(StringSelectEntry entry){
     m_data->add_entry(std::move(entry));
+}
+size_t StringSelectDatabase::size() const{
+    return m_data->size();
 }
 
 StringSelectDatabase create_string_select_database(const std::vector<std::string>& slugs){

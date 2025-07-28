@@ -148,12 +148,9 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , LABEL_TYPE_DATABASE(create_label_type_database())
     , LABEL_TYPE("<b>Select Label:</b>", LABEL_TYPE_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
     , FORM_LABEL("bulbasaur")
-    , CUSTOM_LABEL_DATABASE(create_string_select_database({
-        "sun",
-        "mc"
-    }))
+    , CUSTOM_LABEL_DATABASE(create_string_select_database({"mc"})) // mc for "main character"
     , CUSTOM_SET_LABEL(CUSTOM_LABEL_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
-    , MANUAL_LABEL(false, "Input: ", LockMode::UNLOCK_WHILE_RUNNING, "", "Custom Label")
+    , MANUAL_LABEL(false, LockMode::UNLOCK_WHILE_RUNNING, "", "Custom Label", true)
 {
     ADD_OPTION(X);
     ADD_OPTION(Y);
@@ -203,10 +200,15 @@ void LabelImages::from_json(const JsonValue& json){
         m_display_option.load_json(*value);
     }
     m_options.load_json(json);
+    const std::string* file_path = obj->get_string("CUSTOM_LABEL_SET_FILE_PATH");
+    if (file_path){
+        load_custom_label_set(*file_path);
+    }
 }
 JsonValue LabelImages::to_json() const{
     JsonObject obj = std::move(*m_options.to_json().to_object());
     obj["ImageSetup"] = m_display_option.to_json();
+    obj["CUSTOM_LABEL_SET_FILE_PATH"] = m_custom_label_set_file_path;
 
     save_annotation_to_file();
     return obj;
@@ -561,6 +563,40 @@ void LabelImages::set_selected_label(const std::string& slug){
     MANUAL_LABEL.set(slug);
 }
 
+void LabelImages::load_custom_label_set(const std::string& json_path){
+    StringSelectDatabase new_database;
+    try{
+        JsonValue value = load_json_file(json_path);
+        const JsonArray& json_array = value.to_array_throw();
+        for(size_t i = 0; i < json_array.size(); i++){
+            const std::string& label_slug = json_array[i].to_string_throw();
+            new_database.add_entry(StringSelectEntry(label_slug, label_slug));
+        }
+    } catch(FileException& e){
+        std::cerr << "Error: File exception " << e.message() << std::endl;
+        QMessageBox box;
+        box.warning(nullptr, "Unable to Load Custom Label Set",
+            QString::fromStdString("Cannot open JSON file " + json_path + " for the custom label set. Probably wrong permission?"));
+        return;
+    } catch(JsonParseException& e){
+        std::cerr << "Error: JSON parse exception " << e.message() << std::endl;
+        QMessageBox box;
+        box.warning(nullptr, "Unable to Load Custom Label Set",
+            QString::fromStdString("Cannot parse JSON file " + json_path + " for the custom label set. Probably wrong file content?"));
+        return;
+    }
+    
+    cout << "Loaded " << new_database.size() << " custom labels from " << json_path << endl;
+    CUSTOM_LABEL_DATABASE = new_database;
+    if (&json_path != &m_custom_label_set_file_path){
+        m_custom_label_set_file_path = json_path;
+    }
+
+    // if the current label is set by MANUAL_LABEL but its value appears in the newly loaded custom set,
+    // the label UI should switch the label to be shown as part of the custom set.
+    // so call the following line to achieve that
+    set_selected_label(selected_label());
+}
 
 LabelImages_Widget::~LabelImages_Widget(){
     m_display_session.overlay().remove_listener(*this);
@@ -637,13 +673,17 @@ LabelImages_Widget::LabelImages_Widget(
     ConfigWidget* custom_label_widget = program.CUSTOM_SET_LABEL.make_QtWidget(*scroll_inner);
     annotation_row->addWidget(&custom_label_widget->widget(), 2);
     ConfigWidget* manual_input_label_widget = program.MANUAL_LABEL.make_QtWidget(*scroll_inner);
-    annotation_row->addWidget(&manual_input_label_widget->widget(), 4);
+    annotation_row->addWidget(&manual_input_label_widget->widget(), 2);
+    QPushButton* load_custom_set_button = new QPushButton("Load Custom Set", scroll_inner);
+    annotation_row->addWidget(load_custom_set_button, 2);
     annotation_row->addWidget(new QLabel(scroll_inner), 10); // an empty label to push other UIs to the left
 
     // add compute embedding button
 
     QPushButton* compute_embedding_button = new QPushButton("Compute Image Embeddings (SLOW!)", scroll_inner);
     scroll_layout->addWidget(compute_embedding_button);
+
+    // connect button signals to define button actions
 
     connect(delete_anno_button, &QPushButton::clicked, this, [this](bool){
         auto& program = this->m_program;
@@ -657,6 +697,21 @@ LabelImages_Widget::LabelImages_Widget(
     connect(next_anno_button, &QPushButton::clicked, this, [this](bool){
         auto& program = this->m_program;
         program.select_next_annotation();
+    });
+
+    connect(load_custom_set_button, &QPushButton::clicked, this, [this](bool){
+        const std::string& last_loaded_file_path = m_program.m_custom_label_set_file_path;
+        std::string starting_dir = ".";
+        if (last_loaded_file_path.size() > 0){
+            starting_dir = std::filesystem::path(last_loaded_file_path).parent_path().string();
+        }
+        const std::string path = QFileDialog::getOpenFileName(
+            nullptr, "Open JSON file", QString::fromStdString(starting_dir), "*.json"
+        ).toStdString();
+        if (path.size() > 0){
+            cout << "File dialog returns JSON path " << path << endl;
+            m_program.load_custom_label_set(path);
+        }
     });
 
     connect(compute_embedding_button, &QPushButton::clicked, this, [this](bool){
