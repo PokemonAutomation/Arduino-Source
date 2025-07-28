@@ -15,6 +15,7 @@
 #define PokemonAutomation_Options_EnumDropdownDatabase_H
 
 #include <string>
+#include <vector>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
 
