@@ -783,10 +783,47 @@ void LabelImages_Widget::post_startup(VideoSource* source){
     m_program.load_image_related_data(image_path, cur_res.width, cur_res.height);
 }
 
+void LabelImages_Widget::key_press(QKeyEvent* event){
+    const auto key = Qt::Key(event->key());
+    switch(key){
+    case Qt::Key::Key_Shift:
+        m_shift_pressed = true;
+        break;
+    case Qt::Key::Key_Control:
+        #ifndef __APPLE__
+        m_control_pressed = true;
+        #endif
+        break;
+    case Qt::Key::Key_Meta:
+        #if defined(__APPLE__)
+        m_control_pressed = true;
+        #endif
+        break;
+    default:
+    }
+}
+
 void LabelImages_Widget::key_release(QKeyEvent* event){
     const auto key = Qt::Key(event->key());
-    if (key == Qt::Key::Key_Delete || key == Qt::Key::Key_Backspace){
+    switch(key){
+    case Qt::Key::Key_Shift:
+        m_shift_pressed = false;
+        break;
+    case Qt::Key::Key_Control:
+        #ifndef __APPLE__
+        m_control_pressed = false;
+        #endif
+        break;
+    case Qt::Key::Key_Meta:
+        #if defined(__APPLE__)
+        m_control_pressed = false;
+        #endif
+        break;
+    case Qt::Key::Key_Delete:
+    case Qt::Key::Key_Backspace:
         m_program.delete_selected_annotation();
+        break;
+    default:
     }
 }
 
@@ -816,6 +853,9 @@ void LabelImages_Widget::on_mouse_release(double x, double y){
     // user may have very small movement while doing quick clicking. To register this as a simple click, use relative
     // screen distance threshold 0.0015 and click duration threshold 0.15 second:
     if ((rel_x == 0 && rel_y == 0) || (rel_x < 0.0015 && rel_y < 0.0015 && duration < std::chrono::milliseconds(150))){
+        if (m_shift_pressed){
+            cout << "shift pressed while at " << x << " " << y << endl;
+        }
         // process mouse clicking
         // change currently selected annotation
         // also change the option values in the UI

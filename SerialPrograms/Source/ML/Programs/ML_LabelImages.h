@@ -190,7 +190,7 @@ public:
     virtual void post_startup(VideoSource* source) override;
 
     //  Overwrites CommandReceiver::key_press().
-    virtual void key_press(QKeyEvent* event) override {}
+    virtual void key_press(QKeyEvent* event) override;
     //  Overwrites CommandReceiver::key_release().
     virtual void key_release(QKeyEvent* event) override;
     //  Overwrites CommandReceiver::focus_in().
@@ -221,6 +221,9 @@ private:
     std::optional<std::pair<double, double>> m_mouse_start;
     std::optional<std::pair<double, double>> m_mouse_end;
     std::chrono::time_point<std::chrono::high_resolution_clock> m_mouse_start_time;
+
+    bool m_shift_pressed = false;
+    bool m_control_pressed = false;
 };
 
 
