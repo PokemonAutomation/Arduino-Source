@@ -108,13 +108,19 @@ size_t ImagePixelBox::distance_to_point_y(const size_t y) const{
 }
 //  The distance from the box center to a point on x axis
 size_t ImagePixelBox::center_distance_to_point_x(const size_t x) const{
-    size_t d = center_x() - x;
-    return d > 0 ? d : -d;
+    const size_t cx = center_x();
+    if (cx >= x){
+        return cx - x;
+    }
+    return x - cx;
 }
 //  The distance from the box center to a point on y axis
 size_t ImagePixelBox::center_distance_to_point_y(const size_t y) const{
-    size_t d = center_y() - y;
-    return d > 0 ? d : -d;
+    const size_t cy = center_y();
+    if (cy >= y){
+        return cy - y;
+    }
+    return y - cy;
 }
 
 
