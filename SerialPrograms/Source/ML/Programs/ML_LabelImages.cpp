@@ -450,6 +450,8 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
 
     const size_t px = (size_t)std::max<double>(source_image_width * x + 0.5, 0);
     const size_t py = (size_t)std::max<double>(source_image_height * y + 0.5, 0);
+
+    const size_t old_selected_idx = m_selected_obj_idx;
     
     double closest_distance = DBL_MAX;
     std::vector<size_t> zero_distance_annotations;
@@ -480,8 +482,11 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
         }
     }
 
-    auto new_label = m_annotations[m_selected_obj_idx].label;
-    set_selected_label(new_label);
+    if (old_selected_idx != m_selected_obj_idx){
+        auto new_label = m_annotations[m_selected_obj_idx].label;
+        set_selected_label(new_label);
+        update_rendered_objects();
+    }
 }
 
 void LabelImages::select_prev_annotation(){
