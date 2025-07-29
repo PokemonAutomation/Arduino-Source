@@ -799,7 +799,7 @@ void LabelImages_Widget::key_press(QKeyEvent* event){
         m_control_pressed = true;
         #endif
         break;
-    default:
+    default:;
     }
 }
 
@@ -823,7 +823,7 @@ void LabelImages_Widget::key_release(QKeyEvent* event){
     case Qt::Key::Key_Backspace:
         m_program.delete_selected_annotation();
         break;
-    default:
+    default:;
     }
 }
 
