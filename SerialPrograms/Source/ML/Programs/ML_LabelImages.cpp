@@ -447,16 +447,36 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0){
         return;
     }
+
+    const size_t px = (size_t)std::max<double>(source_image_width * x + 0.5, 0);
+    const size_t py = (size_t)std::max<double>(source_image_height * y + 0.5, 0);
     
     double closest_distance = DBL_MAX;
+    std::vector<size_t> zero_distance_annotations;
     for(size_t i = 0; i < m_annotations.size(); i++){
-        ImageFloatBox float_box = pixelbox_to_floatbox(source_image_width, source_image_height, m_annotations[i].mask_box);
-        double center_x = float_box.x + float_box.width/2.0;
-        double center_y = float_box.y + float_box.height/2.0;
-        double d2 = (center_x-x)*(center_x-x) + (center_y-y)*(center_y-y);
+        const size_t dx = m_annotations[i].mask_box.distance_to_point_x(px);
+        const size_t dy = m_annotations[i].mask_box.distance_to_point_y(py);
+        const size_t d2 = dx*dx + dy*dy;
+        if (d2 == 0){
+            zero_distance_annotations.push_back(i);
+        }
         if (d2 < closest_distance){
             closest_distance = d2;
             m_selected_obj_idx = i;
+        }
+    }
+
+    if (zero_distance_annotations.size() > 1){
+        // this point is inside multiple boxes, we then use the closest to the box center to determine
+        closest_distance = DBL_MAX;
+        for(size_t i : zero_distance_annotations){
+            const size_t dx = m_annotations[i].mask_box.center_distance_to_point_x(px);
+            const size_t dy = m_annotations[i].mask_box.center_distance_to_point_y(py);
+            const size_t d2 = dx*dx + dy*dy;
+            if (d2 < closest_distance){
+                closest_distance = d2;
+                m_selected_obj_idx = i;
+            }
         }
     }
 
@@ -779,17 +799,30 @@ void LabelImages_Widget::on_mouse_press(double x, double y){
     m_mouse_end.emplace();
     m_mouse_start->first = m_mouse_end->first = x;
     m_mouse_start->second = m_mouse_end->second = y;
+    m_mouse_start_time = std::chrono::high_resolution_clock::now();
 }
 
 void LabelImages_Widget::on_mouse_release(double x, double y){
-    if (m_mouse_start == m_mouse_end){
+    const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - m_mouse_start_time;
+    const double rel_x = std::fabs(m_mouse_start->first - m_mouse_end->first);
+    const double rel_y = std::fabs(m_mouse_start->second - m_mouse_end->second);
+
+    m_mouse_start.reset();
+    m_mouse_end.reset();
+
+    // cout << "Mouse release " << (rel_x) << " " << (rel_y) << " duration " << duration << " " <<
+    //     (duration < std::chrono::milliseconds(150)) << endl;
+
+    // user may have very small movement while doing quick clicking. To register this as a simple click, use relative
+    // screen distance threshold 0.0015 and click duration threshold 0.15 second:
+    if ((rel_x == 0 && rel_y == 0) || (rel_x < 0.0015 && rel_y < 0.0015 && duration < std::chrono::milliseconds(150))){
         // process mouse clicking
         // change currently selected annotation
         // also change the option values in the UI
         m_program.change_annotation_selection_by_mouse(x, y);
+        return;
     }
-    m_mouse_start.reset();
-    m_mouse_end.reset();
+
     m_program.compute_mask();
 }
 

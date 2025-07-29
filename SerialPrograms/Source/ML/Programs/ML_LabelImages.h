@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_ML_LabelImages_H
 #define PokemonAutomation_ML_LabelImages_H
 
-#include <QGraphicsScene>
 #include <memory>
+#include <chrono>
+#include <QGraphicsScene>
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
@@ -219,6 +220,7 @@ private:
 
     std::optional<std::pair<double, double>> m_mouse_start;
     std::optional<std::pair<double, double>> m_mouse_end;
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_mouse_start_time;
 };
 
 
