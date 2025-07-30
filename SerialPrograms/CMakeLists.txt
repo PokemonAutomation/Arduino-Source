@@ -138,10 +138,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Options/BatchOption.h
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
-    ../Common/Cpp/Options/ButtonOption.cpp
-    ../Common/Cpp/Options/ButtonOption.h
     ../Common/Cpp/Options/BoxFloatOption.cpp
     ../Common/Cpp/Options/BoxFloatOption.h
+    ../Common/Cpp/Options/ButtonOption.cpp
+    ../Common/Cpp/Options/ButtonOption.h
     ../Common/Cpp/Options/ColorOption.cpp
     ../Common/Cpp/Options/ColorOption.h
     ../Common/Cpp/Options/ConfigOption.cpp
@@ -896,6 +896,8 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
     Source/ML/DataLabeling/ML_AnnotationIO.cpp
     Source/ML/DataLabeling/ML_AnnotationIO.h
+    Source/ML/DataLabeling/ML_ObjectAnnotation.cpp
+    Source/ML/DataLabeling/ML_ObjectAnnotation.h
     Source/ML/DataLabeling/ML_SegmentAnythingModel.cpp
     Source/ML/DataLabeling/ML_SegmentAnythingModel.h
     Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
@@ -903,6 +905,8 @@ file(GLOB MAIN_SOURCES
     Source/ML/ML_Panels.h
     Source/ML/Programs/ML_LabelImages.cpp
     Source/ML/Programs/ML_LabelImages.h
+    Source/ML/Programs/ML_LabelImagesWidget.cpp
+    Source/ML/Programs/ML_LabelImagesWidget.h
     Source/ML/UI/ML_ImageAnnotationCommandRow.cpp
     Source/ML/UI/ML_ImageAnnotationCommandRow.h
     Source/ML/UI/ML_ImageAnnotationDisplayOption.cpp
