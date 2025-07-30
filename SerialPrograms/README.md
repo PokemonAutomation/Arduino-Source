@@ -25,3 +25,6 @@ Currently, we build with Qt 6.8.3. But we still retain compatibility with Qt 5.1
 This doesn't actually work. (flickering video display) But here are the instructions for setting it up anyway.
 
 - [How to Build (Qt 6.8.2) - Ubuntu](BuildInstructions/Build-Ubuntu-Qt6.8.2.md)
+
+**Mac:**
+https://github.com/PokemonAutomation/ComputerControl/blob/master/Wiki/SetupGuide/CompilingForMac.md
