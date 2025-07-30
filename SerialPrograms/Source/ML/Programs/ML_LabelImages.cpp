@@ -15,10 +15,11 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Resources/Pokemon_PokemonForms.h"
+// #include "Pokemon/Resources/Pokemon_PokemonForms.h"
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ML/DataLabeling/ML_AnnotationIO.h"
 #include "ML_LabelImages.h"
+#include "ML_LabelImagesOverlayManager.h"
 
 
 
@@ -54,7 +55,6 @@ IntegerEnumDropdownDatabase create_label_type_database(){
 LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_display_session(m_display_option)
-    , m_overlay_set(m_display_session.overlay())
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
     , X("<b>X Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
@@ -95,6 +95,8 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
         box.critical(nullptr, "SAM Model Does Not Exist",
             QString::fromStdString("SAM model path" + sam_model_path + " does not exist."));
     }
+
+    m_overlay_manager = new LabelImages_OverlayManager(*this);
 }
 LabelImages::~LabelImages(){
     X.remove_listener(*this);
@@ -142,7 +144,7 @@ void LabelImages::save_annotation_to_file() const{
 }
 
 void LabelImages::clear_for_new_image(){
-    m_overlay_set.clear();
+    m_overlay_manager->clear();
     source_image_width = source_image_height = 0;
     m_image_embedding.clear();
     m_output_boolean_mask.clear();
@@ -156,12 +158,16 @@ void LabelImages::clear_for_new_image(){
 
 // assuming clear_for_new_image() is already called
 void LabelImages::load_image_related_data(const std::string& image_path, size_t source_image_width, size_t source_image_height){
+    cout << "Image source: " << image_path << ", " << source_image_width << " x " << source_image_height << endl;
+
     this->source_image_height = source_image_height;
     this->source_image_width = source_image_width;
 
     m_mask_image = ImageRGB32(source_image_width, source_image_height);
-    cout << "Image source: " << image_path << ", " << source_image_width << " x " << source_image_height << endl;
-    // if no such embedding file, m_iamge_embedding will be empty
+
+    m_overlay_manager->set_image_size();
+
+    // if no such embedding file, m_image_embedding will be empty
     const bool embedding_loaded = load_image_embedding(image_path, m_image_embedding);
     if (!embedding_loaded){
         return; // no embedding, then no way for us to annotate
@@ -218,65 +224,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
 }
 
 void LabelImages::update_rendered_objects(){
-    m_overlay_set.clear();
-    if (WIDTH > 0.0 && HEIGHT > 0.0){
-        m_overlay_set.add(COLOR_RED, {X, Y, WIDTH, HEIGHT});
-    }
-
-    auto create_overlay_for_index = [&](size_t i_obj){
-        const auto& obj = m_annotations[i_obj];
-        // overlayset.add(COLOR_RED, pixelbox_to_floatbox(source_image_width, source_image_height, obj.user_box));
-        const auto mask_float_box = pixelbox_to_floatbox(source_image_width, source_image_height, obj.mask_box);
-        std::string label = obj.label;
-        const Pokemon::PokemonForm* form = Pokemon::get_pokemon_form(label);
-        if (form != nullptr){
-            label = form->display_name();
-        }
-        Color mask_box_color = (i_obj == m_selected_obj_idx) ? COLOR_BLACK : COLOR_BLUE;
-        m_overlay_set.add(mask_box_color, mask_float_box, label);
-        size_t mask_width = obj.mask_box.width();
-        size_t mask_height = obj.mask_box.height();
-        ImageRGB32 mask_image(mask_width, mask_height);
-        // cout << "in render, mask_box " << obj.mask_box.min_x << " " << obj.mask_box.min_y << " " << obj.mask_box.max_x << " " << obj.mask_box.max_y << endl;
-
-        for (size_t y = 0; y < mask_height; y++){
-            for (size_t x = 0; x < mask_width; x++){
-                const bool mask = obj.mask[y*mask_width + x];
-                uint32_t& pixel = mask_image.pixel(x, y);
-                // if the pixel's mask value is true, set a semi-transparent 45-degree blue strip color
-                // otherwise: fully transparent (alpha = 0)
-                uint32_t color = 0;
-                if (mask){
-                    color = (std::abs(int(x) - int(y)) % 4 <= 1) ? combine_argb(150, 30, 144, 255) : combine_argb(150, 0, 0, 60);
-                }
-                pixel = color;
-            }
-        }
-        // cout << " count " << count << endl;
-        m_overlay_set.add(std::move(mask_image), mask_float_box);
-
-        for(const auto& p : obj.inclusion_points){
-            auto fp = pixel_to_float(p.first, p.second);
-            ImageFloatBox box(fp.first, fp.second, 0.01, 0.01);
-            m_overlay_set.add(COLOR_RED, box);
-        }
-        for(const auto& p : obj.exclusion_points){
-            auto fp = pixel_to_float(p.first, p.second);
-            ImageFloatBox box(fp.first, fp.second, 0.01, 0.01);
-            m_overlay_set.add(COLOR_BLUE, box);
-        }
-    };
-    for(size_t i_obj = 0; i_obj < m_annotations.size(); i_obj++){
-        if (i_obj == m_selected_obj_idx){
-            // skip current selected annotation because we want to render it last so that
-            // it will not be occluded by other annotations
-            continue;
-        }
-        create_overlay_for_index(i_obj);
-    }
-    if (m_selected_obj_idx < m_annotations.size()){
-        create_overlay_for_index(m_selected_obj_idx);
-    }
+    m_overlay_manager->update_rendered_annotations();
 }
 
 void LabelImages::compute_mask(){

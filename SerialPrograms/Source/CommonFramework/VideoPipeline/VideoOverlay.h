@@ -32,7 +32,7 @@ public:
     // call `remove_box()` once to remove it.
     //
     // Can use `InferenceBoxScope: public ImageFloatBox` to handle box removal automatically when it's destroyed.
-    // Can also use `VideoOverlay.h:VideoOverlaySet` to manage multiple boxes.
+    // Can also use `VideoOverlayScopes.h:VideoOverlaySet` to manage multiple boxes.
     virtual void add_box(const OverlayBox& box) = 0;
 
     // Asychronously, remove an added inference box.

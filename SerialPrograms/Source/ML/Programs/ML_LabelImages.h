@@ -16,7 +16,6 @@
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Pokemon/Options/Pokemon_HomeSpriteSelectOption.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "ML/DataLabeling/ML_ObjectAnnotation.h"
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ML/UI/ML_ImageAnnotationDisplayOption.h"
@@ -37,6 +36,7 @@ namespace ML{
 
 class ImageAnnotationDisplayWidget;
 class LabelImages_Widget;
+class LabelImages_OverlayManager;
 
 
 class LabelImages_Descriptor : public PanelDescriptor{
@@ -111,12 +111,14 @@ private:
     void remove_closest_point(std::vector<std::pair<size_t, size_t>>& points, double x, double y);
 
     friend class LabelImages_Widget;
+    friend class LabelImages_OverlayManager;
 
     // image display options like what image file is loaded
     ImageAnnotationDisplayOption m_display_option;
     // handles image display session, holding a reference to m_display_option
     ImageAnnotationDisplaySession m_display_session;
-    VideoOverlaySet m_overlay_set;
+    // manages overlay rendering that shows annotations overlayed on the image
+    LabelImages_OverlayManager* m_overlay_manager = nullptr;
     // the group option that holds rest of the options defined below:
     BatchOption m_options;
 
@@ -158,6 +160,7 @@ private:
     // so this flag is used to denote if we fail to load an annotation file
     bool m_fail_to_load_annotation_file = false;
 
+    // the file path to load custom label set
     std::string m_custom_label_set_file_path;
 };
 
