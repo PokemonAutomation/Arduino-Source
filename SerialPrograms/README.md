@@ -28,4 +28,8 @@ This doesn't actually work. (flickering video display) But here are the instruct
 
 **Mac:**
 
-- https://github.com/PokemonAutomation/ComputerControl/blob/master/Wiki/SetupGuide/CompilingForMac.md
+- [Compilling for Mac](BuildInstructions/CompilingForMac.md)
+
+## Developer guide
+
+https://github.com/PokemonAutomation/ComputerControl/blob/master/Wiki/Developer/README.md
