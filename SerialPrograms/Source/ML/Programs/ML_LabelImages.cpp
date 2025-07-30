@@ -263,7 +263,7 @@ void LabelImages::update_rendered_objects(){
         }
         create_overlay_for_index(i_obj);
     }
-    if (m_selected_obj_idx >= 0 && m_selected_obj_idx < m_annotations.size()){
+    if (m_selected_obj_idx < m_annotations.size()){
         create_overlay_for_index(m_selected_obj_idx);
     }
 }

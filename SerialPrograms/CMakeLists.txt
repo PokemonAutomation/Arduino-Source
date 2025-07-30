@@ -2609,11 +2609,14 @@ else() # macOS and Linux
     endif()
 
     if (APPLE)
-        # Add -Wno-c11-extensions to avoid clang gives
+        ###################################################
+        # Compiler flag change history:
+        # Removed -Wno-c11-extensions since we no long have following error:
         # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
         # when compiling OpenCV
-        # target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
-        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
+        ###################################################
+        # Use https://clang.llvm.org/docs/DiagnosticsReference.html to query Clang warnings
+        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32 -Wtautological-constant-in-range-compare -Wsequence-point)
     else()
         # Assume GCC
         target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
