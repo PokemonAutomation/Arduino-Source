@@ -9,6 +9,7 @@
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -27,6 +28,7 @@
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRaidSearchDetector.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraRewardsReader.h"
 #include "PokemonSV/Programs/PokemonSV_ConnectToInternet.h"
+#include "PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_BasicCatcher.h"
 #include "PokemonSV_TeraRoutines.h"
 
@@ -218,7 +220,7 @@ void enter_tera_search(
         OverworldWatcher overworld(stream.logger(), COLOR_RED);
         MainMenuWatcher main_menu(COLOR_YELLOW);
         PokePortalWatcher poke_portal(COLOR_GREEN);
-        TeraRaidSearchWatcher raid_search(COLOR_CYAN);
+        TeraRaidSearchWatcher raid_search(COLOR_CYAN, std::chrono::milliseconds(500));
         CodeEntryWatcher code_entry(COLOR_PURPLE);
         AdvanceDialogWatcher dialog(COLOR_BLUE);
         context.wait_for_all_requests();
@@ -278,6 +280,129 @@ void enter_tera_search(
         }
     }
 }
+
+void join_raid(
+    const ProgramInfo& info, ConsoleHandle& console, ProControllerContext& context,
+    bool connect_to_internet,
+    KeyboardLayout keyboard_layout,
+    RaidWaiter& raid_waiter
+){
+    WallClock start = current_time();
+    bool connected = false;
+    while (true){
+        if (current_time() - start > std::chrono::minutes(5)){
+            dump_image_and_throw_recoverable_exception(
+                info, console, "JoinRaidFailed",
+                "join_raid(): Failed to enter Tera raid."
+            );
+        }
+
+        OverworldWatcher overworld(console.logger(), COLOR_RED);
+        MainMenuWatcher main_menu(COLOR_YELLOW);
+        PokePortalWatcher poke_portal(COLOR_GREEN);
+        TeraRaidSearchWatcher raid_search(COLOR_CYAN);
+        AdvanceDialogWatcher dialog(COLOR_BLUE);
+        CodeEntryWatcher code_entry(COLOR_PURPLE);
+        TeraLobbyWatcher lobby(console.logger(), COLOR_ORANGE);
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(30),
+            {
+                overworld,
+                main_menu,
+                poke_portal,
+                raid_search,
+                dialog,
+                code_entry,
+                lobby,
+            }
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            console.log("Detected overworld.");
+            pbf_press_button(context, BUTTON_X, 20, 105);
+            continue;
+
+        case 1:
+            console.log("Detected main menu.");
+            if (connect_to_internet && !connected){
+                connect_to_internet_from_menu(info, console, context);
+                connected = true;
+                continue;
+            }
+            if (main_menu.move_cursor(info, console, context, MenuSide::RIGHT, 3)){
+                pbf_press_button(context, BUTTON_A, 20, 230);
+            }
+            continue;
+
+        case 2:
+            console.log("Detected Poke Portal.");
+            if (poke_portal.move_cursor(info, console, context, 1)){
+                pbf_press_button(context, BUTTON_A, 20, 230);
+            }
+            continue;
+
+        case 3:
+            console.log("Detected Tera Raid Search.");
+            if (raid_search.move_cursor_to_search(info, console, context)){
+                pbf_press_button(context, BUTTON_A, 20, 105);
+            }
+            continue;
+
+        case 4:
+            console.log("Detected Dialog.");
+            pbf_press_button(context, BUTTON_B, 20, 105);
+            continue;
+
+        case 5:{
+            console.log("Detected Code Entry.");
+            std::string code = raid_waiter.wait_for_raid_code();
+            enter_code(
+                console, context,
+                keyboard_layout,
+                code,
+                false, true, false
+            );
+
+#if 0
+            if (console.index() == 1){
+                dump_image_and_throw_recoverable_exception(
+                    info, console, "InjectedError",
+                    "join_raid(): Injected Error"
+                );
+            }
+#endif
+
+            break;
+        }
+        case 6:
+            console.log("Detected Raid Lobby.");
+            return;
+
+        default:
+            auto screen = console.video().snapshot();
+            report_error(
+                &console.logger(),
+                info,
+                "join_raid()",
+                {{"Message", "No recognized state after 30 seconds."}},
+                screen,
+                &console.history()
+            );
+
+            pbf_press_button(context, BUTTON_B, 160ms, 840ms);
+//            OperationFailedException::fire(
+//                ErrorReport::SEND_ERROR_REPORT,
+//                "join_raid(): No recognized state after 30 seconds.",
+//                console,
+//                std::move(screen)
+//            );
+        }
+    }
+}
+
 
 
 
@@ -670,7 +795,12 @@ TeraResult run_tera_summary(
 }
 
 
-void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+void run_from_tera_battle(
+    ProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::atomic<uint64_t>* stat_errors
+){
     stream.log("Running away from tera raid battle...");
 
     WallClock start = current_time();
@@ -688,9 +818,10 @@ void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProContr
         GradientArrowWatcher leave_confirm(
             COLOR_RED,
             GradientArrowType::RIGHT,
-            {0.557621, 0.471074, 0.388476, 0.247934}
+            {0.557621, 0.471074, 0.25, 0.247934}
         );
         OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
+        TeraCardWatcher tera_card(COLOR_BLUE);
         context.wait_for_all_requests();
 
         int ret = wait_until(
@@ -700,6 +831,7 @@ void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProContr
                 battle_menu,
                 leave_confirm,
                 overworld,
+                tera_card,
             }
         );
 
@@ -718,7 +850,19 @@ void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProContr
         case 2:
             stream.log("Detected overworld.");
             return;
+        case 3:
+            stream.log("Detected a raid. (unexpected)", COLOR_RED);
+            if (stat_errors){
+                (*stat_errors)++;
+                env.update_stats();
+            }
+            pbf_press_button(context, BUTTON_B, 160ms, 80ms);
+            continue;
         default:
+            if (stat_errors){
+                (*stat_errors)++;
+                env.update_stats();
+            }
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "run_from_tera_battle(): No recognized state after 1 minutes.",

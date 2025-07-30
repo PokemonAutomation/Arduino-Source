@@ -12,6 +12,7 @@
 #include "Common/Cpp/ImageResolution.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/StatAccumulator.h"
 
 class QWidget;
 
@@ -45,10 +46,7 @@ public:
 
 
 public:
-    VideoSource(bool allow_watchdog_reset)
-        : m_allow_watchdog_reset(allow_watchdog_reset)
-        , m_sanitizer("VideoSource")
-    {}
+    VideoSource(Logger& m_logger, bool allow_watchdog_reset);
     virtual ~VideoSource() = default;
 
 
@@ -65,15 +63,12 @@ public:
 
 
 protected:
-    void report_source_frame(std::shared_ptr<const VideoFrame> frame){
-        auto scope_check = m_sanitizer.check_scope();
-        m_source_frame_listeners.run_method_unique(&VideoFrameListener::on_frame, frame);
-    }
+    //  These are not thread-safe.
+
+    void report_source_frame(std::shared_ptr<const VideoFrame> frame);
+
     // Called by UI to report a frame is rendered
-    void report_rendered_frame(WallClock timestamp){
-        auto scope_check = m_sanitizer.check_scope();
-        m_rendered_frame_listeners.run_method_unique(&RenderedFrameListener::on_rendered_frame, timestamp);
-    }
+    void report_rendered_frame(WallClock timestamp);
 
 
 public:
@@ -81,10 +76,15 @@ public:
 
 
 private:
+    Logger& m_logger;
+
     ListenerSet<VideoFrameListener> m_source_frame_listeners;
     ListenerSet<RenderedFrameListener> m_rendered_frame_listeners;
 
     const bool m_allow_watchdog_reset;
+
+    PeriodicStatsReporterI32 m_stats_report_source_frame;
+    PeriodicStatsReporterI32 m_stats_report_rendered_frame;
 
     LifetimeSanitizer m_sanitizer;
 };

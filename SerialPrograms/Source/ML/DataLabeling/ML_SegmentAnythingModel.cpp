@@ -199,6 +199,23 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         return;
     }
     
+    if (!std::filesystem::exists(embedding_model_path)){
+        std::cerr << "Error: no such embedding model path " << embedding_model_path << "." << std::endl;
+        QMessageBox box;
+        box.critical(nullptr, "Embedding Model Does Not Exist",
+            QString::fromStdString("Embedding model path" + embedding_model_path + " does not exist."));
+        return;
+    }
+    // since the embedding model has too many weights, onnx created a .data file to contain weights.
+    auto embedding_model_data_path = embedding_model_path + ".data";
+    if (!std::filesystem::exists(embedding_model_data_path)){
+        std::cerr << "Error: no such embedding model data path " << embedding_model_data_path << "." << std::endl;
+        QMessageBox box;
+        box.critical(nullptr, "Embedding Model Data File Does Not Exist",
+            QString::fromStdString("Embedding model data file path" + embedding_model_data_path + " does not exist."));
+        return;
+    }
+
     SAMEmbedderSession embedding_session(embedding_model_path);
     std::vector<float> output_image_embedding;
     for (size_t i = 0; i < all_image_paths.size(); i++){
@@ -238,7 +255,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         embedding_session.run(resized_mat, output_image_embedding);
         save_image_embedding_to_disk(image_path, output_image_embedding);
     }
-
+    std::cout << "Done computing embeddings for images in folder " << image_folder_path << "." << std::endl;
 
 }
 

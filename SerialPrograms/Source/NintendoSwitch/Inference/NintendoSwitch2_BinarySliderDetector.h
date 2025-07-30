@@ -22,7 +22,7 @@ public:
     BinarySliderDetector(Color color, const ImageFloatBox& box);
     void make_overlays(VideoOverlaySet& items) const;
 
-    std::vector<std::pair<bool, ImagePixelBox>> detect(const ImageViewRGB32& image) const;
+    std::vector<std::pair<bool, ImagePixelBox>> detect(const ImageViewRGB32& screen) const;
 
 private:
     Color m_color;

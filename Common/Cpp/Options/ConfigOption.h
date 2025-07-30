@@ -27,7 +27,7 @@ enum class LockMode{
 };
 enum class ConfigOptionState{
     ENABLED,
-    DISABLED,
+    DISABLED, // aka locked
     HIDDEN,
 };
 
@@ -93,6 +93,12 @@ public:
     }
 
 public:
+    //  Return the lock mode: how locking works on this option. It can be:
+    //  - UNLOCK_WHILE_RUNNING,
+    //  - LOCK_WHILE_RUNNING,
+    //  - READ_ONLY, (aka always locked)
+    //  This value is const throughout the ConfigOption lifetime. It is set
+    //  when constructing the ConfigOption.
     LockMode lock_mode() const;
 
     //  Returns error message if invalid. Otherwise returns empty string.
@@ -104,7 +110,17 @@ public:
     //  transient state that the option object may have.
     virtual void reset_state(){};
 
+    //  Thread-safe: return the current visibility state. It can be:
+    //  - ENABLED
+    //  - DISABLED
+    //  - HIDDEN
     ConfigOptionState visibility() const;
+    //  Thread-safe: set the option's visibility state. It can be:
+    //  - ENABLED
+    //  - DISABLED
+    //  - HIDDEN
+    //  If visibility changed, all attached listeners' on_config_visibility_changed()
+    //  will be called.
     virtual void set_visibility(ConfigOptionState visibility);
 
 

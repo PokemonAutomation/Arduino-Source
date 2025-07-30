@@ -12,6 +12,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonArray.h"
 #include "StringSelectOption.h"
 
 //#include <iostream>
@@ -74,6 +75,7 @@ struct StringSelectDatabase::Data{
 
         m_longest_text_length = std::max(m_longest_text_length, item.display_name.size());
     }
+    size_t size() const { return m_list.size(); }
 };
 
 
@@ -105,7 +107,35 @@ size_t StringSelectDatabase::search_index_by_name(const std::string& display_nam
 void StringSelectDatabase::add_entry(StringSelectEntry entry){
     m_data->add_entry(std::move(entry));
 }
+size_t StringSelectDatabase::size() const{
+    return m_data->size();
+}
 
+StringSelectDatabase create_string_select_database(const std::vector<std::string>& slugs){
+    StringSelectDatabase database;
+    for (const std::string& slug : slugs){
+        // slug name is also the display name
+        database.add_entry(StringSelectEntry(slug, slug));
+    }
+    return database;
+}
+
+bool load_json_to_string_select_database(const JsonValue& json, StringSelectDatabase& database){
+    const JsonArray* json_array = json.to_array();
+    std::vector<std::string> slugs;
+    if (json_array == nullptr){
+        return false;
+    }
+    for (const JsonValue& element : *json_array){
+        const std::string* str = element.to_string();
+        if (str == nullptr){
+            return false;
+        }
+        slugs.push_back(*str);
+    }
+    database = create_string_select_database(slugs);
+    return true;
+}
 
 
 

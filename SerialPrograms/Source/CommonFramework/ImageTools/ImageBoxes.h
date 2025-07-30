@@ -56,6 +56,14 @@ struct ImagePixelBox : public Rectangle<size_t>{
     size_t distance_x(const ImagePixelBox& box) const;
     //  The distance to another box on y axis. If two boxes overlap, the distance is 0.
     size_t distance_y(const ImagePixelBox& box) const;
+    //  The distance to a point on x axis. If the point is in the box, the distance is 0.
+    size_t distance_to_point_x(const size_t x) const;
+    //  The distance to a point on y axis. If the point is in the box, the distance is 0.
+    size_t distance_to_point_y(const size_t y) const;
+    //  The distance from the box center to a point on x axis
+    size_t center_distance_to_point_x(const size_t x) const;
+    //  The distance from the box center to a point on y axis
+    size_t center_distance_to_point_y(const size_t y) const;
 };
 
 // An axis aligned box in the normalized image space. Used for getting a crop from an image for various

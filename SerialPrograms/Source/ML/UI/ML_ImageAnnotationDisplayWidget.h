@@ -35,10 +35,12 @@ class ImageAnnotationCommandRow;
 class ImageAnnotationDisplayWidget final : public QWidget, public CommandReceiver{
 public:
     virtual ~ImageAnnotationDisplayWidget();
+    // command_receiver: if not nullptr, ImageAnnotationDisplayWidget will forward key and
+    // focus events happened on the image display window to this command_receiver.
     ImageAnnotationDisplayWidget(
         QWidget& parent,
         ImageAnnotationDisplaySession& session,
-        uint64_t program_id
+        CommandReceiver* command_receiver = nullptr
     );
 
 public:
@@ -47,16 +49,32 @@ public:
     //  The public versions of the private QWidget key and focus event handling functions.
     //  They are needed to accept key and focus passed from CommonFramework/VideoPipeline/UI:VideoDisplayWindow.
 
+    //  Overwrites CommandReceiver::key_press().
+    //  The public versions of the private QWidget key event handling functions.
+    //  They are needed to accept key passed from CommonFramework/VideoPipeline/UI:VideoDisplayWindow.
     virtual void key_press(QKeyEvent* event) override;
+    //  Overwrites CommandReceiver::key_release().
+    //  The public versions of the private QWidget key event handling functions.
+    //  They are needed to accept key passed from CommonFramework/VideoPipeline/UI:VideoDisplayWindow.
     virtual void key_release(QKeyEvent* event) override;
 
+    //  Overwrites CommandReceiver::focus_in().
+    //  The public versions of the private QWidget focus event handling functions.
+    //  They are needed to accept focus passed from CommonFramework/VideoPipeline/UI:VideoDisplayWindow.
     virtual void focus_in(QFocusEvent* event) override;
+    //  Overwrites CommandReceiver::focus_out().
+    //  The public versions of the private QWidget focus event handling functions.
+    //  They are needed to accept focus passed from CommonFramework/VideoPipeline/UI:VideoDisplayWindow.
     virtual void focus_out(QFocusEvent* event) override;
 
 private:
+    //  Overwrites QWidget::keyPressEvent().
     virtual void keyPressEvent(QKeyEvent* event) override;
+    //  Overwrites QWidget::keyReleaseEvent().
     virtual void keyReleaseEvent(QKeyEvent* event) override;
+    //  Overwrites QWidget::focusInEvent().
     virtual void focusInEvent(QFocusEvent* event) override;
+    //  Overwrites QWidget::focusOutEvent().
     virtual void focusOutEvent(QFocusEvent* event) override;
 
 private:
@@ -69,6 +87,8 @@ private:
     ImageAnnotationCommandRow* m_command;
 
     ImageAnnotationSourceSelectorWidget* m_selector_widget;
+
+    CommandReceiver* m_command_receiver;
 };
 
 

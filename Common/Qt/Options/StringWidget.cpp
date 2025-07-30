@@ -9,9 +9,9 @@
 #include <QLineEdit>
 #include "StringWidget.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 
@@ -47,6 +47,19 @@ StringCellWidget::StringCellWidget(QWidget& parent, StringCell& value)
             m_value.set(this->text().toStdString());
         }
     );
+    if (m_value.signal_all_text_changes()){
+        connect(
+            this, &QLineEdit::textChanged,
+            [this]{
+                std::string old_value = (std::string)m_value;
+                std::string text = this->text().toStdString();
+                if (old_value == text){
+                    return;
+                }
+                m_value.set(std::move(text));
+            }
+        );
+    }
 
     m_value.add_listener(*this);
 }
@@ -59,8 +72,22 @@ void StringCellWidget::on_config_value_changed(void* object){
     }, Qt::QueuedConnection);
 }
 void StringCellWidget::on_config_visibility_changed(){
+    // Overwrite ConfigWidget::on_config_visibility_changed() because ConfigWidget cannot handle
+    // READ_ONLY state.
+    this->setEnabled(true);
     QMetaObject::invokeMethod(this, [this]{
-        setReadOnly(m_value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
+        const ConfigOptionState visibility = m_value.visibility();
+        this->setReadOnly(visibility != ConfigOptionState::ENABLED || 
+            m_value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
+        switch (visibility){
+        case ConfigOptionState::ENABLED:
+        case ConfigOptionState::DISABLED:
+            this->setVisible(true);
+            break;
+        case ConfigOptionState::HIDDEN:
+            this->setVisible(false);
+            break;
+        }
     }, Qt::QueuedConnection);
 }
 
@@ -96,6 +123,19 @@ StringOptionWidget::StringOptionWidget(QWidget& parent, StringOption& value)
             m_value.set(m_box->text().toStdString());
         }
     );
+    if (m_value.signal_all_text_changes()){
+        connect(
+            m_box, &QLineEdit::textChanged,
+            [this]{
+                const std::string old_value = (std::string)m_value;
+                std::string text = m_box->text().toStdString();
+                if (old_value == text){
+                    return;
+                }
+                m_value.set(std::move(text));
+            }
+        );
+    }
 
     m_value.add_listener(*this);
 }
@@ -108,8 +148,22 @@ void StringOptionWidget::on_config_value_changed(void* object){
     }, Qt::QueuedConnection);
 }
 void StringOptionWidget::on_config_visibility_changed(){
-    QMetaObject::invokeMethod(m_box, [this]{
-        m_box->setReadOnly(m_value.is_locked());
+    // Overwrite ConfigWidget::on_config_visibility_changed() because ConfigWidget cannot handle
+    // READ_ONLY state.
+    this->setEnabled(true);
+    QMetaObject::invokeMethod(this, [this]{
+        const ConfigOptionState visibility = m_value.visibility();
+        m_box->setReadOnly(visibility != ConfigOptionState::ENABLED || 
+            m_value.lock_mode() == LockMode::READ_ONLY || m_value.is_locked());
+        switch (visibility){
+        case ConfigOptionState::ENABLED:
+        case ConfigOptionState::DISABLED:
+            this->setVisible(true);
+            break;
+        case ConfigOptionState::HIDDEN:
+            this->setVisible(false);
+            break;
+        }
     }, Qt::QueuedConnection);
 }
 

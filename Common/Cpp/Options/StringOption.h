@@ -20,12 +20,14 @@ public:
         bool is_password,
         LockMode lock_while_program_is_running,
         std::string default_value,
-        std::string placeholder_text
+        std::string placeholder_text,
+        bool signal_all_text_changes = false
     );
 
     bool is_password() const;
     const std::string& placeholder_text() const;
     const std::string default_value() const;
+    bool signal_all_text_changes() const;
 
     bool is_locked() const;
     void set_locked(bool locked);
@@ -56,7 +58,8 @@ public:
         std::string label,
         LockMode lock_while_program_is_running,
         std::string default_value,
-        std::string placeholder_text
+        std::string placeholder_text,
+        bool signal_all_text_changes = false
     );
 
     const std::string& label() const{ return m_label; }

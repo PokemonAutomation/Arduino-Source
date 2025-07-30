@@ -15,25 +15,25 @@ namespace PokemonAutomation{
 
 
 void VideoOverlaySession::add_listener(ContentListener& listener){
-    WriteSpinLock lg(m_lock);
-    m_content_listeners.insert(&listener);
-    listener.on_overlay_update_stats(&m_stats_order);
+    m_listeners.add(listener);
 }
 void VideoOverlaySession::remove_listener(ContentListener& listener){
-    WriteSpinLock lg(m_lock);
-//    listener.on_overlay_update_stats(nullptr);
-    m_content_listeners.erase(&listener);
+    m_listeners.remove(listener);
 }
 
 
 VideoOverlaySession::~VideoOverlaySession(){
-    ReadSpinLock lg(m_lock);
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_update_stats(nullptr);
+    {
+        std::lock_guard<std::mutex> lg(m_stats_lock);
+        m_stopping = true;
     }
+    m_stats_cv.notify_all();
+    m_stats_updater.join();
 }
-VideoOverlaySession::VideoOverlaySession(VideoOverlayOption& option)
-    : m_option(option)
+VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& option)
+    : m_logger(logger)
+    , m_option(option)
+    , m_stats_updater(&VideoOverlaySession::stats_thread, this)
 {}
 
 
@@ -50,7 +50,6 @@ void VideoOverlaySession::get(VideoOverlayOption& option){
     option.stats.store(stats, std::memory_order_relaxed);
 }
 void VideoOverlaySession::set(const VideoOverlayOption& option){
-    WriteSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_boxes()");
     bool boxes = option.boxes.load(std::memory_order_relaxed);
     bool text = option.text.load(std::memory_order_relaxed);
     bool images = option.images.load(std::memory_order_relaxed);
@@ -61,81 +60,87 @@ void VideoOverlaySession::set(const VideoOverlayOption& option){
     m_option.images.store(images, std::memory_order_relaxed);
     m_option.log.store(log, std::memory_order_relaxed);
     m_option.stats.store(stats, std::memory_order_relaxed);
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_enabled_boxes(boxes);
-        listener->on_overlay_enabled_text(text);
-        listener->on_overlay_enabled_images(images);
-        listener->on_overlay_enabled_log(log);
-        listener->on_overlay_enabled_stats(stats);
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_boxes, boxes);
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_text, text);
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_images, images);
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_log, log);
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_stats, stats);
+}
+
+
+void VideoOverlaySession::stats_thread(){
+    std::unique_lock<std::mutex> lg(m_stats_lock);
+    while (!m_stopping){
+        {
+            std::vector<OverlayStatSnapshot> lines;
+            ReadSpinLock lg0(m_lock);
+            for (const auto& stat : m_stats_order){
+                OverlayStatSnapshot snapshot = stat->get_current();
+                if (!snapshot.text.empty()){
+                    lines.emplace_back(std::move(snapshot));
+                }
+            }
+            m_stat_lines = std::move(lines);
+        }
+        m_stats_cv.wait_for(lg, std::chrono::milliseconds(100));
     }
 }
 
 
 void VideoOverlaySession::set_enabled_boxes(bool enabled){
     m_option.boxes.store(enabled, std::memory_order_relaxed);
-    ReadSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_boxes()");
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_enabled_boxes(enabled);
-    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_boxes, enabled);
 }
 void VideoOverlaySession::set_enabled_text(bool enabled){
     m_option.text.store(enabled, std::memory_order_relaxed);
-    ReadSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_text()");
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_enabled_text(enabled);
-    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_text, enabled);
 }
 void VideoOverlaySession::set_enabled_images(bool enabled){
     m_option.images.store(enabled, std::memory_order_relaxed);
-    ReadSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_images()");
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_enabled_images(enabled);
-    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_images, enabled);
 }
 void VideoOverlaySession::set_enabled_log(bool enabled){
     m_option.log.store(enabled, std::memory_order_relaxed);
-    ReadSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_log()");
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_enabled_log(enabled);
-    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_log, enabled);
 }
 void VideoOverlaySession::set_enabled_stats(bool enabled){
     m_option.stats.store(enabled, std::memory_order_relaxed);
-    ReadSpinLock lg(m_lock, "VideoOverlaySession::set_enabled_stats()");
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_enabled_stats(enabled);
-    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_stats, enabled);
 }
 
 
+//
+//  Boxes
+//
 
 void VideoOverlaySession::add_box(const OverlayBox& box){
-    WriteSpinLock lg(m_lock, "VideoOverlaySession::add_box()");
-    m_boxes.insert(&box);
-    push_box_update();
+    std::shared_ptr<std::vector<OverlayBox>> ptr = std::make_shared<std::vector<OverlayBox>>();
+    {
+        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_box()");
+        m_boxes.insert(&box);
+
+        //  We create a newly allocated Box vector to avoid listener accessing
+        //  `m_boxes` asynchronously.
+        for (const auto& item : m_boxes){
+            ptr->emplace_back(*item);
+        }
+    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_update_boxes, ptr);
 }
 void VideoOverlaySession::remove_box(const OverlayBox& box){
-    WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_box()");
-    m_boxes.erase(&box);
-    push_box_update();
-}
-
-void VideoOverlaySession::push_box_update(){
-    if (m_content_listeners.empty()){
-        return;
-    }
-    
-    //  We create a newly allocated Box vector to avoid listener accessing
-    //  `m_boxes` asynchronously.
     std::shared_ptr<std::vector<OverlayBox>> ptr = std::make_shared<std::vector<OverlayBox>>();
-    for (const auto& item : m_boxes){
-        ptr->emplace_back(*item);
-    }
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_update_boxes(ptr);
-    }
-}
+    {
+        WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_box()");
+        m_boxes.erase(&box);
 
+        //  We create a newly allocated Box vector to avoid listener accessing
+        //  `m_boxes` asynchronously.
+        for (const auto& item : m_boxes){
+            ptr->emplace_back(*item);
+        }
+    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_update_boxes, ptr);
+}
 std::vector<OverlayBox> VideoOverlaySession::boxes() const{
     ReadSpinLock lg(m_lock);
     std::vector<OverlayBox> ret;
@@ -145,33 +150,39 @@ std::vector<OverlayBox> VideoOverlaySession::boxes() const{
     return ret;
 }
 
+
+//
+//  Texts
+//
+
 void VideoOverlaySession::add_text(const OverlayText& text){
-    WriteSpinLock lg(m_lock, "VideoOverlaySession::add_text()");
-    m_texts.insert(&text);
-    push_text_update();
+    std::shared_ptr<std::vector<OverlayText>> ptr = std::make_shared<std::vector<OverlayText>>();
+    {
+        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_text()");
+        m_texts.insert(&text);
+
+        //  We create a newly allocated Box vector to avoid listener accessing
+        //  `m_texts` asynchronously.
+        for (const auto& item : m_texts){
+            ptr->emplace_back(*item);
+        }
+    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_update_text, ptr);
 }
 void VideoOverlaySession::remove_text(const OverlayText& text){
-    WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_text()");
-    m_texts.erase(&text);
-    push_text_update();
-}
-
-void VideoOverlaySession::push_text_update(){
-    if (m_content_listeners.empty()){
-        return;
-    }
-
-    //  We create a newly allocated Box vector to avoid listener accessing
-    //  `m_texts` asynchronously.
     std::shared_ptr<std::vector<OverlayText>> ptr = std::make_shared<std::vector<OverlayText>>();
-    for (const auto& item : m_texts){
-        ptr->emplace_back(*item);
-    }
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_update_text(ptr);
-    }
-}
+    {
+        WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_text()");
+        m_texts.erase(&text);
 
+        //  We create a newly allocated Box vector to avoid listener accessing
+        //  `m_texts` asynchronously.
+        for (const auto& item : m_texts){
+            ptr->emplace_back(*item);
+        }
+    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_update_text, ptr);
+}
 std::vector<OverlayText> VideoOverlaySession::texts() const{
     ReadSpinLock lg(m_lock);
     std::vector<OverlayText> ret;
@@ -182,33 +193,38 @@ std::vector<OverlayText> VideoOverlaySession::texts() const{
 }
 
 
+//
+//  Images
+//
+
 void VideoOverlaySession::add_image(const OverlayImage& image){
-    WriteSpinLock lg(m_lock, "VideoOverlaySession::add_image()");
-    m_images.insert(&image);
-    push_image_update();
+    std::shared_ptr<std::vector<OverlayImage>> ptr = std::make_shared<std::vector<OverlayImage>>();
+    {
+        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_image()");
+        m_images.insert(&image);
+
+        //  We create a newly allocated Box vector to avoid listener accessing
+        //  `m_images` asynchronously.
+        for (const auto& item : m_images){
+            ptr->emplace_back(*item);
+        }
+    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_update_images, ptr);
 }
 void VideoOverlaySession::remove_image(const OverlayImage& image){
-    WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_image()");
-    m_images.erase(&image);
-    push_image_update();
-}
-
-void VideoOverlaySession::push_image_update(){
-    if (m_content_listeners.empty()){
-        return;
-    }
-
-    //  We create a newly allocated Box vector to avoid listener accessing
-    //  `m_images` asynchronously.
     std::shared_ptr<std::vector<OverlayImage>> ptr = std::make_shared<std::vector<OverlayImage>>();
-    for (const auto& item : m_images){
-        ptr->emplace_back(*item);
-    }
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_update_images(ptr);
-    }
-}
+    {
+        WriteSpinLock lg(m_lock, "VideoOverlaySession::remove_image()");
+        m_images.erase(&image);
 
+        //  We create a newly allocated Box vector to avoid listener accessing
+        //  `m_images` asynchronously.
+        for (const auto& item : m_images){
+            ptr->emplace_back(*item);
+        }
+    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_update_images, ptr);
+}
 std::vector<OverlayImage> VideoOverlaySession::images() const{
     ReadSpinLock lg(m_lock);
     std::vector<OverlayImage> ret;
@@ -219,39 +235,42 @@ std::vector<OverlayImage> VideoOverlaySession::images() const{
 }
 
 
+//
+//  Log
+//
+
 void VideoOverlaySession::add_log(std::string message, Color color){
-    WriteSpinLock lg(m_lock, "VideoOverlaySession::add_log_text()");
-    m_log_texts.emplace_front(color, std::move(message));
-
-    if (m_log_texts.size() > LOG_MAX_LINES){
-        m_log_texts.pop_back();
-    }
-
-    push_log_text_update();
-}
-
-void VideoOverlaySession::clear_log(){
-    WriteSpinLock lg(m_lock, "VideoOverlaySession::clear_log_texts()");
-    m_log_texts.clear();
-    push_log_text_update();
-}
-
-void VideoOverlaySession::push_log_text_update(){
-    if (m_content_listeners.empty()){
-        return;
-    }
-    
-    //  We create a newly allocated Box vector to avoid listener accessing
-    //  `m_log_texts` asynchronously.
     std::shared_ptr<std::vector<OverlayLogLine>> ptr = std::make_shared<std::vector<OverlayLogLine>>();
-    for(const auto& item : m_log_texts){
-        ptr->emplace_back(item);
-    }
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_update_log(ptr);
-    }
-}
+    {
+        WriteSpinLock lg(m_lock, "VideoOverlaySession::add_log_text()");
+        m_log_texts.emplace_front(color, std::move(message));
 
+        if (m_log_texts.size() > LOG_MAX_LINES){
+            m_log_texts.pop_back();
+        }
+
+        //  We create a newly allocated Box vector to avoid listener accessing
+        //  `m_log_texts` asynchronously.
+        for(const auto& item : m_log_texts){
+            ptr->emplace_back(item);
+        }
+    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_update_log, ptr);
+}
+void VideoOverlaySession::clear_log(){
+    std::shared_ptr<std::vector<OverlayLogLine>> ptr = std::make_shared<std::vector<OverlayLogLine>>();
+    {
+        WriteSpinLock lg(m_lock, "VideoOverlaySession::clear_log_texts()");
+        m_log_texts.clear();
+
+        //  We create a newly allocated Box vector to avoid listener accessing
+        //  `m_log_texts` asynchronously.
+        for(const auto& item : m_log_texts){
+            ptr->emplace_back(item);
+        }
+    }
+    m_listeners.run_method_unique(&ContentListener::on_overlay_update_log, ptr);
+}
 std::vector<OverlayLogLine> VideoOverlaySession::log_texts() const{
     ReadSpinLock lg(m_lock);
     std::vector<OverlayLogLine> ret;
@@ -262,18 +281,15 @@ std::vector<OverlayLogLine> VideoOverlaySession::log_texts() const{
 }
 
 
-
+//
+//  Stats
+//
 
 void VideoOverlaySession::add_stat(OverlayStat& stat){
     WriteSpinLock lg(m_lock);
     auto map_iter = m_stats.find(&stat);
     if (map_iter != m_stats.end()){
         return;
-    }
-
-    //  Remove all stats so they aren't being referenced.
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_update_stats(nullptr);
     }
 
     m_stats_order.emplace_back(&stat);
@@ -285,11 +301,6 @@ void VideoOverlaySession::add_stat(OverlayStat& stat){
         m_stats_order.pop_back();
         throw;
     }
-
-    //  Add all the stats back.
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_update_stats(&m_stats_order);
-    }
 }
 void VideoOverlaySession::remove_stat(OverlayStat& stat){
     WriteSpinLock lg(m_lock);
@@ -298,20 +309,14 @@ void VideoOverlaySession::remove_stat(OverlayStat& stat){
         return;
     }
 
-    //  Remove all stats so they aren't being referenced.
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_update_stats(nullptr);
-    }
-
     m_stats_order.erase(iter->second);
     m_stats.erase(iter);
-
-    //  Add all the stats back.
-    for (ContentListener* listener : m_content_listeners){
-        listener->on_overlay_update_stats(&m_stats_order);
-    }
 }
 
+std::vector<OverlayStatSnapshot> VideoOverlaySession::stats() const{
+    ReadSpinLock lg(m_lock);
+    return m_stat_lines;
+}
 
 
 

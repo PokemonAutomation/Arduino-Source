@@ -11,7 +11,7 @@
 #if QT_VERSION_MAJOR == 6
 
 //#include <set>
-#include <mutex>
+//#include <mutex>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
@@ -23,6 +23,7 @@
 #include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoSource.h"
 #include "CommonFramework/VideoPipeline/CameraInfo.h"
+#include "QCameraThread.h"
 #include "QVideoFrameCache.h"
 #include "SnapshotManager.h"
 #include "CameraImplementations.h"
@@ -126,7 +127,8 @@ private:
     Logger& m_logger;
     Resolution m_resolution;
 
-    std::unique_ptr<QCamera> m_camera;
+//    std::unique_ptr<QCamera> m_camera;
+    std::unique_ptr<QCameraThread> m_camera;
     std::unique_ptr<QVideoSink> m_video_sink;
     std::unique_ptr<QMediaCaptureSession> m_capture_session;
 

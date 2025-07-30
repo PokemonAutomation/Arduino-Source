@@ -23,6 +23,7 @@
 #include "PokemonSV/Options/PokemonSV_PlayerList.h"
 #include "PokemonSV_AutoHostTools.h"
 #include "PokemonSV_JoinTracker.h"
+#include "PokemonSV_TeraRoutines.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -96,6 +97,17 @@ private:
         size_t host_index, const std::string& normalized_code
     );
 
+    bool start_sequence_host(
+        MultiSwitchProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context,
+        RaidWaiter& raid_waiter, CancellableScope& joiner_scope,
+        std::string& lobby_code,
+        std::array<std::map<Language, std::string>, 4>& player_names
+    );
+    void start_sequence_joiner(
+        ProgramEnvironment& env, ConsoleHandle& console, ProControllerContext& context,
+        RaidWaiter& raid_waiter
+    );
+
     bool run_raid(
         MultiSwitchProgramEnvironment& env, CancellableScope& scope,
         std::string& lobby_code,
@@ -137,7 +149,7 @@ private:
 
     WallClock m_last_time_fix;
 //    std::atomic<bool> m_raid_error;
-    bool m_reset_required[4];
+    std::atomic<bool> m_reset_required[4];
 };
 
 

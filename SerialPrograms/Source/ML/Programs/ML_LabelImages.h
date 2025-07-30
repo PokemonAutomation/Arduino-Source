@@ -7,9 +7,14 @@
 #ifndef PokemonAutomation_ML_LabelImages_H
 #define PokemonAutomation_ML_LabelImages_H
 
+#include <memory>
+#include <chrono>
 #include <QGraphicsScene>
 #include "Common/Cpp/Options/BatchOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/EnumDropdownDatabase.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/Panels/UI/PanelWidget.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
@@ -19,6 +24,7 @@
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemSession.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ML/UI/ML_ImageAnnotationDisplayOption.h"
@@ -50,7 +56,7 @@ class LabelImages_Widget;
 struct ObjectAnnotation{
     ImagePixelBox user_box; // user drawn loose bounding box
     ImagePixelBox mask_box;
-    std::vector<bool> mask;
+    std::vector<bool> mask; // size() equals the total pixels in mask_box
     std::string label = "unknown";
 
     ObjectAnnotation();
@@ -64,10 +70,11 @@ public:
 
 
 // Program to annoatation images for training ML models
-class LabelImages : public PanelInstance{
+class LabelImages : public PanelInstance, public ConfigOption::Listener {
 public:
     LabelImages(const LabelImages_Descriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
+    ~LabelImages();
 
 public:
     // Serialization
@@ -86,23 +93,38 @@ public:
     void load_image_related_data(const std::string& image_path, const size_t source_image_width, const size_t source_image_height);
 
     // Update rendering data reflect the current annotation
-    void update_rendered_objects(VideoOverlaySet& overlayset);
+    void update_rendered_objects();
 
     // Use user currently drawn box to compute per-pixel masks on the image using SAM model
-    void compute_mask(VideoOverlaySet& overlay_set);
+    void compute_mask();
 
     // Compute embeddings for all images in a folder.
     // This can be very slow!
     void compute_embeddings_for_folder(const std::string& image_folder);
 
+    // Delete the currently selected object annotation.
+    void delete_selected_annotation();
+
+    void change_annotation_selection_by_mouse(double x, double y);
+    void select_prev_annotation();
+    void select_next_annotation();
+
+    // return the label selected on UI
+    std::string selected_label() const;
+    void set_selected_label(const std::string& label);
+
+    void load_custom_label_set(const std::string& json_path);
+
 private:
+    void on_config_value_changed(void* object) override;
+
     friend class LabelImages_Widget;
-    friend class DrawnBoundingBox;
 
     // image display options like what image file is loaded
     ImageAnnotationDisplayOption m_display_option;
     // handles image display session, holding a reference to m_display_option
     ImageAnnotationDisplaySession m_display_session;
+    VideoOverlaySet m_overlay_set;
     // the group option that holds rest of the options defined below:
     BatchOption m_options;
 
@@ -110,7 +132,19 @@ private:
     FloatingPointOption Y;
     FloatingPointOption WIDTH;
     FloatingPointOption HEIGHT;
+
+    // the database to initialize LABEL_TYPE
+    IntegerEnumDropdownDatabase LABEL_TYPE_DATABASE;
+    // a dropdown menu to choose which source below to set label from
+    IntegerEnumDropdownOption LABEL_TYPE;
+    // source 1: a dropdown menu for all pokemon forms
     Pokemon::HomeSpriteSelectCell FORM_LABEL;
+    // the database to initialize CUSTOM_SET_LABEL
+    StringSelectDatabase CUSTOM_LABEL_DATABASE;
+    // source 2: a dropdown menu for custom labels
+    StringSelectCell CUSTOM_SET_LABEL;
+    // source 3: editable text input
+    StringCell MANUAL_LABEL;
 
     size_t source_image_height = 0;
     size_t source_image_width = 0;
@@ -120,39 +154,27 @@ private:
     // buffer to compute SAM mask on
     ImageRGB32 m_mask_image;
 
-    SAMSession m_sam_session;
+    std::unique_ptr<SAMSession> m_sam_session;
     std::vector<ObjectAnnotation> m_annotations;
-    size_t m_last_object_idx = 0;
+    
+    // currently selected annotated object's index
+    // if this value == m_annotations.size(), it means the user is not selecting anything
+    size_t m_selected_obj_idx = 0;
     std::string m_annotation_file_path;
     // if we find an annotation file that is supposed to be created by user in a previous session, but
     // we fail to load it, then we shouldn't overwrite this file to possibly erase the previous work.
     // so this flag is used to denote if we fail to load an annotation file
     bool m_fail_to_load_annotation_file = false;
+
+    std::string m_custom_label_set_file_path;
 };
 
 
-class DrawnBoundingBox : public ConfigOption::Listener, public VideoOverlay::MouseListener{
-public:
-    ~DrawnBoundingBox();
-    DrawnBoundingBox(LabelImages_Widget& widget, VideoOverlay& overlay);
-    virtual void on_config_value_changed(void* object) override;
-    virtual void on_mouse_press(double x, double y) override;
-    virtual void on_mouse_release(double x, double y) override;
-    virtual void on_mouse_move(double x, double y) override;
-
-private:
-    void detach();
-
-private:
-    LabelImages_Widget& m_widget;
-    VideoOverlay& m_overlay;
-    std::mutex m_lock;
-
-    std::optional<std::pair<double, double>> m_mouse_start;
-};
-
-
-class LabelImages_Widget : public PanelWidget, public ConfigOption::Listener, public VideoSession::StateListener{
+class LabelImages_Widget : public PanelWidget,
+                           public ConfigOption::Listener,
+                           public VideoSession::StateListener,
+                           public CommandReceiver,
+                           public VideoOverlay::MouseListener{
 public:
     ~LabelImages_Widget();
     LabelImages_Widget(
@@ -161,27 +183,47 @@ public:
         PanelHolder& holder
     );
 
-    // called after loading a new image, clean up all internal data 
-    void clear_for_new_image();
-
+    //  Overwrites ConfigOption::Listener::on_config_value_changed().
     virtual void on_config_value_changed(void* object) override;
 
     //  Overwrites VideoSession::StateListener::post_startup().
     virtual void post_startup(VideoSource* source) override;
+
+    //  Overwrites CommandReceiver::key_press().
+    virtual void key_press(QKeyEvent* event) override;
+    //  Overwrites CommandReceiver::key_release().
+    virtual void key_release(QKeyEvent* event) override;
+    //  Overwrites CommandReceiver::focus_in().
+    virtual void focus_in(QFocusEvent* event) override {}
+    //  Overwrites CommandReceiver::focus_out().
+    virtual void focus_out(QFocusEvent* event) override {}
+
+    //  Overwrites VideoOverlay::MouseListener::on_mouse_press().
+    virtual void on_mouse_press(double x, double y) override;
+    //  Overwrites VideoOverlay::MouseListener::on_mouse_release().
+    virtual void on_mouse_release(double x, double y) override;
+    //  Overwrites VideoOverlay::MouseListener::on_mouse_move().
+    virtual void on_mouse_move(double x, double y) override;
 
 private:
     LabelImages& m_program;
     ImageAnnotationDisplaySession& m_display_session;
 
     ImageAnnotationDisplayWidget* m_image_display_widget;
-
-    VideoOverlaySet m_overlay_set;
-    DrawnBoundingBox m_drawn_box;
     
+    // show the info about the loaded image embedding data corresponding to the currently
+    // displayed image
     QLabel* m_embedding_info_label = nullptr;
-    ConfigWidget* m_option_widget;
 
-    friend class DrawnBoundingBox;
+    // TODO: see if we can use
+    // Common/Cpp/Options/BoxFloatOption.h and Common/Qt/Options/BoxFloatWidget.h as UI options
+
+    std::optional<std::pair<double, double>> m_mouse_start;
+    std::optional<std::pair<double, double>> m_mouse_end;
+    std::chrono::time_point<std::chrono::high_resolution_clock> m_mouse_start_time;
+
+    bool m_shift_pressed = false;
+    bool m_control_pressed = false;
 };
 
 

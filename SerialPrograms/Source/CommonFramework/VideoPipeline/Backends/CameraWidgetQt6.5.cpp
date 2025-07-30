@@ -82,7 +82,7 @@ CameraVideoSource::~CameraVideoSource(){
         m_logger.log("Stopping Camera...");
     }catch (...){}
 
-    m_camera->stop();
+//    m_camera->stop();
     m_capture_session.reset();
     m_camera.reset();
 }
@@ -91,8 +91,9 @@ CameraVideoSource::CameraVideoSource(
     const CameraInfo& info,
     Resolution desired_resolution
 )
-    : VideoSource(true)
+    : VideoSource(logger, true)
     , m_logger(logger)
+    , m_last_frame(logger)
     , m_snapshot_manager(logger, m_last_frame)
 {
     if (!info){
@@ -146,12 +147,15 @@ CameraVideoSource::CameraVideoSource(
     m_resolution = Resolution(size.width(), size.height());
     m_logger.log("Resolution: " + m_resolution.to_string());
 
-    m_camera.reset(new QCamera(*device));
-    m_camera->setCameraFormat(*format);
+    m_camera.reset(new QCameraThread(m_logger, *device, *format));
+//    m_camera.reset(new QCamera(*device));
+//    m_camera->setCameraFormat(*format);
 
     m_capture_session.reset(new QMediaCaptureSession());
-    m_capture_session->setCamera(m_camera.get());
+//    m_capture_session->setCamera(m_camera.get());
+    m_capture_session->setCamera(&m_camera->camera());
 
+#if 0
     connect(m_camera.get(), &QCamera::errorOccurred, this, [&](){
         if (m_camera->error() == QCamera::NoError){
             return;
@@ -160,6 +164,8 @@ CameraVideoSource::CameraVideoSource(
     });
 
     m_camera->start();
+#endif
+
 }
 
 
@@ -174,18 +180,16 @@ void CameraVideoSource::set_video_output(QGraphicsVideoItem& item){
 
     connect(
         item.videoSink(), &QVideoSink::videoFrameChanged,
-        m_camera.get(), [&](const QVideoFrame& frame){
-            //  This will be on the main thread. So we waste as little time as
-            //  possible. Shallow-copy the frame, update the listeners, and
-            //  return immediately to unblock the main thread.
+        &m_camera->camera(), [&](const QVideoFrame& frame){
+            //  This runs on the QCamera's thread. So it is off the critical path.
 
             WallClock now = current_time();
             if (!m_last_frame.push_frame(frame, now)){
                 return;
             }
             report_source_frame(std::make_shared<VideoFrame>(now, frame));
-        },
-        Qt::DirectConnection
+        }//,
+//        Qt::DirectConnection
     );
 }
 

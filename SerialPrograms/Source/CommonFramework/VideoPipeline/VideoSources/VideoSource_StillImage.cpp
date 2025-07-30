@@ -61,15 +61,15 @@ JsonValue VideoSourceDescriptor_StillImage::to_json() const{
 
 std::unique_ptr<VideoSource> VideoSourceDescriptor_StillImage::make_VideoSource(Logger& logger, Resolution resolution) const{
 //    cout << "make_VideoSource: " << m_path << endl;
-    return std::make_unique<VideoSource_StillImage>(path(), resolution);
+    return std::make_unique<VideoSource_StillImage>(logger, path(), resolution);
 }
 
 
 
 
 
-VideoSource_StillImage::VideoSource_StillImage(const std::string& path, Resolution resolution)
-    : VideoSource(false)
+VideoSource_StillImage::VideoSource_StillImage(Logger& logger, const std::string& path, Resolution resolution)
+    : VideoSource(logger, false)
     , m_original_image(QString::fromStdString(path))
 {
     m_snapshot = VideoSnapshot(

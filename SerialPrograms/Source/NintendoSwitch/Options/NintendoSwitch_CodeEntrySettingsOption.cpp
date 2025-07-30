@@ -65,20 +65,20 @@ DigitEntryTimingsOption::DigitEntryTimingsOption(bool switch2)
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
         switch2
-            ? "48ms"
-            : PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
+            ? PreloadSettings::instance().DEVELOPER_MODE ? "48 ms" : "64 ms"
+            : PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40 ms"
     )
     , HOLD(
         "<b>Hold:</b><br>Duration to hold each button press down.<br>"
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        PreloadSettings::instance().DEVELOPER_MODE ? "48 ms" : "80ms"
+        "48 ms"
     )
     , COOLDOWN(
         "<b>Hold:</b><br>Do not reuse a button until this long after it is reused.<br>"
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
+        "24 ms"
     )
 {
     PA_ADD_OPTION(REORDERING);
@@ -100,27 +100,27 @@ KeyboardEntryTimingsOption::KeyboardEntryTimingsOption(bool switch2)
     , REORDERING(
         "<b>Character Reordering:</b><br>Allow characters to be entered out of order.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        PreloadSettings::instance().DEVELOPER_MODE
+        true
     )
     , TIME_UNIT(
         "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.<br>"
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
         switch2
-            ? "48ms"
-            : PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
+            ? PreloadSettings::instance().DEVELOPER_MODE ? "48 ms" : "64 ms"
+            : PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40 ms"
     )
     , HOLD(
         "<b>Hold:</b><br>Duration to hold each button press down.<br>"
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        PreloadSettings::instance().DEVELOPER_MODE ? "48 ms" : "80ms"
+        "48 ms"
     )
     , COOLDOWN(
         "<b>Hold:</b><br>Do not reuse a button until this long after it is reused.<br>"
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
-        PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40ms"
+        "24 ms"
     )
 {
     PA_ADD_OPTION(REORDERING);

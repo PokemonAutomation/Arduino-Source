@@ -9,15 +9,19 @@
 
 #include <string>
 #include <atomic>
+#include <mutex>
+#include <condition_variable>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
     class EventNotificationOption;
     class ImageViewRGB32;
     struct ProgramInfo;
+    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
@@ -51,6 +55,66 @@ void enter_tera_search(
 );
 
 
+class RaidWaiter : public CancellableScope{
+public:
+    void signal_joiner_is_ready(){
+        {
+            std::lock_guard<std::mutex> lg(m_lock);
+            m_joiners_ready++;
+        }
+        m_cv.notify_all();
+    }
+    void signal_raid_code_is_ready(std::string raid_code){
+        {
+            std::lock_guard<std::mutex> lg(m_lock);
+            m_raid_code = std::move(raid_code);
+        }
+        m_cv.notify_all();
+    }
+
+    std::string wait_for_raid_code(){
+        std::unique_lock<std::mutex> lg(m_lock);
+        m_cv.wait(
+            lg,
+            [&]{
+                return !m_raid_code.empty() || cancelled();
+            }
+        );
+        throw_if_cancelled();
+        return m_raid_code;
+    }
+    void wait_for_joiners(size_t joiners){
+        std::unique_lock<std::mutex> lg(m_lock);
+        m_cv.wait(
+            lg,
+            [&]{
+                return m_joiners_ready >= joiners || cancelled();
+            }
+        );
+        throw_if_cancelled();
+    }
+    virtual bool cancel(std::exception_ptr exception = nullptr) noexcept override{
+        bool ret = CancellableScope::cancel(exception);
+        {
+            std::unique_lock<std::mutex> lg(m_lock);
+        }
+        m_cv.notify_all();
+        return ret;
+    }
+
+private:
+    size_t m_joiners_ready = 0;
+    std::string m_raid_code;
+    std::mutex m_lock;
+    std::condition_variable m_cv;
+};
+
+void join_raid(
+    const ProgramInfo& info, ConsoleHandle& console, ProControllerContext& context,
+    bool connect_to_internet,
+    KeyboardLayout keyboard_layout,
+    RaidWaiter& raid_waiter
+);
 
 
 
@@ -112,7 +176,12 @@ TeraResult run_tera_summary(
 );
 
 //  Run away from tera battle.
-void run_from_tera_battle(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+void run_from_tera_battle(
+    ProgramEnvironment& env,
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::atomic<uint64_t>* stat_errors
+);
 
 bool is_sparkling_raid(VideoStream& stream, ProControllerContext& context);
 

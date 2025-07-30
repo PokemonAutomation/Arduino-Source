@@ -14,7 +14,8 @@
 namespace PokemonAutomation{
 
 
-
+//  A Widget to hold multiple derived classes of ConfigWidget.
+//  Construct using a BatchOption.
 class BatchWidget : public QWidget, public ConfigWidget{
 public:
     ~BatchWidget();

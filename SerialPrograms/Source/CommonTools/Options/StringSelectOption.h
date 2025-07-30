@@ -15,6 +15,7 @@
 
 namespace PokemonAutomation{
 
+class JsonValue;
 
 
 
@@ -50,13 +51,16 @@ public:
 public:
     StringSelectDatabase();
     void add_entry(StringSelectEntry entry);
+    size_t size() const;
 
 public:
     const std::vector<StringSelectEntry>& case_list() const;
     size_t longest_text_length() const;
 
     const StringSelectEntry& operator[](size_t index) const;
+    // if not found, return SIZE_MAX
     size_t search_index_by_slug(const std::string& slug) const;
+    // if not found, return SIZE_MAX
     size_t search_index_by_name(const std::string& display_name) const;
 
 private:
@@ -64,8 +68,18 @@ private:
     Pimpl<Data> m_data;
 };
 
+// Create a simple StringSelectDatabase from a list of slugs.
+// The display names of each entry will be the same as their slugs.
+StringSelectDatabase create_string_select_database(const std::vector<std::string>& slugs);
+// Load a simple list of JSON strings to a StringSelectDatabase.
+// Previous content of the StringSelectDatabase is removed if loading is successful.
+// The display names of each loaded entry will be the same as their slugs.
+// Return whether we successfully loaded from the JSON. If loading failed, the initial content
+// of the database is not removed.
+bool load_json_to_string_select_database(const JsonValue& json, StringSelectDatabase& database);
 
-
+//  Config option that creates a cell where users can select a string from
+//  its dropdown menu. It is best to put this cell in a table widget.
 class StringSelectCell : public ConfigOption{
 public:
     ~StringSelectCell();
@@ -117,7 +131,10 @@ private:
 };
 
 
-
+//  Config option that creates a dropdown menu for users to select
+//  a sring. Different from StringSelectCell which is typically used 
+//  in a table, StringSelectOption is considered a standalone option
+//  that comes with its own label.
 class StringSelectOption : public StringSelectCell{
 public:
     StringSelectOption(

@@ -10,6 +10,7 @@
 #include <QWidget>
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Watchdog.h"
+#include "CommonFramework/Tools/StatAccumulator.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 
 namespace PokemonAutomation{
@@ -52,8 +53,6 @@ private:
     virtual void on_overlay_update_images(const std::shared_ptr<const std::vector<OverlayImage>>& images) override;
     // callback function from VideoOverlaySession on overlay images updated
     virtual void on_overlay_update_log   (const std::shared_ptr<const std::vector<OverlayLogLine>>& logs) override;
-    // callback function from VideoOverlaySession on overlay stats updated
-    virtual void on_overlay_update_stats (const std::list<OverlayStat*>* stats) override;
 
     virtual void on_watchdog_timeout() override;
 
@@ -89,7 +88,8 @@ private:
     std::shared_ptr<const std::vector<OverlayText>> m_texts;
     std::shared_ptr<const std::vector<OverlayImage>> m_images;
     std::shared_ptr<const std::vector<OverlayLogLine>> m_log;
-    const std::list<OverlayStat*>* m_stats;
+
+    PeriodicStatsReporterI32 m_stats_paint;
 };
 
 

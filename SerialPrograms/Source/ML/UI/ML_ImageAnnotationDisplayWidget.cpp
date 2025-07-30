@@ -40,10 +40,11 @@ ImageAnnotationDisplayWidget::~ImageAnnotationDisplayWidget(){
 ImageAnnotationDisplayWidget::ImageAnnotationDisplayWidget(
     QWidget& parent,
     ImageAnnotationDisplaySession& session,
-    uint64_t program_id
+    CommandReceiver* command_receiver
 )
     : QWidget(&parent)
     , m_session(session)
+    , m_command_receiver(command_receiver)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -94,19 +95,31 @@ void ImageAnnotationDisplayWidget::update_ui(ProgramState state){
 void ImageAnnotationDisplayWidget::key_press(QKeyEvent* event){
 //    cout << "press:   " << event->nativeVirtualKey() << endl;
     m_command->on_key_press(*event);
+    if (m_command_receiver){
+        m_command_receiver->key_press(event);
+    }
 }
 
 void ImageAnnotationDisplayWidget::key_release(QKeyEvent* event){
 //    cout << "release: " << event->nativeVirtualKey() << endl;
     m_command->on_key_release(*event);
+    if (m_command_receiver){
+        m_command_receiver->key_release(event);
+    }
 }
 
 void ImageAnnotationDisplayWidget::focus_in(QFocusEvent* event){
     m_command->set_focus(true);
+    if (m_command_receiver){
+        m_command_receiver->focus_in(event);
+    }
 }
 
 void ImageAnnotationDisplayWidget::focus_out(QFocusEvent* event){
     m_command->set_focus(false);
+    if (m_command_receiver){
+        m_command_receiver->focus_out(event);
+    }
 }
 
 void ImageAnnotationDisplayWidget::keyPressEvent(QKeyEvent* event){

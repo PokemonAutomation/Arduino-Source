@@ -28,7 +28,7 @@ void BinarySliderDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 
-std::vector<std::pair<bool, ImagePixelBox>> BinarySliderDetector::detect(const ImageViewRGB32& image) const{
+std::vector<std::pair<bool, ImagePixelBox>> BinarySliderDetector::detect(const ImageViewRGB32& screen) const{
     using namespace Kernels::Waterfill;
 
     static ImageMatch::ExactImageMatcher LIGHT_OFF_CURSOR   (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Light-Off-Cursor.png");
@@ -40,7 +40,7 @@ std::vector<std::pair<bool, ImagePixelBox>> BinarySliderDetector::detect(const I
     static ImageMatch::ExactImageMatcher DARK_ON_CURSOR     (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Dark-On-Cursor.png");
     static ImageMatch::ExactImageMatcher DARK_ON_NOCURSOR   (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Dark-On-NoCursor.png");
 
-    ImageViewRGB32 region = extract_box_reference(image, m_box);
+    ImageViewRGB32 region = extract_box_reference(screen, m_box);
 
     std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
         region,
@@ -56,6 +56,7 @@ std::vector<std::pair<bool, ImagePixelBox>> BinarySliderDetector::detect(const I
 
     std::vector<std::pair<bool, ImagePixelBox>> best;
 
+//    int c = 0;
     for (PackedBinaryMatrix& matrix : matrices){
 //        cout << "-----------------" << endl;
         session->set_source(matrix);
@@ -69,6 +70,12 @@ std::vector<std::pair<bool, ImagePixelBox>> BinarySliderDetector::detect(const I
             if (aspect_ratio < 0.9 || aspect_ratio > 1.1){
                 continue;
             }
+
+            double min_area = screen.total_pixels() * (3000. / (3840*2160));
+            if ((double)object.area < min_area){
+                continue;
+            }
+
             ImageViewRGB32 cropped = extract_box_reference(region, object);
 
             double best_off_rmsd = 9999;
@@ -90,6 +97,8 @@ std::vector<std::pair<bool, ImagePixelBox>> BinarySliderDetector::detect(const I
             double best_rmsd = on ? best_on_rmsd : best_off_rmsd;
 
             if (best_rmsd < 60){
+//                cout << "rmsd = " << best_rmsd << endl;
+//                cropped.save("slider-" + std::to_string(c) + "-" + std::to_string(sliders.size()) + ".png");
                 sliders.emplace_back(on, object);
             }
 
@@ -102,6 +111,8 @@ std::vector<std::pair<bool, ImagePixelBox>> BinarySliderDetector::detect(const I
         if (best.size() < sliders.size()){
             best = std::move(sliders);
         }
+
+//        c++;
     }
 
     return best;

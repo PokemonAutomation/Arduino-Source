@@ -6,6 +6,7 @@
 
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ErrorReports/ErrorReports.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -77,6 +78,20 @@ DateTime DateReader_US::read_date(Logger& logger, std::shared_ptr<const ImageRGB
         date.hour = (int8_t)hour;
     }
 
+    if (date.day < 0 ||
+        date.month < 0 ||
+        date.year < 0 ||
+        date.hour < 0 ||
+        date.minute < 0
+    ){
+        report_error(
+            &logger, ProgramInfo(),
+            "Failed to read date.",
+            {},
+            *screen
+        );
+    }
+
     return date;
 }
 void DateReader_US::set_date(
@@ -104,16 +119,30 @@ void DateReader_US::set_date(
         }
 
         move_horizontal(context, cursor_position, 0);
-        adjust_wrap(context, 1, 12, current.month, date.month);
+        if (current.month < 0){
+            stream.log("Failed to read month. Will not adjust.", COLOR_RED);
+        }else{
+            adjust_wrap(context, 1, 12, current.month, date.month);
+        }
 
         move_horizontal(context, cursor_position, 1);
-        adjust_no_wrap(context, current.day, date.day);
+        if (current.day < 0){
+            stream.log("Failed to read day. Will not adjust.", COLOR_RED);
+        }else{
+            adjust_no_wrap(context, current.day, date.day);
+        }
 
         move_horizontal(context, cursor_position, 2);
-        adjust_no_wrap(context, current.year, date.year);
+        if (current.year < 0){
+            stream.log("Failed to read year. Will not adjust.", COLOR_RED);
+        }else{
+            adjust_no_wrap(context, current.year, date.year);
+        }
 
         move_horizontal(context, cursor_position, 3);
-        {
+        if (current.hour < 0){
+            stream.log("Failed to read hour. Will not adjust.", COLOR_RED);
+        }else{
             int8_t c = current.hour;
             int8_t t = date.hour;
             if (c >= 12) c -= 12;
@@ -122,7 +151,11 @@ void DateReader_US::set_date(
         }
 
         move_horizontal(context, cursor_position, 4);
-        adjust_wrap(context, 0, 59, current.minute, date.minute);
+        if (current.minute < 0){
+            stream.log("Failed to read minutes. Will not adjust.", COLOR_RED);
+        }else{
+            adjust_wrap(context, 0, 59, current.minute, date.minute);
+        }
 
         move_horizontal(context, cursor_position, 5);
         if ((date.hour < 12) != (current.hour < 12)){

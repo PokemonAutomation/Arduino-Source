@@ -53,6 +53,7 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
 
     for (size_t attempts = 0; attempts < 10; attempts++){
         HomeMenuWatcher home_menu(console, 100ms);
+        context.wait_for_all_requests();
         int ret = wait_until(
             console, context, 5000ms,
             {home_menu}
@@ -61,7 +62,7 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
             return;
         }
         console.log("Unable to detect Home. Pressing Home button...", COLOR_RED);
-        pbf_press_button(context, BUTTON_HOME, 160ms, 0ms);
+        pbf_press_button(context, BUTTON_HOME, 160ms, 160ms);
     }
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,

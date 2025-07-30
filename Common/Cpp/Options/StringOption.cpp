@@ -16,6 +16,7 @@ struct StringCell::Data{
     const bool m_is_password;
     const std::string m_default;
     const std::string m_placeholder_text;
+    const bool m_report_all_text_changes;
 
     std::atomic<bool> m_locked;
 
@@ -25,11 +26,13 @@ struct StringCell::Data{
     Data(
         bool is_password,
         std::string default_value,
-        std::string placeholder_text
+        std::string placeholder_text,
+        bool report_all_text_changes
     )
         : m_is_password(is_password)
         , m_default(std::move(default_value))
         , m_placeholder_text(std::move(placeholder_text))
+        , m_report_all_text_changes(report_all_text_changes)
         , m_current(m_default)
     {}
 };
@@ -40,10 +43,11 @@ StringCell::StringCell(
     bool is_password,
     LockMode lock_while_program_is_running,
     std::string default_value,
-    std::string placeholder_text
+    std::string placeholder_text,
+    bool signal_all_text_changes
 )
     : ConfigOption(lock_while_program_is_running)
-    , m_data(CONSTRUCT_TOKEN, is_password, std::move(default_value), std::move(placeholder_text))
+    , m_data(CONSTRUCT_TOKEN, is_password, std::move(default_value), std::move(placeholder_text), signal_all_text_changes)
 {}
 
 bool StringCell::is_password() const{
@@ -54,6 +58,9 @@ const std::string& StringCell::placeholder_text() const{
 }
 const std::string StringCell::default_value() const{
     return m_data->m_default;
+}
+bool StringCell::signal_all_text_changes() const{
+    return m_data->m_report_all_text_changes;
 }
 
 
@@ -108,9 +115,10 @@ StringOption::StringOption(
     std::string label,
     LockMode lock_while_program_is_running,
     std::string default_value,
-    std::string placeholder_text
+    std::string placeholder_text,
+    bool signal_all_text_changes
 )
-     : StringCell(is_password, lock_while_program_is_running, default_value, placeholder_text)
+     : StringCell(is_password, lock_while_program_is_running, default_value, placeholder_text, signal_all_text_changes)
      , m_label(std::move(label))
 {}
 

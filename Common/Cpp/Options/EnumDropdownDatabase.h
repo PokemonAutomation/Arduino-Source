@@ -15,6 +15,7 @@
 #define PokemonAutomation_Options_EnumDropdownDatabase_H
 
 #include <string>
+#include <vector>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Containers/FixedLimitVector.h"
 
@@ -47,7 +48,7 @@ public:
     IntegerEnumDropdownDatabase(std::initializer_list<EnumEntry> list);
 
     void add(EnumEntry entry);
-    void add(size_t value, std::string slug, std::string display, bool enabled){
+    void add(size_t value, std::string slug, std::string display, bool enabled = true){
         add(EnumEntry{value, std::move(slug), std::move(display), enabled});
     }
 
@@ -64,6 +65,10 @@ protected:
 private:
     Pimpl<IntegerEnumDropdownDatabaseImpl> m_core;
 };
+
+// Create a simple StringSelectDatabase from a list of slugs.
+// The display names of each entry will be the same as their slugs and enum_values will be their indices.
+IntegerEnumDropdownDatabase create_integer_enum_dropdown_database(const std::vector<std::string>& slugs);
 
 
 

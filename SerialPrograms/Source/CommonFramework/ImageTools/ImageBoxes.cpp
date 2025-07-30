@@ -95,6 +95,34 @@ size_t ImagePixelBox::distance_y(const ImagePixelBox& box) const{
     return 0;
 }
 
+size_t ImagePixelBox::distance_to_point_x(const size_t x) const{
+    size_t min_x = std::max(this->min_x, x);
+    size_t max_x = std::min(this->max_x, x);
+    return min_x - max_x;
+}
+//  The distance to a point on y axis. If the point is in the box, the distance is 0.
+size_t ImagePixelBox::distance_to_point_y(const size_t y) const{
+    size_t min_y = std::max(this->min_y, y);
+    size_t max_y = std::min(this->max_y, y);
+    return min_y - max_y;
+}
+//  The distance from the box center to a point on x axis
+size_t ImagePixelBox::center_distance_to_point_x(const size_t x) const{
+    const size_t cx = center_x();
+    if (cx >= x){
+        return cx - x;
+    }
+    return x - cx;
+}
+//  The distance from the box center to a point on y axis
+size_t ImagePixelBox::center_distance_to_point_y(const size_t y) const{
+    const size_t cy = center_y();
+    if (cy >= y){
+        return cy - y;
+    }
+    return y - cy;
+}
+
 
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImagePixelBox& box){
     return image.sub_image(box.min_x, box.min_y, box.width(), box.height());

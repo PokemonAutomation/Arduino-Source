@@ -36,7 +36,7 @@ ImageAnnotationDisplaySession::ImageAnnotationDisplaySession(ImageAnnotationDisp
     , m_display_option(option)
     , m_still_image_option(create_still_image_video_source_option())
     , m_video_session(m_logger, m_still_image_option)
-    , m_overlay(option.m_overlay)
+    , m_overlay(m_logger, option.m_overlay)
     , m_cpu_utilization(new CpuUtilizationStat())
     , m_main_thread_utilization(new ThreadUtilizationStat(current_thread_handle(), "Main Qt Thread:"))
 {

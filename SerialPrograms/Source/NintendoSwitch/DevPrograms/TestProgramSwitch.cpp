@@ -195,7 +195,7 @@ TestProgram::TestProgram()
     )
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
     , STATIC_TEXT("Test text...")
-//    , PLAYER_LIST("Test Table", LockMode::UNLOCK_WHILE_RUNNING, "Notes")
+    , BOX("Box", LockMode::UNLOCK_WHILE_RUNNING, 0, 0, 1, 1)
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -209,7 +209,7 @@ TestProgram::TestProgram()
 //    PA_ADD_OPTION(CONSOLE_MODEL);
     PA_ADD_OPTION(IMAGE_PATH);
     PA_ADD_OPTION(STATIC_TEXT);
-//    PA_ADD_OPTION(PLAYER_LIST);
+    PA_ADD_OPTION(BOX);
 //    PA_ADD_OPTION(battle_AI);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);
@@ -254,10 +254,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+
     auto screenshot = feed.snapshot();
 
-    PokemonSwSh::MaxLairInternal::PathSelectDetector detector;
-    detector.detect(screenshot);
+
+    DateReader reader(console);
+    reader.make_overlays(overlays);
+    reader.read_date(logger, screenshot);
+
+
+#if 0
+    BinarySliderDetector detector(COLOR_BLUE, {0.836431, 0.097521, 0.069703, 0.796694});
+    auto result = detector.detect(screenshot);
+
+    for (auto& item : result){
+        cout << item.first << " : " << item.second.center_y() << endl;
+    }
+#endif
+
+//    LetsGoKillWatcher menu(logger, COLOR_RED, true, {0.23, 0.23, 0.04, 0.20});
+//    cout << menu.detect(screenshot) << endl;
+
+
+
+//    PokemonSwSh::MaxLairInternal::PathSelectDetector detector;
+//    detector.detect(screenshot);
 
 //    int ret = PokemonSwSh::MaxLairInternal::read_side(screenshot);
 //    cout << "ret = " << ret << endl;

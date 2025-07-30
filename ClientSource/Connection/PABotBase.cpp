@@ -312,7 +312,7 @@ void PABotBase::process_ack_request(BotBaseMessage message){
 
     if constexpr (!variable_length){
         if (message.body.size() != sizeof(Params)){
-            m_sniffer->log("Ignoring message with invalid size.");
+            m_logger.log("Ignoring message with invalid size.");
             return;
         }
     }
@@ -324,14 +324,14 @@ void PABotBase::process_ack_request(BotBaseMessage message){
         WriteSpinLock lg(m_state_lock, "PABotBase::process_ack_request()");
 
         if (m_pending_requests.empty()){
-            m_sniffer->log("Unexpected request ack message: seqnum = " + std::to_string(seqnum));
+            m_logger.log("Unexpected request ack message: seqnum = " + std::to_string(seqnum));
             return;
         }
 
         uint64_t full_seqnum = infer_full_seqnum(m_pending_requests, seqnum);
         std::map<uint64_t, PendingRequest>::iterator iter = m_pending_requests.find(full_seqnum);
         if (iter == m_pending_requests.end()){
-            m_sniffer->log("Unexpected request ack message: seqnum = " + std::to_string(seqnum));
+            m_logger.log("Unexpected request ack message: seqnum = " + std::to_string(seqnum));
             return;
         }
         iter->second.sanitizer.check_usage();
@@ -357,10 +357,10 @@ void PABotBase::process_ack_request(BotBaseMessage message){
         }
         return;
     case AckState::ACKED:
-        m_sniffer->log("Duplicate request ack message: seqnum = " + std::to_string(seqnum));
+        m_logger.log("Duplicate request ack message: seqnum = " + std::to_string(seqnum));
         return;
     case AckState::FINISHED:
-        m_sniffer->log("Request ack on command finish: seqnum = " + std::to_string(seqnum));
+        m_logger.log("Request ack on command finish: seqnum = " + std::to_string(seqnum));
         return;
     }
 }
@@ -369,7 +369,7 @@ void PABotBase::process_ack_command(BotBaseMessage message){
     auto scope_check = m_sanitizer.check_scope();
 
     if (message.body.size() != sizeof(Params)){
-        m_sniffer->log("Ignoring message with invalid size.");
+        m_logger.log("Ignoring message with invalid size.");
         return;
     }
     const Params* params = (const Params*)message.body.c_str();
@@ -378,14 +378,14 @@ void PABotBase::process_ack_command(BotBaseMessage message){
     WriteSpinLock lg(m_state_lock, "PABotBase::process_ack_command()");
 
     if (m_pending_commands.empty()){
-        m_sniffer->log("Unexpected command ack message: seqnum = " + std::to_string(seqnum));
+        m_logger.log("Unexpected command ack message: seqnum = " + std::to_string(seqnum));
         return;
     }
 
     uint64_t full_seqnum = infer_full_seqnum(m_pending_commands, seqnum);
     auto iter = m_pending_commands.find(full_seqnum);
     if (iter == m_pending_commands.end()){
-        m_sniffer->log("Unexpected command ack message: seqnum = " + std::to_string(seqnum));
+        m_logger.log("Unexpected command ack message: seqnum = " + std::to_string(seqnum));
         return;
     }
     iter->second.sanitizer.check_usage();
@@ -399,10 +399,10 @@ void PABotBase::process_ack_command(BotBaseMessage message){
         iter->second.ack = std::move(message);
         return;
     case AckState::ACKED:
-        m_sniffer->log("Duplicate command ack message: seqnum = " + std::to_string(seqnum));
+        m_logger.log("Duplicate command ack message: seqnum = " + std::to_string(seqnum));
         return;
     case AckState::FINISHED:
-        m_sniffer->log("Command ack on finished command: seqnum = " + std::to_string(seqnum));
+        m_logger.log("Command ack on finished command: seqnum = " + std::to_string(seqnum));
         return;
     }
 }
@@ -411,7 +411,7 @@ void PABotBase::process_command_finished(BotBaseMessage message){
     auto scope_check = m_sanitizer.check_scope();
 
     if (message.body.size() != sizeof(Params)){
-        m_sniffer->log("Ignoring message with invalid size.");
+        m_logger.log("Ignoring message with invalid size.");
         return;
     }
     const Params* params = (const Params*)message.body.c_str();
@@ -437,7 +437,7 @@ void PABotBase::process_command_finished(BotBaseMessage message){
 #endif
 
     if (m_pending_commands.empty()){
-        m_sniffer->log(
+        m_logger.log(
             "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
             ", command_seqnum = " + std::to_string(command_seqnum)
         );
@@ -447,7 +447,7 @@ void PABotBase::process_command_finished(BotBaseMessage message){
     uint64_t full_seqnum = infer_full_seqnum(m_pending_commands, command_seqnum);
     auto iter = m_pending_commands.find(full_seqnum);
     if (iter == m_pending_commands.end()){
-        m_sniffer->log(
+        m_logger.log(
             "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
             ", command_seqnum = " + std::to_string(command_seqnum)
         );
@@ -466,7 +466,7 @@ void PABotBase::process_command_finished(BotBaseMessage message){
         m_cv.notify_all();
         return;
     case AckState::FINISHED:
-        m_sniffer->log("Duplicate command finish: seqnum = " + std::to_string(seqnum));
+        m_logger.log("Duplicate command finish: seqnum = " + std::to_string(seqnum));
         return;
     }
 }
@@ -494,7 +494,7 @@ void PABotBase::on_recv_message(BotBaseMessage message){
         return;
     case PABB_MSG_ERROR_INVALID_TYPE:{
         if (message.body.size() != sizeof(pabb_MsgInfoInvalidType)){
-            m_sniffer->log("Ignoring message with invalid size.");
+            m_logger.log("Ignoring message with invalid size.");
             return;
         }
         const pabb_MsgInfoInvalidType* params = (const pabb_MsgInfoInvalidType*)message.body.c_str();
@@ -509,7 +509,7 @@ void PABotBase::on_recv_message(BotBaseMessage message){
     }
     case PABB_MSG_ERROR_MISSED_REQUEST:{
         if (message.body.size() != sizeof(pabb_MsgInfoMissedRequest)){
-            m_sniffer->log("Ignoring message with invalid size.");
+            m_logger.log("Ignoring message with invalid size.");
             return;
         }
         const pabb_MsgInfoMissedRequest* params = (const pabb_MsgInfoMissedRequest*)message.body.c_str();

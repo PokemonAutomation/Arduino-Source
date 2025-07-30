@@ -74,10 +74,11 @@ CommandRow::CommandRow(
     m_overlay_text->setChecked(session.enabled_text());
     row->addWidget(m_overlay_text);
 
-    if (PreloadSettings::instance().DEVELOPER_MODE){
-        m_overlay_images = new QCheckBox("Masks", this);
-        m_overlay_images->setChecked(session.enabled_images());
-        row->addWidget(m_overlay_images);
+    m_overlay_images = new QCheckBox("Masks", this);
+    m_overlay_images->setChecked(session.enabled_images());
+    row->addWidget(m_overlay_images);
+    if (!PreloadSettings::instance().DEVELOPER_MODE){
+        m_overlay_images->setVisible(false);
     }
 
     m_overlay_log = new QCheckBox("Log", this);

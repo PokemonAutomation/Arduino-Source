@@ -120,7 +120,14 @@ const EnumEntry* IntegerEnumDropdownDatabase::find_display(const std::string& di
 FixedLimitVector<size_t> IntegerEnumDropdownDatabase::all_values() const{
     return m_core->all_values();
 }
-
+IntegerEnumDropdownDatabase create_integer_enum_dropdown_database(const std::vector<std::string>& slugs){
+    IntegerEnumDropdownDatabase database;
+    for (size_t i = 0; i < slugs.size(); i++){
+        // display name is the same as slug
+        database.add(i, slugs[i], slugs[i]);
+    }
+    return database;
+}
 
 template class FixedLimitVector<size_t>;
 
