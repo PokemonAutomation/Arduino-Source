@@ -148,11 +148,8 @@ CameraVideoSource::CameraVideoSource(
     m_logger.log("Resolution: " + m_resolution.to_string());
 
     m_camera.reset(new QCameraThread(m_logger, *device, *format));
-//    m_camera.reset(new QCamera(*device));
-//    m_camera->setCameraFormat(*format);
 
     m_capture_session.reset(new QMediaCaptureSession());
-//    m_capture_session->setCamera(m_camera.get());
     m_capture_session->setCamera(&m_camera->camera());
 
 #if 0
@@ -188,8 +185,7 @@ void CameraVideoSource::set_video_output(QGraphicsVideoItem& item){
                 return;
             }
             report_source_frame(std::make_shared<VideoFrame>(now, frame));
-        }//,
-//        Qt::DirectConnection
+        }
     );
 }
 

@@ -272,6 +272,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/TimeExpressionWidget.h
     ../Common/Qt/Redispatch.cpp
     ../Common/Qt/Redispatch.h
+    ../Common/Qt/SpinWaitWithEvents.h
     ../Common/Qt/StringToolsQt.cpp
     ../Common/Qt/StringToolsQt.h
     ../Common/Qt/TimeQt.cpp

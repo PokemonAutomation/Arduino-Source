@@ -127,7 +127,6 @@ private:
     Logger& m_logger;
     Resolution m_resolution;
 
-//    std::unique_ptr<QCamera> m_camera;
     std::unique_ptr<QCameraThread> m_camera;
     std::unique_ptr<QVideoSink> m_video_sink;
     std::unique_ptr<QMediaCaptureSession> m_capture_session;

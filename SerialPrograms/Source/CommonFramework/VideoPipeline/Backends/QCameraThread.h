@@ -10,6 +10,7 @@
 #include <QThread>
 #include <QCamera>
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Qt/SpinWaitWithEvents.h"
 
 //#include <iostream>
 //using std::cout;
@@ -19,8 +20,6 @@ namespace PokemonAutomation{
 
 
 class QCameraThread : public QThread{
-    Q_OBJECT
-
 public:
     QCameraThread(
         Logger& logger,
@@ -34,8 +33,7 @@ public:
     {
         start();
 
-        std::unique_lock<std::mutex> lg(m_lock);
-        m_cv.wait(lg, [this]{ return m_camera != nullptr; });
+        m_spin_waiter.process_events_while_waiting();
     }
     ~QCameraThread(){
         quit();
@@ -62,10 +60,7 @@ private:
 
         camera.start();
 
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-        }
-        m_cv.notify_all();
+        m_spin_waiter.signal();
 
 //        cout << "start" << endl;
         exec();
@@ -80,9 +75,7 @@ private:
     QCameraDevice m_device;
     QCameraFormat m_format;
     QCamera* m_camera;
-
-    std::mutex m_lock;
-    std::condition_variable m_cv;
+    SpinWaitWithEvents m_spin_waiter;
 };
 
 
