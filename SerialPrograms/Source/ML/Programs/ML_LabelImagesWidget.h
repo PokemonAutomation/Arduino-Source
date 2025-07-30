@@ -86,6 +86,8 @@ private:
 
     bool m_shift_pressed = false;
     bool m_control_pressed = false;
+    double m_cur_mouse_x = 0.0;
+    double m_cur_mouse_y = 0.0;
 };
 
 

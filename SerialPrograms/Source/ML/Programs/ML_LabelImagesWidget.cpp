@@ -242,11 +242,21 @@ void LabelImages_Widget::key_release(QKeyEvent* event){
     case Qt::Key::Key_Backspace:
         m_program.delete_selected_annotation();
         break;
+    case Qt::Key::Key_D:
+        if (m_control_pressed){
+            m_program.remove_segmentation_inclusion_point(m_cur_mouse_x, m_cur_mouse_y);
+        } else if (m_shift_pressed){
+            m_program.remove_segmentation_exclusion_point(m_cur_mouse_x, m_cur_mouse_y);
+        }
+        break;
     default:;
     }
 }
 
 void LabelImages_Widget::on_mouse_press(double x, double y){
+    m_cur_mouse_x = x;
+    m_cur_mouse_y = y;
+
     m_program.WIDTH.set(0);
     m_program.HEIGHT.set(0);
     m_program.X.set(x);
@@ -259,6 +269,9 @@ void LabelImages_Widget::on_mouse_press(double x, double y){
 }
 
 void LabelImages_Widget::on_mouse_release(double x, double y){
+    m_cur_mouse_x = x;
+    m_cur_mouse_y = y;
+
     const std::chrono::duration<double> duration = std::chrono::high_resolution_clock::now() - m_mouse_start_time;
     const double rel_x = std::fabs(m_mouse_start->first - m_mouse_end->first);
     const double rel_y = std::fabs(m_mouse_start->second - m_mouse_end->second);
@@ -272,16 +285,22 @@ void LabelImages_Widget::on_mouse_release(double x, double y){
     // user may have very small movement while doing quick clicking. To register this as a simple click, use relative
     // screen distance threshold 0.0015 and click duration threshold 0.15 second:
     if ((rel_x == 0 && rel_y == 0) || (rel_x < 0.0015 && rel_y < 0.0015 && duration < std::chrono::milliseconds(150))){
-        if (m_shift_pressed){
-            cout << "shift pressed while at " << x << " " << y << endl;
+        if (m_control_pressed){
+            // cout << "Ctrl pressed while at " << x << " " << y << endl;
+            m_program.add_segmentation_inclusion_point(x, y);
+        } else if (m_shift_pressed){
+            // cout << "Shift pressed while at " << x << " " << y << endl;
+            m_program.add_segmentation_exclusion_point(x, y);
+        } else{
+            // normal mouse clicking
+            // change currently selected annotation
+            // also change the option values in the UI
+            m_program.change_annotation_selection_by_mouse(x, y);
         }
-        // process mouse clicking
-        // change currently selected annotation
-        // also change the option values in the UI
-        m_program.change_annotation_selection_by_mouse(x, y);
         return;
     }
 
+    // not mouse clicking. So user draw a box:
     m_program.compute_mask();
 }
 
@@ -311,6 +330,8 @@ void LabelImages_Widget::on_mouse_move(double x, double y){
     m_program.HEIGHT.set(yh - yl);
 
     m_program.update_rendered_objects();
+    m_cur_mouse_x = x;
+    m_cur_mouse_y = y;
 }
 
 

@@ -254,6 +254,17 @@ void LabelImages::update_rendered_objects(){
         }
         // cout << " count " << count << endl;
         m_overlay_set.add(std::move(mask_image), mask_float_box);
+
+        for(const auto& p : obj.inclusion_points){
+            auto fp = pixel_to_float(p.first, p.second);
+            ImageFloatBox box(fp.first, fp.second, 0.01, 0.01);
+            m_overlay_set.add(COLOR_RED, box);
+        }
+        for(const auto& p : obj.exclusion_points){
+            auto fp = pixel_to_float(p.first, p.second);
+            ImageFloatBox box(fp.first, fp.second, 0.01, 0.01);
+            m_overlay_set.add(COLOR_BLUE, box);
+        }
     };
     for(size_t i_obj = 0; i_obj < m_annotations.size(); i_obj++){
         if (i_obj == m_selected_obj_idx){
@@ -337,6 +348,75 @@ void LabelImages::compute_mask(){
     }
 }
 
+void LabelImages::add_segmentation_inclusion_point(double x, double y){
+    if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0
+        || m_selected_obj_idx >= m_annotations.size()){
+        return;
+    }
+    auto& cur_anno = m_annotations[m_selected_obj_idx];
+    if (cur_anno.mask.size() == 0){
+        return;
+    }
+    cur_anno.inclusion_points.push_back(float_to_pixel(x, y));
+    update_rendered_objects();
+}
+
+void LabelImages::add_segmentation_exclusion_point(double x, double y){
+    if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0
+        || m_selected_obj_idx >= m_annotations.size()){
+        return;
+    }
+    auto& cur_anno = m_annotations[m_selected_obj_idx];
+    if (cur_anno.mask.size() == 0){
+        return;
+    }
+    cur_anno.exclusion_points.push_back(float_to_pixel(x, y));
+    update_rendered_objects();
+}
+
+void LabelImages::remove_closest_point(std::vector<std::pair<size_t, size_t>>& points, double x, double y){
+    if (points.size() == 0){
+        return;
+    }
+
+    std::pair<size_t, size_t> tp = float_to_pixel(x, y);
+
+    size_t min_dist = SIZE_MAX;
+    size_t target_point = 0;
+    for(size_t i = 0; i < points.size(); i++){
+        const auto& ip = points[i];
+        size_t d_x = ip.first > tp.first ? ip.first - tp.first : tp.first - ip.first;
+        size_t d_y = ip.second > tp.second ? ip.second - tp.second : tp.second - ip.second;
+        size_t d2 = d_x * d_x + d_y * d_y;
+        if (d2 < min_dist){
+            min_dist = d2;
+            target_point = i;
+        }
+    }
+    points.erase(points.begin() + target_point);
+
+}
+    
+void LabelImages::remove_segmentation_inclusion_point(double x, double y){
+    if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0
+        || m_selected_obj_idx >= m_annotations.size()){
+        return;
+    }
+    auto& points = m_annotations[m_selected_obj_idx].inclusion_points;
+    remove_closest_point(points, x, y);
+    update_rendered_objects();
+}
+
+void LabelImages::remove_segmentation_exclusion_point(double x, double y){
+    if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0
+        || m_selected_obj_idx >= m_annotations.size()){
+        return;
+    }
+    auto& points = m_annotations[m_selected_obj_idx].exclusion_points;
+    remove_closest_point(points, x, y);
+    update_rendered_objects();
+}
+
 void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
     std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
     std::cout << "Use SAM Embedding model " << embedding_model_path << std::endl;
@@ -373,16 +453,15 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
         return;
     }
 
-    const size_t px = (size_t)std::max<double>(source_image_width * x + 0.5, 0);
-    const size_t py = (size_t)std::max<double>(source_image_height * y + 0.5, 0);
+    std::pair<size_t, size_t> p = float_to_pixel(x, y);
 
     const size_t old_selected_idx = m_selected_obj_idx;
     
-    double closest_distance = DBL_MAX;
+    size_t closest_distance = SIZE_MAX;
     std::vector<size_t> zero_distance_annotations;
     for(size_t i = 0; i < m_annotations.size(); i++){
-        const size_t dx = m_annotations[i].mask_box.distance_to_point_x(px);
-        const size_t dy = m_annotations[i].mask_box.distance_to_point_y(py);
+        const size_t dx = m_annotations[i].mask_box.distance_to_point_x(p.first);
+        const size_t dy = m_annotations[i].mask_box.distance_to_point_y(p.second);
         const size_t d2 = dx*dx + dy*dy;
         if (d2 == 0){
             zero_distance_annotations.push_back(i);
@@ -395,10 +474,10 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
 
     if (zero_distance_annotations.size() > 1){
         // this point is inside multiple boxes, we then use the closest to the box center to determine
-        closest_distance = DBL_MAX;
+        closest_distance = SIZE_MAX;
         for(size_t i : zero_distance_annotations){
-            const size_t dx = m_annotations[i].mask_box.center_distance_to_point_x(px);
-            const size_t dy = m_annotations[i].mask_box.center_distance_to_point_y(py);
+            const size_t dx = m_annotations[i].mask_box.center_distance_to_point_x(p.first);
+            const size_t dy = m_annotations[i].mask_box.center_distance_to_point_y(p.second);
             const size_t d2 = dx*dx + dy*dy;
             if (d2 < closest_distance){
                 closest_distance = d2;
@@ -546,6 +625,16 @@ void LabelImages::load_custom_label_set(const std::string& json_path){
     // the label UI should switch the label to be shown as part of the custom set.
     // so call the following line to achieve that
     set_selected_label(selected_label());
+}
+
+std::pair<size_t, size_t> LabelImages::float_to_pixel(double x, double y) const{
+    const size_t px = (size_t)std::max<double>(source_image_width * x + 0.5, 0);
+    const size_t py = (size_t)std::max<double>(source_image_height * y + 0.5, 0);
+    return std::make_pair(px, py);
+}
+
+std::pair<double, double> LabelImages::pixel_to_float(size_t x, size_t y) const{
+    return std::make_pair(x / (double)source_image_width, y / (double)source_image_height);
 }
 
 

@@ -73,6 +73,16 @@ public:
 
     // Use user currently drawn box to compute per-pixel masks on the image using SAM model
     void compute_mask();
+    // User adds an inclusion point to the current selected annotation. It will then re-compute
+    // the per-pixel mask using the added inclusion point.
+    void add_segmentation_inclusion_point(double x, double y);
+    // Remove the closest user added segmentation inclusion point on the current selected annotation
+    void remove_segmentation_inclusion_point(double x, double y);
+    // User adds an exclusion point to the current selected annotation. It will then re-compute
+    // the per-pixel mask using the added exclusion point.
+    void add_segmentation_exclusion_point(double x, double y);
+    // Remove the closest user added segmentation exclusion point on the current selected annotation
+    void remove_segmentation_exclusion_point(double x, double y);
 
     // Compute embeddings for all images in a folder.
     // This can be very slow!
@@ -93,6 +103,12 @@ public:
 
 private:
     void on_config_value_changed(void* object) override;
+
+    std::pair<size_t, size_t> float_to_pixel(double x, double y) const;
+    // note! will have division by source_image_width/height!
+    std::pair<double, double> pixel_to_float(size_t x, size_t y) const;
+
+    void remove_closest_point(std::vector<std::pair<size_t, size_t>>& points, double x, double y);
 
     friend class LabelImages_Widget;
 

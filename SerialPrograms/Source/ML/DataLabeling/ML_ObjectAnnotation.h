@@ -24,6 +24,14 @@ struct ObjectAnnotation{
     ImagePixelBox user_box;
     // tight bounding box around a mask
     ImagePixelBox mask_box;
+    // User added points to denote this point belongs to the object.
+    // This is to help the automatic annotation model to compute the correct
+    // per-pixel mask.
+    std::vector<std::pair<size_t, size_t>> inclusion_points;
+    // User added points to denote this point does not belong to the object.
+    // This is to help the automatic annotation model to compute the correct
+    // per-pixel mask.
+    std::vector<std::pair<size_t, size_t>> exclusion_points;
     // per-pixel mask on whether this pixel belongs to the object
     // size() equals the total pixels in mask_box
     std::vector<bool> mask;
