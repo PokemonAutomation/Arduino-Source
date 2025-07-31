@@ -73,7 +73,7 @@ void VideoOverlaySession::stats_thread(){
     while (!m_stopping){
         {
             std::vector<OverlayStatSnapshot> lines;
-            ReadSpinLock lg0(m_lock);
+            WriteSpinLock lg0(m_lock);
             for (const auto& stat : m_stats_order){
                 OverlayStatSnapshot snapshot = stat->get_current();
                 if (!snapshot.text.empty()){
@@ -274,7 +274,7 @@ void VideoOverlaySession::clear_log(){
 std::vector<OverlayLogLine> VideoOverlaySession::log_texts() const{
     ReadSpinLock lg(m_lock);
     std::vector<OverlayLogLine> ret;
-    for(const auto& item : m_log_texts){
+    for (const auto& item : m_log_texts){
         ret.emplace_back(item);
     }
     return ret;
