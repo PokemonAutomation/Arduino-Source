@@ -280,7 +280,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h
-    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_Generic.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
     ../IconResource/IconResource.rc
@@ -693,8 +693,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_PostConnectActions.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WiredController.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WiredController.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
@@ -939,8 +939,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.h
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.cpp
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessController.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessController.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessJoycon.cpp
@@ -2609,14 +2609,11 @@ else() # macOS and Linux
     endif()
 
     if (APPLE)
-        ###################################################
-        # Compiler flag change history:
-        # Removed -Wno-c11-extensions since we no long have following error:
+        # Add -Wno-c11-extensions to avoid clang gives
         # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
         # when compiling OpenCV
-        ###################################################
-        # Use https://clang.llvm.org/docs/DiagnosticsReference.html to query Clang warnings
-        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32 -Wtautological-constant-in-range-compare -Wsequence-point)
+        # target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
+        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
     else()
         # Assume GCC
         target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)

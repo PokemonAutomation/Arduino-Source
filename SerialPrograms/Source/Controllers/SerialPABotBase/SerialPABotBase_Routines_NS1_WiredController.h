@@ -1,23 +1,23 @@
-/*  SerialPABotBase (Nintendo Switch Generic Wired Controller)
+/*  SerialPABotBase (Nintendo Switch 1 Wired Controller)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_SerialPABotBase_NS_Generic_H
-#define PokemonAutomation_SerialPABotBase_NS_Generic_H
+#ifndef PokemonAutomation_SerialPABotBase_NS1_WiredController_H
+#define PokemonAutomation_SerialPABotBase_NS1_WiredController_H
 
-#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS_Generic.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WiredController.h"
 #include "ClientSource/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
-class DeviceRequest_NS_Generic_ControllerStateMs : public BotBaseRequest{
+class DeviceRequest_NS1_WiredController_ControllerStateMs : public BotBaseRequest{
 public:
-    pabb_Message_NS_Generic_ControllerStateMs params;
-    DeviceRequest_NS_Generic_ControllerStateMs(
+    pabb_Message_Report_NS1_WiredController params;
+    DeviceRequest_NS1_WiredController_ControllerStateMs(
         uint16_t milliseconds,
         uint16_t buttons,
         uint8_t dpad,
@@ -45,7 +45,7 @@ public:
         params.report.right_joystick_y = right_joystick_y;
     }
     virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_NS_GENERIC_CONTROLLER_STATE_MS, params);
+        return BotBaseMessage(PABB_MSG_REPORT_NS1_WIRED_CONTROLLER, params);
     }
 };
 

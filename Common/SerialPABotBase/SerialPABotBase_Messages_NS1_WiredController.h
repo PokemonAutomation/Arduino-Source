@@ -1,11 +1,11 @@
-/*  SerialPABotBase Messages (Nintendo Switch Generic Wired Controller)
+/*  SerialPABotBase Messages (Nintendo Switch 1 Wired Controller)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_SerialPABotBase_Messages_NS_Generic_H
-#define PokemonAutomation_SerialPABotBase_Messages_NS_Generic_H
+#ifndef PokemonAutomation_SerialPABotBase_Messages_NS1_WiredController_H
+#define PokemonAutomation_SerialPABotBase_Messages_NS1_WiredController_H
 
 #include "SerialPABotBase_Protocol.h"
 
@@ -25,23 +25,21 @@ namespace SerialPABotBase{
 #endif
 
 
-#define PABB_MSG_NS_GENERIC_CONTROLLER_STATE_MS     0x90
+#define PABB_MSG_REPORT_NS1_WIRED_CONTROLLER    0x90
 typedef struct{
     uint8_t buttons0;
     uint8_t buttons1;
-//    uint8_t buttons2;
-//    uint8_t buttons3;
     uint8_t dpad;
     uint8_t left_joystick_x;
     uint8_t left_joystick_y;
     uint8_t right_joystick_x;
     uint8_t right_joystick_y;
-} pabb_ControllerReport_NS_Generic_Controller;
+} pabb_Report_NS1_WiredController;
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    pabb_ControllerReport_NS_Generic_Controller report;
-} PABB_PACK pabb_Message_NS_Generic_ControllerStateMs;
+    pabb_Report_NS1_WiredController report;
+} PABB_PACK pabb_Message_Report_NS1_WiredController;
 
 
 

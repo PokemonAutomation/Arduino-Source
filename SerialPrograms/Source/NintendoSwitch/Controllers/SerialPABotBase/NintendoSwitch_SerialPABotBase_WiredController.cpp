@@ -1,4 +1,4 @@
-/*  SerialPABotBase: Pokken Controller
+/*  SerialPABotBase: Wired Controller (Switch 1)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -7,12 +7,11 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
-#include "Common/Cpp/Options/TimeExpressionOption.h"
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
+//#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_Generic.h"
-#include "NintendoSwitch_SerialPABotBase_PokkenController.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WiredController.h"
+#include "NintendoSwitch_SerialPABotBase_WiredController.h"
 
 //#include <iostream>
 //using std::cout;
@@ -26,7 +25,7 @@ using namespace std::chrono_literals;
 
 
 
-SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
+SerialPABotBase_WiredController::SerialPABotBase_WiredController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection
 )
@@ -37,13 +36,13 @@ SerialPABotBase_PokkenController::SerialPABotBase_PokkenController(
         connection
     )
     , m_stopping(false)
-    , m_status_thread(&SerialPABotBase_PokkenController::status_thread, this)
+    , m_status_thread(&SerialPABotBase_WiredController::status_thread, this)
 {}
-SerialPABotBase_PokkenController::~SerialPABotBase_PokkenController(){
+SerialPABotBase_WiredController::~SerialPABotBase_WiredController(){
     stop();
     m_status_thread.join();
 }
-void SerialPABotBase_PokkenController::stop(){
+void SerialPABotBase_WiredController::stop(){
     if (m_stopping.exchange(true)){
         return;
     }
@@ -62,7 +61,7 @@ void SerialPABotBase_PokkenController::stop(){
 
 
 
-void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable, WallDuration duration){
+void SerialPABotBase_WiredController::push_state(const Cancellable* cancellable, WallDuration duration){
     //  Must be called inside "m_state_lock".
 
     if (!is_ready()){
@@ -192,7 +191,7 @@ void SerialPABotBase_PokkenController::push_state(const Cancellable* cancellable
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         m_serial->issue_request(
-            SerialPABotBase::DeviceRequest_NS_Generic_ControllerStateMs(
+            SerialPABotBase::DeviceRequest_NS1_WiredController_ControllerStateMs(
                 (uint16_t)current.count(),
                 buttons,
                 dpad,
@@ -231,69 +230,8 @@ private:
 };
 
 
-#if 0
-class TickRateTracker{
-public:
-    TickRateTracker(double expected_ticks_per_second)
-        : m_expected_ticks_per_second(expected_ticks_per_second)
-//        , m_history(10)
-    {}
 
-
-    double push_ticks(uint64_t ticks){
-        WallClock now = current_time();
-
-//        if (m_history.full()){
-//            m_history.pop_front();
-//        }
-
-        if (ticks <= m_last_ticks){
-            m_last_push = WallClock::min();
-            m_last_ticks = 0;
-            m_consecutive_off = 0;
-        }
-
-        double ticks_per_second = 0;
-
-        if (m_last_push != WallClock::min()){
-            uint64_t elapsed_ticks = ticks - m_last_ticks;
-            double elapsed_seconds = std::chrono::duration_cast<std::chrono::microseconds>(now - m_last_push).count() * 0.000001;
-            ticks_per_second = elapsed_ticks / elapsed_seconds;
-//            m_history.push_back(ticks_per_second);
-
-            double rate_error = std::abs(ticks_per_second - m_expected_ticks_per_second) / m_expected_ticks_per_second;
-            if (rate_error > 0.1){
-                m_consecutive_off++;
-            }else{
-                m_consecutive_off = 0;
-            }
-
-        }
-
-        m_last_push = now;
-        m_last_ticks = ticks;
-
-        return ticks_per_second;
-    }
-
-    size_t consecutive_off_readings() const{
-        return m_consecutive_off;
-    }
-
-
-private:
-    double m_expected_ticks_per_second;
-    WallClock m_last_push = WallClock::min();
-    uint64_t m_last_ticks = 0;
-
-    size_t m_consecutive_off = 0;
-
-//    CircularBuffer<double> m_history;
-};
-#endif
-
-
-void SerialPABotBase_PokkenController::status_thread(){
+void SerialPABotBase_WiredController::status_thread(){
     constexpr std::chrono::milliseconds PERIOD(1000);
     std::atomic<WallClock> last_ack(current_time());
 

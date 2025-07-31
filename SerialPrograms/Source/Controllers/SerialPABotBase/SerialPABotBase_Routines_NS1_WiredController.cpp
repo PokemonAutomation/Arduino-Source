@@ -17,16 +17,16 @@ namespace SerialPABotBase{
 
 int register_message_converters_push_button_framework(){
     register_message_converter(
-        PABB_MSG_NS_GENERIC_CONTROLLER_STATE_MS,
+        PABB_MSG_REPORT_NS1_WIRED_CONTROLLER,
         [](const std::string& body){
             //  Disable this by default since it's very spammy.
             if (!GlobalSettings::instance().LOG_EVERYTHING){
                 return std::string();
             }
             std::ostringstream ss;
-            ss << "controller_state_ms() - ";
-            if (body.size() != sizeof(pabb_Message_NS_Generic_ControllerStateMs)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_Message_NS_Generic_ControllerStateMs*)body.c_str();
+            ss << "PABB_MSG_REPORT_NS1_WIRED_CONTROLLER: ";
+            if (body.size() != sizeof(pabb_Message_Report_NS1_WiredController)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_Report_NS1_WiredController*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
 
             uint16_t buttons = params->report.buttons0;

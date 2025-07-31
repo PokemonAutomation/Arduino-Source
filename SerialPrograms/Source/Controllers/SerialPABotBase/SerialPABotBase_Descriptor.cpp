@@ -10,7 +10,7 @@
 #include "SerialPABotBase_Descriptor.h"
 #include "SerialPABotBase_SelectorWidget.h"
 
-#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.h"
+#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
 #include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessProController.h"
 #include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessJoycon.h"
 
@@ -71,7 +71,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
     switch (controller_type){
     case ControllerType::NintendoSwitch_WiredProController:
         return std::unique_ptr<AbstractController>(
-            new PokemonAutomation::NintendoSwitch::SerialPABotBase_PokkenController(
+            new PokemonAutomation::NintendoSwitch::SerialPABotBase_WiredController(
                 logger,
                 static_cast<SerialPABotBase_Connection&>(connection)
             )

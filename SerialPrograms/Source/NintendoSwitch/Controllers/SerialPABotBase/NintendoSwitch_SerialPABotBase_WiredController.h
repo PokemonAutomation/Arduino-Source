@@ -1,11 +1,11 @@
-/*  SerialPABotBase: Pokken Controller
+/*  SerialPABotBase: Wired Controller (Switch 1)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_PokkenController_H
-#define PokemonAutomation_NintendoSwitch_SerialPABotBase_PokkenController_H
+#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
+#define PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
 
 #include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class SerialPABotBase_PokkenController final :
+class SerialPABotBase_WiredController final :
     public ProController,
     public SerialPABotBase_Controller
 {
@@ -25,11 +25,11 @@ public:
 
 
 public:
-    SerialPABotBase_PokkenController(
+    SerialPABotBase_WiredController(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection
     );
-    ~SerialPABotBase_PokkenController();
+    ~SerialPABotBase_WiredController();
     void stop();
 
     virtual Logger& logger() override{

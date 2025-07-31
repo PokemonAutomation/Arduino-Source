@@ -10,7 +10,7 @@
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
-#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_PokkenController.h"
+#include "NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch_Tests.h"
 #include "TestUtils.h"
@@ -29,7 +29,7 @@ int test_NintendoSwitch_UpdatePopupDetector(const ImageViewRGB32& image, bool ta
     auto& logger = global_logger_command_line();
     DummyBotBase botbase(logger);
     SerialPABotBase::SerialPABotBase_Connection connection(logger, nullptr, {});
-    SerialPABotBase_PokkenController controller(logger, connection);
+    SerialPABotBase_WiredController controller(logger, connection);
     DummyVideoFeed video_feed;
     DummyVideoOverlay video_overlay;
     DummyAudioFeed audio_feed;
