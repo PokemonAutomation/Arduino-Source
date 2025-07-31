@@ -108,8 +108,8 @@ void SingleSwitchProgramInstance::start_program_border_check(
 ){
     switch (feedback_type){
     case FeedbackType::NONE:
-    case FeedbackType::OPTIONAL_:
         return;
+    case FeedbackType::OPTIONAL_:
     case FeedbackType::REQUIRED:
     case FeedbackType::VIDEO_AUDIO:
         StartProgramChecks::check_border(stream);
