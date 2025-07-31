@@ -39,7 +39,7 @@ ConsoleType settings_detect_console_type(
     detector.make_overlays(overlays);
 
     ssf_do_nothing(context, 500ms);
-    for (size_t c = 0; c < 5; c++){
+    for (size_t c = 0; c < 6; c++){
         ssf_issue_scroll(context, SSF_SCROLL_DOWN, 200ms, 100ms, 100ms);
     }
     ssf_do_nothing(context, 500ms);
@@ -49,7 +49,7 @@ ConsoleType settings_detect_console_type(
 //    snapshot->save("screenshot.png");
     size_t sliders = detector.detect(snapshot).size();
     switch (sliders){
-    case 2:
+    case 1:
         console.state().set_console_type(console, ConsoleType::Switch2_FW20_International);
         break;
     case 3:
@@ -66,7 +66,7 @@ ConsoleType settings_detect_console_type(
     console.log(std::string("Detected console type as: ") + ConsoleType_strings(console_type));
 
     //  Scroll back up.
-    for (size_t c = 0; c < 6; c++){
+    for (size_t c = 0; c < 7; c++){
         ssf_issue_scroll(context, SSF_SCROLL_UP, 200ms, 100ms, 100ms);
     }
     ssf_do_nothing(context, 500ms);
