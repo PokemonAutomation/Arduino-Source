@@ -5,7 +5,7 @@
  */
 
 #include <sstream>
-#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS_Generic.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WiredController.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h"

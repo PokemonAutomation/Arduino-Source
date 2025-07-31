@@ -40,7 +40,7 @@ public:
 
 public:
     virtual ControllerType controller_type() const override{
-        return ControllerType::NintendoSwitch_WiredProController;
+        return ControllerType::NintendoSwitch_WiredController;
     }
     virtual const ControllerFeatures& controller_features() const override;
     virtual ControllerPerformanceClass performance_class() const override{

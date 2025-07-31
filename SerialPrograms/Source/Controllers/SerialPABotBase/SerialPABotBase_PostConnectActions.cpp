@@ -32,7 +32,7 @@ void run_post_connect_actions_ESP32(
 
     ControllerType desired_controller = change_controller.value();
     switch (desired_controller){
-    case ControllerType::NintendoSwitch_WiredProController:
+    case ControllerType::NintendoSwitch_WiredController:
     case ControllerType::NintendoSwitch_WirelessProController:
     case ControllerType::NintendoSwitch_LeftJoycon:
     case ControllerType::NintendoSwitch_RightJoycon:{

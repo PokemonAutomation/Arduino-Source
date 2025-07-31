@@ -69,7 +69,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
     ControllerType controller_type
 ) const{
     switch (controller_type){
-    case ControllerType::NintendoSwitch_WiredProController:
+    case ControllerType::NintendoSwitch_WiredController:
         return std::unique_ptr<AbstractController>(
             new PokemonAutomation::NintendoSwitch::SerialPABotBase_WiredController(
                 logger,

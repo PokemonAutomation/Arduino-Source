@@ -39,7 +39,7 @@ ProController_SysbotBase::ProController_SysbotBase(
     //  Check compatibility.
 
     ControllerModeStatus mode_status = connection.controller_mode_status();
-    auto iter = mode_status.supported_controllers.find(ControllerType::NintendoSwitch_WiredProController);
+    auto iter = mode_status.supported_controllers.find(ControllerType::NintendoSwitch_WiredController);
     if (iter != mode_status.supported_controllers.end()){
         m_dispatch_thread = std::thread(&ProController_SysbotBase::thread_body, this);
     }

@@ -30,10 +30,12 @@ enum class ControllerInterface{
 enum class ControllerType{
     None,
 
-    //  There's a difference between the generic 3rd party wired controllers and
-    //  a pro controller connected over USB. If/when we support the latter, we
-    //  will need to split this controller type.
-    NintendoSwitch_WiredProController,
+    //  This is for all the generic wired controllers.
+    //  These do not support gyro or rumble.
+    NintendoSwitch_WiredController,
+
+    //  The official Pro Controller, connected over USB.
+//    NintendoSwitch_WiredProController,
 
     NintendoSwitch_WirelessProController,
     NintendoSwitch_LeftJoycon,
