@@ -39,12 +39,6 @@ DateReader::DateReader(ConsoleHandle& console)
     : m_console(console)
     , m_switch1(COLOR_RED)
     , m_switch2(COLOR_MAGENTA)
-    , m_background_top(0.50, 0.02, 0.45, 0.08)
-    , m_window_top(0.50, 0.36, 0.45, 0.07)
-    , m_window_text(0.05, 0.36, 0.10, 0.07)
-    , m_us_hour(0.473, 0.61, 0.06, 0.09)
-    , m_jp_year(0.136, 0.61, 0.11, 0.09)
-    , m_jp_month_arrow(0.30, 0.50, 0.05, 0.06)
     , m_switch1_US(COLOR_YELLOW)
     , m_switch1_EU(COLOR_CYAN)
     , m_switch1_JP(COLOR_PURPLE)
@@ -53,12 +47,9 @@ DateReader::DateReader(ConsoleHandle& console)
     , m_switch2_JP(COLOR_PURPLE)
 {}
 void DateReader::make_overlays(VideoOverlaySet& items) const{
-    items.add(COLOR_RED, m_background_top);
-    items.add(COLOR_RED, m_window_top);
-    items.add(COLOR_RED, m_window_text);
-    items.add(COLOR_RED, m_us_hour);
-    items.add(COLOR_RED, m_jp_year);
-    items.add(COLOR_RED, m_jp_month_arrow);
+    m_switch1.make_overlays(items);
+    m_switch2.make_overlays(items);
+
     m_switch1_US.make_overlays(items);
     m_switch1_EU.make_overlays(items);
     m_switch1_JP.make_overlays(items);

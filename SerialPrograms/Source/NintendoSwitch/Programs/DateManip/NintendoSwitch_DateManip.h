@@ -46,14 +46,6 @@ private:
     DateChangeDetector_Switch1 m_switch1;
     DateChangeDetector_Switch2 m_switch2;
 
-    ImageFloatBox m_background_top;
-    ImageFloatBox m_window_top;
-    ImageFloatBox m_window_text;
-
-    ImageFloatBox m_us_hour;
-    ImageFloatBox m_jp_year;
-    ImageFloatBox m_jp_month_arrow;
-
     DateReader_Switch1_US m_switch1_US;
     DateReader_Switch1_EU m_switch1_EU;
     DateReader_Switch1_JP m_switch1_JP;

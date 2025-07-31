@@ -8,6 +8,10 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch_DateChangeDetector.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -95,7 +99,7 @@ DateChangeDetector_Switch2::DateChangeDetector_Switch2(Color color)
     , m_window_bottom(0.50, 0.80, 0.45, 0.07)
     , m_window_text(0.05, 0.02, 0.10, 0.08)
     , m_jp_year(0.139, 0.436, 0.088, 0.095)
-    , m_us_hour(0.473, 0.61, 0.06, 0.09)
+    , m_us_hour(0.466856, 0.567340, 0.049242, 0.063973)
     , m_jp_month_arrow(0.291705, 0.331675, 0.054986, 0.069652)
 {}
 void DateChangeDetector_Switch2::make_overlays(VideoOverlaySet& items) const{
@@ -149,6 +153,8 @@ bool DateChangeDetector_Switch2::detect(const ImageViewRGB32& screen){
 DateFormat DateChangeDetector_Switch2::detect_date_format(const ImageViewRGB32& screen) const{
     ImageViewRGB32 us_hours = extract_box_reference(screen, m_us_hour);
     ImageStats stats_us_hours = image_stats(us_hours);
+
+//    cout << stats_us_hours.stddev.sum() << endl;
 
     if (stats_us_hours.stddev.sum() > 30){
         return DateFormat::US;
