@@ -44,7 +44,8 @@ constexpr Button VALID_RIGHT_JOYCON_BUTTONS =
     BUTTON_ZR |
     BUTTON_PLUS |
     BUTTON_RCLICK |
-    BUTTON_HOME;
+    BUTTON_HOME |
+    BUTTON_C;
 
 
 

@@ -417,6 +417,8 @@ std::vector<std::unique_ptr<EditableTableRow>> JoyconKeyboardMappingTable::make_
 
         ret.emplace_back(make_mapping("SL",             Qt::Key::Key_F1,        JoyconDeltas{.buttons = BUTTON_RIGHT_SL}));
         ret.emplace_back(make_mapping("SR",             Qt::Key::Key_F3,        JoyconDeltas{.buttons = BUTTON_RIGHT_SR}));
+
+        ret.emplace_back(make_mapping("C (Switch 2)",   Qt::Key::Key_B,         JoyconDeltas{.buttons = BUTTON_C}));
     }
 
     return ret;
