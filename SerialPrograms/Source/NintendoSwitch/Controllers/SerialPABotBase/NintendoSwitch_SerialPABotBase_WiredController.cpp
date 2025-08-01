@@ -10,7 +10,7 @@
 //#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WiredController.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.h"
 #include "NintendoSwitch_SerialPABotBase_WiredController.h"
 
 //#include <iostream>
@@ -71,6 +71,7 @@ void SerialPABotBase_WiredController::push_state(const Cancellable* cancellable,
     int dpad_x = 0;
     int dpad_y = 0;
     uint16_t buttons = 0;
+    uint8_t dpad_byte = 0;
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
         if (!m_buttons[c].is_busy()){
             continue;
@@ -97,6 +98,7 @@ void SerialPABotBase_WiredController::push_state(const Cancellable* cancellable,
         case BUTTON_RIGHT:      dpad_x++; break;
         case BUTTON_DOWN:       dpad_y++; break;
         case BUTTON_LEFT:       dpad_x--; break;
+        case BUTTON_C:          dpad_byte |= 0x80; break;
         default:;
         }
     }
@@ -163,6 +165,7 @@ void SerialPABotBase_WiredController::push_state(const Cancellable* cancellable,
             }
         }
     }
+    dpad_byte |= dpad;
 
 
 
@@ -191,10 +194,10 @@ void SerialPABotBase_WiredController::push_state(const Cancellable* cancellable,
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
         m_serial->issue_request(
-            SerialPABotBase::DeviceRequest_NS1_WiredController_ControllerStateMs(
+            SerialPABotBase::DeviceRequest_NS2_WiredController_ControllerStateMs(
                 (uint16_t)current.count(),
                 buttons,
-                dpad,
+                dpad_byte,
                 left_x, left_y,
                 right_x, right_y
             ),

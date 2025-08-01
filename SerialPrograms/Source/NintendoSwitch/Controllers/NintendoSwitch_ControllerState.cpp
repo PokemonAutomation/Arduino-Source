@@ -32,10 +32,11 @@ std::string button_to_string(Button button){
     if (button & BUTTON_RIGHT)      str += "Right ";
     if (button & BUTTON_DOWN)       str += "Down ";
     if (button & BUTTON_LEFT)       str += "Left ";
-    if (button & BUTTON_LEFT_SL)    str += "Left-SL";
-    if (button & BUTTON_LEFT_SR)    str += "Left-SR";
-    if (button & BUTTON_RIGHT_SL)   str += "Right-SL";
-    if (button & BUTTON_RIGHT_SR)   str += "Right-SR";
+    if (button & BUTTON_LEFT_SL)    str += "Left-SL ";
+    if (button & BUTTON_LEFT_SR)    str += "Left-SR ";
+    if (button & BUTTON_RIGHT_SL)   str += "Right-SL ";
+    if (button & BUTTON_RIGHT_SR)   str += "Right-SR ";
+    if (button & BUTTON_C)          str += "C ";
     if (str.empty()){
         str = "none";
     }

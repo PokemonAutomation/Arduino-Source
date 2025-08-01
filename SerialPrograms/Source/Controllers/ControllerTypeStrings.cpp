@@ -19,7 +19,7 @@ const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS{
 
 const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
     {ControllerType::None,                                  "None"},
-    {ControllerType::NintendoSwitch_WiredController,        "NS1: Wired Controller"},
+    {ControllerType::NintendoSwitch_WiredController,        "NS2: Wired Controller"},
     {ControllerType::NintendoSwitch_WirelessProController,  "NS1: Wireless Pro Controller"},
     {ControllerType::NintendoSwitch_LeftJoycon,             "NS1: Left Joycon"},
     {ControllerType::NintendoSwitch_RightJoycon,            "NS1: Right Joycon"},

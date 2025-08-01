@@ -44,6 +44,9 @@ TurboButton::TurboButton()
             {BUTTON_RCLICK,     "RCLICK", "R-Click (right joystick click)"},
             {BUTTON_HOME,       "HOME", "Home"},
             {BUTTON_CAPTURE,    "CAPTURE", "Capture"},
+            {BUTTON_GR,         "GR", "GR (Switch 2)"},
+            {BUTTON_GL,         "GL", "GL (Switch 2)"},
+            {BUTTON_C,          "C", "C (Switch 2)"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         BUTTON_A
