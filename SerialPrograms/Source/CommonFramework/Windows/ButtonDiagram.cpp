@@ -18,9 +18,11 @@
 
 namespace PokemonAutomation{
 
-const char* PRO_CONTROLLER_MAPPING_PATH = "/NintendoSwitch/Layout-ProController.png";
-const char* JOYCON_VERTICAL_MAPPING_PATH = "/NintendoSwitch/Layout-JoyconVertical.png";
-const char* JOYCON_HORIZONTAL_MAPPING_PATH = "/NintendoSwitch/Layout-JoyconHorizontal.png";
+const char* NS1_PRO_CONTROLLER_MAPPING_PATH = "/NintendoSwitch/Layout-ProController.png";
+const char* NS1_JOYCON_VERTICAL_MAPPING_PATH = "/NintendoSwitch/Layout-JoyconVertical.png";
+const char* NS1_JOYCON_HORIZONTAL_MAPPING_PATH = "/NintendoSwitch/Layout-JoyconHorizontal.png";
+
+const char* NS2_PRO_CONTROLLER_MAPPING_PATH = "/NintendoSwitch2/Layout-ProController.png";
 
 
 ButtonDiagram::ButtonDiagram(QWidget* parent)
@@ -29,28 +31,35 @@ ButtonDiagram::ButtonDiagram(QWidget* parent)
     setWindowTitle("Controller Keyboard Mapping");
 
     QMenuBar* menu = menuBar();
-    QMenu* pro_controller = menu->addMenu("Pro Controller");
-    QMenu* joycon_vertical = menu->addMenu("Joycon (Vertical)");
-    QMenu* joycon_horizontal = menu->addMenu("Joycon (Horizontal)");
+    QMenu* ns1_pro_controller = menu->addMenu("NS1: Pro Controller");
+    QMenu* ns1_joycon_vertical = menu->addMenu("NS1: Joycon (Vertical)");
+    QMenu* ns1_joycon_horizontal = menu->addMenu("NS1: Joycon (Horizontal)");
+    QMenu* ns2_pro_controller = menu->addMenu("NS2: Pro Controller");
 
 //    pro_controller->addAction("asdfadf");
 
     connect(
-        pro_controller, &QMenu::aboutToShow,
+        ns1_pro_controller, &QMenu::aboutToShow,
         this, [this](){
-            set_image(PRO_CONTROLLER_MAPPING_PATH);
+            set_image(NS1_PRO_CONTROLLER_MAPPING_PATH);
         }
     );
     connect(
-        joycon_vertical, &QMenu::aboutToShow,
+        ns1_joycon_vertical, &QMenu::aboutToShow,
         this, [this](){
-            set_image(JOYCON_VERTICAL_MAPPING_PATH);
+            set_image(NS1_JOYCON_VERTICAL_MAPPING_PATH);
         }
     );
     connect(
-        joycon_horizontal, &QMenu::aboutToShow,
+        ns1_joycon_horizontal, &QMenu::aboutToShow,
         this, [this](){
-            set_image(JOYCON_HORIZONTAL_MAPPING_PATH);
+            set_image(NS1_JOYCON_HORIZONTAL_MAPPING_PATH);
+        }
+    );
+    connect(
+        ns2_pro_controller, &QMenu::aboutToShow,
+        this, [this](){
+            set_image(NS2_PRO_CONTROLLER_MAPPING_PATH);
         }
     );
 
@@ -67,7 +76,7 @@ ButtonDiagram::ButtonDiagram(QWidget* parent)
 
     resize(800, 600 + menu->sizeHint().height());
 
-    set_image(PRO_CONTROLLER_MAPPING_PATH);
+    set_image(NS2_PRO_CONTROLLER_MAPPING_PATH);
 
     add_window(*this);
 }

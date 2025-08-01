@@ -31,14 +31,14 @@ void BinarySliderDetector::make_overlays(VideoOverlaySet& items) const{
 std::vector<std::pair<bool, ImagePixelBox>> BinarySliderDetector::detect(const ImageViewRGB32& screen) const{
     using namespace Kernels::Waterfill;
 
-    static ImageMatch::ExactImageMatcher LIGHT_OFF_CURSOR   (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Light-Off-Cursor.png");
-    static ImageMatch::ExactImageMatcher LIGHT_OFF_NOCURSOR (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Light-Off-NoCursor.png");
-    static ImageMatch::ExactImageMatcher LIGHT_ON_CURSOR    (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Light-On-Cursor.png");
-    static ImageMatch::ExactImageMatcher LIGHT_ON_NOCURSOR  (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Light-On-NoCursor.png");
-    static ImageMatch::ExactImageMatcher DARK_OFF_CURSOR    (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Dark-Off-Cursor.png");
-    static ImageMatch::ExactImageMatcher DARK_OFF_NOCURSOR  (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Dark-Off-NoCursor.png");
-    static ImageMatch::ExactImageMatcher DARK_ON_CURSOR     (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Dark-On-Cursor.png");
-    static ImageMatch::ExactImageMatcher DARK_ON_NOCURSOR   (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider-Dark-On-NoCursor.png");
+    static ImageMatch::ExactImageMatcher LIGHT_OFF_CURSOR   (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider/BinarySlider-Light-Off-Cursor.png");
+    static ImageMatch::ExactImageMatcher LIGHT_OFF_NOCURSOR (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider/BinarySlider-Light-Off-NoCursor.png");
+    static ImageMatch::ExactImageMatcher LIGHT_ON_CURSOR    (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider/BinarySlider-Light-On-Cursor.png");
+    static ImageMatch::ExactImageMatcher LIGHT_ON_NOCURSOR  (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider/BinarySlider-Light-On-NoCursor.png");
+    static ImageMatch::ExactImageMatcher DARK_OFF_CURSOR    (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider/BinarySlider-Dark-Off-Cursor.png");
+    static ImageMatch::ExactImageMatcher DARK_OFF_NOCURSOR  (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider/BinarySlider-Dark-Off-NoCursor.png");
+    static ImageMatch::ExactImageMatcher DARK_ON_CURSOR     (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider/BinarySlider-Dark-On-Cursor.png");
+    static ImageMatch::ExactImageMatcher DARK_ON_NOCURSOR   (RESOURCE_PATH() + "NintendoSwitch2/BinarySlider/BinarySlider-Dark-On-NoCursor.png");
 
     ImageViewRGB32 region = extract_box_reference(screen, m_box);
 
