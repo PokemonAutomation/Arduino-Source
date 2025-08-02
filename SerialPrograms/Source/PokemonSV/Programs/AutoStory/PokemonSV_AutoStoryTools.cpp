@@ -41,7 +41,8 @@ namespace PokemonSV{
 
 
 
-
+// spam A button to choose the first move
+// throw exception if wipeout or if your lead faints.
 void run_battle_press_A(
     VideoStream& stream,
     ProControllerContext& context,
@@ -63,7 +64,7 @@ void run_battle_press_A(
         std::vector<PeriodicInferenceCallback> callbacks; 
         std::vector<CallbackEnum> enum_all_callbacks;
         //  mandatory callbacks: Battle, Overworld, Advance Dialog, Swap menu, Move select
-        //  optional callbacks: ADVANCE_DIALOG, DIALOG_ARROW, NEXT_POKEMON
+        //  optional callbacks: DIALOG_ARROW, NEXT_POKEMON
 
         // merge the mandatory and optional callbacks as a set, to avoid duplicates. then convert to vector
         std::unordered_set<CallbackEnum> enum_all_callbacks_set{CallbackEnum::BATTLE, CallbackEnum::OVERWORLD, CallbackEnum::ADVANCE_DIALOG, CallbackEnum::SWAP_MENU, CallbackEnum::MOVE_SELECT}; // mandatory callbacks
@@ -180,6 +181,27 @@ void run_battle_press_A(
           
         }
     }
+}
+
+void run_trainer_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks,
+    bool detect_wipeout
+){
+    enum_optional_callbacks.insert(CallbackEnum::NEXT_POKEMON);  // always check for the "Next pokemon" prompt when in trainer battles
+    run_battle_press_A(stream, context, stop_condition, enum_optional_callbacks, detect_wipeout);
+}
+
+void run_wild_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks,
+    bool detect_wipeout
+){
+    run_battle_press_A(stream, context, stop_condition, enum_optional_callbacks, detect_wipeout);
 }
 
 void select_top_move(VideoStream& stream, ProControllerContext& context, size_t consecutive_move_select){
@@ -477,7 +499,7 @@ void overworld_navigation(
                 return;
             }
 
-            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD, {}, detect_wipeout);
+            run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD, {}, detect_wipeout);
             if (auto_heal){
                 auto_heal_from_menu_or_overworld(info, stream, context, 0, true);
             }
@@ -749,7 +771,7 @@ void handle_unexpected_battles(
             action(info, stream, context);
             return;
         }catch (UnexpectedBattleException&){
-            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
+            run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
 }
@@ -949,7 +971,7 @@ bool is_ride_active(const ProgramInfo& info, VideoStream& stream, ProControllerC
             return is_ride_active;        
 
         }catch(UnexpectedBattleException&){
-            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
+            run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
 
@@ -1078,7 +1100,7 @@ void realign_player_from_landmark(
             return;      
 
         }catch (UnexpectedBattleException&){
-            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
+            run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }catch (OperationFailedException&){
             // reset to overworld if failed to center on the pokecenter, and re-try
             leave_phone_to_overworld(info, stream, context);
@@ -1160,7 +1182,7 @@ void move_cursor_towards_flypoint_and_go_there(
             return;      
 
         }catch (UnexpectedBattleException&){
-            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
+            run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }catch (OperationFailedException&){
             // reset to overworld if failed to center on the pokecenter, and re-try
             leave_phone_to_overworld(info, stream, context);

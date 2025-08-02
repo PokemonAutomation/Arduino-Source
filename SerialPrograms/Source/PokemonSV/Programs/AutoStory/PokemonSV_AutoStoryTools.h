@@ -118,13 +118,25 @@ public:
         AutoStoryOptions options) const = 0;
 };
 
-// spam A button to choose the first move
+// spam A button to choose the first move for trainer battles
+// detect_wipeout: can be false if you have multiple pokemon in your party, since an exception will be thrown if your lead faints.
 // throw exception if wipeout or if your lead faints.
-void run_battle_press_A(
+void run_trainer_battle_press_A(
     VideoStream& stream,
     ProControllerContext& context,
     BattleStopCondition stop_condition,
-    std::unordered_set<CallbackEnum> optional_callbacks = {},
+    std::unordered_set<CallbackEnum> enum_optional_callbacks = {},
+    bool detect_wipeout = false
+);
+
+// spam A button to choose the first move for wild battles
+// detect_wipeout: can be false if you have multiple pokemon in your party, since an exception will be thrown if your lead faints.
+// throw exception if wipeout or if your lead faints.
+void run_wild_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks = {},
     bool detect_wipeout = false
 );
 

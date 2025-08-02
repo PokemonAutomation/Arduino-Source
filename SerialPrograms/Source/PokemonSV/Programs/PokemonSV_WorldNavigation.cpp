@@ -426,7 +426,7 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, 
     }
 }
 
-// Open map and teleport back to town pokecenter to reset the hunting path.
+// Open map and teleport back to town pokecenter
 void reset_to_pokecenter(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
     while (true){
         try {
@@ -434,7 +434,7 @@ void reset_to_pokecenter(const ProgramInfo& info, VideoStream& stream, ProContro
             fly_to_closest_pokecenter_on_map(info, stream, context);
             break;
         }catch (UnexpectedBattleException&){
-            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
+            run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
 
@@ -560,7 +560,7 @@ bool attempt_fly_to_overlapping_flypoint(
             return fly_to_overworld_from_map(info, stream, context, true);
 
         }catch (UnexpectedBattleException&){
-            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
+            run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
 
