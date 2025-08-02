@@ -44,6 +44,8 @@ std::string AutoStory_Segment_03::end_text() const{
 void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
 
@@ -53,8 +55,6 @@ void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ProC
 
     context.wait_for_all_requests();
     env.console.log("End Segment 03: Catch Tutorial", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
 
 }
 

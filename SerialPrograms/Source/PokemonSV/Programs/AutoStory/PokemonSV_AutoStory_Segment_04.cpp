@@ -49,6 +49,8 @@ void AutoStory_Segment_04::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 04: Rescue Legendary", COLOR_ORANGE);
 
@@ -56,8 +58,6 @@ void AutoStory_Segment_04::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("End Segment 04: Rescue Legendary", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
 
 }
 

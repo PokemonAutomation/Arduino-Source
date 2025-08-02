@@ -48,6 +48,8 @@ void AutoStory_Segment_05::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
 
@@ -56,8 +58,6 @@ void AutoStory_Segment_05::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("End Segment 05: First Arven Battle", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
 
 }
 

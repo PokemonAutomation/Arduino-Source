@@ -39,7 +39,7 @@ void AutoStory_Segment_00::run_segment(
     ProControllerContext& context,
     AutoStoryOptions options
 ) const{
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    // AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
     env.console.log("Start Segment 00: Intro Cutscene", COLOR_ORANGE);
@@ -48,8 +48,6 @@ void AutoStory_Segment_00::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("End Segment 00: Intro Cutscene", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
 }
 
 

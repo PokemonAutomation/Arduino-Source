@@ -49,15 +49,15 @@ void AutoStory_Segment_02::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
 
     checkpoint_04(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 02: First Nemona Battle", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats(); 
+    env.console.log("End Segment 02: First Nemona Battle", COLOR_GREEN);         
 
 }
 
