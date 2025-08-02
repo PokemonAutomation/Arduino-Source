@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -44,6 +45,8 @@ void AutoStory_Segment_08::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 08: Beat Team Star and arrive at School", COLOR_ORANGE);
 
@@ -54,8 +57,6 @@ void AutoStory_Segment_08::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("End Segment 08: Beat Team Star and arrive at School", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
 
 }
 
@@ -100,7 +101,7 @@ void checkpoint_13(
         
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -158,7 +159,7 @@ void checkpoint_14(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -201,7 +202,7 @@ void checkpoint_15(
             {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD});
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

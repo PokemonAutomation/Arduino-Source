@@ -28,7 +28,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_13::name() const{
-    return "11.1: Bombirdier Titan: Go to West Province Area One Central Pokecenter";
+    return "13: Bombirdier Titan: Go to West Province Area One Central Pokecenter";
 }
 
 std::string AutoStory_Segment_13::start_text() const{
@@ -46,15 +46,15 @@ void AutoStory_Segment_13::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 11.1: Bombirdier Titan: Go to West Province Area One Central Pokecenter", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_29(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 11.1: Bombirdier Titan: Go to West Province Area One Central Pokecenter", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 
@@ -192,7 +192,7 @@ void checkpoint_29(
 
                 break;
 
-            }catch (...){ // try again if fall into water
+            }catch(OperationFailedException&){ // try again if fall into water
                 pbf_mash_button(context, BUTTON_A, 250);
 
                 // walk back to start position before bridge
@@ -311,7 +311,7 @@ void checkpoint_29(
               
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

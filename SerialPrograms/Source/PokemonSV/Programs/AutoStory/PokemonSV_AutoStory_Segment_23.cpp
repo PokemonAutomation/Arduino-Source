@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
@@ -42,15 +43,15 @@ void AutoStory_Segment_23::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment ", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     // checkpoint_(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment ", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 

@@ -32,7 +32,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_12::name() const{
-    return "10.3: Cortondo Gym - Gym battle";
+    return "12: Cortondo Gym (Bug): Gym battle";
 }
 
 std::string AutoStory_Segment_12::start_text() const{
@@ -51,15 +51,15 @@ void AutoStory_Segment_12::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 10.3: Cortondo Gym - Gym battle", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_28(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 10.3: Cortondo Gym - Gym battle", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 
@@ -135,7 +135,7 @@ void checkpoint_28(
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

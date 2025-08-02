@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
@@ -28,7 +29,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_16::name() const{
-    return "13.1: Cascarrafa Gym (Water): Get Kofu's wallet";
+    return "16: Cascarrafa Gym (Water): Get Kofu's wallet";
 }
 
 std::string AutoStory_Segment_16::start_text() const{
@@ -46,16 +47,16 @@ void AutoStory_Segment_16::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 13.1: Cascarrafa Gym (Water): Get Kofu's wallet", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_35(env, context, options.notif_status_update);
     checkpoint_36(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 13.1: Cascarrafa Gym (Water): Get Kofu's wallet", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 
@@ -99,7 +100,7 @@ void checkpoint_35(
         mash_button_till_overworld(env.console, context, BUTTON_A);
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -178,7 +179,7 @@ void checkpoint_36(
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);           
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

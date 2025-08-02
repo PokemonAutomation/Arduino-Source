@@ -711,6 +711,10 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProController
         NOTIFICATION_STATUS_UPDATE
     };    
 
+    if (get_start_segment_index() > get_end_segment_index()){
+        throw UserSetupError(env.logger(), "The start segment cannot be later than the end segment.");
+    }
+
     for (size_t segment_index = get_start_segment_index(); segment_index <= get_end_segment_index(); segment_index++){
         ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options);
     }

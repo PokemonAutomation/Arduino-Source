@@ -31,7 +31,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_20::name() const{
-    return "16: Artazon Gym (Grass)";
+    return "20: Artazon Gym (Grass)";
 }
 
 std::string AutoStory_Segment_20::start_text() const{
@@ -49,17 +49,17 @@ void AutoStory_Segment_20::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment ", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_43(env, context, options.notif_status_update);
     checkpoint_44(env, context, options.notif_status_update);
     checkpoint_45(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment ", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 
@@ -131,7 +131,7 @@ void checkpoint_43(
 
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -477,7 +477,7 @@ void checkpoint_44(
 
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -540,7 +540,7 @@ void checkpoint_45(
         mash_button_till_overworld(env.console, context, BUTTON_A);
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

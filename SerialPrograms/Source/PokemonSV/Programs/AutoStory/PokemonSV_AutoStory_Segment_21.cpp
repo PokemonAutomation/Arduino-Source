@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
@@ -28,7 +29,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_21::name() const{
-    return "17.1: Team Star (Fire): Go to East Province (Area One) Pokecenter";
+    return "21: Team Star (Fire): Go to East Province (Area One) Pokecenter";
 }
 
 std::string AutoStory_Segment_21::start_text() const{
@@ -46,15 +47,15 @@ void AutoStory_Segment_21::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment ", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_46(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment ", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 
@@ -110,7 +111,7 @@ void checkpoint_46(
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

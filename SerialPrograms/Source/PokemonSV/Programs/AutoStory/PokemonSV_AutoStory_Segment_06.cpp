@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
@@ -46,6 +47,8 @@ void AutoStory_Segment_06::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
 
@@ -53,8 +56,6 @@ void AutoStory_Segment_06::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("End Segment 06: Go to Los Platos", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
 
 }
 
@@ -109,7 +110,7 @@ void checkpoint_11(
         env.console.overlay().add_log("Reached Los Platos", COLOR_WHITE);
 
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

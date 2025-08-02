@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -48,15 +49,15 @@ void AutoStory_Segment_02::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 02: First Nemona Battle", COLOR_ORANGE);
 
     checkpoint_04(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 02: First Nemona Battle", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats(); 
+    env.console.log("End Segment 02: First Nemona Battle", COLOR_GREEN);         
 
 }
 
@@ -93,7 +94,7 @@ void checkpoint_04(
         env.console.log("Finished battle.");
 
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

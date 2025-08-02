@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
@@ -47,6 +48,8 @@ void AutoStory_Segment_05::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
 
@@ -55,8 +58,6 @@ void AutoStory_Segment_05::run_segment(
 
     context.wait_for_all_requests();
     env.console.log("End Segment 05: First Arven Battle", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
 
 }
 
@@ -101,7 +102,7 @@ void checkpoint_09(
         env.console.overlay().add_log("Receive legendary ball", COLOR_WHITE);
 
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -143,7 +144,7 @@ void checkpoint_10(
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

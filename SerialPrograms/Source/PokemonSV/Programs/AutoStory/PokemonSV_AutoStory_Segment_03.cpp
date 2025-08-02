@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
@@ -43,6 +44,8 @@ std::string AutoStory_Segment_03::end_text() const{
 void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
 
@@ -52,8 +55,6 @@ void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ProC
 
     context.wait_for_all_requests();
     env.console.log("End Segment 03: Catch Tutorial", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
 
 }
 
@@ -84,7 +85,7 @@ void checkpoint_05(
         env.console.overlay().add_log("Get mom's sandwich", COLOR_WHITE);
         mash_button_till_overworld(env.console, context);
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -134,7 +135,7 @@ void checkpoint_06(
         env.console.overlay().add_log("Finished catch tutorial", COLOR_WHITE);
 
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -188,7 +189,7 @@ void checkpoint_07(
         env.console.overlay().add_log("Mystery cry", COLOR_WHITE);
         
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

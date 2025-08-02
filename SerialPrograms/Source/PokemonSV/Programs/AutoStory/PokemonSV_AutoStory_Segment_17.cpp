@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
@@ -28,7 +29,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_17::name() const{
-    return "13.2: Cascarrafa Gym (Water): Gym challenge and Gym battle";
+    return "17: Cascarrafa Gym (Water): Gym challenge and Gym battle";
 }
 
 std::string AutoStory_Segment_17::start_text() const{
@@ -46,16 +47,16 @@ void AutoStory_Segment_17::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 13.2: Cascarrafa Gym (Water): Gym battle", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_37(env, context, options.notif_status_update);
     checkpoint_38(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 13.2: Cascarrafa Gym (Water): Gym battle", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 
@@ -102,7 +103,7 @@ void checkpoint_37(
 
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -173,7 +174,7 @@ void checkpoint_38(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

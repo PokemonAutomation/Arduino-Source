@@ -37,7 +37,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_11::name() const{
-    return "10.2: Cortondo Gym - Gym challenge";
+    return "11: Cortondo Gym (Bug): Gym challenge";
 }
 
 std::string AutoStory_Segment_11::start_text() const{
@@ -55,8 +55,10 @@ void AutoStory_Segment_11::run_segment(
 ) const{
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
+    stats.m_segment++;
+    env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 10.2: Cortondo Gym - Gym challenge", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_24(env, context, options.notif_status_update);
     checkpoint_25(env, context, options.notif_status_update);
@@ -64,9 +66,7 @@ void AutoStory_Segment_11::run_segment(
     checkpoint_27(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 10.2: Cortondo Gym - Gym challenge", COLOR_GREEN);
-    stats.m_segment++;
-    env.update_stats();
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 
@@ -124,7 +124,7 @@ void checkpoint_24(
         
 
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -211,7 +211,7 @@ void checkpoint_25(
         enter_menu_from_overworld(env.program_info(), env.console, context, -1);
 
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
