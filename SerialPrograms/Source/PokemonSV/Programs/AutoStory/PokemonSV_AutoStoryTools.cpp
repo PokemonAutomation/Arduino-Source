@@ -62,6 +62,7 @@ void run_battle_press_A(
 
         std::vector<PeriodicInferenceCallback> callbacks; 
         //  mandatory callbacks: Battle, Overworld, Advance Dialog, Swap menu, Move select
+        //  optional callbacks: ADVANCE_DIALOG, DIALOG_ARROW, NEXT_POKEMON
         std::vector<CallbackEnum> enum_all_callbacks{CallbackEnum::BATTLE, CallbackEnum::OVERWORLD, CallbackEnum::ADVANCE_DIALOG, CallbackEnum::SWAP_MENU, CallbackEnum::MOVE_SELECT}; // mandatory callbacks
         enum_all_callbacks.insert(enum_all_callbacks.end(), enum_optional_callbacks.begin(), enum_optional_callbacks.end()); // append the mandatory and optional callback vectors together
         for (const CallbackEnum& enum_callback : enum_all_callbacks){
@@ -78,10 +79,10 @@ void run_battle_press_A(
             case CallbackEnum::BATTLE:
                 callbacks.emplace_back(battle);
                 break;
-            case CallbackEnum::GRADIENT_ARROW:
+            case CallbackEnum::NEXT_POKEMON: // to detect the "next pokemon" prompt.
                 callbacks.emplace_back(next_pokemon);
                 break;
-            case CallbackEnum::SWAP_MENU:  
+            case CallbackEnum::SWAP_MENU:  // detecting Swap Menu implies your lead fainted.
                 callbacks.emplace_back(fainted);
                 break;                     
             case CallbackEnum::MOVE_SELECT:
@@ -159,7 +160,7 @@ void run_battle_press_A(
             stream.log("run_battle_press_A: Detected dialog arrow.");
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
-        case CallbackEnum::GRADIENT_ARROW:
+        case CallbackEnum::NEXT_POKEMON:
             stream.log("run_battle_press_A: Detected prompt for bringing in next pokemon. Keep current pokemon.");
             pbf_mash_button(context, BUTTON_B, 100);
             break;

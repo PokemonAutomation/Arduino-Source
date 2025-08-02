@@ -93,7 +93,7 @@ void checkpoint_13(
         
         env.console.log("run_battle_press_A: Battle with Nemona at Mesagoza gate. Stop when detect dialog.");
         // story continues even if you lose
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::NEXT_POKEMON});
         
         env.console.log("clear_dialog: Talk with Nemona within Mesagoza. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
@@ -147,14 +147,14 @@ void checkpoint_14(
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
         // run battle until dialog
         env.console.log("run_battle_press_A: Battle with Team Star grunt 1. Stop when detect dialog.");
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {}, true);
+        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {}, true);  // enemy only has 1 Pokemon, so no need to detect "Next Pokemon" prompt
         // clear dialog until battle, with prompt, white button, tutorial, battle
         env.console.log("clear_dialog: Talk with Team Star and Nemona. Receive Tera orb. Stop when detect battle.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, 
             {CallbackEnum::PROMPT_DIALOG, CallbackEnum::WHITE_A_BUTTON, CallbackEnum::TUTORIAL, CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
         // run battle until dialog
         env.console.log("run_battle_press_A: Battle with Team Star grunt 2. Stop when detect dialog.");
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {}, true);
+        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {}, true); // enemy only has 1 Pokemon, so no need to detect "Next Pokemon" prompt
         // clear dialog until overworld
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
        

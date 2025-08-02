@@ -58,7 +58,7 @@ enum class CallbackEnum{
     BATTLE,
     TUTORIAL,
     BLACK_DIALOG_BOX,
-    GRADIENT_ARROW,
+    NEXT_POKEMON,
     SWAP_MENU,
     MOVE_SELECT,
 };
@@ -118,7 +118,7 @@ public:
 };
 
 // spam A button to choose the first move
-// throw exception if wipeout.
+// throw exception if wipeout or if your lead faints.
 void run_battle_press_A(
     VideoStream& stream,
     ProControllerContext& context,
