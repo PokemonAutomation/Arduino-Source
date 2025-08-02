@@ -96,6 +96,8 @@ CameraVideoSource::CameraVideoSource(
     , m_last_frame(logger)
     , m_snapshot_manager(logger, m_last_frame)
 {
+//    cout << "desired_resolution = " << desired_resolution.width << " x " << desired_resolution.height << endl;
+
     if (!info){
         return;
     }

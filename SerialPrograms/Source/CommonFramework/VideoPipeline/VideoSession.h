@@ -145,7 +145,10 @@ public:
     //  referenced video source option (aka the VideoSourceOption passed to the
     //  VideoSession constructor).
     //  The change is dispatched to the Qt main thread to execute.
-    void set_source(const std::shared_ptr<VideoSourceDescriptor>& device);
+    void set_source(
+        const std::shared_ptr<VideoSourceDescriptor>& device,
+        Resolution resolution = {}
+    );
     //  Change video resolution.
     //  This will trigger a video source reset.
     //  Change of resolution will be reflected on the internal referenced video

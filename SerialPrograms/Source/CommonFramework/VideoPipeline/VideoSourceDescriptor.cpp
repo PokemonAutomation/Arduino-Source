@@ -87,6 +87,7 @@ void VideoSourceOption::load_json(const JsonValue& json){
                     break;
                 }
                 m_resolution = Resolution(width, height);
+//                cout << "VideoSourceOption::load_json(): " << this << " - " << width << " x " << height << endl;
             }while (false);
         }
 
