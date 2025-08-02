@@ -407,7 +407,7 @@ void home_to_date_time_Switch1_wireless_esp32_feedback(
         SelectedSettingWatcher system_setting_selected(system_setting_box, other_setting1, other_setting2);
         int ret = run_until<ProControllerContext>(
             stream, context,
-            [](ProControllerContext& context){
+            [&](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
                     ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
                 }
