@@ -29,7 +29,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_21::name() const{
-    return "17.1: Team Star (Fire): Go to East Province (Area One) Pokecenter";
+    return "21: Team Star (Fire): Go to East Province (Area One) Pokecenter";
 }
 
 std::string AutoStory_Segment_21::start_text() const{
@@ -48,12 +48,12 @@ void AutoStory_Segment_21::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.log("Start Segment ", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_46(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment ", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

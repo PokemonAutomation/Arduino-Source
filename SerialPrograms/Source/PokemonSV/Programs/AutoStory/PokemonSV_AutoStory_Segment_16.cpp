@@ -29,7 +29,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_16::name() const{
-    return "13.1: Cascarrafa Gym (Water): Get Kofu's wallet";
+    return "16: Cascarrafa Gym (Water): Get Kofu's wallet";
 }
 
 std::string AutoStory_Segment_16::start_text() const{
@@ -48,13 +48,13 @@ void AutoStory_Segment_16::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.log("Start Segment 13.1: Cascarrafa Gym (Water): Get Kofu's wallet", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_35(env, context, options.notif_status_update);
     checkpoint_36(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 13.1: Cascarrafa Gym (Water): Get Kofu's wallet", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

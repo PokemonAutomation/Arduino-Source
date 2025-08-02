@@ -29,7 +29,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_19::name() const{
-    return "15.1: Klawf Titan: Battle Klawf";
+    return "19: Klawf Titan: Battle Klawf";
 }
 
 std::string AutoStory_Segment_19::start_text() const{
@@ -48,13 +48,13 @@ void AutoStory_Segment_19::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.log("Start Segment 15.2: Klawf Titan: Battle Klawf", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_41(env, context, options.notif_status_update);
     checkpoint_42(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 15.2: Klawf Titan: Battle Klawf", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

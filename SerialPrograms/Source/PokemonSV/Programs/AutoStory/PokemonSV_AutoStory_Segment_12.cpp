@@ -32,7 +32,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_12::name() const{
-    return "10.3: Cortondo Gym - Gym battle";
+    return "12: Cortondo Gym (Bug): Gym battle";
 }
 
 std::string AutoStory_Segment_12::start_text() const{
@@ -52,12 +52,12 @@ void AutoStory_Segment_12::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.log("Start Segment 10.3: Cortondo Gym - Gym battle", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_28(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 10.3: Cortondo Gym - Gym battle", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

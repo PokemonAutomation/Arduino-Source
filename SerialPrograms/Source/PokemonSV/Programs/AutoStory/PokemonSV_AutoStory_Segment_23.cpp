@@ -44,12 +44,12 @@ void AutoStory_Segment_23::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.log("Start Segment ", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     // checkpoint_(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment ", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

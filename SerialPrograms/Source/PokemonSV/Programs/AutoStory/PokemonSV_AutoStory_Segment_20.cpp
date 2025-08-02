@@ -31,7 +31,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_20::name() const{
-    return "16: Artazon Gym (Grass)";
+    return "20: Artazon Gym (Grass)";
 }
 
 std::string AutoStory_Segment_20::start_text() const{
@@ -50,14 +50,14 @@ void AutoStory_Segment_20::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.log("Start Segment ", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_43(env, context, options.notif_status_update);
     checkpoint_44(env, context, options.notif_status_update);
     checkpoint_45(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment ", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

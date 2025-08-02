@@ -32,7 +32,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_15::name() const{
-    return "12: Team Star (Dark)";
+    return "15: Team Star (Dark)";
 }
 
 std::string AutoStory_Segment_15::start_text() const{
@@ -51,7 +51,7 @@ void AutoStory_Segment_15::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.log("Start Segment 12: Team Star (Dark)", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_32(env, context, options.notif_status_update);
     checkpoint_33(env, context, options.notif_status_update);
@@ -59,7 +59,7 @@ void AutoStory_Segment_15::run_segment(
    
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 12: Team Star (Dark)", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 

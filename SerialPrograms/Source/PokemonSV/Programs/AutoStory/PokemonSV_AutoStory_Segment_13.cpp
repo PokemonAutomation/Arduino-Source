@@ -28,7 +28,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_13::name() const{
-    return "11.1: Bombirdier Titan: Go to West Province Area One Central Pokecenter";
+    return "13: Bombirdier Titan: Go to West Province Area One Central Pokecenter";
 }
 
 std::string AutoStory_Segment_13::start_text() const{
@@ -47,12 +47,12 @@ void AutoStory_Segment_13::run_segment(
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
 
     context.wait_for_all_requests();
-    env.console.log("Start Segment 11.1: Bombirdier Titan: Go to West Province Area One Central Pokecenter", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     checkpoint_29(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 11.1: Bombirdier Titan: Go to West Province Area One Central Pokecenter", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
     stats.m_segment++;
     env.update_stats();
 
