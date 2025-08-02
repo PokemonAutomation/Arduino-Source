@@ -409,7 +409,7 @@ void home_to_date_time_Switch1_wireless_esp32_feedback(
             stream, context,
             [](ProControllerContext& context){
                 for (int i = 0; i < 10; i++){
-                    ssf_issue_scroll(context, SSF_SCROLL_DOWN, 24ms);
+                    ssf_issue_scroll(context, SSF_SCROLL_DOWN, unit);
                 }
             },
             {system_setting_selected}
@@ -438,7 +438,7 @@ void home_to_date_time_Switch1_wireless_esp32_feedback(
 
         // only one ButtonA press since the program can self-recover if the button is dropped.
         // furthermore, the program can't self-recover if a second button press is registered.
-        ssf_press_button(context, BUTTON_A, 24ms, 48ms, 24ms);
+        ssf_press_button(context, BUTTON_A, 360ms, 2*unit, unit);
 
         context.wait_for_all_requests();
         context.wait_for(Milliseconds(300));
