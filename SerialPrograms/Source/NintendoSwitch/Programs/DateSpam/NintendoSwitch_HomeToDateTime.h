@@ -49,6 +49,9 @@ void home_to_date_time_Switch1_sbb_blind(
 void home_to_date_time_Switch1_wired_feedback(
     VideoStream& stream, ProControllerContext& context, bool to_date_change
 );
+void home_to_date_time_Switch1_wireless_esp32_feedback(
+    VideoStream& stream, ProControllerContext& context, bool to_date_change
+);
 
 
 
