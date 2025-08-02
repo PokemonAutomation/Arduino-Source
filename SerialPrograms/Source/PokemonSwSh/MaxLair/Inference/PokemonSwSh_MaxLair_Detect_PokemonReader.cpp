@@ -371,7 +371,6 @@ std::string read_pokemon_name_sprite(
     }
 
     //  This is where things get bad since OCR and sprites disagree.
-    dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
 
     //  If there is only one sprite match, use it.
     if (result.results.size() == 1){
@@ -387,6 +386,9 @@ std::string read_pokemon_name_sprite(
 
     //  At this point, both OCR and sprites have multiple items in completely disjoint sets.
     logger.log("Sprite and OCR disagree so badly that no arbitration will be attempted.", COLOR_RED);
+
+    dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
+
     return "";
 }
 
