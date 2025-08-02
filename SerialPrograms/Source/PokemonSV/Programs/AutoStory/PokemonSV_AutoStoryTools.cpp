@@ -46,7 +46,7 @@ void run_battle_press_A(
     VideoStream& stream,
     ProControllerContext& context,
     BattleStopCondition stop_condition,
-    std::vector<CallbackEnum> enum_optional_callbacks,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks,
     bool detect_wipeout
 ){
     int16_t num_times_seen_overworld = 0;
@@ -61,10 +61,15 @@ void run_battle_press_A(
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
 
         std::vector<PeriodicInferenceCallback> callbacks; 
+        std::vector<CallbackEnum> enum_all_callbacks;
         //  mandatory callbacks: Battle, Overworld, Advance Dialog, Swap menu, Move select
         //  optional callbacks: ADVANCE_DIALOG, DIALOG_ARROW, NEXT_POKEMON
-        std::vector<CallbackEnum> enum_all_callbacks{CallbackEnum::BATTLE, CallbackEnum::OVERWORLD, CallbackEnum::ADVANCE_DIALOG, CallbackEnum::SWAP_MENU, CallbackEnum::MOVE_SELECT}; // mandatory callbacks
-        enum_all_callbacks.insert(enum_all_callbacks.end(), enum_optional_callbacks.begin(), enum_optional_callbacks.end()); // append the mandatory and optional callback vectors together
+
+        // merge the mandatory and optional callbacks as a set, to avoid duplicates. then convert to vector
+        std::unordered_set<CallbackEnum> enum_all_callbacks_set{CallbackEnum::BATTLE, CallbackEnum::OVERWORLD, CallbackEnum::ADVANCE_DIALOG, CallbackEnum::SWAP_MENU, CallbackEnum::MOVE_SELECT}; // mandatory callbacks
+        enum_all_callbacks_set.insert(enum_optional_callbacks.begin(), enum_optional_callbacks.end()); // append the mandatory and optional callback sets together
+        enum_all_callbacks.assign(enum_all_callbacks_set.begin(), enum_all_callbacks_set.end());
+
         for (const CallbackEnum& enum_callback : enum_all_callbacks){
             switch(enum_callback){
             case CallbackEnum::ADVANCE_DIALOG:

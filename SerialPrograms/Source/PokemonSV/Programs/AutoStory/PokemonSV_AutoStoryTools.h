@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_AutoStoryTools_H
 
 #include <functional>
+#include <unordered_set>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
@@ -123,7 +124,7 @@ void run_battle_press_A(
     VideoStream& stream,
     ProControllerContext& context,
     BattleStopCondition stop_condition,
-    std::vector<CallbackEnum> optional_callbacks = {},
+    std::unordered_set<CallbackEnum> optional_callbacks = {},
     bool detect_wipeout = false
 );
 
