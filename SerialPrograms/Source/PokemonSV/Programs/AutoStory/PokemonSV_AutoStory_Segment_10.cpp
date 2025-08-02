@@ -117,7 +117,7 @@ void checkpoint_21(
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -184,7 +184,7 @@ void checkpoint_22(
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -303,7 +303,7 @@ void checkpoint_23(
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);             
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

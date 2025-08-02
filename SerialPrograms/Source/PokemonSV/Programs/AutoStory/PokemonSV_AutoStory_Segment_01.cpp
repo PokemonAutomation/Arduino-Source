@@ -93,7 +93,7 @@ AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
         context.wait_for_all_requests();
 
         break;  
-    }catch(...){
+    }catch(OperationFailedException&){
         // (void)e;
         first_attempt = false;
         context.wait_for_all_requests();
@@ -185,7 +185,7 @@ void checkpoint_02(
         leave_phone_to_overworld(env.program_info(), env.console, context);
 
         break;  
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -278,7 +278,7 @@ void checkpoint_03(
         leave_box_system_to_overworld(env.program_info(), env.console, context);
 
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

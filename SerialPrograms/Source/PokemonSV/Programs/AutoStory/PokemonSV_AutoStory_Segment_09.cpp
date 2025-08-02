@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
@@ -105,7 +106,7 @@ void checkpoint_16(
         
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -160,7 +161,7 @@ void checkpoint_17(
         
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -206,7 +207,7 @@ void checkpoint_18(
             {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -250,7 +251,7 @@ void checkpoint_19(
 
        
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -303,7 +304,7 @@ void checkpoint_20(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
         break;
-    }catch(...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

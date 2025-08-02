@@ -131,7 +131,7 @@ void checkpoint_43(
 
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -477,7 +477,7 @@ void checkpoint_44(
 
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
@@ -540,7 +540,7 @@ void checkpoint_45(
         mash_button_till_overworld(env.console, context, BUTTON_A);
        
         break;
-    }catch (...){
+    }catch(OperationFailedException&){
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);

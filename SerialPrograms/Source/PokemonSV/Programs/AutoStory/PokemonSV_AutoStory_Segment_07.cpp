@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
@@ -120,7 +121,7 @@ void checkpoint_12(
             env.console.log("Reached Mesagoza (South) Pokecenter.");
 
             break;
-        }catch(...){
+        }catch(OperationFailedException&){
             context.wait_for_all_requests();
             env.console.log("Resetting from checkpoint.");
             reset_game(env.program_info(), env.console, context);
