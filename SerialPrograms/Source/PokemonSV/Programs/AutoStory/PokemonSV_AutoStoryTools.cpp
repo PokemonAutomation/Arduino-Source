@@ -1071,11 +1071,11 @@ void realign_player_from_landmark(
 
             return;      
 
+        }catch (UnexpectedBattleException&){
+            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }catch (OperationFailedException&){
             // reset to overworld if failed to center on the pokecenter, and re-try
             leave_phone_to_overworld(info, stream, context);
-        }catch (UnexpectedBattleException&){
-            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
     
@@ -1153,11 +1153,11 @@ void move_cursor_towards_flypoint_and_go_there(
 
             return;      
 
+        }catch (UnexpectedBattleException&){
+            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }catch (OperationFailedException&){
             // reset to overworld if failed to center on the pokecenter, and re-try
             leave_phone_to_overworld(info, stream, context);
-        }catch (UnexpectedBattleException&){
-            run_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
     
