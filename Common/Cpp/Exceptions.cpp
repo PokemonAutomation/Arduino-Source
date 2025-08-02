@@ -30,13 +30,13 @@ std::string Exception::to_str() const{
 
 
 
-FileException::FileException(Logger* logger, const char* location, std::string message, std::string file)
+FileException::FileException(Logger* logger, const char* location, std::string message_string, std::string file)
     : m_location(location)
-    , m_message(std::move(message))
+    , m_message(std::move(message_string))
     , m_file(std::move(file))
 {
     std::string str = FileException::name();
-    str += ": " + m_message;
+    str += ": " + message();
     if (logger != nullptr){
         logger->log(str, COLOR_RED);
     }else{
