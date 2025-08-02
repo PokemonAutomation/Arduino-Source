@@ -16,7 +16,7 @@ class FatalProgramException;
 
 //  Thrown by subroutines if caught in an wild battle in-game unexpectedly.
 //  These include recoverable errors which can be consumed by the program.
-class UnexpectedBattleException : public ScreenshotException{
+class UnexpectedBattleException : public OperationFailedException{
 public:
     using ScreenshotException::ScreenshotException;
 
