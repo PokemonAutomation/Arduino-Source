@@ -44,7 +44,10 @@ bool home_to_date_time_Switch1_feedback(ConsoleHandle& console, ProControllerCon
     case ControllerPerformanceClass::SerialPABotBase_Wired:
         home_to_date_time_Switch1_wired_feedback(console, context, to_date_change);
         return true;
-    default:;
+    case ControllerPerformanceClass::SerialPABotBase_Wireless:
+        home_to_date_time_Switch1_wireless_esp32_feedback(console, context, to_date_change);
+        return true;
+    default:
         return false;
     }
 }
