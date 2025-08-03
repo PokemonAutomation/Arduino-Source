@@ -228,7 +228,8 @@ void checkpoint_41(
 
 
         // battle Klawf phase 1
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+        env.console.log("Battle Klawf Titan phase 1.");
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 2.83);
@@ -240,7 +241,8 @@ void checkpoint_41(
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 30, {CallbackEnum::BATTLE});
         // Klawf battle phase 2
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
+        env.console.log("Battle Klawf Titan phase 1.");
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
         // get ride upgrade
         mash_button_till_overworld(env.console, context, BUTTON_A);        
 

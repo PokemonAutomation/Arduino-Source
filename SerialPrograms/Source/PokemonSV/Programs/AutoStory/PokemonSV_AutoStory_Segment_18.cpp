@@ -200,7 +200,8 @@ void checkpoint_39(
 
         // battle the titan phase 1
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::BLACK_DIALOG_BOX});
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+        env.console.log("Battle Great Tusk/Iron Treads Titan phase 1.");
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
 
         // section 5
         realign_player_from_landmark(
@@ -225,7 +226,8 @@ void checkpoint_39(
 
         // battle the titan phase 2
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});  
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
+        env.console.log("Battle Great Tusk/Iron Treads Titan phase 2.");
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
        
         break;

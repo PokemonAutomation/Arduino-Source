@@ -122,9 +122,9 @@ void checkpoint_06(
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, 
             {CallbackEnum::WHITE_A_BUTTON, CallbackEnum::TUTORIAL, CallbackEnum::BATTLE});
         
-        // can die in catch tutorial, and the story will continue
-        env.console.log("run_battle_press_A: Battle Lechonk in catch tutorial. Stop when detect dialog.");
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        // can die in catch tutorial, and the story will continue. so need to detect wipeout
+        env.console.log("Battle Lechonk in catch tutorial. Stop when detect dialog.");
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
 
         env.console.log("clear_dialog: Talk with Nemona to finish catch tutorial. Stop when detect overworld.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 

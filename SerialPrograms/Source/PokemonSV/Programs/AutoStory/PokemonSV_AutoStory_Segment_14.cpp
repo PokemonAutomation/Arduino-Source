@@ -225,10 +225,12 @@ void checkpoint_30(
 
         }       
 
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        env.console.log("Battle Bombirdier Titan phase 1.");
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 30, {CallbackEnum::BATTLE});
         // round 2 of battle 
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
+        env.console.log("Battle Bombirdier Titan phase 2.");
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
         // get ride upgrade
         mash_button_till_overworld(env.console, context, BUTTON_A);
 

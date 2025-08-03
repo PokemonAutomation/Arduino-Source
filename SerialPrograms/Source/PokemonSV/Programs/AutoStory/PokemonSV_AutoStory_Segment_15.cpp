@@ -127,7 +127,8 @@ void checkpoint_32(
 
         // battle team star grunts
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::PROMPT_DIALOG, CallbackEnum::DIALOG_ARROW});
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        env.console.log("Battle Team star grunt.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
 
        
@@ -253,7 +254,8 @@ void checkpoint_33(
             );            
         }
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {}, true);
+        env.console.log("Battle the Team Star (Dark) boss.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
 

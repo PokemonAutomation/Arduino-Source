@@ -181,7 +181,8 @@ void checkpoint_25(
         direction.change_direction(env.program_info(), env.console, context,  1.485);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 128, 20);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        env.console.log("Battle Olive Roll NPC 1.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // section 6
@@ -200,7 +201,8 @@ void checkpoint_25(
         direction.change_direction(env.program_info(), env.console, context,  4.275);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10, 128, 20);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
-        run_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        env.console.log("Battle Olive Roll NPC 2.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // section 10. leave Olive roll
