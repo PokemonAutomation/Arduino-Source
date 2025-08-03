@@ -10,7 +10,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
-#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
+//#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PathMap.h"
 
 namespace PokemonAutomation{
@@ -32,7 +32,7 @@ bool read_type_array(
         type[c] = PokemonType::NONE;
     }
 
-    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, 0.20);
+    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_type_symbols(screen, image, 0.20);
     if (candidates.size() < count){
 //        dump_image(console, screen, "ReadPath");
         return false;

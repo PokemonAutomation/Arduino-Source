@@ -81,6 +81,8 @@ TypeSprite::TypeSprite(const std::string& slug)
         object.merge_assume_no_overlap(item);
     }
 
+    m_aspect_ratio = object.aspect_ratio();
+
 //    sprite.save("symbol-" + std::to_string(slug) + ".png");
     m_matcher.reset(
         new ImageMatch::WeightedExactImageMatcher(

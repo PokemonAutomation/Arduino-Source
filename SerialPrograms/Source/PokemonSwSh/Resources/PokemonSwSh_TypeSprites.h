@@ -22,6 +22,7 @@ using namespace Pokemon;
 class TypeSprite{
 public:
     const std::string& slug() const{ return m_slug; }
+    double aspect_ratio() const{ return m_aspect_ratio; }
 //    const ImageRGB32& sprite() const{ return m_sprite; }
 
     const ImageMatch::WeightedExactImageMatcher& matcher() const{ return *m_matcher; }
@@ -32,6 +33,7 @@ public:
 
 private:
     std::string m_slug;
+    double m_aspect_ratio;
 
     std::unique_ptr<ImageMatch::WeightedExactImageMatcher> m_matcher;
 };

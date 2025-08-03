@@ -9,6 +9,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h"
 #include "PokemonSwSh_TypeSymbolFinder.h"
 
 #include <iostream>
@@ -66,6 +67,8 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
         return {1.0, PokemonType::NONE};
     }
 
+    double aspect_ratio = (double)width / height;
+
 //    static int c = 0;
 //    image.save("test-" + std::to_string(threshold) + "-" + std::to_string(c++) + ".png");
 
@@ -76,6 +79,13 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
 //        if (threshold != 700 || id != 55){
 //            continue;
 //        }
+
+        double expected_aspect_ratio = item.second.aspect_ratio();
+//        cout << item.second.slug() << " : " << expected_aspect_ratio << endl;
+        if (std::abs(aspect_ratio - expected_aspect_ratio) > 0.05){
+            continue;
+        }
+
         double rmsd_alpha = item.second.matcher().diff(image);
 
 //        item.second.matcher().m_image.save("sprite.png");
@@ -107,13 +117,17 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
     return {best_score, best_type};
 }
 
-void find_symbol_candidates(
+void find_type_symbol_candidates(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>>& candidates,
+    const ImageViewPlanar32& original_screen,
     const ImageViewRGB32& image,
     PackedBinaryMatrix& matrix, double max_area_ratio
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
+    std::vector<WaterfillObject> objects = find_objects_inplace(
+        matrix,
+        (size_t)(20. * original_screen.total_pixels() / (1920*1080))
+    );
 
 //    static int index = 0;
 
@@ -181,7 +195,8 @@ void find_symbol_candidates(
 
 
 
-std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
+std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
+    const ImageViewPlanar32& original_screen,
     const ImageViewRGB32& image, double max_area_ratio
 ){
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates;
@@ -199,7 +214,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
             }
         );
         for (PackedBinaryMatrix& matrix : matrices){
-            find_symbol_candidates(candidates, image, matrix, max_area_ratio);
+            find_type_symbol_candidates(candidates, original_screen,image, matrix, max_area_ratio);
         }
     }
 
@@ -239,7 +254,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
 
 
 
-void test_find_symbols(
+void test_find_type_symbols(
     CancellableScope& scope,
     VideoOverlay& overlay,
     const ImageFloatBox& box,
@@ -247,7 +262,7 @@ void test_find_symbols(
 ){
     ImageViewRGB32 image = extract_box_reference(screen, box);
 
-    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, max_area_ratio);
+    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_type_symbols(screen, image, max_area_ratio);
 
 
     std::deque<OverlayBoxScope> hits;
