@@ -12,6 +12,8 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h"
 #include "PokemonSwSh_MaxLair_CatchScreenTracker.h"
 
+//#define PA_FORCE_SLOT_SHINY     2
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -32,6 +34,9 @@ size_t CaughtPokemonScreen::total() const{
     return m_total;
 }
 const CaughtPokemon& CaughtPokemonScreen::operator[](size_t position) const{
+    return m_mons[position];
+}
+CaughtPokemon& CaughtPokemonScreen::operator[](size_t position){
     return m_mons[position];
 }
 bool CaughtPokemonScreen::current_position() const{
@@ -113,6 +118,11 @@ void CaughtPokemonScreen::scroll_to(size_t position){
     }
 }
 void CaughtPokemonScreen::process_detection(Detection detection){
+#ifdef PA_FORCE_SLOT_SHINY
+        if (m_current_position == PA_FORCE_SLOT_SHINY){
+            detection = Detection::SHINY;
+        }
+#endif
     CaughtPokemon& mon = m_mons[m_current_position];
     switch (detection){
     case SummaryShinySymbolDetector::Detection::NO_DETECTION:

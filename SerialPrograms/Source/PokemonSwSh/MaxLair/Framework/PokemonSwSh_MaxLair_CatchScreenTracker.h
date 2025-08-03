@@ -31,6 +31,7 @@ public:
 
     size_t total() const;
     const CaughtPokemon& operator[](size_t position) const;
+          CaughtPokemon& operator[](size_t position);
 
     bool current_position() const;
     bool is_summary() const;

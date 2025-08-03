@@ -14,6 +14,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogTriangleDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h"
@@ -35,23 +39,79 @@ StateMachineAction mash_A_to_entrance(
     VideoStream& stream, ProControllerContext& context,
     const ImageViewRGB32& entrance
 ){
+    WallClock start = current_time();
+    while (true){
+        if (current_time() - start > std::chrono::seconds(60)){
+            stream.log("Unable to find entrance after 60 seconds.", COLOR_RED);
+            runtime.session_stats.add_error();
+            dump_image(stream.logger(), MODULE_NAME, stream.video(), "FailedToDetectEntrance");
+            return StateMachineAction::RESET_RECOVER;
+        }
+
+        EntranceDetector entrance_detector(entrance);
+        SelectionArrowFinder prompt(stream.overlay(), {0.362689, 0.282828, 0.625000, 0.580808});
+        DialogTriangleDetector triangle(stream.logger(), stream.overlay(), true);
+        BlackDialogBoxDetector dialog(true);
+        ReceivePokemonDetector receive(true);
+
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            stream, context,
+            std::chrono::seconds(10),
+            {
+                entrance_detector,
+                prompt,
+                triangle,
+                dialog,
+                receive,
+            },
+            INFERENCE_RATE
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            stream.log("Detected entrance.");
+            return StateMachineAction::KEEP_GOING;
+        case 1:
+            stream.log("Detected prompt.");
+            pbf_press_button(context, BUTTON_A, 80ms, 320ms);
+            break;
+        case 2:
+            stream.log("Detected dialog triangle.");
+            pbf_press_button(context, BUTTON_B, 80ms, 320ms);
+            break;
+        case 3:
+            stream.log("Detected dialog box.");
+            pbf_press_button(context, BUTTON_B, 80ms, 320ms);
+            break;
+        case 4:
+            stream.log("Detected receive " + Pokemon::STRING_POKEMON + ".");
+            pbf_press_button(context, BUTTON_B, 80ms, 320ms);
+            break;
+        default:
+            stream.log("No recognized state after 10 seconds.", COLOR_RED);
+            pbf_press_button(context, BUTTON_B, 80ms, 320ms);
+            pbf_press_button(context, BUTTON_X, 80ms, 320ms);   //  In case we landed in the nickname menu.
+        }
+    }
+
     EntranceDetector entrance_detector(entrance);
-
-    int result = run_until<ProControllerContext>(
+    int ret = run_until<ProControllerContext>(
         stream, context,
-        [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
+        [](ProControllerContext& context){
+            for (size_t c = 0; c < 60; c++){
+                pbf_press_button(context, BUTTON_B, 80ms, 920ms);
+            }
         },
-        {{entrance_detector}},
-        INFERENCE_RATE
+        {entrance_detector}
     );
-
-    if (result < 0){
-        stream.log("Failed to detect entrance.", COLOR_RED);
+    if (ret < 0){
+        stream.log("Unable to find entrance after 60 seconds.", COLOR_RED);
         runtime.session_stats.add_error();
         dump_image(stream.logger(), MODULE_NAME, stream.video(), "FailedToDetectEntrance");
         return StateMachineAction::RESET_RECOVER;
     }
+
     return StateMachineAction::KEEP_GOING;
 }
 
