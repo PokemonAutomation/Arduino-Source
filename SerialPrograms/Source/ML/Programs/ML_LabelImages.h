@@ -72,7 +72,10 @@ public:
     void update_rendered_objects();
 
     // Use user currently drawn box to compute per-pixel masks on the image using SAM model
-    void compute_mask();
+    void add_new_annotation_from_user_box();
+    // update mask after user add or remove an inclusion or exclusion point on the currently selected annotation
+    // rendered objects are not updated
+    void update_mask_for_selected_annotation();
     // User adds an inclusion point to the current selected annotation. It will then re-compute
     // the per-pixel mask using the added inclusion point.
     void add_segmentation_inclusion_point(double x, double y);
@@ -109,6 +112,19 @@ private:
     std::pair<double, double> pixel_to_float(size_t x, size_t y) const;
 
     void remove_closest_point(std::vector<std::pair<size_t, size_t>>& points, double x, double y);
+
+    // call SAM model to compute mask from the given user box and inclusiong and exclusion points.
+    // if SAM session failed or no SAM model loaded, return false
+    // if user box is empty or no mask is created, return false
+    // return true when the mask is created successfully and saved to `mask_box` and `mask`.
+    // no change to `mask_box` and `mask` if the function returns false.
+    bool run_sam_to_create_annotation(
+        const ImagePixelBox& user_box,
+        const std::vector<std::pair<size_t, size_t>>& inclusion_points,
+        const std::vector<std::pair<size_t, size_t>>& exclusion_points,
+        ImagePixelBox& mask_box,
+        std::vector<bool>& mask
+    );
 
     friend class LabelImages_Widget;
     friend class LabelImages_OverlayManager;

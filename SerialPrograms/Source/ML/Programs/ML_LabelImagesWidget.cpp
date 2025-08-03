@@ -253,6 +253,12 @@ void LabelImages_Widget::key_release(QKeyEvent* event){
     }
 }
 
+void LabelImages_Widget::focus_in(QFocusEvent* event){
+}
+
+void LabelImages_Widget::focus_out(QFocusEvent* event){
+}
+
 void LabelImages_Widget::on_mouse_press(double x, double y){
     m_cur_mouse_x = x;
     m_cur_mouse_y = y;
@@ -301,10 +307,13 @@ void LabelImages_Widget::on_mouse_release(double x, double y){
     }
 
     // not mouse clicking. So user draw a box:
-    m_program.compute_mask();
+    m_program.add_new_annotation_from_user_box();
 }
 
 void LabelImages_Widget::on_mouse_move(double x, double y){
+    m_cur_mouse_x = x;
+    m_cur_mouse_y = y;
+
     if (!m_mouse_start){
         return;
     }
@@ -330,8 +339,6 @@ void LabelImages_Widget::on_mouse_move(double x, double y){
     m_program.HEIGHT.set(yh - yl);
 
     m_program.update_rendered_objects();
-    m_cur_mouse_x = x;
-    m_cur_mouse_y = y;
 }
 
 

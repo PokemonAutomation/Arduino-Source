@@ -66,10 +66,6 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , CUSTOM_SET_LABEL(CUSTOM_LABEL_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
     , MANUAL_LABEL(false, LockMode::UNLOCK_WHILE_RUNNING, "", "Custom Label", true)
 {
-    ADD_OPTION(X);
-    ADD_OPTION(Y);
-    ADD_OPTION(WIDTH);
-    ADD_OPTION(HEIGHT);
     ADD_OPTION(LABEL_TYPE);
     ADD_OPTION(FORM_LABEL);
     ADD_OPTION(CUSTOM_SET_LABEL);
@@ -223,25 +219,76 @@ void LabelImages::update_rendered_objects(){
     m_overlay_manager->update_rendered_annotations();
 }
 
-void LabelImages::compute_mask(){
+void LabelImages::add_new_annotation_from_user_box(){
+    ImageFloatBox user_float_box(X, Y, WIDTH, HEIGHT);
+    ImagePixelBox user_box = floatbox_to_pixelbox(source_image_width, source_image_height, user_float_box);
+
+    ImagePixelBox mask_box;
+    std::vector<bool> mask;
+    const bool mask_computed = run_sam_to_create_annotation(user_box, {}, {}, mask_box, mask);
+
+    if (mask_computed){
+        ObjectAnnotation annotation;
+        annotation.user_box = user_box;
+        annotation.mask_box = mask_box;
+        annotation.mask = std::move(mask);
+        annotation.label = this->selected_label();;
+        m_selected_obj_idx = m_annotations.size();
+        m_annotations.emplace_back(std::move(annotation));
+        update_rendered_objects();
+    }
+}
+
+void LabelImages::update_mask_for_selected_annotation(){
+    if (m_selected_obj_idx >= m_annotations.size()){
+        return;
+    }
+
+    auto& anno = m_annotations[m_selected_obj_idx];
+    run_sam_to_create_annotation(anno.user_box, anno.inclusion_points, anno.exclusion_points, anno.mask_box, anno.mask);
+}
+
+bool LabelImages::run_sam_to_create_annotation(
+    const ImagePixelBox& user_box,
+    const std::vector<std::pair<size_t, size_t>>& inclusion_points,
+    const std::vector<std::pair<size_t, size_t>>& exclusion_points,
+    ImagePixelBox& mask_box,
+    std::vector<bool>& mask
+){
     const size_t source_width = source_image_width;
     const size_t source_height = source_image_height;
-    
-    const int box_x = int(X * source_width + 0.5);
-    const int box_y = int(Y * source_height + 0.5);
-    const int box_width = int(WIDTH * source_width + 0.5);
-    const int box_height = int(HEIGHT * source_height + 0.5);
-    if (box_width == 0 || box_height == 0){
-        return;
-    }
     if (!m_sam_session || m_image_embedding.size() == 0){
         // no embedding file loaded
-        return;
+        return false;
     }
+    if (user_box.width() == 0 || user_box.height() == 0){
+        return false;
+    }
+    
+    // input_points: input point coordinates (x, y) in pixel units. [p0_x, p0_y, p1_x, p1_y, p2_x, ...].
+    //     Vector size: 2*num_points
+    // input_point_labels: if a point is part of the object to segment, its corresponding label value is 1.
+    //     if a point is outside of the object, value is 0. Vector size: num_points.
+
+    // input_box: if not empty, the two corner points (in pixel units) of a bounding box for the object to segment.
+    //     [p0_x, p0_y, p1_x, p1_y], where p0 is the top-left corner and p1 is the lower right corner.
+    const size_t num_points = inclusion_points.size() + exclusion_points.size();
+    std::vector<int> input_points(2*num_points), input_point_labels(num_points);
+    for(size_t i = 0; i < inclusion_points.size(); i++){
+        input_points[2*i] = static_cast<int>(inclusion_points[i].first);
+        input_points[2*i+1] = static_cast<int>(inclusion_points[i].second);
+        input_point_labels[i] = 1;
+    }
+    for(size_t i = 0; i < exclusion_points.size(); i++){
+        input_points[2*inclusion_points.size() + 2*i] = static_cast<int>(exclusion_points[i].first);
+        input_points[2*inclusion_points.size() + 2*i+1] = static_cast<int>(exclusion_points[i].second);
+        input_point_labels[inclusion_points.size() + i] = 0;
+    }
+
     m_sam_session->run(
         m_image_embedding,
-        (int)source_height, (int)source_width, {}, {},
-        {box_x, box_y, box_x + box_width, box_y + box_height},
+        (int)source_height, (int)source_width, input_points, input_point_labels,
+        {static_cast<int>(user_box.min_x), static_cast<int>(user_box.min_y), static_cast<int>(user_box.max_x)-1, static_cast<int>(user_box.max_y)-1},
         m_output_boolean_mask
     );
 
@@ -258,26 +305,21 @@ void LabelImages::compute_mask(){
             }
         }
     }
-    if (min_mask_x < INT_MAX && max_mask_x > min_mask_x && min_mask_y < INT_MAX && max_mask_y > min_mask_y){
-        const size_t mask_width = max_mask_x - min_mask_x + 1;
-        const size_t mask_height = max_mask_y - min_mask_y + 1;
-
-        ObjectAnnotation annotation;
-        annotation.user_box = ImagePixelBox(box_x, box_y, box_x + box_width + 1, box_y + box_height + 1);
-        annotation.mask_box = ImagePixelBox(min_mask_x, min_mask_y, max_mask_x+1, max_mask_y+1);
-        annotation.mask.resize(mask_width * mask_height);
-        for(size_t row = 0; row < mask_height; row++){
-            auto it = m_output_boolean_mask.begin() + (min_mask_y + row) * source_width + min_mask_x;
-            auto it2 = annotation.mask.begin() + row * mask_width;
-            std::copy(it, it + mask_width, it2);
-        }
-
-        annotation.label = this->selected_label();;
-        m_selected_obj_idx = m_annotations.size();
-        m_annotations.emplace_back(std::move(annotation));
-
-        update_rendered_objects();
+    if (min_mask_x >= INT_MAX || max_mask_x < min_mask_x || min_mask_y >= INT_MAX || max_mask_y <= min_mask_y){
+        return false;
     }
+    
+    const size_t mask_width = max_mask_x - min_mask_x + 1;
+    const size_t mask_height = max_mask_y - min_mask_y + 1;
+
+    mask_box = ImagePixelBox(min_mask_x, min_mask_y, max_mask_x+1, max_mask_y+1);
+    mask.resize(mask_width * mask_height);
+    for(size_t row = 0; row < mask_height; row++){
+        auto it = m_output_boolean_mask.begin() + (min_mask_y + row) * source_width + min_mask_x;
+        auto it2 = mask.begin() + row * mask_width;
+        std::copy(it, it + mask_width, it2);
+    }
+    return true;
 }
 
 void LabelImages::add_segmentation_inclusion_point(double x, double y){
@@ -290,6 +332,7 @@ void LabelImages::add_segmentation_inclusion_point(double x, double y){
         return;
     }
     cur_anno.inclusion_points.push_back(float_to_pixel(x, y));
+    update_mask_for_selected_annotation();
     update_rendered_objects();
 }
 
@@ -303,6 +346,7 @@ void LabelImages::add_segmentation_exclusion_point(double x, double y){
         return;
     }
     cur_anno.exclusion_points.push_back(float_to_pixel(x, y));
+    update_mask_for_selected_annotation();
     update_rendered_objects();
 }
 
@@ -336,6 +380,7 @@ void LabelImages::remove_segmentation_inclusion_point(double x, double y){
     }
     auto& points = m_annotations[m_selected_obj_idx].inclusion_points;
     remove_closest_point(points, x, y);
+    update_mask_for_selected_annotation();
     update_rendered_objects();
 }
 
@@ -346,6 +391,7 @@ void LabelImages::remove_segmentation_exclusion_point(double x, double y){
     }
     auto& points = m_annotations[m_selected_obj_idx].exclusion_points;
     remove_closest_point(points, x, y);
+    update_mask_for_selected_annotation();
     update_rendered_objects();
 }
 
@@ -362,7 +408,7 @@ void LabelImages::delete_selected_annotation(){
 
     m_annotations.erase(m_annotations.begin() + m_selected_obj_idx);
 
-    if (m_annotations.size() == 0){
+    if (m_annotations.size() == 0){ // no more annotations
         m_selected_obj_idx = 0;
         update_rendered_objects();
         return;
@@ -374,7 +420,7 @@ void LabelImages::delete_selected_annotation(){
         // no change to the currently selected index
     }
 
-    std::string& cur_label = m_annotations[m_selected_obj_idx].label;
+    std::string cur_label = m_annotations[m_selected_obj_idx].label;
     set_selected_label(cur_label);
     update_rendered_objects();
 }
@@ -419,7 +465,7 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
     }
 
     if (old_selected_idx != m_selected_obj_idx){
-        auto new_label = m_annotations[m_selected_obj_idx].label;
+        std::string new_label = m_annotations[m_selected_obj_idx].label;
         set_selected_label(new_label);
         update_rendered_objects();
     }
@@ -439,7 +485,7 @@ void LabelImages::select_prev_annotation(){
         m_selected_obj_idx--;
     }
 
-    auto new_label = m_annotations[m_selected_obj_idx].label;
+    std::string new_label = m_annotations[m_selected_obj_idx].label;
     set_selected_label(new_label);
     update_rendered_objects();
 }
@@ -457,7 +503,7 @@ void LabelImages::select_next_annotation(){
         m_selected_obj_idx++;
     }
 
-    auto new_label = m_annotations[m_selected_obj_idx].label;
+    std::string new_label = m_annotations[m_selected_obj_idx].label;
     set_selected_label(new_label);
     update_rendered_objects();
 }
@@ -484,7 +530,7 @@ void LabelImages::on_config_value_changed(void* object){
     }
 
     if (object == &LABEL_TYPE || object == &FORM_LABEL || object == &CUSTOM_SET_LABEL || object == &MANUAL_LABEL){
-        // label changed
+        // label changed by user: modify internal annotation data
         if (m_annotations.size() > 0 && m_selected_obj_idx < m_annotations.size()){
             std::string& cur_label = m_annotations[m_selected_obj_idx].label;
             const std::string ui_slug = this->selected_label();
