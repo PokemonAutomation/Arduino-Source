@@ -313,6 +313,10 @@ void MainWindow::close_panel() noexcept{
 //    cout << "close_panel(): enter: " << m_current_panel_widget << endl;
     //  Must destroy the widget first since it references the instance.
     if (m_current_panel_widget != nullptr){
+        //  Possible optimization. Hide it so Qt doesn't need to recalculate
+        //  all the layouts.
+        m_current_panel_widget->hide();
+
         m_right_panel_layout->removeWidget(m_current_panel_widget);
         QWidget* widget = m_current_panel_widget;
         m_current_panel_widget = nullptr;
