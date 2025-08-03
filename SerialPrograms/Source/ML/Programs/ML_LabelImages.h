@@ -145,9 +145,6 @@ private:
     std::vector<float> m_image_embedding;
     std::vector<bool> m_output_boolean_mask;
 
-    // buffer to compute SAM mask on
-    ImageRGB32 m_mask_image;
-
     std::unique_ptr<SAMSession> m_sam_session;
     std::vector<ObjectAnnotation> m_annotations;
     

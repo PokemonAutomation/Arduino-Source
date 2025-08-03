@@ -15,7 +15,6 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonTools.h"
 #include "Pokemon/Pokemon_Strings.h"
-// #include "Pokemon/Resources/Pokemon_PokemonForms.h"
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ML/DataLabeling/ML_AnnotationIO.h"
 #include "ML_LabelImages.h"
@@ -148,7 +147,6 @@ void LabelImages::clear_for_new_image(){
     source_image_width = source_image_height = 0;
     m_image_embedding.clear();
     m_output_boolean_mask.clear();
-    m_mask_image = ImageRGB32();
     m_annotations.clear();
     m_selected_obj_idx = 0;
     m_annotation_file_path = "";
@@ -162,8 +160,6 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
 
     this->source_image_height = source_image_height;
     this->source_image_width = source_image_width;
-
-    m_mask_image = ImageRGB32(source_image_width, source_image_height);
 
     m_overlay_manager->set_image_size();
 
@@ -238,7 +234,6 @@ void LabelImages::compute_mask(){
     if (box_width == 0 || box_height == 0){
         return;
     }
-
     if (!m_sam_session || m_image_embedding.size() == 0){
         // no embedding file loaded
         return;
@@ -254,29 +249,18 @@ void LabelImages::compute_mask(){
     size_t min_mask_y = INT_MAX, max_mask_y = 0;
     for (size_t y = 0; y < source_height; y++){
         for (size_t x = 0; x < source_width; x++){
-            bool mask = m_output_boolean_mask[y*source_width + x];
-            uint32_t& pixel = m_mask_image.pixel(x, y);
-            // if the pixel's mask value is true, set a semi-transparent 45-degree blue strip color
-            // otherwise: fully transparent (alpha = 0)
-            uint32_t color = 0;
+            const bool mask = m_output_boolean_mask[y*source_width + x];
             if (mask){
-                color = (std::abs(int(x) - int(y)) % 4 <= 1) ? combine_argb(150, 30, 144, 255) : combine_argb(150, 0, 0, 60);
                 min_mask_x = std::min(x, min_mask_x);
                 max_mask_x = std::max(x, max_mask_x);
                 min_mask_y = std::min(y, min_mask_y);
                 max_mask_y = std::max(y, max_mask_y);
             }
-            pixel = color;
         }
     }
     if (min_mask_x < INT_MAX && max_mask_x > min_mask_x && min_mask_y < INT_MAX && max_mask_y > min_mask_y){
         const size_t mask_width = max_mask_x - min_mask_x + 1;
         const size_t mask_height = max_mask_y - min_mask_y + 1;
-        ImageFloatBox mask_box(
-            min_mask_x/double(source_width), min_mask_y/double(source_height),
-            mask_width/double(source_width), mask_height/double(source_height));
-        const std::string label = this->selected_label();
-        
 
         ObjectAnnotation annotation;
         annotation.user_box = ImagePixelBox(box_x, box_y, box_x + box_width + 1, box_y + box_height + 1);
@@ -288,7 +272,7 @@ void LabelImages::compute_mask(){
             std::copy(it, it + mask_width, it2);
         }
 
-        annotation.label = label;
+        annotation.label = this->selected_label();;
         m_selected_obj_idx = m_annotations.size();
         m_annotations.emplace_back(std::move(annotation));
 
