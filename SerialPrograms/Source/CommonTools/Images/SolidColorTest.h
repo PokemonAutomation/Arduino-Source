@@ -11,6 +11,10 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -56,6 +60,7 @@ inline bool is_black(
 ){
     ImageStats stats = image_stats(image);
 //    cout << stats.average << stats.stddev << endl;
+//    cout << is_black(stats, max_rgb_sum, max_stddev_sum) << endl;
     return is_black(stats, max_rgb_sum, max_stddev_sum);
 }
 inline bool is_grey(
