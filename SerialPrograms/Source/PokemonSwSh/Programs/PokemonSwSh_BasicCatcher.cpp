@@ -184,7 +184,7 @@ CatchResults basic_catcher(
 //    console.video().snapshot()->save("test1.png");
 //    context.wait_for(std::chrono::milliseconds(5000));
     {
-        ReceivePokemonDetector caught_detector(true);
+        ReceivePokemonOverWatcher caught_detector(true);
 
         int result = run_until<ProControllerContext>(
             stream, context,

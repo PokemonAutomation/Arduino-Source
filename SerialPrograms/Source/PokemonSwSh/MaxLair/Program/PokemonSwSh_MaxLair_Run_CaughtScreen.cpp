@@ -52,7 +52,7 @@ StateMachineAction mash_A_to_entrance(
         SelectionArrowFinder prompt(stream.overlay(), {0.362689, 0.282828, 0.625000, 0.580808});
         DialogTriangleDetector triangle(stream.logger(), stream.overlay(), true);
         BlackDialogBoxDetector dialog(true);
-        ReceivePokemonDetector receive(true);
+        ReceivePokemonWatcher receive(COLOR_RED);
 
         context.wait_for_all_requests();
         int ret = wait_until(
@@ -67,7 +67,11 @@ StateMachineAction mash_A_to_entrance(
             },
             INFERENCE_RATE
         );
-        context.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(500));
+        if (receive.detect(stream.video().snapshot())){
+            ret = 4;
+        }
+
         switch (ret){
         case 0:
             stream.log("Detected entrance.");

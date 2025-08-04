@@ -155,7 +155,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         {
             context.wait_for_all_requests();
 
-            ReceivePokemonDetector receive_detector(false);
+            ReceivePokemonOverWatcher receive_detector(false);
 //            ShinySparkleDetector shiny_detector(
 //                env.console, env.console,
 //                ImageFloatBox(0.1, 0.01, 0.8, 0.77)
