@@ -296,8 +296,7 @@ bool LabelImages::run_sam_to_create_annotation(
     size_t min_mask_y = INT_MAX, max_mask_y = 0;
     for (size_t y = 0; y < source_height; y++){
         for (size_t x = 0; x < source_width; x++){
-            const bool mask = m_output_boolean_mask[y*source_width + x];
-            if (mask){
+            if (m_output_boolean_mask[y*source_width + x]){
                 min_mask_x = std::min(x, min_mask_x);
                 max_mask_x = std::max(x, max_mask_x);
                 min_mask_y = std::min(y, min_mask_y);
