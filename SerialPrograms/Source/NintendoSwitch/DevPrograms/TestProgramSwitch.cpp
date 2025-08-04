@@ -264,6 +264,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     for (int i = 0; i < 10; i++){
         cout << detector.detect_material_name(console, image, context, (int8_t)i) << endl;
+        cout << detector.detect_material_quantity(console, image, context, (int8_t)i) << endl;
     }
 #endif
 

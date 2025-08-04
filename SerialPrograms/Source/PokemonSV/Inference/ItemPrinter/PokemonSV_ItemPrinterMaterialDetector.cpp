@@ -260,12 +260,11 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
 
 int16_t ItemPrinterMaterialDetector::detect_material_quantity(
     VideoStream& stream,
+    const ImageViewRGB32& screen,
     ProControllerContext& context,
     int8_t row_index
 ) const{
-    context.wait_for_all_requests();
-    VideoSnapshot snapshot = stream.video().snapshot();
-    int16_t value = read_number(stream.logger(), snapshot, m_box_mat_quantity[row_index], row_index);
+    int16_t value = read_number(stream.logger(), screen, m_box_mat_quantity[row_index], row_index);
     return value;
 }
 

@@ -61,6 +61,7 @@ public:
     // detect the quantity of material at the given row number
     int16_t detect_material_quantity(
         VideoStream& stream,
+        const ImageViewRGB32& screen,
         ProControllerContext& context,
         int8_t row_index
     ) const;
