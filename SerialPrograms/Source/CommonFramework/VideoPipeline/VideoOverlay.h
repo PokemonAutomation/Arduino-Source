@@ -32,7 +32,7 @@ public:
     // call `remove_box()` once to remove it.
     //
     // Can use `InferenceBoxScope: public ImageFloatBox` to handle box removal automatically when it's destroyed.
-    // Can also use `VideoOverlay.h:VideoOverlaySet` to manage multiple boxes.
+    // Can also use `VideoOverlayScopes.h:VideoOverlaySet` to manage multiple boxes.
     virtual void add_box(const OverlayBox& box) = 0;
 
     // Asychronously, remove an added inference box.
@@ -84,8 +84,11 @@ public:
     };
     void add_listener(MouseListener& listener);
     void remove_listener(MouseListener& listener);
+    // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_press().
     void issue_mouse_press(double x, double y);
+    // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_release().
     void issue_mouse_release(double x, double y);
+    // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_move().
     void issue_mouse_move(double x, double y);
 
 private:

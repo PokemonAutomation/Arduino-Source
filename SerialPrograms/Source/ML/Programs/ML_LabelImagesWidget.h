@@ -56,9 +56,9 @@ public:
     //  Overwrites CommandReceiver::key_release().
     virtual void key_release(QKeyEvent* event) override;
     //  Overwrites CommandReceiver::focus_in().
-    virtual void focus_in(QFocusEvent* event) override {}
+    virtual void focus_in(QFocusEvent* event) override;
     //  Overwrites CommandReceiver::focus_out().
-    virtual void focus_out(QFocusEvent* event) override {}
+    virtual void focus_out(QFocusEvent* event) override;
 
     //  Overwrites VideoOverlay::MouseListener::on_mouse_press().
     virtual void on_mouse_press(double x, double y) override;
@@ -86,6 +86,8 @@ private:
 
     bool m_shift_pressed = false;
     bool m_control_pressed = false;
+    double m_cur_mouse_x = 0.0;
+    double m_cur_mouse_y = 0.0;
 };
 
 

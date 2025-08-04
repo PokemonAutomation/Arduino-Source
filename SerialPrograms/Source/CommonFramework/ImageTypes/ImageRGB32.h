@@ -27,6 +27,7 @@ private:
 
 public:
     ImageRGB32();
+    //  Create an ARGB32 image of shape width x height with uninitialized pixels.
     ImageRGB32(size_t width, size_t height);
     explicit ImageRGB32(const std::string& filename);
 

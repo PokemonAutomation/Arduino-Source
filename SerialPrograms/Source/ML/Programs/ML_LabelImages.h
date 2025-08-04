@@ -16,7 +16,6 @@
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Pokemon/Options/Pokemon_HomeSpriteSelectOption.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "ML/DataLabeling/ML_ObjectAnnotation.h"
 #include "ML/DataLabeling/ML_SegmentAnythingModel.h"
 #include "ML/UI/ML_ImageAnnotationDisplayOption.h"
@@ -37,6 +36,7 @@ namespace ML{
 
 class ImageAnnotationDisplayWidget;
 class LabelImages_Widget;
+class LabelImages_OverlayManager;
 
 
 class LabelImages_Descriptor : public PanelDescriptor{
@@ -72,7 +72,20 @@ public:
     void update_rendered_objects();
 
     // Use user currently drawn box to compute per-pixel masks on the image using SAM model
-    void compute_mask();
+    void add_new_annotation_from_user_box();
+    // update mask after user add or remove an inclusion or exclusion point on the currently selected annotation
+    // rendered objects are not updated
+    void update_mask_for_selected_annotation();
+    // User adds an inclusion point to the current selected annotation. It will then re-compute
+    // the per-pixel mask using the added inclusion point.
+    void add_segmentation_inclusion_point(double x, double y);
+    // Remove the closest user added segmentation inclusion point on the current selected annotation
+    void remove_segmentation_inclusion_point(double x, double y);
+    // User adds an exclusion point to the current selected annotation. It will then re-compute
+    // the per-pixel mask using the added exclusion point.
+    void add_segmentation_exclusion_point(double x, double y);
+    // Remove the closest user added segmentation exclusion point on the current selected annotation
+    void remove_segmentation_exclusion_point(double x, double y);
 
     // Compute embeddings for all images in a folder.
     // This can be very slow!
@@ -94,13 +107,34 @@ public:
 private:
     void on_config_value_changed(void* object) override;
 
+    std::pair<size_t, size_t> float_to_pixel(double x, double y) const;
+    // note! will have division by source_image_width/height!
+    std::pair<double, double> pixel_to_float(size_t x, size_t y) const;
+
+    void remove_closest_point(std::vector<std::pair<size_t, size_t>>& points, double x, double y);
+
+    // call SAM model to compute mask from the given user box and inclusiong and exclusion points.
+    // if SAM session failed or no SAM model loaded, return false
+    // if user box is empty or no mask is created, return false
+    // return true when the mask is created successfully and saved to `mask_box` and `mask`.
+    // no change to `mask_box` and `mask` if the function returns false.
+    bool run_sam_to_create_annotation(
+        const ImagePixelBox& user_box,
+        const std::vector<std::pair<size_t, size_t>>& inclusion_points,
+        const std::vector<std::pair<size_t, size_t>>& exclusion_points,
+        ImagePixelBox& mask_box,
+        std::vector<bool>& mask
+    );
+
     friend class LabelImages_Widget;
+    friend class LabelImages_OverlayManager;
 
     // image display options like what image file is loaded
     ImageAnnotationDisplayOption m_display_option;
     // handles image display session, holding a reference to m_display_option
     ImageAnnotationDisplaySession m_display_session;
-    VideoOverlaySet m_overlay_set;
+    // manages overlay rendering that shows annotations overlayed on the image
+    LabelImages_OverlayManager* m_overlay_manager = nullptr;
     // the group option that holds rest of the options defined below:
     BatchOption m_options;
 
@@ -127,9 +161,6 @@ private:
     std::vector<float> m_image_embedding;
     std::vector<bool> m_output_boolean_mask;
 
-    // buffer to compute SAM mask on
-    ImageRGB32 m_mask_image;
-
     std::unique_ptr<SAMSession> m_sam_session;
     std::vector<ObjectAnnotation> m_annotations;
     
@@ -142,6 +173,7 @@ private:
     // so this flag is used to denote if we fail to load an annotation file
     bool m_fail_to_load_annotation_file = false;
 
+    // the file path to load custom label set
     std::string m_custom_label_set_file_path;
 };
 

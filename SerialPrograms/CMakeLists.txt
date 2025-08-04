@@ -905,6 +905,8 @@ file(GLOB MAIN_SOURCES
     Source/ML/ML_Panels.h
     Source/ML/Programs/ML_LabelImages.cpp
     Source/ML/Programs/ML_LabelImages.h
+    Source/ML/Programs/ML_LabelImagesOverlayManager.cpp
+    Source/ML/Programs/ML_LabelImagesOverlayManager.h
     Source/ML/Programs/ML_LabelImagesWidget.cpp
     Source/ML/Programs/ML_LabelImagesWidget.h
     Source/ML/UI/ML_ImageAnnotationCommandRow.cpp
