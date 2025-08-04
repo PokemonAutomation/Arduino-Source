@@ -25,6 +25,13 @@ public:
     ) const override;
 };
 
+// start: 
+// end: 
+void checkpoint_50(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update
+);
 
 
 

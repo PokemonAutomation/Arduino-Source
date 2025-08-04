@@ -42,8 +42,8 @@ void checkpoint_48(
     EventNotificationOption& notif_status_update
 );
 
-// start: 
-// end: 
+// start: Beat Team Star (Fire)
+// end: At East Province (Area Two) Pokecenter.
 void checkpoint_49(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,

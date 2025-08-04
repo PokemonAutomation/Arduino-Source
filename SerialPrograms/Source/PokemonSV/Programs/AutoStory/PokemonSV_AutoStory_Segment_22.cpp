@@ -39,7 +39,7 @@ std::string AutoStory_Segment_22::start_text() const{
 }
 
 std::string AutoStory_Segment_22::end_text() const{
-    return "End: ";
+    return "End: Defeated Team Star (Fire). At East Province (Area One) Pokecenter.";
 }
 
 void AutoStory_Segment_22::run_segment(
@@ -56,6 +56,7 @@ void AutoStory_Segment_22::run_segment(
 
     checkpoint_47(env, context, options.notif_status_update);
     checkpoint_48(env, context, options.notif_status_update);
+    checkpoint_49(env, context, options.notif_status_update);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -288,7 +289,6 @@ void checkpoint_48(
 }
 
 
-// todo: uncomment checkpoint_save
 void checkpoint_49(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
@@ -299,7 +299,7 @@ void checkpoint_49(
     while (true){
     try{
         if (first_attempt){
-            // checkpoint_save(env, context, notif_status_update);
+            checkpoint_save(env, context, notif_status_update);
             first_attempt = false;
         }else{
             enter_menu_from_overworld(env.program_info(), env.console, context, -1);
@@ -310,6 +310,102 @@ void checkpoint_49(
         }
 
         context.wait_for_all_requests();
+        // marker 1
+        realign_player_from_landmark(
+            env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 255, 128, 30},
+            {ZoomChange::ZOOM_IN, 0, 90, 90}
+        );  
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 30, 10, false);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, 0, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );  
+
+        // marker 2
+        realign_player_from_landmark(
+            env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 128, 0, 30},
+            {ZoomChange::ZOOM_IN, 128, 255, 30}
+        );  
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 30, 10, false);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );   
+        
+        // marker 3
+        realign_player_from_landmark(
+            env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 255, 180, 50},
+            {ZoomChange::ZOOM_IN, 0, 70, 175}
+        );  
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 30, 10, false);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );      
+        
+        // marker 4
+        realign_player_from_landmark(
+            env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 255, 180, 50},
+            {ZoomChange::ZOOM_IN, 0, 50, 185}
+        );  
+        // walk until you run into the wall
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
+            128, 0, 10, 10, false);        
+  
+        
+        // marker 5. put marker on other side of bridge
+        realign_player_from_landmark(
+            env.program_info(), env.console, context, 
+            {ZoomChange::ZOOM_IN, 128, 128, 0},
+            {ZoomChange::ZOOM_IN, 128, 0, 10}
+        );  
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 30, 10, false);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, 0, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );         
+        
+
+        // marker 6. set marker past pokecenter
+        handle_unexpected_battles(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 255, 30);
+        });      
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
+            128, 15, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
+          
+
+        fly_to_overlapping_flypoint(env.program_info(), env.console, context);         
 
 
        
