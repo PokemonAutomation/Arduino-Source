@@ -118,6 +118,7 @@
 #include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
+#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
@@ -254,7 +255,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+
 #if 1
+    ImageRGB32 image(IMAGE_PATH);
+    SandwichPlateDetector middle_plate_detector(logger, COLOR_RED, LANGUAGE, SandwichPlateDetector::Side::MIDDLE);
+    cout << middle_plate_detector.detect_filling_name(image) << endl;
+#endif
+
+#if 0
     ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
     // detector.make_overlays(overlays);
     // cout << (int)detector.find_happiny_dust_row_index(console, context) << endl;

@@ -1213,12 +1213,12 @@ void run_sandwich_maker(
     context.wait_for_all_requests();
 
     //Find fillings and add them in order
-    for (const std::string& i : fillings_sorted){
-        //cout << "Placing " << i << endl;
-        stream.log("Placing " + i, COLOR_WHITE);
-        stream.overlay().add_log("Placing " + i, COLOR_WHITE);
+    for (const std::string& expected_filling : fillings_sorted){
+        //cout << "Placing " << expected_filling << endl;
+        stream.log("Placing " + expected_filling, COLOR_WHITE);
+        stream.overlay().add_log("Placing " + expected_filling, COLOR_WHITE);
 
-        int times_to_place = (int)(FillingsCoordinates::instance().get_filling_information(i).piecesPerServing) * (fillings.find(i)->second);
+        int times_to_place = (int)(FillingsCoordinates::instance().get_filling_information(expected_filling).piecesPerServing) * (fillings.find(expected_filling)->second);
         int placement_number = 0;
 
         //cout << "Times to place: " << times_to_place << endl;
@@ -1227,11 +1227,29 @@ void run_sandwich_maker(
 
         std::vector<int> plate_index;
         //Get the plates we want to go to
+        bool found_plate_index = false;
         for (int j = 0; j < (int)plate_order.size(); j++){
-            if (i == plate_order.at(j)){
+            if (expected_filling == plate_order.at(j)){
                 plate_index.push_back(j);
+                found_plate_index = true;
             }
         }
+        if (!found_plate_index){
+            // expected_filling not found within plate_order
+            stream.log("The expected filling not found within the plates.", COLOR_ORANGE);
+            if (plate_order.size() == 1){ // if there's only one plate, we assume it's the expected filling
+                stream.log("There's only one plate, so we assume it's the expected filling.");
+                plate_index.push_back(0);
+            }else{
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "run_sandwich_maker(): Did not detect the expected ingredients on the plate(s).",
+                    stream
+                );
+            }
+                 
+        }
+
 
         //Target the correct filling plate and place until it is empty
         for (int j = 0; j < (int)plate_index.size(); j++){
@@ -1284,8 +1302,8 @@ void run_sandwich_maker(
                 context.wait_for_all_requests();
 
                 //Get placement location
-                ImageFloatBox placement_target = FillingsCoordinates::instance().get_filling_information(i).placementCoordinates.at(
-                    (int)fillings.find(i)->second).at(placement_number);
+                ImageFloatBox placement_target = FillingsCoordinates::instance().get_filling_information(expected_filling).placementCoordinates.at(
+                    (int)fillings.find(expected_filling)->second).at(placement_number);
 
                 HandMoveData hand_move_data = move_sandwich_hand_and_check_if_plates_empty(
                     env,
