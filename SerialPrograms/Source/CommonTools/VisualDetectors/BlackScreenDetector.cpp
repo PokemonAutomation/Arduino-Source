@@ -80,6 +80,7 @@ bool BlackScreenOverWatcher::process_frame(const ImageViewRGB32& frame, WallCloc
     }
     if (!m_has_been_black){
         m_has_been_black = m_on.process_frame(frame, timestamp);
+//        cout << "m_has_been_black = " << m_has_been_black << endl;
         return false;
     }
 

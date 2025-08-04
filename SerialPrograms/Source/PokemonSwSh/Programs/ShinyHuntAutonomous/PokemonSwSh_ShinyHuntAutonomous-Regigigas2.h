@@ -49,9 +49,6 @@ private:
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
     EventNotificationsOption NOTIFICATIONS;
-
-    SectionDividerOption m_advanced_options;
-    MillisecondsOption CATCH_TO_OVERWORLD_DELAY0;
 };
 
 }

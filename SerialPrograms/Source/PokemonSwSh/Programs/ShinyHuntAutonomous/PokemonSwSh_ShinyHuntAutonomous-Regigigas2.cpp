@@ -12,6 +12,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -61,14 +62,6 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
-    , m_advanced_options(
-        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
-    )
-    , CATCH_TO_OVERWORLD_DELAY0(
-        "<b>Catch to Overworld Delay:</b>",
-        LockMode::LOCK_WHILE_RUNNING,
-        "8000 ms"
-    )
 {
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -77,9 +70,6 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
     PA_ADD_OPTION(REVERSAL_PP);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
-
-    PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY0);
 }
 
 
@@ -87,20 +77,31 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
 bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, ProControllerContext& context) const{
     pbf_mash_button(context, BUTTON_A, 4000ms);
 
-    RaidCatchDetector detector(stream.overlay());
-    int result = wait_until(
-        stream, context,
-        std::chrono::seconds(30),
-        {{detector}}
-    );
-    switch (result){
-    case 0:
-        ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
-        pbf_press_button(context, BUTTON_A, 80ms, CATCH_TO_OVERWORLD_DELAY0);
-        return true;
-    default:
-        stream.log("Raid Catch Menu not found.", COLOR_RED);
-        return false;
+    while (true){
+        RaidCatchDetector detector(stream.overlay());
+        YCommIconDetector overworld(true);
+        context.wait_for_all_requests();
+        int result = wait_until(
+            stream, context,
+            std::chrono::seconds(30),
+            {
+                detector,
+                overworld,
+            }
+        );
+        context.wait_for(std::chrono::milliseconds(250));
+        switch (result){
+        case 0:
+            ssf_press_dpad_ptv(context, DPAD_DOWN, 80ms);
+            pbf_mash_button(context, BUTTON_A, 250ms);
+            break;
+        case 1:
+            stream.log("Detected overworld.");
+            return true;
+        default:
+            stream.log("No state detected after 30 seconds.", COLOR_RED);
+            return false;
+        }
     }
 }
 void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -125,7 +126,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){
             env.log("Starting Regigigas Encounter: " + tostr_u_commas(stats.encounters() + 1));
 
-            pbf_mash_button(context, BUTTON_A, 18s);
+            pbf_mash_button(context, BUTTON_A, 5s);
             context.wait_for_all_requests();
 
             {
