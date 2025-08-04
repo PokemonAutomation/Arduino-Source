@@ -94,6 +94,180 @@ void checkpoint_50(
 }
 
 
+// todo: uncomment checkpoint_save
+void checkpoint_51(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update
+){
+    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            // checkpoint_save(env, context, notif_status_update);
+            first_attempt = false;
+        }else{
+            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
+            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
+            env.log("Wait 10 seconds.");
+            context.wait_for(Milliseconds(10 * 1000));
+            save_game_from_overworld(env.program_info(), env.console, context);
+        }
+
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException&){
+        context.wait_for_all_requests();
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }         
+    }
+
+}
+
+// todo: uncomment checkpoint_save
+void checkpoint_52(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update
+){
+    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            // checkpoint_save(env, context, notif_status_update);
+            first_attempt = false;
+        }else{
+            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
+            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
+            env.log("Wait 10 seconds.");
+            context.wait_for(Milliseconds(10 * 1000));
+            save_game_from_overworld(env.program_info(), env.console, context);
+        }
+
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException&){
+        context.wait_for_all_requests();
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }         
+    }
+
+}
+
+// todo: uncomment checkpoint_save
+void checkpoint_53(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update
+){
+    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            // checkpoint_save(env, context, notif_status_update);
+            first_attempt = false;
+        }else{
+            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
+            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
+            env.log("Wait 10 seconds.");
+            context.wait_for(Milliseconds(10 * 1000));
+            save_game_from_overworld(env.program_info(), env.console, context);
+        }
+
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException&){
+        context.wait_for_all_requests();
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }         
+    }
+
+}
+
+// todo: uncomment checkpoint_save
+void checkpoint_54(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update
+){
+    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            // checkpoint_save(env, context, notif_status_update);
+            first_attempt = false;
+        }else{
+            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
+            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
+            env.log("Wait 10 seconds.");
+            context.wait_for(Milliseconds(10 * 1000));
+            save_game_from_overworld(env.program_info(), env.console, context);
+        }
+
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException&){
+        context.wait_for_all_requests();
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }         
+    }
+
+}
+
+// todo: uncomment checkpoint_save
+void checkpoint_55(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update
+){
+    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    bool first_attempt = true;
+    while (true){
+    try{
+        if (first_attempt){
+            // checkpoint_save(env, context, notif_status_update);
+            first_attempt = false;
+        }else{
+            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
+            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
+            env.log("Wait 10 seconds.");
+            context.wait_for(Milliseconds(10 * 1000));
+            save_game_from_overworld(env.program_info(), env.console, context);
+        }
+
+        context.wait_for_all_requests();
+       
+        break;
+    }catch(OperationFailedException&){
+        context.wait_for_all_requests();
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }         
+    }
+
+}
 
 }
 }
