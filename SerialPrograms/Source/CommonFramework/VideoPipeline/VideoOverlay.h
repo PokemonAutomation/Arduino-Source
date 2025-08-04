@@ -84,8 +84,11 @@ public:
     };
     void add_listener(MouseListener& listener);
     void remove_listener(MouseListener& listener);
+    // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_press().
     void issue_mouse_press(double x, double y);
+    // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_release().
     void issue_mouse_release(double x, double y);
+    // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_move().
     void issue_mouse_move(double x, double y);
 
 private:
