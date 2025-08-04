@@ -993,8 +993,11 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
             int8_t happiny_dust_row_num = detector.find_happiny_dust_row_index(
                 env.console, context
             );
+
+            context.wait_for_all_requests();
+            VideoSnapshot snapshot = env.console.video().snapshot();
             num_happiny_dust = detector.detect_material_quantity(
-                env.console, context,
+                env.console, snapshot, context,
                 happiny_dust_row_num
             );
             pbf_mash_button(context, BUTTON_B, 100);

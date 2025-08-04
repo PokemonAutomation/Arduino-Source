@@ -58,14 +58,18 @@ public:
         int16_t material_value
     ) const;
 
+    // detect the quantity of material at the given row number
     int16_t detect_material_quantity(
         VideoStream& stream,
+        const ImageViewRGB32& screen,
         ProControllerContext& context,
         int8_t row_index
     ) const;
 
+    // detects the material name at the given row_index, given the screen
     std::string detect_material_name(
         VideoStream& stream,
+        const ImageViewRGB32& screen,
         ProControllerContext& context,
         int8_t row_index
     ) const;    

@@ -254,14 +254,28 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+#if 1
+    ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
+    // detector.make_overlays(overlays);
+    // cout << (int)detector.find_happiny_dust_row_index(console, context) << endl;
 
+    ImageRGB32 image(IMAGE_PATH);
+    // auto image = feed.snapshot();
+
+    for (int i = 0; i < 10; i++){
+        cout << detector.detect_material_name(console, image, context, (int8_t)i) << endl;
+        cout << detector.detect_material_quantity(console, image, context, (int8_t)i) << endl;
+    }
+#endif
+
+#if 0
     auto screenshot = feed.snapshot();
 
 
     DateReader reader(console);
     reader.make_overlays(overlays);
     reader.read_date(logger, screenshot);
-
+#endif
 
 #if 0
     BinarySliderDetector detector(COLOR_BLUE, {0.836431, 0.097521, 0.069703, 0.796694});
