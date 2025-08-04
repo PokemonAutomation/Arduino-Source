@@ -159,43 +159,51 @@ int16_t ItemPrinterMaterialDetector::read_number(
 int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
     VideoStream& stream, ProControllerContext& context
 ) const{
-    int8_t value_68_row_index;
+    int8_t happiny_dust_row_index = -1;
     for (size_t c = 0; c < 30; c++){
         context.wait_for_all_requests();
-        std::vector<int8_t> value_68_row_index_list = find_material_value_row_index(stream, context, 68);
-        for (size_t i = 0; i < value_68_row_index_list.size(); i++){
-            value_68_row_index = value_68_row_index_list[i];
-            if (detect_material_name(stream, context, value_68_row_index) == "happiny-dust"){
-                // found screen and row number with Happiny dust.
-                // std::cout << "Happiny dust found. Row number: " << std::to_string(value_68_row_index) << std::endl;
-                return value_68_row_index;
-            }
-        }
+        VideoSnapshot snapshot = stream.video().snapshot();
+        int8_t total_rows = 10;
         
+        SpinLock lock;
+        GlobalThreadPools::normal_inference().run_in_parallel(
+            [&](size_t index){
+                std::string material_name = detect_material_name(stream, snapshot, context, (int8_t)index);
+                if ("happiny-dust" == material_name){
+                    WriteSpinLock lg(lock);
+                    happiny_dust_row_index = (int8_t)index;
+                }
+            },
+            0, total_rows, 1
+        );
+
+        if (happiny_dust_row_index != -1){
+            // found screen and row number with Happiny dust.
+            // std::cout << "Happiny dust found. Row number: " << std::to_string(value_68_row_index) << std::endl;
+            return happiny_dust_row_index;
+        }
+
         // keep searching for Happiny dust
         pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
     }
 
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
-        "Failed to find Happiny dust after 10 tries.",
+        "Failed to find Happiny dust after multiple attempts.",
         stream
     );
 
 }
 
-// detects the material name at the given row_index
-// MaterialNameReader has a very limited dictionary,
-// so it can only reliably read the material names with 68% value
-// (i.e. Ditto Goo, Happiny Dust, Magby Hair, Beldum Claw)
 std::string ItemPrinterMaterialDetector::detect_material_name(
     VideoStream& stream,
+    const ImageViewRGB32& screen,
     ProControllerContext& context,
     int8_t row_index
 ) const{
-    VideoSnapshot snapshot = stream.video().snapshot();
+    
     ImageFloatBox material_name_box = m_box_mat_name[row_index];
-    ImageViewRGB32 material_name_image = extract_box_reference(snapshot, material_name_box);
+    ImageViewRGB32 material_name_image = extract_box_reference(screen, material_name_box);
     const auto ocr_result = MaterialNameReader::instance().read_substring(
         stream.logger(), m_language,
         material_name_image, OCR::BLACK_OR_WHITE_TEXT_FILTERS()
@@ -250,7 +258,6 @@ std::vector<int8_t> ItemPrinterMaterialDetector::find_material_value_row_index(
 
 }
 
-// detect the quantity of material at the given row number
 int16_t ItemPrinterMaterialDetector::detect_material_quantity(
     VideoStream& stream,
     ProControllerContext& context,
