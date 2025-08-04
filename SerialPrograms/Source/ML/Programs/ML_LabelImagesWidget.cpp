@@ -5,6 +5,8 @@
  *  Derived class of PanelWidget as the UI for program LabelImages.
  */
 
+#include <QDesktopServices>
+#include <QUrl>
 #include <QFileDialog>
 #include <QLabel>
 #include <QMessageBox>
@@ -93,6 +95,12 @@ LabelImages_Widget::LabelImages_Widget(
     QPushButton* next_anno_button = new QPushButton("Next Annotation", scroll_inner);
     button_row->addWidget(next_anno_button, 1);
 
+    QPushButton* save_anno_button = new QPushButton("Save Annotation", scroll_inner);
+    button_row->addWidget(save_anno_button, 1);
+
+    QPushButton* open_anno_folder_button = new QPushButton("Open Saved Annotation Folder", scroll_inner);
+    button_row->addWidget(open_anno_folder_button, 1);
+
     // add a row for user annotation
     // the user can annotate in two modes:
     // - set a pokemon form label
@@ -125,17 +133,24 @@ LabelImages_Widget::LabelImages_Widget(
     // connect button signals to define button actions
 
     connect(delete_anno_button, &QPushButton::clicked, this, [this](bool){
-        auto& program = this->m_program;
-        program.delete_selected_annotation();
+        this->m_program.delete_selected_annotation();
     });
 
     connect(pre_anno_button, &QPushButton::clicked, this, [this](bool){
-        auto& program = this->m_program;
-        program.select_prev_annotation();
+        this->m_program.select_prev_annotation();
     });
     connect(next_anno_button, &QPushButton::clicked, this, [this](bool){
-        auto& program = this->m_program;
-        program.select_next_annotation();
+        this->m_program.select_next_annotation();
+    });
+    connect(open_anno_folder_button, &QPushButton::clicked, this, [this](bool){
+        this->m_program.save_annotation_to_file();
+
+        // ensure the folder exists
+        std::filesystem::create_directory(ML_ANNOTATION_PATH());
+        QDesktopServices::openUrl(QUrl(QString::fromStdString("file:///" + ML_ANNOTATION_PATH())));
+    });
+    connect(save_anno_button, &QPushButton::clicked, this, [this](bool){
+        this->m_program.save_annotation_to_file();
     });
 
     connect(load_custom_set_button, &QPushButton::clicked, this, [this](bool){
