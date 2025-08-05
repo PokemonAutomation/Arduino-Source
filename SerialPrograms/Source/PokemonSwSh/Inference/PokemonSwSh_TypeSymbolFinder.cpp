@@ -81,8 +81,14 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
 //        }
 
         double expected_aspect_ratio = item.second.aspect_ratio();
-//        cout << item.second.slug() << " : " << expected_aspect_ratio << endl;
-        if (std::abs(aspect_ratio - expected_aspect_ratio) > 0.05){
+        double ratio = aspect_ratio / expected_aspect_ratio;
+#if 0
+        cout << item.second.slug()
+             << " : expected = " << expected_aspect_ratio
+             << ", actual = " << aspect_ratio
+             << ", ratio = " << ratio << endl;
+#endif
+        if (std::abs(ratio - 1) > 0.2){
             continue;
         }
 

@@ -13,6 +13,10 @@
 //#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PathMap.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -33,6 +37,14 @@ bool read_type_array(
     }
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_type_symbols(screen, image, 0.20);
+//    cout << candidates.size() << endl;
+
+#if 0
+    for (auto& item : candidates){
+        cout << item.first << " : " << POKEMON_TYPE_SLUGS().get_string(item.second.first) << endl;
+    }
+#endif
+
     if (candidates.size() < count){
 //        dump_image(console, screen, "ReadPath");
         return false;

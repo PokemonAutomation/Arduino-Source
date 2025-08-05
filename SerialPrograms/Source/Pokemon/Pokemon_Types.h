@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_Types_H
 #define PokemonAutomation_Pokemon_Types_H
 
-#include <string>
+//#include <string>
 #include "Common/Cpp/EnumStringMap.h"
 
 namespace PokemonAutomation{
