@@ -170,11 +170,7 @@ void run_autohost(
             code = raid_code->get_code();
         }
         if (!code.empty()){
-            char str[8];
-            for (size_t c = 0; c < 8; c++){
-                str[c] = code[c] + '0';
-            }
-            env.log("Next Raid Code: " + std::string(str, sizeof(str)));
+            env.log("Next Raid Code: " + code);
             pbf_press_button(context, BUTTON_PLUS, 5, 145);
             FastCodeEntry::numberpad_enter_code(console, context, code, true);
             pbf_wait(context, 180);

@@ -264,7 +264,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     reader.read_opponent_in_summary(logger, screenshot);
 #endif
 
-#if 1
+#if 0
     auto screenshot = feed.snapshot();
 
     std::deque<OverlayBoxScope> hits;
@@ -342,7 +342,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
+#if 1
     auto screenshot = feed.snapshot();
 
     PokemonHome::BallReader reader(console);
