@@ -614,6 +614,7 @@ void change_settings_prior_to_autostory(
 
     // get index of `Options` in the Main Menu, which depends on where you are in Autostory
     int8_t options_index;  
+    std::string assumption_text = "";
     switch(current_segment_num){
         case 0:
             return; // can't change settings in the intro cutscene
@@ -623,6 +624,7 @@ void change_settings_prior_to_autostory(
             // - Options
             // - Save        
             options_index = 0;
+            assumption_text = "We assume 'Bag' is not yet unlocked.";
             break;
         case 2:
             // Menu
@@ -630,6 +632,7 @@ void change_settings_prior_to_autostory(
             // - Options
             // - Save
             options_index = 1;
+            assumption_text = "We assume 'Boxes' is not yet unlocked.";
             break;
         case 3:
         case 4:
@@ -641,6 +644,7 @@ void change_settings_prior_to_autostory(
             // - Options
             // - Save        
             options_index = 2;
+            assumption_text = "We assume 'Poke Portal' is not yet unlocked.";
             break;
         case 7:
         case 8:
@@ -652,6 +656,7 @@ void change_settings_prior_to_autostory(
             // - Options
             // - Save  
             options_index = 3;
+            assumption_text = "We assume 'Picnic' is not yet unlocked.";
             break;                    
         default:
             // Menu
@@ -661,10 +666,13 @@ void change_settings_prior_to_autostory(
             // - Poke Portal
             // - Options
             // - Save          
-            options_index = 4;        
+            options_index = 4;
+            assumption_text = "We assume that the tutorial is done, and all menu items are unlocked.";
             break;
     }
     
+    env.console.log("change_settings_prior_to_autostory: " + assumption_text + " The index of \"Options\" in the Menu is " + std::to_string(options_index) + ".");
+        
     bool has_minimap = current_segment_num >= 2;  // the minimap only shows up in segment 2 and beyond
 
     enter_menu_from_overworld(env.program_info(), env.console, context, options_index, MenuSide::RIGHT, has_minimap);
