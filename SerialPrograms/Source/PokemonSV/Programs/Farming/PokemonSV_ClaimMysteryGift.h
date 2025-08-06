@@ -37,6 +37,8 @@ public:
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
+    void run_autostory_until_pokeportal_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 private:
     virtual void on_config_value_changed(void* object) override;
 
@@ -58,6 +60,8 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };
+
+void claim_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index);
 
 
 

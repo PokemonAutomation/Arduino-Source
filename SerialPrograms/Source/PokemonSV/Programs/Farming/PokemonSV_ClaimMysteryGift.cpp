@@ -17,6 +17,8 @@
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_ClaimMysteryGift.h"
 
 #include <iostream>
@@ -97,9 +99,29 @@ void ClaimMysteryGift::on_config_value_changed(void* object){
 }
 
 
+void claim_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index){
 
+    enter_menu_from_overworld(env.program_info(), env.console, context, menu_index);
+    pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+    pbf_press_dpad(context, DPAD_UP, 20, 105);
+    pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+    pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+    pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
+    clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);  
+}
 
+void ClaimMysteryGift::run_autostory_until_pokeportal_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    AutoStoryOptions options{
+        LANGUAGE,
+        StarterChoice::FUECOCO,
+        NOTIFICATION_STATUS_UPDATE
+    };    
 
+    for (size_t segment_index = 0; segment_index <= 7; segment_index++){
+        ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options);
+    }
+}
 
 
 void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -112,7 +134,14 @@ void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     // env.console.log("Start Segment " + ALL_AUTO_STORY_SEGMENT_LIST()[get_start_segment_index()]->name(), COLOR_ORANGE);
 
+    if (STARTING_POINT == StartingPoint::DONE_TUTORIAL){
+        claim_mystery_gift(env, context, 3);
+    }else{
 
+        run_autostory_until_pokeportal_unlocked(env, context);
+
+        claim_mystery_gift(env, context, 2);
+    }
 
     // run_autostory(env, context);
     
