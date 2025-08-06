@@ -164,8 +164,18 @@ std::unique_ptr<StatsTracker> AutoStory_Descriptor::make_stats() const{
 
 
 AutoStory::~AutoStory(){
+    STORY_SECTION.remove_listener(*this);
     STARTPOINT_TUTORIAL.remove_listener(*this);
     ENDPOINT_TUTORIAL.remove_listener(*this);
+    STARTPOINT_MAINSTORY.remove_listener(*this);
+    ENDPOINT_MAINSTORY.remove_listener(*this);    
+    ENABLE_TEST_CHECKPOINTS.remove_listener(*this);
+    ENABLE_TEST_REALIGN.remove_listener(*this);
+    ENABLE_MISC_TEST.remove_listener(*this);
+    TEST_PBF_LEFT_JOYSTICK.remove_listener(*this);
+    TEST_PBF_LEFT_JOYSTICK2.remove_listener(*this);
+    TEST_CURRENT_DIRECTION.remove_listener(*this);
+    TEST_CHANGE_DIRECTION.remove_listener(*this);    
 }
 
 AutoStory::AutoStory()

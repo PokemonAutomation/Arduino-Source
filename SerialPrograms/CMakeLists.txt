@@ -1824,6 +1824,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryCatchPhoto.h
     Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h
+    Source/PokemonSV/Programs/Farming/PokemonSV_ClaimMysteryGift.cpp
+    Source/PokemonSV/Programs/Farming/PokemonSV_ClaimMysteryGift.h    
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h
     Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.cpp
