@@ -799,6 +799,8 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
+    env.console.log("Start Segment " + ALL_AUTO_STORY_SEGMENT_LIST()[get_start_segment_index()]->name(), COLOR_ORANGE);
+
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
         change_settings_prior_to_autostory(env, context, get_start_segment_index(), LANGUAGE);
