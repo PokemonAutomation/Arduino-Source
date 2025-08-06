@@ -34,7 +34,7 @@ LabelImages_Descriptor::LabelImages_Descriptor()
         Color(),
         "ML:LabelImages",
         "ML", "Label Images",
-        "", // "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/LabelImages.md",
+        "ComputerControl/blob/master/Wiki/Programs/ML/LabelImages.md",
         "Label " + Pokemon::STRING_POKEMON + " on images" 
     )
 {}
