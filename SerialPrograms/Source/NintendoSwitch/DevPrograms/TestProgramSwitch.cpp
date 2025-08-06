@@ -118,7 +118,6 @@
 #include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_NumberCodeEntry.h"
 #include "PokemonSV/Inference/ItemPrinter/PokemonSV_ItemPrinterMenuDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_SandwichHandDetector.h"
-#include "PokemonSV/Inference/Picnics/PokemonSV_SandwichPlateDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
@@ -138,6 +137,7 @@
 #include "PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathMap.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -256,10 +256,29 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+#if 0
+    auto screenshot = feed.snapshot();
+
+    OcrFailureWatchdog watchdog(logger);
+    MaxLairInternal::BattleMenuReader reader(overlay, Language::ChineseTraditional, watchdog);
+    reader.read_opponent_in_summary(logger, screenshot);
+#endif
+
 #if 1
-    ImageRGB32 image(IMAGE_PATH);
-    SandwichPlateDetector middle_plate_detector(logger, COLOR_RED, LANGUAGE, SandwichPlateDetector::Side::MIDDLE);
-    cout << middle_plate_detector.detect_filling_name(image) << endl;
+    auto screenshot = feed.snapshot();
+
+    std::deque<OverlayBoxScope> hits;
+    Pokemon::PokemonType type[4];
+
+    bool ret = MaxLairInternal::read_type_array(
+        console,
+        screenshot,
+        ImageFloatBox{0.150, 0.020, 0.800, 0.780},
+        hits,
+        4, type, nullptr
+    );
+
+    cout << "ret = " << ret << endl;
 #endif
 
 #if 0
@@ -652,13 +671,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ItemPrinterMaterialDetector detector(COLOR_RED, Language::English);
 
     std::vector<ImageFloatBox> boxes = {
-        // {0.485,0.176758,0.037,0.05}, {0.485,0.250977,0.037,0.05}, {0.485,0.325196,0.037,0.05}, {0.485,0.399415,0.037,0.05}, {0.485,0.473634,0.037,0.05}, {0.485,0.547853,0.037,0.05}, {0.485,0.622072,0.037,0.05}, {0.485,0.696291,0.037,0.05}, {0.485,0.77051,0.037,0.05}, {0.485,0.844729,0.037,0.05}, 
-        {0.39,0.176758,0.025,0.05}, {0.39,0.250977,0.025,0.05}, {0.39,0.325196,0.025,0.05}, {0.39,0.399415,0.025,0.05}, {0.39,0.473634,0.025,0.05}, {0.39,0.547853,0.025,0.05}, {0.39,0.622072,0.025,0.05}, {0.39,0.696291,0.025,0.05}, {0.39,0.77051,0.025,0.05}, {0.39,0.844729,0.025,0.05}, 
+        // {0.485,0.176758,0.037,0.05}, {0.485,0.250977,0.037,0.05}, {0.485,0.325196,0.037,0.05}, {0.485,0.399415,0.037,0.05}, {0.485,0.473634,0.037,0.05}, {0.485,0.547853,0.037,0.05}, {0.485,0.622072,0.037,0.05}, {0.485,0.696291,0.037,0.05}, {0.485,0.77051,0.037,0.05}, {0.485,0.844729,0.037,0.05},
+        {0.39,0.176758,0.025,0.05}, {0.39,0.250977,0.025,0.05}, {0.39,0.325196,0.025,0.05}, {0.39,0.399415,0.025,0.05}, {0.39,0.473634,0.025,0.05}, {0.39,0.547853,0.025,0.05}, {0.39,0.622072,0.025,0.05}, {0.39,0.696291,0.025,0.05}, {0.39,0.77051,0.025,0.05}, {0.39,0.844729,0.025,0.05},
     };
     for (ImageFloatBox box : boxes){
         detector.read_number(console.logger(), env.inference_dispatcher(), image, box);
     }
-    
+
 #endif
 #endif
 
@@ -919,7 +938,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     VideoSnapshot image = feed.snapshot();
     DirectionDetector detector;
-    
+
     // ImageRGB32 image("MaterialFarmer-1.png");
     // ImageRGB32 image("dark-capture-card_1.png");
     // DirectionDetector detector(COLOR_BLUE, ImageFloatBox(0,0,1,1));
@@ -937,7 +956,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     // cout << (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2) << endl;
 
     // test OCR for number 1 -> 999. for black text on light background.
-    // increasing quantity of materials to sell. 
+    // increasing quantity of materials to sell.
     for (int i = 1; i < 1000; i++){
        context.wait_for_all_requests();
         if (i != (int)detector.detect_material_quantity(env.inference_dispatcher(), console, context, 2)){

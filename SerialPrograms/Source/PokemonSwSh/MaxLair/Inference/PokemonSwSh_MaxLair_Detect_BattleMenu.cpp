@@ -333,12 +333,14 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
         }
     }
 
-//    for (const auto& slug : allowed_slugs){
-//        cout << "allowed_slugs = " << slug << endl;
-//    }
-//    for (const auto& slug : name_slugs){
-//        cout << "name_slugs = " << slug << endl;
-//    }
+#if 0
+    for (const auto& slug : allowed_slugs){
+        cout << "allowed_slugs = " << slug << endl;
+    }
+    for (const auto& slug : name_slugs){
+        cout << "name_slugs = " << slug << endl;
+    }
+#endif
 
     if (common_slugs.size() == 1){
         logger.log("Disambiguation succeeded: " + *common_slugs.begin(), COLOR_BLUE);

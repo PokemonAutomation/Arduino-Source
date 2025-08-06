@@ -55,7 +55,12 @@ bool read_type_array(
     hits.clear();
     size_t c = 0;
     for (const auto& item : candidates){
-        hits.emplace_back(stream.overlay(), translate_to_parent(screen, box, item.second.second), COLOR_GREEN);
+        hits.emplace_back(
+            stream.overlay(),
+            COLOR_GREEN,
+            translate_to_parent(screen, box, item.second.second),
+            POKEMON_TYPE_SLUGS().get_string(item.second.first)
+        );
         sorted.emplace(item.second.second.min_x, &item.second);
         c++;
         if (c >= count){

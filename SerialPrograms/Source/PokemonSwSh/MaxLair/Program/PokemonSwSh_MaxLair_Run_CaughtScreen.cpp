@@ -223,6 +223,7 @@ StateMachineAction run_caught_screen(
             synchronize_caught_screen(console_index, console, context, state_tracker);
             pbf_press_dpad(context, DPAD_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 10, 115);
             return mash_A_to_entrance(runtime, console, context, entrance);
         }else{
             console.log("Taking non-shiny boss and returning to entrance...", COLOR_BLUE);

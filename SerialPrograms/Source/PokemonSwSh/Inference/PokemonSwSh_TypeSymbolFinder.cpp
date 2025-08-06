@@ -49,6 +49,7 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
     return dist_x*dist_x + dist_y*dist_y;
 }
 
+//bool print = false;
 
 std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
     size_t width = image.width();
@@ -64,6 +65,9 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
     }
     ImageStats stats = image_stats(image);
     if (stats.stddev.sum() < 50){
+//        if (print){
+//            cout << "stats.stddev.sum() = " << stats.stddev.sum() << endl;
+//        }
         return {1.0, PokemonType::NONE};
     }
 
@@ -73,7 +77,7 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
 //    image.save("test-" + std::to_string(threshold) + "-" + std::to_string(c++) + ".png");
 
 //    std::map<double, PokemonType> rank;
-    double best_score = 0.4;
+    double best_score = 0.45;
     PokemonType best_type = PokemonType::NONE;
     for (const auto& item : all_type_sprites()){
 //        if (threshold != 700 || id != 55){
@@ -83,10 +87,12 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
         double expected_aspect_ratio = item.second.aspect_ratio();
         double ratio = aspect_ratio / expected_aspect_ratio;
 #if 0
-        cout << item.second.slug()
-             << " : expected = " << expected_aspect_ratio
-             << ", actual = " << aspect_ratio
-             << ", ratio = " << ratio << endl;
+        if (print){
+            cout << item.second.slug()
+                 << " : expected = " << expected_aspect_ratio
+                 << ", actual = " << aspect_ratio
+                 << ", ratio = " << ratio << endl;
+        }
 #endif
         if (std::abs(ratio - 1) > 0.2){
             continue;
@@ -95,7 +101,9 @@ std::pair<double, PokemonType> match_type_symbol(const ImageViewRGB32& image){
         double rmsd_alpha = item.second.matcher().diff(image);
 
 //        item.second.matcher().m_image.save("sprite.png");
-//        cout << item.second.slug() << ": " << rmsd_alpha << endl;
+//        if (print){
+//            cout << item.second.slug() << ": " << rmsd_alpha << endl;
+//        }
 
 #if 0
         //  Handicap fairy due to white and pink being too similar in color and
@@ -135,7 +143,7 @@ void find_type_symbol_candidates(
         (size_t)(20. * original_screen.total_pixels() / (1920*1080))
     );
 
-//    static int index = 0;
+    static int index = 0;
 
     std::map<size_t, WaterfillObject> objmap;
     for (size_t c = 0; c < objects.size(); c++){
@@ -144,9 +152,9 @@ void find_type_symbol_candidates(
         }
         objmap[c] = objects[c];
 
-//        image.copy(
-//            objects[c].min_x, objects[c].min_y, objects[c].width(), objects[c].height()
-//        ).save("test-" + std::to_string(index++) + ".png");
+#if 0
+        extract_box_reference(image, ImagePixelBox(objects[c])).save("test-" + std::to_string(index++) + ".png");
+#endif
     }
 
 //    cout << "begin = " << objmap.size() << endl;
@@ -183,7 +191,12 @@ void find_type_symbol_candidates(
     //  Identify objects.
     for (const auto& item : objmap){
         ImageViewRGB32 img = extract_box_reference(image, item.second);
+
+//        print = index == 137;
+//        img.save("test-" + std::to_string(index++) + ".png");
+
         std::pair<double, PokemonType> result = match_type_symbol(img);
+//        cout << "result = " << POKEMON_TYPE_SLUGS().get_string(result.second) << ": " << result.first << endl;
         if (result.second != PokemonType::NONE){
             const WaterfillObject& obj = item.second;
             candidates.emplace(
@@ -211,6 +224,11 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
         std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(
             image,
             {
+                {0xff808060, 0xffffffff},
+                {0xffa0a060, 0xffffffff},
+                {0xff606060, 0xffffffff},
+                {0xff707070, 0xffffffff},
+                {0xff808080, 0xffffffff},
                 {0xff909090, 0xffffffff},
                 {0xffa0a0a0, 0xffffffff},
                 {0xffb0b0b0, 0xffffffff},
@@ -224,9 +242,11 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
         }
     }
 
+//    cout << "-------------" << endl;
+
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> filtered;
     for (const auto& candidate : candidates){
-//        cout << get_type_slug(candidate.second.first) << ": " << candidate.first << endl;
+//        cout << POKEMON_TYPE_SLUGS().get_string(candidate.second.first) << ": " << candidate.first << endl;
 //        hits.emplace_back(overlay, translate_to_parent(screen, box, candidate.second.second.box), COLOR_GREEN);
 
         bool is_dupe = false;
@@ -242,6 +262,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
     }
 
 #if 0
+    static int c = 0;
     for (const auto& item : filtered){
 //        cout << get_type_slug(item.second.first) << ": " << item.first << " - [" << item.second.second.center_x() << "," << item.second.second.center_y() << "]" << endl;
         const ImagePixelBox& box = item.second.second;
@@ -249,7 +270,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_type_symbols(
             box.min_x, box.min_y,
             box.width(), box.height()
         );
-//        img.save("test-" + std::to_string(c++) + ".png");
+        img.save("test-" + std::to_string(c++) + ".png");
     }
 #endif
 
