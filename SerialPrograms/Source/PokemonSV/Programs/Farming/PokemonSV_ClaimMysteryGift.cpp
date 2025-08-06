@@ -71,7 +71,19 @@ ClaimMysteryGift::ClaimMysteryGift()
         },
         LockMode::LOCK_WHILE_RUNNING,
         StartingPoint::NEW_GAME
-    )    
+    )
+    , MYSTERY_GIFT_NOTE{
+        "Ensure you are logged into a Nintendo account.<br>"
+        "You can ignore the options for multiple switches below. This only works for 1 Switch.<br>"
+        "Refer to the documentation on github for more details."
+    }
+    , CODE(
+        "<b>Link Code:</b><br>Mystery Gift code. (not case sensitive)<br>"
+        "(Box is big so it's easy to land your mouse on.)",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "0123", "0123",
+        true
+    )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(30))
     , NOTIFICATIONS({
@@ -84,6 +96,9 @@ ClaimMysteryGift::ClaimMysteryGift()
 
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STARTING_POINT);
+    PA_ADD_OPTION(MYSTERY_GIFT_NOTE);
+    PA_ADD_OPTION(CODE);
+    PA_ADD_OPTION(SETTINGS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 
@@ -98,8 +113,24 @@ void ClaimMysteryGift::on_config_value_changed(void* object){
 
 }
 
+void ClaimMysteryGift::enter_mystery_gift_code(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    std::string normalized_code;
+    bool force_keyboard_mode = true;
+    bool connect_controller_press = true;
+    normalize_code(normalized_code, CODE, force_keyboard_mode);
 
-void claim_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index){
+    const FastCodeEntrySettings& settings = SETTINGS;
+    enter_code(
+        env.console, context,
+        settings.keyboard_layout[env.console.index()],
+        normalized_code, force_keyboard_mode,
+        !settings.skip_plus,
+        connect_controller_press
+    );    
+
+}
+
+void ClaimMysteryGift::claim_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index){
 
     enter_menu_from_overworld(env.program_info(), env.console, context, menu_index);
     pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
@@ -109,6 +140,7 @@ void claim_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContex
     pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
     clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);  
+    enter_mystery_gift_code(env, context);
 }
 
 void ClaimMysteryGift::run_autostory_until_pokeportal_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context){

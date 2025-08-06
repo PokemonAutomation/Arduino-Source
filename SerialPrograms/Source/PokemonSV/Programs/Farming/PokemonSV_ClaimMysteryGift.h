@@ -15,6 +15,8 @@
 #include "CommonTools/Options/StringSelectOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "Common/Cpp/Options/TextEditOption.h"
+#include "PokemonSV/Programs/FastCodeEntry/PokemonSV_CodeEntry.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,6 +40,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     void run_autostory_until_pokeportal_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void claim_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index);
+    void enter_mystery_gift_code(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     virtual void on_config_value_changed(void* object) override;
@@ -54,6 +58,9 @@ private:
     };
 
     EnumDropdownOption<StartingPoint> STARTING_POINT;
+    StaticTextOption MYSTERY_GIFT_NOTE;
+    TextEditOption CODE;
+    FastCodeEntrySettingsOption SETTINGS;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
@@ -61,7 +68,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 };
 
-void claim_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index);
+
 
 
 
