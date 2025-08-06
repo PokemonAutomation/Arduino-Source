@@ -143,7 +143,7 @@ void find_type_symbol_candidates(
         (size_t)(20. * original_screen.total_pixels() / (1920*1080))
     );
 
-    static int index = 0;
+//    static int index = 0;
 
     std::map<size_t, WaterfillObject> objmap;
     for (size_t c = 0; c < objects.size(); c++){
