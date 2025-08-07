@@ -40,7 +40,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     void run_autostory_until_pokeportal_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    void enter_mystery_gift_window(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index);
+    void enter_mystery_gift_code_window(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index);
     void enter_mystery_gift_code(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
@@ -54,12 +54,20 @@ private:
     
     enum class StartingPoint{
         NEW_GAME,
-        IN_MYSTERY_GIFT,
+        IN_MYSTERY_GIFT_CODE_WINDOW,
         DONE_TUTORIAL,
     };
 
+        enum class ObtainingMethod{
+        VIA_INTERNET_ALL,
+        VIA_INTERNET_ONE,
+        VIA_CODE,
+    };
+
     EnumDropdownOption<StartingPoint> STARTING_POINT;
+    EnumDropdownOption<ObtainingMethod> OBTAINING_METHOD;
     StaticTextOption MYSTERY_GIFT_NOTE;
+    StaticTextOption MULTISWITCH_NOTE;
     TextEditOption CODE;
     FastCodeEntrySettingsOption SETTINGS;
 

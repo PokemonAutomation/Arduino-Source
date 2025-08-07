@@ -58,6 +58,7 @@ ClaimMysteryGift_Descriptor::ClaimMysteryGift_Descriptor()
 
 
 ClaimMysteryGift::~ClaimMysteryGift(){
+    OBTAINING_METHOD.remove_listener(*this);
     STARTING_POINT.remove_listener(*this);
 }
 
@@ -72,17 +73,28 @@ ClaimMysteryGift::ClaimMysteryGift()
         "<b>Starting point:",
         {
             {StartingPoint::NEW_GAME,                "new-game",           "New Game: Start after you have selected your username and character appearance"},
-            {StartingPoint::IN_MYSTERY_GIFT,         "in-mystery-gift",    "Start in Mystery Gift window, with cursor on the “1” key."},
+            {StartingPoint::IN_MYSTERY_GIFT_CODE_WINDOW,         "in-mystery-gift-code-window",    "Start in Mystery Gift code window, with cursor on the “1” key."},
             {StartingPoint::DONE_TUTORIAL,           "done-tutorial",      "Start in game. But with all menus closed. Tutorial must be completed. You need to be outside, where you can use Pokeportal."},
         },
         LockMode::LOCK_WHILE_RUNNING,
         StartingPoint::NEW_GAME
     )
+    , OBTAINING_METHOD(
+        "<b>Method for obtaining mystery gift:",
+        {
+            {ObtainingMethod::VIA_INTERNET_ALL, "via-internet-all",  "Via Internet: Get all mystery gifts from the \"Via internet\" screen."},
+            {ObtainingMethod::VIA_INTERNET_ONE, "via-internet-one",  "Via Internet: Get only the top mystery gift from the \"Via internet\" screen."},
+            {ObtainingMethod::VIA_CODE,         "via-code",      "Via Code: Get the mystery gift based on the code entered below."},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        ObtainingMethod::VIA_INTERNET_ALL
+    )    
     , MYSTERY_GIFT_NOTE{
-        "Ensure you are logged into a Nintendo account. This account does NOT need to have a subscription to Nintendo Switch Online.<br>"
-        "In the keyboard section below, you only need to adjust the option for Swtich 0. Ignore the options for the other Switches.<br>"
-        "Refer to the documentation on github for more details."
+        "Ensure you are logged into a Nintendo account. This account does NOT need to have a subscription to Nintendo Switch Online."
     }
+    , MULTISWITCH_NOTE{
+        "In the keyboard section below, you only need to adjust the option for Swtich 0. Ignore the options for the other Switches."
+    }    
     , CODE(
         "<b>Mystery Gift Code:</b><br>Mystery Gift code. (not case sensitive)<br>"
         "(Box is big so it's easy to land your mouse on.)",
@@ -101,8 +113,10 @@ ClaimMysteryGift::ClaimMysteryGift()
 {
 
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(STARTING_POINT);
     PA_ADD_OPTION(MYSTERY_GIFT_NOTE);
+    PA_ADD_OPTION(STARTING_POINT);
+    PA_ADD_OPTION(OBTAINING_METHOD);
+    PA_ADD_OPTION(MULTISWITCH_NOTE);
     PA_ADD_OPTION(CODE);
     PA_ADD_OPTION(SETTINGS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -111,11 +125,27 @@ ClaimMysteryGift::ClaimMysteryGift()
 
     ClaimMysteryGift::on_config_value_changed(this);
 
+    OBTAINING_METHOD.add_listener(*this);
     STARTING_POINT.add_listener(*this);
 }
 
 void ClaimMysteryGift::on_config_value_changed(void* object){
+    if (STARTING_POINT == StartingPoint::IN_MYSTERY_GIFT_CODE_WINDOW){
+        OBTAINING_METHOD.set_visibility(ConfigOptionState::HIDDEN);
+    }else{
+        OBTAINING_METHOD.set_visibility(ConfigOptionState::ENABLED);
+    }
 
+
+    if (OBTAINING_METHOD == ObtainingMethod::VIA_CODE){
+        MULTISWITCH_NOTE.set_visibility(ConfigOptionState::ENABLED);
+        CODE.set_visibility(ConfigOptionState::ENABLED);
+        SETTINGS.set_visibility(ConfigOptionState::ENABLED);
+    }else{
+        MULTISWITCH_NOTE.set_visibility(ConfigOptionState::HIDDEN);
+        CODE.set_visibility(ConfigOptionState::HIDDEN);
+        SETTINGS.set_visibility(ConfigOptionState::HIDDEN);
+    }
 
 }
 
@@ -138,7 +168,7 @@ void ClaimMysteryGift::enter_mystery_gift_code(SingleSwitchProgramEnvironment& e
 
 }
 
-void ClaimMysteryGift::enter_mystery_gift_window(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index){
+void ClaimMysteryGift::enter_mystery_gift_code_window(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index){
     env.console.log("Save game, then try to enter the mystery gift window.", COLOR_YELLOW);
     save_game_from_menu_or_overworld(env.program_info(), env.console, context, false);
 
@@ -154,7 +184,7 @@ void ClaimMysteryGift::enter_mystery_gift_window(SingleSwitchProgramEnvironment&
         try {
             clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
         }catch(OperationFailedException&){
-            env.console.log("enter_mystery_gift_window: Failed to detect the dialog that leads to the Mystery Gift window. Reset game and re-try.", COLOR_YELLOW);
+            env.console.log("enter_mystery_gift_code_window: Failed to detect the dialog that leads to the Mystery Gift code window. Reset game and re-try.", COLOR_YELLOW);
             reset_game(env.program_info(), env.console, context);
             continue;
         }
@@ -199,7 +229,7 @@ void ClaimMysteryGift::enter_mystery_gift_window(SingleSwitchProgramEnvironment&
             {key1_selected}
         );
         if (ret < 0){  // failed to detect Key 1 being highlighted. Reset game and re-try
-            env.console.log("enter_mystery_gift_window: Failed to detect the Mystery Gift window. Reset game and re-try.", COLOR_YELLOW);
+            env.console.log("enter_mystery_gift_code_window: Failed to detect the Mystery Gift code window. Reset game and re-try.", COLOR_YELLOW);
             reset_game(env.program_info(), env.console, context);
             continue;
         }       
@@ -210,7 +240,7 @@ void ClaimMysteryGift::enter_mystery_gift_window(SingleSwitchProgramEnvironment&
 
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
-        "enter_mystery_gift_window(): Failed to reach Mystery Gift screen after several attempts.",
+        "enter_mystery_gift_code_window(): Failed to reach Mystery Gift code window after several attempts.",
         env.console
     );    
 }
@@ -241,13 +271,29 @@ void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControlle
     if (STARTING_POINT == StartingPoint::NEW_GAME){
         run_autostory_until_pokeportal_unlocked(env, context);
         env.console.log("Done Autostory portion. Pokeportal should now be unlocked.");
-        enter_mystery_gift_window(env, context, 2);
+        if (OBTAINING_METHOD == ObtainingMethod::VIA_CODE){
+            enter_mystery_gift_code_window(env, context, 2);
+            enter_mystery_gift_code(env, context);
+        }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_ALL){
+
+        }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_ONE){
+
+        }
+
+    }else if(STARTING_POINT == StartingPoint::IN_MYSTERY_GIFT_CODE_WINDOW){
+        // only claim the mystery gift via code. not via internet
         enter_mystery_gift_code(env, context);
-    }else if(STARTING_POINT == StartingPoint::IN_MYSTERY_GIFT){
-        enter_mystery_gift_code(env, context);
+        
     }else if (STARTING_POINT == StartingPoint::DONE_TUTORIAL){
-        enter_mystery_gift_window(env, context, 3);
-        enter_mystery_gift_code(env, context);
+
+        if (OBTAINING_METHOD == ObtainingMethod::VIA_CODE){
+            enter_mystery_gift_code_window(env, context, 3);
+            enter_mystery_gift_code(env, context);            
+        }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_ALL){
+
+        }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_ONE){
+
+        }        
     }else{
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown STARTING_POINT.");
     }
