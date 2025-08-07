@@ -21,7 +21,8 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
-        AutoStoryOptions options) const override;
+        AutoStoryOptions options,
+        AutoStoryStats& stats) const override;
 };
 
 
@@ -30,7 +31,8 @@ public:
 void checkpoint_43(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: At Artazon Gym building. Battled Nemona. Received Sunflora gym challenge.
@@ -38,7 +40,8 @@ void checkpoint_43(
 void checkpoint_44(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: Finished Sunflora gym challenge.
@@ -46,7 +49,8 @@ void checkpoint_44(
 void checkpoint_45(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 

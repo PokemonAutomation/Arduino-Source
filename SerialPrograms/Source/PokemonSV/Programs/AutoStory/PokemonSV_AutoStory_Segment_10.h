@@ -21,7 +21,8 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
-        AutoStoryOptions options
+        AutoStoryOptions options,
+        AutoStoryStats& stats
     ) const override;
 };
 
@@ -31,7 +32,8 @@ public:
 void checkpoint_21(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: At Mesagoza West gate flypoint
@@ -39,7 +41,8 @@ void checkpoint_21(
 void checkpoint_22(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: At South Province Area Two Pokecenter.
@@ -47,7 +50,8 @@ void checkpoint_22(
 void checkpoint_23(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 

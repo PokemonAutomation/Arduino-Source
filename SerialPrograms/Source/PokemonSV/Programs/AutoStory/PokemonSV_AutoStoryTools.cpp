@@ -1009,8 +1009,7 @@ void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, ProControl
     }
 }
 
-void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update){
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     save_game_from_overworld(env.program_info(), env.console, context);
     stats.m_checkpoint++;
     env.update_stats();

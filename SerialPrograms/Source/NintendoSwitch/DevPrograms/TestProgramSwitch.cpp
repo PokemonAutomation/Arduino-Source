@@ -138,6 +138,7 @@
 #include "PokemonHome/Inference/PokemonHome_BallReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathMap.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -256,6 +257,36 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+#if 0
+    bool switch2 = true;
+    ImageFloatBox key1_box; 
+    ImageFloatBox other_setting1; 
+    ImageFloatBox other_setting2; 
+
+    if (!switch2){
+        key1_box = {0.037322, 0.451172, 0.009879, 0.113281};
+        other_setting1 = {0.01, 0.451172, 0.009879, 0.113281};
+        other_setting2 = {0.02, 0.451172, 0.009879, 0.113281};
+    }else if (switch2){
+        key1_box = {0.062706, 0.510763, 0.009901, 0.097847};
+        other_setting1 = {0.02, 0.510763, 0.009901, 0.097847};
+        other_setting2 = {0.04, 0.510763, 0.009901, 0.097847};            
+    }     
+    
+    SelectedSettingWatcher key1_selected(key1_box, other_setting1, other_setting2, other_setting1);
+    int ret = wait_until(
+        console, context,
+        Milliseconds(5000),
+        {key1_selected}
+    );
+    if (ret < 0){  // failed to detect Key 1 being highlighted. Reset game and re-try
+        console.log("claim_mystery_gift: Failed to detect the Mystery Gift window. Reset game and re-try.", COLOR_YELLOW);
+        reset_game(env.program_info(), console, context);
+    }   
+
+#endif
+
 #if 0
     auto screenshot = feed.snapshot();
 
@@ -342,7 +373,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
     auto screenshot = feed.snapshot();
 
     PokemonHome::BallReader reader(console);
@@ -607,7 +638,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    context->issue_gyro_rotate_x(&scope, duration, duration, 0s, 0x1000);
 //    context->issue_nop(&scope, 60h);
 
-#if 1
+#if 0
     auto duration = 15ms;
     for (size_t c = 0; c < 65536; c += 1){
         context->issue_gyro_accel_x(&scope, 0s, duration, 0s, (uint16_t)(688 + 0*c % 2));
@@ -655,7 +686,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #if 0
     // ImageRGB32 image(IMAGE_PATH);
     auto image = feed.snapshot();
-#if 1
+#if 0
     ImageRGB32 image(IMAGE_PATH);
     // auto image = feed.snapshot();
 

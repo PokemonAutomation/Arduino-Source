@@ -21,7 +21,8 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
-        AutoStoryOptions options) const override;
+        AutoStoryOptions options,
+        AutoStoryStats& stats) const override;
 };
 
 
@@ -30,7 +31,8 @@ public:
 void checkpoint_05(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: Met mom at gate. Received mom's sandwich.
@@ -38,7 +40,8 @@ void checkpoint_05(
 void checkpoint_06(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: Cleared catch tutorial.
@@ -46,7 +49,8 @@ void checkpoint_06(
 void checkpoint_07(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 

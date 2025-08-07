@@ -49,7 +49,7 @@ private:
     ConsoleType m_last;
 };
 
-
+ConsoleType detect_console_type_from_in_game(ConsoleHandle& console, ProControllerContext& context);
 
 
 

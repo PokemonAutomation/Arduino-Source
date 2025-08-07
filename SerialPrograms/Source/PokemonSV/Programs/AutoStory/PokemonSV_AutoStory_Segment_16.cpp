@@ -43,17 +43,18 @@ std::string AutoStory_Segment_16::end_text() const{
 void AutoStory_Segment_16::run_segment(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    AutoStoryOptions options
+    AutoStoryOptions options,
+    AutoStoryStats& stats
 ) const{
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    
 
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_35(env, context, options.notif_status_update);
-    checkpoint_36(env, context, options.notif_status_update);
+    checkpoint_35(env, context, options.notif_status_update, stats);
+    checkpoint_36(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -64,14 +65,15 @@ void AutoStory_Segment_16::run_segment(
 void checkpoint_35(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 ){
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context, notif_status_update);
+            checkpoint_save(env, context, notif_status_update, stats);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -114,14 +116,15 @@ void checkpoint_35(
 void checkpoint_36(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 ){
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context, notif_status_update);
+            checkpoint_save(env, context, notif_status_update, stats);
             first_attempt = false;
         }         
         context.wait_for_all_requests();

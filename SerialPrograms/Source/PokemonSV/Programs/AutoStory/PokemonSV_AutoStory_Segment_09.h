@@ -21,7 +21,8 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
-        AutoStoryOptions options
+        AutoStoryOptions options,
+        AutoStoryStats& stats
     ) const override;
 };
 
@@ -31,7 +32,8 @@ public:
 void checkpoint_16(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: Talked to Arven. Received Titan questline (Path of Legends).
@@ -39,7 +41,8 @@ void checkpoint_16(
 void checkpoint_17(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: Talked to Cassiopeia. Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.
@@ -47,7 +50,8 @@ void checkpoint_17(
 void checkpoint_18(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: Talked to Clavell and the professor.
@@ -55,7 +59,8 @@ void checkpoint_18(
 void checkpoint_19(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: Talked to Nemona, visited dorm, time passed.
@@ -63,7 +68,8 @@ void checkpoint_19(
 void checkpoint_20(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 

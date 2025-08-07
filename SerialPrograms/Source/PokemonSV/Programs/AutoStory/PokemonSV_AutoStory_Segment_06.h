@@ -21,7 +21,8 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
-        AutoStoryOptions options
+        AutoStoryOptions options,
+        AutoStoryStats& stats
     ) const override;
 };
 
@@ -31,7 +32,8 @@ public:
 void checkpoint_11(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 }

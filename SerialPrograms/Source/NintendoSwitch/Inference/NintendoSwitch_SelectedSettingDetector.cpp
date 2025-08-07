@@ -9,9 +9,9 @@
 #include "NintendoSwitch_SelectedSettingDetector.h"
 
 //
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -21,24 +21,26 @@ SelectedSettingWatcher::~SelectedSettingWatcher() = default;
 SelectedSettingWatcher::SelectedSettingWatcher(
     ImageFloatBox selected_box,
     ImageFloatBox not_selected_box1,
-    ImageFloatBox not_selected_box2
+    ImageFloatBox not_selected_box2,
+    ImageFloatBox representative_background
 )
     : VisualInferenceCallback("SelectedSettingWatcher")
     , m_selected_box(selected_box)
     , m_not_selected_box1(not_selected_box1)
     , m_not_selected_box2(not_selected_box2)
+    , m_representative_background(representative_background)
 {}
 
 void SelectedSettingWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_selected_box);
     items.add(COLOR_BLUE, m_not_selected_box1);
     items.add(COLOR_BLUE, m_not_selected_box2);
+    items.add(COLOR_GREEN, m_representative_background);
 }
 
-bool is_white_theme(const ImageViewRGB32& screen){
-    ImageFloatBox window_top(0.60, 0.02, 0.35, 0.05);
-    ImageStats stats_window_top = image_stats(extract_box_reference(screen, window_top));
-    bool white_theme = stats_window_top.average.sum() > 500;
+bool SelectedSettingWatcher::is_white_theme(const ImageViewRGB32& screen){
+    ImageStats stats_window_background = image_stats(extract_box_reference(screen, m_representative_background));
+    bool white_theme = stats_window_background.average.sum() > 500;
     return white_theme;
 }
 

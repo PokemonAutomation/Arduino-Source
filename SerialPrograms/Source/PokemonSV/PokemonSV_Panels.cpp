@@ -53,6 +53,7 @@
 #include "Programs/ShinyHunting/PokemonSV_ShinyHunt-Scatterbug.h"
 
 #include "Programs/AutoStory/PokemonSV_AutoStory.h"
+#include "Programs/Farming/PokemonSV_ClaimMysteryGift.h"
 
 #include "Programs/Glitches/PokemonSV_WildItemFarmer.h"
 #include "Programs/Glitches/PokemonSV_RideCloner-1.0.1.h"
@@ -146,6 +147,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- Public Betas ----");
     ret.emplace_back(make_single_switch_program<AutoStory_Descriptor, AutoStory>());
+    ret.emplace_back(make_single_switch_program<ClaimMysteryGift_Descriptor, ClaimMysteryGift>());
 
     ret.emplace_back("---- Deprecated Programs ----");
     ret.emplace_back(make_single_switch_program<AutoItemPrinter_Descriptor, AutoItemPrinter>());

@@ -21,7 +21,8 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
-        AutoStoryOptions options
+        AutoStoryOptions options,
+        AutoStoryStats& stats
     ) const override;
 };
 
@@ -31,7 +32,8 @@ public:
 void checkpoint_37(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: Won auction at Porto Marinada, passed Gym challenge.
@@ -39,7 +41,8 @@ void checkpoint_37(
 void checkpoint_38(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 
