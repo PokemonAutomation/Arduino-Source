@@ -28,6 +28,7 @@ using namespace Pokemon;
 
 
 bool connect_to_internet(
+    const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     bool host_online,
     Milliseconds connect_to_internet_delay
@@ -40,7 +41,7 @@ bool connect_to_internet(
         return true;
     }
     if (connect_to_internet_with_inference(
-        stream, context,
+        info, stream, context,
         std::chrono::seconds(5), connect_to_internet_delay
     )){
         return true;
@@ -136,7 +137,7 @@ void run_autohost(
     context.wait_for_all_requests();
 
     if (!connect_to_internet(
-        console, context,
+        env.program_info(), console, context,
         host_online,
         connect_to_internet_delay
     )){

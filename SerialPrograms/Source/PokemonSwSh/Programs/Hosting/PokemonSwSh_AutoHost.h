@@ -24,6 +24,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet(
+    const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     bool host_online,
     Milliseconds connect_to_internet_delay

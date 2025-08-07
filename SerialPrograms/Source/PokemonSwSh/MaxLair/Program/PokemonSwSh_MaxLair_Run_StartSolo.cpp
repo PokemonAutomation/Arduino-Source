@@ -128,6 +128,7 @@ bool start_adventure(
 
 
 bool start_raid_self_solo(
+    const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,
@@ -138,7 +139,7 @@ bool start_raid_self_solo(
     GlobalState& state = state_tracker[0];
 
     //  Enter lobby.
-    entrance = enter_lobby(stream, context, boss_slot, false, ore);
+    entrance = enter_lobby(info, stream, context, boss_slot, false, ore);
     if (!*entrance){
         return false;
     }
@@ -172,7 +173,8 @@ bool start_raid_host_solo(
 
     //  Enter lobby.
     entrance = enter_lobby(
-        console, context, boss_slot,
+        env.program_info(), console, context,
+        boss_slot,
         settings.MODE == HostingMode::HOST_ONLINE,
         ore
     );
@@ -210,7 +212,13 @@ bool start_raid_host_solo(
 
     if (!wait_for_a_player(console, context, *entrance, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
-        return start_raid_self_solo(console, context, state_tracker, entrance, boss_slot, ore);
+        return start_raid_self_solo(
+            env.program_info(), console, context,
+            state_tracker,
+            entrance,
+            boss_slot,
+            ore
+        );
     }
 
     //  Ready up.

@@ -63,6 +63,7 @@ private:
 
 
 std::shared_ptr<const ImageRGB32> enter_lobby(
+    const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
@@ -70,7 +71,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
     pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 
     if (connect_to_internet){
-        connect_to_internet_with_inference(stream, context);
+        connect_to_internet_with_inference(info, stream, context);
     }
 
     VideoOverlaySet boxes(stream.overlay());

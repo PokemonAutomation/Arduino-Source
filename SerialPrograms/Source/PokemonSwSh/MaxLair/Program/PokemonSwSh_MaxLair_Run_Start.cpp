@@ -132,7 +132,7 @@ bool start_raid_local(
     if (env.consoles.size() == 1){
         ProControllerContext context(scope, host.pro_controller());
         return start_raid_self_solo(
-            host, context,
+            env.program_info(), host, context,
             state_tracker, entrance[0], boss_slot, console_stats[0].ore
         );
     }
@@ -147,7 +147,7 @@ bool start_raid_local(
         bool is_host = index == host.index();
 
         entrance[index] = enter_lobby(
-            console, context,
+            env.program_info(), console, context,
             is_host ? boss_slot : 0,
             settings.MODE == HostingMode::HOST_ONLINE,
             console_stats[index].ore
@@ -301,7 +301,7 @@ bool start_raid_host(
         bool is_host = index == host.index();
 
         entrance[index] = enter_lobby(
-            console, context,
+            env.program_info(), console, context,
             is_host ? boss_slot : 0,
             settings.MODE == HostingMode::HOST_ONLINE,
             console_stats[index].ore

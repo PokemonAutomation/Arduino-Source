@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_StartSolo_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_StartSolo_H
 
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
@@ -42,6 +43,7 @@ bool start_adventure(
 
 
 bool start_raid_self_solo(
+    const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     GlobalStateTracker& state_tracker,
     std::shared_ptr<const ImageRGB32>& entrance, size_t boss_slot,

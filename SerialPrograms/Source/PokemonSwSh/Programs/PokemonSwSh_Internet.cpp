@@ -18,6 +18,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet_with_inference(
+    const ProgramInfo& info,
     VideoStream& stream, ProControllerContext& context,
     Milliseconds post_wait_time,
     Milliseconds timeout_ticks
@@ -41,7 +42,7 @@ bool connect_to_internet_with_inference(
             stream.log("Y-COMM detected.");
         }else{
             stream.log("Failed to detect Y-COMM after timeout.", COLOR_RED);
-            dump_image(stream.logger(), ProgramInfo(), "connect_to_internet_with_inference", stream.video().snapshot());
+            dump_image(stream.logger(), info, "connect_to_internet_with_inference", stream.video().snapshot());
             ok = false;
         }
     }
