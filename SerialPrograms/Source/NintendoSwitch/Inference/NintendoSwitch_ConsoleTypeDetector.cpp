@@ -7,6 +7,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "NintendoSwitch_ConsoleTypeDetector.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 //#include <iostream>
 //using std::cout;
@@ -83,6 +86,17 @@ void ConsoleTypeDetector_StartGameUserSelect::commit_to_cache(){
     m_console.state().set_console_type(m_console, m_last);
 }
 
+ConsoleType detect_console_type_from_in_game(ConsoleHandle& console, ProControllerContext& context){
+    go_home(console, context);
+    
+    ConsoleTypeDetector_Home detector(console);
+    ConsoleType console_type = detector.detect_only(console.video().snapshot());
+    detector.commit_to_cache();
+
+    resume_game_from_home(console, context);
+    
+    return console_type;
+}
 
 
 

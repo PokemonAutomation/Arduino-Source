@@ -114,9 +114,11 @@ void ClaimMysteryGift::on_config_value_changed(void* object){
 }
 
 void ClaimMysteryGift::enter_mystery_gift_code(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    env.log("Enter mystery gift code.");
+
     std::string normalized_code;
     bool force_keyboard_mode = true;
-    bool connect_controller_press = true;
+    bool connect_controller_press = false;
     normalize_code(normalized_code, CODE, force_keyboard_mode);
 
     const FastCodeEntrySettings& settings = SETTINGS;
@@ -140,6 +142,7 @@ void ClaimMysteryGift::claim_mystery_gift(SingleSwitchProgramEnvironment& env, P
     pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
     clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);  
+
     enter_mystery_gift_code(env, context);
 }
 
