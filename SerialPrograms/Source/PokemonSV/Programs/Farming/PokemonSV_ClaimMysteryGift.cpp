@@ -79,12 +79,12 @@ ClaimMysteryGift::ClaimMysteryGift()
         StartingPoint::NEW_GAME
     )
     , MYSTERY_GIFT_NOTE{
-        "Ensure you are logged into a Nintendo account.<br>"
-        "You can ignore the options for multiple switches below. This only works for 1 Switch.<br>"
+        "Ensure you are logged into a Nintendo account. This account does NOT need to have a subscription to Nintendo Switch Online.<br>"
+        "In the keyboard section below, you only need to adjust the option for Swtich 0. Ignore the options for the other Switches.<br>"
         "Refer to the documentation on github for more details."
     }
     , CODE(
-        "<b>Link Code:</b><br>Mystery Gift code. (not case sensitive)<br>"
+        "<b>Mystery Gift Code:</b><br>Mystery Gift code. (not case sensitive)<br>"
         "(Box is big so it's easy to land your mouse on.)",
         LockMode::UNLOCK_WHILE_RUNNING,
         "0123", "0123",
