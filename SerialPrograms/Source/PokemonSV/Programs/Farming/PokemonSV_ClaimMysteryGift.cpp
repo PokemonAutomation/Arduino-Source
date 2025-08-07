@@ -4,7 +4,8 @@
  *
  */
 
- #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -148,15 +149,20 @@ void ClaimMysteryGift::claim_mystery_gift(SingleSwitchProgramEnvironment& env, P
         pbf_press_dpad(context, DPAD_DOWN, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
         pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
+        try {
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
+        }catch(OperationFailedException&){
+            env.console.log("claim_mystery_gift: Failed to detect the dialog that leads to the Mystery Gift window. Reset game and re-try.", COLOR_YELLOW);
+            reset_game(env.program_info(), env.console, context);
+            continue;
+        }
 
         context.wait_for_all_requests();
         context.wait_for(Milliseconds(300));
         // we expect to be within Mystery Gift window, with the keyboard visible and "1" being highlighted
-        // 
-
+        
+        // check whether this is Switch 1 or 2.
         ConsoleType console_type = env.console.state().console_type();
-                
         if (console_type == ConsoleType::Unknown){
             env.console.log("Unknown Switch type. Try to detect.");
             console_type = detect_console_type_from_in_game(env.console, context);
