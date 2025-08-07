@@ -41,18 +41,19 @@ std::string AutoStory_Segment_08::end_text() const{
 void AutoStory_Segment_08::run_segment(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    AutoStoryOptions options
+    AutoStoryOptions options,
+    AutoStoryStats& stats
 ) const{
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    
 
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 08: Beat Team Star and arrive at School", COLOR_ORANGE);
 
-    checkpoint_13(env, context, options.notif_status_update);
-    checkpoint_14(env, context, options.notif_status_update);
-    checkpoint_15(env, context, options.notif_status_update);
+    checkpoint_13(env, context, options.notif_status_update, stats);
+    checkpoint_14(env, context, options.notif_status_update, stats);
+    checkpoint_15(env, context, options.notif_status_update, stats);
     
 
     context.wait_for_all_requests();
@@ -64,10 +65,11 @@ void AutoStory_Segment_08::run_segment(
 void checkpoint_13(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 ){
     // reset rate: 0%. 0 resets out of 70.
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    
     bool first_attempt = true;
     while (true){
     try{
@@ -75,7 +77,7 @@ void checkpoint_13(
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
         
             if (first_attempt){
-                checkpoint_save(env, context, notif_status_update);
+                checkpoint_save(env, context, notif_status_update, stats);
                 first_attempt = false;
             } 
 
@@ -115,14 +117,15 @@ void checkpoint_13(
 void checkpoint_14(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 ){
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context, notif_status_update);
+            checkpoint_save(env, context, notif_status_update, stats);
             first_attempt = false;
         }         
         context.wait_for_all_requests();
@@ -173,14 +176,15 @@ void checkpoint_14(
 void checkpoint_15(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 ){
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    
     bool first_attempt = true;
     while (true){
     try{
         if (first_attempt){
-            checkpoint_save(env, context, notif_status_update);
+            checkpoint_save(env, context, notif_status_update, stats);
             first_attempt = false;
         }         
         context.wait_for_all_requests();

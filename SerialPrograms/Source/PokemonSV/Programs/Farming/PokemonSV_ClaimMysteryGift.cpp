@@ -213,9 +213,9 @@ void ClaimMysteryGift::run_autostory_until_pokeportal_unlocked(SingleSwitchProgr
         StarterChoice::FUECOCO,
         NOTIFICATION_STATUS_UPDATE
     };    
-
+    AutoStoryStats stats;  // unused
     for (size_t segment_index = 0; segment_index <= 7; segment_index++){
-        ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options);
+        ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options, stats);
     }
 }
 

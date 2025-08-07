@@ -21,7 +21,8 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
-        AutoStoryOptions options
+        AutoStoryOptions options,
+        AutoStoryStats& stats
     ) const override;
 };
 
@@ -31,6 +32,7 @@ void checkpoint_01(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats,
     Language language
 );
 
@@ -39,7 +41,8 @@ void checkpoint_01(
 void checkpoint_02(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 );
 
 // start: standing in front of power of science NPC. Cleared map tutorial.
@@ -48,6 +51,7 @@ void checkpoint_03(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats,
     Language language,
     StarterChoice starter_choice
 );

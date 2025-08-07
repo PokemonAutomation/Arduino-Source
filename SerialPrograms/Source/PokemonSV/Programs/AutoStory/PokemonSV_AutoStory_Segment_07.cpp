@@ -43,16 +43,17 @@ std::string AutoStory_Segment_07::end_text() const{
 void AutoStory_Segment_07::run_segment(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    AutoStoryOptions options
+    AutoStoryOptions options,
+    AutoStoryStats& stats
 ) const{
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    
 
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
     env.console.log("Start Segment 07: Go to Mesagoza South", COLOR_ORANGE);
 
-    checkpoint_12(env, context, options.notif_status_update);
+    checkpoint_12(env, context, options.notif_status_update, stats);
 
     // // Mystery Gift, delete later
     // enter_menu_from_overworld(env.program_info(), env.console, context, 2);
@@ -72,17 +73,18 @@ void AutoStory_Segment_07::run_segment(
 void checkpoint_12(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
-    EventNotificationOption& notif_status_update
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
 ){
     // reset rate: ~25%. 12 resets out of 52. 
     // resets due to: getting attacked by wild pokemon, either from behind, 
     // or when lead pokemon not strong enough to clear them with Let's go
-    AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
+    
     bool first_attempt = true;
     while (true){
         try{
             if (first_attempt){
-                checkpoint_save(env, context, notif_status_update);
+                checkpoint_save(env, context, notif_status_update, stats);
                 first_attempt = false;
             }
 

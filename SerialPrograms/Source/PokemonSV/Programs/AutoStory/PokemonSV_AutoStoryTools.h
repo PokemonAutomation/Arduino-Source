@@ -115,7 +115,8 @@ public:
     virtual void run_segment(
         SingleSwitchProgramEnvironment& env, 
         ProControllerContext& context,
-        AutoStoryOptions options) const = 0;
+        AutoStoryOptions options,
+        AutoStoryStats& stats) const = 0;
 };
 
 // spam A button to choose the first move for trainer battles
@@ -289,7 +290,7 @@ void change_settings_prior_to_autostory(
 void change_settings(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language, bool use_inference = true);
 
 
-void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update);
+void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 enum class ZoomChange{
     ZOOM_IN,
