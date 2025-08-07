@@ -468,7 +468,8 @@ void check_basket_to_collect_eggs(
             if (consecutive_nothing >= 10){
                 dump_image_and_throw_recoverable_exception(
                     info, stream, "BasketNotFound",
-                    "collect_eggs_from_basket(): Basket not found after 10 attempts."
+                    "collect_eggs_from_basket(): Basket not found after 10 attempts.\n"
+                    "Please make sure that the \"Camera Support\" option is set to \"On\"."
                 );
             }
             if (checked){
