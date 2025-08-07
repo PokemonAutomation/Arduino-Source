@@ -74,6 +74,12 @@ public:
     const std::string& directory() const{
         return m_directory;
     }
+    const std::string& title() const{
+        return m_title;
+    }
+    const std::vector<std::pair<std::string, std::string>>& messages() const{
+        return m_messages;
+    }
 
     void add_file(std::string filename);
 
