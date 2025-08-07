@@ -71,8 +71,9 @@ ClaimMysteryGift::ClaimMysteryGift()
     , STARTING_POINT(
         "<b>Starting point:",
         {
-            {StartingPoint::NEW_GAME,                "new-game",           "New Game"},
-            {StartingPoint::DONE_TUTORIAL,           "done-tutorial",      "Done Tutorial"},
+            {StartingPoint::NEW_GAME,                "new-game",           "New Game: Start after you have selected your username and character appearance"},
+            {StartingPoint::IN_MYSTERY_GIFT,         "in-mystery-gift",    "Start in Mystery Gift window, with cursor on the “1” key."},
+            {StartingPoint::DONE_TUTORIAL,           "done-tutorial",      "Start in game. But with all menus closed. Tutorial must be completed. You need to be outside, where you can use Pokeportal."},
         },
         LockMode::LOCK_WHILE_RUNNING,
         StartingPoint::NEW_GAME
@@ -137,7 +138,8 @@ void ClaimMysteryGift::enter_mystery_gift_code(SingleSwitchProgramEnvironment& e
 
 }
 
-void ClaimMysteryGift::claim_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index){
+void ClaimMysteryGift::enter_mystery_gift_window(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index){
+    env.console.log("Save game, then try to enter the mystery gift window.", COLOR_YELLOW);
     save_game_from_menu_or_overworld(env.program_info(), env.console, context, false);
 
     size_t max_attempts = 5;
@@ -152,7 +154,7 @@ void ClaimMysteryGift::claim_mystery_gift(SingleSwitchProgramEnvironment& env, P
         try {
             clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
         }catch(OperationFailedException&){
-            env.console.log("claim_mystery_gift: Failed to detect the dialog that leads to the Mystery Gift window. Reset game and re-try.", COLOR_YELLOW);
+            env.console.log("enter_mystery_gift_window: Failed to detect the dialog that leads to the Mystery Gift window. Reset game and re-try.", COLOR_YELLOW);
             reset_game(env.program_info(), env.console, context);
             continue;
         }
@@ -197,18 +199,18 @@ void ClaimMysteryGift::claim_mystery_gift(SingleSwitchProgramEnvironment& env, P
             {key1_selected}
         );
         if (ret < 0){  // failed to detect Key 1 being highlighted. Reset game and re-try
-            env.console.log("claim_mystery_gift: Failed to detect the Mystery Gift window. Reset game and re-try.", COLOR_YELLOW);
+            env.console.log("enter_mystery_gift_window: Failed to detect the Mystery Gift window. Reset game and re-try.", COLOR_YELLOW);
             reset_game(env.program_info(), env.console, context);
             continue;
         }       
 
-        enter_mystery_gift_code(env, context);
+        
         return;
     }
 
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
-        "claim_mystery_gift(): Failed to reach Mystery Gift screen after several attempts.",
+        "enter_mystery_gift_window(): Failed to reach Mystery Gift screen after several attempts.",
         env.console
     );    
 }
@@ -236,16 +238,19 @@ void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     // env.console.log("Start Segment " + ALL_AUTO_STORY_SEGMENT_LIST()[get_start_segment_index()]->name(), COLOR_ORANGE);
 
-    if (STARTING_POINT == StartingPoint::DONE_TUTORIAL){
-        claim_mystery_gift(env, context, 3);
-    }else{
-
+    if (STARTING_POINT == StartingPoint::NEW_GAME){
         run_autostory_until_pokeportal_unlocked(env, context);
         env.console.log("Done Autostory portion. Pokeportal should now be unlocked.");
-        claim_mystery_gift(env, context, 2);
+        enter_mystery_gift_window(env, context, 2);
+        enter_mystery_gift_code(env, context);
+    }else if(STARTING_POINT == StartingPoint::IN_MYSTERY_GIFT){
+        enter_mystery_gift_code(env, context);
+    }else if (STARTING_POINT == StartingPoint::DONE_TUTORIAL){
+        enter_mystery_gift_window(env, context, 3);
+        enter_mystery_gift_code(env, context);
+    }else{
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown STARTING_POINT.");
     }
-
-    // run_autostory(env, context);
     
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
     GO_HOME_WHEN_DONE.run_end_of_program(context);
