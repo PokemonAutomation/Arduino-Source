@@ -243,7 +243,9 @@ std::vector<CodeEntryActionWithDelay> keyboard_get_best_path(
         for (CodeEntryActionWithDelay& action : current_path){
             current_time += action.delay;
         }
-        if (best_time > current_time){
+        if (best_time > current_time ||
+            (best_time == current_time && best_path.size() > current_path.size())
+        ){
             best_time = current_time;
             best_path = std::move(current_path);
         }

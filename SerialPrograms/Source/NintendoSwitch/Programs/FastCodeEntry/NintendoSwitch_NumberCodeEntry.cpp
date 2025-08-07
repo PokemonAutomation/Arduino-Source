@@ -162,7 +162,9 @@ std::vector<CodeEntryActionWithDelay> numberpad_get_best_path(
 //                action.delay =
             }
         }
-        if (best_time > current_time){
+        if (best_time > current_time ||
+            (best_time == current_time && best_path.size() > current_path.size())
+        ){
             best_time = current_time;
             best_path = std::move(current_path);
         }
