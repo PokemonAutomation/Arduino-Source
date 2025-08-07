@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
@@ -219,7 +220,8 @@ void mash_A_to_change_region(
 
 
 void open_travel_map_from_jubilife(
-    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    bool fresh_from_reset
 ){
     pbf_move_left_joystick(context, 128, 255, 200, 0);
     MapDetector detector;
@@ -233,11 +235,19 @@ void open_travel_map_from_jubilife(
         {{detector}}
     );
     if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "Map not detected after 10 x A presses.",
-            stream
-        );
+        if (fresh_from_reset){
+            throw UserSetupError(
+                stream.logger(),
+                "Map not detected after reset.\n"
+                "Make sure you save your game in Jubilife with your back facing the gate."
+            );
+        }else{
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Map not detected after 10 x A presses.",
+                stream
+            );
+        }
     }
     stream.log("Found map!");
 }
@@ -245,12 +255,13 @@ void open_travel_map_from_jubilife(
 
 void goto_camp_from_jubilife(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
-    const TravelLocation& location
+    const TravelLocation& location,
+    bool fresh_from_reset
 ){
     stream.overlay().add_log("Travel to " + std::string(MAP_REGION_NAMES[int(location.region)]));
     // Move backwards and talk to guard to open the map.
     context.wait_for_all_requests();
-    open_travel_map_from_jubilife(env, stream, context);
+    open_travel_map_from_jubilife(env, stream, context, fresh_from_reset);
     context.wait_for(std::chrono::milliseconds(500));
 
     DpadPosition direction = location.region < MapRegion::HIGHLANDS ? DPAD_RIGHT : DPAD_LEFT;

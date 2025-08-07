@@ -58,7 +58,9 @@ private:
         const std::set<std::string>& desired_hisui_map_events,
         const std::set<std::string>& desired_outbreaks,
         const std::set<std::string>& desired_MMO_pokemon,
-        const std::set<std::string>& desired_star_MMO_pokemon);
+        const std::set<std::string>& desired_star_MMO_pokemon,
+        bool& fresh_from_reset
+    );
     
     //  Read the travel map from Jublilife village to find any desired pokemon or MMO events. 
     //  Return true if program should stop (match found).
@@ -73,7 +75,8 @@ private:
     // Otherwise, the function is called when the player character is standing at the program start location.
     void goto_region_and_return(
         SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-        bool inside_map
+        bool inside_map,
+        bool fresh_from_reset
     );
 
     static std::set<std::string> to_set(const StringSelectTableOption& option);

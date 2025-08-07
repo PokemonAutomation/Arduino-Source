@@ -114,12 +114,19 @@ void enter_ruins(ProControllerContext& context){
 }
 
 
-void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void UnownFinder::run_iteration(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    bool fresh_from_reset
+){
     UnownFinder_Descriptor::Stats& stats = env.current_stats<UnownFinder_Descriptor::Stats>();
 
     stats.attempts++;
 
-    goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
+    goto_camp_from_jubilife(
+        env, env.console, context,
+        TravelLocations::instance().Mirelands_Mirelands,
+        fresh_from_reset
+    );
 
     change_mount(env.console, context, MountState::BRAVIARY_ON);
 
@@ -172,17 +179,22 @@ void UnownFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
+
+    bool fresh_from_reset = false;
     while (true){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
-            run_iteration(env, context);
+            run_iteration(env, context, fresh_from_reset);
         }catch (OperationFailedException& e){
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            fresh_from_reset = reset_game_from_home(
+                env, env.console, context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            );
         }
     }
 

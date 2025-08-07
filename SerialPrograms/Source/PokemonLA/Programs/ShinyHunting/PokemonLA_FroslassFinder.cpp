@@ -98,12 +98,19 @@ FroslassFinder::FroslassFinder()
 }
 
 
-void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void FroslassFinder::run_iteration(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    bool fresh_from_reset
+){
     FroslassFinder_Descriptor::Stats& stats = env.current_stats<FroslassFinder_Descriptor::Stats>();
 
     stats.attempts++;
 
-    goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Icelands_Arena);
+    goto_camp_from_jubilife(
+        env, env.console, context,
+        TravelLocations::instance().Icelands_Arena,
+        fresh_from_reset
+    );
 
     //Start path
     env.console.log("Beginning Shiny Detection...");
@@ -162,7 +169,10 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProContr
 
     env.console.log("No shiny detected, Reset game!");
     pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-    reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    fresh_from_reset = reset_game_from_home(
+        env, env.console, context,
+        ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+    );
 }
 
 
@@ -172,17 +182,21 @@ void FroslassFinder::program(SingleSwitchProgramEnvironment& env, ProControllerC
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
+    bool fresh_from_reset = false;
     while (true){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
-            run_iteration(env, context);
+            run_iteration(env, context, fresh_from_reset);
         }catch (OperationFailedException& e){
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            fresh_from_reset = reset_game_from_home(
+                env, env.console, context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            );
         }
     }
 

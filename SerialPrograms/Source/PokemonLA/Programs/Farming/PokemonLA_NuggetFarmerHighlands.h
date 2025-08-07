@@ -31,7 +31,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    bool run_iteration(
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+        bool fresh_from_reset
+    );
 
 private:
     class RunRoute;

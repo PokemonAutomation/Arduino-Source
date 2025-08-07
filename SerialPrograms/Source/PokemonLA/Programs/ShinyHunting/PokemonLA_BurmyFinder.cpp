@@ -737,7 +737,11 @@ void BurmyFinder::single_path(SingleSwitchProgramEnvironment& env, ProController
 
 }
 
-void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, TreeCounter& tree_counter){
+void BurmyFinder::run_iteration(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    TreeCounter& tree_counter,
+    bool fresh_from_reset
+){
     BurmyFinder_Descriptor::Stats& stats = env.current_stats<BurmyFinder_Descriptor::Stats>();
     stats.attempts++;
     env.update_stats();
@@ -775,7 +779,11 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControll
 
     BlackOutDetector black_out_detector(env.console, env.console);
 
-    goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+    goto_camp_from_jubilife(
+        env, env.console, context,
+        TravelLocations::instance().Fieldlands_Heights,
+        fresh_from_reset
+    );
 
     int ret = run_until<ProControllerContext>(
         env.console, context,
@@ -824,18 +832,22 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
     TreeCounter counters;
 
+    bool fresh_from_reset = false;
     while (true){
         env.update_stats();
         counters.log(env.logger());
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
-            run_iteration(env, context, counters);
+            run_iteration(env, context, counters, fresh_from_reset);
         }catch (OperationFailedException& e){
             stats.errors++;
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            fresh_from_reset = reset_game_from_home(
+                env, env.console, context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            );
         }
     }
 

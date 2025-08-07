@@ -52,7 +52,8 @@ std::set<std::string> enter_region_and_read_MMO(
     const std::set<std::string>& desired_star_MMOs,
     bool debug_mode,
     int& num_mmo_pokemon_found,
-    int& num_star_mmo_found
+    int& num_star_mmo_found,
+    bool fresh_from_reset
 ){
     MapRegion region = MapRegion::NONE;
     TravelLocation location = TravelLocations::instance().Fieldlands_Fieldlands;
@@ -111,7 +112,7 @@ std::set<std::string> enter_region_and_read_MMO(
     }
 
     env.log("Go to " + std::string(MAP_REGION_NAMES[int(region)]) + " to check MMO.");
-    goto_camp_from_jubilife(env, env.console, context, location);
+    goto_camp_from_jubilife(env, env.console, context, location, fresh_from_reset);
 
     // Open map
     pbf_press_button(context, BUTTON_MINUS, 50, 100);

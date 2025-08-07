@@ -38,7 +38,8 @@ void mash_A_to_change_region(
 // and travel to a location.
 void goto_camp_from_jubilife(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
-    const TravelLocation& location
+    const TravelLocation& location,
+    bool fresh_from_reset
 );
 
 
@@ -60,7 +61,8 @@ void goto_Mai_from_camp(
 // Return after the map is detected.
 // Throw an error if map is not found.
 void open_travel_map_from_jubilife(
-    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    bool fresh_from_reset
 );
 
 

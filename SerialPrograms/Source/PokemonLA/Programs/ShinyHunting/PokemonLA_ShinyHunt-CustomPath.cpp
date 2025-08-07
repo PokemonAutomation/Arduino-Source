@@ -289,6 +289,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProContro
     // How many runs so far after last time reset
     uint32_t time_reset_run_count = 0;
 
+    bool fresh_from_reset = false;
     while (true){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
@@ -296,14 +297,17 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProContro
             stats.attempts++;
 
             const TravelLocation location = PATH.travel_location();
-            goto_camp_from_jubilife(env, env.console, context, location);
+            goto_camp_from_jubilife(env, env.console, context, location, fresh_from_reset);
             run_path(env, context);
             ++time_reset_run_count;
 
             if(RESET_METHOD == ResetMethod::SoftReset){
                 env.console.log("Resetting by closing the game.");
                 pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-                reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                fresh_from_reset = reset_game_from_home(
+                    env, env.console, context,
+                    ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+                );
             }else{
                 env.console.log("Resetting by going to village.");
                 goto_camp_from_overworld(env, env.console, context);
@@ -328,7 +332,10 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProContro
 
             time_reset_run_count = 0;
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            fresh_from_reset = reset_game_from_home(
+                env, env.console, context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            );
         }
 
     }

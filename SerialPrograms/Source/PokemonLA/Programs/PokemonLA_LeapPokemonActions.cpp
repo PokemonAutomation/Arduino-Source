@@ -20,10 +20,18 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, LeapPokemon pokemon){
+void route(
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    LeapPokemon pokemon,
+    bool fresh_from_reset
+){
     switch (pokemon){
     case LeapPokemon::Aipom:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Coastlands_Beachside);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Coastlands_Beachside,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 238, 255, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(stream, context, MountState::BRAVIARY_ON);
@@ -34,7 +42,11 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         pbf_move_left_joystick(context, 127, 0, (3 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Burmy:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Fieldlands_Heights);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Fieldlands_Heights,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 170, 255, 30, 30);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, (uint16_t)(6.35 * TICKS_PER_SECOND), 20);
@@ -46,7 +58,11 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.10 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Cherrim:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Highlands_Mountain);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Highlands_Mountain,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 255, 35, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(stream, context, MountState::BRAVIARY_ON);
@@ -59,14 +75,22 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.20 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Cherubi:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Fieldlands_Arena);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Fieldlands_Arena,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 255, 152, 30, 30);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, (uint16_t)(25.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_PLUS, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Combee:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Fieldlands_Arena);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Fieldlands_Arena,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 57, 255, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(stream, context, MountState::BRAVIARY_ON);
@@ -74,7 +98,11 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Heracross:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Highlands_Mountain);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Highlands_Mountain,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 0, 220, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 127, 0, (4 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
@@ -82,7 +110,11 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         break;
     case LeapPokemon::Pachirisu:
     case LeapPokemon::Vespiquen:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Mirelands_Bogbound);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Mirelands_Bogbound,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 0, 170, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(stream, context, MountState::BRAVIARY_ON);
@@ -90,7 +122,11 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Wormadam:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Fieldlands_Fieldlands);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Fieldlands_Fieldlands,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 110, 255, 30, 30);
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, (uint16_t)(6.25 * TICKS_PER_SECOND), 20);
@@ -100,7 +136,11 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.2 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Geodude:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Fieldlands_Heights);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Fieldlands_Heights,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 200, 255, 20, 20);
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(stream, context, MountState::BRAVIARY_ON);
@@ -112,20 +152,32 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Graveler:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Highlands_Highlands);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Highlands_Highlands,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 255, 145, 20, 20);
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 127, 0, (5 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Bonsly:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Mirelands_DiamondSettlement);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Mirelands_DiamondSettlement,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 0, 150, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(stream, context, MountState::BRAVIARY_ON);
         pbf_move_left_joystick(context, 127, 0, (10 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Bronzor:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Highlands_Mountain);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Highlands_Mountain,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 55, 255, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(stream, context, MountState::WYRDEER_ON);
@@ -134,7 +186,11 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.2 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Nosepass:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Highlands_Summit);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Highlands_Summit,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 255, 175, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(stream, context, MountState::WYRDEER_ON);
@@ -143,7 +199,11 @@ void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& c
         pbf_move_right_joystick(context, 127, 255, (uint16_t)(0.2 * TICKS_PER_SECOND), (uint16_t)(0.5 * TICKS_PER_SECOND));
         break;
     case LeapPokemon::Bergimite:
-        goto_camp_from_jubilife(env, stream, context, TravelLocations::instance().Icelands_Snowfields);
+        goto_camp_from_jubilife(
+            env, stream, context,
+            TravelLocations::instance().Icelands_Snowfields,
+            fresh_from_reset
+        );
         pbf_move_left_joystick(context, 115, 255, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(stream, context, MountState::WYRDEER_ON);

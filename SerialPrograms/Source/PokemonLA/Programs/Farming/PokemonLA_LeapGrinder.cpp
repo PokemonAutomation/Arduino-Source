@@ -149,7 +149,10 @@ LeapGrinder::LeapGrinder()
 }
 
 
-bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool LeapGrinder::run_iteration(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    bool fresh_from_reset
+){
 
     LeapGrinder_Descriptor::Stats& stats = env.current_stats<LeapGrinder_Descriptor::Stats>();
     stats.attempts++;
@@ -183,7 +186,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, ProControll
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            route(env, env.console, context, (LeapPokemon)POKEMON.index());
+            route(env, env.console, context, (LeapPokemon)POKEMON.index(), fresh_from_reset);
         },
         {{shiny_detector}}
     );
@@ -301,11 +304,12 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
+    bool fresh_from_reset = false;
     while (true){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
-            if(run_iteration(env, context)){
+            if(run_iteration(env, context, fresh_from_reset)){
                 break;
             }
         }catch (OperationFailedException& e){
@@ -313,7 +317,10 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            fresh_from_reset = reset_game_from_home(
+                env, env.console, context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            );
             // Switch from items to pokemons
             pbf_press_button(context, BUTTON_X, 20, 30);
         }

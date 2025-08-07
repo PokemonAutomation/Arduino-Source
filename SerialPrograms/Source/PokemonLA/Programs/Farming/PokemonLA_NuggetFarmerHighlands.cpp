@@ -92,11 +92,18 @@ NuggetFarmerHighlands::NuggetFarmerHighlands()
 
 
 
-bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool NuggetFarmerHighlands::run_iteration(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    bool fresh_from_reset
+){
     NuggetFarmerHighlands_Descriptor::Stats& stats = env.current_stats<NuggetFarmerHighlands_Descriptor::Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
-    goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Highlands_Mountain);
+    goto_camp_from_jubilife(
+        env, env.console, context,
+        TravelLocations::instance().Highlands_Mountain,
+        fresh_from_reset
+    );
 
     stats.attempts++;
 
@@ -220,11 +227,12 @@ void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, ProCont
     // Put a save here so that when the program reloads from error it won't break.
     save_game_from_overworld(env, env.console, context);
 
+    bool fresh_from_reset = false;
     while (true){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS);
         try{
-            if (run_iteration(env, context)){
+            if (run_iteration(env, context, fresh_from_reset)){
                 break;
             }
         }catch (OperationFailedException& e){
@@ -232,7 +240,10 @@ void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, ProCont
             e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            fresh_from_reset = reset_game_from_home(
+                env, env.console, context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            );
         }
     }
 

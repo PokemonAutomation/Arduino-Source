@@ -43,7 +43,8 @@ std::set<std::string> enter_region_and_read_MMO(
     const std::set<std::string>& desired_star_MMOs,
     bool debug,
     int& num_mmo_found,
-    int& num_star_mmo_found
+    int& num_star_mmo_found,
+    bool fresh_from_reset
 );
 
 

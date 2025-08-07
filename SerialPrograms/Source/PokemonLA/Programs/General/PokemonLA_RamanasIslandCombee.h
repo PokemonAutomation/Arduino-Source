@@ -33,7 +33,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void run_iteration(
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+        bool fresh_from_reset
+    );
     void grouped_path(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void check_tree_no_stop(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     bool check_tree(SingleSwitchProgramEnvironment& env, ProControllerContext& context);

@@ -36,7 +36,11 @@ public:
 private:
     struct TreeCounter;
 
-    void run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context, TreeCounter& tree_counter);
+    void run_iteration(
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+        TreeCounter& tree_counter,
+        bool fresh_from_reset
+    );
     // Press X to throw pokemon, check whether there is pokemon in the tree. Wait for potential battle
     // after pokemon is thrown.
     // Return true if encountering a burmy in the tree. False otherwise.

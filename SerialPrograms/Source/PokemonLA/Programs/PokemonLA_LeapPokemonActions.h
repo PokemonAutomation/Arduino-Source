@@ -38,7 +38,11 @@ enum class LeapPokemon
 };
 
 void setup(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context);
-void route(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, LeapPokemon pokemon);
+void route(
+    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+    LeapPokemon pokemon,
+    bool fresh_from_reset
+);
 bool check_tree_or_ore_for_battle(VideoStream& stream, ProControllerContext& context);
 void exit_battle(VideoStream& stream, ProControllerContext& context, ExitBattleMethod exit_method);
 void return_to_jubilife(ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context, LeapPokemon pokemon);

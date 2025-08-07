@@ -308,8 +308,10 @@ std::set<std::string> OutbreakFinder::read_travel_map_outbreaks(
 }
 
 
-void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, ProControllerContext& context, 
-    bool inside_travel_map
+void OutbreakFinder::goto_region_and_return(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    bool inside_travel_map,
+    bool fresh_from_reset
 ){
     env.log("Go to a random region and back to refresh outbreaks...");
     env.console.overlay().add_log("Refresh outbreaks");
@@ -317,7 +319,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
 
     if (inside_travel_map == false){
         // Move to guard to open map
-        open_travel_map_from_jubilife(env, env.console, context);
+        open_travel_map_from_jubilife(env, env.console, context, fresh_from_reset);
         context.wait_for(std::chrono::milliseconds(500));
     }
 
@@ -408,13 +410,14 @@ std::vector<std::string> OutbreakFinder::run_iteration(
     const std::set<std::string>& desired_hisui_map_events,
     const std::set<std::string>& desired_outbreaks,
     const std::set<std::string>& desired_MMOs,
-    const std::set<std::string>& desired_star_MMOs
+    const std::set<std::string>& desired_star_MMOs,
+    bool& fresh_from_reset
 ){
     OutbreakFinder_Descriptor::Stats& stats = env.current_stats<OutbreakFinder_Descriptor::Stats>();
 
     //  Enter map.
     try{
-        open_travel_map_from_jubilife(env, env.console, context);
+        open_travel_map_from_jubilife(env, env.console, context, fresh_from_reset);
     }catch (OperationFailedException&){
         stats.errors++;
         throw;
@@ -463,12 +466,19 @@ std::vector<std::string> OutbreakFinder::run_iteration(
         // To not waste them, save here so that we can reset to get berries back.
         save_game_from_overworld(env, env.console, context);
 
-        for(const auto& mmo_name: found_hisui_map_events){
+        for (const auto& mmo_name: found_hisui_map_events){
             int num_new_mmo_pokemon_found = 0;
             int num_new_star_mmo_found = 0;
             std::set<std::string> found_pokemon = enter_region_and_read_MMO(
-                env, context, mmo_name, desired_MMOs, desired_star_MMOs, DEBUG_MODE,
-                num_new_mmo_pokemon_found, num_new_star_mmo_found);
+                env, context,
+                mmo_name,
+                desired_MMOs,
+                desired_star_MMOs,
+                DEBUG_MODE,
+                num_new_mmo_pokemon_found,
+                num_new_star_mmo_found,
+                fresh_from_reset
+            );
             stats.mmo_pokemon += num_new_mmo_pokemon_found;
             stats.stars += num_new_star_mmo_found;
             env.update_stats();
@@ -488,7 +498,10 @@ std::vector<std::string> OutbreakFinder::run_iteration(
             env.log("No target MMO sprite found. Reset game...");
             env.console.overlay().add_log("No target MMO");
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            fresh_from_reset = reset_game_from_home(
+                env, env.console, context,
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            );
         }
     }
 
@@ -496,7 +509,7 @@ std::vector<std::string> OutbreakFinder::run_iteration(
     send_program_status_notification(env, NOTIFICATION_STATUS);
 
     //  Go to an arbitrary region and return to refresh outbreaks.
-    goto_region_and_return(env, context, inside_travel_map);
+    goto_region_and_return(env, context, inside_travel_map, fresh_from_reset);
 
     return std::vector<std::string>();
 }
@@ -514,16 +527,20 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerC
     // press a random button to let Switch register the wired controller
     pbf_press_button(context, BUTTON_ZL, 10ms, 30ms);
 
+    bool fresh_from_reset = false;
     if (RESET_GAME_AND_CONTINUE_SEARCHING){
         // the outbreak found by the last program run did not yield what the user wants.
         // so we reset the game now and skip the ongoing outbreaks
         env.log("Reset game and skip ongoing outbreaks");
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-        reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        fresh_from_reset = reset_game_from_home(
+            env, env.console, context,
+            ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+        );
 
         //  Go to region and return.
         bool inside_travel_map = false;
-        goto_region_and_return(env, context, inside_travel_map);
+        goto_region_and_return(env, context, inside_travel_map, fresh_from_reset);
     }
 
     std::set<std::string> desired_outbreaks = to_set(DESIRED_MO_SLUGS);
@@ -581,8 +598,13 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerC
     std::vector<std::string> found_outbreaks;
     while (true){
         found_outbreaks = run_iteration(
-            env, context, desired_hisui_map_events, desired_outbreaks, desired_MMO_pokemon, 
-            desired_star_MMO_pokemon);
+            env, context,
+            desired_hisui_map_events,
+            desired_outbreaks,
+            desired_MMO_pokemon,
+            desired_star_MMO_pokemon,
+            fresh_from_reset
+        );
         if (found_outbreaks.size() > 0)
         {
             break;
