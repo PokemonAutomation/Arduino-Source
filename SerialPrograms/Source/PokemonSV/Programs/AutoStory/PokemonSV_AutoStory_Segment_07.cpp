@@ -55,16 +55,6 @@ void AutoStory_Segment_07::run_segment(
 
     checkpoint_12(env, context, options.notif_status_update, stats);
 
-    // // Mystery Gift, delete later
-    // enter_menu_from_overworld(env.program_info(), env.console, context, 2);
-    // pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-    // pbf_press_dpad(context, DPAD_UP, 20, 105);
-    // pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-    // pbf_press_dpad(context, DPAD_DOWN, 20, 105);
-    // pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-    // pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
-    // clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);
-
     context.wait_for_all_requests();
     env.console.log("End Segment 07: Go to Mesagoza South", COLOR_GREEN);
 

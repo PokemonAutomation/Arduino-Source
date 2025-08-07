@@ -205,6 +205,12 @@ void ClaimMysteryGift::claim_mystery_gift(SingleSwitchProgramEnvironment& env, P
         enter_mystery_gift_code(env, context);
         return;
     }
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "claim_mystery_gift(): Failed to reach Mystery Gift screen after several attempts.",
+        env.console
+    );    
 }
 
 void ClaimMysteryGift::run_autostory_until_pokeportal_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -214,7 +220,7 @@ void ClaimMysteryGift::run_autostory_until_pokeportal_unlocked(SingleSwitchProgr
         NOTIFICATION_STATUS_UPDATE
     };    
     AutoStoryStats stats;  // unused
-    for (size_t segment_index = 0; segment_index <= 7; segment_index++){
+    for (size_t segment_index = 0; segment_index <= 6; segment_index++){
         ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options, stats);
     }
 }
@@ -235,7 +241,7 @@ void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControlle
     }else{
 
         run_autostory_until_pokeportal_unlocked(env, context);
-
+        env.console.log("Done Autostory portion. Pokeportal should now be unlocked.");
         claim_mystery_gift(env, context, 2);
     }
 
