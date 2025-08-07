@@ -4,6 +4,7 @@
  *
  */
 
+ #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -12,9 +13,12 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
+#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h"
@@ -133,17 +137,68 @@ void ClaimMysteryGift::enter_mystery_gift_code(SingleSwitchProgramEnvironment& e
 }
 
 void ClaimMysteryGift::claim_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index){
+    save_game_from_menu_or_overworld(env.program_info(), env.console, context, false);
 
-    enter_menu_from_overworld(env.program_info(), env.console, context, menu_index);
-    pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-    pbf_press_dpad(context, DPAD_UP, 20, 105);
-    pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-    pbf_press_dpad(context, DPAD_DOWN, 20, 105);
-    pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
-    pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
-    clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10);  
+    size_t max_attempts = 5;
+    for (size_t i = 0; i < max_attempts; i++){
+        enter_menu_from_overworld(env.program_info(), env.console, context, menu_index);
+        pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+        pbf_press_dpad(context, DPAD_UP, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+        pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 4 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 20, 10 * TICKS_PER_SECOND);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, {CallbackEnum::PROMPT_DIALOG});
 
-    enter_mystery_gift_code(env, context);
+        context.wait_for_all_requests();
+        context.wait_for(Milliseconds(300));
+        // we expect to be within Mystery Gift window, with the keyboard visible and "1" being highlighted
+        // 
+
+        ConsoleType console_type = env.console.state().console_type();
+                
+        if (console_type == ConsoleType::Unknown){
+            env.console.log("Unknown Switch type. Try to detect.");
+            console_type = detect_console_type_from_in_game(env.console, context);
+        }
+
+        ImageFloatBox key1_box; 
+        ImageFloatBox other_setting1; 
+        ImageFloatBox other_setting2; 
+        ImageFloatBox background; 
+
+        if (is_switch1(console_type)){
+            key1_box = {0.037322, 0.451172, 0.009879, 0.113281};
+            other_setting1 = {0.01, 0.451172, 0.009879, 0.113281};
+            other_setting2 = {0.02, 0.451172, 0.009879, 0.113281};
+            background = {0.0, 0.451172, 0.009879, 0.113281};
+        }else if (is_switch2(console_type)){
+            key1_box = {0.062706, 0.510763, 0.009901, 0.097847};
+            other_setting1 = {0.02, 0.510763, 0.009901, 0.097847};
+            other_setting2 = {0.04, 0.510763, 0.009901, 0.097847};   
+            background = {0.0, 0.510763, 0.009901, 0.097847};
+        }else{
+            throw UserSetupError(
+                env.console,
+                "Please select a valid Switch console type."
+            );
+        }        
+        
+        SelectedSettingWatcher key1_selected(key1_box, other_setting1, other_setting2, background);
+        int ret = wait_until(
+            env.console, context,
+            Milliseconds(5000),
+            {key1_selected}
+        );
+        if (ret < 0){  // failed to detect Key 1 being highlighted. Reset game and re-try
+            env.console.log("claim_mystery_gift: Failed to detect the Mystery Gift window. Reset game and re-try.", COLOR_YELLOW);
+            reset_game(env.program_info(), env.console, context);
+            continue;
+        }       
+
+        enter_mystery_gift_code(env, context);
+        return;
+    }
 }
 
 void ClaimMysteryGift::run_autostory_until_pokeportal_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
