@@ -59,6 +59,14 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
             {home_menu}
         );
         if (ret == 0){
+            //  While we're on the Home screen, we might as well read the
+            //  console type as well.
+            if (console.state().console_type_confirmed()){
+                return;
+            }
+            ConsoleTypeDetector_Home detector(console);
+            detector.detect_only(console.video().snapshot());
+            detector.commit_to_cache();
             return;
         }
         console.log("Unable to detect Home. Pressing Home button...", COLOR_RED);

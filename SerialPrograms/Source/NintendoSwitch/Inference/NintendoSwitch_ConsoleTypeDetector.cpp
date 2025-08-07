@@ -87,15 +87,9 @@ void ConsoleTypeDetector_StartGameUserSelect::commit_to_cache(){
 }
 
 ConsoleType detect_console_type_from_in_game(ConsoleHandle& console, ProControllerContext& context){
-    go_home(console, context);
-    
-    ConsoleTypeDetector_Home detector(console);
-    ConsoleType console_type = detector.detect_only(console.video().snapshot());
-    detector.commit_to_cache();
-
+    go_home(console, context);  //  Automatically detects console type as well.
     resume_game_from_home(console, context);
-    
-    return console_type;
+    return console.state().console_type();
 }
 
 
