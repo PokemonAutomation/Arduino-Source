@@ -5,6 +5,7 @@
  */
 
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -74,7 +75,7 @@ ClaimMysteryGift::ClaimMysteryGift()
         {
             {StartingPoint::NEW_GAME,                "new-game",           "New Game: Start after you have selected your username and character appearance"},
             {StartingPoint::IN_MYSTERY_GIFT_CODE_WINDOW,         "in-mystery-gift-code-window",    "Start in Mystery Gift code window, with cursor on the “1” key."},
-            {StartingPoint::DONE_TUTORIAL,           "done-tutorial",      "Start in game. Tutorial must be completed. All menus closed. Disconnected from internet. You need to be outside, where you can use Pokeportal."},
+            // {StartingPoint::DONE_TUTORIAL,           "done-tutorial",      "Start in game. Tutorial must be completed. All menus closed. Disconnected from internet. You need to be outside, where you can use Pokeportal."},
         },
         LockMode::LOCK_WHILE_RUNNING,
         StartingPoint::NEW_GAME
@@ -82,12 +83,12 @@ ClaimMysteryGift::ClaimMysteryGift()
     , OBTAINING_METHOD(
         "<b>Method for obtaining mystery gift:",
         {
-            // {ObtainingMethod::VIA_INTERNET_ALL, "via-internet-all",  "Via Internet: Get all mystery gifts from the \"Get via Internet\" screen (except for the Mythical Pecha Berry)."},
+            {ObtainingMethod::VIA_INTERNET_ALL, "via-internet-all",  "Via Internet: Get all mystery gifts from the \"Get via Internet\" screen."},
             {ObtainingMethod::VIA_INTERNET_NONE, "via-internet-one",  "Via Internet: Go to the Mystery Gift \"Get via Internet\" screen. Don't claim anything."},
             {ObtainingMethod::VIA_CODE,         "via-code",      "Via Code: Get the mystery gift based on the code entered below."},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        ObtainingMethod::VIA_INTERNET_NONE
+        ObtainingMethod::VIA_INTERNET_ALL
     )    
     , MYSTERY_GIFT_NOTE{
         "Ensure you are logged into a Nintendo account. This account does NOT need to have a subscription to Nintendo Switch Online."
@@ -198,77 +199,95 @@ void ClaimMysteryGift::enter_mystery_gift_via_internet_window(SingleSwitchProgra
 }
 
 
-// void ClaimMysteryGift::claim_internet_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-//     env.log("Claim Mystery Gifts via Internet.");
-//     context.wait_for_all_requests();
-//     ImageFloatBox box{0.256326, 0.099804, 0.044004, 0.616438};
-//     GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::RIGHT, box);
-//     int ret = wait_until(
-//         env.console, context,
-//         Milliseconds(10 * 1000),
-//         { arrow }
-//     );
-//     if (ret == 0){
-//         env.console.log("Gradient arrow detected.");
-//     }else{
-//         OperationFailedException::fire(
-//             ErrorReport::SEND_ERROR_REPORT,
-//             "Failed to detect gradient arrow. We might not be in the Mystery Gift via Internet screen.",
-//             env.console
-//         );
-//     }   
 
-//     std::vector<double> y_position_seen;
-//     // determine how many mystery gifts are available to claim
-//     while(true){
-//         context.wait_for_all_requests();
-//         ImageFloatBox result_box;
-//         arrow.detect(result_box, console.video().snapshot());
-//         double current_y_pos = result_box.y;
-//         bool seen = false;
-//         for (double y_pos : y_position_seen){
-//             // if difference is less than 0.02, then it's the same
-//             if (std::abs(current_y_pos - y_pos) < 0.02){
-//                 seen = true;
-//                 break;
-//             }
-//         }
-//         if (!seen){
-//             y_position_seen.emplace_back(current_y_pos);
-//         }else{
-//             pbf_press_dpad(context, DPAD_DOWN, 160ms, 320ms);
-//         }
-//     }    
+void ClaimMysteryGift::claim_internet_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    env.log("Claim Mystery Gifts via Internet.");
+    context.wait_for_all_requests();
+    ImageFloatBox box{0.256326, 0.099804, 0.044004, 0.616438};
+    GradientArrowWatcher arrow(COLOR_RED, GradientArrowType::RIGHT, box);
+    int ret = wait_until(
+        env.console, context,
+        Milliseconds(10 * 1000),
+        { arrow }
+    );
+    if (ret == 0){
+        env.console.log("Gradient arrow detected.");
+    }else{
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to detect gradient arrow. We might not be in the Mystery Gift via Internet screen.",
+            env.console
+        );
+    }   
 
-//     while(true){
-//         context.wait_for_all_requests();
-//         ImageFloatBox result_box;
-//         arrow.detect(result_box, console.video().snapshot());
-//         double y_pos = result_box.y;
+    // std::vector<double> y_position_seen;
+    // double previous = -1;
+    size_t max_attempts = 30;
+    for (size_t i = 0; i < max_attempts; i++){
+        context.wait_for_all_requests();
+        // ImageFloatBox result_box;
+        // arrow.detect(result_box, env.console.video().snapshot());
+        // double current_y_pos = result_box.y;
+        // if (current_y_pos < previous - 0.02){
+        //     env.console.log("We have looped back around. Stop.");
+        //     break;
+        // }
 
-//         pbf_press_dpad(context, DPAD_DOWN, 160ms, 320ms);
-//         // collect the mystery gift. Press A until you see the Gradient arrow again.
-//         ret = run_until<ProControllerContext>(
-//             env.console, context,
-//             [&](ProControllerContext& context){
-//                 for (size_t i = 0; i < 40; i++){
-//                     pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
-//                 }
-//             },
-//             arrow
-//         );
-//         if (ret < 0){
-//             OperationFailedException::fire(
-//                 ErrorReport::SEND_ERROR_REPORT,
-//                 "Failed to detect gradient arrow. We might not be in the Mystery Gift via Internet screen.",
-//                 env.console
-//             );            
-//         }
+        // bool seen_before = false;
+        // // check if we have seen this position before
+        // for (double y_pos : y_position_seen){
+        //     // if difference is less than 0.02, then it's the same
+        //     env.console.log("current_y_pos: " + std::to_string(current_y_pos) + " y_pos: " + std::to_string(y_pos));
+        //     if (std::abs(current_y_pos - y_pos) < 0.02){
+        //         seen_before = true;
+        //         break;
+        //     }
+        // }
+        // if (seen_before){
+        //     env.console.log("We have seen this selection before, go down.");
+        //     previous = current_y_pos;
+        //     pbf_press_dpad(context, DPAD_DOWN, 160ms, 320ms);
+        //     continue;
+        // }
+        // env.console.log("We have NOT seen this selection before. Try to collect the Mystery Gift.");
+        // y_position_seen.emplace_back(current_y_pos);
 
-//     }
+        pbf_press_button(context, BUTTON_A, 30ms, 30ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 160ms);  // second button press in case first one drops
+        context.wait_for_all_requests();
 
+        BlackScreenWatcher detector(COLOR_RED, {0.286199, 0.221328, 0.453620, 0.205231});
+        ret = wait_until(
+            env.console, context,
+            Milliseconds(1 * 1000),
+            {detector}
+        );
+        if (ret == 0){
+            env.console.log("Already received gift. Assume we have run out of mystery gifts to collect.", COLOR_ORANGE);
+            break;
+        }
+        
+        // if Black screen not detected, it's likely an unclaimed gift.
+        // collect the mystery gift. Press A until you see the Gradient arrow again.
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                for (size_t i = 0; i < 60; i++){
+                    pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+                }
+            },
+            {arrow}
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to detect gradient arrow. We might not be in the Mystery Gift via Internet screen.",
+                env.console
+            );            
+        }
 
-// }
+    }
+}
 
 void ClaimMysteryGift::enter_mystery_gift_code_window(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index){
     env.console.log("Save game, then try to enter the mystery gift window.", COLOR_YELLOW);
@@ -368,7 +387,6 @@ void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControlle
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    // env.console.log("Start Segment " + ALL_AUTO_STORY_SEGMENT_LIST()[get_start_segment_index()]->name(), COLOR_ORANGE);
 
     if (STARTING_POINT == StartingPoint::NEW_GAME){
         run_autostory_until_pokeportal_unlocked(env, context);
@@ -377,8 +395,8 @@ void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControlle
             enter_mystery_gift_code_window(env, context, 2);
             enter_mystery_gift_code(env, context);
         }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_ALL){
-            // enter_mystery_gift_via_internet_window(env, context, 2);
-            // claim_internet_mystery_gift(env, context);
+            enter_mystery_gift_via_internet_window(env, context, 2);
+            claim_internet_mystery_gift(env, context);
 
         }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_NONE){
             enter_mystery_gift_via_internet_window(env, context, 2);
@@ -389,18 +407,18 @@ void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControlle
         // only claim the mystery gift via code. not via internet
         enter_mystery_gift_code(env, context);
 
-    }else if (STARTING_POINT == StartingPoint::DONE_TUTORIAL){
+    // }else if (STARTING_POINT == StartingPoint::DONE_TUTORIAL){
 
-        if (OBTAINING_METHOD == ObtainingMethod::VIA_CODE){
-            enter_mystery_gift_code_window(env, context, 3);
-            enter_mystery_gift_code(env, context);            
-        }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_ALL){
-            // enter_mystery_gift_via_internet_window(env, context, 3);
+    //     if (OBTAINING_METHOD == ObtainingMethod::VIA_CODE){
+    //         enter_mystery_gift_code_window(env, context, 3);
+    //         enter_mystery_gift_code(env, context);            
+    //     }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_ALL){
+    //         // enter_mystery_gift_via_internet_window(env, context, 3);
 
-        }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_NONE){
-            enter_mystery_gift_via_internet_window(env, context, 3);
+    //     }else if(OBTAINING_METHOD == ObtainingMethod::VIA_INTERNET_NONE){
+    //         enter_mystery_gift_via_internet_window(env, context, 3);
 
-        }        
+    //     }        
     }else{
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown STARTING_POINT.");
     }
