@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -60,6 +61,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
@@ -139,6 +141,12 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
                 if (result < 0){
                     stats.add_error();
                     env.update_stats();
+                    if (NOTIFICATION_ERROR_RECOVERABLE.ok_to_send_now(env.logger())){
+                        dump_image(
+                            env.logger(), env.program_info(), env.console,
+                            "Start of battle not detected after 30 seconds."
+                        );
+                    }
                     break;
                 }
                 env.log("Detected battle start.");
