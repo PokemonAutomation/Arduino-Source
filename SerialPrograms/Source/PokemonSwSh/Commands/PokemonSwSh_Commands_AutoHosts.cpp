@@ -90,7 +90,7 @@ void accept_FRs(
     }
 
     //  Go to Switch Home menu.
-    pbf_press_button(context, BUTTON_HOME, 80ms, game_to_home_delay_safe);
+    go_home(console, context);
 
     home_to_add_friends(context, slot, 0, fix_cursor);
 

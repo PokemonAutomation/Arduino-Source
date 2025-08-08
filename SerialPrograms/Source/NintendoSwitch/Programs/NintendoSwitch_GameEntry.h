@@ -17,6 +17,7 @@ namespace NintendoSwitch{
 
 
 void go_home(ConsoleHandle& console, ProControllerContext& context);
+void go_home(ConsoleHandle& console, JoyconContext& context);
 void ensure_at_home(ConsoleHandle& console, ProControllerContext& context);
 void ensure_at_home(ConsoleHandle& console, JoyconContext& context);
 

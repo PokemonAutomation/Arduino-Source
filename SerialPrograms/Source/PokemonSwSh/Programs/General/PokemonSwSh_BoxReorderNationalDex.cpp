@@ -13,6 +13,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -227,7 +228,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, ProCont
     }
 
     // Go to Switch home menu
-    pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().HOME_TO_GAME_DELAY0);
+    go_home(env.console, context);
 }
 
 

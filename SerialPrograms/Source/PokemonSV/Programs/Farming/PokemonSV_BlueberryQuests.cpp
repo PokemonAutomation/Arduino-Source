@@ -1064,7 +1064,7 @@ void quest_hatch_egg(
 
     //Fix time before hatching
     if (BBQ_OPTIONS.FIX_TIME_FOR_HATCH){
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        go_home(console, context);
         home_to_date_time(console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
@@ -1294,7 +1294,7 @@ void quest_tera_raid(
             exit_tera_win_without_catching(env.program_info(), console, context, 0);
         }else{
             if (BBQ_OPTIONS.CATCH_ON_WIN.FIX_TIME_ON_CATCH){
-                pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+                go_home(console, context);
                 home_to_date_time(console, context, false);
                 pbf_press_button(context, BUTTON_A, 20, 105);
                 pbf_press_button(context, BUTTON_A, 20, 105);

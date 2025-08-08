@@ -259,7 +259,7 @@ bool RideCloner101::run_post_win(
     RideCloner101_Descriptor::Stats& stats = env.current_stats<RideCloner101_Descriptor::Stats>();
 
     if (FIX_TIME_ON_CATCH){
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        go_home(console, context);
         home_to_date_time(console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);

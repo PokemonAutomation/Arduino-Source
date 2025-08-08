@@ -139,7 +139,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
         //Fix the time to prevent running out of years
         pbf_wait(context, 250);
         context.wait_for_all_requests();
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        go_home(env.console, context);
         home_to_date_time(env.console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);
@@ -160,7 +160,7 @@ void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
     env.update_stats();
 
     if (BBQ_OPTIONS.FIX_TIME_WHEN_DONE){
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        go_home(env.console, context);
         home_to_date_time(env.console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);

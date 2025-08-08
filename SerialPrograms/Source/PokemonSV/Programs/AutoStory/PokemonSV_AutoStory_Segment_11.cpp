@@ -573,7 +573,7 @@ void checkpoint_26(
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
         
         // fix the time
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        go_home(env.console, context);
         home_to_date_time(env.console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);

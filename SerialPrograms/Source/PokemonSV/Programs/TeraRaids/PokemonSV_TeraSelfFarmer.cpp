@@ -189,7 +189,7 @@ bool TeraSelfFarmer::run_raid(SingleSwitchProgramEnvironment& env, ProController
 
 
     if (CATCH_ON_WIN.FIX_TIME_ON_CATCH){
-        pbf_press_button(context, BUTTON_HOME, 80ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        go_home(env.console, context);
         home_to_date_time(env.console, context, false);
         pbf_press_button(context, BUTTON_A, 20, 105);
         pbf_press_button(context, BUTTON_A, 20, 105);

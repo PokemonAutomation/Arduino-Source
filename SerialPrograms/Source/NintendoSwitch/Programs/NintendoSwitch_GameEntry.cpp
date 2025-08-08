@@ -33,12 +33,21 @@ namespace NintendoSwitch{
 
 
 void go_home(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Going Home...");
     pbf_press_button(context, BUTTON_HOME, 160ms, 0ms);
     if (!console.video().snapshot()){
         pbf_wait(context, 640ms);
         return;
     }
-
+    ensure_at_home(console, context);
+}
+void go_home(ConsoleHandle& console, JoyconContext& context){
+    console.log("Going Home...");
+    pbf_press_button(context, BUTTON_HOME, 160ms, 0ms);
+    if (!console.video().snapshot()){
+        pbf_wait(context, 640ms);
+        return;
+    }
     ensure_at_home(console, context);
 }
 
