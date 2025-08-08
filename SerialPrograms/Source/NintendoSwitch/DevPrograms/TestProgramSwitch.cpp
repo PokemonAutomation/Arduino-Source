@@ -258,6 +258,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+    auto screenshot = feed.snapshot();
+
+    YCommIconDetector detector(true);
+    cout << detector.process_frame(screenshot, current_time()) << endl;
+
+
 #if 0
     bool switch2 = true;
     ImageFloatBox key1_box; 

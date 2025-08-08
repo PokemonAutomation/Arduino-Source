@@ -18,6 +18,8 @@
 #include "WaterfillUtilities.h"
 
 #include <iostream>
+//using std::cout;
+//using std::endl;
 
 
 namespace PokemonAutomation{
@@ -96,6 +98,7 @@ bool match_template_by_waterfill(
         std::cout << ")" << std::endl;
     }
     std::vector<PokemonAutomation::PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(image, filters);
+//    cout << matrices.size() << endl;
 
     bool detected = false;
     bool stop_match = false;
@@ -116,10 +119,12 @@ bool match_template_by_waterfill(
         std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
         Kernels::Waterfill::WaterfillObject object;
         const size_t min_area = area_thresholds.first;
+//        cout << "min_area = " << min_area << endl;
         session->set_source(matrix);
         auto finder = session->make_iterator(min_area);
         const bool keep_object_matrix = false;
         while (finder->find_next(object, keep_object_matrix)){
+//            cout << "object.area = " << object.area << endl;
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
                 std::cout << "------------" << std::endl;
                 std::cout << "Object area: " << object.area << std::endl;
