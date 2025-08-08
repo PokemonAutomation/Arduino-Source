@@ -11,6 +11,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_TeraRewardsMenu.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV_TeraBattler.h"
 
@@ -213,6 +214,16 @@ bool run_tera_battle(
         CheerSelectWatcher cheer_select_menu(COLOR_YELLOW);
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
         TargetSelectWatcher target_select_menu(COLOR_CYAN);
+        TeraRewardsMenuWatcher rewards_menu(
+            COLOR_BLUE,
+            //  This can false positive against the back (B) button while in the
+            //  lobby. So don't trigger this unless we see the battle menu first.
+            //  At the same time, there's a possibility that we miss the battle
+            //  menu if the raid is won before it even loads. And this can only
+            //  happen if the raid was uncatchable to begin with.
+            std::chrono::seconds(battle_menu_seen ? 5 : 180)
+        );
+#if 0
         WhiteButtonWatcher next_button(
             COLOR_CYAN,
             WhiteButton::ButtonA,
@@ -225,6 +236,7 @@ bool run_tera_battle(
             //  happen if the raid was uncatchable to begin with.
             std::chrono::seconds(battle_menu_seen ? 5 : 180)
         );
+#endif
         TeraCatchWatcher catch_menu(COLOR_BLUE);
         OverworldWatcher overworld(stream.logger(), COLOR_GREEN);
         context.wait_for_all_requests();
@@ -241,7 +253,8 @@ bool run_tera_battle(
                 cheer_select_menu,
                 move_select_menu,
                 target_select_menu,
-                next_button,
+//                next_button,
+                rewards_menu,
                 catch_menu,
                 overworld,
             }

@@ -1577,6 +1577,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/Battles/PokemonSV_StartBattleYellowBar.h
     Source/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.cpp
     Source/PokemonSV/Inference/Battles/PokemonSV_TeraBattleMenus.h
+    Source/PokemonSV/Inference/Battles/PokemonSV_TeraRewardsMenu.cpp
+    Source/PokemonSV/Inference/Battles/PokemonSV_TeraRewardsMenu.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.cpp
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h
     Source/PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.cpp
