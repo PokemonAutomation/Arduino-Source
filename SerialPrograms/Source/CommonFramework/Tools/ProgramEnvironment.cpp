@@ -73,6 +73,9 @@ AsyncDispatcher& ProgramEnvironment::realtime_inference_dispatcher(){
 
 void ProgramEnvironment::update_stats(){
     m_session.report_stats_changed();
+    if (m_current_stats){
+        m_logger.log("Current Stats: " + m_current_stats->to_str(StatsTracker::PrintMode::DUMP));
+    }
 }
 
 

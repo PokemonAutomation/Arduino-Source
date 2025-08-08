@@ -24,6 +24,7 @@ public:
     virtual ~StatsTracker() = default;
 
     enum PrintMode{
+        DUMP,
         DISPLAY_ON_SCREEN,
         SAVE_TO_STATS_FILE,
     };

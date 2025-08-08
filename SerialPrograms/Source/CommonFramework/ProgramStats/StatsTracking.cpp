@@ -53,6 +53,8 @@ std::string StatsTracker::to_str(PrintMode mode) const{
             }
         case ALWAYS_HIDDEN:
             switch (mode){
+            case DUMP:
+                break;
             case DISPLAY_ON_SCREEN:
                 continue;
             case SAVE_TO_STATS_FILE:
