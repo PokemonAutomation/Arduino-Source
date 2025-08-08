@@ -40,6 +40,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     void run_autostory_until_pokeportal_unlocked(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void enter_mystery_gift_via_internet_window(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index);
+    void claim_internet_mystery_gift(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
     void enter_mystery_gift_code_window(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int menu_index);
     void enter_mystery_gift_code(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
@@ -60,7 +62,7 @@ private:
 
         enum class ObtainingMethod{
         VIA_INTERNET_ALL,
-        VIA_INTERNET_ONE,
+        VIA_INTERNET_NONE,
         VIA_CODE,
     };
 
