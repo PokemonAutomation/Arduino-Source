@@ -139,6 +139,8 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathMap.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
+#include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -260,9 +262,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto screenshot = feed.snapshot();
 
-    YCommIconDetector detector(true);
+    PokemonSwSh::BlackDialogBoxDetector detector(true);
+    detector.make_overlays(overlays);
     cout << detector.process_frame(screenshot, current_time()) << endl;
 
+
+
+//    PokemonSV::BoxShinyDetector detector;
+//    cout << detector.detect(screenshot) << endl;
+
+
+
+
+#if 0
+    YCommIconDetector detector(true);
+    cout << detector.process_frame(screenshot, current_time()) << endl;
+#endif
 
 #if 0
     bool switch2 = true;
