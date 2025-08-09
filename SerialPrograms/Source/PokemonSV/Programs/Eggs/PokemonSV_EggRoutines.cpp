@@ -757,7 +757,11 @@ bool check_baby_info(
     gender_detector.make_overlays(overlay_set);
     BoxNatureDetector nature_detector(stream.overlay(), LANGUAGE);
 
-    const int shiny_ret = wait_until(stream, context, std::chrono::milliseconds(200), {shiny_detector});
+    const int shiny_ret = wait_until(
+        stream, context,
+        std::chrono::milliseconds(500),
+        {shiny_detector}
+    );
     const bool shiny = (shiny_ret == 0);
     VideoSnapshot screen = stream.video().snapshot();
     
