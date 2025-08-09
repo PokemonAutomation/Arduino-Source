@@ -91,7 +91,7 @@ void VideoSession::set(const VideoSourceOption& option){
 
 void VideoSession::reset(){
     m_logger.log("Resetting the video...", COLOR_GREEN);
-    dispatch_to_main_thread([this]{
+    queue_on_main_thread([this]{
         std::lock_guard<std::mutex> lg0(m_reset_lock);
 
         m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
@@ -124,7 +124,7 @@ void VideoSession::set_source(
     Resolution resolution
 ){
     m_logger.log("Changing video...", COLOR_GREEN);
-    dispatch_to_main_thread([this, device, resolution]{
+    queue_on_main_thread([this, device, resolution]{
         std::lock_guard<std::mutex> lg0(m_reset_lock);
         if (*m_descriptor == *device && !m_descriptor->should_reload()){
             return;
@@ -163,7 +163,7 @@ void VideoSession::set_source(
 }
 void VideoSession::set_resolution(Resolution resolution){
     m_logger.log("Changing resolution...", COLOR_GREEN);
-    dispatch_to_main_thread([this, resolution]{
+    queue_on_main_thread([this, resolution]{
         std::lock_guard<std::mutex> lg0(m_reset_lock);
         if (m_option.m_resolution == resolution){
             return;
