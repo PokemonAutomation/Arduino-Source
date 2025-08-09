@@ -68,7 +68,11 @@ void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
     for (uint32_t c = 0; c < SKIPS; c++){
         env.log("Fetch Attempts: " + tostr_u_commas(c));
         home_roll_date_enter_game_autorollback(env.console, context, year);
-        pbf_mash_button(context, BUTTON_B, 90);
+        if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
+            pbf_wait(context, 90);
+        }else{
+            pbf_mash_button(context, BUTTON_B, 90);
+        }
 
         ssf_press_button_ptv(context, BUTTON_A, 160ms);
         pbf_mash_button(context, BUTTON_ZL, 385);
