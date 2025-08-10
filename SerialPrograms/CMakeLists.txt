@@ -903,12 +903,18 @@ file(GLOB MAIN_SOURCES
     Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
     Source/ML/ML_Panels.cpp
     Source/ML/ML_Panels.h
+    Source/ML/Models/ML_ONNXRuntimeHelpers.cpp
+    Source/ML/Models/ML_ONNXRuntimeHelpers.h
+    Source/ML/Models/ML_YOLOv5Model.cpp
+    Source/ML/Models/ML_YOLOv5Model.h
     Source/ML/Programs/ML_LabelImages.cpp
     Source/ML/Programs/ML_LabelImages.h
     Source/ML/Programs/ML_LabelImagesOverlayManager.cpp
     Source/ML/Programs/ML_LabelImagesOverlayManager.h
     Source/ML/Programs/ML_LabelImagesWidget.cpp
     Source/ML/Programs/ML_LabelImagesWidget.h
+    Source/ML/Programs/ML_RunYOLO.cpp
+    Source/ML/Programs/ML_RunYOLO.h
     Source/ML/UI/ML_ImageAnnotationCommandRow.cpp
     Source/ML/UI/ML_ImageAnnotationCommandRow.h
     Source/ML/UI/ML_ImageAnnotationDisplayOption.cpp

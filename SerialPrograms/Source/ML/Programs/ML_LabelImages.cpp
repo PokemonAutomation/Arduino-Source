@@ -70,7 +70,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     ADD_OPTION(FORM_LABEL);
     ADD_OPTION(CUSTOM_SET_LABEL);
     ADD_OPTION(MANUAL_LABEL);
-
+ 
     X.add_listener(*this);
     Y.add_listener(*this);
     WIDTH.add_listener(*this);
@@ -79,6 +79,8 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     FORM_LABEL.add_listener(*this);
     CUSTOM_SET_LABEL.add_listener(*this);
     MANUAL_LABEL.add_listener(*this);
+
+
 
     // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
     const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";

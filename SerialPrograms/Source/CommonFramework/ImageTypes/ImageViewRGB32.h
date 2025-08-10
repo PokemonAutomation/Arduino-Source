@@ -57,6 +57,7 @@ public:
     QImage to_QImage_owning() const;    //  Return a copy that owns its own buffer. (slow)
     QImage scaled_to_QImage(size_t width, size_t height) const;
 
+    // convert to cv::Mat with BGRA color channel order
     cv::Mat to_opencv_Mat() const;
 
 private:
