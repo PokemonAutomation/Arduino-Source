@@ -8,6 +8,7 @@
 #define PokemonAutomation_VideoPipeline_VideoSession_H
 
 #include <memory>
+#include <deque>
 #include <mutex>
 #include "Common/Cpp/EventRateTracker.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
@@ -176,7 +177,28 @@ private:
 
 
 private:
-    mutable std::mutex m_reset_lock;
+    enum CommandType{
+        RESET,
+        SET_SOURCE,
+        SET_RESOLUTION
+    };
+    struct Command{
+        CommandType command_type;
+        std::shared_ptr<VideoSourceDescriptor> device;
+        Resolution resolution;
+    };
+    void run_commands();
+
+    void internal_reset();
+    void internal_set_source(
+        const std::shared_ptr<VideoSourceDescriptor>& device,
+        Resolution resolution = {}
+    );
+    void internal_set_resolution(Resolution resolution);
+
+
+private:
+    mutable std::recursive_mutex m_reset_lock;
     mutable SpinLock m_state_lock;
 
     Logger& m_logger;
@@ -188,6 +210,12 @@ private:
 
     std::shared_ptr<const VideoSourceDescriptor> m_descriptor;
     std::unique_ptr<VideoSource> m_video_source;
+
+    //  We need to queue up all reset commands and run them on the main thread.
+    //  This is needed to prevent re-entrant calls from event processing.
+    SpinLock m_queue_lock;
+    size_t m_recursion_depth = 0;
+    std::deque<Command> m_queued_commands;
 
     ListenerSet<StateListener> m_state_listeners;
     ListenerSet<VideoFrameListener> m_frame_listeners;
