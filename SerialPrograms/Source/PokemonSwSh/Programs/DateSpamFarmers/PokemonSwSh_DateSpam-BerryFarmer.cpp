@@ -69,7 +69,11 @@ void BerryFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         env.log("Fetch Attempts: " + tostr_u_commas(c));
 
         home_roll_date_enter_game_autorollback(env.console, context, year);
-        pbf_mash_button(context, BUTTON_B, 90);
+        if (context->performance_class() == ControllerPerformanceClass::SysbotBase){
+            pbf_wait(context, 90);
+        }else{
+            pbf_mash_button(context, BUTTON_B, 90);
+        }
 
         pbf_press_button(context, BUTTON_A, 10, 10);
         pbf_mash_button(context, BUTTON_ZL, 385);

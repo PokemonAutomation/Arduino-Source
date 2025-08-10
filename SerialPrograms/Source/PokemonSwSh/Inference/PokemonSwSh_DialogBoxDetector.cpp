@@ -50,8 +50,8 @@ void BlackDialogBoxDetector::make_overlays(VideoOverlaySet& items) const{
 
 bool BlackDialogBoxDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     bool detected = true;
-    for(const auto& box : BLACK_BOXES){
-        if (is_black(extract_box_reference(frame, box), 180, 35) == false){
+    for (const auto& box : BLACK_BOXES){
+        if (is_black(extract_box_reference(frame, box), 200, 35) == false){
             detected = false;
             break;
         }

@@ -90,109 +90,208 @@ void VideoSession::set(const VideoSourceOption& option){
 }
 
 void VideoSession::reset(){
-    m_logger.log("Resetting the video...", COLOR_GREEN);
-    dispatch_to_main_thread([this]{
-        std::lock_guard<std::mutex> lg0(m_reset_lock);
-
-        m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
-
-        {
-            WriteSpinLock lg(m_state_lock);
-            if (m_video_source){
-                m_video_source->remove_source_frame_listener(*this);
-                m_video_source->remove_rendered_frame_listener(*this);
-                m_video_source.reset();
+    {
+        WriteSpinLock lg(m_queue_lock);
+//        cout << "VideoSession::reset(): " << m_queued_commands.size() << endl;
+        m_queued_commands.emplace_back(
+            Command{
+                CommandType::RESET,
+                nullptr,
+                Resolution{}
             }
-
-            m_video_source = m_descriptor->make_VideoSource(m_logger, m_option.m_resolution);
-
-            if (m_video_source){
-                m_option.m_resolution = m_video_source->current_resolution();
-                m_video_source->add_source_frame_listener(*this);
-                m_video_source->add_rendered_frame_listener(*this);
-            }
-        }
-
-        m_state_listeners.run_method_unique(
-            &StateListener::post_startup,
-            m_video_source.get()
         );
-    });
+    }
+    dispatch_to_main_thread([this]{ run_commands(); });
 }
 void VideoSession::set_source(
     const std::shared_ptr<VideoSourceDescriptor>& device,
     Resolution resolution
 ){
-    m_logger.log("Changing video...", COLOR_GREEN);
-    dispatch_to_main_thread([this, device, resolution]{
-        std::lock_guard<std::mutex> lg0(m_reset_lock);
-        if (*m_descriptor == *device && !m_descriptor->should_reload()){
-            return;
-        }
-
-        m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
-
-        {
-            WriteSpinLock lg(m_state_lock);
-            if (m_video_source){
-                m_video_source->remove_source_frame_listener(*this);
-                m_video_source->remove_rendered_frame_listener(*this);
-                m_video_source.reset();
+    {
+        WriteSpinLock lg(m_queue_lock);
+//        cout << "VideoSession::set_source(): " << m_queued_commands.size() << endl;
+        m_queued_commands.emplace_back(
+            Command{
+                CommandType::SET_SOURCE,
+                device,
+                resolution
             }
-
-            m_option.set_descriptor(device);
-            m_descriptor = device;
-
-            Resolution desired_resolution = resolution ? resolution : m_option.m_resolution;
-//            cout << "VideoSession::set_source(): " << &m_option << " - " << desired_resolution.width << " x " << desired_resolution.height << endl;
-
-            m_video_source = device->make_VideoSource(m_logger, desired_resolution);
-
-            if (m_video_source){
-                m_option.m_resolution = m_video_source->current_resolution();
-                m_video_source->add_source_frame_listener(*this);
-                m_video_source->add_rendered_frame_listener(*this);
-            }
-        }
-
-        m_state_listeners.run_method_unique(
-            &StateListener::post_startup,
-            m_video_source.get()
         );
-    });
+    }
+    dispatch_to_main_thread([this]{ run_commands(); });
 }
 void VideoSession::set_resolution(Resolution resolution){
-    m_logger.log("Changing resolution...", COLOR_GREEN);
-    dispatch_to_main_thread([this, resolution]{
-        std::lock_guard<std::mutex> lg0(m_reset_lock);
-        if (m_option.m_resolution == resolution){
-            return;
-        }
-
-        {
-            WriteSpinLock lg(m_state_lock);
-            m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
-
-            if (m_video_source){
-                m_video_source->remove_source_frame_listener(*this);
-                m_video_source->remove_rendered_frame_listener(*this);
-                m_video_source.reset();
+    {
+        WriteSpinLock lg(m_queue_lock);
+//        cout << "VideoSession::set_resolution(): " << m_queued_commands.size() << endl;
+        m_queued_commands.emplace_back(
+            Command{
+                CommandType::SET_RESOLUTION,
+                nullptr,
+                resolution
             }
-
-            m_video_source = m_descriptor->make_VideoSource(m_logger, resolution);
-
-            if (m_video_source){
-                m_option.m_resolution = m_video_source->current_resolution();
-                m_video_source->add_source_frame_listener(*this);
-                m_video_source->add_rendered_frame_listener(*this);
-            }
-        }
-
-        m_state_listeners.run_method_unique(
-            &StateListener::post_startup,
-            m_video_source.get()
         );
-    });
+    }
+    dispatch_to_main_thread([this]{ run_commands(); });
+}
+
+void VideoSession::internal_reset(){
+    m_logger.log("Resetting the video...", COLOR_GREEN);
+    m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
+
+    Resolution resolution = m_option.m_resolution;
+    std::unique_ptr<VideoSource> source;
+    {
+        WriteSpinLock lg(m_state_lock);
+        source = std::move(m_video_source);
+    }
+    if (source){
+        source->remove_source_frame_listener(*this);
+        source->remove_rendered_frame_listener(*this);
+        source.reset();
+    }
+
+    source = m_descriptor->make_VideoSource(m_logger, resolution);
+    if (source){
+        resolution = source->current_resolution();
+        source->add_source_frame_listener(*this);
+        source->add_rendered_frame_listener(*this);
+    }
+
+    {
+        WriteSpinLock lg(m_state_lock);
+        m_option.m_resolution = resolution;
+        m_video_source = std::move(source);
+    }
+
+    m_state_listeners.run_method_unique(
+        &StateListener::post_startup,
+        m_video_source.get()
+    );
+}
+void VideoSession::internal_set_source(
+    const std::shared_ptr<VideoSourceDescriptor>& device,
+    Resolution resolution
+){
+    m_logger.log("Changing video...", COLOR_GREEN);
+    if (*m_descriptor == *device && !m_descriptor->should_reload()){
+        return;
+    }
+
+    m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
+
+    std::unique_ptr<VideoSource> source;
+    {
+        WriteSpinLock lg(m_state_lock);
+        source = std::move(m_video_source);
+    }
+    if (source){
+        source->remove_source_frame_listener(*this);
+        source->remove_rendered_frame_listener(*this);
+        source.reset();
+    }
+    {
+        WriteSpinLock lg(m_state_lock);
+        m_option.set_descriptor(device);
+        m_descriptor = device;
+    }
+
+    Resolution desired_resolution = resolution ? resolution : m_option.m_resolution;
+    source = device->make_VideoSource(m_logger, desired_resolution);
+    if (source){
+        resolution = source->current_resolution();
+        source->add_source_frame_listener(*this);
+        source->add_rendered_frame_listener(*this);
+    }
+
+    {
+        WriteSpinLock lg(m_state_lock);
+        m_option.m_resolution = resolution;
+        m_video_source = std::move(source);
+    }
+
+    m_state_listeners.run_method_unique(
+        &StateListener::post_startup,
+        m_video_source.get()
+    );
+}
+void VideoSession::internal_set_resolution(Resolution resolution){
+    m_logger.log("Changing resolution...", COLOR_GREEN);
+    if (m_option.m_resolution == resolution){
+        return;
+    }
+
+    m_state_listeners.run_method_unique(&StateListener::pre_shutdown);
+
+    std::unique_ptr<VideoSource> source;
+    {
+        WriteSpinLock lg(m_state_lock);
+        source = std::move(m_video_source);
+    }
+    if (source){
+        source->remove_source_frame_listener(*this);
+        source->remove_rendered_frame_listener(*this);
+        source.reset();
+    }
+
+    source = m_descriptor->make_VideoSource(m_logger, resolution);
+    if (source){
+        resolution = source->current_resolution();
+        source->add_source_frame_listener(*this);
+        source->add_rendered_frame_listener(*this);
+    }
+
+    {
+        WriteSpinLock lg(m_state_lock);
+        m_option.m_resolution = resolution;
+        m_video_source = std::move(source);
+    }
+
+    m_state_listeners.run_method_unique(
+        &StateListener::post_startup,
+        m_video_source.get()
+    );
+}
+
+void VideoSession::run_commands(){
+    std::lock_guard<std::recursive_mutex> lg0(m_reset_lock);
+    if (m_recursion_depth != 0){
+        m_logger.log("Suppressing re-entrant command...", COLOR_RED);
+        return;
+    }
+    m_recursion_depth++;
+    try{
+        while (true){
+            Command command;
+            {
+                WriteSpinLock lg(m_queue_lock);
+//                cout << "VideoSession::run_commands(): " << m_queued_commands.size() << endl;
+                if (m_queued_commands.empty()){
+                    break;
+                }
+                command = std::move(m_queued_commands.front());
+                m_queued_commands.pop_front();
+            }
+
+            switch (command.command_type){
+            case CommandType::RESET:
+                internal_reset();
+                break;
+
+            case CommandType::SET_SOURCE:
+                internal_set_source(command.device, command.resolution);
+                break;
+
+            case CommandType::SET_RESOLUTION:
+                internal_set_resolution(command.resolution);
+                break;
+            }
+        }
+        m_recursion_depth--;
+    }catch (...){
+        m_recursion_depth--;
+        throw;
+    }
 }
 
 
