@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_SerialPABotBase_Messages_ESP32_H
 #define PokemonAutomation_SerialPABotBase_Messages_ESP32_H
 
+#include "../Controllers/NintendoSwitch_WirelessController_State.h"
 #include "SerialPABotBase_Protocol.h"
 
 #if _WIN32
@@ -31,30 +32,6 @@ typedef struct{
     uint8_t left_grip[3];
     uint8_t right_grip[3];
 } PABB_NintendoSwitch_ControllerColors;
-
-typedef struct{
-    uint8_t button3;
-    uint8_t button4;
-    uint8_t button5;
-    uint8_t left_joystick[3];
-    uint8_t right_joystick[3];
-    uint8_t vibrator;
-} PABB_NintendoSwitch_ButtonState;
-
-typedef struct{
-    int16_t accel_x;
-    int16_t accel_y;
-    int16_t accel_z;
-    int16_t rotation_x;
-    int16_t rotation_y;
-    int16_t rotation_z;
-} PABB_NintendoSwitch_GyroState;
-
-typedef struct{
-    PABB_NintendoSwitch_GyroState time0;
-    PABB_NintendoSwitch_GyroState time1;
-    PABB_NintendoSwitch_GyroState time2;
-} PABB_NintendoSwitch_GyroStateX3;
 
 
 
@@ -82,7 +59,7 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    PABB_NintendoSwitch_ButtonState buttons;
+    pa_NintendoSwitch_WirelessController_State0x30_Buttons buttons;
 } PABB_PACK pabb_Message_ESP32_CommandButtonState;
 
 
@@ -90,8 +67,7 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    PABB_NintendoSwitch_ButtonState buttons;
-    PABB_NintendoSwitch_GyroStateX3 gyro;
+    pa_NintendoSwitch_WirelessController_State0x30 state;
 } PABB_PACK pabb_Message_ESP32_CommandFullState;
 
 

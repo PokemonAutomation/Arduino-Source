@@ -62,6 +62,8 @@ file(GLOB MAIN_SOURCES
     ../Common/CRC32.cpp
     ../Common/CRC32.h
     ../Common/Compiler.h
+    ../Common/Controllers/NintendoSwitch2_WiredController_State.h
+    ../Common/Controllers/NintendoSwitch_WirelessController_State.h
     ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp
     ../Common/Cpp/BitmapConversion.h

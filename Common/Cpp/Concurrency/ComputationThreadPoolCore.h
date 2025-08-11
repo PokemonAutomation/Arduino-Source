@@ -17,7 +17,7 @@
 #define PokemonAutomation_ComputationThreadPoolCore_H
 
 #include <functional>
-#include <list>
+//#include <list>
 #include <deque>
 #include <thread>
 #include "Common/Cpp/CpuUtilization/CpuUtilization.h"
