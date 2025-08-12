@@ -34,21 +34,21 @@ public:
 
 private:
     Color m_color;
-    ImageFloatBox m_bottom_white;
+    ImageFloatBox m_bottom_solid;
     ImageFloatBox m_bottom_buttons;
 };
 NewsDetector::NewsDetector(Color color)
     : m_color(color)
-    , m_bottom_white(0.15, 0.92, 0.20, 0.06)
+    , m_bottom_solid(0.15, 0.92, 0.20, 0.06)
     , m_bottom_buttons(0.40, 0.92, 0.58, 0.06)
 {}
 void NewsDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_bottom_white);
+    items.add(m_color, m_bottom_solid);
     items.add(m_color, m_bottom_buttons);
 }
 bool NewsDetector::detect(const ImageViewRGB32& screen){
-    ImageStats bottom_white = image_stats(extract_box_reference(screen, m_bottom_white));
-    if (!is_white(bottom_white)){
+    ImageStats bottom_solid = image_stats(extract_box_reference(screen, m_bottom_solid));
+    if (!is_white(bottom_solid) && !is_black(bottom_solid)){
         return false;
     }
 
@@ -161,7 +161,14 @@ void connect_to_internet_from_overworld(const ProgramInfo& info, VideoStream& st
         int ret = wait_until(
             stream, context,
             std::chrono::seconds(60),
-            {overworld, main_menu, dialog, prompt, news, battle_menu}
+            {
+                overworld,
+                main_menu,
+                dialog,
+                prompt,
+                news,
+                battle_menu,
+            }
         );
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){

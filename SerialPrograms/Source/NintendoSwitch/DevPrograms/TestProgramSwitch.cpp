@@ -141,6 +141,8 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
+#include "CommonTools/Images/SolidColorTest.h"
+
 
 #include <QPixmap>
 #include <QVideoFrame>
@@ -262,10 +264,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto screenshot = feed.snapshot();
 
+#if 0
+    NewsDetector detector;
+    detector.make_overlays(overlays);
+    cout << detector.detect(screenshot) << endl;
+#endif
+
+#if 0
     PokemonSwSh::BlackDialogBoxDetector detector(true);
     detector.make_overlays(overlays);
     cout << detector.process_frame(screenshot, current_time()) << endl;
-
+#endif
 
 
 //    PokemonSV::BoxShinyDetector detector;
