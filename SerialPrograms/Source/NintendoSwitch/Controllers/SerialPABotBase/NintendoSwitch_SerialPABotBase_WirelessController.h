@@ -98,19 +98,19 @@ protected:
         data[2] = (uint8_t)(wy >> 4);
     }
 
-    Button populate_report_buttons(PABB_NintendoSwitch_ButtonState& buttons);
-    bool populate_report_gyro(PABB_NintendoSwitch_GyroState& gyro);
+    Button populate_report_buttons(pa_NintendoSwitch_WirelessController_State0x30_Buttons& buttons);
+    bool populate_report_gyro(pa_NintendoSwitch_WirelessController_State0x30_Gyro& gyro);
 
     void issue_report(
         const Cancellable* cancellable,
         WallDuration duration,
-        const PABB_NintendoSwitch_ButtonState& buttons
+        const pa_NintendoSwitch_WirelessController_State0x30_Buttons& buttons
     );
     void issue_report(
         const Cancellable* cancellable,
         WallDuration duration,
-        const PABB_NintendoSwitch_ButtonState& buttons,
-        const PABB_NintendoSwitch_GyroState& gyro
+        const pa_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
+        const pa_NintendoSwitch_WirelessController_State0x30_Gyro& gyro
     );
 
 

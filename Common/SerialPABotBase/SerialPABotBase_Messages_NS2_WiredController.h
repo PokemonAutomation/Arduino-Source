@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_SerialPABotBase_Messages_NS2_WiredController_H
 #define PokemonAutomation_SerialPABotBase_Messages_NS2_WiredController_H
 
+#include "../Controllers/NintendoSwitch2_WiredController_State.h"
 #include "SerialPABotBase_Protocol.h"
 
 #if _WIN32
@@ -27,18 +28,9 @@ namespace SerialPABotBase{
 
 #define PABB_MSG_REPORT_NS2_WIRED_CONTROLLER    0x90
 typedef struct{
-    uint8_t buttons0;
-    uint8_t buttons1;
-    uint8_t dpad_byte;
-    uint8_t left_joystick_x;
-    uint8_t left_joystick_y;
-    uint8_t right_joystick_x;
-    uint8_t right_joystick_y;
-} pabb_Report_NS2_WiredController;
-typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    pabb_Report_NS2_WiredController report;
+    pa_NintendoSwitch2_WiredController_State report;
 } PABB_PACK pabb_Message_Report_NS2_WiredController;
 
 

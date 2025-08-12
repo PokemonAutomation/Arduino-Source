@@ -127,7 +127,7 @@ void SerialPABotBase_WirelessJoycon::issue_mash_button(
 
 
 void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* cancellable, WallDuration duration){
-    PABB_NintendoSwitch_ButtonState buttons{
+    pa_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -146,7 +146,7 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
         );
     }
 
-    PABB_NintendoSwitch_GyroState gyro{};
+    pa_NintendoSwitch_WirelessController_State0x30_Gyro gyro{};
     bool gyro_active = populate_report_gyro(gyro);
 
     if (!gyro_active){
@@ -156,7 +156,7 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
     }
 }
 void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* cancellable, WallDuration duration){
-    PABB_NintendoSwitch_ButtonState buttons{
+    pa_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -177,7 +177,7 @@ void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* 
 
 //    cout << (int)m_right_joystick.x << " - " << (int)m_right_joystick.y << ": " << std::chrono::duration_cast<Milliseconds>(duration).count() << endl;
 
-    PABB_NintendoSwitch_GyroState gyro{};
+    pa_NintendoSwitch_WirelessController_State0x30_Gyro gyro{};
     bool gyro_active = populate_report_gyro(gyro);
 
     if (!gyro_active){

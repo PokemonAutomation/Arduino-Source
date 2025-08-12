@@ -37,7 +37,7 @@ SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
 void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancellable, WallDuration duration){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
-    PABB_NintendoSwitch_ButtonState buttons{
+    pa_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -73,7 +73,7 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         );
     }
 
-    PABB_NintendoSwitch_GyroState gyro{
+    pa_NintendoSwitch_WirelessController_State0x30_Gyro gyro{
         0x0000,
         0x0000,
         0x0000,

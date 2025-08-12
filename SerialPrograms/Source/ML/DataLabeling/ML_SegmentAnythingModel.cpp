@@ -14,30 +14,13 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
+#include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_SegmentAnythingModelConstants.h"
 #include "ML_SegmentAnythingModel.h"
 #include "ML_AnnotationIO.h"
 
 namespace PokemonAutomation{
 namespace ML{
-
-Ort::SessionOptions create_session_option(){
-    return Ort::SessionOptions{};
-
-    // create session using Apple ML
-
-    // Ort::SessionOptions so;
-    // std::unordered_map<std::string, std::string> provider_options;
-    // provider_options["ModelFormat"] = "NeuralNetwork"; 
-    // so.AppendExecutionProvider("CoreML", provider_options);
-    // return so;
-}
-
-
-template<typename T, class Buffer, class Shape> Ort::Value create_tensor(const OrtMemoryInfo* memory_info, Buffer& buffer, const Shape& shape){
-    return Ort::Value::CreateTensor<T>(memory_info, buffer.data(), buffer.size(),
-        shape.data(), shape.size());
-}
 
 
 SAMEmbedderSession::SAMEmbedderSession(const std::string& model_path)

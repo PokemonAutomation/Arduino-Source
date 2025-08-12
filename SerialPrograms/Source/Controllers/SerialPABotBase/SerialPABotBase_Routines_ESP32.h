@@ -84,7 +84,10 @@ public:
 class MessageControllerStateButtons : public BotBaseRequest{
 public:
     pabb_Message_ESP32_CommandButtonState params;
-    MessageControllerStateButtons(uint16_t milliseconds, const PABB_NintendoSwitch_ButtonState& state)
+    MessageControllerStateButtons(
+        uint16_t milliseconds,
+        const pa_NintendoSwitch_WirelessController_State0x30_Buttons& state
+    )
         : BotBaseRequest(true)
     {
         params.seqnum = 0;
@@ -100,15 +103,15 @@ public:
     pabb_Message_ESP32_CommandFullState params;
     MessageControllerStateFull(
         uint16_t milliseconds,
-        const PABB_NintendoSwitch_ButtonState& buttons,
-        const PABB_NintendoSwitch_GyroStateX3& gyro
+        const pa_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
+        const pa_NintendoSwitch_WirelessController_State0x30_GyroX3& gyro
     )
         : BotBaseRequest(true)
     {
         params.seqnum = 0;
         params.milliseconds = milliseconds;
-        params.buttons = buttons;
-        params.gyro = gyro;
+        params.state.buttons = buttons;
+        params.state.gyro = gyro;
     }
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_ESP32_CONTROLLER_STATE_FULL, params);

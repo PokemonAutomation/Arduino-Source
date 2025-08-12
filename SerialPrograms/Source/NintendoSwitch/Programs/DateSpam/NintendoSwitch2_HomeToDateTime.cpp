@@ -50,6 +50,7 @@ ConsoleType settings_detect_console_type(
     size_t sliders = detector.detect(snapshot).size();
     switch (sliders){
     case 1:
+    case 2:
         console.state().set_console_type(console, ConsoleType::Switch2_FW20_International);
         break;
     case 3:
