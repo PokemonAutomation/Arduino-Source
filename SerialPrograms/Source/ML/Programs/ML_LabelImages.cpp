@@ -118,26 +118,38 @@ void LabelImages::from_json(const JsonValue& json){
     if (file_path){
         load_custom_label_set(*file_path);
     }
+
+    file_path = obj->get_string("YOLO_CONFIG_FILE_PATH");
+    if (file_path){
+        m_yolo_config_file_path = *file_path;
+    }
 }
 JsonValue LabelImages::to_json() const{
     JsonObject obj = std::move(*m_options.to_json().to_object());
     obj["ImageSetup"] = m_display_option.to_json();
     obj["CUSTOM_LABEL_SET_FILE_PATH"] = m_custom_label_set_file_path;
+    obj["YOLO_CONFIG_FILE_PATH"] = m_yolo_config_file_path;
 
     save_annotation_to_file();
     return obj;
 }
 
 void LabelImages::save_annotation_to_file() const{
-    // m_annotation_file_path
-    if (m_annotation_file_path.size() > 0 && !m_fail_to_load_annotation_file){
-        JsonArray anno_json_arr;
-        for(const auto& anno_obj: m_annotations){
-            anno_json_arr.push_back(anno_obj.to_json());
-        }
-        cout << "Saving annotation to " << m_annotation_file_path << endl;
-        anno_json_arr.dump(m_annotation_file_path);
+    if (m_annotation_file_path.size() == 0 || m_fail_to_load_annotation_file){
+        return;
     }
+    JsonObject json;
+    json["IMAGE_WIDTH"] = source_image_width;
+    json["IMAGE_HEIGHT"] = source_image_height;
+
+    JsonArray anno_json_arr;
+    for(const auto& anno_obj: m_annotations){
+        anno_json_arr.push_back(anno_obj.to_json());
+    }
+    json["ANNOTATION"] = std::move(anno_json_arr);
+
+    cout << "Saving annotation to " << m_annotation_file_path << endl;
+    json.dump(m_annotation_file_path);
 }
 
 void LabelImages::clear_for_new_image(){
@@ -188,7 +200,14 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     }
 
     const JsonValue loaded_json = parse_json(json_content);
-    const JsonArray* json_array = loaded_json.to_array();
+    const JsonObject* json_obj = loaded_json.to_object();
+    const JsonArray* json_array = nullptr;
+    if (json_obj == nullptr){
+        // legacy format, load as an array
+        json_array = loaded_json.to_array();
+    } else{
+        json_array = json_obj->get_array("ANNOTATION");
+    }
     if (json_array == nullptr){
         m_fail_to_load_annotation_file = true;
         QMessageBox box;
@@ -606,14 +625,23 @@ void LabelImages::load_custom_label_set(const std::string& json_path){
     set_selected_label(selected_label());
 }
 
+
 std::pair<size_t, size_t> LabelImages::float_to_pixel(double x, double y) const{
     const size_t px = (size_t)std::max<double>(source_image_width * x + 0.5, 0);
     const size_t py = (size_t)std::max<double>(source_image_height * y + 0.5, 0);
     return std::make_pair(px, py);
 }
 
+
 std::pair<double, double> LabelImages::pixel_to_float(size_t x, size_t y) const{
     return std::make_pair(x / (double)source_image_width, y / (double)source_image_height);
+}
+
+
+void LabelImages::export_to_yolov5_dataset(const std::string& image_folder_path, const std::string& dataset_path){
+    m_yolo_config_file_path = dataset_path;
+
+    export_image_annotations_to_yolo_dataset(image_folder_path, ML_ANNOTATION_PATH(), dataset_path);
 }
 
 

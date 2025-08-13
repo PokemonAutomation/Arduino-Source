@@ -127,8 +127,13 @@ LabelImages_Widget::LabelImages_Widget(
 
     // add compute embedding button
 
-    QPushButton* compute_embedding_button = new QPushButton("Compute Image Embeddings (SLOW!)", scroll_inner);
-    scroll_layout->addWidget(compute_embedding_button);
+    QHBoxLayout* external_action_row = new QHBoxLayout();
+    scroll_layout->addLayout(external_action_row);
+    QPushButton* compute_embedding_button = new QPushButton("Compute Image Embeddings. SLOW! Don't Close Program!", scroll_inner);
+    external_action_row->addWidget(compute_embedding_button, 10);
+
+    QPushButton* export_to_yolo_button = new QPushButton("Export Image To YOLOv5", scroll_inner);
+    external_action_row->addWidget(export_to_yolo_button, 5);
 
     // connect button signals to define button actions
 
@@ -160,7 +165,7 @@ LabelImages_Widget::LabelImages_Widget(
             starting_dir = std::filesystem::path(last_loaded_file_path).parent_path().string();
         }
         const std::string path = QFileDialog::getOpenFileName(
-            nullptr, "Open JSON file", QString::fromStdString(starting_dir), "*.json"
+            nullptr, "Open JSON File", QString::fromStdString(starting_dir), "*.json"
         ).toStdString();
         if (path.size() > 0){
             cout << "File dialog returns JSON path " << path << endl;
@@ -170,11 +175,39 @@ LabelImages_Widget::LabelImages_Widget(
 
     connect(compute_embedding_button, &QPushButton::clicked, this, [this](bool){
         std::string folder_path = QFileDialog::getExistingDirectory(
-            nullptr, "Open image folder", ".").toStdString();
+            nullptr, "Open Image Folder", ".").toStdString();
 
         if (folder_path.size() > 0){
             this->m_program.compute_embeddings_for_folder(folder_path);
         }
+    });
+
+    connect(export_to_yolo_button, &QPushButton::clicked, this, [this](bool){
+        std::string folder_path = QFileDialog::getExistingDirectory(
+            nullptr, "Open Image Folder",
+            QString::fromStdString(m_image_display_widget->image_folder_path())
+            // QFileDialog::Option::DontUseNativeDialog
+        ).toStdString();
+        if (folder_path.size() == 0){
+            return;
+        }
+
+        const std::string& last_loaded_file_path = m_program.m_yolo_config_file_path;
+        std::string starting_dir = ".";
+        if (last_loaded_file_path.size() > 0){
+            starting_dir = std::filesystem::path(last_loaded_file_path).parent_path().string();
+        }
+        const std::string ds_config_path = QFileDialog::getOpenFileName(
+            nullptr, "Open YOLOv5 Dataset Config YAML File", QString::fromStdString(starting_dir), "*.yaml"
+        ).toStdString();
+        if (ds_config_path.size() == 0){
+            return;
+        }
+
+        cout << "Found image folder " << folder_path << endl;
+        cout << "Found YOLO dataset config " << ds_config_path << endl;
+
+        m_program.export_to_yolov5_dataset(folder_path, ds_config_path);
     });
 
     cout << "LabelImages_Widget built" << endl;

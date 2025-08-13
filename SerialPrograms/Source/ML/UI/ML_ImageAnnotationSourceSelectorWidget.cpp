@@ -142,6 +142,7 @@ void ImageAnnotationSourceSelectorWidget::post_startup(VideoSource* source){
     const auto filename = path.filename();
     const std::string folder_path = path.parent_path().string();
     const bool recursive_search = false;
+    m_image_folder_path = folder_path;
     m_image_paths_in_folder = find_images_in_folder(folder_path, recursive_search);
     const size_t num_images = m_image_paths_in_folder.size();
     m_cur_image_file_idx_in_folder = SIZE_MAX;

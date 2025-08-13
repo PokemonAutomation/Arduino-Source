@@ -43,6 +43,9 @@ public:
         CommandReceiver* command_receiver = nullptr
     );
 
+    // Get the folder path of the current loaded image
+    std::string image_folder_path() const;
+
 public:
     void update_ui(ProgramState state);
 

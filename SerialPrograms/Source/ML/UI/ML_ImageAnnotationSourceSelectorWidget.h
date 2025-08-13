@@ -27,6 +27,8 @@ public:
     ~ImageAnnotationSourceSelectorWidget();
     ImageAnnotationSourceSelectorWidget(ImageAnnotationDisplaySession& session);
 
+    // Get the folder path of the current loaded image
+    std::string image_folder_path() const { return m_image_folder_path; }
 
 private:
     //  Overwrites VideoSession::StateListener::post_startup().
@@ -39,6 +41,7 @@ private:
     QLabel* m_source_file_path_label;
     QLabel* m_folder_info_label;
 
+    std::string m_image_folder_path;
     std::vector<std::string> m_image_paths_in_folder;
     std::size_t m_cur_image_file_idx_in_folder = 0;
 };

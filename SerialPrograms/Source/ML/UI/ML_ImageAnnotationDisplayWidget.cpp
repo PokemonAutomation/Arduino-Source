@@ -87,6 +87,9 @@ ImageAnnotationDisplayWidget::ImageAnnotationDisplayWidget(
     setFocusPolicy(Qt::StrongFocus);
 }
 
+std::string ImageAnnotationDisplayWidget::image_folder_path() const{
+    return m_selector_widget->image_folder_path();
+}
 
 void ImageAnnotationDisplayWidget::update_ui(ProgramState state){
     m_command->on_state_changed(state);

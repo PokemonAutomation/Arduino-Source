@@ -104,6 +104,8 @@ public:
 
     void load_custom_label_set(const std::string& json_path);
 
+    void export_to_yolov5_dataset(const std::string& image_folder_path, const std::string& dataset_path);
+
 private:
     void on_config_value_changed(void* object) override;
 
@@ -175,6 +177,9 @@ private:
 
     // the file path to load custom label set
     std::string m_custom_label_set_file_path;
+    // the path to get the YOLOv5 YAML config file to export images and finished annotations to
+    // YOLO dataset.
+    std::string m_yolo_config_file_path;
 };
 
 
