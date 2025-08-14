@@ -493,7 +493,10 @@ int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrum
     auto& logger = global_logger_command_line();
     DummyBotBase botbase(logger);
     SerialPABotBase::SerialPABotBase_Connection connection(logger, nullptr, {});
-    SerialPABotBase_WiredController controller(logger, connection);
+    SerialPABotBase_WiredController controller(
+        logger, connection,
+        ControllerType::NintendoSwitch_WiredController
+    );
     DummyVideoFeed video_feed;
     DummyVideoOverlay video_overlay;
     DummyAudioFeed audio_feed;

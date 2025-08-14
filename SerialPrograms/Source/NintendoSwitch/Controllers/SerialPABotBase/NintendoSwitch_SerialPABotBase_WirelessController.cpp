@@ -64,7 +64,7 @@ void SerialPABotBase_WirelessController::stop(){
 
 
 
-Button SerialPABotBase_WirelessController::populate_report_buttons(pa_NintendoSwitch_WirelessController_State0x30_Buttons& buttons){
+Button SerialPABotBase_WirelessController::populate_report_buttons(pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
     Button all_buttons = BUTTON_NONE;
@@ -108,7 +108,7 @@ Button SerialPABotBase_WirelessController::populate_report_buttons(pa_NintendoSw
     }
     return all_buttons;
 }
-bool SerialPABotBase_WirelessController::populate_report_gyro(pa_NintendoSwitch_WirelessController_State0x30_Gyro& gyro){
+bool SerialPABotBase_WirelessController::populate_report_gyro(pabb_NintendoSwitch_WirelessController_State0x30_Gyro& gyro){
     bool gyro_active = false;
     {
         if (m_accel_x.is_busy()){
@@ -143,7 +143,7 @@ bool SerialPABotBase_WirelessController::populate_report_gyro(pa_NintendoSwitch_
 void SerialPABotBase_WirelessController::issue_report(
     const Cancellable* cancellable,
     WallDuration duration,
-    const pa_NintendoSwitch_WirelessController_State0x30_Buttons& buttons
+    const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons
 ){
     //  Release the state lock since we are no longer touching state.
     //  This loop can block indefinitely if the command queue is full.
@@ -170,15 +170,15 @@ void SerialPABotBase_WirelessController::issue_report(
 void SerialPABotBase_WirelessController::issue_report(
     const Cancellable* cancellable,
     WallDuration duration,
-    const pa_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
-    const pa_NintendoSwitch_WirelessController_State0x30_Gyro& gyro
+    const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
+    const pabb_NintendoSwitch_WirelessController_State0x30_Gyro& gyro
 ){
     //  Release the state lock since we are no longer touching state.
     //  This loop can block indefinitely if the command queue is full.
     ReverseLockGuard<std::mutex> lg(m_state_lock);
 
     //  TODO: For now we duplicate the gyro data to all 3 5ms segments.
-    pa_NintendoSwitch_WirelessController_State0x30_GyroX3 gyro3{
+    pabb_NintendoSwitch_WirelessController_State0x30_GyroX3 gyro3{
         gyro, gyro, gyro
     };
 

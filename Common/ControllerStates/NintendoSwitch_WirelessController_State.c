@@ -9,7 +9,7 @@
 #include "NintendoSwitch_WirelessController_State.h"
 
 
-const pa_NintendoSwitch_WirelessController_State0x30 pa_NintendoSwitch_WirelessController_State0x30_NEUTRAL_STATE = {
+const pabb_NintendoSwitch_WirelessController_State0x30 pabb_NintendoSwitch_WirelessController_State0x30_NEUTRAL_STATE = {
     .buttons = {
         .button3 = 0,
         .button4 = 0,
@@ -21,10 +21,10 @@ const pa_NintendoSwitch_WirelessController_State0x30 pa_NintendoSwitch_WirelessC
     .gyro = {},
 };
 
-bool pa_NintendoSwitch_WirelessController_State0x30_equals(
-    const pa_NintendoSwitch_WirelessController_State0x30* state0,
-    const pa_NintendoSwitch_WirelessController_State0x30* state1
+bool pabb_NintendoSwitch_WirelessController_State0x30_equals(
+    const pabb_NintendoSwitch_WirelessController_State0x30* state0,
+    const pabb_NintendoSwitch_WirelessController_State0x30* state1
 ){
-    return memcmp(state0, state1, sizeof(pa_NintendoSwitch_WirelessController_State0x30)) == 0;
+    return memcmp(state0, state1, sizeof(pabb_NintendoSwitch_WirelessController_State0x30)) == 0;
 }
 

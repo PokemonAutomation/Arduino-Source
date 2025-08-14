@@ -18,7 +18,7 @@ namespace SerialPABotBase{
 
 
 
-void run_post_connect_actions_ESP32(
+void run_post_connect_actions_ESP32S3(
     ControllerModeStatus& status,
     const std::string& device_name,
     PABotBase& botbase,
@@ -33,6 +33,42 @@ void run_post_connect_actions_ESP32(
     ControllerType desired_controller = change_controller.value();
     switch (desired_controller){
     case ControllerType::NintendoSwitch_WiredController:
+    case ControllerType::NintendoSwitch2_WiredController:
+    default:;
+    }
+
+    uint32_t native_controller_id = controller_type_to_id(desired_controller);
+    botbase.issue_request_and_wait(
+        DeviceRequest_change_controller_mode(native_controller_id),
+        nullptr
+    );
+
+    //  Re-read the controller.
+    logger.log("Reading Controller Mode...");
+    uint32_t type_id = read_controller_mode(botbase);
+    status.current_controller = id_to_controller_type(type_id);
+    logger.log(
+        "Reading Controller Mode... Mode = " +
+        CONTROLLER_TYPE_STRINGS.get_string(status.current_controller)
+    );
+}
+
+
+void run_post_connect_actions_ESP32(
+    ControllerModeStatus& status,
+    const std::string& device_name,
+    PABotBase& botbase,
+    std::optional<ControllerType> change_controller
+){
+    if (!change_controller){
+        return;
+    }
+
+    Logger& logger = botbase.logger();
+
+    ControllerType desired_controller = change_controller.value();
+    switch (desired_controller){
+//    case ControllerType::NintendoSwitch_WiredController:
     case ControllerType::NintendoSwitch_WirelessProController:
     case ControllerType::NintendoSwitch_LeftJoycon:
     case ControllerType::NintendoSwitch_RightJoycon:{
@@ -133,6 +169,9 @@ void run_post_connect_actions(
     switch (program_id){
     case PABB_PID_PABOTBASE_ESP32:
         run_post_connect_actions_ESP32(status, device_name, botbase, change_controller);
+        return;
+    case PABB_PID_PABOTBASE_ESP32S3:
+        run_post_connect_actions_ESP32S3(status, device_name, botbase, change_controller);
         return;
     }
 }

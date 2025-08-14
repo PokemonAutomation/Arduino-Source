@@ -300,9 +300,15 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
     //  Only relevant to Switch controllers.
     switch (controller){
     case ControllerType::NintendoSwitch_WiredController:
+    case ControllerType::NintendoSwitch_WiredProController:
     case ControllerType::NintendoSwitch_WirelessProController:
     case ControllerType::NintendoSwitch_LeftJoycon:
     case ControllerType::NintendoSwitch_RightJoycon:
+    case ControllerType::NintendoSwitch2_WiredController:
+    case ControllerType::NintendoSwitch2_WiredProController:
+    case ControllerType::NintendoSwitch2_WirelessProController:
+    case ControllerType::NintendoSwitch2_LeftJoycon:
+    case ControllerType::NintendoSwitch2_RightJoycon:
         break;
     default:
         return profile;

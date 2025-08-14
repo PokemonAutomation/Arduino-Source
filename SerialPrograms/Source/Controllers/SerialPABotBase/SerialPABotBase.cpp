@@ -50,15 +50,30 @@ ControllerType id_to_controller_type(uint32_t id){
     switch (id){
     case PABB_CID_NONE:
         return ControllerType::None;
-    case PABB_CID_NINTENDO_SWITCH_WIRED_PRO_CONTROLLER:
+
+    case PABB_CID_NintendoSwitch_WiredController:
         return ControllerType::NintendoSwitch_WiredController;
-    case PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER:
+    case PABB_CID_NintendoSwitch_WiredProController:
+        return ControllerType::NintendoSwitch_WiredProController;
+    case PABB_CID_NintendoSwitch_WirelessProController:
         return ControllerType::NintendoSwitch_WirelessProController;
-    case PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON:
+    case PABB_CID_NintendoSwitch_LeftJoycon:
         return ControllerType::NintendoSwitch_LeftJoycon;
-    case PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON:
+    case PABB_CID_NintendoSwitch_RightJoycon:
         return ControllerType::NintendoSwitch_RightJoycon;
+
+    case PABB_CID_NintendoSwitch2_WiredController:
+        return ControllerType::NintendoSwitch2_WiredController;
+    case PABB_CID_NintendoSwitch2_WiredProController:
+        return ControllerType::NintendoSwitch2_WiredProController;
+    case PABB_CID_NintendoSwitch2_WirelessProController:
+        return ControllerType::NintendoSwitch2_WirelessProController;
+    case PABB_CID_NintendoSwitch2_LeftJoycon:
+        return ControllerType::NintendoSwitch2_LeftJoycon;
+    case PABB_CID_NintendoSwitch2_RightJoycon:
+        return ControllerType::NintendoSwitch2_RightJoycon;
     }
+
     throw InternalProgramError(
         nullptr, PA_CURRENT_FUNCTION,
         "Invalid Controller ID: " + std::to_string(id)
@@ -68,15 +83,30 @@ uint32_t controller_type_to_id(ControllerType controller_type){
     switch (controller_type){
     case ControllerType::None:
         return PABB_CID_NONE;
+
     case ControllerType::NintendoSwitch_WiredController:
-        return PABB_CID_NINTENDO_SWITCH_WIRED_PRO_CONTROLLER;
+        return PABB_CID_NintendoSwitch_WiredController;
+    case ControllerType::NintendoSwitch_WiredProController:
+        return PABB_CID_NintendoSwitch_WiredProController;
     case ControllerType::NintendoSwitch_WirelessProController:
-        return PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER;
+        return PABB_CID_NintendoSwitch_WirelessProController;
     case ControllerType::NintendoSwitch_LeftJoycon:
-        return PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
+        return PABB_CID_NintendoSwitch_LeftJoycon;
     case ControllerType::NintendoSwitch_RightJoycon:
-        return PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
+        return PABB_CID_NintendoSwitch_RightJoycon;
+
+    case ControllerType::NintendoSwitch2_WiredController:
+        return PABB_CID_NintendoSwitch2_WiredController;
+    case ControllerType::NintendoSwitch2_WiredProController:
+        return PABB_CID_NintendoSwitch2_WiredProController;
+    case ControllerType::NintendoSwitch2_WirelessProController:
+        return PABB_CID_NintendoSwitch2_WirelessProController;
+    case ControllerType::NintendoSwitch2_LeftJoycon:
+        return PABB_CID_NintendoSwitch2_LeftJoycon;
+    case ControllerType::NintendoSwitch2_RightJoycon:
+        return PABB_CID_NintendoSwitch2_RightJoycon;
     }
+
     throw InternalProgramError(
         nullptr, PA_CURRENT_FUNCTION,
         "Invalid Controller Enum: " + std::to_string((int)controller_type)
@@ -92,7 +122,54 @@ const std::map<
         std::map<ControllerType, ControllerFeatures>
     >
 > SUPPORTED_VERSIONS{
-    {2025061208, {
+    {2025081300, {
+        {PABB_PID_PABOTBASE_ArduinoUnoR3, {
+            {ControllerType::NintendoSwitch2_WiredController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_ArduinoLeonardo, {
+            {ControllerType::NintendoSwitch2_WiredController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_ProMicro, {
+            {ControllerType::NintendoSwitch2_WiredController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_Teensy2, {
+            {ControllerType::NintendoSwitch2_WiredController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_TeensyPP2, {
+            {ControllerType::NintendoSwitch2_WiredController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_ESP32S3, {
+            {ControllerType::NintendoSwitch_WiredController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+            {ControllerType::NintendoSwitch2_WiredController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+        }},
         {PABB_PID_PABOTBASE_ESP32, {
             {ControllerType::NintendoSwitch_WirelessProController, {
                 ControllerFeature::TickPrecise,
@@ -105,52 +182,6 @@ const std::map<
             {ControllerType::NintendoSwitch_RightJoycon, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_RightJoycon,
-            }},
-        }},
-    }},
-    {2025061308, {
-        {PABB_PID_PABOTBASE_ESP32S3, {
-            {ControllerType::NintendoSwitch_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }},
-        }},
-    }},
-    {2025061407, {
-        {PABB_PID_PABOTBASE_ArduinoUnoR3, {
-            {ControllerType::NintendoSwitch_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }},
-        }},
-        {PABB_PID_PABOTBASE_ArduinoLeonardo, {
-            {ControllerType::NintendoSwitch_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }},
-        }},
-        {PABB_PID_PABOTBASE_ProMicro, {
-            {ControllerType::NintendoSwitch_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }},
-        }},
-        {PABB_PID_PABOTBASE_Teensy2, {
-            {ControllerType::NintendoSwitch_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
-            }},
-        }},
-        {PABB_PID_PABOTBASE_TeensyPP2, {
-            {ControllerType::NintendoSwitch_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
     }},

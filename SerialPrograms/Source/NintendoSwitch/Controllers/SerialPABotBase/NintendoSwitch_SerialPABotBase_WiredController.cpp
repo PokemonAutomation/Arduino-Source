@@ -27,7 +27,8 @@ using namespace std::chrono_literals;
 
 SerialPABotBase_WiredController::SerialPABotBase_WiredController(
     Logger& logger,
-    SerialPABotBase::SerialPABotBase_Connection& connection
+    SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerType controller_type
 )
     : ProController(logger)
     , SerialPABotBase_Controller(
@@ -35,6 +36,7 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
         ControllerType::NintendoSwitch_WiredController,
         connection
     )
+    , m_controller_type(controller_type)
     , m_stopping(false)
     , m_status_thread(&SerialPABotBase_WiredController::status_thread, this)
 {}

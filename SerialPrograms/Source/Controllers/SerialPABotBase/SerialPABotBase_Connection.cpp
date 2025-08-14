@@ -181,6 +181,7 @@ ControllerType SerialPABotBase_Connection::get_controller_type(
         current_controller = available_controllers.begin()->first;
     }else if (available_controllers.size() > 1){
         uint32_t type_id = read_controller_mode(*m_botbase);
+//        cout << "type_id = " << type_id << endl;
         current_controller = id_to_controller_type(type_id);
     }
     m_logger.Logger::log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));

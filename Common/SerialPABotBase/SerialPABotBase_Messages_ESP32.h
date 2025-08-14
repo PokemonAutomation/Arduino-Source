@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_SerialPABotBase_Messages_ESP32_H
 #define PokemonAutomation_SerialPABotBase_Messages_ESP32_H
 
-#include "../Controllers/NintendoSwitch_WirelessController_State.h"
+#include "../ControllerStates/NintendoSwitch_WirelessController_State.h"
 #include "SerialPABotBase_Protocol.h"
 
 #if _WIN32
@@ -59,7 +59,7 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    pa_NintendoSwitch_WirelessController_State0x30_Buttons buttons;
+    pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons;
 } PABB_PACK pabb_Message_ESP32_CommandButtonState;
 
 
@@ -67,7 +67,7 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    pa_NintendoSwitch_WirelessController_State0x30 state;
+    pabb_NintendoSwitch_WirelessController_State0x30 state;
 } PABB_PACK pabb_Message_ESP32_CommandFullState;
 
 

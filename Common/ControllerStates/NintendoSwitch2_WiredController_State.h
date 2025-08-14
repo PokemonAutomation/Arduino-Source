@@ -24,13 +24,13 @@ typedef struct{
     uint8_t left_joystick_y;
     uint8_t right_joystick_x;
     uint8_t right_joystick_y;
-} pa_NintendoSwitch2_WiredController_State;
+} pabb_NintendoSwitch2_WiredController_State;
 
-extern const pa_NintendoSwitch2_WiredController_State pa_NintendoSwitch2_WiredController_State_NEUTRAL_STATE;
+extern const pabb_NintendoSwitch2_WiredController_State pabb_NintendoSwitch2_WiredController_State_NEUTRAL_STATE;
 
-bool pa_NintendoSwitch2_WiredController_State_equals(
-    const pa_NintendoSwitch2_WiredController_State* state0,
-    const pa_NintendoSwitch2_WiredController_State* state1
+bool pabb_NintendoSwitch2_WiredController_State_equals(
+    const pabb_NintendoSwitch2_WiredController_State* state0,
+    const pabb_NintendoSwitch2_WiredController_State* state1
 );
 
 

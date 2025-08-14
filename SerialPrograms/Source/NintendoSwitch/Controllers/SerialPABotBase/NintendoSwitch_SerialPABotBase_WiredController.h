@@ -27,7 +27,8 @@ public:
 public:
     SerialPABotBase_WiredController(
         Logger& logger,
-        SerialPABotBase::SerialPABotBase_Connection& connection
+        SerialPABotBase::SerialPABotBase_Connection& connection,
+        ControllerType controller_type
     );
     ~SerialPABotBase_WiredController();
     void stop();
@@ -45,7 +46,7 @@ public:
 
 public:
     virtual ControllerType controller_type() const override{
-        return ControllerType::NintendoSwitch_WiredController;
+        return m_controller_type;
     }
     virtual const ControllerFeatures& controller_features() const override{
         return m_supported_features;
@@ -228,6 +229,7 @@ private:
 
 
 private:
+    const ControllerType m_controller_type;
     CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;
     std::mutex m_sleep_lock;

@@ -27,13 +27,13 @@ public:
         uint32_t controller_id = PABB_CID_NONE;
         switch (controller_type){
         case ControllerType::NintendoSwitch_WirelessProController:
-            controller_id = PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER;
+            controller_id = PABB_CID_NintendoSwitch_WirelessProController;
             break;
         case ControllerType::NintendoSwitch_LeftJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
+            controller_id = PABB_CID_NintendoSwitch_LeftJoycon;
             break;
         case ControllerType::NintendoSwitch_RightJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
+            controller_id = PABB_CID_NintendoSwitch_RightJoycon;
             break;
         default:;
         }
@@ -59,13 +59,13 @@ public:
         uint32_t controller_id = PABB_CID_NONE;
         switch (controller_type){
         case ControllerType::NintendoSwitch_WirelessProController:
-            controller_id = PABB_CID_NINTENDO_SWITCH_WIRELESS_PRO_CONTROLLER;
+            controller_id = PABB_CID_NintendoSwitch_WirelessProController;
             break;
         case ControllerType::NintendoSwitch_LeftJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_LEFT_JOYCON;
+            controller_id = PABB_CID_NintendoSwitch_LeftJoycon;
             break;
         case ControllerType::NintendoSwitch_RightJoycon:
-            controller_id = PABB_CID_NINTENDO_SWITCH_RIGHT_JOYCON;
+            controller_id = PABB_CID_NintendoSwitch_RightJoycon;
             break;
         default:;
         }
@@ -86,7 +86,7 @@ public:
     pabb_Message_ESP32_CommandButtonState params;
     MessageControllerStateButtons(
         uint16_t milliseconds,
-        const pa_NintendoSwitch_WirelessController_State0x30_Buttons& state
+        const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& state
     )
         : BotBaseRequest(true)
     {
@@ -103,8 +103,8 @@ public:
     pabb_Message_ESP32_CommandFullState params;
     MessageControllerStateFull(
         uint16_t milliseconds,
-        const pa_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
-        const pa_NintendoSwitch_WirelessController_State0x30_GyroX3& gyro
+        const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
+        const pabb_NintendoSwitch_WirelessController_State0x30_GyroX3& gyro
     )
         : BotBaseRequest(true)
     {
