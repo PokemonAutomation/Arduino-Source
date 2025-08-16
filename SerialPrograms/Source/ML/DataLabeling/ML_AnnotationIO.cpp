@@ -207,8 +207,7 @@ void export_image_annotations_to_yolo_dataset(
         const auto target_image_file = target_image_folder / image_file.filename();
         try{
             fs::copy_file(image_file, target_image_file);
-        } catch (fs::filesystem_error& e)
-        {
+        }catch (fs::filesystem_error&){
             QMessageBox box;
             box.critical(nullptr, "Cannot Copy File",
                 QString::fromStdString(
@@ -242,8 +241,8 @@ void export_image_annotations_to_yolo_dataset(
             const int64_t image_width = json_obj->get_integer_throw("IMAGE_WIDTH");
             const int64_t image_height = json_obj->get_integer_throw("IMAGE_HEIGHT");
             const JsonArray& json_array = json_obj->get_array_throw("ANNOTATION");
-            for(size_t i = 0; i < json_array.size(); i++){
-                const ObjectAnnotation anno_obj = ObjectAnnotation::from_json((json_array)[i]);
+            for(size_t j = 0; j < json_array.size(); j++){
+                const ObjectAnnotation anno_obj = ObjectAnnotation::from_json((json_array)[j]);
                 const std::string& label = anno_obj.label;
 
                 auto it = label_indices.find(label);
@@ -282,8 +281,8 @@ void export_image_annotations_to_yolo_dataset(
 
         const auto target_label_file = target_label_folder / image_file.filename().replace_extension(".txt");
         std::ofstream fout(target_label_file.string());
-        for(const auto& line : label_file_lines){
-            fout << line << "\n";
+        for(const auto& file_line : label_file_lines){
+            fout << file_line << "\n";
         }
     }
     cout << "Done exporting " << image_paths.size() << " annotations to YOLOv5 dataset" << endl;
