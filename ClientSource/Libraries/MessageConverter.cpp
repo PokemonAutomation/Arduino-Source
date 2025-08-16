@@ -340,6 +340,18 @@ int register_message_converters_framework_requests(){
             return ss.str();
         }
     );
+    register_message_converter(
+        PABB_MSG_REQUEST_READ_MAC_ADDRESS,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_READ_MAC_ADDRESS - ";
+            if (body.size() != sizeof(pabb_MsgRequestReadMacAddress)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestReadMacAddress*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", mode = " << params->mode;
+            return ss.str();
+        }
+    );
 #if 0
     register_message_converter(
         PABB_MSG_COMMAND_SET_LED_STATE,

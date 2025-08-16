@@ -138,6 +138,18 @@ public:
         return BotBaseMessage(PABB_MSG_REQUEST_STATUS, params);
     }
 };
+class DeviceRequest_read_mac_address : public BotBaseRequest{
+public:
+    pabb_MsgRequestReadMacAddress params;
+    DeviceRequest_read_mac_address(uint32_t mode)
+        : BotBaseRequest(false)
+    {
+        params.mode = mode;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_READ_MAC_ADDRESS, params);
+    }
+};
 
 
 

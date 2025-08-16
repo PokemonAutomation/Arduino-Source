@@ -1,122 +1,122 @@
 /*  Serial PABotBase Message Protocol
- * 
+ *
  *  From: https://github.com/PokemonAutomation/
- * 
- * 
+ *
+ *
  *      Pokemon Automation Bot-Base implements reliable data transmissions over
  *  serial communication. This is done by checksumming messages along with a
  *  protocol that is tolerant to data drops.
- * 
+ *
  *  This file describes the message protocol. The data being transmitted is raw
  *  binary and not is readable text.
- * 
- * 
+ *
+ *
  *  Message Format:
  *      byte 0: Length of the entire message. (bits are inverted)
  *      byte 1: Message Type
  *      byte X: Optional data of variable length.
  *      Last 4 bytes: CRC32C of the entire message except these last 4 bytes.
- * 
+ *
  *      Thus there are 6 bytes of overhead for each message.
- * 
- * 
+ *
+ *
  *  There are currently 4 categories of message types:
- * 
+ *
  *      1.  Info: These are simple one-way messages. They do not need to be
  *          acked and may be dropped without adversely affecting anything.
- * 
+ *
  *      2.  Ack/Response: These are messages sent in response to an earlier
  *          message that was received.
- * 
+ *
  *      3.  Request: The sender requests the receiver to do something simple.
  *          The receiver must respond with an ack.
- * 
+ *
  *          This is used for things that take no clock time. For example, querying
  *          for program identifiers, turning on/off LEDs, or setting flags in the
  *          program to change its behavior in the future.
- * 
+ *
  *      4.  Command: The sender requests the receiver to do a large asynchronous
  *          operation. The receiver must ack this message. Once the command is
  *          finished, the receiver must send a request message back to the sender
  *          to indicate that the command is finished.
- * 
+ *
  *          This is used for issuing button presses or other subroutines that
  *          consume time.
- * 
- * 
+ *
+ *
  *  General Protocol:
- * 
+ *
  *      1.  Every time you send a new request/command message, you increment
  *          your sequence number (seqnum) by 1.
- * 
+ *
  *      2.  If you receive an invalid message (bad length or bad checksum), ignore
  *          the first byte and attempt to parse the next byte as the start of a
  *          new message.
- * 
+ *
  *      3.  If you receive a zero for the 1st byte of a message, ignore it and
  *          attempt to parse the next byte as the start of a new message.
- * 
+ *
  *      4.  At any point, you can send a bunch of zero bytes. This will cause
  *          the receiver to re-synchronize.
- * 
+ *
  *      5.  If you receive a request/command message, you must send the appropriate
  *          ack/response message using the same seqnum.
- * 
+ *
  *      6.  If you receive a command message, you must first ack the message itself.
  *          Once the command is finished, you must send a request referencing the
  *          command to indicate that it is finished. You will receive an ack for
  *          this short (finishing) command, and if you don't, send it again until
  *          you do. If the command finishes immediately, you can skip the ack and
  *          just send the finish request.
- * 
+ *
  *      7.  If you send a request/command message and don't get a response after
  *          a time limit, you should resend the message with the same seqnum.
- * 
+ *
  *      8.  If you receive a request/command that has a seqnum ahead of what you
  *          are expecting, it means an earlier request/command was dropped.
  *          Do not process the request/command since you will lose ordering.
- * 
+ *
  *      9.  If you receive a request/command that has an old seqnum, it is a
  *          retransmit. Send an ack for it, but don't process it again. (idempotency)
- * 
- * 
+ *
+ *
  *  Failure Analysis:
- * 
+ *
  *      -   Corrupted messages will either fail checksum or will have an invalid
  *          length/type. These are simply ignored and dropped.
- * 
+ *
  *      -   If either sender or receiver gets out-of-sync and loses track of
  *          message boundaries, it will eventually find the boundary again by
  *          simply trying to parse every byte as the start of a new message and
  *          verifying the length and CRC.
- * 
+ *
  *      -   If a request/command is dropped, no ack will be received. The sender
  *          will eventually send the command again. (#7)
- * 
+ *
  *      -   If an ack is dropped, the sender will eventually resend the
  *          request/command again. The receiver will see the duplicate
  *          request/command and ack it. But the receiver will not process it
  *          again to preserve idempotency. (#9)
- * 
+ *
  *  The current protocol guarantees that all commands are processed in order
  *  exactly once. Requests are not guaranteed to process in order and may execute
  *  more than once so they should be idempotent.
- * 
+ *
  *  The protocol also allows both sides to queue up requests and commands.
  *  In other words, it is possible to send multiple requests/commands at once
  *  without waiting for the individual acks.
- * 
- * 
+ *
+ *
  *  PABotBase Specifics:
- * 
+ *
  *      -   PABotBase can queue up to 4 commands. If it receives any commands
  *          while the queue is full, it drops it and responds with
  *          "PABB_MSG_ERROR_COMMAND_DROPPED". (Any command that results in a
  *          button press or a wait is a long command.)
- * 
+ *
  *      -   PABotBase can still handle other messages while it is running a long
  *          command.
- * 
+ *
  */
 
 #ifndef PokemonAutomation_SerialPABotBase_Protocol_H
@@ -328,13 +328,19 @@ typedef struct{
     uint32_t mode;
 } PABB_PACK pabb_MsgRequestChangeControllerMode;
 
+
 ////////////////////////////////////////////////////////////////////////////////
 //  Common Requests
 
-#define PABB_MSG_REQUEST_STATUS   0x50
+#define PABB_MSG_REQUEST_STATUS                 0x50
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_Message_RequestStatus;
+#define PABB_MSG_REQUEST_READ_MAC_ADDRESS       0x51
+typedef struct{
+    seqnum_t seqnum;
+    uint32_t mode;
+} PABB_PACK pabb_MsgRequestReadMacAddress;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Commands
