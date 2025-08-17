@@ -4,6 +4,7 @@
  *
  */
 
+#include <stdint.h>
 #include <stdexcept>
 #include "StringTools.h"
 
