@@ -351,6 +351,27 @@ void collect_eggs_after_sandwich(
     //  Recall your ride to reduce obstacles.
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
+#if 1
+    //  Move left
+    pbf_move_left_joystick(context, 0, 128, 80ms, 480ms);
+    pbf_press_button(context, BUTTON_L, 120ms, 120ms);
+    pbf_move_left_joystick(context, 128, 0, 320ms, 480ms);
+
+    //  Move forward to pass table
+    pbf_move_left_joystick(context, 255, 128, 80ms, 480ms);
+    pbf_press_button(context, BUTTON_L, 120ms, 120ms);
+    pbf_move_left_joystick(context, 128, 0, 640ms, 320ms);
+
+    //  Move right
+    pbf_move_left_joystick(context, 255, 128, 80ms, 480ms);
+    pbf_press_button(context, BUTTON_L, 120ms, 120ms);
+    pbf_move_left_joystick(context, 128, 0, 320ms, 320ms);
+
+    //  Move back to face basket
+    pbf_move_left_joystick(context, 255, 128, 80ms, 320ms);
+    pbf_press_button(context, BUTTON_L, 120ms, 120ms);
+    pbf_move_left_joystick(context, 128, 0, 160ms, 320ms);
+#else
     //  Move left
     pbf_move_left_joystick(context, 0, 128, 40, 40);
     //  Move forward to pass table
@@ -363,6 +384,7 @@ void collect_eggs_after_sandwich(
     //  Move closer to the basket.
     pbf_press_button(context, BUTTON_L, 20, 105);
     pbf_move_left_joystick(context, 128, 0, 10, 40);
+#endif
 
 
     context.wait_for_all_requests();

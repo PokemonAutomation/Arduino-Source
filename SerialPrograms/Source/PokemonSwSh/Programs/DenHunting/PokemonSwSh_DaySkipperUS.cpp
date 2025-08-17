@@ -148,12 +148,14 @@ void DaySkipperUS::run_switch1(SingleSwitchProgramEnvironment& env, ProControlle
 void DaySkipperUS::run_switch2(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     using namespace DateSkippers::Switch2;
 
+#if 1
     if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired){
         throw UserSetupError(
             env.logger(),
             "This program requires a tick precise wired controller."
         );
     }
+#endif
 
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
