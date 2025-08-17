@@ -13,6 +13,10 @@
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_PostConnectActions.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
@@ -58,7 +62,7 @@ void post_connect_read_switch1_wireless(
     ControllerModeStatus& status,
     const std::string& device_name,
     PABotBase& botbase,
-    ControllerType controller_type, uint32_t controller_id
+    ControllerType desired_controller, uint32_t controller_id
 ){
     Logger& logger = botbase.logger();
 
@@ -86,7 +90,7 @@ void post_connect_read_switch1_wireless(
         PokemonAutomation::NintendoSwitch::ConsoleSettings::instance().CONTROLLER_SETTINGS.get_or_make_profile(
             controller_mac_address,
             device_name,
-            controller_type
+            desired_controller
         );
 
     PABB_NintendoSwitch_ControllerColors colors;
@@ -117,27 +121,11 @@ void post_connect_read_switch1_wireless(
 
     botbase.issue_request_and_wait(
         MessageControllerWriteSpi(
-            controller_type,
+            desired_controller,
             0x00006050, sizeof(PABB_NintendoSwitch_ControllerColors),
             &colors
         ),
         nullptr
-    );
-
-
-    uint32_t native_controller_id = controller_type_to_id(controller_type);
-    botbase.issue_request_and_wait(
-        DeviceRequest_change_controller_mode(native_controller_id),
-        nullptr
-    );
-
-    //  Re-read the controller.
-    logger.log("Reading Controller Mode...");
-    uint32_t type_id = read_controller_mode(botbase);
-    status.current_controller = id_to_controller_type(type_id);
-    logger.log(
-        "Reading Controller Mode... Mode = " +
-        CONTROLLER_TYPE_STRINGS.get_string(status.current_controller)
     );
 }
 
@@ -159,24 +147,40 @@ void run_post_connect_actions_ESP32(
             status, device_name, botbase, desired_controller,
             PABB_CID_NintendoSwitch_WirelessProController
         );
-        return;
+        break;
 
     case ControllerType::NintendoSwitch_LeftJoycon:
         post_connect_read_switch1_wireless(
             status, device_name, botbase, desired_controller,
             PABB_CID_NintendoSwitch_LeftJoycon
         );
-        return;
+        break;
 
     case ControllerType::NintendoSwitch_RightJoycon:
         post_connect_read_switch1_wireless(
             status, device_name, botbase, desired_controller,
             PABB_CID_NintendoSwitch_RightJoycon
         );
-        return;
+        break;
 
     default:;
     }
+
+    uint32_t native_controller_id = controller_type_to_id(desired_controller);
+    botbase.issue_request_and_wait(
+        DeviceRequest_change_controller_mode(native_controller_id),
+        nullptr
+    );
+
+    //  Re-read the controller.
+    Logger& logger = botbase.logger();
+    logger.log("Reading Controller Mode...");
+    uint32_t type_id = read_controller_mode(botbase);
+    status.current_controller = id_to_controller_type(type_id);
+    logger.log(
+        "Reading Controller Mode... Mode = " +
+        CONTROLLER_TYPE_STRINGS.get_string(status.current_controller)
+    );
 }
 
 
