@@ -95,6 +95,7 @@ void SingleSwitchProgramSession::run_program_instance(SingleSwitchProgramEnviron
         try{
             env.console.controller().cancel_all_commands();
         }catch (...){}
+        std::lock_guard<std::mutex> lg(program_lock());
         m_scope.store(nullptr, std::memory_order_release);
         throw;
     }
