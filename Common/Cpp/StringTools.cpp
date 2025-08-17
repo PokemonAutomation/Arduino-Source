@@ -4,6 +4,7 @@
  *
  */
 
+#include <stdexcept>
 #include "StringTools.h"
 
 namespace PokemonAutomation{
@@ -39,9 +40,9 @@ size_t to_size_t(const std::string& str){
     try {
         int num = std::stoi(str);
         return static_cast<size_t>(num);
-    } catch (const std::invalid_argument& e) {
+    } catch (const std::invalid_argument&) {
         return SIZE_MAX;
-    } catch (const std::out_of_range& e) {
+    } catch (const std::out_of_range&) {
         return SIZE_MAX;
     }
 }
