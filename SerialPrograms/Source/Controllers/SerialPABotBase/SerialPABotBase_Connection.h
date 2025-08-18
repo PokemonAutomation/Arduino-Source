@@ -27,7 +27,8 @@ public:
     SerialPABotBase_Connection(
         Logger& logger,
         const QSerialPortInfo* port,
-        std::optional<ControllerType> change_controller
+        std::optional<ControllerType> change_controller,
+        bool clear_settings
     );
     ~SerialPABotBase_Connection();
 
@@ -57,12 +58,14 @@ private:
         const std::map<ControllerType, ControllerFeatures>& available_controllers
     );
 
-    ControllerModeStatus read_device_specs(
-        std::optional<ControllerType> change_controller
+    ControllerModeStatus process_device(
+        std::optional<ControllerType> change_controller,
+        bool clear_settings
     );
 
     void thread_body(
-        std::optional<ControllerType> change_controller
+        std::optional<ControllerType> change_controller,
+        bool clear_settings
     );
 
 

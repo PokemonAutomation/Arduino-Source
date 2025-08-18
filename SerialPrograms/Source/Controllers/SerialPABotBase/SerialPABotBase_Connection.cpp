@@ -34,7 +34,8 @@ namespace SerialPABotBase{
 SerialPABotBase_Connection::SerialPABotBase_Connection(
     Logger& logger,
     const QSerialPortInfo* port,
-    std::optional<ControllerType> change_controller
+    std::optional<ControllerType> change_controller,
+    bool clear_settings
 )
     : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
 {
@@ -82,7 +83,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
     m_status_thread = std::thread(
         run_with_catch,
         "SerialPABotBase_Connection::thread_body()",
-        [=, this]{ thread_body(change_controller); }
+        [=, this]{ thread_body(change_controller, clear_settings); }
     );
 }
 SerialPABotBase_Connection::~SerialPABotBase_Connection(){
@@ -190,8 +191,9 @@ ControllerType SerialPABotBase_Connection::get_controller_type(
 
 
 
-ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
-    std::optional<ControllerType> change_controller
+ControllerModeStatus SerialPABotBase_Connection::process_device(
+    std::optional<ControllerType> change_controller,
+    bool clear_settings
 ){
     //  Protocol
     {
@@ -231,7 +233,8 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
         ret,
         m_program_id, m_device_name,
         *m_botbase,
-        change_controller
+        change_controller,
+        clear_settings
     );
     return ret;
 }
@@ -239,7 +242,8 @@ ControllerModeStatus SerialPABotBase_Connection::read_device_specs(
 
 
 void SerialPABotBase_Connection::thread_body(
-    std::optional<ControllerType> change_controller
+    std::optional<ControllerType> change_controller,
+    bool clear_settings
 ){
     using namespace PokemonAutomation;
 
@@ -271,7 +275,7 @@ void SerialPABotBase_Connection::thread_body(
         ControllerModeStatus mode_status;
         std::string error;
         try{
-            mode_status = read_device_specs(change_controller);
+            mode_status = process_device(change_controller, clear_settings);
             std::lock_guard<std::mutex> lg(m_lock);
             m_mode_status = mode_status;
 

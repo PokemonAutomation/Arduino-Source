@@ -4,9 +4,10 @@
  *
  */
 
+#include <QKeyEvent>
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
 
@@ -70,6 +71,10 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     m_status_text->setText(QString::fromStdString(session.status_text()));
 
     m_reset_button = new QPushButton("Reset Ctrl.", this);
+    m_reset_button->setToolTip(
+        "<b>Click:</b> Reset the controller.<br><br>"
+        "<b>Shift+Click:</b> Reset and clear the controller of any state. This will unpair it with any hosts it may be connected to."
+    );
     serial_row->addWidget(m_reset_button, 1);
 
     bool options_locked = session.options_locked();
@@ -77,6 +82,8 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
         m_selector->setEnabled(!options_locked);
     }
     m_reset_button->setEnabled(!options_locked);
+
+    setFocusPolicy(Qt::StrongFocus);
 
     connect(
         interface_dropdown, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
@@ -112,7 +119,9 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     connect(
         m_reset_button, &QPushButton::clicked,
         this, [this](bool){
-            m_session.reset();
+            bool shift_held = QGuiApplication::keyboardModifiers() & Qt::ShiftModifier;
+//            cout << "shift = " << shift_held << endl;
+            m_session.reset(shift_held);
         }
     );
 
@@ -210,6 +219,43 @@ void ControllerSelectorWidget::options_locked(bool locked){
 }
 
 
+#if 0
+void ControllerSelectorWidget::update_buttons(){
+    if (m_shift_held){
+        m_reset_button->setText("Clear Ctrl.");
+    }else{
+        m_reset_button->setText("Reset Ctrl.");
+    }
+}
+
+
+void ControllerSelectorWidget::keyPressEvent(QKeyEvent* event){
+//    cout << "ControllerSelectorWidget::keyPressEvent()" << endl;
+    if (event->key() == Qt::Key_Shift){
+        m_shift_held = true;
+    }
+    update_buttons();
+//    QWidget::keyPressEvent(event);
+}
+void ControllerSelectorWidget::keyReleaseEvent(QKeyEvent* event){
+//    cout << "ControllerSelectorWidget::keyReleaseEvent()" << endl;
+    if (event->key() == Qt::Key_Shift){
+        m_shift_held = false;
+    }
+    update_buttons();
+//    QWidget::keyReleaseEvent(event);
+}
+void ControllerSelectorWidget::focusInEvent(QFocusEvent* event){
+//    cout << "ControllerSelectorWidget::focusInEvent()" << endl;
+    QWidget::focusInEvent(event);
+}
+void ControllerSelectorWidget::focusOutEvent(QFocusEvent* event){
+//    cout << "ControllerSelectorWidget::focusOutEvent()" << endl;
+    m_shift_held = false;
+    update_buttons();
+    QWidget::focusOutEvent(event);
+}
+#endif
 
 
 

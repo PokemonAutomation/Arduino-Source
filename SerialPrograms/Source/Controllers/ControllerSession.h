@@ -87,7 +87,7 @@ public:
 
 public:
     //  Returns empty string on success. Otherwise returns error message.
-    std::string reset();
+    std::string reset(bool clear_settings);
 
     //  Try to run the following lambda on the underlying controller type.
     //  Returns empty string if successful. Otherwise returns error message.
@@ -118,7 +118,7 @@ public:
 
 
 private:
-    void make_controller(std::optional<ControllerType> change_controller);
+    void make_controller(std::optional<ControllerType> change_controller, bool clear_settings);
 
 //    virtual void pre_connection_not_ready(ControllerConnection& connection) override;
     virtual void post_connection_ready(

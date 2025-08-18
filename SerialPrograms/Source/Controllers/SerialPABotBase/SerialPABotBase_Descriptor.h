@@ -41,7 +41,8 @@ public:
 
     virtual std::unique_ptr<ControllerConnection> open_connection(
         Logger& logger,
-        std::optional<ControllerType> change_controller
+        std::optional<ControllerType> change_controller,
+        bool clear_settings
     ) const override;
     virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,

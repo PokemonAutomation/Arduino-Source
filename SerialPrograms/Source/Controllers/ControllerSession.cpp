@@ -50,7 +50,7 @@ ControllerSession::ControllerSession(
     , m_controller_type(ControllerType::None)
     , m_options_locked(false)
     , m_descriptor(option.descriptor())
-    , m_connection(m_descriptor->open_connection(logger, {}))
+    , m_connection(m_descriptor->open_connection(logger, {}, false))
 {
     if (!m_connection){
         return;
@@ -159,13 +159,14 @@ void ControllerSession::set_options_locked(bool locked){
 }
 
 
-void ControllerSession::make_controller(std::optional<ControllerType> change_controller){
+void ControllerSession::make_controller(std::optional<ControllerType> change_controller, bool clear_settings){
     //  Must be called under "m_reset_lock".
 
     bool ready = false;
     {
         std::lock_guard<std::mutex> lg(m_state_lock);
-        m_connection = m_descriptor->open_connection(m_logger, change_controller);
+//        cout << "clear_settings = " << clear_settings << endl;
+        m_connection = m_descriptor->open_connection(m_logger, change_controller, clear_settings);
         if (m_connection){
             m_connection->add_status_listener(*this);
             ready = m_connection->is_ready();
@@ -217,7 +218,7 @@ bool ControllerSession::set_device(const std::shared_ptr<const ControllerDescrip
         controller.reset();
         connection.reset();
 
-        make_controller({});
+        make_controller({}, false);
     }
     signal_descriptor_changed(device);
     signal_status_text_changed(status_text());
@@ -254,7 +255,7 @@ bool ControllerSession::set_controller(ControllerType controller_type){
         controller.reset();
         connection.reset();
 
-        make_controller(controller_type);
+        make_controller(controller_type, false);
         device = m_descriptor;
     }
     signal_descriptor_changed(device);
@@ -264,7 +265,7 @@ bool ControllerSession::set_controller(ControllerType controller_type){
 
 
 
-std::string ControllerSession::reset(){
+std::string ControllerSession::reset(bool clear_settings){
 //    cout << "ControllerSession::reset()" << endl;
 
     {
@@ -294,7 +295,7 @@ std::string ControllerSession::reset(){
         controller.reset();
         connection.reset();
 
-        make_controller(m_controller_type);
+        make_controller(m_controller_type, clear_settings);
     }
     signal_status_text_changed(status_text());
     return "";

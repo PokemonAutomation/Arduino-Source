@@ -26,7 +26,8 @@ void run_post_connect_actions_ESP32S3(
     ControllerModeStatus& status,
     const std::string& device_name,
     PABotBase& botbase,
-    std::optional<ControllerType> change_controller
+    std::optional<ControllerType> change_controller,
+    bool clear_settings
 ){
     if (!change_controller){
         return;
@@ -42,10 +43,17 @@ void run_post_connect_actions_ESP32S3(
     }
 
     uint32_t native_controller_id = controller_type_to_id(desired_controller);
-    botbase.issue_request_and_wait(
-        DeviceRequest_change_controller_mode(native_controller_id),
-        nullptr
-    );
+    if (clear_settings){
+        botbase.issue_request_and_wait(
+            DeviceRequest_reset_to_controller(native_controller_id),
+            nullptr
+        );
+    }else{
+        botbase.issue_request_and_wait(
+            DeviceRequest_change_controller_mode(native_controller_id),
+            nullptr
+        );
+    }
 
     //  Re-read the controller.
     logger.log("Reading Controller Mode...");
@@ -133,7 +141,8 @@ void run_post_connect_actions_ESP32(
     ControllerModeStatus& status,
     const std::string& device_name,
     PABotBase& botbase,
-    std::optional<ControllerType> change_controller
+    std::optional<ControllerType> change_controller,
+    bool clear_settings
 ){
     if (!change_controller){
         return;
@@ -167,10 +176,17 @@ void run_post_connect_actions_ESP32(
     }
 
     uint32_t native_controller_id = controller_type_to_id(desired_controller);
-    botbase.issue_request_and_wait(
-        DeviceRequest_change_controller_mode(native_controller_id),
-        nullptr
-    );
+    if (clear_settings){
+        botbase.issue_request_and_wait(
+            DeviceRequest_reset_to_controller(native_controller_id),
+            nullptr
+        );
+    }else{
+        botbase.issue_request_and_wait(
+            DeviceRequest_change_controller_mode(native_controller_id),
+            nullptr
+        );
+    }
 
     //  Re-read the controller.
     Logger& logger = botbase.logger();
@@ -190,14 +206,15 @@ void run_post_connect_actions(
     ControllerModeStatus& status,
     uint32_t program_id, const std::string& device_name,
     PABotBase& botbase,
-    std::optional<ControllerType> change_controller
+    std::optional<ControllerType> change_controller,
+    bool clear_settings
 ){
     switch (program_id){
     case PABB_PID_PABOTBASE_ESP32:
-        run_post_connect_actions_ESP32(status, device_name, botbase, change_controller);
+        run_post_connect_actions_ESP32(status, device_name, botbase, change_controller, clear_settings);
         return;
     case PABB_PID_PABOTBASE_ESP32S3:
-        run_post_connect_actions_ESP32S3(status, device_name, botbase, change_controller);
+        run_post_connect_actions_ESP32S3(status, device_name, botbase, change_controller, clear_settings);
         return;
     }
 }

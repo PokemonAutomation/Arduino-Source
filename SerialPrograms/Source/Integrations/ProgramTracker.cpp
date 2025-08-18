@@ -85,8 +85,8 @@ std::string ProgramTracker::reset_serial(uint64_t console_id){
         global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
-    std::string error = iter->second.first->controller().reset();
-    return error.empty() ? "Serial connection was reset." : error;
+    std::string error = iter->second.first->controller().reset(false);
+    return error.empty() ? "Controller was reset." : error;
 }
 std::string ProgramTracker::start_program(uint64_t program_id){
     std::lock_guard<std::mutex> lg(m_lock);

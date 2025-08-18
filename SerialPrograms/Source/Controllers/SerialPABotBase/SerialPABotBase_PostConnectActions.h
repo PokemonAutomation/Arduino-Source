@@ -18,7 +18,8 @@ void run_post_connect_actions(
     ControllerModeStatus& status,
     uint32_t program_id, const std::string& device_name,
     PABotBase& botbase,
-    std::optional<ControllerType> change_controller
+    std::optional<ControllerType> change_controller,
+    bool clear_settings
 );
 
 

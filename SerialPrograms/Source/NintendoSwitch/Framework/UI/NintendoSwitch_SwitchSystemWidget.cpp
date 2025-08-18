@@ -225,10 +225,14 @@ void SwitchSystemWidget::focus_out(QFocusEvent* event){
 }
 
 void SwitchSystemWidget::keyPressEvent(QKeyEvent* event){
+//    cout << "SwitchSystemWidget::keyPressEvent()" << endl;
     key_press(event);
+//    QWidget::keyPressEvent(event);
 }
 void SwitchSystemWidget::keyReleaseEvent(QKeyEvent* event){
+//    cout << "SwitchSystemWidget::keyReleaseEvent()" << endl;
     key_release(event);
+//    QWidget::keyReleaseEvent(event);
 }
 void SwitchSystemWidget::focusInEvent(QFocusEvent* event){
 //    cout << "focusInEvent" << endl;

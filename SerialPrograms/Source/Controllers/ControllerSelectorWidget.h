@@ -47,6 +47,16 @@ private:
     );
 
 private:
+    void update_buttons();
+
+#if 0
+    virtual void keyPressEvent(QKeyEvent* event) override;
+    virtual void keyReleaseEvent(QKeyEvent* event) override;
+    virtual void focusInEvent(QFocusEvent* event) override;
+    virtual void focusOutEvent(QFocusEvent* event) override;
+#endif
+
+private:
     ControllerSession& m_session;
 
     QHBoxLayout* m_dropdowns;
@@ -55,6 +65,8 @@ private:
     QComboBox* m_controllers_dropdown = nullptr;
     QLabel* m_status_text = nullptr;
     QPushButton* m_reset_button = nullptr;
+
+//    bool m_shift_held = false;
 
     std::vector<std::shared_ptr<const ControllerDescriptor>> m_device_list;
 };

@@ -158,6 +158,8 @@ const std::map<
                 ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
+    }},
+    {2025081700, {
         {PABB_PID_PABOTBASE_ESP32S3, {
             {ControllerType::NintendoSwitch_WiredController, {
                 ControllerFeature::TickPrecise,
@@ -170,8 +172,6 @@ const std::map<
                 ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
-    }},
-    {2025081600, {
         {PABB_PID_PABOTBASE_ESP32, {
             {ControllerType::NintendoSwitch_WirelessProController, {
                 ControllerFeature::TickPrecise,
