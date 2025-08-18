@@ -117,13 +117,25 @@ public:
 class DeviceRequest_change_controller_mode : public BotBaseRequest{
 public:
     pabb_MsgRequestChangeControllerMode params;
-    DeviceRequest_change_controller_mode(uint32_t mode)
+    DeviceRequest_change_controller_mode(uint32_t controller_id)
         : BotBaseRequest(false)
     {
-        params.mode = mode;
+        params.controller_id = controller_id;
     }
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE, params);
+    }
+};
+class DeviceRequest_reset_to_controller : public BotBaseRequest{
+public:
+    pabb_MsgRequestChangeControllerMode params;
+    DeviceRequest_reset_to_controller(uint32_t controller_id)
+        : BotBaseRequest(false)
+    {
+        params.controller_id = controller_id;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_RESET_TO_CONTROLLER, params);
     }
 };
 class MessageControllerStatus : public BotBaseRequest{

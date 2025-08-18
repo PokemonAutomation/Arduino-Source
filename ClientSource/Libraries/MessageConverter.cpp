@@ -336,7 +336,19 @@ int register_message_converters_framework_requests(){
             if (body.size() != sizeof(pabb_MsgRequestChangeControllerMode)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_MsgRequestChangeControllerMode*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", mode = " << params->mode;
+            ss << ", controller_id = " << params->controller_id;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_RESET_TO_CONTROLLER,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_RESET_TO_CONTROLLER - ";
+            if (body.size() != sizeof(pabb_MsgRequestChangeControllerMode)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestChangeControllerMode*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", controller_id = " << params->controller_id;
             return ss.str();
         }
     );

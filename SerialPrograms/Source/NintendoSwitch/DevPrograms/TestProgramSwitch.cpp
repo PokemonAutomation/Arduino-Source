@@ -264,6 +264,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto screenshot = feed.snapshot();
 
+    TeraCardReader detector;
+    detector.make_overlays(overlays);
+
+    cout << detector.detect(screenshot) << endl;
+    detector.pokemon_slug(logger, env.program_info(), screenshot);
+
+
 #if 0
     NewsDetector detector;
     detector.make_overlays(overlays);

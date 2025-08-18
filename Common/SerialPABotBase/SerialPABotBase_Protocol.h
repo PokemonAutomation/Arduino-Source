@@ -322,10 +322,11 @@ typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_MsgRequestReadControllerMode;
 
-#define PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE 0x4a
+#define PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE 0x4a    //  Change controller and keep settings.
+#define PABB_MSG_REQUEST_RESET_TO_CONTROLLER    0x4b    //  Change controller and wipe settings. (unpair from host)
 typedef struct{
     seqnum_t seqnum;
-    uint32_t mode;
+    uint32_t controller_id;
 } PABB_PACK pabb_MsgRequestChangeControllerMode;
 
 
