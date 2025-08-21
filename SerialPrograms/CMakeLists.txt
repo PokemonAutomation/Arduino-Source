@@ -19,6 +19,16 @@ set(CMAKE_AUTOUIC ON)
 add_custom_target(build-time-make-directory ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
 
+# Find repo root folder path
+string(FIND "${CMAKE_CURRENT_SOURCE_DIR}" "Arduino-Source-Internal" internal_repro_position)  # determine if this is an internal repo
+    if (internal_repro_position EQUAL -1)  # no "Arduino-Source-Internal" substr in the current source dir
+        # we are building the public repo
+        set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
+    else()
+        # we are building the internal repo
+        set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../")
+    endif()
+
 #Find threads library
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -2402,14 +2412,7 @@ if (APPLE)
 
     # make sure Packages repo, https://github.com/PokemonAutomation/Packages is placed in the same folder as this Arduino-Source repo
     # so the post-build command can copy the resources folder Packages/SerialPrograms/Resources/ into the built app bundle:
-    string(FIND "${CMAKE_CURRENT_SOURCE_DIR}" "Arduino-Source-Internal" internal_repro_position)  # determine if this is an internal repo
-    if (internal_repro_position EQUAL -1)  # no "Arduino-Source-Internal" substr in the current source dir
-        # we are building the public repo
-        set(RESOURCES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../Packages/SerialPrograms/Resources")
-    else()
-        # we are building the internal repo
-        set(RESOURCES_PATH "${CMAKE_CURRENT_SOURCE_DIR}/../../../../Packages/SerialPrograms/Resources")
-    endif()
+    set(RESOURCES_PATH "${REPO_ROOT_DIR}../Packages/SerialPrograms/Resources")
     message(STATUS "Set Resources folder path from Packages repo: ${RESOURCES_PATH}")
     add_custom_command(
         TARGET SerialPrograms
@@ -2551,9 +2554,25 @@ else() # macOS and Linux
         # Save the root path as CMake variable HOMEBREW_PREFIX.
         execute_process(COMMAND brew --prefix OUTPUT_VARIABLE HOMEBREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
 
-        # Get ONNX Runtime paths
-        target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
-        target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
+        # ==== Get ONNX Runtime paths ====
+        # First, try to see if there is an ONNX Runtime library built from source.
+        # Assume the onnxruntime repo, https://github.com/microsoft/onnxruntime is placed in the same folder as
+        # this Arduino-Source repo:
+        set(ONNXRUNTIME_ROOTDIR "${REPO_ROOT_DIR}../onnxruntime/")
+        set(ONNXRUNTIME_HEADER_DIR "${ONNXRUNTIME_ROOTDIR}include/onnxruntime/core/session/")
+        if(EXISTS "${ONNXRUNTIME_HEADER_DIR}")
+            # we have ONNX Runtime built from source
+            message("Use ONNX Runtime built from source at ${ONNXRUNTIME_ROOTDIR}")
+            target_include_directories(SerialPrograms PRIVATE ${ONNXRUNTIME_HEADER_DIR})
+            link_directories(SerialPrograms PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release)
+            target_link_libraries(SerialPrograms PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release/libonnxruntime.dylib)
+        else()
+            message("Built-from-source ONNX Runtime folder ${ONNXRUNTIME_ROOTDIR} does not exist.")
+            message("Use ONNX Runtime installed by Homebrew.")
+            target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
+            target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
+        endif()
+        
     else() # Linux
         # Instructions took from https://github.com/microsoft/onnxruntime/discussions/6489
         # Step 1: Download the file

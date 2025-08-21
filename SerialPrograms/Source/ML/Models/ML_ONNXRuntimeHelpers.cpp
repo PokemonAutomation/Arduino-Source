@@ -13,15 +13,23 @@ namespace PokemonAutomation{
 namespace ML{
 
 Ort::SessionOptions create_session_option(){
-    return Ort::SessionOptions{};
+    Ort::SessionOptions so;
 
-    // create session using Apple ML
+#if __APPLE__
+    // create session using Apple ML acceleration library CoreML
+    std::unordered_map<std::string, std::string> provider_options;
+    // See for provider options: https://onnxruntime.ai/docs/execution-providers/CoreML-ExecutionProvider.html
+    // "NeuralNetwork" is a faster ModelFormat than "MLProgram".
+    provider_options["ModelFormat"] = std::string("NeuralNetwork");
+    provider_options["ModelCacheDirectory"] = "./ModelCache/";
+    // provider_options["MLComputeUnits"] = "ALL";
+    // provider_options["RequireStaticInputShapes"] = "0";
+    // provider_options["EnableOnSubgraphs"] = "0";
+    so.AppendExecutionProvider("CoreML", provider_options);
+#endif
 
-    // Ort::SessionOptions so;
-    // std::unordered_map<std::string, std::string> provider_options;
-    // provider_options["ModelFormat"] = "NeuralNetwork"; 
-    // so.AppendExecutionProvider("CoreML", provider_options);
-    // return so;
+    // use CPU session
+    return so;
 }
 
 

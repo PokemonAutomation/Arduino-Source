@@ -17,8 +17,10 @@ namespace PokemonAutomation{
 namespace ML{
 
 
-// Create an ONNX Runtiem session options object.
-// For now it only sets the session to be CPU. In future we can create options for GPU or macOS MPS
+// Create an ONNX Runtime session options object.
+// If on macOS, will use CoreML as the backend.
+// Otherwise, use CPU to run the model.
+// TODO: add Cuda backend for Windows machine.
 Ort::SessionOptions create_session_option();
 
 // Handy function to create an ONNX Runtime tensor view class from a vector-like `buffer` object holding
