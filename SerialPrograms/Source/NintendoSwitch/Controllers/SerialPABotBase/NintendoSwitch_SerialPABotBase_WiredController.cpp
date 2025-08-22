@@ -33,7 +33,7 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
     : ProController(logger)
     , SerialPABotBase_Controller(
         logger,
-        ControllerType::NintendoSwitch_WiredController,
+        controller_type,
         connection
     )
     , m_controller_type(controller_type)

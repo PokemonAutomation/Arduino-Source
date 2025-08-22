@@ -60,6 +60,7 @@ public:
     ProController(Logger& logger);
     virtual ~ProController();
 
+protected:
     //  Must call before destruction begins.
     void stop() noexcept;
 
@@ -199,7 +200,7 @@ public:
     //  This will use either the dpad or either joystick - whichever is
     //  available first in the pipeline.
     //
-    //  The intended use-case of this for fast scrolling in the system menu
+    //  The intended use-case of this is for fast scrolling in the system menu
     //  where all 3 buttons have the same effect and can be used at the same
     //  time.
     //

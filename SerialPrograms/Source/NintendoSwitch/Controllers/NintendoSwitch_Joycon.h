@@ -56,6 +56,7 @@ public:
     JoyconController(Logger& logger, ControllerType controller_type);
     virtual ~JoyconController();
 
+protected:
     //  Must call before destruction begins.
     void stop() noexcept;
 
