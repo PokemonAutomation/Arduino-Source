@@ -12,7 +12,7 @@
 namespace PokemonAutomation{
 namespace ML{
 
-Ort::SessionOptions create_session_option(){
+Ort::SessionOptions create_session_option(const std::string& cache_folder_name){
     Ort::SessionOptions so;
 
 #if __APPLE__
@@ -21,7 +21,8 @@ Ort::SessionOptions create_session_option(){
     // See for provider options: https://onnxruntime.ai/docs/execution-providers/CoreML-ExecutionProvider.html
     // "NeuralNetwork" is a faster ModelFormat than "MLProgram".
     provider_options["ModelFormat"] = std::string("NeuralNetwork");
-    provider_options["ModelCacheDirectory"] = "./ModelCache/";
+    // TODO: need to make sure the cache works
+    provider_options["ModelCacheDirectory"] = "./ModelCache/" + cache_folder_name;
     // provider_options["MLComputeUnits"] = "ALL";
     // provider_options["RequireStaticInputShapes"] = "0";
     // provider_options["EnableOnSubgraphs"] = "0";

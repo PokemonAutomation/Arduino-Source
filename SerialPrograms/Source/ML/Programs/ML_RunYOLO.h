@@ -8,11 +8,7 @@
 #ifndef PokemonAutomation_ML_RunYOLO_H
 #define PokemonAutomation_ML_RunYOLO_H
 
-#include <memory>
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "ML/Models/ML_YOLOv5Model.h"
 
 namespace PokemonAutomation{
 namespace ML{
@@ -31,7 +27,6 @@ public:
     virtual void program(NintendoSwitch::SingleSwitchProgramEnvironment& env, NintendoSwitch::ProControllerContext& context) override;
 
 private:
-    std::unique_ptr<YOLOv5Session> m_yolo_session;
 };
 
 

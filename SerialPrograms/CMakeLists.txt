@@ -913,6 +913,8 @@ file(GLOB MAIN_SOURCES
     Source/ML/DataLabeling/ML_SegmentAnythingModel.cpp
     Source/ML/DataLabeling/ML_SegmentAnythingModel.h
     Source/ML/DataLabeling/ML_SegmentAnythingModelConstants.h
+    Source/ML/Inference/ML_YOLOv5Detector.cpp
+    Source/ML/Inference/ML_YOLOv5Detector.h
     Source/ML/ML_Panels.cpp
     Source/ML/ML_Panels.h
     Source/ML/Models/ML_ONNXRuntimeHelpers.cpp
@@ -1845,7 +1847,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h
     Source/PokemonSV/Programs/Farming/PokemonSV_ClaimMysteryGift.cpp
-    Source/PokemonSV/Programs/Farming/PokemonSV_ClaimMysteryGift.h    
+    Source/PokemonSV/Programs/Farming/PokemonSV_ClaimMysteryGift.h
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.cpp
     Source/PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h
     Source/PokemonSV/Programs/Farming/PokemonSV_FlyingTrialFarmer.cpp
@@ -2572,7 +2574,7 @@ else() # macOS and Linux
             target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
             target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
         endif()
-        
+
     else() # Linux
         # Instructions took from https://github.com/microsoft/onnxruntime/discussions/6489
         # Step 1: Download the file

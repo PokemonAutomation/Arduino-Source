@@ -58,7 +58,7 @@ std::tuple<int, int, double, double> resize_image_with_border(
 
 YOLOv5Session::YOLOv5Session(const std::string& model_path, std::vector<std::string> label_names)
 : m_label_names(std::move(label_names))
-, m_session_options(create_session_option())
+, m_session_options(create_session_option("YOLOv5"))
 , m_session{m_env, str_to_onnx_str(model_path).c_str(), m_session_options}
 , m_memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
 , m_input_names{m_session.GetInputNames()}
