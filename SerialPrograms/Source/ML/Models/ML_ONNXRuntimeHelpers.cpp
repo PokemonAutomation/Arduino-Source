@@ -7,6 +7,7 @@
 
 #include <iostream>
 #include <onnxruntime_cxx_api.h>
+#include "Common/Compiler.h"
 #include "ML_ONNXRuntimeHelpers.h"
 
 namespace PokemonAutomation{
