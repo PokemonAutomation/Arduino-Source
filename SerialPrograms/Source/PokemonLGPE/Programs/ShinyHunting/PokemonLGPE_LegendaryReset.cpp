@@ -202,11 +202,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
             consecutive_failures++;
         }
 
-        //Reset game
-        pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
-        reset_game_from_home(env, env.console, context, 3000ms);
-        context.wait_for_all_requests();
-
+        reset_game_from_game(env, env.console, context, &stats.errors, 3000ms);
         stats.resets++;
     }
     //Shiny found, complete the battle

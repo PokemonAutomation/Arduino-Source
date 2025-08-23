@@ -40,6 +40,13 @@ bool reset_game_from_home(
     Milliseconds post_wait_time = std::chrono::milliseconds(125)
 );
 
+void reset_game_from_game(
+    ProgramEnvironment& env,
+    ConsoleHandle& console, JoyconContext& context,
+    std::atomic<uint64_t>* errors,
+    Milliseconds post_wait_time = std::chrono::milliseconds(125)
+);
+
 
 
 

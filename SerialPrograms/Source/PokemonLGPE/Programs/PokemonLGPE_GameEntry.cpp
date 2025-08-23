@@ -126,6 +126,25 @@ bool reset_game_from_home(
 }
 
 
+void reset_game_from_game(
+    ProgramEnvironment& env,
+    ConsoleHandle& console, JoyconContext& context,
+    std::atomic<uint64_t>* errors,
+    Milliseconds post_wait_time
+){
+    while (true){
+        pbf_press_button(context, BUTTON_HOME, 200ms, 2000ms);
+        if (reset_game_from_home(env, console, context, 3000ms)){
+            break;
+        }
+        env.log("Resetting...", COLOR_RED);
+        if (errors){
+            (*errors)++;
+            env.update_stats();
+        }
+    }
+
+}
 
 
 
