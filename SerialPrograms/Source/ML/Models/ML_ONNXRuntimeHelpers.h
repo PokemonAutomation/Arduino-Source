@@ -16,14 +16,14 @@
 namespace PokemonAutomation{
 namespace ML{
 
-
-// Create an ONNX Runtime session options object.
+// Create an ONNX Session.
+// cache_folder_name: the folder name in under ./ModelCache/ to store model caches. This name is better
+//   to be unique for each model for easier file management.
+//
 // If on macOS, will use CoreML as the backend.
 // Otherwise, use CPU to run the model.
 // TODO: add Cuda backend for Windows machine.
-// cache_folder_name: the folder name in under ./ModelCache/ to store model caches. This name is better
-//   to be unique for each model for easier file management.
-Ort::SessionOptions create_session_option(const std::string& cache_folder_name);
+Ort::Session create_session(const std::string& model_path, const std::string& cache_folder_name);
 
 // Handy function to create an ONNX Runtime tensor view class from a vector-like `buffer` object holding
 // the tensor data and an array-like `shape` object that represents the dimension of the tensor.
