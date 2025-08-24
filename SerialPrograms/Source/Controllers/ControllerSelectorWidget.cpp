@@ -10,6 +10,7 @@
 //#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 
 #include "SerialPABotBase/SerialPABotBase_SelectorWidget.h"
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
@@ -71,10 +72,13 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     m_status_text->setText(QString::fromStdString(session.status_text()));
 
     m_reset_button = new QPushButton("Reset Ctrl.", this);
+#if 1
     m_reset_button->setToolTip(
         "<b>Click:</b> Reset the controller.<br><br>"
-        "<b>Shift+Click:</b> Reset and clear the controller of any state. This will unpair it with any hosts it may be connected to."
+        "<b>Shift+Click:</b> Reset and clear the controller of any state. "
+        "For controllers save pairing state, this will unpair it with any hosts it may be connected to."
     );
+#endif
     serial_row->addWidget(m_reset_button, 1);
 
     bool options_locked = session.options_locked();
@@ -120,7 +124,6 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
         m_reset_button, &QPushButton::clicked,
         this, [this](bool){
             bool shift_held = QGuiApplication::keyboardModifiers() & Qt::ShiftModifier;
-//            cout << "shift = " << shift_held << endl;
             m_session.reset(shift_held);
         }
     );

@@ -104,6 +104,17 @@ ConsoleSettings::ConsoleSettings()
         LockMode::LOCK_WHILE_RUNNING,
         false
     )
+    , ENABLE_ESP32_RECONNECT(
+        "<b>Enable ESP32 Wireless Reconnect:</b><br>"
+        "<font color=\"orange\">This is a buggy feature that when enabled will:</font><br>"
+        " 1. Allow an ESP32 controller to reconnect to the previously paired Switch when switching to it from another controller.<br>"
+        " 2. Clicking \"Reset Ctrl.\" will soft-reset the controller and attempt to reconnect to the same Switch it is already paired with.<br>"
+        " 3. SHIFT-clicking \"Reset Ctrl.\" will clear the pairing state and begin pairing again. "
+        "This will allow it to pair with a different Switch as well as clearing any MAC address bans on the current Switch.<br>"
+        "<font color=\"red\">As of this writing, this feature works perfectly on the Switch 2, but is broken on the Switch 1.</font>",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
     , ENABLE_SBB3_PINGS(
         "<b>Enable sys-botbase 3 Pings:</b><br>"
         "Use sys-botbase's ping command for latency measurement instead of \"getVersion\".",
@@ -129,6 +140,7 @@ ConsoleSettings::ConsoleSettings()
     PA_ADD_OPTION(START_GAME_INTERNET_CHECK_DELAY0);
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     PA_ADD_OPTION(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    PA_ADD_OPTION(ENABLE_ESP32_RECONNECT);
     PA_ADD_OPTION(ENABLE_SBB3_PINGS);
     PA_ADD_OPTION(ENABLE_SBB3_LOGGING);
     PA_ADD_OPTION(TIMING_OPTIONS);

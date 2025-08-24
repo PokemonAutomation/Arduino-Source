@@ -175,6 +175,10 @@ void run_post_connect_actions_ESP32(
     default:;
     }
 
+    if (!NintendoSwitch::ConsoleSettings::instance().ENABLE_ESP32_RECONNECT){
+        clear_settings = true;
+    }
+
     uint32_t native_controller_id = controller_type_to_id(desired_controller);
     if (clear_settings){
         botbase.issue_request_and_wait(
