@@ -28,14 +28,38 @@ uint32_t average_colors(uint32_t x, uint32_t y){
 }
 
 
-struct OfficialJoyconColors{
+
+struct ControllerColors{
     std::string name;
+
+    ControllerColors(std::string p_name)
+        : name(std::move(p_name))
+    {}
+    virtual ~ControllerColors() = default;
+    virtual void write_to_profile(ControllerProfile& profile, ControllerType controller) const = 0;
+};
+
+struct JoyconColors : public ControllerColors{
     uint32_t left_body;
     uint32_t left_buttons;
     uint32_t right_body;
     uint32_t right_buttons;
 
-    void write_to_profile(ControllerProfile& profile, ControllerType controller) const{
+    JoyconColors(
+        std::string p_name,
+        uint32_t p_left_body,
+        uint32_t p_left_button,
+        uint32_t p_right_body,
+        uint32_t p_right_buttons
+    )
+        : ControllerColors(std::move(p_name))
+        , left_body(p_left_body)
+        , left_buttons(p_left_button)
+        , right_body(p_right_body)
+        , right_buttons(p_right_buttons)
+    {}
+
+    virtual void write_to_profile(ControllerProfile& profile, ControllerType controller) const override{
         profile.official_name = name;
         switch (controller){
         case ControllerType::NintendoSwitch_WirelessProController:{
@@ -56,13 +80,55 @@ struct OfficialJoyconColors{
             break;
         default:;
         }
+    }
+};
+struct ProconColors : public ControllerColors{
+    uint32_t left_grip;
+    uint32_t right_grip;
+    uint32_t body;
+    uint32_t buttons;
 
+    ProconColors(
+        std::string p_name,
+        uint32_t p_left_grip,
+        uint32_t p_right_grip,
+        uint32_t p_body,
+        uint32_t p_buttons
+    )
+        : ControllerColors(std::move(p_name))
+        , left_grip(p_left_grip)
+        , right_grip(p_right_grip)
+        , body(p_body)
+        , buttons(p_buttons)
+    {}
+
+    virtual void write_to_profile(ControllerProfile& profile, ControllerType controller) const override{
+        profile.official_name = name;
+        switch (controller){
+        case ControllerType::NintendoSwitch_WirelessProController:{
+            //  Set the grips to the joycon colors.
+            profile.left_grip = left_grip;
+            profile.right_grip = right_grip;
+            profile.body_color = body;
+            profile.button_color = buttons;
+            break;
+        }
+        case ControllerType::NintendoSwitch_LeftJoycon:
+            profile.button_color = buttons;
+            profile.body_color = left_grip;
+            break;
+        case ControllerType::NintendoSwitch_RightJoycon:
+            profile.button_color = buttons;
+            profile.body_color = right_grip;
+            break;
+        default:;
+        }
     }
 };
 
-const std::vector<OfficialJoyconColors>& OFFICIAL_JOYCON_COLORS(){
+const std::vector<JoyconColors>& OFFICIAL_JOYCON_COLORS0(){
     //  From: https://switchbrew.org/wiki/Joy-Con#Colors
-    const static std::vector<OfficialJoyconColors> database{
+    const static std::vector<JoyconColors> database{
         {"Developer Black",                     0x313131, 0x0F0F0F, 0x313131, 0x0F0F0F},
 
         {"Stock: Grey / Grey",                  0x828282, 0x0F0F0F, 0x828282, 0x0F0F0F},
@@ -94,20 +160,51 @@ const std::vector<OfficialJoyconColors>& OFFICIAL_JOYCON_COLORS(){
     };
     return database;
 }
+const std::vector<ProconColors>& OFFICIAL_PROCON_COLORS0(){
+    //  From: https://gbatemp.net/threads/people-with-special-edition-pro-controllers-i-need-your-help-with-colors.627413/
+    const static std::vector<ProconColors> database{
+        {"Procon: Stock Black",                 0x323232, 0x323232, 0x323232, 0xFFFFFF},
+        {"Procon: Super Smash Bros. Ultimate",  0xFFFFFF, 0xFFFFFF, 0x2D2D2D, 0xE6E6E6},
+        {"Procon: Zelda Tears of the Kingdom",  0x464646, 0xFFFFFF, 0x2D2D2D, 0xE6E6E6},
+//        {"Procon: Xenoblade Chronicles 2",      0xFFFFFF, 0xFFFFFF, 0x323132, 0xFFFFFF},    //  The actual values. Switch automatically replaces grips with pink.
+        {"Procon: Xenoblade Chronicles 2",      0xff3a66, 0xff3a66, 0x323132, 0xFFFFFF},    //  Grip color is a guess.
+        {"Procon: Splatoon 2",                  0x1EDC00, 0xFF3278, 0x2D2D2D, 0xE6E6E6},    //  This is just a guess.
+        {"Procon: Splatoon 3",                  0x6455F5, 0xC3FA05, 0x2D2D2D, 0xE6E6E6},
+    };
+    return database;
+}
+std::vector<const ControllerColors*> make_OFFICIAL_CONTROLLER_COLORS(){
+    std::vector<const ControllerColors*> ret;
+    for (const JoyconColors& item : OFFICIAL_JOYCON_COLORS0()){
+        ret.emplace_back(&item);
+    }
+    for (const ProconColors& item : OFFICIAL_PROCON_COLORS0()){
+        ret.emplace_back(&item);
+    }
+    return ret;
+}
+const std::vector<const ControllerColors*> OFFICIAL_CONTROLLER_COLORS(){
+    static const std::vector<const ControllerColors*> database = make_OFFICIAL_CONTROLLER_COLORS();
+    return database;
+}
 
-
-StringSelectDatabase make_JOYCON_DATABASE(){
+StringSelectDatabase make_CONTROLLER_DATABASE(){
     StringSelectDatabase database;
     database.add_entry(StringSelectEntry("Custom", "Custom"));
-    for (const OfficialJoyconColors& item : OFFICIAL_JOYCON_COLORS()){
+    for (const JoyconColors& item : OFFICIAL_JOYCON_COLORS0()){
+        database.add_entry(
+            StringSelectEntry(item.name, item.name)
+        );
+    }
+    for (const ProconColors& item : OFFICIAL_PROCON_COLORS0()){
         database.add_entry(
             StringSelectEntry(item.name, item.name)
         );
     }
     return database;
 }
-const StringSelectDatabase& JOYCON_DATABASE(){
-    static const StringSelectDatabase database = make_JOYCON_DATABASE();
+const StringSelectDatabase& CONTROLLER_DATABASE(){
+    static const StringSelectDatabase database = make_CONTROLLER_DATABASE();
     return database;
 }
 
@@ -166,7 +263,7 @@ ControllerSettingsRow::ControllerSettingsRow(EditableTableOption& parent_table)
         0x96F5F5, 0x96F5F5
     )
     , official_color(
-        JOYCON_DATABASE(),
+        CONTROLLER_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
@@ -240,7 +337,7 @@ void ControllerSettingsRow::on_config_value_changed(void* object){
         m_pending_official_load++;
 
         ControllerProfile profile{};
-        OFFICIAL_JOYCON_COLORS()[index - 1].write_to_profile(profile, controller);
+        OFFICIAL_CONTROLLER_COLORS()[index - 1]->write_to_profile(profile, controller);
         this->set_profile(profile);
 
         m_pending_official_load--;
@@ -277,7 +374,7 @@ std::vector<std::string> ControllerSettingsTable::make_header() const{
 
 
 ControllerProfile ControllerSettingsTable::random_profile(ControllerType controller){
-    const std::vector<OfficialJoyconColors>& DATABASE = OFFICIAL_JOYCON_COLORS();
+    const std::vector<const ControllerColors*>& DATABASE = OFFICIAL_CONTROLLER_COLORS();
 
     ControllerProfile profile;
 
@@ -285,7 +382,7 @@ ControllerProfile ControllerSettingsTable::random_profile(ControllerType control
     seed = pabb_crc32(0, &seed, sizeof(seed));
     seed %= DATABASE.size();
 
-    DATABASE[(size_t)seed].write_to_profile(profile, controller);
+    DATABASE[(size_t)seed]->write_to_profile(profile, controller);
     return profile;
 }
 ControllerProfile ControllerSettingsTable::get_or_make_profile(
