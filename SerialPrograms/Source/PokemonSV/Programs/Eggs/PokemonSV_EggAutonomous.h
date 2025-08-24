@@ -126,7 +126,7 @@ private:
     bool m_in_critical_to_save_stage = false;
 };
 
-
+void change_settings_egg_program(SingleSwitchProgramEnvironment& env, ProControllerContext& context,  Language language);
 
 
 }
