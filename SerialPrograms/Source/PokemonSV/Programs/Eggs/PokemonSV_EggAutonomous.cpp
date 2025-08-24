@@ -767,12 +767,12 @@ bool EggAutonomous::handle_recoverable_error(
         env.log("Don't reset game to protect it.", COLOR_RED);
         return true;
     }
-
+    std::string fail_message = e.message();
     consecutive_failures++;
     if (consecutive_failures >= 3){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Failed 3 times in the row.",
+            "Failed 3 times in the row.\n" + fail_message,
             env.console
         );
     }
