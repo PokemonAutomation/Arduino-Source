@@ -351,7 +351,7 @@ void collect_eggs_after_sandwich(
     //  Recall your ride to reduce obstacles.
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
-#if 1
+#if 0
     //  Move left
     pbf_move_left_joystick(context, 0, 128, 80ms, 480ms);
     pbf_press_button(context, BUTTON_L, 120ms, 120ms);
