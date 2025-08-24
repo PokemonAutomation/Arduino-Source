@@ -29,6 +29,7 @@
 #include "PokemonSV/Programs/Eggs/PokemonSV_EggRoutines.h"
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
 #include "PokemonSV_EggAutonomous.h"
 
 namespace PokemonAutomation{
@@ -736,6 +737,26 @@ void EggAutonomous::save_game(SingleSwitchProgramEnvironment& env, ProController
     }
 }
 
+void change_settings_egg_program(SingleSwitchProgramEnvironment& env, ProControllerContext& context,  Language language){
+    int8_t options_index = 4;
+    enter_menu_from_overworld(env.program_info(), env.console, context, options_index, MenuSide::RIGHT);
+    MenuOption session(env.console, context, language);
+
+    std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>> options = {
+        {MenuOptionItemEnum::TEXT_SPEED, {MenuOptionToggleEnum::FAST}},
+        {MenuOptionItemEnum::SKIP_MOVE_LEARNING, {MenuOptionToggleEnum::ON}},
+        {MenuOptionItemEnum::GIVE_NICKNAMES, {MenuOptionToggleEnum::OFF}},
+        {MenuOptionItemEnum::CAMERA_SUPPORT, {MenuOptionToggleEnum::ON}},
+        {MenuOptionItemEnum::AUTOSAVE, {MenuOptionToggleEnum::OFF}},
+
+    };
+    session.set_options(options); 
+
+    pbf_mash_button(context, BUTTON_A, 1 * TICKS_PER_SECOND);
+    clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5, {CallbackEnum::PROMPT_DIALOG});
+    press_Bs_to_back_to_overworld(env.program_info(), env.console, context);    
+}
+
 
 bool EggAutonomous::handle_recoverable_error(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
@@ -779,6 +800,10 @@ bool EggAutonomous::handle_recoverable_error(
 
     env.log("Reset game to handle recoverable error");
     reset_game(env.program_info(), env.console, context);
+
+    if (e.message().find("collect_eggs_from_basket") != std::string::npos){
+        change_settings_egg_program(env, context, LANGUAGE);
+    }
 
     return false;
 }

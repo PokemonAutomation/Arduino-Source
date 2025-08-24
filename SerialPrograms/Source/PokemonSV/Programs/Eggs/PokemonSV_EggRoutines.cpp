@@ -351,6 +351,30 @@ void collect_eggs_after_sandwich(
     //  Recall your ride to reduce obstacles.
     pbf_press_button(context, BUTTON_PLUS, 20, 105);
 
+#if 1
+    // this sequence will purposefully fail if Camera support is off. 
+    // If we fail to reach the egg basket, we can then check that Camera support is on.
+
+    //  Move forward to table
+    pbf_move_left_joystick(context, 128, 0, 80, 40);
+    //  Move left
+    pbf_move_left_joystick(context, 0, 128, 40, 40);
+    //  Move forward to pass table
+    pbf_move_left_joystick(context, 128, 0, 80, 40);
+    //  Move right
+    pbf_move_left_joystick(context, 255, 128, 40, 85);
+    //  Move back/right to align to basket
+    pbf_move_left_joystick(context, 240, 255, 40, 40);
+
+    //  Move closer to the basket, up to the table
+    pbf_press_button(context, BUTTON_L, 20, 105);
+    pbf_move_left_joystick(context, 128, 0, 100, 40);
+
+    //  face away from the table
+    pbf_press_button(context, BUTTON_L, 20, 105);
+    pbf_move_left_joystick(context, 128, 255, 10, 40);  
+#endif
+
 #if 0
     //  Move left
     pbf_move_left_joystick(context, 0, 128, 80ms, 480ms);
@@ -371,7 +395,9 @@ void collect_eggs_after_sandwich(
     pbf_move_left_joystick(context, 255, 128, 80ms, 320ms);
     pbf_press_button(context, BUTTON_L, 120ms, 120ms);
     pbf_move_left_joystick(context, 128, 0, 160ms, 320ms);
-#else
+#endif
+
+#if 0
     //  Move left
     pbf_move_left_joystick(context, 0, 128, 40, 40);
     //  Move forward to pass table
