@@ -84,5 +84,11 @@ Language language_code_to_enum(const std::string& language){
     return iter->second;
 }
 
+std::string language_warning(Language language){
+    return "Please ensure that you have set the correct Game Language in the program settings.\n"
+            "Current language set: " + language_data(language).name;
+
+}
+
 
 }

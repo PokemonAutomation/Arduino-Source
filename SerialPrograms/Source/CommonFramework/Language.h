@@ -60,6 +60,7 @@ private:
 
 const LanguageData& language_data(Language language);
 Language language_code_to_enum(const std::string& language);
+std::string language_warning(Language language);
 
 
 
