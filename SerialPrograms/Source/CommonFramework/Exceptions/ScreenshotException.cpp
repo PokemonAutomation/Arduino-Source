@@ -85,17 +85,20 @@ std::shared_ptr<const ImageRGB32> ScreenshotException::screenshot() const{
 }
 
 
-void ScreenshotException::send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const{
+void ScreenshotException::send_notification(ProgramEnvironment& env, EventNotificationOption& notification, const std::string& title_prefix) const{
     std::vector<std::pair<std::string, std::string>> embeds;
     if (!m_message.empty()){
         embeds.emplace_back(std::pair<std::string, std::string>("Message:", m_message));
     }
 
+    std::string title = title_prefix;
+    title.append(name());
+
     if (m_send_error_report == ErrorReport::SEND_ERROR_REPORT){
         report_error(
             &env.logger(),
             env.program_info(),
-            name(),
+            title,
             embeds,
             screenshot_view(),
             m_stream ? &m_stream->history() : nullptr
@@ -111,26 +114,18 @@ void ScreenshotException::send_notification(ProgramEnvironment& env, EventNotifi
     );
 }
 
+void ScreenshotException::send_recoverable_notification(ProgramEnvironment& env) const{
+    EventNotificationOption recoverable_notification = EventNotificationOption(
+        "Program Error (Recoverable)",
+        true, true,
+        ImageAttachmentMode::JPG,
+        {"Notifs"}
+    );    
+
+    send_notification(env, recoverable_notification, "Recoverable Error: ");
+}
+
 void ScreenshotException::send_fatal_notification(ProgramEnvironment& env) const{
-    std::vector<std::pair<std::string, std::string>> embeds;
-    if (!m_message.empty()){
-        embeds.emplace_back(std::pair<std::string, std::string>("Message:", m_message));
-    }
-
-    std::string title = "Fatal Error: ";
-    title.append(name());
-
-    if (m_send_error_report == ErrorReport::SEND_ERROR_REPORT){
-        report_error(
-            &env.logger(),
-            env.program_info(),
-            title,
-            embeds,
-            screenshot_view(),
-            m_stream ? &m_stream->history() : nullptr
-        );
-    }
-
     EventNotificationOption fatal_notification = EventNotificationOption(
         "Program Error (Fatal)",
         true, true,
@@ -138,13 +133,7 @@ void ScreenshotException::send_fatal_notification(ProgramEnvironment& env) const
         {"Notifs"}
     );
 
-    send_program_notification(
-        env, fatal_notification,
-        color(),
-        name(),
-        std::move(embeds), "",
-        screenshot_view()
-    );
+    send_notification(env, fatal_notification, "Recoverable Error: ");
 }
 
 

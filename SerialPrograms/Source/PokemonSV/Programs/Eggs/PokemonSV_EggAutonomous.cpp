@@ -796,7 +796,7 @@ bool EggAutonomous::handle_recoverable_error(
             env.console
         );
     }
-    e.send_notification(env, notification);
+    e.send_recoverable_notification(env);
 
     env.log("Reset game to handle recoverable error");
     reset_game(env.program_info(), env.console, context);
