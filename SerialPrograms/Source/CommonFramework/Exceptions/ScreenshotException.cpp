@@ -111,6 +111,41 @@ void ScreenshotException::send_notification(ProgramEnvironment& env, EventNotifi
     );
 }
 
+void ScreenshotException::send_fatal_notification(ProgramEnvironment& env) const{
+    std::vector<std::pair<std::string, std::string>> embeds;
+    if (!m_message.empty()){
+        embeds.emplace_back(std::pair<std::string, std::string>("Message:", m_message));
+    }
+
+    std::string title = "Fatal Error: ";
+    title.append(name());
+
+    if (m_send_error_report == ErrorReport::SEND_ERROR_REPORT){
+        report_error(
+            &env.logger(),
+            env.program_info(),
+            title,
+            embeds,
+            screenshot_view(),
+            m_stream ? &m_stream->history() : nullptr
+        );
+    }
+
+    EventNotificationOption fatal_notification = EventNotificationOption(
+        "Program Error (Fatal)",
+        true, true,
+        ImageAttachmentMode::JPG,
+        {"Notifs"}
+    );
+
+    send_program_notification(
+        env, fatal_notification,
+        color(),
+        name(),
+        std::move(embeds), "",
+        screenshot_view()
+    );
+}
 
 
 

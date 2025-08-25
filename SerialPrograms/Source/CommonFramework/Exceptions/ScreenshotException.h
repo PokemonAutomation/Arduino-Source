@@ -72,6 +72,7 @@ public:
 
     virtual Color color() const{ return COLOR_RED; }
     virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const;
+    void send_fatal_notification(ProgramEnvironment& env) const;
 
 public:
     ErrorReport m_send_error_report;

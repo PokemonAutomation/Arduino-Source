@@ -767,7 +767,6 @@ bool EggAutonomous::handle_recoverable_error(
     auto& stats = env.current_stats<EggAutonomous_Descriptor::Stats>();
     stats.m_errors++;
     env.update_stats();
-    e.send_notification(env, notification);
 
     if (SAVE_DEBUG_VIDEO){
         // Take a video to give more context for debugging
@@ -797,6 +796,7 @@ bool EggAutonomous::handle_recoverable_error(
             env.console
         );
     }
+    e.send_notification(env, notification);
 
     env.log("Reset game to handle recoverable error");
     reset_game(env.program_info(), env.console, context);
