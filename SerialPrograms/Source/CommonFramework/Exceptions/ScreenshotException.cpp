@@ -122,7 +122,7 @@ void ScreenshotException::send_recoverable_notification(ProgramEnvironment& env)
         {"Notifs"}
     );    
 
-    send_notification(env, recoverable_notification, "Recoverable Error: ");
+    send_notification(env, recoverable_notification, "Recoverable: ");
 }
 
 void ScreenshotException::send_fatal_notification(ProgramEnvironment& env) const{
@@ -133,7 +133,7 @@ void ScreenshotException::send_fatal_notification(ProgramEnvironment& env) const
         {"Notifs"}
     );
 
-    send_notification(env, fatal_notification, "Fatal Error: ");
+    send_notification(env, fatal_notification, "Fatal: ");
 }
 
 
