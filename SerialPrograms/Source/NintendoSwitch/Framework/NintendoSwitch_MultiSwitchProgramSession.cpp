@@ -233,7 +233,7 @@ void MultiSwitchProgramSession::internal_run_program(){
             message = e.name();
         }
         report_error(message);
-        e.send_notification(env, m_option.instance().NOTIFICATION_ERROR_FATAL);
+        e.send_fatal_notification(env);
     }catch (Exception& e){
         logger().log("Program stopped with an exception!", COLOR_RED);
         env.add_overlay_log_to_all_consoles("- Program Error -", COLOR_RED);

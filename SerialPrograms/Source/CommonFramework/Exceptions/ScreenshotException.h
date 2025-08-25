@@ -71,7 +71,9 @@ public:
     std::shared_ptr<const ImageRGB32> screenshot() const;
 
     virtual Color color() const{ return COLOR_RED; }
-    virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification) const;
+    virtual void send_notification(ProgramEnvironment& env, EventNotificationOption& notification, const std::string& title_prefix = "") const;
+    void send_recoverable_notification(ProgramEnvironment& env) const;
+    void send_fatal_notification(ProgramEnvironment& env) const;
 
 public:
     ErrorReport m_send_error_report;
