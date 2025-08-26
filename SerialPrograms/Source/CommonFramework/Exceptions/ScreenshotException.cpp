@@ -108,7 +108,7 @@ void ScreenshotException::send_notification(ProgramEnvironment& env, EventNotifi
     send_program_notification(
         env, notification,
         color(),
-        name(),
+        title,
         std::move(embeds), "",
         screenshot_view()
     );
