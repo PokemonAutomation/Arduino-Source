@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_MemoryUtilization_Linux_TPP
 #define PokemonAutomation_MemoryUtilization_Linux_TPP
 
+#include <stdint.h>
 #include <utility>
 #include <string>
 #include <fstream>

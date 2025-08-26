@@ -18,10 +18,14 @@
 #elif __linux
 #include "MemoryUtilization_Linux.tpp"
 
+#else
+
 namespace PokemonAutomation{
     MemoryUsage process_memory_usage(){
+        return MemoryUsage{};
     }
 }
+
 #endif
 
 
