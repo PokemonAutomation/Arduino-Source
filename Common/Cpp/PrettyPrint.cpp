@@ -49,6 +49,123 @@ std::string tostr_u_commas(int64_t x){
 
     return out;
 }
+
+
+inline std::string byte_prefix(size_t index){
+    static const char* BYTE_NAMES[] = {
+        " bytes",
+        " KiB",
+        " MiB",
+        " GiB",
+        " TiB",
+        " PiB",
+        " EiB",
+        " ZiB",
+        " YiB",
+    };
+    constexpr size_t SUFFIX_SIZE = sizeof(BYTE_NAMES) / sizeof(const char*);
+
+    if (index < SUFFIX_SIZE){
+        return BYTE_NAMES[index];
+    }
+
+    return " * 2^" + std::to_string(index) + "0";
+}
+
+template <typename IntegerType>
+std::string tostr_ui_bytes(IntegerType bytes){
+    //  Prints out bytes in one of the following forms:
+    //  0.xx suffix
+    //  x.xx suffix
+    //  xx.x suffix
+    //   xxx suffix
+
+    //  Conditions:
+    //      "bytes" must be non-negative
+
+    std::string out;
+    if (bytes < 1000){
+        //  Downcast to a more efficient type.
+        uint32_t sbytes = (uint32_t)bytes;
+        if (bytes < 10){
+//            out += " ";
+        }
+        out += std::to_string(sbytes);
+        out += byte_prefix(0);
+        return out;
+    }
+
+    size_t suffix_index = 1;
+    while (bytes >= 1024000){
+        bytes >>= 10;
+        suffix_index++;
+    }
+
+    //  Downcast to a more efficient type.
+    uint32_t sbytes = (uint32_t)bytes;
+
+    sbytes *= 1000;
+    sbytes >>= 10;
+
+    //  .xxx
+    if (sbytes < 995){
+        sbytes += 5;
+        sbytes /= 10;
+
+        out += "0.";
+        out += std::to_string(sbytes);
+        out += byte_prefix(suffix_index);
+        return out;
+    }
+
+    //  x.xx
+    if (sbytes < 9995){
+        sbytes += 5;
+        sbytes /= 10;
+
+        out += std::to_string(sbytes / 100);
+        sbytes %= 100;
+        out += ".";
+        if (sbytes >= 10){
+            out += std::to_string(sbytes);
+        }else{
+            out += "0";
+            out += std::to_string(sbytes);
+        }
+        out += byte_prefix(suffix_index);
+        return out;
+    }
+
+    //  xx.x or (0.98)
+    if (sbytes < 99950){
+        sbytes += 50;
+        sbytes /= 100;
+
+        out += std::to_string(sbytes / 10);
+        sbytes %= 10;
+        out += ".";
+        out += std::to_string(sbytes);
+        out += byte_prefix(suffix_index);
+        return out;
+    }
+
+    //  xxx or (1.00)
+    {
+        sbytes += 500;
+        sbytes /= 1000;
+
+//        out += " ";
+        out += std::to_string(sbytes);
+        out += byte_prefix(suffix_index);
+        return out;
+    }
+}
+std::string tostr_bytes(uint64_t bytes){
+    return tostr_ui_bytes(bytes);
+}
+
+
+
 std::string tostr_default(double x){
     std::ostringstream ss;
     ss << x;

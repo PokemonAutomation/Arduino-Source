@@ -148,6 +148,9 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/ListenerSet.h
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.cpp
     ../Common/Cpp/MemoryUtilization/MemoryUtilization.h
+    ../Common/Cpp/MemoryUtilization/MemoryUtilization_Linux.tpp
+    ../Common/Cpp/MemoryUtilization/MemoryUtilization_Mac.tpp
+    ../Common/Cpp/MemoryUtilization/MemoryUtilization_Windows.tpp
     ../Common/Cpp/Options/BatchOption.cpp
     ../Common/Cpp/Options/BatchOption.h
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp
@@ -506,7 +509,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/Backends/SnapshotManager.h
     Source/CommonFramework/VideoPipeline/Backends/VideoFrameQt.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
+    Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.cpp
     Source/CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h
+    Source/CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.cpp
+    Source/CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.h
     Source/CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.cpp
     Source/CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h
     Source/CommonFramework/VideoPipeline/UI/VideoDisplayWidget.cpp

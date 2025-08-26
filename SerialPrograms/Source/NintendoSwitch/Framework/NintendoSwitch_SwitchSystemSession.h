@@ -30,6 +30,7 @@
 #include "NintendoSwitch_SwitchSystemOption.h"
 
 namespace PokemonAutomation{
+    class MemoryUtilizationStats;
     class CpuUtilizationStat;
     class ThreadUtilizationStat;
 namespace NintendoSwitch{
@@ -91,6 +92,7 @@ private:
 
     StreamHistorySession m_history;
 
+    std::unique_ptr<MemoryUtilizationStats> m_memory_usage;
     std::unique_ptr<CpuUtilizationStat> m_cpu_utilization;
     std::unique_ptr<ThreadUtilizationStat> m_main_thread_utilization;
 };
