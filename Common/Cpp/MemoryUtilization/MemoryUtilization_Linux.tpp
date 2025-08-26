@@ -12,7 +12,6 @@
 #include <fstream>
 #include <iostream>
 #include <unistd.h>
-#include <sys/proc_info.h>
 #include "MemoryUtilization.h"
 
 namespace PokemonAutomation{
@@ -66,16 +65,6 @@ MemoryUsage process_memory_usage(){
         bytes = std::min(bytes, usage.total_system_memory);
 
         usage.total_used_system_memory = usage.total_system_memory - bytes;
-    }
-
-    pid_t pid = getpid();
-    struct proc_taskinfo task_info;
-    int ret = proc_pidinfo(pid, PROC_PIDTASKINFO, 0, &task_info, sizeof(task_info));
-
-    if (ret <= 0) {
-        std::cerr << "Error getting process info for PID " << pid << ": " << strerror(errno) << std::endl;
-    }else{
-        usage.process_physical_memory = task_info.pti_resident_size;
     }
 
     return usage;
