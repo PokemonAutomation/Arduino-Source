@@ -41,9 +41,9 @@ RunYOLO::RunYOLO() {}
 
 void RunYOLO::program(NintendoSwitch::SingleSwitchProgramEnvironment& env, NintendoSwitch::ProControllerContext& context){
 
-    // MemoryUsage mu = process_memory_usage();
-    // std::cout << "Memory usage: " << mu.total_system_memory << " " << mu.total_used_system_memory << " " 
-        // << mu.process_physical_memory << " " << mu.process_virtual_memory << std::endl;
+    MemoryUsage mu = process_memory_usage();
+    std::cout << "Memory usage: " << mu.total_system_memory << " " << mu.total_used_system_memory << " " 
+        << mu.process_physical_memory << " " << mu.process_virtual_memory << std::endl;
     
     YOLOv5Watcher watcher(env.console.overlay());
 
