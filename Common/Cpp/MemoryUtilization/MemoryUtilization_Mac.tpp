@@ -94,6 +94,7 @@ MemoryUsage process_memory_usage(){
         std::cerr << "Error getting process info for PID " << pid << ": " << strerror(errno) << std::endl;
     }else{
         usage.process_physical_memory = task_info.pti_resident_size;
+        usage.process_virtual_memory = task_info.pti_virtual_size;
     }
 
     int mib[] = {CTL_HW, HW_MEMSIZE};
@@ -106,25 +107,16 @@ MemoryUsage process_memory_usage(){
         usage.total_system_memory = physical_memory;
     }
 
-    vm_size_t page_size;
     vm_statistics_data_t vm_stats;
-    mach_port_t mach_port = mach_host_self();
-    mach_msg_type_number_t count = sizeof(vm_stats) / sizeof(integer_t);
-
-    // Get the host statistics
-    if (KERN_SUCCESS != host_statistics(mach_port, HOST_VM_INFO, (host_info_t)&vm_stats, &count)) {
+    mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
+    if (host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count) != 0) {
         std::cerr << "Failed to get host statistics." << std::endl;
-    } else{
-        // Get the system's page size
-        host_page_size(mach_port, &page_size);
-
+    } else {
         // Calculate used memory from vm_statistics
-        // Used memory = Wired + Active + Inactive
-        size_t wired_pages = vm_stats.wire_count;
-        size_t active_pages = vm_stats.active_count;
-        size_t inactive_pages = vm_stats.inactive_count;
-
-        usage.total_used_system_memory = (wired_pages + active_pages + inactive_pages) * page_size;
+        // Used = active_count + wire_count
+        // Cached = inactive_count
+        // Buffered = purgeable_count
+        usage.total_used_system_memory = (size_t)(vm_stats.active_count + vm_stats.wire_count) * (size_t)vm_page_size;
     }
     return usage;
 }
