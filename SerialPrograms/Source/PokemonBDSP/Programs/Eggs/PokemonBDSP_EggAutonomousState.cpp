@@ -350,7 +350,7 @@ void EggAutonomousState::fetch_egg(){
         int ret = run_until<ProControllerContext>(
             m_stream, m_context,
             [](ProControllerContext& context){
-                pbf_press_button(context, BUTTON_ZL, 20, 230);
+                pbf_press_button(context, BUTTON_ZL, 160ms, 9840ms);
             },
             {{dialog}}
         );
