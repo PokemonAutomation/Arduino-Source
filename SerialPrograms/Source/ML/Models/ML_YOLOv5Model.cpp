@@ -11,11 +11,13 @@
 #include <opencv2/imgproc.hpp>
 #include <opencv2/dnn.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
+#include "CommonFramework/Globals.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_YOLOv5Model.h"
 
 namespace PokemonAutomation{
 namespace ML{
+
 
 std::tuple<int, int, double, double> resize_image_with_border(
     const cv::Mat& input_image,
@@ -58,7 +60,8 @@ std::tuple<int, int, double, double> resize_image_with_border(
 
 YOLOv5Session::YOLOv5Session(const std::string& model_path, std::vector<std::string> label_names)
 : m_label_names(std::move(label_names))
-, m_session{create_session(model_path, "YOLOv5")}
+, m_session_options(create_session_options(ML_MODEL_CACHE_PATH() + "YOLOv5"))
+, m_session{create_session(m_env, m_session_options, model_path, ML_MODEL_CACHE_PATH() + "YOLOv5")}
 , m_memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
 , m_input_names{m_session.GetInputNames()}
 , m_output_names{m_session.GetOutputNames()}

@@ -24,7 +24,6 @@ namespace fs = std::filesystem;
 namespace PokemonAutomation{
 namespace ML{
 
-const char* MODEL_CACHE_FOLDER = "./ModelCache/";
 
 // Computes the cryptographic hash of a file.
 std::string create_file_hash(const std::string& filepath){
@@ -52,6 +51,7 @@ Ort::SessionOptions create_session_options(const std::string& model_cache_path){
     // "NeuralNetwork" is a faster ModelFormat than "MLProgram".
     provider_options["ModelFormat"] = std::string("NeuralNetwork");
     provider_options["ModelCacheDirectory"] = model_cache_path;
+
     // provider_options["MLComputeUnits"] = "ALL";
     // provider_options["RequireStaticInputShapes"] = "0";
     // provider_options["EnableOnSubgraphs"] = "0";
@@ -113,14 +113,13 @@ void write_cache_flag_file(const std::string& model_cache_path, const std::strin
 }
 
 
-Ort::Session create_session(const std::string& model_path, const std::string& cache_folder_name){
-    const std::string model_cache_path = MODEL_CACHE_FOLDER + cache_folder_name;
-    Ort::SessionOptions so = create_session_options(model_cache_path);
+Ort::Session create_session(const Ort::Env& env, const Ort::SessionOptions& so,
+    const std::string& model_path, const std::string& model_cache_path)
+{
     bool write_flag_file = true;
     std::string file_hash;
     std::tie(write_flag_file, file_hash) = clean_up_old_model_cache(model_cache_path, model_path);
     
-    Ort::Env env;
     Ort::Session session{env, str_to_onnx_str(model_path).c_str(), so};
     // when Ort::Ssssion is created, if possible, it will create a model cache
     if (write_flag_file){

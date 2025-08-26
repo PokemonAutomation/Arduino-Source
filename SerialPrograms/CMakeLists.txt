@@ -146,6 +146,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/LifetimeSanitizer.h
     ../Common/Cpp/ListenerSet.h
+    ../Common/Cpp/MemoryUtilization/MemoryUtilization.cpp
+    ../Common/Cpp/MemoryUtilization/MemoryUtilization.h
     ../Common/Cpp/Options/BatchOption.cpp
     ../Common/Cpp/Options/BatchOption.h
     ../Common/Cpp/Options/BooleanCheckBoxOption.cpp

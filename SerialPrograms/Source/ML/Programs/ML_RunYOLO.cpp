@@ -16,6 +16,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "ML/Inference/ML_YOLOv5Detector.h"
+#include "Common/Cpp/MemoryUtilization/MemoryUtilization.h"
 #include "ML_RunYOLO.h"
 
 namespace PokemonAutomation{
@@ -39,6 +40,10 @@ RunYOLO_Descriptor::RunYOLO_Descriptor()
 RunYOLO::RunYOLO() {}
 
 void RunYOLO::program(NintendoSwitch::SingleSwitchProgramEnvironment& env, NintendoSwitch::ProControllerContext& context){
+
+    // MemoryUsage mu = process_memory_usage();
+    // std::cout << "Memory usage: " << mu.total_system_memory << " " << mu.total_used_system_memory << " " 
+        // << mu.process_physical_memory << " " << mu.process_virtual_memory << std::endl;
     
     YOLOv5Watcher watcher(env.console.overlay());
 

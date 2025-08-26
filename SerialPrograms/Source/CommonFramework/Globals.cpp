@@ -205,5 +205,10 @@ const std::string& ML_ANNOTATION_PATH(){
     return path;
 }
 
+const std::string& ML_MODEL_CACHE_PATH(){
+    static const std::string path = RUNTIME_BASE_PATH() + "ModelCache/";
+    return path;
+}
+
 }
 

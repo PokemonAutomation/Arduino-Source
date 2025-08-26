@@ -14,6 +14,7 @@
 #include <opencv2/imgcodecs.hpp>
 #include <opencv2/imgproc.hpp>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
+#include "CommonFramework/Globals.h"
 #include "ML/Models/ML_ONNXRuntimeHelpers.h"
 #include "ML_SegmentAnythingModelConstants.h"
 #include "ML_SegmentAnythingModel.h"
@@ -24,7 +25,8 @@ namespace ML{
 
 
 SAMEmbedderSession::SAMEmbedderSession(const std::string& model_path)
-    : session{create_session(model_path, "SAMEmbedder")}
+    : m_session_options{create_session_options(ML_MODEL_CACHE_PATH() + "SAMEmbedder/")}
+    , session{create_session(m_env, m_session_options, model_path, ML_MODEL_CACHE_PATH() + "SAMEmbedder/")}
     , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , input_names{session.GetInputNames()}
     , output_names{session.GetOutputNames()}
@@ -63,7 +65,8 @@ void SAMEmbedderSession::run(cv::Mat& input_image, std::vector<float>& model_out
 
 
 SAMSession::SAMSession(const std::string& model_path)
-    : session{create_session(model_path, "SAM")}
+    : m_session_options{create_session_options(ML_MODEL_CACHE_PATH() + "SAM/")}
+    , session{create_session(m_env, m_session_options, model_path, ML_MODEL_CACHE_PATH() + "SAM/")}
     , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , input_names{session.GetInputNames()}
     , output_names{session.GetOutputNames()}

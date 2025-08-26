@@ -85,7 +85,6 @@ int main(int argc, char *argv[]){
             return 1;
         }
 
-        std::cout << "Loading from program setting JSON: " << PROGRAM_SETTING_JSON_PATH() << std::endl;
         PERSISTENT_SETTINGS().read();
 
         if (!migrate_stats(logger)){
