@@ -77,6 +77,7 @@ private:
     StringSelectOption STARTPOINT_MAINSTORY;
     StringSelectOption ENDPOINT_MAINSTORY;
 
+    StaticTextOption SETUP_NOTE;
     StaticTextOption MAINSTORY_NOTE;
 
     StaticTextOption START_DESCRIPTION;

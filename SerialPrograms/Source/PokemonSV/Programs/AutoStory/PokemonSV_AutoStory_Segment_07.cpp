@@ -33,7 +33,7 @@ std::string AutoStory_Segment_07::name() const{
 }
 
 std::string AutoStory_Segment_07::start_text() const{
-    return "Start: At Los Platos Pokecenter.";
+    return "Start: At Los Platos Pokecenter. Cleared Let's go tutorial.";
 }
 
 std::string AutoStory_Segment_07::end_text() const{

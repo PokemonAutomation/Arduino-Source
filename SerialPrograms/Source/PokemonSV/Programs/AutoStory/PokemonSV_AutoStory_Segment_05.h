@@ -27,7 +27,7 @@ public:
 };
 
 
-// start: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
+// start: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave. Standing next to Koraidon/Miraidon just outside the cave exit.
 // end: Battled Arven and received Legendary's Pokeball.
 void checkpoint_09(
     SingleSwitchProgramEnvironment& env,
@@ -37,7 +37,7 @@ void checkpoint_09(
 );
 
 // start: Battled Arven and received Legendary's Pokeball.
-// end: Talked to Nemona at the Lighthouse.
+// end: Talked to Nemona at roof of the Lighthouse.
 void checkpoint_10(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,

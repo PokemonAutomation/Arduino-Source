@@ -36,7 +36,7 @@ std::string AutoStory_Segment_12::name() const{
 }
 
 std::string AutoStory_Segment_12::start_text() const{
-    return "Start: Beat Cortondo Gym challenge.";
+    return "Start: Beat Cortondo Gym challenge. At Cortondo East Pokecenter.";
 }
 
 std::string AutoStory_Segment_12::end_text() const{

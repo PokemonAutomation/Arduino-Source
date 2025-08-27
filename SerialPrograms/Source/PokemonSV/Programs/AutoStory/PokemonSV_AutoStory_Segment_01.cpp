@@ -39,11 +39,11 @@ std::string AutoStory_Segment_01::name() const{
 
 
 std::string AutoStory_Segment_01::start_text() const{
-    return "Start: Finished cutscene.";
+    return "Start: Finished cutscene. Stood up from chair. Walked to left side of room.";
 }
 
 std::string AutoStory_Segment_01::end_text() const{
-    return "End: Picked the starter.";
+    return "End: Picked the starter. Changed move order.";
 }
 
 void AutoStory_Segment_01::run_segment(

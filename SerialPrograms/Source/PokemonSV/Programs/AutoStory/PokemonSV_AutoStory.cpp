@@ -218,6 +218,13 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         "10"
     )       
+    , SETUP_NOTE{
+        "NOTE: Make sure you have selected the correct Start Point. "
+        "Make sure your player character is in the exact correct start position for that Start Point, "
+        "especially if your start point is NOT at the beginning of the Tutorial/Main Story. "
+        "Read the Start Point's description to help with finding the correct start position."
+        "For Start Points that are at Pokecenters, ensure that you fly there so that your character is in the exactly correct start position."
+    }    
     , MAINSTORY_NOTE{
         "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Dazzling Gleam, Psychic, Mystical Fire.<br>"
         "Also, make sure you have two other strong pokemon (e.g. level 100 Talonflames)<br>"
@@ -436,6 +443,7 @@ AutoStory::AutoStory()
 
 
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(SETUP_NOTE);
     PA_ADD_OPTION(STORY_SECTION);
     PA_ADD_OPTION(STARTPOINT_TUTORIAL);
     PA_ADD_OPTION(MAINSTORY_NOTE);

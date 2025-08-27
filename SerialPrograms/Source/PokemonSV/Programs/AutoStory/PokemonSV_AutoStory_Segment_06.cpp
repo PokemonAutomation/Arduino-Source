@@ -33,11 +33,11 @@ std::string AutoStory_Segment_06::name() const{
 }
 
 std::string AutoStory_Segment_06::start_text() const{
-    return "Start: Battled Arven, received Legendary's Pokeball. Talked to Nemona at Lighthouse.";
+    return "Start: Battled Arven, received Legendary's Pokeball. Talked to Nemona at roof of Lighthouse.";
 }
 
 std::string AutoStory_Segment_06::end_text() const{
-    return "End: At Los Platos Pokecenter.";
+    return "End: At Los Platos Pokecenter. Cleared Let's go tutorial.";
 }
 
 void AutoStory_Segment_06::run_segment(

@@ -38,7 +38,7 @@ std::string AutoStory_Segment_03::start_text() const{
 }
 
 std::string AutoStory_Segment_03::end_text() const{
-    return "End: Finished catch tutorial. Walked to the cliff and heard mystery cry.";
+    return "End: Finished catch tutorial. Walked to the cliff and heard mystery cry. Standing in front of Nemona near the cliff.";
 }
 
 void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{

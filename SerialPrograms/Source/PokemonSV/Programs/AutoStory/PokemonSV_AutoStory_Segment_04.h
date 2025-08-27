@@ -27,8 +27,8 @@ public:
 };
 
 
-// start: Moved to cliff. Heard mystery cry.
-// end: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave.
+// start: Moved to cliff. Heard mystery cry. Standing in front of Nemona near the cliff.
+// end: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave. Standing next to Koraidon/Miraidon just outside the cave exit.
 void checkpoint_08(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,

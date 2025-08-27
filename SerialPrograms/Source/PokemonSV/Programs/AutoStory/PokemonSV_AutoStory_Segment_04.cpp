@@ -35,11 +35,11 @@ std::string AutoStory_Segment_04::name() const{
 }
 
 std::string AutoStory_Segment_04::start_text() const{
-    return "Start: Finished catch tutorial. Walked to the cliff and heard mystery cry.";
+    return "Start: Finished catch tutorial. Walked to the cliff and heard mystery cry. Standing in front of Nemona near the cliff.";
 }
 
 std::string AutoStory_Segment_04::end_text() const{
-    return "End: Saved the Legendary. Escaped from the Houndoom cave.";
+    return "End: Saved the Legendary. Escaped from the Houndoom cave. Standing next to Koraidon/Miraidon just outside the cave exit.";
 }
 
 void AutoStory_Segment_04::run_segment(

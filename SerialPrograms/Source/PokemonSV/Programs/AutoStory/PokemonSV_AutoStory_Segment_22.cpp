@@ -39,7 +39,7 @@ std::string AutoStory_Segment_22::start_text() const{
 }
 
 std::string AutoStory_Segment_22::end_text() const{
-    return "End: Defeated Team Star (Fire). At East Province (Area One) Pokecenter.";
+    return "End: Defeated Team Star (Fire). At East Province (Area Two) Pokecenter.";
 }
 
 void AutoStory_Segment_22::run_segment(

@@ -27,7 +27,7 @@ public:
 };
 
 
-// start: Talked to Nemona at the Lighthouse.
+// start: Talked to Nemona at roof of the Lighthouse.
 // end: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
 void checkpoint_11(
     SingleSwitchProgramEnvironment& env,

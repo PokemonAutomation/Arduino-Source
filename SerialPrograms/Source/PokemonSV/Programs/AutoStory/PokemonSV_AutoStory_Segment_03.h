@@ -45,7 +45,7 @@ void checkpoint_06(
 );
 
 // start: Cleared catch tutorial.
-// end: Moved to cliff. Heard mystery cry.
+// end: Moved to cliff. Heard mystery cry. Standing in front of Nemona near the cliff.
 void checkpoint_07(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,

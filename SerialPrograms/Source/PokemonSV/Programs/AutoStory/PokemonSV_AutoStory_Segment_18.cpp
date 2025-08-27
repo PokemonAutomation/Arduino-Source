@@ -34,7 +34,7 @@ std::string AutoStory_Segment_18::name() const{
 }
 
 std::string AutoStory_Segment_18::start_text() const{
-    return "Start: Defeated Cascarrafa Gym (Water). At Cascarrafa Gym.";
+    return "Start: Defeated Cascarrafa Gym (Water). Inside Cascarrafa Gym building.";
 }
 
 std::string AutoStory_Segment_18::end_text() const{

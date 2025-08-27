@@ -34,11 +34,11 @@ std::string AutoStory_Segment_05::name() const{
 }
 
 std::string AutoStory_Segment_05::start_text() const{
-    return "Start: Saved the Legendary. Escaped from the Houndoom cave.";
+    return "Start: Saved the Legendary. Escaped from the Houndoom cave. Standing next to Koraidon/Miraidon just outside the cave exit.";
 }
 
 std::string AutoStory_Segment_05::end_text() const{
-    return "End: Battled Arven, received Legendary's Pokeball. Talked to Nemona at Lighthouse.";
+    return "End: Battled Arven, received Legendary's Pokeball. Talked to Nemona at roof of Lighthouse.";
 }
 
 void AutoStory_Segment_05::run_segment(

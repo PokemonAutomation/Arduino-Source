@@ -33,7 +33,7 @@ std::string AutoStory_Segment_19::name() const{
 }
 
 std::string AutoStory_Segment_19::start_text() const{
-    return "Start: At South Province (Area Three) Pokecenter.";
+    return "Start: Defeated Great Tusk/Iron Treads. At South Province (Area Three) Pokecenter.";
 }
 
 std::string AutoStory_Segment_19::end_text() const{

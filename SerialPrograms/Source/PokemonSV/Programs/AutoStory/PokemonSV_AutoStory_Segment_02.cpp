@@ -35,7 +35,7 @@ std::string AutoStory_Segment_02::name() const{
 }
 
 std::string AutoStory_Segment_02::start_text() const{
-    return "Start: Picked the starter.";
+    return "Start: Picked the starter. Changed move order.";
 }
 
 std::string AutoStory_Segment_02::end_text() const{

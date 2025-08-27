@@ -31,7 +31,7 @@ std::string AutoStory_Segment_09::name() const{
 }
 
 std::string AutoStory_Segment_09::start_text() const{
-    return "Start: Battled Team Star, talked to Jacq, standing in classroom.";
+    return "Start: Battled Team Star. Talked to Jacq, introduced self to class, standing in middle of classroom.";
 }
 
 std::string AutoStory_Segment_09::end_text() const{
