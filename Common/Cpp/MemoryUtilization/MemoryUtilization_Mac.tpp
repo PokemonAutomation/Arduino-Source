@@ -8,14 +8,12 @@
 #define PokemonAutomation_MemoryUtilization_Mac_TPP
 
 #include <iostream>
-#include <unistd.h> // For getpid()
 #include <sys/types.h>
 #include <sys/sysctl.h>
-#include <sys/proc_info.h>
-#include <libproc.h>
 #include <mach/mach.h>
 #include <mach/mach_host.h>
 #include <mach/mach_vm.h>
+#include <mach/task_info.h>
 #include <mach/vm_statistics.h>
 
 namespace PokemonAutomation{
@@ -85,38 +83,38 @@ void analyze_vm_regions() {
 
 MemoryUsage process_memory_usage(){
     MemoryUsage usage;
-
-    pid_t pid = getpid();
-    struct proc_taskinfo task_info;
-    int ret = proc_pidinfo(pid, PROC_PIDTASKINFO, 0, &task_info, sizeof(task_info));
-
-    if (ret <= 0) {
-        std::cerr << "Error getting process info for PID " << pid << ": " << strerror(errno) << std::endl;
-    }else{
-        usage.process_physical_memory = task_info.pti_resident_size;
-        usage.process_virtual_memory = task_info.pti_virtual_size;
+    static int64_t physical_memory = 0;
+    if (physical_memory == 0) {
+        int mib[] = {CTL_HW, HW_MEMSIZE};
+        size_t length = sizeof(physical_memory);
+        if (sysctl(mib, 2, &physical_memory, &length, NULL, 0) != 0) {
+            std::cerr << "Error calling sysctl()." << std::endl;
+        }
     }
-
-    int mib[] = {CTL_HW, HW_MEMSIZE};
-    int64_t physical_memory = 0;
-    size_t length = sizeof(physical_memory);
-
-    if (sysctl(mib, 2, &physical_memory, &length, NULL, 0) != 0) {
-        std::cerr << "Error calling sysctl()." << std::endl;
-    } else{
-        usage.total_system_memory = physical_memory;
+    usage.total_system_memory = physical_memory;
+    {
+        task_vm_info_data_t tvi;
+        mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
+        if(KERN_SUCCESS == task_info(mach_task_self(), TASK_VM_INFO, (task_info_t) &tvi, &count))
+        {
+            usage.process_physical_memory = tvi.resident_size; // resident_size = internal + external + reusable
+            usage.process_virtual_memory = tvi.virtual_size;
+        } else {
+            std::cerr << "Failed to get task info." << std::endl;
+        }
     }
-
-    vm_statistics_data_t vm_stats;
-    mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
-    if (host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count) != 0) {
-        std::cerr << "Failed to get host statistics." << std::endl;
-    } else {
-        // Calculate used memory from vm_statistics
-        // Used = active_count + wire_count
-        // Cached = inactive_count
-        // Buffered = purgeable_count
-        usage.total_used_system_memory = (size_t)(vm_stats.active_count + vm_stats.wire_count) * (size_t)vm_page_size;
+    {
+        vm_statistics_data_t vm_stats;
+        mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
+        if (KERN_SUCCESS == host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count)) {
+            // Calculate used memory from vm_statistics
+            // Used = active_count + wire_count
+            // Cached = inactive_count
+            // Buffered = purgeable_count
+            usage.total_used_system_memory = (size_t)(vm_stats.active_count + vm_stats.wire_count) * (size_t)vm_page_size;
+        } else {
+            std::cerr << "Failed to get host statistics." << std::endl;
+        }
     }
     return usage;
 }
