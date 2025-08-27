@@ -67,13 +67,9 @@ void checkpoint_08(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](){
+
         context.wait_for_all_requests();
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 230, 70, 100);
@@ -192,15 +188,9 @@ void checkpoint_08(
         
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }            
-    }
+    
+    });
+
 
 }
 

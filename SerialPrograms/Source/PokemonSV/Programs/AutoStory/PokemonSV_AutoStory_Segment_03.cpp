@@ -64,13 +64,8 @@ void checkpoint_05(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](){         
         context.wait_for_all_requests();
 
         DirectionDetector direction;
@@ -83,15 +78,8 @@ void checkpoint_05(
         env.console.log("Get mom's sandwich");
         env.console.overlay().add_log("Get mom's sandwich", COLOR_WHITE);
         mash_button_till_overworld(env.console, context);
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }    
+    
+    });   
 }
 
 void checkpoint_06(
@@ -100,13 +88,8 @@ void checkpoint_06(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    bool first_attempt = true;
-    while (true){
-    try{        
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }        
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](){        
 
         context.wait_for_all_requests();
 
@@ -133,15 +116,8 @@ void checkpoint_06(
         env.console.log("Finished catch tutorial");
         env.console.overlay().add_log("Finished catch tutorial", COLOR_WHITE);
 
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }            
-    }
+    });
+
 }
 
 void checkpoint_07(
@@ -150,13 +126,8 @@ void checkpoint_07(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](){         
 
         context.wait_for_all_requests();
         env.console.log("Move to cliff");
@@ -187,15 +158,9 @@ void checkpoint_07(
         env.console.log("Mystery cry");
         env.console.overlay().add_log("Mystery cry", COLOR_WHITE);
         
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }           
-    }
+    });
+       
+
 }
 
 

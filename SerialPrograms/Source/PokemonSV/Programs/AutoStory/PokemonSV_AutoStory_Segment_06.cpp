@@ -67,13 +67,8 @@ void checkpoint_11(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        } 
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](){ 
 
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -109,15 +104,7 @@ void checkpoint_11(
         env.console.log("Reached Los Platos");
         env.console.overlay().add_log("Reached Los Platos", COLOR_WHITE);
 
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 

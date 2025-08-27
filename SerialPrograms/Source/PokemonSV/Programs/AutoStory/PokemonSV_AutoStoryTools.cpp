@@ -1220,6 +1220,52 @@ void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProController
 
 }
 
+void checkpoint_reattempt_loop(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats,
+    std::function<void()>&& action
+){
+    size_t max_attempts = 100;
+    bool first_attempt = true;
+    for (size_t i = 0;;i++){
+    try{
+        if (first_attempt){
+            checkpoint_save(env, context, notif_status_update, stats);
+            first_attempt = false;
+        }else{
+            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
+            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
+            env.log("Wait 10 seconds.");
+            context.wait_for(Milliseconds(10 * 1000));
+            save_game_from_overworld(env.program_info(), env.console, context);
+        }
+
+        action();
+       
+        break;
+    }catch(OperationFailedException&){
+        if (i > max_attempts){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Autostory checkpoint failed 100 times.\n"
+                "Make sure you selected the correct Start Point, and your character is in the exactly correct starting position."
+                "Also, make sure you have set the correct Language.",
+                env.console
+            );
+        }
+        context.wait_for_all_requests();
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }         
+    }
+
+}
+
+
 
 
 }
