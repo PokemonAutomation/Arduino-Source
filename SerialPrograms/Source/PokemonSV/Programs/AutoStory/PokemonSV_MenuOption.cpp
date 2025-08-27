@@ -78,7 +78,8 @@ int8_t MenuOption::get_selected_index(const ImageViewRGB32& screen) const {
     if (!m_arrow.detect(box, screen)){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "MenuOption::get_selected_index(): Unable to find cursor.",
+            "MenuOption::get_selected_index(): Unable to find cursor.\n"
+            "We expect to be in the Options screen. Ensure you selected the correct Autostory start segment.",
             m_stream
         );
     }
@@ -127,7 +128,11 @@ std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
                     return "fast";
             }
         }
-        return "";
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "MenuOption::read_option(): Unable to read item. No results returned.",
+            m_stream
+        );        
     }
 
     if (results.size() > 1){

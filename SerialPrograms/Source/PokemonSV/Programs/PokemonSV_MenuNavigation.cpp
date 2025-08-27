@@ -546,7 +546,7 @@ void enter_menu_from_overworld(const ProgramInfo& info, VideoStream& stream, Pro
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "enter_menu_from_overworld(): No recognized state after 30 seconds.",
+                "enter_menu_from_overworld(): No recognized state after 30 seconds. Can't find overworld or main menu.",
                 stream
             );
         }
