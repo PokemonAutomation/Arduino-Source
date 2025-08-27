@@ -13,8 +13,9 @@
 #include <mach/mach.h>
 #include <mach/mach_host.h>
 #include <mach/mach_vm.h>
-#include <mach/task_info.h>
 #include <mach/vm_statistics.h>
+
+#include "MemoryUtilization.h"
 
 namespace PokemonAutomation{
 
@@ -93,15 +94,31 @@ MemoryUsage process_memory_usage(){
     }
     usage.total_system_memory = physical_memory;
     {
-        task_vm_info_data_t tvi;
-        mach_msg_type_number_t count = TASK_VM_INFO_COUNT;
-        if(KERN_SUCCESS == task_info(mach_task_self(), TASK_VM_INFO, (task_info_t) &tvi, &count))
-        {
-            usage.process_physical_memory = tvi.resident_size; // resident_size = internal + external + reusable
-            usage.process_virtual_memory = tvi.virtual_size;
-        } else {
-            std::cerr << "Failed to get task info." << std::endl;
+        mach_vm_address_t address = 0;
+        mach_vm_size_t size = 0;
+        vm_region_extended_info_data_t info;
+        mach_msg_type_number_t count = VM_REGION_EXTENDED_INFO_COUNT;
+        mach_port_t object_name;
+        unsigned int pages_resident = 0;
+        unsigned int pages_swapped_out = 0;
+        unsigned int pages_dirtied = 0;
+
+        while (true) {
+            auto kr = mach_vm_region(mach_task_self(), &address, &size, VM_REGION_EXTENDED_INFO, (vm_region_info_t)&info, &count, &object_name);
+            if (kr != KERN_SUCCESS) {
+                if (kr == KERN_INVALID_ADDRESS) { // end of the address space
+                    break;
+                }
+                std::cerr << "mach_vm_region_recurse failed with error: " << mach_error_string(kr) << std::endl;
+                break;
+            }
+            pages_resident += info.pages_resident;
+            pages_swapped_out += info.pages_swapped_out;
+            pages_dirtied += info.pages_dirtied;
+            address += size;
         }
+        usage.process_physical_memory = (size_t)(pages_resident - pages_dirtied) * (size_t)vm_page_size;
+        usage.process_virtual_memory = usage.process_physical_memory + (size_t)pages_swapped_out * (size_t)vm_page_size;
     }
     {
         vm_statistics_data_t vm_stats;
