@@ -34,7 +34,7 @@ std::string AutoStory_Segment_18::name() const{
 }
 
 std::string AutoStory_Segment_18::start_text() const{
-    return "Start: Defeated Cascarrafa Gym (Water). Inside Cascarrafa Gym building.";
+    return "Start: Defeated Cascarrafa Gym (Water). At Porto Marinada Pokecenter.";
 }
 
 std::string AutoStory_Segment_18::end_text() const{
@@ -78,14 +78,6 @@ void checkpoint_39(
             first_attempt = false;
         }         
         context.wait_for_all_requests();
-
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);
-        // wait for overworld after leaving Gym
-        wait_for_overworld(env.program_info(), env.console, context, 30);
-
-        // fly to Porto Marinada pokecenter
-        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 80, 150});
 
         DirectionDetector direction;
         

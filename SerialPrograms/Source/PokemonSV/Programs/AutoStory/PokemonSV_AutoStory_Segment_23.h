@@ -26,64 +26,6 @@ public:
     ) const override;
 };
 
-// start: 
-// end: 
-void checkpoint_50(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
-
-// start: 
-// end: 
-void checkpoint_51(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
-
-
-// start: 
-// end: 
-void checkpoint_52(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
-
-
-// start: 
-// end: 
-void checkpoint_53(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
-
-
-// start: 
-// end: 
-void checkpoint_54(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
-
-
-// start: 
-// end: 
-void checkpoint_55(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
-
 
 
 

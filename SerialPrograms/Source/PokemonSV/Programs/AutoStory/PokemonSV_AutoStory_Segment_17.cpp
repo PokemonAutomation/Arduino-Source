@@ -37,7 +37,7 @@ std::string AutoStory_Segment_17::start_text() const{
 }
 
 std::string AutoStory_Segment_17::end_text() const{
-    return "End: Defeated Cascarrafa Gym (Water). Inside Cascarrafa Gym building.";
+    return "End: Defeated Cascarrafa Gym (Water). At Porto Marinada Pokecenter.";
 }
 
 void AutoStory_Segment_17::run_segment(
@@ -177,6 +177,16 @@ void checkpoint_38(
         env.console.log("Battle Water Gym.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+        
+        // Gym now defeated. now in Cascaraffa gym building
+        context.wait_for_all_requests();
+        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);
+        // wait for overworld after leaving Gym
+        wait_for_overworld(env.program_info(), env.console, context, 30);
+
+        // fly to Porto Marinada pokecenter
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 80, 150});        
 
         break;
     }catch(OperationFailedException&){

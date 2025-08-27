@@ -27,7 +27,7 @@ public:
 };
 
 
-// start: Defeated Cascarrafa Gym (Water). At Cascarrafa Gym.
+// start: Defeated Cascarrafa Gym (Water). At Porto Marinada Pokecenter.
 // end: Defeated Great Tusk/Iron Treads. 
 void checkpoint_39(
     SingleSwitchProgramEnvironment& env,

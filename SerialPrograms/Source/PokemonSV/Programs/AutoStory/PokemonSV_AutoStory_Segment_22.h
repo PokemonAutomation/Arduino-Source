@@ -27,32 +27,64 @@ public:
 };
 
 
-// start: At East Province (Area One) Pokecenter.
-// end: At gate of Team Star (Fire) base.
-void checkpoint_47(
+// start: 
+// end: 
+void checkpoint_50(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 );
 
-// start: At gate of Team Star (Fire) base.
-// end: Beat Team Star (Fire)
-void checkpoint_48(
+// start: 
+// end: 
+void checkpoint_51(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 );
 
-// start: Beat Team Star (Fire)
-// end: At East Province (Area Two) Pokecenter.
-void checkpoint_49(
+
+// start: 
+// end: 
+void checkpoint_52(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 );
+
+
+// start: 
+// end: 
+void checkpoint_53(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+
+// start: 
+// end: 
+void checkpoint_54(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+
+// start: 
+// end: 
+void checkpoint_55(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
 
 
 

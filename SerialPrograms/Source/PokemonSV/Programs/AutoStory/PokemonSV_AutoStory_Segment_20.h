@@ -53,6 +53,14 @@ void checkpoint_45(
     AutoStoryStats& stats
 );
 
+// start: Defeated Artazon Gym (Grass). Inside gym building.
+// end: At East Province (Area One) Pokecenter.
+void checkpoint_46(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
 
 
 }

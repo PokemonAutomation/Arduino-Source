@@ -37,7 +37,7 @@ void checkpoint_37(
 );
 
 // start: Won auction at Porto Marinada, passed Gym challenge.
-// end: Defeat Cascarrafa Gym
+// end: Defeat Cascarrafa Gym. At Porto Marinada Pokecenter.
 void checkpoint_38(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
