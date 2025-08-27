@@ -130,7 +130,7 @@ PageIngredients IngredientSession::read_screen(std::shared_ptr<const ImageRGB32>
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "IngredientSession::read_current_page(): Unable to read selected item. Ambiguous result: "
-                + set_to_str(ocr_result) + ", " + set_to_str(sprite_result),
+                + set_to_str(ocr_result) + ", " + set_to_str(sprite_result) + "\n" + language_warning(m_language),
                 m_stream,
                 screen
             );

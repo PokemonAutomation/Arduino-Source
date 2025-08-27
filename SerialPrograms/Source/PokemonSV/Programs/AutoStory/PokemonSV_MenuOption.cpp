@@ -138,7 +138,7 @@ std::string MenuOption::read_option(const ImageViewRGB32& cropped) const{
     if (results.size() > 1){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results.",
+            "MenuOption::read_option(): Unable to read item. Ambiguous or multiple results.\n" + language_warning(m_language),
             m_stream
         );
     }

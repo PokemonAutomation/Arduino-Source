@@ -223,7 +223,7 @@ std::string ItemPrinterMaterialDetector::detect_material_name(
     if (results.size() > 1){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "ItemPrinterMaterialDetector::detect_material_name(): Unable to read selected item. Ambiguous or multiple results.",
+            "ItemPrinterMaterialDetector::detect_material_name(): Unable to read selected item. Ambiguous or multiple results.\n" + language_warning(m_language),
             stream
         );
     }
