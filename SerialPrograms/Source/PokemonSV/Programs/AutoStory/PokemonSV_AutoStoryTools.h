@@ -337,12 +337,23 @@ void move_cursor_towards_flypoint_and_go_there(
 
 void check_num_sunflora_found(SingleSwitchProgramEnvironment& env, ProControllerContext& context, int expected_number);
 
+// run given action, with max_attempts number of attempts
+// save prior to first attempt
+// throw exception if we try to exceed max_attempts.
 void checkpoint_reattempt_loop(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
-    std::function<void()>&& action
+    std::function<void(size_t attempt_number)>&& action
+);
+
+void checkpoint_reattempt_loop_tutorial(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats,
+    std::function<void(size_t attempt_number)>&& action
 );
 
 

@@ -71,7 +71,7 @@ void checkpoint_13(
     // reset rate: 0%. 0 resets out of 70.
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){                  
 
@@ -108,7 +108,7 @@ void checkpoint_14(
 ){
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
         // realign diagonally to the left
@@ -155,7 +155,7 @@ void checkpoint_15(
 ){
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
         // realign diagonally to the right

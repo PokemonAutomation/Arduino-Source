@@ -78,13 +78,8 @@ void checkpoint_24(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
         context.wait_for_all_requests();
         DirectionDetector direction;
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -125,15 +120,7 @@ void checkpoint_24(
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
         
 
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 
@@ -145,13 +132,8 @@ void checkpoint_25(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
         // section 1. align to Olive roll NPC
@@ -215,15 +197,7 @@ void checkpoint_25(
         wait_for_overworld(env.program_info(), env.console, context);
         enter_menu_from_overworld(env.program_info(), env.console, context, -1);
 
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 
@@ -234,13 +208,8 @@ void checkpoint_26(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
         // change the time of day: close game, change time to 5:45 am.
@@ -582,15 +551,7 @@ void checkpoint_26(
 
         enter_menu_from_overworld(env.program_info(), env.console, context, -1);
 
-        break;
-    }catch (...){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        // reset_game(env.program_info(), env.console, context); // the checkpoint itself already resets the game, so need to reset twice
-        stats.m_reset++;
-        env.update_stats();
-    }         
-    }
+    });
 
 }
 
@@ -601,25 +562,12 @@ void checkpoint_27(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
         context.wait_for_all_requests();
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 40});
 
-        break;
-    }catch (...){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }         
-    }
+    });
 
 }
 

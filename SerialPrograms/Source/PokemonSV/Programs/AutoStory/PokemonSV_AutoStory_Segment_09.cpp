@@ -73,7 +73,7 @@ void checkpoint_16(
 ){
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
 
@@ -115,7 +115,7 @@ void checkpoint_17(
 ){
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
 
@@ -159,7 +159,7 @@ void checkpoint_18(
 ){
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
 
@@ -194,7 +194,7 @@ void checkpoint_19(
 ){
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
 
@@ -228,7 +228,7 @@ void checkpoint_20(
 ){
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
        

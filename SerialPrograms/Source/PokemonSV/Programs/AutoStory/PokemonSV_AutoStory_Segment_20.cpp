@@ -73,19 +73,8 @@ void checkpoint_43(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }else{
-            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
-            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
-            env.log("Wait 10 seconds.");
-            context.wait_for(Milliseconds(10 * 1000));
-            save_game_from_overworld(env.program_info(), env.console, context);
-        }
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
         context.wait_for_all_requests();
 
         // place the marker somewhere else. the current location disrupts the Stationary detector
@@ -134,15 +123,7 @@ void checkpoint_43(
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }         
-    }
+    });
 
 }
 
@@ -153,19 +134,8 @@ void checkpoint_44(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }else{
-            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
-            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
-            env.log("Wait 10 seconds.");
-            context.wait_for(Milliseconds(10 * 1000));
-            save_game_from_overworld(env.program_info(), env.console, context);
-        }
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
 
@@ -481,15 +451,7 @@ void checkpoint_44(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }         
-    }
+    });
 
 }
 
@@ -500,19 +462,8 @@ void checkpoint_45(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }else{
-            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
-            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
-            env.log("Wait 10 seconds.");
-            context.wait_for(Milliseconds(10 * 1000));
-            save_game_from_overworld(env.program_info(), env.console, context);
-        }
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
         
         context.wait_for_all_requests();
 
@@ -546,15 +497,7 @@ void checkpoint_45(
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }         
-    }
+    });
 
 }
 
@@ -567,19 +510,8 @@ void checkpoint_46(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }else{
-            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
-            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
-            env.log("Wait 10 seconds.");
-            context.wait_for(Milliseconds(10 * 1000));
-            save_game_from_overworld(env.program_info(), env.console, context);
-        }
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
         
         context.wait_for_all_requests();
 
@@ -612,15 +544,7 @@ void checkpoint_46(
        
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }         
-    }
+    });
 
 
 

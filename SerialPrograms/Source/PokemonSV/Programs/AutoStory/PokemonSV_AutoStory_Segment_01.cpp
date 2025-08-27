@@ -75,34 +75,17 @@ void checkpoint_01(
     AutoStoryStats& stats, 
     Language language
 ){
-    bool first_attempt = true;
-    while (true){
-    try{
-        if(first_attempt){
-            save_game_tutorial(env.program_info(), env.console, context);
-            stats.m_checkpoint++;
-            env.update_stats();
-            send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
-        }
+    checkpoint_reattempt_loop_tutorial(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
         
         context.wait_for_all_requests();
         // set settings
         enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT, false);
-        change_settings(env, context, language, first_attempt);
+        change_settings(env, context, language, attempt_number==0);
         pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
 
-        break;  
-    }catch(OperationFailedException&){
-        // (void)e;
-        first_attempt = false;
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }
-    }
+    });
 }
 
 void checkpoint_02(
@@ -111,16 +94,8 @@ void checkpoint_02(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    bool first_attempt = true;
-    while (true){
-    try{
-        if(first_attempt){
-            save_game_tutorial(env.program_info(), env.console, context);
-            stats.m_checkpoint++;
-            env.update_stats();
-            send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
-            first_attempt = false;
-        }
+    checkpoint_reattempt_loop_tutorial(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
         
         context.wait_for_all_requests();
         env.console.log("Go downstairs, get stopped by Skwovet");
@@ -184,15 +159,7 @@ void checkpoint_02(
         open_map_from_overworld(env.program_info(), env.console, context, true);
         leave_phone_to_overworld(env.program_info(), env.console, context);
 
-        break;  
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }
-    }
+    });
 }
 
 void checkpoint_03(
@@ -204,7 +171,7 @@ void checkpoint_03(
     StarterChoice starter_choice
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
         
         context.wait_for_all_requests();
         DirectionDetector direction;

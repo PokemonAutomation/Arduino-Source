@@ -59,7 +59,6 @@ void AutoStory_Segment_13::run_segment(
 
 }
 
-// todo: shift all checkpoint numbers to make space for the Cortondo checkpoints
 void checkpoint_29(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
@@ -67,13 +66,8 @@ void checkpoint_29(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
@@ -312,15 +306,7 @@ void checkpoint_29(
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
               
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 

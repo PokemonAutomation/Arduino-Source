@@ -71,7 +71,7 @@ void checkpoint_12(
     // or when lead pokemon not strong enough to clear them with Let's go
     
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
         context.wait_for_all_requests();

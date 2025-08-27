@@ -1225,24 +1225,17 @@ void checkpoint_reattempt_loop(
     ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats,
-    std::function<void()>&& action
+    std::function<void(size_t attempt_number)>&& action
 ){
     size_t max_attempts = 100;
-    bool first_attempt = true;
     for (size_t i = 0;;i++){
     try{
-        if (first_attempt){
+        if (i==0){
             checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }else{
-            enter_menu_from_overworld(env.program_info(), env.console, context, -1);
-            // we wait 10 seconds then save, so that the initial conditions are slightly different on each reset.
-            env.log("Wait 10 seconds.");
-            context.wait_for(Milliseconds(10 * 1000));
-            save_game_from_overworld(env.program_info(), env.console, context);
         }
 
-        action();
+        context.wait_for_all_requests();
+        action(i);
        
         break;
     }catch(OperationFailedException&){
@@ -1263,6 +1256,37 @@ void checkpoint_reattempt_loop(
     }         
     }
 
+}
+
+void checkpoint_reattempt_loop_tutorial(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats,
+    std::function<void(size_t attempt_number)>&& action
+){
+
+    for (size_t i = 0;;i++){
+    try{
+        if(i==0){
+            save_game_tutorial(env.program_info(), env.console, context);
+            stats.m_checkpoint++;
+            env.update_stats();
+            send_program_status_notification(env, notif_status_update, "Saved at checkpoint.");     
+        }
+        
+        context.wait_for_all_requests();
+        action(i);
+
+        break;  
+    }catch(OperationFailedException&){
+        context.wait_for_all_requests();
+        env.console.log("Resetting from checkpoint.");
+        reset_game(env.program_info(), env.console, context);
+        stats.m_reset++;
+        env.update_stats();
+    }
+    }    
 }
 
 

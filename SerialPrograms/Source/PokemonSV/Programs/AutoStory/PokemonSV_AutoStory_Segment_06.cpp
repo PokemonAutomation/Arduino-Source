@@ -68,7 +68,7 @@ void checkpoint_11(
     AutoStoryStats& stats
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){ 
+    [&](size_t attempt_number){ 
 
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,

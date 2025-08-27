@@ -69,7 +69,7 @@ void checkpoint_09(
     AutoStoryStats& stats
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
 
@@ -108,7 +108,7 @@ void checkpoint_10(
     AutoStoryStats& stats
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](){
+    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
         env.console.log("Lighthouse view");
