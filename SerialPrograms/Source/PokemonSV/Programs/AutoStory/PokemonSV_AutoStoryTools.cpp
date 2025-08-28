@@ -1238,13 +1238,13 @@ void checkpoint_reattempt_loop(
         action(i);
        
         break;
-    }catch(OperationFailedException&){
+    }catch(OperationFailedException& e){
         if (i > max_attempts){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Autostory checkpoint failed 100 times.\n"
                 "Make sure you selected the correct Start Point, and your character is in the exactly correct starting position."
-                "Also, make sure you have set the correct Language.",
+                "Also, make sure you have set the correct Language.\n" + e.message(),
                 env.console
             );
         }
@@ -1265,7 +1265,7 @@ void checkpoint_reattempt_loop_tutorial(
     AutoStoryStats& stats,
     std::function<void(size_t attempt_number)>&& action
 ){
-
+    size_t max_attempts = 100;
     for (size_t i = 0;;i++){
     try{
         if(i==0){
@@ -1279,7 +1279,16 @@ void checkpoint_reattempt_loop_tutorial(
         action(i);
 
         break;  
-    }catch(OperationFailedException&){
+    }catch(OperationFailedException& e){
+        if (i > max_attempts){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Autostory checkpoint failed 100 times.\n"
+                "Make sure you selected the correct Start Point, and your character is in the exactly correct starting position."
+                "Also, make sure you have set the correct Language.\n" + e.message(),
+                env.console
+            );
+        }        
         context.wait_for_all_requests();
         env.console.log("Resetting from checkpoint.");
         reset_game(env.program_info(), env.console, context);
