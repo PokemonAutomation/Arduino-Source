@@ -150,6 +150,8 @@ void checkpoint_25(
         );     
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
+        context.wait_for_all_requests();
+
         // section 2
         pbf_move_left_joystick(context, 128, 0, 1300, 100);
 
