@@ -70,16 +70,10 @@ void checkpoint_13(
 ){
     // reset rate: 0%. 0 resets out of 70.
     
-    bool first_attempt = true;
-    while (true){
-    try{
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-        
-            if (first_attempt){
-                checkpoint_save(env, context, notif_status_update, stats);
-                first_attempt = false;
-            } 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){                  
 
             fly_to_overlapping_flypoint(info, env.console, context);
 
@@ -102,15 +96,7 @@ void checkpoint_13(
             {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG, CallbackEnum::WHITE_A_BUTTON});
         
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 
@@ -121,13 +107,9 @@ void checkpoint_14(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
         context.wait_for_all_requests();
         // realign diagonally to the left
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 80, 0, 100);
@@ -161,15 +143,7 @@ void checkpoint_14(
         // clear dialog until overworld
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 
@@ -180,13 +154,9 @@ void checkpoint_15(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
         context.wait_for_all_requests();
         // realign diagonally to the right
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 178, 0, 100);
@@ -205,15 +175,7 @@ void checkpoint_15(
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
             {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD});
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 

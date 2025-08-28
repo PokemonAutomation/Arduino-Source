@@ -68,13 +68,9 @@ void checkpoint_09(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    bool first_attempt = true;
-    while (true){
-    try{        
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }      
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
         context.wait_for_all_requests();
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 110, 50);
@@ -101,15 +97,8 @@ void checkpoint_09(
         env.console.log("Receive legendary ball");
         env.console.overlay().add_log("Receive legendary ball", COLOR_WHITE);
 
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }            
-    }
+    });
+
 }
 
 void checkpoint_10(
@@ -118,13 +107,9 @@ void checkpoint_10(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }        
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
         context.wait_for_all_requests();
         env.console.log("Lighthouse view");
         env.console.overlay().add_log("Lighthouse view", COLOR_WHITE);
@@ -143,15 +128,7 @@ void checkpoint_10(
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }           
-    }
+    });
 }
 
 

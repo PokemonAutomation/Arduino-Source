@@ -67,13 +67,8 @@ void checkpoint_04(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    bool first_attempt = true;
-    while (true){
-    try{        
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }        
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){        
         context.wait_for_all_requests();
 
         DirectionDetector direction;
@@ -92,15 +87,8 @@ void checkpoint_04(
         context.wait_for_all_requests();
         env.console.log("Finished battle.");
 
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }        
     }
+    );
 
 }
 

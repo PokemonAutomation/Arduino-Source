@@ -70,13 +70,8 @@ void checkpoint_21(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 
         context.wait_for_all_requests();
@@ -118,15 +113,7 @@ void checkpoint_21(
         context.wait_for_all_requests();
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 
@@ -137,13 +124,8 @@ void checkpoint_22(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
         context.wait_for_all_requests();
         // section 1
         realign_player_from_landmark(
@@ -186,15 +168,7 @@ void checkpoint_22(
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 
@@ -207,13 +181,8 @@ void checkpoint_23(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
         context.wait_for_all_requests();
 
         // section 1
@@ -306,15 +275,7 @@ void checkpoint_23(
 
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);             
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }             
-    }
+    });
 
 }
 

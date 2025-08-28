@@ -474,7 +474,7 @@ AutoStory::AutoStory()
 }
 
 void AutoStory::on_config_value_changed(void* object){
-    ConfigOptionState state = (STARTPOINT_TUTORIAL.index() <= 1)
+    ConfigOptionState state = (STARTPOINT_TUTORIAL.index() <= 1 && STORY_SECTION == StorySection::TUTORIAL)
         ? ConfigOptionState::ENABLED
         : ConfigOptionState::HIDDEN;
     STARTERCHOICE.set_visibility(state);

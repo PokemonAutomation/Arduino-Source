@@ -72,13 +72,8 @@ void checkpoint_28(
     AutoStoryStats& stats
 ){
     
-    bool first_attempt = true;
-    while (true){
-    try{
-        if (first_attempt){
-            checkpoint_save(env, context, notif_status_update, stats);
-            first_attempt = false;
-        }         
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
         context.wait_for_all_requests();
         DirectionDetector direction;
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -137,15 +132,7 @@ void checkpoint_28(
         pbf_move_left_joystick(context, 128, 0, 1600, 100);
         fly_to_overlapping_flypoint(env.program_info(), env.console, context);
        
-        break;
-    }catch(OperationFailedException&){
-        context.wait_for_all_requests();
-        env.console.log("Resetting from checkpoint.");
-        reset_game(env.program_info(), env.console, context);
-        stats.m_reset++;
-        env.update_stats();
-    }         
-    }
+    });
 
 }
 
