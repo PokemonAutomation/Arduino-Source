@@ -589,10 +589,10 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
     std::string top_move = reader.read_move(stream.logger(), screen, 0);
     stream.log("Current top move: " + top_move);
     if (top_move != "ember" && top_move != "leafage" && top_move != "water-gun"){
-        stream.log("Failed to swap moves.");
+        stream.log("Unable to confirm that the moves actually swapped.");
         OperationFailedException exception(
             ErrorReport::SEND_ERROR_REPORT,
-            "swap_starter_moves: Failed to swap moves.\n" + language_warning(language),
+            "swap_starter_moves: Unable to confirm that the moves actually swapped.\n" + language_warning(language),
             stream
         );
         exception.send_recoverable_notification(env);
