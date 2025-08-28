@@ -23,7 +23,7 @@ const Resolution DEFAULT_RESOLUTION(1920, 1080);
 
 TimingOptions::TimingOptions()
     : GroupOption(
-        "Timing Options",
+        "Controller Timing Options",
         LockMode::UNLOCK_WHILE_RUNNING,
         EnableMode::ALWAYS_ENABLED,
         true
@@ -43,9 +43,11 @@ TimingOptions::TimingOptions()
         0ms, 200ms, "10 ms"
     )
     , SYSBOTBASE(
-        "<b>sys-botbase Timing Variation:</b><br>"
-        "Assume that sys-botbase controllers have a timing variation of no greater than this. "
-        "This is used to adjust button delays to ensure they go through correctly.",
+        "<b>sys-botbase 2 Timing Variation:</b><br>"
+        "Assume that sys-botbase 2 controllers have a timing variation of no greater than this. "
+        "This is used to adjust button delays to ensure they go through correctly.<br>"
+        "sys-botbase 3 does not use this option since it is as stable as a wired microcontroller "
+        "and is therefore categorized accordingly.",
         LockMode::LOCK_WHILE_RUNNING,
         0ms, 200ms, "150 ms"
     )
