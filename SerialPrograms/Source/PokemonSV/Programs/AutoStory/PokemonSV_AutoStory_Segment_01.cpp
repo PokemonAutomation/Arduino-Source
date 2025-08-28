@@ -236,8 +236,8 @@ void checkpoint_03(
         clear_tutorial(env.console, context);
 
         env.console.log("Change move order.");
-        swap_starter_moves(env.program_info(), env.console, context, language);
-        leave_box_system_to_overworld(env.program_info(), env.console, context);
+        swap_starter_moves(env, context, language);
+        press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
 
     }
     );

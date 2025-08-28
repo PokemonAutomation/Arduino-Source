@@ -556,52 +556,47 @@ void config_option(ProControllerContext& context, int change_option_value){
     pbf_press_dpad(context, DPAD_DOWN,  15, 20);
 }
 
-void swap_starter_moves(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, Language language){
-    WallClock start = current_time();
-    while (true){
-        if (current_time() - start > std::chrono::minutes(3)){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "swap_starter_moves(): Failed to swap the starter moves after 3 minutes.",
-                stream
-            );
-        }
-        // start in the overworld
-        press_Bs_to_back_to_overworld(info, stream, context);
+void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
+    const ProgramInfo& info = env.program_info();
+    VideoStream& stream = env.console;
 
-        // open menu, select your starter
-        enter_menu_from_overworld(info, stream, context, 0, MenuSide::LEFT);
+    // start in the overworld
+    press_Bs_to_back_to_overworld(info, stream, context);
 
-        // enter Pokemon summary screen
-        pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
-        pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
-        pbf_press_button(context, BUTTON_Y, 20, 40);
+    // open menu, select your starter
+    enter_menu_from_overworld(info, stream, context, 0, MenuSide::LEFT);
 
-        // select move 1
-        pbf_press_button(context, BUTTON_A, 20, 40);  
-        pbf_press_dpad(context, DPAD_DOWN,  15, 40);
-        pbf_press_dpad(context, DPAD_DOWN,  15, 40);
-        // extra button presses to avoid drops
-        pbf_press_dpad(context, DPAD_DOWN,  15, 40); 
-        pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+    // enter Pokemon summary screen
+    pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
+    pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_Y, 20, 40);
 
-        // select move 3. swap move 1 and move 3.
-        pbf_press_button(context, BUTTON_A, 20, 40);    
+    // select move 1
+    pbf_press_button(context, BUTTON_A, 20, 40);  
+    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
+    // extra button presses to avoid drops
+    pbf_press_dpad(context, DPAD_DOWN,  15, 40); 
+    pbf_press_dpad(context, DPAD_DOWN,  15, 40);
 
-        // confirm that Ember/Leafage/Water Gun is in slot 1
-        context.wait_for_all_requests();
-        VideoSnapshot screen = stream.video().snapshot();
-        PokemonMovesReader reader(language);
-        std::string top_move = reader.read_move(stream.logger(), screen, 0);
-        stream.log("Current top move: " + top_move);
-        if (top_move != "ember" && top_move != "leafage" && top_move != "water-gun"){
-            stream.log("Failed to swap moves. Re-try.");
-            continue;
-        }   
+    // select move 3. swap move 1 and move 3.
+    pbf_press_button(context, BUTTON_A, 20, 40);    
 
-
-        break;    
-    }
+    // confirm that Ember/Leafage/Water Gun is in slot 1
+    context.wait_for_all_requests();
+    VideoSnapshot screen = stream.video().snapshot();
+    PokemonMovesReader reader(language);
+    std::string top_move = reader.read_move(stream.logger(), screen, 0);
+    stream.log("Current top move: " + top_move);
+    if (top_move != "ember" && top_move != "leafage" && top_move != "water-gun"){
+        stream.log("Failed to swap moves.");
+        OperationFailedException exception(
+            ErrorReport::SEND_ERROR_REPORT,
+            "swap_starter_moves: Failed to swap moves.\n" + language_warning(language),
+            stream
+        );
+        exception.send_recoverable_notification(env);
+    }   
 
 }
 

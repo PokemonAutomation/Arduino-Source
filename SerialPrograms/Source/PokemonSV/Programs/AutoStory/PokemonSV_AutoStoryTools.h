@@ -179,7 +179,7 @@ void overworld_navigation(const ProgramInfo& info, VideoStream& stream, ProContr
 void config_option(ProControllerContext& context, int change_option_value);
 
 // enter menu and swap the first and third moves for your starter
-void swap_starter_moves(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, Language language);
+void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
 
 // run the given `action`. if detect a battle, stop the action, and throw exception
 void do_action_and_monitor_for_battles(
