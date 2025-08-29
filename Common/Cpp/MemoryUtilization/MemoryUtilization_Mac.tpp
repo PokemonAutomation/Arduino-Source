@@ -120,19 +120,31 @@ MemoryUsage process_memory_usage(){
         usage.process_physical_memory = (size_t)(pages_resident - pages_dirtied) * (size_t)vm_page_size;
         usage.process_virtual_memory = usage.process_physical_memory + (size_t)pages_swapped_out * (size_t)vm_page_size;
     }
+    // ref: https://github.com/htop-dev/htop/blob/main/darwin/Platform.c
+    #ifdef __arm64__
+    {
+        vm_statistics64_data_t vm_stats;
+        mach_msg_type_number_t count = HOST_VM_INFO64_COUNT;
+        if (KERN_SUCCESS == host_statistics64(mach_host_self(), HOST_VM_INFO64, (host_info_t)&vm_stats, &count)) {
+            auto used = vm_stats.active_count + vm_stats.inactive_count +
+              vm_stats.speculative_count + vm_stats.wire_count + vm_stats.compressor_page_count
+              - vm_stats.purgeable_count - vm_stats.external_page_count;
+            usage.total_used_system_memory = (size_t)used * (size_t)vm_page_size;
+        } else {
+            std::cerr << "Failed to get host statistics64." << std::endl;
+        }
+    }
+    #else
     {
         vm_statistics_data_t vm_stats;
         mach_msg_type_number_t count = HOST_VM_INFO_COUNT;
         if (KERN_SUCCESS == host_statistics(mach_host_self(), HOST_VM_INFO, (host_info_t)&vm_stats, &count)) {
-            // Calculate used memory from vm_statistics
-            // Used = active_count + wire_count
-            // Cached = inactive_count
-            // Buffered = purgeable_count
             usage.total_used_system_memory = (size_t)(vm_stats.active_count + vm_stats.wire_count) * (size_t)vm_page_size;
         } else {
             std::cerr << "Failed to get host statistics." << std::endl;
         }
     }
+    #endif
     return usage;
 }
 
