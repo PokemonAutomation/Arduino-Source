@@ -163,7 +163,7 @@ const std::vector<JoyconColors>& OFFICIAL_JOYCON_COLORS0(){
 const std::vector<ProconColors>& OFFICIAL_PROCON_COLORS0(){
     //  From: https://gbatemp.net/threads/people-with-special-edition-pro-controllers-i-need-your-help-with-colors.627413/
     const static std::vector<ProconColors> database{
-        {"Procon: Stock Black",                 0x323232, 0x323232, 0x323232, 0xFFFFFF},
+        {"Procon: Stock Black",                 0x323232, 0x323232, 0x323232, 0xFFFFFF},    //  This is just a guess.
         {"Procon: Super Smash Bros. Ultimate",  0xFFFFFF, 0xFFFFFF, 0x2D2D2D, 0xE6E6E6},
         {"Procon: Monster Hunter Rise",         0x474646, 0x474646, 0x2D2D2D, 0xE7E6E6},
         {"Procon: Zelda Tears of the Kingdom",  0x464646, 0xFFFFFF, 0x2D2D2D, 0xE6E6E6},

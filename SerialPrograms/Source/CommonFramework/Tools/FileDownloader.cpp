@@ -52,6 +52,7 @@ std::string download_file(Logger& logger, const std::string& url){
     );
 
     QNetworkRequest request(QUrl(QString::fromStdString(url)));
+    request.setTransferTimeout(std::chrono::seconds(5));
     reply.reset(network_access_manager.get(request));
 
 #if 0
