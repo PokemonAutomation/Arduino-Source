@@ -16,6 +16,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+# Set root dir for convenience
+set(PROJECT_ROOT_DIR "${CMAKE_SOURCE_DIR}/..")
+get_filename_component(PROJECT_ROOT_DIR "${CMAKE_SOURCE_DIR}/.." ABSOLUTE)
+
 add_custom_target(build-time-make-directory ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
 
@@ -731,6 +735,8 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/DiscordWebhookSettings.h
     Source/Integrations/DppIntegration/DppClient.cpp
     Source/Integrations/DppIntegration/DppClient.h
+    Source/Integrations/DiscordSocial/DiscordSocial.cpp
+    Source/Integrations/DiscordSocial/DiscordSocial.h
     Source/Integrations/DppIntegration/DppCommandHandler.cpp
     Source/Integrations/DppIntegration/DppCommandHandler.h
     Source/Integrations/DppIntegration/DppUtility.cpp
@@ -2449,10 +2455,15 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
 endif()
 
-#extract opencv_world4110d.dll from archive on Windows Debug builds
+#extract opencv_world4110d.dll from archive on Windows Debug build, extract Discord Social SDK
 if (WIN32)
     file(ARCHIVE_EXTRACT
       INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110d.zip
+      DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/
+    )
+
+    file(ARCHIVE_EXTRACT
+      INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win.zip
       DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/
     )
 endif()
@@ -2503,9 +2514,21 @@ if (WIN32)
 
     add_library(dpp_lib IMPORTED UNKNOWN)
     set_target_properties(dpp_lib PROPERTIES
-        IMPORTED_LOCATION_RELEASE ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
-        IMPORTED_LOCATION_DEBUG ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dppd.lib)
+        IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dppd.lib)
     set_target_properties(dpp_lib PROPERTIES
+        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
+        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
+        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
+    )
+
+    add_library(discord_lib IMPORTED UNKNOWN)
+    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/discord_social_sdk_win/)
+    set_target_properties(discord_lib PROPERTIES
+        IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win/lib/release/discord_partner_sdk.lib
+        IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win/lib/debug/discord_partner_sdk.lib)
+    set_target_properties(discord_lib PROPERTIES
         MAP_IMPORTED_CONFIG_DEBUG           DEBUG
         MAP_IMPORTED_CONFIG_RELEASE         RELEASE
         MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
@@ -2519,13 +2542,16 @@ if (WIN32)
         ONNX_lib
         ONNX_Providers_lib
         dpp_lib
+        discord_lib
     )
+
     target_compile_definitions(
         SerialPrograms PRIVATE
         _CRT_SECURE_NO_WARNINGS
         _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
         PA_TESSERACT
         PA_DPP
+        PA_SOCIAL_SDK
     )
 
     target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
@@ -2770,6 +2796,16 @@ file(GLOB MY_DLLS
   "../3rdPartyBinaries/*.dll"
 )
 file(COPY ${MY_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+
+# Copy discord_social_sdk DLL based on build type
+add_custom_command(
+    TARGET SerialPrograms
+    POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy
+        $<IF:$<CONFIG:Debug>,"${PROJECT_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/debug/discord_partner_sdk.dll","${PROJECT_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/release/discord_partner_sdk.dll">
+        $<TARGET_FILE_DIR:SerialPrograms>/Binaries64/discord_partner_sdk.dll
+    COMMENT "Copying Discord SDK DLL to Binaries64"
+)
 endif()
 
 if (QT_MAJOR GREATER_EQUAL 6)

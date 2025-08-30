@@ -70,6 +70,9 @@ const std::string DISCORD_LINK_URL_PROGRAM = "https://discord.gg/BSjDp27";
 //  URL to use in the Discord notifications/embeds.
 const std::string DISCORD_LINK_URL_EMBED = "https://discord.gg/xMJcveK";
 
+// URL to use in the DiscordSocialSDK integration.
+const std::string DISCORD_LINK_URL_SDK = "https://discord.gg/gn9YEyjjAV";
+
 
 
 #if 0
