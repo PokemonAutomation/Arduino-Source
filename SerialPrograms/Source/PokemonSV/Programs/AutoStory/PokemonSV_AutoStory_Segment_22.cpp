@@ -4,12 +4,11 @@
  *
  */
 
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV_AutoStoryTools.h"
@@ -29,7 +28,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_22::name() const{
-    return "22: ";
+    return "22: Levincia Gym (Electric)";
 }
 
 std::string AutoStory_Segment_22::start_text() const{
@@ -53,7 +52,7 @@ void AutoStory_Segment_22::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    // checkpoint_(env, context, options.notif_status_update, stats);
+    // checkpoint_50(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -68,6 +67,71 @@ void checkpoint_50(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        
+        context.wait_for_all_requests();
+        // set down marker 1
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 60, 50);
+
+        DirectionDetector direction;
+        direction.change_direction(env.program_info(), env.console, context, 0);
+        pbf_move_left_joystick(context, 128, 0, 150, 100);
+
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 60, 20, false);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                pbf_move_left_joystick(context, 0, 128, 128, 255);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );
+        
+        get_off_ride(env.program_info(), env.console, context);
+
+        // marker 2
+        realign_player_from_landmark(
+            env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 255, 50, 50},
+            {ZoomChange::ZOOM_IN, 0, 100, 60}
+        );  
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 40, 10, false);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, 255, 128, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );      
+
+        get_on_ride(env.program_info(), env.console, context);
+        
+        // marker 3
+        realign_player_from_landmark(
+            env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 255, 128, 20},
+            {ZoomChange::ZOOM_IN, 0, 0, 0}
+        );  
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 40, 10, false);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                // jump over the fence when stationary
+                context.wait_for_all_requests();
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 100);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );          
+
+        fly_to_overlapping_flypoint(env.program_info(), env.console, context);
 
 
     });

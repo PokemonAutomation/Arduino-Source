@@ -27,8 +27,8 @@ public:
 };
 
 
-// start: 
-// end: 
+// start: Defeated Team Star (Fire). At East Province (Area Two) Pokecenter.
+// end: At Levincia (South) Pokecenter.
 void checkpoint_50(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
