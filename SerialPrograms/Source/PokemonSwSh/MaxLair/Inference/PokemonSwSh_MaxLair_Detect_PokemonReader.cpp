@@ -354,6 +354,7 @@ std::string read_pokemon_name_sprite(
     if (!ocr_hit){
         std::string ret = sprite_hit ? std::move(iter->second) : "";
         logger.log("Failed to read name. Using sprite result: " + ret, COLOR_RED);
+        ocr_watchdog.push_result(false);
 //        dump_image(logger, screen, "MaxLair-read_name_sprite");
         return ret;
     }
@@ -375,6 +376,7 @@ std::string read_pokemon_name_sprite(
     //  If there is only one sprite match, use it.
     if (result.results.size() == 1){
         logger.log("Sprite and OCR disagree. Attempt to arbitrate... Picking: " + result.results.begin()->second, COLOR_RED);
+        ocr_watchdog.push_result(false);
         return std::move(result.results.begin()->second);
     }
 
@@ -386,6 +388,7 @@ std::string read_pokemon_name_sprite(
 
     //  At this point, both OCR and sprites have multiple items in completely disjoint sets.
     logger.log("Sprite and OCR disagree so badly that no arbitration will be attempted.", COLOR_RED);
+    ocr_watchdog.push_result(false);
 
     dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
 

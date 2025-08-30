@@ -61,7 +61,7 @@ AdventureRuntime::AdventureRuntime(
     , session_stats(p_session_stats)
 {
     for (size_t c = 0; c < p_console_settings.active_consoles(); c++){
-        ocr_watchdog.emplace_back(consoles[c].logger());
+        ocr_watchdog.emplace_back(consoles[c].logger(), console_settings.PLAYERS[c]->language);
     }
 }
 

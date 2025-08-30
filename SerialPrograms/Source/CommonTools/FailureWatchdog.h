@@ -10,6 +10,7 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Language.h"
 
 namespace PokemonAutomation{
 
@@ -21,13 +22,15 @@ class FailureWatchdog{
 public:
     FailureWatchdog(
         Logger& logger,
-        std::string failure_message,
+        Language language,
+//        std::string failure_message,
         uint64_t min_count = 5,
         double min_success_rate = 0.5,
         std::chrono::seconds time_limit = std::chrono::seconds(120)
     )
         : m_logger(logger)
-        , m_failure_message(std::move(failure_message))
+        , m_language(language)
+//        , m_failure_message(std::move(failure_message))
         , m_min_count(min_count)
         , m_min_success_rate(min_success_rate)
         , m_time_limit(time_limit)
@@ -63,13 +66,18 @@ public:
         }
 
 
-        throw UserSetupError(m_logger, m_failure_message);
+        throw UserSetupError(
+            m_logger,
+            "Too many text recognition errors. Did you set the correct language?\n"
+            "Current Language: " + language_data(m_language).name
+        );
     }
 
 
 private:
     Logger& m_logger;
-    std::string m_failure_message;
+    Language m_language;
+//    std::string m_failure_message;
     uint64_t m_min_count;
     double m_min_success_rate;
     WallDuration m_time_limit;
@@ -88,14 +96,16 @@ class OcrFailureWatchdog : public FailureWatchdog{
 public:
     OcrFailureWatchdog(
         Logger& logger,
-        std::string failure_message = "Too many text recognition errors. Did you set the correct language?",
+        Language language,
+//        std::string failure_message = "Too many text recognition errors. Did you set the correct language?",
         uint64_t min_count = 5,
         double min_success_rate = 0.5,
         std::chrono::seconds time_limit = std::chrono::seconds(120)
     )
         : FailureWatchdog(
             logger,
-            std::move(failure_message),
+            language,
+//            std::move(failure_message),
             min_count,
             min_success_rate,
             time_limit
