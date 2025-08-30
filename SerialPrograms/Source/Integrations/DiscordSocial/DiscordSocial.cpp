@@ -19,19 +19,25 @@ DiscordSocial& DiscordSocial::instance(){
 }
 
 void DiscordSocial::run(){
-    m_client = std::make_shared<Client>();
-    if (!m_client){
+    auto client = std::make_shared<Client>();
+    if (!client){
         log("Failed to initialize DiscordSocialSDK.", "run()", LoggingSeverity::Error);
-        m_client.reset();
         return;
     }
 
-    m_client->SetApplicationId(m_app_id);
-    m_client->AddLogCallback([&](auto message, auto severity){
-        log(message, "Internal", severity);
-    }, m_log_level);
+    m_client = std::move(client);
+    try{
+        m_client->SetApplicationId(m_app_id);
+        m_client->AddLogCallback([&](auto message, auto severity){
+            log(message, "Internal", severity);
+        }, m_log_level);
 
-    std::thread(&DiscordSocial::thread_loop, this).detach();
+        m_thread = std::thread(&DiscordSocial::thread_loop, this);
+    }catch (...){
+        m_client.reset();
+        log("Failed to start DiscordSocialSDK.", "run()", LoggingSeverity::Error);
+        throw;
+    }
 }
 
 void DiscordSocial::thread_loop(){
@@ -59,9 +65,9 @@ void DiscordSocial::thread_loop(){
         }
     }
 
-    log("Discord Rich Presence update thread exiting...", "thread_loop()", LoggingSeverity::Info);
     m_running.store(false, std::memory_order_release);
     m_client.reset();
+    log("Discord Rich Presence update thread exiting...", "thread_loop()", LoggingSeverity::Info);
 }
 
 void DiscordSocial::update_rich_presence(){
@@ -111,8 +117,8 @@ void DiscordSocial::update_rich_presence(){
             }
         });
     }catch (const std::exception& e){
-        log("Exception: " + std::string(e.what()), "update_rp()", LoggingSeverity::Error);
         m_running.store(false, std::memory_order_release);
+        log("Exception: " + std::string(e.what()), "update_rp()", LoggingSeverity::Error);
     }
 }
 

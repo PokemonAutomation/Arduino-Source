@@ -2,6 +2,7 @@
 #ifndef DISCORD_SOCIAL_H
 #define DISCORD_SOCIAL_H
 
+#include <thread>
 #include <atomic>
 #include <discord_social_sdk/discordpp.h>
 #include "Common/Cpp/AbstractLogger.h"
@@ -14,6 +15,7 @@ namespace DiscordSocialSDK{
             DiscordSocial() : m_running(false) {}
             ~DiscordSocial(){
                 m_running.store(false, std::memory_order_release);
+                m_thread.join();
                 if (m_client) m_client.reset();
             }
 
@@ -28,6 +30,7 @@ namespace DiscordSocialSDK{
             void thread_loop();
 
         private:
+            std::thread m_thread;
             std::shared_ptr<discordpp::Client> m_client = nullptr;
             std::atomic<bool> m_running;
             const uint64_t m_app_id = 1406867596585865326;
