@@ -9,9 +9,14 @@
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_CodeEntry.h"
 #include "PokemonSV_ClipboardFastCodeEntry.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -46,7 +51,9 @@ void ClipboardFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancell
     //  Connect the controller.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
+        detect_console_type_from_in_game(console, context);
     });
+
 
     QClipboard* clipboard = QApplication::clipboard();
 #if 0
@@ -66,6 +73,7 @@ void ClipboardFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancell
 
     while (true){
         std::string code = clipboard->text().toStdString();
+//        cout << code << endl;
         if (code != start_text && !code.empty()){
             const char* error = enter_code(env, scope, SETTINGS, code, false, false);
             if (error == nullptr){

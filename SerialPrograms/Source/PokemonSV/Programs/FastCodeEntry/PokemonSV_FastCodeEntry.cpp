@@ -4,12 +4,12 @@
  *
  */
 
-#include <map>
 #include <mutex>
 #include <condition_variable>
 #include "Common/Cpp/Exceptions.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_CodeEntry.h"
 #include "PokemonSV_FastCodeEntry.h"
@@ -143,6 +143,7 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
     //  Connect the controller.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         ssf_press_button_ptv(context, BUTTON_R | BUTTON_L);
+        detect_console_type_from_in_game(console, context);
     });
 
     FceCodeListener listener(CODE);

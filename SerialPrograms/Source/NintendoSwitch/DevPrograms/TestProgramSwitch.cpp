@@ -142,6 +142,7 @@
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxShinyDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "CommonTools/Images/SolidColorTest.h"
+#include "CommonTools/Async/InterruptableCommands.h"
 
 
 #include <QPixmap>
@@ -241,6 +242,9 @@ void TestProgram::on_press(){
 
 
 
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -260,16 +264,55 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.pro_controller());
     VideoOverlaySet overlays(overlay);
 
+    AsyncCommandSession<ProController> session(
+        scope, logger, env.realtime_dispatcher(),
+        console.pro_controller()
+    );
+
+    Milliseconds delay = 500ms;
+
+    for (int c = 0; c < 100; c++){
+        session.dispatch([](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_A, 360000ms);
+        });
+
+        delay = 552ms;
+
+        cout << "delay = " << delay.count() << endl;
+
+        context.wait_for(delay);
+
+        session.stop_command();
+
+        pbf_press_button(context, BUTTON_B, 5000ms, 800ms);
+        context.wait_for_all_requests();
+
+        delay += 1ms;
+    }
 
 
+
+
+
+#if 0
     auto screenshot = feed.snapshot();
 
+
+
+    PokemonSV::OverworldDetector detector;
+    detector.make_overlays(overlays);
+    cout << detector.detect(screenshot) << endl;
+#endif
+
+
+
+#if 0
     TeraCardReader detector;
     detector.make_overlays(overlays);
 
     cout << detector.detect(screenshot) << endl;
     detector.pokemon_slug(logger, env.program_info(), screenshot);
-
+#endif
 
 #if 0
     NewsDetector detector;

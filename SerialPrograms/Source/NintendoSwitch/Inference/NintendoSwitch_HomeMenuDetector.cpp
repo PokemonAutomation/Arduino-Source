@@ -88,7 +88,7 @@ bool HomeMenuDetector::detect_only(const ImageViewRGB32& screen){
 
     ImageStats stats_bottom_icons = image_stats(extract_box_reference(screen, m_bottom_icons));
 //    cout << stats_bottom_icons.average << stats_bottom_icons.stddev << endl;
-    if (stats_bottom_icons.stddev.sum() < 50){
+    if (stats_bottom_icons.stddev.sum() < 10){
         return false;
     }
 

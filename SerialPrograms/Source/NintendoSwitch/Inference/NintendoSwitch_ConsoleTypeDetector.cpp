@@ -87,6 +87,10 @@ void ConsoleTypeDetector_StartGameUserSelect::commit_to_cache(){
 }
 
 ConsoleType detect_console_type_from_in_game(ConsoleHandle& console, ProControllerContext& context){
+    if (console.state().console_type_confirmed()){
+        return console.state().console_type();
+    }
+    console.log("Unknown Switch type. Try to detect.", COLOR_ORANGE);
     go_home(console, context);  //  Automatically detects console type as well.
     resume_game_from_home(console, context);
     return console.state().console_type();

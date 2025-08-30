@@ -287,11 +287,7 @@ void keyboard_enter_code(
     }
 
 
-    ConsoleType console_type = console.state().console_type();
-    if (console_type == ConsoleType::Unknown){
-        console.log("Unknown Switch type. Try to detect.", COLOR_ORANGE);
-        console_type = detect_console_type_from_in_game(console, context);
-    }
+    ConsoleType console_type = detect_console_type_from_in_game(console, context);
     bool switch2;
     if (is_switch1(console_type)){
         switch2 = false;

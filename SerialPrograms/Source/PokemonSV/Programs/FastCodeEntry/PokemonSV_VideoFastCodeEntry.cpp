@@ -12,6 +12,7 @@
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Inference/Tera/PokemonSV_TeraCodeReader.h"
 #include "PokemonSV_CodeEntry.h"
@@ -183,6 +184,7 @@ void VideoFastCodeEntry::program(MultiSwitchProgramEnvironment& env, Cancellable
     //  Connect the controller.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
         pbf_press_button(context, BUTTON_PLUS, 5, 3);
+        detect_console_type_from_in_game(console, context);
     });
 
     //  Preload 6 threads to OCR the code.

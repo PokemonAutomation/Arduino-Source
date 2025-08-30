@@ -231,7 +231,6 @@ file(GLOB MAIN_SOURCES
     ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.cpp
     ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h
-    ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h
     ../Common/Qt/AutoHeightTable.cpp
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
