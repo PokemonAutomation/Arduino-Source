@@ -31,6 +31,7 @@ extern const std::string GITHUB_LINK_URL;
 extern const std::string DISCORD_LINK_TEXT;
 extern const std::string DISCORD_LINK_URL_PROGRAM;
 extern const std::string DISCORD_LINK_URL_EMBED;
+extern const std::string DISCORD_LINK_URL_SDK;
 
 extern const std::string COMPILER_VERSION;
 

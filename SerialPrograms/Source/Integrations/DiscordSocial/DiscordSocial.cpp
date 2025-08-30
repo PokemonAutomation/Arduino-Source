@@ -6,6 +6,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "Integrations/ProgramTracker.h"
 #include "../../CommonFramework/GlobalSettingsPanel.h"
+#include "../../CommonFramework/Globals.h"
 
 using namespace discordpp;
 namespace PokemonAutomation{
@@ -70,10 +71,10 @@ void DiscordSocial::update_rich_presence(){
 
         discordpp::ActivityAssets assets{};
         assets.SetLargeImage("rotom");
-        assets.SetLargeText("Pok\u00E9mon Automation");
+        assets.SetLargeText(PROGRAM_NAME);
 
         for (const auto& item : ProgramTracker::instance().all_programs()){
-            switch (item.second.state) {
+            switch (item.second.state){
                 case ProgramState::RUNNING:{
                     assets.SetSmallImage("running");
                     assets.SetSmallText("Running");
@@ -86,7 +87,7 @@ void DiscordSocial::update_rich_presence(){
                     state = "Stopped";
                     m_activity.SetAssets(assets); break;
                 }
-                default: {
+                default:{
                     assets.SetSmallImage("idle");
                     assets.SetSmallText("Idle");
                     state = "Idle";
@@ -146,17 +147,17 @@ Activity DiscordSocial::create_activity(){
 
     ActivityButton button1{};
     button1.SetLabel("Download from GitHub");
-    button1.SetUrl("https://github.com/PokemonAutomation/ComputerControl/releases/latest");
+    button1.SetUrl(m_github_release_latest);
     activity.AddButton(button1);
 
     ActivityButton button2{};
     button2.SetLabel("Join our Discord");
-    button2.SetUrl("https://discord.gg/pokemonautomation");
+    button2.SetUrl(DISCORD_LINK_URL_SDK);
     activity.AddButton(button2);
 
     discordpp::ActivityAssets assets{};
     assets.SetLargeImage("rotom");
-    assets.SetLargeText("Pok\u00E9mon Automation");
+    assets.SetLargeText(PROGRAM_NAME);
     assets.SetSmallImage("idle");
     assets.SetSmallText("Idle");
     activity.Assets().emplace(assets);

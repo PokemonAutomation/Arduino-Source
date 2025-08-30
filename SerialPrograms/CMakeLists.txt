@@ -2464,7 +2464,7 @@ if (WIN32)
     )
 
     file(ARCHIVE_EXTRACT
-      INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk.zip
+      INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win.zip
       DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/
     )
 endif()
@@ -2525,10 +2525,10 @@ if (WIN32)
     )
 
     add_library(discord_lib IMPORTED UNKNOWN)
-    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/discord_social_sdk/)
+    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/discord_social_sdk_win/)
     set_target_properties(discord_lib PROPERTIES
-        IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk/lib/release/discord_partner_sdk.lib
-        IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk/lib/debug/discord_partner_sdk.lib)
+        IMPORTED_LOCATION_RELEASE   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win/lib/release/discord_partner_sdk.lib
+        IMPORTED_LOCATION_DEBUG     ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win/lib/debug/discord_partner_sdk.lib)
     set_target_properties(discord_lib PROPERTIES
         MAP_IMPORTED_CONFIG_DEBUG           DEBUG
         MAP_IMPORTED_CONFIG_RELEASE         RELEASE
@@ -2803,7 +2803,7 @@ add_custom_command(
     TARGET SerialPrograms
     POST_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy
-        $<IF:$<CONFIG:Debug>,"${PROJECT_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk/bin/debug/discord_partner_sdk.dll","${PROJECT_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk/bin/release/discord_partner_sdk.dll">
+        $<IF:$<CONFIG:Debug>,"${PROJECT_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/debug/discord_partner_sdk.dll","${PROJECT_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/release/discord_partner_sdk.dll">
         $<TARGET_FILE_DIR:SerialPrograms>/Binaries64/discord_partner_sdk.dll
     COMMENT "Copying Discord SDK DLL to Binaries64"
 )

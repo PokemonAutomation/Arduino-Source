@@ -34,6 +34,7 @@ namespace DiscordSocialSDK{
             discordpp::Activity m_activity;
             discordpp::ActivityTimestamps m_timestamps{};
             discordpp::LoggingSeverity m_log_level = discordpp::LoggingSeverity::Error;
+            const std::string m_github_release_latest = "https://github.com/PokemonAutomation/ComputerControl/releases/latest";
     };
 }
 }
