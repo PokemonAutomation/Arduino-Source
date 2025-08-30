@@ -60,7 +60,6 @@ MemoryUsage process_memory_usage(){
     {
         uint64_t bytes = 0;
 
-        //  Running this at our poll rate is a terrible idea.
 #if 1
         const std::string TOKEN = "MemAvailable:";
 
