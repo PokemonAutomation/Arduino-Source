@@ -103,6 +103,7 @@ public:
     Pimpl<SleepSuppressOptions> SLEEP_SUPPRESS;
 
     SectionDividerOption m_discord_settings;
+    BooleanCheckBoxOption RICH_PRESENCE;
     BooleanCheckBoxOption ALL_STATS;
     Pimpl<Integration::DiscordSettingsOption> DISCORD;
 

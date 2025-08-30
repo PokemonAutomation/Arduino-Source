@@ -5,6 +5,7 @@
 //#include <QTextStream>
 #include <QMessageBox>
 #include <Integrations/DppIntegration/DppClient.h>
+#include <Integrations/DiscordSocial/DiscordSocial.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "PersistentSettings.h"
@@ -113,6 +114,12 @@ int main(int argc, char *argv[]){
         Integration::DppClient::Client::instance().connect();
 #endif
         discord_settings.on_config_value_changed(nullptr);
+    }
+
+    if (GlobalSettings::instance().RICH_PRESENCE){
+#ifdef PA_SOCIAL_SDK
+        Integration::DiscordSocialSDK::DiscordSocial::instance().run();
+#endif
     }
 
     set_working_directory();

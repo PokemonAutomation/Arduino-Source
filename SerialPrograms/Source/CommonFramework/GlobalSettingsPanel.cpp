@@ -157,6 +157,11 @@ GlobalSettings::GlobalSettings()
             "online documentation"
         ) + ")</font>"
     )
+    , RICH_PRESENCE(
+        "<b>Enable Rich Presence:</b><br>Will display program activity and status under your Discord user.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , ALL_STATS(
         "<b>All Stats:</b><br>Include all-time stats for notifications.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -223,6 +228,7 @@ GlobalSettings::GlobalSettings()
 #endif
 
     PA_ADD_STATIC(m_discord_settings);
+    PA_ADD_OPTION(RICH_PRESENCE);
     PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(DISCORD);
 
