@@ -158,7 +158,9 @@ GlobalSettings::GlobalSettings()
         ) + ")</font>"
     )
     , RICH_PRESENCE(
-        "<b>Enable Rich Presence:</b><br>Will display program activity and status under your Discord user.",
+        "<b>Enable Rich Presence:</b><br>"
+        "Display program activity and status under your Discord user.<br>"
+        "Restart the program for the change to take effect.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
@@ -228,7 +230,9 @@ GlobalSettings::GlobalSettings()
 #endif
 
     PA_ADD_STATIC(m_discord_settings);
+#ifdef PA_SOCIAL_SDK
     PA_ADD_OPTION(RICH_PRESENCE);
+#endif
     PA_ADD_OPTION(ALL_STATS);
     PA_ADD_OPTION(DISCORD);
 

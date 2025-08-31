@@ -116,11 +116,11 @@ int main(int argc, char *argv[]){
         discord_settings.on_config_value_changed(nullptr);
     }
 
-    if (GlobalSettings::instance().RICH_PRESENCE){
 #ifdef PA_SOCIAL_SDK
+    if (GlobalSettings::instance().RICH_PRESENCE){
         Integration::DiscordSocialSDK::DiscordSocial::instance().run();
-#endif
     }
+#endif
 
     set_working_directory();
 
