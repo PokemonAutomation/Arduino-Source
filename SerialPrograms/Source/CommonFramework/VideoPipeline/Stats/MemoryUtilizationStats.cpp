@@ -49,11 +49,11 @@ void MemoryUtilizationStats::update(){
         memory.process_virtual_memory,
         memory.process_physical_memory
     )){
-        if (usage < 0.50){
+        if (usage < 0.10){
             process.color = COLOR_RED;
-        }else if (usage < 0.75){
+        }else if (usage < 0.25){
             process.color = COLOR_ORANGE;
-        }else if (usage < 0.90){
+        }else if (usage < 0.50){
             process.color = COLOR_YELLOW;
         }
     }
