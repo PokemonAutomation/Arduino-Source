@@ -165,7 +165,8 @@ const std::vector<ProconColors>& OFFICIAL_PROCON_COLORS0(){
     const static std::vector<ProconColors> database{
         {"Procon: Stock Black",                 0x323232, 0x323232, 0x323232, 0xFFFFFF},    //  This is just a guess.
         {"Procon: Super Smash Bros. Ultimate",  0xFFFFFF, 0xFFFFFF, 0x2D2D2D, 0xE6E6E6},
-        {"Procon: Monster Hunter Rise",         0x474646, 0x474646, 0x2D2D2D, 0xE7E6E6},
+        {"Procon: Monster Hunter Rise",         0x474646, 0x474646, 0x2E2D2D, 0xE7E6E6},
+        {"Procon: Monster Hunter Sunbreak",     0x464646, 0x464646, 0x2D2E2D, 0xE7E6E6},
         {"Procon: Zelda Tears of the Kingdom",  0x464646, 0xFFFFFF, 0x2D2D2D, 0xE6E6E6},
 //        {"Procon: Xenoblade Chronicles 2",      0xFFFFFF, 0xFFFFFF, 0x323132, 0xFFFFFF},    //  The actual values. Switch automatically replaces grips with pink.
         {"Procon: Xenoblade Chronicles 2",      0xff3a66, 0xff3a66, 0x323132, 0xFFFFFF},    //  Grip color is a guess.
