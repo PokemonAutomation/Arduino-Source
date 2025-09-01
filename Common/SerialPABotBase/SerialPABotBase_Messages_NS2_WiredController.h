@@ -26,12 +26,12 @@ namespace SerialPABotBase{
 #endif
 
 
-#define PABB_MSG_REPORT_NS2_WIRED_CONTROLLER    0x90
+#define PABB_MSG_COMMAND_NS2_WIRED_CONTROLLER_STATE     0x90
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
     pabb_NintendoSwitch2_WiredController_State report;
-} PABB_PACK pabb_Message_Report_NS2_WiredController;
+} PABB_PACK pabb_Message_Command_NS2_WiredController_State;
 
 
 

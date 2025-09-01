@@ -15,18 +15,18 @@ namespace SerialPABotBase{
 
 
 
-int register_message_converters_push_button_framework(){
+int register_message_converters_NS2_WiredController(){
     register_message_converter(
-        PABB_MSG_REPORT_NS2_WIRED_CONTROLLER,
+        PABB_MSG_COMMAND_NS2_WIRED_CONTROLLER_STATE,
         [](const std::string& body){
             //  Disable this by default since it's very spammy.
             if (!GlobalSettings::instance().LOG_EVERYTHING){
                 return std::string();
             }
             std::ostringstream ss;
-            ss << "PABB_MSG_REPORT_NS2_WIRED_CONTROLLER: ";
-            if (body.size() != sizeof(pabb_Message_Report_NS2_WiredController)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_Message_Report_NS2_WiredController*)body.c_str();
+            ss << "PABB_MSG_COMMAND_NS2_WIRED_CONTROLLER_STATE: ";
+            if (body.size() != sizeof(pabb_Message_Command_NS2_WiredController_State)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_Command_NS2_WiredController_State*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
 
             uint32_t buttons = params->report.buttons0;
@@ -45,7 +45,7 @@ int register_message_converters_push_button_framework(){
     );
     return 0;
 }
-int init_PushButtonFramework = register_message_converters_push_button_framework();
+int init_PushButtonFramework = register_message_converters_NS2_WiredController();
 
 
 

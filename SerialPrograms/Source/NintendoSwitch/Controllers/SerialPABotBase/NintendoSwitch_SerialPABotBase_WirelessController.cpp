@@ -8,7 +8,7 @@
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_ESP32.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessController.h"
 

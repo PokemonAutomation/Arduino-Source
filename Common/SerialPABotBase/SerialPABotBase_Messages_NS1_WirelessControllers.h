@@ -1,11 +1,11 @@
-/*  SerialPABotBase Messages (ESP32)
+/*  SerialPABotBase Messages (Nintendo Switch 1 Wireless Controllers)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_SerialPABotBase_Messages_ESP32_H
-#define PokemonAutomation_SerialPABotBase_Messages_ESP32_H
+#ifndef PokemonAutomation_SerialPABotBase_Messages_NS1_WirelessControllers_H
+#define PokemonAutomation_SerialPABotBase_Messages_NS1_WirelessControllers_H
 
 #include "../ControllerStates/NintendoSwitch_WirelessController_State.h"
 #include "SerialPABotBase_Protocol.h"
@@ -37,38 +37,38 @@ typedef struct{
 
 
 
-#define PABB_MSG_ESP32_REQUEST_READ_SPI         0x60
+#define PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_READ_SPI   0x60
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
     uint32_t address;
     uint8_t bytes;
-} PABB_PACK pabb_Message_ESP32_ReadSpi;
+} PABB_PACK pabb_Message_NS1_WirelessController_ReadSpi;
 
-#define PABB_MSG_ESP32_REQUEST_WRITE_SPI        0x61
+#define PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_WRITE_SPI  0x61
 typedef struct{
     seqnum_t seqnum;
     uint32_t controller_type;
     uint32_t address;
     uint8_t bytes;
-} PABB_PACK pabb_Message_ESP32_WriteSpi;
+} PABB_PACK pabb_Message_NS1_WirelessController_WriteSpi;
 
 
 
-#define PABB_MSG_ESP32_CONTROLLER_STATE_BUTTONS     0xa0
+#define PABB_MSG_COMMAND_NS1_WIRELESS_CONTROLLER_BUTTONS    0xa0
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
     pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons;
-} PABB_PACK pabb_Message_ESP32_CommandButtonState;
+} PABB_PACK pabb_Message_Command_NS1_WirelessController_Buttons;
 
 
-#define PABB_MSG_ESP32_CONTROLLER_STATE_FULL        0xa1
+#define PABB_MSG_COMMAND_NS1_WIRELESS_CONTROLLER_FULL_STATE 0xa1
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
     pabb_NintendoSwitch_WirelessController_State0x30 state;
-} PABB_PACK pabb_Message_ESP32_CommandFullState;
+} PABB_PACK pabb_Message_Command_NS1_WirelessController_FullState;
 
 
 

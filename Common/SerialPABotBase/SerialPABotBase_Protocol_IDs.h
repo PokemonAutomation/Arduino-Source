@@ -31,6 +31,9 @@
 #define PABB_PID_PABOTBASE_ESP32                            0x10
 #define PABB_PID_PABOTBASE_ESP32S3                          0x12
 
+//  Raspberry Pi
+#define PABB_PID_PABOTBASE_PicoW                            0x20
+
 
 //
 //  Controller IDs

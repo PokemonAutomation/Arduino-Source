@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessController_H
 
 #include <cmath>
-#include "Common/SerialPABotBase/SerialPABotBase_Messages_ESP32.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WirelessControllers.h"
 #include "Controllers/JoystickTools.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 

@@ -9,7 +9,7 @@
 #include "Controllers/ControllerTypeStrings.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "SerialPABotBase_Routines_Protocol.h"
-#include "SerialPABotBase_Routines_ESP32.h"
+#include "SerialPABotBase_Routines_NS1_WirelessControllers.h"
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_PostConnectActions.h"
 
