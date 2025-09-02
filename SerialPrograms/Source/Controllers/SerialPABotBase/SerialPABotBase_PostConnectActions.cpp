@@ -215,6 +215,7 @@ void run_post_connect_actions(
 ){
     switch (program_id){
     case PABB_PID_PABOTBASE_ESP32:
+    case PABB_PID_PABOTBASE_PicoW:
         run_post_connect_actions_ESP32(status, device_name, botbase, change_controller, clear_settings);
         return;
     case PABB_PID_PABOTBASE_ESP32S3:

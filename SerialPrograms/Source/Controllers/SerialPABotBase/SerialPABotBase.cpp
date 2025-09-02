@@ -25,7 +25,7 @@ const ControllerFeatures OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
 
 std::string program_name(uint8_t id){
     switch (id){
-    case PABB_PID_UNSPECIFIED:                  return "Microcontroller Program";
+    case PABB_PID_UNSPECIFIED:                  return "None";
 
     //  Old (fat) PABotBase with scheduler.
     case PABB_PID_PABOTBASE_12KB:               return "PABotBase-AVR8-12KB";
@@ -42,6 +42,8 @@ std::string program_name(uint8_t id){
 
     case PABB_PID_PABOTBASE_ESP32:              return "PABotBase-ESP32";
     case PABB_PID_PABOTBASE_ESP32S3:            return "PABotBase-ESP32-S3";
+
+    case PABB_PID_PABOTBASE_PicoW:              return "PABotBase-PicoW";
 
     default: return "Unknown ID";
     }
@@ -161,6 +163,20 @@ const std::map<
     }},
     {2025081700, {
         {PABB_PID_PABOTBASE_ESP32, {
+            {ControllerType::NintendoSwitch_WirelessProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+            }},
+            {ControllerType::NintendoSwitch_LeftJoycon, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_LeftJoycon,
+            }},
+            {ControllerType::NintendoSwitch_RightJoycon, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_RightJoycon,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_PicoW, {
             {ControllerType::NintendoSwitch_WirelessProController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
