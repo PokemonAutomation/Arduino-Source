@@ -43,7 +43,8 @@ std::string program_name(uint8_t id){
     case PABB_PID_PABOTBASE_ESP32:              return "PABotBase-ESP32";
     case PABB_PID_PABOTBASE_ESP32S3:            return "PABotBase-ESP32-S3";
 
-    case PABB_PID_PABOTBASE_PicoW:              return "PABotBase-PicoW";
+    case PABB_PID_PABOTBASE_PicoW_USB:          return "PABotBase-PicoW (USB)";
+    case PABB_PID_PABOTBASE_PicoW_UART:         return "PABotBase-PicoW (UART)";
 
     default: return "Unknown ID";
     }
@@ -176,7 +177,31 @@ const std::map<
                 ControllerFeature::NintendoSwitch_RightJoycon,
             }},
         }},
-        {PABB_PID_PABOTBASE_PicoW, {
+        {PABB_PID_PABOTBASE_PicoW_USB, {
+            {ControllerType::NintendoSwitch_WirelessProController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+            }},
+            {ControllerType::NintendoSwitch_LeftJoycon, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_LeftJoycon,
+            }},
+            {ControllerType::NintendoSwitch_RightJoycon, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_RightJoycon,
+            }},
+        }},
+        {PABB_PID_PABOTBASE_PicoW_UART, {
+            {ControllerType::NintendoSwitch_WiredController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
+            {ControllerType::NintendoSwitch2_WiredController, {
+                ControllerFeature::TickPrecise,
+                ControllerFeature::NintendoSwitch_ProController,
+                ControllerFeature::NintendoSwitch_DateSkip,
+            }},
             {ControllerType::NintendoSwitch_WirelessProController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,

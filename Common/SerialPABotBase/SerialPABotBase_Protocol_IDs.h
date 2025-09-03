@@ -32,7 +32,8 @@
 #define PABB_PID_PABOTBASE_ESP32S3                          0x12
 
 //  Raspberry Pi
-#define PABB_PID_PABOTBASE_PicoW                            0x20
+#define PABB_PID_PABOTBASE_PicoW_USB                        0x20
+#define PABB_PID_PABOTBASE_PicoW_UART                       0x21
 
 
 //
