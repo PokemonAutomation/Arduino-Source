@@ -43,9 +43,7 @@ public:
         return ControllerType::NintendoSwitch_WiredController;
     }
     virtual ControllerPerformanceClass performance_class() const override{
-        //  TODO: Change to SerialPABotBase_Wired when we prove it is stable.
         return ControllerPerformanceClass::SerialPABotBase_Wired;
-//        return ControllerPerformanceClass::SysbotBase;
     }
 
     virtual Milliseconds ticksize() const override{
@@ -55,10 +53,7 @@ public:
         return Milliseconds(8);
     }
     virtual Milliseconds timing_variation() const override{
-        //  TODO: Verify it is actually this stable.
         return ConsoleSettings::instance().TIMING_OPTIONS.WIRED_MICROCONTROLLER;
-//        return ConsoleSettings::instance().TIMING_OPTIONS.SYSBOTBASE;
-//        return Milliseconds(8);
     }
     virtual bool atomic_multibutton() const override{
         return true;

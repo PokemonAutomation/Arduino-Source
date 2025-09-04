@@ -43,33 +43,6 @@ const std::map<uint32_t, std::set<pabb_ProgramID>>& SUPPORTED_VERSIONS(){
 
 
 
-
-std::string program_name(uint32_t id){
-    switch (id){
-    case PABB_PID_UNSPECIFIED:                  return "None";
-
-    //  Old (fat) PABotBase with scheduler.
-    case PABB_PID_PABOTBASE_12KB:               return "PABotBase-AVR8-12KB";
-    case PABB_PID_PABOTBASE_31KB:               return "PABotBase-AVR8-31KB";
-
-    //  New (slim) PABotBase.
-    case PABB_PID_PABOTBASE_ArduinoUnoR3:       return "PABotBase-UnoR3";
-    case PABB_PID_PABOTBASE_ArduinoLeonardo:    return "PABotBase-Leonardo";
-    case PABB_PID_PABOTBASE_ProMicro:           return "PABotBase-ProMicro";
-    case PABB_PID_PABOTBASE_Teensy2:            return "PABotBase-Teensy2.0";
-    case PABB_PID_PABOTBASE_TeensyPP2:          return "PABotBase-Teensy++2.0";
-
-    case PABB_PID_PABOTBASE_CH552:              return "PABotBase-CH552";
-
-    case PABB_PID_PABOTBASE_ESP32:              return "PABotBase-ESP32";
-    case PABB_PID_PABOTBASE_ESP32S3:            return "PABotBase-ESP32-S3";
-
-    case PABB_PID_PABOTBASE_PicoW_USB:          return "PABotBase-PicoW (USB)";
-    case PABB_PID_PABOTBASE_PicoW_UART:         return "PABotBase-PicoW (UART)";
-
-    default: return "Unknown ID";
-    }
-}
 ControllerType id_to_controller_type(uint32_t id){
     switch (id){
     case PABB_CID_NONE:

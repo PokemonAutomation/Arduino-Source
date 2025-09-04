@@ -264,8 +264,17 @@ ControllerModeStatus SerialPABotBase_Connection::process_device(
     //  Queue Size
     process_queue_size();
 
-    //  Controller Type
-    ControllerType current_controller = get_controller_type(controllers);
+    //  Current Controller
+    ControllerType current_controller;
+    {
+        m_logger.log("Reading Controller Mode...");
+        uint32_t type_id = read_controller_mode(*m_botbase);
+        current_controller = id_to_controller_type(type_id);
+        m_logger.Logger::log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
+    }
+
+//    //  Controller Type
+//    ControllerType current_controller = get_controller_type(controllers);
 
     //  Run any post-connection actions specific to this program.
     ControllerModeStatus ret{current_controller, controllers};

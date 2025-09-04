@@ -11,6 +11,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "Controllers/ControllerTypes.h"
 
 namespace PokemonAutomation{
@@ -25,7 +26,6 @@ const std::map<uint32_t, std::set<pabb_ProgramID>>& SUPPORTED_VERSIONS();
 
 
 
-std::string program_name(uint32_t id);
 ControllerType id_to_controller_type(uint32_t id);
 uint32_t controller_type_to_id(ControllerType controller_type);
 
