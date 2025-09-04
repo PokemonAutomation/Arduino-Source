@@ -31,8 +31,7 @@ LPFarmer_Descriptor::LPFarmer_Descriptor()
         "Farm LP by day skipping Tera raids.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct LPFarmer_Descriptor::Stats : public StatsTracker{

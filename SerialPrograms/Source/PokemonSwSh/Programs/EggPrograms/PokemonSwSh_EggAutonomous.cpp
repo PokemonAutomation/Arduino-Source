@@ -57,8 +57,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         "Automatically fetch+hatch eggs and keep all shinies.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

@@ -68,8 +68,7 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
         "Read all the tasks in your " + STRING_POKEDEX + " and output a file with the tasks you did.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

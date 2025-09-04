@@ -139,8 +139,7 @@ TestDudunsparceFormDetector_Descriptor::TestDudunsparceFormDetector_Descriptor()
         "Test ML model on Dudunsparce form in SV box system",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::ENABLE_COMMANDS
     )
 {}
 

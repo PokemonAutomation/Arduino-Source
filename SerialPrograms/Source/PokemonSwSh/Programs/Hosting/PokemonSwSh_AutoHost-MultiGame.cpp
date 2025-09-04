@@ -34,8 +34,7 @@ AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
         "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 std::unique_ptr<StatsTracker> AutoHostMultiGame_Descriptor::make_stats() const{

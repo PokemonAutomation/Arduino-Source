@@ -49,8 +49,7 @@ CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()
         "Perform RNG manipulation to get rare balls from the Cram-o-matic.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

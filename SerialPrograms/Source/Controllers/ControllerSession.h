@@ -43,15 +43,11 @@ public:
     ~ControllerSession();
     ControllerSession(
         Logger& logger,
-        ControllerOption& option,
-        const ControllerFeatures& required_features
+        ControllerOption& option
     );
 
     Logger& logger(){
         return m_logger;
-    }
-    const ControllerFeatures& required_features(){
-        return m_required_features;
     }
     std::vector<ControllerType> available_controllers() const;
 
@@ -148,7 +144,6 @@ private:
 
 private:
     Logger& m_logger;
-    const ControllerFeatures& m_required_features;
     ControllerOption& m_option;
     ControllerType m_controller_type;
 

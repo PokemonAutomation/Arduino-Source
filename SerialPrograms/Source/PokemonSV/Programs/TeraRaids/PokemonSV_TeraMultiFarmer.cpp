@@ -113,7 +113,6 @@ TeraMultiFarmer_Descriptor::TeraMultiFarmer_Descriptor()
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
         2, 4, 2
     )
 {}

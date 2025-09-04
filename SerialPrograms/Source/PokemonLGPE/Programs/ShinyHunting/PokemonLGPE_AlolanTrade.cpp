@@ -31,8 +31,7 @@ AlolanTrade_Descriptor::AlolanTrade_Descriptor()
         "Shiny hunt Alolan forms by trading in-game.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

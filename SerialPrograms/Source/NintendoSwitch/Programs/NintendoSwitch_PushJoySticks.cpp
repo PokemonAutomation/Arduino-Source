@@ -20,8 +20,7 @@ PushJoySticks_Descriptor::PushJoySticks_Descriptor()
         "Push Joy Sticks continuously.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

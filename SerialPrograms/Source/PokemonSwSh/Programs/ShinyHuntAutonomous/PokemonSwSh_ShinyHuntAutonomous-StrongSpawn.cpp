@@ -30,8 +30,7 @@ ShinyHuntAutonomousStrongSpawn_Descriptor::ShinyHuntAutonomousStrongSpawn_Descri
         "Automatically hunt for shiny strong spawns using video feedback.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn_Descriptor::make_stats() const{

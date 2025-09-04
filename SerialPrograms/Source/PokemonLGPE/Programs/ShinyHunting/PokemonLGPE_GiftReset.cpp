@@ -31,8 +31,7 @@ GiftReset_Descriptor::GiftReset_Descriptor()
         "Shiny hunt gift Pokemon by resetting the game.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

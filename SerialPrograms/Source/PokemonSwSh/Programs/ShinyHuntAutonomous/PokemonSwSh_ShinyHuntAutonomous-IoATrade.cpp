@@ -32,8 +32,7 @@ ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
         "Hunt for shiny Isle of Armor trade using video feedback.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade_Descriptor::make_stats() const{

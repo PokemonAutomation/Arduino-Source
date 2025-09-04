@@ -35,7 +35,6 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
         1, 4, 1
     )
 {}

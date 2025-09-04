@@ -45,8 +45,7 @@ TeraSelfFarmer_Descriptor::TeraSelfFarmer_Descriptor()
         "Farm items and " + STRING_POKEMON + " from Tera raids. Can also hunt for shiny and high reward raids.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct TeraSelfFarmer_Descriptor::Stats : public StatsTracker{

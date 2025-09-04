@@ -37,8 +37,7 @@ IngoMoveGrinder_Descriptor::IngoMoveGrinder_Descriptor()
         "More effective than Ingo Battle Grinder for " + STRING_POKEDEX + " research tasks but less effective for everything else.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class IngoMoveGrinder_Descriptor::Stats : public StatsTracker{

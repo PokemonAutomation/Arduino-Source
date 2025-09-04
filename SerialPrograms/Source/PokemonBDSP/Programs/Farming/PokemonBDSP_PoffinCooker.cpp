@@ -27,8 +27,7 @@ PoffinCooker_Descriptor::PoffinCooker_Descriptor()
         "Cook Poffins.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct PoffinCooker_Descriptor::Stats : public StatsTracker{

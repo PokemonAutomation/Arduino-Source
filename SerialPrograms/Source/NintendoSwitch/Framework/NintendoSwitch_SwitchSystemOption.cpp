@@ -42,18 +42,15 @@ const std::string SwitchSystemOption::JSON_CONSOLE_TYPE = "ConsoleType";
 
 
 SwitchSystemOption::SwitchSystemOption(
-    const ControllerFeatures& required_features,
     bool allow_commands_while_running
 )
-    : m_required_features(required_features)
-    , m_allow_commands_while_running(allow_commands_while_running)
+    : m_allow_commands_while_running(allow_commands_while_running)
 {}
 SwitchSystemOption::SwitchSystemOption(
-    const ControllerFeatures& required_features,
     bool allow_commands_while_running,
     const JsonValue& json
 )
-    : SwitchSystemOption(required_features, allow_commands_while_running)
+    : SwitchSystemOption(allow_commands_while_running)
 {
     load_json(json);
 }

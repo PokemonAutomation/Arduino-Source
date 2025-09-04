@@ -128,10 +128,7 @@ SwitchSystemWidget::SwitchSystemWidget(
                 return;
             }
 
-            SwitchSystemOption option(
-                m_session.required_features(),
-                m_session.allow_commands_while_running()
-            );
+            SwitchSystemOption option(m_session.allow_commands_while_running());
 
             //  Deserialize into this local option instance.
             option.load_json(load_json_file(path));
@@ -148,10 +145,7 @@ SwitchSystemWidget::SwitchSystemWidget(
             }
 
             //  Create a copy of option, to be able to serialize it later on
-            SwitchSystemOption option(
-                m_session.required_features(),
-                m_session.allow_commands_while_running()
-            );
+            SwitchSystemOption option(m_session.allow_commands_while_running());
 
             m_session.get(option);
 

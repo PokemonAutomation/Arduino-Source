@@ -10,6 +10,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -35,11 +36,7 @@ FlyingTrialFarmer_Descriptor::FlyingTrialFarmer_Descriptor()
         "Farm the flying trial for BP.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {
-            ControllerFeature::TickPrecise,
-            ControllerFeature::NintendoSwitch_ProController,
-        }
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct FlyingTrialFarmer_Descriptor::Stats : public StatsTracker{
@@ -180,6 +177,7 @@ uint8_t FlyingTrialFarmer::get_final_y_axis(int8_t delta_y){
 }
 
 void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
     assert_16_9_720p_min(env.logger(), env.console);
 
     FlyingTrialFarmer_Descriptor::Stats& stats = env.current_stats<FlyingTrialFarmer_Descriptor::Stats>();

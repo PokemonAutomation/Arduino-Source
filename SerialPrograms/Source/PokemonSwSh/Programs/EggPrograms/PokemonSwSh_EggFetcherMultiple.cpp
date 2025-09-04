@@ -38,8 +38,7 @@ EggFetcherMultiple_Descriptor::EggFetcherMultiple_Descriptor()
         "Fetch eggs from multiple species without hatching them.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

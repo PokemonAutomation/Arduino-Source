@@ -47,8 +47,7 @@ AutoHost_Descriptor::AutoHost_Descriptor()
         "Auto-host a Tera raid.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct AutoHost_Descriptor::Stats : public StatsTracker{

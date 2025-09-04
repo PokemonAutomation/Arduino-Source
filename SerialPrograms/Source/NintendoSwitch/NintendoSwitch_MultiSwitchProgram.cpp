@@ -112,7 +112,6 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     ProgramControllerClass color_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    ControllerFeatures required_features,
     size_t min_switches,
     size_t max_switches,
     size_t default_switches,
@@ -127,7 +126,6 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     )
     , m_color_class(color_class)
     , m_feedback(feedback)
-    , m_required_features(std::move(required_features))
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_deprecated(deprecated)
     , m_min_switches(min_switches)

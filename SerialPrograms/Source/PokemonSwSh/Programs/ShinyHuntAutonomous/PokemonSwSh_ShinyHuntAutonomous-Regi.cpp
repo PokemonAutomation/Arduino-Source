@@ -29,8 +29,7 @@ ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
         "Automatically hunt for shiny Regi using video feedback.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi_Descriptor::make_stats() const{

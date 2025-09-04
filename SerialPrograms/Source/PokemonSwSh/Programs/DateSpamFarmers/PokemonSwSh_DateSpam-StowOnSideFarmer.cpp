@@ -27,8 +27,7 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
         "Farm the Stow-on-Side items dealer.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

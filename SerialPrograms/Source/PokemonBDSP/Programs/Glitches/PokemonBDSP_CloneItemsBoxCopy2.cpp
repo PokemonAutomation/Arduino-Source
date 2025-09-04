@@ -9,6 +9,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/VisualDetectors/ImageMatchDetector.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -31,11 +32,7 @@ CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
         "<font color=\"red\">(The menu glitch can only be activated on version 1.1.0 - 1.1.3.)</font>",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {
-            ControllerFeature::TickPrecise,
-            ControllerFeature::NintendoSwitch_ProController,
-        }
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct CloneItemsBoxCopy2_Descriptor::Stats : public StatsTracker{
@@ -86,6 +83,8 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2()
 
 
 void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     CloneItemsBoxCopy2_Descriptor::Stats& stats = env.current_stats<CloneItemsBoxCopy2_Descriptor::Stats>();
 
 //    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;

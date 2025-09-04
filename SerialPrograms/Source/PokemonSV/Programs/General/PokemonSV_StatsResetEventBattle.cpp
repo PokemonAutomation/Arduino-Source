@@ -77,8 +77,7 @@ StatsResetEventBattle_Descriptor::StatsResetEventBattle_Descriptor()
         "Repeatedly catch Bloodmoon Ursaluna or Pecharunt until you get the stats you want.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct StatsResetEventBattle_Descriptor::Stats : public StatsTracker{

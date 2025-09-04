@@ -9,6 +9,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -39,11 +40,7 @@ GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
         "Farm Chest Gimmighoul for coins.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {
-            ControllerFeature::TickPrecise,
-            ControllerFeature::NintendoSwitch_ProController,
-        }
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -132,7 +129,9 @@ void GimmighoulChestFarmer::navigate_to_gimmi(SingleSwitchProgramEnvironment& en
 }
 
 void GimmighoulChestFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
     assert_16_9_720p_min(env.logger(), env.console);
+
     GimmighoulChestFarmer_Descriptor::Stats& stats = env.current_stats<GimmighoulChestFarmer_Descriptor::Stats>();
 
     if (START_LOCATION == StartLocation::FlyPoint){

@@ -32,8 +32,7 @@ MassAttachItems_Descriptor::MassAttachItems_Descriptor()
         "Mass attach items to " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct MassAttachItems_Descriptor::Stats : public StatsTracker{

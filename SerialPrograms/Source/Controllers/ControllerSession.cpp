@@ -41,11 +41,9 @@ ControllerSession::~ControllerSession(){
 }
 ControllerSession::ControllerSession(
     Logger& logger,
-    ControllerOption& option,
-    const ControllerFeatures& required_features
+    ControllerOption& option
 )
     : m_logger(logger)
-    , m_required_features(required_features)
     , m_option(option)
     , m_controller_type(ControllerType::None)
     , m_options_locked(false)

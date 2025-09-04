@@ -29,11 +29,7 @@ DaySkipperJPN7p8k_Descriptor::DaySkipperJPN7p8k_Descriptor()
         "A faster, but less reliable Japanese date skipper. (7800 skips/hour)",
         ProgramControllerClass::StandardController_WithRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {
-            ControllerFeature::TickPrecise,
-            ControllerFeature::NintendoSwitch_ProController,
-        }
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 std::unique_ptr<StatsTracker> DaySkipperJPN7p8k_Descriptor::make_stats() const{

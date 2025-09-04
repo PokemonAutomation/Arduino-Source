@@ -31,8 +31,7 @@ FossilRevival_Descriptor::FossilRevival_Descriptor()
         "Shiny hunt fossil Pokemon by reviving and resetting.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

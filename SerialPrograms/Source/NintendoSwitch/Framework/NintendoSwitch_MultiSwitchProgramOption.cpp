@@ -19,7 +19,6 @@ MultiSwitchProgramOption::MultiSwitchProgramOption(const MultiSwitchProgramDescr
     : PanelInstance(descriptor)
     , m_descriptor(descriptor)
     , m_system(
-        descriptor.required_features(),
         descriptor.feedback(),
         descriptor.allow_commands_while_running()
             ? AllowCommandsWhenRunning::ENABLE_COMMANDS

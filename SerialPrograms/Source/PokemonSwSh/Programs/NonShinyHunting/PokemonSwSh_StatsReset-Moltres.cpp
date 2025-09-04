@@ -35,8 +35,7 @@ StatsResetMoltres_Descriptor::StatsResetMoltres_Descriptor()
         "Repeatedly catch moltres until you get the stats you want.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct StatsResetMoltres_Descriptor::Stats : public StatsTracker{

@@ -34,8 +34,7 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
         "Constantly reset the cave to find Shiny Alpha Crobat.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class CrobatFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

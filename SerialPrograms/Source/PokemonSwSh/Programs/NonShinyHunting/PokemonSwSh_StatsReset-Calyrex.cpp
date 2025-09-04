@@ -32,8 +32,7 @@ StatsResetCalyrex_Descriptor::StatsResetCalyrex_Descriptor()
         "Repeatedly catch calyrex (and its horse) until you get the stats you want.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct StatsResetCalyrex_Descriptor::Stats : public StatsTracker{

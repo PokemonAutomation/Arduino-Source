@@ -28,7 +28,6 @@ EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {},
         true
     )
 {}

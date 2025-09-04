@@ -48,8 +48,7 @@ ShinyHuntScatterbug_Descriptor::ShinyHuntScatterbug_Descriptor()
         "Shiny hunt Scatterbug.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct ShinyHuntScatterbug_Descriptor::Stats : public LetsGoEncounterBotStats{

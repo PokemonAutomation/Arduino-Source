@@ -33,8 +33,7 @@ MagikarpMoveGrinder_Descriptor::MagikarpMoveGrinder_Descriptor()
         "grind status moves with any style against a Magikarp to finish " + STRING_POKEDEX + " research tasks.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class MagikarpMoveGrinder_Descriptor::Stats : public StatsTracker{

@@ -34,8 +34,7 @@ FroslassFinder_Descriptor::FroslassFinder_Descriptor()
         "Constantly reset to find a Alpha Froslass or any Shiny in the path.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class FroslassFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

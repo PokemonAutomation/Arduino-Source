@@ -29,8 +29,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         "Hatch eggs from boxes.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::OPTIONAL_,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct EggHatcher_Descriptor::Stats : public StatsTracker{

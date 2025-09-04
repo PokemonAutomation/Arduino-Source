@@ -33,8 +33,7 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
         "Automatically reset for a purple beam.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct PurpleBeamFinder_Descriptor::Stats : public StatsTracker{

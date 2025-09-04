@@ -24,8 +24,7 @@ PageSwap_Descriptor::PageSwap_Descriptor()
         "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

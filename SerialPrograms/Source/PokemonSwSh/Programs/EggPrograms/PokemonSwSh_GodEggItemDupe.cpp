@@ -27,8 +27,7 @@ GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
         "Mass duplicate items with the God Egg.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

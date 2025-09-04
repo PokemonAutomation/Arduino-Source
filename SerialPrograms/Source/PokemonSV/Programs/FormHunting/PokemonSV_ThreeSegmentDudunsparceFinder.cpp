@@ -32,8 +32,7 @@ ThreeSegmentDudunsparceFinder_Descriptor::ThreeSegmentDudunsparceFinder_Descript
         "Check whether a box of Dunsparce contain at least one that evolves into Three-Segment Dudunsparce.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct ThreeSegmentDudunsparceFinder_Descriptor::Stats : public StatsTracker{

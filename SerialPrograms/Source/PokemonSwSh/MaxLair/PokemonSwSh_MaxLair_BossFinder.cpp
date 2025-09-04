@@ -31,7 +31,6 @@ MaxLairBossFinder_Descriptor::MaxLairBossFinder_Descriptor()
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
         1, 4, 1
     )
 {}

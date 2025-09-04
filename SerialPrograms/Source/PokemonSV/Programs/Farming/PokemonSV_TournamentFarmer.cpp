@@ -39,8 +39,7 @@ TournamentFarmer_Descriptor::TournamentFarmer_Descriptor()
         "Farm the Academy Ace Tournament for money and prizes.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

@@ -29,12 +29,7 @@ DaySkipperEU_Descriptor::DaySkipperEU_Descriptor()
         "A day skipper for EU date format that.  (Switch 1: ~7500 skips/hour, Switch 2: 5655 skips/hour)",
         ProgramControllerClass::StandardController_WithRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {
-            ControllerFeature::TickPrecise,
-            ControllerFeature::NintendoSwitch_ProController,
-            // ControllerFeature::NintendoSwitch_DateSkip,
-        }
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 std::unique_ptr<StatsTracker> DaySkipperEU_Descriptor::make_stats() const{

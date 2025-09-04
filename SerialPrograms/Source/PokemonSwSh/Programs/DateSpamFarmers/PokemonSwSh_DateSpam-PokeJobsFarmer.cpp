@@ -30,8 +30,7 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
         "Farm " + STRING_POKEJOB + "s.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
      )
 {}
 

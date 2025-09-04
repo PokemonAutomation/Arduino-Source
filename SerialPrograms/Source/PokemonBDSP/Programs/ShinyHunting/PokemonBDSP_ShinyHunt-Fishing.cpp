@@ -29,8 +29,7 @@ ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
         "Shiny hunt fishing " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct ShinyHuntFishing_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{

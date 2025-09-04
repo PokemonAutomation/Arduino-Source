@@ -24,7 +24,6 @@ BallThrower_Descriptor::BallThrower_Descriptor()
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
         true
     )
 {}

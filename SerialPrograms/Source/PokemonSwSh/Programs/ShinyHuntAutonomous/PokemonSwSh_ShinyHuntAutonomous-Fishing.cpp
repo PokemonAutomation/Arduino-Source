@@ -32,8 +32,7 @@ ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
         "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct ShinyHuntAutonomousFishing_Descriptor::Stats : public ShinyHuntTracker{

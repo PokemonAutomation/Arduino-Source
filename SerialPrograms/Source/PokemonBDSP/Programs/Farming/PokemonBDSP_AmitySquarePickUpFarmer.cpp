@@ -25,8 +25,7 @@ AmitySquarePickUpFarmer_Descriptor::AmitySquarePickUpFarmer_Descriptor()
         "Automatically fetch berries and stickers from the walking pokemon in Amity Square.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct AmitySquarePickUpFarmer_Descriptor::Stats : public StatsTracker{

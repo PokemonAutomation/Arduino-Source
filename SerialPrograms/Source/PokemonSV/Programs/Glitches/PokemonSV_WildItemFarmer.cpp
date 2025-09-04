@@ -35,8 +35,7 @@ WildItemFarmer_Descriptor::WildItemFarmer_Descriptor()
         "Farm an item held by a wild " + Pokemon::STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

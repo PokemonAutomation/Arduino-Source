@@ -25,8 +25,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         "Mass release boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

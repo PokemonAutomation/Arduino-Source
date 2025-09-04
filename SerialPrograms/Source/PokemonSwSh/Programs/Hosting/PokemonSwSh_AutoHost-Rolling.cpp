@@ -35,8 +35,7 @@ AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
         "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{

@@ -128,7 +128,6 @@ VideoFastCodeEntry_Descriptor::VideoFastCodeEntry_Descriptor()
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
         1, 4, 1
     )
 {}

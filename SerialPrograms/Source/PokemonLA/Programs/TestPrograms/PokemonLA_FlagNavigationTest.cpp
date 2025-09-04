@@ -23,8 +23,7 @@ FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()
         "Navigate to the flag pin.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

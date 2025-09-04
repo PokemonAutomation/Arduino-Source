@@ -20,8 +20,7 @@ TurboButton_Descriptor::TurboButton_Descriptor()
         "Mash a controller button. (similar to turbo controller)",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

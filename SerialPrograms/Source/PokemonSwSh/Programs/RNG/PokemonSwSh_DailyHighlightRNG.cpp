@@ -47,8 +47,7 @@ DailyHighlightRNG_Descriptor::DailyHighlightRNG_Descriptor()
         "Perform RNG manipulation to get rare items from the daily highlight trader.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

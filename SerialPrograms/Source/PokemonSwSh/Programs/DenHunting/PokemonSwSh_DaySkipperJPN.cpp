@@ -29,12 +29,7 @@ DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
         "A day skipper for Japanese date format. (Switch 1: 7600 skips/hour, Switch 2: 5655 skips/hour)",
         ProgramControllerClass::StandardController_WithRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {
-            ControllerFeature::TickPrecise,
-            ControllerFeature::NintendoSwitch_ProController,
-            // ControllerFeature::NintendoSwitch_DateSkip,
-        }
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

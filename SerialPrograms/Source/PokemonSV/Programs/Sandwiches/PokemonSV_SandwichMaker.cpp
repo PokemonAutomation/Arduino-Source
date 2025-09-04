@@ -29,8 +29,7 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
         "Make a sandwich of your choice.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

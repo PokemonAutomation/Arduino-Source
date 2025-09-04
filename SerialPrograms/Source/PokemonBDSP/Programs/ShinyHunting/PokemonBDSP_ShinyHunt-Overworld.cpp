@@ -28,8 +28,7 @@ ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
         "Shiny hunt overworld " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct ShinyHuntOverworld_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{

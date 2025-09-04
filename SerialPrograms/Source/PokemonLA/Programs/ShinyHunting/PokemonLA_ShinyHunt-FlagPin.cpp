@@ -33,8 +33,7 @@ ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
         "Repeatedly travel to a flag pin to shiny hunt " + STRING_POKEMON + " around it.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class ShinyHuntFlagPin_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

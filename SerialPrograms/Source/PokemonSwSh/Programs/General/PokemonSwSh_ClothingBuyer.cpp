@@ -24,8 +24,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         "Buy out all the clothing in a store.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

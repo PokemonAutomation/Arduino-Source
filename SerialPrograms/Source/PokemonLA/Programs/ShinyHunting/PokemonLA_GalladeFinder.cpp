@@ -31,8 +31,7 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
         "Constantly reset the Snowpoint Temple to find Shiny Alpha Gallade.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class GalladeFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

@@ -32,8 +32,7 @@ GeneratePokedexSprites_Descriptor::GeneratePokedexSprites_Descriptor()
         "Generate " + STRING_POKEMON + " Sprite data by iterating the " + STRING_POKEDEX + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

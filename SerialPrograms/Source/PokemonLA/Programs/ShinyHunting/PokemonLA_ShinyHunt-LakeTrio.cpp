@@ -37,8 +37,7 @@ ShinyHuntLakeTrio_Descriptor::ShinyHuntLakeTrio_Descriptor()
         "Shiny hunt the lake trio legendaries.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntLakeTrio_Descriptor::make_stats() const{

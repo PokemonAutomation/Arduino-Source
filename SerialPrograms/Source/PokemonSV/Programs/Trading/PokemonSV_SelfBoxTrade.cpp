@@ -27,7 +27,6 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
         2, 2, 2
     )
 {}

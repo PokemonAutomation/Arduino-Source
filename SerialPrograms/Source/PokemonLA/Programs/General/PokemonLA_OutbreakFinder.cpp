@@ -107,8 +107,7 @@ OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
         "Search for an outbreak for a specific " + STRING_POKEMON,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class OutbreakFinder_Descriptor::Stats : public StatsTracker{

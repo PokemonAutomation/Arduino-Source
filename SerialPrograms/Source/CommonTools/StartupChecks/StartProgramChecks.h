@@ -24,12 +24,6 @@ void check_border(VideoStream& stream);
 
 void check_performance_class_wired_or_wireless(AbstractController& controller);
 
-void check_controller_features(
-    Logger& logger,
-    const ControllerFeatures& capabilities,
-    const ControllerFeatures& required_features
-);
-
 
 
 }

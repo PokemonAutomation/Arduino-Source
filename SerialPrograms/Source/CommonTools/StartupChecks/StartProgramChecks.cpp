@@ -65,23 +65,6 @@ void check_performance_class_wired_or_wireless(AbstractController& controller){
 }
 
 
-void check_controller_features(
-    Logger& logger,
-    const ControllerFeatures& capabilities,
-    const ControllerFeatures& required_features
-){
-    std::string missing_feature = capabilities.contains_all(required_features);
-    if (missing_feature.empty()){
-        return;
-    }
-    throw UserSetupError(
-        logger,
-        "Cannot start program. The controller is missing the feature: " + missing_feature
-    );
-}
-
-
-
 
 }
 }

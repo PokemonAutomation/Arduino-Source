@@ -32,8 +32,7 @@ StatsResetRegi_Descriptor::StatsResetRegi_Descriptor()
         "Repeatedly catch regi until you get the stats you want.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct StatsResetRegi_Descriptor::Stats : public StatsTracker{

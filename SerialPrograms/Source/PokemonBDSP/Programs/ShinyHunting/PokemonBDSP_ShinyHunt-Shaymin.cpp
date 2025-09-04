@@ -28,8 +28,7 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
         "Shiny hunt Shaymin using the runaway method.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntShaymin_Descriptor::make_stats() const{

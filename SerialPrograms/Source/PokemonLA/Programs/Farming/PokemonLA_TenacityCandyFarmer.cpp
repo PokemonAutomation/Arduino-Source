@@ -37,8 +37,7 @@ TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
         "Modest nature Arceus with Legend Plate applied to grind exp, exp candies XL and evolution items.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class TenacityCandyFarmer_Descriptor::Stats : public StatsTracker{

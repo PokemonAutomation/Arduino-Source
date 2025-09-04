@@ -12,6 +12,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -40,11 +41,7 @@ CloneItems101_Descriptor::CloneItems101_Descriptor()
         "Clone items using the add-to-party glitch.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {
-            ControllerFeature::TickPrecise,
-            ControllerFeature::NintendoSwitch_ProController,
-        }
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct CloneItems101_Descriptor::Stats : public StatsTracker{
@@ -264,6 +261,7 @@ bool CloneItems101::clone_item(ProgramEnvironment& env, VideoStream& stream, Pro
 }
 
 void CloneItems101::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
     assert_16_9_720p_min(env.logger(), env.console);
 
     CloneItems101_Descriptor::Stats& stats = env.current_stats<CloneItems101_Descriptor::Stats>();

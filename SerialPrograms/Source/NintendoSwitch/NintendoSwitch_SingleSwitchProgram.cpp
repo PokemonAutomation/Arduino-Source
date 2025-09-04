@@ -25,7 +25,6 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     ProgramControllerClass color_class,
     FeedbackType feedback,
     AllowCommandsWhenRunning allow_commands_while_running,
-    ControllerFeatures required_features,
     bool deprecated
 )
     : ProgramDescriptor(
@@ -37,7 +36,6 @@ SingleSwitchProgramDescriptor::SingleSwitchProgramDescriptor(
     )
     , m_color_class(color_class)
     , m_feedback(feedback)
-    , m_required_features(std::move(required_features))
     , m_allow_commands_while_running(allow_commands_while_running == AllowCommandsWhenRunning::ENABLE_COMMANDS)
     , m_deprecated(deprecated)
 {}

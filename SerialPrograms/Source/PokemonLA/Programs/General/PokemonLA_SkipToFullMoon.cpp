@@ -30,8 +30,7 @@ SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
         "Skip nights until full moon.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

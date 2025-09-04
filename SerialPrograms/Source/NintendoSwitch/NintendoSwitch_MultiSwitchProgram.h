@@ -80,7 +80,6 @@ public:
         ProgramControllerClass color_class,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
-        ControllerFeatures required_features,
         size_t min_switches,
         size_t max_switches,
         size_t default_switches,
@@ -89,7 +88,6 @@ public:
 
     ProgramControllerClass color_class() const{ return m_color_class; }
     FeedbackType feedback() const{ return m_feedback; }
-    const ControllerFeatures& required_features() const{ return m_required_features; }
     bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
     bool deprecated() const{ return m_deprecated; }
 
@@ -103,7 +101,6 @@ public:
 private:
     const ProgramControllerClass m_color_class;
     const FeedbackType m_feedback;
-    const ControllerFeatures m_required_features;
     const bool m_allow_commands_while_running;
     const bool m_deprecated;
 

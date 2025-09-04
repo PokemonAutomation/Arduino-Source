@@ -34,8 +34,7 @@ GimmighoulRoamingFarmer_Descriptor::GimmighoulRoamingFarmer_Descriptor()
         "Farm roaming Gimmighoul for coins.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

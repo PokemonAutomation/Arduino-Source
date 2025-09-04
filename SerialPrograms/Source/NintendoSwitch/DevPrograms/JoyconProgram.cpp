@@ -24,8 +24,7 @@ JoyconProgram_Descriptor::JoyconProgram_Descriptor()
         "Template for a joycon program.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

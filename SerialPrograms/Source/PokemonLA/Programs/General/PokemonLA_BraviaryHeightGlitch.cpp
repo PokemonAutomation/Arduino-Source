@@ -22,8 +22,7 @@ BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
         "Increase your height in place using the height glitch.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

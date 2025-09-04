@@ -51,8 +51,7 @@ ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
         "Farm the Item Printer using RNG Manipulation.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

@@ -41,8 +41,7 @@ RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
         "Check Ramanas Island Tree until a Combee is found.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class RamanasCombeeFinder_Descriptor::Stats : public StatsTracker{

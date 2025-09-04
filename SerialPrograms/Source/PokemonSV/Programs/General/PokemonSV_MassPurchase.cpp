@@ -30,8 +30,7 @@ MassPurchase_Descriptor::MassPurchase_Descriptor()
         "Purchase a specified amount of items from a shop.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

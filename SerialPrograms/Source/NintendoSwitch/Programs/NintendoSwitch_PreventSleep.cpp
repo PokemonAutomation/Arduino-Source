@@ -19,8 +19,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
         "Press B every 15 seconds to keep the Switch from sleeping.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

@@ -28,8 +28,7 @@ SeedFinder_Descriptor::SeedFinder_Descriptor()
         "Finds the current state to be used for manual RNG manipulation.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

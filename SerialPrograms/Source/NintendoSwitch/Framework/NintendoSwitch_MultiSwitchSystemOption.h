@@ -31,7 +31,6 @@ public:
 
 public:
     MultiSwitchSystemOption(
-        const ControllerFeatures& required_features,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
@@ -39,7 +38,6 @@ public:
         size_t switches
     );
     MultiSwitchSystemOption(
-        const ControllerFeatures& required_features,
         FeedbackType feedback,
         AllowCommandsWhenRunning allow_commands_while_running,
         size_t min_switches,
@@ -62,7 +60,6 @@ public:
 private:
     friend class MultiSwitchSystemWidget;
 
-    const ControllerFeatures& m_required_features;
     const bool m_allow_commands_while_running;
 
     const size_t m_min_switches;

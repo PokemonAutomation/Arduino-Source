@@ -40,8 +40,7 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
         "Farm nuggets off the Miss Fortune sisters in the Coronet Highlands.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class NuggetFarmerHighlands_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

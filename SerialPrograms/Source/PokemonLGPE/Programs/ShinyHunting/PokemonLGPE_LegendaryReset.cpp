@@ -32,8 +32,7 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         "Shiny hunt Legendary Pokemon by resetting the game.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

@@ -35,8 +35,7 @@ DailyItemFarmer_Descriptor::DailyItemFarmer_Descriptor()
         "Farm daily item respawns (ex. fossils) by date-skipping.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

@@ -34,8 +34,7 @@ SizeChecker_Descriptor::SizeChecker_Descriptor()
         "Check boxes of " + STRING_POKEMON + " for size marks.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct SizeChecker_Descriptor::Stats : public StatsTracker{

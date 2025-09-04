@@ -27,8 +27,7 @@ MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
         "Revive fossils. Supports multiple saves so you can go afk for longer than 5 hours.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

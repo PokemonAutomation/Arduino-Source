@@ -37,8 +37,7 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         "Shake trees and ores to grind tasks",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class LeapGrinder_Descriptor::Stats : public StatsTracker{

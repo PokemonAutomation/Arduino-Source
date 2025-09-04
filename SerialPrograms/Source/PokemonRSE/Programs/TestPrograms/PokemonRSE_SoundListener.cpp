@@ -36,8 +36,7 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         "Test sound detectors listening to audio stream.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::ENABLE_COMMANDS
     )
 {}
 

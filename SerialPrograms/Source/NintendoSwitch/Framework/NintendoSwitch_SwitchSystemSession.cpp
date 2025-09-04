@@ -44,7 +44,7 @@ SwitchSystemSession::SwitchSystemSession(
     : m_console_number(console_number)
     , m_logger(global_logger_raw(), "Console " + std::to_string(console_number))
     , m_option(option)
-    , m_controller(m_logger, option.m_controller, option.m_required_features)
+    , m_controller(m_logger, option.m_controller)
     , m_video(m_logger, option.m_video)
     , m_audio(m_logger, option.m_audio)
     , m_overlay(m_logger, option.m_overlay)

@@ -30,8 +30,7 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         "Automatically fetch eggs from a picnic.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct EggFetcher_Descriptor::Stats : public StatsTracker{

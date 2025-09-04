@@ -33,8 +33,7 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
         "Use Grits items on " + STRING_POKEMON,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

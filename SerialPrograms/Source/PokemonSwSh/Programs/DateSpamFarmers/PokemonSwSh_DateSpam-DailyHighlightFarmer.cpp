@@ -27,8 +27,7 @@ DailyHighlightFarmer_Descriptor::DailyHighlightFarmer_Descriptor()
         "Farm the daily highlight watt trader in Crown Tundra.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 

@@ -33,8 +33,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         "Mass release boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct MassRelease_Descriptor::Stats : public StatsTracker{

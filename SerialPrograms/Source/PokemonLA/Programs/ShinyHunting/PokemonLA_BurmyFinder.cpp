@@ -48,8 +48,7 @@ BurmyFinder_Descriptor::BurmyFinder_Descriptor()
         "Check nearby trees for a possible Shiny, Alpha or Alpha Shiny Burmy",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class BurmyFinder_Descriptor::Stats : public StatsTracker{

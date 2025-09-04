@@ -45,11 +45,9 @@ class SwitchSystemOption{
 
 public:
     SwitchSystemOption(
-        const ControllerFeatures& required_features,
         bool allow_commands_while_running
     );
     SwitchSystemOption(
-        const ControllerFeatures& required_features,
         bool allow_commands_while_running,
         const JsonValue& json
     );
@@ -59,7 +57,6 @@ public:
 
 
 public:
-    const ControllerFeatures& m_required_features;
     const bool m_allow_commands_while_running;
 
     ControllerOption m_controller;

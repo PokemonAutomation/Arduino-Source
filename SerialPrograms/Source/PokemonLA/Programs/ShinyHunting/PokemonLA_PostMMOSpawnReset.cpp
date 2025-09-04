@@ -31,8 +31,7 @@ PostMMOSpawnReset_Descriptor::PostMMOSpawnReset_Descriptor()
         "Constantly reset the spawn after MMO finishes.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class PostMMOSpawnReset_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

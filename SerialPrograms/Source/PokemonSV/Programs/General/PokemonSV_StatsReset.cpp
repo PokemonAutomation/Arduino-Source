@@ -39,8 +39,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         "Repeatedly catch static encounters until you get the stats you want.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct StatsReset_Descriptor::Stats : public StatsTracker{

@@ -33,8 +33,7 @@ DenRoller_Descriptor::DenRoller_Descriptor()
         "Roll den to the N'th day, SR and repeat.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 struct DenRoller_Descriptor::Stats : public StatsTracker{

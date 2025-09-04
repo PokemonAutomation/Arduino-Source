@@ -35,8 +35,7 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
         "Constantly reset to find a Shiny Unown or any Shiny in the path.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController}
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 class UnownFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

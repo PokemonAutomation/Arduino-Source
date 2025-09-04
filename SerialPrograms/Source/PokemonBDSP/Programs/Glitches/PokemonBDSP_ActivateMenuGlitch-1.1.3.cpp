@@ -7,6 +7,7 @@
 #include <QtGlobal>
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -30,11 +31,7 @@ ActivateMenuGlitch113_Descriptor::ActivateMenuGlitch113_Descriptor()
         "<font color=\"red\">(This works on game versions 1.1.1 - 1.1.3. It has been patched out in later versions.)</font>",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::OPTIONAL_,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {
-            ControllerFeature::TickPrecise,
-            ControllerFeature::NintendoSwitch_ProController,
-        }
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
@@ -52,6 +49,8 @@ ActivateMenuGlitch113::ActivateMenuGlitch113()
 
 
 void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     VideoStream& stream = env.console;
 
     //  Enable Strength
