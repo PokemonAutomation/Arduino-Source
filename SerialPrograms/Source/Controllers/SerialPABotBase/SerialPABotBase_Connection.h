@@ -8,9 +8,11 @@
 #define PokemonAutomation_Controllers_SerialPABotBase_Connection_H
 
 #include <memory>
+#include <set>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Connection/MessageLogger.h"
 #include "Controllers/ControllerConnection.h"
@@ -44,14 +46,14 @@ public:
 
 
 private:
-    const std::map<uint32_t, std::vector<ControllerType>>&
-    get_programs_for_protocol(uint32_t protocol);
+    const std::set<pabb_ProgramID>& get_programs_for_protocol(uint32_t protocol);
 
-    const std::vector<ControllerType>&
-    get_controllers_for_program(
+#if 0
+    const std::vector<ControllerType>& get_controllers_for_program(
         const std::map<uint32_t, std::vector<ControllerType>>& available_programs,
         uint32_t program_id
     );
+#endif
 
     void process_queue_size();
     ControllerType get_controller_type(
@@ -76,6 +78,8 @@ private:
     uint32_t m_protocol = 0;
     uint32_t m_version = 0;
     uint8_t m_program_id = 0;
+    std::string m_program_name;
+    std::vector<pabb_ControllerID> m_controller_list;
     ControllerModeStatus m_mode_status;
 
     std::thread m_status_thread;

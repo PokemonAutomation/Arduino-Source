@@ -13,8 +13,38 @@ namespace SerialPABotBase{
 
 
 
+const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES(){
+    static const std::map<pabb_ProgramID, uint32_t> database{
+        {PABB_PID_UNSPECIFIED,                  2025090300},
+        {PABB_PID_PABOTBASE_ArduinoUnoR3,       2025090300},
+        {PABB_PID_PABOTBASE_ArduinoLeonardo,    2025090300},
+        {PABB_PID_PABOTBASE_ProMicro,           2025090300},
+        {PABB_PID_PABOTBASE_Teensy2,            2025090300},
+        {PABB_PID_PABOTBASE_TeensyPP2,          2025090300},
+        {PABB_PID_PABOTBASE_ESP32,              2025090300},
+        {PABB_PID_PABOTBASE_ESP32S3,            2025090300},
+        {PABB_PID_PABOTBASE_PicoW_USB,          2025090300},
+        {PABB_PID_PABOTBASE_PicoW_UART,         2025090300},
+    };
+    return database;
+}
 
-std::string program_name(uint8_t id){
+std::map<uint32_t, std::set<pabb_ProgramID>> make_SUPPORTED_VERSIONS(){
+    std::map<uint32_t, std::set<pabb_ProgramID>> ret;
+    for (const auto& item : SUPPORTED_DEVICES()){
+        ret[item.second].insert(item.first);
+    }
+    return ret;
+}
+const std::map<uint32_t, std::set<pabb_ProgramID>>& SUPPORTED_VERSIONS(){
+    static const std::map<uint32_t, std::set<pabb_ProgramID>> database = make_SUPPORTED_VERSIONS();
+    return database;
+}
+
+
+
+
+std::string program_name(uint32_t id){
     switch (id){
     case PABB_PID_UNSPECIFIED:                  return "None";
 
@@ -106,65 +136,6 @@ uint32_t controller_type_to_id(ControllerType controller_type){
         "Invalid Controller Enum: " + std::to_string((int)controller_type)
     );
 }
-
-
-
-const std::map<
-    uint32_t,   //  Protocol Version
-    std::map<
-        uint32_t,   //  Program ID
-        std::vector<ControllerType>
-    >
-> SUPPORTED_VERSIONS{
-    {2025081300, {
-        {PABB_PID_PABOTBASE_ArduinoUnoR3, {
-            ControllerType::NintendoSwitch2_WiredController,
-        }},
-        {PABB_PID_PABOTBASE_ArduinoLeonardo, {
-            ControllerType::NintendoSwitch2_WiredController,
-        }},
-        {PABB_PID_PABOTBASE_ProMicro, {
-            ControllerType::NintendoSwitch2_WiredController,
-        }},
-        {PABB_PID_PABOTBASE_Teensy2, {
-            ControllerType::NintendoSwitch2_WiredController,
-        }},
-        {PABB_PID_PABOTBASE_TeensyPP2, {
-            ControllerType::NintendoSwitch2_WiredController,
-        }},
-    }},
-    {2025081700, {
-        {PABB_PID_PABOTBASE_ESP32, {
-            ControllerType::None,
-            ControllerType::NintendoSwitch_WirelessProController,
-            ControllerType::NintendoSwitch_LeftJoycon,
-            ControllerType::NintendoSwitch_RightJoycon,
-        }},
-        {PABB_PID_PABOTBASE_PicoW_USB, {
-            ControllerType::None,
-            ControllerType::NintendoSwitch_WirelessProController,
-            ControllerType::NintendoSwitch_LeftJoycon,
-            ControllerType::NintendoSwitch_RightJoycon,
-        }},
-        {PABB_PID_PABOTBASE_PicoW_UART, {
-            ControllerType::None,
-            ControllerType::NintendoSwitch_WiredController,
-            ControllerType::NintendoSwitch2_WiredController,
-            ControllerType::NintendoSwitch_WirelessProController,
-            ControllerType::NintendoSwitch_LeftJoycon,
-            ControllerType::NintendoSwitch_RightJoycon,
-        }},
-    }},
-    {2025081711, {
-        {PABB_PID_PABOTBASE_ESP32S3, {
-            ControllerType::None,
-            ControllerType::NintendoSwitch_WiredController,
-            ControllerType::NintendoSwitch2_WiredController,
-        }},
-    }},
-};
-
-
 
 
 

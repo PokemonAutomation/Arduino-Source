@@ -4,6 +4,7 @@
  *
  */
 
+#include <optional>
 #include <mutex>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "BoxDraw.h"

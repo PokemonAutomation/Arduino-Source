@@ -9,6 +9,7 @@
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Connection/PABotBase.h"
@@ -122,12 +123,11 @@ ControllerModeStatus SerialPABotBase_Connection::controller_mode_status() const{
 
 
 
-const std::map<uint32_t, std::vector<ControllerType>>&
-SerialPABotBase_Connection::get_programs_for_protocol(uint32_t protocol){
+const std::set<pabb_ProgramID>& SerialPABotBase_Connection::get_programs_for_protocol(uint32_t protocol){
     //  (protocol_requested / 100) == (protocol_device / 100)
     //  (protocol_requested % 100) <= (protocol_device % 100)
-    auto iter = SUPPORTED_VERSIONS.upper_bound(protocol);
-    if (iter == SUPPORTED_VERSIONS.begin()){
+    auto iter = SUPPORTED_VERSIONS().upper_bound(protocol);
+    if (iter == SUPPORTED_VERSIONS().begin()){
         throw SerialProtocolException(
             m_logger, PA_CURRENT_FUNCTION,
             "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
@@ -146,8 +146,8 @@ SerialPABotBase_Connection::get_programs_for_protocol(uint32_t protocol){
     return iter->second;
 }
 
-const std::vector<ControllerType>&
-SerialPABotBase_Connection::get_controllers_for_program(
+#if 0
+const std::vector<ControllerType>& SerialPABotBase_Connection::get_controllers_for_program(
     const std::map<uint32_t, std::vector<ControllerType>>& available_programs,
     uint32_t program_id
 ){
@@ -161,6 +161,7 @@ SerialPABotBase_Connection::get_controllers_for_program(
     }
     return iter->second;
 }
+#endif
 
 void SerialPABotBase_Connection::process_queue_size(){
     m_logger.log("Requesting queue size...");
@@ -195,40 +196,79 @@ ControllerModeStatus SerialPABotBase_Connection::process_device(
     std::optional<ControllerType> change_controller,
     bool clear_settings
 ){
-    //  Protocol
+    //  Protocol Version
     {
         m_logger.Logger::log("Checking Protocol Version...");
         m_protocol = protocol_version(*m_botbase);
-        m_logger.Logger::log("Checking Protocol Version... Protocol = " + std::to_string(m_protocol));
+        m_logger.Logger::log("Checking Protocol Version... (" + std::to_string(m_protocol) + ")");
     }
-    const std::map<uint32_t, std::vector<ControllerType>>& PROGRAMS =
-        get_programs_for_protocol(m_protocol);
-
+    const std::set<pabb_ProgramID>& PROGRAMS = get_programs_for_protocol(m_protocol);
 
     //  Program ID
     {
         m_logger.Logger::log("Checking Program ID...");
         m_program_id = program_id(*m_botbase);
-        m_logger.Logger::log("Checking Program ID... Program ID = " + std::to_string(m_program_id));
+        m_logger.Logger::log("Checking Program ID... (0x" + tostr_hex(m_program_id) + ")");
     }
-    const std::vector<ControllerType>& CONTROLLERS =
-        get_controllers_for_program(PROGRAMS, m_program_id);
+    if (PROGRAMS.find(m_program_id) == PROGRAMS.end()){
+#if 1
+        m_logger.Logger::log(
+            "Unrecognized Program ID: 0x" + tostr_hex(m_program_id) + " for this protocol version. "
+            "Compatibility is not guaranteed.",
+            COLOR_RED
+        );
+#else
+        throw SerialProtocolException(
+            m_logger, PA_CURRENT_FUNCTION,
+            "Unrecognized Program ID: 0x" + tostr_hex(m_program_id) + "<br>"
+            "Please install the firmware that came with this version of the program."
+        );
+#endif
+    }
 
     //  Firmware Version
     {
         m_logger.Logger::log("Checking Firmware Version...");
         m_version = program_version(*m_botbase);
-        m_logger.Logger::log("Checking Firmware Version... Version = " + std::to_string(m_version));
+        m_logger.Logger::log("Checking Firmware Version... (" + std::to_string(m_version) + ")");
+    }
+
+    //  Program Name
+    {
+        m_logger.Logger::log("Checking Program Name...");
+        m_program_name = program_name(*m_botbase);
+        m_logger.Logger::log("Checking Program Name... (" + m_program_name + ")");
+    }
+
+    //  Controller List
+    {
+        m_logger.Logger::log("Checking Controller List...");
+        m_controller_list = controller_list(*m_botbase);
+        std::string str;
+        bool first = true;
+        for (pabb_ControllerID id : m_controller_list){
+            if (!first){
+                str += ", ";
+            }
+            first = false;
+            str += "0x" + tostr_hex(id);
+        }
+        m_logger.Logger::log("Checking Controller List... (" + str + ")");
+    }
+
+    std::vector<ControllerType> controllers;
+    for (pabb_ControllerID id : m_controller_list){
+        controllers.emplace_back(id_to_controller_type(id));
     }
 
     //  Queue Size
     process_queue_size();
 
     //  Controller Type
-    ControllerType current_controller = get_controller_type(CONTROLLERS);
+    ControllerType current_controller = get_controller_type(controllers);
 
     //  Run any post-connection actions specific to this program.
-    ControllerModeStatus ret{current_controller, CONTROLLERS};
+    ControllerModeStatus ret{current_controller, controllers};
     run_post_connect_actions(
         ret,
         m_program_id, m_device_name,
@@ -271,6 +311,7 @@ void SerialPABotBase_Connection::thread_body(
     }
 
     //  Check protocol and version.
+
     {
         ControllerModeStatus mode_status;
         std::string error;
@@ -290,7 +331,8 @@ void SerialPABotBase_Connection::thread_body(
         }
         if (error.empty()){
 //            std::string text = "Program: " + program_name(m_program_id) + " (" + std::to_string(m_version) + ")";
-            std::string text = program_name(m_program_id) + " (" + std::to_string(m_version) + ")";
+//            std::string text = program_name(m_program_id) + " (" + std::to_string(m_version) + ")";
+            std::string text = m_program_name + " (" + std::to_string(m_version) + ")";
             set_status_line0(text, theme_friendly_darkblue());
             declare_ready(mode_status);
         }else{

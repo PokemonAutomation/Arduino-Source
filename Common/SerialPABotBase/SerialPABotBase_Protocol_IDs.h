@@ -7,9 +7,13 @@
 #ifndef PokemonAutomation_SerialPABotBase_Protocol_IDs_H
 #define PokemonAutomation_SerialPABotBase_Protocol_IDs_H
 
+#include <stdint.h>
+
 //
 //  Program IDs
 //
+
+typedef uint8_t pabb_ProgramID;
 
 #define PABB_PID_UNSPECIFIED                                0x00
 
@@ -40,6 +44,8 @@
 //  Controller IDs
 //
 
+typedef uint32_t pabb_ControllerID;
+
 #define PABB_CID_NONE                                       0
 
 #define PABB_CID_NintendoSwitch_WiredController             0x1000
@@ -47,6 +53,7 @@
 #define PABB_CID_NintendoSwitch_WirelessProController       0x1002
 #define PABB_CID_NintendoSwitch_LeftJoycon                  0x1003
 #define PABB_CID_NintendoSwitch_RightJoycon                 0x1004
+
 #define PABB_CID_NintendoSwitch2_WiredController            0x1010
 #define PABB_CID_NintendoSwitch2_WiredProController         0x1011
 #define PABB_CID_NintendoSwitch2_WirelessProController      0x1012

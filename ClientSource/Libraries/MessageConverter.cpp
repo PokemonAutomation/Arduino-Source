@@ -261,6 +261,28 @@ int register_message_converters_framework_requests(){
         }
     );
     register_message_converter(
+        PABB_MSG_REQUEST_PROGRAM_NAME,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_PROGRAM_NAME - ";
+            if (body.size() != sizeof(pabb_MsgRequestProgramName)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestProgramName*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_CONTROLLER_LIST,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_CONTROLLER_LIST - ";
+            if (body.size() != sizeof(pabb_MsgRequestControllerList)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestControllerList*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
         PABB_MSG_REQUEST_CLOCK,
         [](const std::string& body){
             std::ostringstream ss;

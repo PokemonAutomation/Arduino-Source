@@ -266,7 +266,7 @@ typedef struct{
 } PABB_PACK pabb_MsgInfoI32Label;
 
 ////////////////////////////////////////////////////////////////////////////////
-//  Requests
+//  Static Requests
 
 #define PABB_MSG_SEQNUM_RESET                   0x40
 //  After you send this message, the next seqnum you should use is (seqnum + 1).
@@ -289,12 +289,40 @@ typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_MsgRequestProgramID;
 
-#define PABB_MSG_REQUEST_CLOCK                  0x44
+#define PABB_MSG_REQUEST_PROGRAM_NAME           0x44
 typedef struct{
     seqnum_t seqnum;
-} PABB_PACK pabb_system_clock;
+} PABB_PACK pabb_MsgRequestProgramName;
 
-#define PABB_MSG_REQUEST_COMMAND_FINISHED       0x45
+#define PABB_MSG_REQUEST_CONTROLLER_LIST        0x45
+typedef struct{
+    seqnum_t seqnum;
+} PABB_PACK pabb_MsgRequestControllerList;
+
+#define PABB_MSG_REQUEST_QUEUE_SIZE             0x46
+typedef struct{
+    seqnum_t seqnum;
+} PABB_PACK pabb_MsgRequestQueueSize;
+
+////////////////////////////////////////////////////////////////////////////////
+//  Mode Requests
+
+#define PABB_MSG_REQUEST_READ_CONTROLLER_MODE   0x47
+typedef struct{
+    seqnum_t seqnum;
+} PABB_PACK pabb_MsgRequestReadControllerMode;
+
+#define PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE 0x48    //  Change controller and keep settings.
+#define PABB_MSG_REQUEST_RESET_TO_CONTROLLER    0x49    //  Change controller and wipe settings. (unpair from host)
+typedef struct{
+    seqnum_t seqnum;
+    uint32_t controller_id;
+} PABB_PACK pabb_MsgRequestChangeControllerMode;
+
+////////////////////////////////////////////////////////////////////////////////
+//  Command Queue Requests
+
+#define PABB_MSG_REQUEST_COMMAND_FINISHED       0x4a
 //  When you receive this message, you must ack it with PABB_MSG_ACK_REQUEST.
 typedef struct{
     seqnum_t seqnum;
@@ -302,41 +330,29 @@ typedef struct{
     uint32_t finish_time;
 } PABB_PACK pabb_MsgRequestCommandFinished;
 
-#define PABB_MSG_REQUEST_STOP                   0x46
+#define PABB_MSG_REQUEST_STOP                   0x4b
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_MsgRequestStop;
 
-#define PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT     0x47
+#define PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT     0x4c
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_MsgRequestNextCmdInterrupt;
 
-#define PABB_MSG_REQUEST_QUEUE_SIZE             0x48
-typedef struct{
-    seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestQueueSize;
-
-#define PABB_MSG_REQUEST_READ_CONTROLLER_MODE   0x49
-typedef struct{
-    seqnum_t seqnum;
-} PABB_PACK pabb_MsgRequestReadControllerMode;
-
-#define PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE 0x4a    //  Change controller and keep settings.
-#define PABB_MSG_REQUEST_RESET_TO_CONTROLLER    0x4b    //  Change controller and wipe settings. (unpair from host)
-typedef struct{
-    seqnum_t seqnum;
-    uint32_t controller_id;
-} PABB_PACK pabb_MsgRequestChangeControllerMode;
-
-
 ////////////////////////////////////////////////////////////////////////////////
-//  Common Requests
+//  Other Requests
+
+#define PABB_MSG_REQUEST_CLOCK                  0x4f    //  Deprecated
+typedef struct{
+    seqnum_t seqnum;
+} PABB_PACK pabb_system_clock;
 
 #define PABB_MSG_REQUEST_STATUS                 0x50
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_Message_RequestStatus;
+
 #define PABB_MSG_REQUEST_READ_MAC_ADDRESS       0x51
 typedef struct{
     seqnum_t seqnum;
