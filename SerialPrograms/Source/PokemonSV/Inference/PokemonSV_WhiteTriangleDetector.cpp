@@ -55,7 +55,10 @@ void WhiteTriangleDetector::make_overlays(VideoOverlaySet& items) const{
 
 bool WhiteTriangleDetector::detect(const ImageViewRGB32& screen) {
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {combine_rgb(200, 200, 200), combine_rgb(255, 255, 255)},
+        {combine_rgb(240, 240, 240), combine_rgb(255, 255, 255)},
+        {combine_rgb(220, 220, 220), combine_rgb(240, 240, 240)},
+        {combine_rgb(200, 200, 200), combine_rgb(220, 220, 220)},
+        {combine_rgb(190, 190, 190), combine_rgb(210, 210, 210)},
 
     };
 
@@ -67,8 +70,6 @@ bool WhiteTriangleDetector::detect(const ImageViewRGB32& screen) {
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * min_object_size);
 
     bool is_found = false;
-
-    ImagePixelBox pixel_search_area = floatbox_to_pixelbox(screen.width(), screen.height(), m_box);    
     match_template_by_waterfill(
         extract_box_reference(screen, m_box), 
         WhiteTriangleMatcher::instance(),
