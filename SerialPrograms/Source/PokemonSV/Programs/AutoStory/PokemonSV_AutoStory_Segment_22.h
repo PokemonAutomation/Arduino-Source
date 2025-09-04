@@ -46,8 +46,8 @@ void checkpoint_51(
 );
 
 
-// start: 
-// end: 
+// start: At Levincia gym building. Talked to Hassel, met Rika.
+// end: Finished Levincia gym challenge.
 void checkpoint_52(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,

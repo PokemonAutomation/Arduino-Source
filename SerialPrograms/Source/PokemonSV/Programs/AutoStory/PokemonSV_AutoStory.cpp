@@ -3,6 +3,9 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+
 
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -799,20 +802,6 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         DirectionDetector direction;
 
-        // talk to receptionist
-        env.console.log("Talk to Levincia gym receptionist.");
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});    
-        
-        pbf_move_left_joystick(context, 128, 255, 500, 100);
-        pbf_wait(context, 3 * TICKS_PER_SECOND);        
-        // wait for dialog after leaving gym
-        // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
-        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20, 128, 255);
-
-        // mash A until grey bar at top.
-
-        // the cursor will automatically zoom in on the desired target
 
         return;
     }

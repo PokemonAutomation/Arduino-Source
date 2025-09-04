@@ -5,6 +5,9 @@
  */
 
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "PokemonSV/Inference/PokemonSV_WhiteTriangleDetector.h"
+#include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -190,8 +193,118 @@ void checkpoint_52(
         
         pbf_move_left_joystick(context, 128, 255, 500, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
-        // wait for overworld after leaving gym
-        wait_for_overworld(env.program_info(), env.console, context, 30); 
+        // wait for dialog after leaving gym
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20, 128, 255);
+        
+        WhiteTriangleWatcher white_triangle(COLOR_RED, ImageFloatBox(0.948773, 0.034156, 0.013874, 0.024668));
+        // mash A until detect top right white triangle 1
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 200000ms);
+            },
+            {white_triangle}
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
+                env.console
+            );
+        }
+        env.console.log("Detected white triangle in top right. Assume we are in the Levincia Hide-and-Seek gym challenge.");
+
+        // select Clavell 1
+        pbf_move_left_joystick(context, 255, 0, 2000ms, 480ms);
+        pbf_move_left_joystick(context, 10, 255, 100, 100);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+
+        // mash B until detect battle 1
+        NormalBattleMenuWatcher battle(COLOR_BLUE);
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_B, 100000ms); // press B so we don't mash past the Battle menu
+            },
+            {battle}
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
+                env.console
+            );
+        }        
+
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+
+        // mash B until detect top right white triangle 2
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_B, 100000ms); // press B so we don't accidentally select random guy
+            },
+            {white_triangle}
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
+                env.console
+            );
+        }        
+        env.console.log("Detected white triangle in top right. Assume we are in the Levincia Hide-and-Seek gym challenge.");
+
+        // select Clavell 2
+        pbf_move_left_joystick(context, 0, 0, 3000ms, 480ms);
+        pbf_move_left_joystick(context, 255, 250, 100, 100);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+
+        // mash B until detect battle 2
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_B, 100000ms); // press B so we don't mash past the Battle menu
+                // for (size_t i = 0; i < 200; i++){
+                //     pbf_press_button(context, BUTTON_A, 100, 100);
+                // }
+            },
+            {battle}
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
+                env.console
+            );
+        }        
+
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);        
+
+        // mash B until detect top right white triangle 3
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_B, 100000ms);
+            },
+            {white_triangle}
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to detect white triangle in top right, which is an indicator of the Levincia Hide-and-Seek gym challenge.",
+                env.console
+            );
+        }        
+
+        env.console.log("Detected white triangle in top right. Assume we are in the Levincia Hide-and-Seek gym challenge.");
+
+        // select Clavell 3
+        pbf_move_left_joystick(context, 255, 0, 2000ms, 480ms);       
+        pbf_move_left_joystick(context, 85, 255, 80, 100); 
+
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
 
 
     });
