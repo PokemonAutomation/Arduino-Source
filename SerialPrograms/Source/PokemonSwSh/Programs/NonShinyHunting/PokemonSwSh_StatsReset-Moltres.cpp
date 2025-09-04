@@ -33,10 +33,10 @@ StatsResetMoltres_Descriptor::StatsResetMoltres_Descriptor()
         STRING_POKEMON + " SwSh", "Stats Reset - Moltres",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Moltres.md",
         "Repeatedly catch moltres until you get the stats you want.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct StatsResetMoltres_Descriptor::Stats : public StatsTracker{

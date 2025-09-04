@@ -45,10 +45,10 @@ DailyHighlightRNG_Descriptor::DailyHighlightRNG_Descriptor()
         STRING_POKEMON + " SwSh", "Daily Highlight RNG",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DailyHighlightRNG.md",
         "Perform RNG manipulation to get rare items from the daily highlight trader.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-          {ControllerFeature::NintendoSwitch_ProController},
-          FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

@@ -22,6 +22,7 @@ BowItemDuper_Descriptor::BowItemDuper_Descriptor()
         "Zelda: TotK", "Bow Item Duper",
         "ComputerControl/blob/master/Wiki/Programs/ZeldaTotK/BowItemDuper.md",
         "Use the Bow Swap Glitch to farm any fusable items.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

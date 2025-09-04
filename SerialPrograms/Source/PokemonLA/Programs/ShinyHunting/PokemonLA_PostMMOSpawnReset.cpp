@@ -29,10 +29,10 @@ PostMMOSpawnReset_Descriptor::PostMMOSpawnReset_Descriptor()
         STRING_POKEMON + " LA", "Post-MMO Spawn Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PostMMOSpawnReset.md",
         "Constantly reset the spawn after MMO finishes.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class PostMMOSpawnReset_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

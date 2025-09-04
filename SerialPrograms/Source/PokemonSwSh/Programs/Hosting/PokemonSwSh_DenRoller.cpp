@@ -31,10 +31,10 @@ DenRoller_Descriptor::DenRoller_Descriptor()
         STRING_POKEMON + " SwSh", "Den Roller",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DenRoller.md",
         "Roll den to the N'th day, SR and repeat.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct DenRoller_Descriptor::Stats : public StatsTracker{

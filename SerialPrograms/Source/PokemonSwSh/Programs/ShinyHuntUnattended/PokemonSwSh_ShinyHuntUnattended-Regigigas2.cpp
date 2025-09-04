@@ -25,10 +25,10 @@ ShinyHuntUnattendedRegigigas2_Descriptor::ShinyHuntUnattendedRegigigas2_Descript
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Regigigas2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regigigas2.md",
         "A new version of the Regigigas program that is faster.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
-        FasterIfTickPrecise::NOT_FASTER,
         true
     )
 {}

@@ -33,6 +33,7 @@ TournamentFarmer2_Descriptor::TournamentFarmer2_Descriptor()
         STRING_POKEMON + " SV", "Tournament Farmer 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TournamentFarmer2.md",
         "Farm the Academy Ace Tournament for money and prizes. (version 2)",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController}

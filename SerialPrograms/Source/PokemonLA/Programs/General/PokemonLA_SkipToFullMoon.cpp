@@ -28,10 +28,10 @@ SkipToFullMoon_Descriptor::SkipToFullMoon_Descriptor()
         STRING_POKEMON + " LA", "Skip to Full Moon",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/SkipToFullMoon.md",
         "Skip nights until full moon.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

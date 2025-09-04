@@ -30,10 +30,10 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         STRING_POKEMON + " SV", "Egg Hatcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggHatcher.md",
         "Automatically hatch eggs from boxes.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct EggHatcher_Descriptor::Stats : public StatsTracker{

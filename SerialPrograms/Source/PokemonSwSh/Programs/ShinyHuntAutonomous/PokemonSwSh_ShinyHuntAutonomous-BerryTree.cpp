@@ -35,10 +35,10 @@ ShinyHuntAutonomousBerryTree_Descriptor::ShinyHuntAutonomousBerryTree_Descriptor
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Berry Tree",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-BerryTree.md",
         "Automatically hunt for shiny berry tree " + STRING_POKEMON + " using video feedback.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree_Descriptor::make_stats() const{

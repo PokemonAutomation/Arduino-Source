@@ -27,6 +27,7 @@ DaySkipperUS_Descriptor::DaySkipperUS_Descriptor()
         STRING_POKEMON + " SwSh", "Day Skipper (US)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperUS.md",
         "A day skipper for US date format that.  (Switch 1: ~7100 skips/hour, Switch 2: 5443 skips/hour)",
+        ProgramControllerClass::StandardController_WithRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {
@@ -81,7 +82,20 @@ DaySkipperUS::DaySkipperUS()
 void DaySkipperUS::run_switch1(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     using namespace DateSkippers::Switch1;
 
-    bool needs_inference = context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired;
+    bool needs_inference;
+    switch (context->performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired:
+        needs_inference = false;
+        break;
+    case ControllerPerformanceClass::SerialPABotBase_Wireless:
+        needs_inference = true;
+        break;
+    default:
+        throw UserSetupError(
+            env.logger(),
+            "This program requires a controller performance class of \"Wired\" or \"Wireless\" for the Switch 1."
+        );
+    }
 
     SkipperStats& stats = env.current_stats<SkipperStats>();
     stats.total_skips = SKIPS;
@@ -152,7 +166,7 @@ void DaySkipperUS::run_switch2(SingleSwitchProgramEnvironment& env, ProControlle
     if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired){
         throw UserSetupError(
             env.logger(),
-            "This program requires a tick precise wired controller."
+            "This program requires a controller performance class of \"Wired\" for the Switch 2."
         );
     }
 #endif

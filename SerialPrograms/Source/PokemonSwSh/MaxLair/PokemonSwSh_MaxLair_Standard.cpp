@@ -32,10 +32,10 @@ MaxLairStandard_Descriptor::MaxLairStandard_Descriptor()
         STRING_POKEMON + " SwSh", "Max Lair - Standard",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MaxLair-Standard.md",
         "Auto Max Lair 2.0 - Run Dynamax Adventures until a shiny legendary is found.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER,
         1, 4, 1
     )
 {}

@@ -21,6 +21,7 @@ SurfItemDuper_Descriptor::SurfItemDuper_Descriptor()
         "Zelda: TotK", "Shield Surf Item Duper",
         "ComputerControl/blob/master/Wiki/Programs/ZeldaTotK/SurfItemDuper.md",
         "Use the Shield Surfing Menu Sort glitch to duplicate items.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

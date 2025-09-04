@@ -35,10 +35,10 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         STRING_POKEMON + " LA", "Leap Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/LeapGrinder.md",
         "Shake trees and ores to grind tasks",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class LeapGrinder_Descriptor::Stats : public StatsTracker{

@@ -29,10 +29,10 @@ ShinyHuntAutonomousSwordsOfJustice_Descriptor::ShinyHuntAutonomousSwordsOfJustic
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Swords Of Justice",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-SwordsOfJustice.md",
         "Automatically hunt for shiny Sword of Justice using video feedback.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousSwordsOfJustice_Descriptor::make_stats() const{

@@ -24,10 +24,10 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
         STRING_POKEMON + " BDSP", "Self Touch Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/SelfTouchTrade.md",
         "Touch trade boxes of " + STRING_POKEMON + " between two local Switches.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER,
         2, 2, 2
     )
 {}

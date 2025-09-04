@@ -25,10 +25,10 @@ BerryFarmer_Descriptor::BerryFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Berry Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-BerryFarmer.md",
         "Farm berries.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

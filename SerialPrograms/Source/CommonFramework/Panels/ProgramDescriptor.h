@@ -14,7 +14,13 @@ namespace PokemonAutomation{
 class StatsTracker;
 
 
-
+enum class ProgramControllerClass{
+    StandardController_NoRestrictions,              //  Blue
+    StandardController_PerformanceClassSensitive,   //  Green
+    StandardController_RequiresPrecision,           //  Purple
+    StandardController_WithRestrictions,            //  Red
+    SpecializedController,                          //  Pink
+};
 enum class AllowCommandsWhenRunning{
     DISABLE_COMMANDS,
     ENABLE_COMMANDS,

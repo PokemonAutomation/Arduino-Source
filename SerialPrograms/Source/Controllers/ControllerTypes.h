@@ -10,14 +10,6 @@
 namespace PokemonAutomation{
 
 
-//  This is used only for the UI to indicate if a program may be faster on
-//  tick-precise controllers. There is no functional effect.
-enum class FasterIfTickPrecise{
-    NOT_FASTER,
-    FASTER,
-    MUCH_FASTER,
-};
-
 
 enum class ControllerInterface{
     None,
@@ -52,10 +44,6 @@ enum class ControllerFeature{
 
     NintendoSwitch_LeftJoycon,
     NintendoSwitch_RightJoycon,
-
-    //  This is leftover from the days of RPCs. But we keep it here as a hack to
-    //  lock ESP32 out of the day skippers since it's too unstable to run those.
-    NintendoSwitch_DateSkip,
 };
 
 

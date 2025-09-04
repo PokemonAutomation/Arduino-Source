@@ -46,10 +46,10 @@ BurmyFinder_Descriptor::BurmyFinder_Descriptor()
         STRING_POKEMON + " LA", "Burmy Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/BurmyHunter.md",
         "Check nearby trees for a possible Shiny, Alpha or Alpha Shiny Burmy",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class BurmyFinder_Descriptor::Stats : public StatsTracker{

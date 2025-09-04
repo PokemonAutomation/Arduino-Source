@@ -130,35 +130,30 @@ const std::map<
             {ControllerType::NintendoSwitch2_WiredController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
         {PABB_PID_PABOTBASE_ArduinoLeonardo, {
             {ControllerType::NintendoSwitch2_WiredController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
         {PABB_PID_PABOTBASE_ProMicro, {
             {ControllerType::NintendoSwitch2_WiredController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
         {PABB_PID_PABOTBASE_Teensy2, {
             {ControllerType::NintendoSwitch2_WiredController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
         {PABB_PID_PABOTBASE_TeensyPP2, {
             {ControllerType::NintendoSwitch2_WiredController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
     }},
@@ -195,12 +190,10 @@ const std::map<
             {ControllerType::NintendoSwitch_WiredController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
             {ControllerType::NintendoSwitch2_WiredController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
             {ControllerType::NintendoSwitch_WirelessProController, {
                 ControllerFeature::TickPrecise,
@@ -221,12 +214,10 @@ const std::map<
             {ControllerType::NintendoSwitch_WiredController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
             {ControllerType::NintendoSwitch2_WiredController, {
                 ControllerFeature::TickPrecise,
                 ControllerFeature::NintendoSwitch_ProController,
-                ControllerFeature::NintendoSwitch_DateSkip,
             }},
         }},
     }},

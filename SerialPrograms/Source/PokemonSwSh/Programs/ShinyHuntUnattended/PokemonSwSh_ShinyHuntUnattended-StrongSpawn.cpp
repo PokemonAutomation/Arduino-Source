@@ -25,10 +25,10 @@ ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descri
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Strong Spawn",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-StrongSpawn.md",
         "Hunt for shiny strong spawns. Stop when a shiny is found.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
-        FasterIfTickPrecise::NOT_FASTER,
         true
     )
 {}

@@ -35,6 +35,7 @@ ShinyHuntLakeTrio_Descriptor::ShinyHuntLakeTrio_Descriptor()
         STRING_POKEMON + " LA", "Shiny Hunt - Lake Trio",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-LakeTrio.md",
         "Shiny hunt the lake trio legendaries.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController}

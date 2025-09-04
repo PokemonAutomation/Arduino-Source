@@ -35,10 +35,10 @@ ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()
         STRING_POKEMON + " LA", "Shiny Hunt - Custom Path",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-CustomPath.md",
         "Repeatedly travel on a custom path to shiny hunt " + STRING_POKEMON + " around it.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController,},
-        FasterIfTickPrecise::FASTER
+        {ControllerFeature::NintendoSwitch_ProController,}
     )
 {}
 class ShinyHuntCustomPath_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

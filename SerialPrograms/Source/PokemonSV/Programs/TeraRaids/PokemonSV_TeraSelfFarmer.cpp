@@ -43,10 +43,10 @@ TeraSelfFarmer_Descriptor::TeraSelfFarmer_Descriptor()
         STRING_POKEMON + " SV", "Tera Self Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraSelfFarmer.md",
         "Farm items and " + STRING_POKEMON + " from Tera raids. Can also hunt for shiny and high reward raids.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct TeraSelfFarmer_Descriptor::Stats : public StatsTracker{

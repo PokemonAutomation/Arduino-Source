@@ -28,10 +28,10 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         STRING_POKEMON + " SV", "Egg Fetcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggFetcher.md",
         "Automatically fetch eggs from a picnic.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct EggFetcher_Descriptor::Stats : public StatsTracker{

@@ -36,10 +36,10 @@ EggFetcherMultiple_Descriptor::EggFetcherMultiple_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Fetcher Multiple",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggFetcherMultiple.md",
         "Fetch eggs from multiple species without hatching them.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

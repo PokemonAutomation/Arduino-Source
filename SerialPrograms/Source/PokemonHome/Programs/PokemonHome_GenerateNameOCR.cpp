@@ -28,10 +28,10 @@ GenerateNameOCRData_Descriptor::GenerateNameOCRData_Descriptor()
         STRING_POKEMON + " Home", STRING_POKEMON + " Home: Generate Name OCR",
         "",
         "Generate " + STRING_POKEMON + " Name OCR data by iterating the National " + STRING_POKEDEX + ".",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

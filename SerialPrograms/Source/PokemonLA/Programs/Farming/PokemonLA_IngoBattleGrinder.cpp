@@ -37,11 +37,12 @@ IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
         "PokemonLA:IngoBattleGrinder",
         STRING_POKEMON + " LA", "Ingo Battle Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/IngoBattleGrinder.md",
-        "Attend Ingo's battles to grind exp and move related " + STRING_POKEDEX + " research tasks. Less effective than Ingo Move Grinder for " + STRING_POKEDEX + " research tasks but more effective for everything else.",
+        "Attend Ingo's battles to grind exp and move related " + STRING_POKEDEX + " research tasks. "
+        "Less effective than Ingo Move Grinder for " + STRING_POKEDEX + " research tasks but more effective for everything else.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class IngoBattleGrinder_Descriptor::Stats : public StatsTracker{

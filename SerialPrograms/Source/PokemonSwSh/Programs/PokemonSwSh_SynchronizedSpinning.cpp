@@ -19,10 +19,10 @@ SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()
         "PokemonSwSh:SynchronizedSpinning",
         STRING_POKEMON + " SwSh", "Synchronized Spinning", "",
         "Don't ask... seriously, don't ask...",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER,
         1, 4, 1
     )
 {}

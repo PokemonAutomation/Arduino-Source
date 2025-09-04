@@ -36,7 +36,6 @@ const EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS{
     {ControllerFeature::NintendoSwitch_ProController,       "NintendoSwitch_ProController"},
     {ControllerFeature::NintendoSwitch_LeftJoycon,          "NintendoSwitch_LeftJoycon"},
     {ControllerFeature::NintendoSwitch_RightJoycon,         "NintendoSwitch_RightJoycon"},
-    {ControllerFeature::NintendoSwitch_DateSkip,            "NintendoSwitch_DateSkip"},
 };
 
 

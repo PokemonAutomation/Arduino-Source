@@ -28,10 +28,10 @@ DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
         STRING_POKEMON + " LA", "Distortion Waiter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/DistortionWaiter.md",
         "Wait for a distortion to appear.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class DistortionWaiter_Descriptor::Stats : public StatsTracker{

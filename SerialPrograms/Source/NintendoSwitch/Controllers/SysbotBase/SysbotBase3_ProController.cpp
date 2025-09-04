@@ -45,7 +45,6 @@ const ControllerFeatures& ProController_SysbotBase3::controller_features() const
     static const ControllerFeatures features{
         ControllerFeature::TickPrecise,
         ControllerFeature::NintendoSwitch_ProController,
-        ControllerFeature::NintendoSwitch_DateSkip,
     };
     return features;
 }

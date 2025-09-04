@@ -39,10 +39,10 @@ RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
         STRING_POKEMON + " LA", "Ramanas Combee Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/RamanasCombeeFinder.md",
         "Check Ramanas Island Tree until a Combee is found.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class RamanasCombeeFinder_Descriptor::Stats : public StatsTracker{

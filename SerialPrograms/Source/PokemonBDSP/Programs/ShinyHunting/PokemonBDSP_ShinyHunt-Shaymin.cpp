@@ -26,10 +26,10 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
         STRING_POKEMON + " BDSP", "Shiny Hunt - Shaymin",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Shaymin.md",
         "Shiny hunt Shaymin using the runaway method.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntShaymin_Descriptor::make_stats() const{

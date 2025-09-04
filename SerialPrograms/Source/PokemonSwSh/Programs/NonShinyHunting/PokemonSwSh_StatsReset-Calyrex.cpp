@@ -30,10 +30,10 @@ StatsResetCalyrex_Descriptor::StatsResetCalyrex_Descriptor()
         STRING_POKEMON + " SwSh", "Stats Reset - Calyrex",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Calyrex.md",
         "Repeatedly catch calyrex (and its horse) until you get the stats you want.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct StatsResetCalyrex_Descriptor::Stats : public StatsTracker{

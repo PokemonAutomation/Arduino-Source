@@ -47,10 +47,10 @@ AuctionFarmer_Descriptor::AuctionFarmer_Descriptor()
         STRING_POKEMON + " SV", "Auction Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AuctionFarmer.md",
         "Check auctions and bid on items.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

@@ -18,6 +18,7 @@ PushJoySticks_Descriptor::PushJoySticks_Descriptor()
         "Nintendo Switch", "Push Joy Sticks",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PushJoySticks.md",
         "Push Joy Sticks continuously.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController}

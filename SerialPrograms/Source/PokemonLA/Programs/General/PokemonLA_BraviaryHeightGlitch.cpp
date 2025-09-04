@@ -20,10 +20,10 @@ BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
         STRING_POKEMON + " LA", "Braviary Height Glitch",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/BraviaryHeightGlitch.md",
         "Increase your height in place using the height glitch.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

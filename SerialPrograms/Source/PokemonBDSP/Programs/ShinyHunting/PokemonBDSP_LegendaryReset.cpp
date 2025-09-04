@@ -28,10 +28,10 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         STRING_POKEMON + " BDSP", "Legendary Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/LegendaryReset.md",
         "Shiny hunt a standing legendary " + STRING_POKEMON + ".",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 std::unique_ptr<StatsTracker> LegendaryReset_Descriptor::make_stats() const{

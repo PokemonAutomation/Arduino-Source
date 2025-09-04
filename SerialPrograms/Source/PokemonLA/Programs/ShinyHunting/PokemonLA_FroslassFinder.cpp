@@ -32,10 +32,10 @@ FroslassFinder_Descriptor::FroslassFinder_Descriptor()
         STRING_POKEMON + " LA", "Alpha Froslass Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaFroslassHunter.md",
         "Constantly reset to find a Alpha Froslass or any Shiny in the path.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class FroslassFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

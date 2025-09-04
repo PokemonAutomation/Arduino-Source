@@ -28,6 +28,7 @@ FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
         STRING_POKEMON + " SwSh", "Friend Search Disconnect",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/FriendSearchDisconnect.md",
         "Disconnect from the internet using the friend search method.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController}

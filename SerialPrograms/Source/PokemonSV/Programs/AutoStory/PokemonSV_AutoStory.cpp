@@ -151,6 +151,7 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         STRING_POKEMON + " SV", "Auto Story",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutoStory.md",
         "Progress through the mainstory of SV.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

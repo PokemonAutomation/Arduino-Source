@@ -28,10 +28,10 @@ MassPurchase_Descriptor::MassPurchase_Descriptor()
         STRING_POKEMON + " SV", "Mass Purchase",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MassPurchase.md",
         "Purchase a specified amount of items from a shop.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

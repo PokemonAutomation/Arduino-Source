@@ -29,10 +29,10 @@ AlolanTrade_Descriptor::AlolanTrade_Descriptor()
         Pokemon::STRING_POKEMON + " LGPE", "Alolan Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLGPE/AlolanTrade.md",
         "Shiny hunt Alolan forms by trading in-game.",
+        ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_RightJoycon}
     )
 {}
 

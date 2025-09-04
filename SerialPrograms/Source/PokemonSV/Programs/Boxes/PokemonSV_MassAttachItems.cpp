@@ -30,10 +30,10 @@ MassAttachItems_Descriptor::MassAttachItems_Descriptor()
         STRING_POKEMON + " SV", "Mass Attach Items",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MassAttachItems.md",
         "Mass attach items to " + STRING_POKEMON + ".",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct MassAttachItems_Descriptor::Stats : public StatsTracker{

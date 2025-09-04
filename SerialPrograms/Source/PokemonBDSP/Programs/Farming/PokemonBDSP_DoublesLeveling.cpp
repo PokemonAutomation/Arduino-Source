@@ -28,10 +28,10 @@ DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
         STRING_POKEMON + " BDSP", "Double Battle Leveling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/DoublesLeveling.md",
         "Level up your party by spamming spread moves in a double battle with a partner that heals you forever.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct DoublesLeveling_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{

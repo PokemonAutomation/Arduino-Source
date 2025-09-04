@@ -29,10 +29,10 @@ ESPTraining_Descriptor::ESPTraining_Descriptor()
         STRING_POKEMON + " SV", "ESP Training",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ESPTraining.md",
         "Clear the ESP Training to farm EV berries.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct ESPTraining_Descriptor::Stats : public StatsTracker{

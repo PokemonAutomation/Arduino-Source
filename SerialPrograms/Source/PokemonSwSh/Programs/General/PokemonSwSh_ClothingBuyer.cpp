@@ -22,10 +22,10 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
         STRING_POKEMON + " SwSh", "Clothing Buyer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ClothingBuyer.md",
         "Buy out all the clothing in a store.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

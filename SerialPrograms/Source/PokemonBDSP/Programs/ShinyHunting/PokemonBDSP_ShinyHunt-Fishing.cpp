@@ -27,10 +27,10 @@ ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
         STRING_POKEMON + " BDSP", "Shiny Hunt - Fishing",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Fishing.md",
         "Shiny hunt fishing " + STRING_POKEMON + ".",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct ShinyHuntFishing_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{

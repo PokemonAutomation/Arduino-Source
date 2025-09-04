@@ -60,6 +60,7 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
         STRING_POKEMON + " Home", "Box Sorter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonHome/BoxSorter.md",
         "Order boxes of " + STRING_POKEMON + ".",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

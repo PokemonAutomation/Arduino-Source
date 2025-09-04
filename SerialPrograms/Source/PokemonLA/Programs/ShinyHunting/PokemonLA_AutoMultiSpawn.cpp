@@ -205,6 +205,7 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
         STRING_POKEMON + " LA", "Auto Multi-Spawn",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AutoMultiSpawn.md",
         "Advance a path in MultiSpawn shiny hunting method.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

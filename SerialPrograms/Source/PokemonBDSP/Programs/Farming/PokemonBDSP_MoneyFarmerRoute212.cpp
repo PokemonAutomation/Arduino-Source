@@ -31,6 +31,7 @@ MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
         STRING_POKEMON + " BDSP", "Money Farmer (Route 212)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MoneyFarmerRoute212.md",
         "Farm money by using VS Seeker to rebattle the rich couple on Route 212.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {

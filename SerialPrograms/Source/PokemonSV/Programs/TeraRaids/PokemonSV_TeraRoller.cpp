@@ -40,10 +40,10 @@ TeraRoller_Descriptor::TeraRoller_Descriptor()
         STRING_POKEMON + " SV", "Tera Roller",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraRoller.md",
         "Roll Tera raids to find shiny " + STRING_POKEMON + ".",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct TeraRoller_Descriptor::Stats : public StatsTracker{

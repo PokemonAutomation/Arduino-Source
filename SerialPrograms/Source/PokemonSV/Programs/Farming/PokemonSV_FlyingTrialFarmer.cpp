@@ -33,6 +33,7 @@ FlyingTrialFarmer_Descriptor::FlyingTrialFarmer_Descriptor()
         STRING_POKEMON + " SV", "Flying Trial Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/FlyingTrialFarmer.md",
         "Farm the flying trial for BP.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {

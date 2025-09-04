@@ -31,6 +31,7 @@ MoneyFarmerRoute210_Descriptor::MoneyFarmerRoute210_Descriptor()
         STRING_POKEMON + " BDSP", "Money Farmer (Route 210)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MoneyFarmerRoute210.md",
         "Farm money by using VS Seeker to rebattle the Ace Trainer couple on Route 210.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {

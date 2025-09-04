@@ -27,6 +27,7 @@ SandwichMaker_Descriptor::SandwichMaker_Descriptor()
         STRING_POKEMON + " SV", "Sandwich Maker",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/SandwichMaker.md",
         "Make a sandwich of your choice.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController}

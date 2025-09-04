@@ -23,7 +23,9 @@ BoxDraw_Descriptor::BoxDraw_Descriptor()
         "Nintendo Switch", "Box Draw",
         "",
         "Test box coordinates for development.",
-        FeedbackType::NONE, AllowCommandsWhenRunning::ENABLE_COMMANDS,
+        ProgramControllerClass::StandardController_NoRestrictions,
+        FeedbackType::NONE,
+        AllowCommandsWhenRunning::ENABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController}
     )
 {}

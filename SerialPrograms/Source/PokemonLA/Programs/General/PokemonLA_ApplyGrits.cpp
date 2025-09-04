@@ -31,10 +31,10 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
         STRING_POKEMON + " LA", "Apply Grits",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ApplyGrits.md",
         "Use Grits items on " + STRING_POKEMON,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

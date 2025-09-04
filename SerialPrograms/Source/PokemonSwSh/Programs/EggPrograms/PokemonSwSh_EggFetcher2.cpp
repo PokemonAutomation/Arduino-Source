@@ -25,10 +25,10 @@ EggFetcher2_Descriptor::EggFetcher2_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Fetcher 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggFetcher2.md",
         "Fetch eggs without hatching them.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

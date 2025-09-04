@@ -26,10 +26,10 @@ ShinyHuntUnattendedRegi_Descriptor::ShinyHuntUnattendedRegi_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Regi",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regi.md",
         "Hunt for shiny Regis. Stop when a shiny is found.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
-        FasterIfTickPrecise::NOT_FASTER,
         true
     )
 {}

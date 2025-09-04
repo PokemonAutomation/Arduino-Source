@@ -28,6 +28,7 @@ CurryHunter_Descriptor::CurryHunter_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/CurryHunter.md",
         "Cooks curry to attract " + STRING_POKEMON + " to your camp. "
         "<font color=\"red\">(This program cannot detect shinies. You must check manually or with " + STRING_POKEMON + " HOME.)</font>",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

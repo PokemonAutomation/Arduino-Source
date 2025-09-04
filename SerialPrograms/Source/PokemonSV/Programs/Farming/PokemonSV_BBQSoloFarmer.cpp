@@ -32,6 +32,7 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         STRING_POKEMON + " SV", "BBQ Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/BBQSoloFarmer.md",
         "Farm Blueberry Quests in the Terarium for BP.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

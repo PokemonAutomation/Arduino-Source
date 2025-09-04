@@ -45,10 +45,10 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         STRING_POKEMON + " SV", "Egg Autonomous",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggAutonomous.md",
         "Automatically get meal power, fetch eggs from a picnic and hatch them.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct EggAutonomous_Descriptor::Stats : public StatsTracker{

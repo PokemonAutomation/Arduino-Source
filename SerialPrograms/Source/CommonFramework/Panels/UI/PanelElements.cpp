@@ -51,93 +51,37 @@ CollapsibleGroupBox* make_panel_header(
 
     return header;
 }
-#if 0
 CollapsibleGroupBox* make_panel_header(
     QWidget& parent,
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
-    FeedbackType feedback
-){
-    CollapsibleGroupBox* header = make_panel_header(parent, display_name, doc_link, description);
-    QLayout* layout = header->widget()->layout();
-
-    QLabel* text = nullptr;
-    switch (feedback){
-    case FeedbackType::NONE:
-        text = new QLabel(
-            QString::fromStdString(html_color_text("(This program does not use feedback. It can run without video input.)", COLOR_PURPLE)),
-            header
-        );
-        break;
-    case FeedbackType::OPTIONAL_:
-        text = new QLabel(
-            QString::fromStdString(html_color_text("(This program will use video feedback if it is available. Video input is not required.)", COLOR_PURPLE)),
-            header
-        );
-        break;
-    case FeedbackType::REQUIRED:
-        text = new QLabel(
-            "<font color=\"green\">(This program requires video feedback. Please make sure you choose the correct capture device.)</font>",
-            header
-        );
-        break;
-    case FeedbackType::VIDEO_AUDIO:
-        text = new QLabel(
-            "<font color=\"green\">(This program requires video and audio feedback. Please make sure you choose the correct capture device, as well as the correct audio device.)</font>",
-            header
-        );
-        break;
-    }
-    text->setWordWrap(true);
-    layout->addWidget(text);
-
-    return header;
-}
-#endif
-CollapsibleGroupBox* make_panel_header(
-    QWidget& parent,
-    const std::string& display_name,
-    const std::string& doc_link,
-    const std::string& description,
-    const ControllerFeatures& required_features,
-    FasterIfTickPrecise faster_if_tick_precise
+    ProgramControllerClass color_class
 ){
     CollapsibleGroupBox* header = make_panel_header(parent, display_name, doc_link, description);
     QLayout* layout = header->widget()->layout();
 
     std::string text;
-    do{
-        if (required_features.contains(ControllerFeature::NintendoSwitch_DateSkip)){
-            text = html_color_text("(This program requires advanced RPCs.)", COLOR_RED);
+    switch (color_class){
+    case ProgramControllerClass::StandardController_NoRestrictions:
+    case ProgramControllerClass::StandardController_PerformanceClassSensitive:
+        text = html_color_text(
+            "(This program is sensitive to the performance of the controller. "
+            "Wired controllers are better than wireless. "
+            "And wireless is better than tick-imprecise controller.)",
+            COLOR_DARKGREEN
+        );
             break;
-        }
-        if (required_features.contains(ControllerFeature::TickPrecise)){
-            text = html_color_text("(This program requires a tick-precise controller.)", COLOR_PURPLE);
-            break;
-        }
-
-        switch (faster_if_tick_precise){
-        case PokemonAutomation::FasterIfTickPrecise::MUCH_FASTER:
-            text = html_color_text(
-                "(This program does not have any special controller requirements. "
-                "However, it is strongly recommended to use a tick-precise controller as the program will run much faster and/or more reliably.)",
-                COLOR_DARKGREEN
-            );
-            break;
-        case PokemonAutomation::FasterIfTickPrecise::FASTER:
-            text = html_color_text(
-                "(This program does not have any special controller requirements. "
-                "However, it runs faster if the controller is tick-precise.)",
-                COLOR_DARKGREEN
-            );
-            break;
-        case PokemonAutomation::FasterIfTickPrecise::NOT_FASTER:
-            text = html_color_text("(This program does not have any special controller requirements.)", COLOR_BLUE);
-            break;
-        }
-
-    }while (false);
+    case ProgramControllerClass::StandardController_RequiresPrecision:
+        text = html_color_text("(This program requires a tick-precise controller.)", COLOR_PURPLE);
+        break;
+    case ProgramControllerClass::StandardController_WithRestrictions:
+        text = html_color_text("(This program may require a specific controller in a specific environment.)", COLOR_RED);
+        break;
+    case ProgramControllerClass::SpecializedController:
+        text = html_color_text("(This program requires a specific type of controller.)", COLOR_MAGENTA);
+        break;
+    }
 
     QLabel* label = new QLabel(QString::fromStdString(text), header);
     label->setWordWrap(true);

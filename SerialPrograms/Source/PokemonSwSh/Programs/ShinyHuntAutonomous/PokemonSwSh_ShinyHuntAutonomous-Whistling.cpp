@@ -28,10 +28,10 @@ ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Whistling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Whistling.md",
         "Stand in one place and whistle. Shiny hunt everything that attacks you using video feedback.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct ShinyHuntAutonomousWhistling_Descriptor::Stats : public ShinyHuntTracker{

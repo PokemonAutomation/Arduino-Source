@@ -29,6 +29,7 @@ RunYOLO_Descriptor::RunYOLO_Descriptor()
         "Nintendo Switch", "Run YOLO",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/RunYOLO.md",
         "Run YOLO object detection model.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
         {}

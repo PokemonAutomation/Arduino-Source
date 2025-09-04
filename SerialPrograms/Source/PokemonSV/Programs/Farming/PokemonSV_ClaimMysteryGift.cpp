@@ -46,6 +46,7 @@ ClaimMysteryGift_Descriptor::ClaimMysteryGift_Descriptor()
         STRING_POKEMON + " SV", "Claim Mystery Gift",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ClaimMysteryGift.md",
         "Claim the Mystery Gift in SV.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

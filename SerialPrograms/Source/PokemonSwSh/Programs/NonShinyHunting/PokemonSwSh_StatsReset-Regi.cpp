@@ -30,10 +30,10 @@ StatsResetRegi_Descriptor::StatsResetRegi_Descriptor()
         STRING_POKEMON + " SwSh", "Stats Reset - Regi",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Regi.md",
         "Repeatedly catch regi until you get the stats you want.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct StatsResetRegi_Descriptor::Stats : public StatsTracker{

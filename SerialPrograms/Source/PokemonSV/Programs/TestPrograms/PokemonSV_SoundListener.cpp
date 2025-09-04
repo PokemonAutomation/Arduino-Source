@@ -26,7 +26,9 @@ SoundListener_Descriptor::SoundListener_Descriptor()
         STRING_POKEMON + " LA", "Sound Listener",
         "",
         "Test sound detectors listening to audio stream.",
-        FeedbackType::REQUIRED, AllowCommandsWhenRunning::ENABLE_COMMANDS,
+        ProgramControllerClass::StandardController_NoRestrictions,
+        FeedbackType::REQUIRED,
+        AllowCommandsWhenRunning::ENABLE_COMMANDS,
         {}
     )
 {}

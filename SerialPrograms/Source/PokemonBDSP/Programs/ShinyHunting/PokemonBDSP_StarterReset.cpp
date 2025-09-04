@@ -32,10 +32,10 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         STRING_POKEMON + " BDSP", "Starter Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/StarterReset.md",
         "Shiny hunt your starter " + STRING_POKEMON + ".",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct StarterReset_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{

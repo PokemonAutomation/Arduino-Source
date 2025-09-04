@@ -33,10 +33,10 @@ AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
         STRING_POKEMON + " SwSh", "Auto-Host Rolling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-Rolling.md",
         "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 std::unique_ptr<StatsTracker> AutoHostRolling_Descriptor::make_stats() const{

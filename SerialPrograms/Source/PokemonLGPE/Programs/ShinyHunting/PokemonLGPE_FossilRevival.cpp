@@ -29,10 +29,10 @@ FossilRevival_Descriptor::FossilRevival_Descriptor()
         Pokemon::STRING_POKEMON + " LGPE", "Fossil Revival",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLGPE/FossilRevival.md",
         "Shiny hunt fossil Pokemon by reviving and resetting.",
+        ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_RightJoycon}
     )
 {}
 

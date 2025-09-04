@@ -26,10 +26,10 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Loto Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-LotoFarmer.md",
         "Farm the Loto ID.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

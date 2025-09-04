@@ -31,10 +31,10 @@ ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
         STRING_POKEMON + " LA", "Shiny Hunt - Flag Pin",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-FlagPin.md",
         "Repeatedly travel to a flag pin to shiny hunt " + STRING_POKEMON + " around it.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class ShinyHuntFlagPin_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

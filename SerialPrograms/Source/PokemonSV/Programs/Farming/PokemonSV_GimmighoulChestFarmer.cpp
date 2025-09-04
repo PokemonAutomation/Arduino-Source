@@ -37,13 +37,13 @@ GimmighoulChestFarmer_Descriptor::GimmighoulChestFarmer_Descriptor()
         STRING_POKEMON + " SV", "Gimmighoul Chest Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/GimmighoulChestFarmer.md",
         "Farm Chest Gimmighoul for coins.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {
             ControllerFeature::TickPrecise,
             ControllerFeature::NintendoSwitch_ProController,
-        },
-        FasterIfTickPrecise::MUCH_FASTER
+        }
     )
 {}
 

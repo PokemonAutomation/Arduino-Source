@@ -55,10 +55,10 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Autonomous",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggAutonomous.md",
         "Automatically fetch+hatch eggs and keep all shinies.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

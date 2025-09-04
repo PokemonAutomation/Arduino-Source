@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonObject.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+//#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SwitchSystemOption.h"
 //#include "UI/NintendoSwitch_SwitchSystemWidget.h"
 
@@ -15,45 +15,21 @@ namespace NintendoSwitch{
 
 // constexpr Color COLOR_GREEN2(0xff00aa00);
 
-#if 0
-Color pick_color(FeedbackType feedback){
-    switch (feedback){
-    case FeedbackType::NONE:
+Color pick_color(ProgramControllerClass color_class){
+    switch (color_class){
+    case ProgramControllerClass::StandardController_NoRestrictions:
         return COLOR_BLUE;
-    case FeedbackType::OPTIONAL_:
-        return COLOR_PURPLE;
-    case FeedbackType::REQUIRED:
+    case ProgramControllerClass::StandardController_PerformanceClassSensitive:
         return COLOR_DARKGREEN;
-    case FeedbackType::VIDEO_AUDIO:
+    case ProgramControllerClass::StandardController_RequiresPrecision:
+        return COLOR_PURPLE;
+    case ProgramControllerClass::StandardController_WithRestrictions:
         return COLOR_RED;
-    }
-    return Color();
-}
-#endif
-Color pick_color(
-    const ControllerFeatures& required_features,
-    FasterIfTickPrecise faster_if_tick_precise
-){
-    if (required_features.contains(ControllerFeature::NintendoSwitch_DateSkip)){
-        return COLOR_RED;
-    }
-    if (required_features.contains(ControllerFeature::NintendoSwitch_LeftJoycon) ||
-        required_features.contains(ControllerFeature::NintendoSwitch_RightJoycon)
-    ){
+    case ProgramControllerClass::SpecializedController:
         return COLOR_MAGENTA;
+    default:
+        return Color();
     }
-    if (required_features.contains(ControllerFeature::TickPrecise)){
-        return COLOR_PURPLE;
-    }
-    switch (faster_if_tick_precise){
-    case FasterIfTickPrecise::MUCH_FASTER:
-    case FasterIfTickPrecise::FASTER:
-        return COLOR_DARKGREEN;
-    case FasterIfTickPrecise::NOT_FASTER:
-        return COLOR_BLUE;
-    }
-
-    return COLOR_BLUE;
 }
 
 

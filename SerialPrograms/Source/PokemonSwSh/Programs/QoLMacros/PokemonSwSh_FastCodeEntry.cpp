@@ -21,10 +21,10 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
         STRING_POKEMON + " SwSh", "Fast Code Entry (FCE)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/FastCodeEntry.md",
         "Force your way into raids by entering 8-digit codes in under 1 second.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

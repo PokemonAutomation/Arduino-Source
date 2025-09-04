@@ -21,10 +21,10 @@ BallThrower_Descriptor::BallThrower_Descriptor()
         STRING_POKEMON + " SwSh", "Ball Thrower",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BallThrower.md",
         "Blindly throw balls at the opposing " + STRING_POKEMON + " until it catches.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER,
         true
     )
 {}

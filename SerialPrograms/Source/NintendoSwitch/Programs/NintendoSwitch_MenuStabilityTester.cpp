@@ -18,10 +18,10 @@ MenuStabilityTester_Descriptor::MenuStabilityTester_Descriptor()
         "Nintendo Switch", "Menu Stability Tester",
         "",
         "Test the speed and stability of various fast menu movements.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

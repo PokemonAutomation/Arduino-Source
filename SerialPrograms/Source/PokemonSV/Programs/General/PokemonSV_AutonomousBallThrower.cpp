@@ -25,10 +25,10 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
         STRING_POKEMON + " SV", "Autonomous Ball Thrower",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutonomousBallThrower.md",
         "Repeatedly throw a ball until you catch the pokemon.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct AutonomousBallThrower_Descriptor::Stats : public StatsTracker{

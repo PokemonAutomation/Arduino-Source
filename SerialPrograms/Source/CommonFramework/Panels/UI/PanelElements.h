@@ -11,7 +11,8 @@
 #include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
-#include "Controllers/ControllerCapability.h"
+#include "CommonFramework/Panels/ProgramDescriptor.h"
+//#include "Controllers/ControllerCapability.h"
 
 class QPushButton;
 
@@ -26,22 +27,12 @@ CollapsibleGroupBox* make_panel_header(
     const std::string& doc_link,
     const std::string& description
 );
-#if 0
 CollapsibleGroupBox* make_panel_header(
     QWidget& parent,
     const std::string& display_name,
     const std::string& doc_link,
     const std::string& description,
-    FeedbackType feedback
-);
-#endif
-CollapsibleGroupBox* make_panel_header(
-    QWidget& parent,
-    const std::string& display_name,
-    const std::string& doc_link,
-    const std::string& description,
-    const ControllerFeatures& required_features,
-    FasterIfTickPrecise faster_if_tick_precise
+    ProgramControllerClass color_class
 );
 
 

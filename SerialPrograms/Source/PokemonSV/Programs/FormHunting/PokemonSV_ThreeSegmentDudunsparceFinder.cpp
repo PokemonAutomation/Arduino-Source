@@ -30,10 +30,10 @@ ThreeSegmentDudunsparceFinder_Descriptor::ThreeSegmentDudunsparceFinder_Descript
         STRING_POKEMON + " SV", "Three-Segment Dudunsparce Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ThreeSegmentDudunsparceFinder.md",
         "Check whether a box of Dunsparce contain at least one that evolves into Three-Segment Dudunsparce.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct ThreeSegmentDudunsparceFinder_Descriptor::Stats : public StatsTracker{

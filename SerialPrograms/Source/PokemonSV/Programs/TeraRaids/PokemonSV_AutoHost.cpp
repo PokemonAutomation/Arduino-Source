@@ -45,6 +45,7 @@ AutoHost_Descriptor::AutoHost_Descriptor()
         STRING_POKEMON + " SV", "Auto-Host",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutoHost.md",
         "Auto-host a Tera raid.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController}

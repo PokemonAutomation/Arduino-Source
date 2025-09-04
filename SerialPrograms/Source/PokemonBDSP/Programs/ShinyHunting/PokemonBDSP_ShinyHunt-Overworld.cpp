@@ -26,10 +26,10 @@ ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
         STRING_POKEMON + " BDSP", "Shiny Hunt - Overworld",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Overworld.md",
         "Shiny hunt overworld " + STRING_POKEMON + ".",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct ShinyHuntOverworld_Descriptor::Stats : public PokemonSwSh::ShinyHuntTracker{

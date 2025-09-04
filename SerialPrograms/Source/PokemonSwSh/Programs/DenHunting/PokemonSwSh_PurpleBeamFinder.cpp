@@ -31,10 +31,10 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Purple Beam Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/PurpleBeamFinder.md",
         "Automatically reset for a purple beam.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct PurpleBeamFinder_Descriptor::Stats : public StatsTracker{

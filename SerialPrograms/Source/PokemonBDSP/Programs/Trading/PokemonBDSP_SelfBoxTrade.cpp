@@ -24,10 +24,10 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
         STRING_POKEMON + " BDSP", "Self Box Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/SelfBoxTrade.md",
         "Trade boxes of " + STRING_POKEMON + " between two local Switches.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER,
         2, 2, 2
     )
 {}

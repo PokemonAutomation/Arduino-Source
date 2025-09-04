@@ -32,10 +32,10 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
         STRING_POKEMON + " LA", "Alpha Crobat Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaCrobatHunter.md",
         "Constantly reset the cave to find Shiny Alpha Crobat.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class CrobatFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

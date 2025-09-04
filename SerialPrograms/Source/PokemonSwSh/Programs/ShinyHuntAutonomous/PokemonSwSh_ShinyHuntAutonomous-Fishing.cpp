@@ -30,10 +30,10 @@ ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Fishing",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Fishing.md",
         "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct ShinyHuntAutonomousFishing_Descriptor::Stats : public ShinyHuntTracker{

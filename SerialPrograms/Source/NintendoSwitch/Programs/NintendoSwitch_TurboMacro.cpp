@@ -22,6 +22,7 @@ TurboMacro_Descriptor::TurboMacro_Descriptor()
         "Nintendo Switch", "Turbo Macro",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboMacro.md",
         "Create macros",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {ControllerFeature::NintendoSwitch_ProController}

@@ -33,10 +33,10 @@ WildItemFarmer_Descriptor::WildItemFarmer_Descriptor()
         Pokemon::STRING_POKEMON + " SV", "Wild Item Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/WildItemFarmer.md",
         "Farm an item held by a wild " + Pokemon::STRING_POKEMON + ".",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

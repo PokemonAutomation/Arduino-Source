@@ -26,10 +26,10 @@ SeedFinder_Descriptor::SeedFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Seed Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/SeedFinder.md",
         "Finds the current state to be used for manual RNG manipulation.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

@@ -26,6 +26,7 @@ AudioStarterReset_Descriptor::AudioStarterReset_Descriptor()
         Pokemon::STRING_POKEMON + " RSE", "Starter Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/AudioStarterReset.md",
         "Soft reset for a shiny starter. Ruby and Sapphire only.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

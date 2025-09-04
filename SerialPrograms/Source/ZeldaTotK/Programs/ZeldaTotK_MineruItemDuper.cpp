@@ -21,6 +21,7 @@ MineruItemDuper_Descriptor::MineruItemDuper_Descriptor()
         "Zelda: TotK", "Mineru Item Duper",
         "ComputerControl/blob/master/Wiki/Programs/ZeldaTotK/MineruItemDuper.md",
         "Use the Mineru Menu Sort glitch to duplicate items.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

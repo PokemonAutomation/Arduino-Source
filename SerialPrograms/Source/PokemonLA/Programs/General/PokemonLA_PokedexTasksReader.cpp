@@ -66,10 +66,10 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
         STRING_POKEMON + " LA", STRING_POKEDEX + " Tasks Reader",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PokedexTasksReader.md",
         "Read all the tasks in your " + STRING_POKEDEX + " and output a file with the tasks you did.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

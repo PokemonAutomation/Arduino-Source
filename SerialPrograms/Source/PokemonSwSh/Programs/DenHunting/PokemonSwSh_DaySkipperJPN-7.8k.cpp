@@ -27,12 +27,12 @@ DaySkipperJPN7p8k_Descriptor::DaySkipperJPN7p8k_Descriptor()
         STRING_POKEMON + " SwSh", "Day Skipper (JPN) - 7.8k",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperJPN-7.8k.md",
         "A faster, but less reliable Japanese date skipper. (7800 skips/hour)",
+        ProgramControllerClass::StandardController_WithRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {
             ControllerFeature::TickPrecise,
             ControllerFeature::NintendoSwitch_ProController,
-            ControllerFeature::NintendoSwitch_DateSkip,
         }
     )
 {}
@@ -158,7 +158,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, ProControll
     if (context->performance_class() != ControllerPerformanceClass::SerialPABotBase_Wired){
         throw UserSetupError(
             env.logger(),
-            "This program requires a tick precise wired controller."
+            "This program requires a controller performance class of \"Wired\" for the Switch 1."
         );
     }
 

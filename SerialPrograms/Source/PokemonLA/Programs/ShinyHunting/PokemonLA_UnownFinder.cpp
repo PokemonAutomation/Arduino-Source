@@ -33,10 +33,10 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
         STRING_POKEMON + " LA", "Unown Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/UnownHunter.md",
         "Constantly reset to find a Shiny Unown or any Shiny in the path.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class UnownFinder_Descriptor::Stats : public StatsTracker, public ShinyStatIncrementer{

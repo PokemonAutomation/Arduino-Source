@@ -30,10 +30,10 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
         Pokemon::STRING_POKEMON + " LGPE", "Legendary Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLGPE/LegendaryReset.md",
         "Shiny hunt Legendary Pokemon by resetting the game.",
+        ProgramControllerClass::SpecializedController,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_RightJoycon}
     )
 {}
 

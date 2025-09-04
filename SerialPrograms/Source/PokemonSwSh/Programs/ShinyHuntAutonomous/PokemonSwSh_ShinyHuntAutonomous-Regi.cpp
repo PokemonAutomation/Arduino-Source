@@ -27,10 +27,10 @@ ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Regi",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Regi.md",
         "Automatically hunt for shiny Regi using video feedback.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi_Descriptor::make_stats() const{

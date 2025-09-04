@@ -28,10 +28,10 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
         "Date Spam - " + STRING_POKEJOB + "s Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-PokeJobsFarmer.md",
         "Farm " + STRING_POKEJOB + "s.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
      )
 {}
 

@@ -47,10 +47,10 @@ CramomaticRNG_Descriptor::CramomaticRNG_Descriptor()
         STRING_POKEMON + " SwSh", "Cram-o-matic RNG",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/CramomaticRNG.md",
         "Perform RNG manipulation to get rare balls from the Cram-o-matic.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

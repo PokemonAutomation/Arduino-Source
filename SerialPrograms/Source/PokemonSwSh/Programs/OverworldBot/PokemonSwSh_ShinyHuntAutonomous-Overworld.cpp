@@ -33,10 +33,10 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Overworld",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Overworld.md",
         "Automatically shiny hunt overworld " + STRING_POKEMON + " with video feedback.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct ShinyHuntAutonomousOverworld_Descriptor::Stats : public ShinyHuntTracker{

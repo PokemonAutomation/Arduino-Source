@@ -49,10 +49,10 @@ ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
         Pokemon::STRING_POKEMON + " SV", "Item Printer RNG",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ItemPrinterRNG.md",
         "Farm the Item Printer using RNG Manipulation.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

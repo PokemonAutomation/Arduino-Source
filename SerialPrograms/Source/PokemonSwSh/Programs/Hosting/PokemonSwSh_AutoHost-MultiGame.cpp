@@ -32,10 +32,10 @@ AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
         STRING_POKEMON + " SwSh", "Auto-Host Multi-Game",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-MultiGame.md",
         "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 std::unique_ptr<StatsTracker> AutoHostMultiGame_Descriptor::make_stats() const{

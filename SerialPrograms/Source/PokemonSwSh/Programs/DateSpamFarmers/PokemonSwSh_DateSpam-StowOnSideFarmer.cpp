@@ -25,10 +25,10 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Stow-On-Side Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-StowOnSideFarmer.md",
         "Farm the Stow-on-Side items dealer.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

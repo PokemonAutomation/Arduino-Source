@@ -24,10 +24,10 @@ GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
         STRING_POKEMON + " SwSh", "God Egg Duplication",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/GodEggDuplication.md",
         "Mass duplicate " + STRING_POKEMON + " with the God Egg.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 

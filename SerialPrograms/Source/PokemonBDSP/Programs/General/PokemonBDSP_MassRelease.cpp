@@ -24,10 +24,10 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         STRING_POKEMON + " BDSP", "Mass Release",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MassRelease.md",
         "Mass release boxes of " + STRING_POKEMON + ".",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct MassRelease_Descriptor::Stats : public StatsTracker{

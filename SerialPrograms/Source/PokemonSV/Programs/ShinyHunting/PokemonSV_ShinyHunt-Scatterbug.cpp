@@ -46,10 +46,10 @@ ShinyHuntScatterbug_Descriptor::ShinyHuntScatterbug_Descriptor()
         STRING_POKEMON + " SV", "Shiny Hunt - Scatterbug",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ShinyHunt-Scatterbug.md",
         "Shiny hunt Scatterbug.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct ShinyHuntScatterbug_Descriptor::Stats : public LetsGoEncounterBotStats{

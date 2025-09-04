@@ -32,10 +32,10 @@ ShinyHuntAutonomousRegigigas2_Descriptor::ShinyHuntAutonomousRegigigas2_Descript
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Regigigas2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Regigigas2.md",
         "Automatically hunt for shiny Regigigas using video feedback.",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2_Descriptor::make_stats() const{

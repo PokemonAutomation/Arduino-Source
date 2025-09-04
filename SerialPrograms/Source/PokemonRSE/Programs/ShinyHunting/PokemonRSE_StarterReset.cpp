@@ -28,6 +28,7 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         Pokemon::STRING_POKEMON + " RSE", "[RS]Starter Reset - Video",
         "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/StarterReset.md",
         "Soft reset for a shiny starter. Ruby and Sapphire only.",
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}

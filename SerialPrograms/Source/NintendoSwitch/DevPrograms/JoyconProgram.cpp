@@ -22,10 +22,10 @@ JoyconProgram_Descriptor::JoyconProgram_Descriptor()
         "Nintendo Switch", "Joycon Program",
         "",
         "Template for a joycon program.",
+        ProgramControllerClass::SpecializedController,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_RightJoycon},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_RightJoycon}
     )
 {}
 

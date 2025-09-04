@@ -173,10 +173,10 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         "Nintendo Switch", "Test Program (Switch)",
         "",
         "Test Program (Switch)",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
         {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
-        FasterIfTickPrecise::NOT_FASTER,
         1, 4, 1
     )
 {}

@@ -105,10 +105,10 @@ OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
         STRING_POKEMON + " LA", "Outbreak Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/OutbreakFinder.md",
         "Search for an outbreak for a specific " + STRING_POKEMON,
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::NOT_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 class OutbreakFinder_Descriptor::Stats : public StatsTracker{

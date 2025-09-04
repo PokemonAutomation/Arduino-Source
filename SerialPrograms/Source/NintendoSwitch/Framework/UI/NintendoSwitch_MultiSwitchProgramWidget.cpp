@@ -60,8 +60,7 @@ MultiSwitchProgramWidget2::MultiSwitchProgramWidget2(
         descriptor.display_name(),
         descriptor.doc_link(),
         descriptor.description(),
-        descriptor.required_features(),
-        descriptor.faster_if_tick_precise()
+        descriptor.color_class()
     );
     layout->addWidget(header);
 

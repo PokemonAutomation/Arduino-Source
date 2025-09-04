@@ -34,6 +34,7 @@ GenerateIVCheckerOCR_Descriptor::GenerateIVCheckerOCR_Descriptor()
         STRING_POKEMON + " SwSh", "Generate IV Checker OCR Data",
         "",
         "Generate IV Checker OCR Data",
+        ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {}

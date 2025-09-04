@@ -35,10 +35,10 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
         STRING_POKEMON + " SwSh", "Dex Rec Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DexRecFinder.md",
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
+        ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {ControllerFeature::NintendoSwitch_ProController},
-        FasterIfTickPrecise::MUCH_FASTER
+        {ControllerFeature::NintendoSwitch_ProController}
     )
 {}
 struct DexRecFinder_Descriptor::Stats : public StatsTracker{
