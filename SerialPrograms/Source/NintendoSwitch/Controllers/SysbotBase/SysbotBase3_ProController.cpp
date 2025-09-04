@@ -41,14 +41,6 @@ ProController_SysbotBase3::~ProController_SysbotBase3(){
     m_connection.remove_listener(*this);
 }
 
-const ControllerFeatures& ProController_SysbotBase3::controller_features() const{
-    static const ControllerFeatures features{
-        ControllerFeature::TickPrecise,
-        ControllerFeature::NintendoSwitch_ProController,
-    };
-    return features;
-}
-
 void ProController_SysbotBase3::cancel_all_commands(){
     std::lock_guard<std::mutex> lg(m_state_lock);
     if (m_stopping){

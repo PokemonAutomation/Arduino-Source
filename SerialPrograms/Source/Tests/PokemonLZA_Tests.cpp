@@ -10,7 +10,6 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
-#include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h" 
 #include <QFileInfo>

@@ -36,13 +36,7 @@ ProController_SysbotBase::ProController_SysbotBase(
         return;
     }
 
-    //  Check compatibility.
-
-    ControllerModeStatus mode_status = connection.controller_mode_status();
-    auto iter = mode_status.supported_controllers.find(ControllerType::NintendoSwitch_WiredController);
-    if (iter != mode_status.supported_controllers.end()){
-        m_dispatch_thread = std::thread(&ProController_SysbotBase::thread_body, this);
-    }
+    m_dispatch_thread = std::thread(&ProController_SysbotBase::thread_body, this);
 }
 ProController_SysbotBase::~ProController_SysbotBase(){
     stop();
@@ -59,14 +53,6 @@ void ProController_SysbotBase::stop(){
         std::lock_guard<std::mutex> lg(m_state_lock);
         m_cv.notify_all();
     }
-}
-
-
-const ControllerFeatures& ProController_SysbotBase::controller_features() const{
-    static const ControllerFeatures features{
-        ControllerFeature::NintendoSwitch_ProController,
-    };
-    return features;
 }
 
 

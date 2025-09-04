@@ -307,7 +307,7 @@ void ControllerSession::post_connection_ready(
     ControllerConnection& connection,
     const ControllerModeStatus& mode_status
 ){
-    const std::map<ControllerType, ControllerFeatures>& supported_controllers = mode_status.supported_controllers;
+    const std::vector<ControllerType>& supported_controllers = mode_status.supported_controllers;
     if (supported_controllers.empty()){
         return;
     }
@@ -318,7 +318,6 @@ void ControllerSession::post_connection_ready(
 //    Sleep(10000);
 
 
-    std::vector<ControllerType> available_controllers;
 //    ControllerType selected_controller = ControllerType::None;
     bool ready;
     {
@@ -334,33 +333,9 @@ void ControllerSession::post_connection_ready(
             return;
         }
 
-        //  We only show the "none" option when there are multiple controllers
-        //  to choose from.
-        if (supported_controllers.size() > 1){
-            available_controllers.emplace_back(ControllerType::None);
-        }
-        for (const auto& item : supported_controllers){
-            available_controllers.emplace_back(item.first);
-        }
-
         //  Copy the list. One will be moved into "m_available_controllers".
         //  The other will be stored locally for the callbacks.
-        m_available_controllers = available_controllers;
-
-
-#if 0
-        auto iter = supported_controllers.begin();
-        if (supported_controllers.size() == 1){
-            //  Only one controller available. Force the option to it.
-            current_controller = iter->first;
-        }else{
-            //  Keep the current controller only if it exists.
-            iter = supported_controllers.find(m_option.m_controller_type);
-            if (iter != supported_controllers.end()){
-                current_controller = m_option.m_controller_type;
-            }
-        }
-#endif
+        m_available_controllers = supported_controllers;
 
         //  Construct the controller.
         if (current_controller != ControllerType::None){
@@ -377,7 +352,7 @@ void ControllerSession::post_connection_ready(
         ready = m_controller && m_controller->is_ready();
     }
 
-    signal_controller_changed(current_controller, available_controllers);
+    signal_controller_changed(current_controller, supported_controllers);
     signal_ready_changed(ready);
     signal_status_text_changed(status_text());
 }

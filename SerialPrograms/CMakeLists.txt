@@ -684,8 +684,6 @@ file(GLOB MAIN_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
     Source/Controllers/Controller.h
-    Source/Controllers/ControllerCapability.cpp
-    Source/Controllers/ControllerCapability.h
     Source/Controllers/ControllerConnection.cpp
     Source/Controllers/ControllerConnection.h
     Source/Controllers/ControllerDescriptor.cpp

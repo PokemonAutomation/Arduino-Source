@@ -44,18 +44,18 @@ public:
 
 
 private:
-    const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>&
+    const std::map<uint32_t, std::vector<ControllerType>>&
     get_programs_for_protocol(uint32_t protocol);
 
-    const std::map<ControllerType, ControllerFeatures>&
+    const std::vector<ControllerType>&
     get_controllers_for_program(
-        const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>& available_programs,
+        const std::map<uint32_t, std::vector<ControllerType>>& available_programs,
         uint32_t program_id
     );
 
     void process_queue_size();
     ControllerType get_controller_type(
-        const std::map<ControllerType, ControllerFeatures>& available_controllers
+        const std::vector<ControllerType>& available_controllers
     );
 
     ControllerModeStatus process_device(

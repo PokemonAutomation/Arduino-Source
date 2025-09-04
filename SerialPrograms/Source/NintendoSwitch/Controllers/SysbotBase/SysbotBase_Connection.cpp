@@ -100,9 +100,7 @@ ControllerModeStatus TcpSysbotBase_Connection::controller_mode_status() const{
     return {
         ControllerType::NintendoSwitch_WiredController,
         {
-            {ControllerType::NintendoSwitch_WiredController, {
-                ControllerFeature::NintendoSwitch_ProController
-            }},
+            ControllerType::NintendoSwitch_WiredController,
         }
     };
 }

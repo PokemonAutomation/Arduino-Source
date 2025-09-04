@@ -54,7 +54,6 @@ protected:
     //  access these asynchronously.
     SerialPABotBase::SerialPABotBase_Connection& m_handle;
     BotBaseController* m_serial;
-    ControllerFeatures m_supported_features;
 
     mutable SpinLock m_error_lock;
     std::string m_error_string;

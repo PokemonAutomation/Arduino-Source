@@ -47,9 +47,6 @@ public:
     virtual ControllerType controller_type() const override{
         return m_controller_type;
     }
-    virtual const ControllerFeatures& controller_features() const override{
-        return m_supported_features;
-    }
     virtual ControllerPerformanceClass performance_class() const override{
         return ControllerPerformanceClass::SerialPABotBase_Wireless;
     }

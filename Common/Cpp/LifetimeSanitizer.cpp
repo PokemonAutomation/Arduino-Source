@@ -26,7 +26,6 @@ namespace PokemonAutomation{
 const std::set<std::string> SANITIZER_FILTER = {
 //    "MultiSwitchProgramSession",
 //    "MultiSwitchProgramWidget2",
-//    "ControllerFeatures",
 };
 
 SpinLock sanitizer_lock;

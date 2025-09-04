@@ -20,7 +20,6 @@
 #include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
 #include "CommonFramework/Panels/ProgramDescriptor.h"
-#include "Controllers/ControllerCapability.h"
 #include "Controllers/ControllerDescriptor.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 

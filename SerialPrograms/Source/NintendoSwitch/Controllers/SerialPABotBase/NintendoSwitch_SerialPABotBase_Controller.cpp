@@ -7,7 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBaseMessage.h"
 #include "Controllers/ControllerTypeStrings.h"
-#include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
 //#include <iostream>
@@ -42,12 +41,6 @@ SerialPABotBase_Controller::SerialPABotBase_Controller(
         "SerialPABotBase_Controller(): ControllerType = " +
         CONTROLLER_TYPE_STRINGS.get_string(mode_status.current_controller)
     );
-
-    std::map<ControllerType, ControllerFeatures>& controllers = mode_status.supported_controllers;
-    auto iter = controllers.find(controller_type);
-    if (iter != controllers.end()){
-        m_supported_features = std::move(iter->second);
-    }
 }
 
 

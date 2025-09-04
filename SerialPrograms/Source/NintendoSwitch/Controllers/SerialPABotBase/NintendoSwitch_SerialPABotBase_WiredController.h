@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
 
-#include "Controllers/ControllerCapability.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
@@ -47,9 +46,6 @@ public:
 public:
     virtual ControllerType controller_type() const override{
         return m_controller_type;
-    }
-    virtual const ControllerFeatures& controller_features() const override{
-        return m_supported_features;
     }
     virtual ControllerPerformanceClass performance_class() const override{
         return ControllerPerformanceClass::SerialPABotBase_Wired;

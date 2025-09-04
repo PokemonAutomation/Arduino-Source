@@ -9,8 +9,9 @@
 
 #include <stdint.h>
 #include <string>
+#include <vector>
 #include <map>
-#include "Controllers/ControllerCapability.h"
+#include "Controllers/ControllerTypes.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
@@ -27,7 +28,7 @@ extern const std::map<
     uint32_t,   //  Protocol Version
     std::map<
         uint32_t,   //  Program ID
-        std::map<ControllerType, ControllerFeatures>
+        std::vector<ControllerType>
     >
 > SUPPORTED_VERSIONS;
 

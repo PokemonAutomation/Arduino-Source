@@ -12,13 +12,12 @@
 #ifndef POKEMON_AUTOMATION_ML_ImageAnnotationDisplayOption_H
 #define POKEMON_AUTOMATION_ML_ImageAnnotationDisplayOption_H
 
-#include "Common/Cpp/Color.h"
+//#include "Common/Cpp/Color.h"
 #include "CommonFramework/AudioPipeline/AudioOption.h"
-#include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
+//#include "CommonFramework/VideoPipeline/VideoSourceDescriptor.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayOption.h"
-#include "Controllers/ControllerCapability.h"
 #include "Controllers/ControllerDescriptor.h"
-#include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
+//#include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 
 namespace PokemonAutomation{
     class ControllerRequirements;

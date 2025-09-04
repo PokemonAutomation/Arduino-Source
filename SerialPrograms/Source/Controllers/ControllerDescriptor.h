@@ -13,7 +13,7 @@
 #include <map>
 #include "Common/Cpp/AbstractLogger.h"
 //#include "Common/Cpp/Json/JsonObject.h"
-#include "ControllerCapability.h"
+#include "ControllerTypes.h"
 #include "Controller.h"
 
 class QWidget;

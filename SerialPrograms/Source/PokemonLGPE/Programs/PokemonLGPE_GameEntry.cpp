@@ -4,18 +4,18 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "Controllers/ControllerCapability.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "Controllers/ControllerTypes.h"
+//#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
+//#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "PokemonLGPE/PokemonLGPE_Settings.h"
 #include "PokemonLGPE_GameEntry.h"
 
@@ -101,7 +101,7 @@ bool reset_game_from_home(
     ConsoleHandle& console, JoyconContext& context,
     Milliseconds post_wait_time
 ){
-    if (!(context.controller().controller_type() == ControllerType::NintendoSwitch_RightJoycon)) {
+    if (dynamic_cast<RightJoycon*>(&context.controller()) == nullptr){
         console.log("Right Joycon required!", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,

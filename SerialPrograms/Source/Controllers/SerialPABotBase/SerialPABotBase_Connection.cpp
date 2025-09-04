@@ -122,7 +122,7 @@ ControllerModeStatus SerialPABotBase_Connection::controller_mode_status() const{
 
 
 
-const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>&
+const std::map<uint32_t, std::vector<ControllerType>>&
 SerialPABotBase_Connection::get_programs_for_protocol(uint32_t protocol){
     //  (protocol_requested / 100) == (protocol_device / 100)
     //  (protocol_requested % 100) <= (protocol_device % 100)
@@ -146,9 +146,9 @@ SerialPABotBase_Connection::get_programs_for_protocol(uint32_t protocol){
     return iter->second;
 }
 
-const std::map<ControllerType, ControllerFeatures>&
+const std::vector<ControllerType>&
 SerialPABotBase_Connection::get_controllers_for_program(
-    const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>& available_programs,
+    const std::map<uint32_t, std::vector<ControllerType>>& available_programs,
     uint32_t program_id
 ){
     auto iter = available_programs.find(program_id);
@@ -174,12 +174,12 @@ void SerialPABotBase_Connection::process_queue_size(){
     m_botbase->set_queue_limit(queue_size);
 }
 ControllerType SerialPABotBase_Connection::get_controller_type(
-    const std::map<ControllerType, ControllerFeatures>& available_controllers
+    const std::vector<ControllerType>& available_controllers
 ){
     m_logger.log("Reading Controller Mode...");
     ControllerType current_controller = ControllerType::None;
     if (available_controllers.size() == 1){
-        current_controller = available_controllers.begin()->first;
+        current_controller = available_controllers[0];
     }else if (available_controllers.size() > 1){
         uint32_t type_id = read_controller_mode(*m_botbase);
 //        cout << "type_id = " << type_id << endl;
@@ -201,7 +201,7 @@ ControllerModeStatus SerialPABotBase_Connection::process_device(
         m_protocol = protocol_version(*m_botbase);
         m_logger.Logger::log("Checking Protocol Version... Protocol = " + std::to_string(m_protocol));
     }
-    const std::map<uint32_t, std::map<ControllerType, ControllerFeatures>>& PROGRAMS =
+    const std::map<uint32_t, std::vector<ControllerType>>& PROGRAMS =
         get_programs_for_protocol(m_protocol);
 
 
@@ -211,7 +211,7 @@ ControllerModeStatus SerialPABotBase_Connection::process_device(
         m_program_id = program_id(*m_botbase);
         m_logger.Logger::log("Checking Program ID... Program ID = " + std::to_string(m_program_id));
     }
-    const std::map<ControllerType, ControllerFeatures>& CONTROLLERS =
+    const std::vector<ControllerType>& CONTROLLERS =
         get_controllers_for_program(PROGRAMS, m_program_id);
 
     //  Firmware Version

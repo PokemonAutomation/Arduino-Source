@@ -87,14 +87,6 @@ void SingleSwitchProgramInstance::start_program_controller_check(
     if (!session.ready()){
         throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
     }
-
-#if 0   //  REMOVE
-    StartProgramChecks::check_controller_features(
-        session.logger(),
-        session.controller()->controller_features(),
-        session.required_features()
-    );
-#endif
 }
 void SingleSwitchProgramInstance::start_program_feedback_check(
     VideoStream& stream,

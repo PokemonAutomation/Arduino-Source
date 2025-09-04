@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 struct ControllerModeStatus{
     ControllerType current_controller = ControllerType::None;
-    std::map<ControllerType, ControllerFeatures> supported_controllers;
+    std::vector<ControllerType> supported_controllers;
 };
 
 

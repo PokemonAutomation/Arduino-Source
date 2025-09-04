@@ -42,7 +42,6 @@ public:
     virtual ControllerType controller_type() const override{
         return ControllerType::NintendoSwitch_WiredController;
     }
-    virtual const ControllerFeatures& controller_features() const override;
     virtual ControllerPerformanceClass performance_class() const override{
         //  TODO: Change to SerialPABotBase_Wired when we prove it is stable.
         return ControllerPerformanceClass::SerialPABotBase_Wired;

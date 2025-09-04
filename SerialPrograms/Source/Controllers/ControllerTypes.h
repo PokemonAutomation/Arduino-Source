@@ -35,18 +35,6 @@ enum class ControllerType{
 };
 
 
-enum class ControllerFeature{
-    TickPrecise,
-
-    //  If we add support gyro or rumble, we will need to split this feature
-    //  since the Pokken controller doesn't support those.
-    NintendoSwitch_ProController,
-
-    NintendoSwitch_LeftJoycon,
-    NintendoSwitch_RightJoycon,
-};
-
-
 enum class ControllerPerformanceClass{
     Unknown,
     SerialPABotBase_Wired,

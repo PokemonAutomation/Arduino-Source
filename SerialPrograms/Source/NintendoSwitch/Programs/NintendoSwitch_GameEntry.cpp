@@ -450,7 +450,7 @@ void start_game_from_home_with_inference(
 ){
     context.wait_for_all_requests();
 
-    if (!(context.controller().controller_type() == ControllerType::NintendoSwitch_RightJoycon)) {
+    if (dynamic_cast<RightJoycon*>(&context.controller()) == nullptr){
         console.log("Right Joycon required!", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,

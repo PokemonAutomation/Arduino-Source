@@ -113,103 +113,53 @@ const std::map<
     uint32_t,   //  Protocol Version
     std::map<
         uint32_t,   //  Program ID
-        std::map<ControllerType, ControllerFeatures>
+        std::vector<ControllerType>
     >
 > SUPPORTED_VERSIONS{
     {2025081300, {
         {PABB_PID_PABOTBASE_ArduinoUnoR3, {
-            {ControllerType::NintendoSwitch2_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
+            ControllerType::NintendoSwitch2_WiredController,
         }},
         {PABB_PID_PABOTBASE_ArduinoLeonardo, {
-            {ControllerType::NintendoSwitch2_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
+            ControllerType::NintendoSwitch2_WiredController,
         }},
         {PABB_PID_PABOTBASE_ProMicro, {
-            {ControllerType::NintendoSwitch2_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
+            ControllerType::NintendoSwitch2_WiredController,
         }},
         {PABB_PID_PABOTBASE_Teensy2, {
-            {ControllerType::NintendoSwitch2_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
+            ControllerType::NintendoSwitch2_WiredController,
         }},
         {PABB_PID_PABOTBASE_TeensyPP2, {
-            {ControllerType::NintendoSwitch2_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
+            ControllerType::NintendoSwitch2_WiredController,
         }},
     }},
     {2025081700, {
         {PABB_PID_PABOTBASE_ESP32, {
-            {ControllerType::NintendoSwitch_WirelessProController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
-            {ControllerType::NintendoSwitch_LeftJoycon, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_LeftJoycon,
-            }},
-            {ControllerType::NintendoSwitch_RightJoycon, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_RightJoycon,
-            }},
+            ControllerType::None,
+            ControllerType::NintendoSwitch_WirelessProController,
+            ControllerType::NintendoSwitch_LeftJoycon,
+            ControllerType::NintendoSwitch_RightJoycon,
         }},
         {PABB_PID_PABOTBASE_PicoW_USB, {
-            {ControllerType::NintendoSwitch_WirelessProController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
-            {ControllerType::NintendoSwitch_LeftJoycon, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_LeftJoycon,
-            }},
-            {ControllerType::NintendoSwitch_RightJoycon, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_RightJoycon,
-            }},
+            ControllerType::None,
+            ControllerType::NintendoSwitch_WirelessProController,
+            ControllerType::NintendoSwitch_LeftJoycon,
+            ControllerType::NintendoSwitch_RightJoycon,
         }},
         {PABB_PID_PABOTBASE_PicoW_UART, {
-            {ControllerType::NintendoSwitch_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
-            {ControllerType::NintendoSwitch2_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
-            {ControllerType::NintendoSwitch_WirelessProController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
-            {ControllerType::NintendoSwitch_LeftJoycon, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_LeftJoycon,
-            }},
-            {ControllerType::NintendoSwitch_RightJoycon, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_RightJoycon,
-            }},
+            ControllerType::None,
+            ControllerType::NintendoSwitch_WiredController,
+            ControllerType::NintendoSwitch2_WiredController,
+            ControllerType::NintendoSwitch_WirelessProController,
+            ControllerType::NintendoSwitch_LeftJoycon,
+            ControllerType::NintendoSwitch_RightJoycon,
         }},
     }},
     {2025081711, {
         {PABB_PID_PABOTBASE_ESP32S3, {
-            {ControllerType::NintendoSwitch_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
-            {ControllerType::NintendoSwitch2_WiredController, {
-                ControllerFeature::TickPrecise,
-                ControllerFeature::NintendoSwitch_ProController,
-            }},
+            ControllerType::None,
+            ControllerType::NintendoSwitch_WiredController,
+            ControllerType::NintendoSwitch2_WiredController,
         }},
     }},
 };

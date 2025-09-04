@@ -31,13 +31,6 @@ const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
     {ControllerType::NintendoSwitch2_RightJoycon,           "NS2: Right Joycon"},
 };
 
-const EnumStringMap<ControllerFeature> CONTROLLER_FEATURE_STRINGS{
-    {ControllerFeature::TickPrecise,                        "TickPrecise"},
-    {ControllerFeature::NintendoSwitch_ProController,       "NintendoSwitch_ProController"},
-    {ControllerFeature::NintendoSwitch_LeftJoycon,          "NintendoSwitch_LeftJoycon"},
-    {ControllerFeature::NintendoSwitch_RightJoycon,         "NintendoSwitch_RightJoycon"},
-};
-
 
 
 

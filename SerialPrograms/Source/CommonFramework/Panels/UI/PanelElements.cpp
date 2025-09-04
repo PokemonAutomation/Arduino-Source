@@ -10,7 +10,6 @@
 #include <QPushButton>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "Controllers/ControllerCapability.h"
 #include "PanelElements.h"
 
 namespace PokemonAutomation{

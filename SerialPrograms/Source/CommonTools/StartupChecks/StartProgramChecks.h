@@ -13,7 +13,6 @@
 namespace PokemonAutomation{
     class Logger;
     class VideoStream;
-    class ControllerFeatures;
     class AbstractController;
 namespace StartProgramChecks{
 
