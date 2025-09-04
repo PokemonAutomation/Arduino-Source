@@ -11,6 +11,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetectors/BlackBorderDetector.h"
 #include "Controllers/ControllerCapability.h"
+#include "Controllers/Controller.h"
 #include "StartProgramChecks.h"
 
 namespace PokemonAutomation{
@@ -47,6 +48,21 @@ void check_border(VideoStream& stream){
     );
 }
 
+
+
+void check_performance_class_wired_or_wireless(AbstractController& controller){
+    switch (controller.performance_class()){
+    case ControllerPerformanceClass::SerialPABotBase_Wired:
+    case ControllerPerformanceClass::SerialPABotBase_Wireless:
+        return;
+    default:
+        throw UserSetupError(
+            controller.logger(),
+            "Incompatible Controller:\n\n"
+            "This program requires a controller with performance class \"Wired\" or \"Wireless\"."
+        );
+    }
+}
 
 
 void check_controller_features(

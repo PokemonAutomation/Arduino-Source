@@ -35,6 +35,8 @@ inline Milliseconds round_up_to_ticksize(Milliseconds ticksize, Milliseconds dur
 
 class AbstractController{
 public:
+    static const char NAME[];
+
     virtual ~AbstractController() = default;
 
     virtual Logger& logger() = 0;
@@ -44,6 +46,7 @@ public:
 public:
     //  Static Information
 
+    virtual const char* name() = 0;
     virtual ControllerType controller_type() const = 0;
     virtual const ControllerFeatures& controller_features() const = 0;
     virtual ControllerPerformanceClass performance_class() const = 0;
@@ -187,6 +190,8 @@ public:
     virtual void keyboard_release(const QKeyEvent& event){}
 };
 
+
+inline const char AbstractController::NAME[] = "Controller";
 
 
 

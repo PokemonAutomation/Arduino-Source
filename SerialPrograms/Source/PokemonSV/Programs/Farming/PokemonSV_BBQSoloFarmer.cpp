@@ -6,17 +6,18 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
+#include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSV/PokemonSV_Settings.h"
+//#include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV_BBQSoloFarmer.h"
 
@@ -35,7 +36,7 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 struct BBQSoloFarmer_Descriptor::Stats : public StatsTracker{
@@ -70,7 +71,9 @@ BBQSoloFarmer::BBQSoloFarmer()
 }
 
 void BBQSoloFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
     assert_16_9_720p_min(env.logger(), env.console);
+
     BBQSoloFarmer_Descriptor::Stats& stats = env.current_stats<BBQSoloFarmer_Descriptor::Stats>();
 
     //Make sure console type is set

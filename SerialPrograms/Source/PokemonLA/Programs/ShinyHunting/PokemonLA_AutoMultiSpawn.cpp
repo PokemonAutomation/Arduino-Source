@@ -17,6 +17,7 @@
 #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -83,7 +84,7 @@ std::pair<bool, PokemonDetails> control_focus_to_throw(
         context,
         env.console.logger(),
         env.realtime_dispatcher(),
-        env.console.pro_controller()
+        env.console.controller<ProController>()
     );
 
     // First, let controller press ZL non-stop to start focusing on a pokemon
@@ -208,7 +209,7 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 
@@ -277,6 +278,8 @@ std::vector<int> parse_multispawn_path(SingleSwitchProgramEnvironment& env, cons
 
 
 void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 

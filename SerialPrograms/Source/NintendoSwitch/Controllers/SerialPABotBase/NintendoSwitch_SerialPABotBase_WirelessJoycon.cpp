@@ -17,55 +17,72 @@ namespace NintendoSwitch{
 
 
 
-SerialPABotBase_WirelessJoycon::SerialPABotBase_WirelessJoycon(
+SerialPABotBase_WirelessLeftJoycon::SerialPABotBase_WirelessLeftJoycon(
     Logger& logger,
-    SerialPABotBase::SerialPABotBase_Connection& connection,
-    ControllerType controller_type
+    SerialPABotBase::SerialPABotBase_Connection& connection
 )
-    : JoyconController(logger, controller_type)
-    , SerialPABotBase_WirelessController(
-        logger,
-        connection,
-        controller_type
+    : SerialPABotBase_WirelessJoycon<LeftJoycon>(
+        logger, connection,
+        ControllerType::NintendoSwitch_LeftJoycon
     )
-    , m_controller_type(controller_type)
 {
-    switch (controller_type){
-    case ControllerType::NintendoSwitch_LeftJoycon:
-        m_valid_buttons = VALID_LEFT_JOYCON_BUTTONS;
-        break;
-    case ControllerType::NintendoSwitch_RightJoycon:
-        m_valid_buttons = VALID_RIGHT_JOYCON_BUTTONS;
-        break;
-    default:
-        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Invalid joycon type.");
-    }
+    m_valid_buttons = VALID_LEFT_JOYCON_BUTTONS;
 }
-SerialPABotBase_WirelessJoycon::~SerialPABotBase_WirelessJoycon(){
+SerialPABotBase_WirelessLeftJoycon::~SerialPABotBase_WirelessLeftJoycon(){
+    JoyconController::stop();
+    SerialPABotBase_WirelessController::stop();
+}
+
+SerialPABotBase_WirelessRightJoycon::SerialPABotBase_WirelessRightJoycon(
+    Logger& logger,
+    SerialPABotBase::SerialPABotBase_Connection& connection
+)
+    : SerialPABotBase_WirelessJoycon<RightJoycon>(
+        logger, connection,
+        ControllerType::NintendoSwitch_RightJoycon
+    )
+{
+    m_valid_buttons = VALID_RIGHT_JOYCON_BUTTONS;
+}
+SerialPABotBase_WirelessRightJoycon::~SerialPABotBase_WirelessRightJoycon(){
     JoyconController::stop();
     SerialPABotBase_WirelessController::stop();
 }
 
 
 
-void SerialPABotBase_WirelessJoycon::issue_buttons(
+
+
+
+
+template <typename JoyconType>
+SerialPABotBase_WirelessJoycon<JoyconType>::SerialPABotBase_WirelessJoycon(
+    Logger& logger,
+    SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerType controller_type
+)
+    : JoyconType(logger, controller_type)
+    , SerialPABotBase_WirelessController(
+        logger,
+        connection,
+        controller_type
+    )
+    , m_controller_type(controller_type)
+{}
+
+
+
+template <typename JoyconType>
+void SerialPABotBase_WirelessJoycon<JoyconType>::issue_buttons(
     const Cancellable* cancellable,
     Button button,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
 ){
     button &= m_valid_buttons;
-    switch (m_controller_type){
-    case ControllerType::NintendoSwitch_LeftJoycon:
-        ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
-        break;
-    case ControllerType::NintendoSwitch_RightJoycon:
-        ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
-        break;
-    default:
-        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Invalid joycon type.");
-    }
+    ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
 }
-void SerialPABotBase_WirelessJoycon::issue_joystick(
+template <typename JoyconType>
+void SerialPABotBase_WirelessJoycon<JoyconType>::issue_joystick(
     const Cancellable* cancellable,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown
@@ -81,7 +98,8 @@ void SerialPABotBase_WirelessJoycon::issue_joystick(
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Invalid joycon type.");
     }
 }
-void SerialPABotBase_WirelessJoycon::issue_full_controller_state(
+template <typename JoyconType>
+void SerialPABotBase_WirelessJoycon<JoyconType>::issue_full_controller_state(
     const Cancellable* cancellable,
     Button button,
     uint8_t joystick_x, uint8_t joystick_y,
@@ -115,7 +133,8 @@ void SerialPABotBase_WirelessJoycon::issue_full_controller_state(
 
 
 
-void SerialPABotBase_WirelessJoycon::issue_mash_button(
+template <typename JoyconType>
+void SerialPABotBase_WirelessJoycon<JoyconType>::issue_mash_button(
     const Cancellable* cancellable,
     Button button, Milliseconds duration
 ){
@@ -126,7 +145,8 @@ void SerialPABotBase_WirelessJoycon::issue_mash_button(
 
 
 
-void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* cancellable, WallDuration duration){
+template <typename JoyconType>
+void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_left_joycon(const Cancellable* cancellable, WallDuration duration){
     pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
@@ -155,7 +175,8 @@ void SerialPABotBase_WirelessJoycon::push_state_left_joycon(const Cancellable* c
         issue_report(cancellable, duration, buttons, gyro);
     }
 }
-void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* cancellable, WallDuration duration){
+template <typename JoyconType>
+void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_right_joycon(const Cancellable* cancellable, WallDuration duration){
     pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
@@ -186,7 +207,8 @@ void SerialPABotBase_WirelessJoycon::push_state_right_joycon(const Cancellable* 
         issue_report(cancellable, duration, buttons, gyro);
     }
 }
-void SerialPABotBase_WirelessJoycon::push_state(const Cancellable* cancellable, WallDuration duration){
+template <typename JoyconType>
+void SerialPABotBase_WirelessJoycon<JoyconType>::push_state(const Cancellable* cancellable, WallDuration duration){
     switch (m_controller_type){
     case ControllerType::NintendoSwitch_LeftJoycon:
         push_state_left_joycon(cancellable, duration);
@@ -198,6 +220,9 @@ void SerialPABotBase_WirelessJoycon::push_state(const Cancellable* cancellable, 
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Invalid joycon type.");
     }
 }
+
+
+
 
 
 

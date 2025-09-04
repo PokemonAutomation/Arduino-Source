@@ -17,6 +17,7 @@
 #include "CommonFramework/Panels/ProgramDescriptor.h"
 #include "Controllers/ControllerCapability.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{

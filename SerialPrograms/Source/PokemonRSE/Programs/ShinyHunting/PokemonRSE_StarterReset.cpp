@@ -6,11 +6,12 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
@@ -31,7 +32,7 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 
@@ -83,6 +84,8 @@ StarterReset::StarterReset()
 }
 
 void StarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     StarterReset_Descriptor::Stats& stats = env.current_stats<StarterReset_Descriptor::Stats>();
 
     /*

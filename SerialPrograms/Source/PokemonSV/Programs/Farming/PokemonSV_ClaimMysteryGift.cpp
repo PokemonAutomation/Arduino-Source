@@ -7,22 +7,23 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/GlobalSettingsPanel.h"
+//#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/ProgramStats/StatsTracking.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Pokemon_Strings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_SelectedSettingDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
-#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
-#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
+//#include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
+//#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
-#include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
+//#include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStory.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_ClaimMysteryGift.h"
@@ -49,7 +50,7 @@ ClaimMysteryGift_Descriptor::ClaimMysteryGift_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 
@@ -381,7 +382,9 @@ void ClaimMysteryGift::run_autostory_until_pokeportal_unlocked(SingleSwitchProgr
 
 
 void ClaimMysteryGift::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
     assert_16_9_720p_min(env.logger(), env.console);
+
     // ClaimMysteryGiftStats& stats = env.current_stats<ClaimMysteryGiftStats>();
 
 

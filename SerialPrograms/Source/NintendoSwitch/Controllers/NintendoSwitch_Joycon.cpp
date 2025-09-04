@@ -24,6 +24,11 @@ namespace NintendoSwitch{
 using namespace std::chrono_literals;
 
 
+const char JoyconController::NAME[] = "Nintendo Switch: Joycon";
+const char LeftJoycon::NAME[] = "Nintendo Switch: Left Joycon";
+const char RightJoycon::NAME[] = "Nintendo Switch: Right Joycon";
+
+
 
 class JoyconController::KeyboardManager final :
     public PokemonAutomation::KeyboardManager<JoyconState, JoyconDeltas>

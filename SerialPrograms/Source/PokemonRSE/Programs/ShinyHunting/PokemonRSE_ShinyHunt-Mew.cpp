@@ -4,13 +4,14 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
+//#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -31,7 +32,7 @@ ShinyHuntMew_Descriptor::ShinyHuntMew_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 
@@ -190,6 +191,8 @@ void ShinyHuntMew::exit_mew(SingleSwitchProgramEnvironment& env, ProControllerCo
 }
 
 void ShinyHuntMew::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     ShinyHuntMew_Descriptor::Stats& stats = env.current_stats<ShinyHuntMew_Descriptor::Stats>();
 
     /*

@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -20,7 +21,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
@@ -29,10 +31,10 @@ RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
         STRING_POKEMON + " SwSh", "Raid Item Farmer (OHKO)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/RaidItemFarmerOHKO.md",
         "Farm items from raids that can be OHKO'ed. (requires multiple Switches)",
-        ProgramControllerClass::StandardController_NoRestrictions,
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {},
         2, 4, 2
     )
 {}
@@ -98,7 +100,7 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO()
 }
 
 void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    ProControllerContext host(scope, env.consoles[0].pro_controller());
+    ProControllerContext host(scope, env.consoles[0].controller<ProController>());
     size_t switches = env.consoles.size();
 
     WallDuration TOUCH_DATE_INTERVAL = TOUCH_DATE_INTERVAL0;
@@ -106,6 +108,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
     env.run_in_parallel(
         scope,
         [](ConsoleHandle& console, ProControllerContext& context){
+            StartProgramChecks::check_performance_class_wired_or_wireless(context);
             grip_menu_connect_go_home(context);
         }
     );

@@ -6,9 +6,10 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h"
@@ -29,7 +30,7 @@ AudioStarterReset_Descriptor::AudioStarterReset_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 
@@ -85,6 +86,8 @@ AudioStarterReset::AudioStarterReset()
 }
 
 void AudioStarterReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     AudioStarterReset_Descriptor::Stats& stats = env.current_stats<AudioStarterReset_Descriptor::Stats>();
 
     /*

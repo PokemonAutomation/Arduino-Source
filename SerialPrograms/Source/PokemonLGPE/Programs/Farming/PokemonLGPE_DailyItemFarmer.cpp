@@ -157,7 +157,7 @@ void DailyItemFarmer::start_local_trade(SingleSwitchProgramEnvironment& env, Joy
 }
 
 void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
-    JoyconContext context(scope, env.console.controller<JoyconController>());
+    JoyconContext context(scope, env.console.controller<RightJoycon>());
     assert_16_9_720p_min(env.logger(), env.console);
     DailyItemFarmer_Descriptor::Stats& stats = env.current_stats<DailyItemFarmer_Descriptor::Stats>();
 

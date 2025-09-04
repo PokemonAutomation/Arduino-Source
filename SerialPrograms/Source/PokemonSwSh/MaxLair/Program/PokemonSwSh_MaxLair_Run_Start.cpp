@@ -130,7 +130,7 @@ bool start_raid_local(
     ConsoleRuntime console_stats[4]
 ){
     if (env.consoles.size() == 1){
-        ProControllerContext context(scope, host.pro_controller());
+        ProControllerContext context(scope, host.controller<ProController>());
         return start_raid_self_solo(
             env.program_info(), host, context,
             state_tracker, entrance[0], boss_slot, console_stats[0].ore
@@ -279,7 +279,7 @@ bool start_raid_host(
     ConsoleRuntime console_stats[4]
 ){
     if (env.consoles.size() == 1){
-        ProControllerContext context(scope, host.pro_controller());
+        ProControllerContext context(scope, host.controller<ProController>());
         return start_raid_host_solo(
             env, host, context,
             state_tracker,

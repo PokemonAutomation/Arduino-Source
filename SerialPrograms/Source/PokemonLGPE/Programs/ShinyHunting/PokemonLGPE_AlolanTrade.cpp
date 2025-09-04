@@ -137,7 +137,7 @@ void AlolanTrade::run_trade(SingleSwitchProgramEnvironment& env, JoyconContext& 
 }
 
 void AlolanTrade::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
-    JoyconContext context(scope, env.console.controller<JoyconController>());
+    JoyconContext context(scope, env.console.controller<RightJoycon>());
     assert_16_9_720p_min(env.logger(), env.console);
     AlolanTrade_Descriptor::Stats& stats = env.current_stats<AlolanTrade_Descriptor::Stats>();
 

@@ -10,7 +10,7 @@
 #include <memory>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "Controllers/NintendoSwitch_ProController.h"
+#include "Controllers/Controller.h"
 #include "NintendoSwitch_ConsoleState.h"
 
 namespace PokemonAutomation{
@@ -47,18 +47,13 @@ public:
         if (ret){
             return *ret;
         }
-        throw InternalProgramError(&logger(), PA_CURRENT_FUNCTION, "Unable to cast controller.");
+        throw UserSetupError(
+            logger(),
+            std::string("Incompatible Controller:\n\n") +
+            "Required:\n    " + ControllerType::NAME + "\n"
+            "Actual:\n    " + m_controller.name()
+        );
     }
-
-    //  REMOVE: Temporary for refactor.
-    ProController& pro_controller(){
-        ProController* ret = dynamic_cast<ProController*>(&m_controller);
-        if (ret){
-            return *ret;
-        }
-        throw InternalProgramError(&logger(), PA_CURRENT_FUNCTION, "Unable to cast to ProController.");
-    }
-
 
     operator Logger&(){ return logger(); }
     operator VideoFeed&(){ return video(); }

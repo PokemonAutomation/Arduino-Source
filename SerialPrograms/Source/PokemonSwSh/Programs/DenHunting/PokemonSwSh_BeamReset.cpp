@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -24,10 +25,10 @@ BeamReset_Descriptor::BeamReset_Descriptor()
         STRING_POKEMON + " SwSh", "Beam Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BeamReset.md",
         "Reset a beam until you see a purple beam.",
-        ProgramControllerClass::StandardController_NoRestrictions,
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {},
         true
     )
 {}
@@ -52,6 +53,8 @@ BeamReset::BeamReset()
 }
 
 void BeamReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);

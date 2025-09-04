@@ -149,7 +149,7 @@ bool LegendaryReset::run_encounter(SingleSwitchProgramEnvironment& env, JoyconCo
 }
 
 void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
-    JoyconContext context(scope, env.console.controller<JoyconController>());
+    JoyconContext context(scope, env.console.controller<RightJoycon>());
     assert_16_9_720p_min(env.logger(), env.console);
     LegendaryReset_Descriptor::Stats& stats = env.current_stats<LegendaryReset_Descriptor::Stats>();
 

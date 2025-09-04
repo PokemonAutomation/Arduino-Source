@@ -8,6 +8,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -154,7 +155,7 @@ AutoStory_Descriptor::AutoStory_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 
@@ -807,6 +808,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
 }
 
 void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
     assert_16_9_720p_min(env.logger(), env.console);
 
 

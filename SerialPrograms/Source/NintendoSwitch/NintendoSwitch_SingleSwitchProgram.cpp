@@ -75,7 +75,7 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(
 
 
 void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
-    ProControllerContext context(scope, env.console.pro_controller());
+    ProControllerContext context(scope, env.console.controller<ProController>());
     program(env, context);
 }
 void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -90,11 +90,13 @@ void SingleSwitchProgramInstance::start_program_controller_check(
         throw UserSetupError(session.logger(), "Cannot Start: Controller is not ready.");
     }
 
+#if 0   //  REMOVE
     StartProgramChecks::check_controller_features(
         session.logger(),
         session.controller()->controller_features(),
         session.required_features()
     );
+#endif
 }
 void SingleSwitchProgramInstance::start_program_feedback_check(
     VideoStream& stream,

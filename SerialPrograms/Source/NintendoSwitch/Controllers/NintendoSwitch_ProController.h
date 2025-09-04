@@ -60,6 +60,14 @@ public:
     ProController(Logger& logger);
     virtual ~ProController();
 
+
+public:
+    static const char NAME[];
+    virtual const char* name() override{
+        return NAME;
+    };
+
+
 protected:
     //  Must call before destruction begins.
     void stop() noexcept;

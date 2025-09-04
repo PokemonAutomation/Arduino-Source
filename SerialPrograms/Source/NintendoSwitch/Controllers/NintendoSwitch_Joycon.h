@@ -56,6 +56,14 @@ public:
     JoyconController(Logger& logger, ControllerType controller_type);
     virtual ~JoyconController();
 
+
+public:
+    static const char NAME[];
+    virtual const char* name() override{
+        return NAME;
+    };
+
+
 protected:
     //  Must call before destruction begins.
     void stop() noexcept;
@@ -171,6 +179,24 @@ private:
 
 
 
+class LeftJoycon : public JoyconController{
+public:
+    using JoyconController::JoyconController;
+
+    static const char NAME[];
+    virtual const char* name() override{
+        return NAME;
+    };
+};
+class RightJoycon : public JoyconController{
+public:
+    using JoyconController::JoyconController;
+
+    static const char NAME[];
+    virtual const char* name() override{
+        return NAME;
+    };
+};
 
 
 

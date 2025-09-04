@@ -79,7 +79,7 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
             ThreadUtilizationStat stat(current_thread_handle(), "Program Thread " + std::to_string(index) + ":");
             console.overlay().add_stat(stat);
             try{
-                ProControllerContext context(scope, consoles[index].pro_controller());  //  REMOVE: don't use pro_controller()
+                ProControllerContext context(scope, consoles[index].controller<ProController>());   //  REMOVE: don't use pro_controller()
                 func(console, context);
                 context.wait_for_all_requests();
                 console.overlay().remove_stat(stat);

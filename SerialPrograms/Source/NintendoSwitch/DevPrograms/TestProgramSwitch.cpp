@@ -176,7 +176,7 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {},
         1, 4, 1
     )
 {}
@@ -261,12 +261,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    [[maybe_unused]] BotBase& botbase = env.consoles[0];
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
-    ProControllerContext context(scope, console.pro_controller());
+    ProControllerContext context(scope, console.controller<ProController>());
     VideoOverlaySet overlays(overlay);
 
     AsyncCommandSession<ProController> session(
         scope, logger, env.realtime_dispatcher(),
-        console.pro_controller()
+        console.controller<ProController>()
     );
 
     Milliseconds delay = 500ms;

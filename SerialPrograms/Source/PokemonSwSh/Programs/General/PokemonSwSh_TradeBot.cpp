@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -17,7 +18,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 TradeBot_Descriptor::TradeBot_Descriptor()
@@ -29,7 +31,7 @@ TradeBot_Descriptor::TradeBot_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 
@@ -155,6 +157,8 @@ void TradeBot::trade_slot(
 }
 
 void TradeBot::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     std::string code = TRADE_CODE.to_str();
 
     if (START_LOCATION.start_in_grip_menu()){

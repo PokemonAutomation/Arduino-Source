@@ -14,15 +14,6 @@ namespace SerialPABotBase{
 
 
 
-//  Defaults
-const ControllerFeatures OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS{
-    ControllerFeature::TickPrecise,
-    ControllerFeature::NintendoSwitch_ProController,
-};
-
-
-
-
 std::string program_name(uint8_t id){
     switch (id){
     case PABB_PID_UNSPECIFIED:                  return "None";

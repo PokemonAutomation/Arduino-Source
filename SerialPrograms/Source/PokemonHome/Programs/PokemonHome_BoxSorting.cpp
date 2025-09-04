@@ -38,6 +38,7 @@ language
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/OCR/OCR_NumberReader.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonHome/Inference/PokemonHome_BoxGenderDetector.h"
@@ -63,7 +64,7 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 struct BoxSorting_Descriptor::Stats : public StatsTracker{
@@ -458,6 +459,7 @@ void do_sort(
 }
 
 void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
 
     std::vector<BoxSortingSelection> sort_preferences = SORT_TABLE.preferences();
     if (sort_preferences.empty()){

@@ -7,6 +7,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "ZeldaTotK_MineruItemDuper.h"
@@ -24,7 +25,7 @@ MineruItemDuper_Descriptor::MineruItemDuper_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 
@@ -66,6 +67,8 @@ MineruItemDuper::MineruItemDuper()
 }
 
 void MineruItemDuper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     MineruItemDuper_Descriptor::Stats& stats = env.current_stats<MineruItemDuper_Descriptor::Stats>();
 
     /*

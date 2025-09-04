@@ -8,16 +8,17 @@
 #include <sstream>
 #include <map>
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Exceptions/OperationFailedException.h"
+//#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSwSh/PokemonSwSh_Settings.h"
+//#include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_BoxReorderNationalDex.h"
 
@@ -142,7 +143,7 @@ BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS}
+        {}
     )
 {}
 
@@ -173,6 +174,8 @@ BoxReorderNationalDex::BoxReorderNationalDex()
 }
 
 void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     if (START_LOCATION.start_in_grip_menu()){
         grip_menu_connect_go_home(context);
         resume_game_no_interact(env.console, context, DODGE_SYSTEM_UPDATE_WINDOW);

@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"
 #include "PokemonSwSh_EggCombinedShared.h"
@@ -22,10 +23,10 @@ EggCombined2_Descriptor::EggCombined2_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Combined 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggCombined2.md",
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
-        ProgramControllerClass::StandardController_NoRestrictions,
+        ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
-        {SerialPABotBase::OLD_NINTENDO_SWITCH_DEFAULT_REQUIREMENTS},
+        {},
         true
     )
 {}
@@ -80,6 +81,8 @@ EggCombined2::EggCombined2()
 }
 
 void EggCombined2::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StartProgramChecks::check_performance_class_wired_or_wireless(context);
+
     EggCombinedSession session{
         BOXES_TO_HATCH,
         STEPS_TO_HATCH,

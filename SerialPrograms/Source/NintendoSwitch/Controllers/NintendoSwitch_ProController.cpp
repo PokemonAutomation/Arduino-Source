@@ -23,6 +23,7 @@ namespace NintendoSwitch{
 using namespace std::chrono_literals;
 
 
+const char ProController::NAME[] = "Nintendo Switch: Pro Controller";
 
 
 
