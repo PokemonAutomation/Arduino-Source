@@ -84,7 +84,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_19>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_20>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_21>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_22>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_22>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_23>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_24>());
 
@@ -798,7 +798,22 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         //     128, 0, 60, 10, false);
 
         DirectionDetector direction;
+
+        // talk to receptionist
+        env.console.log("Talk to Levincia gym receptionist.");
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});    
         
+        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        // wait for dialog after leaving gym
+        // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20, 128, 255);
+
+        // mash A until grey bar at top.
+
+        // the cursor will automatically zoom in on the desired target
+
         return;
     }
 

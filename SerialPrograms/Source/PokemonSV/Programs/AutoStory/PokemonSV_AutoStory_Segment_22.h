@@ -36,8 +36,8 @@ void checkpoint_50(
     AutoStoryStats& stats
 );
 
-// start: 
-// end: 
+// start: At Levincia (South) Pokecenter.
+// end: At Levincia gym building. Talked to Hassel, met Rika.
 void checkpoint_51(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,

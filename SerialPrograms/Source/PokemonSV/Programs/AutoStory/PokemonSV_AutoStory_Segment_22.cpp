@@ -52,7 +52,9 @@ void AutoStory_Segment_22::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    // checkpoint_50(env, context, options.notif_status_update, stats);
+    checkpoint_50(env, context, options.notif_status_update, stats);
+    checkpoint_51(env, context, options.notif_status_update, stats);
+    checkpoint_52(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -148,6 +150,26 @@ void checkpoint_51(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
+        context.wait_for_all_requests();
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 128, 50);
+        pbf_move_left_joystick(context, 128, 0, 400, 100);        
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 170, 0, 60);
+        pbf_move_left_joystick(context, 128, 0, 1800, 100);       
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 85, 60);
+        
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, 0, 0, 100, 50);   // move forward/left
+            },
+            5, 5
+        );         
+
+        // enter gym building. talk to Hassel, meet Rika
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD}); 
+
 
     });    
 
@@ -161,6 +183,15 @@ void checkpoint_52(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        // talk to receptionist
+        env.console.log("Talk to Levincia gym receptionist.");
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 10);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});    
+        
+        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        // wait for overworld after leaving gym
+        wait_for_overworld(env.program_info(), env.console, context, 30); 
 
 
     });
