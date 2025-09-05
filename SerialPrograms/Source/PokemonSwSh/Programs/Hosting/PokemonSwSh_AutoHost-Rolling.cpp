@@ -196,7 +196,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, ProController
 
         //  Exit game.
         ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 160ms);
-        close_game(env.console, context);
+        close_game_from_home(env.console, context);
 
         //  Post-raid delay.
         pbf_wait(context, EXTRA_DELAY_BETWEEN_RAIDS0);

@@ -71,7 +71,7 @@ void close_game_if_overworld(
     pbf_press_dpad(context, DPAD_DOWN, 10, 10);
 
     //  Close and restart game.
-    close_game(console, context);
+    close_game_from_home(console, context);
     pbf_press_button(context, BUTTON_HOME, 10, 190);
 }
 

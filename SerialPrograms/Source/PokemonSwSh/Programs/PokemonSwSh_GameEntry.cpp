@@ -138,7 +138,7 @@ void reset_game_from_home_with_inference(
         tolerate_update_menu
     ){
 //        cout << "close game" << endl;
-        close_game(console, context);
+        close_game_from_home(console, context);
 //        cout << "start_game_from_home_with_inference game" << endl;
         start_game_from_home_with_inference(
             console, context, tolerate_update_menu, 0, 0, backup_save, post_wait_time
@@ -168,7 +168,7 @@ void start_game_from_home(
         tolerate_update_menu
     ){
 //        cout << "close game" << endl;
-        close_game(console, context);
+        close_game_from_home(console, context);
 //        cout << "start_game_from_home_with_inference game" << endl;
         start_game_from_home_with_inference(
             console, context, tolerate_update_menu, game_slot, user_slot, backup_save, post_wait_time
