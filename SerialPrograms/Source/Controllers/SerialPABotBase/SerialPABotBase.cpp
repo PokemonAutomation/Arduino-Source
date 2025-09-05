@@ -23,8 +23,6 @@ const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES(){
         {PABB_PID_PABOTBASE_TeensyPP2,          2025090300},
         {PABB_PID_PABOTBASE_ESP32,              2025090300},
         {PABB_PID_PABOTBASE_ESP32S3,            2025090300},
-        {PABB_PID_PABOTBASE_PicoW_USB,          2025090300},
-        {PABB_PID_PABOTBASE_PicoW_UART,         2025090300},
     };
     return database;
 }

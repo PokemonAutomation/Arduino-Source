@@ -179,10 +179,17 @@ ControllerType SerialPABotBase_Connection::process_device(bool set_to_null_contr
     if (PROGRAMS.find(m_program_id) == PROGRAMS.end()){
 #if 1
         m_logger.Logger::log(
-            "Unrecognized Program ID: 0x" + tostr_hex(m_program_id) + " for this protocol version. "
+            "Unrecognized Program ID: (0x" + tostr_hex(m_program_id) + ") for this protocol version. "
             "Compatibility is not guaranteed.",
             COLOR_RED
         );
+        if (PROGRAMS.find(PABB_PID_UNSPECIFIED) == PROGRAMS.end()){
+            throw SerialProtocolException(
+                m_logger, PA_CURRENT_FUNCTION,
+                "Unrecognized program IDs require latest protocol.<br>"
+                "Program ID: 0x" + tostr_hex(m_program_id) + ", Device Protocol: " + std::to_string(m_protocol)
+            );
+        }
 #else
         throw SerialProtocolException(
             m_logger, PA_CURRENT_FUNCTION,
@@ -288,7 +295,7 @@ void SerialPABotBase_Connection::thread_body(bool set_to_null_controller){
             error = e.message();
         }
         if (!error.empty()){
-            m_ready.store(false, std::memory_order_relaxed);
+//            m_ready.store(false, std::memory_order_relaxed);
             set_status_line0(error, COLOR_RED);
 //            signal_pre_not_ready();
             m_botbase->stop();

@@ -301,6 +301,12 @@ std::string ControllerSession::reset(bool clear_settings){
 //                return "No connection set.";
 //            }
 
+//            cout << "Checking readiness... " << (int)m_desired_controller << endl;
+            if (m_connection && m_connection->is_ready()){
+                m_desired_controller = m_connection->current_controller();
+//                cout << "Ready! - " << (int)m_desired_controller << endl;
+            }
+
             //  Move these out to indicate that we should no longer access them.
             controller = std::move(m_controller);
             connection = std::move(m_connection);
@@ -358,7 +364,11 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
         }
 
         reset_mode = m_next_reset_mode;
+
+        supported_controllers = m_connection->controller_list();
+        current_controller = m_connection->current_controller();
     }
+    signal_controller_changed(current_controller, supported_controllers);
 
     //  Construct the controller.
     if (desired_controller != ControllerType::None){
@@ -389,7 +399,6 @@ void ControllerSession::post_connection_ready(ControllerConnection& connection){
 //        cout << "current_controller = " << CONTROLLER_TYPE_STRINGS.get_string(current_controller) << endl;
         ready = m_controller && m_controller->is_ready();
     }
-
     signal_controller_changed(current_controller, supported_controllers);
     signal_ready_changed(ready);
     signal_status_text_changed(status_text());
