@@ -39,7 +39,7 @@ std::string AutoStory_Segment_22::start_text() const{
 }
 
 std::string AutoStory_Segment_22::end_text() const{
-    return "End: ";
+    return "End: Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.";
 }
 
 void AutoStory_Segment_22::run_segment(
@@ -58,6 +58,7 @@ void AutoStory_Segment_22::run_segment(
     checkpoint_50(env, context, options.notif_status_update, stats);
     checkpoint_51(env, context, options.notif_status_update, stats);
     checkpoint_52(env, context, options.notif_status_update, stats);
+    checkpoint_53(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -320,38 +321,34 @@ void checkpoint_53(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
+        // realign camera. 
+        pbf_press_button(context, BUTTON_L, 30, 30);
+
+        // walk backwards into the Gym building
+        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+
+        // talk to Gym receptionist
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
+        env.console.log("Battle Electric Gym leader.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        // Gym leader defeated. Standing in Gym building
+        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);
+        // wait for overworld after leaving Gym
+        wait_for_overworld(env.program_info(), env.console, context, 30);
+
+        // fly to Levincia (North) Pokecenter
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 100, 0, 50});
 
     });
 
 }
 
-void checkpoint_54(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
-
-
-    });    
-
-}
-
-void checkpoint_55(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
-
-
-    });    
-
-}
 
 }
 }

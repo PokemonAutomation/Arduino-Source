@@ -641,6 +641,11 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_53(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_54(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_55(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_56(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_57(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_58(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_59(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_60(env, context, notif_status_update, stats);});
     
 
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
