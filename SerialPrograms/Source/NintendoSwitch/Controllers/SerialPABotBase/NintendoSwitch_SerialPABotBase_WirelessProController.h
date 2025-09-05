@@ -25,7 +25,8 @@ class SerialPABotBase_WirelessProController final :
 public:
     SerialPABotBase_WirelessProController(
         Logger& logger,
-        SerialPABotBase::SerialPABotBase_Connection& connection
+        SerialPABotBase::SerialPABotBase_Connection& connection,
+        ControllerResetMode reset_mode
     );
     ~SerialPABotBase_WirelessProController();
 

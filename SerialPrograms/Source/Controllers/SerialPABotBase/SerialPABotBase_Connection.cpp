@@ -18,7 +18,6 @@
 #include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "SerialPABotBase.h"
-#include "SerialPABotBase_PostConnectActions.h"
 #include "SerialPABotBase_Connection.h"
 
 //#include <iostream>
@@ -35,8 +34,7 @@ namespace SerialPABotBase{
 SerialPABotBase_Connection::SerialPABotBase_Connection(
     Logger& logger,
     const QSerialPortInfo* port,
-    std::optional<ControllerType> change_controller,
-    bool clear_settings
+    bool set_to_null_controller
 )
     : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
 {
@@ -84,7 +82,7 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
     m_status_thread = std::thread(
         run_with_catch,
         "SerialPABotBase_Connection::thread_body()",
-        [=, this]{ thread_body(change_controller, clear_settings); }
+        [=, this]{ thread_body(set_to_null_controller); }
     );
 }
 SerialPABotBase_Connection::~SerialPABotBase_Connection(){
@@ -113,13 +111,18 @@ BotBaseController* SerialPABotBase_Connection::botbase(){
     }
     return ret;
 }
-
-
-
-ControllerModeStatus SerialPABotBase_Connection::controller_mode_status() const{
-    std::lock_guard<std::mutex> lg(m_lock);
-    return m_mode_status;
+ControllerType SerialPABotBase_Connection::refresh_controller_type(){
+    m_logger.log("Reading Controller Mode...");
+    uint32_t type_id = read_controller_mode(*botbase());
+    ControllerType current_controller = id_to_controller_type(type_id);
+    m_logger.log(
+        "Reading Controller Mode... Mode = " +
+        CONTROLLER_TYPE_STRINGS.get_string(current_controller)
+    );
+    m_current_controller.store(current_controller, std::memory_order_release);
+    return current_controller;
 }
+
 
 
 
@@ -146,23 +149,6 @@ const std::set<pabb_ProgramID>& SerialPABotBase_Connection::get_programs_for_pro
     return iter->second;
 }
 
-#if 0
-const std::vector<ControllerType>& SerialPABotBase_Connection::get_controllers_for_program(
-    const std::map<uint32_t, std::vector<ControllerType>>& available_programs,
-    uint32_t program_id
-){
-    auto iter = available_programs.find(program_id);
-    if (iter == available_programs.end()){
-        throw SerialProtocolException(
-            m_logger, PA_CURRENT_FUNCTION,
-            "Unrecognized Program ID: " + std::to_string(program_id) + "<br>"
-            "Please install the firmware that came with this version of the program."
-        );
-    }
-    return iter->second;
-}
-#endif
-
 void SerialPABotBase_Connection::process_queue_size(){
     m_logger.log("Requesting queue size...");
     uint8_t queue_size = device_queue_size(*m_botbase);
@@ -174,28 +160,8 @@ void SerialPABotBase_Connection::process_queue_size(){
     m_logger.Logger::log("Setting queue size to: " + std::to_string(queue_size));
     m_botbase->set_queue_limit(queue_size);
 }
-ControllerType SerialPABotBase_Connection::get_controller_type(
-    const std::vector<ControllerType>& available_controllers
-){
-    m_logger.log("Reading Controller Mode...");
-    ControllerType current_controller = ControllerType::None;
-    if (available_controllers.size() == 1){
-        current_controller = available_controllers[0];
-    }else if (available_controllers.size() > 1){
-        uint32_t type_id = read_controller_mode(*m_botbase);
-//        cout << "type_id = " << type_id << endl;
-        current_controller = id_to_controller_type(type_id);
-    }
-    m_logger.Logger::log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
-    return current_controller;
-}
 
-
-
-ControllerModeStatus SerialPABotBase_Connection::process_device(
-    std::optional<ControllerType> change_controller,
-    bool clear_settings
-){
+ControllerType SerialPABotBase_Connection::process_device(bool set_to_null_controller){
     //  Protocol Version
     {
         m_logger.Logger::log("Checking Protocol Version...");
@@ -243,57 +209,39 @@ ControllerModeStatus SerialPABotBase_Connection::process_device(
     //  Controller List
     {
         m_logger.Logger::log("Checking Controller List...");
-        m_controller_list = controller_list(*m_botbase);
         std::string str;
         bool first = true;
-        for (pabb_ControllerID id : m_controller_list){
+        for (pabb_ControllerID id : SerialPABotBase::controller_list(*m_botbase)){
             if (!first){
                 str += ", ";
             }
             first = false;
             str += "0x" + tostr_hex(id);
+            m_controller_list.emplace_back(id_to_controller_type(id));
         }
         m_logger.Logger::log("Checking Controller List... (" + str + ")");
-    }
-
-    std::vector<ControllerType> controllers;
-    for (pabb_ControllerID id : m_controller_list){
-        controllers.emplace_back(id_to_controller_type(id));
     }
 
     //  Queue Size
     process_queue_size();
 
     //  Current Controller
-    ControllerType current_controller;
-    {
-        m_logger.log("Reading Controller Mode...");
-        uint32_t type_id = read_controller_mode(*m_botbase);
-        current_controller = id_to_controller_type(type_id);
-        m_logger.Logger::log("Reading Controller Mode... Mode = " + CONTROLLER_TYPE_STRINGS.get_string(current_controller));
+    ControllerType current_controller = refresh_controller_type();
+
+    if (set_to_null_controller && current_controller != ControllerType::None){
+        m_botbase->issue_request_and_wait(
+            DeviceRequest_change_controller_mode(PABB_CID_NONE),
+            nullptr
+        );
+        current_controller = refresh_controller_type();
     }
 
-//    //  Controller Type
-//    ControllerType current_controller = get_controller_type(controllers);
-
-    //  Run any post-connection actions specific to this program.
-    ControllerModeStatus ret{current_controller, controllers};
-    run_post_connect_actions(
-        ret,
-        m_program_id, m_device_name,
-        *m_botbase,
-        change_controller,
-        clear_settings
-    );
-    return ret;
+    return current_controller;
 }
 
 
 
-void SerialPABotBase_Connection::thread_body(
-    std::optional<ControllerType> change_controller,
-    bool clear_settings
-){
+void SerialPABotBase_Connection::thread_body(bool set_to_null_controller){
     using namespace PokemonAutomation;
 
     m_botbase->set_sniffer(&m_logger);
@@ -322,15 +270,16 @@ void SerialPABotBase_Connection::thread_body(
     //  Check protocol and version.
 
     {
-        ControllerModeStatus mode_status;
         std::string error;
         try{
-            mode_status = process_device(change_controller, clear_settings);
-            std::lock_guard<std::mutex> lg(m_lock);
-            m_mode_status = mode_status;
+            process_device(set_to_null_controller);
 
             //  Stop pending commands.
             m_botbase->stop_all_commands();
+
+            std::string text = m_program_name + " (" + std::to_string(m_version) + ")";
+            set_status_line0(text, theme_friendly_darkblue());
+            declare_ready();
         }catch (InvalidConnectionStateException&){
             return;
         }catch (SerialProtocolException& e){
@@ -338,13 +287,7 @@ void SerialPABotBase_Connection::thread_body(
         }catch (ConnectionException& e){
             error = e.message();
         }
-        if (error.empty()){
-//            std::string text = "Program: " + program_name(m_program_id) + " (" + std::to_string(m_version) + ")";
-//            std::string text = program_name(m_program_id) + " (" + std::to_string(m_version) + ")";
-            std::string text = m_program_name + " (" + std::to_string(m_version) + ")";
-            set_status_line0(text, theme_friendly_darkblue());
-            declare_ready(mode_status);
-        }else{
+        if (!error.empty()){
             m_ready.store(false, std::memory_order_relaxed);
             set_status_line0(error, COLOR_RED);
 //            signal_pre_not_ready();

@@ -36,10 +36,9 @@ SerialPABotBase_Controller::SerialPABotBase_Controller(
 
     //  Check compatibility.
 
-    ControllerModeStatus mode_status = connection.controller_mode_status();
     logger.log(
         "SerialPABotBase_Controller(): ControllerType = " +
-        CONTROLLER_TYPE_STRINGS.get_string(mode_status.current_controller)
+        CONTROLLER_TYPE_STRINGS.get_string(connection.current_controller())
     );
 }
 

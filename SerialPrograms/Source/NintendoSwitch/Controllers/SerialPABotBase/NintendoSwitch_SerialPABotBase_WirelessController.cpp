@@ -7,6 +7,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -30,7 +31,8 @@ using namespace std::chrono_literals;
 SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
-    ControllerType controller_type
+    ControllerType controller_type,
+    ControllerResetMode reset_mode
 )
     : SerialPABotBase_Controller(
         logger,
@@ -40,8 +42,36 @@ SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
     , m_controller_type(controller_type)
     , m_timing_variation(ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS_ESP32)
     , m_stopping(false)
-    , m_status_thread(&SerialPABotBase_WirelessController::status_thread, this)
-{}
+{
+    using namespace SerialPABotBase;
+
+    switch (reset_mode){
+    case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
+        break;
+    case PokemonAutomation::ControllerResetMode::SIMPLE_RESET:
+        set_info();
+        connection.botbase()->issue_request_and_wait(
+            DeviceRequest_change_controller_mode(controller_type_to_id(controller_type)),
+            nullptr
+        );
+        break;
+    case PokemonAutomation::ControllerResetMode::RESET_AND_CLEAR_STATE:
+        set_info();
+        connection.botbase()->issue_request_and_wait(
+            DeviceRequest_reset_to_controller(controller_type_to_id(controller_type)),
+            nullptr
+        );
+        break;
+    }
+
+    //  Re-read the controller.
+    ControllerType current_controller = connection.refresh_controller_type();
+    if (current_controller != controller_type){
+        throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
+    }
+
+    m_status_thread = std::thread(&SerialPABotBase_WirelessController::status_thread, this);
+}
 SerialPABotBase_WirelessController::~SerialPABotBase_WirelessController(){
     stop();
     m_status_thread.join();
@@ -58,6 +88,72 @@ void SerialPABotBase_WirelessController::stop(){
         }
         m_cv.notify_all();
     }
+}
+
+void SerialPABotBase_WirelessController::set_info(){
+    using namespace SerialPABotBase;
+
+    uint8_t controller_mac_address[6] = {};
+    {
+        BotBaseMessage response = m_serial->issue_request_and_wait(
+            DeviceRequest_read_mac_address(controller_type_to_id(m_controller_type)),
+            nullptr
+        );
+        if (response.body.size() == sizeof(seqnum_t) + sizeof(controller_mac_address)){
+            memcpy(
+                controller_mac_address,
+                response.body.data() + sizeof(seqnum_t),
+                sizeof(controller_mac_address)
+            );
+        }else{
+            m_logger.log(
+                "Invalid response size to PABB_MSG_ESP32_REQUEST_READ_SPI: body = " + std::to_string(response.body.size()),
+                COLOR_RED
+            );
+        }
+    }
+
+    NintendoSwitch::ControllerProfile profile =
+        PokemonAutomation::NintendoSwitch::ConsoleSettings::instance().CONTROLLER_SETTINGS.get_or_make_profile(
+            controller_mac_address,
+            m_handle.device_name(),
+            m_controller_type
+        );
+
+    PABB_NintendoSwitch_ControllerColors colors;
+    {
+        Color color(profile.body_color);
+        colors.body[0] = color.red();
+        colors.body[1] = color.green();
+        colors.body[2] = color.blue();
+    }
+    {
+        Color color(profile.button_color);
+        colors.buttons[0] = color.red();
+        colors.buttons[1] = color.green();
+        colors.buttons[2] = color.blue();
+    }
+    {
+        Color color(profile.left_grip);
+        colors.left_grip[0] = color.red();
+        colors.left_grip[1] = color.green();
+        colors.left_grip[2] = color.blue();
+    }
+    {
+        Color color(profile.right_grip);
+        colors.right_grip[0] = color.red();
+        colors.right_grip[1] = color.green();
+        colors.right_grip[2] = color.blue();
+    }
+
+    m_serial->issue_request_and_wait(
+        MessageControllerWriteSpi(
+            m_controller_type,
+            0x00006050, sizeof(PABB_NintendoSwitch_ControllerColors),
+            &colors
+        ),
+        nullptr
+    );
 }
 
 

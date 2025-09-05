@@ -9,6 +9,8 @@
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 //#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "Controllers/ControllerTypeStrings.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.h"
 #include "NintendoSwitch_SerialPABotBase_WiredController.h"
@@ -28,7 +30,8 @@ using namespace std::chrono_literals;
 SerialPABotBase_WiredController::SerialPABotBase_WiredController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
-    ControllerType controller_type
+    ControllerType controller_type,
+    ControllerResetMode reset_mode
 )
     : ProController(logger)
     , SerialPABotBase_Controller(
@@ -38,8 +41,34 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
     )
     , m_controller_type(controller_type)
     , m_stopping(false)
-    , m_status_thread(&SerialPABotBase_WiredController::status_thread, this)
-{}
+{
+    using namespace SerialPABotBase;
+
+    switch (reset_mode){
+    case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
+        break;
+    case PokemonAutomation::ControllerResetMode::SIMPLE_RESET:
+        connection.botbase()->issue_request_and_wait(
+            DeviceRequest_change_controller_mode(controller_type_to_id(controller_type)),
+            nullptr
+        );
+        break;
+    case PokemonAutomation::ControllerResetMode::RESET_AND_CLEAR_STATE:
+        connection.botbase()->issue_request_and_wait(
+            DeviceRequest_reset_to_controller(controller_type_to_id(controller_type)),
+            nullptr
+        );
+        break;
+    }
+
+    //  Re-read the controller.
+    ControllerType current_controller = connection.refresh_controller_type();
+    if (current_controller != controller_type){
+        throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
+    }
+
+    m_status_thread = std::thread(&SerialPABotBase_WiredController::status_thread, this);
+}
 SerialPABotBase_WiredController::~SerialPABotBase_WiredController(){
     stop();
     m_status_thread.join();

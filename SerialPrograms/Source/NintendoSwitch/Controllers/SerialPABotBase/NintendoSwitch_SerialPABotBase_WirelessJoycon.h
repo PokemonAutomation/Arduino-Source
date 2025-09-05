@@ -27,7 +27,8 @@ protected:
     SerialPABotBase_WirelessJoycon(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
-        ControllerType controller_type
+        ControllerType controller_type,
+        ControllerResetMode reset_mode
     );
 
 
@@ -174,7 +175,8 @@ class SerialPABotBase_WirelessLeftJoycon final : public SerialPABotBase_Wireless
 public:
     SerialPABotBase_WirelessLeftJoycon(
         Logger& logger,
-        SerialPABotBase::SerialPABotBase_Connection& connection
+        SerialPABotBase::SerialPABotBase_Connection& connection,
+        ControllerResetMode reset_mode
     );
     ~SerialPABotBase_WirelessLeftJoycon();
 };
@@ -182,7 +184,8 @@ class SerialPABotBase_WirelessRightJoycon final : public SerialPABotBase_Wireles
 public:
     SerialPABotBase_WirelessRightJoycon(
         Logger& logger,
-        SerialPABotBase::SerialPABotBase_Connection& connection
+        SerialPABotBase::SerialPABotBase_Connection& connection,
+        ControllerResetMode reset_mode
     );
     ~SerialPABotBase_WirelessRightJoycon();
 };

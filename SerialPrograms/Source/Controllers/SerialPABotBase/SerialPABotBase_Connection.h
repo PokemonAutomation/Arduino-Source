@@ -29,46 +29,28 @@ public:
     SerialPABotBase_Connection(
         Logger& logger,
         const QSerialPortInfo* port,
-        std::optional<ControllerType> change_controller,
-        bool clear_settings
+        bool set_to_null_controller
     );
     ~SerialPABotBase_Connection();
 
 
 public:
-//    uint8_t program_id() const{
-//        return m_program_id;
-//    }
+    const std::string& device_name() const{
+        return m_device_name;
+    }
     BotBaseController* botbase();
 
-public:
-    virtual ControllerModeStatus controller_mode_status() const override;
+    ControllerType refresh_controller_type();
 
 
 private:
     const std::set<pabb_ProgramID>& get_programs_for_protocol(uint32_t protocol);
 
-#if 0
-    const std::vector<ControllerType>& get_controllers_for_program(
-        const std::map<uint32_t, std::vector<ControllerType>>& available_programs,
-        uint32_t program_id
-    );
-#endif
-
     void process_queue_size();
-    ControllerType get_controller_type(
-        const std::vector<ControllerType>& available_controllers
-    );
 
-    ControllerModeStatus process_device(
-        std::optional<ControllerType> change_controller,
-        bool clear_settings
-    );
+    ControllerType process_device(bool set_to_null_controller);
 
-    void thread_body(
-        std::optional<ControllerType> change_controller,
-        bool clear_settings
-    );
+    void thread_body(bool set_to_null_controller);
 
 
 private:
@@ -79,8 +61,6 @@ private:
     uint32_t m_version = 0;
     uint8_t m_program_id = 0;
     std::string m_program_name;
-    std::vector<pabb_ControllerID> m_controller_list;
-    ControllerModeStatus m_mode_status;
 
     std::thread m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;

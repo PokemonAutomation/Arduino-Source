@@ -15,21 +15,11 @@ namespace PokemonAutomation{
 
 
 
-struct ControllerModeStatus{
-    ControllerType current_controller = ControllerType::None;
-    std::vector<ControllerType> supported_controllers;
-};
-
-
-
 class ControllerConnection{
 public:
     struct StatusListener{
 //        virtual void pre_connection_not_ready(ControllerConnection& connection){}
-        virtual void post_connection_ready(
-            ControllerConnection& connection,
-            const ControllerModeStatus& mode_status
-        ){}
+        virtual void post_connection_ready(ControllerConnection& connection){}
         virtual void status_text_changed(
             ControllerConnection& connection, const std::string& text
         ){}
@@ -43,15 +33,23 @@ public:
 
 
 public:
+    ControllerConnection()
+        : m_current_controller(ControllerType::None)
+        , m_ready(false)
+    {}
     virtual ~ControllerConnection() = default;
 
+    ControllerType current_controller() const{
+        return m_current_controller.load(std::memory_order_acquire);
+    }
     bool is_ready() const{ return m_ready.load(std::memory_order_acquire); }
     std::string status_text() const;
 
-    //  Returns the current controller type and the list of supported controllers.
-    //  The current controller may be "None" if there is only one supported
-    //  controller since it is implied to be that.
-    virtual ControllerModeStatus controller_mode_status() const = 0;
+    //  It it not safe to call this until "is_ready()" is true.
+    const std::vector<ControllerType>& controller_list(){
+        return m_controller_list;
+    }
+
 
 
 public:
@@ -60,18 +58,23 @@ public:
 
 
 protected:
-    void declare_ready(const ControllerModeStatus& mode_status);
+    void declare_ready();
 
 
 private:
 //    void signal_pre_not_ready();
-    void signal_post_ready(const ControllerModeStatus& mode_status);
+    void signal_post_ready();
     void signal_status_text_changed(const std::string& text);
     void signal_error(const std::string& text);
 
 
 protected:
+    //  This is written to once and never modified again.
+    std::vector<ControllerType> m_controller_list;
+
+    std::atomic<ControllerType> m_current_controller;
     std::atomic<bool> m_ready;
+
 
 private:
     mutable SpinLock m_status_text_lock;

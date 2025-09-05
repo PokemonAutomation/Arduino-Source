@@ -57,17 +57,17 @@ JsonValue SerialPABotBase_Descriptor::to_json() const{
 
 std::unique_ptr<ControllerConnection> SerialPABotBase_Descriptor::open_connection(
     Logger& logger,
-    std::optional<ControllerType> change_controller,
-    bool clear_settings
+    bool set_to_null_controller
 ) const{
     return std::unique_ptr<ControllerConnection>(
-        new SerialPABotBase_Connection(logger, &m_port, change_controller, clear_settings)
+        new SerialPABotBase_Connection(logger, &m_port, set_to_null_controller)
     );
 }
 std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
     Logger& logger,
     ControllerConnection& connection,
-    ControllerType controller_type
+    ControllerType controller_type,
+    ControllerResetMode reset_mode
 ) const{
     switch (controller_type){
     case ControllerType::NintendoSwitch_WiredController:
@@ -76,7 +76,8 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
             new PokemonAutomation::NintendoSwitch::SerialPABotBase_WiredController(
                 logger,
                 static_cast<SerialPABotBase_Connection&>(connection),
-                controller_type
+                controller_type,
+                reset_mode
             )
         );
 
@@ -84,7 +85,8 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
         return std::unique_ptr<AbstractController>(
             new PokemonAutomation::NintendoSwitch::SerialPABotBase_WirelessProController(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection)
+                static_cast<SerialPABotBase_Connection&>(connection),
+                reset_mode
             )
         );
 
@@ -92,7 +94,8 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
         return std::unique_ptr<AbstractController>(
             new PokemonAutomation::NintendoSwitch::SerialPABotBase_WirelessLeftJoycon(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection)
+                static_cast<SerialPABotBase_Connection&>(connection),
+                reset_mode
             )
         );
 
@@ -100,7 +103,8 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
         return std::unique_ptr<AbstractController>(
             new PokemonAutomation::NintendoSwitch::SerialPABotBase_WirelessRightJoycon(
                 logger,
-                static_cast<SerialPABotBase_Connection&>(connection)
+                static_cast<SerialPABotBase_Connection&>(connection),
+                reset_mode
             )
         );
 

@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 void ControllerConnection::add_status_listener(StatusListener& listener){
     m_status_listeners.add(listener);
     if (m_ready.load(std::memory_order_acquire)){
-        listener.post_connection_ready(*this, controller_mode_status());
+        listener.post_connection_ready(*this);
     }
 }
 void ControllerConnection::remove_status_listener(StatusListener& listener){
@@ -36,7 +36,6 @@ std::string ControllerConnection::status_text() const{
 }
 
 
-
 void ControllerConnection::set_status_line0(const std::string& text, Color color){
     {
         WriteSpinLock lg(m_status_text_lock);
@@ -51,17 +50,17 @@ void ControllerConnection::set_status_line1(const std::string& text, Color color
     }
     signal_status_text_changed(status_text());
 }
-void ControllerConnection::declare_ready(const ControllerModeStatus& mode_status){
+void ControllerConnection::declare_ready(){
     m_ready.store(true, std::memory_order_release);
-    signal_post_ready(mode_status);
+    signal_post_ready();
 }
 
 
 //void ControllerConnection::signal_pre_not_ready(){
 //    m_status_listeners.run_method_unique(&StatusListener::pre_connection_not_ready, *this);
 //}
-void ControllerConnection::signal_post_ready(const ControllerModeStatus& mode_status){
-    m_status_listeners.run_method_unique(&StatusListener::post_connection_ready, *this, mode_status);
+void ControllerConnection::signal_post_ready(){
+    m_status_listeners.run_method_unique(&StatusListener::post_connection_ready, *this);
 }
 void ControllerConnection::signal_status_text_changed(const std::string& text){
 //    cout << "m_status_listeners.size() = " << m_status_listeners.count_unique() << endl;

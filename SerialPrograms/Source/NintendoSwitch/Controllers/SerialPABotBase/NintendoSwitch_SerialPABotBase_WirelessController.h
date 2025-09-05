@@ -26,7 +26,8 @@ public:
     SerialPABotBase_WirelessController(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
-        ControllerType controller_type
+        ControllerType controller_type,
+        ControllerResetMode reset_mode
     );
     ~SerialPABotBase_WirelessController();
     void stop();
@@ -42,6 +43,10 @@ public:
     Milliseconds timing_variation() const{
         return m_timing_variation;
     }
+
+
+protected:
+    void set_info();
 
 
 protected:

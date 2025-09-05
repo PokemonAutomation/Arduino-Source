@@ -42,7 +42,6 @@ public:
     );
     ~TcpSysbotBase_Connection();
 
-    virtual ControllerModeStatus controller_mode_status() const override;
     bool supports_command_queue() const{
         return m_supports_command_queue.load(std::memory_order_relaxed);
     }

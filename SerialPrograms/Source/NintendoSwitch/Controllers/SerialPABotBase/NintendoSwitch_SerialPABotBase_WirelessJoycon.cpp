@@ -19,11 +19,13 @@ namespace NintendoSwitch{
 
 SerialPABotBase_WirelessLeftJoycon::SerialPABotBase_WirelessLeftJoycon(
     Logger& logger,
-    SerialPABotBase::SerialPABotBase_Connection& connection
+    SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerResetMode reset_mode
 )
     : SerialPABotBase_WirelessJoycon<LeftJoycon>(
         logger, connection,
-        ControllerType::NintendoSwitch_LeftJoycon
+        ControllerType::NintendoSwitch_LeftJoycon,
+        reset_mode
     )
 {
     m_valid_buttons = VALID_LEFT_JOYCON_BUTTONS;
@@ -35,11 +37,13 @@ SerialPABotBase_WirelessLeftJoycon::~SerialPABotBase_WirelessLeftJoycon(){
 
 SerialPABotBase_WirelessRightJoycon::SerialPABotBase_WirelessRightJoycon(
     Logger& logger,
-    SerialPABotBase::SerialPABotBase_Connection& connection
+    SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerResetMode reset_mode
 )
     : SerialPABotBase_WirelessJoycon<RightJoycon>(
         logger, connection,
-        ControllerType::NintendoSwitch_RightJoycon
+        ControllerType::NintendoSwitch_RightJoycon,
+        reset_mode
     )
 {
     m_valid_buttons = VALID_RIGHT_JOYCON_BUTTONS;
@@ -59,13 +63,15 @@ template <typename JoyconType>
 SerialPABotBase_WirelessJoycon<JoyconType>::SerialPABotBase_WirelessJoycon(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
-    ControllerType controller_type
+    ControllerType controller_type,
+    ControllerResetMode reset_mode
 )
     : JoyconType(logger, controller_type)
     , SerialPABotBase_WirelessController(
         logger,
         connection,
-        controller_type
+        controller_type,
+        reset_mode
     )
     , m_controller_type(controller_type)
 {}

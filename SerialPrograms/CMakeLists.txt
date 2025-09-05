@@ -710,8 +710,6 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_PostConnectActions.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_PostConnectActions.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.cpp

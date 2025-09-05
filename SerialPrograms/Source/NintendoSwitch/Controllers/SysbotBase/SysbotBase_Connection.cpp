@@ -54,6 +54,9 @@ TcpSysbotBase_Connection::TcpSysbotBase_Connection(
     , m_last_ping_send(WallClock::min())
     , m_last_ping_receive(WallClock::min())
 {
+    m_controller_list.emplace_back(ControllerType::NintendoSwitch_WiredProController);
+    m_current_controller = ControllerType::NintendoSwitch_WiredProController;
+
     QHostAddress address;
     int port;
     if (!parse_ip_and_port(url, address, port)){
@@ -95,15 +98,6 @@ TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
     }
 }
 
-
-ControllerModeStatus TcpSysbotBase_Connection::controller_mode_status() const{
-    return {
-        ControllerType::NintendoSwitch_WiredController,
-        {
-            ControllerType::NintendoSwitch_WiredController,
-        }
-    };
-}
 
 void TcpSysbotBase_Connection::write_data(const std::string& data){
     WriteSpinLock lg(m_send_lock, "TcpSysbotBase_Connection::write_data()");
@@ -295,7 +289,7 @@ void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
     }
 
     m_thread = std::thread(&TcpSysbotBase_Connection::thread_loop, this);
-    declare_ready(controller_mode_status());
+    declare_ready();
 }
 
 

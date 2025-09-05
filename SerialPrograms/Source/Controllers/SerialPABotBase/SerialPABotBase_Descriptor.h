@@ -41,13 +41,13 @@ public:
 
     virtual std::unique_ptr<ControllerConnection> open_connection(
         Logger& logger,
-        std::optional<ControllerType> change_controller,
-        bool clear_settings
+        bool set_to_null_controller
     ) const override;
     virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
         ControllerConnection& connection,
-        ControllerType controller_type
+        ControllerType controller_type,
+        ControllerResetMode reset_mode
     ) const override;
 
     virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const override;

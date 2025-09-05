@@ -19,13 +19,15 @@ namespace NintendoSwitch{
 
 SerialPABotBase_WirelessProController::SerialPABotBase_WirelessProController(
     Logger& logger,
-    SerialPABotBase::SerialPABotBase_Connection& connection
+    SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerResetMode reset_mode
 )
     : ProController(logger)
     , SerialPABotBase_WirelessController(
         logger,
         connection,
-        ControllerType::NintendoSwitch_WirelessProController
+        ControllerType::NintendoSwitch_WirelessProController,
+        reset_mode
     )
 {}
 SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){

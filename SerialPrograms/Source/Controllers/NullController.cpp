@@ -30,15 +30,15 @@ JsonValue NullControllerDescriptor::to_json() const{
 }
 std::unique_ptr<ControllerConnection> NullControllerDescriptor::open_connection(
     Logger& logger,
-    std::optional<ControllerType> change_controller,
-    bool clear_settings
+    bool set_to_null_controller
 ) const{
     return nullptr;
 }
 std::unique_ptr<AbstractController> NullControllerDescriptor::make_controller(
     Logger& logger,
     ControllerConnection& connection,
-    ControllerType controller_type
+    ControllerType controller_type,
+    ControllerResetMode reset_mode
 ) const{
     return nullptr;
 }

@@ -89,7 +89,7 @@ public:
     //  Returns empty string if successful. Otherwise returns error message.
     template <typename ControllerType, typename Lambda>
     std::string try_run(Lambda&& function) noexcept{
-        std::lock_guard<std::mutex> lg(m_state_lock);
+        ReadSpinLock lg(m_state_lock);
         if (!m_controller){
             return "Controller is null.";
         }
@@ -114,13 +114,13 @@ public:
 
 
 private:
-    void make_controller(std::optional<ControllerType> change_controller, bool clear_settings);
+    void make_controller(
+        std::optional<ControllerType> change_controller,
+        bool clear_settings
+    );
 
 //    virtual void pre_connection_not_ready(ControllerConnection& connection) override;
-    virtual void post_connection_ready(
-        ControllerConnection& connection,
-        const ControllerModeStatus& mode_status
-    ) override;
+    virtual void post_connection_ready(ControllerConnection& connection) override;
     virtual void status_text_changed(
         ControllerConnection& connection,
         const std::string& text
@@ -145,10 +145,9 @@ private:
 private:
     Logger& m_logger;
     ControllerOption& m_option;
-    ControllerType m_controller_type;
 
     std::mutex m_reset_lock;
-    mutable std::mutex m_state_lock;
+    mutable SpinLock m_state_lock;
 
     bool m_options_locked;
     std::string m_user_input_disallow_reason;
@@ -156,7 +155,9 @@ private:
     SpinLock m_message_lock;
     std::string m_controller_error;
 
-    std::vector<ControllerType> m_available_controllers;
+    //  Next Reset
+    ControllerType m_desired_controller;
+    ControllerResetMode m_next_reset_mode;
 
     std::shared_ptr<const ControllerDescriptor> m_descriptor;
     std::unique_ptr<ControllerConnection> m_connection;

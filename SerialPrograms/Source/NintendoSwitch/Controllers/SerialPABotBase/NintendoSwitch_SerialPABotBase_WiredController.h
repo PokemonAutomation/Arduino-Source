@@ -27,7 +27,8 @@ public:
     SerialPABotBase_WiredController(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
-        ControllerType controller_type
+        ControllerType controller_type,
+        ControllerResetMode reset_mode
     );
     ~SerialPABotBase_WiredController();
     void stop();

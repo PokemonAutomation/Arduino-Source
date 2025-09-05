@@ -27,6 +27,15 @@ class ControllerConnection;
 class ControllerSelectorWidget;
 
 
+
+enum class ControllerResetMode{
+    DO_NOT_RESET,
+    SIMPLE_RESET,
+    RESET_AND_CLEAR_STATE,
+};
+
+
+
 //
 //  Represents an entire controller interface.
 //
@@ -105,13 +114,13 @@ public:
 public:
     virtual std::unique_ptr<ControllerConnection> open_connection(
         Logger& logger,
-        std::optional<ControllerType> change_controller,
-        bool clear_settings
+        bool set_to_null_controller
     ) const = 0;
     virtual std::unique_ptr<AbstractController> make_controller(
         Logger& logger,
         ControllerConnection& connection,
-        ControllerType controller_type
+        ControllerType controller_type,
+        ControllerResetMode reset_mode
     ) const = 0;
 
     virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const = 0;

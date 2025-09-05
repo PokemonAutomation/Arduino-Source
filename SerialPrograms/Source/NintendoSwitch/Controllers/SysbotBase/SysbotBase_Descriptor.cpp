@@ -49,8 +49,7 @@ JsonValue TcpSysbotBase_Descriptor::to_json() const{
 
 std::unique_ptr<ControllerConnection> TcpSysbotBase_Descriptor::open_connection(
     Logger& logger,
-    std::optional<ControllerType> change_controller,
-    bool clear_settings
+    bool set_to_null_controller
 ) const{
     return std::unique_ptr<ControllerConnection>(
         new TcpSysbotBase_Connection(logger, m_url)
@@ -59,7 +58,8 @@ std::unique_ptr<ControllerConnection> TcpSysbotBase_Descriptor::open_connection(
 std::unique_ptr<AbstractController> TcpSysbotBase_Descriptor::make_controller(
     Logger& logger,
     ControllerConnection& connection,
-    ControllerType controller_type
+    ControllerType controller_type,
+    ControllerResetMode reset_mode
 ) const{
     TcpSysbotBase_Connection& sbb_connection = static_cast<TcpSysbotBase_Connection&>(connection);
     if (sbb_connection.supports_command_queue()){
