@@ -27,8 +27,8 @@ public:
 };
 
 
-// start: 
-// end: 
+// start: Defeated Team Star (Fire). At East Province (Area Two) Pokecenter.
+// end: At Levincia (South) Pokecenter.
 void checkpoint_50(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -36,8 +36,8 @@ void checkpoint_50(
     AutoStoryStats& stats
 );
 
-// start: 
-// end: 
+// start: At Levincia (South) Pokecenter.
+// end: At Levincia gym building. Talked to Hassel, met Rika.
 void checkpoint_51(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -46,8 +46,8 @@ void checkpoint_51(
 );
 
 
-// start: 
-// end: 
+// start: At Levincia gym building. Talked to Hassel, met Rika.
+// end: Finished Levincia gym challenge.
 void checkpoint_52(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -56,8 +56,8 @@ void checkpoint_52(
 );
 
 
-// start: 
-// end: 
+// start: Finished Levincia gym challenge. Standing outside Levincia gym.
+// end: Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.
 void checkpoint_53(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -65,25 +65,6 @@ void checkpoint_53(
     AutoStoryStats& stats
 );
 
-
-// start: 
-// end: 
-void checkpoint_54(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
-
-
-// start: 
-// end: 
-void checkpoint_55(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
 
 
 

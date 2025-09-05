@@ -7,11 +7,8 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
-#include "PokemonSV/Programs/PokemonSV_GameEntry.h"
-#include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV_AutoStoryTools.h"
