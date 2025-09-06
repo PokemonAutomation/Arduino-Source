@@ -7,9 +7,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "NintendoSwitch_ConsoleTypeDetector.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 //#include <iostream>
 //using std::cout;
@@ -22,12 +21,14 @@ namespace NintendoSwitch{
 ConsoleTypeDetector_Home::ConsoleTypeDetector_Home(ConsoleHandle& console, Color color)
     : m_console(console)
     , m_color(color)
-    , m_bottom_line(0.10, 0.88, 0.80, 0.03)
+    , m_bottom_line(0.20, 0.88, 0.60, 0.03)
     , m_last(ConsoleType::Unknown)
 {}
 void ConsoleTypeDetector_Home::make_overlays(VideoOverlaySet& items) const{
     ConsoleType known_state = m_console.state().console_type();
-    if (known_state != ConsoleType::Unknown){
+    if (known_state != ConsoleType::Unknown &&
+        m_console.state().console_type_confirmed()
+    ){
         return;
     }
     items.add(m_color, m_bottom_line);

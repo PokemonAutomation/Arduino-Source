@@ -265,8 +265,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    HomeMenuDetector detector(console);
+    detector.make_overlays(overlays);
 
 
+
+
+#if 0
 //    auto screenshot = feed.snapshot();
 
     PokemonLGPE::BattleArrowWatcher detector(COLOR_RED, {0.004251, 0.638941, 0.062699, 0.115312});
@@ -276,7 +281,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         cout << detector.process_frame(feed.snapshot()) << endl;
         scope.wait_for(100ms);
     }
-
+#endif
 
 
 

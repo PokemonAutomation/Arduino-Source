@@ -31,11 +31,11 @@ private:
     Color m_color;
     ConsoleTypeDetector_Home m_console_type;
     ImageFloatBox m_top;
+//    ImageFloatBox m_iconrow_left;
+    ImageFloatBox m_iconrow_right;
+    ImageFloatBox m_iconrow_icons;
     ImageFloatBox m_bottom_row;
     ImageFloatBox m_bottom_icons;
-    ImageFloatBox m_bottom_left;
-    ImageFloatBox m_bottom_right;
-    ImageFloatBox m_bottom_middle;
     ImageFloatBox m_user_icons;
     ImageFloatBox m_game_slot;
 };
