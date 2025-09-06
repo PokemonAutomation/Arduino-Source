@@ -59,7 +59,8 @@ void check_performance_class_wired_or_wireless(AbstractController& controller){
         throw UserSetupError(
             controller.logger(),
             "Incompatible Controller:\n\n"
-            "This program requires a controller with performance class \"Wired\" or \"Wireless\"."
+            "This program requires a controller with performance class \"Wired\" or \"Wireless\".\n\n"
+            "If you are using sys-botbase 2, please upgrade to sys-botbase 3."
         );
     }
 }

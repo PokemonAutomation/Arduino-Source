@@ -143,6 +143,7 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_DialogBoxDetector.h"
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Async/InterruptableCommands.h"
+#include "PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 
 
 #include <QPixmap>
@@ -176,7 +177,6 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::OPTIONAL_,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
-        {},
         1, 4, 1
     )
 {}
@@ -264,6 +264,23 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.controller<ProController>());
     VideoOverlaySet overlays(overlay);
 
+
+
+
+//    auto screenshot = feed.snapshot();
+
+    PokemonLGPE::BattleArrowWatcher detector(COLOR_RED, {0.004251, 0.638941, 0.062699, 0.115312});
+    detector.make_overlays(overlays);
+
+    while (true){
+        cout << detector.process_frame(feed.snapshot()) << endl;
+        scope.wait_for(100ms);
+    }
+
+
+
+
+#if 0
     AsyncCommandSession<ProController> session(
         scope, logger, env.realtime_dispatcher(),
         console.controller<ProController>()
@@ -289,7 +306,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
         delay += 1ms;
     }
-
+#endif
 
 
 

@@ -8,7 +8,8 @@
 #define PokemonAutomation_PokemonLGPE_BattleArrowDetector_H
 
 #include <chrono>
-#include <atomic>
+//#include <atomic>
+#include <deque>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -37,11 +38,28 @@ protected:
     Color m_color;
     ImageFloatBox m_box;
 };
-class BattleArrowWatcher : public DetectorToFinder<BattleArrowDetector>{
+
+
+//
+//  We use a custom watcher because the arrow wiggles and thus is less likely to
+//  maintain consecutive detections.
+//
+class BattleArrowWatcher : public BattleArrowDetector, public VisualInferenceCallback{
 public:
     BattleArrowWatcher(Color color = COLOR_RED, ImageFloatBox box = {0.546, 0.863, 0.045, 0.068})
-         : DetectorToFinder("BattleArrowWatcher", std::chrono::milliseconds(100), color, box)
+         : BattleArrowDetector(color, box)
+         , VisualInferenceCallback("BattleArrowWatcher")
     {}
+
+    virtual void make_overlays(VideoOverlaySet& items) const override{
+        BattleArrowDetector::make_overlays(items);
+    }
+
+    using VisualInferenceCallback::process_frame;
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+private:
+    std::deque<WallClock> m_detections;
 };
 
 

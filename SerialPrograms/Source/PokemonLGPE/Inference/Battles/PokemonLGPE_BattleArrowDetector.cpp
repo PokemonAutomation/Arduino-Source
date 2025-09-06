@@ -53,7 +53,7 @@ bool BattleArrowDetector::detect(const ImageViewRGB32& screen){
         ImageViewRGB32 cropped = extract_box_reference(region, object);
         //cropped.save("test-object-" + std::to_string(c++) + ".png");
         double rmsd = matcher.rmsd(cropped);
-        //cout << rmsd << endl;
+//        cout << rmsd << endl;
         if (rmsd < 116){
             return true;
         }
@@ -61,6 +61,25 @@ bool BattleArrowDetector::detect(const ImageViewRGB32& screen){
 
     return false;
 }
+
+
+bool BattleArrowWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    if (!detect(frame)){
+        return false;
+    }
+    m_detections.emplace_back(timestamp);
+
+    WallClock threshold = timestamp - std::chrono::seconds(5);
+    while (!m_detections.empty() && m_detections.front() < threshold){
+        m_detections.pop_front();
+    }
+
+//    cout << "m_detections = " << m_detections.size() << endl;
+
+    return m_detections.size() >= 3;
+}
+
+
 
 
 

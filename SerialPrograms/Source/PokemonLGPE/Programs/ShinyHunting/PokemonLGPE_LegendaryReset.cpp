@@ -206,7 +206,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
     }
     //Shiny found, complete the battle
     WallClock start = current_time();
-    BattleArrowWatcher catching_started(COLOR_RED, {0.005, 0.662, 0.049, 0.069});
+    BattleArrowWatcher catching_started(COLOR_RED, {0.004251, 0.638941, 0.062699, 0.115312});
     int res = run_until<JoyconContext>(
         env.console, context,
         [&](JoyconContext& context) {
