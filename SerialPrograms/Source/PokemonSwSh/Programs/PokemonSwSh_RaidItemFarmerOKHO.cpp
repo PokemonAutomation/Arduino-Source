@@ -176,7 +176,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
                     //  Add a little extra wait time since correctness matters here.
                     ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
 
-                    close_game(console, context);
+                    close_game_from_home(console, context);
 
                     //  Touch the date.
                     if (TOUCH_DATE_INTERVAL > 0ms && current_time() - last_touch >= TOUCH_DATE_INTERVAL){

@@ -78,7 +78,7 @@ void reset_game_from_home(
         return;
     }
 
-    close_game(console, context);
+    close_game_from_home(console, context);
     start_game_from_home(context, tolerate_update_menu, 0, 0, false);
 }
 void settings_to_enter_game(ProControllerContext& context, bool fast){

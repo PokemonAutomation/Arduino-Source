@@ -62,7 +62,7 @@ private:
 
 
 bool reset_game_to_gamemenu(ConsoleHandle& console, ProControllerContext& context){
-    close_game(console, context);
+    close_game_from_home(console, context);
     start_game_from_home(
         console, context,
         true,

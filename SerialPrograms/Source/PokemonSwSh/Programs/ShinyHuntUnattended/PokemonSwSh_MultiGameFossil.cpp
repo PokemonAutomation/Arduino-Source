@@ -139,7 +139,7 @@ void run_fossil_batch(
 
     //  Exit game.
     ssf_press_button(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE0, 80ms);
-    close_game(console, context);
+    close_game_from_home(console, context);
 }
 
 
