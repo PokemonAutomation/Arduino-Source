@@ -22,22 +22,22 @@ HomeMenuDetector::HomeMenuDetector(ConsoleHandle& console, Color color)
     : m_color(color)
     , m_console_type(console, color)
     , m_top(0.510223, 0.019835, 0.441450, 0.034711)
+//    , m_iconrow_left(0.02, 0.70, 0.13, 0.15)
+    , m_iconrow_right(0.85, 0.70, 0.13, 0.15)
+    , m_iconrow_icons(0.20, 0.70, 0.60, 0.15)
     , m_bottom_row(0.10, 0.92, 0.10, 0.05)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
-    , m_bottom_left(0.02, 0.70, 0.15, 0.15)
-    , m_bottom_right(0.83, 0.70, 0.15, 0.15)
-    , m_bottom_middle(0.20, 0.70, 0.60, 0.15)
     , m_user_icons(0.05, 0.05, 0.2, 0.08)
     , m_game_slot(0.08, 0.25, 0.10, 0.38)
 {}
 void HomeMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_console_type.make_overlays(items);
     items.add(m_color, m_top);
+//    items.add(m_color, m_iconrow_left);
+    items.add(m_color, m_iconrow_right);
+    items.add(m_color, m_iconrow_icons);
     items.add(m_color, m_bottom_row);
     items.add(m_color, m_bottom_icons);
-    items.add(m_color, m_bottom_left);
-    items.add(m_color, m_bottom_right);
-    items.add(m_color, m_bottom_middle);
     items.add(m_color, m_user_icons);
     items.add(m_color, m_game_slot);
 }
@@ -92,30 +92,30 @@ bool HomeMenuDetector::detect_only(const ImageViewRGB32& screen){
         return false;
     }
 
-    ImageStats stats_bottom_left = image_stats(extract_box_reference(screen, m_bottom_left));
-    ImageStats stats_bottom_right = image_stats(extract_box_reference(screen, m_bottom_right));
+//    ImageStats stats_bottom_left = image_stats(extract_box_reference(screen, m_bottom_row));
+    ImageStats stats_bottom_right = image_stats(extract_box_reference(screen, m_iconrow_right));
 //    cout << stats_bottom_left.average << stats_bottom_left.stddev << endl;
 //    cout << stats_bottom_right.average << stats_bottom_right.stddev << endl;
     if (white){
-        if (!is_white(stats_bottom_left) || !is_white(stats_bottom_right)){
+        if (!is_white(stats_bottom_row) || !is_white(stats_bottom_right)){
 //            cout << "asdf" << endl;
             return false;
         }
     }else{
-        if (!is_grey(stats_bottom_left, 0, 200) || !is_grey(stats_bottom_right, 0, 200)){
+        if (!is_grey(stats_bottom_row, 0, 200) || !is_grey(stats_bottom_right, 0, 200)){
 //            cout << "qwer" << endl;
             return false;
         }
     }
 
-    ImageStats stats_bottom_middle = image_stats(extract_box_reference(screen, m_bottom_middle));
+    ImageStats stats_bottom_middle = image_stats(extract_box_reference(screen, m_iconrow_icons));
     if (stats_bottom_middle.stddev.sum() < 50){
         return false;
     }
 
-//    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) << endl;
-    if (euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) > 20){
-//        cout << "qwer = " << euclidean_distance(stats_bottom_row.average, stats_bottom_left.average) << endl;
+//    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_row.average) << endl;
+    if (euclidean_distance(stats_bottom_row.average, stats_bottom_row.average) > 20){
+//        cout << "qwer = " << euclidean_distance(stats_bottom_row.average, stats_bottom_row.average) << endl;
         return false;
     }
 //    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_right.average) << endl;
@@ -123,13 +123,13 @@ bool HomeMenuDetector::detect_only(const ImageViewRGB32& screen){
 //        cout << "asdf" << endl;
         return false;
     }
-//    cout << euclidean_distance(stats_bottom_left.average, stats_bottom_left.average) << endl;
-    if (euclidean_distance(stats_bottom_left.average, stats_bottom_right.average) > 20){
+//    cout << euclidean_distance(stats_bottom_row.average, stats_bottom_row.average) << endl;
+    if (euclidean_distance(stats_bottom_row.average, stats_bottom_right.average) > 20){
 //        cout << "zxcv" << endl;
         return false;
     }
-//    cout << euclidean_distance(stats_top.average, stats_bottom_left.average) << endl;
-    if (euclidean_distance(stats_top.average, stats_bottom_left.average) > 20){
+//    cout << euclidean_distance(stats_top.average, stats_bottom_row.average) << endl;
+    if (euclidean_distance(stats_top.average, stats_bottom_row.average) > 20){
 //        cout << "xcvb" << endl;
         return false;
     }
