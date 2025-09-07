@@ -51,7 +51,7 @@ SerialPrograms/*.lib
 .vs
 Resources/*
 SerialPrograms/CMakeLists.txt.user
-opencv_world4110d.dll
+opencv_world4120d.dll
 
 # Python cache
 __pycache__

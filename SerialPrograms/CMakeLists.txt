@@ -2463,10 +2463,10 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
 endif()
 
-#extract opencv_world4110d.dll from archive on Windows Debug build, extract Discord Social SDK
+#extract opencv_world4120d.dll from archive on Windows Debug build, extract Discord Social SDK
 if (WIN32)
     file(ARCHIVE_EXTRACT
-      INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110d.zip
+      INPUT ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4120d.zip
       DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/
     )
 
@@ -2486,10 +2486,10 @@ target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 
 if (WIN32)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
-    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/opencv-4.11.0/)
+    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/opencv-4.12.0/)
     set_target_properties(OpenCV_lib PROPERTIES
-        IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110.lib
-        IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110d.lib
+        IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4120.lib
+        IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4120d.lib
         MAP_IMPORTED_CONFIG_DEBUG           DEBUG
         MAP_IMPORTED_CONFIG_RELEASE         RELEASE
         MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
