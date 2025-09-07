@@ -10,7 +10,7 @@
 #include "Common/Qt/StringToolsQt.h"
 //#include "CommonFramework/Globals.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
-#include "DppIntegration/DppClient.h"
+#include "Integrations/DppIntegration/DppClient.h"
 #include "DiscordIntegrationSettings.h"
 
 //#include <iostream>

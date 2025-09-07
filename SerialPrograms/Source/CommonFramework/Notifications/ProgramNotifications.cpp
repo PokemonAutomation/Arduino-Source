@@ -5,7 +5,6 @@
  */
 
 #include <QFile>
-#include <Integrations/DppIntegration/DppClient.h>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
@@ -15,6 +14,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "Integrations/DiscordWebhook.h"
+#include "Integrations/DppIntegration/DppClient.h"
 #include "ProgramNotifications.h"
 
 //#include <iostream>

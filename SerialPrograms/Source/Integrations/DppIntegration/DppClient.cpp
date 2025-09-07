@@ -2,13 +2,13 @@
 
 #include <set>
 #include <dpp/dpp.h>
-#include <Integrations/DppIntegration/DppClient.h>
-#include <Integrations/DppIntegration/DppCommandHandler.h>
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
+#include "Integrations/DppIntegration/DppClient.h"
+#include "Integrations/DppIntegration/DppCommandHandler.h"
 
 using namespace dpp;
 namespace PokemonAutomation{
