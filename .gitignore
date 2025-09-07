@@ -2,6 +2,8 @@ SerialPrograms/bin/
 
 .vscode
 
+discord_social_sdk_win/
+
 # macOS hidden system file
 .DS_Store
 
@@ -55,3 +57,4 @@ __pycache__
 
 # Jupyter Notebooks
 *.ipynb
+
