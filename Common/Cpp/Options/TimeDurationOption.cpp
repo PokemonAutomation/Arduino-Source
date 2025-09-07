@@ -248,7 +248,7 @@ std::string TimeDurationCell<Type>::time_string() const{
 template <typename Type>
 std::string TimeDurationCell<Type>::time_string(const std::string& text) const{
     const Data& data = *m_data;
-    Type value;
+    Type value{};
     std::string error = data.process(text, value);
     if (!error.empty()){
         return "<font color=\"red\">" + error + "</font>";
