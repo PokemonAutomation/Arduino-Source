@@ -2443,7 +2443,7 @@ target_link_libraries(SerialPrograms PRIVATE Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR
 target_link_libraries(SerialPrograms PRIVATE Threads::Threads)
 
 #add defines
-target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)
+target_compile_definitions(SerialPrograms PRIVATE NOMINMAX DPP_NO_DEPRECATED)
 
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
     target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
