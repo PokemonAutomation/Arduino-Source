@@ -1,21 +1,10 @@
-#set the minimum cmake version required
+# Set the minimum cmake version required
 cmake_minimum_required(VERSION 3.18.0)
 
-#set the name of the project
+# Set the project name
 project(SerialPrograms)
 
-#enable c++ 23
-set(CMAKE_CXX_STANDARD 23)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
-#produce clang tidy file
-set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
-
-set(CMAKE_AUTOMOC ON)
-set(CMAKE_AUTORCC ON)
-set(CMAKE_AUTOUIC ON)
-
 add_custom_target(build-time-make-directory ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
 
@@ -23,12 +12,25 @@ add_custom_target(build-time-make-directory ALL
 string(FIND "${CMAKE_CURRENT_SOURCE_DIR}" "Arduino-Source-Internal" internal_repo_position)
 
 # Determine if this is an internal repo and normalize REPO_ROOT_DIR
-if (internal_repo_position EQUAL -1)
+if(internal_repo_position EQUAL -1)
     # We are building the public repo
     set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
 else()
     # We are building the internal repo
     set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../")
+endif()
+
+# Extract Discord Social SDK
+if(WIN32)
+    message(STATUS "Extracting Social SDK")
+    set(DISCORD_SDK_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win.zip")
+    set(DISCORD_SDK_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win")
+    if(EXISTS "${DISCORD_SDK_ZIP}" AND NOT EXISTS "${DISCORD_SDK_DIR}")
+        file(ARCHIVE_EXTRACT
+            INPUT "${DISCORD_SDK_ZIP}"
+            DESTINATION "${REPO_ROOT_DIR}/3rdPartyBinaries"
+        )
+    endif()
 endif()
 
 # Determine environment
@@ -38,7 +40,6 @@ if(DEFINED ENV{GITHUB_ACTIONS})
 else()
     message(STATUS "Detected local dev environment")
     set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
-    message(STATUS "Packages directory: ${PACKAGES_DIR}")
 
     # Clone or update the Packages repo
     if(NOT EXISTS "${PACKAGES_DIR}/.git")
@@ -51,6 +52,7 @@ else()
             OUTPUT_STRIP_TRAILING_WHITESPACE
             ERROR_STRIP_TRAILING_WHITESPACE
         )
+
         if(NOT result EQUAL 0)
             message(FATAL_ERROR "Failed to clone Packages repo:\n${err}")
         endif()
@@ -64,6 +66,7 @@ else()
             OUTPUT_STRIP_TRAILING_WHITESPACE
             ERROR_STRIP_TRAILING_WHITESPACE
         )
+
         if(NOT result EQUAL 0)
             message(WARNING "Failed to update Packages repo:\n${err}")
         endif()
@@ -73,8 +76,13 @@ else()
     set(FIRMWARE_DIR "${PACKAGES_DIR}/PABotBase/PABotBase-Switch")
     set(SCRIPTS_DIR "${PACKAGES_DIR}/SerialPrograms/Scripts")
     set(RESOURCES_DIR "${PACKAGES_DIR}/SerialPrograms/Resources")
-    set(DEST_DIR "$<TARGET_FILE_DIR:SerialPrograms>")
-    set(DEPLOY_DIR "$<TARGET_FILE_DIR:SerialPrograms>/Binaries64")
+    set(DEST_DIR "$<TARGET_FILE_DIR:SerialPrograms>/Output")
+    if(PACKAGE_BUILD)
+        set(DEPLOY_DIR "${DEST_DIR}/Binaries64")
+    else()
+        set(DEPLOY_DIR "${DEST_DIR}")
+    endif()
+
     set(DEPLOY_FILES TRUE)
     message(STATUS "Packages repo ready for deployment")
 endif()
@@ -83,14 +91,35 @@ endif()
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
 
-#find Qt
+# Define the base Qt installation directory
+set(QT_BASE_DIR "C:/Qt")
+
+# Define the major version of Qt to search for
 if(NOT QT_MAJOR)
     set(QT_MAJOR 6)
 endif()
 
+# Find all subdirectories in the Qt base directory
+file(GLOB QT_SUBDIRS LIST_DIRECTORIES true "${QT_BASE_DIR}/${QT_MAJOR}*")
+
+# Filter and sort the directories to find the latest version
+list(SORT QT_SUBDIRS)
+list(REVERSE QT_SUBDIRS)
+
+# Get the first directory in the sorted list (latest version)
+list(GET QT_SUBDIRS 0 QT_LATEST_DIR)
+
+# Debug message to verify the latest Qt directory
+if(QT_LATEST_DIR)
+    message(STATUS "Latest Qt directory for Qt${QT_MAJOR}: ${QT_LATEST_DIR}")
+    set(CMAKE_PREFIX_PATH "${QT_LATEST_DIR}/msvc2022_64/lib/cmake")
+else()
+    message(FATAL_ERROR "No Qt${QT_MAJOR} installation found in ${QT_BASE_DIR}")
+endif()
+
 find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
 # Find windeployqt.exe relative to the Qt bin dir
-if (WIN32 AND DEPLOY_FILES)
+if(WIN32 AND DEPLOY_FILES)
     get_target_property(qt_core_location Qt${QT_MAJOR}::Core LOCATION)
     get_filename_component(qt_bin_dir "${qt_core_location}" DIRECTORY)
     find_program(WINDEPLOYQT_EXECUTABLE windeployqt
@@ -2535,15 +2564,10 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
 endif()
 
-#extract opencv_world4110d.dll from archive on Windows Debug build, extract Discord Social SDK
+#extract opencv_world4110d.dll from archive on Windows Debug build
 if (WIN32)
     file(ARCHIVE_EXTRACT
       INPUT ${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4110d.zip
-      DESTINATION ${REPO_ROOT_DIR}/3rdPartyBinaries/
-    )
-
-    file(ARCHIVE_EXTRACT
-      INPUT ${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win.zip
       DESTINATION ${REPO_ROOT_DIR}/3rdPartyBinaries/
     )
 endif()
