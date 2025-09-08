@@ -4,6 +4,7 @@
 #include <QFileInfo>
 //#include <QTextStream>
 #include <QMessageBox>
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "PersistentSettings.h"
@@ -23,7 +24,6 @@
 #include "Startup/SetupSettings.h"
 #include "Startup/NewVersionCheck.h"
 #include "Windows/MainWindow.h"
-
 
 #include <iostream>
 using std::cout;
