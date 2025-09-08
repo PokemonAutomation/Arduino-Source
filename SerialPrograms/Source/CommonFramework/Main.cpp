@@ -4,8 +4,7 @@
 #include <QFileInfo>
 //#include <QTextStream>
 #include <QMessageBox>
-#include <Integrations/DppIntegration/DppClient.h>
-#include <Integrations/DiscordSocial/DiscordSocial.h>
+#include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "PersistentSettings.h"
@@ -13,6 +12,9 @@
 #include "ErrorReports/ProgramDumper.h"
 #include "ErrorReports/ErrorReports.h"
 #include "Environment/HardwareValidation.h"
+#include "Integrations/DiscordSettingsOption.h"
+#include "Integrations/DiscordSocial/DiscordSocial.h"
+#include "Integrations/DppIntegration/DppClient.h"
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
 //#include "Tools/StatsDatabase.h"
@@ -22,7 +24,6 @@
 #include "Startup/SetupSettings.h"
 #include "Startup/NewVersionCheck.h"
 #include "Windows/MainWindow.h"
-
 
 #include <iostream>
 using std::cout;

@@ -2,6 +2,7 @@
 #ifndef DPP_CLIENT_H
 #define DPP_CLIENT_H
 
+#ifdef PA_DPP
 #include <atomic>
 #include <dpp/dpp.h>
 #include <Integrations/DppIntegration/DppCommandHandler.h>
@@ -48,4 +49,6 @@ private:
 }
 }
 }
+#endif
+
 #endif
