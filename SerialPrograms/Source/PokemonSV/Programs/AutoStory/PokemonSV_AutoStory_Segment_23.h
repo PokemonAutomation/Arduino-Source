@@ -27,8 +27,8 @@ public:
 };
 
 
-// start: 
-// end: 
+// start: Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.
+// end: At East Province (Area Three) Watchtower.
 void checkpoint_54(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
