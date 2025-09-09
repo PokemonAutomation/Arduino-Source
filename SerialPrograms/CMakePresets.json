@@ -18,7 +18,9 @@
         "CMAKE_AUTOMOC": "ON",
         "CMAKE_AUTORCC": "ON",
         "CMAKE_AUTOUIC": "ON",
-        "PACKAGE_BUILD": "OFF"
+        "PACKAGE_BUILD": "OFF",
+        "PREFERRED_QT_DIR": "C:/Qt",
+        "PREFERRED_QT_VER": "6.8.3",
       }
     },
     {
