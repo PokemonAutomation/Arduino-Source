@@ -345,6 +345,9 @@ void checkpoint_55(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+
+        // todo: try to align to left side of tunnel. then charge at Orthworm
+        // reset if caught in battle.
         /////////////////////
 
         // get_off_ride(env.program_info(), env.console, context);

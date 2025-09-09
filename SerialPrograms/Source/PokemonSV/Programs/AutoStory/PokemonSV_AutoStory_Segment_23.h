@@ -37,7 +37,7 @@ void checkpoint_54(
 );
 
 
-// start: 
+// start: At East Province (Area Three) Watchtower.
 // end: 
 void checkpoint_55(
     SingleSwitchProgramEnvironment& env,
