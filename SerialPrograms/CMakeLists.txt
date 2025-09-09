@@ -110,31 +110,47 @@ if(NOT QT_MAJOR)
     set(QT_MAJOR 6)
 endif()
 
-find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+# Make sure CI builds work without going overboard with per-platform directory shenanigans
+if(NOT DEPLOY_FILES)
+    find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+endif()
 
 # Find Qt and windeployqt.exe relative to the Qt bin dir
 if(WIN32 AND DEPLOY_FILES)
     # Define the base Qt installation directory
-    set(QT_BASE_DIR "C:/Qt")
-
-    # Find all subdirectories in the Qt base directory
-    file(GLOB QT_SUBDIRS LIST_DIRECTORIES true "${QT_BASE_DIR}/${QT_MAJOR}*")
-
-    # Filter and sort the directories to find the latest version
-    list(SORT QT_SUBDIRS)
-    list(REVERSE QT_SUBDIRS)
-
-    # Get the first directory in the sorted list (latest version)
-    list(GET QT_SUBDIRS 0 QT_LATEST_DIR)
-
-    # Debug message to verify the latest Qt directory
-    if(QT_LATEST_DIR)
-        message(STATUS "Latest Qt directory for Qt${QT_MAJOR}: ${QT_LATEST_DIR}")
-        set(CMAKE_PREFIX_PATH "${QT_LATEST_DIR}/msvc2022_64/lib/cmake")
-    else()
-        message(FATAL_ERROR "No Qt${QT_MAJOR} installation found in ${QT_BASE_DIR}")
+    if(PREFERRED_QT_DIR AND PREFERRED_QT_VER)
+        set(QT_CANDIDATE_DIR "${PREFERRED_QT_DIR}/${PREFERRED_QT_VER}/msvc2022_64/lib/cmake")
     endif()
 
+    # Set default base directory just in case, validate that Qt specified in CMakePresets.json exists
+    # Otherwise search out the latest available in the default Qt directory.
+    set(QT_BASE_DIR "C:/Qt")
+    if(QT_CANDIDATE_DIR AND EXISTS "${QT_CANDIDATE_DIR}")
+        message(STATUS "Using preferred Qt directory for Qt${QT_MAJOR} ${PREFERRED_QT_VER}: ${QT_CANDIDATE_DIR}")
+        set(CMAKE_PREFIX_PATH "${QT_CANDIDATE_DIR}")
+        find_package(Qt${QT_MAJOR} ${PREFERRED_QT_VER} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+    else()
+        # Find all subdirectories in the Qt base directory
+        find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+        file(GLOB QT_SUBDIRS LIST_DIRECTORIES true "${QT_BASE_DIR}/${QT_MAJOR}*")
+
+        # Filter and sort the directories to find the latest version
+        list(SORT QT_SUBDIRS)
+        list(REVERSE QT_SUBDIRS)
+
+        # Get the first directory in the sorted list (latest version)
+        list(GET QT_SUBDIRS 0 QT_LATEST_DIR)
+
+        # Debug message to verify the latest Qt directory
+        if(QT_LATEST_DIR)
+            message(STATUS "Latest Qt directory for Qt${QT_MAJOR}: ${QT_LATEST_DIR}")
+            set(CMAKE_PREFIX_PATH "${QT_LATEST_DIR}/msvc2022_64/lib/cmake")
+        else()
+            message(FATAL_ERROR "No Qt${QT_MAJOR} installation found in ${QT_BASE_DIR}")
+        endif()
+    endif()
+
+    # Find windeployqt.exe for Qt dependency deployment
     get_target_property(qt_core_location Qt${QT_MAJOR}::Core LOCATION)
     get_filename_component(qt_bin_dir "${qt_core_location}" DIRECTORY)
     find_program(WINDEPLOYQT_EXECUTABLE windeployqt
