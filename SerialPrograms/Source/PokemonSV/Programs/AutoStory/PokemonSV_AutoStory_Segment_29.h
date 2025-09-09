@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSV_AutoStory_Segment_23_H
-#define PokemonAutomation_PokemonSV_AutoStory_Segment_23_H
+#ifndef PokemonAutomation_PokemonSV_AutoStory_Segment_29_H
+#define PokemonAutomation_PokemonSV_AutoStory_Segment_29_H
 
 #include "PokemonSV_AutoStoryTools.h"
 
@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
-class AutoStory_Segment_23 : public AutoStory_Segment{
+class AutoStory_Segment_29 : public AutoStory_Segment{
 public:
     virtual std::string name() const override;
     virtual std::string start_text() const override;
@@ -26,15 +26,6 @@ public:
     ) const override;
 };
 
-
-// start: Defeated Levincia Gym (Electric). At Levincia (North) Pokecenter.
-// end: At East Province (Area Three) Watchtower.
-void checkpoint_54(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
 
 
 
