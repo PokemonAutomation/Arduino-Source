@@ -288,8 +288,9 @@ JsonValue TurboMacroRow::to_json() const{
 TurboMacroTable::TurboMacroTable()
     : EditableTableOption_t<TurboMacroRow>(
         "<b>Custom Macro Table:</b><br>"
-        "Set a list of button press to create a macro. 125 ticks = 1 second. Joystick direction is specified by (x, y).<br>"
-        "x = 0 is left, x = 255 is right. y = 0 is up, y = 255 is down. 128 is neutral for both. Ex. Move joystick fully left would be (0, 128). Move joystick up-right would be (255, 0).",
+        "Set a list of button press to create a macro. Joystick direction is specified by (x, y).<br>"
+        "x = 0 is left, x = 255 is right. y = 0 is up, y = 255 is down. 128 is neutral for both. Ex.<br>"
+        "Move joystick fully left would be (0, 128). Move joystick up-right would be (255, 0).",
         LockMode::LOCK_WHILE_RUNNING
     )
 {}

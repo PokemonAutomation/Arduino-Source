@@ -137,7 +137,7 @@ const std::vector<JoyconColors>& OFFICIAL_JOYCON_COLORS0(){
 
         {"Neon Red / Neon Blue",                0xFF3C28, 0x1E0A0A, 0x0AB9E6, 0x001E1E},
         {"Blue / Neon Yellow",                  0x4655F5, 0x00000A, 0xE6FF00, 0x142800},
-        {"Neon Pink / Green Pink",              0xFF3278, 0x28001E, 0x1EDC00, 0x002800},
+        {"Neon Pink / Neon Green",              0xFF3278, 0x28001E, 0x1EDC00, 0x002800},
         {"Neon Green / Neon Pink",              0x1EDC00, 0x002800, 0xFF3278, 0x28001E},
         {"Neon Purple / Neon Orange",           0xB400E6, 0x140014, 0xFAA005, 0x0F0A00},
         {"Pastel Pink / Pastel Pink",           0xFFAFAF, 0x372D2D, 0xFFAFAF, 0x372D2D},
