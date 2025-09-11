@@ -94,7 +94,7 @@ void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
 void ProController_SysbotBase::push_state(
     const Cancellable* cancellable,
     WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerCommand>> state
+    std::vector<std::shared_ptr<const SchedulerResource>> state
 ){
     //  Must be called inside "m_state_lock".
 

@@ -39,7 +39,7 @@ SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
 void SerialPABotBase_WirelessProController::push_state(
     const Cancellable* cancellable,
     WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerCommand>> state
+    std::vector<std::shared_ptr<const SchedulerResource>> state
 ){
     SwitchControllerState controller_state;
     for (auto& item : state){

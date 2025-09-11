@@ -218,7 +218,7 @@ private:
     virtual void push_state(
         const Cancellable* cancellable,
         WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerCommand>> state
+        std::vector<std::shared_ptr<const SchedulerResource>> state
     ) override;
 
     void send_diff(

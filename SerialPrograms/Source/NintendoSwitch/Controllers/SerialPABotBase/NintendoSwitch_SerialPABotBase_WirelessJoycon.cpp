@@ -155,7 +155,7 @@ template <typename JoyconType>
 void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_left_joycon(
     const Cancellable* cancellable,
     WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerCommand>> state
+    std::vector<std::shared_ptr<const SchedulerResource>> state
 ){
     SwitchControllerState controller_state;
     for (auto& item : state){
@@ -200,7 +200,7 @@ template <typename JoyconType>
 void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_right_joycon(
     const Cancellable* cancellable,
     WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerCommand>> state
+    std::vector<std::shared_ptr<const SchedulerResource>> state
 ){
     SwitchControllerState controller_state;
     for (auto& item : state){
@@ -239,7 +239,7 @@ template <typename JoyconType>
 void SerialPABotBase_WirelessJoycon<JoyconType>::push_state(
     const Cancellable* cancellable,
     WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerCommand>> state
+    std::vector<std::shared_ptr<const SchedulerResource>> state
 ){
     switch (m_controller_type){
     case ControllerType::NintendoSwitch_LeftJoycon:

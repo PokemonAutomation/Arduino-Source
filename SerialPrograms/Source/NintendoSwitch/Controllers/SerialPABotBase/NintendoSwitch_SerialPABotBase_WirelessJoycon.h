@@ -164,17 +164,17 @@ protected:
     void push_state_left_joycon(
         const Cancellable* cancellable,
         WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerCommand>> state
+        std::vector<std::shared_ptr<const SchedulerResource>> state
     );
     void push_state_right_joycon(
         const Cancellable* cancellable,
         WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerCommand>> state
+        std::vector<std::shared_ptr<const SchedulerResource>> state
     );
     virtual void push_state(
         const Cancellable* cancellable,
         WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerCommand>> state
+        std::vector<std::shared_ptr<const SchedulerResource>> state
     ) override;
 
     ControllerType m_controller_type;

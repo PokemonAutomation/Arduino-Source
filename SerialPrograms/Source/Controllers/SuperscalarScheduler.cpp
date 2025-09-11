@@ -40,9 +40,9 @@ void SuperscalarScheduler::clear() noexcept{
     m_pending_clear.store(false, std::memory_order_release);
 }
 
-std::vector<std::shared_ptr<const SchedulerCommand>> SuperscalarScheduler::current_live_commands(){
+std::vector<std::shared_ptr<const SchedulerResource>> SuperscalarScheduler::current_live_commands(){
     WallClock device_sent_time = m_device_sent_time;
-    std::vector<std::shared_ptr<const SchedulerCommand>> ret;
+    std::vector<std::shared_ptr<const SchedulerResource>> ret;
     for (auto& item : m_live_commands){
         if (item.second.busy_time <= device_sent_time && device_sent_time < item.second.done_time){
             ret.emplace_back(item.second.command);
@@ -105,7 +105,7 @@ bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
     }
 
     //  Compute the resource state at this timestamp.
-    std::vector<std::shared_ptr<const SchedulerCommand>> state = current_live_commands();
+    std::vector<std::shared_ptr<const SchedulerResource>> state = current_live_commands();
     clear_finished_commands();
 
     m_device_sent_time = next_state_change;
@@ -231,7 +231,7 @@ void SuperscalarScheduler::issue_wait_for_resource(
 }
 void SuperscalarScheduler::issue_to_resource(
     const Cancellable* cancellable,
-    std::shared_ptr<const SchedulerCommand> resource,
+    std::shared_ptr<const SchedulerResource> resource,
     WallDuration delay, WallDuration hold, WallDuration cooldown
 ){
     if (m_pending_clear.load(std::memory_order_acquire)){

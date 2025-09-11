@@ -95,7 +95,7 @@ void SerialPABotBase_WiredController::stop(){
 void SerialPABotBase_WiredController::push_state(
     const Cancellable* cancellable,
     WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerCommand>> state
+    std::vector<std::shared_ptr<const SchedulerResource>> state
 ){
     //  Must be called inside "m_state_lock".
 

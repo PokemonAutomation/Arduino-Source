@@ -71,9 +71,9 @@ struct SwitchControllerState{
     uint16_t gyro[6];
 };
 
-class SwitchCommand : public SchedulerCommand{
+class SwitchCommand : public SchedulerResource{
 public:
-    using SchedulerCommand::SchedulerCommand;
+    using SchedulerResource::SchedulerResource;
     virtual void apply(SwitchControllerState& state) const = 0;
 };
 class SwitchCommand_Button : public SwitchCommand{
@@ -171,8 +171,7 @@ inline SplitDpad convert_unified_to_split_dpad(DpadPosition dpad){
 
 
 
-class ControllerWithScheduler : protected SuperscalarScheduler
-{
+class ControllerWithScheduler : protected SuperscalarScheduler{
 public:
     ControllerWithScheduler(Logger& logger);
 

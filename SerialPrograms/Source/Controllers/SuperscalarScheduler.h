@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Controllers_SuperscalarScheduler_H
 #define PokemonAutomation_Controllers_SuperscalarScheduler_H
 
+#include <memory>
 #include <set>
 #include <map>
 #include <atomic>
@@ -20,15 +21,15 @@ class SuperscalarScheduler;
 
 
 
-class SchedulerCommand{
+class SchedulerResource{
 public:
     const size_t id;
 
-    SchedulerCommand(size_t id)
+    SchedulerResource(size_t id)
         : id(id)
     {}
 
-    virtual ~SchedulerCommand() = default;
+    virtual ~SchedulerResource() = default;
 };
 
 
@@ -82,7 +83,7 @@ public:
     //  The resource must be ready to be used.
     void issue_to_resource(
         const Cancellable* cancellable,
-        std::shared_ptr<const SchedulerCommand> resource,
+        std::shared_ptr<const SchedulerResource> resource,
         WallDuration delay, WallDuration hold, WallDuration cooldown
     );
 
@@ -102,13 +103,13 @@ protected:
     virtual void push_state(
         const Cancellable* cancellable,
         WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerCommand>> state
+        std::vector<std::shared_ptr<const SchedulerResource>> state
     ) = 0;
 
 
 private:
     void clear() noexcept;
-    std::vector<std::shared_ptr<const SchedulerCommand>> current_live_commands();
+    std::vector<std::shared_ptr<const SchedulerResource>> current_live_commands();
     void clear_finished_commands();
     bool iterate_schedule(const Cancellable* cancellable);
     void process_schedule(const Cancellable* cancellable);
@@ -145,7 +146,7 @@ private:
     std::set<WallClock> m_state_changes;
 
     struct Command{
-        std::shared_ptr<const SchedulerCommand> command;
+        std::shared_ptr<const SchedulerResource> command;
         WallClock busy_time;    //  Timestamp of when resource will be become busy.
         WallClock done_time;    //  Timestamp of when resource will be done being busy.
         WallClock free_time;    //  Timestamp of when resource can be used again.
