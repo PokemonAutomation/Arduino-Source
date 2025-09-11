@@ -67,12 +67,15 @@ ControllerType id_to_controller_type(uint32_t id){
         return ControllerType::NintendoSwitch2_LeftJoycon;
     case PABB_CID_NintendoSwitch2_RightJoycon:
         return ControllerType::NintendoSwitch2_RightJoycon;
+
+    default:
+        return ControllerType::None;
     }
 
-    throw InternalProgramError(
-        nullptr, PA_CURRENT_FUNCTION,
-        "Invalid Controller ID: " + std::to_string(id)
-    );
+//    throw InternalProgramError(
+//        nullptr, PA_CURRENT_FUNCTION,
+//        "Invalid Controller ID: " + std::to_string(id)
+//    );
 }
 uint32_t controller_type_to_id(ControllerType controller_type){
     switch (controller_type){

@@ -76,8 +76,9 @@ file(GLOB MAIN_SOURCES
     ../Common/CRC32.cpp
     ../Common/CRC32.h
     ../Common/Compiler.h
-    ../Common/ControllerStates/NintendoSwitch2_WiredController_State.h
+    ../Common/ControllerStates/HID_Keyboard_State.h
     ../Common/ControllerStates/NintendoSwitch_WirelessController_State.h
+    ../Common/ControllerStates/NintendoSwitch2_WiredController_State.h
     ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp
     ../Common/Cpp/BitmapConversion.h
@@ -299,6 +300,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/TimeQt.h
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WirelessControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS2_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
@@ -695,6 +697,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
+    Source/Controllers/HID_Keyboard.cpp
+    Source/Controllers/HID_Keyboard.h
     Source/Controllers/JoystickTools.h
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h

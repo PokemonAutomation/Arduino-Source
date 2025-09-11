@@ -48,6 +48,8 @@ typedef uint32_t pabb_ControllerID;
 
 #define PABB_CID_NONE                                       0
 
+#define PABB_CID_StandardHid_Keyboard                       0x0100
+
 #define PABB_CID_NintendoSwitch_WiredController             0x1000
 #define PABB_CID_NintendoSwitch_WiredProController          0x1001
 #define PABB_CID_NintendoSwitch_WirelessProController       0x1002

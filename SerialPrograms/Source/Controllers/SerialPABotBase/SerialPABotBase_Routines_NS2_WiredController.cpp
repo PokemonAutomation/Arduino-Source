@@ -1,4 +1,4 @@
-/*  SerialPABotBase AVR8 Routines
+/*  SerialPABotBase (Nintendo Switch 2 Wired Controller)
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -45,7 +45,7 @@ int register_message_converters_NS2_WiredController(){
     );
     return 0;
 }
-int init_PushButtonFramework = register_message_converters_NS2_WiredController();
+int init_NS2_WiredController = register_message_converters_NS2_WiredController();
 
 
 
