@@ -215,7 +215,11 @@ public:
 
 
 private:
-    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
+    virtual void push_state(
+        const Cancellable* cancellable,
+        WallDuration duration,
+        std::vector<std::shared_ptr<const SchedulerCommand>> state
+    ) override;
 
     void send_diff(
         const ProControllerState& old_state,

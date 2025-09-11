@@ -161,9 +161,21 @@ public:
 
 
 protected:
-    void push_state_left_joycon(const Cancellable* cancellable, WallDuration duration);
-    void push_state_right_joycon(const Cancellable* cancellable, WallDuration duration);
-    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
+    void push_state_left_joycon(
+        const Cancellable* cancellable,
+        WallDuration duration,
+        std::vector<std::shared_ptr<const SchedulerCommand>> state
+    );
+    void push_state_right_joycon(
+        const Cancellable* cancellable,
+        WallDuration duration,
+        std::vector<std::shared_ptr<const SchedulerCommand>> state
+    );
+    virtual void push_state(
+        const Cancellable* cancellable,
+        WallDuration duration,
+        std::vector<std::shared_ptr<const SchedulerCommand>> state
+    ) override;
 
     ControllerType m_controller_type;
     Button m_valid_buttons;

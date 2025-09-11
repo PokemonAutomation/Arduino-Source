@@ -160,15 +160,19 @@ void SerialPABotBase_WirelessController::set_info(){
 
 
 
-Button SerialPABotBase_WirelessController::populate_report_buttons(pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons){
+Button SerialPABotBase_WirelessController::populate_report_buttons(
+    pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
+    const SwitchControllerState& controller_state
+){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
 
     Button all_buttons = BUTTON_NONE;
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
-        if (!m_buttons[c].is_busy()){
+        Button button = (Button)((ButtonFlagType)1 << c);
+        if (!(controller_state.buttons & button)){
             continue;
         }
-        Button button = (Button)((ButtonFlagType)1 << c);
+
         all_buttons |= button;
         switch (button){
         //  Right
@@ -204,34 +208,24 @@ Button SerialPABotBase_WirelessController::populate_report_buttons(pabb_Nintendo
     }
     return all_buttons;
 }
-bool SerialPABotBase_WirelessController::populate_report_gyro(pabb_NintendoSwitch_WirelessController_State0x30_Gyro& gyro){
+bool SerialPABotBase_WirelessController::populate_report_gyro(
+    pabb_NintendoSwitch_WirelessController_State0x30_Gyro& gyro,
+    const SwitchControllerState& controller_state
+){
+    gyro.accel_x = controller_state.gyro[0];
+    gyro.accel_y = controller_state.gyro[1];
+    gyro.accel_z = controller_state.gyro[2];
+    gyro.rotation_x = controller_state.gyro[3];
+    gyro.rotation_y = controller_state.gyro[4];
+    gyro.rotation_z = controller_state.gyro[5];
+
     bool gyro_active = false;
-    {
-        if (m_accel_x.is_busy()){
-            gyro.accel_x = m_accel_x.value;
-            gyro_active = true;
-        }
-        if (m_accel_y.is_busy()){
-            gyro.accel_y = m_accel_y.value;
-            gyro_active = true;
-        }
-        if (m_accel_z.is_busy()){
-            gyro.accel_z = m_accel_z.value;
-            gyro_active = true;
-        }
-        if (m_rotation_x.is_busy()){
-            gyro.rotation_x = m_rotation_x.value;
-            gyro_active = true;
-        }
-        if (m_rotation_y.is_busy()){
-            gyro.rotation_y = m_rotation_y.value;
-            gyro_active = true;
-        }
-        if (m_rotation_z.is_busy()){
-            gyro.rotation_z = m_rotation_z.value;
-            gyro_active = true;
-        }
-    }
+    gyro_active |= gyro.accel_x != 0;
+    gyro_active |= gyro.accel_y != 0;
+    gyro_active |= gyro.accel_z != 0;
+    gyro_active |= gyro.rotation_x != 0;
+    gyro_active |= gyro.rotation_y != 0;
+    gyro_active |= gyro.rotation_z != 0;
     return gyro_active;
 }
 

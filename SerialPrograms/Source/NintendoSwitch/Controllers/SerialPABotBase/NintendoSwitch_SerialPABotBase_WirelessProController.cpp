@@ -36,9 +36,17 @@ SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
 }
 
 
-void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancellable, WallDuration duration){
-    //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
+void SerialPABotBase_WirelessProController::push_state(
+    const Cancellable* cancellable,
+    WallDuration duration,
+    std::vector<std::shared_ptr<const SchedulerCommand>> state
+){
+    SwitchControllerState controller_state;
+    for (auto& item : state){
+        static_cast<const SwitchCommand&>(*item).apply(controller_state);
+    }
 
+    //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
     pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
@@ -49,10 +57,10 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
     };
 
 //    Button all_buttons =
-    populate_report_buttons(buttons);
+    populate_report_buttons(buttons, controller_state);
 
-    if (m_dpad.is_busy()){
-        SplitDpad dpad = convert_unified_to_split_dpad(m_dpad.position);
+    {
+        SplitDpad dpad = convert_unified_to_split_dpad(controller_state.dpad);
         buttons.button5 |= (dpad.down  ? 1 : 0) << 0;
         buttons.button5 |= (dpad.up    ? 1 : 0) << 1;
         buttons.button5 |= (dpad.right ? 1 : 0) << 2;
@@ -60,20 +68,16 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
     }
 
     //  Left Stick
-    if (m_left_joystick.is_busy()){
-        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            buttons.left_joystick,
-            m_left_joystick.x, m_left_joystick.y
-        );
-    }
+    encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
+        buttons.left_joystick,
+        controller_state.left_stick_x, controller_state.left_stick_y
+    );
 
     //  Right Stick
-    if (m_right_joystick.is_busy()){
-        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            buttons.right_joystick,
-            m_right_joystick.x, m_right_joystick.y
-        );
-    }
+    encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
+        buttons.right_joystick,
+        controller_state.right_stick_x, controller_state.right_stick_y
+    );
 
     pabb_NintendoSwitch_WirelessController_State0x30_Gyro gyro{
         0x0000,
@@ -83,7 +87,7 @@ void SerialPABotBase_WirelessProController::push_state(const Cancellable* cancel
         0x0000,
         0x0000,
     };
-    bool gyro_active = populate_report_gyro(gyro);
+    bool gyro_active = populate_report_gyro(gyro, controller_state);
 
 //    gyro_active = true;
 //    gyro.rotation_y = 0x00ff;

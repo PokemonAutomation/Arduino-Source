@@ -17,12 +17,10 @@ namespace PokemonAutomation{
 
 SuperscalarScheduler::SuperscalarScheduler(
     Logger& logger,
-    WallDuration flush_threshold,
-    std::vector<ExecutionResource*> resources
+    WallDuration flush_threshold
 )
     : m_logger(logger)
     , m_flush_threshold(flush_threshold)
-    , m_resources(std::move(resources))
 {
     clear();
 }
@@ -38,33 +36,29 @@ void SuperscalarScheduler::clear() noexcept{
     m_device_sent_time = now;
     m_max_free_time = now;
     m_state_changes.clear();
-    for (ExecutionResource* resource : m_resources){
-        resource->m_is_busy = false;
-        resource->m_busy_time = now;
-        resource->m_done_time = now;
-        resource->m_free_time = now;
-//        cout << "issue_time = " << std::chrono::duration_cast<Milliseconds>((m_device_issue_time - m_local_start)).count()
-//             << ", sent_time = " << std::chrono::duration_cast<Milliseconds>((m_device_sent_time - m_local_start)).count()
-//             << ", free_time = " << std::chrono::duration_cast<Milliseconds>((resource->m_free_time - m_local_start)).count()
-//             << endl;
-    }
+    m_live_commands.clear();
     m_pending_clear.store(false, std::memory_order_release);
 }
 
-void SuperscalarScheduler::update_busy_states(){
+std::vector<std::shared_ptr<const SchedulerCommand>> SuperscalarScheduler::current_live_commands(){
     WallClock device_sent_time = m_device_sent_time;
-    for (ExecutionResource* resource : m_resources){
-        resource->m_is_busy = resource->m_busy_time <= device_sent_time && device_sent_time < resource->m_done_time;
-
-#if 0
-        if (resource->m_done_time >m_local_start){
-            cout << "------------" << endl;
-            cout << "m_busy_time        = " << std::chrono::duration_cast<Milliseconds>(resource->m_busy_time - m_local_start) << endl;
-            cout << "m_done_time        = " << std::chrono::duration_cast<Milliseconds>(resource->m_done_time - m_local_start) << endl;
-            cout << "m_device_sent_time = " << std::chrono::duration_cast<Milliseconds>(m_device_sent_time - m_local_start) << endl;
-            cout << "m_is_busy = " << resource->m_is_busy << endl;
+    std::vector<std::shared_ptr<const SchedulerCommand>> ret;
+    for (auto& item : m_live_commands){
+        if (item.second.busy_time <= device_sent_time && device_sent_time < item.second.done_time){
+            ret.emplace_back(item.second.command);
         }
-#endif
+    }
+    return ret;
+}
+void SuperscalarScheduler::clear_finished_commands(){
+    WallClock device_sent_time = m_device_sent_time;
+    for (auto iter = m_live_commands.begin(); iter != m_live_commands.end();){
+//        cout << "device_sent_time = " << device_sent_time << ", free_time = " << iter->second.free_time << endl;
+        if (device_sent_time >= iter->second.free_time){
+            iter = m_live_commands.erase(iter);
+        }else{
+            ++iter;
+        }
     }
 }
 bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
@@ -111,14 +105,15 @@ bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
     }
 
     //  Compute the resource state at this timestamp.
-    update_busy_states();
+    std::vector<std::shared_ptr<const SchedulerCommand>> state = current_live_commands();
+    clear_finished_commands();
 
     m_device_sent_time = next_state_change;
     if (next_state_change > *iter){
         m_state_changes.erase(iter);
     }
 
-    this->push_state(cancellable, duration);
+    this->push_state(cancellable, duration, std::move(state));
 
 //    SpinLockGuard lg(m_lock);
 
@@ -203,7 +198,10 @@ void SuperscalarScheduler::issue_nop(const Cancellable* cancellable, WallDuratio
     m_local_last_activity = current_time();
     process_schedule(cancellable);
 }
-void SuperscalarScheduler::issue_wait_for_resource(const Cancellable* cancellable, ExecutionResource& resource){
+void SuperscalarScheduler::issue_wait_for_resource(
+    const Cancellable* cancellable,
+    size_t resource_id
+){
     if (m_pending_clear.load(std::memory_order_acquire)){
         clear();
         return;
@@ -214,15 +212,26 @@ void SuperscalarScheduler::issue_wait_for_resource(const Cancellable* cancellabl
 //         << ", free_time = " << std::chrono::duration_cast<Milliseconds>((resource.m_free_time - m_local_start)).count()
 //         << endl;
     //  Resource is not ready yet. Stall until it is.
+
+#if 1
+    auto iter = m_live_commands.find(resource_id);
+    if (iter != m_live_commands.end() && iter->second.free_time > m_device_sent_time){
+        m_device_issue_time = iter->second.free_time;
+        m_local_last_activity = current_time();
+    }
+#else
     if (resource.m_free_time > m_device_sent_time){
 //        cout << "stall = " << std::chrono::duration_cast<Milliseconds>(resource.m_free_time - m_device_sent_time).count() << endl;
         m_device_issue_time = resource.m_free_time;
         m_local_last_activity = current_time();
     }
+#endif
+
     process_schedule(cancellable);
 }
 void SuperscalarScheduler::issue_to_resource(
-    const Cancellable* cancellable, ExecutionResource& resource,
+    const Cancellable* cancellable,
+    std::shared_ptr<const SchedulerCommand> resource,
     WallDuration delay, WallDuration hold, WallDuration cooldown
 ){
     if (m_pending_clear.load(std::memory_order_acquire)){
@@ -230,12 +239,15 @@ void SuperscalarScheduler::issue_to_resource(
     }
 
     //  Resource is busy.
-    if (m_device_sent_time < resource.m_free_time){
+    auto ret = m_live_commands.try_emplace(resource->id);
+    if (!ret.second && m_device_sent_time < ret.first->second.free_time){
+//        cout << m_device_sent_time << " : " << ret.first->second.free_time << endl;
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
             "Attempted to issue resource that isn't ready."
         );
     }
+    Command& command = ret.first->second;
 
     delay    = std::max(delay, WallDuration::zero());
     hold     = std::max(hold, WallDuration::zero());
@@ -257,9 +269,10 @@ void SuperscalarScheduler::issue_to_resource(
     m_state_changes.insert(m_device_issue_time);
     m_state_changes.insert(release_time);
 
-    resource.m_busy_time = m_device_issue_time;
-    resource.m_done_time = release_time;
-    resource.m_free_time = free_time;
+    command.command = std::move(resource);
+    command.busy_time = m_device_issue_time;
+    command.done_time = release_time;
+    command.free_time = free_time;
 
     m_device_issue_time += delay;
     m_max_free_time = std::max(m_max_free_time, free_time);

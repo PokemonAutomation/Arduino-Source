@@ -92,51 +92,36 @@ void SerialPABotBase_WiredController::stop(){
 
 
 
-void SerialPABotBase_WiredController::push_state(const Cancellable* cancellable, WallDuration duration){
+void SerialPABotBase_WiredController::push_state(
+    const Cancellable* cancellable,
+    WallDuration duration,
+    std::vector<std::shared_ptr<const SchedulerCommand>> state
+){
     //  Must be called inside "m_state_lock".
 
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
 
+    SwitchControllerState controller_state;
+    for (auto& item : state){
+        static_cast<const SwitchCommand&>(*item).apply(controller_state);
+    }
+
     int dpad_x = 0;
     int dpad_y = 0;
     uint16_t buttons = 0;
     uint8_t dpad_byte = 0;
-    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
-        if (!m_buttons[c].is_busy()){
-            continue;
-        }
-        Button button = (Button)((ButtonFlagType)1 << c);
-        switch (button){
-        case BUTTON_Y:          buttons |= 1 <<  0; break;
-        case BUTTON_B:          buttons |= 1 <<  1; break;
-        case BUTTON_A:          buttons |= 1 <<  2; break;
-        case BUTTON_X:          buttons |= 1 <<  3; break;
-        case BUTTON_L:          buttons |= 1 <<  4; break;
-        case BUTTON_R:          buttons |= 1 <<  5; break;
-        case BUTTON_ZL:         buttons |= 1 <<  6; break;
-        case BUTTON_ZR:         buttons |= 1 <<  7; break;
-        case BUTTON_MINUS:      buttons |= 1 <<  8; break;
-        case BUTTON_PLUS:       buttons |= 1 <<  9; break;
-        case BUTTON_LCLICK:     buttons |= 1 << 10; break;
-        case BUTTON_RCLICK:     buttons |= 1 << 11; break;
-        case BUTTON_HOME:       buttons |= 1 << 12; break;
-        case BUTTON_CAPTURE:    buttons |= 1 << 13; break;
-        case BUTTON_GR:         buttons |= 1 << 14; break;
-        case BUTTON_GL:         buttons |= 1 << 15; break;
-        case BUTTON_UP:         dpad_y--; break;
-        case BUTTON_RIGHT:      dpad_x++; break;
-        case BUTTON_DOWN:       dpad_y++; break;
-        case BUTTON_LEFT:       dpad_x--; break;
-        case BUTTON_C:          dpad_byte |= 0x80; break;
-        default:;
-        }
-    }
 
+    buttons = (uint16_t)controller_state.buttons;
+    if (controller_state.buttons & Button::BUTTON_UP)       dpad_y--;
+    if (controller_state.buttons & Button::BUTTON_RIGHT)    dpad_x++;
+    if (controller_state.buttons & Button::BUTTON_DOWN)     dpad_y++;
+    if (controller_state.buttons & Button::BUTTON_LEFT)     dpad_x--;
+    if (controller_state.buttons & Button::BUTTON_C)        dpad_byte |= 0x80;
 
     //  Merge the dpad states.
-    DpadPosition dpad = m_dpad.is_busy() ? m_dpad.position : DPAD_NONE;
+    DpadPosition dpad = controller_state.dpad;
     {
         switch (dpad){
         case DpadPosition::DPAD_UP:
@@ -199,21 +184,6 @@ void SerialPABotBase_WiredController::push_state(const Cancellable* cancellable,
     dpad_byte |= dpad;
 
 
-
-    uint8_t left_x = 128;
-    uint8_t left_y = 128;
-    uint8_t right_x = 128;
-    uint8_t right_y = 128;
-    if (m_left_joystick.is_busy()){
-        left_x = m_left_joystick.x;
-        left_y = m_left_joystick.y;
-    }
-    if (m_right_joystick.is_busy()){
-        right_x = m_right_joystick.x;
-        right_y = m_right_joystick.y;
-    }
-
-
     //  Release the state lock since we are no longer touching state.
     //  This loop can block indefinitely if the command queue is full.
     ReverseLockGuard<std::mutex> lg(m_state_lock);
@@ -229,8 +199,8 @@ void SerialPABotBase_WiredController::push_state(const Cancellable* cancellable,
                 (uint16_t)current.count(),
                 buttons,
                 dpad_byte,
-                left_x, left_y,
-                right_x, right_y
+                controller_state.left_stick_x, controller_state.left_stick_y,
+                controller_state.right_stick_x, controller_state.right_stick_y
             ),
             cancellable
         );

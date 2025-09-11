@@ -152,7 +152,16 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_mash_button(
 
 
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_left_joycon(const Cancellable* cancellable, WallDuration duration){
+void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_left_joycon(
+    const Cancellable* cancellable,
+    WallDuration duration,
+    std::vector<std::shared_ptr<const SchedulerCommand>> state
+){
+    SwitchControllerState controller_state;
+    for (auto& item : state){
+        static_cast<const SwitchCommand&>(*item).apply(controller_state);
+    }
+
     pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
@@ -162,18 +171,24 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_left_joycon(const Ca
         .vibrator = 0x00,
     };
 
-    populate_report_buttons(buttons);
+    populate_report_buttons(buttons, controller_state);
 
-    //  Left Stick
-    if (m_left_joystick.is_busy()){
-        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            buttons.left_joystick,
-            m_left_joystick.x, m_left_joystick.y
-        );
+    {
+        SplitDpad dpad = convert_unified_to_split_dpad(controller_state.dpad);
+        buttons.button5 |= (dpad.down  ? 1 : 0) << 0;
+        buttons.button5 |= (dpad.up    ? 1 : 0) << 1;
+        buttons.button5 |= (dpad.right ? 1 : 0) << 2;
+        buttons.button5 |= (dpad.left  ? 1 : 0) << 3;
     }
 
+    //  Left Stick
+    encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
+        buttons.left_joystick,
+        controller_state.left_stick_x, controller_state.left_stick_y
+    );
+
     pabb_NintendoSwitch_WirelessController_State0x30_Gyro gyro{};
-    bool gyro_active = populate_report_gyro(gyro);
+    bool gyro_active = populate_report_gyro(gyro, controller_state);
 
     if (!gyro_active){
         issue_report(cancellable, duration, buttons);
@@ -182,7 +197,16 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_left_joycon(const Ca
     }
 }
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_right_joycon(const Cancellable* cancellable, WallDuration duration){
+void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_right_joycon(
+    const Cancellable* cancellable,
+    WallDuration duration,
+    std::vector<std::shared_ptr<const SchedulerCommand>> state
+){
+    SwitchControllerState controller_state;
+    for (auto& item : state){
+        static_cast<const SwitchCommand&>(*item).apply(controller_state);
+    }
+
     pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
@@ -192,20 +216,18 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_right_joycon(const C
         .vibrator = 0x00,
     };
 
-    populate_report_buttons(buttons);
+    populate_report_buttons(buttons, controller_state);
 
     //  Right Stick
-    if (m_right_joystick.is_busy()){
-        encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
-            buttons.right_joystick,
-            m_right_joystick.x, m_right_joystick.y
-        );
-    }
+    encode_joystick<JOYSTICK_MIN_THRESHOLD, JOYSTICK_MAX_THRESHOLD>(
+        buttons.right_joystick,
+        controller_state.right_stick_x, controller_state.right_stick_y
+    );
 
 //    cout << (int)m_right_joystick.x << " - " << (int)m_right_joystick.y << ": " << std::chrono::duration_cast<Milliseconds>(duration).count() << endl;
 
     pabb_NintendoSwitch_WirelessController_State0x30_Gyro gyro{};
-    bool gyro_active = populate_report_gyro(gyro);
+    bool gyro_active = populate_report_gyro(gyro, controller_state);
 
     if (!gyro_active){
         issue_report(cancellable, duration, buttons);
@@ -214,13 +236,17 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_right_joycon(const C
     }
 }
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::push_state(const Cancellable* cancellable, WallDuration duration){
+void SerialPABotBase_WirelessJoycon<JoyconType>::push_state(
+    const Cancellable* cancellable,
+    WallDuration duration,
+    std::vector<std::shared_ptr<const SchedulerCommand>> state
+){
     switch (m_controller_type){
     case ControllerType::NintendoSwitch_LeftJoycon:
-        push_state_left_joycon(cancellable, duration);
+        push_state_left_joycon(cancellable, duration, std::move(state));
         break;
     case ControllerType::NintendoSwitch_RightJoycon:
-        push_state_right_joycon(cancellable, duration);
+        push_state_right_joycon(cancellable, duration, std::move(state));
         break;
     default:
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Invalid joycon type.");

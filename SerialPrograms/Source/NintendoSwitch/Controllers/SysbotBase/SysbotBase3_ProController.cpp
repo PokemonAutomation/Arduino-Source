@@ -171,7 +171,11 @@ void ProController_SysbotBase3::on_message(const std::string& message){
     m_cv.notify_all();
 }
 
-void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallDuration duration){
+void ProController_SysbotBase3::push_state(
+    const Cancellable* cancellable,
+    WallDuration duration,
+    std::vector<std::shared_ptr<const SchedulerCommand>> state
+){
     //  Must be called inside "m_state_lock".
 
     if (cancellable){
@@ -181,35 +185,41 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
         throw InvalidConnectionStateException("");
     }
 
+    SwitchControllerState controller_state;
+    for (auto& item : state){
+        static_cast<const SwitchCommand&>(*item).apply(controller_state);
+    }
+
+
     //  Flags map to: https://github.com/switchbrew/libnx/blob/master/nx/include/switch/services/hid.h#L584
     uint64_t nx_button = 0;
-    if (m_buttons[ 0].is_busy()) nx_button |= (uint64_t)1 <<  3;    //  Y
-    if (m_buttons[ 1].is_busy()) nx_button |= (uint64_t)1 <<  1;    //  B
-    if (m_buttons[ 2].is_busy()) nx_button |= (uint64_t)1 <<  0;    //  A
-    if (m_buttons[ 3].is_busy()) nx_button |= (uint64_t)1 <<  2;    //  X
-    if (m_buttons[ 4].is_busy()) nx_button |= (uint64_t)1 <<  6;    //  L
-    if (m_buttons[ 5].is_busy()) nx_button |= (uint64_t)1 <<  7;    //  R
-    if (m_buttons[ 6].is_busy()) nx_button |= (uint64_t)1 <<  8;    //  ZL
-    if (m_buttons[ 7].is_busy()) nx_button |= (uint64_t)1 <<  9;    //  ZR
-    if (m_buttons[ 8].is_busy()) nx_button |= (uint64_t)1 << 11;    //  -
-    if (m_buttons[ 9].is_busy()) nx_button |= (uint64_t)1 << 10;    //  +
-    if (m_buttons[10].is_busy()) nx_button |= (uint64_t)1 <<  4;    //  L-click
-    if (m_buttons[11].is_busy()) nx_button |= (uint64_t)1 <<  5;    //  R-click
-    if (m_buttons[12].is_busy()) nx_button |= (uint64_t)1 << 18;    //  Home
-    if (m_buttons[13].is_busy()) nx_button |= (uint64_t)1 << 19;    //  Capture
-    if (m_buttons[14].is_busy()) nx_button |= (uint64_t)1 << 13;    //  Up
-    if (m_buttons[15].is_busy()) nx_button |= (uint64_t)1 << 14;    //  Right
-    if (m_buttons[16].is_busy()) nx_button |= (uint64_t)1 << 15;    //  Down
-    if (m_buttons[17].is_busy()) nx_button |= (uint64_t)1 << 12;    //  Left
+    if (controller_state.buttons & BUTTON_Y)        nx_button |= (uint64_t)1 <<  3;    //  Y
+    if (controller_state.buttons & BUTTON_B)        nx_button |= (uint64_t)1 <<  1;    //  B
+    if (controller_state.buttons & BUTTON_A)        nx_button |= (uint64_t)1 <<  0;    //  A
+    if (controller_state.buttons & BUTTON_X)        nx_button |= (uint64_t)1 <<  2;    //  X
+    if (controller_state.buttons & BUTTON_L)        nx_button |= (uint64_t)1 <<  6;    //  L
+    if (controller_state.buttons & BUTTON_R)        nx_button |= (uint64_t)1 <<  7;    //  R
+    if (controller_state.buttons & BUTTON_ZL)       nx_button |= (uint64_t)1 <<  8;    //  ZL
+    if (controller_state.buttons & BUTTON_ZR)       nx_button |= (uint64_t)1 <<  9;    //  ZR
+    if (controller_state.buttons & BUTTON_MINUS)    nx_button |= (uint64_t)1 << 11;    //  -
+    if (controller_state.buttons & BUTTON_PLUS)     nx_button |= (uint64_t)1 << 10;    //  +
+    if (controller_state.buttons & BUTTON_LCLICK)   nx_button |= (uint64_t)1 <<  4;    //  L-click
+    if (controller_state.buttons & BUTTON_RCLICK)   nx_button |= (uint64_t)1 <<  5;    //  R-click
+    if (controller_state.buttons & BUTTON_HOME)     nx_button |= (uint64_t)1 << 18;    //  Home
+    if (controller_state.buttons & BUTTON_CAPTURE)  nx_button |= (uint64_t)1 << 19;    //  Capture
+    if (controller_state.buttons & BUTTON_UP)       nx_button |= (uint64_t)1 << 13;    //  Up
+    if (controller_state.buttons & BUTTON_RIGHT)    nx_button |= (uint64_t)1 << 14;    //  Right
+    if (controller_state.buttons & BUTTON_DOWN)     nx_button |= (uint64_t)1 << 15;    //  Down
+    if (controller_state.buttons & BUTTON_LEFT)     nx_button |= (uint64_t)1 << 12;    //  Left
 #if 0   //  Don't exist on pro controller.
-    if (m_buttons[18].is_busy()) nx_button |= (uint64_t)1 << 24;    //  Left SL
-    if (m_buttons[19].is_busy()) nx_button |= (uint64_t)1 << 25;    //  Left SR
-    if (m_buttons[20].is_busy()) nx_button |= (uint64_t)1 << 26;    //  Right SL
-    if (m_buttons[21].is_busy()) nx_button |= (uint64_t)1 << 27;    //  Right SR
+    if (controller_state.buttons & BUTTON_LEFT_SL)  nx_button |= (uint64_t)1 << 24;    //  Left SL
+    if (controller_state.buttons & BUTTON_LEFT_SR)  nx_button |= (uint64_t)1 << 25;    //  Left SR
+    if (controller_state.buttons & BUTTON_RIGHT_SL) nx_button |= (uint64_t)1 << 26;    //  Right SL
+    if (controller_state.buttons & BUTTON_RIGHT_SR) nx_button |= (uint64_t)1 << 27;    //  Right SR
 #endif
 
     {
-        DpadPosition dpad = m_dpad.is_busy() ? m_dpad.position : DPAD_NONE;
+        DpadPosition dpad = controller_state.dpad;
         SplitDpad split_dpad = convert_unified_to_split_dpad(dpad);
         if (split_dpad.up)    nx_button |= (uint64_t)1 << 13;
         if (split_dpad.right) nx_button |= (uint64_t)1 << 14;
@@ -221,16 +231,16 @@ void ProController_SysbotBase3::push_state(const Cancellable* cancellable, WallD
     int16_t left_y = 0;
     int16_t right_x = 0;
     int16_t right_y = 0;
-    if (m_left_joystick.is_busy()){
-        double fx = JoystickTools::linear_u8_to_float(m_left_joystick.x);
-        double fy = -JoystickTools::linear_u8_to_float(m_left_joystick.y);
+    {
+        double fx = JoystickTools::linear_u8_to_float(controller_state.left_stick_x);
+        double fy = -JoystickTools::linear_u8_to_float(controller_state.left_stick_y);
         JoystickTools::clip_magnitude(fx, fy);
         left_x = JoystickTools::linear_float_to_s16(fx);
         left_y = JoystickTools::linear_float_to_s16(fy);
     }
-    if (m_right_joystick.is_busy()){
-        double fx = JoystickTools::linear_u8_to_float(m_right_joystick.x);
-        double fy = -JoystickTools::linear_u8_to_float(m_right_joystick.y);
+    {
+        double fx = JoystickTools::linear_u8_to_float(controller_state.right_stick_x);
+        double fy = -JoystickTools::linear_u8_to_float(controller_state.right_stick_y);
         JoystickTools::clip_magnitude(fx, fy);
         right_x = JoystickTools::linear_float_to_s16(fx);
         right_y = JoystickTools::linear_float_to_s16(fy);

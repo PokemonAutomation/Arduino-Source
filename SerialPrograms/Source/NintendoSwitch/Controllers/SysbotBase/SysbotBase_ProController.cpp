@@ -91,7 +91,11 @@ void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
     }
 //    cout << "ProController_SysbotBase::wait_for_all - Exit()" << endl;
 }
-void ProController_SysbotBase::push_state(const Cancellable* cancellable, WallDuration duration){
+void ProController_SysbotBase::push_state(
+    const Cancellable* cancellable,
+    WallDuration duration,
+    std::vector<std::shared_ptr<const SchedulerCommand>> state
+){
     //  Must be called inside "m_state_lock".
 
     if (cancellable){
@@ -101,26 +105,9 @@ void ProController_SysbotBase::push_state(const Cancellable* cancellable, WallDu
         throw InvalidConnectionStateException("");
     }
 
-    Button buttons = BUTTON_NONE;
-    for (size_t c = 0; c < 14; c++){
-        buttons |= m_buttons[c].is_busy()
-            ? (Button)((uint16_t)1 << c)
-            : BUTTON_NONE;
-    }
-
-    DpadPosition dpad = m_dpad.is_busy() ? m_dpad.position : DPAD_NONE;
-
-    uint8_t left_x = 128;
-    uint8_t left_y = 128;
-    uint8_t right_x = 128;
-    uint8_t right_y = 128;
-    if (m_left_joystick.is_busy()){
-        left_x = m_left_joystick.x;
-        left_y = m_left_joystick.y;
-    }
-    if (m_right_joystick.is_busy()){
-        right_x = m_right_joystick.x;
-        right_y = m_right_joystick.y;
+    SwitchControllerState controller_state;
+    for (auto& item : state){
+        static_cast<const SwitchCommand&>(*item).apply(controller_state);
     }
 
     std::unique_lock<std::mutex> lg(m_state_lock, std::adopt_lock_t());
@@ -151,12 +138,12 @@ void ProController_SysbotBase::push_state(const Cancellable* cancellable, WallDu
 
     Command& command = m_command_queue.push_back();
 
-    command.state.buttons = buttons;
-    command.state.dpad = dpad;
-    command.state.left_x = left_x;
-    command.state.left_y = left_y;
-    command.state.right_x = right_x;
-    command.state.right_y = right_y;
+    command.state.buttons = controller_state.buttons;
+    command.state.dpad = controller_state.dpad;
+    command.state.left_x = controller_state.left_stick_x;
+    command.state.left_y = controller_state.left_stick_y;
+    command.state.right_x = controller_state.right_stick_x;
+    command.state.right_y = controller_state.right_stick_y;
 
     command.duration = std::chrono::duration_cast<Milliseconds>(duration);
 }

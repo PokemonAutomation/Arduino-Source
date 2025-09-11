@@ -220,7 +220,11 @@ private:
     PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
         return milliseconds / 8 + (milliseconds % 8 + 7) / 8;
     }
-    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
+    virtual void push_state(
+        const Cancellable* cancellable,
+        WallDuration duration,
+        std::vector<std::shared_ptr<const SchedulerCommand>> state
+    ) override;
 
     void status_thread();
 

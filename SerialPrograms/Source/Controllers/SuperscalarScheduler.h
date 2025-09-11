@@ -8,6 +8,7 @@
 #define PokemonAutomation_Controllers_SuperscalarScheduler_H
 
 #include <set>
+#include <map>
 #include <atomic>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/CancellableScope.h"
@@ -17,28 +18,17 @@ namespace PokemonAutomation{
 class SuperscalarScheduler;
 
 
-class ExecutionResource{
+
+
+class SchedulerCommand{
 public:
-    virtual ~ExecutionResource() = default;
-    ExecutionResource()
-        : m_busy_time(WallClock::min())
-        , m_done_time(WallClock::min())
-        , m_free_time(WallClock::min())
+    const size_t id;
+
+    SchedulerCommand(size_t id)
+        : id(id)
     {}
 
-    bool is_busy() const{
-        return m_is_busy;
-    }
-    WallClock free_time() const{
-        return m_free_time;
-    }
-
-private:
-    friend class SuperscalarScheduler;
-    bool m_is_busy = false;
-    WallClock m_busy_time;  //  Timestamp of when resource will be become busy.
-    WallClock m_done_time;  //  Timestamp of when resource will be done being busy.
-    WallClock m_free_time;  //  Timestamp of when resource can be used again.
+    virtual ~SchedulerCommand() = default;
 };
 
 
@@ -47,11 +37,7 @@ private:
 
 class SuperscalarScheduler{
 public:
-    SuperscalarScheduler(
-        Logger& logger,
-        WallDuration flush_threshold,
-        std::vector<ExecutionResource*> resources
-    );
+    SuperscalarScheduler(Logger& logger, WallDuration flush_threshold);
 
 
 public:
@@ -60,6 +46,13 @@ public:
 
     void clear_on_next(){
         m_pending_clear.store(true, std::memory_order_release);
+    }
+
+    WallClock busy_until(size_t resource_id) const{
+        auto iter = m_live_commands.find(resource_id);
+        return iter != m_live_commands.end()
+            ? iter->second.free_time
+            : WallClock::min();
     }
 
 
@@ -80,12 +73,16 @@ public:
 
     //  Wait until the specified resource is ready to be used.
     //  This will advance the issue timestamp until the resource is ready.
-    void issue_wait_for_resource(const Cancellable* cancellable, ExecutionResource& resource);
+    void issue_wait_for_resource(
+        const Cancellable* cancellable,
+        size_t resource_id
+    );
 
     //  Issue a resource with the specified timing parameters.
     //  The resource must be ready to be used.
     void issue_to_resource(
-        const Cancellable* cancellable, ExecutionResource& resource,
+        const Cancellable* cancellable,
+        std::shared_ptr<const SchedulerCommand> resource,
         WallDuration delay, WallDuration hold, WallDuration cooldown
     );
 
@@ -102,12 +99,17 @@ protected:
     //  functions. Implementations of this method should be aware of this
     //  re-entrancy when this gets called on them with respect to locking.
     //
-    virtual void push_state(const Cancellable* cancellable, WallDuration duration) = 0;
+    virtual void push_state(
+        const Cancellable* cancellable,
+        WallDuration duration,
+        std::vector<std::shared_ptr<const SchedulerCommand>> state
+    ) = 0;
 
 
 private:
     void clear() noexcept;
-    void update_busy_states();
+    std::vector<std::shared_ptr<const SchedulerCommand>> current_live_commands();
+    void clear_finished_commands();
     bool iterate_schedule(const Cancellable* cancellable);
     void process_schedule(const Cancellable* cancellable);
 
@@ -142,7 +144,13 @@ private:
     //  timestamps in this set, the state is constant.
     std::set<WallClock> m_state_changes;
 
-    std::vector<ExecutionResource*> m_resources;
+    struct Command{
+        std::shared_ptr<const SchedulerCommand> command;
+        WallClock busy_time;    //  Timestamp of when resource will be become busy.
+        WallClock done_time;    //  Timestamp of when resource will be done being busy.
+        WallClock free_time;    //  Timestamp of when resource can be used again.
+    };
+    std::map<size_t, Command> m_live_commands;
 };
 
 

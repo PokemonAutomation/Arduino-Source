@@ -18,10 +18,7 @@ using namespace std::chrono_literals;
 
 
 ControllerWithScheduler::ControllerWithScheduler(Logger& logger)
-    : SuperscalarScheduler(
-        logger, Milliseconds(4),
-        make_resource_list()
-    )
+    : SuperscalarScheduler(logger, Milliseconds(4))
     , m_logger(logger)
 //    , m_logging_suppress(0)
 {}
@@ -64,14 +61,15 @@ void ControllerWithScheduler::issue_buttons(
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
         ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
-            this->issue_wait_for_resource(cancellable, m_buttons[c]);
+            this->issue_wait_for_resource(cancellable, c);
         }
     }
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
         ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
             this->issue_to_resource(
-                cancellable, m_buttons[c],
+                cancellable,
+                std::make_unique<SwitchCommand_Button>((SwitchResource)c),
                 WallDuration::zero(), hold, cooldown
             );
         }
@@ -99,9 +97,12 @@ void ControllerWithScheduler::issue_dpad(
         cancellable->throw_if_cancelled();
     }
 
-    this->issue_wait_for_resource(cancellable, m_dpad);
-    m_dpad.position = position;
-    this->issue_to_resource(cancellable, m_dpad, delay, hold, cooldown);
+    this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::DPAD);
+    this->issue_to_resource(
+        cancellable,
+        std::make_unique<SwitchCommand_Dpad>(position),
+        delay, hold, cooldown
+    );
 
     if (m_logging_throttler){
         m_logger.log(
@@ -125,10 +126,12 @@ void ControllerWithScheduler::issue_left_joystick(
         cancellable->throw_if_cancelled();
     }
 
-    this->issue_wait_for_resource(cancellable, m_left_joystick);
-    m_left_joystick.x = x;
-    m_left_joystick.y = y;
-    this->issue_to_resource(cancellable, m_left_joystick, delay, hold, cooldown);
+    this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::JOYSTICK_LEFT);
+    this->issue_to_resource(
+        cancellable,
+        std::make_unique<SwitchCommand_LeftJoystick>(x, y),
+        delay, hold, cooldown
+    );
 
     if (m_logging_throttler){
         m_logger.log(
@@ -151,10 +154,12 @@ void ControllerWithScheduler::issue_right_joystick(
         cancellable->throw_if_cancelled();
     }
 
-    this->issue_wait_for_resource(cancellable, m_right_joystick);
-    m_right_joystick.x = x;
-    m_right_joystick.y = y;
-    this->issue_to_resource(cancellable, m_right_joystick, delay, hold, cooldown);
+    this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::JOYSTICK_RIGHT);
+    this->issue_to_resource(
+        cancellable,
+        std::make_unique<SwitchCommand_RightJoystick>(x, y),
+        delay, hold, cooldown
+    );
 
     if (m_logging_throttler){
         m_logger.log(
@@ -171,7 +176,7 @@ void ControllerWithScheduler::issue_right_joystick(
 
 void ControllerWithScheduler::issue_gyro(
     const Cancellable* cancellable,
-    SwitchGyro& gyro, const char* name,
+    SwitchResource id, const char* name,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     int16_t value
 ){
@@ -181,9 +186,12 @@ void ControllerWithScheduler::issue_gyro(
         cancellable->throw_if_cancelled();
     }
 
-    this->issue_wait_for_resource(cancellable, gyro);
-    gyro.value = value;
-    this->issue_to_resource(cancellable, gyro, delay, hold, cooldown);
+    this->issue_wait_for_resource(cancellable, (size_t)id);
+    this->issue_to_resource(
+        cancellable,
+        std::make_unique<SwitchCommand_Gyro>(id, value),
+        delay, hold, cooldown
+    );
 
     if (m_logging_throttler){
         m_logger.log(
@@ -215,38 +223,36 @@ void ControllerWithScheduler::issue_full_controller_state(
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
         ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
-            this->issue_wait_for_resource(cancellable, m_buttons[c]);
+            this->issue_wait_for_resource(cancellable, (size_t)c);
         }
     }
-    this->issue_wait_for_resource(cancellable, m_dpad);
-    this->issue_wait_for_resource(cancellable, m_left_joystick);
-    this->issue_wait_for_resource(cancellable, m_right_joystick);
-
-    m_dpad.position = position;
-    m_left_joystick.x = left_x;
-    m_left_joystick.y = left_y;
-    m_right_joystick.x = right_x;
-    m_right_joystick.y = right_y;
+    this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::DPAD);
+    this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::JOYSTICK_LEFT);
+    this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::JOYSTICK_RIGHT);
 
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
         ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
             this->issue_to_resource(
-                cancellable, m_buttons[c],
+                cancellable,
+                std::make_unique<SwitchCommand_Button>((SwitchResource)c),
                 WallDuration::zero(), hold, WallDuration::zero()
             );
         }
     }
     this->issue_to_resource(
-        cancellable, m_dpad,
+        cancellable,
+        std::make_unique<SwitchCommand_Dpad>(position),
         WallDuration::zero(), hold, WallDuration::zero()
     );
     this->issue_to_resource(
-        cancellable, m_left_joystick,
+        cancellable,
+        std::make_unique<SwitchCommand_LeftJoystick>(left_x, left_y),
         WallDuration::zero(), hold, WallDuration::zero()
     );
     this->issue_to_resource(
-        cancellable, m_right_joystick,
+        cancellable,
+        std::make_unique<SwitchCommand_RightJoystick>(right_x, right_y),
         hold, hold, WallDuration::zero()
     );
 
@@ -374,9 +380,9 @@ void ControllerWithScheduler::issue_system_scroll(
 
     ThrottleScope scope(m_logging_throttler);
 
-    WallClock dpad = m_dpad.free_time();
-    WallClock left_joystick = m_left_joystick.free_time();
-    WallClock right_joystick = m_right_joystick.free_time();
+    WallClock dpad = busy_until((size_t)SwitchResource::DPAD);
+    WallClock left_joystick = busy_until((size_t)SwitchResource::JOYSTICK_LEFT);
+    WallClock right_joystick = busy_until((size_t)SwitchResource::JOYSTICK_RIGHT);
 
     do{
         if (dpad <= left_joystick && dpad <= right_joystick){
