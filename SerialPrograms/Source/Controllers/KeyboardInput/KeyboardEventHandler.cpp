@@ -30,5 +30,11 @@ void KeyboardEventHandler::remove_listener(KeyboardListener& listener){
     data.m_listeners.remove(listener);
 }
 
+void KeyboardEventHandler::report_keyboard_state_changed(Milliseconds duration, const NintendoSwitch::ProControllerState& state){
+    auto scope = m_lifetime_sanitizer.check_scope();
+    Data& data = *m_data;
+    data.m_listeners.run_method_unique(&KeyboardListener::on_keyboard_control_state_change, duration, state);
+}
+
 
 }
