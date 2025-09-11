@@ -102,7 +102,9 @@ void ProController::keyboard_release(const QKeyEvent& event){
 }
 
 
+void ProController::on_keyboard_control_state_change(Milliseconds duration, const ProControllerState& state) {
 
+}
 
 
 
