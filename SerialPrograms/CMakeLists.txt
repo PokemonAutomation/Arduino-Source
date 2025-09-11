@@ -701,6 +701,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
+    Source/Controllers/KeyboardInput/KeyboardEventHandler.cpp
+    Source/Controllers/KeyboardInput/KeyboardEventHandler.h
     Source/Controllers/KeyboardInput/KeyboardInput.cpp
     Source/Controllers/KeyboardInput/KeyboardInput.h
     Source/Controllers/KeyboardInput/KeyboardStateTracker.cpp
