@@ -53,13 +53,15 @@ constexpr Button VALID_PRO_CONTROLLER_BUTTONS =
 //
 //  This is the generic interface to a Switch pro controller.
 //
-class ProController : public AbstractController{
+class ProController : public AbstractController, public KeyboardEventHandler::KeyboardListener{
 public:
     using ContextType = ProControllerContext;
 
     ProController(Logger& logger);
     virtual ~ProController();
 
+private:
+    virtual void on_keyboard_control_state_change(Milliseconds duration, const ProControllerState& state) override;
 
 public:
     static const char NAME[];
