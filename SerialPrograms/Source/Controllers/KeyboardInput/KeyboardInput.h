@@ -14,6 +14,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Controllers/Controller.h"
 #include "Controllers/KeyboardInput/GlobalQtKeyMap.h"
+#include "KeyboardEventHandler.h"
 #include "KeyboardStateTracker.h"
 
 class QKeyEvent;
@@ -86,7 +87,7 @@ private:
 
 
 template <typename StateType, typename DeltaType>
-class KeyboardManager : public KeyboardInputController{
+class KeyboardManager : public KeyboardInputController, public KeyboardEventHandler{
 public:
     KeyboardManager(Logger& logger, AbstractController& controller)
         : KeyboardInputController(logger, true)
