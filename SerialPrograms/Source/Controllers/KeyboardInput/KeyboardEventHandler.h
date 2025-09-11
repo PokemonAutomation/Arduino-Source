@@ -11,9 +11,12 @@
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/LifetimeSanitizer.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 
 namespace PokemonAutomation{
+
+namespace NintendoSwitch{
+    class ProControllerState;  // forward declaration to avoid circular dependency
+}
 
 class KeyboardEventHandler{
 public:
