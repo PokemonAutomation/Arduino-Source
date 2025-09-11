@@ -29,6 +29,11 @@ public:
     void add_listener(KeyboardListener& listener);
     void remove_listener(KeyboardListener& listener);
 
+protected:
+    //  Report that the keyboard state has changed. This will be pushed to
+    //  all listeners.
+    void report_keyboard_state_changed(Milliseconds duration, const NintendoSwitch::ProControllerState& state);
+
 private:
     struct Data;
     Pimpl<Data> m_data;
