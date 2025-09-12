@@ -214,10 +214,9 @@ public:
 
 private:
     virtual void on_message(const std::string& message) override;
-    virtual void push_state(
+    virtual void execute_state(
         const Cancellable* cancellable,
-        WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerResource>> state
+        const SuperscalarScheduler::ScheduleEntry& entry
     ) override;
 
 

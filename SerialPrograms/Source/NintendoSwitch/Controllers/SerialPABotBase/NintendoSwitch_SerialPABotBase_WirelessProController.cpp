@@ -36,13 +36,12 @@ SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
 }
 
 
-void SerialPABotBase_WirelessProController::push_state(
+void SerialPABotBase_WirelessProController::execute_state(
     const Cancellable* cancellable,
-    WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerResource>> state
+    const SuperscalarScheduler::ScheduleEntry& entry
 ){
     SwitchControllerState controller_state;
-    for (auto& item : state){
+    for (auto& item : entry.state){
         static_cast<const SwitchCommand&>(*item).apply(controller_state);
     }
 
@@ -94,9 +93,9 @@ void SerialPABotBase_WirelessProController::push_state(
 //    gyro.rotation_z = 0x000f;
 
     if (!gyro_active){
-        issue_report(cancellable, duration, buttons);
+        issue_report(cancellable, entry.duration, buttons);
     }else{
-        issue_report(cancellable, duration, buttons, gyro);
+        issue_report(cancellable, entry.duration, buttons, gyro);
     }
 
 #if 0

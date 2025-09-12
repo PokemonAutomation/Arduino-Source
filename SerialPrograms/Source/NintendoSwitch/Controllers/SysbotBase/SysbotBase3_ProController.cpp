@@ -55,7 +55,7 @@ void ProController_SysbotBase3::cancel_all_commands(){
         m_logger.log("sys-botbase3: cqCancel");
     }
 
-    this->clear_on_next();
+    m_scheduler.clear_on_next();
     m_cv.notify_all();
     m_logger.log("cancel_all_commands(): Command Queue Size = " + std::to_string(queued), COLOR_DARKGREEN);
 }
@@ -77,21 +77,26 @@ void ProController_SysbotBase3::replace_on_next_command(){
     }
 #endif
 
-    this->clear_on_next();
+    m_scheduler.clear_on_next();
     m_cv.notify_all();
     m_logger.log("replace_on_next_command(): Command Queue Size = " + std::to_string(queued), COLOR_DARKGREEN);
 }
 void ProController_SysbotBase3::wait_for_all(const Cancellable* cancellable){
+    SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
-    std::unique_lock<std::mutex> lg1(m_state_lock);
+    {
+        std::lock_guard<std::mutex> lg1(m_state_lock);
 
-//    cout << "wait_for_all() - start" << endl;
+    //    cout << "wait_for_all() - start" << endl;
 
-    if (m_stopping){
-        throw InvalidConnectionStateException("");
+        if (m_stopping){
+            throw InvalidConnectionStateException("");
+        }
+        m_scheduler.issue_wait_for_all(schedule);
     }
-    this->issue_wait_for_all(cancellable);
+    execute_schedule(cancellable, schedule);
 
+    std::unique_lock<std::mutex> lg1(m_state_lock);
     while (true){
         if (m_stopping){
             throw InvalidConnectionStateException("");
@@ -171,13 +176,10 @@ void ProController_SysbotBase3::on_message(const std::string& message){
     m_cv.notify_all();
 }
 
-void ProController_SysbotBase3::push_state(
+void ProController_SysbotBase3::execute_state(
     const Cancellable* cancellable,
-    WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerResource>> state
+    const SuperscalarScheduler::ScheduleEntry& entry
 ){
-    //  Must be called inside "m_state_lock".
-
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
@@ -186,7 +188,7 @@ void ProController_SysbotBase3::push_state(
     }
 
     SwitchControllerState controller_state;
-    for (auto& item : state){
+    for (auto& item : entry.state){
         static_cast<const SwitchCommand&>(*item).apply(controller_state);
     }
 
@@ -253,9 +255,8 @@ void ProController_SysbotBase3::push_state(
         message += "cqReplaceOnNext\r\n";
     }
 
-    std::unique_lock<std::mutex> lg(m_state_lock, std::adopt_lock_t());
-
     //  Wait until there is space.
+    std::unique_lock<std::mutex> lg(m_state_lock);
     m_cv.wait(lg, [this, cancellable]{
         if (cancellable && cancellable->cancelled()){
             return true;
@@ -263,14 +264,12 @@ void ProController_SysbotBase3::push_state(
         return m_stopping || m_next_seqnum - m_next_expected_seqnum_ack < QUEUE_SIZE;
     });
 
-    lg.release();
-
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
 
     Sysbotbase3_ControllerCommand command;
-    command.milliseconds = std::chrono::duration_cast<Milliseconds>(duration).count();
+    command.milliseconds = std::chrono::duration_cast<Milliseconds>(entry.duration).count();
     command.seqnum = m_next_seqnum++;
     command.state.buttons = nx_button;
     command.state.left_joystick_x = left_x;

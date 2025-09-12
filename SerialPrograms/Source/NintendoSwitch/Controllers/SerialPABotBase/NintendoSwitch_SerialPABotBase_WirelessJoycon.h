@@ -161,20 +161,17 @@ public:
 
 
 protected:
-    void push_state_left_joycon(
+    void execute_state_left_joycon(
         const Cancellable* cancellable,
-        WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerResource>> state
+        const SuperscalarScheduler::ScheduleEntry& entry
     );
-    void push_state_right_joycon(
+    void execute_state_right_joycon(
         const Cancellable* cancellable,
-        WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerResource>> state
+        const SuperscalarScheduler::ScheduleEntry& entry
     );
-    virtual void push_state(
+    virtual void execute_state(
         const Cancellable* cancellable,
-        WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerResource>> state
+        const SuperscalarScheduler::ScheduleEntry& entry
     ) override;
 
     ControllerType m_controller_type;

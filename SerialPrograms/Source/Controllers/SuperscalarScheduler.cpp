@@ -40,9 +40,9 @@ void SuperscalarScheduler::clear() noexcept{
     m_pending_clear.store(false, std::memory_order_release);
 }
 
-std::vector<std::shared_ptr<const SchedulerResource>> SuperscalarScheduler::current_live_commands(){
+SuperscalarScheduler::State SuperscalarScheduler::current_live_commands(){
     WallClock device_sent_time = m_device_sent_time;
-    std::vector<std::shared_ptr<const SchedulerResource>> ret;
+    State ret;
     for (auto& item : m_live_commands){
         if (item.second.busy_time <= device_sent_time && device_sent_time < item.second.done_time){
             ret.emplace_back(item.second.command);
@@ -61,11 +61,7 @@ void SuperscalarScheduler::clear_finished_commands(){
         }
     }
 }
-bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
-    if (cancellable){
-        cancellable->throw_if_cancelled();
-    }
-
+bool SuperscalarScheduler::iterate_schedule(Schedule& schedule){
 //    cout << "----------------------------> " << m_state_changes.size() << endl;
 //    cout << "m_device_sent_time = " << std::chrono::duration_cast<Milliseconds>(m_device_sent_time - m_local_start) << endl;
 
@@ -113,7 +109,9 @@ bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
         m_state_changes.erase(iter);
     }
 
-    this->push_state(cancellable, duration, std::move(state));
+    ScheduleEntry& entry = schedule.emplace_back();
+    entry.duration = duration;
+    entry.state = std::move(state);
 
 //    SpinLockGuard lg(m_lock);
 
@@ -153,18 +151,18 @@ bool SuperscalarScheduler::iterate_schedule(const Cancellable* cancellable){
 
     return true;
 }
-void SuperscalarScheduler::process_schedule(const Cancellable* cancellable){
+void SuperscalarScheduler::process_schedule(Schedule& schedule){
     //  Any exception is either an unrecoverable error, or an async-cancel.
     //  Both cases should clear the scheduler.
     try{
-        while (iterate_schedule(cancellable));
+        while (iterate_schedule(schedule));
     }catch (...){
         clear();
         throw;
     }
 }
 
-void SuperscalarScheduler::issue_wait_for_all(const Cancellable* cancellable){
+void SuperscalarScheduler::issue_wait_for_all(Schedule& schedule){
     if (m_pending_clear.load(std::memory_order_acquire)){
         clear();
         return;
@@ -177,9 +175,9 @@ void SuperscalarScheduler::issue_wait_for_all(const Cancellable* cancellable){
 //         << endl;
     m_device_issue_time = std::max(m_device_issue_time, m_max_free_time);
     m_max_free_time = m_device_issue_time;
-    process_schedule(cancellable);
+    process_schedule(schedule);
 }
-void SuperscalarScheduler::issue_nop(const Cancellable* cancellable, WallDuration delay){
+void SuperscalarScheduler::issue_nop(Schedule& schedule, WallDuration delay){
     if (delay <= WallDuration::zero()){
         return;
     }
@@ -196,12 +194,9 @@ void SuperscalarScheduler::issue_nop(const Cancellable* cancellable, WallDuratio
     m_device_issue_time = next_issue_time;
     m_max_free_time = std::max(m_max_free_time, m_device_issue_time);
     m_local_last_activity = current_time();
-    process_schedule(cancellable);
+    process_schedule(schedule);
 }
-void SuperscalarScheduler::issue_wait_for_resource(
-    const Cancellable* cancellable,
-    size_t resource_id
-){
+void SuperscalarScheduler::issue_wait_for_resource(Schedule& schedule, size_t resource_id){
     if (m_pending_clear.load(std::memory_order_acquire)){
         clear();
         return;
@@ -219,10 +214,10 @@ void SuperscalarScheduler::issue_wait_for_resource(
         m_local_last_activity = current_time();
     }
 
-    process_schedule(cancellable);
+    process_schedule(schedule);
 }
 void SuperscalarScheduler::issue_to_resource(
-    const Cancellable* cancellable,
+    Schedule& schedule,
     std::shared_ptr<const SchedulerResource> resource,
     WallDuration delay, WallDuration hold, WallDuration cooldown
 ){
@@ -268,7 +263,7 @@ void SuperscalarScheduler::issue_to_resource(
     m_max_free_time = std::max(m_max_free_time, m_device_issue_time);
     m_local_last_activity = current_time();
 
-    process_schedule(cancellable);
+    process_schedule(schedule);
 }
 
 

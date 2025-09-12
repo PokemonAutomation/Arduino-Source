@@ -11,12 +11,25 @@
 #define PokemonAutomation_NintendoSwitch_ControllerWithScheduler_H
 
 #include <mutex>
+#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/RecursiveThrottler.h"
 #include "Controllers/SuperscalarScheduler.h"
 #include "NintendoSwitch_ControllerState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+
+struct SwitchControllerState{
+    Button buttons = BUTTON_NONE;
+    DpadPosition dpad = DpadPosition::DPAD_NONE;
+    uint8_t left_stick_x = 128;
+    uint8_t left_stick_y = 128;
+    uint8_t right_stick_x = 128;
+    uint8_t right_stick_y = 128;
+
+    uint16_t gyro[6];
+};
 
 
 enum class SwitchResource{
@@ -57,18 +70,6 @@ enum class SwitchResource{
     GYRO_ROTATE_X,
     GYRO_ROTATE_Y,
     GYRO_ROTATE_Z,
-};
-
-
-struct SwitchControllerState{
-    Button buttons = BUTTON_NONE;
-    DpadPosition dpad = DpadPosition::DPAD_NONE;
-    uint8_t left_stick_x = 128;
-    uint8_t left_stick_y = 128;
-    uint8_t right_stick_x = 128;
-    uint8_t right_stick_y = 128;
-
-    uint16_t gyro[6];
 };
 
 class SwitchCommand : public SchedulerResource{
@@ -171,7 +172,7 @@ inline SplitDpad convert_unified_to_split_dpad(DpadPosition dpad){
 
 
 
-class ControllerWithScheduler : protected SuperscalarScheduler{
+class ControllerWithScheduler{
 public:
     ControllerWithScheduler(Logger& logger);
 
@@ -307,12 +308,26 @@ protected:
 #endif
 
 //    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
+    virtual void execute_state(
+        const Cancellable* cancellable,
+        const SuperscalarScheduler::ScheduleEntry& entry
+    ){}
+    virtual void execute_schedule(
+        const Cancellable* cancellable,
+        const SuperscalarScheduler::Schedule& schedule
+    ){
+        for (const SuperscalarScheduler::ScheduleEntry& entry : schedule){
+            execute_state(cancellable, entry);
+        }
+    }
 
 
 protected:
     Logger& m_logger;
 //    std::atomic<size_t> m_logging_suppress;
     RecursiveThrottler m_logging_throttler;
+
+    SuperscalarScheduler m_scheduler;
 
     //  If you need both of these locks, always acquire "m_issue_lock" first.
 

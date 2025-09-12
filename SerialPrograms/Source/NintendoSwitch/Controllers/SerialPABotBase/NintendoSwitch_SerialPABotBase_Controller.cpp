@@ -51,7 +51,7 @@ void SerialPABotBase_Controller::cancel_all_commands(){
         throw InvalidConnectionStateException(error_string());
     }
     m_serial->stop_all_commands();
-    this->clear_on_next();
+    m_scheduler.clear_on_next();
 }
 void SerialPABotBase_Controller::replace_on_next_command(){
     std::lock_guard<std::mutex> lg(m_state_lock);
@@ -59,11 +59,12 @@ void SerialPABotBase_Controller::replace_on_next_command(){
         throw InvalidConnectionStateException(error_string());
     }
     m_serial->next_command_interrupt();
-    this->clear_on_next();
+    m_scheduler.clear_on_next();
 }
 
 
 void SerialPABotBase_Controller::wait_for_all(const Cancellable* cancellable){
+    SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     {
         std::lock_guard<std::mutex> lg1(m_state_lock);
@@ -77,8 +78,9 @@ void SerialPABotBase_Controller::wait_for_all(const Cancellable* cancellable){
             throw InvalidConnectionStateException(error_string());
         }
 
-        this->issue_wait_for_all(cancellable);
+        m_scheduler.issue_wait_for_all(schedule);
     }
+    execute_schedule(cancellable, schedule);
     m_serial->wait_for_all_requests(cancellable);
 }
 

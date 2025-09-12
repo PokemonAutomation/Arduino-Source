@@ -64,7 +64,7 @@ void ProController_SysbotBase::cancel_all_commands(){
     m_next_state_change = WallClock::min();
     m_command_queue.clear();
     m_cv.notify_all();
-    this->clear_on_next();
+    m_scheduler.clear_on_next();
     m_logger.log("cancel_all_commands(): Command Queue Size = " + std::to_string(queue_size), COLOR_DARKGREEN);
 }
 void ProController_SysbotBase::replace_on_next_command(){
@@ -72,17 +72,23 @@ void ProController_SysbotBase::replace_on_next_command(){
     std::lock_guard<std::mutex> lg(m_state_lock);
     m_cv.notify_all();
     m_replace_on_next = true;
-    this->clear_on_next();
+    m_scheduler.clear_on_next();
     m_logger.log("replace_on_next_command(): Command Queue Size = " + std::to_string(m_command_queue.size()), COLOR_DARKGREEN);
 }
 
 
 void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
 //    cout << "ProController_SysbotBase::wait_for_all - Enter()" << endl;
+    SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
+    {
+        std::lock_guard<std::mutex> lg1(m_state_lock);
+        m_logger.log("wait_for_all(): Command Queue Size = " + std::to_string(m_command_queue.size()), COLOR_DARKGREEN);
+        m_scheduler.issue_wait_for_all(schedule);
+    }
+    execute_schedule(cancellable, schedule);
+
     std::unique_lock<std::mutex> lg1(m_state_lock);
-    m_logger.log("wait_for_all(): Command Queue Size = " + std::to_string(m_command_queue.size()), COLOR_DARKGREEN);
-    this->issue_wait_for_all(cancellable);
     m_cv.wait(lg1, [this]{
         return m_next_state_change == WallClock::max() || m_replace_on_next;
     });
@@ -91,13 +97,10 @@ void ProController_SysbotBase::wait_for_all(const Cancellable* cancellable){
     }
 //    cout << "ProController_SysbotBase::wait_for_all - Exit()" << endl;
 }
-void ProController_SysbotBase::push_state(
+void ProController_SysbotBase::execute_state(
     const Cancellable* cancellable,
-    WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerResource>> state
+    const SuperscalarScheduler::ScheduleEntry& entry
 ){
-    //  Must be called inside "m_state_lock".
-
     if (cancellable){
         cancellable->throw_if_cancelled();
     }
@@ -106,17 +109,16 @@ void ProController_SysbotBase::push_state(
     }
 
     SwitchControllerState controller_state;
-    for (auto& item : state){
+    for (auto& item : entry.state){
         static_cast<const SwitchCommand&>(*item).apply(controller_state);
     }
 
-    std::unique_lock<std::mutex> lg(m_state_lock, std::adopt_lock_t());
-
+    //  Wait until there is space.
+    std::unique_lock<std::mutex> lg(m_state_lock);
     m_cv.wait(lg, [this]{
         return m_command_queue.size() < QUEUE_SIZE || m_replace_on_next;
     });
 
-    lg.release();
 
     if (cancellable){
         cancellable->throw_if_cancelled();
@@ -145,7 +147,7 @@ void ProController_SysbotBase::push_state(
     command.state.right_x = controller_state.right_stick_x;
     command.state.right_y = controller_state.right_stick_y;
 
-    command.duration = std::chrono::duration_cast<Milliseconds>(duration);
+    command.duration = std::chrono::duration_cast<Milliseconds>(entry.duration);
 }
 
 

@@ -11,8 +11,10 @@
 #include <set>
 #include <map>
 #include <atomic>
+#include "Common/Compiler.h"
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/AbstractLogger.h"
-#include "Common/Cpp/CancellableScope.h"
+//#include "Common/Cpp/CancellableScope.h"
 
 namespace PokemonAutomation{
 
@@ -38,6 +40,14 @@ public:
 
 class SuperscalarScheduler{
 public:
+    using State = std::vector<std::shared_ptr<const SchedulerResource>>;
+    struct ScheduleEntry{
+        WallDuration duration;
+        State state;
+    };
+    using Schedule = std::vector<ScheduleEntry>;
+
+public:
     SuperscalarScheduler(Logger& logger, WallDuration flush_threshold);
 
 
@@ -53,7 +63,9 @@ public:
 public:
     //  These are the standard "issue" commands.
     //
-    //  These functions may or may not block.
+    //  These functions are non-blocking and will append any new schedule
+    //  entries to "schedule".
+    //
     //  These are not thread-safe with each other.
     //
 
@@ -66,52 +78,30 @@ public:
 
     //  Wait until the pipeline has completely cleared and all resources have
     //  returned to the ready state.
-    void issue_wait_for_all(const Cancellable* cancellable);
+    void issue_wait_for_all(Schedule& schedule);
 
     //  Issue a do-nothing command for the specified delay.
     //  This will advance the issue timestamp.
-    void issue_nop(const Cancellable* cancellable, WallDuration delay);
+    void issue_nop(Schedule& schedule, WallDuration delay);
 
     //  Wait until the specified resource is ready to be used.
     //  This will advance the issue timestamp until the resource is ready.
-    void issue_wait_for_resource(
-        const Cancellable* cancellable,
-        size_t resource_id
-    );
+    void issue_wait_for_resource(Schedule& schedule, size_t resource_id);
 
     //  Issue a resource with the specified timing parameters.
     void issue_to_resource(
-        const Cancellable* cancellable,
+        Schedule& schedule,
         std::shared_ptr<const SchedulerResource> resource,
         WallDuration delay, WallDuration hold, WallDuration cooldown
     );
 
 
-protected:
-    //
-    //  This class will automatically call "push_state()" when a state is ready.
-    //  The child class should send/queue this state to the device/Switch.
-    //
-    //  This function is allowed to block. In other words, it can wait until
-    //  there is space in the queue before returning.
-    //
-    //  This will always be called inside one of the above "issue_XXX()"
-    //  functions. Implementations of this method should be aware of this
-    //  re-entrancy when this gets called on them with respect to locking.
-    //
-    virtual void push_state(
-        const Cancellable* cancellable,
-        WallDuration duration,
-        std::vector<std::shared_ptr<const SchedulerResource>> state
-    ) = 0;
-
-
 private:
     void clear() noexcept;
-    std::vector<std::shared_ptr<const SchedulerResource>> current_live_commands();
+    State current_live_commands();
     void clear_finished_commands();
-    bool iterate_schedule(const Cancellable* cancellable);
-    void process_schedule(const Cancellable* cancellable);
+    bool iterate_schedule(Schedule& schedule);
+    void process_schedule(Schedule& schedule);
 
 
 private:

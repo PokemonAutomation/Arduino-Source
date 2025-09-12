@@ -152,13 +152,12 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_mash_button(
 
 
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_left_joycon(
+void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_left_joycon(
     const Cancellable* cancellable,
-    WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerResource>> state
+    const SuperscalarScheduler::ScheduleEntry& entry
 ){
     SwitchControllerState controller_state;
-    for (auto& item : state){
+    for (auto& item : entry.state){
         static_cast<const SwitchCommand&>(*item).apply(controller_state);
     }
 
@@ -191,19 +190,18 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_left_joycon(
     bool gyro_active = populate_report_gyro(gyro, controller_state);
 
     if (!gyro_active){
-        issue_report(cancellable, duration, buttons);
+        issue_report(cancellable, entry.duration, buttons);
     }else{
-        issue_report(cancellable, duration, buttons, gyro);
+        issue_report(cancellable, entry.duration, buttons, gyro);
     }
 }
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_right_joycon(
+void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_right_joycon(
     const Cancellable* cancellable,
-    WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerResource>> state
+    const SuperscalarScheduler::ScheduleEntry& entry
 ){
     SwitchControllerState controller_state;
-    for (auto& item : state){
+    for (auto& item : entry.state){
         static_cast<const SwitchCommand&>(*item).apply(controller_state);
     }
 
@@ -230,23 +228,22 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::push_state_right_joycon(
     bool gyro_active = populate_report_gyro(gyro, controller_state);
 
     if (!gyro_active){
-        issue_report(cancellable, duration, buttons);
+        issue_report(cancellable, entry.duration, buttons);
     }else{
-        issue_report(cancellable, duration, buttons, gyro);
+        issue_report(cancellable, entry.duration, buttons, gyro);
     }
 }
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::push_state(
+void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state(
     const Cancellable* cancellable,
-    WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerResource>> state
+    const SuperscalarScheduler::ScheduleEntry& entry
 ){
     switch (m_controller_type){
     case ControllerType::NintendoSwitch_LeftJoycon:
-        push_state_left_joycon(cancellable, duration, std::move(state));
+        execute_state_left_joycon(cancellable, entry);
         break;
     case ControllerType::NintendoSwitch_RightJoycon:
-        push_state_right_joycon(cancellable, duration, std::move(state));
+        execute_state_right_joycon(cancellable, entry);
         break;
     default:
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Invalid joycon type.");

@@ -235,10 +235,6 @@ void SerialPABotBase_WirelessController::issue_report(
     WallDuration duration,
     const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons
 ){
-    //  Release the state lock since we are no longer touching state.
-    //  This loop can block indefinitely if the command queue is full.
-    ReverseLockGuard<std::mutex> lg(m_state_lock);
-
     //  We will not do any throttling or timing adjustments here. We'll defer
     //  to the microcontroller to do that for us.
 
@@ -263,10 +259,6 @@ void SerialPABotBase_WirelessController::issue_report(
     const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
     const pabb_NintendoSwitch_WirelessController_State0x30_Gyro& gyro
 ){
-    //  Release the state lock since we are no longer touching state.
-    //  This loop can block indefinitely if the command queue is full.
-    ReverseLockGuard<std::mutex> lg(m_state_lock);
-
     //  TODO: For now we duplicate the gyro data to all 3 5ms segments.
     pabb_NintendoSwitch_WirelessController_State0x30_GyroX3 gyro3{
         gyro, gyro, gyro

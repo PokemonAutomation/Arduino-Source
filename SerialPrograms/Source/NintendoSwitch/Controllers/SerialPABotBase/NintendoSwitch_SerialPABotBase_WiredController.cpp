@@ -91,20 +91,16 @@ void SerialPABotBase_WiredController::stop(){
 
 
 
-
-void SerialPABotBase_WiredController::push_state(
+void SerialPABotBase_WiredController::execute_state(
     const Cancellable* cancellable,
-    WallDuration duration,
-    std::vector<std::shared_ptr<const SchedulerResource>> state
+    const SuperscalarScheduler::ScheduleEntry& entry
 ){
-    //  Must be called inside "m_state_lock".
-
     if (!is_ready()){
         throw InvalidConnectionStateException(error_string());
     }
 
     SwitchControllerState controller_state;
-    for (auto& item : state){
+    for (auto& item : entry.state){
         static_cast<const SwitchCommand&>(*item).apply(controller_state);
     }
 
@@ -183,14 +179,9 @@ void SerialPABotBase_WiredController::push_state(
     }
     dpad_byte |= dpad;
 
-
-    //  Release the state lock since we are no longer touching state.
-    //  This loop can block indefinitely if the command queue is full.
-    ReverseLockGuard<std::mutex> lg(m_state_lock);
-
     //  Divide the controller state into smaller chunks that fit into the report
     //  duration.
-    Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(duration);
+    Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(entry.duration);
 
     while (time_left > Milliseconds::zero()){
         Milliseconds current = std::min(time_left, 65535ms);
@@ -207,6 +198,8 @@ void SerialPABotBase_WiredController::push_state(
         time_left -= current;
     }
 }
+
+
 
 
 #if 0
