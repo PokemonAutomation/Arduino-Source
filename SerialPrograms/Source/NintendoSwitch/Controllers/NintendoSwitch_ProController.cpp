@@ -52,6 +52,7 @@ public:
     }
     virtual void send_state(const ControllerState& state) override{
         const ProControllerState& switch_state = static_cast<const ProControllerState&>(state);
+        report_keyboard_command_sent(switch_state);
 #if 0
         m_controller.logger().log(
             "VirtualController: (" + button_to_string(switch_state.buttons) +
@@ -78,7 +79,6 @@ public:
             switch_state.right_y
         );
 
-        report_keyboard_command_sent(switch_state);
     }
 
 
