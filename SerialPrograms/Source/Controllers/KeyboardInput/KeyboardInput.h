@@ -14,6 +14,7 @@
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Controllers/Controller.h"
 #include "Controllers/KeyboardInput/GlobalQtKeyMap.h"
+#include "KeyboardEventHandler.h"
 #include "KeyboardStateTracker.h"
 
 class QKeyEvent;
@@ -86,7 +87,7 @@ private:
 
 
 template <typename StateType, typename DeltaType>
-class KeyboardManager : public KeyboardInputController{
+class KeyboardManager : public KeyboardInputController, public KeyboardEventHandler{
 public:
     KeyboardManager(Logger& logger, AbstractController& controller)
         : KeyboardInputController(logger, true)
@@ -122,6 +123,7 @@ public:
         deltas.to_state(static_cast<StateType&>(state));
     }
     virtual void cancel_all_commands() override{
+        report_keyboard_command_stopped();
         WriteSpinLock lg(m_lock);
         if (m_controller == nullptr){
             return;
@@ -129,6 +131,7 @@ public:
         m_controller->cancel_all_commands();
     }
     virtual void replace_on_next_command() override{
+        report_keyboard_command_stopped();
         WriteSpinLock lg(m_lock);
         if (m_controller == nullptr){
             return;
