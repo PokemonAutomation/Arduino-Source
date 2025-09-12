@@ -53,7 +53,7 @@ bool check_hardware(){
         box.warning(nullptr, "Warning", str);
     }
 
-    if (specs.base_frequency < 1'500'000'000){
+    if (specs.base_frequency < 2'000'000'000){
         QMessageBox box;
         QString str;
         str += "This computer may not be powerful enough to run this program.<br><br>";
@@ -71,7 +71,7 @@ bool check_hardware(){
         ? specs.threads - specs.cores
         : 0;
     double efreq = (specs.cores + 0.2 * vcores) * specs.base_frequency;
-    if (efreq < 6'000'000'000){
+    if (efreq < 8'000'000'000){
         QMessageBox box;
         QString str;
         str += "This computer may not be powerful enough to run this program.<br><br>";
