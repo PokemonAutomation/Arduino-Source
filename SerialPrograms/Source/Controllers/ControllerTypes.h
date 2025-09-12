@@ -22,6 +22,8 @@ enum class ControllerInterface{
 enum class ControllerType{
     None,
 
+    HID_Keyboard,
+
     NintendoSwitch_WiredController,     //  Generic 3rd party wired controller.
     NintendoSwitch_WiredProController,  //  The official Pro Controller, connected over USB.
     NintendoSwitch_WirelessProController,

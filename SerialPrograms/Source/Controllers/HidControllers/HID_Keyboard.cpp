@@ -277,6 +277,7 @@ void Keyboard::stop() noexcept{
 }
 
 
+#if 0
 void Keyboard::keyboard_release_all(){
 //    m_keyboard_manager->clear_state();
 }
@@ -286,7 +287,7 @@ void Keyboard::keyboard_press(const QKeyEvent& event){
 void Keyboard::keyboard_release(const QKeyEvent& event){
 //    m_keyboard_manager->on_key_release(event);
 }
-
+#endif
 
 
 

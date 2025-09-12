@@ -14,7 +14,7 @@
 #include <map>
 #include <mutex>
 #include "CommonFramework/Globals.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "ProgramTrackerInterfaces.h"
 
 namespace PokemonAutomation{

@@ -6,10 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Concurrency/ReverseLockGuard.h"
-//#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
-#include "Controllers/ControllerTypeStrings.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.h"
@@ -265,8 +262,6 @@ void SerialPABotBase_WiredController::status_thread(){
     });
 
 
-//    ExtendedLengthCounter clock_tracker;
-//    TickRateTracker tick_rate_tracker(m_use_milliseconds ? 1000 : TICKS_PER_SECOND);
     WallClock next_ping = current_time();
     while (true){
         if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
@@ -297,28 +292,6 @@ void SerialPABotBase_WiredController::status_thread(){
             );
 
             m_handle.set_status_line1(str);
-
-
-#if 0
-            pabb_MsgAckRequestI32 response;
-            m_serial->issue_request_and_wait(
-                SerialPABotBase::DeviceRequest_system_clock(),
-                &m_scope
-            ).convert<PABB_MSG_ACK_REQUEST_I32>(logger(), response);
-            last_ack.store(current_time(), std::memory_order_relaxed);
-
-            uint64_t wallclock = clock_tracker.push_short_value(response.data);
-//            double ticks_per_second = tick_rate_tracker.push_ticks(wallclock);
-            m_handle.set_status_line1(
-                "Device Clock: " + tostr_u_commas(wallclock),
-                theme_friendly_darkblue()
-            );
-#endif
-
-//            if (tick_rate_tracker.consecutive_off_readings() >= 10){
-//                error = "Tick rate is erratic. Arduino/Teensy is not reliable on Switch 2.";
-//            }
-
         }catch (OperationCancelledException&){
             break;
         }catch (InvalidConnectionStateException&){

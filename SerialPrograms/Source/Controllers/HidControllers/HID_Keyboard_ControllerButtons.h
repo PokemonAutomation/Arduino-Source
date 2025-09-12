@@ -1,22 +1,20 @@
-/*  HID Keyboard
+/*  HID Keyboard Controller Buttons
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  This is the raw (full) controller API that is exposed to programs.
- *
  */
 
-#ifndef PokemonAutomation_HID_Keyboard_H
-#define PokemonAutomation_HID_Keyboard_H
+#ifndef PokemonAutomation_HID_Keyboard_ControllerButtons_H
+#define PokemonAutomation_HID_Keyboard_ControllerButtons_H
 
-#include "Common/Cpp/Containers/Pimpl.h"
-#include "Controllers/Controller.h"
+#include <stdint.h>
+
 
 namespace PokemonAutomation{
 namespace HidControllers{
 
 
-
+#if 0
 using KeyboardModType = uint8_t;
 enum KeyboardMod : KeyboardModType{
     LEFT_CTRL   =   1 << 0,
@@ -40,6 +38,7 @@ inline constexpr KeyboardMod operator&(KeyboardMod x, KeyboardMod y){
 inline constexpr void operator&=(KeyboardMod& x, KeyboardMod y){
     x = (KeyboardMod)((KeyboardModType)x & (KeyboardModType)y);
 }
+#endif
 
 
 //  Taken from: https://gist.github.com/MightyPork/6da26e382a7ad91b5496ee55fdc73db2
@@ -181,7 +180,6 @@ enum KeyboardKey : uint8_t{
 
     KEY_KP_COMMA    =   0x85,
 
-#if 0
     KEY_LEFT_CTRL   =   0xe0,
     KEY_LEFT_SHIFT  =   0xe1,
     KEY_LEFT_ALT    =   0xe2,
@@ -190,7 +188,6 @@ enum KeyboardKey : uint8_t{
     KEY_RIGHT_SHIFT =   0xe5,
     KEY_RIGHT_ALT   =   0xe6,
     KEY_RIGHT_META  =   0xe7,
-#endif
 
     KEY_MEDIA_PLAYPAUSE     =   0xe8,
     KEY_MEDIA_STOPCD        =   0xe9,
@@ -216,64 +213,7 @@ enum KeyboardKey : uint8_t{
 
 
 
-class Keyboard;
-using KeyboardContext = ControllerContext<Keyboard>;
 
-
-
-
-class Keyboard : public AbstractController{
-public:
-    using ContextType = KeyboardContext;
-
-    Keyboard(Logger& logger);
-    virtual ~Keyboard();
-
-
-public:
-    static const char NAME[];
-    virtual const char* name() override{
-        return NAME;
-    };
-
-
-protected:
-    //  Must call before destruction begins.
-    void stop() noexcept;
-
-
-public:
-    //  Standard Commands
-
-    virtual void issue_mod(
-        const Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        KeyboardMod mod
-    ) = 0;
-    virtual void issue_key(
-        const Cancellable* cancellable,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        KeyboardKey key
-    ) = 0;
-
-    virtual void issue_report(
-        const Cancellable* cancellable,
-        Milliseconds duration, uint64_t report
-    ) = 0;
-
-
-public:
-    //  Keyboard Input
-
-    virtual void keyboard_release_all() override;
-    virtual void keyboard_press(const QKeyEvent& event) override;
-    virtual void keyboard_release(const QKeyEvent& event) override;
-
-
-private:
-//    class KeyboardManager;
-//    Pimpl<KeyboardManager> m_keyboard_manager;
-};
 
 
 

@@ -8,7 +8,7 @@
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_NS2_WiredController.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{

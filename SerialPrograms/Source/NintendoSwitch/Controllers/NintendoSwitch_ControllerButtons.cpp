@@ -1,10 +1,10 @@
-/*  Nintendo Switch Controller State
+/*  Nintendo Switch Controller Buttons
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#include "NintendoSwitch_ControllerState.h"
+#include "NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

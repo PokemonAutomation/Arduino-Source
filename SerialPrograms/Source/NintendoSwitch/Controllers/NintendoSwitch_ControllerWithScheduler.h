@@ -10,11 +10,9 @@
 #ifndef PokemonAutomation_NintendoSwitch_ControllerWithScheduler_H
 #define PokemonAutomation_NintendoSwitch_ControllerWithScheduler_H
 
-#include <mutex>
 #include "Common/Cpp/CancellableScope.h"
-#include "Common/Cpp/RecursiveThrottler.h"
-#include "Controllers/SuperscalarScheduler.h"
-#include "NintendoSwitch_ControllerState.h"
+#include "Controllers/Schedulers/ControllerWithScheduler.h"
+#include "NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -172,20 +170,14 @@ inline SplitDpad convert_unified_to_split_dpad(DpadPosition dpad){
 
 
 
-class ControllerWithScheduler{
+class ControllerWithScheduler : public PokemonAutomation::ControllerWithScheduler{
 public:
-    ControllerWithScheduler(Logger& logger);
-
-    RecursiveThrottler& logging_throttler(){
-        return m_logging_throttler;
-    }
+    using PokemonAutomation::ControllerWithScheduler::ControllerWithScheduler;
 
 
 public:
     //  Superscalar Commands (the "ssf" framework)
 
-    void issue_barrier(const Cancellable* cancellable);
-    void issue_nop(const Cancellable* cancellable, Milliseconds duration);
     void issue_buttons(
         const Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
@@ -288,56 +280,6 @@ public:
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         DpadPosition direction  //  Diagonals not allowed.
     );
-
-
-protected:
-#if 0
-    class LoggingSuppressScope{
-    public:
-        LoggingSuppressScope(std::atomic<size_t>& counter)
-            : m_counter(counter)
-        {
-            m_counter++;
-        }
-        ~LoggingSuppressScope(){
-            m_counter--;
-        }
-    private:
-        std::atomic<size_t>& m_counter;
-    };
-#endif
-
-//    virtual void push_state(const Cancellable* cancellable, WallDuration duration) override;
-    virtual void execute_state(
-        const Cancellable* cancellable,
-        const SuperscalarScheduler::ScheduleEntry& entry
-    ){}
-    virtual void execute_schedule(
-        const Cancellable* cancellable,
-        const SuperscalarScheduler::Schedule& schedule
-    ){
-        for (const SuperscalarScheduler::ScheduleEntry& entry : schedule){
-            execute_state(cancellable, entry);
-        }
-    }
-
-
-protected:
-    Logger& m_logger;
-//    std::atomic<size_t> m_logging_suppress;
-    RecursiveThrottler m_logging_throttler;
-
-    SuperscalarScheduler m_scheduler;
-
-    //  If you need both of these locks, always acquire "m_issue_lock" first.
-
-    //  This lock makes sure that only one command is issued at a time. It can
-    //  be held for long periods of time if the command queue is full.
-    std::mutex m_issue_lock;
-
-    //  This lock protects the state/fields of this class and subclasses.
-    //  This lock is never held for a long time.
-    std::mutex m_state_lock;
 };
 
 

@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <vector>
 #include "Common/Cpp/Time.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{

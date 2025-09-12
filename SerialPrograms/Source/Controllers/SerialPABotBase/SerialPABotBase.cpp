@@ -46,6 +46,9 @@ ControllerType id_to_controller_type(uint32_t id){
     case PABB_CID_NONE:
         return ControllerType::None;
 
+    case PABB_CID_StandardHid_Keyboard:
+        return ControllerType::HID_Keyboard;
+
     case PABB_CID_NintendoSwitch_WiredController:
         return ControllerType::NintendoSwitch_WiredController;
     case PABB_CID_NintendoSwitch_WiredProController:
@@ -81,6 +84,9 @@ uint32_t controller_type_to_id(ControllerType controller_type){
     switch (controller_type){
     case ControllerType::None:
         return PABB_CID_NONE;
+
+    case ControllerType::HID_Keyboard:
+        return PABB_CID_StandardHid_Keyboard;
 
     case ControllerType::NintendoSwitch_WiredController:
         return PABB_CID_NintendoSwitch_WiredController;

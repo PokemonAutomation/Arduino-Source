@@ -15,7 +15,7 @@
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "Common/Cpp/Options/KeyBindingOption.h"
-#include "NintendoSwitch_ControllerState.h"
+#include "NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

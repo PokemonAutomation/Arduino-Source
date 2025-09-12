@@ -697,8 +697,13 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
-    Source/Controllers/HID_Keyboard.cpp
-    Source/Controllers/HID_Keyboard.h
+    Source/Controllers/HidControllers/HID_Keyboard.cpp
+    Source/Controllers/HidControllers/HID_Keyboard.h
+    Source/Controllers/HidControllers/HID_Keyboard_ControllerButtons.h
+    Source/Controllers/HidControllers/HID_Keyboard_SerialPABotBase.cpp
+    Source/Controllers/HidControllers/HID_Keyboard_SerialPABotBase.h
+    Source/Controllers/HidControllers/HID_KeyboardWithScheduler.cpp
+    Source/Controllers/HidControllers/HID_KeyboardWithScheduler.h
     Source/Controllers/JoystickTools.h
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
@@ -708,6 +713,9 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/KeyboardInput/KeyboardStateTracker.h
     Source/Controllers/NullController.cpp
     Source/Controllers/NullController.h
+    Source/Controllers/Schedulers/ControllerWithScheduler.h
+    Source/Controllers/Schedulers/SuperscalarScheduler.cpp
+    Source/Controllers/Schedulers/SuperscalarScheduler.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
@@ -721,8 +729,6 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
-    Source/Controllers/SuperscalarScheduler.cpp
-    Source/Controllers/SuperscalarScheduler.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp
@@ -958,10 +964,10 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.cpp

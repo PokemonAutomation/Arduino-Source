@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_VirtualControllerState_H
 
 #include "Controllers/KeyboardInput/KeyboardInput.h"
-#include "NintendoSwitch_ControllerState.h"
+#include "NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

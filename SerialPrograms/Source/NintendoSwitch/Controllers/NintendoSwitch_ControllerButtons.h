@@ -1,11 +1,11 @@
-/*  Nintendo Switch Controller State
+/*  Nintendo Switch Controller Buttons
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_ControllerState_H
-#define PokemonAutomation_NintendoSwitch_ControllerState_H
+#ifndef PokemonAutomation_NintendoSwitch_ControllerButtons_H
+#define PokemonAutomation_NintendoSwitch_ControllerButtons_H
 
 #include <stdint.h>
 #include <string>

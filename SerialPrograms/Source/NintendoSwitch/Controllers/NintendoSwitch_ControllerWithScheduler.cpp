@@ -16,45 +16,6 @@ using namespace std::chrono_literals;
 
 
 
-
-ControllerWithScheduler::ControllerWithScheduler(Logger& logger)
-    : m_logger(logger)
-//    , m_logging_suppress(0)
-    , m_scheduler(logger, Milliseconds(4))
-{}
-
-
-
-void ControllerWithScheduler::issue_barrier(const Cancellable* cancellable){
-    SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
-    {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
-        m_scheduler.issue_wait_for_all(schedule);
-    }
-    execute_schedule(cancellable, schedule);
-    if (m_logging_throttler){
-        m_logger.log("issue_barrier()", COLOR_DARKGREEN);
-    }
-}
-void ControllerWithScheduler::issue_nop(const Cancellable* cancellable, Milliseconds duration){
-    SuperscalarScheduler::Schedule schedule;
-    std::lock_guard<std::mutex> lg0(m_issue_lock);
-    {
-        std::lock_guard<std::mutex> lg1(m_state_lock);
-        if (cancellable){
-            cancellable->throw_if_cancelled();
-        }
-        m_scheduler.issue_nop(schedule, WallDuration(duration));
-    }
-    execute_schedule(cancellable, schedule);
-    if (m_logging_throttler){
-        m_logger.log(
-            "issue_nop(): duration = " + std::to_string(duration.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-    }
-}
 void ControllerWithScheduler::issue_buttons(
     const Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
@@ -67,7 +28,12 @@ void ControllerWithScheduler::issue_buttons(
         if (cancellable){
             cancellable->throw_if_cancelled();
         }
-
+        for (size_t c = 0; c < TOTAL_BUTTONS; c++){
+            ButtonFlagType mask = (ButtonFlagType)1 << c;
+            if (button & mask){
+                m_scheduler.issue_wait_for_resource(schedule, c);
+            }
+        }
         for (size_t c = 0; c < TOTAL_BUTTONS; c++){
             ButtonFlagType mask = (ButtonFlagType)1 << c;
             if (button & mask){

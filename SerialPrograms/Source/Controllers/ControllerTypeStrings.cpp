@@ -19,6 +19,7 @@ const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS{
 
 const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
     {ControllerType::None,                                  "None"},
+    {ControllerType::HID_Keyboard,                          "HID: Keyboard"},
     {ControllerType::NintendoSwitch_WiredController,        "NS1: Wired Controller"},
     {ControllerType::NintendoSwitch_WiredProController,     "NS1: Wired Pro Controller"},
     {ControllerType::NintendoSwitch_WirelessProController,  "NS1: Wireless Pro Controller"},
