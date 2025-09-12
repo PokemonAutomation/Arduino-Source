@@ -1,0 +1,104 @@
+{
+  "version": 3,
+  "cmakeMinimumRequired": {
+    "major": 3,
+    "minor": 18,
+    "patch": 0
+  },
+  "configurePresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "generator": "Ninja",
+      "binaryDir": "${sourceParentDir}/build",
+      "cacheVariables": {
+        "CMAKE_CXX_STANDARD": "23",
+        "CMAKE_CXX_STANDARD_REQUIRED": "ON",
+        "CMAKE_EXPORT_COMPILE_COMMANDS": "ON",
+        "CMAKE_AUTOMOC": "ON",
+        "CMAKE_AUTORCC": "ON",
+        "CMAKE_AUTOUIC": "ON",
+        "PACKAGE_BUILD": "OFF",
+        "PREFERRED_QT_DIR": "C:/Qt",
+        "PREFERRED_QT_VER": "6.8.3",
+      }
+    },
+    {
+      "name": "Debug",
+      "inherits": "default",
+      "description": "Build with debug information",
+      "binaryDir": "${sourceParentDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Debug",
+        "PACKAGE_BUILD": "OFF"
+      }
+    },
+    {
+      "name": "Release",
+      "inherits": "default",
+      "description": "Build for release",
+      "binaryDir": "${sourceParentDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "Release",
+        "PACKAGE_BUILD": "OFF"
+      }
+    },
+    {
+      "name": "RelWithDebInfo",
+      "inherits": "default",
+      "description": "Build for release with debug information",
+      "binaryDir": "${sourceParentDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "PACKAGE_BUILD": "OFF"
+      }
+    },
+    {
+      "name": "MinSizeRel",
+      "inherits": "default",
+      "description": "Build for minimum size release",
+      "binaryDir": "${sourceParentDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "MinSizeRel",
+        "PACKAGE_BUILD": "OFF"
+      }
+    },
+    {
+      "name": "Publish",
+      "inherits": "default",
+      "description": "Build for publishing with debug information and packaging enabled",
+      "binaryDir": "${sourceParentDir}/build/${presetName}",
+      "cacheVariables": {
+        "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+        "PACKAGE_BUILD": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "default",
+      "hidden": true,
+      "configurePreset": "default"
+    },
+    {
+      "name": "Debug",
+      "configurePreset": "Debug"
+    },
+    {
+      "name": "Release",
+      "configurePreset": "Release"
+    },
+    {
+      "name": "RelWithDebInfo",
+      "configurePreset": "RelWithDebInfo"
+    },
+    {
+      "name": "MinSizeRel",
+      "configurePreset": "MinSizeRel"
+    },
+    {
+      "name": "Publish",
+      "configurePreset": "Publish"
+    }
+  ]
+}
