@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -42,6 +43,7 @@
 #include <dpp/role.h>
 #include <dpp/user.h>
 #include <dpp/channel.h>
+#include <dpp/thread.h>
 #include <dpp/guild.h>
 #include <dpp/invite.h>
 #include <dpp/dtemplate.h>
@@ -72,3 +74,4 @@
 #include <dpp/discordevents.h>
 #include <dpp/timed_listener.h>
 #include <dpp/collector.h>
+#include <dpp/bignum.h>
