@@ -128,6 +128,7 @@ public:
             return;
         }
         m_controller->cancel_all_commands();
+        report_keyboard_command_stopped();
     }
     virtual void replace_on_next_command() override{
         WriteSpinLock lg(m_lock);
@@ -135,6 +136,7 @@ public:
             return;
         }
         m_controller->replace_on_next_command();
+        report_keyboard_command_stopped();
     }
 
 

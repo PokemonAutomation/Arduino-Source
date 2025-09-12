@@ -61,7 +61,8 @@ public:
     virtual ~ProController();
 
 private:
-    virtual void on_keyboard_control_state_change(Milliseconds duration, const ProControllerState& state) override;
+    virtual void on_keyboard_command_sent(const ProControllerState& state) override;
+    virtual void on_keyboard_command_stopped() override;
 
 public:
     static const char NAME[];
@@ -220,6 +221,7 @@ public:
         DpadPosition direction  //  Diagonals not allowed.
     ) = 0;
 
+    void monitor_keyboard_events();
 
 public:
     //  Keyboard Input
