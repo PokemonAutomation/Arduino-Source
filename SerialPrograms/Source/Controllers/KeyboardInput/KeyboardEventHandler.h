@@ -24,7 +24,8 @@ public:
     virtual ~KeyboardEventHandler();
 
      struct KeyboardListener{
-        virtual void on_keyboard_control_state_change(Milliseconds duration, const NintendoSwitch::ProControllerState& state){}
+        virtual void on_keyboard_command_sent(const NintendoSwitch::ProControllerState& state){}
+        virtual void on_keyboard_command_stopped(){}
     };
     void add_listener(KeyboardListener& listener);
     void remove_listener(KeyboardListener& listener);
@@ -32,7 +33,9 @@ public:
 protected:
     //  Report that the keyboard state has changed. This will be pushed to
     //  all listeners.
-    void report_keyboard_state_changed(Milliseconds duration, const NintendoSwitch::ProControllerState& state);
+    void report_keyboard_command_sent(const NintendoSwitch::ProControllerState& state);
+
+    void report_keyboard_command_stopped();
 
 private:
     struct Data;

@@ -264,11 +264,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.controller<ProController>());
     VideoOverlaySet overlays(overlay);
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+#if 1
+    context.controller().monitor_keyboard_events();
+#endif
+
+
+#if 0
 
     HomeMenuDetector detector(console);
     detector.make_overlays(overlays);
-
-
+#endif
 
 
 #if 0
