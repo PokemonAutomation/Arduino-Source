@@ -49,13 +49,6 @@ public:
         m_pending_clear.store(true, std::memory_order_release);
     }
 
-    WallClock busy_until(size_t resource_id) const{
-        auto iter = m_live_commands.find(resource_id);
-        return iter != m_live_commands.end()
-            ? iter->second.free_time
-            : WallClock::min();
-    }
-
 
 public:
     //  These are the standard "issue" commands.
@@ -63,6 +56,13 @@ public:
     //  These functions may or may not block.
     //  These are not thread-safe with each other.
     //
+
+    WallClock busy_until(size_t resource_id) const{
+        auto iter = m_live_commands.find(resource_id);
+        return iter != m_live_commands.end()
+            ? iter->second.free_time
+            : WallClock::min();
+    }
 
     //  Wait until the pipeline has completely cleared and all resources have
     //  returned to the ready state.
@@ -80,7 +80,6 @@ public:
     );
 
     //  Issue a resource with the specified timing parameters.
-    //  The resource must be ready to be used.
     void issue_to_resource(
         const Cancellable* cancellable,
         std::shared_ptr<const SchedulerResource> resource,
@@ -138,7 +137,7 @@ private:
     //  The current timestamp of what has been sent to the device.
     WallClock m_device_sent_time;
 
-    //  Maximum of: m_resources[]->m_free_time
+    //  Maximum of: m_live_commands[]->second.free_time
     WallClock m_max_free_time;
 
     //  A set of all the scheduled state changes that will happen. Between

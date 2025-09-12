@@ -61,12 +61,6 @@ void ControllerWithScheduler::issue_buttons(
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
         ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
-            this->issue_wait_for_resource(cancellable, c);
-        }
-    }
-    for (size_t c = 0; c < TOTAL_BUTTONS; c++){
-        ButtonFlagType mask = (ButtonFlagType)1 << c;
-        if (button & mask){
             this->issue_to_resource(
                 cancellable,
                 std::make_unique<SwitchCommand_Button>((SwitchResource)c),
@@ -97,7 +91,6 @@ void ControllerWithScheduler::issue_dpad(
         cancellable->throw_if_cancelled();
     }
 
-    this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::DPAD);
     this->issue_to_resource(
         cancellable,
         std::make_unique<SwitchCommand_Dpad>(position),
@@ -126,7 +119,6 @@ void ControllerWithScheduler::issue_left_joystick(
         cancellable->throw_if_cancelled();
     }
 
-    this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::JOYSTICK_LEFT);
     this->issue_to_resource(
         cancellable,
         std::make_unique<SwitchCommand_LeftJoystick>(x, y),
@@ -154,7 +146,6 @@ void ControllerWithScheduler::issue_right_joystick(
         cancellable->throw_if_cancelled();
     }
 
-    this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::JOYSTICK_RIGHT);
     this->issue_to_resource(
         cancellable,
         std::make_unique<SwitchCommand_RightJoystick>(x, y),
@@ -186,7 +177,6 @@ void ControllerWithScheduler::issue_gyro(
         cancellable->throw_if_cancelled();
     }
 
-    this->issue_wait_for_resource(cancellable, (size_t)id);
     this->issue_to_resource(
         cancellable,
         std::make_unique<SwitchCommand_Gyro>(id, value),
@@ -220,6 +210,7 @@ void ControllerWithScheduler::issue_full_controller_state(
         cancellable->throw_if_cancelled();
     }
 
+#if 0
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
         ButtonFlagType mask = (ButtonFlagType)1 << c;
         if (button & mask){
@@ -229,6 +220,9 @@ void ControllerWithScheduler::issue_full_controller_state(
     this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::DPAD);
     this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::JOYSTICK_LEFT);
     this->issue_wait_for_resource(cancellable, (size_t)SwitchResource::JOYSTICK_RIGHT);
+#else
+    this->issue_wait_for_all(cancellable);
+#endif
 
     for (size_t c = 0; c < TOTAL_BUTTONS; c++){
         ButtonFlagType mask = (ButtonFlagType)1 << c;

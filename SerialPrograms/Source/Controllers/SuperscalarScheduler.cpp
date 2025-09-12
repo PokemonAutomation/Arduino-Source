@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Time.h"
 #include "SuperscalarScheduler.h"
 
@@ -211,21 +211,13 @@ void SuperscalarScheduler::issue_wait_for_resource(
 //         << ", sent_time = " << std::chrono::duration_cast<Milliseconds>((m_device_sent_time - m_local_start)).count()
 //         << ", free_time = " << std::chrono::duration_cast<Milliseconds>((resource.m_free_time - m_local_start)).count()
 //         << endl;
-    //  Resource is not ready yet. Stall until it is.
 
-#if 1
+    //  Resource is not ready yet. Stall until it is.
     auto iter = m_live_commands.find(resource_id);
-    if (iter != m_live_commands.end() && iter->second.free_time > m_device_sent_time){
+    if (iter != m_live_commands.end() && m_device_sent_time < iter->second.free_time){
         m_device_issue_time = iter->second.free_time;
         m_local_last_activity = current_time();
     }
-#else
-    if (resource.m_free_time > m_device_sent_time){
-//        cout << "stall = " << std::chrono::duration_cast<Milliseconds>(resource.m_free_time - m_device_sent_time).count() << endl;
-        m_device_issue_time = resource.m_free_time;
-        m_local_last_activity = current_time();
-    }
-#endif
 
     process_schedule(cancellable);
 }
@@ -238,14 +230,11 @@ void SuperscalarScheduler::issue_to_resource(
         clear();
     }
 
-    //  Resource is busy.
+    //  Resource is busy. Stall until it is free.
     auto ret = m_live_commands.try_emplace(resource->id);
-    if (!ret.second && m_device_sent_time < ret.first->second.free_time){
+    if (!ret.second){
 //        cout << m_device_sent_time << " : " << ret.first->second.free_time << endl;
-        throw InternalProgramError(
-            nullptr, PA_CURRENT_FUNCTION,
-            "Attempted to issue resource that isn't ready."
-        );
+        m_device_issue_time = std::max(m_device_issue_time, ret.first->second.free_time);
     }
     Command& command = ret.first->second;
 

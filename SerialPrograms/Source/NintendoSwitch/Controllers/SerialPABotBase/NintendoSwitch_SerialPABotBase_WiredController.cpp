@@ -209,6 +209,7 @@ void SerialPABotBase_WiredController::push_state(
 }
 
 
+#if 0
 //
 //  Given a regularly reported 32-bit counter that wraps around, infer its true
 //  64-bit value.
@@ -232,6 +233,7 @@ private:
     uint32_t m_high_bits;
     uint32_t m_last_received;
 };
+#endif
 
 
 
@@ -270,7 +272,7 @@ void SerialPABotBase_WiredController::status_thread(){
     });
 
 
-    ExtendedLengthCounter clock_tracker;
+//    ExtendedLengthCounter clock_tracker;
 //    TickRateTracker tick_rate_tracker(m_use_milliseconds ? 1000 : TICKS_PER_SECOND);
     WallClock next_ping = current_time();
     while (true){
