@@ -26,6 +26,8 @@ void MemoryUtilizationStats::update(){
 
     double usage;
 
+    constexpr uint64_t GB = (uint64_t)1 << 30;
+
     OverlayStatSnapshot system;
     if (get_stat(
         system.text, usage,
@@ -33,11 +35,13 @@ void MemoryUtilizationStats::update(){
         memory.total_system_memory,
         memory.total_used_system_memory
     )){
-        if (usage >= 0.90){
+        uint64_t free_memory = memory.process_physical_memory - memory.process_virtual_memory;
+
+        if (usage >= 0.90 || free_memory < 2*GB){
             system.color = COLOR_RED;
-        }else if (usage >= 0.75){
+        }else if (usage >= 0.75 || free_memory < 4*GB){
             system.color = COLOR_ORANGE;
-        }else if (usage >= 0.50){
+        }else if (usage >= 0.50 || free_memory < 8*GB){
             system.color = COLOR_YELLOW;
         }
     }
@@ -49,12 +53,14 @@ void MemoryUtilizationStats::update(){
         memory.process_virtual_memory,
         memory.process_physical_memory
     )){
-        if (usage < 0.10){
-            process.color = COLOR_RED;
-        }else if (usage < 0.25){
-            process.color = COLOR_ORANGE;
-        }else if (usage < 0.50){
-            process.color = COLOR_YELLOW;
+        if (memory.process_virtual_memory > 1*GB){
+            if (usage < 0.10){
+                process.color = COLOR_RED;
+            }else if (usage < 0.25){
+                process.color = COLOR_ORANGE;
+            }else if (usage < 0.50){
+                process.color = COLOR_YELLOW;
+            }
         }
     }
 
