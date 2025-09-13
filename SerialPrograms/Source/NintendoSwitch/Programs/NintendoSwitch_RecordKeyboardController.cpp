@@ -42,21 +42,15 @@ RecordKeyboardController::RecordKeyboardController(){
 
 
 
-void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+    AbstractControllerContext context(scope, env.console.controller());
+    // ProControllerContext context(scope, env.console.controller<ProController>());
+    context.controller().monitor_keyboard_events(*this);
+    // context->start_recording();
+    // env.console.controller()
     
     
 }
-
-void RecordKeyboardController::monitor_keyboard_events(ProControllerContext& context){
-    // ProController::KeyboardManager& keyboard_manager = *context.controller().m_keyboard_manager;
-    // keyboard_manager.add_listener(*this);
-
-
-    // context.controller().m_keyboard_manager ->m_keyboard_manager->add_listener(*this);  
-    // keyboard_manager  
-}
-
-    // m_keyboard_manager->remove_listener(*this);
 
 
 void RecordKeyboardController::on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state){

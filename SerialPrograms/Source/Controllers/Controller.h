@@ -10,6 +10,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Time.h"
+#include "Controllers/KeyboardInput/KeyboardEventHandler.h"
 #include "Common/Cpp/CancellableScope.h"
 
 class QKeyEvent;
@@ -203,6 +204,8 @@ public:
     virtual void keyboard_release_all(){}
     virtual void keyboard_press(const QKeyEvent& event){}
     virtual void keyboard_release(const QKeyEvent& event){}
+
+    virtual void monitor_keyboard_events(KeyboardEventHandler::KeyboardListener& keyboard_listener) = 0;
 };
 
 
@@ -294,6 +297,7 @@ private:
 };
 
 
+using AbstractControllerContext = ControllerContext<AbstractController>;
 
 using AbstractControllerContext = ControllerContext<AbstractController>;
 

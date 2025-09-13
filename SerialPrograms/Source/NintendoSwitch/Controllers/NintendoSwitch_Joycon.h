@@ -171,6 +171,8 @@ public:
     virtual void keyboard_press(const QKeyEvent& event) override;
     virtual void keyboard_release(const QKeyEvent& event) override;
 
+    virtual void monitor_keyboard_events(KeyboardEventHandler::KeyboardListener& keyboard_listener) override;
+
 
 private:
     class KeyboardManager;

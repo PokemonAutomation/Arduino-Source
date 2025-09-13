@@ -28,14 +28,12 @@ public:
     RecordKeyboardController();
     
 
-    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     virtual void on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state) override;
     virtual void on_keyboard_command_stopped(WallClock time_stamp) override;
 
-    void monitor_keyboard_events(ProControllerContext& context);
-    
 };
 
 
