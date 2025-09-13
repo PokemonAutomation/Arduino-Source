@@ -1121,6 +1121,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_RecordKeyboardController.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_RecordKeyboardController.h
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp

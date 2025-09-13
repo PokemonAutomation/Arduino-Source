@@ -269,7 +269,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 1
-    context.controller().monitor_keyboard_events();
+    // context.controller().monitor_keyboard_events();
 #endif
 
 

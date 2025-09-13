@@ -53,16 +53,12 @@ constexpr Button VALID_PRO_CONTROLLER_BUTTONS =
 //
 //  This is the generic interface to a Switch pro controller.
 //
-class ProController : public AbstractController, public KeyboardEventHandler::KeyboardListener{
+class ProController : public AbstractController{
 public:
     using ContextType = ProControllerContext;
 
     ProController(Logger& logger);
     virtual ~ProController();
-
-private:
-    virtual void on_keyboard_command_sent(const ProControllerState& state) override;
-    virtual void on_keyboard_command_stopped() override;
 
 public:
     static const char NAME[];
@@ -221,7 +217,6 @@ public:
         DpadPosition direction  //  Diagonals not allowed.
     ) = 0;
 
-    void monitor_keyboard_events();
 
 public:
     //  Keyboard Input
@@ -231,7 +226,7 @@ public:
     virtual void keyboard_release(const QKeyEvent& event) override;
 
 
-private:
+public:
     class KeyboardManager;
     Pimpl<KeyboardManager> m_keyboard_manager;
 };

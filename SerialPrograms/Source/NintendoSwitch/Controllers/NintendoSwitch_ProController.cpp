@@ -12,9 +12,9 @@
 #include "NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_ProController.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 
@@ -92,7 +92,6 @@ ProController::ProController(Logger& logger)
 
 }
 ProController::~ProController(){
-    m_keyboard_manager->remove_listener(*this);
 }
 void ProController::stop() noexcept{
     m_keyboard_manager->stop();
@@ -107,18 +106,6 @@ void ProController::keyboard_press(const QKeyEvent& event){
 }
 void ProController::keyboard_release(const QKeyEvent& event){
     m_keyboard_manager->on_key_release(event);
-}
-
-void ProController::on_keyboard_command_sent(const ProControllerState& state) {
-    cout << "keyboard_command_sent" << endl;
-}
-
-void ProController::on_keyboard_command_stopped() {
-    cout << "keyboard_command_stopped" << endl;
-}
-
-void ProController::monitor_keyboard_events(){
-    m_keyboard_manager->add_listener(*this);
 }
 
 
