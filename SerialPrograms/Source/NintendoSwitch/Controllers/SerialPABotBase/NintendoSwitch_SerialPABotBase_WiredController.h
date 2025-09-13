@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_WiredControllerNS1_H
 
+#include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
@@ -15,9 +16,12 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+
+
 class SerialPABotBase_WiredController final :
     public ProController,
-    public SerialPABotBase_Controller
+    public SerialPABotBase_Controller,
+    private SerialPABotBase::ControllerStatusThreadCallback
 {
 public:
     using ContextType = ProControllerContext;
@@ -216,6 +220,11 @@ public:
 
 
 private:
+    virtual void update_status(Cancellable& cancellable) override;
+    virtual void stop_with_error(std::string message) override;
+
+
+private:
     template <typename Type>
     PA_FORCE_INLINE Type milliseconds_to_ticks_8ms(Type milliseconds){
         return milliseconds / 8 + (milliseconds % 8 + 7) / 8;
@@ -225,16 +234,10 @@ private:
         const SuperscalarScheduler::ScheduleEntry& entry
     ) override;
 
-    void status_thread();
-
 
 private:
     const ControllerType m_controller_type;
-    CancellableHolder<CancellableScope> m_scope;
-    std::atomic<bool> m_stopping;
-    std::mutex m_sleep_lock;
-    std::condition_variable m_cv;
-    std::thread m_status_thread;
+    std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
 };
 
 

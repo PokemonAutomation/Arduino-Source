@@ -8,8 +8,10 @@
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessController_H
 
 #include <cmath>
-#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WirelessControllers.h"
+#include "Common/ControllerStates/NintendoSwitch_WirelessController_State.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
 #include "Controllers/JoystickTools.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
 //#include <iostream>
@@ -21,7 +23,10 @@ namespace NintendoSwitch{
 
 
 
-class SerialPABotBase_WirelessController : public SerialPABotBase_Controller{
+class SerialPABotBase_WirelessController :
+    public SerialPABotBase_Controller,
+    private SerialPABotBase::ControllerStatusThreadCallback
+{
 public:
     SerialPABotBase_WirelessController(
         Logger& logger,
@@ -41,7 +46,7 @@ public:
         return Milliseconds(15);
     }
     Milliseconds timing_variation() const{
-        return m_timing_variation;
+        return ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS_ESP32;
     }
 
 
@@ -126,25 +131,16 @@ protected:
 
 
 private:
-#if 0
-    template <typename Type>
-    PA_FORCE_INLINE Type milliseconds_to_ticks_15ms(Type milliseconds){
-        return milliseconds / 15 + (milliseconds % 15 + 14) / 15;
-    }
-#endif
-
-    void status_thread();
+    virtual void update_status(Cancellable& cancellable) override;
+    virtual void stop_with_error(std::string message) override;
 
 
 protected:
     const ControllerType m_controller_type;
-    Milliseconds m_timing_variation;
 private:
-    CancellableHolder<CancellableScope> m_scope;
-    std::atomic<bool> m_stopping;
-    std::mutex m_sleep_lock;
-    std::condition_variable m_cv;
-    std::thread m_status_thread;
+    std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
+
+    std::string m_color_html;
 };
 
 

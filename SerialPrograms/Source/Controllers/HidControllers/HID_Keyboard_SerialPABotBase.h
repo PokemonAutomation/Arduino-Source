@@ -9,6 +9,7 @@
 
 #include "ClientSource/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
 #include "HID_Keyboard.h"
 #include "HID_KeyboardWithScheduler.h"
 
@@ -19,7 +20,8 @@ namespace HidControllers{
 
 class SerialPABotBase_Keyboard final :
     public Keyboard,
-    public KeyboardControllerWithScheduler
+    public KeyboardControllerWithScheduler,
+    private SerialPABotBase::ControllerStatusThreadCallback
 {
 public:
     using ContextType = KeyboardContext;
@@ -95,13 +97,8 @@ public:
 
 
 public:
-    void stop_with_error(std::string error_message){
-        {
-            WriteSpinLock lg(m_error_lock);
-            m_error_string = error_message;
-        }
-        m_serial->stop(std::move(error_message));
-    }
+    virtual void update_status(Cancellable& cancellable) override;
+    virtual void stop_with_error(std::string error_message) override;
 
     std::string error_string() const{
         ReadSpinLock lg(m_error_lock);
@@ -134,12 +131,7 @@ protected:
     mutable SpinLock m_error_lock;
     std::string m_error_string;
 
-
-    CancellableHolder<CancellableScope> m_scope;
-    std::atomic<bool> m_stopping;
-    std::mutex m_sleep_lock;
-    std::condition_variable m_cv;
-//    std::thread m_status_thread;
+    std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
 };
 
 

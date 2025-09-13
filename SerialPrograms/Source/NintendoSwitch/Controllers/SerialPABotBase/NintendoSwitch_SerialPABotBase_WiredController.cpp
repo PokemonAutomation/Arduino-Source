@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
@@ -37,7 +36,6 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
         connection
     )
     , m_controller_type(controller_type)
-    , m_stopping(false)
 {
     using namespace SerialPABotBase;
 
@@ -64,25 +62,16 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
         throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
     }
 
-    m_status_thread = std::thread(&SerialPABotBase_WiredController::status_thread, this);
+    m_status_thread.reset(new SerialPABotBase::ControllerStatusThread(
+        connection, *this
+    ));
 }
 SerialPABotBase_WiredController::~SerialPABotBase_WiredController(){
     stop();
-    m_status_thread.join();
 }
 void SerialPABotBase_WiredController::stop(){
-    if (m_stopping.exchange(true)){
-        return;
-    }
     ProController::stop();
-    m_scope.cancel(nullptr);
-    {
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-        if (m_serial){
-            m_serial->notify_all();
-        }
-        m_cv.notify_all();
-    }
+    m_status_thread.reset();
 }
 
 
@@ -199,136 +188,33 @@ void SerialPABotBase_WiredController::execute_state(
 
 
 
-#if 0
-//
-//  Given a regularly reported 32-bit counter that wraps around, infer its true
-//  64-bit value.
-//
-class ExtendedLengthCounter{
-public:
-    ExtendedLengthCounter()
-        : m_high_bits(0)
-        , m_last_received(0)
-    {}
+void SerialPABotBase_WiredController::update_status(Cancellable& cancellable){
+    pabb_MsgAckRequestI32 response;
+    m_serial->issue_request_and_wait(
+        SerialPABotBase::MessageControllerStatus(),
+        &cancellable
+    ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
 
-    uint64_t push_short_value(uint32_t counter){
-        if (counter < m_last_received && counter - m_last_received < 0x40000000){
-            m_high_bits++;
-        }
-        m_last_received = counter;
-        return ((uint64_t)m_high_bits << 32) | counter;
-    }
+    uint32_t status = response.data;
+    bool status_connected = status & 1;
+    bool status_ready     = status & 2;
 
-private:
-    uint32_t m_high_bits;
-    uint32_t m_last_received;
-};
-#endif
+    std::string str;
+    str += "Connected: " + (status_connected
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
+    str += " - Ready: " + (status_ready
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
 
-
-
-void SerialPABotBase_WiredController::status_thread(){
-    constexpr std::chrono::milliseconds PERIOD(1000);
-    std::atomic<WallClock> last_ack(current_time());
-
-    std::thread watchdog([&, this]{
-        WallClock next_ping = current_time();
-        while (true){
-            if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
-                break;
-            }
-
-            auto last = current_time() - last_ack.load(std::memory_order_relaxed);
-            std::chrono::duration<double> seconds = last;
-            if (last > 2 * PERIOD && is_ready()){
-                std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
-                m_handle.set_status_line1(text, COLOR_RED);
-//                m_logger.log("Connection issue detected. Turning on all logging...");
-//                settings.log_everything.store(true, std::memory_order_release);
-            }
-
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
-            if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
-                break;
-            }
-
-            WallClock now = current_time();
-            next_ping += PERIOD;
-            if (now + PERIOD < next_ping){
-                next_ping = now + PERIOD;
-            }
-            m_cv.wait_until(lg, next_ping);
-        }
-    });
-
-
-    WallClock next_ping = current_time();
-    while (true){
-        if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
-            break;
-        }
-
-        std::string error;
-        try{
-            pabb_MsgAckRequestI32 response;
-            m_serial->issue_request_and_wait(
-                SerialPABotBase::MessageControllerStatus(),
-                &m_scope
-            ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
-            last_ack.store(current_time(), std::memory_order_relaxed);
-
-            uint32_t status = response.data;
-            bool status_connected = status & 1;
-            bool status_ready     = status & 2;
-
-            std::string str;
-            str += "Connected: " + (status_connected
-                ? html_color_text("Yes", theme_friendly_darkblue())
-                : html_color_text("No", COLOR_RED)
-            );
-            str += " - Ready: " + (status_ready
-                ? html_color_text("Yes", theme_friendly_darkblue())
-                : html_color_text("No", COLOR_RED)
-            );
-
-            m_handle.set_status_line1(str);
-        }catch (OperationCancelledException&){
-            break;
-        }catch (InvalidConnectionStateException&){
-            break;
-        }catch (SerialProtocolException& e){
-            error = e.message();
-        }catch (ConnectionException& e){
-            error = e.message();
-        }catch (...){
-            error = "Unknown error.";
-        }
-        if (!error.empty()){
-            m_handle.set_status_line1(error, COLOR_RED);
-            stop_with_error(std::move(error));
-        }
-
-//        cout << "lock()" << endl;
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-//        cout << "lock() - done" << endl;
-        if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
-            break;
-        }
-
-        WallClock now = current_time();
-        next_ping += PERIOD;
-        if (now + PERIOD < next_ping){
-            next_ping = now + PERIOD;
-        }
-        m_cv.wait_until(lg, next_ping);
-    }
-
-    {
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-        m_cv.notify_all();
-    }
-    watchdog.join();
+    m_handle.set_status_line1(str);
 }
+void SerialPABotBase_WiredController::stop_with_error(std::string message){
+    SerialPABotBase_Controller::stop_with_error(std::move(message));
+}
+
 
 
 

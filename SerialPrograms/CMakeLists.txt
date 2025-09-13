@@ -729,6 +729,7 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp

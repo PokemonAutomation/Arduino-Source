@@ -4,13 +4,10 @@
  *
  */
 
-#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessController.h"
 
 //#include <iostream>
@@ -40,8 +37,6 @@ SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
         connection
     )
     , m_controller_type(controller_type)
-    , m_timing_variation(ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS_ESP32)
-    , m_stopping(false)
 {
     using namespace SerialPABotBase;
 
@@ -70,24 +65,15 @@ SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
         throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
     }
 
-    m_status_thread = std::thread(&SerialPABotBase_WirelessController::status_thread, this);
+    m_status_thread.reset(new SerialPABotBase::ControllerStatusThread(
+        connection, *this
+    ));
 }
 SerialPABotBase_WirelessController::~SerialPABotBase_WirelessController(){
     stop();
-    m_status_thread.join();
 }
 void SerialPABotBase_WirelessController::stop(){
-    if (m_stopping.exchange(true)){
-        return;
-    }
-    m_scope.cancel(nullptr);
-    {
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-        if (m_serial){
-            m_serial->notify_all();
-        }
-        m_cv.notify_all();
-    }
+    m_status_thread.reset();
 }
 
 void SerialPABotBase_WirelessController::set_info(){
@@ -320,171 +306,94 @@ void SerialPABotBase_WirelessController::issue_report(
 
 
 
-void SerialPABotBase_WirelessController::status_thread(){
-    constexpr std::chrono::milliseconds PERIOD(1000);
-    std::atomic<WallClock> last_ack(current_time());
+void SerialPABotBase_WirelessController::update_status(Cancellable& cancellable){
+    if (m_color_html.empty()){
+        try{
+            m_logger.log("Reading Controller Colors...");
 
-    //  Read controller colors.
-    std::string color_html;
-#if 1
-    try{
-        m_logger.log("Reading Controller Colors...");
+            using ControllerColors = PABB_NintendoSwitch_ControllerColors;
 
-        using ControllerColors = PABB_NintendoSwitch_ControllerColors;
-
-        BotBaseMessage response = m_serial->issue_request_and_wait(
-            SerialPABotBase::MessageControllerReadSpi(
-                m_controller_type,
-                0x00006050, sizeof(ControllerColors)
-            ),
-            &m_scope
-        );
-
-        ControllerColors colors{};
-        if (response.body.size() == sizeof(seqnum_t) + sizeof(ControllerColors)){
-            memcpy(&colors, response.body.data() + sizeof(seqnum_t), sizeof(ControllerColors));
-        }else{
-            m_logger.log(
-                "Invalid response size to PABB_MSG_ESP32_REQUEST_READ_SPI: body = " + std::to_string(response.body.size()),
-                COLOR_RED
+            BotBaseMessage response = m_serial->issue_request_and_wait(
+                SerialPABotBase::MessageControllerReadSpi(
+                    m_controller_type,
+                    0x00006050, sizeof(ControllerColors)
+                ),
+                &cancellable
             );
+
+            ControllerColors colors{};
+            if (response.body.size() == sizeof(seqnum_t) + sizeof(ControllerColors)){
+                memcpy(&colors, response.body.data() + sizeof(seqnum_t), sizeof(ControllerColors));
+            }else{
+                m_logger.log(
+                    "Invalid response size to PABB_MSG_ESP32_REQUEST_READ_SPI: body = " + std::to_string(response.body.size()),
+                    COLOR_RED
+                );
+                m_handle.set_status_line1("Error: See log for more information.", COLOR_RED);
+                return;
+            }
+            m_logger.log("Reading Controller Colors... Done");
+
+            switch (m_controller_type){
+            case ControllerType::NintendoSwitch_WirelessProController:{
+                Color left(colors.left_grip[0], colors.left_grip[1], colors.left_grip[2]);
+                Color body(colors.body[0], colors.body[1], colors.body[2]);
+                Color right(colors.right_grip[0], colors.right_grip[1], colors.right_grip[2]);
+                m_color_html += html_color_text("&#x2b24;", left);
+                m_color_html += " " + html_color_text("&#x2b24;", body);
+                m_color_html += " " + html_color_text("&#x2b24;", right);
+                break;
+            }
+            case ControllerType::NintendoSwitch_LeftJoycon:
+            case ControllerType::NintendoSwitch_RightJoycon:{
+                Color body(colors.body[0], colors.body[1], colors.body[2]);
+                m_color_html = html_color_text("&#x2b24;", body);
+                break;
+            }
+            default:;
+            }
+
+        }catch (Exception& e){
+            e.log(m_logger);
             m_handle.set_status_line1("Error: See log for more information.", COLOR_RED);
             return;
         }
-        m_logger.log("Reading Controller Colors... Done");
-
-        switch (m_controller_type){
-        case ControllerType::NintendoSwitch_WirelessProController:{
-            Color left(colors.left_grip[0], colors.left_grip[1], colors.left_grip[2]);
-            Color body(colors.body[0], colors.body[1], colors.body[2]);
-            Color right(colors.right_grip[0], colors.right_grip[1], colors.right_grip[2]);
-            color_html += html_color_text("&#x2b24;", left);
-            color_html += " " + html_color_text("&#x2b24;", body);
-            color_html += " " + html_color_text("&#x2b24;", right);
-            break;
-        }
-        case ControllerType::NintendoSwitch_LeftJoycon:
-        case ControllerType::NintendoSwitch_RightJoycon:{
-            Color body(colors.body[0], colors.body[1], colors.body[2]);
-            color_html = html_color_text("&#x2b24;", body);
-            break;
-        }
-        default:;
-        }
-
-    }catch (Exception& e){
-        e.log(m_logger);
-        m_handle.set_status_line1("Error: See log for more information.", COLOR_RED);
-        return;
     }
-#endif
 
 
-    std::thread watchdog([&, this]{
-        WallClock next_ping = current_time();
-        while (true){
-            if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
-                break;
-            }
+    pabb_MsgAckRequestI32 response;
+    m_serial->issue_request_and_wait(
+        SerialPABotBase::MessageControllerStatus(),
+        &cancellable
+    ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
 
-            auto last = current_time() - last_ack.load(std::memory_order_relaxed);
-            std::chrono::duration<double> seconds = last;
-            if (last > 2 * PERIOD){
-                std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
-                m_handle.set_status_line1(text, COLOR_RED);
-//                m_logger.log("Connection issue detected. Turning on all logging...");
-//                settings.log_everything.store(true, std::memory_order_release);
-            }
-
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
-            if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
-                break;
-            }
-
-            WallClock now = current_time();
-            next_ping += PERIOD;
-            if (now + PERIOD < next_ping){
-                next_ping = now + PERIOD;
-            }
-            m_cv.wait_until(lg, next_ping);
-        }
-    });
-
-    WallClock next_ping = current_time();
-    while (true){
-        if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
-            break;
-        }
-
-        std::string error;
-        try{
-            pabb_MsgAckRequestI32 response;
-            m_serial->issue_request_and_wait(
-                SerialPABotBase::MessageControllerStatus(),
-                &m_scope
-            ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
-            last_ack.store(current_time(), std::memory_order_relaxed);
-
-            uint32_t status = response.data;
+    uint32_t status = response.data;
 //            bool status_connected = status & 1;
-            bool status_ready     = status & 2;
-            bool status_paired    = status & 4;
+    bool status_ready     = status & 2;
+    bool status_paired    = status & 4;
 
-            std::string str;
-            str += "Paired: " + (status_paired
-                ? html_color_text("Yes", theme_friendly_darkblue())
-                : html_color_text("No", COLOR_RED)
-            );
+    std::string str;
+    str += "Paired: " + (status_paired
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
 #if 0
-            str += "Connected: " + (status_connected
-                ? html_color_text("Yes", theme_friendly_darkblue())
-                : html_color_text("No", COLOR_RED)
-            );
+    str += "Connected: " + (status_connected
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
 #endif
-            str += " - Connected: " + (status_ready
-                ? html_color_text("Yes", theme_friendly_darkblue())
-                : html_color_text("No", COLOR_RED)
-            );
-            str += " - " + color_html;
+    str += " - Connected: " + (status_ready
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
+    str += " - " + m_color_html;
 
-            m_handle.set_status_line1(str);
-        }catch (OperationCancelledException&){
-            break;
-        }catch (InvalidConnectionStateException&){
-            break;
-        }catch (SerialProtocolException& e){
-            error = e.message();
-        }catch (ConnectionException& e){
-            error = e.message();
-        }catch (...){
-            error = "Unknown error.";
-        }
-        if (!error.empty()){
-            stop();
-            m_handle.set_status_line1(error, COLOR_RED);
-            break;
-        }
+    m_handle.set_status_line1(str);
+}
 
-//        cout << "lock()" << endl;
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-//        cout << "lock() - done" << endl;
-        if (m_stopping.load(std::memory_order_relaxed) || !m_handle.is_ready()){
-            break;
-        }
-
-        WallClock now = current_time();
-        next_ping += PERIOD;
-        if (now + PERIOD < next_ping){
-            next_ping = now + PERIOD;
-        }
-        m_cv.wait_until(lg, next_ping);
-    }
-
-    {
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-        m_cv.notify_all();
-    }
-    watchdog.join();
+void SerialPABotBase_WirelessController::stop_with_error(std::string message){
+    SerialPABotBase_Controller::stop_with_error(std::move(message));
 }
 
 

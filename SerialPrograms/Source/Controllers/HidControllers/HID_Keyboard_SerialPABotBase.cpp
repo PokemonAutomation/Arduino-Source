@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "HID_Keyboard_SerialPABotBase.h"
 
@@ -46,24 +47,17 @@ SerialPABotBase_Keyboard::SerialPABotBase_Keyboard(
     if (current_controller != ControllerType::HID_Keyboard){
         throw SerialProtocolException(logger, PA_CURRENT_FUNCTION, "Failed to set controller type.");
     }
+
+    m_status_thread.reset(new SerialPABotBase::ControllerStatusThread(
+        connection, *this
+    ));
 }
 SerialPABotBase_Keyboard::~SerialPABotBase_Keyboard(){
     stop();
-//    m_status_thread.join();
 }
 void SerialPABotBase_Keyboard::stop(){
-    if (m_stopping.exchange(true)){
-        return;
-    }
     Keyboard::stop();
-    m_scope.cancel(nullptr);
-    {
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
-        if (m_serial){
-            m_serial->notify_all();
-        }
-        m_cv.notify_all();
-    }
+    m_status_thread.reset();
 }
 
 
@@ -109,7 +103,42 @@ void SerialPABotBase_Keyboard::execute_state(
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
     //  TODO
+    m_logger.log("SerialPABotBase_Keyboard::execute_state() - Not implemented yet.", COLOR_RED);
 }
+
+
+
+void SerialPABotBase_Keyboard::update_status(Cancellable& cancellable){
+    pabb_MsgAckRequestI32 response;
+    m_serial->issue_request_and_wait(
+        SerialPABotBase::MessageControllerStatus(),
+        &cancellable
+    ).convert<PABB_MSG_ACK_REQUEST_I32>(m_logger, response);
+
+    uint32_t status = response.data;
+    bool status_connected = status & 1;
+    bool status_ready     = status & 2;
+
+    std::string str;
+    str += "Connected: " + (status_connected
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
+    str += " - Ready: " + (status_ready
+        ? html_color_text("Yes", theme_friendly_darkblue())
+        : html_color_text("No", COLOR_RED)
+    );
+
+    m_handle.set_status_line1(str);
+}
+void SerialPABotBase_Keyboard::stop_with_error(std::string error_message){
+    {
+        WriteSpinLock lg(m_error_lock);
+        m_error_string = error_message;
+    }
+    m_serial->stop(std::move(error_message));
+}
+
 
 
 
