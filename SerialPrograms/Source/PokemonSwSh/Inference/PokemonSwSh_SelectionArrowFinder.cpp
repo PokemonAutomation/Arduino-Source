@@ -197,16 +197,26 @@ RotomPhoneMenuArrowFinder::RotomPhoneMenuArrowFinder(VideoOverlay& overlay)
     }
 }
 
-int RotomPhoneMenuArrowFinder::detect(const ImageViewRGB32& screen){
+void RotomPhoneMenuArrowFinder::make_overlays(VideoOverlaySet& items) const{
+
+}
+bool RotomPhoneMenuArrowFinder::detect(const ImageViewRGB32& screen){
+    return detect_index(screen) >= 0;
+}
+
+int RotomPhoneMenuArrowFinder::detect_index(const ImageViewRGB32& screen){
     const double screen_scale = screen.height() / 1080.0;
     const size_t min_arrow_area = size_t(1400 * screen_scale * screen_scale);
     for (size_t i_row = 0; i_row < 2; i_row++){
         for (size_t j_col = 0; j_col < 5; j_col++){
             ImageFloatBox box(0.047 + j_col*0.183, 0.175 + 0.333*i_row, 0.059, 0.104);
             std::vector<ImagePixelBox> arrows = find_selection_arrows(
-                extract_box_reference(screen, box), min_arrow_area);
+                extract_box_reference(screen, box),
+                min_arrow_area
+            );
             if (arrows.size() > 0){
-                return (int)(i_row * 5 + j_col);
+                m_index = (int)(i_row * 5 + j_col);
+                return m_index;
             }
         }
     }

@@ -7,7 +7,8 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+//#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BoxHelpers.h"
 #include "PokemonSwSh_MenuNavigation.h"
@@ -24,15 +25,18 @@ void navigate_to_menu_app(
     EventNotificationOption& notification_option
 ){
     context.wait_for_all_requests();
-    RotomPhoneMenuArrowFinder menu_arrow_detector(stream.overlay());
-    auto snapshot = stream.video().snapshot();
-    const int cur_app_index = menu_arrow_detector.detect(snapshot);
+    RotomPhoneMenuArrowWatcher menu_arrow(stream.overlay());
+    wait_until(
+        stream, context,
+        5000ms,
+        {menu_arrow}
+    );
+    const int cur_app_index = menu_arrow.current_index();
     if (cur_app_index < 0){
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "Cannot detect Rotom phone menu.",
-            stream,
-            std::move(snapshot)
+            stream
         );
     }
     stream.log("Detect menu cursor at " + std::to_string(cur_app_index) + ".");

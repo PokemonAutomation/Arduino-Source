@@ -11,6 +11,7 @@
 #include <deque>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -77,18 +78,33 @@ public:
 };
 
 // The arrow that points to one of the ten apps on Rotom Phone menu
-class RotomPhoneMenuArrowFinder{
+class RotomPhoneMenuArrowFinder : public StaticScreenDetector{
 public:
     RotomPhoneMenuArrowFinder(VideoOverlay& overlay);
+
+    int current_index() const{
+        return m_index;
+    }
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
     // Detect which app is selected by the arrow. Return the index of the app
     // The order is: from top to bottom, from left to right.
     // If no arrow found, return -1.
-    int detect(const ImageViewRGB32& screen);
+    int detect_index(const ImageViewRGB32& screen);
 
 private:
     VideoOverlaySet m_overlay_set;
+    int m_index = -1;
 };
+class RotomPhoneMenuArrowWatcher : public DetectorToFinder<RotomPhoneMenuArrowFinder>{
+public:
+    RotomPhoneMenuArrowWatcher(VideoOverlay& overlay)
+         : DetectorToFinder("RotomPhoneMenuArrowWatcher", std::chrono::milliseconds(250), overlay)
+    {}
+};
+
 
 
 }
