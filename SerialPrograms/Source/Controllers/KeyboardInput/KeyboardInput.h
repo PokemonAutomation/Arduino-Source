@@ -123,20 +123,22 @@ public:
         deltas.to_state(static_cast<StateType&>(state));
     }
     virtual void cancel_all_commands() override{
-        report_keyboard_command_stopped();
+        WallClock time_stamp = current_time();
         WriteSpinLock lg(m_lock);
         if (m_controller == nullptr){
             return;
         }
         m_controller->cancel_all_commands();
+        report_keyboard_command_stopped(time_stamp);
     }
     virtual void replace_on_next_command() override{
-        report_keyboard_command_stopped();
+        WallClock time_stamp = current_time();
         WriteSpinLock lg(m_lock);
         if (m_controller == nullptr){
             return;
         }
         m_controller->replace_on_next_command();
+        // report_keyboard_command_stopped(time_stamp);
     }
 
 

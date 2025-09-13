@@ -31,16 +31,16 @@ void KeyboardEventHandler::remove_listener(KeyboardListener& listener){
     data.m_listeners.remove(listener);
 }
 
-void KeyboardEventHandler::report_keyboard_command_sent(const ControllerState& state){
+void KeyboardEventHandler::report_keyboard_command_sent(WallClock time_stamp, const ControllerState& state){
     auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
-    data.m_listeners.run_method_unique(&KeyboardListener::on_keyboard_command_sent, state);
+    data.m_listeners.run_method_unique(&KeyboardListener::on_keyboard_command_sent, time_stamp, state);
 }
 
-void KeyboardEventHandler::report_keyboard_command_stopped(){
+void KeyboardEventHandler::report_keyboard_command_stopped(WallClock time_stamp){
     auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
-    data.m_listeners.run_method_unique(&KeyboardListener::on_keyboard_command_stopped);
+    data.m_listeners.run_method_unique(&KeyboardListener::on_keyboard_command_stopped, time_stamp);
 }
 
 

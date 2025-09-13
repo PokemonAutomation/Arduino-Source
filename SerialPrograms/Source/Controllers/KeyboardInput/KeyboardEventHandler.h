@@ -22,8 +22,8 @@ public:
     virtual ~KeyboardEventHandler();
 
      struct KeyboardListener{
-        virtual void on_keyboard_command_sent(const ControllerState& state){}
-        virtual void on_keyboard_command_stopped(){}
+        virtual void on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state){}
+        virtual void on_keyboard_command_stopped(WallClock time_stamp){}
     };
     void add_listener(KeyboardListener& listener);
     void remove_listener(KeyboardListener& listener);
@@ -31,9 +31,9 @@ public:
 protected:
     //  Report that the keyboard state has changed. This will be pushed to
     //  all listeners.
-    void report_keyboard_command_sent(const ControllerState& state);
+    void report_keyboard_command_sent(WallClock time_stamp, const ControllerState& state);
 
-    void report_keyboard_command_stopped();
+    void report_keyboard_command_stopped(WallClock time_stamp);
 
 private:
     struct Data;

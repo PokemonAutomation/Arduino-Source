@@ -57,6 +57,7 @@ public:
         stop();
     }
     virtual void send_state(const ControllerState& state) override{
+        WallClock time_stamp = current_time();
         const JoyconState& switch_state = static_cast<const JoyconState&>(state);
 #if 0
         m_controller->logger().log(
@@ -78,6 +79,7 @@ public:
             switch_state.joystick_y,
             ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255
         );
+        report_keyboard_command_sent(time_stamp, switch_state);
     }
 };
 
