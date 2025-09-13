@@ -43,6 +43,23 @@ public:
 
 
 public:
+    template <typename ControllerType>
+    ControllerType* cast(){
+        return dynamic_cast<ControllerType*>(this);
+    }
+    template <typename ControllerType>
+    ControllerType& cast_with_exception(){
+        ControllerType* controller = dynamic_cast<ControllerType*>(this);
+        if (!controller){
+            throw_bad_cast(ControllerType::NAME);
+        }
+        return *controller;
+    }
+private:
+    void throw_bad_cast(const char* desired_typename);
+
+
+public:
     //  Static Information
 
     virtual const char* name() = 0;
@@ -210,6 +227,12 @@ public:
     {
         attach(parent);
     }
+    template <typename T>
+    ControllerContext(ControllerContext<T>& context)
+        : m_controller(context.controller().template cast_with_exception<Type>())
+    {
+        attach(context);
+    }
     virtual ~ControllerContext(){
         detach();
     }
@@ -265,6 +288,9 @@ private:
     LifetimeSanitizer m_lifetime_sanitizer;
 };
 
+
+
+using AbstractControllerContext = ControllerContext<AbstractController>;
 
 
 

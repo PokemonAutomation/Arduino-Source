@@ -59,6 +59,7 @@ public:
     KeyboardEntryTimingsOption  SWITCH1_KEYBOARD_ENTRY0;
     DigitEntryTimingsOption     SWITCH2_DIGIT_ENTRY0;
     KeyboardEntryTimingsOption  SWITCH2_KEYBOARD_ENTRY0;
+    KeyboardControllerTimingsOption KEYBOARD_CONTROLLER_TIMINGS;
 
     SectionDividerOption KEYBOARD_SECTION;
     KeyboardMappingOption KEYBOARD_MAPPINGS;

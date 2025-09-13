@@ -8,7 +8,7 @@
 #include <QClipboard>
 //#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSV_CodeEntry.h"
@@ -48,8 +48,13 @@ void ClipboardFastCodeEntry::update_active_consoles(size_t switch_count){
 
 void ClipboardFastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     //  Connect the controller.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-        pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
+    env.run_in_parallel(scope, [&](CancellableScope& scope, ConsoleHandle& console){
+        auto* procon = console.controller().cast<ProController>();
+        if (procon == nullptr){
+            return;
+        }
+        ProControllerContext context(scope, *procon);
+        ssf_press_button_ptv(context, BUTTON_R | BUTTON_L);
         detect_console_type_from_in_game(console, context);
     });
 

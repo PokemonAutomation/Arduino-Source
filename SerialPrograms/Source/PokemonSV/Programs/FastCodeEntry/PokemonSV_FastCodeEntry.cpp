@@ -140,7 +140,12 @@ void FastCodeEntry::program(MultiSwitchProgramEnvironment& env, CancellableScope
     }
 
     //  Connect the controller.
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel(scope, [&](CancellableScope& scope, ConsoleHandle& console){
+        auto* procon = console.controller().cast<ProController>();
+        if (procon == nullptr){
+            return;
+        }
+        ProControllerContext context(scope, *procon);
         ssf_press_button_ptv(context, BUTTON_R | BUTTON_L);
         detect_console_type_from_in_game(console, context);
     });

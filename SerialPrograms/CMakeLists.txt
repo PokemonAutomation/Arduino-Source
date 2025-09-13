@@ -685,6 +685,7 @@ file(GLOB MAIN_SOURCES
     Source/ComputerPrograms/Framework/ComputerProgramSession.h
     Source/ComputerPrograms/Framework/ComputerProgramWidget.cpp
     Source/ComputerPrograms/Framework/ComputerProgramWidget.h
+    Source/Controllers/Controller.cpp
     Source/Controllers/Controller.h
     Source/Controllers/ControllerConnection.cpp
     Source/Controllers/ControllerConnection.h

@@ -58,6 +58,16 @@ public:
     MillisecondsOption COOLDOWN;
 };
 
+class KeyboardControllerTimingsOption : public GroupOption{
+public:
+    KeyboardControllerTimingsOption();
+
+public:
+    MillisecondsOption TIME_UNIT;
+    MillisecondsOption HOLD;
+    MillisecondsOption COOLDOWN;
+};
+
 
 
 

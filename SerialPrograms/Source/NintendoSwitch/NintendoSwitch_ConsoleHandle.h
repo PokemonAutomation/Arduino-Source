@@ -43,16 +43,7 @@ public:
 
     template <typename ControllerType = AbstractController>
     ControllerType& controller(){
-        ControllerType* ret = dynamic_cast<ControllerType*>(&m_controller);
-        if (ret){
-            return *ret;
-        }
-        throw UserSetupError(
-            logger(),
-            std::string("Incompatible Controller:\n\n") +
-            "Required:\n    " + ControllerType::NAME + "\n"
-            "Actual:\n    " + m_controller.name()
-        );
+        return m_controller.cast_with_exception<ControllerType>();
     }
 
     operator Logger&(){ return logger(); }

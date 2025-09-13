@@ -131,6 +131,35 @@ KeyboardEntryTimingsOption::KeyboardEntryTimingsOption(bool switch2)
 
 
 
+KeyboardControllerTimingsOption::KeyboardControllerTimingsOption()
+    : GroupOption(
+        "Keyboard Controller Timings",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        GroupOption::EnableMode::ALWAYS_ENABLED, true
+    )
+    , TIME_UNIT(
+        "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        PreloadSettings::instance().DEVELOPER_MODE ? "24 ms" : "40 ms"
+    )
+    , HOLD(
+        "<b>Hold:</b><br>Duration to hold each key press down.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "48 ms"
+    )
+    , COOLDOWN(
+        "<b>Hold:</b><br>Do not reuse a key until this long after it is reused.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "24 ms"
+    )
+{
+    PA_ADD_OPTION(TIME_UNIT);
+    PA_ADD_OPTION(HOLD);
+    PA_ADD_OPTION(COOLDOWN);
+}
+
+
+
 
 
 

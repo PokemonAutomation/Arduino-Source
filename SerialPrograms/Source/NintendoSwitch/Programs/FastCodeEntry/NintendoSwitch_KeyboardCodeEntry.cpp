@@ -23,6 +23,118 @@ namespace NintendoSwitch{
 namespace FastCodeEntry{
 
 
+
+
+void keyboard_enter_code(
+    ConsoleHandle& console, AbstractControllerContext& context,
+    KeyboardLayout keyboard_layout, const std::string& code,
+    bool include_plus
+){
+    auto* keyboard = context->cast<HidControllers::Keyboard>();
+    if (keyboard){
+        HidControllers::KeyboardContext subcontext(context);
+        keyboard_enter_code(console, subcontext, code, include_plus);
+        return;
+    }
+
+    auto* procon = context->cast<ProController>();
+    if (procon){
+        ProControllerContext subcontext(context);
+        keyboard_enter_code(console, subcontext, keyboard_layout, code, include_plus);
+        return;
+    }
+
+    throw UserSetupError(
+        console, "Unsupported controller type."
+    );
+}
+
+
+
+
+
+void keyboard_enter_code(
+    ConsoleHandle& console, HidControllers::KeyboardContext& context,
+    const std::string& code,
+    bool include_plus
+){
+    using namespace HidControllers;
+
+    Milliseconds delay = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.TIME_UNIT;
+    Milliseconds hold = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.HOLD;
+    Milliseconds cool = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.COOLDOWN;
+
+    static const std::map<char, KeyboardKey> MAP{
+        {'1', KeyboardKey::KEY_1},
+        {'2', KeyboardKey::KEY_2},
+        {'3', KeyboardKey::KEY_3},
+        {'4', KeyboardKey::KEY_4},
+        {'5', KeyboardKey::KEY_5},
+        {'6', KeyboardKey::KEY_6},
+        {'7', KeyboardKey::KEY_7},
+        {'8', KeyboardKey::KEY_8},
+        {'9', KeyboardKey::KEY_9},
+        {'0', KeyboardKey::KEY_0},
+
+        {'Q', KeyboardKey::KEY_Q},
+        {'W', KeyboardKey::KEY_W},
+        {'E', KeyboardKey::KEY_E},
+        {'R', KeyboardKey::KEY_R},
+        {'T', KeyboardKey::KEY_T},
+        {'Y', KeyboardKey::KEY_Y},
+        {'U', KeyboardKey::KEY_U},
+        {'P', KeyboardKey::KEY_P},
+
+        {'A', KeyboardKey::KEY_A},
+        {'S', KeyboardKey::KEY_S},
+        {'D', KeyboardKey::KEY_D},
+        {'F', KeyboardKey::KEY_F},
+        {'G', KeyboardKey::KEY_G},
+        {'H', KeyboardKey::KEY_H},
+        {'J', KeyboardKey::KEY_J},
+        {'K', KeyboardKey::KEY_K},
+        {'L', KeyboardKey::KEY_L},
+
+        {'X', KeyboardKey::KEY_X},
+        {'C', KeyboardKey::KEY_C},
+        {'V', KeyboardKey::KEY_V},
+        {'B', KeyboardKey::KEY_B},
+        {'N', KeyboardKey::KEY_N},
+        {'M', KeyboardKey::KEY_M},
+    };
+
+    for (char ch : code){
+        auto iter = MAP.find(ch);
+        if (iter == MAP.end()){
+            throw_and_log<OperationFailedException>(
+                console, ErrorReport::NO_ERROR_REPORT,
+                "Invalid code character."
+            );
+        }
+        context->issue_key(&context, delay, hold, cool, iter->second);
+    }
+
+    if (include_plus){
+        context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
+        context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
+        context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 struct KeyboardEntryPosition{
     uint8_t row;
     uint8_t col;

@@ -138,7 +138,7 @@ const char* normalize_code(std::string& normalized_code, const std::string& code
 }
 
 void enter_code(
-    ConsoleHandle& console, ProControllerContext& context,
+    ConsoleHandle& console, AbstractControllerContext& context,
     KeyboardLayout keyboard_layout,
     const std::string& normalized_code, bool force_keyboard_mode,
     bool include_plus,
@@ -146,7 +146,11 @@ void enter_code(
 ){
     if (connect_controller_press){
         //  Connect the controller.
-        pbf_press_button(context, BUTTON_R | BUTTON_L, 5, 3);
+        auto* procon = context->cast<ProController>();
+        if (procon){
+            ProControllerContext subcontext(context, *procon);
+            pbf_press_button(subcontext, BUTTON_R | BUTTON_L, 5, 3);
+        }
     }
 
     if (force_keyboard_mode){
@@ -186,7 +190,8 @@ const char* enter_code(
         return error;
     }
 
-    env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
+    env.run_in_parallel(scope, [&](CancellableScope& scope, ConsoleHandle& console){
+        AbstractControllerContext context(scope, console.controller());
         enter_code(
             console, context,
             settings.keyboard_layout[console.index()],

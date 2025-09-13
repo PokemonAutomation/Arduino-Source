@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_CodeEntry_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+//#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
@@ -61,12 +61,29 @@ struct FastCodeEntrySettings{
 const char* normalize_code(std::string& normalized_code, const std::string& code, bool override_mode = false);
 
 void enter_code(
-    ConsoleHandle& console, ProControllerContext& context,
+    ConsoleHandle& console, AbstractControllerContext& context,
     KeyboardLayout keyboard_layout,
     const std::string& normalized_code, bool force_keyboard_mode,
     bool include_plus,
     bool connect_controller_press
 );
+template <typename ControllerContext>
+inline void enter_code(
+    ConsoleHandle& console, ControllerContext& context,
+    KeyboardLayout keyboard_layout,
+    const std::string& normalized_code, bool force_keyboard_mode,
+    bool include_plus,
+    bool connect_controller_press
+){
+    AbstractControllerContext subcontext(context);
+    enter_code(
+        console, subcontext,
+        keyboard_layout,
+        normalized_code, force_keyboard_mode,
+        include_plus,
+        connect_controller_press
+    );
+}
 
 const char* enter_code(
     MultiSwitchProgramEnvironment& env, CancellableScope& scope,

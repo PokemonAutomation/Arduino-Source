@@ -22,6 +22,107 @@ namespace NintendoSwitch{
 namespace FastCodeEntry{
 
 
+
+
+void numberpad_enter_code(
+    ConsoleHandle& console, AbstractControllerContext& context,
+    const std::string& code,
+    bool include_plus
+){
+    auto* keyboard = dynamic_cast<HidControllers::Keyboard*>(&context.controller());
+    if (keyboard){
+        HidControllers::KeyboardContext subcontext(context);
+        numberpad_enter_code(console, subcontext, code, include_plus);
+        return;
+    }
+
+    auto* procon = dynamic_cast<ProController*>(&context.controller());
+    if (procon){
+        ProControllerContext subcontext(context);
+        numberpad_enter_code(console, subcontext, code, include_plus);
+        return;
+    }
+
+    throw UserSetupError(
+        console, "Unsupported controller type."
+    );
+}
+
+
+
+
+
+void numberpad_enter_code(
+    ConsoleHandle& console, HidControllers::KeyboardContext& context,
+    const std::string& code,
+    bool include_plus
+){
+    using namespace HidControllers;
+
+    Milliseconds delay = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.TIME_UNIT;
+    Milliseconds hold = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.HOLD;
+    Milliseconds cool = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.COOLDOWN;
+
+    static const std::map<char, KeyboardKey> MAP{
+        {0, KeyboardKey::KEY_0},
+        {1, KeyboardKey::KEY_1},
+        {2, KeyboardKey::KEY_2},
+        {3, KeyboardKey::KEY_3},
+        {4, KeyboardKey::KEY_4},
+        {5, KeyboardKey::KEY_5},
+        {6, KeyboardKey::KEY_6},
+        {7, KeyboardKey::KEY_7},
+        {8, KeyboardKey::KEY_8},
+        {9, KeyboardKey::KEY_9},
+        {'0', KeyboardKey::KEY_0},
+        {'1', KeyboardKey::KEY_1},
+        {'2', KeyboardKey::KEY_2},
+        {'3', KeyboardKey::KEY_3},
+        {'4', KeyboardKey::KEY_4},
+        {'5', KeyboardKey::KEY_5},
+        {'6', KeyboardKey::KEY_6},
+        {'7', KeyboardKey::KEY_7},
+        {'8', KeyboardKey::KEY_8},
+        {'9', KeyboardKey::KEY_9},
+    };
+
+    for (char ch : code){
+        auto iter = MAP.find(ch);
+        if (iter == MAP.end()){
+            throw_and_log<OperationFailedException>(
+                console, ErrorReport::NO_ERROR_REPORT,
+                "Invalid code character."
+            );
+        }
+        context->issue_key(&context, delay, hold, cool, iter->second);
+    }
+
+    if (include_plus){
+        context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
+        context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
+        context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
+    }
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 struct NumberEntryPosition{
     uint8_t row;
     uint8_t col;
