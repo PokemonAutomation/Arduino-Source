@@ -698,13 +698,6 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
-    Source/Controllers/HidControllers/HID_Keyboard.cpp
-    Source/Controllers/HidControllers/HID_Keyboard.h
-    Source/Controllers/HidControllers/HID_Keyboard_ControllerButtons.h
-    Source/Controllers/HidControllers/HID_Keyboard_SerialPABotBase.cpp
-    Source/Controllers/HidControllers/HID_Keyboard_SerialPABotBase.h
-    Source/Controllers/HidControllers/HID_KeyboardWithScheduler.cpp
-    Source/Controllers/HidControllers/HID_KeyboardWithScheduler.h
     Source/Controllers/JoystickTools.h
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
@@ -733,6 +726,13 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h
+    Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
+    Source/Controllers/StandardHid/StandardHid_Keyboard.h
+    Source/Controllers/StandardHid/StandardHid_Keyboard_ControllerButtons.h
+    Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.cpp
+    Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
+    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
+    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp

@@ -8,7 +8,7 @@
 #include "CommonTools/Async/InterruptableCommands.tpp"
 #include "CommonTools/Async/SuperControlSession.tpp"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
-#include "HID_Keyboard.h"
+#include "StandardHid_Keyboard.h"
 
 //#include <iostream>
 //using std::cout;
@@ -17,10 +17,10 @@
 namespace PokemonAutomation{
 
 //  Instantiate some template helper classes.
-template class AsyncCommandSession<HidControllers::Keyboard>;
-template class SuperControlSession<HidControllers::Keyboard>;
+template class AsyncCommandSession<StandardHid::Keyboard>;
+template class SuperControlSession<StandardHid::Keyboard>;
 
-namespace HidControllers{
+namespace StandardHid{
 
 using namespace std::chrono_literals;
 

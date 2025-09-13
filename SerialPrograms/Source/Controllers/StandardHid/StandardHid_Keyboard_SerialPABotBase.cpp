@@ -7,14 +7,14 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h"
-#include "HID_Keyboard_SerialPABotBase.h"
+#include "StandardHid_Keyboard_SerialPABotBase.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
 
 namespace PokemonAutomation{
-namespace HidControllers{
+namespace StandardHid{
 
 using namespace std::chrono_literals;
 

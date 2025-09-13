@@ -4,10 +4,10 @@
  *
  */
 
-#include "HID_KeyboardWithScheduler.h"
+#include "StandardHid_KeyboardWithScheduler.h"
 
 namespace PokemonAutomation{
-namespace HidControllers{
+namespace StandardHid{
 
 
 

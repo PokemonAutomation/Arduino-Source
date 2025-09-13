@@ -4,14 +4,14 @@
  *
  */
 
-#ifndef PokemonAutomation_HID_Keyboard_ControllerButtons_H
-#define PokemonAutomation_HID_Keyboard_ControllerButtons_H
+#ifndef PokemonAutomation_StandardHid_Keyboard_ControllerButtons_H
+#define PokemonAutomation_StandardHid_Keyboard_ControllerButtons_H
 
 #include <stdint.h>
 
 
 namespace PokemonAutomation{
-namespace HidControllers{
+namespace StandardHid{
 
 
 #if 0

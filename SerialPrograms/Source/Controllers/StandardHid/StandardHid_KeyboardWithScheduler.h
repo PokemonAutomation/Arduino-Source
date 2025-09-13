@@ -7,17 +7,16 @@
  *
  */
 
-#ifndef PokemonAutomation_HID_KeyboardWithScheduler_H
-#define PokemonAutomation_HID_KeyboardWithScheduler_H
+#ifndef PokemonAutomation_StandardHid_KeyboardWithScheduler_H
+#define PokemonAutomation_StandardHid_KeyboardWithScheduler_H
 
-#include <vector>
 #include <set>
 #include "Common/Cpp/CancellableScope.h"
 #include "Controllers/Schedulers/ControllerWithScheduler.h"
-#include "HID_Keyboard_ControllerButtons.h"
+#include "StandardHid_Keyboard_ControllerButtons.h"
 
 namespace PokemonAutomation{
-namespace HidControllers{
+namespace StandardHid{
 
 
 

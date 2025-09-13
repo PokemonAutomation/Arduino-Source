@@ -30,9 +30,9 @@ void keyboard_enter_code(
     KeyboardLayout keyboard_layout, const std::string& code,
     bool include_plus
 ){
-    auto* keyboard = context->cast<HidControllers::Keyboard>();
+    auto* keyboard = context->cast<StandardHid::Keyboard>();
     if (keyboard){
-        HidControllers::KeyboardContext subcontext(context);
+        StandardHid::KeyboardContext subcontext(context);
         keyboard_enter_code(console, subcontext, code, include_plus);
         return;
     }
@@ -54,11 +54,11 @@ void keyboard_enter_code(
 
 
 void keyboard_enter_code(
-    ConsoleHandle& console, HidControllers::KeyboardContext& context,
+    ConsoleHandle& console, StandardHid::KeyboardContext& context,
     const std::string& code,
     bool include_plus
 ){
-    using namespace HidControllers;
+    using namespace StandardHid;
 
     Milliseconds delay = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.TIME_UNIT;
     Milliseconds hold = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.HOLD;

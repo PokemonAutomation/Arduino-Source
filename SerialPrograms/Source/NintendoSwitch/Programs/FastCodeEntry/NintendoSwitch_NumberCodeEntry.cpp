@@ -29,9 +29,9 @@ void numberpad_enter_code(
     const std::string& code,
     bool include_plus
 ){
-    auto* keyboard = dynamic_cast<HidControllers::Keyboard*>(&context.controller());
+    auto* keyboard = dynamic_cast<StandardHid::Keyboard*>(&context.controller());
     if (keyboard){
-        HidControllers::KeyboardContext subcontext(context);
+        StandardHid::KeyboardContext subcontext(context);
         numberpad_enter_code(console, subcontext, code, include_plus);
         return;
     }
@@ -53,11 +53,11 @@ void numberpad_enter_code(
 
 
 void numberpad_enter_code(
-    ConsoleHandle& console, HidControllers::KeyboardContext& context,
+    ConsoleHandle& console, StandardHid::KeyboardContext& context,
     const std::string& code,
     bool include_plus
 ){
-    using namespace HidControllers;
+    using namespace StandardHid;
 
     Milliseconds delay = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.TIME_UNIT;
     Milliseconds hold = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.HOLD;

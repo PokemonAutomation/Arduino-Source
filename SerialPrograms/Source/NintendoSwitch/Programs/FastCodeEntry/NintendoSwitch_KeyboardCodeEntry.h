@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_KeyboardCodeEntry_H
 
 #include <string>
-#include "Controllers/HidControllers/HID_Keyboard.h"
+#include "Controllers/StandardHid/StandardHid_Keyboard.h"
 #include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
@@ -28,7 +28,7 @@ void keyboard_enter_code(
 );
 
 void keyboard_enter_code(
-    ConsoleHandle& console, HidControllers::KeyboardContext& context,
+    ConsoleHandle& console, StandardHid::KeyboardContext& context,
     const std::string& code,
     bool include_plus
 );

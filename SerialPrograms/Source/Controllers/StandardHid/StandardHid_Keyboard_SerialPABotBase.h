@@ -4,17 +4,17 @@
  *
  */
 
-#ifndef PokemonAutomation_HID_Keyboard_SerialPABotBase_H
-#define PokemonAutomation_HID_Keyboard_SerialPABotBase_H
+#ifndef PokemonAutomation_StandardHid_Keyboard_SerialPABotBase_H
+#define PokemonAutomation_StandardHid_Keyboard_SerialPABotBase_H
 
 #include "ClientSource/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
-#include "HID_Keyboard.h"
-#include "HID_KeyboardWithScheduler.h"
+#include "StandardHid_Keyboard.h"
+#include "StandardHid_KeyboardWithScheduler.h"
 
 namespace PokemonAutomation{
-namespace HidControllers{
+namespace StandardHid{
 
 
 

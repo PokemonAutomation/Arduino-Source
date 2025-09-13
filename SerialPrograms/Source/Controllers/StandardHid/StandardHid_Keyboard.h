@@ -6,16 +6,16 @@
  *
  */
 
-#ifndef PokemonAutomation_HID_Keyboard_H
-#define PokemonAutomation_HID_Keyboard_H
+#ifndef PokemonAutomation_StandardHid_Keyboard_H
+#define PokemonAutomation_StandardHid_Keyboard_H
 
 #include <set>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Controllers/Controller.h"
-#include "HID_Keyboard_ControllerButtons.h"
+#include "StandardHid_Keyboard_ControllerButtons.h"
 
 namespace PokemonAutomation{
-namespace HidControllers{
+namespace StandardHid{
 
 
 class Keyboard;
