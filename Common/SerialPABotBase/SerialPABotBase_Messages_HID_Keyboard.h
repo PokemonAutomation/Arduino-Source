@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_SerialPABotBase_Messages_HID_Keyboard_H
 #define PokemonAutomation_SerialPABotBase_Messages_HID_Keyboard_H
 
-#include "../ControllerStates/HID_Keyboard_State.h"
+#include "../ControllerStates/StandardHid_Keyboard_State.h"
 #include "SerialPABotBase_Protocol.h"
 
 #if _WIN32
