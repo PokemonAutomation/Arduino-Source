@@ -14,9 +14,7 @@
 
 namespace PokemonAutomation{
 
-namespace NintendoSwitch{
-    class ProControllerState;  // forward declaration to avoid circular dependency
-}
+class ControllerState;  // forward declaration to avoid circular dependency
 
 class KeyboardEventHandler{
 public:
@@ -24,7 +22,7 @@ public:
     virtual ~KeyboardEventHandler();
 
      struct KeyboardListener{
-        virtual void on_keyboard_command_sent(const NintendoSwitch::ProControllerState& state){}
+        virtual void on_keyboard_command_sent(const ControllerState& state){}
         virtual void on_keyboard_command_stopped(){}
     };
     void add_listener(KeyboardListener& listener);
@@ -33,7 +31,7 @@ public:
 protected:
     //  Report that the keyboard state has changed. This will be pushed to
     //  all listeners.
-    void report_keyboard_command_sent(const NintendoSwitch::ProControllerState& state);
+    void report_keyboard_command_sent(const ControllerState& state);
 
     void report_keyboard_command_stopped();
 

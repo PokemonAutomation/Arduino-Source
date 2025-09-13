@@ -3,6 +3,7 @@
  */
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "KeyboardEventHandler.h"
 
 namespace PokemonAutomation{
@@ -30,7 +31,7 @@ void KeyboardEventHandler::remove_listener(KeyboardListener& listener){
     data.m_listeners.remove(listener);
 }
 
-void KeyboardEventHandler::report_keyboard_command_sent(const NintendoSwitch::ProControllerState& state){
+void KeyboardEventHandler::report_keyboard_command_sent(const ControllerState& state){
     auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
     data.m_listeners.run_method_unique(&KeyboardListener::on_keyboard_command_sent, state);
