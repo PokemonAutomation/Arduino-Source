@@ -61,7 +61,10 @@ SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
         box.warning(
             nullptr,
             "Deprecation Notice",
-            "This program is deprecated and no longer maintained. Please consider using a newer alternative."
+            QString::fromStdString(
+                "The program \"" + descriptor.display_name() + "\" is deprecated "
+                "and no longer maintained. Please consider using a newer alternative."
+            )
         );
     }
 
