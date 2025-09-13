@@ -63,6 +63,8 @@ CollapsibleGroupBox* make_panel_header(
     std::string text;
     switch (color_class){
     case ProgramControllerClass::StandardController_NoRestrictions:
+        return header;
+
     case ProgramControllerClass::StandardController_PerformanceClassSensitive:
         text = html_color_text(
             "(This program is sensitive to the performance of the controller. "
@@ -70,16 +72,20 @@ CollapsibleGroupBox* make_panel_header(
             "And wireless is better than tick-imprecise controller.)",
             COLOR_DARKGREEN
         );
-            break;
+        break;
+
     case ProgramControllerClass::StandardController_RequiresPrecision:
         text = html_color_text("(This program requires a tick-precise controller.)", COLOR_PURPLE);
         break;
+
     case ProgramControllerClass::StandardController_WithRestrictions:
         text = html_color_text("(This program may require a specific controller in a specific environment.)", COLOR_RED);
         break;
+
     case ProgramControllerClass::SpecializedController:
         text = html_color_text("(This program requires a specific type of controller.)", COLOR_MAGENTA);
         break;
+
     }
 
     QLabel* label = new QLabel(QString::fromStdString(text), header);

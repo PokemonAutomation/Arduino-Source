@@ -27,23 +27,35 @@ bool connect_to_internet_with_inference(
     //  Enter Y-COMM.
     bool ok = true;
 //    cout << "Waiting for Y-COMM to open..." << endl;
-    {
+    for (size_t attempts = 0;;){
         YCommMenuDetector detector(true);
-        if (!detector.detect(stream.video().snapshot())){
-            pbf_press_button(context, BUTTON_Y, 10, TICKS_PER_SECOND);
-            context.wait_for_all_requests();
+        if (detector.detect(stream.video().snapshot())){
+            stream.log("Y-COMM detected.");
+            break;
         }
-        int result = wait_until(
+
+        int result = run_until<ProControllerContext>(
             stream, context,
-            std::chrono::seconds(10),
-            {{detector}}
+            [](ProControllerContext& context){
+                pbf_press_button(context, BUTTON_Y, 200ms, 4800ms);
+            },
+            {detector}
         );
         if (result == 0){
             stream.log("Y-COMM detected.");
-        }else{
-            stream.log("Failed to detect Y-COMM after timeout.", COLOR_RED);
-            dump_image(stream.logger(), info, "connect_to_internet_with_inference", stream.video().snapshot());
+            break;
+        }
+        stream.log("Failed to detect Y-COMM.", COLOR_RED);
+
+        attempts++;
+        if (attempts >= 9){
+            dump_image(
+                stream.logger(), info,
+                "connect_to_internet_with_inference",
+                stream.video().snapshot()
+            );
             ok = false;
+            break;
         }
     }
 
