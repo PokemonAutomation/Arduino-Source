@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_HID_Keyboard_H
 #define PokemonAutomation_HID_Keyboard_H
 
-#include <vector>
+#include <set>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Controllers/Controller.h"
 #include "HID_Keyboard_ControllerButtons.h"
@@ -55,21 +55,21 @@ public:
     virtual void issue_keys(
         const Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        const std::vector<KeyboardKey>& keys
+        const std::set<KeyboardKey>& keys
     ) = 0;
 
 
 public:
     //  Keyboard Input
 
-//    virtual void keyboard_release_all() override;
-//    virtual void keyboard_press(const QKeyEvent& event) override;
-//    virtual void keyboard_release(const QKeyEvent& event) override;
+    virtual void keyboard_release_all() override;
+    virtual void keyboard_press(const QKeyEvent& event) override;
+    virtual void keyboard_release(const QKeyEvent& event) override;
 
 
 private:
-//    class KeyboardManager;
-//    Pimpl<KeyboardManager> m_keyboard_manager;
+    class KeyboardManager;
+    Pimpl<KeyboardManager> m_keyboard_manager;
 };
 
 

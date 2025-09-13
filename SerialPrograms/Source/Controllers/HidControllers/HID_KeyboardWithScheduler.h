@@ -30,6 +30,9 @@ public:
     KeyboardCommand(KeyboardKey key)
         : SchedulerResource((size_t)key)
     {}
+    KeyboardKey key() const{
+        return (KeyboardKey)id;
+    }
 };
 
 
@@ -50,7 +53,7 @@ public:
     void issue_keys(
         const Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        const std::vector<KeyboardKey>& keys
+        const std::set<KeyboardKey>& keys
     );
 };
 

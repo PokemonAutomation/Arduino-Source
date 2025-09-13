@@ -90,7 +90,7 @@ public:
     virtual void issue_keys(
         const Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        const std::vector<KeyboardKey>& keys
+        const std::set<KeyboardKey>& keys
     ) override{
         KeyboardControllerWithScheduler::issue_keys(cancellable, delay, hold, cooldown, keys);
     }
@@ -130,6 +130,8 @@ protected:
 
     mutable SpinLock m_error_lock;
     std::string m_error_string;
+
+    std::multimap<WallClock, KeyboardKey> m_last_state;
 
     std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
 };

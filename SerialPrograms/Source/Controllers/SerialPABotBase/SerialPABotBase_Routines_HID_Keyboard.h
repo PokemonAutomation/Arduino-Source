@@ -19,7 +19,7 @@ public:
     pabb_Message_Command_HID_Keyboard_State params;
     DeviceRequest_HID_Keyboard_StateMs(
         uint16_t milliseconds,
-        uint64_t report
+        const pabb_HID_Keyboard_State& report
     )
         : BotBaseRequest(true)
     {
@@ -27,7 +27,7 @@ public:
 
         params.seqnum = 0;
         params.milliseconds = milliseconds;
-        memcpy(&params.report, &report, sizeof(params.report));
+        params.report = report;
     }
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_COMMAND_HID_KEYBOARD_STATE, params);

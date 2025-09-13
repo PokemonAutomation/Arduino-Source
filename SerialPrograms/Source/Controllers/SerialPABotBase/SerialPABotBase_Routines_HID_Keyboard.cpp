@@ -29,12 +29,12 @@ int register_message_converters_HID_Keyboard(){
             ss << "seqnum = " << (uint64_t)params->seqnum;
 
             ss << std::hex;
-            ss << ", 0x" << params->report.key0;
-            ss << ", 0x" << params->report.key1;
-            ss << ", 0x" << params->report.key2;
-            ss << ", 0x" << params->report.key3;
-            ss << ", 0x" << params->report.key4;
-            ss << ", 0x" << params->report.key5;
+            ss << ", 0x" << params->report.key[0];
+            ss << ", 0x" << params->report.key[1];
+            ss << ", 0x" << params->report.key[2];
+            ss << ", 0x" << params->report.key[3];
+            ss << ", 0x" << params->report.key[4];
+            ss << ", 0x" << params->report.key[5];
 
             ss << std::dec;
             ss << ", milliseconds = " << params->milliseconds;

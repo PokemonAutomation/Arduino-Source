@@ -173,8 +173,8 @@ enum KeyboardKey : uint8_t{
     KEY_COPY        =   0x7c,
     KEY_PASTE       =   0x7d,
     KEY_FIND        =   0x7e,
-    KEY_MUTE        =   0x7f,
 
+    KEY_VOLUME_MUTE =   0x7f,
     KEY_VOLUME_UP   =   0x80,
     KEY_VOLUME_DOWN =   0x81,
 

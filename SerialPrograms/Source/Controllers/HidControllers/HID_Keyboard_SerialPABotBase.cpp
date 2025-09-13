@@ -6,10 +6,17 @@
 
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h"
 #include "HID_Keyboard_SerialPABotBase.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace HidControllers{
+
+using namespace std::chrono_literals;
 
 
 
@@ -102,8 +109,97 @@ void SerialPABotBase_Keyboard::execute_state(
     const Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
-    //  TODO
-    m_logger.log("SerialPABotBase_Keyboard::execute_state() - Not implemented yet.", COLOR_RED);
+    std::set<KeyboardKey> state;
+    for (const auto& item : entry.state){
+        KeyboardKey key = static_cast<const KeyboardCommand&>(*item).key();
+//        cout << (int)key << endl;
+        state.insert(key);
+    }
+
+    //  Last State: Remove keys that are no longer pressed.
+    //  Current State: Remove keys that were already pressed.
+    for (auto iterL = m_last_state.begin(); iterL != m_last_state.end();){
+        auto iterS = state.find(iterL->second);
+        if (iterS == state.end()){
+            iterL = m_last_state.erase(iterL);
+        }else{
+            state.erase(iterS);
+            ++iterL;
+        }
+    }
+
+    //  Add the new keys to the state.
+    for (KeyboardKey key : state){
+        m_last_state.emplace(current_time(), key);
+    }
+
+    //  Get a searchable set of all currently pressed keys.
+    state.clear();
+    for (const auto& item : m_last_state){
+        state.insert(item.second);
+    }
+
+    //  Add the modifier keys.
+    pabb_HID_Keyboard_State report = {};
+    if (state.contains(KeyboardKey::KEY_LEFT_CTRL)){
+        state.erase(KeyboardKey::KEY_LEFT_CTRL);
+        report.modifiers |= 1 << 0;
+    }
+    if (state.contains(KeyboardKey::KEY_LEFT_SHIFT)){
+        state.erase(KeyboardKey::KEY_LEFT_SHIFT);
+        report.modifiers |= 1 << 1;
+    }
+    if (state.contains(KeyboardKey::KEY_LEFT_ALT)){
+        state.erase(KeyboardKey::KEY_LEFT_ALT);
+        report.modifiers |= 1 << 2;
+    }
+    if (state.contains(KeyboardKey::KEY_LEFT_META)){
+        state.erase(KeyboardKey::KEY_LEFT_CTRL);
+        report.modifiers |= 1 << 3;
+    }
+    if (state.contains(KeyboardKey::KEY_RIGHT_CTRL)){
+        state.erase(KeyboardKey::KEY_RIGHT_CTRL);
+        report.modifiers |= 1 << 4;
+    }
+    if (state.contains(KeyboardKey::KEY_RIGHT_SHIFT)){
+        state.erase(KeyboardKey::KEY_RIGHT_SHIFT);
+        report.modifiers |= 1 << 5;
+    }
+    if (state.contains(KeyboardKey::KEY_RIGHT_ALT)){
+        state.erase(KeyboardKey::KEY_RIGHT_ALT);
+        report.modifiers |= 1 << 6;
+    }
+    if (state.contains(KeyboardKey::KEY_RIGHT_META)){
+        state.erase(KeyboardKey::KEY_RIGHT_META);
+        report.modifiers |= 1 << 7;
+    }
+
+//    cout << "modifiers = " << (int)report.modifiers << endl;
+
+    //  Add the remaining keys.
+    auto iter = state.begin();
+    for (size_t c = 0; c < 6; c++){
+        if (iter == state.end()){
+            break;
+        }
+        report.key[c] = *iter;
+    }
+
+    //  Divide the controller state into smaller chunks that fit into the report
+    //  duration.
+    Milliseconds time_left = std::chrono::duration_cast<Milliseconds>(entry.duration);
+
+    while (time_left > Milliseconds::zero()){
+        Milliseconds current = std::min(time_left, 65535ms);
+        m_serial->issue_request(
+            SerialPABotBase::DeviceRequest_HID_Keyboard_StateMs(
+                (uint16_t)current.count(),
+                report
+            ),
+            cancellable
+        );
+        time_left -= current;
+    }
 }
 
 

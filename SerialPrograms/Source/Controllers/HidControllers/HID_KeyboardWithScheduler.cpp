@@ -41,7 +41,7 @@ void KeyboardControllerWithScheduler::issue_key(
 void KeyboardControllerWithScheduler::issue_keys(
     const Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-    const std::vector<KeyboardKey>& keys
+    const std::set<KeyboardKey>& keys
 ){
     SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);

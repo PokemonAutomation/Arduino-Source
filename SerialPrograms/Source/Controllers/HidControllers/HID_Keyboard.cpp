@@ -5,11 +5,14 @@
  */
 
 #include "Common/Cpp/Containers/Pimpl.tpp"
-#include "Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h"
 #include "CommonTools/Async/InterruptableCommands.tpp"
 #include "CommonTools/Async/SuperControlSession.tpp"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "HID_Keyboard.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -25,50 +28,179 @@ using namespace std::chrono_literals;
 const char Keyboard::NAME[] = "HID: Keyboard";
 
 
-#if 0
 
-const std::map<Qt::Key, uint8_t>& KEYID_TO_HID_KEY(){
-    static const std::map<Qt::Key, uint8_t> database{
-        {Qt::Key::Key_A, 0x04},
-        {Qt::Key::Key_B, 0x05},
-        {Qt::Key::Key_C, 0x06},
-        {Qt::Key::Key_D, 0x07},
-        {Qt::Key::Key_E, 0x08},
-        {Qt::Key::Key_F, 0x09},
-        {Qt::Key::Key_G, 0x0a},
-        {Qt::Key::Key_H, 0x0b},
-        {Qt::Key::Key_I, 0x0c},
-        {Qt::Key::Key_J, 0x0d},
-        {Qt::Key::Key_K, 0x0e},
-        {Qt::Key::Key_L, 0x0f},
-        {Qt::Key::Key_M, 0x10},
-        {Qt::Key::Key_N, 0x11},
-        {Qt::Key::Key_O, 0x12},
-        {Qt::Key::Key_P, 0x13},
-        {Qt::Key::Key_Q, 0x14},
-        {Qt::Key::Key_R, 0x15},
-        {Qt::Key::Key_S, 0x16},
-        {Qt::Key::Key_T, 0x17},
-        {Qt::Key::Key_U, 0x18},
-        {Qt::Key::Key_V, 0x19},
-        {Qt::Key::Key_W, 0x1a},
-        {Qt::Key::Key_X, 0x1b},
-        {Qt::Key::Key_Y, 0x1c},
-        {Qt::Key::Key_Z, 0x1d},
 
-        {Qt::Key::Key_1,        0x1e},
-        {Qt::Key::Key_2,        0x1f},
-        {Qt::Key::Key_3,        0x20},
-        {Qt::Key::Key_4,        0x21},
-        {Qt::Key::Key_5,        0x22},
-        {Qt::Key::Key_6,        0x23},
-        {Qt::Key::Key_7,        0x24},
-        {Qt::Key::Key_8,        0x25},
-        {Qt::Key::Key_9,        0x26},
-        {Qt::Key::Key_0,        0x27},
+class KeyboardState : public ControllerState{
+public:
+    virtual void clear() override{
+        keys.clear();
+    }
+    virtual bool operator==(const ControllerState& x) const override{
+        if (typeid(*this) != typeid(x)){
+            return false;
+        }
 
-        {Qt::Key::Key_Exclam,   0x1e},
-        {Qt::Key::Key_At,       0x1f},
+        const KeyboardState& r = static_cast<const KeyboardState&>(x);
+        if (keys.size() != r.keys.size()){
+            return false;
+        }
+
+        auto iter0 = keys.begin();
+        auto iter1 = r.keys.begin();
+        for (; iter0 != keys.end(); ++iter0, ++iter1){
+            if (*iter0 != *iter1){
+                return false;
+            }
+        }
+
+        return true;
+    }
+    virtual bool is_neutral() const override{
+        return keys.empty();
+    }
+
+public:
+    std::set<KeyboardKey> keys;
+};
+
+
+
+
+
+const std::map<Qt::Key, KeyboardKey>& KEYID_TO_HID_KEY(){
+    static const std::map<Qt::Key, KeyboardKey> database{
+        {Qt::Key::Key_A,    KeyboardKey::KEY_A},
+        {Qt::Key::Key_B,    KeyboardKey::KEY_B},
+        {Qt::Key::Key_C,    KeyboardKey::KEY_C},
+        {Qt::Key::Key_D,    KeyboardKey::KEY_D},
+        {Qt::Key::Key_E,    KeyboardKey::KEY_E},
+        {Qt::Key::Key_F,    KeyboardKey::KEY_F},
+        {Qt::Key::Key_G,    KeyboardKey::KEY_G},
+        {Qt::Key::Key_H,    KeyboardKey::KEY_H},
+        {Qt::Key::Key_I,    KeyboardKey::KEY_I},
+        {Qt::Key::Key_J,    KeyboardKey::KEY_J},
+        {Qt::Key::Key_K,    KeyboardKey::KEY_K},
+        {Qt::Key::Key_L,    KeyboardKey::KEY_L},
+        {Qt::Key::Key_M,    KeyboardKey::KEY_M},
+        {Qt::Key::Key_N,    KeyboardKey::KEY_N},
+        {Qt::Key::Key_O,    KeyboardKey::KEY_O},
+        {Qt::Key::Key_P,    KeyboardKey::KEY_P},
+        {Qt::Key::Key_Q,    KeyboardKey::KEY_Q},
+        {Qt::Key::Key_R,    KeyboardKey::KEY_R},
+        {Qt::Key::Key_S,    KeyboardKey::KEY_S},
+        {Qt::Key::Key_T,    KeyboardKey::KEY_T},
+        {Qt::Key::Key_U,    KeyboardKey::KEY_U},
+        {Qt::Key::Key_V,    KeyboardKey::KEY_V},
+        {Qt::Key::Key_W,    KeyboardKey::KEY_W},
+        {Qt::Key::Key_X,    KeyboardKey::KEY_X},
+        {Qt::Key::Key_Y,    KeyboardKey::KEY_Y},
+        {Qt::Key::Key_Z,    KeyboardKey::KEY_Z},
+
+        {Qt::Key::Key_1,    KeyboardKey::KEY_1},
+        {Qt::Key::Key_2,    KeyboardKey::KEY_2},
+        {Qt::Key::Key_3,    KeyboardKey::KEY_3},
+        {Qt::Key::Key_4,    KeyboardKey::KEY_4},
+        {Qt::Key::Key_5,    KeyboardKey::KEY_5},
+        {Qt::Key::Key_6,    KeyboardKey::KEY_6},
+        {Qt::Key::Key_7,    KeyboardKey::KEY_7},
+        {Qt::Key::Key_8,    KeyboardKey::KEY_8},
+        {Qt::Key::Key_9,    KeyboardKey::KEY_9},
+        {Qt::Key::Key_0,    KeyboardKey::KEY_0},
+
+        {Qt::Key::Key_Enter,        KeyboardKey::KEY_ENTER},
+        {Qt::Key::Key_Escape,       KeyboardKey::KEY_ESC},
+        {Qt::Key::Key_Backspace,    KeyboardKey::KEY_BACKSPACE},
+        {Qt::Key::Key_Tab,          KeyboardKey::KEY_TAB},
+        {Qt::Key::Key_Space,        KeyboardKey::KEY_SPACE},
+        {Qt::Key::Key_Minus,        KeyboardKey::KEY_MINUS},
+        {Qt::Key::Key_Equal,        KeyboardKey::KEY_EQUAL},
+        {Qt::Key::Key_BraceLeft,    KeyboardKey::KEY_LEFT_BRACE},
+        {Qt::Key::Key_BracketLeft,  KeyboardKey::KEY_LEFT_BRACE},
+        {Qt::Key::Key_BraceRight,   KeyboardKey::KEY_RIGHT_BRACE},
+        {Qt::Key::Key_BracketRight, KeyboardKey::KEY_RIGHT_BRACE},
+        {Qt::Key::Key_Backslash,    KeyboardKey::KEY_BACKSLASH},
+        {Qt::Key::Key_Semicolon,    KeyboardKey::KEY_SEMICOLON},
+        {Qt::Key::Key_Apostrophe,   KeyboardKey::KEY_APOSTROPHE},
+
+        {Qt::Key::Key_AsciiTilde,   KeyboardKey::KEY_GRAVE},
+
+        {Qt::Key::Key_Comma,        KeyboardKey::KEY_COMMA},
+        {Qt::Key::Key_Period,       KeyboardKey::KEY_DOT},
+        {Qt::Key::Key_Slash,        KeyboardKey::KEY_SLASH},
+        {Qt::Key::Key_CapsLock,     KeyboardKey::KEY_CAPS_LOCK},
+
+        {Qt::Key::Key_F1,           KeyboardKey::KEY_F1},
+        {Qt::Key::Key_F2,           KeyboardKey::KEY_F2},
+        {Qt::Key::Key_F3,           KeyboardKey::KEY_F3},
+        {Qt::Key::Key_F4,           KeyboardKey::KEY_F4},
+        {Qt::Key::Key_F5,           KeyboardKey::KEY_F5},
+        {Qt::Key::Key_F6,           KeyboardKey::KEY_F6},
+        {Qt::Key::Key_F7,           KeyboardKey::KEY_F7},
+        {Qt::Key::Key_F8,           KeyboardKey::KEY_F8},
+        {Qt::Key::Key_F9,           KeyboardKey::KEY_F9},
+        {Qt::Key::Key_F10,          KeyboardKey::KEY_F10},
+        {Qt::Key::Key_F11,          KeyboardKey::KEY_F11},
+        {Qt::Key::Key_F12,          KeyboardKey::KEY_F12},
+
+        {Qt::Key::Key_Print,        KeyboardKey::KEY_PRINT_SCREEN},
+        {Qt::Key::Key_ScrollLock,   KeyboardKey::KEY_SCROLL_LOCK},
+        {Qt::Key::Key_Pause,        KeyboardKey::KEY_PAUSE},
+        {Qt::Key::Key_Insert,       KeyboardKey::KEY_INSERT},
+        {Qt::Key::Key_Home,         KeyboardKey::KEY_HOME},
+        {Qt::Key::Key_PageUp,       KeyboardKey::KEY_PAGE_UP},
+        {Qt::Key::Key_Delete,       KeyboardKey::KEY_DELETE},
+        {Qt::Key::Key_End,          KeyboardKey::KEY_END},
+        {Qt::Key::Key_PageDown,     KeyboardKey::KEY_PAGE_DOWN},
+        {Qt::Key::Key_Right,        KeyboardKey::KEY_RIGHT},
+        {Qt::Key::Key_Left,         KeyboardKey::KEY_LEFT},
+        {Qt::Key::Key_Down,         KeyboardKey::KEY_DOWN},
+        {Qt::Key::Key_Up,           KeyboardKey::KEY_UP},
+        {Qt::Key::Key_NumLock,      KeyboardKey::KEY_NUM_LOCK},
+
+//        {Qt::Key::Key_Plus,         KeyboardKey::KEY_KP_SLASH},
+        {Qt::Key::Key_Asterisk,     KeyboardKey::KEY_KP_ASTERISK},
+        {Qt::Key::Key_Plus,         KeyboardKey::KEY_KP_PLUS},
+
+        {Qt::Key::Key_F13,          KeyboardKey::KEY_F13},
+        {Qt::Key::Key_F14,          KeyboardKey::KEY_F14},
+        {Qt::Key::Key_F15,          KeyboardKey::KEY_F15},
+        {Qt::Key::Key_F16,          KeyboardKey::KEY_F16},
+        {Qt::Key::Key_F17,          KeyboardKey::KEY_F17},
+        {Qt::Key::Key_F18,          KeyboardKey::KEY_F18},
+        {Qt::Key::Key_F19,          KeyboardKey::KEY_F19},
+        {Qt::Key::Key_F20,          KeyboardKey::KEY_F20},
+        {Qt::Key::Key_F21,          KeyboardKey::KEY_F21},
+        {Qt::Key::Key_F22,          KeyboardKey::KEY_F22},
+        {Qt::Key::Key_F23,          KeyboardKey::KEY_F23},
+        {Qt::Key::Key_F24,          KeyboardKey::KEY_F24},
+
+        {Qt::Key::Key_Open,         KeyboardKey::KEY_OPEN},
+        {Qt::Key::Key_Help,         KeyboardKey::KEY_HELP},
+        {Qt::Key::Key_Menu,         KeyboardKey::KEY_MENU},
+        {Qt::Key::Key_Select,       KeyboardKey::KEY_SELECT},
+        {Qt::Key::Key_Stop,         KeyboardKey::KEY_STOP},
+//        {Qt::Key::Key_Again,        KeyboardKey::KEY_AGAIN},
+        {Qt::Key::Key_Undo,         KeyboardKey::KEY_UNDO},
+        {Qt::Key::Key_Cut,          KeyboardKey::KEY_CUT},
+        {Qt::Key::Key_Copy,         KeyboardKey::KEY_COPY},
+        {Qt::Key::Key_Paste,        KeyboardKey::KEY_PASTE},
+        {Qt::Key::Key_Find,         KeyboardKey::KEY_FIND},
+        {Qt::Key::Key_VolumeMute,   KeyboardKey::KEY_VOLUME_MUTE},
+        {Qt::Key::Key_VolumeUp,     KeyboardKey::KEY_VOLUME_UP},
+        {Qt::Key::Key_VolumeDown,   KeyboardKey::KEY_VOLUME_DOWN},
+
+        {Qt::Key::Key_Control,      KeyboardKey::KEY_LEFT_CTRL},
+        {Qt::Key::Key_Shift,        KeyboardKey::KEY_LEFT_SHIFT},
+        {Qt::Key::Key_Alt,          KeyboardKey::KEY_LEFT_ALT},
+        {Qt::Key::Key_Meta,         KeyboardKey::KEY_LEFT_META},
+
+//        {Qt::Key::Key_MediaPlay,    KeyboardKey::KEY_MEDIA_PLAYPAUSE},
+//        {Qt::Key::Key_MediaStop,    KeyboardKey::KEY_MEDIA_STOPCD},
+//        {Qt::Key::Key_MediaPrevious,KeyboardKey::KEY_MEDIA_PREVIOUS_SONG},
+//        {Qt::Key::Key_MediaNext,    KeyboardKey::KEY_MEDIA_NEXT_SONG},
+//        {Qt::Key::Key_Eject,        KeyboardKey::KEY_MEDIA_EJECTCD},
+//        {Qt::Key::Key_Eject,        KeyboardKey::KEY_MEDIA_VOLUME_UP},
+//        {Qt::Key::Key_Eject,        KeyboardKey::KEY_MEDIA_VOLUME_DOWN},
     };
     return database;
 };
@@ -76,109 +208,22 @@ const std::map<Qt::Key, uint8_t>& KEYID_TO_HID_KEY(){
 
 
 
-class KeyboardState final : public ControllerState{
-public:
-    virtual void clear() override{
-        m_pressed.clear();
-        m_order.clear();
-    }
-    virtual bool operator==(const ControllerState& x) const override{
-        if (typeid(*this) != typeid(x)){
-            return false;
-        }
-        const KeyboardState& r = static_cast<const KeyboardState&>(x);
-        if (m_pressed.size() != r.m_pressed.size()){
-            return false;
-        }
-        auto iter0 = m_pressed.begin();
-        auto iter1 = r.m_pressed.begin();
-        for (; iter0 != m_pressed.end(); ++iter0, ++iter1){
-            if (iter0->first != iter1->first){
-                return false;
-            }
-        }
-        return true;
-    }
-    virtual bool is_neutral() const override{
-        return m_pressed.empty();
-    }
 
-    auto begin(){
-        return m_pressed.begin();
-    }
-    auto end(){
-        return m_pressed.end();
-    }
-    void erase(Qt::Key key){
-        auto iter = m_pressed.find(key);
-        m_order.erase(iter->second);
-        m_pressed.erase(iter);
-    }
-    void add_key(WallClock timestamp, Qt::Key key){
-        auto ret = m_pressed.try_emplace(key);
-        if (!ret.second){
-            return;
-        }
-        try{
-            auto iter = m_order.emplace(
-                std::piecewise_construct,
-                std::forward_as_tuple(timestamp),
-                std::forward_as_tuple(key)
-            );
-            ret.first->second = iter;
-        }catch (...){
-            m_pressed.erase(ret.first);
-            throw;
-        }
-    }
 
-    uint64_t to_report() const{
-        union{
-            pabb_HID_Keyboard_State report;
-            uint64_t u64;
-        };
-        u64 = 0;
 
-        report.modifiers = 0;
-        if (m_pressed.contains(Qt::Key::Key_Control)){
-            report.modifiers |= 1;
-        }
-        if (m_pressed.contains(Qt::Key::Key_Shift)){
-            report.modifiers |= 2;
-        }
-        if (m_pressed.contains(Qt::Key::Key_Alt)){
-            report.modifiers |= 4;
-        }
-        if (m_pressed.contains(Qt::Key::Key_Meta)){
-            report.modifiers |= 8;
-        }
 
-        const std::map<Qt::Key, uint8_t>& hid_map = KEYID_TO_HID_KEY();
 
-        auto iter = m_order.begin();
-        size_t c = 0;
-        for (; c < 6 && iter != m_order.end(); c++, ++iter){
-            auto iter0 = hid_map.find(iter->second);
-            if (iter0 != hid_map.end()){
-                report.key[c++] = iter0->second;
-            }
-        }
 
-        return u64;
-    }
-
-private:
-    std::map<Qt::Key, std::multimap<WallClock, Qt::Key>::iterator> m_pressed;
-    std::multimap<WallClock, Qt::Key> m_order;
-};
 
 
 class Keyboard::KeyboardManager final : public PokemonAutomation::KeyboardInputController{
 public:
-    KeyboardManager(Logger& logger, AbstractController& controller)
+    KeyboardManager(Logger& logger, Keyboard& controller)
         : KeyboardInputController(logger, true)
         , m_controller(&controller)
-    {}
+    {
+        KeyboardInputController::start();
+    }
     void stop() noexcept{
         {
             WriteSpinLock lg(m_lock);
@@ -195,34 +240,20 @@ public:
     }
     virtual void update_state(ControllerState& state, const std::set<uint32_t>& pressed_keys) override{
         const QtKeyMap& qkey_map = QtKeyMap::instance();
-//        const std::map<Qt::Key, uint8_t>& hid_map = KEYID_TO_HID_KEY();
+        const std::map<Qt::Key, KeyboardKey>& hid_map = KEYID_TO_HID_KEY();
 
-        KeyboardState& lstate = static_cast<KeyboardState&>(state);
+        KeyboardState& local_state = static_cast<KeyboardState&>(state);
+        local_state.clear();
 
-        std::set<Qt::Key> pressed;
         for (uint32_t native_key : pressed_keys){
             std::set<Qt::Key> qkeys = qkey_map.get_QtKeys(native_key);
             for (Qt::Key qkey : qkeys){
-                pressed.insert(qkey);
-#if 0
+//                cout << "qkey = " << qkey << endl;
                 auto iter = hid_map.find(qkey);
                 if (iter != hid_map.end()){
-                    pressed.insert(iter->second);
+                    local_state.keys.insert(iter->second);
                 }
-#endif
             }
-        }
-
-        //  Remove keys that are no longer in the pressed set.
-        for (auto& item : lstate){
-            if (pressed.find(item.first) == pressed.end()){
-                lstate.erase(item.first);
-            }
-        }
-
-        WallClock now = current_time();
-        for (Qt::Key key : pressed){
-            lstate.add_key(now, key);
         }
     }
     virtual void cancel_all_commands() override{
@@ -239,55 +270,50 @@ public:
         }
         m_controller->replace_on_next_command();
     }
-
     virtual void send_state(const ControllerState& state) override{
-        const KeyboardState& lstate = static_cast<const KeyboardState&>(state);
-
+        const KeyboardState& local_state = static_cast<const KeyboardState&>(state);
         WriteSpinLock lg(m_lock);
         if (m_controller == nullptr){
             return;
         }
-
-        uint64_t report = lstate.to_report();
-        static_cast<Keyboard*>(m_controller)->issue_report(
-            nullptr, 2000ms, report
-        );
+        m_controller->issue_keys(nullptr, 2000ms, 2000ms, 0ms, local_state.keys);
     }
 
 
 protected:
     SpinLock m_lock;
-    AbstractController* m_controller;
+    Keyboard* m_controller;
 };
 
-#endif
+
+
+
+
 
 
 
 Keyboard::Keyboard(Logger& logger)
-//    : m_keyboard_manager(CONSTRUCT_TOKEN, logger, *this)
+    : m_keyboard_manager(CONSTRUCT_TOKEN, logger, *this)
 {
 
 }
 Keyboard::~Keyboard(){
-
+    stop();
 }
 void Keyboard::stop() noexcept{
-//    m_keyboard_manager->stop();
+    m_keyboard_manager->stop();
 }
 
 
-#if 0
 void Keyboard::keyboard_release_all(){
-//    m_keyboard_manager->clear_state();
+    m_keyboard_manager->clear_state();
 }
 void Keyboard::keyboard_press(const QKeyEvent& event){
-//    m_keyboard_manager->on_key_press(event);
+    m_keyboard_manager->on_key_press(event);
 }
 void Keyboard::keyboard_release(const QKeyEvent& event){
-//    m_keyboard_manager->on_key_release(event);
+    m_keyboard_manager->on_key_release(event);
 }
-#endif
 
 
 

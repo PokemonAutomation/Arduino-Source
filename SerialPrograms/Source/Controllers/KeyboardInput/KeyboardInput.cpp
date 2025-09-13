@@ -39,7 +39,9 @@ void KeyboardInputController::stop() noexcept{
         std::lock_guard<std::mutex> lg(m_sleep_lock);
         m_cv.notify_all();
     }
-    m_thread.join();
+    if (m_thread.joinable()){
+        m_thread.join();
+    }
 }
 
 void KeyboardInputController::clear_state(){
