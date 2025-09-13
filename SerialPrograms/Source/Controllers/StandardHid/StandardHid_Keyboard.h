@@ -47,6 +47,10 @@ protected:
 public:
     //  Standard Commands
 
+    //  Note that only 6 keys (not counting modifiers) can be communicated at
+    //  once over the HID protocol. If you hold down more than 6, only the first
+    //  6 chronologically will be applied.
+
     virtual void issue_key(
         const Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,

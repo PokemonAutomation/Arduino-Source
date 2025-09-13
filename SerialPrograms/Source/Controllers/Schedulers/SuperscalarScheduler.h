@@ -10,7 +10,6 @@
 #include <memory>
 #include <set>
 #include <map>
-#include <atomic>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/AbstractLogger.h"
@@ -50,13 +49,8 @@ public:
 public:
     SuperscalarScheduler(Logger& logger, WallDuration flush_threshold);
 
-
-public:
-    //  This is intended to be run on a different thread from the functions in
-    //  the next section. So it is safe to run from anywhere.
-
     void clear_on_next(){
-        m_pending_clear.store(true, std::memory_order_release);
+        m_pending_clear = true;
     }
 
 
@@ -111,7 +105,7 @@ private:
     //  much time.
     const WallDuration m_flush_threshold;
 
-    std::atomic<bool> m_pending_clear;
+    bool m_pending_clear;
 
     //  The construction time of this object. This is only used for debugging
     //  purposes since it lets you print wall times relative to this.

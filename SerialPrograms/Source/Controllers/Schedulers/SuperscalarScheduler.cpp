@@ -37,7 +37,7 @@ void SuperscalarScheduler::clear() noexcept{
     m_max_free_time = now;
     m_state_changes.clear();
     m_live_commands.clear();
-    m_pending_clear.store(false, std::memory_order_release);
+    m_pending_clear = false;
 }
 
 SuperscalarScheduler::State SuperscalarScheduler::current_live_commands(){
@@ -163,7 +163,7 @@ void SuperscalarScheduler::process_schedule(Schedule& schedule){
 }
 
 void SuperscalarScheduler::issue_wait_for_all(Schedule& schedule){
-    if (m_pending_clear.load(std::memory_order_acquire)){
+    if (m_pending_clear){
         clear();
         return;
     }
@@ -181,7 +181,7 @@ void SuperscalarScheduler::issue_nop(Schedule& schedule, WallDuration delay){
     if (delay <= WallDuration::zero()){
         return;
     }
-    if (m_pending_clear.load(std::memory_order_acquire)){
+    if (m_pending_clear){
         clear();
     }
 //    cout << "issue_nop(): " << m_state_changes.size() << endl;
@@ -197,7 +197,7 @@ void SuperscalarScheduler::issue_nop(Schedule& schedule, WallDuration delay){
     process_schedule(schedule);
 }
 void SuperscalarScheduler::issue_wait_for_resource(Schedule& schedule, size_t resource_id){
-    if (m_pending_clear.load(std::memory_order_acquire)){
+    if (m_pending_clear){
         clear();
         return;
     }
@@ -221,7 +221,7 @@ void SuperscalarScheduler::issue_to_resource(
     std::shared_ptr<const SchedulerResource> resource,
     WallDuration delay, WallDuration hold, WallDuration cooldown
 ){
-    if (m_pending_clear.load(std::memory_order_acquire)){
+    if (m_pending_clear){
         clear();
     }
 
