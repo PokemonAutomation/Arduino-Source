@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 #define PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 
-#include "Controllers/KeyboardInput/KeyboardEventHandler.h"
+#include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -22,7 +22,7 @@ public:
 
 
 
-class RecordKeyboardController : public SingleSwitchProgramInstance{ //, public KeyboardEventHandler::KeyboardListener
+class RecordKeyboardController : public SingleSwitchProgramInstance, public KeyboardEventHandler::KeyboardListener{ 
 public:
     ~RecordKeyboardController();
     RecordKeyboardController();
@@ -31,8 +31,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    // virtual void on_keyboard_command_sent(const NintendoSwitch::ProControllerState& state){} override;
-    // virtual void on_keyboard_command_stopped(){} override;
+    virtual void on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state) override;
+    virtual void on_keyboard_command_stopped(WallClock time_stamp) override;
 
     void monitor_keyboard_events(ProControllerContext& context);
     

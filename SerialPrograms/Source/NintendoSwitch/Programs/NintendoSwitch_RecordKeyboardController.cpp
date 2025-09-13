@@ -59,12 +59,12 @@ void RecordKeyboardController::monitor_keyboard_events(ProControllerContext& con
     // m_keyboard_manager->remove_listener(*this);
 
 
-// void RecordKeyboardController::on_keyboard_command_sent(const NintendoSwitch::ProControllerState& state){
-//     cout << "keyboard_command_sent" << endl;
-// }
-// void RecordKeyboardController::on_keyboard_command_stopped(){
-//     cout << "keyboard_command_stopped" << endl;
-// }
+void RecordKeyboardController::on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state){
+    cout << "keyboard_command_sent" << endl;
+}
+void RecordKeyboardController::on_keyboard_command_stopped(WallClock time_stamp){
+    cout << "keyboard_command_stopped" << endl;
+}
 
 
 
