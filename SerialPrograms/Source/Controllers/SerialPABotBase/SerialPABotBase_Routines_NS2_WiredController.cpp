@@ -8,7 +8,7 @@
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_NS2_WiredController.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
+//#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{
@@ -28,7 +28,9 @@ int register_message_converters_NS2_WiredController(){
             if (body.size() != sizeof(pabb_Message_Command_NS2_WiredController_State)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_Message_Command_NS2_WiredController_State*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", milliseconds = " << params->milliseconds;
 
+#if 0
             uint32_t buttons = params->report.buttons0;
             buttons |= (uint32_t)params->report.buttons1 << 8;
             if (params->report.dpad_byte & 0x80){
@@ -39,7 +41,8 @@ int register_message_converters_NS2_WiredController(){
 
             ss << ", LJ = (" << (int)params->report.left_joystick_x << "," << (int)params->report.left_joystick_y << ")";
             ss << ", RJ = (" << (int)params->report.right_joystick_x << "," << (int)params->report.right_joystick_y << ")";
-            ss << ", milliseconds = " << params->milliseconds;
+#endif
+
             return ss.str();
         }
     );

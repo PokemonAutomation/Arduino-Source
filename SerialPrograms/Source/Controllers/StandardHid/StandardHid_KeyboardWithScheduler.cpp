@@ -62,6 +62,8 @@ void KeyboardControllerWithScheduler::issue_keys(
     }
     execute_schedule(cancellable, schedule);
     if (m_logging_throttler){
+        //  Do not log the contents of the command due to privacy concerns.
+        //  (people entering passwords)
         m_logger.log(
             "issue_keys(): "
             "delay = " + std::to_string(delay.count()) + "ms" +

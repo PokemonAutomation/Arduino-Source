@@ -72,6 +72,10 @@ int register_message_converters_NS1_WirelessControllers(){
             const auto* params = (const pabb_Message_Command_NS1_WirelessController_Buttons*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
             ss << ", milliseconds = " << params->milliseconds;
+
+            //  Do not log the contents of the command due to privacy concerns.
+            //  (people entering passwords)
+
             return ss.str();
         }
     );
@@ -88,6 +92,10 @@ int register_message_converters_NS1_WirelessControllers(){
             const auto* params = (const pabb_Message_Command_NS1_WirelessController_FullState*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
             ss << ", milliseconds = " << params->milliseconds;
+
+            //  Do not log the contents of the command due to privacy concerns.
+            //  (people entering passwords)
+
             return ss.str();
         }
     );

@@ -218,7 +218,11 @@ class ControllerContext final : public CancellableScope{
 public:
     using ControllerType = Type;
 
+
 public:
+    virtual ~ControllerContext(){
+        detach();
+    }
     ControllerContext(ControllerType& controller)
         : m_controller(controller)
     {}
@@ -233,10 +237,9 @@ public:
     {
         attach(context);
     }
-    virtual ~ControllerContext(){
-        detach();
-    }
 
+
+public:
     ControllerType* operator->(){
         m_lifetime_sanitizer.check_usage();
         return &m_controller;
@@ -245,6 +248,8 @@ public:
     operator ControllerType&() const{ return m_controller; }
     ControllerType& controller() const{ return m_controller; }
 
+
+public:
     void wait_for_all_requests() const{
         auto scope = m_lifetime_sanitizer.check_scope();
         m_controller.wait_for_all(this);

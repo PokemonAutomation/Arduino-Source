@@ -238,6 +238,9 @@ void ControllerWithScheduler::issue_full_controller_state(
     }
     execute_schedule(cancellable, schedule);
     if (m_logging_throttler){
+        //  Do not log the contents of the command due to privacy concerns.
+        //  (people entering passwords)
+#if 0
         m_logger.log(
             "issue_controller_state(): (" + button_to_string(button) +
             "), dpad(" + dpad_to_string(position) +
@@ -246,6 +249,12 @@ void ControllerWithScheduler::issue_full_controller_state(
             "), hold = " + std::to_string(hold.count()) + "ms",
             COLOR_DARKGREEN
         );
+#else
+        m_logger.log(
+            "issue_controller_state(): hold = " + std::to_string(hold.count()) + "ms",
+            COLOR_DARKGREEN
+        );
+#endif
     }
 }
 
