@@ -205,7 +205,8 @@ public:
     virtual void keyboard_press(const QKeyEvent& event){}
     virtual void keyboard_release(const QKeyEvent& event){}
 
-    virtual void monitor_keyboard_events(KeyboardEventHandler::KeyboardListener& keyboard_listener) = 0;
+    virtual void add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) = 0;
+    virtual void remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) = 0;
 };
 
 

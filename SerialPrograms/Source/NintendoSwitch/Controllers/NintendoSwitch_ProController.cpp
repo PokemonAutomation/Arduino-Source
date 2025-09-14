@@ -110,8 +110,12 @@ void ProController::keyboard_release(const QKeyEvent& event){
     m_keyboard_manager->on_key_release(event);
 }
 
-void ProController::monitor_keyboard_events(KeyboardEventHandler::KeyboardListener& keyboard_listener){
+void ProController::add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
     m_keyboard_manager->add_listener(keyboard_listener);
+}
+
+void ProController::remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
+    m_keyboard_manager->remove_listener(keyboard_listener);
 }
 
 

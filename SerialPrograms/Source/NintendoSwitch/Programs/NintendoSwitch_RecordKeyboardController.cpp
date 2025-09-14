@@ -45,9 +45,19 @@ RecordKeyboardController::RecordKeyboardController(){
 void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     AbstractControllerContext context(scope, env.console.controller());
     // ProControllerContext context(scope, env.console.controller<ProController>());
-    context.controller().monitor_keyboard_events(*this);
-    // context->start_recording();
-    // env.console.controller()
+    context.controller().add_keyboard_listener(*this);
+
+
+    try{
+        context.wait_until_cancel();
+    }catch (ProgramCancelledException&){
+
+        // JsonObject json = context->get_keyboard_recording();
+        // json.save("recording.json");
+        context.controller().remove_keyboard_listener(*this);
+        throw;
+    }
+
     
     
 }
