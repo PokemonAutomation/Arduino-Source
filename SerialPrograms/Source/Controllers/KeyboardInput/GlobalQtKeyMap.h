@@ -19,6 +19,24 @@ namespace PokemonAutomation{
 
 class QtKeyMap{
 public:
+    struct QtKey{
+        Qt::Key key;
+        bool keypad;
+
+        QtKey(Qt::Key key, bool keypad = false)
+            : key(key)
+            , keypad(keypad)
+        {}
+
+        bool operator<(const QtKey& x) const{
+            if (keypad != x.keypad){
+                return x.keypad;
+            }
+            return key < x.key;
+        }
+    };
+
+public:
     static QtKeyMap& instance(){
         static QtKeyMap map;
         return map;
@@ -26,7 +44,7 @@ public:
 
     void record(const QKeyEvent& event);
 
-    std::set<Qt::Key> get_QtKeys(uint32_t native_key) const;
+    std::set<QtKey> get_QtKeys(uint32_t native_key) const;
 
 
 private:
@@ -36,7 +54,7 @@ private:
 private:
     mutable SpinLock m_lock;
     //  Map of native key to Qt's key ID.
-    std::map<uint32_t, std::set<Qt::Key>> m_map;
+    std::map<uint32_t, std::set<QtKey>> m_map;
 };
 
 

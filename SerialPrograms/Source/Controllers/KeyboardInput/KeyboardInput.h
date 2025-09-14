@@ -110,9 +110,9 @@ public:
         DeltaType deltas;
         const QtKeyMap& qkey_map = QtKeyMap::instance();
         for (uint32_t native_key : pressed_keys){
-            std::set<Qt::Key> qkeys = qkey_map.get_QtKeys(native_key);
-            for (Qt::Key qkey : qkeys){
-                auto iter = m_mapping.find(qkey);
+            std::set<QtKeyMap::QtKey> qkeys = qkey_map.get_QtKeys(native_key);
+            for (QtKeyMap::QtKey qkey : qkeys){
+                auto iter = m_mapping.find(qkey.key);
                 if (iter != m_mapping.end()){
                     deltas += iter->second;
                     break;

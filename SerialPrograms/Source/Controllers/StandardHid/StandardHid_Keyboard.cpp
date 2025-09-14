@@ -67,8 +67,8 @@ public:
 
 
 
-const std::map<Qt::Key, KeyboardKey>& KEYID_TO_HID_KEY(){
-    static const std::map<Qt::Key, KeyboardKey> database{
+const std::map<QtKeyMap::QtKey, KeyboardKey>& KEYID_TO_HID_KEY(){
+    static const std::map<QtKeyMap::QtKey, KeyboardKey> database{
         {Qt::Key::Key_A,    KeyboardKey::KEY_A},
         {Qt::Key::Key_B,    KeyboardKey::KEY_B},
         {Qt::Key::Key_C,    KeyboardKey::KEY_C},
@@ -157,9 +157,22 @@ const std::map<Qt::Key, KeyboardKey>& KEYID_TO_HID_KEY(){
         {Qt::Key::Key_Up,           KeyboardKey::KEY_UP},
         {Qt::Key::Key_NumLock,      KeyboardKey::KEY_NUM_LOCK},
 
-//        {Qt::Key::Key_Plus,         KeyboardKey::KEY_KP_SLASH},
-        {Qt::Key::Key_Asterisk,     KeyboardKey::KEY_KP_ASTERISK},
-        {Qt::Key::Key_Plus,         KeyboardKey::KEY_KP_PLUS},
+        {{Qt::Key::Key_Slash, true},        KeyboardKey::KEY_KP_SLASH},
+        {{Qt::Key::Key_Asterisk, true},     KeyboardKey::KEY_KP_ASTERISK},
+        {{Qt::Key::Key_Minus, true},        KeyboardKey::KEY_KP_MINUS},
+        {{Qt::Key::Key_Plus, true},         KeyboardKey::KEY_KP_PLUS},
+        {{Qt::Key::Key_Enter, true},        KeyboardKey::KEY_KP_ENTER},
+        {{Qt::Key::Key_1, true},            KeyboardKey::KEY_KP_1},
+        {{Qt::Key::Key_2, true},            KeyboardKey::KEY_KP_2},
+        {{Qt::Key::Key_3, true},            KeyboardKey::KEY_KP_3},
+        {{Qt::Key::Key_4, true},            KeyboardKey::KEY_KP_4},
+        {{Qt::Key::Key_5, true},            KeyboardKey::KEY_KP_5},
+        {{Qt::Key::Key_6, true},            KeyboardKey::KEY_KP_6},
+        {{Qt::Key::Key_7, true},            KeyboardKey::KEY_KP_7},
+        {{Qt::Key::Key_8, true},            KeyboardKey::KEY_KP_8},
+        {{Qt::Key::Key_9, true},            KeyboardKey::KEY_KP_9},
+        {{Qt::Key::Key_0, true},            KeyboardKey::KEY_KP_0},
+        {{Qt::Key::Key_Period, true},       KeyboardKey::KEY_KP_DOT},
 
         {Qt::Key::Key_F13,          KeyboardKey::KEY_F13},
         {Qt::Key::Key_F14,          KeyboardKey::KEY_F14},
@@ -240,17 +253,18 @@ public:
     }
     virtual void update_state(ControllerState& state, const std::set<uint32_t>& pressed_keys) override{
         const QtKeyMap& qkey_map = QtKeyMap::instance();
-        const std::map<Qt::Key, KeyboardKey>& hid_map = KEYID_TO_HID_KEY();
+        const std::map<QtKeyMap::QtKey, KeyboardKey>& hid_map = KEYID_TO_HID_KEY();
 
         KeyboardState& local_state = static_cast<KeyboardState&>(state);
         local_state.clear();
 
         for (uint32_t native_key : pressed_keys){
-            std::set<Qt::Key> qkeys = qkey_map.get_QtKeys(native_key);
-            for (Qt::Key qkey : qkeys){
+            std::set<QtKeyMap::QtKey> qkeys = qkey_map.get_QtKeys(native_key);
+            for (QtKeyMap::QtKey qkey : qkeys){
 //                cout << "qkey = " << qkey << endl;
                 auto iter = hid_map.find(qkey);
                 if (iter != hid_map.end()){
+//                    cout << "hid-key = " << (uint16_t)iter->second << endl;
                     local_state.keys.insert(iter->second);
                 }
             }
