@@ -77,8 +77,8 @@ file(GLOB MAIN_SOURCES
     ../Common/CRC32.h
     ../Common/Compiler.h
     ../Common/ControllerStates/HID_Keyboard_State.h
-    ../Common/ControllerStates/NintendoSwitch_WirelessController_State.h
     ../Common/ControllerStates/NintendoSwitch2_WiredController_State.h
+    ../Common/ControllerStates/NintendoSwitch_WirelessController_State.h
     ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp
     ../Common/Cpp/BitmapConversion.h
@@ -728,25 +728,25 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h
     Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
+    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
+    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_ControllerButtons.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
-    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
-    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp
     Source/Integrations/DiscordIntegrationTable.h
     Source/Integrations/DiscordSettingsOption.cpp
     Source/Integrations/DiscordSettingsOption.h
+    Source/Integrations/DiscordSocial/DiscordSocial.cpp
+    Source/Integrations/DiscordSocial/DiscordSocial.h
     Source/Integrations/DiscordWebhook.cpp
     Source/Integrations/DiscordWebhook.h
     Source/Integrations/DiscordWebhookSettings.cpp
     Source/Integrations/DiscordWebhookSettings.h
     Source/Integrations/DppIntegration/DppClient.cpp
     Source/Integrations/DppIntegration/DppClient.h
-    Source/Integrations/DiscordSocial/DiscordSocial.cpp
-    Source/Integrations/DiscordSocial/DiscordSocial.h
     Source/Integrations/DppIntegration/DppCommandHandler.cpp
     Source/Integrations/DppIntegration/DppCommandHandler.h
     Source/Integrations/DppIntegration/DppUtility.cpp
@@ -1492,6 +1492,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/General/PokemonLA_RamanasIslandCombee.h
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h
+    Source/PokemonLA/Programs/ML/PokemonLA_GeneratePokemonImageTrainingData.cpp
+    Source/PokemonLA/Programs/ML/PokemonLA_GeneratePokemonImageTrainingData.h
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp
@@ -1723,7 +1725,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h
     Source/PokemonSV/Inference/PokemonSV_WhiteTriangleDetector.cpp
-    Source/PokemonSV/Inference/PokemonSV_WhiteTriangleDetector.h    
+    Source/PokemonSV/Inference/PokemonSV_WhiteTriangleDetector.h
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.cpp
     Source/PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h
     Source/PokemonSV/Inference/Tera/PokemonSV_TeraCardDetector.cpp

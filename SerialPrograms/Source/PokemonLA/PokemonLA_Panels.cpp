@@ -45,6 +45,8 @@
 #include "Programs/TestPrograms/PokemonLA_FlagNavigationTest.h"
 #include "Programs/TestPrograms/PokemonLA_SoundListener.h"
 
+#include "Programs/ML/PokemonLA_GeneratePokemonImageTrainingData.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -99,6 +101,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<AutoMultiSpawn_Descriptor, AutoMultiSpawn>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back("---- Machine Learning ----");
+        ret.emplace_back(make_single_switch_program<GeneratePokemonImageTrainingData_Descriptor, GeneratePokemonImageTrainingData>());
+
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<MountDetectionTest_Descriptor, MountDetectionTest>());
         ret.emplace_back(make_single_switch_program<OverworldWatcher_Descriptor, OverworldWatcher>());
