@@ -63,6 +63,19 @@ bool ProControllerState::is_neutral() const{
         && right_y == 128;
 }
 
+JsonObject ProControllerState::serialize_state() const {
+    JsonObject obj;
+    obj["is_neutral"] = is_neutral();
+    obj["buttons"] = button_to_string(buttons);
+    obj["dpad"] = dpad_to_string(dpad);
+    obj["left_x"] = std::to_string(left_x);
+    obj["left_y"] = std::to_string(left_y);
+    obj["right_x"] = std::to_string(right_x);
+    obj["right_y"] = std::to_string(right_y);
+    
+    return obj;
+}
+
 
 void ProControllerDeltas::operator+=(const ProControllerDeltas& x){
     buttons |= x.buttons;
@@ -169,6 +182,15 @@ bool JoyconState::is_neutral() const{
         && joystick_y == 128;
 }
 
+JsonObject JoyconState::serialize_state() const {
+    JsonObject obj;
+    obj["is_neutral"] = is_neutral();
+    obj["buttons"] = button_to_string(buttons);
+    obj["joystick_x"] = std::to_string(joystick_x);
+    obj["joystick_y"] = std::to_string(joystick_y);
+    
+    return obj;
+}
 
 void JoyconDeltas::operator+=(const JoyconDeltas& x){
     buttons |= x.buttons;

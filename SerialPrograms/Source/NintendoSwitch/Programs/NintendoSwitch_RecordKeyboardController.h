@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 #define PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -33,6 +34,36 @@ public:
 private:
     virtual void on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state) override;
     virtual void on_keyboard_command_stopped(WallClock time_stamp) override;
+
+
+    // Examples for JsonObject controller_state:
+    // ProControllerState:
+        // {
+        //     “is_neutral”: false
+        //     "buttons": "L R",
+        //     "dpad": "none",
+        //     "left_x": 100,
+        //     "left_y": 200,
+        //     "right_x": 128,
+        //     "right_y": 128,
+        // }
+    // JoyconState
+        // {
+        //     “is_neutral”: false
+        //     "buttons": "L R",
+        //     "joystick_x": 100,
+        //     "joystick_x": 200,
+        // }
+    // Neutral controller: we know the controller is neutral, so no need for all the other button info
+        // {
+        //     “is_neutral”: true
+        // }
+    struct ControllerStateSnapshot {
+        WallClock time_stamp;
+        JsonObject controller_state;
+    };
+
+    std::vector<ControllerStateSnapshot> m_controller_history;
 
 };
 

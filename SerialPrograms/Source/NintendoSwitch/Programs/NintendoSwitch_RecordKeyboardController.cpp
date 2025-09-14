@@ -55,9 +55,24 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
 
 void RecordKeyboardController::on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state){
     cout << "keyboard_command_sent" << endl;
+    JsonObject serialized_state = state.serialize_state();
+    
+    ControllerStateSnapshot state_snapshot = {
+        time_stamp,
+        std::move(serialized_state)
+    };
+    m_controller_history.emplace_back(std::move(state_snapshot));
 }
 void RecordKeyboardController::on_keyboard_command_stopped(WallClock time_stamp){
     cout << "keyboard_command_stopped" << endl;
+    JsonObject obj;
+    obj["is_neutral"] = true;
+
+    ControllerStateSnapshot state_snapshot = {
+        time_stamp, 
+        std::move(obj)
+    };
+    m_controller_history.emplace_back(std::move(state_snapshot));
 }
 
 
