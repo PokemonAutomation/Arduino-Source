@@ -150,7 +150,7 @@ void do_egg_cycle_motion(
             stream
         );
         break;
-    case 2:
+    default:
         dump_image_and_throw_recoverable_exception(
             info, stream, "NoEggToHatch",
             "hatch_eggs_at_zero_gate(): No more egg hatch after 10 minutes."
@@ -841,3 +841,4 @@ bool check_baby_info(
 }
 }
 }
+
