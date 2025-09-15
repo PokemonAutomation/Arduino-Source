@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -23,7 +24,9 @@
 #include <dpp/misc-enum.h>
 #include <string>
 #include <functional>
+#include <ctime>
 #include <dpp/socket.h>
+#include <cstdint>
 
 namespace dpp {
 
@@ -56,6 +59,7 @@ bool close_socket(dpp::socket sfd);
  * @brief Set a socket to blocking or non-blocking IO
  *
  * @param sockfd socket to act upon
+ * @param non_blocking should socket be non-blocking?
  * @return false on error, true on success
  */
 bool set_nonblocking(dpp::socket sockfd, bool non_blocking);
@@ -69,6 +73,11 @@ bool set_nonblocking(dpp::socket sockfd, bool non_blocking);
  */
 class DPP_EXPORT ssl_client
 {
+private:
+	/**
+	 * @brief Clean up resources
+	 */
+	void cleanup();
 protected:
 	/**
 	 * @brief Input buffer received from socket
@@ -231,10 +240,10 @@ public:
 
 	/**
 	 * @brief Write to the output buffer.
-	 * @param data Data to be written to the buffer
+	 * @param data Data to be written to the buffer.
 	 * @note The data may not be written immediately and may be written at a later time to the socket.
 	 */
-	virtual void write(const std::string &data);
+	void socket_write(const std::string_view data);
 
 	/**
 	 * @brief Close socket connection
@@ -249,4 +258,4 @@ public:
 	virtual void log(dpp::loglevel severity, const std::string &msg) const;
 };
 
-};
+}
