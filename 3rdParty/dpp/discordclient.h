@@ -2,6 +2,7 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
+ * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -24,7 +25,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include <dpp/nlohmann/json_fwd.hpp>
+#include <dpp/json_fwd.h>
 #include <dpp/wsclient.h>
 #include <dpp/dispatcher.h>
 #include <dpp/event.h>
@@ -34,7 +35,7 @@
 #include <mutex>
 #include <shared_mutex>
 
-using json = nlohmann::json;
+
 
 #define DISCORD_API_VERSION	"10"
 #define API_PATH	        "/api/v" DISCORD_API_VERSION
@@ -87,6 +88,12 @@ public:
 	class discord_voice_client* voiceclient;
 
 	/**
+	 * @brief True to enable DAVE E2EE
+	 * @warning This is an EXPERIMENTAL feature!
+	 */
+	bool dave;
+
+	/**
 	 * @brief Construct a new voiceconn object
 	 */
 	voiceconn() = default;
@@ -96,8 +103,10 @@ public:
 	 * 
 	 * @param o owner
 	 * @param _channel_id voice channel id
+	 * @param enable_dave True to enable DAVE E2EE
+	 * @warn DAVE is an EXPERIMENTAL feature!
 	 */
-	voiceconn(class discord_client* o, snowflake _channel_id);
+	voiceconn(class discord_client* o, snowflake _channel_id, bool enable_dave);
 
 	/**
 	 * @brief Destroy the voiceconn object
@@ -263,6 +272,10 @@ private:
 	 */
 	void set_resume_hostname();
 
+	/**
+	 * @brief Clean up resources
+	 */
+	void cleanup();
 public:
 	/**
 	 * @brief Owning cluster
@@ -354,7 +367,7 @@ public:
 	/**
 	 * @brief List of voice channels we are connecting to keyed by guild id
 	 */
-	std::unordered_map<snowflake, voiceconn*> connecting_voice_channels;
+	std::unordered_map<snowflake, std::unique_ptr<voiceconn>> connecting_voice_channels;
 
 	/**
 	 * @brief The gateway address we reconnect to when we resume a session
@@ -449,6 +462,8 @@ public:
 	 * @param intents Privileged intents to use, a bitmask of values from dpp::intents
 	 * @param compressed True if the received data will be gzip compressed
 	 * @param ws_protocol Websocket protocol to use for the connection, JSON or ETF
+	 * 
+	 * @throws std::bad_alloc Passed up to the caller if any internal objects fail to allocate, after cleanup has completed
 	 */
 	discord_client(dpp::cluster* _cluster, uint32_t _shard_id, uint32_t _max_shards, const std::string &_token, uint32_t intents = 0, bool compressed = true, websocket_protocol_t ws_protocol = ws_json);
 
@@ -466,9 +481,10 @@ public:
 	/**
 	 * @brief Handle JSON from the websocket.
 	 * @param buffer The entire buffer content from the websocket client
+	 * @param opcode The type of frame, e.g. text or binary
 	 * @returns True if a frame has been handled
 	 */
-	virtual bool handle_frame(const std::string &buffer);
+	virtual bool handle_frame(const std::string &buffer, ws_opcode opcode);
 
 	/**
 	 * @brief Handle a websocket error.
@@ -490,12 +506,13 @@ public:
 	 * @param channel_id Channel ID of the voice channel
 	 * @param self_mute True if the bot should mute itself
 	 * @param self_deaf True if the bot should deafen itself
+	 * @param enable_dave True to enable DAVE E2EE - EXPERIMENTAL
 	 * @return reference to self
 	 * @note This is NOT a synchronous blocking call! The bot isn't instantly ready to send or listen for audio,
 	 * as we have to wait for the connection to the voice server to be established!
 	 * e.g. wait for dpp::cluster::on_voice_ready event, and then send the audio within that event.
 	 */
-	discord_client& connect_voice(snowflake guild_id, snowflake channel_id, bool self_mute = false, bool self_deaf = false);
+	discord_client& connect_voice(snowflake guild_id, snowflake channel_id, bool self_mute = false, bool self_deaf = false, bool enable_dave = false);
 
 	/**
 	 * @brief Disconnect from the connected voice channel on a guild
@@ -516,4 +533,4 @@ public:
 	voiceconn* get_voice(snowflake guild_id);
 };
 
-};
+}
