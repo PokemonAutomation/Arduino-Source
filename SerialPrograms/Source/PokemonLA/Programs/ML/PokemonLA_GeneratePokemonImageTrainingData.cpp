@@ -172,6 +172,7 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         break;
     case StartingLocation::COASTLANDS_BEACHSIDE:
         env.log("Starting at Coastlands - Beachside Camp");
+        pbf_move_left_joystick(context, 0, 35, 160, 10);
         break;
     case StartingLocation::COASTLANDS_COASTLANDS:
         env.log("Starting at Coastlands - Coastlands Camp");
