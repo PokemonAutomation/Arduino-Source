@@ -43,10 +43,14 @@ void goto_camp_from_jubilife(
 );
 
 
+// From overworld, open map, press X to open the fast travel popup menu and fast travel to
+// the first camp from the menu.
 void goto_camp_from_overworld(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context
 );
 
+// From overworld, open map, press X to open the fast travel popup menu and go to the specified
+// travel location.
 void goto_any_camp_from_overworld(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     const TravelLocation& location
