@@ -116,6 +116,8 @@ void SerialPABotBase_Keyboard::execute_state(
         state.insert(key);
     }
 
+//    cout << "last = " << m_last_state.size() << ", now = " << state.size() << endl;
+
     //  Last State: Remove keys that are no longer pressed.
     //  Current State: Remove keys that were already pressed.
     for (auto iterL = m_last_state.begin(); iterL != m_last_state.end();){

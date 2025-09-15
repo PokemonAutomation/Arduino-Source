@@ -43,7 +43,10 @@ void SuperscalarScheduler::clear() noexcept{
 SuperscalarScheduler::State SuperscalarScheduler::current_live_commands(){
     WallClock device_sent_time = m_device_sent_time;
     State ret;
+//    cout << "device_sent_time = " << std::chrono::duration_cast<Milliseconds>(device_sent_time - m_local_start).count() << endl;
     for (auto& item : m_live_commands){
+//        cout << "busy = " << std::chrono::duration_cast<Milliseconds>(item.second.busy_time - m_local_start).count()
+//             << ", done = " << std::chrono::duration_cast<Milliseconds>(item.second.done_time - m_local_start).count() << endl;
         if (item.second.busy_time <= device_sent_time && device_sent_time < item.second.done_time){
             ret.emplace_back(item.second.command);
         }
@@ -230,6 +233,7 @@ void SuperscalarScheduler::issue_to_resource(
     if (!ret.second){
 //        cout << m_device_sent_time << " : " << ret.first->second.free_time << endl;
         m_device_issue_time = std::max(m_device_issue_time, ret.first->second.free_time);
+        process_schedule(schedule);
     }
     Command& command = ret.first->second;
 
