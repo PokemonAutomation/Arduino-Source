@@ -728,11 +728,13 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h
     Source/Controllers/StandardHid/StandardHid_Keyboard.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard.h
-    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
-    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_ControllerButtons.h
+    Source/Controllers/StandardHid/StandardHid_Keyboard_KeyMappings.cpp
+    Source/Controllers/StandardHid/StandardHid_Keyboard_KeyMappings.h
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.cpp
     Source/Controllers/StandardHid/StandardHid_Keyboard_SerialPABotBase.h
+    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.cpp
+    Source/Controllers/StandardHid/StandardHid_KeyboardWithScheduler.h
     Source/Integrations/DiscordIntegrationSettings.cpp
     Source/Integrations/DiscordIntegrationSettings.h
     Source/Integrations/DiscordIntegrationTable.cpp
