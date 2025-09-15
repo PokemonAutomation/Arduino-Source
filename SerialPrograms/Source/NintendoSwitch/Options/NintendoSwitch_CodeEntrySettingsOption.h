@@ -12,16 +12,13 @@
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "NintendoSwitch/Programs/FastCodeEntry/NintendoSwitch_KeyboardEntryMappings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
 
-enum class KeyboardLayout{
-    QWERTY,
-    AZERTY
-};
 class KeyboardLayoutOption : public EnumDropdownOption<KeyboardLayout>{
 public:
     KeyboardLayoutOption();

@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch_CodeEntryTools.h"
+#include "NintendoSwitch_KeyboardEntryMappings.h"
 #include "NintendoSwitch_KeyboardCodeEntry.h"
 
 //#include <iostream>
@@ -33,7 +34,7 @@ void keyboard_enter_code(
     auto* keyboard = context->cast<StandardHid::Keyboard>();
     if (keyboard){
         StandardHid::KeyboardContext subcontext(context);
-        keyboard_enter_code(console, subcontext, code, include_plus);
+        keyboard_enter_code(console, subcontext, keyboard_layout, code, include_plus);
         return;
     }
 
@@ -55,7 +56,7 @@ void keyboard_enter_code(
 
 void keyboard_enter_code(
     ConsoleHandle& console, StandardHid::KeyboardContext& context,
-    const std::string& code,
+    KeyboardLayout keyboard_layout, const std::string& code,
     bool include_plus
 ){
     using namespace StandardHid;
@@ -64,44 +65,7 @@ void keyboard_enter_code(
     Milliseconds hold = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.HOLD;
     Milliseconds cool = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.COOLDOWN;
 
-    static const std::map<char, KeyboardKey> MAP{
-        {'1', KeyboardKey::KEY_1},
-        {'2', KeyboardKey::KEY_2},
-        {'3', KeyboardKey::KEY_3},
-        {'4', KeyboardKey::KEY_4},
-        {'5', KeyboardKey::KEY_5},
-        {'6', KeyboardKey::KEY_6},
-        {'7', KeyboardKey::KEY_7},
-        {'8', KeyboardKey::KEY_8},
-        {'9', KeyboardKey::KEY_9},
-        {'0', KeyboardKey::KEY_0},
-
-        {'Q', KeyboardKey::KEY_Q},
-        {'W', KeyboardKey::KEY_W},
-        {'E', KeyboardKey::KEY_E},
-        {'R', KeyboardKey::KEY_R},
-        {'T', KeyboardKey::KEY_T},
-        {'Y', KeyboardKey::KEY_Y},
-        {'U', KeyboardKey::KEY_U},
-        {'P', KeyboardKey::KEY_P},
-
-        {'A', KeyboardKey::KEY_A},
-        {'S', KeyboardKey::KEY_S},
-        {'D', KeyboardKey::KEY_D},
-        {'F', KeyboardKey::KEY_F},
-        {'G', KeyboardKey::KEY_G},
-        {'H', KeyboardKey::KEY_H},
-        {'J', KeyboardKey::KEY_J},
-        {'K', KeyboardKey::KEY_K},
-        {'L', KeyboardKey::KEY_L},
-
-        {'X', KeyboardKey::KEY_X},
-        {'C', KeyboardKey::KEY_C},
-        {'V', KeyboardKey::KEY_V},
-        {'B', KeyboardKey::KEY_B},
-        {'N', KeyboardKey::KEY_N},
-        {'M', KeyboardKey::KEY_M},
-    };
+    const std::map<char, KeyboardKey>& MAP = KEYBOARD_MAPPINGS(keyboard_layout);
 
     for (char ch : code){
         auto iter = MAP.find(ch);
@@ -126,102 +90,6 @@ void keyboard_enter_code(
 
 
 
-
-
-
-
-
-
-
-
-
-struct KeyboardEntryPosition{
-    uint8_t row;
-    uint8_t col;
-};
-
-static const std::map<char, KeyboardEntryPosition>& KEYBOARD_POSITIONS_QWERTY(){
-    static const std::map<char, KeyboardEntryPosition> map{
-        {'1', {0, 0}},
-        {'2', {0, 1}},
-        {'3', {0, 2}},
-        {'4', {0, 3}},
-        {'5', {0, 4}},
-        {'6', {0, 5}},
-        {'7', {0, 6}},
-        {'8', {0, 7}},
-        {'9', {0, 8}},
-        {'0', {0, 9}},
-
-        {'Q', {1, 0}},
-        {'W', {1, 1}},
-        {'E', {1, 2}},
-        {'R', {1, 3}},
-        {'T', {1, 4}},
-        {'Y', {1, 5}},
-        {'U', {1, 6}},
-        {'P', {1, 9}},
-
-        {'A', {2, 0}},
-        {'S', {2, 1}},
-        {'D', {2, 2}},
-        {'F', {2, 3}},
-        {'G', {2, 4}},
-        {'H', {2, 5}},
-        {'J', {2, 6}},
-        {'K', {2, 7}},
-        {'L', {2, 8}},
-
-        {'X', {3, 1}},
-        {'C', {3, 2}},
-        {'V', {3, 3}},
-        {'B', {3, 4}},
-        {'N', {3, 5}},
-        {'M', {3, 6}},
-    };
-    return map;
-}
-static const std::map<char, KeyboardEntryPosition>& KEYBOARD_POSITIONS_AZERTY(){
-    static const std::map<char, KeyboardEntryPosition> map{
-        {'1', {0, 0}},
-        {'2', {0, 1}},
-        {'3', {0, 2}},
-        {'4', {0, 3}},
-        {'5', {0, 4}},
-        {'6', {0, 5}},
-        {'7', {0, 6}},
-        {'8', {0, 7}},
-        {'9', {0, 8}},
-        {'0', {0, 9}},
-
-        {'A', {1, 0}},
-        {'E', {1, 2}},
-        {'R', {1, 3}},
-        {'T', {1, 4}},
-        {'Y', {1, 5}},
-        {'U', {1, 6}},
-        {'P', {1, 9}},
-
-        {'Q', {2, 0}},
-        {'S', {2, 1}},
-        {'D', {2, 2}},
-        {'F', {2, 3}},
-        {'G', {2, 4}},
-        {'H', {2, 5}},
-        {'J', {2, 6}},
-        {'K', {2, 7}},
-        {'L', {2, 8}},
-        {'M', {2, 9}},
-
-        {'W', {3, 0}},
-        {'X', {3, 1}},
-        {'C', {3, 2}},
-        {'V', {3, 3}},
-        {'B', {3, 4}},
-        {'N', {3, 5}},
-    };
-    return map;
-}
 
 
 
@@ -374,18 +242,7 @@ void keyboard_enter_code(
     bool include_plus
 ){
     //  Calculate the coordinates.
-    auto get_keyboard_layout = [](KeyboardLayout keyboard_layout){
-        switch (keyboard_layout){
-        case KeyboardLayout::QWERTY:
-            return KEYBOARD_POSITIONS_QWERTY();
-        case KeyboardLayout::AZERTY:
-            return KEYBOARD_POSITIONS_AZERTY();
-        default:
-            return KEYBOARD_POSITIONS_QWERTY();
-        }
-    };
-
-    const std::map<char, KeyboardEntryPosition>& POSITION_MAP = get_keyboard_layout(keyboard_layout);
+    const std::map<char, KeyboardEntryPosition>& POSITION_MAP = KEYBOARD_POSITIONS(keyboard_layout);
     std::vector<KeyboardEntryPosition> positions;
     for (char ch : code){
         auto iter = POSITION_MAP.find(ch);

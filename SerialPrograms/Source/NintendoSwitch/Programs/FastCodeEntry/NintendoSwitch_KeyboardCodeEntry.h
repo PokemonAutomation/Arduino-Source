@@ -29,7 +29,7 @@ void keyboard_enter_code(
 
 void keyboard_enter_code(
     ConsoleHandle& console, StandardHid::KeyboardContext& context,
-    const std::string& code,
+    KeyboardLayout keyboard_layout, const std::string& code,
     bool include_plus
 );
 void keyboard_enter_code(
