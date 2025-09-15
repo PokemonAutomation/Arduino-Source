@@ -35,11 +35,15 @@ private:
     virtual void on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state) override;
     virtual void on_keyboard_command_stopped(WallClock time_stamp) override;
 
+    // convert m_controller_history to json
+    // remove adjacent duplicate controller states.
+    JsonValue controller_history_to_json(Logger& logger);
+
 
     // Examples for JsonObject controller_state:
     // ProControllerState:
         // {
-        //     “is_neutral”: false
+        //     "is_neutral": false
         //     "buttons": "L R",
         //     "dpad": "none",
         //     "left_x": 100,
@@ -49,14 +53,14 @@ private:
         // }
     // JoyconState
         // {
-        //     “is_neutral”: false
+        //     "is_neutral": false
         //     "buttons": "L R",
         //     "joystick_x": 100,
         //     "joystick_x": 200,
         // }
     // Neutral controller: we know the controller is neutral, so no need for all the other button info
         // {
-        //     “is_neutral”: true
+        //     "is_neutral": true
         // }
     struct ControllerStateSnapshot {
         WallClock time_stamp;
