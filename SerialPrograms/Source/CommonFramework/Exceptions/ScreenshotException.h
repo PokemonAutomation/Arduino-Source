@@ -26,6 +26,8 @@ enum class ErrorReport{
 };
 
 
+//  Base class for program exception holding a screenshot.
+//
 //  Do not use this class directly. It is just to reuse the screenshot holding
 //  logic that's shared by multiple exception types.
 class ScreenshotException : public Exception{

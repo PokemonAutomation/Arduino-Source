@@ -78,22 +78,6 @@ send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 send_program_fatal_error_notification(env, NOTIFICATION_ERROR_FATAL, "Error message");
 ```
 
-## Error Handling
-
-### Standard Pattern
-```cpp
-try{
-    // Main program logic
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-}catch(ProgramFinishedException&){
-    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-    throw;
-}catch(std::exception& e){
-    send_program_fatal_error_notification(env, NOTIFICATION_ERROR_FATAL, e.what());
-    throw;
-}
-```
-
 ## Controller Input
 
 ### Button Presses
@@ -107,6 +91,45 @@ context.wait_for_all_requests();  // wait for button to finish execution
 ```cpp
 context.wait_for(std::chrono::milliseconds(1000));
 ```
+
+## Main Program Function Pattern
+
+### Simplest Program
+```cpp
+void ProgramName::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    // button presses and inference routines
+}
+```
+
+## Looping Program with Ability to Recover from Minor Error
+
+```cpp
+while(true){
+    try{
+        // Initialization logic
+
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+
+        // Main program logic
+
+        send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    }catch(ProgramFinishedException&){ // an exception indicating the program has finished
+        env.update_stats();
+        send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+        throw;
+    }catch(ScreenshotException& e){ // an exception indicating an error somewhere in the loop
+        if(...){ // if we can recover from it
+            // execute recover logic (usually is restarting the game)
+            continue;
+        }
+        // we cannot recover from the exception. Throw the exception to the higher level to
+        // trigger fatal error noticiation and cleanup.
+        throw;
+    }
+}
+```
+
 
 ## Program Registration
 
