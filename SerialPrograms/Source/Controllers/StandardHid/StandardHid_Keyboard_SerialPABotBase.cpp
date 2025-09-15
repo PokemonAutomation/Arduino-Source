@@ -183,6 +183,7 @@ void SerialPABotBase_Keyboard::execute_state(
             break;
         }
         report.key[c] = *iter;
+        ++iter;
     }
 
     //  Divide the controller state into smaller chunks that fit into the report

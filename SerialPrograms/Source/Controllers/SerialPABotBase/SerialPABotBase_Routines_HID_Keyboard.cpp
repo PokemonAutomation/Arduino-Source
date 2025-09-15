@@ -33,12 +33,12 @@ int register_message_converters_HID_Keyboard(){
             //  (people entering passwords)
 #if 0
             ss << std::hex;
-            ss << ", 0x" << params->report.key[0];
-            ss << ", 0x" << params->report.key[1];
-            ss << ", 0x" << params->report.key[2];
-            ss << ", 0x" << params->report.key[3];
-            ss << ", 0x" << params->report.key[4];
-            ss << ", 0x" << params->report.key[5];
+            ss << ", 0x" << (int)params->report.key[0];
+            ss << ", 0x" << (int)params->report.key[1];
+            ss << ", 0x" << (int)params->report.key[2];
+            ss << ", 0x" << (int)params->report.key[3];
+            ss << ", 0x" << (int)params->report.key[4];
+            ss << ", 0x" << (int)params->report.key[5];
             ss << std::dec;
 #endif
 
