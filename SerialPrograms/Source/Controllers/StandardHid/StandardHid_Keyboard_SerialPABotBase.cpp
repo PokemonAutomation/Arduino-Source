@@ -109,37 +109,14 @@ void SerialPABotBase_Keyboard::execute_state(
     const Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
-    std::set<KeyboardKey> state;
+    std::map<KeyboardKey, uint64_t> state;
     for (const auto& item : entry.state){
-        KeyboardKey key = static_cast<const KeyboardCommand&>(*item).key();
+        const KeyboardCommand& key = static_cast<const KeyboardCommand&>(*item);
 //        cout << (int)key << endl;
-        state.insert(key);
+        state.emplace(key.key(), key.seqnum());
     }
 
 //    cout << "last = " << m_last_state.size() << ", now = " << state.size() << endl;
-
-    //  Last State: Remove keys that are no longer pressed.
-    //  Current State: Remove keys that were already pressed.
-    for (auto iterL = m_last_state.begin(); iterL != m_last_state.end();){
-        auto iterS = state.find(iterL->second);
-        if (iterS == state.end()){
-            iterL = m_last_state.erase(iterL);
-        }else{
-            state.erase(iterS);
-            ++iterL;
-        }
-    }
-
-    //  Add the new keys to the state.
-    for (KeyboardKey key : state){
-        m_last_state.emplace(current_time(), key);
-    }
-
-    //  Get a searchable set of all currently pressed keys.
-    state.clear();
-    for (const auto& item : m_last_state){
-        state.insert(item.second);
-    }
 
     //  Add the modifier keys.
     pabb_HID_Keyboard_State report = {};
@@ -176,16 +153,44 @@ void SerialPABotBase_Keyboard::execute_state(
         report.modifiers |= 1 << 7;
     }
 
+    //  Last State: Remove keys that are no longer pressed.
+    //  Current State: Remove keys that were already pressed.
+    for (auto iterL = m_last_state.begin(); iterL != m_last_state.end();){
+        auto iterS = state.find(iterL->second);
+        if (iterS == state.end()){
+            iterL = m_last_state.erase(iterL);
+        }else{
+            state.erase(iterS);
+            ++iterL;
+        }
+    }
+
+    //  Add the new keys to the state.
+    for (const auto& key : state){
+        m_last_state.emplace(key.second, key.first);
+    }
+
+    //  Get a searchable set of all currently pressed keys.
+    state.clear();
+    for (const auto& item : m_last_state){
+        state.emplace(item.second, item.first);
+    }
+
 //    cout << "modifiers = " << (int)report.modifiers << endl;
 
     //  Add the remaining keys.
-    auto iter = state.begin();
+    auto iter = m_last_state.begin();
     for (size_t c = 0; c < 6; c++){
-        if (iter == state.end()){
+        if (iter == m_last_state.end()){
             break;
         }
-        report.key[c] = *iter;
+        report.key[c] = iter->second;
         ++iter;
+    }
+
+//    cout << m_last_state.size() << endl;
+    if (m_last_state.size() > 6){
+        m_logger.log("Unable to send more than 6 simultaneous keyboard presses due to HID limitation.", COLOR_RED);
     }
 
     //  Divide the controller state into smaller chunks that fit into the report

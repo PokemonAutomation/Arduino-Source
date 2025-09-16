@@ -60,6 +60,7 @@ public:
     KeyboardControllerTimingsOption();
 
 public:
+    BooleanCheckBoxOption PARLLELIZE;
     MillisecondsOption TIME_UNIT;
     MillisecondsOption HOLD;
     MillisecondsOption COOLDOWN;

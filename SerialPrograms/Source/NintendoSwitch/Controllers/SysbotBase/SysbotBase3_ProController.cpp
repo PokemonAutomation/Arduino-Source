@@ -286,9 +286,13 @@ void ProController_SysbotBase3::execute_state(
 
     m_connection.write_data(message);
 
+    //  Do not log the contents of the command due to privacy concerns.
+    //  (people entering passwords)
+#if 0
     if (GlobalSettings::instance().LOG_EVERYTHING){
         m_logger.log("sys-botbase3: " + message);
     }
+#endif
 }
 
 

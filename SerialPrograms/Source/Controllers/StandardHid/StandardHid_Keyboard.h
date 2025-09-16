@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_StandardHid_Keyboard_H
 #define PokemonAutomation_StandardHid_Keyboard_H
 
-#include <set>
+#include <vector>
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Controllers/Controller.h"
 #include "StandardHid_Keyboard_ControllerButtons.h"
@@ -59,7 +59,7 @@ public:
     virtual void issue_keys(
         const Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        const std::set<KeyboardKey>& keys
+        const std::vector<KeyboardKey>& keys
     ) = 0;
 
 

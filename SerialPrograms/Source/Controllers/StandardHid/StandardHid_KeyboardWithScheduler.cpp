@@ -23,7 +23,7 @@ void KeyboardControllerWithScheduler::issue_key(
             cancellable->throw_if_cancelled();
         }
         m_scheduler.issue_to_resource(
-            schedule, std::make_unique<KeyboardCommand>(key),
+            schedule, std::make_unique<KeyboardCommand>(key, m_seqnum++),
             delay, hold, cooldown
         );
     }
@@ -41,7 +41,7 @@ void KeyboardControllerWithScheduler::issue_key(
 void KeyboardControllerWithScheduler::issue_keys(
     const Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-    const std::set<KeyboardKey>& keys
+    const std::vector<KeyboardKey>& keys
 ){
     SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
@@ -54,7 +54,7 @@ void KeyboardControllerWithScheduler::issue_keys(
         }
         for (KeyboardKey key : keys){
             m_scheduler.issue_to_resource(
-                schedule, std::make_unique<KeyboardCommand>(key),
+                schedule, std::make_unique<KeyboardCommand>(key, m_seqnum++),
                 WallDuration::zero(), hold, cooldown
             );
         }

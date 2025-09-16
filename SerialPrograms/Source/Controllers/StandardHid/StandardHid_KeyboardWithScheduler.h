@@ -26,12 +26,19 @@ struct KeyboardControllerState{
 
 class KeyboardCommand : public SchedulerResource{
 public:
-    KeyboardCommand(KeyboardKey key)
+    KeyboardCommand(KeyboardKey key, uint64_t seqnum)
         : SchedulerResource((size_t)key)
+        , m_seqnum(seqnum)
     {}
     KeyboardKey key() const{
         return (KeyboardKey)id;
     }
+    uint64_t seqnum() const{
+        return m_seqnum;
+    }
+
+private:
+    uint64_t m_seqnum;
 };
 
 
@@ -52,8 +59,11 @@ public:
     void issue_keys(
         const Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
-        const std::set<KeyboardKey>& keys
+        const std::vector<KeyboardKey>& keys
     );
+
+private:
+    uint64_t m_seqnum = 0;
 };
 
 

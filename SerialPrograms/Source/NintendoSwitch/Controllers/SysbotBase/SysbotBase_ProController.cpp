@@ -264,9 +264,13 @@ void ProController_SysbotBase::send_diff(
 //    cout << message << endl;
     m_connection.write_data(message);
 
+    //  Do not log the contents of the command due to privacy concerns.
+    //  (people entering passwords)
+#if 0
     if (GlobalSettings::instance().LOG_EVERYTHING){
         m_logger.log("sys-botbase: " + message);
     }
+#endif
 }
 
 

@@ -134,7 +134,11 @@ public:
         if (m_controller == nullptr){
             return;
         }
-        m_controller->issue_keys(nullptr, 2000ms, 2000ms, 0ms, local_state.keys);
+        m_controller->issue_keys(
+            nullptr,
+            2000ms, 2000ms, 0ms,
+            std::vector<KeyboardKey>(local_state.keys.begin(), local_state.keys.end())
+        );
     }
 
 

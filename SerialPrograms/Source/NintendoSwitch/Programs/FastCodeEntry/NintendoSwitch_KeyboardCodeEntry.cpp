@@ -65,8 +65,13 @@ void keyboard_enter_code(
     Milliseconds hold = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.HOLD;
     Milliseconds cool = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.COOLDOWN;
 
+    Milliseconds parallel_delay = ConsoleSettings::instance().KEYBOARD_CONTROLLER_TIMINGS.PARLLELIZE
+        ? 0ms
+        : delay;
+
     const std::map<char, KeyboardKey>& MAP = KEYBOARD_MAPPINGS(keyboard_layout);
 
+    std::vector<KeyboardKey> HID_ids;
     for (char ch : code){
         auto iter = MAP.find(ch);
         if (iter == MAP.end()){
@@ -75,7 +80,17 @@ void keyboard_enter_code(
                 "Invalid code character."
             );
         }
-        context->issue_key(&context, delay, hold, cool, iter->second);
+        HID_ids.emplace_back(iter->second);
+//        context->issue_key(&context, delay, hold, cool, iter->second);
+    }
+
+    for (size_t c = 1; c < HID_ids.size(); c++){
+        KeyboardKey curr = HID_ids[c - 1];
+        KeyboardKey next = HID_ids[c];
+        context->issue_key(&context, curr < next ? parallel_delay : delay, hold, cool, curr);
+    }
+    if (!HID_ids.empty()){
+        context->issue_key(&context, parallel_delay, hold, cool, HID_ids.back());
     }
 
     if (include_plus){

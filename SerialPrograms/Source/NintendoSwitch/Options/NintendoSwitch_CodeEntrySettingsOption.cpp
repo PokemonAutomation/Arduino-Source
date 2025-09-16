@@ -75,7 +75,7 @@ DigitEntryTimingsOption::DigitEntryTimingsOption(bool switch2)
         "48 ms"
     )
     , COOLDOWN(
-        "<b>Hold:</b><br>Do not reuse a button until this long after it is reused.<br>"
+        "<b>Cooldown:</b><br>Do not reuse a button until this long after it is reused.<br>"
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
         "24 ms"
@@ -117,7 +117,7 @@ KeyboardEntryTimingsOption::KeyboardEntryTimingsOption(bool switch2)
         "48 ms"
     )
     , COOLDOWN(
-        "<b>Hold:</b><br>Do not reuse a button until this long after it is reused.<br>"
+        "<b>Cooldown:</b><br>Do not reuse a button until this long after it is reused.<br>"
         "<font color=\"red\">Controller timing variation will be added to this number.</font>",
         LockMode::UNLOCK_WHILE_RUNNING,
         "24 ms"
@@ -137,6 +137,11 @@ KeyboardControllerTimingsOption::KeyboardControllerTimingsOption()
         LockMode::UNLOCK_WHILE_RUNNING,
         GroupOption::EnableMode::ALWAYS_ENABLED, true
     )
+    , PARLLELIZE(
+        "<b>Parallel Entry:</b><br>Allow characters to be entered in parallel if possible.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        PreloadSettings::instance().DEVELOPER_MODE
+    )
     , TIME_UNIT(
         "<b>Time Unit:</b><br>Timesteps should increment in multiples of this unit.",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -145,14 +150,15 @@ KeyboardControllerTimingsOption::KeyboardControllerTimingsOption()
     , HOLD(
         "<b>Hold:</b><br>Duration to hold each key press down.",
         LockMode::UNLOCK_WHILE_RUNNING,
-        "48 ms"
+        "40 ms"
     )
     , COOLDOWN(
-        "<b>Hold:</b><br>Do not reuse a key until this long after it is reused.",
+        "<b>Cooldown:</b><br>Do not reuse a key until this long after it is reused.",
         LockMode::UNLOCK_WHILE_RUNNING,
         "24 ms"
     )
 {
+    PA_ADD_OPTION(PARLLELIZE);
     PA_ADD_OPTION(TIME_UNIT);
     PA_ADD_OPTION(HOLD);
     PA_ADD_OPTION(COOLDOWN);
