@@ -32,12 +32,17 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
+    // whenever a keyboard command is sent/stopped: 
+    // add to m_controller_history the time_stamp and the ControllerState serialized to JSON.
     virtual void on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state) override;
     virtual void on_keyboard_command_stopped(WallClock time_stamp) override;
 
     // convert m_controller_history to json
     // remove adjacent duplicate controller states.
-    JsonValue controller_history_to_json(Logger& logger);
+    JsonValue controller_history_to_json(Logger& logger, ControllerCategory controller_category);
+
+    // convert the json, with the controller history, to a string, which represents C++ code.
+    std::string json_to_cpp_code(const JsonValue& json, ControllerCategory controller_category);
 
 
     // Examples for JsonObject controller_state:

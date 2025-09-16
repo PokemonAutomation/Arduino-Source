@@ -8,6 +8,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_RecordKeyboardController.h"
+#include "Controllers/ControllerTypeStrings.h"
 
 #include <iostream>
 using std::cout;
@@ -43,31 +44,38 @@ RecordKeyboardController::RecordKeyboardController(){
 
 void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     AbstractControllerContext context(scope, env.console.controller());
-    // ProControllerContext context(scope, env.console.controller<ProController>());
     context.controller().add_keyboard_listener(*this);
-    // CONTROLLER_TYPE_STRINGS.get_string(connection.current_controller());
+    ControllerCategory controller_category = env.console.controller().controller_category();
 
     try{
         context.wait_until_cancel();
     }catch (ProgramCancelledException&){
 
-        JsonValue json = controller_history_to_json(env.console.logger());
+        JsonValue json = controller_history_to_json(env.console.logger(), controller_category);
         json.dump("recording.json");
         m_controller_history.clear();
+
+        json_to_cpp_code(json, controller_category);
+
         context.controller().remove_keyboard_listener(*this);
         throw;
     }
-
-    
-    
 }
 
-JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger){
+
+std::string RecordKeyboardController::json_to_cpp_code(const JsonValue& json, ControllerCategory controller_category){
+
+    return "";
+}
+
+JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, ControllerCategory controller_category){
     if (m_controller_history.size() < 2){
-        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "RecordKeyboardController:: m_controller_history should have at least two entries, start and stop.");
+        // throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "RecordKeyboardController:: m_controller_history should have at least two entries, start and stop.");
+        logger.log("RecordKeyboardController:: We expected m_controller_history to have at least two entries, start and stop. Aborting.", COLOR_RED);
+        return JsonValue();
     }
     
-    JsonArray json;
+    JsonArray json_array;
     ControllerStateSnapshot* prev_snapshot = &m_controller_history[0]; // the previous non-duplicate snapshot
 
     for (size_t i = 1; i < m_controller_history.size(); i++){ // start at index i = 1, since prev_snapshot starts at i=0 and we continue when current == previous.
@@ -90,12 +98,16 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger){
         // cout << prev_controller_state.dump() << endl;
         JsonObject recording = prev_controller_state.clone();
         recording["duration_in_ms"] = duration;
-        json.push_back(std::move(recording));
+        json_array.push_back(std::move(recording));
         prev_snapshot = &snapshot; // update the previous non-duplicate snapshot
     }
     
+    
+    JsonObject json_result;
+    json_result["controller_category"] = CONTROLLER_CATEGORY_STRINGS.get_string(controller_category);
+    json_result["history"] = JsonValue(std::move(json_array));
 
-    return json;
+    return json_result;
 
 }
 
