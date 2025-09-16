@@ -37,33 +37,64 @@ RecordKeyboardController::~RecordKeyboardController(){
     // m_keyboard_manager->remove_listener(*this);
 }
 
-RecordKeyboardController::RecordKeyboardController(){
+RecordKeyboardController::RecordKeyboardController() 
+    : MODE(
+        "<b>Mode:</b>",
+        {
+            {Mode::RECORD,   "record", "Record "},
+            {Mode::REPLAY,  "replay", "Replay"},
+            {Mode::CONVERT_JSON_TO_CODE,       "convert-to-code", "[For Developers] Convert json to code."},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        Mode::RECORD
+    )
+    , JSON_FILE_NAME(
+        false,
+        "Name of the JSON file to read/write.", 
+        LockMode::LOCK_WHILE_RUNNING, 
+        "recording",
+        "<name of JSON file>"
+    )
+{
+    PA_ADD_OPTION(MODE);
 }
 
 
 
 void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     AbstractControllerContext context(scope, env.console.controller());
-    context.controller().add_keyboard_listener(*this);
     ControllerCategory controller_category = env.console.controller().controller_category();
+
+    if (MODE == Mode::RECORD){
+        context.controller().add_keyboard_listener(*this);
+        
+    }else if (MODE == Mode::REPLAY){
+
+    }else if (MODE == Mode::CONVERT_JSON_TO_CODE){
+
+    }
+
 
     try{
         context.wait_until_cancel();
     }catch (ProgramCancelledException&){
 
-        JsonValue json = controller_history_to_json(env.console.logger(), controller_category);
-        json.dump("recording.json");
-        m_controller_history.clear();
+        if (MODE == Mode::RECORD){
+            JsonValue json = controller_history_to_json(env.console.logger(), controller_category);
+            json.dump(std::string(JSON_FILE_NAME) + ".json");
+            m_controller_history.clear();
 
-        json_to_cpp_code(json, controller_category);
+            json_to_cpp_code(json);
 
-        context.controller().remove_keyboard_listener(*this);
+            context.controller().remove_keyboard_listener(*this);
+        }
         throw;
     }
 }
 
 
-std::string RecordKeyboardController::json_to_cpp_code(const JsonValue& json, ControllerCategory controller_category){
+std::string RecordKeyboardController::json_to_cpp_code(const JsonValue& json){
+    // std::string controller_category = json[]
 
     return "";
 }

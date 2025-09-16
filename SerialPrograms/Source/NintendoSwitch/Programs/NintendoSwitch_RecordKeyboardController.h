@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -42,7 +43,7 @@ private:
     JsonValue controller_history_to_json(Logger& logger, ControllerCategory controller_category);
 
     // convert the json, with the controller history, to a string, which represents C++ code.
-    std::string json_to_cpp_code(const JsonValue& json, ControllerCategory controller_category);
+    std::string json_to_cpp_code(const JsonValue& json);
 
 
     // Examples for JsonObject controller_state:
@@ -72,7 +73,17 @@ private:
         JsonObject controller_state;
     };
 
+private:
+    enum class Mode{
+        RECORD,
+        REPLAY,
+        CONVERT_JSON_TO_CODE,
+    };
+    EnumDropdownOption<Mode> MODE;
+    StringOption JSON_FILE_NAME;
+
     std::vector<ControllerStateSnapshot> m_controller_history;
+    
 
 };
 
