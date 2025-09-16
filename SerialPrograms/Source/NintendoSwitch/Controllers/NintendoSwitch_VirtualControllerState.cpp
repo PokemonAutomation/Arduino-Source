@@ -68,10 +68,10 @@ JsonObject ProControllerState::serialize_state() const {
     obj["is_neutral"] = is_neutral();
     obj["buttons"] = button_to_string(buttons);
     obj["dpad"] = dpad_to_string(dpad);
-    obj["left_x"] = std::to_string(left_x);
-    obj["left_y"] = std::to_string(left_y);
-    obj["right_x"] = std::to_string(right_x);
-    obj["right_y"] = std::to_string(right_y);
+    obj["left_x"] = left_x;
+    obj["left_y"] = left_y;
+    obj["right_x"] = right_x;
+    obj["right_y"] = right_y;
     
     return obj;
 }
@@ -186,8 +186,8 @@ JsonObject JoyconState::serialize_state() const {
     JsonObject obj;
     obj["is_neutral"] = is_neutral();
     obj["buttons"] = button_to_string(buttons);
-    obj["joystick_x"] = std::to_string(joystick_x);
-    obj["joystick_y"] = std::to_string(joystick_y);
+    obj["joystick_x"] = joystick_x;
+    obj["joystick_y"] = joystick_y;
     
     return obj;
 }

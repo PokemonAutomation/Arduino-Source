@@ -4,7 +4,6 @@
  *
  */
 
-
 #include "Common/Cpp/Json/JsonArray.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_RecordKeyboardController.h"
@@ -34,7 +33,6 @@ RecordKeyboardController_Descriptor::RecordKeyboardController_Descriptor()
 
 RecordKeyboardController::~RecordKeyboardController(){
     
-    // m_keyboard_manager->remove_listener(*this);
 }
 
 RecordKeyboardController::RecordKeyboardController() 
@@ -57,6 +55,7 @@ RecordKeyboardController::RecordKeyboardController()
     )
 {
     PA_ADD_OPTION(MODE);
+    PA_ADD_OPTION(JSON_FILE_NAME);
 }
 
 
@@ -67,36 +66,98 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
 
     if (MODE == Mode::RECORD){
         context.controller().add_keyboard_listener(*this);
+
+        try{
+            context.wait_until_cancel();
+        }catch (ProgramCancelledException&){
+
+            if (MODE == Mode::RECORD){
+                JsonValue json = controller_history_to_json(env.console.logger(), controller_category);
+                json.dump(std::string(JSON_FILE_NAME) + ".json");
+                m_controller_history.clear();
+
+                json_to_cpp_code(env.console.logger(),json);
+
+                context.controller().remove_keyboard_listener(*this);
+            }
+            throw;
+        }        
         
     }else if (MODE == Mode::REPLAY){
 
     }else if (MODE == Mode::CONVERT_JSON_TO_CODE){
+        JsonValue json = load_json_file(std::string(JSON_FILE_NAME) + ".json");
+        json_to_cpp_code(env.console.logger(), json);
+
 
     }
 
-
-    try{
-        context.wait_until_cancel();
-    }catch (ProgramCancelledException&){
-
-        if (MODE == Mode::RECORD){
-            JsonValue json = controller_history_to_json(env.console.logger(), controller_category);
-            json.dump(std::string(JSON_FILE_NAME) + ".json");
-            m_controller_history.clear();
-
-            json_to_cpp_code(json);
-
-            context.controller().remove_keyboard_listener(*this);
-        }
-        throw;
-    }
 }
 
 
-std::string RecordKeyboardController::json_to_cpp_code(const JsonValue& json){
-    // std::string controller_category = json[]
+std::string RecordKeyboardController::json_to_cpp_code(Logger& logger, const JsonValue& json){
+    try{
+        const JsonObject& obj = json.to_object_throw();
 
-    return "";
+        std::string controller_category_string = obj.get_string_throw("controller_category");
+        cout << controller_category_string << endl;
+        ControllerCategory controller_category = CONTROLLER_CATEGORY_STRINGS.get_enum(controller_category_string);
+
+        const JsonArray& history_json = obj.get_array_throw("history");
+
+        switch (controller_category){
+        case ControllerCategory::PRO_CONTROLLER:
+            return json_to_cpp_code_pro_controller(history_json);
+        }
+
+        return "";
+    }catch (ParseException&){
+        
+        throw ParseException("JSON parsing error. Given JSON file doesn't match the expected format.");
+    }
+}
+
+std::string RecordKeyboardController::json_to_cpp_code_pro_controller(const JsonArray& history){
+    std::string result;
+    for(size_t i = 0; i < history.size(); i++){
+        const JsonObject& snapshot = history[i].to_object_throw();
+        int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
+        bool is_neutral = snapshot.get_boolean_throw("is_neutral");
+        cout << duration_in_ms << endl;
+        if (is_neutral){
+            result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
+        }else{
+            std::string buttons_string = snapshot.get_string_throw("buttons");
+            std::string dpad_string = snapshot.get_string_throw("dpad");
+            int64_t left_x = snapshot.get_integer_throw("left_x");
+            int64_t left_y = snapshot.get_integer_throw("left_y");
+            int64_t right_x = snapshot.get_integer_throw("right_x");
+            int64_t right_y = snapshot.get_integer_throw("right_y");
+            
+            // ensure all x, y are uint8_t
+            uint8_t uint8_max = std::numeric_limits<uint8_t>::max();
+            uint8_t uint8_min = std::numeric_limits<uint8_t>::min();
+            if (left_x > uint8_max || left_x < uint8_min || 
+                left_y > uint8_max || left_y < uint8_min || 
+                right_x > uint8_max || right_x < uint8_min || 
+                right_y > uint8_max || right_y < uint8_min){
+
+                throw ParseException();
+            }
+
+            result += "pbf_controller_state(context, " 
+                + buttons_string + "," 
+                + dpad_string + "," 
+                + std::to_string(left_x) + "," + std::to_string(left_y) + "," 
+                + std::to_string(right_x) + "," + std::to_string(right_y) + "," 
+                + std::to_string(duration_in_ms) +"ms);\n";
+        }
+
+    }
+
+    cout << result << endl;
+    return result;
+
 }
 
 JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, ControllerCategory controller_category){

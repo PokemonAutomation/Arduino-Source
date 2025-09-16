@@ -43,7 +43,9 @@ private:
     JsonValue controller_history_to_json(Logger& logger, ControllerCategory controller_category);
 
     // convert the json, with the controller history, to a string, which represents C++ code.
-    std::string json_to_cpp_code(const JsonValue& json);
+    std::string json_to_cpp_code(Logger& logger, const JsonValue& json);
+
+    std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
 
 
     // Examples for JsonObject controller_state:
