@@ -32,6 +32,13 @@ const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
     {ControllerType::NintendoSwitch2_RightJoycon,           "NS2: Right Joycon"},
 };
 
+const EnumStringMap<ControllerCategory> CONTROLLER_CATEGORY_STRINGS{
+    {ControllerCategory::NONE,                                  "none"},
+    {ControllerCategory::LEFT_JOYCON,                           "left-joycon"},
+    {ControllerCategory::RIGHT_JOYCON,                          "right-joycon"},
+    {ControllerCategory::PRO_CONTROLLER,                        "pro-controller"},
+};
+
 
 
 

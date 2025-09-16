@@ -9,6 +9,8 @@
 
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "NintendoSwitch_ControllerButtons.h"
+#include "NintendoSwitch_ControllerState.h"
+#include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
 
 namespace PokemonAutomation{
@@ -190,6 +192,9 @@ public:
     virtual const char* name() override{
         return NAME;
     };
+    virtual ControllerCategory controller_category() const override{
+        return ControllerCategory::LEFT_JOYCON;
+    }    
 };
 class RightJoycon : public JoyconController{
 public:
@@ -199,6 +204,9 @@ public:
     virtual const char* name() override{
         return NAME;
     };
+    virtual ControllerCategory controller_category() const override{
+        return ControllerCategory::RIGHT_JOYCON;
+    } 
 };
 
 
