@@ -101,7 +101,7 @@ std::string RecordKeyboardController::json_to_cpp_code(Logger& logger, const Jso
 
         std::string controller_category_string = obj.get_string_throw("controller_category");
         cout << controller_category_string << endl;
-        ControllerCategory controller_category = CONTROLLER_CATEGORY_STRINGS.get_enum(controller_category_string);
+        ControllerCategory controller_category = CONTROLLER_CATEGORY_STRINGS().get_enum(controller_category_string);
 
         const JsonArray& history_json = obj.get_array_throw("history");
 
@@ -198,7 +198,7 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
     
     
     JsonObject json_result;
-    json_result["controller_category"] = CONTROLLER_CATEGORY_STRINGS.get_string(controller_category);
+    json_result["controller_category"] = CONTROLLER_CATEGORY_STRINGS().get_string(controller_category);
     json_result["history"] = JsonValue(std::move(json_array));
 
     return json_result;
