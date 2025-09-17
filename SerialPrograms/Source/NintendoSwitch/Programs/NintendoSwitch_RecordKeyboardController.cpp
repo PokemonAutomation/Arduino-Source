@@ -125,6 +125,44 @@ void RecordKeyboardController::json_to_pbf_actions(SingleSwitchProgramEnvironmen
 
 }
 
+NonNeutralControllerField get_non_neutral_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y){
+    NonNeutralControllerField non_neutral_field = NonNeutralControllerField::NONE;
+    int8_t num_non_neutral_fields = 0;
+    if (button != BUTTON_NONE) { 
+        num_non_neutral_fields++;
+        // if (num_non_neutral_fields > 1){
+        //     return NonNeutralControllerField::MULTIPLE;
+        // }
+        non_neutral_field = NonNeutralControllerField::BUTTON; 
+    }
+
+    if (dpad != DPAD_NONE){
+        num_non_neutral_fields++;
+        if (num_non_neutral_fields > 1){
+            return NonNeutralControllerField::MULTIPLE;
+        }
+        non_neutral_field = NonNeutralControllerField::DPAD; 
+    }
+
+    if (left_x != STICK_CENTER || left_y != STICK_CENTER){
+        num_non_neutral_fields++;
+        if (num_non_neutral_fields > 1){
+            return NonNeutralControllerField::MULTIPLE;
+        }
+        non_neutral_field = NonNeutralControllerField::LEFT_JOYSTICK; 
+    }
+
+    if (right_x != STICK_CENTER || right_y != STICK_CENTER){
+        num_non_neutral_fields++;
+        if (num_non_neutral_fields > 1){
+            return NonNeutralControllerField::MULTIPLE;
+        }
+        non_neutral_field = NonNeutralControllerField::RIGHT_JOYSTICK; 
+    }
+
+    return non_neutral_field;
+}
+
 void RecordKeyboardController::json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history){
     for(size_t i = 0; i < history.size(); i++){
         const JsonObject& snapshot = history[i].to_object_throw();
@@ -153,7 +191,28 @@ void RecordKeyboardController::json_to_pbf_actions_pro_controller(ProControllerC
                 throw ParseException();
             }
 
-            pbf_controller_state(context, button, dpad, left_x, left_y, right_x, right_y, Milliseconds(duration_in_ms));
+            NonNeutralControllerField non_neutral_field = get_non_neutral_controller_field(button, dpad, left_x, left_y, right_x, right_y);
+            switch (non_neutral_field){
+            case NonNeutralControllerField::BUTTON:
+                pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::DPAD:
+                pbf_press_dpad(context, dpad, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::LEFT_JOYSTICK:
+                pbf_move_left_joystick(context, left_x, left_y, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::RIGHT_JOYSTICK:
+                pbf_move_right_joystick(context, right_x, right_y, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::MULTIPLE:
+                pbf_controller_state(context, button, dpad, left_x, left_y, right_x, right_y, Milliseconds(duration_in_ms));
+                break;
+            case NonNeutralControllerField::NONE:
+                pbf_wait(context, Milliseconds(duration_in_ms));
+                break;
+            }
+
             
         }
 
@@ -189,7 +248,7 @@ std::string RecordKeyboardController::json_to_cpp_code_pro_controller(const Json
         const JsonObject& snapshot = history[i].to_object_throw();
         int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
         bool is_neutral = snapshot.get_boolean_throw("is_neutral");
-        cout << duration_in_ms << endl;
+        // cout << duration_in_ms << endl;
         if (is_neutral){
             result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
         }else{
@@ -213,12 +272,43 @@ std::string RecordKeyboardController::json_to_cpp_code_pro_controller(const Json
                 throw ParseException();
             }
 
-            result += "pbf_controller_state(context, " 
-                + button_to_code_string(button) + ", " 
-                + dpad_to_code_string(dpad) + ", " 
-                + std::to_string(left_x) + ", " + std::to_string(left_y) + ", " 
-                + std::to_string(right_x) + ", " + std::to_string(right_y) + ", " 
-                + std::to_string(duration_in_ms) +"ms);\n";
+
+            NonNeutralControllerField non_neutral_field = get_non_neutral_controller_field(button, dpad, left_x, left_y, right_x, right_y);
+            switch (non_neutral_field){
+            case NonNeutralControllerField::BUTTON:
+                result += "pbf_press_button(context, " 
+                    + button_to_code_string(button) + ", " 
+                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
+                break;
+            case NonNeutralControllerField::DPAD:
+                result += "pbf_press_dpad(context, " 
+                    + dpad_to_code_string(dpad) + ", " 
+                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
+                break;
+            case NonNeutralControllerField::LEFT_JOYSTICK:
+                result += "pbf_move_left_joystick(context, " 
+                    + std::to_string(left_x) + ", " + std::to_string(left_y) + ", " 
+                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
+                break;
+            case NonNeutralControllerField::RIGHT_JOYSTICK:
+                result += "pbf_move_right_joystick(context, " 
+                    + std::to_string(right_x) + ", " + std::to_string(right_y) + ", "
+                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
+                break;
+            case NonNeutralControllerField::MULTIPLE:
+                result += "pbf_controller_state(context, " 
+                    + button_to_code_string(button) + ", " 
+                    + dpad_to_code_string(dpad) + ", " 
+                    + std::to_string(left_x) + ", " + std::to_string(left_y) + ", " 
+                    + std::to_string(right_x) + ", " + std::to_string(right_y) + ", " 
+                    + std::to_string(duration_in_ms) +"ms);\n";
+                break;
+            case NonNeutralControllerField::NONE:
+                result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
+                break;
+            }            
+
+            
         }
 
     }

@@ -93,7 +93,15 @@ private:
 
 };
 
-
+enum class NonNeutralControllerField {
+    BUTTON,
+    DPAD,
+    LEFT_JOYSTICK,
+    RIGHT_JOYSTICK,
+    MULTIPLE,
+    NONE,
+};
+NonNeutralControllerField get_non_neutral_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y);
 
 
 }
