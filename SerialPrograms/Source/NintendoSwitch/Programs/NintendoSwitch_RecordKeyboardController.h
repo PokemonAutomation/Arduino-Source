@@ -17,6 +17,40 @@ namespace NintendoSwitch{
 
 class ProControllerState;
 
+enum class NonNeutralControllerField {
+    BUTTON,
+    DPAD,
+    LEFT_JOYSTICK,
+    RIGHT_JOYSTICK,
+    MULTIPLE,
+    NONE,
+};
+NonNeutralControllerField get_non_neutral_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y);
+
+// helper function that exposes the Pro Controller fields from the given JSON
+void json_to_pro_controller_state(
+    const JsonArray& history, 
+    std::function<void(int64_t duration_in_ms)>&& neutral_action,
+    std::function<void(
+        NonNeutralControllerField non_neutral_field,
+        Button button, 
+        DpadPosition dpad, 
+        uint8_t left_x, 
+        uint8_t left_y, 
+        uint8_t right_x, 
+        uint8_t right_y, 
+        int64_t duration_in_ms
+    )>&& non_neutral_action
+);
+
+// convert the json, with the controller history, to a string, which represents C++ code.
+std::string json_to_cpp_code(Logger& logger, const JsonValue& json);
+std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
+
+// given the json, with the controller history, run the controller actions using the pbf functions.
+void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category);
+void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history);
+
 class RecordKeyboardController_Descriptor : public SingleSwitchProgramDescriptor{
 public:
     RecordKeyboardController_Descriptor();
@@ -41,15 +75,6 @@ private:
     // convert m_controller_history to json
     // remove adjacent duplicate controller states.
     JsonValue controller_history_to_json(Logger& logger, ControllerCategory controller_category);
-
-    // convert the json, with the controller history, to a string, which represents C++ code.
-    std::string json_to_cpp_code(Logger& logger, const JsonValue& json);
-
-    std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
-
-    void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category);
-
-    void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history);
 
 
     // Examples for JsonObject controller_state:
@@ -93,15 +118,6 @@ private:
 
 };
 
-enum class NonNeutralControllerField {
-    BUTTON,
-    DPAD,
-    LEFT_JOYSTICK,
-    RIGHT_JOYSTICK,
-    MULTIPLE,
-    NONE,
-};
-NonNeutralControllerField get_non_neutral_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y);
 
 
 }

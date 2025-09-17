@@ -99,7 +99,7 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
 }
 
 
-void RecordKeyboardController::json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category){
+void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category){
     try{
         const JsonObject& obj = json.to_object_throw();
 
@@ -163,13 +163,26 @@ NonNeutralControllerField get_non_neutral_controller_field(Button button, DpadPo
     return non_neutral_field;
 }
 
-void RecordKeyboardController::json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history){
+void json_to_pro_controller_state(
+    const JsonArray& history, 
+    std::function<void(int64_t duration_in_ms)>&& neutral_action,
+    std::function<void(
+        NonNeutralControllerField non_neutral_field,
+        Button button, 
+        DpadPosition dpad, 
+        uint8_t left_x, 
+        uint8_t left_y, 
+        uint8_t right_x, 
+        uint8_t right_y, 
+        int64_t duration_in_ms
+    )>&& non_neutral_action
+){
     for(size_t i = 0; i < history.size(); i++){
         const JsonObject& snapshot = history[i].to_object_throw();
         int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
         bool is_neutral = snapshot.get_boolean_throw("is_neutral");
         if (is_neutral){
-            pbf_wait(context, Milliseconds(duration_in_ms));
+            neutral_action(duration_in_ms);
         }else{
             std::string buttons_string = snapshot.get_string_throw("buttons");
             std::string dpad_string = snapshot.get_string_throw("dpad");
@@ -192,6 +205,31 @@ void RecordKeyboardController::json_to_pbf_actions_pro_controller(ProControllerC
             }
 
             NonNeutralControllerField non_neutral_field = get_non_neutral_controller_field(button, dpad, left_x, left_y, right_x, right_y);
+
+            non_neutral_action(non_neutral_field, button, dpad, left_x, left_y, right_x, right_y, duration_in_ms);
+            
+        }
+
+    }
+
+}
+
+
+void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history){
+
+    json_to_pro_controller_state(history, 
+        [&](int64_t duration_in_ms){
+            pbf_wait(context, Milliseconds(duration_in_ms));
+        },
+        [&](NonNeutralControllerField non_neutral_field,
+            Button button, 
+            DpadPosition dpad, 
+            uint8_t left_x, 
+            uint8_t left_y, 
+            uint8_t right_x, 
+            uint8_t right_y, 
+            int64_t duration_in_ms
+        ){
             switch (non_neutral_field){
             case NonNeutralControllerField::BUTTON:
                 pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
@@ -211,16 +249,12 @@ void RecordKeyboardController::json_to_pbf_actions_pro_controller(ProControllerC
             case NonNeutralControllerField::NONE:
                 pbf_wait(context, Milliseconds(duration_in_ms));
                 break;
-            }
-
-            
+            }            
         }
-
-    }
-
+    );
 }
 
-std::string RecordKeyboardController::json_to_cpp_code(Logger& logger, const JsonValue& json){
+std::string json_to_cpp_code(Logger& logger, const JsonValue& json){
     try{
         const JsonObject& obj = json.to_object_throw();
 
@@ -242,38 +276,23 @@ std::string RecordKeyboardController::json_to_cpp_code(Logger& logger, const Jso
     }
 }
 
-std::string RecordKeyboardController::json_to_cpp_code_pro_controller(const JsonArray& history){
+std::string json_to_cpp_code_pro_controller(const JsonArray& history){
     std::string result;
-    for(size_t i = 0; i < history.size(); i++){
-        const JsonObject& snapshot = history[i].to_object_throw();
-        int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
-        bool is_neutral = snapshot.get_boolean_throw("is_neutral");
-        // cout << duration_in_ms << endl;
-        if (is_neutral){
+
+    json_to_pro_controller_state(history, 
+        [&](int64_t duration_in_ms){
             result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
-        }else{
-            std::string buttons_string = snapshot.get_string_throw("buttons");
-            std::string dpad_string = snapshot.get_string_throw("dpad");
+        },
+        [&](NonNeutralControllerField non_neutral_field,
+            Button button, 
+            DpadPosition dpad, 
+            uint8_t left_x, 
+            uint8_t left_y, 
+            uint8_t right_x, 
+            uint8_t right_y, 
+            int64_t duration_in_ms
+        ){
 
-            Button button = string_to_button(buttons_string);
-            DpadPosition dpad = string_to_dpad(dpad_string);
-
-            int64_t left_x = snapshot.get_integer_throw("left_x");
-            int64_t left_y = snapshot.get_integer_throw("left_y");
-            int64_t right_x = snapshot.get_integer_throw("right_x");
-            int64_t right_y = snapshot.get_integer_throw("right_y");
-            
-            // ensure all x, y are within STICK_MIN/MAX
-            if (left_x > STICK_MAX || left_x < STICK_MIN || 
-                left_y > STICK_MAX || left_y < STICK_MIN || 
-                right_x > STICK_MAX || right_x < STICK_MIN || 
-                right_y > STICK_MAX || right_y < STICK_MIN)
-            {
-                throw ParseException();
-            }
-
-
-            NonNeutralControllerField non_neutral_field = get_non_neutral_controller_field(button, dpad, left_x, left_y, right_x, right_y);
             switch (non_neutral_field){
             case NonNeutralControllerField::BUTTON:
                 result += "pbf_press_button(context, " 
@@ -307,12 +326,9 @@ std::string RecordKeyboardController::json_to_cpp_code_pro_controller(const Json
                 result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
                 break;
             }            
-
-            
         }
-
-    }
-
+    );
+    
     cout << result << endl;
     return result;
 
