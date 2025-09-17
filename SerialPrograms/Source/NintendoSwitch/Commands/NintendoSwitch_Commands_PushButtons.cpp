@@ -118,6 +118,19 @@ void pbf_mash_button(JoyconContext& context, Button button, Milliseconds duratio
     ssf_mash1_button(context, button, duration);
 }
 
+void pbf_controller_state(
+    JoyconContext& context,
+    Button button,
+    uint8_t x, uint8_t y,
+    Milliseconds duration
+){
+    context->issue_full_controller_state(
+        &context,
+        button,
+        x, y,
+        duration
+    );
+}
 
 
 
