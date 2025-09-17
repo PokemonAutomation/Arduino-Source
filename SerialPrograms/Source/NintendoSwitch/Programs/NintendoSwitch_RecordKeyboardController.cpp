@@ -129,27 +129,29 @@ std::string RecordKeyboardController::json_to_cpp_code_pro_controller(const Json
         }else{
             std::string buttons_string = snapshot.get_string_throw("buttons");
             std::string dpad_string = snapshot.get_string_throw("dpad");
+
+            Button button = string_to_button(buttons_string);
+            DpadPosition dpad = string_to_dpad(dpad_string);
+
             int64_t left_x = snapshot.get_integer_throw("left_x");
             int64_t left_y = snapshot.get_integer_throw("left_y");
             int64_t right_x = snapshot.get_integer_throw("right_x");
             int64_t right_y = snapshot.get_integer_throw("right_y");
             
-            // ensure all x, y are uint8_t
-            uint8_t uint8_max = std::numeric_limits<uint8_t>::max();
-            uint8_t uint8_min = std::numeric_limits<uint8_t>::min();
-            if (left_x > uint8_max || left_x < uint8_min || 
-                left_y > uint8_max || left_y < uint8_min || 
-                right_x > uint8_max || right_x < uint8_min || 
-                right_y > uint8_max || right_y < uint8_min){
-
+            // ensure all x, y are within STICK_MIN/MAX
+            if (left_x > STICK_MAX || left_x < STICK_MIN || 
+                left_y > STICK_MAX || left_y < STICK_MIN || 
+                right_x > STICK_MAX || right_x < STICK_MIN || 
+                right_y > STICK_MAX || right_y < STICK_MIN)
+            {
                 throw ParseException();
             }
 
             result += "pbf_controller_state(context, " 
-                + buttons_string + "," 
-                + dpad_string + "," 
-                + std::to_string(left_x) + "," + std::to_string(left_y) + "," 
-                + std::to_string(right_x) + "," + std::to_string(right_y) + "," 
+                + button_to_code_string(button) + ", " 
+                + dpad_to_code_string(dpad) + ", " 
+                + std::to_string(left_x) + ", " + std::to_string(left_y) + ", " 
+                + std::to_string(right_x) + ", " + std::to_string(right_y) + ", " 
                 + std::to_string(duration_in_ms) +"ms);\n";
         }
 
