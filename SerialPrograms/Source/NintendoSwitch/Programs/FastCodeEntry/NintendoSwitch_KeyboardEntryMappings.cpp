@@ -45,16 +45,16 @@ const std::map<char, KeyboardEntryPosition>& KEYBOARD_POSITIONS(KeyboardLayout l
 const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS_QWERTY(){
     using namespace StandardHid;
     static const std::map<char, KeyboardKey> map{
-        {'1', KeyboardKey::KEY_1},
-        {'2', KeyboardKey::KEY_2},
-        {'3', KeyboardKey::KEY_3},
-        {'4', KeyboardKey::KEY_4},
-        {'5', KeyboardKey::KEY_5},
-        {'6', KeyboardKey::KEY_6},
-        {'7', KeyboardKey::KEY_7},
-        {'8', KeyboardKey::KEY_8},
-        {'9', KeyboardKey::KEY_9},
-        {'0', KeyboardKey::KEY_0},
+        {'1', KeyboardKey::KEY_KP_1},
+        {'2', KeyboardKey::KEY_KP_2},
+        {'3', KeyboardKey::KEY_KP_3},
+        {'4', KeyboardKey::KEY_KP_4},
+        {'5', KeyboardKey::KEY_KP_5},
+        {'6', KeyboardKey::KEY_KP_6},
+        {'7', KeyboardKey::KEY_KP_7},
+        {'8', KeyboardKey::KEY_KP_8},
+        {'9', KeyboardKey::KEY_KP_9},
+        {'0', KeyboardKey::KEY_KP_0},
 
         {'Q', KeyboardKey::KEY_Q},
         {'W', KeyboardKey::KEY_W},
@@ -90,16 +90,16 @@ const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS_QWERTY(){
 const std::map<char, StandardHid::KeyboardKey>& KEYBOARD_MAPPINGS_AZERTY(){
     using namespace StandardHid;
     static const std::map<char, KeyboardKey> map{
-        {'1', KeyboardKey::KEY_1},
-        {'2', KeyboardKey::KEY_2},
-        {'3', KeyboardKey::KEY_3},
-        {'4', KeyboardKey::KEY_4},
-        {'5', KeyboardKey::KEY_5},
-        {'6', KeyboardKey::KEY_6},
-        {'7', KeyboardKey::KEY_7},
-        {'8', KeyboardKey::KEY_8},
-        {'9', KeyboardKey::KEY_9},
-        {'0', KeyboardKey::KEY_0},
+        {'1', KeyboardKey::KEY_KP_1},
+        {'2', KeyboardKey::KEY_KP_2},
+        {'3', KeyboardKey::KEY_KP_3},
+        {'4', KeyboardKey::KEY_KP_4},
+        {'5', KeyboardKey::KEY_KP_5},
+        {'6', KeyboardKey::KEY_KP_6},
+        {'7', KeyboardKey::KEY_KP_7},
+        {'8', KeyboardKey::KEY_KP_8},
+        {'9', KeyboardKey::KEY_KP_9},
+        {'0', KeyboardKey::KEY_KP_0},
 
         {'A', KeyboardKey::KEY_Q},
         {'Z', KeyboardKey::KEY_W},

@@ -12,6 +12,7 @@
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch_CodeEntryTools.h"
 #include "NintendoSwitch_NumberCodeEntry.h"
+#include "NintendoSwitch_KeyboardCodeEntry.h"
 
 //#include <iostream>
 //using std::cout;
@@ -32,7 +33,7 @@ void numberpad_enter_code(
     auto* keyboard = dynamic_cast<StandardHid::Keyboard*>(&context.controller());
     if (keyboard){
         StandardHid::KeyboardContext subcontext(context);
-        numberpad_enter_code(console, subcontext, code, include_plus);
+        keyboard_enter_code(console, subcontext, KeyboardLayout::QWERTY, code, include_plus);
         return;
     }
 
@@ -51,7 +52,7 @@ void numberpad_enter_code(
 
 
 
-
+#if 0
 void numberpad_enter_code(
     ConsoleHandle& console, StandardHid::KeyboardContext& context,
     const std::string& code,
@@ -103,7 +104,7 @@ void numberpad_enter_code(
         context->issue_key(&context, delay, hold, cool, KeyboardKey::KEY_ENTER);
     }
 }
-
+#endif
 
 
 
