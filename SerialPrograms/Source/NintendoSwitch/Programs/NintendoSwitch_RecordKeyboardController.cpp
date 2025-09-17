@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Json/JsonArray.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_RecordKeyboardController.h"
 #include "Controllers/ControllerTypeStrings.h"
@@ -84,6 +85,9 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
         }        
         
     }else if (MODE == Mode::REPLAY){
+        JsonValue json = load_json_file(std::string(JSON_FILE_NAME) + ".json");
+        json_to_pbf_actions(env, scope, json, controller_category);
+
 
     }else if (MODE == Mode::CONVERT_JSON_TO_CODE){
         JsonValue json = load_json_file(std::string(JSON_FILE_NAME) + ".json");
@@ -94,6 +98,68 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
 
 }
 
+
+void RecordKeyboardController::json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category){
+    try{
+        const JsonObject& obj = json.to_object_throw();
+
+        std::string controller_category_string = obj.get_string_throw("controller_category");
+        ControllerCategory controller_category_json = CONTROLLER_CATEGORY_STRINGS().get_enum(controller_category_string);
+        if (controller_category_json != controller_category){
+            throw UserSetupError(env.logger(), "Controller category in the JSON file does not match your current selected controller.");
+        }
+
+        const JsonArray& history_json = obj.get_array_throw("history");
+
+        switch (controller_category){
+        case ControllerCategory::PRO_CONTROLLER:
+            ProControllerContext context(scope, env.console.controller<ProController>());
+            json_to_pbf_actions_pro_controller(context, history_json);
+            break;
+        }
+
+    }catch (ParseException&){
+        
+        throw ParseException("JSON parsing error. Given JSON file doesn't match the expected format.");
+    }    
+
+}
+
+void RecordKeyboardController::json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history){
+    for(size_t i = 0; i < history.size(); i++){
+        const JsonObject& snapshot = history[i].to_object_throw();
+        int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
+        bool is_neutral = snapshot.get_boolean_throw("is_neutral");
+        if (is_neutral){
+            pbf_wait(context, Milliseconds(duration_in_ms));
+        }else{
+            std::string buttons_string = snapshot.get_string_throw("buttons");
+            std::string dpad_string = snapshot.get_string_throw("dpad");
+
+            Button button = string_to_button(buttons_string);
+            DpadPosition dpad = string_to_dpad(dpad_string);
+
+            int64_t left_x = snapshot.get_integer_throw("left_x");
+            int64_t left_y = snapshot.get_integer_throw("left_y");
+            int64_t right_x = snapshot.get_integer_throw("right_x");
+            int64_t right_y = snapshot.get_integer_throw("right_y");
+            
+            // ensure all x, y are within STICK_MIN/MAX
+            if (left_x > STICK_MAX || left_x < STICK_MIN || 
+                left_y > STICK_MAX || left_y < STICK_MIN || 
+                right_x > STICK_MAX || right_x < STICK_MIN || 
+                right_y > STICK_MAX || right_y < STICK_MIN)
+            {
+                throw ParseException();
+            }
+
+            pbf_controller_state(context, button, dpad, left_x, left_y, right_x, right_y, Milliseconds(duration_in_ms));
+            
+        }
+
+    }
+
+}
 
 std::string RecordKeyboardController::json_to_cpp_code(Logger& logger, const JsonValue& json){
     try{

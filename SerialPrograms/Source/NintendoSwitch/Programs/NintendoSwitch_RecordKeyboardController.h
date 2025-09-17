@@ -47,6 +47,10 @@ private:
 
     std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
 
+    void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category);
+
+    void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history);
+
 
     // Examples for JsonObject controller_state:
     // ProControllerState:
