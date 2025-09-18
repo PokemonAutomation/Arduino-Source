@@ -124,6 +124,9 @@ void json_to_cpp_code(Logger& logger, const JsonValue& json, const std::string& 
         case ControllerCategory::RIGHT_JOYCON:
             output_text = json_to_cpp_code_joycon(history_json);
             break;
+        default:
+            // generate empty text if ControllerCategory is not one of the above
+            break;
         }
 
         QFile file(QString::fromStdString(output_file_name + ".txt"));
@@ -185,6 +188,8 @@ std::string json_to_cpp_code_pro_controller(const JsonArray& history){
             case NonNeutralControllerField::NONE:
                 result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
                 break;
+            default:
+                throw ParseException("Unexpected NonNeutralControllerField enum.");
             }            
         }
     );
@@ -228,6 +233,8 @@ std::string json_to_cpp_code_joycon(const JsonArray& history){
             case NonNeutralControllerField::NONE:
                 result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
                 break;
+            default:
+                throw ParseException("Unexpected NonNeutralControllerField enum.");
             }            
         }
     );
@@ -264,6 +271,9 @@ void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& 
             json_to_pbf_actions_joycon(context, history_json);
             break;
         }
+        default:
+            // do nothing if the ControllerCategory is not one of the above.
+            break;
         }
 
     }catch (ParseException& e){
@@ -307,6 +317,8 @@ void json_to_pbf_actions_pro_controller(ProControllerContext& context, const Jso
             case NonNeutralControllerField::NONE:
                 pbf_wait(context, Milliseconds(duration_in_ms));
                 break;
+            default:
+                throw ParseException("Unexpected NonNeutralControllerField enum.");
             }            
         }
     );
@@ -337,6 +349,8 @@ void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history
             case NonNeutralControllerField::NONE:
                 pbf_wait(context, Milliseconds(duration_in_ms));
                 break;
+            default:
+                throw ParseException("Unexpected NonNeutralControllerField enum.");
             }            
         }
     );
