@@ -135,13 +135,11 @@ public:
         report_keyboard_command_stopped(time_stamp);
     }
     virtual void replace_on_next_command() override{
-        WallClock time_stamp = current_time();
         WriteSpinLock lg(m_lock);
         if (m_controller == nullptr){
             return;
         }
         m_controller->replace_on_next_command();
-        // report_keyboard_command_stopped(time_stamp);
     }
 
 
