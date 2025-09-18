@@ -9,6 +9,7 @@
 
 #include <functional>
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
@@ -131,6 +132,7 @@ private:
     };
     EnumDropdownOption<Mode> MODE;
     StringOption FILE_NAME;
+    BooleanCheckBoxOption GENERATE_CPP_CODE_AFTER_RECORDING;
 
     std::vector<ControllerStateSnapshot> m_controller_history;
     

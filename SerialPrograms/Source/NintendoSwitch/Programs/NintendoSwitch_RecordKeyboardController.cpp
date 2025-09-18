@@ -50,14 +50,20 @@ RecordKeyboardController::RecordKeyboardController()
     )
     , FILE_NAME(
         false,
-        "Name of the JSON file to read/write.", 
+        "<b>Name of the JSON file to read/write.</b>", 
         LockMode::LOCK_WHILE_RUNNING, 
-        "recording",
+        "UserSettings/recording",
         "<name of JSON file>"
+    )
+    , GENERATE_CPP_CODE_AFTER_RECORDING(
+        "<b>[For Developers] Generate C++ code text file, after recording:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
     )
 {
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(FILE_NAME);
+    PA_ADD_OPTION(GENERATE_CPP_CODE_AFTER_RECORDING);
 }
 
 
@@ -84,7 +90,9 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
             json.dump(output_json_filename);
             m_controller_history.clear();
 
-            json_to_cpp_code(env.console.logger(), json, FILE_NAME);
+            if (GENERATE_CPP_CODE_AFTER_RECORDING){
+                json_to_cpp_code(env.console.logger(), json, FILE_NAME);
+            }
 
             context.controller().remove_keyboard_listener(*this);
             
