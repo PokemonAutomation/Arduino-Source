@@ -176,15 +176,19 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         break;
     case StartingLocation::COASTLANDS_COASTLANDS:
         env.log("Starting at Coastlands - Coastlands Camp");
+        pbf_move_left_joystick(context, 0, 40, 180, 10);
         break;
     case StartingLocation::HIGHLANDS_HIGHLANDS:
         env.log("Starting at Highlands - Highlands Camp");
+        pbf_move_left_joystick(context, 0, 20, 140, 10);
         break;
     case StartingLocation::HIGHLANDS_MOUNTAIN:
         env.log("Starting at Highlands - Mountain Camp");
+        pbf_move_left_joystick(context, 0, 15, 100, 10);
         break;
     case StartingLocation::HIGHLANDS_SUMMIT:
         env.log("Starting at Highlands - Summit Camp");
+        pbf_move_left_joystick(context, 10, 0, 150, 10);
         break;
     case StartingLocation::ICELANDS_SNOWFIELDS:
         env.log("Starting at Icelands - Snowfields Camp");
