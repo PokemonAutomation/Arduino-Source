@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_DateManip_24h_H
 #define PokemonAutomation_NintendoSwitch_DateManip_24h_H
 
+#include <memory>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "NintendoSwitch_DateManipTools.h"
 #include "NintendoSwitch_DateManipBase.h"

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonTools_ImageMatchDetector_H
 #define PokemonAutomation_CommonTools_ImageMatchDetector_H
 
+#include <memory>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"

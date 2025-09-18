@@ -13,6 +13,7 @@
 #include <vector>
 #include <map>
 #include <mutex>
+#include <memory>
 #include "CommonFramework/Globals.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "ProgramTrackerInterfaces.h"

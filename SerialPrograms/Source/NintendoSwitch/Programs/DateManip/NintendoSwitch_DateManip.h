@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_DateManip_H
 #define PokemonAutomation_NintendoSwitch_DateManip_H
 
+#include <memory>
 #include "Common/Cpp/DateTime.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"

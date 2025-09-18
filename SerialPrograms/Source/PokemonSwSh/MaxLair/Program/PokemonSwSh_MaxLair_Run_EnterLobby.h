@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_EnterLobby_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_EnterLobby_H
 
+#include <memory>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_Entrance_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_Entrance_H
 
+#include <memory>
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"

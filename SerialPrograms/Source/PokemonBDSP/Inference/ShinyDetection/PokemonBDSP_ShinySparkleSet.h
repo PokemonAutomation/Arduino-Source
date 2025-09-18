@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinySparkleSet_H
 #define PokemonAutomation_PokemonBDSP_ShinySparkleSet_H
 
+#include <memory>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "Pokemon/Pokemon_ShinySparkleSet.h"
 

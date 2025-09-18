@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSV_IngredientSession_H
 
 #include <map>
+#include <memory>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/VideoStream.h"

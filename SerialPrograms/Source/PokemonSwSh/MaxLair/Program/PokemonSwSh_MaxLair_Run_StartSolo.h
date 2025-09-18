@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_StartSolo_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_StartSolo_H
 
+#include <memory>
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/Tools/VideoStream.h"

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_OperationFailedException_H
 #define PokemonAutomation_OperationFailedException_H
 
+#include <memory>
 #include "CommonFramework/Tools/VideoStream.h"
 #include "ScreenshotException.h"
 
