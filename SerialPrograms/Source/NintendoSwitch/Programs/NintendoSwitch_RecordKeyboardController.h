@@ -60,8 +60,8 @@ void json_to_joycon_state(
     )>&& non_neutral_action
 );
 
-// convert the json, with the controller history, to a string, which represents C++ code.
-std::string json_to_cpp_code(Logger& logger, const JsonValue& json);
+// given the json, with the controller history, output a text file which represents C++ code.
+void json_to_cpp_code(Logger& logger, const JsonValue& json, const std::string& output_file_name);
 std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
 std::string json_to_cpp_code_joycon(const JsonArray& history);
 
@@ -130,7 +130,7 @@ private:
         CONVERT_JSON_TO_CODE,
     };
     EnumDropdownOption<Mode> MODE;
-    StringOption JSON_FILE_NAME;
+    StringOption FILE_NAME;
 
     std::vector<ControllerStateSnapshot> m_controller_history;
     

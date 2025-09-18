@@ -4,6 +4,7 @@
  *
  */
 
+#include <QFile>
 #include "Common/Cpp/Json/JsonArray.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
@@ -47,7 +48,7 @@ RecordKeyboardController::RecordKeyboardController()
         LockMode::LOCK_WHILE_RUNNING,
         Mode::RECORD
     )
-    , JSON_FILE_NAME(
+    , FILE_NAME(
         false,
         "Name of the JSON file to read/write.", 
         LockMode::LOCK_WHILE_RUNNING, 
@@ -56,7 +57,7 @@ RecordKeyboardController::RecordKeyboardController()
     )
 {
     PA_ADD_OPTION(MODE);
-    PA_ADD_OPTION(JSON_FILE_NAME);
+    PA_ADD_OPTION(FILE_NAME);
 }
 
 
@@ -66,39 +67,45 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
     ControllerCategory controller_category = env.console.controller().controller_category();
 
     if (MODE == Mode::RECORD){
+        // check if given file name already exists. If it does, throw an error so we don't overwrite it.
+        std::string output_json_filename = std::string(FILE_NAME) + ".json";
+        QFile file(QString::fromStdString(output_json_filename));
+        if (file.open(QFile::ReadOnly)){
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Given file name already exists. Choose a different file name.", output_json_filename);
+        }
+
         context.controller().add_keyboard_listener(*this);
 
         try{
             context.wait_until_cancel();
         }catch (ProgramCancelledException&){
 
-            if (MODE == Mode::RECORD){
-                JsonValue json = controller_history_to_json(env.console.logger(), controller_category);
-                json.dump(std::string(JSON_FILE_NAME) + ".json");
-                m_controller_history.clear();
+            JsonValue json = controller_history_to_json(env.console.logger(), controller_category);
+            json.dump(output_json_filename);
+            m_controller_history.clear();
 
-                json_to_cpp_code(env.console.logger(),json);
+            json_to_cpp_code(env.console.logger(), json, FILE_NAME);
 
-                context.controller().remove_keyboard_listener(*this);
-            }
+            context.controller().remove_keyboard_listener(*this);
+            
             throw;
         }        
         
     }else if (MODE == Mode::REPLAY){
-        JsonValue json = load_json_file(std::string(JSON_FILE_NAME) + ".json");
+        JsonValue json = load_json_file(std::string(FILE_NAME) + ".json");
         json_to_pbf_actions(env, scope, json, controller_category);
 
 
     }else if (MODE == Mode::CONVERT_JSON_TO_CODE){
-        JsonValue json = load_json_file(std::string(JSON_FILE_NAME) + ".json");
-        json_to_cpp_code(env.console.logger(), json);
+        JsonValue json = load_json_file(std::string(FILE_NAME) + ".json");
+        json_to_cpp_code(env.console.logger(), json, FILE_NAME);
 
 
     }
 
 }
 
-std::string json_to_cpp_code(Logger& logger, const JsonValue& json){
+void json_to_cpp_code(Logger& logger, const JsonValue& json, const std::string& output_file_name){
     try{
         const JsonObject& obj = json.to_object_throw();
 
@@ -108,15 +115,21 @@ std::string json_to_cpp_code(Logger& logger, const JsonValue& json){
 
         const JsonArray& history_json = obj.get_array_throw("history");
 
+        std::string output_text;
         switch (controller_category){
         case ControllerCategory::PRO_CONTROLLER:
-            return json_to_cpp_code_pro_controller(history_json);
+            output_text = json_to_cpp_code_pro_controller(history_json);
+            break;
         case ControllerCategory::LEFT_JOYCON:
         case ControllerCategory::RIGHT_JOYCON:
-            return json_to_cpp_code_joycon(history_json);
+            output_text = json_to_cpp_code_joycon(history_json);
+            break;
         }
 
-        return "";
+        QFile file(QString::fromStdString(output_file_name + ".txt"));
+        file.open(QIODevice::WriteOnly);
+        file.write(output_text.c_str(), output_text.size());
+
     }catch (ParseException& e){
         logger.log(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.", COLOR_RED);
         throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
@@ -430,7 +443,7 @@ void json_to_pro_controller_state(
                 right_x > STICK_MAX || right_x < STICK_MIN || 
                 right_y > STICK_MAX || right_y < STICK_MIN)
             {
-                throw ParseException();
+                throw ParseException("x or y values are outside of 0-255.");
             }
 
             NonNeutralControllerField non_neutral_field = get_non_neutral_pro_controller_field(button, dpad, left_x, left_y, right_x, right_y);
@@ -472,7 +485,7 @@ void json_to_joycon_state(
             if (x > STICK_MAX || x < STICK_MIN || 
                 y > STICK_MAX || y < STICK_MIN)
             {
-                throw ParseException();
+                throw ParseException("x or y values are outside of 0-255.");
             }
 
             NonNeutralControllerField non_neutral_field = get_non_neutral_joycon_controller_field(button, x, y);
