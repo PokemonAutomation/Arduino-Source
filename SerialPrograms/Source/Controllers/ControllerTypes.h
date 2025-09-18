@@ -49,6 +49,7 @@ enum class ControllerCategory{
     LEFT_JOYCON,
     RIGHT_JOYCON,
     PRO_CONTROLLER,
+    KEYBOARD,
 };
 
 

@@ -10,7 +10,6 @@
 #define PokemonAutomation_NintendoSwitch_Controller_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
-#include "NintendoSwitch_ControllerState.h"
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
 #include "NintendoSwitch_ControllerButtons.h"

@@ -39,7 +39,7 @@ public:
 
     virtual bool is_neutral() const = 0;
 
-    virtual JsonObject serialize_state() const = 0;
+    virtual JsonObject serialize_state() const {return JsonObject();};
 };
 
 

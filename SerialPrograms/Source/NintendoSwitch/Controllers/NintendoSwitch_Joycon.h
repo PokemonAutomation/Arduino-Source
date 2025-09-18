@@ -9,7 +9,6 @@
 
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "NintendoSwitch_ControllerButtons.h"
-#include "NintendoSwitch_ControllerState.h"
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
 

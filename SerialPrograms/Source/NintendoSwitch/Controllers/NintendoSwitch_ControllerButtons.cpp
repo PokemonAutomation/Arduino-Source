@@ -7,7 +7,6 @@
 #include "NintendoSwitch_ControllerButtons.h"
 #include "Common/Cpp/EnumStringMap.h"
 #include "Common/Cpp/StringTools.h"
-#include "NintendoSwitch_ControllerState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
