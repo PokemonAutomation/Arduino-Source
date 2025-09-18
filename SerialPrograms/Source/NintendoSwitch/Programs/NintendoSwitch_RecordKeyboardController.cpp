@@ -98,162 +98,6 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
 
 }
 
-
-void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category){
-    try{
-        const JsonObject& obj = json.to_object_throw();
-
-        std::string controller_category_string = obj.get_string_throw("controller_category");
-        ControllerCategory controller_category_json = CONTROLLER_CATEGORY_STRINGS().get_enum(controller_category_string);
-        if (controller_category_json != controller_category){
-            throw UserSetupError(env.logger(), "Controller category in the JSON file does not match your current selected controller.");
-        }
-
-        const JsonArray& history_json = obj.get_array_throw("history");
-
-        switch (controller_category){
-        case ControllerCategory::PRO_CONTROLLER:
-            ProControllerContext context(scope, env.console.controller<ProController>());
-            json_to_pbf_actions_pro_controller(context, history_json);
-            break;
-        }
-
-    }catch (ParseException&){
-        
-        throw ParseException("JSON parsing error. Given JSON file doesn't match the expected format.");
-    }    
-
-}
-
-NonNeutralControllerField get_non_neutral_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y){
-    NonNeutralControllerField non_neutral_field = NonNeutralControllerField::NONE;
-    int8_t num_non_neutral_fields = 0;
-    if (button != BUTTON_NONE) { 
-        num_non_neutral_fields++;
-        // if (num_non_neutral_fields > 1){
-        //     return NonNeutralControllerField::MULTIPLE;
-        // }
-        non_neutral_field = NonNeutralControllerField::BUTTON; 
-    }
-
-    if (dpad != DPAD_NONE){
-        num_non_neutral_fields++;
-        if (num_non_neutral_fields > 1){
-            return NonNeutralControllerField::MULTIPLE;
-        }
-        non_neutral_field = NonNeutralControllerField::DPAD; 
-    }
-
-    if (left_x != STICK_CENTER || left_y != STICK_CENTER){
-        num_non_neutral_fields++;
-        if (num_non_neutral_fields > 1){
-            return NonNeutralControllerField::MULTIPLE;
-        }
-        non_neutral_field = NonNeutralControllerField::LEFT_JOYSTICK; 
-    }
-
-    if (right_x != STICK_CENTER || right_y != STICK_CENTER){
-        num_non_neutral_fields++;
-        if (num_non_neutral_fields > 1){
-            return NonNeutralControllerField::MULTIPLE;
-        }
-        non_neutral_field = NonNeutralControllerField::RIGHT_JOYSTICK; 
-    }
-
-    return non_neutral_field;
-}
-
-void json_to_pro_controller_state(
-    const JsonArray& history, 
-    std::function<void(int64_t duration_in_ms)>&& neutral_action,
-    std::function<void(
-        NonNeutralControllerField non_neutral_field,
-        Button button, 
-        DpadPosition dpad, 
-        uint8_t left_x, 
-        uint8_t left_y, 
-        uint8_t right_x, 
-        uint8_t right_y, 
-        int64_t duration_in_ms
-    )>&& non_neutral_action
-){
-    for(size_t i = 0; i < history.size(); i++){
-        const JsonObject& snapshot = history[i].to_object_throw();
-        int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
-        bool is_neutral = snapshot.get_boolean_throw("is_neutral");
-        if (is_neutral){
-            neutral_action(duration_in_ms);
-        }else{
-            std::string buttons_string = snapshot.get_string_throw("buttons");
-            std::string dpad_string = snapshot.get_string_throw("dpad");
-
-            Button button = string_to_button(buttons_string);
-            DpadPosition dpad = string_to_dpad(dpad_string);
-
-            int64_t left_x = snapshot.get_integer_throw("left_x");
-            int64_t left_y = snapshot.get_integer_throw("left_y");
-            int64_t right_x = snapshot.get_integer_throw("right_x");
-            int64_t right_y = snapshot.get_integer_throw("right_y");
-            
-            // ensure all x, y are within STICK_MIN/MAX
-            if (left_x > STICK_MAX || left_x < STICK_MIN || 
-                left_y > STICK_MAX || left_y < STICK_MIN || 
-                right_x > STICK_MAX || right_x < STICK_MIN || 
-                right_y > STICK_MAX || right_y < STICK_MIN)
-            {
-                throw ParseException();
-            }
-
-            NonNeutralControllerField non_neutral_field = get_non_neutral_controller_field(button, dpad, left_x, left_y, right_x, right_y);
-
-            non_neutral_action(non_neutral_field, button, dpad, left_x, left_y, right_x, right_y, duration_in_ms);
-            
-        }
-
-    }
-
-}
-
-
-void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history){
-
-    json_to_pro_controller_state(history, 
-        [&](int64_t duration_in_ms){
-            pbf_wait(context, Milliseconds(duration_in_ms));
-        },
-        [&](NonNeutralControllerField non_neutral_field,
-            Button button, 
-            DpadPosition dpad, 
-            uint8_t left_x, 
-            uint8_t left_y, 
-            uint8_t right_x, 
-            uint8_t right_y, 
-            int64_t duration_in_ms
-        ){
-            switch (non_neutral_field){
-            case NonNeutralControllerField::BUTTON:
-                pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::DPAD:
-                pbf_press_dpad(context, dpad, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::LEFT_JOYSTICK:
-                pbf_move_left_joystick(context, left_x, left_y, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::RIGHT_JOYSTICK:
-                pbf_move_right_joystick(context, right_x, right_y, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::MULTIPLE:
-                pbf_controller_state(context, button, dpad, left_x, left_y, right_x, right_y, Milliseconds(duration_in_ms));
-                break;
-            case NonNeutralControllerField::NONE:
-                pbf_wait(context, Milliseconds(duration_in_ms));
-                break;
-            }            
-        }
-    );
-}
-
 std::string json_to_cpp_code(Logger& logger, const JsonValue& json){
     try{
         const JsonObject& obj = json.to_object_throw();
@@ -267,12 +111,15 @@ std::string json_to_cpp_code(Logger& logger, const JsonValue& json){
         switch (controller_category){
         case ControllerCategory::PRO_CONTROLLER:
             return json_to_cpp_code_pro_controller(history_json);
+        case ControllerCategory::LEFT_JOYCON:
+        case ControllerCategory::RIGHT_JOYCON:
+            return json_to_cpp_code_joycon(history_json);
         }
 
         return "";
-    }catch (ParseException&){
-        
-        throw ParseException("JSON parsing error. Given JSON file doesn't match the expected format.");
+    }catch (ParseException& e){
+        logger.log(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.", COLOR_RED);
+        throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
     }
 }
 
@@ -331,6 +178,310 @@ std::string json_to_cpp_code_pro_controller(const JsonArray& history){
     
     cout << result << endl;
     return result;
+
+}
+
+std::string json_to_cpp_code_joycon(const JsonArray& history){
+    std::string result;
+
+    json_to_joycon_state(history, 
+        [&](int64_t duration_in_ms){
+            result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
+        },
+        [&](NonNeutralControllerField non_neutral_field,
+            Button button, 
+            uint8_t x, 
+            uint8_t y, 
+            int64_t duration_in_ms
+        ){
+
+            switch (non_neutral_field){
+            case NonNeutralControllerField::BUTTON:
+                result += "pbf_press_button(context, " 
+                    + button_to_code_string(button) + ", " 
+                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
+                break;
+            case NonNeutralControllerField::JOYSTICK:
+                result += "pbf_move_left_joystick(context, " 
+                    + std::to_string(x) + ", " + std::to_string(y) + ", " 
+                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
+                break;
+            case NonNeutralControllerField::MULTIPLE:
+                result += "pbf_controller_state(context, " 
+                    + button_to_code_string(button) + ", " 
+                    + std::to_string(x) + ", " + std::to_string(y) + ", " 
+                    + std::to_string(duration_in_ms) +"ms);\n";
+                break;
+            case NonNeutralControllerField::NONE:
+                result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
+                break;
+            }            
+        }
+    );
+    
+    cout << result << endl;
+    return result;
+
+}
+
+
+void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category){
+    try{
+        const JsonObject& obj = json.to_object_throw();
+
+        std::string controller_category_string = obj.get_string_throw("controller_category");
+        ControllerCategory controller_category_json = CONTROLLER_CATEGORY_STRINGS().get_enum(controller_category_string);
+        if (controller_category_json != controller_category){
+            throw UserSetupError(env.logger(), "Controller category in the JSON file does not match your current selected controller.");
+        }
+
+        const JsonArray& history_json = obj.get_array_throw("history");
+
+        switch (controller_category){
+        case ControllerCategory::PRO_CONTROLLER:
+        {
+            ProControllerContext context(scope, env.console.controller<ProController>());
+            json_to_pbf_actions_pro_controller(context, history_json);
+            break;
+        }
+        case ControllerCategory::LEFT_JOYCON:
+        case ControllerCategory::RIGHT_JOYCON:
+        {
+            JoyconContext context(scope, env.console.controller<JoyconController>());
+            json_to_pbf_actions_joycon(context, history_json);
+            break;
+        }
+        }
+
+    }catch (ParseException& e){
+        env.log(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.", COLOR_RED);
+        throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
+    }    
+
+}
+
+void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history){
+
+    json_to_pro_controller_state(history, 
+        [&](int64_t duration_in_ms){
+            pbf_wait(context, Milliseconds(duration_in_ms));
+        },
+        [&](NonNeutralControllerField non_neutral_field,
+            Button button, 
+            DpadPosition dpad, 
+            uint8_t left_x, 
+            uint8_t left_y, 
+            uint8_t right_x, 
+            uint8_t right_y, 
+            int64_t duration_in_ms
+        ){
+            switch (non_neutral_field){
+            case NonNeutralControllerField::BUTTON:
+                pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::DPAD:
+                pbf_press_dpad(context, dpad, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::LEFT_JOYSTICK:
+                pbf_move_left_joystick(context, left_x, left_y, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::RIGHT_JOYSTICK:
+                pbf_move_right_joystick(context, right_x, right_y, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::MULTIPLE:
+                pbf_controller_state(context, button, dpad, left_x, left_y, right_x, right_y, Milliseconds(duration_in_ms));
+                break;
+            case NonNeutralControllerField::NONE:
+                pbf_wait(context, Milliseconds(duration_in_ms));
+                break;
+            }            
+        }
+    );
+}
+
+void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history){
+
+    json_to_joycon_state(history, 
+        [&](int64_t duration_in_ms){
+            pbf_wait(context, Milliseconds(duration_in_ms));
+        },
+        [&](NonNeutralControllerField non_neutral_field,
+            Button button, 
+            uint8_t x, 
+            uint8_t y, 
+            int64_t duration_in_ms
+        ){
+            switch (non_neutral_field){
+            case NonNeutralControllerField::BUTTON:
+                pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::JOYSTICK:
+                pbf_move_joystick(context, x, y, Milliseconds(duration_in_ms), Milliseconds(0));
+                break;
+            case NonNeutralControllerField::MULTIPLE:
+                pbf_controller_state(context, button, x, y, Milliseconds(duration_in_ms));
+                break;
+            case NonNeutralControllerField::NONE:
+                pbf_wait(context, Milliseconds(duration_in_ms));
+                break;
+            }            
+        }
+    );
+}
+
+
+NonNeutralControllerField get_non_neutral_pro_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y){
+    NonNeutralControllerField non_neutral_field = NonNeutralControllerField::NONE;
+    int8_t num_non_neutral_fields = 0;
+    if (button != BUTTON_NONE) { 
+        num_non_neutral_fields++;
+        // if (num_non_neutral_fields > 1){
+        //     return NonNeutralControllerField::MULTIPLE;
+        // }
+        non_neutral_field = NonNeutralControllerField::BUTTON; 
+    }
+
+    if (dpad != DPAD_NONE){
+        num_non_neutral_fields++;
+        if (num_non_neutral_fields > 1){
+            return NonNeutralControllerField::MULTIPLE;
+        }
+        non_neutral_field = NonNeutralControllerField::DPAD; 
+    }
+
+    if (left_x != STICK_CENTER || left_y != STICK_CENTER){
+        num_non_neutral_fields++;
+        if (num_non_neutral_fields > 1){
+            return NonNeutralControllerField::MULTIPLE;
+        }
+        non_neutral_field = NonNeutralControllerField::LEFT_JOYSTICK; 
+    }
+
+    if (right_x != STICK_CENTER || right_y != STICK_CENTER){
+        num_non_neutral_fields++;
+        if (num_non_neutral_fields > 1){
+            return NonNeutralControllerField::MULTIPLE;
+        }
+        non_neutral_field = NonNeutralControllerField::RIGHT_JOYSTICK; 
+    }
+
+    return non_neutral_field;
+}
+
+NonNeutralControllerField get_non_neutral_joycon_controller_field(Button button, uint8_t x, uint8_t y){
+    NonNeutralControllerField non_neutral_field = NonNeutralControllerField::NONE;
+    int8_t num_non_neutral_fields = 0;
+    if (button != BUTTON_NONE) { 
+        num_non_neutral_fields++;
+        // if (num_non_neutral_fields > 1){
+        //     return NonNeutralControllerField::MULTIPLE;
+        // }
+        non_neutral_field = NonNeutralControllerField::BUTTON; 
+    }
+
+    if (x != STICK_CENTER || y != STICK_CENTER){
+        num_non_neutral_fields++;
+        if (num_non_neutral_fields > 1){
+            return NonNeutralControllerField::MULTIPLE;
+        }
+        non_neutral_field = NonNeutralControllerField::JOYSTICK; 
+    }
+
+    return non_neutral_field;
+}
+
+
+
+void json_to_pro_controller_state(
+    const JsonArray& history, 
+    std::function<void(int64_t duration_in_ms)>&& neutral_action,
+    std::function<void(
+        NonNeutralControllerField non_neutral_field,
+        Button button, 
+        DpadPosition dpad, 
+        uint8_t left_x, 
+        uint8_t left_y, 
+        uint8_t right_x, 
+        uint8_t right_y, 
+        int64_t duration_in_ms
+    )>&& non_neutral_action
+){
+    for(size_t i = 0; i < history.size(); i++){
+        const JsonObject& snapshot = history[i].to_object_throw();
+        int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
+        bool is_neutral = snapshot.get_boolean_throw("is_neutral");
+        if (is_neutral){
+            neutral_action(duration_in_ms);
+        }else{
+            std::string buttons_string = snapshot.get_string_throw("buttons");
+            std::string dpad_string = snapshot.get_string_throw("dpad");
+
+            Button button = string_to_button(buttons_string);
+            DpadPosition dpad = string_to_dpad(dpad_string);
+
+            int64_t left_x = snapshot.get_integer_throw("left_x");
+            int64_t left_y = snapshot.get_integer_throw("left_y");
+            int64_t right_x = snapshot.get_integer_throw("right_x");
+            int64_t right_y = snapshot.get_integer_throw("right_y");
+            
+            // ensure all x, y are within STICK_MIN/MAX
+            if (left_x > STICK_MAX || left_x < STICK_MIN || 
+                left_y > STICK_MAX || left_y < STICK_MIN || 
+                right_x > STICK_MAX || right_x < STICK_MIN || 
+                right_y > STICK_MAX || right_y < STICK_MIN)
+            {
+                throw ParseException();
+            }
+
+            NonNeutralControllerField non_neutral_field = get_non_neutral_pro_controller_field(button, dpad, left_x, left_y, right_x, right_y);
+
+            non_neutral_action(non_neutral_field, button, dpad, left_x, left_y, right_x, right_y, duration_in_ms);
+            
+        }
+
+    }
+
+}
+
+void json_to_joycon_state(
+    const JsonArray& history, 
+    std::function<void(int64_t duration_in_ms)>&& neutral_action,
+    std::function<void(
+        NonNeutralControllerField non_neutral_field,
+        Button button, 
+        uint8_t x, 
+        uint8_t y, 
+        int64_t duration_in_ms
+    )>&& non_neutral_action
+){
+    for(size_t i = 0; i < history.size(); i++){
+        const JsonObject& snapshot = history[i].to_object_throw();
+        int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
+        bool is_neutral = snapshot.get_boolean_throw("is_neutral");
+        if (is_neutral){
+            neutral_action(duration_in_ms);
+        }else{
+            std::string buttons_string = snapshot.get_string_throw("buttons");
+
+            Button button = string_to_button(buttons_string);
+
+            int64_t x = snapshot.get_integer_throw("joystick_x");
+            int64_t y = snapshot.get_integer_throw("joystick_y");
+            
+            // ensure x, y are within STICK_MIN/MAX
+            if (x > STICK_MAX || x < STICK_MIN || 
+                y > STICK_MAX || y < STICK_MIN)
+            {
+                throw ParseException();
+            }
+
+            NonNeutralControllerField non_neutral_field = get_non_neutral_joycon_controller_field(button, x, y);
+
+            non_neutral_action(non_neutral_field, button, x, y, duration_in_ms);
+            
+        }
+
+    }
 
 }
 

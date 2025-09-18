@@ -7,8 +7,10 @@
 #ifndef PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 #define PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 
+#include <functional>
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -22,10 +24,12 @@ enum class NonNeutralControllerField {
     DPAD,
     LEFT_JOYSTICK,
     RIGHT_JOYSTICK,
+    JOYSTICK,
     MULTIPLE,
     NONE,
 };
-NonNeutralControllerField get_non_neutral_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y);
+NonNeutralControllerField get_non_neutral_pro_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y);
+NonNeutralControllerField get_non_neutral_joycon_controller_field(Button button, uint8_t x, uint8_t y);
 
 // helper function that exposes the Pro Controller fields from the given JSON
 void json_to_pro_controller_state(
@@ -43,13 +47,28 @@ void json_to_pro_controller_state(
     )>&& non_neutral_action
 );
 
+// helper function that exposes the Joycon fields from the given JSON
+void json_to_joycon_state(
+    const JsonArray& history, 
+    std::function<void(int64_t duration_in_ms)>&& neutral_action,
+    std::function<void(
+        NonNeutralControllerField non_neutral_field,
+        Button button, 
+        uint8_t x, 
+        uint8_t y, 
+        int64_t duration_in_ms
+    )>&& non_neutral_action
+);
+
 // convert the json, with the controller history, to a string, which represents C++ code.
 std::string json_to_cpp_code(Logger& logger, const JsonValue& json);
 std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
+std::string json_to_cpp_code_joycon(const JsonArray& history);
 
 // given the json, with the controller history, run the controller actions using the pbf functions.
 void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category);
 void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history);
+void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history);
 
 class RecordKeyboardController_Descriptor : public SingleSwitchProgramDescriptor{
 public:
