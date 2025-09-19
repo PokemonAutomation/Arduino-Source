@@ -50,13 +50,17 @@ RecordKeyboardController::RecordKeyboardController()
     )
     , FILE_NAME(
         false,
-        "<b>Name of the JSON file to read/write.</b>", 
+        "<b>File name:</b><br>"
+        "Name of the JSON file to read/write.", 
         LockMode::LOCK_WHILE_RUNNING, 
         "UserSettings/recording",
         "<name of JSON file>"
     )
     , GENERATE_CPP_CODE_AFTER_RECORDING(
-        "<b>[For Developers] Generate C++ code text file, after recording:</b>",
+        "<b>[For Developers]</b><br>"
+        "<b>Automatically generate C++ code:</b><br>"
+        "After recording, a text file with the C++ code will automatically be generated.<br>"
+        "The name of the text file will be as per \"File name\" above.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
