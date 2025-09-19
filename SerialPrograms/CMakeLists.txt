@@ -2564,7 +2564,7 @@ if (APPLE)
         "${RESOURCES_PATH}"
         "$<TARGET_FILE_DIR:SerialPrograms>/../Resources"
     )
-elseif (WIN32)
+elseif (WIN32 AND DEPLOY_FILES)
     # Set directories and file dependencies (we HAVE to depend on a file for build-time extraction/git clone to work)
     set(OPENCV_DEBUG_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4110d.zip")
     set(OPENCV_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4110d.dll")
@@ -2913,9 +2913,24 @@ endif()
 if (WIN32 AND NOT DEPLOY_FILES)
     file(GLOB MY_DLLS
         "../3rdPartyBinaries/*.dll"
-)
+    )
+    file(COPY ${MY_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 
-file(COPY ${MY_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
+    message(STATUS "Extracting opencv_world4110d")
+    file(ARCHIVE_EXTRACT
+      INPUT ${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4110d.zip
+      DESTINATION ${REPO_ROOT_DIR}/3rdPartyBinaries/
+    )
+
+    set(DISCORD_SDK_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win.zip")
+    set(DISCORD_SDK_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win")
+    if(EXISTS "${DISCORD_SDK_ZIP}" AND NOT EXISTS "${DISCORD_SDK_DIR}")
+        message(STATUS "Extracting Social SDK")
+        file(ARCHIVE_EXTRACT
+            INPUT "${DISCORD_SDK_ZIP}"
+            DESTINATION "${REPO_ROOT_DIR}/3rdPartyBinaries"
+        )
+    endif()
 endif()
 
 if (WIN32 AND DEPLOY_FILES)
