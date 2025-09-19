@@ -529,6 +529,7 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
     
     JsonArray json_array;
     ControllerStateSnapshot* prev_snapshot = &m_controller_history[0]; // the previous non-duplicate snapshot
+    WallClock initial_time_stamp = m_controller_history[0].time_stamp;
 
     for (size_t i = 1; i < m_controller_history.size(); i++){ // start at index i = 1, since prev_snapshot starts at i=0 and we continue when current == previous.
         ControllerStateSnapshot& snapshot = m_controller_history[i];
@@ -542,10 +543,42 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
             continue;
         }
         
-        // cout << time_stamp << endl;
-        // cout << prev_time_stamp << endl;
-        auto elapsed_time = std::chrono::duration_cast<std::chrono::milliseconds>(time_stamp - prev_time_stamp); // might need to figure out how rounding works.
+        // Normalize each time stamp relative to the initial time stamp, and round to milliseconds.
+        // When only considering the distance between adjacent timestamps, you end up with drift due to rounding from nanoseconds to milliseconds, 
+
+        // example:
+        // Timestamps           Diff only comparing adjacent                Total time since start
+        // 12:00 1ns            1.4ns -> 1ms                                0ms
+        // 12:00 1401ns         1.4ns -> 1ms                                1ms
+        // 12:00 2801ns         1.4ns -> 1ms                                2ms
+        // 12:00 4201ns         1.4ns -> 1ms                                3ms
+        // 12:00 5601ns         1.4ns -> 1ms                                4ms
+        // 12:00 7001ns         1.4ns -> 1ms                                5ms
+        // 12:00 8401ns         1.4ns -> 1ms                                6ms
+        // 12:00 9801ns         1.4ns -> 1ms                                7ms
+        // 12:00 11201ns                                                    8ms
+        // total time elapsed: 11.2ms vs 8ms
+
+        // Normalized timestamps		Diff using normalized timestamps    Total time since start
+        // 0ns                          1ms                                 0ms
+        // 1.4ms -> 1ms                 2ms	                                1ms
+        // 2.8ms -> 3ms                 1ms                                 3ms
+        // 4.2ms -> 4ms                 2ms                                 4ms
+        // 5.6ms -> 6ms                 1ms                                 6ms
+        // 7.0ms -> 7ms                 1ms                                 7ms
+        // 8.4ms -> 8ms                 2ms                                 8ms
+        // 9.8ms -> 10ms                1ms                                 10ms
+        // 11.2ms -> 11ms                                                   11ms
+        // total time elapsed: 11.2ms vs 11ms
+
+
+        Milliseconds current_timestamp_time_since_start = 
+            std::chrono::round<Milliseconds>(std::chrono::duration_cast<std::chrono::nanoseconds>(time_stamp - initial_time_stamp)); // find the time difference as nanoseconds, then round to milliseconds
+        Milliseconds prev_timestamp_time_since_start = 
+            std::chrono::round<Milliseconds>(std::chrono::duration_cast<std::chrono::nanoseconds>(prev_time_stamp - initial_time_stamp)); 
+        Milliseconds elapsed_time = current_timestamp_time_since_start - prev_timestamp_time_since_start;
         int64_t duration = elapsed_time.count();
+
         // cout << std::to_string(duration) << endl;
         // cout << prev_controller_state.dump() << endl;
         JsonObject recording = prev_controller_state.clone();
