@@ -7,6 +7,7 @@
 #include <optional>
 #include <mutex>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "Common/Cpp/StringTools.h"
 #include "BoxDraw.h"
 
 // #include <iostream>
@@ -144,25 +145,11 @@ void BoxDraw::update_box_coordinates(){
     BOX_COORDINATES.set(box_coord_string);
 }
 
-std::vector<std::string> split(const std::string& str, const std::string& delimiter) {
-    std::vector<std::string> tokens;
-    size_t start = 0;
-    size_t end = str.find(delimiter);
-    
-    while (end != std::string::npos) {
-        tokens.push_back(str.substr(start, end - start));
-        start = end + delimiter.length();
-        end = str.find(delimiter, start);
-    }
-    
-    tokens.push_back(str.substr(start));
-    return tokens;
-}
 
 
 void BoxDraw::update_individual_coordinates(){
     std::string box_coord_string = BOX_COORDINATES;
-    std::vector<std::string> all_coords = split(box_coord_string, ", ");
+    std::vector<std::string> all_coords = StringTools::split(box_coord_string, ", ");
 
     std::string x_string = all_coords[0];
     std::string y_string = all_coords[1];

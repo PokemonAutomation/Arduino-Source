@@ -57,6 +57,7 @@ public:
         stop();
     }
     virtual void send_state(const ControllerState& state) override{
+        WallClock time_stamp = current_time();
         const JoyconState& switch_state = static_cast<const JoyconState&>(state);
 #if 0
         m_controller->logger().log(
@@ -78,6 +79,7 @@ public:
             switch_state.joystick_y,
             ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255
         );
+        report_keyboard_command_sent(time_stamp, switch_state);
     }
 };
 
@@ -106,7 +108,13 @@ void JoyconController::keyboard_release(const QKeyEvent& event){
     m_keyboard_manager->on_key_release(event);
 }
 
+void JoyconController::add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
+    m_keyboard_manager->add_listener(keyboard_listener);
+}
 
+void JoyconController::remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
+    m_keyboard_manager->remove_listener(keyboard_listener);
+}
 
 
 

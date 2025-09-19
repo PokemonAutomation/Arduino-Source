@@ -701,6 +701,8 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/JoystickTools.h
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.cpp
     Source/Controllers/KeyboardInput/GlobalQtKeyMap.h
+    Source/Controllers/KeyboardInput/KeyboardEventHandler.cpp
+    Source/Controllers/KeyboardInput/KeyboardEventHandler.h
     Source/Controllers/KeyboardInput/KeyboardInput.cpp
     Source/Controllers/KeyboardInput/KeyboardInput.h
     Source/Controllers/KeyboardInput/KeyboardStateTracker.cpp
@@ -1119,6 +1121,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PushJoySticks.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_RecordKeyboardController.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_RecordKeyboardController.h
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_SnapshotDumper.h
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp
