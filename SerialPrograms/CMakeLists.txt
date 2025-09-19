@@ -53,36 +53,25 @@ else()
     message(STATUS "Detected local dev environment")
     set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
 
-    # Clone or update the Packages repo
+    # Add a custom command to clone Packages
     if(NOT EXISTS "${PACKAGES_DIR}/.git")
-        message(STATUS "Packages repo not found. Cloning...")
-        execute_process(
-            COMMAND git clone --branch master https://github.com/PokemonAutomation/Packages.git "${PACKAGES_DIR}"
-            RESULT_VARIABLE result
-            OUTPUT_VARIABLE out
-            ERROR_VARIABLE err
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_STRIP_TRAILING_WHITESPACE
+        add_custom_command(
+            OUTPUT "${PACKAGES_DIR}/.git"
+            COMMAND ${CMAKE_COMMAND} -E echo "Cloning Packages repo..."
+            COMMAND ${CMAKE_COMMAND} -E make_directory "${PACKAGES_DIR}"
+            COMMAND git clone --branch master https://github.com/PokemonAutomation/Packages "${PACKAGES_DIR}"
+            WORKING_DIRECTORY "${REPO_ROOT_DIR}"
+            COMMENT "Cloning Packages repository"
+            VERBATIM
         )
-
-        if(NOT result EQUAL 0)
-            message(FATAL_ERROR "Failed to clone Packages repo:\n${err}")
-        endif()
-    else()
-        message(STATUS "Packages repo exists. Pulling latest changes...")
-        execute_process(
-            COMMAND git -C "${PACKAGES_DIR}" pull origin master
-            RESULT_VARIABLE result
-            OUTPUT_VARIABLE out
-            ERROR_VARIABLE err
-            OUTPUT_STRIP_TRAILING_WHITESPACE
-            ERROR_STRIP_TRAILING_WHITESPACE
-        )
-
-        if(NOT result EQUAL 0)
-            message(WARNING "Failed to update Packages repo:\n${err}")
-        endif()
     endif()
+
+    list(APPEND _cmake_files_to_watch "${PACKAGES_DIR}/.git")
+    # Add a custom target which we will depend on in executable_add() later on
+    add_custom_target(
+        PackagesRepo
+        DEPENDS "${PACKAGES_DIR}/.git"
+    )
 
     # Set paths for post-build deployment
     set(FIRMWARE_DIR "${PACKAGES_DIR}/PABotBase/PABotBase-Switch")
@@ -98,7 +87,6 @@ else()
     endif()
 
     set(DEPLOY_FILES TRUE)
-    message(STATUS "Packages repo ready for deployment")
 endif()
 
 #Find threads library
@@ -2576,7 +2564,28 @@ if (APPLE)
         "${RESOURCES_PATH}"
         "$<TARGET_FILE_DIR:SerialPrograms>/../Resources"
     )
-else() # WIN and Linux:
+elseif (WIN32)
+    # Set directories and file dependencies (we HAVE to depend on a file for build-time extraction/git clone to work)
+    set(OPENCV_DEBUG_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4110d.zip")
+    set(OPENCV_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4110d.dll")
+
+    set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win.zip")
+    set(DISCORD_LIB_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/lib/debug/discord_partner_sdk.lib")
+    set(DISCORD_LIB_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/lib/release/discord_partner_sdk.lib")
+
+    list(APPEND _cmake_files_to_watch "${DISCORD_LIB_DEBUG}")
+    list(APPEND _cmake_files_to_watch "${DISCORD_LIB_RELEASE}")
+    list(APPEND _cmake_files_to_watch "${OPENCV_DEBUG}")
+
+    add_custom_target(ExtractDependencies
+        COMMENT "Extracting 3rd party dependencies..."
+        DEPENDS ${DISCORD_LIB_DEBUG} ${DISCORD_LIB_RELEASE} ${OPENCV_DEBUG}
+    )
+
+    add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
+    add_dependencies(SerialPrograms ExtractDependencies)
+    add_dependencies(SerialPrograms PackagesRepo)
+else()
     add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
 endif()
 
@@ -2593,25 +2602,6 @@ if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/Internal0.cpp)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
-endif()
-
-# Extract opencv_world4110d.dll from archive on Windows Debug build, extract Discord Social SDK for Windows
-if (WIN32)
-    message(STATUS "Extracting opencv_world4110d")
-    file(ARCHIVE_EXTRACT
-      INPUT ${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4110d.zip
-      DESTINATION ${REPO_ROOT_DIR}/3rdPartyBinaries/
-    )
-
-    set(DISCORD_SDK_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win.zip")
-    set(DISCORD_SDK_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win")
-    if(EXISTS "${DISCORD_SDK_ZIP}" AND NOT EXISTS "${DISCORD_SDK_DIR}")
-        message(STATUS "Extracting Social SDK")
-        file(ARCHIVE_EXTRACT
-            INPUT "${DISCORD_SDK_ZIP}"
-            DESTINATION "${REPO_ROOT_DIR}/3rdPartyBinaries"
-        )
-    endif()
 endif()
 
 #add include directory
@@ -2929,103 +2919,87 @@ file(COPY ${MY_DLLS} DESTINATION ${CMAKE_CURRENT_BINARY_DIR})
 endif()
 
 if (WIN32 AND DEPLOY_FILES)
-    # Ensure the binaries directory exists
-    add_custom_command(
-        TARGET SerialPrograms
-        POST_BUILD
+    # Ensure target dirs and copy content folders
+    set(DEPLOY_CMDS)
+    list(APPEND DEPLOY_CMDS
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Ensure deploy dir exists: ${DEPLOY_DIR}"
         COMMAND ${CMAKE_COMMAND} -E make_directory ${DEPLOY_DIR}
-        COMMENT "Ensuring binary directory exists"
-    )
 
-    # Copy the resources folder to build directory
-    add_custom_command(
-        TARGET SerialPrograms
-        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying resources to destination dir: ${DEST_DIR}/Resources"
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${RESOURCES_DIR} "${DEST_DIR}/Resources"
-        COMMENT "Copying the resources folder to the build directory"
-    )
 
-    # Copy the firmware folder to build directory
-    add_custom_command(
-        TARGET SerialPrograms
-        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying firmware to destination dir: ${DEST_DIR}/PABotBase"
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${FIRMWARE_DIR} "${DEST_DIR}/PABotBase"
-        COMMENT "Copying the firmware folder to the build directory"
-    )
 
-    # Copy the scripts folder to build directory
-    add_custom_command(
-        TARGET SerialPrograms
-        POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying scripts to destination dir: ${DEST_DIR}/Scripts"
         COMMAND ${CMAKE_COMMAND} -E copy_directory ${SCRIPTS_DIR} "${DEST_DIR}/Scripts"
-        COMMENT "Copying the scripts folder to the build directory"
     )
 
-    # Run windeployqt.exe to deploy Qt dependencies based on build type
+    # Run windeployqt for the current config
     if(WINDEPLOYQT_EXECUTABLE)
-        add_custom_command(
-            TARGET SerialPrograms
-            POST_BUILD
+        list(APPEND DEPLOY_CMDS
+            COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Running windeployqt"
             COMMAND "${WINDEPLOYQT_EXECUTABLE}"
-                    --dir "${DEPLOY_DIR}"
-                    $<IF:$<CONFIG:Debug>,--debug,--release>
-                    $<TARGET_FILE:SerialPrograms>
-            COMMENT "Deploying Qt dependencies for $<CONFIG>"
+                --dir "${DEPLOY_DIR}"
+                $<IF:$<CONFIG:Debug>,--debug,--release>
+                $<TARGET_FILE:SerialPrograms>
         )
     else()
         message(WARNING "windeployqt not found, skipping Qt deployment.")
     endif()
 
-    # Move 3rd party DLLs to binaries folder
-    file(GLOB THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/*.dll")
-    foreach(DLL ${THIRD_PARTY_DLLS})
-        get_filename_component(DLL_NAME ${DLL} NAME)
-        add_custom_command(
-            TARGET SerialPrograms
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy ${DLL} "${DEPLOY_DIR}/${DLL_NAME}"
-            COMMENT "Moving ${DLL_NAME} to binaries folder"
-        )
-    endforeach()
-
-    # Move binaries generated by CMake to binaries folder
-    file(GLOB DLL_FILES "${CMAKE_CURRENT_BINARY_DIR}/*.dll")
-    foreach(DLL ${DLL_FILES})
-        get_filename_component(DLL_NAME ${DLL} NAME)
-        add_custom_command(
-            TARGET SerialPrograms
-            POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E rename ${DLL} "${DEPLOY_DIR}/${DLL_NAME}"
-            COMMENT "Moving ${DLL_NAME} to binaries folder"
-        )
-    endforeach()
-
-    # Copy discord_social_sdk DLL based on build type
-    add_custom_command(
-        TARGET SerialPrograms
-        POST_BUILD
+    # Copy Discord SDK DLL (config-specific)
+    list(APPEND DEPLOY_CMDS
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying Discord SDK DLL"
         COMMAND ${CMAKE_COMMAND} -E copy
-            $<IF:$<CONFIG:Debug>,"${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/debug/discord_partner_sdk.dll","${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/release/discord_partner_sdk.dll">
-            "${DEPLOY_DIR}/discord_partner_sdk.dll"
-        COMMENT "Copying Discord SDK DLL to the binaries folder"
+            $<IF:$<CONFIG:Debug>,${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/debug/discord_partner_sdk.dll,${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/release/discord_partner_sdk.dll>
+            ${DEPLOY_DIR}/discord_partner_sdk.dll
     )
 
-    # Move the .exe file to Binaries64
-    add_custom_command(
-        TARGET SerialPrograms
-        POST_BUILD
+    # Copy all 3rdPartyBinaries *.dll (computed at configure-time)
+    file(GLOB THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/*.dll")
+    foreach(DLL IN LISTS THIRD_PARTY_DLLS)
+        message(STATUS "Adding deploy command for 3rd party DLL: ${DLL}")
+        list(APPEND DEPLOY_CMDS COMMAND ${CMAKE_COMMAND} -E copy "${DLL}" "${DEPLOY_DIR}/")
+    endforeach()
+
+    # Copy the built exe and pdb (pdb guarded for existence)
+    list(APPEND DEPLOY_CMDS
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying built exe and pdb"
         COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:SerialPrograms> "${DEPLOY_DIR}/$<TARGET_FILE_NAME:SerialPrograms>"
-        COMMENT "Moving .exe to the binaries folder"
+        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_PDB_FILE:SerialPrograms> "${DEPLOY_DIR}/$<TARGET_PDB_FILE_NAME:SerialPrograms>"
     )
 
-    # Move the .pdb file to Binaries64
-    add_custom_command(
-        TARGET SerialPrograms
-        POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E make_directory "${DEPLOY_DIR}"
-        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_PDB_FILE:SerialPrograms> "${DEPLOY_DIR}/$<TARGET_PDB_FILE_NAME:SerialPrograms>"
-        COMMENT "Moving .pdb to the binaries folder"
+    add_custom_target(DeployRuntime ALL
+        DEPENDS SerialPrograms ExtractDependencies PackagesRepo
+        COMMENT "Deploying runtime (Qt, packages, DLLs) to ${DEPLOY_DIR}"
+        VERBATIM
+        ${DEPLOY_CMDS}
     )
+
+    # Extract Discord SDK build-time, if it doesn't already exist
+    if (NOT EXISTS "${DISCORD_LIB_DEBUG}" OR NOT EXISTS "${DISCORD_LIB_RELEASE}")
+        message(STATUS "Discord SDK not found, extracting from zip...")
+        add_custom_command(
+            OUTPUT "${DISCORD_LIB_DEBUG}" "${DISCORD_LIB_RELEASE}"
+            COMMAND ${CMAKE_COMMAND} -E tar xf "${DISCORD_ZIP}"
+            WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
+            DEPENDS "${DISCORD_ZIP}"
+            COMMENT "Extracting Discord SDK"
+        )
+    endif()
+
+    # Extract OpenCV debug DLL build-time, if it doesn't already exist
+    if (NOT EXISTS "${OPENCV_DEBUG}")
+        message(STATUS "OpenCV debug DLL not found, extracting from zip...")
+        add_custom_command(
+            OUTPUT "${OPENCV_DEBUG}"
+            COMMAND ${CMAKE_COMMAND} -E tar xf "${OPENCV_DEBUG_ZIP}"
+            WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
+            DEPENDS "${OPENCV_DEBUG_ZIP}"
+            COMMENT "Extracting OpenCV debug DLL"
+        )
+    endif()
 endif()
 
 if (QT_MAJOR GREATER_EQUAL 6)
