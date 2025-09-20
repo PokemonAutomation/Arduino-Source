@@ -57,7 +57,7 @@ public:
         stop();
     }
     virtual void send_state(const ControllerState& state) override{
-        WallClock time_stamp = current_time();
+        
         const JoyconState& switch_state = static_cast<const JoyconState&>(state);
 #if 0
         m_controller->logger().log(
@@ -72,6 +72,7 @@ public:
             return;
         }
         Milliseconds ticksize = m_controller->ticksize();
+        WallClock time_stamp = current_time();
         static_cast<JoyconController*>(m_controller)->issue_full_controller_state(
             nullptr,
             switch_state.buttons,

@@ -50,8 +50,7 @@ public:
     ~KeyboardManager(){
         stop();
     }
-    virtual void send_state(const ControllerState& state) override{
-        WallClock time_stamp = current_time();
+    virtual void send_state(const ControllerState& state) override{        
         const ProControllerState& switch_state = static_cast<const ProControllerState&>(state);
 
 #if 0
@@ -69,6 +68,7 @@ public:
             return;
         }
         Milliseconds ticksize = m_controller->ticksize();
+        WallClock time_stamp = current_time();
         static_cast<ProController*>(m_controller)->issue_full_controller_state(
             nullptr,
             ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255,

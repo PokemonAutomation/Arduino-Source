@@ -23,7 +23,7 @@ public:
         return dump() == x.dump();
     }
     bool operator!=(const JsonObject& x){
-        return dump() != x.dump();
+        return !(*this == *this);
     }
 private:
     //  Private to avoid accidental copying.

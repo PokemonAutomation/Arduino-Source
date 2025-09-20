@@ -74,7 +74,7 @@ RecordKeyboardController::RecordKeyboardController()
 
 void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     AbstractControllerContext context(scope, env.console.controller());
-    ControllerCategory controller_category = env.console.controller().controller_category();
+    ControllerClass controller_class = env.console.controller().controller_class();
 
     if (MODE == Mode::RECORD){
         // check if given file name already exists. If it does, throw an error so we don't overwrite it.
@@ -90,7 +90,7 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
             context.wait_until_cancel();
         }catch (ProgramCancelledException&){
 
-            JsonValue json = controller_history_to_json(env.console.logger(), controller_category);
+            JsonValue json = controller_history_to_json(env.console.logger(), controller_class);
             json.dump(output_json_filename);
             m_controller_history.clear();
 
@@ -105,7 +105,7 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
         
     }else if (MODE == Mode::REPLAY){
         JsonValue json = load_json_file(std::string(FILE_NAME) + ".json");
-        json_to_pbf_actions(env, scope, json, controller_category);
+        json_to_pbf_actions(env, scope, json, controller_class);
 
 
     }else if (MODE == Mode::CONVERT_JSON_TO_CODE){
@@ -121,23 +121,23 @@ void json_to_cpp_code(Logger& logger, const JsonValue& json, const std::string& 
     try{
         const JsonObject& obj = json.to_object_throw();
 
-        std::string controller_category_string = obj.get_string_throw("controller_category");
-        cout << controller_category_string << endl;
-        ControllerCategory controller_category = CONTROLLER_CATEGORY_STRINGS().get_enum(controller_category_string);
+        std::string controller_class_string = obj.get_string_throw("controller_class");
+        cout << controller_class_string << endl;
+        ControllerClass controller_class = CONTROLLER_CLASS_STRINGS().get_enum(controller_class_string);
 
         const JsonArray& history_json = obj.get_array_throw("history");
 
         std::string output_text;
-        switch (controller_category){
-        case ControllerCategory::PRO_CONTROLLER:
+        switch (controller_class){
+        case ControllerClass::PRO_CONTROLLER:
             output_text = json_to_cpp_code_pro_controller(history_json);
             break;
-        case ControllerCategory::LEFT_JOYCON:
-        case ControllerCategory::RIGHT_JOYCON:
+        case ControllerClass::LEFT_JOYCON:
+        case ControllerClass::RIGHT_JOYCON:
             output_text = json_to_cpp_code_joycon(history_json);
             break;
         default:
-            // generate empty text if ControllerCategory is not one of the above
+            // generate empty text if ControllerClass is not one of the above
             break;
         }
 
@@ -257,34 +257,34 @@ std::string json_to_cpp_code_joycon(const JsonArray& history){
 }
 
 
-void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category){
+void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerClass controller_class){
     try{
         const JsonObject& obj = json.to_object_throw();
 
-        std::string controller_category_string = obj.get_string_throw("controller_category");
-        ControllerCategory controller_category_json = CONTROLLER_CATEGORY_STRINGS().get_enum(controller_category_string);
-        if (controller_category_json != controller_category){
-            throw UserSetupError(env.logger(), "Controller category in the JSON file does not match your current selected controller.");
+        std::string controller_class_string = obj.get_string_throw("controller_class");
+        ControllerClass controller_class_json = CONTROLLER_CLASS_STRINGS().get_enum(controller_class_string);
+        if (controller_class_json != controller_class){
+            throw UserSetupError(env.logger(), "Controller class in the JSON file does not match your current selected controller.");
         }
 
         const JsonArray& history_json = obj.get_array_throw("history");
 
-        switch (controller_category){
-        case ControllerCategory::PRO_CONTROLLER:
+        switch (controller_class){
+        case ControllerClass::PRO_CONTROLLER:
         {
             ProControllerContext context(scope, env.console.controller<ProController>());
             json_to_pbf_actions_pro_controller(context, history_json);
             break;
         }
-        case ControllerCategory::LEFT_JOYCON:
-        case ControllerCategory::RIGHT_JOYCON:
+        case ControllerClass::LEFT_JOYCON:
+        case ControllerClass::RIGHT_JOYCON:
         {
             JoyconContext context(scope, env.console.controller<JoyconController>());
             json_to_pbf_actions_joycon(context, history_json);
             break;
         }
         default:
-            // do nothing if the ControllerCategory is not one of the above.
+            // do nothing if the ControllerClass is not one of the above.
             break;
         }
 
@@ -524,7 +524,7 @@ void json_to_joycon_state(
 
 }
 
-JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, ControllerCategory controller_category){
+JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, ControllerClass controller_class){
     if (m_controller_history.size() < 2){
         // throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "RecordKeyboardController:: m_controller_history should have at least two entries, start and stop.");
         logger.log("RecordKeyboardController:: We expected m_controller_history to have at least two entries, start and stop. Aborting.", COLOR_RED);
@@ -593,7 +593,7 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
     
     
     JsonObject json_result;
-    json_result["controller_category"] = CONTROLLER_CATEGORY_STRINGS().get_string(controller_category);
+    json_result["controller_class"] = CONTROLLER_CLASS_STRINGS().get_string(controller_class);
     json_result["history"] = JsonValue(std::move(json_array));
 
     return json_result;

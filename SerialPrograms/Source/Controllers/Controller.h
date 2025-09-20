@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 class RecursiveThrottler;
 enum class ControllerType;
 enum class ControllerPerformanceClass;
-enum class ControllerCategory;
+enum class ControllerClass;
 
 
 
@@ -66,7 +66,7 @@ public:
 
     virtual const char* name() = 0;
     virtual ControllerType controller_type() const = 0;
-    virtual ControllerCategory controller_category() const = 0;
+    virtual ControllerClass controller_class() const = 0;
     virtual ControllerPerformanceClass performance_class() const = 0;
 
     //  If the controller is polled at a fixed interval, this is that interval.

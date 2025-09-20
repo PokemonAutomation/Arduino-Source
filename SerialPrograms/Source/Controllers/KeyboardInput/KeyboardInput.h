@@ -126,11 +126,11 @@ public:
         deltas.to_state(static_cast<StateType&>(state));
     }
     virtual void cancel_all_commands() override{
-        WallClock time_stamp = current_time();
         WriteSpinLock lg(m_lock);
         if (m_controller == nullptr){
             return;
         }
+        WallClock time_stamp = current_time();
         m_controller->cancel_all_commands();
         report_keyboard_command_stopped(time_stamp);
     }

@@ -191,8 +191,8 @@ public:
     virtual const char* name() override{
         return NAME;
     };
-    virtual ControllerCategory controller_category() const override{
-        return ControllerCategory::LEFT_JOYCON;
+    virtual ControllerClass controller_class() const override{
+        return ControllerClass::LEFT_JOYCON;
     }    
 };
 class RightJoycon : public JoyconController{
@@ -203,8 +203,8 @@ public:
     virtual const char* name() override{
         return NAME;
     };
-    virtual ControllerCategory controller_category() const override{
-        return ControllerCategory::RIGHT_JOYCON;
+    virtual ControllerClass controller_class() const override{
+        return ControllerClass::RIGHT_JOYCON;
     } 
 };
 

@@ -21,7 +21,7 @@ public:
     KeyboardEventHandler();
     virtual ~KeyboardEventHandler();
 
-     struct KeyboardListener{
+    struct KeyboardListener{
         virtual void on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state) = 0;
         virtual void on_keyboard_command_stopped(WallClock time_stamp) = 0;
     };

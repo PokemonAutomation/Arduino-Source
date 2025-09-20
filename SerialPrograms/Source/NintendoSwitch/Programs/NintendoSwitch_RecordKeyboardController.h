@@ -67,7 +67,7 @@ std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
 std::string json_to_cpp_code_joycon(const JsonArray& history);
 
 // given the json, with the controller history, run the controller actions using the pbf functions.
-void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerCategory controller_category);
+void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerClass controller_class);
 void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history);
 void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history);
 
@@ -94,7 +94,7 @@ private:
 
     // convert m_controller_history to json
     // remove adjacent duplicate controller states.
-    JsonValue controller_history_to_json(Logger& logger, ControllerCategory controller_category);
+    JsonValue controller_history_to_json(Logger& logger, ControllerClass controller_class);
 
 
     // Examples for JsonObject controller_state:

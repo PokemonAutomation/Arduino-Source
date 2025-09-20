@@ -44,7 +44,7 @@ enum class ControllerPerformanceClass{
     SysbotBase,
 };
 
-enum class ControllerCategory{
+enum class ControllerClass{
     NONE,
     LEFT_JOYCON,
     RIGHT_JOYCON,

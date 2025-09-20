@@ -66,8 +66,8 @@ public:
     virtual const char* name() override{
         return NAME;
     };
-    virtual ControllerCategory controller_category() const override{
-        return ControllerCategory::PRO_CONTROLLER;
+    virtual ControllerClass controller_class() const override{
+        return ControllerClass::PRO_CONTROLLER;
     }
 
 
