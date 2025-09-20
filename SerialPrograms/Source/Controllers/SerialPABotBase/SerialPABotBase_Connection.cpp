@@ -20,10 +20,6 @@
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Connection.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
-
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
@@ -125,30 +121,6 @@ ControllerType SerialPABotBase_Connection::refresh_controller_type(){
 
 
 
-
-const std::set<pabb_ProgramID>& SerialPABotBase_Connection::get_programs_for_protocol(uint32_t protocol){
-    //  (protocol_requested / 100) == (protocol_device / 100)
-    //  (protocol_requested % 100) <= (protocol_device % 100)
-    auto iter = SUPPORTED_VERSIONS().upper_bound(protocol);
-    if (iter == SUPPORTED_VERSIONS().begin()){
-        throw SerialProtocolException(
-            m_logger, PA_CURRENT_FUNCTION,
-            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
-            "Please flash the .hex/.bin that came with this version of the program."
-        );
-    }
-    --iter;
-    if (iter->first < protocol / 100 * 100){
-        throw SerialProtocolException(
-            m_logger, PA_CURRENT_FUNCTION,
-            "Incompatible protocol. Device: " + std::to_string(protocol) + "<br>"
-            "Please flash the .hex/.bin that came with this version of the program."
-        );
-    }
-
-    return iter->second;
-}
-
 void SerialPABotBase_Connection::process_queue_size(){
     m_logger.log("Requesting queue size...");
     uint8_t queue_size = device_queue_size(*m_botbase);
@@ -161,42 +133,47 @@ void SerialPABotBase_Connection::process_queue_size(){
     m_botbase->set_queue_limit(queue_size);
 }
 
+void SerialPABotBase_Connection::throw_incompatible_protocol(){
+    throw SerialProtocolException(
+        m_logger, PA_CURRENT_FUNCTION,
+        "Incompatible protocol. Device: " + std::to_string(m_protocol) + "<br>"
+        "Please flash the .hex/.bin that came with this version of the program."
+    );
+}
 ControllerType SerialPABotBase_Connection::process_device(bool set_to_null_controller){
     //  Protocol Version
+    const std::map<pabb_ProgramID, uint8_t>* PROGRAMS;
     {
         m_logger.Logger::log("Checking Protocol Version...");
         m_protocol = protocol_version(*m_botbase);
         m_logger.Logger::log("Checking Protocol Version... (" + std::to_string(m_protocol) + ")");
+        auto iter = SUPPORTED_VERSIONS().find(m_protocol / 100);
+        if (iter == SUPPORTED_VERSIONS().end()){
+            throw_incompatible_protocol();
+        }
+        PROGRAMS = &iter->second;
     }
-    const std::set<pabb_ProgramID>& PROGRAMS = get_programs_for_protocol(m_protocol);
 
     //  Program ID
     {
         m_logger.Logger::log("Checking Program ID...");
         m_program_id = program_id(*m_botbase);
         m_logger.Logger::log("Checking Program ID... (0x" + tostr_hex(m_program_id) + ")");
-    }
-    if (PROGRAMS.find(m_program_id) == PROGRAMS.end()){
-#if 1
-        m_logger.Logger::log(
-            "Unrecognized Program ID: (0x" + tostr_hex(m_program_id) + ") for this protocol version. "
-            "Compatibility is not guaranteed.",
-            COLOR_RED
-        );
-        if (PROGRAMS.find(PABB_PID_UNSPECIFIED) == PROGRAMS.end()){
-            throw SerialProtocolException(
-                m_logger, PA_CURRENT_FUNCTION,
-                "Unrecognized program IDs require latest protocol.<br>"
-                "Program ID: 0x" + tostr_hex(m_program_id) + ", Device Protocol: " + std::to_string(m_protocol)
+        auto iter = PROGRAMS->find(m_program_id);
+        if (iter == PROGRAMS->end()){
+            m_logger.Logger::log(
+                "Unrecognized Program ID: (0x" + tostr_hex(m_program_id) + ") for this protocol version. "
+                "Compatibility is not guaranteed.",
+                COLOR_RED
             );
+            iter = PROGRAMS->find(PABB_PID_UNSPECIFIED);
+            if (iter == PROGRAMS->end()){
+                throw_incompatible_protocol();
+            }
         }
-#else
-        throw SerialProtocolException(
-            m_logger, PA_CURRENT_FUNCTION,
-            "Unrecognized Program ID: 0x" + tostr_hex(m_program_id) + "<br>"
-            "Please install the firmware that came with this version of the program."
-        );
-#endif
+        if (m_protocol % 100 < iter->second){
+            throw_incompatible_protocol();
+        }
     }
 
     //  Firmware Version

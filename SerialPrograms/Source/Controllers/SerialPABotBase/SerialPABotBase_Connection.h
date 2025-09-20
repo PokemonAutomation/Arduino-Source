@@ -44,10 +44,8 @@ public:
 
 
 private:
-    const std::set<pabb_ProgramID>& get_programs_for_protocol(uint32_t protocol);
-
     void process_queue_size();
-
+    void throw_incompatible_protocol();
     ControllerType process_device(bool set_to_null_controller);
 
     void thread_body(bool set_to_null_controller);

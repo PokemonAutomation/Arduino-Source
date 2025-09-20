@@ -27,15 +27,15 @@ const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES(){
     return database;
 }
 
-std::map<uint32_t, std::set<pabb_ProgramID>> make_SUPPORTED_VERSIONS(){
-    std::map<uint32_t, std::set<pabb_ProgramID>> ret;
+std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> make_SUPPORTED_VERSIONS(){
+    std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> ret;
     for (const auto& item : SUPPORTED_DEVICES()){
-        ret[item.second].insert(item.first);
+        ret[item.second / 100][item.first] = (uint8_t)(item.second % 100);
     }
     return ret;
 }
-const std::map<uint32_t, std::set<pabb_ProgramID>>& SUPPORTED_VERSIONS(){
-    static const std::map<uint32_t, std::set<pabb_ProgramID>> database = make_SUPPORTED_VERSIONS();
+const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>>& SUPPORTED_VERSIONS(){
+    static const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> database = make_SUPPORTED_VERSIONS();
     return database;
 }
 
