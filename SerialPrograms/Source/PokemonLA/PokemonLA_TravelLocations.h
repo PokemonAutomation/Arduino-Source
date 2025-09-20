@@ -27,9 +27,14 @@ struct TravelLocation{
     const char* display;
 
     MapRegion region;
-    uint8_t warp_slot; // which menu slot to warp from the full-Hisui map when leaving the village.
-    uint8_t warp_sub_slot; // which menu slot to warp the region map, if the location is a settlement or arena that requires an in-region warp.
-    bool reverse_sub_menu_direction; // whether it is faster to go upwards in the in-region warp map to reach the destination slot.
+    // which menu slot to warp from the full-Hisui map when leaving the village.
+    uint8_t warp_slot;
+    // which menu slot to warp across the region map, if the location is a settlement
+    // or arena that requires an in-region warp.
+    uint8_t warp_sub_slot; 
+    // whether it is faster to go upwards in the in-region warp map to reach the
+    // destination slot.
+    bool reverse_sub_menu_direction; 
 
     std::function<void(VideoStream& stream, ProControllerContext& context)> post_arrival_maneuver;
 
@@ -43,6 +48,9 @@ struct TravelLocation{
 };
 
 
+// Singleton to return all travel locations from the Jubilife Village Gate
+// To create a program option to select travel location, use:
+// SerialPrograms/Source/PokemonLA/Options/PokemonLA_TravelLocation.h:TravelLocationOption
 class TravelLocations{
 public:
     static const TravelLocations& instance();
@@ -50,7 +58,8 @@ public:
     const TravelLocation& operator[](size_t index) const{
         return *m_list[index];
     }
-    const IntegerEnumDropdownDatabase& database() const;
+    const IntegerEnumDropdownDatabase& database_outside_village() const { return m_database_outside_village; }
+    const IntegerEnumDropdownDatabase& database_including_village() const { return m_database_include_village; }
 
 
 public:
@@ -81,15 +90,21 @@ public:
 
     const TravelLocation Retreat;
 
+    const TravelLocation Village_GalaxyHall;
+    const TravelLocation Village_FrontGate;
+    const TravelLocation Village_PracticeField;
+    const TravelLocation Village_Farm;
+    const TravelLocation Village_TrainingGrounds;
 
 private:
     TravelLocations();
-    void add_location(const TravelLocation& location);
+    void add_location(const TravelLocation& location, bool inside_village = false);
 
     std::vector<const TravelLocation*> m_list;
     std::map<std::string, const TravelLocation*> m_map;
-
-    IntegerEnumDropdownDatabase m_database;
+ 
+    IntegerEnumDropdownDatabase m_database_outside_village;
+    IntegerEnumDropdownDatabase m_database_include_village;
 };
 
 

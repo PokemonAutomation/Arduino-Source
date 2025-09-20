@@ -176,7 +176,7 @@ void CustomPathCell::on_config_value_changed(void* object){
 
 
 
-CustomPathTableRow2::CustomPathTableRow2(EditableTableOption& parent_table)
+CustomPathTableRow::CustomPathTableRow(EditableTableOption& parent_table)
     : EditableTableRow(parent_table)
     , action(PathAction_Database(), LockMode::LOCK_WHILE_RUNNING, PathAction::NO_ACTION)
     , parameters(action)
@@ -184,13 +184,13 @@ CustomPathTableRow2::CustomPathTableRow2(EditableTableOption& parent_table)
     PA_ADD_OPTION(action);
     PA_ADD_OPTION(parameters);
 }
-std::unique_ptr<EditableTableRow> CustomPathTableRow2::clone() const{
-    std::unique_ptr<CustomPathTableRow2> ret(new CustomPathTableRow2(parent()));
+std::unique_ptr<EditableTableRow> CustomPathTableRow::clone() const{
+    std::unique_ptr<CustomPathTableRow> ret(new CustomPathTableRow(parent()));
     ret->action.set(action);
     ret->parameters = parameters;
     return ret;
 }
-void CustomPathTableRow2::load_json(const JsonValue& json){
+void CustomPathTableRow::load_json(const JsonValue& json){
     const JsonObject* obj = json.to_object();
     if (obj == nullptr){
         return;
@@ -269,7 +269,7 @@ void CustomPathTableRow2::load_json(const JsonValue& json){
         break;
     }
 }
-JsonValue CustomPathTableRow2::to_json() const{
+JsonValue CustomPathTableRow::to_json() const{
     JsonObject obj;
     obj["Action"] = action.to_json();
     switch (action){
@@ -298,8 +298,8 @@ JsonValue CustomPathTableRow2::to_json() const{
     return obj;
 }
 
-CustomPathTable2::CustomPathTable2()
-    : EditableTableOption_t<CustomPathTableRow2>(
+CustomPathTable::CustomPathTable()
+    : EditableTableOption_t<CustomPathTableRow>(
         "<b>Custom Path Table:</b><br>"
         "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"
         "<font color=\"red\">If you wish to ignore enroute shinies, make sure you set \"Enroute Shiny Action\" to ignore shinies.</font>",
@@ -308,35 +308,35 @@ CustomPathTable2::CustomPathTable2()
         make_defaults()
     )
 {}
-std::vector<std::string> CustomPathTable2::make_header() const{
+std::vector<std::string> CustomPathTable::make_header() const{
     return std::vector<std::string>{
         "Action",
         "Parameters",
     };
 }
-std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults(){
+std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable::make_defaults(){
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    auto row = std::make_unique<CustomPathTableRow2>(*this);
+    auto row = std::make_unique<CustomPathTableRow>(*this);
     row->action.set(PathAction::START_LISTEN);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow2>(*this);
+    row = std::make_unique<CustomPathTableRow>(*this);
     row->action.set(PathAction::CHANGE_MOUNT);
     row->parameters.mount.set(PathMount::WYRDEER);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow2>(*this);
+    row = std::make_unique<CustomPathTableRow>(*this);
     row->action.set(PathAction::MOVE_IN_DIRECTION);
     row->parameters.move_forward.set("3200 ms");
     row->parameters.left_x.set(-1.0);
     row->parameters.left_y.set(1.0);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow2>(*this);
+    row = std::make_unique<CustomPathTableRow>(*this);
     row->action.set(PathAction::CENTER_CAMERA);
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow2>(*this);
+    row = std::make_unique<CustomPathTableRow>(*this);
     row->action.set(PathAction::MOVE_FORWARD);
     row->parameters.move_speed.set(PathSpeed::DASH);
     row->parameters.move_forward.set("3200 ms");
@@ -353,7 +353,7 @@ std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable2::make_defaults()
 
 
 
-CustomPathTable::CustomPathTable()
+CustomPathTableFromJubilife::CustomPathTableFromJubilife()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
 //    : PATH(
 //        "<b>Custom Path Table:</b><br>"
@@ -369,7 +369,7 @@ CustomPathTable::CustomPathTable()
 
 class CustomPathTableWidget : public QWidget, public ConfigWidget{
 public:
-    CustomPathTableWidget(QWidget& parent, CustomPathTable& value)
+    CustomPathTableWidget(QWidget& parent, CustomPathTableFromJubilife& value)
         : QWidget(&parent)
         , ConfigWidget(value, *this)
     {
@@ -396,7 +396,7 @@ public:
 
         connect(load_button,  &QPushButton::clicked, this, [&value, this](bool){
             std::string path = QFileDialog::getOpenFileName(this, tr("Open option file"), ".", "*.json").toStdString();
-            std::cout << "Load CustomPathTable from " << path << std::endl;
+            std::cout << "Load CustomPathTableFromJubilife from " << path << std::endl;
             if (path.empty()){
                 return;
             }
@@ -415,7 +415,7 @@ public:
 
         connect(save_button,  &QPushButton::clicked, this, [&value, this](bool){
             std::string path = QFileDialog::getSaveFileName(this, tr("Open option file"), ".", "*.json").toStdString();
-            std::cout << "Save CustomPathTable from " << path << std::endl;
+            std::cout << "Save CustomPathTableFromJubilife from " << path << std::endl;
             if (path.size() > 0){
                 try{
                     JsonObject root;
@@ -435,7 +435,7 @@ private:
     ConfigWidget* m_table_widget = nullptr;
 };
 
-ConfigWidget* CustomPathTable::make_QtWidget(QWidget& parent){
+ConfigWidget* CustomPathTableFromJubilife::make_QtWidget(QWidget& parent){
     return new CustomPathTableWidget(parent, *this);
 }
 

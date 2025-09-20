@@ -81,9 +81,9 @@ public:
     MillisecondsOption wait;
 };
 
-class CustomPathTableRow2 : public EditableTableRow{
+class CustomPathTableRow : public EditableTableRow{
 public:
-    CustomPathTableRow2(EditableTableOption& parent_table);
+    CustomPathTableRow(EditableTableOption& parent_table);
     virtual std::unique_ptr<EditableTableRow> clone() const override;
 
     virtual void load_json(const JsonValue& json) override;
@@ -94,9 +94,9 @@ public:
     CustomPathCell parameters;
 };
 
-class CustomPathTable2 : public EditableTableOption_t<CustomPathTableRow2>{
+class CustomPathTable : public EditableTableOption_t<CustomPathTableRow>{
 public:
-    CustomPathTable2();
+    CustomPathTable();
     virtual std::vector<std::string> make_header() const override;
 
 private:
@@ -108,19 +108,19 @@ private:
 
 
 // A program option to build a custom path to navigate the map
-class CustomPathTable : public BatchOption{
+class CustomPathTableFromJubilife : public BatchOption{
 public:
-    CustomPathTable();
+    CustomPathTableFromJubilife();
 
-    const TravelLocationOption& travel_location() const{ return TRAVEL_LOCATION; }
+    const WildTravelLocationOption& travel_location() const{ return TRAVEL_LOCATION; }
 
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
 public:
     friend class CustomPathTableWidget;
 
-    TravelLocationOption TRAVEL_LOCATION;
-    CustomPathTable2 PATH;
+    WildTravelLocationOption TRAVEL_LOCATION;
+    CustomPathTable PATH;
 };
 
 

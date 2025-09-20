@@ -15,13 +15,19 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class TravelLocationOption : public IntegerEnumDropdownOption{
+// Warp points in wild areas + custom location after hardcoded movement + ancient retreat
+class WildTravelLocationOption : public IntegerEnumDropdownOption{
 public:
-    TravelLocationOption();
+    WildTravelLocationOption();
     operator TravelLocation() const;
 };
 
-
+// All locations in WildTravelLocationOption + Jubilife village warp points
+class AllTravelLocationOption : public IntegerEnumDropdownOption{
+public:
+    AllTravelLocationOption();
+    operator TravelLocation() const;
+};
 
 
 

@@ -114,7 +114,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath()
 
 void ShinyHuntCustomPath::do_non_listen_action(
     VideoStream& stream, ProControllerContext& context,
-    const CustomPathTableRow2& row
+    const CustomPathTableRow& row
 ){
     stream.log("Execute action " + row.action.current_display());
     switch(row.action){
@@ -214,12 +214,12 @@ void ShinyHuntCustomPath::do_non_listen_action(
 
 void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
-    std::vector<std::unique_ptr<CustomPathTableRow2>> table = PATH.PATH.copy_snapshot();
+    std::vector<std::unique_ptr<CustomPathTableRow>> table = PATH.PATH.copy_snapshot();
 
     //  Check whether the user has set shiny sound listen action:
     {
         bool has_listen_action = false;
-        for (const std::unique_ptr<CustomPathTableRow2>& row : table){
+        for (const std::unique_ptr<CustomPathTableRow>& row : table){
             if (row->action == PathAction::START_LISTEN){
                 has_listen_action = true;
                 break;
@@ -250,7 +250,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, ProContr
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            for (const std::unique_ptr<CustomPathTableRow2>& row : table){
+            for (const std::unique_ptr<CustomPathTableRow>& row : table){
                 if (row->action == PathAction::START_LISTEN){
                     listen_for_shiny.store(true, std::memory_order_release);
                     continue;

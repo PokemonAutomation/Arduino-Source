@@ -37,12 +37,9 @@ const TravelLocations& TravelLocations::instance(){
     static const TravelLocations locations;
     return locations;
 }
-const IntegerEnumDropdownDatabase& TravelLocations::database() const{
-    return m_database;
-}
 
 
-void TravelLocations::add_location(const TravelLocation& location){
+void TravelLocations::add_location(const TravelLocation& location, bool inside_village){
     if (!m_map.emplace(location.display, &location).second){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
@@ -50,7 +47,12 @@ void TravelLocations::add_location(const TravelLocation& location){
         );
     }
     m_list.emplace_back(&location);
-    m_database.add(m_list.size() - 1, location.slug, location.display, true);
+    m_database_include_village.add(m_list.size() - 1, location.slug, location.display, true);
+    
+    if (!inside_village){
+        m_database_outside_village.add(m_list.size() - 1, location.slug, location.display, true);    
+    }
+    
 }
 TravelLocations::TravelLocations()
     : Fieldlands_Fieldlands(
@@ -170,6 +172,31 @@ TravelLocations::TravelLocations()
         "Ancient Retreat",
         MapRegion::RETREAT, 0, 0, nullptr, false
     )
+    , Village_GalaxyHall(
+        "village-galaxyhall",
+        "Jubilife Village - Galaxy Hall",
+        MapRegion::JUBILIFE, 0, 0, nullptr, false
+    )
+    , Village_FrontGate(
+        "village-frontgate",
+        "Jubilife Village - Front Gate",
+        MapRegion::JUBILIFE, 0, 1, nullptr, false
+    )
+    , Village_PracticeField(
+        "village-practicefield",
+        "Jubilife Village - Practice Field",
+        MapRegion::JUBILIFE, 0, 2, nullptr, false
+    )
+    , Village_Farm(
+        "village-farm",
+        "Jubilife Village - Farm",
+        MapRegion::JUBILIFE, 0, 3, nullptr, false
+    )
+    , Village_TrainingGrounds(
+        "village-traininggrounds",
+        "Jubilife Village - Training Grounds",
+        MapRegion::JUBILIFE, 0, 2, nullptr, true
+    )
 {
     add_location(Fieldlands_Fieldlands);
     add_location(Fieldlands_Heights);
@@ -196,6 +223,13 @@ TravelLocations::TravelLocations()
     add_location(Icelands_PearlSettlement_SW);
     add_location(Icelands_Arena);
     add_location(Retreat);
+
+    const bool inside_village = true;
+    add_location(Village_GalaxyHall, inside_village);
+    add_location(Village_FrontGate, inside_village);
+    add_location(Village_PracticeField, inside_village);
+    add_location(Village_Farm, inside_village);
+    add_location(Village_TrainingGrounds, inside_village);
 }
 
 

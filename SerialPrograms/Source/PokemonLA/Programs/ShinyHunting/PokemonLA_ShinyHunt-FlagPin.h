@@ -45,7 +45,7 @@ private:
 private:
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
-    TravelLocationOption TRAVEL_LOCATION;
+    WildTravelLocationOption TRAVEL_LOCATION;
 
     SimpleIntegerOption<uint16_t> ENROUTE_DISTANCE;
 

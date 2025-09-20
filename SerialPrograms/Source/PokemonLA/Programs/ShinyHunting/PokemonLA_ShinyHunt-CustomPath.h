@@ -42,15 +42,13 @@ private:
     // Do one action (while ignoring listen-related actions)
     void do_non_listen_action(
         VideoStream& stream, ProControllerContext& context,
-        const CustomPathTableRow2& row
+        const CustomPathTableRow& row
     );
 
 private:
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
-//    TravelLocationOption TRAVEL_LOCATION;
-
-    CustomPathTable PATH;
+    CustomPathTableFromJubilife PATH;
 
     ResetMethodOption RESET_METHOD;
 

@@ -265,6 +265,13 @@ void goto_camp_from_jubilife(
     context.wait_for(std::chrono::milliseconds(500));
 
     DpadPosition direction = location.region < MapRegion::HIGHLANDS ? DPAD_RIGHT : DPAD_LEFT;
+    if (location.region == MapRegion::JUBILIFE){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            std::string("Should not choose Jubilife Village as destination when leaving camp"),
+            stream
+        );
+    }
 
     //  Move to region.
     MapRegion current_region = MapRegion::NONE;

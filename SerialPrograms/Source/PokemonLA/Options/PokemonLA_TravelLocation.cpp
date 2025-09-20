@@ -12,16 +12,31 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-TravelLocationOption::TravelLocationOption()
+WildTravelLocationOption::WildTravelLocationOption()
     : IntegerEnumDropdownOption(
         "<b>Start Location:</b><br>Travel from this location.",
-        TravelLocations::instance().database(),
+        TravelLocations::instance().database_outside_village(),
         LockMode::LOCK_WHILE_RUNNING,
         0
     )
 {}
 
-TravelLocationOption::operator TravelLocation() const{
+WildTravelLocationOption::operator TravelLocation() const{
+    size_t index = this->current_value();
+    return TravelLocations::instance()[index];
+}
+
+
+AllTravelLocationOption::AllTravelLocationOption()
+    : IntegerEnumDropdownOption(
+        "<b>Start Location:</b><br>Travel from this location.",
+        TravelLocations::instance().database_including_village(),
+        LockMode::LOCK_WHILE_RUNNING,
+        0
+    )
+{}
+
+AllTravelLocationOption::operator TravelLocation() const{
     size_t index = this->current_value();
     return TravelLocations::instance()[index];
 }
