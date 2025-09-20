@@ -552,19 +552,19 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
 
         // example:
         // Timestamps           Diff only comparing adjacent                Total time since start
-        // 12:00 1ns            1.4ns -> 1ms                                0ms
-        // 12:00 1401ns         1.4ns -> 1ms                                1ms
-        // 12:00 2801ns         1.4ns -> 1ms                                2ms
-        // 12:00 4201ns         1.4ns -> 1ms                                3ms
-        // 12:00 5601ns         1.4ns -> 1ms                                4ms
-        // 12:00 7001ns         1.4ns -> 1ms                                5ms
-        // 12:00 8401ns         1.4ns -> 1ms                                6ms
-        // 12:00 9801ns         1.4ns -> 1ms                                7ms
-        // 12:00 11201ns                                                    8ms
+        // 12:00 1us            1.4us -> 1ms                                0ms
+        // 12:00 1401us         1.4us -> 1ms                                1ms
+        // 12:00 2801us         1.4us -> 1ms                                2ms
+        // 12:00 4201us         1.4us -> 1ms                                3ms
+        // 12:00 5601us         1.4us -> 1ms                                4ms
+        // 12:00 7001us         1.4us -> 1ms                                5ms
+        // 12:00 8401us         1.4us -> 1ms                                6ms
+        // 12:00 9801us         1.4us -> 1ms                                7ms
+        // 12:00 11201us                                                    8ms
         // total time elapsed: 11.2ms vs 8ms
 
         // Normalized timestamps		Diff using normalized timestamps    Total time since start
-        // 0ns                          1ms                                 0ms
+        // 0ms                          1ms                                 0ms
         // 1.4ms -> 1ms                 2ms	                                1ms
         // 2.8ms -> 3ms                 1ms                                 3ms
         // 4.2ms -> 4ms                 2ms                                 4ms
