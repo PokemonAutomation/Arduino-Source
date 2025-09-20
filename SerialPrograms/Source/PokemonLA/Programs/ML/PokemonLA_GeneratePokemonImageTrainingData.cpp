@@ -192,9 +192,11 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
         break;
     case StartingLocation::ICELANDS_SNOWFIELDS:
         env.log("Starting at Icelands - Snowfields Camp");
+        pbf_move_left_joystick(context, 0, 20, 140, 10);
         break;
     case StartingLocation::ICELANDS_ICEPEAK:
         env.log("Starting at Icelands - Icepeak Camp");
+        pbf_move_left_joystick(context, 20, 0, 180, 10);
         break;
     }
     context.wait_for_all_requests();
