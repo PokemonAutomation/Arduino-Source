@@ -8,6 +8,7 @@
 #define PokemonAutomation_StringTools_H
 
 #include <string>
+#include <vector>
 
 namespace PokemonAutomation{
 namespace StringTools{
