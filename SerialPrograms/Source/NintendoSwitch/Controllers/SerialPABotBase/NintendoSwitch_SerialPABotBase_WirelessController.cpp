@@ -329,7 +329,7 @@ void SerialPABotBase_WirelessController::update_status(Cancellable& cancellable)
                     "Invalid response size to PABB_MSG_ESP32_REQUEST_READ_SPI: body = " + std::to_string(response.body.size()),
                     COLOR_RED
                 );
-                m_handle.set_status_line1("Error: See log for more information.", COLOR_RED);
+//                m_handle.set_status_line1("Error: See log for more information.", COLOR_RED);
                 return;
             }
             m_logger.log("Reading Controller Colors... Done");
@@ -355,8 +355,7 @@ void SerialPABotBase_WirelessController::update_status(Cancellable& cancellable)
 
         }catch (Exception& e){
             e.log(m_logger);
-            m_handle.set_status_line1("Error: See log for more information.", COLOR_RED);
-            return;
+            throw;
         }
     }
 

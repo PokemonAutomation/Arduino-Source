@@ -12,6 +12,10 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "SerialPABotBase_Connection.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
@@ -35,6 +39,7 @@ public:
         : m_connection(connection)
         , m_callback(callback)
         , m_stopping(false)
+        , m_error(false)
         , m_status_thread(&ControllerStatusThread::status_thread, this)
     {}
     ~ControllerStatusThread(){
@@ -61,7 +66,10 @@ private:
         std::thread watchdog([&, this]{
             WallClock next_ping = current_time();
             while (true){
-                if (m_stopping.load(std::memory_order_relaxed) || !m_connection.is_ready()){
+                if (m_stopping.load(std::memory_order_relaxed) ||
+                    m_error.load(std::memory_order_acquire) ||
+                    !m_connection.is_ready()
+                ){
                     break;
                 }
 
@@ -75,7 +83,10 @@ private:
                 }
 
                 std::unique_lock<std::mutex> lg(m_sleep_lock);
-                if (m_stopping.load(std::memory_order_relaxed) || !m_connection.is_ready()){
+                if (m_stopping.load(std::memory_order_relaxed) ||
+                    m_error.load(std::memory_order_acquire) ||
+                    !m_connection.is_ready()
+                ){
                     break;
                 }
 
@@ -101,8 +112,8 @@ private:
                 last_ack.store(current_time(), std::memory_order_relaxed);
             }catch (OperationCancelledException&){
                 break;
-            }catch (InvalidConnectionStateException&){
-                break;
+            }catch (InvalidConnectionStateException& e){
+                error = e.message();
             }catch (SerialProtocolException& e){
                 error = e.message();
             }catch (ConnectionException& e){
@@ -111,6 +122,7 @@ private:
                 error = "Unknown error.";
             }
             if (!error.empty()){
+                m_error.store(true, std::memory_order_release);
                 m_connection.set_status_line1(error, COLOR_RED);
                 m_callback.stop_with_error(std::move(error));
             }
@@ -140,6 +152,7 @@ private:
     ControllerStatusThreadCallback& m_callback;
     CancellableHolder<CancellableScope> m_scope;
     std::atomic<bool> m_stopping;
+    std::atomic<bool> m_error;
     std::mutex m_sleep_lock;
     std::condition_variable m_cv;
     std::thread m_status_thread;
