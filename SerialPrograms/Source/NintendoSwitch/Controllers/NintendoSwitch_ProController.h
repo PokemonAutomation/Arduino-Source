@@ -10,6 +10,7 @@
 #define PokemonAutomation_NintendoSwitch_Controller_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
+#include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
 #include "NintendoSwitch_ControllerButtons.h"
 
@@ -60,12 +61,14 @@ public:
     ProController(Logger& logger);
     virtual ~ProController();
 
-
 public:
     static const char NAME[];
     virtual const char* name() override{
         return NAME;
     };
+    virtual ControllerClass controller_class() const override{
+        return ControllerClass::PRO_CONTROLLER;
+    }
 
 
 protected:
@@ -226,6 +229,8 @@ public:
     virtual void keyboard_press(const QKeyEvent& event) override;
     virtual void keyboard_release(const QKeyEvent& event) override;
 
+    virtual void add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) override;
+    virtual void remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) override;
 
 private:
     class KeyboardManager;

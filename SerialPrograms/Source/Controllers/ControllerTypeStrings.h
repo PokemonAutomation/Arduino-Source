@@ -16,6 +16,7 @@ namespace PokemonAutomation{
 
 extern const EnumStringMap<ControllerInterface> CONTROLLER_INTERFACE_STRINGS;
 extern const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS;
+const EnumStringMap<ControllerClass>& CONTROLLER_CLASS_STRINGS();
 
 
 

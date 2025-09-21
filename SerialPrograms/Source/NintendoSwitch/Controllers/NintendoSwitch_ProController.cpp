@@ -12,6 +12,10 @@
 #include "NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_ProController.h"
 
+// #include <iostream>
+// using std::cout;
+// using std::endl;
+
 namespace PokemonAutomation{
 
 //  Instantiate some template helper classes.
@@ -46,8 +50,9 @@ public:
     ~KeyboardManager(){
         stop();
     }
-    virtual void send_state(const ControllerState& state) override{
+    virtual void send_state(const ControllerState& state) override{        
         const ProControllerState& switch_state = static_cast<const ProControllerState&>(state);
+
 #if 0
         m_controller.logger().log(
             "VirtualController: (" + button_to_string(switch_state.buttons) +
@@ -63,6 +68,7 @@ public:
             return;
         }
         Milliseconds ticksize = m_controller->ticksize();
+        WallClock time_stamp = current_time();
         static_cast<ProController*>(m_controller)->issue_full_controller_state(
             nullptr,
             ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255,
@@ -73,7 +79,11 @@ public:
             switch_state.right_x,
             switch_state.right_y
         );
+
+        report_keyboard_command_sent(time_stamp, switch_state);
     }
+
+
 };
 
 
@@ -84,7 +94,6 @@ ProController::ProController(Logger& logger)
 
 }
 ProController::~ProController(){
-
 }
 void ProController::stop() noexcept{
     m_keyboard_manager->stop();
@@ -101,8 +110,13 @@ void ProController::keyboard_release(const QKeyEvent& event){
     m_keyboard_manager->on_key_release(event);
 }
 
+void ProController::add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
+    m_keyboard_manager->add_listener(keyboard_listener);
+}
 
-
+void ProController::remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
+    m_keyboard_manager->remove_listener(keyboard_listener);
+}
 
 
 

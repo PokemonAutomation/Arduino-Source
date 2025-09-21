@@ -9,6 +9,7 @@
 
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "NintendoSwitch_ControllerButtons.h"
+#include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
 
 namespace PokemonAutomation{
@@ -171,6 +172,9 @@ public:
     virtual void keyboard_press(const QKeyEvent& event) override;
     virtual void keyboard_release(const QKeyEvent& event) override;
 
+    virtual void add_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) override;
+    virtual void remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener) override;
+
 
 private:
     class KeyboardManager;
@@ -187,6 +191,9 @@ public:
     virtual const char* name() override{
         return NAME;
     };
+    virtual ControllerClass controller_class() const override{
+        return ControllerClass::LEFT_JOYCON;
+    }    
 };
 class RightJoycon : public JoyconController{
 public:
@@ -196,6 +203,9 @@ public:
     virtual const char* name() override{
         return NAME;
     };
+    virtual ControllerClass controller_class() const override{
+        return ControllerClass::RIGHT_JOYCON;
+    } 
 };
 
 

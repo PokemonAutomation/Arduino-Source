@@ -11,9 +11,11 @@
 #include <thread>
 #include <condition_variable>
 #include <Qt>
+#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Controllers/Controller.h"
 #include "Controllers/KeyboardInput/GlobalQtKeyMap.h"
+#include "KeyboardEventHandler.h"
 #include "KeyboardStateTracker.h"
 
 class QKeyEvent;
@@ -36,6 +38,8 @@ public:
     virtual bool operator!=(const ControllerState& x) const{ return !(*this == x); }
 
     virtual bool is_neutral() const = 0;
+
+    virtual JsonObject serialize_state() const {return JsonObject();};
 };
 
 
@@ -86,7 +90,7 @@ private:
 
 
 template <typename StateType, typename DeltaType>
-class KeyboardManager : public KeyboardInputController{
+class KeyboardManager : public KeyboardInputController, public KeyboardEventHandler{
 public:
     KeyboardManager(Logger& logger, AbstractController& controller)
         : KeyboardInputController(logger, true)
@@ -126,7 +130,9 @@ public:
         if (m_controller == nullptr){
             return;
         }
+        WallClock time_stamp = current_time();
         m_controller->cancel_all_commands();
+        report_keyboard_command_stopped(time_stamp);
     }
     virtual void replace_on_next_command() override{
         WriteSpinLock lg(m_lock);
