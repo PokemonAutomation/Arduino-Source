@@ -2614,6 +2614,12 @@ else() # macOS and Linux
             target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
             target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
         endif()
+        # Find OpenCV
+        if(CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)")
+            find_package(OpenCV REQUIRED HINTS "/opt/homebrew/opt/opencv/lib/cmake/opencv4/")
+        else()
+            find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
+        endif()
 
     else() # Linux
         # Instructions took from https://github.com/microsoft/onnxruntime/discussions/6489
@@ -2646,13 +2652,10 @@ else() # macOS and Linux
 
         # Link against ONNX Runtime
         target_link_libraries(SerialPrograms PRIVATE onnxruntime)
+        # Find OpenCV
+        find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
     endif()
 
-    # Find OpenCV
-    # set(OPENCV_DIR, "/usr/local/opt/opencv/lib/cmake/opencv4")
-    find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
-    # set(ENV{PKG_CONFIG_PATH} "$ENV{PKG_CONFIG_PATH}:/usr/local/opt/opencv/lib/pkgconfig")
-    # pkg_search_module(OPENCV REQUIRED opencv)
     include_directories(${OpenCV_INCLUDE_DIRS})
     link_directories(${OpenCV_LIBRARY_DIRS})
     target_link_libraries(SerialPrograms PRIVATE ${OpenCV_LIBS})
