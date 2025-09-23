@@ -3,6 +3,7 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -28,15 +29,15 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_24::name() const{
-    return "";
+    return "24: Orthworm Titan: Battle Orthworm Titan";
 }
 
 std::string AutoStory_Segment_24::start_text() const{
-    return "Start: ";
+    return "Start: At East Province (Area Three) Watchtower.";
 }
 
 std::string AutoStory_Segment_24::end_text() const{
-    return "End: ";
+    return "End: Beat Orthworm Titan. At East Province (Area Three) Watchtower.";
 }
 
 void AutoStory_Segment_24::run_segment(
@@ -52,7 +53,7 @@ void AutoStory_Segment_24::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    // checkpoint_(env, context, options.notif_status_update, stats);
+    checkpoint_55(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -69,66 +70,66 @@ void checkpoint_55(
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
-        // todo: try to align to left side of tunnel. then charge at Orthworm
-        // reset if caught in battle.
-        /////////////////////
+        handle_unexpected_battles(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            
+            DirectionDetector direction;
 
-        // get_off_ride(env.program_info(), env.console, context);
+            direction.change_direction(env.program_info(), env.console, context, 3.909067);
+            pbf_move_left_joystick(context, 128, 0, 1000, 100);
 
-        
-        // direction.change_direction(env.program_info(), env.console, context, 0.261);
-        // pbf_move_left_joystick(context, 128, 0, 500, 100);
-        // pbf_move_left_joystick(context, 0, 0, 500, 100);
+            direction.change_direction(env.program_info(), env.console, context, 5.061720);        
+            pbf_move_left_joystick(context, 128, 0, 500, 100);
+            pbf_move_left_joystick(context, 255, 0, 200, 100);
 
-        // // now aligned to corner.
+            // now aligned to the wall next to the hole/passage
 
-        // direction.change_direction(env.program_info(), env.console, context, 3.736);
-        // pbf_move_left_joystick(context, 128, 0, 400, 100);
+            // walk away from wall slightly
+            pbf_move_left_joystick(context, 128, 255, 50, 100);
+            get_on_ride(env.program_info(), env.console, context);
 
-        // direction.change_direction(env.program_info(), env.console, context, 5.306);
-        // pbf_move_left_joystick(context, 128, 0, 700, 100);
+            direction.change_direction(env.program_info(), env.console, context, 0.366);
+            pbf_move_left_joystick(context, 128, 0, 250, 100);
 
-        
-        // direction.change_direction(env.program_info(), env.console, context, 4.988);
-        // pbf_move_left_joystick(context, 128, 0, 800, 100);
-        // pbf_move_left_joystick(context, 255, 0, 500, 100);
+            direction.change_direction(env.program_info(), env.console, context, 2.565);
+            // run at Orthworm. run into its second position as well.
+            pbf_move_left_joystick(context, 128, 0, 50, 0);
+            pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 500);
+            pbf_move_left_joystick(context, 255, 0, 300, 500);
 
-        // // now aligned to the wall next to the hole/passage
+            get_off_ride(env.program_info(), env.console, context);
 
-        // // walk away from wall slightly
-        // pbf_move_left_joystick(context, 128, 255, 50, 100);
-        // get_on_ride(env.program_info(), env.console, context);
+            direction.change_direction(env.program_info(), env.console, context, 0.261);
+            pbf_move_left_joystick(context, 128, 0, 500, 100);
+            pbf_move_left_joystick(context, 0, 0, 500, 100);
 
-        // direction.change_direction(env.program_info(), env.console, context, 0.366);
-        // pbf_move_left_joystick(context, 128, 0, 250, 100);
+            // now aligned to corner.
 
-        // direction.change_direction(env.program_info(), env.console, context, 2.565);
-        // // run at Orthworm. run into its second position as well.
-        // pbf_move_left_joystick(context, 128, 0, 50, 0);
-        // pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, 500);
-        // pbf_move_left_joystick(context, 255, 0, 500, 500);
+            direction.change_direction(env.program_info(), env.console, context, 3.736);
+            pbf_move_left_joystick(context, 128, 0, 400, 100);
 
-        // get_off_ride(env.program_info(), env.console, context);
+            direction.change_direction(env.program_info(), env.console, context, 5.306);
+            pbf_move_left_joystick(context, 128, 0, 700, 100);
 
-        // direction.change_direction(env.program_info(), env.console, context, 0.261);
-        // pbf_move_left_joystick(context, 128, 0, 500, 100);
-        // pbf_move_left_joystick(context, 0, 0, 500, 100);
+            
+            direction.change_direction(env.program_info(), env.console, context, 4.988);
+            pbf_move_left_joystick(context, 128, 0, 800, 100);
+            pbf_move_left_joystick(context, 255, 0, 500, 100);
 
-        // // now aligned to corner.
+            // now aligned to the wall next to the hole/passage   
 
-        // direction.change_direction(env.program_info(), env.console, context, 3.736);
-        // pbf_move_left_joystick(context, 128, 0, 400, 100);
+            // walk away from wall slightly
+            pbf_move_left_joystick(context, 128, 255, 100, 100);  
 
-        // direction.change_direction(env.program_info(), env.console, context, 5.306);
-        // pbf_move_left_joystick(context, 128, 0, 700, 100);
+            direction.change_direction(env.program_info(), env.console, context, 5.722795);
+            pbf_move_left_joystick(context, 128, 0, 600, 100);
 
-        
-        // direction.change_direction(env.program_info(), env.console, context, 4.988);
-        // pbf_move_left_joystick(context, 128, 0, 800, 100);
-        // pbf_move_left_joystick(context, 255, 0, 500, 100);
+            direction.change_direction(env.program_info(), env.console, context, 0.625226);
+        });
 
-        // // now aligned to the wall next to the hole/passage
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
 
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
 
     });    
 
