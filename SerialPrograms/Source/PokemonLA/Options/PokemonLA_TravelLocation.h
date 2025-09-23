@@ -19,14 +19,14 @@ namespace PokemonLA{
 class WildTravelLocationOption : public IntegerEnumDropdownOption{
 public:
     WildTravelLocationOption();
-    operator TravelLocation() const;
+    operator const TravelLocation&() const;
 };
 
 // All locations in WildTravelLocationOption + Jubilife village warp points
 class AllTravelLocationOption : public IntegerEnumDropdownOption{
 public:
     AllTravelLocationOption();
-    operator TravelLocation() const;
+    operator const TravelLocation&() const;
 };
 
 

@@ -21,7 +21,7 @@ WildTravelLocationOption::WildTravelLocationOption()
     )
 {}
 
-WildTravelLocationOption::operator TravelLocation() const{
+WildTravelLocationOption::operator const TravelLocation&() const{
     size_t index = this->current_value();
     return TravelLocations::instance()[index];
 }
@@ -36,7 +36,7 @@ AllTravelLocationOption::AllTravelLocationOption()
     )
 {}
 
-AllTravelLocationOption::operator TravelLocation() const{
+AllTravelLocationOption::operator const TravelLocation&() const{
     size_t index = this->current_value();
     return TravelLocations::instance()[index];
 }
