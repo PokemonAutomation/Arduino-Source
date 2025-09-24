@@ -122,14 +122,13 @@ void FastTravelWatcher::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool FastTravelWatcher::process_frame(const ImageViewRGB32& screen, WallClock timestamp){
-    std::vector<ImageFloatBox> hits = m_detector.detect_all(screen);
+    m_hits = m_detector.detect_all(screen);
 
-    m_hits.reset(hits.size());
-    for (const ImageFloatBox& hit : hits){
-        m_hits.emplace_back(m_overlay, hit, COLOR_MAGENTA);
+    m_hit_boxes.reset(m_hits.size());
+    for (const ImageFloatBox& hit : m_hits){
+        m_hit_boxes.emplace_back(m_overlay, hit, COLOR_MAGENTA);
     }
-
-    return !hits.empty();
+    return !m_hits.empty();
 }
 
 

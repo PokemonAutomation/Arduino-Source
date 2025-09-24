@@ -58,11 +58,13 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
 
+    const std::vector<ImageFloatBox>& found_locations() const { return m_hits; }
 
 protected:
     VideoOverlay& m_overlay;
     FastTravelDetector m_detector;
-    FixedLimitVector<OverlayBoxScope> m_hits;
+    std::vector<ImageFloatBox> m_hits;
+    FixedLimitVector<OverlayBoxScope> m_hit_boxes;
 };
 
 
