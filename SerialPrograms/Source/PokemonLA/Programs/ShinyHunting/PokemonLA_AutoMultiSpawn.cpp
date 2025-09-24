@@ -306,7 +306,7 @@ void AutoMultiSpawn::program(SingleSwitchProgramEnvironment& env, ProControllerC
         env.log("The path is: " + os.str());
     }
     
-    goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
+    fast_travel_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
     change_time_of_day_at_tent(env.console, context, path_times[0], Camp::MIRELANDS_MIRELANDS);
 
     for(size_t iStep = 0; iStep < path_despawns.size(); iStep++){
@@ -358,7 +358,7 @@ void AutoMultiSpawn::advance_one_path_step(
         pbf_press_button(context, BUTTON_X, 20, 230);
     }
 
-    goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
+    fast_travel_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
     
     // We try at most three battles to remove pokemon
     size_t already_removed_pokemon = 0;
@@ -427,7 +427,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         env.log("Cannot focus on any pokemon. Retry.");
         // TODO: escape routine may scare wild pokemon. A better way is to reset and load from the backup save?
         // or load from a previous save?
-        goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
+        fast_travel_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
         // TODO: May need to reset time of day here
     }
 
@@ -563,7 +563,7 @@ size_t AutoMultiSpawn::try_one_battle_to_remove_pokemon(
         }
     }
 
-    goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
+    fast_travel_from_overworld(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
     return num_removed_pokemon;
 }
 

@@ -51,7 +51,7 @@ void goto_camp_from_overworld(
 
 // From overworld, open map, press X to open the fast travel popup menu and go to the specified
 // travel location.
-void goto_any_camp_from_overworld(
+void fast_travel_from_overworld(
     ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
     const TravelLocation& location
 );

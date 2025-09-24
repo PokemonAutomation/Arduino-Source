@@ -30,7 +30,7 @@ const TravelLocation& to_travel_location(StartingLocation location){
 
     switch(location){
     case StartingLocation::JUBILIFE_VILLAGE:
-        break;
+        return locations.Village_FrontGate;
     case StartingLocation::FIELDLANDS_FIELDLANDS:
         return locations.Fieldlands_Fieldlands;
     case StartingLocation::FIELDLANDS_HEIGHTS:
@@ -147,12 +147,18 @@ void GeneratePokemonImageTrainingData::select_starting_location(SingleSwitchProg
     StartingLocation location = STARTING_LOCATION;
     const TravelLocation& travel_loc = to_travel_location(location);
     // fast travel to the target camp to reset player character position
-    goto_any_camp_from_overworld(env, env.console, context, travel_loc);
+    fast_travel_from_overworld(env, env.console, context, travel_loc);
         
     // move to the npc to open box system
     switch(location){
     case StartingLocation::JUBILIFE_VILLAGE:
         env.log("Starting at Jubilife Village");
+        // at gate, face towards the gate
+        pbf_move_left_joystick(context, 128, 255, 240, 30); // move backwards
+        pbf_move_left_joystick(context, 255, 150, 120, 60); // move to right
+        pbf_press_button(context, BUTTON_ZL, 30, 125); // rotate camera to point to where the character is facing
+        pbf_move_left_joystick(context, 128, 0, 700, 30); // move forward
+        pbf_move_left_joystick(context, 255, 125, 30, 60); // move to right
         break;
     case StartingLocation::FIELDLANDS_FIELDLANDS:
         env.log("Starting at Fieldlands - Fieldlands Camp");

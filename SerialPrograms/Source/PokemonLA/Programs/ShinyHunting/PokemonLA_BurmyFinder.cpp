@@ -285,7 +285,7 @@ void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, ProCont
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            fast_travel_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
         },
         {
             {battle_menu_detector},
@@ -302,7 +302,7 @@ void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, ProCont
         // Finish battle
         handle_battle(env, context);
         // Go back to camp
-        goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+        fast_travel_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
     }
 }
 
