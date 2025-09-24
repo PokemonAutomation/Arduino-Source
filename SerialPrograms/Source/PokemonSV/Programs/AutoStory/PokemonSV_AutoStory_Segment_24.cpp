@@ -55,7 +55,7 @@ void AutoStory_Segment_24::run_segment(
 
     checkpoint_55(env, context, options.notif_status_update, stats);
     checkpoint_56(env, context, options.notif_status_update, stats);
-    // checkpoint_57(env, context, options.notif_status_update, stats);
+    checkpoint_57(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -215,7 +215,8 @@ void checkpoint_57(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-
+        // fly back to East Province (Area Three) Watchtower
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::FAST_TRAVEL);
 
     });    
 
