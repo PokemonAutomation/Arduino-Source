@@ -20,7 +20,7 @@
         "CMAKE_AUTOUIC": "ON",
         "PACKAGE_BUILD": "OFF",
         "PREFERRED_QT_DIR": "C:/Qt",
-        "PREFERRED_QT_VER": "6.8.3",
+        "PREFERRED_QT_VER": "6.8.3"
       }
     },
     {
