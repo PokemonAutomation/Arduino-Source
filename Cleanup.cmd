@@ -1,4 +1,5 @@
 
+rd /s /q "build"
 rd /s /q "..\build-SerialPrograms*"
 
 del 3rdPartyBinaries\opencv_world460d.dll
