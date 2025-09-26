@@ -866,8 +866,6 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         DirectionDetector direction;
 
-        // detect_closest_flypoint_and_move_map_cursor_there(env.program_info(), env.console, context, FlyPoint::POKECENTER, 0.29);
-        // print_flypoint_location(env.program_info(), env.console, context, FlyPoint::FAST_TRAVEL);
 
 
         return;

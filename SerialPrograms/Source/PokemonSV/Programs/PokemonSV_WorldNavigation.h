@@ -59,6 +59,21 @@ enum class CallbackEnum{
     MOVE_SELECT,
 };
 
+enum class ZoomChange{
+    ZOOM_IN,
+    ZOOM_IN_TWICE,
+    ZOOM_OUT,
+    ZOOM_OUT_TWICE,
+    KEEP_ZOOM,
+};
+
+struct MoveCursor{
+    ZoomChange zoom_change;
+    uint8_t move_x;
+    uint8_t move_y;
+    uint16_t move_duration;
+};
+
 //  From map, press A to fly to a travel spot.
 //  check_fly_menuitem == true: will detect if the "Fly" menuitem is available. Return false if no "Fly" menuitem (the game
 //    will be on the map menu opened state). Return true if the flight is successful (the game will be at the overworld).
@@ -74,6 +89,8 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProCont
 void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
 void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point);
+
+void place_marker_offset_from_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, MoveCursor move_cursor_near_flypoint, FlyPoint fly_point, ExpectedMarkerPosition marker_offset);
 
 // with the map open, move the cursor to a specific position offset from the flypoint, as per marker_offset
 void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point, ExpectedMarkerPosition marker_offset);

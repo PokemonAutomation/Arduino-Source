@@ -245,20 +245,6 @@ void change_settings(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
 void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-enum class ZoomChange{
-    ZOOM_IN,
-    ZOOM_IN_TWICE,
-    ZOOM_OUT,
-    ZOOM_OUT_TWICE,
-    KEEP_ZOOM,
-};
-
-struct MoveCursor{
-    ZoomChange zoom_change;
-    uint8_t move_x;
-    uint8_t move_y;
-    uint16_t move_duration;
-};
 
 // place a marker on the map, not relative to the current player position, but based on a fixed landmark, such as a pokecenter
 // How this works:

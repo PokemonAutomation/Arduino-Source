@@ -234,6 +234,7 @@ std::string get_flypoint_string(FlyPoint fly_point){
 }
 
 const std::vector<ImageFloatBox> get_flypoint_locations(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point){
+    context.wait_for_all_requests();
     std::vector<ImageFloatBox> found_locations;
     MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
     FastTravelWatcher fast_travel_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
@@ -267,6 +268,74 @@ void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProCo
         os << "Found " + fly_point_string + " at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height;
         stream.log(os.str());
   
+    }
+}
+
+
+
+void place_marker_offset_from_flypoint(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    MoveCursor move_cursor_near_flypoint,
+    FlyPoint fly_point, 
+    ExpectedMarkerPosition marker_offset
+){
+
+    stream.log("place_marker_offset_from_flypoint()");
+    WallClock start = current_time();
+
+    while (true){
+        if (current_time() - start > std::chrono::minutes(5)){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "place_marker_offset_from_flypoint(): Failed to place down marker after 5 minutes.",
+                stream
+            );
+        }
+
+        try {
+            open_map_from_overworld(info, stream, context, false);
+
+            // move cursor near landmark (pokecenter)
+            switch(move_cursor_near_flypoint.zoom_change){
+            case ZoomChange::ZOOM_IN:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;
+            case ZoomChange::ZOOM_IN_TWICE:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;                
+            case ZoomChange::ZOOM_OUT:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;    
+            case ZoomChange::ZOOM_OUT_TWICE:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;                  
+            case ZoomChange::KEEP_ZOOM:
+                break;
+            }
+            uint8_t move_x1 = move_cursor_near_flypoint.move_x;
+            uint8_t move_y1 = move_cursor_near_flypoint.move_y;
+            uint16_t move_duration1 = move_cursor_near_flypoint.move_duration;
+            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+
+            move_cursor_to_position_offset_from_flypoint(info, stream, context, fly_point, {marker_offset.x, marker_offset.y});
+
+            // place down marker
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            leave_phone_to_overworld(info, stream, context);
+
+            return;      
+
+        }catch (UnexpectedBattleException&){
+            run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
+        }catch (OperationFailedException&){
+            // reset to overworld if failed to center on the pokecenter, and re-try
+            leave_phone_to_overworld(info, stream, context);
+        }
     }
 }
 

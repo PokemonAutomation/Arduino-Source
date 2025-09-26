@@ -46,7 +46,7 @@ void checkpoint_56(
 );
 
 // start: Beat Orthworm phase 2
-// end: 
+// end: At East Province (Area Three) Pokecenter.
 void checkpoint_57(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
