@@ -126,6 +126,12 @@ private:
     BooleanCheckBoxOption TEST_CURRENT_DIRECTION;
     BooleanCheckBoxOption TEST_CHANGE_DIRECTION;
     FloatingPointOption DIR_RADIANS;
+
+    EnumDropdownOption<FlyPoint> FLYPOINT_TYPE;
+    BooleanCheckBoxOption TEST_FLYPOINT_LOCATIONS;
+    BooleanCheckBoxOption TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT;
+    FloatingPointOption X_OFFSET;
+    FloatingPointOption Y_OFFSET;
 };
 
 const std::vector<std::unique_ptr<AutoStory_Segment>>& ALL_AUTO_STORY_SEGMENT_LIST();

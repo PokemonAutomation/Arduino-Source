@@ -274,7 +274,7 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
     // loop through flypoint locations. find the point that is closest to marker_offset, by distance x_diff^2 + y_diff^2
     // based on the closest point, move cursor based on x_diff and y_diff. do this again until x_diff/y_diff are within certain margins
     std::string fly_point_string = get_flypoint_string(fly_point);
-    size_t MAX_ATTEMPTS = 20;
+    size_t MAX_ATTEMPTS = 30;
     for (size_t i = 0; i < MAX_ATTEMPTS; i++){
         const std::vector<ImageFloatBox> found_locations = get_flypoint_locations(info, stream, context, fly_point);
         
