@@ -33,8 +33,8 @@
 #include <sstream>
 #include <cfloat>
 #include <iostream>
-// using std::cout;
-// using std::endl;
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -222,6 +222,123 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
     context.wait_for(std::chrono::seconds(3));
 }
 
+std::string get_flypoint_string(FlyPoint fly_point){
+    std::string fly_point_string;
+    if (fly_point == FlyPoint::POKECENTER){
+        fly_point_string = "Pokecenter";
+    }else if(fly_point == FlyPoint::FAST_TRAVEL){
+        fly_point_string = "Fast Travel";
+    }
+
+    return fly_point_string;
+}
+
+const std::vector<ImageFloatBox> get_flypoint_locations(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point){
+    std::vector<ImageFloatBox> found_locations;
+    MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
+    FastTravelWatcher fast_travel_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
+    int ret = -1;
+    if (fly_point == FlyPoint::POKECENTER){
+        ret = wait_until(stream, context, std::chrono::seconds(2), {pokecenter_watcher});
+        if (ret == 0){
+            found_locations = pokecenter_watcher.found_locations();
+        }
+    }else if(fly_point == FlyPoint::FAST_TRAVEL){
+        ret = wait_until(stream, context, std::chrono::seconds(2), {fast_travel_watcher});
+        if (ret == 0){
+            found_locations = fast_travel_watcher.found_locations();
+        }
+    }
+
+    return found_locations;
+}
+
+void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point){
+    std::string fly_point_string = get_flypoint_string(fly_point);
+
+    const std::vector<ImageFloatBox> found_locations = get_flypoint_locations(info, stream, context, fly_point);
+    if (found_locations.empty()){
+        stream.log("No visible " + fly_point_string + " found on map");
+        return;
+    }
+
+    for(const auto& box: found_locations){
+        std::ostringstream os;
+        os << "Found " + fly_point_string + " at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height;
+        stream.log(os.str());
+  
+    }
+}
+
+void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point, ExpectedMarkerPosition marker_offset){
+    // loop through flypoint locations. find the point that is closest to marker_offset, by distance x_diff^2 + y_diff^2
+    // based on the closest point, move cursor based on x_diff and y_diff. do this again until x_diff/y_diff are within certain margins
+    std::string fly_point_string = get_flypoint_string(fly_point);
+    size_t MAX_ATTEMPTS = 20;
+    for (size_t i = 0; i < MAX_ATTEMPTS; i++){
+        const std::vector<ImageFloatBox> found_locations = get_flypoint_locations(info, stream, context, fly_point);
+        
+        const double expected_x = marker_offset.x;
+        const double expected_y = marker_offset.y;
+        double closest_icon_x = 0.0; 
+        double closest_icon_y = 0.0;
+        double closest_dist2 = DBL_MAX;  // distance^2 in pixels
+
+        for(const auto& box: found_locations){
+            const double found_x = box.x;
+            const double found_y = box.y;
+            const double x_diff = (found_x - expected_x) * 1920;
+            const double y_diff = (found_y - expected_y) * 1080;
+            const double dist2 = x_diff * x_diff + y_diff * y_diff;
+            
+
+            if (dist2 < closest_dist2){
+                closest_dist2 = dist2;
+                closest_icon_x = found_x; 
+                closest_icon_y = found_y;
+            }
+        }
+        stream.log("Found closest " + fly_point_string + " icon on map: (" + std::to_string(closest_icon_x) + ", " + std::to_string(closest_icon_y) + ").");
+
+
+        // Convert the vector from ExpectedMarkerPosition to the FlyPoint icon into a left joystick movement
+        const double dif_x = (closest_icon_x - expected_x) * 1920;
+        const double dif_y = (closest_icon_y - expected_y) * 1080;
+        const double magnitude = std::max(std::sqrt(closest_dist2), 1.0);
+        double push_x = dif_x * 64 / magnitude;
+        double push_y = dif_y * 64 / magnitude;
+
+        double scale = 0.29;
+        if (closest_dist2 < 1000){ // if we're already very close to the target, reduce push velocity and push duration
+            scale = 0.1;
+            push_x *= 0.25;
+            push_y *= 0.25;
+        }
+
+        if (closest_dist2 < 5){ // if we're very very close to the target, reduce push velocity and push duration even further
+            push_x *= 0.5;
+            push_y *= 0.5;
+        }
+
+        cout << "sqrt(closest_dist2): " << std::sqrt(closest_dist2) << endl;
+        // cout << "push_x " << push_x << endl;
+        // cout << "dif_x "<< dif_x << endl;
+        // cout << "magnitude " << magnitude << endl;
+
+        if (std::sqrt(closest_dist2) < 0.5){
+            // return when we're close enough to the target
+            break;
+        }
+
+        const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
+        const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
+
+        const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
+        pbf_move_left_joystick(context, move_x, move_y, push_time, 30);
+        context.wait_for_all_requests();
+    }
+
+}
 
 // While in the current map zoom level, detect pokecenter icons and move the map cursor there.
 // Return true if succeed. Return false if no visible pokcenter on map
@@ -241,35 +358,16 @@ bool detect_closest_flypoint_and_move_map_cursor_there(
     double max_dist = DBL_MAX;
     const double center_x = 0.5 * screen_width, center_y = 0.5 * screen_height;
     {
-        int ret = -1;
-        std::string fly_point_string;
-        MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
-        FastTravelWatcher fast_travel_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
-        const std::vector<ImageFloatBox>* found_locations = nullptr;
-        if (fly_point == FlyPoint::POKECENTER){
-            fly_point_string = "Pokecenter";
-            ret = wait_until(stream, context, std::chrono::seconds(2), {pokecenter_watcher});
-            if (ret == 0){
-                found_locations = &pokecenter_watcher.found_locations();
-            }
-        }else if(fly_point == FlyPoint::FAST_TRAVEL){
-            fly_point_string = "Fast Travel";
-            ret = wait_until(stream, context, std::chrono::seconds(2), {fast_travel_watcher});
-            if (ret == 0){
-                found_locations = &fast_travel_watcher.found_locations();
-            }
-        }
-        if (ret != 0){
+        std::string fly_point_string = get_flypoint_string(fly_point);
+        const std::vector<ImageFloatBox> found_locations = get_flypoint_locations(info, stream, context, fly_point);
+        if (found_locations.empty()){
             stream.log("No visible " + fly_point_string + " found on map");
             stream.overlay().add_log("No whole " + fly_point_string + " icon");
             return false;
         }
-
-        if (found_locations == nullptr){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "detect_closest_flypoint_and_move_map_cursor_there: Fly points have been found, but found_locations remains a nullptr.");
-        }
+        
         // Find the detected PokeCenter icon closest to the screen center (where player character is on the map).
-        for(const auto& box: *found_locations){
+        for(const auto& box: found_locations){
             const double loc_x = (box.x + box.width/2) * screen_width;
             const double loc_y = (box.y + box.height/2) * screen_height;
             const double x_diff = loc_x - center_x, y_diff = loc_y - center_y;

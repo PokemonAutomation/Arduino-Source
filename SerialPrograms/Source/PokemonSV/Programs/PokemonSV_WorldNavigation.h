@@ -35,6 +35,10 @@ enum class FlyPoint{
     POKECENTER,
     FAST_TRAVEL,
 };
+struct ExpectedMarkerPosition{
+    double x;
+    double y;
+};
 
 enum class BattleStopCondition{
     STOP_OVERWORLD,
@@ -68,6 +72,11 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProCont
 
 //  While in picnic, stop picnic and back to overworld.
 void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
+
+void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point);
+
+// with the map open, move the cursor to a specific position offset from the flypoint, as per marker_offset
+void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point, ExpectedMarkerPosition marker_offset);
 
 // While in the current map zoom level, detect pokecenter icons and move the map cursor there.
 // Return true if succeed. Return false if no visible pokcenter on map
