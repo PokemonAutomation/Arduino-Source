@@ -78,15 +78,15 @@ public:
     ~ButtonOption();
     ButtonOption(const ButtonOption& x) = delete;
     ButtonOption(
-        std::string label,
-        std::string text,
+        std::string label,  // the description of the button, shown on the left side of the button
+        std::string text,   // the text appearing on the button
         int button_height = 0,
         int text_size = 0
     );
     ButtonOption(
-        std::string label,
+        std::string label,  // the description of the button, shown on the left side of the button
         Enabled state,
-        std::string text,
+        std::string text,   // the text appearing on the button
         int button_height = 0,
         int text_size = 0
     );

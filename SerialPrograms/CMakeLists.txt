@@ -1,6 +1,6 @@
 # Set the minimum cmake version required
 cmake_minimum_required(VERSION 3.18.0)
-
+ 
 # Tell CMake to re-run configuration when these files change (get around Qt issues with stale CMake files)
 set(_cmake_files_to_watch
     "${CMAKE_SOURCE_DIR}/CMakeLists.txt"
@@ -77,7 +77,6 @@ else()
     set(FIRMWARE_DIR "${PACKAGES_DIR}/PABotBase/PABotBase-Switch")
     set(SCRIPTS_DIR "${PACKAGES_DIR}/SerialPrograms/Scripts")
     set(RESOURCES_DIR "${PACKAGES_DIR}/SerialPrograms/Resources")
-
     if(PACKAGE_BUILD)
         set(DEST_DIR "$<TARGET_FILE_DIR:SerialPrograms>/Output")
         set(DEPLOY_DIR "${DEST_DIR}/Binaries64")
@@ -88,7 +87,6 @@ else()
 
     set(DEPLOY_FILES TRUE)
 endif()
-
 #Find threads library
 set(THREADS_PREFER_PTHREAD_FLAG ON)
 find_package(Threads REQUIRED)
@@ -99,7 +97,7 @@ if(NOT QT_MAJOR)
 endif()
 
 # Make sure CI builds work without going overboard with per-platform directory shenanigans
-if(NOT DEPLOY_FILES)
+if(NOT WIN32 OR NOT DEPLOY_FILES)
     find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
 endif()
 

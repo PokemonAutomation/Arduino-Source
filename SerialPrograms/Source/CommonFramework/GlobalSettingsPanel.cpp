@@ -8,6 +8,8 @@
 #include <set>
 #include <QStandardPaths>
 #include <QCryptographicHash>
+#include <QDesktopServices>
+#include <QUrl>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/LifetimeSanitizer.h"
 #include "Common/Cpp/Json/JsonValue.h"
@@ -99,10 +101,15 @@ GlobalSettings& GlobalSettings::instance(){
 }
 GlobalSettings::~GlobalSettings(){
     ENABLE_LIFETIME_SANITIZER0.remove_listener(*this);
+    OPEN_BASE_FOLDER_BUTTON.remove_listener(static_cast<ButtonListener&>(*this));
 }
 GlobalSettings::GlobalSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , CHECK_FOR_UPDATES(CONSTRUCT_TOKEN)
+    , OPEN_BASE_FOLDER_BUTTON(
+        "<b>Runtime Base Folder:</b>",
+        "Open Folder"
+    )
     , STATS_FILE(
         false,
         "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
@@ -211,6 +218,7 @@ GlobalSettings::GlobalSettings()
         "", ""
     )
 {
+    PA_ADD_OPTION(OPEN_BASE_FOLDER_BUTTON);
     PA_ADD_OPTION(CHECK_FOR_UPDATES);
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(TEMP_FOLDER);
@@ -257,6 +265,7 @@ GlobalSettings::GlobalSettings()
 
     GlobalSettings::on_config_value_changed(this);
     ENABLE_LIFETIME_SANITIZER0.add_listener(*this);
+    OPEN_BASE_FOLDER_BUTTON.add_listener(static_cast<ButtonListener&>(*this));
 }
 
 void GlobalSettings::load_json(const JsonValue& json){
@@ -380,6 +389,11 @@ void GlobalSettings::on_config_value_changed(void* object){
         global_logger_tagged().log("LifeTime Sanitizer: Disabled", COLOR_BLUE);
         LifetimeSanitizer::disable();
     }
+}
+
+void GlobalSettings::on_press(){
+    // Open the runtime base folder in the system file manager
+    QDesktopServices::openUrl(QUrl::fromLocalFile(QString::fromStdString(RUNTIME_BASE_PATH())));
 }
 
 

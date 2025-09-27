@@ -2,6 +2,12 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  Defines basic program related const values (version numbers, program names, URLs, etc.)
+ *  and paths to various folders (setting folder, screenshot folder, etc.).
+ *  CAUTION: since the program's runtime base path is initialized only after Qt is initialized,
+ *  do not call any path functions defined here until after Qt is initialized in the main function.
+ * 
+ *  Also defines program state enum and program feedback type enum.
  */
 
 #ifndef PokemonAutomation_Globals_H
@@ -36,6 +42,9 @@ extern const std::string DISCORD_LINK_URL_SDK;
 extern const std::string COMPILER_VERSION;
 
 extern const size_t LOG_HISTORY_LINES;
+
+// Path to the parent folder that holds all other folders, e.g. settings folder, screenshot folder, etc. 
+const std::string& RUNTIME_BASE_PATH();
 
 // Folder path (end with "/") to hold program setting files.
 const std::string& SETTINGS_PATH();

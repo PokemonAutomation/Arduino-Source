@@ -147,11 +147,6 @@ std::string get_runtime_base_path(){
     return "./";
 }
 
-const std::string& RUNTIME_BASE_PATH(){
-    static std::string path = get_runtime_base_path();
-    return path;
-}
-
 std::string get_setting_path(){
     return RUNTIME_BASE_PATH() + "UserSettings/";
 }
@@ -169,6 +164,11 @@ std::string get_user_file_path(){
 }
 
 } // anonymous namespace
+
+const std::string& RUNTIME_BASE_PATH(){
+    static std::string path = get_runtime_base_path();
+    return path;
+}
 
 const std::string& SETTINGS_PATH(){
     static std::string path = get_setting_path();

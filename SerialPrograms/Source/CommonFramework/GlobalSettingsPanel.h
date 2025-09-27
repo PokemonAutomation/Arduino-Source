@@ -12,6 +12,7 @@
 #include "Common/Cpp/Options/ConfigOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/ButtonOption.h"
 //#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
@@ -76,7 +77,7 @@ public:
 
 
 
-class GlobalSettings : public BatchOption, private ConfigOption::Listener{
+class GlobalSettings : public BatchOption, private ConfigOption::Listener, private ButtonListener{
     ~GlobalSettings();
     GlobalSettings();
 public:
@@ -87,10 +88,12 @@ public:
 
 private:
     virtual void on_config_value_changed(void* object) override;
+    virtual void on_press() override;
 
 public:
     Pimpl<CheckForUpdatesOption> CHECK_FOR_UPDATES;
 
+    ButtonOption OPEN_BASE_FOLDER_BUTTON;
     StringOption STATS_FILE;
     FolderInputOption TEMP_FOLDER;
 
