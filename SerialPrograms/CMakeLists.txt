@@ -5,6 +5,7 @@ cmake_minimum_required(VERSION 3.18.0)
 set(_cmake_files_to_watch
     "${CMAKE_SOURCE_DIR}/CMakeLists.txt"
     "${CMAKE_SOURCE_DIR}/CMakePresets.json"
+    "${CMAKE_SOURCE_DIR}/SourceFiles.cmake"
 )
 
 # Watch any helper .cmake files under cmake/
@@ -26,6 +27,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 #set(CMAKE_VERBOSE_MAKEFILE ON)
 
+# Set these three on globally so all intermediate Qt targets can get processed automatically
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
@@ -138,6 +140,16 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${EXECUTABLE_SOURCES}
 # Create library target first
 add_library(SerialProgramsLib STATIC ${LIBRARY_SOURCES})
 
+# Add source code exclusive to the internal repo
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_OFFICIAL)
+    target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal0.cpp)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
+endif()
+
 if (APPLE)
     set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../IconResource/icon.icns)
     # set_source_files_properties(SerialPrograms_ICON PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
@@ -193,19 +205,6 @@ endfunction()
 # Apply common properties to both targets
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
-
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
-    target_compile_definitions(SerialProgramsLib PRIVATE PA_OFFICIAL)
-    target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
-    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
-    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
-    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal0.cpp)
-    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
-endif()
-
-
-
-
 
 if (WIN32)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
@@ -407,11 +406,9 @@ else() # macOS and Linux
     endif()
 
     # Set OS-specific flags
-    if (WIN32)
-    elseif (APPLE)
+    if (APPLE)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
         target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
-    elseif(UNIX)
     endif()
 
     IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
