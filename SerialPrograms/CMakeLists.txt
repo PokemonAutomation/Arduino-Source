@@ -33,15 +33,15 @@ set(CMAKE_AUTOUIC ON)
 add_custom_target(build-time-make-directory ALL
     COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
 
-# Find repo root folder path
-string(FIND "${CMAKE_CURRENT_SOURCE_DIR}" "Arduino-Source-Internal" internal_repo_position)
-
 # Determine if this is an internal repo and normalize REPO_ROOT_DIR
-if(internal_repo_position EQUAL -1)
-    # We are building the public repo
+# CMAKE_CURRENT_SOURCE_DIR: the full path to this CmakeLists.txt
+# Find if "Arduino-Source-Internal" is in the path and store the find result to internal_repo_position
+string(FIND "${CMAKE_CURRENT_SOURCE_DIR}" "Arduino-Source-Internal" internal_repo_position)
+if(internal_repo_position EQUAL -1)  # no "Arduino-Source-Internal" in the path
+    # We are building the public repo, CMakeLists.txt is one level deep in the root repo dir
     set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../")
 else()
-    # We are building the internal repo
+    # We are building the internal repo, CMakeLists.txt is three levels deep in the root repo dir
     set(REPO_ROOT_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../../../")
 endif()
 
@@ -125,7 +125,18 @@ link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 # add the list of all code file paths as ${MAIN_SOURCES}
 include(SourceFiles.cmake)
-source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}../../ FILES ${MAIN_SOURCES})
+
+# Separate sources into library and executable components
+set(LIBRARY_SOURCES ${MAIN_SOURCES})
+list(REMOVE_ITEM LIBRARY_SOURCES "Source/CommonFramework/Main.cpp")
+set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp")
+
+# Organize source files in IDE project view
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${LIBRARY_SOURCES})
+source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${EXECUTABLE_SOURCES})
+
+# Create library target first
+add_library(SerialProgramsLib STATIC ${LIBRARY_SOURCES})
 
 if (APPLE)
     set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../IconResource/icon.icns)
@@ -134,7 +145,7 @@ if (APPLE)
     # Links on how to create a MacOS app bundle with cmake
     # https://stackoverflow.com/questions/53560288/how-to-create-a-macos-app-bundle-with-cmake
     # https://cmake.org/cmake/help/latest/command/add_executable.html
-    add_executable(SerialPrograms MACOSX_BUNDLE ${SerialPrograms_ICON} ${MAIN_SOURCES})
+    add_executable(SerialPrograms MACOSX_BUNDLE ${SerialPrograms_ICON} ${EXECUTABLE_SOURCES})
     set_target_properties(SerialPrograms PROPERTIES
         BUNDLE True
         MACOSX_BUNDLE_GUI_IDENTIFIER PokemonAutomation.SerialPrograms
@@ -159,35 +170,46 @@ if (APPLE)
         "$<TARGET_FILE_DIR:SerialPrograms>/../Resources"
     )
 else()
-    add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
+    add_executable(SerialPrograms WIN32 ${EXECUTABLE_SOURCES})
 endif()
 
-set_target_properties(SerialPrograms PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(SerialPrograms PRIVATE Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
-target_link_libraries(SerialPrograms PRIVATE Threads::Threads)
+target_link_libraries(SerialPrograms PRIVATE SerialProgramsLib)
 
-#add defines
-target_compile_definitions(SerialPrograms PRIVATE NOMINMAX DPP_NO_DEPRECATED)
+# Function to apply common properties to both library and executable targets
+function(apply_common_target_properties target_name)
+    set_target_properties(${target_name} PROPERTIES LINKER_LANGUAGE CXX)
+    target_link_libraries(${target_name} PRIVATE Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
+    target_link_libraries(${target_name} PRIVATE Threads::Threads)
+
+    #add defines
+    target_compile_definitions(${target_name} PRIVATE NOMINMAX DPP_NO_DEPRECATED)
+
+    #add include directory
+    target_include_directories(${target_name} SYSTEM PRIVATE ../3rdParty/)
+    target_include_directories(${target_name} PRIVATE ../ ../../Internal/ Source/)
+    target_link_directories(${target_name} PRIVATE ../3rdPartyBinaries/)
+endfunction()
+
+# Apply common properties to both targets
+apply_common_target_properties(SerialProgramsLib)
+apply_common_target_properties(SerialPrograms)
 
 if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_OFFICIAL)
     target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
-    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
-    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
-    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/Internal0.cpp)
-    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal0.cpp)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
 endif()
 
-#add include directory
-target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/)
-target_include_directories(SerialPrograms PRIVATE ../ ../../Internal/ Source/)
-target_link_directories(SerialPrograms PRIVATE ../3rdPartyBinaries/)
 
 
 
 
 if (WIN32)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
-    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/opencv-4.11.0/)
+    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/opencv-4.11.0/)
     set_target_properties(OpenCV_lib PROPERTIES
         IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110.lib
         IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110d.lib
@@ -198,7 +220,7 @@ if (WIN32)
     )
 
     add_library(ONNX_lib IMPORTED UNKNOWN)
-    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/ONNX/)
+    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/ONNX/)
     set_target_properties(ONNX_lib PROPERTIES
         IMPORTED_LOCATION   ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/onnxruntime.lib
     )
@@ -219,7 +241,7 @@ if (WIN32)
     )
 
     add_library(discord_lib IMPORTED UNKNOWN)
-    target_include_directories(SerialPrograms SYSTEM PRIVATE ../3rdParty/discord_social_sdk_win/)
+    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/discord_social_sdk_win/)
     set_target_properties(discord_lib PROPERTIES
         IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win/lib/release/discord_partner_sdk.lib
         IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/discord_social_sdk_win/lib/debug/discord_partner_sdk.lib
@@ -230,7 +252,7 @@ if (WIN32)
     )
 
     target_link_libraries(
-        SerialPrograms PRIVATE
+        SerialProgramsLib PRIVATE
         tesseractPA.lib
         OpenCV_lib
         ONNX_lib
@@ -240,7 +262,7 @@ if (WIN32)
     )
 
     target_compile_definitions(
-        SerialPrograms PRIVATE
+        SerialProgramsLib PRIVATE
         _CRT_SECURE_NO_WARNINGS
         _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
         PA_TESSERACT
@@ -248,9 +270,9 @@ if (WIN32)
         PA_SOCIAL_SDK
     )
 
-    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
-    target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
-    target_compile_options(SerialPrograms PRIVATE /wd4505)  # unreferenced local function has been removed
+    target_compile_options(SerialProgramsLib PRIVATE /FAs /FaAssembly/ /MP /W4 /WX /external:anglebrackets /external:W0 /utf-8)
+    target_compile_options(SerialProgramsLib PRIVATE /wd5054)  # Deprecated enum arithemtic
+    target_compile_options(SerialProgramsLib PRIVATE /wd4505)  # unreferenced local function has been removed
 
     set(ARCH_FLAGS_09_Nehalem       /W4)    # Dummy parameter
     set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
@@ -292,14 +314,14 @@ else() # macOS and Linux
         if(EXISTS "${ONNXRUNTIME_HEADER_DIR}")
             # we have ONNX Runtime built from source
             message("Use ONNX Runtime built from source at ${ONNXRUNTIME_ROOTDIR}")
-            target_include_directories(SerialPrograms PRIVATE ${ONNXRUNTIME_HEADER_DIR})
-            link_directories(SerialPrograms PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release)
-            target_link_libraries(SerialPrograms PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release/libonnxruntime.dylib)
+            target_include_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_HEADER_DIR})
+            link_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release)
+            target_link_libraries(SerialProgramsLib PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release/libonnxruntime.dylib)
         else()
             message("Built-from-source ONNX Runtime folder ${ONNXRUNTIME_ROOTDIR} does not exist.")
             message("Use ONNX Runtime installed by Homebrew.")
-            target_include_directories(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
-            target_link_libraries(SerialPrograms PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
+            target_include_directories(SerialProgramsLib PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
+            target_link_libraries(SerialProgramsLib PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
         endif()
         # Find OpenCV
         if(CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)")
@@ -338,28 +360,28 @@ else() # macOS and Linux
         )
 
         # Link against ONNX Runtime
-        target_link_libraries(SerialPrograms PRIVATE onnxruntime)
+        target_link_libraries(SerialProgramsLib PRIVATE onnxruntime)
         # Find OpenCV
         find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
     endif()
 
     include_directories(${OpenCV_INCLUDE_DIRS})
     link_directories(${OpenCV_LIBRARY_DIRS})
-    target_link_libraries(SerialPrograms PRIVATE ${OpenCV_LIBS})
+    target_link_libraries(SerialProgramsLib PRIVATE ${OpenCV_LIBS})
 
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
     if (UNIX_LINK_TESSERACT)
         find_package(PkgConfig REQUIRED)
-        target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT UNIX_LINK_TESSERACT)
+        target_compile_definitions(SerialProgramsLib PRIVATE PA_TESSERACT UNIX_LINK_TESSERACT)
         pkg_search_module(TESSERACT REQUIRED tesseract)
         pkg_search_module(LEPTONICA REQUIRED lept)
         include_directories(${TESSERACT_INCLUDE_DIRS})
         include_directories(${LEPTONICA_INCLUDE_DIRS})
         link_directories(${TESSERACT_LIBRARY_DIRS})
         link_directories(${LEPTONICA_LIBRARY_DIRS})
-        target_link_libraries(SerialPrograms PRIVATE ${TESSERACT_LINK_LIBRARIES})
-        target_link_libraries(SerialPrograms PRIVATE ${LEPTONICA_LINK_LIBRARIES})
+        target_link_libraries(SerialProgramsLib PRIVATE ${TESSERACT_LINK_LIBRARIES})
+        target_link_libraries(SerialProgramsLib PRIVATE ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
     # enable dpp integration
@@ -370,46 +392,46 @@ else() # macOS and Linux
             INTERFACE_COMPILE_DEFINITIONS "PA_DPP"
             INTERFACE_LINK_LIBRARIES "-L/opt/homebrew/lib -lssl -lcrypto -lopus -lsodium -lz" # add dpp's deps
         )
-        target_link_libraries(SerialPrograms PRIVATE libdpp)
+        target_link_libraries(SerialProgramsLib PRIVATE libdpp)
     endif()
 
     if (APPLE)
         # Add -Wno-c11-extensions to avoid clang gives
         # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
         # when compiling OpenCV
-        # target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
-        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
+        # target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
+        target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
     else()
         # Assume GCC
-        target_compile_options(SerialPrograms PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
+        target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
     endif()
 
     # Set OS-specific flags
     if (WIN32)
     elseif (APPLE)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
-        target_link_libraries(SerialPrograms PRIVATE "-framework IOKit -framework CoreFoundation")
+        target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
     elseif(UNIX)
     endif()
 
     IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
         # Arm CPU
         #   Run-time ISA dispatching
-        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_arm64_20_M1)
+        target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_arm64_20_M1)
 
     else()
         # Intel CPU
-        target_compile_options(SerialPrograms PRIVATE -march=nehalem)
+        target_compile_options(SerialProgramsLib PRIVATE -march=nehalem)
         set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
         set(ARCH_FLAGS_13_Haswell       -march=haswell)
         set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
         set(ARCH_FLAGS_19_IceLake       -march=icelake-client)
 
         #   Run-time ISA dispatching
-        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_08_Nehalem)
-        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_13_Haswell)
-        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_17_Skylake)
-        target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_19_IceLake)
+        target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_x64_08_Nehalem)
+        target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_x64_13_Haswell)
+        target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_x64_17_Skylake)
+        target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_x64_19_IceLake)
 
     endif()
 endif()
