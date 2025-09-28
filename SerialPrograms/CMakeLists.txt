@@ -280,8 +280,8 @@ if (WIN32)
     set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
 
     if(CMAKE_GENERATOR_TOOLSET MATCHES "ClangCL")
-        target_compile_options(SerialPrograms PRIVATE -Wno-unused-function)
-        target_compile_options(SerialPrograms PRIVATE -march=nehalem)
+        target_compile_options(SerialProgramsLib PRIVATE -Wno-unused-function)
+        target_compile_options(SerialProgramsLib PRIVATE -march=nehalem)
         set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
         set(ARCH_FLAGS_13_Haswell       -march=haswell)
         set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
@@ -289,14 +289,14 @@ if (WIN32)
     endif()
 
     #   Run-time ISA dispatching
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_08_Nehalem)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_13_Haswell)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_17_Skylake)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_x64_19_IceLake)
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_x64_08_Nehalem)
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_x64_13_Haswell)
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_x64_17_Skylake)
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_x64_19_IceLake)
 
-#    target_compile_options(SerialPrograms PRIVATE /arch:AVX2   /DPA_Arch_x64_AVX2)
-#    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
-#    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
+#    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX2   /DPA_Arch_x64_AVX2)
+#    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
+#    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else() # macOS and Linux
     if (APPLE)
         # Get root path where Homebrew installs libraries. Example root path: "/opt/homebrew/",
