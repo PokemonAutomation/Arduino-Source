@@ -19,6 +19,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+
+
 CommandRow::~CommandRow(){
     m_controller.remove_listener(*this);
     m_session.remove_listener(*this);
@@ -65,29 +67,28 @@ CommandRow::CommandRow(
 
 //    row->addWidget(new QLabel("<b>Overlays:<b>", this));
 
-    m_overlay_boxes = new QCheckBox("Boxes", this);
-    m_overlay_boxes->setChecked(session.enabled_boxes());
-    row->addWidget(m_overlay_boxes);
-
-    m_overlay_text = new QCheckBox("Text", this);
-    m_overlay_text->setHidden(true);    //  Nothing uses text overlay yet.
-    m_overlay_text->setChecked(session.enabled_text());
-    row->addWidget(m_overlay_text);
-
-    m_overlay_images = new QCheckBox("Masks", this);
-    m_overlay_images->setChecked(session.enabled_images());
-    row->addWidget(m_overlay_images);
-    if (!PreloadSettings::instance().DEVELOPER_MODE){
-        m_overlay_images->setVisible(false);
+    CheckboxDropdown* overlays = new CheckboxDropdown(this, "Overlays");
+    {
+        m_overlay_boxes = overlays->addItem("Boxes");
+        m_overlay_boxes->setChecked(session.enabled_boxes());
     }
-
-    m_overlay_log = new QCheckBox("Log", this);
-    m_overlay_log->setChecked(session.enabled_log());
-    row->addWidget(m_overlay_log);
-
-    m_overlay_stats = new QCheckBox("Stats", this);
-    m_overlay_stats->setChecked(session.enabled_stats());
-    row->addWidget(m_overlay_stats);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        m_overlay_text = overlays->addItem("Text");  //  Nothing uses text overlay yet.
+        m_overlay_text->setChecked(session.enabled_text());
+    }
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        m_overlay_images = overlays->addItem("Masks");
+        m_overlay_images->setChecked(session.enabled_images());
+    }
+    {
+        m_overlay_log = overlays->addItem("Log");
+        m_overlay_log->setChecked(session.enabled_log());
+    }
+    {
+        m_overlay_stats = overlays->addItem("Stats");
+        m_overlay_stats->setChecked(session.enabled_stats());
+    }
+    row->addWidget(overlays);
 
     row->addSpacing(5);
 
@@ -107,47 +108,44 @@ CommandRow::CommandRow(
 
     update_ui();
 
+#if 1
     connect(
-        m_overlay_boxes, &QCheckBox::clicked,
-        this, [this](bool checked){ m_session.set_enabled_boxes(checked); }
+        m_overlay_boxes, &CheckboxDropdownItem::checkStateChanged,
+        this, [this](Qt::CheckState state){
+
+            m_session.set_enabled_boxes(state == Qt::Checked);
+        }
     );
-#if QT_VERSION < 0x060700
-    connect(
-        m_overlay_text, &QCheckBox::stateChanged,
-        this, [this](bool checked){ m_session.set_enabled_text(checked); }
-    );
-    connect(
-        m_overlay_images, &QCheckBox::stateChanged,
-        this, [this](bool checked){ m_session.set_enabled_images(checked); }
-    );
-    connect(
-        m_overlay_log, &QCheckBox::stateChanged,
-        this, [this](bool checked){ m_session.set_enabled_log(checked); }
-    );
-    connect(
-        m_overlay_stats, &QCheckBox::stateChanged,
-        this, [this](bool checked){ m_session.set_enabled_stats(checked); }
-    );
-#else
-    connect(
-        m_overlay_text, &QCheckBox::checkStateChanged,
-        this, [this](Qt::CheckState state){ m_session.set_enabled_text(state == Qt::Checked); }
-    );
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (m_overlay_text){
         connect(
-            m_overlay_images, &QCheckBox::checkStateChanged,
-            this, [this](Qt::CheckState state){ m_session.set_enabled_images(state == Qt::Checked); }
+            m_overlay_text, &CheckboxDropdownItem::checkStateChanged,
+            this, [this](Qt::CheckState state){
+                m_session.set_enabled_text(state == Qt::Checked);
+            }
+        );
+    }
+    if (m_overlay_images){
+        connect(
+            m_overlay_images, &CheckboxDropdownItem::checkStateChanged,
+            this, [this](Qt::CheckState state){
+                m_session.set_enabled_images(state == Qt::Checked);
+            }
         );
     }
     connect(
-        m_overlay_log, &QCheckBox::checkStateChanged,
-        this, [this](Qt::CheckState state){ m_session.set_enabled_log(state == Qt::Checked); }
+        m_overlay_log, &CheckboxDropdownItem::checkStateChanged,
+        this, [this](Qt::CheckState state){
+            m_session.set_enabled_log(state == Qt::Checked);
+        }
     );
     connect(
-        m_overlay_stats, &QCheckBox::checkStateChanged,
-        this, [this](Qt::CheckState state){ m_session.set_enabled_stats(state == Qt::Checked); }
+        m_overlay_stats, &CheckboxDropdownItem::checkStateChanged,
+        this, [this](Qt::CheckState state){
+            m_session.set_enabled_stats(state == Qt::Checked);
+        }
     );
 #endif
+
     connect(
         m_load_profile_button, &QPushButton::clicked,
         this, [this](bool) { emit load_profile(); }

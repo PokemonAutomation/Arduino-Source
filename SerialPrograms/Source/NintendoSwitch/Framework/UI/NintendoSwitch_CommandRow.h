@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QCheckBox>
+#include "Common/Qt/CheckboxDropdown.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoOverlaySession.h"
 #include "Controllers/ControllerSession.h"
@@ -68,11 +69,11 @@ private:
     QComboBox* m_command_box = nullptr;
     QLabel* m_status = nullptr;
 
-    QCheckBox* m_overlay_log = nullptr;
-    QCheckBox* m_overlay_text = nullptr;
-    QCheckBox* m_overlay_images = nullptr;
-    QCheckBox* m_overlay_boxes = nullptr;
-    QCheckBox* m_overlay_stats = nullptr;
+    CheckboxDropdownItem* m_overlay_boxes = nullptr;
+    CheckboxDropdownItem* m_overlay_text = nullptr;
+    CheckboxDropdownItem* m_overlay_images = nullptr;
+    CheckboxDropdownItem* m_overlay_log = nullptr;
+    CheckboxDropdownItem* m_overlay_stats = nullptr;
 
     QPushButton* m_load_profile_button = nullptr;
     QPushButton* m_save_profile_button = nullptr;
