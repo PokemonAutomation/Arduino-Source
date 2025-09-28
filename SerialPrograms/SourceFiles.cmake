@@ -193,6 +193,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
     ../Common/Qt/AutoWidthLineEdit.h
+    ../Common/Qt/CheckboxDropdown.h
     ../Common/Qt/CodeValidator.cpp
     ../Common/Qt/CodeValidator.h
     ../Common/Qt/CollapsibleGroupBox.cpp
