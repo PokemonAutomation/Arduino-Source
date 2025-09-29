@@ -14,6 +14,10 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
+void register_message_converters_NS2_WiredController();
+
+
+
 class DeviceRequest_NS2_WiredController_ControllerStateMs : public BotBaseRequest{
 public:
     pabb_Message_Command_NS2_WiredController_State params;

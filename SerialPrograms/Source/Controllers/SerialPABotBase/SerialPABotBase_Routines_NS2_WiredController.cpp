@@ -15,7 +15,7 @@ namespace SerialPABotBase{
 
 
 
-int register_message_converters_NS2_WiredController(){
+void register_message_converters_NS2_WiredController(){
     register_message_converter(
         PABB_MSG_COMMAND_NS2_WIRED_CONTROLLER_STATE,
         [](const std::string& body){
@@ -46,9 +46,7 @@ int register_message_converters_NS2_WiredController(){
             return ss.str();
         }
     );
-    return 0;
 }
-int init_NS2_WiredController = register_message_converters_NS2_WiredController();
 
 
 

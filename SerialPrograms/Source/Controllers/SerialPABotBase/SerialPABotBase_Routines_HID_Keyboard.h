@@ -14,6 +14,9 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
+void register_message_converters_HID_Keyboard();
+
+
 class DeviceRequest_HID_Keyboard_StateMs : public BotBaseRequest{
 public:
     pabb_Message_Command_HID_Keyboard_State params;

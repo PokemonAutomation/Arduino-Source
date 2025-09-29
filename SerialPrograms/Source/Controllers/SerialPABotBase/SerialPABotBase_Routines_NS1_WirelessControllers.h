@@ -16,6 +16,7 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
+void register_message_converters_NS1_WirelessControllers();
 
 
 class MessageControllerReadSpi : public BotBaseRequest{

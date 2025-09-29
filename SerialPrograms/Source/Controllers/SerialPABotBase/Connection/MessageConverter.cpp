@@ -14,6 +14,10 @@
 #include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 #include "MessageConverter.h"
 
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.h"
+
 namespace PokemonAutomation{
 
 
@@ -481,17 +485,27 @@ int register_message_converters_custom_info(){
 }
 
 
-int init_MessageLogger =
-    register_message_converters_framework_errors() +
-    register_message_converters_framework_acks() +
-    register_message_converters_framework_requests() +
+
+const std::map<uint8_t, MessageConverter>& make_MESSAGE_MAP(){
+    register_message_converters_framework_errors();
+    register_message_converters_framework_acks();
+    register_message_converters_framework_requests();
     register_message_converters_custom_info();
+
+    SerialPABotBase::register_message_converters_HID_Keyboard();
+    SerialPABotBase::register_message_converters_NS2_WiredController();
+    SerialPABotBase::register_message_converters_NS1_WirelessControllers();
+
+    return converter_map();
+}
+
 
 
 std::string message_to_string(const BotBaseMessage& message){
-    const std::map<uint8_t, MessageConverter>& converters = converter_map();
-    auto iter = converters.find(message.type);
-    if (iter == converters.end()){
+    static const std::map<uint8_t, MessageConverter>& CONVERTER_MAP = make_MESSAGE_MAP();
+
+    auto iter = CONVERTER_MAP.find(message.type);
+    if (iter == CONVERTER_MAP.end()){
         std::ostringstream ss;
         ss << "Unknown Message Type " << (unsigned)message.type << ": length = " << message.body.size();
         return ss.str();

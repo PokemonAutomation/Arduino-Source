@@ -15,7 +15,7 @@ namespace SerialPABotBase{
 
 
 
-int register_message_converters_NS1_WirelessControllers(){
+void register_message_converters_NS1_WirelessControllers(){
     register_message_converter(
         PABB_MSG_REQUEST_STATUS,
         [](const std::string& body){
@@ -99,9 +99,7 @@ int register_message_converters_NS1_WirelessControllers(){
             return ss.str();
         }
     );
-    return 0;
 }
-int init_Messages_ESP32 = register_message_converters_NS1_WirelessControllers();
 
 
 

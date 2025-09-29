@@ -14,7 +14,7 @@ namespace SerialPABotBase{
 
 
 
-int register_message_converters_HID_Keyboard(){
+void register_message_converters_HID_Keyboard(){
     register_message_converter(
         PABB_MSG_COMMAND_HID_KEYBOARD_STATE,
         [](const std::string& body){
@@ -45,9 +45,7 @@ int register_message_converters_HID_Keyboard(){
             return ss.str();
         }
     );
-    return 0;
 }
-int init_PushButtonFramework = register_message_converters_HID_Keyboard();
 
 
 
