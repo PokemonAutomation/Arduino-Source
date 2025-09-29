@@ -4,6 +4,7 @@
  *
  */
 
+#include <atomic>
 #include "3rdParty/ONNX/OnnxToolsPA.h"
 #include "Common/Cpp/Time.h"
 //#include "CommonFramework/ImageTypes/ImageRGB32.h"
