@@ -5,7 +5,7 @@
  */
 
 #include <QString>
-#include "ClientSource/Libraries/Logging.h"
+#include "Common/Cpp/Time.h"
 #include "Logger.h"
 
 #include <iostream>

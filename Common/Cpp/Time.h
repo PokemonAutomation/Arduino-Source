@@ -21,6 +21,7 @@ using Seconds = std::chrono::seconds;
 inline WallClock current_time(){
     return std::chrono::system_clock::now();
 }
+std::string current_time_to_str();
 
 
 uint16_t current_year();

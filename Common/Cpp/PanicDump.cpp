@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "ClientSource/Libraries/Logging.h"
 #include "PrettyPrint.h"
 #include "PanicDump.h"
 

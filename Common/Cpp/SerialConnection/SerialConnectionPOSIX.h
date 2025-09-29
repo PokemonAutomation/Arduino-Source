@@ -20,6 +20,10 @@
 
 namespace PokemonAutomation{
 
+void serial_debug_log(const std::string& msg);
+
+
+
 class SerialConnection : public StreamConnection{
 public:
     //  UTF-8

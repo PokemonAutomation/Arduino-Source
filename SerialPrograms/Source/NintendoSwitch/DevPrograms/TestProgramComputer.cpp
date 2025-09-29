@@ -38,7 +38,6 @@
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 #include "TestProgramComputer.h"
-#include "ClientSource/Libraries/Logging.h"
 #include "Common/Cpp/Containers/Pimpl.tpp"
 
 #include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"

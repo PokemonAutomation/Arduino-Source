@@ -18,12 +18,6 @@ file(GLOB MAIN_SOURCES
     ../ClientSource/Connection/PABotBase.h
     ../ClientSource/Connection/PABotBaseConnection.cpp
     ../ClientSource/Connection/PABotBaseConnection.h
-    ../ClientSource/Connection/SerialConnection.h
-    ../ClientSource/Connection/SerialConnectionPOSIX.h
-    ../ClientSource/Connection/SerialConnectionWinAPI.h
-    ../ClientSource/Connection/StreamInterface.h
-    ../ClientSource/Libraries/Logging.cpp
-    ../ClientSource/Libraries/Logging.h
     ../ClientSource/Libraries/MessageConverter.cpp
     ../ClientSource/Libraries/MessageConverter.h
     ../Common/CRC32.cpp
@@ -167,6 +161,11 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/Rectangle.tpp
     ../Common/Cpp/RecursiveThrottler.h
     ../Common/Cpp/SIMDDebuggers.h
+    ../Common/Cpp/SerialConnection/SerialConnection.cpp
+    ../Common/Cpp/SerialConnection/SerialConnection.h
+    ../Common/Cpp/SerialConnection/SerialConnectionPOSIX.h
+    ../Common/Cpp/SerialConnection/SerialConnectionWinAPI.h
+    ../Common/Cpp/SerialConnection/StreamInterface.h
     ../Common/Cpp/Sockets/AbstractClientSocket.h
     ../Common/Cpp/Sockets/ClientSocket.cpp
     ../Common/Cpp/Sockets/ClientSocket.h

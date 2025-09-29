@@ -6,7 +6,6 @@
 
 #include "Common/CRC32.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-#include "ClientSource/Libraries/Logging.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "BotBaseMessage.h"
 #include "PABotBaseConnection.h"

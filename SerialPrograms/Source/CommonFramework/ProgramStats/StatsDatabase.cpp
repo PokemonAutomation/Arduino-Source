@@ -6,7 +6,7 @@
 
 #include <QFile>
 #include <QSaveFile>
-#include "ClientSource/Libraries/Logging.h"
+#include "Common/Cpp/Time.h"
 #include "StatsDatabase.h"
 
 #include <iostream>

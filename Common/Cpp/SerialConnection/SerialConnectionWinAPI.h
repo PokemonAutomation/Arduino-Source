@@ -12,15 +12,19 @@
 #include <thread>
 #include <windows.h>
 #include "Common/Compiler.h"
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Unicode.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-#include "Common/Cpp/Concurrency/SpinPause.h"
-#include "ClientSource/Libraries/Logging.h"
+//#include "Common/Cpp/Concurrency/SpinPause.h"
 #include "StreamInterface.h"
 
 namespace PokemonAutomation{
+
+void serial_debug_log(const std::string& msg);
+
+
 
 class SerialConnection : public StreamConnection{
 public:
@@ -121,7 +125,7 @@ private:
     void process_error(const std::string& message){
         m_errors++;
         if (m_errors < 100 || m_errors % 1000 == 0){
-            log(message);
+            serial_debug_log(message);
         }
 
         std::string clear_error;
@@ -134,7 +138,7 @@ private:
         }
 
         if (m_errors < 100 || m_errors % 1000 == 0){
-            log(clear_error);
+            serial_debug_log(clear_error);
         }
     }
 

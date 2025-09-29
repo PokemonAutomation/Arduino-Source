@@ -16,10 +16,10 @@
 
 #include <memory>
 #include <deque>
+#include "Common/Cpp/SerialConnection/StreamInterface.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "BotBase.h"
 #include "MessageSniffer.h"
-#include "StreamInterface.h"
 
 namespace PokemonAutomation{
 
