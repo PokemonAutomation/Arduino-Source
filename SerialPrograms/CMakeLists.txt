@@ -140,16 +140,6 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${EXECUTABLE_SOURCES}
 # Create library target first
 add_library(SerialProgramsLib STATIC ${LIBRARY_SOURCES})
 
-# Add source code exclusive to the internal repo
-if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
-    target_compile_definitions(SerialProgramsLib PRIVATE PA_OFFICIAL)
-    target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
-    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
-    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
-    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal0.cpp)
-    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
-endif()
-
 if (APPLE)
     set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../IconResource/icon.icns)
     # set_source_files_properties(SerialPrograms_ICON PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
@@ -186,6 +176,16 @@ else()
 endif()
 
 target_link_libraries(SerialPrograms PRIVATE SerialProgramsLib)
+
+# Add source code exclusive to the internal repo and add C++ macro of official release
+if (EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/../../Internal/SerialPrograms/Internal0.cpp")
+    target_compile_definitions(SerialProgramsLib PRIVATE PA_OFFICIAL)
+    target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.cpp)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_TestPrograms.h)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal0.cpp)
+    target_sources(SerialProgramsLib PRIVATE ../../Internal/SerialPrograms/Internal1.cpp)
+endif()
 
 # Function to apply common properties to both library and executable targets
 function(apply_common_target_properties target_name)
