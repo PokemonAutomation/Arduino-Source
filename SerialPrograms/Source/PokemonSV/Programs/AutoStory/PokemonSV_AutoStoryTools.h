@@ -8,11 +8,11 @@
 #define PokemonAutomation_PokemonSV_AutoStoryTools_H
 
 #include <functional>
-#include <unordered_set>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 // #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 
 namespace PokemonAutomation{
@@ -36,10 +36,6 @@ struct AutoStoryStats : public StatsTracker{
 };    
 
 
-enum class BattleStopCondition{
-    STOP_OVERWORLD,
-    STOP_DIALOG,
-};
 
 enum class ClearDialogMode{
     STOP_OVERWORLD,
@@ -50,19 +46,7 @@ enum class ClearDialogMode{
 };
 
 
-enum class CallbackEnum{
-    ADVANCE_DIALOG,
-    OVERWORLD,
-    PROMPT_DIALOG,
-    WHITE_A_BUTTON,
-    DIALOG_ARROW,
-    BATTLE,
-    TUTORIAL,
-    BLACK_DIALOG_BOX,
-    NEXT_POKEMON,
-    SWAP_MENU,
-    MOVE_SELECT,
-};
+
 
 enum class StartPoint{
     INTRO_CUTSCENE,
@@ -81,11 +65,7 @@ enum class StarterChoice{
     QUAXLY,
 };
 
-enum class PlayerRealignMode{
-    REALIGN_NEW_MARKER,
-    REALIGN_OLD_MARKER,
-    REALIGN_NO_MARKER,
-};
+
 
 enum class NavigationStopCondition{
     STOP_DIALOG,
@@ -94,11 +74,7 @@ enum class NavigationStopCondition{
     STOP_BATTLE,
 };
 
-enum class NavigationMovementMode{
-    DIRECTIONAL_ONLY,
-    DIRECTIONAL_SPAM_A,
-    CLEAR_WITH_LETS_GO,
-};
+
 
 struct AutoStoryOptions{
     Language language;
@@ -119,29 +95,6 @@ public:
         AutoStoryStats& stats) const = 0;
 };
 
-// spam A button to choose the first move for trainer battles
-// detect_wipeout: can be false if you have multiple pokemon in your party, since an exception will be thrown if your lead faints.
-// throw exception if wipeout or if your lead faints.
-void run_trainer_battle_press_A(
-    VideoStream& stream,
-    ProControllerContext& context,
-    BattleStopCondition stop_condition,
-    std::unordered_set<CallbackEnum> enum_optional_callbacks = {},
-    bool detect_wipeout = false
-);
-
-// spam A button to choose the first move for wild battles
-// detect_wipeout: can be false if you have multiple pokemon in your party, since an exception will be thrown if your lead faints.
-// throw exception if wipeout or if your lead faints.
-void run_wild_battle_press_A(
-    VideoStream& stream,
-    ProControllerContext& context,
-    BattleStopCondition stop_condition,
-    std::unordered_set<CallbackEnum> enum_optional_callbacks = {},
-    bool detect_wipeout = false
-);
-
-void select_top_move(VideoStream& stream, ProControllerContext& context, size_t consecutive_move_select);
 
 // press A to clear tutorial screens
 // throw exception if tutorial screen never detected
@@ -292,25 +245,11 @@ void change_settings(SingleSwitchProgramEnvironment& env, ProControllerContext& 
 
 void checkpoint_save(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-enum class ZoomChange{
-    ZOOM_IN,
-    ZOOM_IN_TWICE,
-    ZOOM_OUT,
-    ZOOM_OUT_TWICE,
-    KEEP_ZOOM,
-};
-
-struct MoveCursor{
-    ZoomChange zoom_change;
-    uint8_t move_x;
-    uint8_t move_y;
-    uint16_t move_duration;
-};
 
 // place a marker on the map, not relative to the current player position, but based on a fixed landmark, such as a pokecenter
 // How this works:
 //  - cursor is moved to a point near the landmark, as per `move_cursor_near_landmark`
-//  - move the cursor onto the landmark using `detect_closest_pokecenter_and_move_map_cursor_there`.
+//  - move the cursor onto the landmark using `detect_closest_flypoint_and_move_map_cursor_there`.
 //  - confirm that the pokecenter is centered within cursor. If not, close map app, and re-try.
 //  - cursor is moved to target location, as per `move_cursor_to_target`. A marker is placed down here.
 void realign_player_from_landmark(
@@ -331,7 +270,8 @@ void move_cursor_towards_flypoint_and_go_there(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context,
-    MoveCursor move_cursor_near_flypoint
+    MoveCursor move_cursor_near_flypoint, 
+    FlyPoint fly_point = FlyPoint::POKECENTER
 );
 
 

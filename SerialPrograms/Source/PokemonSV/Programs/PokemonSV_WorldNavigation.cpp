@@ -16,6 +16,7 @@
 #include "PokemonSV/Inference/Map/PokemonSV_MapDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapMenuDetector.h"
 #include "PokemonSV/Inference/Map/PokemonSV_MapPokeCenterIconDetector.h"
+#include "PokemonSV/Inference/Map/PokemonSV_FastTravelDetector.h"
 #include "PokemonSV/Inference/Picnics/PokemonSV_PicnicDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Inference/PokemonSV_ZeroGateWarpPromptDetector.h"
@@ -32,6 +33,9 @@
 #include <sstream>
 #include <cfloat>
 #include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
@@ -218,13 +222,200 @@ void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerCon
     context.wait_for(std::chrono::seconds(3));
 }
 
+std::string get_flypoint_string(FlyPoint fly_point){
+    std::string fly_point_string;
+    if (fly_point == FlyPoint::POKECENTER){
+        fly_point_string = "Pokecenter";
+    }else if(fly_point == FlyPoint::FAST_TRAVEL){
+        fly_point_string = "Fast Travel";
+    }
+
+    return fly_point_string;
+}
+
+const std::vector<ImageFloatBox> get_flypoint_locations(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point){
+    context.wait_for_all_requests();
+    std::vector<ImageFloatBox> found_locations;
+    MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
+    FastTravelWatcher fast_travel_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
+    int ret = -1;
+    if (fly_point == FlyPoint::POKECENTER){
+        ret = wait_until(stream, context, std::chrono::seconds(2), {pokecenter_watcher});
+        if (ret == 0){
+            found_locations = pokecenter_watcher.found_locations();
+        }
+    }else if(fly_point == FlyPoint::FAST_TRAVEL){
+        ret = wait_until(stream, context, std::chrono::seconds(2), {fast_travel_watcher});
+        if (ret == 0){
+            found_locations = fast_travel_watcher.found_locations();
+        }
+    }
+
+    return found_locations;
+}
+
+void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point){
+    std::string fly_point_string = get_flypoint_string(fly_point);
+
+    const std::vector<ImageFloatBox> found_locations = get_flypoint_locations(info, stream, context, fly_point);
+    if (found_locations.empty()){
+        stream.log("No visible " + fly_point_string + " found on map");
+        return;
+    }
+
+    for(const auto& box: found_locations){
+        std::ostringstream os;
+        os << "Found " + fly_point_string + " at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height;
+        stream.log(os.str());
+  
+    }
+}
+
+
+
+void place_marker_offset_from_flypoint(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    MoveCursor move_cursor_near_flypoint,
+    FlyPoint fly_point, 
+    ExpectedMarkerPosition marker_offset
+){
+
+    stream.log("place_marker_offset_from_flypoint()");
+    WallClock start = current_time();
+
+    while (true){
+        if (current_time() - start > std::chrono::minutes(5)){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "place_marker_offset_from_flypoint(): Failed to place down marker after 5 minutes.",
+                stream
+            );
+        }
+
+        try {
+            open_map_from_overworld(info, stream, context, false);
+
+            // move cursor near landmark (pokecenter)
+            switch(move_cursor_near_flypoint.zoom_change){
+            case ZoomChange::ZOOM_IN:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;
+            case ZoomChange::ZOOM_IN_TWICE:
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                pbf_press_button(context, BUTTON_ZR, 20, 105);
+                break;                
+            case ZoomChange::ZOOM_OUT:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;    
+            case ZoomChange::ZOOM_OUT_TWICE:
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
+                break;                  
+            case ZoomChange::KEEP_ZOOM:
+                break;
+            }
+            uint8_t move_x1 = move_cursor_near_flypoint.move_x;
+            uint8_t move_y1 = move_cursor_near_flypoint.move_y;
+            uint16_t move_duration1 = move_cursor_near_flypoint.move_duration;
+            pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
+
+            move_cursor_to_position_offset_from_flypoint(info, stream, context, fly_point, {marker_offset.x, marker_offset.y});
+
+            // place down marker
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            leave_phone_to_overworld(info, stream, context);
+
+            return;      
+
+        }catch (UnexpectedBattleException&){
+            run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
+        }catch (OperationFailedException&){
+            // reset to overworld if failed to center on the pokecenter, and re-try
+            leave_phone_to_overworld(info, stream, context);
+        }
+    }
+}
+
+void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point, ExpectedMarkerPosition marker_offset){
+    // loop through flypoint locations. find the point that is closest to marker_offset, by distance x_diff^2 + y_diff^2
+    // based on the closest point, move cursor based on x_diff and y_diff. do this again until x_diff/y_diff are within certain margins
+    std::string fly_point_string = get_flypoint_string(fly_point);
+    size_t MAX_ATTEMPTS = 20;
+    for (size_t i = 0; i < MAX_ATTEMPTS; i++){
+        const std::vector<ImageFloatBox> found_locations = get_flypoint_locations(info, stream, context, fly_point);
+        
+        const double expected_x = marker_offset.x;
+        const double expected_y = marker_offset.y;
+        double closest_icon_x = 0.0; 
+        double closest_icon_y = 0.0;
+        double closest_dist2 = DBL_MAX;  // distance^2 in pixels
+
+        for(const auto& box: found_locations){
+            const double found_x = box.x;
+            const double found_y = box.y;
+            const double x_diff = (found_x - expected_x) * 1920;
+            const double y_diff = (found_y - expected_y) * 1080;
+            const double dist2 = x_diff * x_diff + y_diff * y_diff;
+            
+
+            if (dist2 < closest_dist2){
+                closest_dist2 = dist2;
+                closest_icon_x = found_x; 
+                closest_icon_y = found_y;
+            }
+        }
+        stream.log("Found closest " + fly_point_string + " icon on map: (" + std::to_string(closest_icon_x) + ", " + std::to_string(closest_icon_y) + ").");
+
+
+        // Convert the vector from ExpectedMarkerPosition to the FlyPoint icon into a left joystick movement
+        const double dif_x = (closest_icon_x - expected_x) * 1920;
+        const double dif_y = (closest_icon_y - expected_y) * 1080;
+        const double magnitude = std::max(std::sqrt(closest_dist2), 1.0);
+        double push_x = dif_x * 64 / magnitude;
+        double push_y = dif_y * 64 / magnitude;
+
+        double scale = 0.29;
+        if (closest_dist2 < 1000){ // if we're already very close to the target, reduce push velocity and push duration
+            scale = 0.1;
+            push_x *= 0.25;
+            push_y *= 0.25;
+        }
+
+        if (closest_dist2 < 5){ // if we're very very close to the target, reduce push velocity and push duration even further
+            push_x *= 0.5;
+            push_y *= 0.5;
+        }
+
+        cout << "sqrt(closest_dist2): " << std::sqrt(closest_dist2) << endl;
+        // cout << "push_x " << push_x << endl;
+        // cout << "dif_x "<< dif_x << endl;
+        // cout << "magnitude " << magnitude << endl;
+
+        if (std::sqrt(closest_dist2) < 0.5){
+            // return when we're close enough to the target
+            break;
+        }
+
+        const uint8_t move_x = uint8_t(std::max(std::min(int(round(push_x + 128) + 0.5), 255), 0));
+        const uint8_t move_y = uint8_t(std::max(std::min(int(round(push_y + 128) + 0.5), 255), 0));
+
+        const uint16_t push_time = std::max(uint16_t(magnitude * scale + 0.5), uint16_t(3));
+        pbf_move_left_joystick(context, move_x, move_y, push_time, 30);
+        context.wait_for_all_requests();
+    }
+
+}
 
 // While in the current map zoom level, detect pokecenter icons and move the map cursor there.
 // Return true if succeed. Return false if no visible pokcenter on map
-bool detect_closest_pokecenter_and_move_map_cursor_there(
+bool detect_closest_flypoint_and_move_map_cursor_there(
     const ProgramInfo& info,
     VideoStream& stream,
     ProControllerContext& context,
+    FlyPoint fly_point,
     double push_scale
 ){
     context.wait_for_all_requests();
@@ -236,21 +427,22 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(
     double max_dist = DBL_MAX;
     const double center_x = 0.5 * screen_width, center_y = 0.5 * screen_height;
     {
-        MapPokeCenterIconWatcher pokecenter_watcher(COLOR_RED, stream.overlay(), MAP_READABLE_AREA);
-        int ret = wait_until(stream, context, std::chrono::seconds(2), {pokecenter_watcher});
-        if (ret != 0){
-            stream.log("No visible pokecetner found on map");
-            stream.overlay().add_log("No whole PokeCenter icon");
+        std::string fly_point_string = get_flypoint_string(fly_point);
+        const std::vector<ImageFloatBox> found_locations = get_flypoint_locations(info, stream, context, fly_point);
+        if (found_locations.empty()){
+            stream.log("No visible " + fly_point_string + " found on map");
+            stream.overlay().add_log("No whole " + fly_point_string + " icon");
             return false;
         }
+        
         // Find the detected PokeCenter icon closest to the screen center (where player character is on the map).
-        for(const auto& box: pokecenter_watcher.found_locations()){
+        for(const auto& box: found_locations){
             const double loc_x = (box.x + box.width/2) * screen_width;
             const double loc_y = (box.y + box.height/2) * screen_height;
             const double x_diff = loc_x - center_x, y_diff = loc_y - center_y;
             const double dist2 = x_diff * x_diff + y_diff * y_diff;
             std::ostringstream os;
-            os << "Found pokecenter at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << 
+            os << "Found " + fly_point_string + " at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height << 
                 ", dist to center " << std::sqrt(dist2) << " pixels";
             stream.log(os.str());
 
@@ -259,8 +451,8 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(
                 closest_icon_x = loc_x; closest_icon_y = loc_y;
             }
         }
-        stream.log("Found closest pokecenter icon on map: (" + std::to_string(closest_icon_x) + ", " + std::to_string(closest_icon_y) + ").");
-        stream.overlay().add_log("Detected PokeCenter icon");
+        stream.log("Found closest " + fly_point_string + " icon on map: (" + std::to_string(closest_icon_x) + ", " + std::to_string(closest_icon_y) + ").");
+        stream.overlay().add_log("Detected " + fly_point_string + " icon");
     }
 
     // Convert the vector from center to the PokeCenter icon into a left joystick movement
@@ -285,13 +477,14 @@ bool detect_closest_pokecenter_and_move_map_cursor_there(
 // While in the current map zoom level, detect pokecenter icons and fly to the closest one.
 // Return true if succeed. Return false if no visible pokcenter on map
 // Throw Operation failed Exception if detected pokecenter, but failed to fly there.
-bool fly_to_visible_closest_pokecenter_cur_zoom_level(
+bool fly_to_visible_closest_flypoint_cur_zoom_level(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context, 
+    FlyPoint fly_point,
     double push_scale
 ){
-    if (!detect_closest_pokecenter_and_move_map_cursor_there(info, stream, context, push_scale)){
+    if (!detect_closest_flypoint_and_move_map_cursor_there(info, stream, context, fly_point, push_scale)){
         return false;
     }
     bool check_fly_menuitem = true;
@@ -302,7 +495,7 @@ bool fly_to_visible_closest_pokecenter_cur_zoom_level(
         // detected pokecenter, but failed to fly there.
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "fly_to_visible_closest_pokecenter_cur_zoom_level(): Detected pokecenter, but failed to fly there as no \"Fly\" menuitem.",
+            "fly_to_visible_closest_flypoint_cur_zoom_level(): Detected pokecenter, but failed to fly there as no \"Fly\" menuitem.",
             stream
         );
     }
@@ -327,7 +520,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
             // try different magnitudes of cursor push with each failure.
             double push_scale = 0.29 * adjustment_table[try_count];
             // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
-            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, stream, context, push_scale)){
+            if (fly_to_visible_closest_flypoint_cur_zoom_level(info, stream, context, FlyPoint::POKECENTER, push_scale)){
                 return; // success in finding the closest pokecenter. Return.
             }
 
@@ -374,7 +567,7 @@ void fly_to_closest_pokecenter_on_map(const ProgramInfo& info, VideoStream& stre
             double push_scale = 0.29 * adjustment_table[try_count];
             // std::cout << "push_scale: " << std::to_string(push_scale) << std::endl;
             // Now try finding the closest pokecenter at the max warpable level
-            if (fly_to_visible_closest_pokecenter_cur_zoom_level(info, stream, context, push_scale)){
+            if (fly_to_visible_closest_flypoint_cur_zoom_level(info, stream, context, FlyPoint::POKECENTER, push_scale)){
                 return; // success in finding the closest pokecenter. Return.
             }else{
                 // Does not detect any pokecenter on map
@@ -659,6 +852,182 @@ void heal_at_pokecenter(
             );  
         }
     }
+}
+
+
+// spam A button to choose the first move
+// throw exception if wipeout or if your lead faints.
+void run_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks,
+    bool detect_wipeout
+){
+    int16_t num_times_seen_overworld = 0;
+    size_t consecutive_move_select = 0;
+    while (true){
+        NormalBattleMenuWatcher battle(COLOR_BLUE);
+        SwapMenuWatcher         fainted(COLOR_PURPLE);
+        OverworldWatcher        overworld(stream.logger(), COLOR_CYAN);
+        AdvanceDialogWatcher    dialog(COLOR_RED);
+        DialogArrowWatcher dialog_arrow(COLOR_RED, stream.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
+        GradientArrowWatcher next_pokemon(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
+        MoveSelectWatcher move_select_menu(COLOR_YELLOW);
+
+        std::vector<PeriodicInferenceCallback> callbacks; 
+        std::vector<CallbackEnum> enum_all_callbacks;
+        //  mandatory callbacks: Battle, Overworld, Advance Dialog, Swap menu, Move select
+        //  optional callbacks: DIALOG_ARROW, NEXT_POKEMON
+
+        // merge the mandatory and optional callbacks as a set, to avoid duplicates. then convert to vector
+        std::unordered_set<CallbackEnum> enum_all_callbacks_set{CallbackEnum::BATTLE, CallbackEnum::OVERWORLD, CallbackEnum::ADVANCE_DIALOG, CallbackEnum::SWAP_MENU, CallbackEnum::MOVE_SELECT}; // mandatory callbacks
+        enum_all_callbacks_set.insert(enum_optional_callbacks.begin(), enum_optional_callbacks.end()); // append the mandatory and optional callback sets together
+        enum_all_callbacks.assign(enum_all_callbacks_set.begin(), enum_all_callbacks_set.end());
+
+        for (const CallbackEnum& enum_callback : enum_all_callbacks){
+            switch(enum_callback){
+            case CallbackEnum::ADVANCE_DIALOG:
+                callbacks.emplace_back(dialog);
+                break;                
+            case CallbackEnum::OVERWORLD:
+                callbacks.emplace_back(overworld);
+                break;
+            case CallbackEnum::DIALOG_ARROW:
+                callbacks.emplace_back(dialog_arrow);
+                break;
+            case CallbackEnum::BATTLE:
+                callbacks.emplace_back(battle);
+                break;
+            case CallbackEnum::NEXT_POKEMON: // to detect the "next pokemon" prompt.
+                callbacks.emplace_back(next_pokemon);
+                break;
+            case CallbackEnum::SWAP_MENU:  // detecting Swap Menu implies your lead fainted.
+                callbacks.emplace_back(fainted);
+                break;                     
+            case CallbackEnum::MOVE_SELECT:
+                callbacks.emplace_back(move_select_menu);
+                break;
+            default:
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback requested.");
+            }
+        }        
+        context.wait_for_all_requests();
+
+        int ret = wait_until(
+            stream, context,
+            std::chrono::seconds(90),
+            callbacks
+        );
+        context.wait_for(std::chrono::milliseconds(100));
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "run_battle_press_A(): Timed out. Did not detect expected stop condition.",
+                stream
+            );
+        }        
+
+        CallbackEnum enum_callback = enum_all_callbacks[ret];
+        switch (enum_callback){
+        case CallbackEnum::BATTLE: // battle
+            stream.log("Detected battle menu.");
+            consecutive_move_select = 0;
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case CallbackEnum::MOVE_SELECT:
+            stream.log("Detected move select. Spam first move");
+            consecutive_move_select++;
+            select_top_move(stream, context, consecutive_move_select);
+            break;
+        case CallbackEnum::OVERWORLD: // overworld
+            stream.log("Detected overworld, battle over.");
+            num_times_seen_overworld++;
+            if (stop_condition == BattleStopCondition::STOP_OVERWORLD){
+                return;
+            }
+            if(num_times_seen_overworld > 30){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "run_battle_press_A(): Stuck in overworld. Did not detect expected stop condition.",
+                    stream
+                );  
+            }            
+            break;
+        case CallbackEnum::ADVANCE_DIALOG: // advance dialog
+            stream.log("Detected dialog.");
+
+            if (detect_wipeout){
+                context.wait_for_all_requests();
+                WipeoutDetector wipeout;
+                VideoSnapshot screen = stream.video().snapshot();
+                // dump_snapshot(console);
+                if (wipeout.detect(screen)){
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "run_battle_press_A(): Detected wipeout. All pokemon fainted.",
+                        stream
+                    );                
+                }
+            }
+
+            if (stop_condition == BattleStopCondition::STOP_DIALOG){
+                return;
+            }
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case CallbackEnum::DIALOG_ARROW:  // dialog arrow
+            stream.log("run_battle_press_A: Detected dialog arrow.");
+            pbf_press_button(context, BUTTON_A, 20, 105);
+            break;
+        case CallbackEnum::NEXT_POKEMON:
+            stream.log("run_battle_press_A: Detected prompt for bringing in next pokemon. Keep current pokemon.");
+            pbf_mash_button(context, BUTTON_B, 100);
+            break;
+        case CallbackEnum::SWAP_MENU:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "run_battle_press_A(): Lead pokemon fainted.",
+                stream
+            );        
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback triggered.");
+          
+        }
+    }
+}
+
+void run_trainer_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks,
+    bool detect_wipeout
+){
+    enum_optional_callbacks.insert(CallbackEnum::NEXT_POKEMON);  // always check for the "Next pokemon" prompt when in trainer battles
+    run_battle_press_A(stream, context, stop_condition, enum_optional_callbacks, detect_wipeout);
+}
+
+void run_wild_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks,
+    bool detect_wipeout
+){
+    run_battle_press_A(stream, context, stop_condition, enum_optional_callbacks, detect_wipeout);
+}
+
+
+
+void select_top_move(VideoStream& stream, ProControllerContext& context, size_t consecutive_move_select){
+    if (consecutive_move_select > 3){
+        // to handle case where move is disabled/out of PP/taunted
+        stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
+        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
+    }
+    pbf_mash_button(context, BUTTON_A, 100);
+
 }
 
 

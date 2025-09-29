@@ -28,7 +28,7 @@ public:
 
 
 // start: At East Province (Area Three) Watchtower.
-// end: 
+// end: Beat Orthworm phase 1
 void checkpoint_55(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -36,8 +36,8 @@ void checkpoint_55(
     AutoStoryStats& stats
 );
 
-// start: 
-// end: 
+// start: Beat Orthworm phase 1
+// end: Beat Orthworm phase 2
 void checkpoint_56(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -45,8 +45,8 @@ void checkpoint_56(
     AutoStoryStats& stats
 );
 
-// start: 
-// end: 
+// start: Beat Orthworm phase 2
+// end: At East Province (Area Three) Pokecenter.
 void checkpoint_57(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,

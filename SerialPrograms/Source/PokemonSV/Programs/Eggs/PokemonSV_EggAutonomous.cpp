@@ -30,6 +30,7 @@
 #include "PokemonSV/Programs/Boxes/PokemonSV_BoxRelease.h"
 #include "PokemonSV/Programs/Sandwiches/PokemonSV_SandwichRoutines.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 #include "PokemonSV_EggAutonomous.h"
 
 namespace PokemonAutomation{

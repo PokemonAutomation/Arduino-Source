@@ -9,16 +9,70 @@
 #ifndef PokemonAutomation_PokemonSV_WorldNavigation_H
 #define PokemonAutomation_PokemonSV_WorldNavigation_H
 
+#include <unordered_set>
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
-#include "PokemonSV/Programs/AutoStory/PokemonSV_AutoStoryTools.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+enum class PlayerRealignMode{
+    REALIGN_NEW_MARKER,
+    REALIGN_OLD_MARKER,
+    REALIGN_NO_MARKER,
+};
+
+enum class NavigationMovementMode{
+    DIRECTIONAL_ONLY,
+    DIRECTIONAL_SPAM_A,
+    CLEAR_WITH_LETS_GO,
+};
+
+enum class FlyPoint{
+    POKECENTER,
+    FAST_TRAVEL,
+};
+struct ExpectedMarkerPosition{
+    double x;
+    double y;
+};
+
+enum class BattleStopCondition{
+    STOP_OVERWORLD,
+    STOP_DIALOG,
+};
+
+enum class CallbackEnum{
+    ADVANCE_DIALOG,
+    OVERWORLD,
+    PROMPT_DIALOG,
+    WHITE_A_BUTTON,
+    DIALOG_ARROW,
+    BATTLE,
+    TUTORIAL,
+    BLACK_DIALOG_BOX,
+    NEXT_POKEMON,
+    SWAP_MENU,
+    MOVE_SELECT,
+};
+
+enum class ZoomChange{
+    ZOOM_IN,
+    ZOOM_IN_TWICE,
+    ZOOM_OUT,
+    ZOOM_OUT_TWICE,
+    KEEP_ZOOM,
+};
+
+struct MoveCursor{
+    ZoomChange zoom_change;
+    uint8_t move_x;
+    uint8_t move_y;
+    uint16_t move_duration;
+};
 
 //  From map, press A to fly to a travel spot.
 //  check_fly_menuitem == true: will detect if the "Fly" menuitem is available. Return false if no "Fly" menuitem (the game
@@ -34,19 +88,28 @@ void picnic_from_overworld(const ProgramInfo& info, VideoStream& stream, ProCont
 //  While in picnic, stop picnic and back to overworld.
 void leave_picnic(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
+void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point);
+
+void place_marker_offset_from_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, MoveCursor move_cursor_near_flypoint, FlyPoint fly_point, ExpectedMarkerPosition marker_offset);
+
+// with the map open, move the cursor to a specific position offset from the flypoint, as per marker_offset
+void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point, ExpectedMarkerPosition marker_offset);
+
 // While in the current map zoom level, detect pokecenter icons and move the map cursor there.
 // Return true if succeed. Return false if no visible pokcenter on map
-bool detect_closest_pokecenter_and_move_map_cursor_there(
+bool detect_closest_flypoint_and_move_map_cursor_there(
     const ProgramInfo& info,
     VideoStream& stream,
     ProControllerContext& context,
+    FlyPoint fly_point,
     double push_scale = 0.29
 );
 
-bool fly_to_visible_closest_pokecenter_cur_zoom_level(
+bool fly_to_visible_closest_flypoint_cur_zoom_level(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context, 
+    FlyPoint fly_point,
     double push_scale = 0.29
 );
 
@@ -135,6 +198,31 @@ void heal_at_pokecenter(
     VideoStream& stream,
     ProControllerContext& context
 );
+
+
+// spam A button to choose the first move for trainer battles
+// detect_wipeout: can be false if you have multiple pokemon in your party, since an exception will be thrown if your lead faints.
+// throw exception if wipeout or if your lead faints.
+void run_trainer_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks = {},
+    bool detect_wipeout = false
+);
+
+// spam A button to choose the first move for wild battles
+// detect_wipeout: can be false if you have multiple pokemon in your party, since an exception will be thrown if your lead faints.
+// throw exception if wipeout or if your lead faints.
+void run_wild_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks = {},
+    bool detect_wipeout = false
+);
+
+void select_top_move(VideoStream& stream, ProControllerContext& context, size_t consecutive_move_select);
 
 
 }

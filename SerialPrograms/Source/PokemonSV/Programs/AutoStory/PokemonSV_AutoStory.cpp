@@ -94,7 +94,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_21>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_22>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_23>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_24>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_24>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_25>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_26>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_27>());
@@ -415,12 +415,48 @@ AutoStory::AutoStory()
         "direction in radians",
         LockMode::UNLOCK_WHILE_RUNNING,
         0
-    )           
+    )   
+    , FLYPOINT_TYPE(
+        "<b>Flypoint type:</b><br>"
+        "For print_flypoint_location() and move_cursor_to_position_offset_from_flypoint()",
+        {
+            {FlyPoint::POKECENTER,         "pokecenter",           "Pokecenter"},
+            {FlyPoint::FAST_TRAVEL,            "fast-travel",              "Fast Travel"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        FlyPoint::POKECENTER
+    )   
+    , TEST_FLYPOINT_LOCATIONS(
+        "<b>TEST: print_flypoint_location():</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    ) 
+    , TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT(
+        "<b>TEST: move_cursor_to_position_offset_from_flypoint():</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
+    , X_OFFSET(
+        "X offset from flypoint",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )
+    , Y_OFFSET(
+        "Y offset from flypoint",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )
 {
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
         PA_ADD_OPTION(CHANGE_SETTINGS);
+
+        PA_ADD_OPTION(FLYPOINT_TYPE);
+        PA_ADD_OPTION(TEST_FLYPOINT_LOCATIONS);
+        PA_ADD_OPTION(TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT);
+        PA_ADD_OPTION(X_OFFSET);
+        PA_ADD_OPTION(Y_OFFSET);
 
         PA_ADD_OPTION(TEST_CURRENT_DIRECTION);
         PA_ADD_OPTION(TEST_CHANGE_DIRECTION);
@@ -768,6 +804,19 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProController
 }
 
 void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+
+    if (TEST_FLYPOINT_LOCATIONS){
+        print_flypoint_location(env.program_info(), env.console, context, FLYPOINT_TYPE);
+        // print_flypoint_location(env.program_info(), env.console, context, FlyPoint::FAST_TRAVEL);
+        return;
+    }
+
+    if (TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT){
+        move_cursor_to_position_offset_from_flypoint(env.program_info(), env.console, context, FLYPOINT_TYPE, {X_OFFSET, Y_OFFSET});
+
+        return;
+    }
+
     if (TEST_CURRENT_DIRECTION){
         DirectionDetector direction;
         // direction.change_direction(env.program_info(), env.console, context, DIR_RADIANS);
@@ -816,6 +865,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         //     128, 0, 60, 10, false);
 
         DirectionDetector direction;
+
 
 
         return;

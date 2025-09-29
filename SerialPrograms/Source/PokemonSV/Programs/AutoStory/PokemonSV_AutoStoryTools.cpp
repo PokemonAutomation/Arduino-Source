@@ -19,7 +19,6 @@
 #include "PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
-#include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
 #include "PokemonSV/Programs/PokemonSV_SaveGame.h"
 #include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
@@ -41,178 +40,7 @@ namespace PokemonSV{
 
 
 
-// spam A button to choose the first move
-// throw exception if wipeout or if your lead faints.
-void run_battle_press_A(
-    VideoStream& stream,
-    ProControllerContext& context,
-    BattleStopCondition stop_condition,
-    std::unordered_set<CallbackEnum> enum_optional_callbacks,
-    bool detect_wipeout
-){
-    int16_t num_times_seen_overworld = 0;
-    size_t consecutive_move_select = 0;
-    while (true){
-        NormalBattleMenuWatcher battle(COLOR_BLUE);
-        SwapMenuWatcher         fainted(COLOR_PURPLE);
-        OverworldWatcher        overworld(stream.logger(), COLOR_CYAN);
-        AdvanceDialogWatcher    dialog(COLOR_RED);
-        DialogArrowWatcher dialog_arrow(COLOR_RED, stream.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
-        GradientArrowWatcher next_pokemon(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
-        MoveSelectWatcher move_select_menu(COLOR_YELLOW);
 
-        std::vector<PeriodicInferenceCallback> callbacks; 
-        std::vector<CallbackEnum> enum_all_callbacks;
-        //  mandatory callbacks: Battle, Overworld, Advance Dialog, Swap menu, Move select
-        //  optional callbacks: DIALOG_ARROW, NEXT_POKEMON
-
-        // merge the mandatory and optional callbacks as a set, to avoid duplicates. then convert to vector
-        std::unordered_set<CallbackEnum> enum_all_callbacks_set{CallbackEnum::BATTLE, CallbackEnum::OVERWORLD, CallbackEnum::ADVANCE_DIALOG, CallbackEnum::SWAP_MENU, CallbackEnum::MOVE_SELECT}; // mandatory callbacks
-        enum_all_callbacks_set.insert(enum_optional_callbacks.begin(), enum_optional_callbacks.end()); // append the mandatory and optional callback sets together
-        enum_all_callbacks.assign(enum_all_callbacks_set.begin(), enum_all_callbacks_set.end());
-
-        for (const CallbackEnum& enum_callback : enum_all_callbacks){
-            switch(enum_callback){
-            case CallbackEnum::ADVANCE_DIALOG:
-                callbacks.emplace_back(dialog);
-                break;                
-            case CallbackEnum::OVERWORLD:
-                callbacks.emplace_back(overworld);
-                break;
-            case CallbackEnum::DIALOG_ARROW:
-                callbacks.emplace_back(dialog_arrow);
-                break;
-            case CallbackEnum::BATTLE:
-                callbacks.emplace_back(battle);
-                break;
-            case CallbackEnum::NEXT_POKEMON: // to detect the "next pokemon" prompt.
-                callbacks.emplace_back(next_pokemon);
-                break;
-            case CallbackEnum::SWAP_MENU:  // detecting Swap Menu implies your lead fainted.
-                callbacks.emplace_back(fainted);
-                break;                     
-            case CallbackEnum::MOVE_SELECT:
-                callbacks.emplace_back(move_select_menu);
-                break;
-            default:
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback requested.");
-            }
-        }        
-        context.wait_for_all_requests();
-
-        int ret = wait_until(
-            stream, context,
-            std::chrono::seconds(90),
-            callbacks
-        );
-        context.wait_for(std::chrono::milliseconds(100));
-        if (ret < 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "run_battle_press_A(): Timed out. Did not detect expected stop condition.",
-                stream
-            );
-        }        
-
-        CallbackEnum enum_callback = enum_all_callbacks[ret];
-        switch (enum_callback){
-        case CallbackEnum::BATTLE: // battle
-            stream.log("Detected battle menu.");
-            consecutive_move_select = 0;
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            break;
-        case CallbackEnum::MOVE_SELECT:
-            stream.log("Detected move select. Spam first move");
-            consecutive_move_select++;
-            select_top_move(stream, context, consecutive_move_select);
-            break;
-        case CallbackEnum::OVERWORLD: // overworld
-            stream.log("Detected overworld, battle over.");
-            num_times_seen_overworld++;
-            if (stop_condition == BattleStopCondition::STOP_OVERWORLD){
-                return;
-            }
-            if(num_times_seen_overworld > 30){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "run_battle_press_A(): Stuck in overworld. Did not detect expected stop condition.",
-                    stream
-                );  
-            }            
-            break;
-        case CallbackEnum::ADVANCE_DIALOG: // advance dialog
-            stream.log("Detected dialog.");
-
-            if (detect_wipeout){
-                context.wait_for_all_requests();
-                WipeoutDetector wipeout;
-                VideoSnapshot screen = stream.video().snapshot();
-                // dump_snapshot(console);
-                if (wipeout.detect(screen)){
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "run_battle_press_A(): Detected wipeout. All pokemon fainted.",
-                        stream
-                    );                
-                }
-            }
-
-            if (stop_condition == BattleStopCondition::STOP_DIALOG){
-                return;
-            }
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            break;
-        case CallbackEnum::DIALOG_ARROW:  // dialog arrow
-            stream.log("run_battle_press_A: Detected dialog arrow.");
-            pbf_press_button(context, BUTTON_A, 20, 105);
-            break;
-        case CallbackEnum::NEXT_POKEMON:
-            stream.log("run_battle_press_A: Detected prompt for bringing in next pokemon. Keep current pokemon.");
-            pbf_mash_button(context, BUTTON_B, 100);
-            break;
-        case CallbackEnum::SWAP_MENU:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "run_battle_press_A(): Lead pokemon fainted.",
-                stream
-            );        
-        default:
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback triggered.");
-          
-        }
-    }
-}
-
-void run_trainer_battle_press_A(
-    VideoStream& stream,
-    ProControllerContext& context,
-    BattleStopCondition stop_condition,
-    std::unordered_set<CallbackEnum> enum_optional_callbacks,
-    bool detect_wipeout
-){
-    enum_optional_callbacks.insert(CallbackEnum::NEXT_POKEMON);  // always check for the "Next pokemon" prompt when in trainer battles
-    run_battle_press_A(stream, context, stop_condition, enum_optional_callbacks, detect_wipeout);
-}
-
-void run_wild_battle_press_A(
-    VideoStream& stream,
-    ProControllerContext& context,
-    BattleStopCondition stop_condition,
-    std::unordered_set<CallbackEnum> enum_optional_callbacks,
-    bool detect_wipeout
-){
-    run_battle_press_A(stream, context, stop_condition, enum_optional_callbacks, detect_wipeout);
-}
-
-void select_top_move(VideoStream& stream, ProControllerContext& context, size_t consecutive_move_select){
-    if (consecutive_move_select > 3){
-        // to handle case where move is disabled/out of PP/taunted
-        stream.log("Failed to select a move 3 times. Choosing a different move.", COLOR_RED);
-        pbf_press_dpad(context, DPAD_DOWN, 20, 40);
-    }
-    pbf_mash_button(context, BUTTON_A, 100);
-
-}
 
 void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t seconds_timeout){
     bool seen_tutorial = false;
@@ -1060,7 +888,7 @@ void realign_player_from_landmark(
             pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
 
             // move cursor to pokecenter
-            if (!detect_closest_pokecenter_and_move_map_cursor_there(info, stream, context, 0.29)){
+            if (!detect_closest_flypoint_and_move_map_cursor_there(info, stream, context, FlyPoint::POKECENTER, 0.29)){
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "realign_player_from_landmark(): No visible pokecenter found on map.",
@@ -1133,7 +961,8 @@ void move_cursor_towards_flypoint_and_go_there(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context,
-    MoveCursor move_cursor_near_flypoint
+    MoveCursor move_cursor_near_flypoint,
+    FlyPoint fly_point
 ){
     WallClock start = current_time();
 
@@ -1173,7 +1002,7 @@ void move_cursor_towards_flypoint_and_go_there(
             uint16_t move_duration1 = move_cursor_near_flypoint.move_duration;
             pbf_move_left_joystick(context, move_x1, move_y1, move_duration1, 1 * TICKS_PER_SECOND);
 
-            if (!fly_to_visible_closest_pokecenter_cur_zoom_level(info, stream, context)){
+            if (!fly_to_visible_closest_flypoint_cur_zoom_level(info, stream, context, fly_point)){
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "move_cursor_towards_flypoint_and_go_there(): No visible pokecenter found on map.",
