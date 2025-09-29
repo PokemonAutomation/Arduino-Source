@@ -131,7 +131,8 @@ include(SourceFiles.cmake)
 # Separate sources into library and executable components
 set(LIBRARY_SOURCES ${MAIN_SOURCES})
 list(REMOVE_ITEM LIBRARY_SOURCES "Source/CommonFramework/Main.cpp")
-set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp")
+# the executable needs the dark style format file
+set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" "../3rdParty/qdarkstyle/dark/darkstyle.qrc")
 
 # Organize source files in IDE project view
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${LIBRARY_SOURCES})
@@ -140,6 +141,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${EXECUTABLE_SOURCES}
 # Create library target first
 add_library(SerialProgramsLib STATIC ${LIBRARY_SOURCES})
 
+# Create binary target
 if (APPLE)
     set(SerialPrograms_ICON ${CMAKE_CURRENT_SOURCE_DIR}/../IconResource/icon.icns)
     # set_source_files_properties(SerialPrograms_ICON PROPERTIES MACOSX_PACKAGE_LOCATION "Resources")
