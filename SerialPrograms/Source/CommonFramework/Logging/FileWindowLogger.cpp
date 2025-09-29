@@ -228,6 +228,7 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
 //    m_statusbar->setObjectName(QString::fromUtf8("statusbar"));
 //    setStatusBar(m_statusbar);
     setWindowTitle("Program Output");
+    this->setWindowIcon(QIcon(QString::fromStdString(RESOURCE_PATH() + "icon.png")));
 
     m_text->setReadOnly(true);
     m_text->setAcceptRichText(true);

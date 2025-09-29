@@ -28,7 +28,7 @@ VideoDisplayWindow::VideoDisplayWindow(VideoDisplayWidget* display_widget)
     // Sets m_display_widget to be the VideoDisplayWindow's central widget.
     // VideoDisplayWindow now takes ownership of m_display_widget as a QWidget
     this->setCentralWidget(m_display_widget);
-    
+
     // this->setSizePolicy(QSizePolicy::Minimum, QSizePolicy::Minimum);
     // m_display_widget->setAlignment(Qt::AlignCenter);
 
