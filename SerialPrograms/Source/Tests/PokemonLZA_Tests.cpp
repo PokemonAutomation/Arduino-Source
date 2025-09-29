@@ -7,6 +7,7 @@
 #include "Common/Compiler.h"
 #include "PokemonLZA_Tests.h"
 #include "TestUtils.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"

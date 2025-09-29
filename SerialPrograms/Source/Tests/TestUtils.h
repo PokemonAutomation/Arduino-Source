@@ -9,19 +9,19 @@
 #ifndef PokemonAutomation_Tests_TestUtils_H
 #define PokemonAutomation_Tests_TestUtils_H
 
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-#include "ClientSource/Connection/BotBase.h"
-#include "ClientSource/Connection/BotBaseMessage.h"
-#include "CommonFramework/AudioPipeline/AudioFeed.h"
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
+#include "Controllers/SerialPABotBase/Connection/BotBase.h"
+#include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
+//#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+//#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+
 
 namespace PokemonAutomation{
 

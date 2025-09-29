@@ -7,7 +7,7 @@
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WirelessControllers.h"
-#include "ClientSource/Libraries/MessageConverter.h"
+#include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 
 namespace PokemonAutomation{

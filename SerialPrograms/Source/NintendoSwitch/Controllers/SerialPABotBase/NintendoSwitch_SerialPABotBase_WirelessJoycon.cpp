@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessJoycon.h"
 
 //#include <iostream>

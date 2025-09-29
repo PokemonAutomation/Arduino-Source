@@ -9,8 +9,8 @@
 
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
-#include "ClientSource/Connection/BotBase.h"
-#include "ClientSource/Connection/BotBaseMessage.h"
+#include "Controllers/SerialPABotBase/Connection/BotBase.h"
+#include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{

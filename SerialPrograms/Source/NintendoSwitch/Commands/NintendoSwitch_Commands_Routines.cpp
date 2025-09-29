@@ -4,17 +4,10 @@
  * 
  */
 
-//#include <sstream>
-#include "ClientSource/Libraries/MessageConverter.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_Commands_Superscalar.h"
-#include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
-//#include "NintendoSwitch_Messages_Routines.h"
 
 //#include <iostream>
 //using std::cout;

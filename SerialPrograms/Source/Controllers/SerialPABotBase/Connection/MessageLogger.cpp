@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-#include "ClientSource/Libraries/MessageConverter.h"
+#include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
 #include "BotBaseMessage.h"
 #include "MessageLogger.h"
 

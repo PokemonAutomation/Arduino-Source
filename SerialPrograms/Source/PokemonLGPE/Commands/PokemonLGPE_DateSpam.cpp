@@ -4,7 +4,7 @@
  * 
  */
 
-#include "ClientSource/Libraries/MessageConverter.h"
+#include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"

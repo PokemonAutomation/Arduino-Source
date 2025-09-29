@@ -8,7 +8,7 @@
 #define PokemonAutomation_SerialPABotBase_HID_Keyboard_H
 
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h"
-#include "ClientSource/Connection/BotBaseMessage.h"
+#include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{

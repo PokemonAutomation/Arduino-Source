@@ -5,7 +5,7 @@
  */
 
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WirelessControllers.h"
-#include "ClientSource/Libraries/MessageConverter.h"
+#include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessProController.h"
 
 //#include <iostream>

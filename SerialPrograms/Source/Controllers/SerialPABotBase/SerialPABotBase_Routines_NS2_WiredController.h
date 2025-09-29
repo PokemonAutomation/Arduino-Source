@@ -8,7 +8,7 @@
 #define PokemonAutomation_SerialPABotBase_NS2_WiredController_H
 
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_NS2_WiredController.h"
-#include "ClientSource/Connection/BotBaseMessage.h"
+#include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
 namespace SerialPABotBase{

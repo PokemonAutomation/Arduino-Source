@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "ClientSource/Connection/BotBaseMessage.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 

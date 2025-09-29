@@ -32,8 +32,8 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
-#include "ClientSource/Connection/MessageLogger.h"
-#include "ClientSource/Connection/PABotBaseConnection.h"
+#include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
+#include "Controllers/SerialPABotBase/Connection/PABotBaseConnection.h"
 #include "BotBase.h"
 #include "BotBaseMessage.h"
 

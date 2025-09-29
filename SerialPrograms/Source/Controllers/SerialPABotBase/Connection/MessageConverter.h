@@ -5,7 +5,7 @@
  */
 
 #include <string>
-#include "ClientSource/Connection/BotBase.h"
+#include "BotBase.h"
 
 namespace PokemonAutomation{
 

@@ -8,13 +8,13 @@
 #define PokemonAutomation_Controllers_SerialPABotBase_Connection_H
 
 #include <memory>
-#include <set>
+//#include <set>
 #include <mutex>
 #include <condition_variable>
 #include <thread>
-#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
-#include "ClientSource/Connection/BotBase.h"
-#include "ClientSource/Connection/MessageLogger.h"
+//#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
+#include "Controllers/SerialPABotBase/Connection/BotBase.h"
+#include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
 #include "Controllers/ControllerConnection.h"
 
 class QSerialPortInfo;

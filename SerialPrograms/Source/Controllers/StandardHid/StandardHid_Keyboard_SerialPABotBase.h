@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_StandardHid_Keyboard_SerialPABotBase_H
 #define PokemonAutomation_StandardHid_Keyboard_SerialPABotBase_H
 
-#include "ClientSource/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Connection.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
 #include "StandardHid_Keyboard.h"

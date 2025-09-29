@@ -6,7 +6,7 @@
 
 #include <sstream>
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h"
-#include "ClientSource/Libraries/MessageConverter.h"
+#include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 
 namespace PokemonAutomation{

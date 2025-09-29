@@ -14,6 +14,7 @@
 #include "TestUtils.h"
 
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
+#include "CommonFramework/Logging/Logger.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_NormalBattleMenus.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxDetection.h"
 #include "PokemonSV/Inference/Boxes/PokemonSV_BoxEggDetector.h"

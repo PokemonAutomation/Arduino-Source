@@ -8,18 +8,6 @@ file(GLOB MAIN_SOURCES
     ../3rdParty/TesseractPA/TesseractPA.cpp
     ../3rdParty/TesseractPA/TesseractPA.h
     ../3rdParty/qdarkstyle/dark/darkstyle.qrc
-    ../ClientSource/Connection/BotBase.cpp
-    ../ClientSource/Connection/BotBase.h
-    ../ClientSource/Connection/BotBaseMessage.h
-    ../ClientSource/Connection/MessageLogger.cpp
-    ../ClientSource/Connection/MessageLogger.h
-    ../ClientSource/Connection/MessageSniffer.h
-    ../ClientSource/Connection/PABotBase.cpp
-    ../ClientSource/Connection/PABotBase.h
-    ../ClientSource/Connection/PABotBaseConnection.cpp
-    ../ClientSource/Connection/PABotBaseConnection.h
-    ../ClientSource/Libraries/MessageConverter.cpp
-    ../ClientSource/Libraries/MessageConverter.h
     ../Common/CRC32.cpp
     ../Common/CRC32.h
     ../Common/Compiler.h
@@ -665,6 +653,18 @@ file(GLOB MAIN_SOURCES
     Source/Controllers/Schedulers/ControllerWithScheduler.h
     Source/Controllers/Schedulers/SuperscalarScheduler.cpp
     Source/Controllers/Schedulers/SuperscalarScheduler.h
+    Source/Controllers/SerialPABotBase/Connection/BotBase.cpp
+    Source/Controllers/SerialPABotBase/Connection/BotBase.h
+    Source/Controllers/SerialPABotBase/Connection/BotBaseMessage.h
+    Source/Controllers/SerialPABotBase/Connection/MessageLogger.cpp
+    Source/Controllers/SerialPABotBase/Connection/MessageLogger.h
+    Source/Controllers/SerialPABotBase/Connection/MessageSniffer.h
+    Source/Controllers/SerialPABotBase/Connection/PABotBase.cpp
+    Source/Controllers/SerialPABotBase/Connection/PABotBase.h
+    Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.cpp
+    Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.h
+    Source/Controllers/SerialPABotBase/Connection/MessageConverter.cpp
+    Source/Controllers/SerialPABotBase/Connection/MessageConverter.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp

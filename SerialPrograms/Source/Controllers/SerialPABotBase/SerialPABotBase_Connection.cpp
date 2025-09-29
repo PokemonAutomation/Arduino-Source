@@ -7,15 +7,14 @@
 #include <QtGlobal>
 #include <QSerialPortInfo>
 #include <QMessageBox>
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
-#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/SerialConnection/SerialConnection.h"
-#include "ClientSource/Libraries/MessageConverter.h"
-#include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/ControllerTypeStrings.h"
+#include "Controllers/SerialPABotBase/Connection/PABotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Connection.h"

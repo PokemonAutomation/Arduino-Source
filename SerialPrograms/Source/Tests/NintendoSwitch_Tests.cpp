@@ -7,6 +7,7 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Time.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Recording/StreamHistorySession.h"
