@@ -68,6 +68,7 @@ CommandRow::CommandRow(
 //    row->addWidget(new QLabel("<b>Overlays:<b>", this));
 
     CheckboxDropdown* overlays = new CheckboxDropdown(this, "Overlays");
+    overlays->setMinimumWidth(80);
     {
         m_overlay_boxes = overlays->addItem("Boxes");
         m_overlay_boxes->setChecked(session.enabled_boxes());
@@ -318,6 +319,7 @@ void CommandRow::ready_changed(bool ready){
 
 }
 }
+
 
 
 
