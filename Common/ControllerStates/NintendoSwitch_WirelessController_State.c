@@ -9,6 +9,12 @@
 #include "NintendoSwitch_WirelessController_State.h"
 
 
+const pabb_NintendoSwitch_Rumble pabb_NintendoSwitch_Rumble_NEUTRAL_STATE = {
+    .left = {0x00, 0x01, 0x40, 0x40},
+    .right = {0x00, 0x01, 0x40, 0x40},
+};
+
+
 const pabb_NintendoSwitch_WirelessController_State0x30 pabb_NintendoSwitch_WirelessController_State0x30_NEUTRAL_STATE = {
     .buttons = {
         .button3 = 0,
@@ -16,7 +22,7 @@ const pabb_NintendoSwitch_WirelessController_State0x30 pabb_NintendoSwitch_Wirel
         .button5 = 0,
         .left_joystick = {0x00, 0x08, 0x80},
         .right_joystick = {0x00, 0x08, 0x80},
-        .vibrator = 0x80,
+        .vibrator = 0x00,
     },
     .gyro = {},
 };

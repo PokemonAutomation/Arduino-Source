@@ -10,27 +10,16 @@
 #include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
 
 void register_message_converters_NS1_WirelessControllers(){
-    register_message_converter(
-        PABB_MSG_REQUEST_STATUS,
-        [](const std::string& body){
-            //  Disable this by default since it's very spammy.
-            if (!GlobalSettings::instance().LOG_EVERYTHING){
-                return std::string();
-            }
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_STATUS() - ";
-            if (body.size() != sizeof(pabb_Message_RequestStatus)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_Message_RequestStatus*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
     register_message_converter(
         PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_READ_SPI,
         [](const std::string& body){
@@ -96,6 +85,29 @@ void register_message_converters_NS1_WirelessControllers(){
             //  Do not log the contents of the command due to privacy concerns.
             //  (people entering passwords)
 
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_INFO_NS1_WIRELESS_CONTROLLER_RUMBLE,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_INFO_NS1_WIRELESS_CONTROLLER_RUMBLE(): ";
+            if (body.size() != sizeof(pabb_MsgInfo_NS1_WirelessController_Rumble)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgInfo_NS1_WirelessController_Rumble*)body.c_str();
+            if (memcmp(
+                    params,
+                    &pabb_NintendoSwitch_Rumble_NEUTRAL_STATE,
+                    sizeof(pabb_NintendoSwitch_Rumble_NEUTRAL_STATE)
+                ) == 0
+            ){
+                return std::string();
+            }
+            static const char HEX_DIGITS[] = "0123456789abcdef";
+            for (size_t c = 0; c < body.size(); c++){
+                uint8_t byte = body[c];
+                ss << " " << HEX_DIGITS[(byte >> 4)] << HEX_DIGITS[byte & 15];
+            }
             return ss.str();
         }
     );

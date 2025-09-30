@@ -76,7 +76,10 @@ void MessageLogger::on_recv(const BotBaseMessage& message){
     if (!print){
         return;
     }
-    log("Receive: " + message_to_string(message), COLOR_DARKGREEN);
+    std::string str = message_to_string(message);
+    if (!str.empty()){
+        log("Receive: " + str, COLOR_DARKGREEN);
+    }
 }
 
 

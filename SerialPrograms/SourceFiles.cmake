@@ -13,6 +13,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Compiler.h
     ../Common/ControllerStates/HID_Keyboard_State.h
     ../Common/ControllerStates/NintendoSwitch2_WiredController_State.h
+    ../Common/ControllerStates/NintendoSwitch_WirelessController_State.c
     ../Common/ControllerStates/NintendoSwitch_WirelessController_State.h
     ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp

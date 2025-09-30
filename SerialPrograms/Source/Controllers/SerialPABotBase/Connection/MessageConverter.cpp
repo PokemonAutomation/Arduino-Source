@@ -11,6 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 //#include "Common/Microcontroller/PABotBaseIDs.h"
 //#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 #include "MessageConverter.h"
 
@@ -35,7 +36,7 @@ void register_message_converter(uint8_t type, MessageConverter converter){
 }
 
 
-int register_message_converters_framework_errors(){
+void register_message_converters_framework_errors(){
     register_message_converter(
         PABB_MSG_ERROR_READY,
         [](const std::string& body){
@@ -138,9 +139,8 @@ int register_message_converters_framework_errors(){
             return ss.str();
         }
     );
-    return 0;
 }
-int register_message_converters_framework_acks(){
+void register_message_converters_framework_acks(){
     register_message_converter(
         PABB_MSG_ACK_COMMAND,
         [](const std::string& body){
@@ -217,196 +217,8 @@ int register_message_converters_framework_acks(){
             return ss.str();
         }
     );
-    return 0;
 }
-int register_message_converters_framework_requests(){
-    register_message_converter(
-        PABB_MSG_SEQNUM_RESET,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_SEQNUM_RESET - ";
-            if (body.size() != sizeof(pabb_MsgInfoSeqnumReset)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgInfoSeqnumReset*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_PROTOCOL_VERSION,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_PROTOCOL_VERSION - ";
-            if (body.size() != sizeof(pabb_MsgRequestProtocolVersion)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestProtocolVersion*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_PROGRAM_VERSION,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_PROGRAM_VERSION - ";
-            if (body.size() != sizeof(pabb_MsgRequestProgramVersion)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestProgramVersion*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_PROGRAM_ID,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_PROGRAM_ID - ";
-            if (body.size() != sizeof(pabb_MsgRequestProgramID)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestProgramID*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_PROGRAM_NAME,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_PROGRAM_NAME - ";
-            if (body.size() != sizeof(pabb_MsgRequestProgramName)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestProgramName*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_CONTROLLER_LIST,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_CONTROLLER_LIST - ";
-            if (body.size() != sizeof(pabb_MsgRequestControllerList)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestControllerList*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_CLOCK,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_CLOCK - ";
-            if (body.size() != sizeof(pabb_system_clock)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_system_clock*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_COMMAND_FINISHED,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_COMMAND_FINISHED - ";
-            if (body.size() != sizeof(pabb_MsgRequestCommandFinished)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestCommandFinished*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", seq_of_original_command = " << (unsigned)params->seq_of_original_command;
-            ss << ", finish_time = " << params->finish_time;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_STOP,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_STOP - ";
-            if (body.size() != sizeof(pabb_MsgRequestStop)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestStop*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT - ";
-            if (body.size() != sizeof(pabb_MsgRequestStop)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestStop*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_QUEUE_SIZE,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_QUEUE_SIZE - ";
-            if (body.size() != sizeof(pabb_MsgRequestQueueSize)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestQueueSize*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_READ_CONTROLLER_MODE,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_READ_CONTROLLER_MODE - ";
-            if (body.size() != sizeof(pabb_MsgRequestReadControllerMode)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestReadControllerMode*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE - ";
-            if (body.size() != sizeof(pabb_MsgRequestChangeControllerMode)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestChangeControllerMode*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", controller_id = " << params->controller_id;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_RESET_TO_CONTROLLER,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_RESET_TO_CONTROLLER - ";
-            if (body.size() != sizeof(pabb_MsgRequestChangeControllerMode)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestChangeControllerMode*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", controller_id = " << params->controller_id;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_REQUEST_READ_MAC_ADDRESS,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_READ_MAC_ADDRESS - ";
-            if (body.size() != sizeof(pabb_MsgRequestReadMacAddress)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgRequestReadMacAddress*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", mode = " << params->mode;
-            return ss.str();
-        }
-    );
-#if 0
-    register_message_converter(
-        PABB_MSG_COMMAND_SET_LED_STATE,
-        [](const std::string& body){
-            std::ostringstream ss;
-            ss << "PABB_MSG_COMMAND_SET_LED_STATE - ";
-            if (body.size() != sizeof(pabb_MsgCommandSetLeds)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgCommandSetLeds*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", on = " << params->on;
-            return ss.str();
-        }
-    );
-#endif
-    return 0;
-}
-int register_message_converters_custom_info(){
+void register_message_converters_framework_custom_info(){
     register_message_converter(
         PABB_MSG_INFO_I32,
         [](const std::string& body){
@@ -481,16 +293,210 @@ int register_message_converters_custom_info(){
             return ss.str();
         }
     );
-    return 0;
 }
-
+void register_message_converters_framework_static_requests(){
+    register_message_converter(
+        PABB_MSG_SEQNUM_RESET,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_SEQNUM_RESET - ";
+            if (body.size() != sizeof(pabb_MsgInfoSeqnumReset)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgInfoSeqnumReset*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_PROTOCOL_VERSION,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_PROTOCOL_VERSION - ";
+            if (body.size() != sizeof(pabb_MsgRequestProtocolVersion)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestProtocolVersion*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_PROGRAM_VERSION,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_PROGRAM_VERSION - ";
+            if (body.size() != sizeof(pabb_MsgRequestProgramVersion)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestProgramVersion*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_PROGRAM_ID,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_PROGRAM_ID - ";
+            if (body.size() != sizeof(pabb_MsgRequestProgramID)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestProgramID*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_PROGRAM_NAME,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_PROGRAM_NAME - ";
+            if (body.size() != sizeof(pabb_MsgRequestProgramName)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestProgramName*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_CONTROLLER_LIST,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_CONTROLLER_LIST - ";
+            if (body.size() != sizeof(pabb_MsgRequestControllerList)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestControllerList*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_QUEUE_SIZE,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_QUEUE_SIZE - ";
+            if (body.size() != sizeof(pabb_MsgRequestQueueSize)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestQueueSize*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+}
+void register_message_converters_framework_mode_requests(){
+    register_message_converter(
+        PABB_MSG_REQUEST_READ_CONTROLLER_MODE,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_READ_CONTROLLER_MODE - ";
+            if (body.size() != sizeof(pabb_MsgRequestReadControllerMode)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestReadControllerMode*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_CHANGE_CONTROLLER_MODE - ";
+            if (body.size() != sizeof(pabb_MsgRequestChangeControllerMode)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestChangeControllerMode*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", controller_id = " << params->controller_id;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_RESET_TO_CONTROLLER,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_RESET_TO_CONTROLLER - ";
+            if (body.size() != sizeof(pabb_MsgRequestChangeControllerMode)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestChangeControllerMode*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", controller_id = " << params->controller_id;
+            return ss.str();
+        }
+    );
+}
+void register_message_converters_framework_command_queue(){
+    register_message_converter(
+        PABB_MSG_REQUEST_COMMAND_FINISHED,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_COMMAND_FINISHED - ";
+            if (body.size() != sizeof(pabb_MsgRequestCommandFinished)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestCommandFinished*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", seq_of_original_command = " << (unsigned)params->seq_of_original_command;
+            ss << ", finish_time = " << params->finish_time;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_STOP,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_STOP - ";
+            if (body.size() != sizeof(pabb_MsgRequestStop)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestStop*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT - ";
+            if (body.size() != sizeof(pabb_MsgRequestStop)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestStop*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+}
+void register_message_converters_framework_other_requests(){
+    register_message_converter(
+        PABB_MSG_REQUEST_CLOCK,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_CLOCK - ";
+            if (body.size() != sizeof(pabb_system_clock)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_system_clock*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_STATUS,
+        [](const std::string& body){
+            //  Disable this by default since it's very spammy.
+            if (!GlobalSettings::instance().LOG_EVERYTHING){
+                return std::string();
+            }
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_STATUS() - ";
+            if (body.size() != sizeof(pabb_Message_RequestStatus)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_RequestStatus*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
+        PABB_MSG_REQUEST_READ_MAC_ADDRESS,
+        [](const std::string& body){
+            std::ostringstream ss;
+            ss << "PABB_MSG_REQUEST_READ_MAC_ADDRESS - ";
+            if (body.size() != sizeof(pabb_MsgRequestReadMacAddress)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestReadMacAddress*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", mode = " << params->mode;
+            return ss.str();
+        }
+    );
+}
 
 
 const std::map<uint8_t, MessageConverter>& make_MESSAGE_MAP(){
     register_message_converters_framework_errors();
     register_message_converters_framework_acks();
-    register_message_converters_framework_requests();
-    register_message_converters_custom_info();
+    register_message_converters_framework_custom_info();
+    register_message_converters_framework_static_requests();
+    register_message_converters_framework_mode_requests();
+    register_message_converters_framework_command_queue();
+    register_message_converters_framework_other_requests();
 
     SerialPABotBase::register_message_converters_HID_Keyboard();
     SerialPABotBase::register_message_converters_NS2_WiredController();

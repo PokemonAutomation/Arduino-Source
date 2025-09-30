@@ -37,6 +37,13 @@ typedef struct{
 
 
 
+#define PABB_MSG_INFO_NS1_WIRELESS_CONTROLLER_RUMBLE        0x30
+typedef struct{
+    pabb_NintendoSwitch_Rumble rumble;
+} PABB_PACK pabb_MsgInfo_NS1_WirelessController_Rumble;
+
+
+
 #define PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_READ_SPI   0x60
 typedef struct{
     seqnum_t seqnum;

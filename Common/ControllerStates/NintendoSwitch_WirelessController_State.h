@@ -15,6 +15,13 @@ extern "C" {
 #endif
 
 
+typedef struct{
+    uint8_t left[4];
+    uint8_t right[4];
+} pabb_NintendoSwitch_Rumble;
+
+extern const pabb_NintendoSwitch_Rumble pabb_NintendoSwitch_Rumble_NEUTRAL_STATE;
+
 
 
 typedef struct{
