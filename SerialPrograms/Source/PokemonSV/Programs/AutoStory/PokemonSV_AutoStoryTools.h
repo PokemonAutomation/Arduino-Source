@@ -299,6 +299,9 @@ void checkpoint_reattempt_loop_tutorial(
 // moves player from Porto Marinada Pokecenter to Medali West Pokecenter
 void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+// moves player from Medali West Pokecenter to Glaseado Mountain Pokecenter
+void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 
 }
 }

@@ -394,7 +394,7 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
         // cout << "dif_x "<< dif_x << endl;
         // cout << "magnitude " << magnitude << endl;
 
-        if (std::sqrt(closest_dist2) <= 1){
+        if (std::sqrt(closest_dist2) < 1.01){
             // return when we're close enough to the target
             break;
         }
