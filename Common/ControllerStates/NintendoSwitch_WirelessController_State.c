@@ -24,7 +24,6 @@ const pabb_NintendoSwitch_WirelessController_State0x30 pabb_NintendoSwitch_Wirel
         .right_joystick = {0x00, 0x08, 0x80},
         .vibrator = 0x00,
     },
-    .gyro = {},
 };
 
 bool pabb_NintendoSwitch_WirelessController_State0x30_equals(

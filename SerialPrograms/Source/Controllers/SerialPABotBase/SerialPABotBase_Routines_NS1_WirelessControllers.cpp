@@ -95,7 +95,7 @@ void register_message_converters_NS1_WirelessControllers(){
             ss << "PABB_MSG_INFO_NS1_WIRELESS_CONTROLLER_RUMBLE(): ";
             if (body.size() != sizeof(pabb_MsgInfo_NS1_WirelessController_Rumble)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_MsgInfo_NS1_WirelessController_Rumble*)body.c_str();
-            if (memcmp(
+            if (!GlobalSettings::instance().LOG_EVERYTHING && memcmp(
                     params,
                     &pabb_NintendoSwitch_Rumble_NEUTRAL_STATE,
                     sizeof(pabb_NintendoSwitch_Rumble_NEUTRAL_STATE)
