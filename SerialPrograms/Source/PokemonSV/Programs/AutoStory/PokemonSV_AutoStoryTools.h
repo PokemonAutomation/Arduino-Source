@@ -302,6 +302,15 @@ void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, Pro
 // moves player from Medali West Pokecenter to Glaseado Mountain Pokecenter
 void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+// moves player from Glaseado Mountain Pokecenter to Casseroya Watchtower 3
+void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+// moves player from Casseroya Watchtower 3 to Dondozo Titan. Defeat Dondozo Titan phase 1.
+void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+// // moves player from Dondozo Titan phase 1 to phase 2. Defeat Dondozo Titan phase 2-3.
+// void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 
 }
 }
