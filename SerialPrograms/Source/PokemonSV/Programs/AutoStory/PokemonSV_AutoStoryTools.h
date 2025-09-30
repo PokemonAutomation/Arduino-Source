@@ -296,6 +296,8 @@ void checkpoint_reattempt_loop_tutorial(
     std::function<void(size_t attempt_number)>&& action
 );
 
+// moves player from Porto Marinada Pokecenter to Medali West Pokecenter
+void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 
 }

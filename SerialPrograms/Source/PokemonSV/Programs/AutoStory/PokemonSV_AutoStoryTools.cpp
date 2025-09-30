@@ -1122,6 +1122,196 @@ void checkpoint_reattempt_loop_tutorial(
     }    
 }
 
+void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    context.wait_for_all_requests();
+
+    // marker 1
+    realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 110, 75);
+
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 40, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );          
+
+    // marker 2.   x=0.3875, y=0.60463
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        FlyPoint::POKECENTER, 
+        {0.3875, 0.60463}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 40, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    ); 
+
+    
+    // marker 3.  : x=0.316146, y=0.623148
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        FlyPoint::POKECENTER, 
+        {0.316146, 0.623148}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 40, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    get_on_ride(env.program_info(), env.console, context);
+
+    // marker 4. cross bridge 1  x=0.310417, y=0.712963. 
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        FlyPoint::POKECENTER, 
+        {0.310417, 0.712963}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 1000ms);
+            pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    get_off_ride(env.program_info(), env.console, context);
+
+
+    // marker 5.  : x=0.582292, y=0.692593
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        FlyPoint::POKECENTER, 
+        {0.582292, 0.692593}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 60, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    get_on_ride(env.program_info(), env.console, context);
+
+    // marker 6. cross bridge 2 :   x=0.555208, y=0.627778
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        FlyPoint::POKECENTER, 
+        {0.555208, 0.627778}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 1000ms);
+            pbf_move_left_joystick(context, 128, 0, 500ms, 0ms);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    get_off_ride(env.program_info(), env.console, context);
+
+    // marker 7.  :  x=0.678646, y=0.669444
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 255, 255, 30}, 
+        FlyPoint::POKECENTER, 
+        {0.678646, 0.669444}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 40, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    // marker 8.  :  x=0.533333, y=0.640741
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 255, 255, 50}, 
+        FlyPoint::POKECENTER, 
+        {0.533333, 0.640741}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 40, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+
+    // marker 9. set marker to pokecenter
+    realign_player_from_landmark(
+        env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_IN, 128, 255, 50},
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0}
+    );  
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 30, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 0, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    ); 
+
+    // marker 10. set marker past pokecenter
+    handle_unexpected_battles(env.program_info(), env.console, context,
+    [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 180, 255, 50);
+    });      
+    overworld_navigation(env.program_info(), env.console, context, 
+        NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
+        128, 15, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
+        
+
+    fly_to_overlapping_flypoint(env.program_info(), env.console, context); 
+
+}
 
 
 

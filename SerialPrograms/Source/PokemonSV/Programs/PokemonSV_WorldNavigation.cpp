@@ -265,7 +265,7 @@ void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProCo
 
     for(const auto& box: found_locations){
         std::ostringstream os;
-        os << "Found " + fly_point_string + " at box: x=" << box.x << ", y=" << box.y << ", width=" << box.width << ", height=" << box.height;
+        os << "Found " + fly_point_string + " at box: x=" << box.x << ", y=" << box.y; // << ", width=" << box.width << ", height=" << box.height;
         stream.log(os.str());
   
     }
@@ -394,7 +394,7 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
         // cout << "dif_x "<< dif_x << endl;
         // cout << "magnitude " << magnitude << endl;
 
-        if (std::sqrt(closest_dist2) < 0.5){
+        if (std::sqrt(closest_dist2) <= 1){
             // return when we're close enough to the target
             break;
         }
