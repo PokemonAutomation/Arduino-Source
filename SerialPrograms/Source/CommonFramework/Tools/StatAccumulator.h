@@ -46,7 +46,8 @@ public:
     PeriodicStatsReporterI32(
         const char* label,
         const char* units, double divider,
-        std::chrono::milliseconds period
+        std::chrono::milliseconds period,
+        uint32_t min_report_time_threshold = 0
     );
     void report_data(Logger& logger, uint32_t x);
 
@@ -55,6 +56,7 @@ private:
     const char* m_units;
     double m_divider;
     std::chrono::milliseconds m_period;
+    uint32_t m_min_report_time_threshold;
     WallClock m_last_report;
 };
 

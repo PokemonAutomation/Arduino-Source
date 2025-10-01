@@ -13,8 +13,16 @@ namespace PokemonAutomation{
 VideoSource::VideoSource(Logger& m_logger, bool allow_watchdog_reset)
     : m_logger(m_logger)
     , m_allow_watchdog_reset(allow_watchdog_reset)
-    , m_stats_report_source_frame("VideoSource::report_source_frame()", "ms", 1000, std::chrono::seconds(60))
-    , m_stats_report_rendered_frame("VideoSource::report_rendered_frame()", "ms", 1000, std::chrono::seconds(60))
+    , m_stats_report_source_frame(
+        "VideoSource::report_source_frame()",
+        "ms", 1000,
+        std::chrono::seconds(60), 1000
+    )
+    , m_stats_report_rendered_frame(
+        "VideoSource::report_rendered_frame()",
+        "ms", 1000,
+        std::chrono::seconds(60), 1000
+    )
     , m_sanitizer("VideoSource")
 {}
 

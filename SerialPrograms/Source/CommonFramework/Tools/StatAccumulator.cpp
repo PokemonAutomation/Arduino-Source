@@ -57,22 +57,29 @@ void StatAccumulatorI32::log(Logger& logger, const std::string& label, const cha
 PeriodicStatsReporterI32::PeriodicStatsReporterI32(
     const char* label,
     const char* units, double divider,
-    std::chrono::milliseconds period
+    std::chrono::milliseconds period,
+    uint32_t min_report_time_threshold
 )
     : m_label(label)
     , m_units(units)
     , m_divider(divider)
     , m_period(period)
+    , m_min_report_time_threshold(min_report_time_threshold)
     , m_last_report(current_time())
 {}
 void PeriodicStatsReporterI32::report_data(Logger& logger, uint32_t x){
     StatAccumulatorI32::operator+=(x);
     WallClock now = current_time();
-    if (m_last_report + m_period <= now){
-        log(logger, m_label, m_units, m_divider);
-        clear();
-        m_last_report = now;
+    if (m_last_report + m_period > now){
+        return;
     }
+
+    if (this->max() >= m_min_report_time_threshold){
+        log(logger, m_label, m_units, m_divider);
+    }
+
+    clear();
+    m_last_report = now;
 
 }
 

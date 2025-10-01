@@ -36,7 +36,11 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent, VideoOverlaySession& ses
     , m_images(std::make_shared<std::vector<OverlayImage>>(session.images()))
     , m_log(std::make_shared<std::vector<OverlayLogLine>>(session.log_texts()))
 //    , m_stats(nullptr)
-    , m_stats_paint("VideoOverlayWidget::paintEvent", "ms", 1000, std::chrono::seconds(10))
+    , m_stats_paint(
+        "VideoOverlayWidget::paintEvent",
+        "ms", 1000,
+        std::chrono::seconds(10), 2000
+    )
 {
     setAttribute(Qt::WA_NoSystemBackground);
     setAttribute(Qt::WA_TranslucentBackground);
