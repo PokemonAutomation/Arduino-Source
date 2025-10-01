@@ -311,6 +311,9 @@ void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnviron
 // moves player from Dondozo Titan phase 1 to phase 2. Defeat Dondozo Titan phase 2-3.
 void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+// moves player from Glaseado Mountain Pokecenter to Montenevera Pokecenter
+void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 
 }
 }

@@ -265,7 +265,7 @@ void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProCo
 
     for(const auto& box: found_locations){
         std::ostringstream os;
-        os << "Found " + fly_point_string + " at box: x=" << box.x << ", y=" << box.y; // << ", width=" << box.width << ", height=" << box.height;
+        os << "Found " + fly_point_string + " at box: {" << box.x << ", " << box.y << "}"; // << ", width=" << box.width << ", height=" << box.height;
         stream.log(os.str());
   
     }
