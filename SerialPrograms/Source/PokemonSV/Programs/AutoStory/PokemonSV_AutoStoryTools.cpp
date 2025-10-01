@@ -1664,6 +1664,79 @@ void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnviron
 
 }
 
+void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    context.wait_for_all_requests();
+    
+    // marker 1      x=0.832292, y=0.54537
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        FlyPoint::FAST_TRAVEL, 
+        {0.832292, 0.54537}
+    );
+
+    get_on_ride(env.program_info(), env.console, context);
+
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    // marker 2       x=0.393229, y=0.748148
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        FlyPoint::FAST_TRAVEL, 
+        {0.393229, 0.748148}
+    );
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+
+    // marker 3. go to Dondozo/Tatsugiri part 2       x=0.55625, y=0.324074
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 0, 255, 100}, 
+        FlyPoint::FAST_TRAVEL, 
+        {0.55625, 0.324074}
+    );
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 80, 40, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+    
+    env.console.log("Battle Dondozo/Tatsugiri Titan phase 2.");
+    run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+    clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+    
+    env.console.log("Battle Dondozo/Tatsugiri Titan phase 3.");
+    run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
+    mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+
+}
+
 
 }
 }
