@@ -382,7 +382,7 @@ else() # macOS and Linux
     if ((APPLE) AND (CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)"))
         add_library(libdpp STATIC IMPORTED)
         set_target_properties(libdpp PROPERTIES
-            IMPORTED_LOCATION ../3rdPartyBinaries/libdpp_macos_arm64.a
+            IMPORTED_LOCATION ${REPO_ROOT_DIR}/3rdPartyBinaries/libdpp_macos_arm64.a
             INTERFACE_COMPILE_DEFINITIONS "PA_DPP"
             INTERFACE_LINK_LIBRARIES "-L/opt/homebrew/lib -lssl -lcrypto -lopus -lsodium -lz" # add dpp's deps
         )
