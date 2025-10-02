@@ -314,6 +314,10 @@ void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& en
 // moves player from Glaseado Mountain Pokecenter to Montenevera Pokecenter
 void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+// moves player from Montenevera Pokecenter to Glaseado Gym Pokecenter
+void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+
 
 }
 }
