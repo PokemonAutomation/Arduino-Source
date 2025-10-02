@@ -1,7 +1,10 @@
-# This CMake file defines all the code file paths as the CMake variable ${MAIN_SOURCES}
+# This CMake file defines all the code file paths as the CMake variables 
 # For the main CMake file, see CMakeLists.txt
 
-file(GLOB MAIN_SOURCES
+# the executable needs the dark style format file
+set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" "../3rdParty/qdarkstyle/dark/darkstyle.qrc")
+
+file(GLOB LIBRARY_SOURCES
     ../3rdParty/ONNX/OnnxToolsPA.h
     ../3rdParty/QtWavFile/WavFile.cpp
     ../3rdParty/QtWavFile/WavFile.h
@@ -357,7 +360,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Logging/OutputRedirector.h
     Source/CommonFramework/Logging/QueuedLogger.cpp
     Source/CommonFramework/Logging/QueuedLogger.h
-    Source/CommonFramework/Main.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.h
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp

@@ -119,20 +119,14 @@ else()
     find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
 endif()
 
-#disable deprecated Qt APIs
+# disable deprecated Qt APIs
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 
-#add current directory to find tesseractPA.lib
+# add current directory to find tesseractPA.lib
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
-# add the list of all code file paths as ${MAIN_SOURCES}
+# add the list of all code file paths as ${LIBRARY_SOURCES} and ${EXECUTABLE_SOURCES}
 include(SourceFiles.cmake)
-
-# Separate sources into library and executable components
-set(LIBRARY_SOURCES ${MAIN_SOURCES})
-list(REMOVE_ITEM LIBRARY_SOURCES "Source/CommonFramework/Main.cpp")
-# the executable needs the dark style format file
-set(EXECUTABLE_SOURCES "Source/CommonFramework/Main.cpp" "../3rdParty/qdarkstyle/dark/darkstyle.qrc")
 
 # Organize source files in IDE project view
 source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR}/../../ FILES ${LIBRARY_SOURCES})

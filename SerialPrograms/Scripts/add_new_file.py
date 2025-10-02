@@ -80,7 +80,7 @@ print(f"SourceFiles.cmake path: {cmake_file_path}")
 file_lines = read_lines(cmake_file_path)
 old_file_lines = file_lines
 
-code_file_start, code_file_end = get_code_file_range(file_lines, "file(GLOB MAIN_SOURCES", ")")
+code_file_start, code_file_end = get_code_file_range(file_lines, "file(GLOB LIBRARY_SOURCES", ")")
 code_file_lines = set(file_lines[code_file_start:code_file_end])
 old_num_code_files = len(code_file_lines)
 print(f"{old_num_code_files} lines from SourceFiles.cmake are for code file paths")
