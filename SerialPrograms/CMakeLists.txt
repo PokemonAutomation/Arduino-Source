@@ -316,7 +316,6 @@ else() # macOS and Linux
             # we have ONNX Runtime built from source
             message("Use ONNX Runtime built from source at ${ONNXRUNTIME_ROOTDIR}")
             target_include_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_HEADER_DIR})
-            link_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release)
             target_link_libraries(SerialProgramsLib PRIVATE ${ONNXRUNTIME_ROOTDIR}/build/MacOS/Release/libonnxruntime.dylib)
         else()
             message("Built-from-source ONNX Runtime folder ${ONNXRUNTIME_ROOTDIR} does not exist.")
