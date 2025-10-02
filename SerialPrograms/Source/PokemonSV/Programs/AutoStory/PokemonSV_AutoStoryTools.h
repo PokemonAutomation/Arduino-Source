@@ -317,6 +317,8 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 // moves player from Montenevera Pokecenter to Glaseado Gym Pokecenter
 void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+// moves player from Glaseado Mountain Pokecenter to North Province Area Three Pokecenter
+void move_from_glaseado_mountain_to_north_province_area_three(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 
 }
