@@ -1,4 +1,4 @@
-# This CMake file defines all the code file paths as the CMake variables 
+# This CMake file defines all the code file paths as the CMake variables
 # For the main CMake file, see CMakeLists.txt
 
 # the executable needs the dark style format file
@@ -659,6 +659,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/Connection/BotBase.cpp
     Source/Controllers/SerialPABotBase/Connection/BotBase.h
     Source/Controllers/SerialPABotBase/Connection/BotBaseMessage.h
+    Source/Controllers/SerialPABotBase/Connection/MessageConverter.cpp
+    Source/Controllers/SerialPABotBase/Connection/MessageConverter.h
     Source/Controllers/SerialPABotBase/Connection/MessageLogger.cpp
     Source/Controllers/SerialPABotBase/Connection/MessageLogger.h
     Source/Controllers/SerialPABotBase/Connection/MessageSniffer.h
@@ -666,8 +668,6 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/Connection/PABotBase.h
     Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.cpp
     Source/Controllers/SerialPABotBase/Connection/PABotBaseConnection.h
-    Source/Controllers/SerialPABotBase/Connection/MessageConverter.cpp
-    Source/Controllers/SerialPABotBase/Connection/MessageConverter.h
     Source/Controllers/SerialPABotBase/SerialPABotBase.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Connection.cpp
