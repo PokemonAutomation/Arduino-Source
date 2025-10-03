@@ -9,11 +9,11 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2025, macos-13, ubuntu-24.04]
+        os: [windows-2025, macos-15, ubuntu-24.04]
         compiler: ['default', 'clang']
-        qt_version: ['6.9.2']
+        qt_version: ['6.9.3']
         include:
-          - qt_version: '6.9.2'
+          - qt_version: '6.9.3'
             qt_version_major: '6'
             qt_modules: 'qtmultimedia qtserialport'
 
