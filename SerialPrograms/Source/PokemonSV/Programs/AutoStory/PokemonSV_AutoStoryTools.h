@@ -323,6 +323,13 @@ void move_from_glaseado_mountain_to_north_province_area_three(SingleSwitchProgra
 // moves player from Glaseado Gym Pokecenter to North Province Area One
 void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+// moves player from North Province Area One to Team Star Fighting base
+void move_from_north_province_area_one_to_fighting_base(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+
+
+
+
 
 }
 }
