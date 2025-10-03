@@ -325,36 +325,82 @@ else() # macOS and Linux
         endif()
 
     else() # Linux
-        # Instructions took from https://github.com/microsoft/onnxruntime/discussions/6489
-        # Step 1: Download the file
-        file(DOWNLOAD
-            https://github.com/microsoft/onnxruntime/releases/download/v1.22.0/onnxruntime-linux-x64-1.22.0.tgz
-            ${CMAKE_BINARY_DIR}/onnxruntime-linux-x64-1.22.0.tgz
-            SHOW_PROGRESS
+        # ONNX RUNTIME LINUX CONFIG
+    # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
+        # this can be done via -DONNX_ROOT_PATH=/path/to/onnx
+
+        # If the path isn't provided, it'll automatically download the 1.23.0 release to the build folder,
+        # extract it, and then link it up
+
+        # Set the ONNXRUNTIME version and arch, allows for quick updates
+        set(ONNXRUNTIME_VERSION "1.23.0")
+        set(ONNXRUNTIME_ARCH "x64")
+        set(ONNXRUNTIME_DIR_NAME "onnxruntime-linux-${ONNXRUNTIME_ARCH}-${ONNXRUNTIME_VERSION}")
+        set(ONNXRUNTIME_TGZ_NAME "${ONNXRUNTIME_DIR_NAME}.tgz")
+        # build up the URL based on the version and name
+        set(ONNXRUNTIME_URL "https://github.com/microsoft/onnxruntime/releases/download/v${ONNXRUNTIME_VERSION}/${ONNXRUNTIME_TGZ_NAME}")
+
+        # Cache variable is editable by users *and* is properly stored
+        set(ONNX_ROOT_PATH "" CACHE PATH "Path to the root of a pre-installed ONNX Runtime (e.g., /path/to/onnxruntime-linux-x64-1.23.0)")
+
+        # Download the onnxruntime if it doesn't exist or if the path is bad
+        if(NOT ONNX_ROOT_PATH OR NOT EXISTS "${ONNX_ROOT_PATH}/include/onnxruntime_cxx_api.h")
+            set(EXTRACTED_ONNX_PATH "${CMAKE_BINARY_DIR}/${ONNXRUNTIME_DIR_NAME}")
+
+            if(NOT IS_DIRECTORY ${EXTRACTED_ONNX_PATH})
+                message(STATUS "ONNX_ROOT_PATH not found. Downloading ONNX Runtime v${ONNXRUNTIME_VERSION}...")
+                
+                # logic for downloading...
+                set(DOWNLOAD_LOCATION "${CMAKE_BINARY_DIR}/${ONNXRUNTIME_TGZ_NAME}")
+                file(DOWNLOAD
+                    ${ONNXRUNTIME_URL}
+                    ${DOWNLOAD_LOCATION}
+                    SHOW_PROGRESS
+                    STATUS download_status
+                )
+                list(GET download_status 0 error_code)
+                if(NOT error_code EQUAL 0)
+                    list(GET download_status 1 error_message)
+                    message(FATAL_ERROR "Failed to download ONNX Runtime: ${error_message}")
+                endif()
+
+                # logic for extracting the tarball to our working directory
+                message(STATUS "Extracting ONNX Runtime...")
+                execute_process(
+                    COMMAND ${CMAKE_COMMAND} -E tar xzf "${DOWNLOAD_LOCATION}"
+                    WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+                )
+            endif()
+
+            # Update the ONNX_ROOT_PATH to point to our downloaded version, force ensures we update it
+            set(ONNX_ROOT_PATH "${EXTRACTED_ONNX_PATH}" CACHE PATH "Path to the downloaded ONNX Runtime" FORCE)
+            message(STATUS "Using downloaded ONNX Runtime at: ${ONNX_ROOT_PATH}")
+        else()
+            message(STATUS "Using user-provided ONNX Runtime at: ${ONNX_ROOT_PATH}")
+        endif()
+
+        # configure and find headers from the onnxruntime
+        find_path(ONNX_INCLUDE_DIRS
+            NAMES onnxruntime_cxx_api.h
+            HINTS "${ONNX_ROOT_PATH}/include"
+            REQUIRED
         )
 
-        # Step 2: Extract the archive
-        execute_process(
-            COMMAND tar -xzf onnxruntime-linux-x64-1.22.0.tgz
-            WORKING_DIRECTORY ${CMAKE_BINARY_DIR}
+        find_library(ONNX_RUNTIME_LIB
+            NAMES onnxruntime
+            HINTS "${ONNX_ROOT_PATH}/lib"
+            REQUIRED
         )
 
-        # Step 3: Copy files to /usr/local
-        execute_process(
-            COMMAND sudo cp -r ${CMAKE_BINARY_DIR}/onnxruntime-linux-x64-1.22.0/include /usr/local/
-        )
-        execute_process(
-            COMMAND sudo cp -r ${CMAKE_BINARY_DIR}/onnxruntime-linux-x64-1.22.0/lib /usr/local/
-        )
-
-        # Step 4: Run ldconfig
-        execute_process(
-            COMMAND sudo ldconfig
-            WORKING_DIRECTORY /usr/local/lib
-        )
-
-        # Link against ONNX Runtime
-        target_link_libraries(SerialProgramsLib PRIVATE onnxruntime)
+        if(ONNX_INCLUDE_DIRS AND ONNX_RUNTIME_LIB)
+            # only link if it was found, otherwise we error out
+            message(STATUS "Found ONNX Include Dirs: ${ONNX_INCLUDE_DIRS}")
+            message(STATUS "Found ONNX Library: ${ONNX_RUNTIME_LIB}")
+            target_include_directories(SerialProgramsLib PUBLIC "${ONNX_INCLUDE_DIRS}")
+            target_link_libraries(SerialProgramsLib PUBLIC "${ONNX_RUNTIME_LIB}")
+        else()
+            message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
+        endif()
         # Find OpenCV
         find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
     endif()
