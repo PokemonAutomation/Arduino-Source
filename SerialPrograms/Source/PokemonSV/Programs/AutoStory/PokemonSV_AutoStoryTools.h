@@ -327,6 +327,10 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
 void move_from_north_province_area_one_to_fighting_base(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 
+void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 
 
 
