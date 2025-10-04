@@ -328,6 +328,7 @@ if (WIN32)
 #    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else() # macOS and Linux
+    find_package(PkgConfig REQUIRED)
     if (APPLE)
         # ==== Get ONNX Runtime paths ====
         # First, try to see if there is an ONNX Runtime library built from source.
@@ -443,7 +444,6 @@ else() # macOS and Linux
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
     if (UNIX_LINK_TESSERACT)
-        find_package(PkgConfig REQUIRED)
         target_compile_definitions(SerialProgramsLib PRIVATE PA_TESSERACT UNIX_LINK_TESSERACT)
         pkg_search_module(TESSERACT REQUIRED tesseract)
         pkg_search_module(LEPTONICA REQUIRED lept)
@@ -455,15 +455,14 @@ else() # macOS and Linux
         target_link_libraries(SerialProgramsLib PRIVATE ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    # enable dpp integration
-    if ((APPLE) AND (CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)"))
-        add_library(libdpp STATIC IMPORTED)
-        set_target_properties(libdpp PROPERTIES
-            IMPORTED_LOCATION ${REPO_ROOT_DIR}/3rdPartyBinaries/libdpp_macos_arm64.a
-            INTERFACE_COMPILE_DEFINITIONS "PA_DPP"
-            INTERFACE_LINK_LIBRARIES "-L/opt/homebrew/lib -lssl -lcrypto -lopus -lsodium -lz" # add dpp's deps
-        )
-        target_link_libraries(SerialProgramsLib PRIVATE libdpp)
+    pkg_search_module(DPP dpp=10.0.22)
+    if (DPP_FOUND) # enable dpp integration
+        target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)
+        ## to build against headers within this repo and properly set flags ##
+        ## don't enable the following line ##
+        # target_include_directories(SerialProgramsLib PRIVATE ${DPP_INCLUDE_DIRS})
+        target_link_directories(SerialProgramsLib PUBLIC ${DPP_LIBRARY_DIRS})
+        target_link_libraries(SerialProgramsLib PUBLIC ${DPP_LIBRARIES})
     endif()
 
     if (APPLE)
