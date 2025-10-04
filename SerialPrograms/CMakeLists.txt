@@ -570,6 +570,9 @@ if (WIN32 AND DEPLOY_FILES)
     set(DISCORD_DLL_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/debug/discord_partner_sdk.dll")
     set(DISCORD_DLL_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win/bin/release/discord_partner_sdk.dll")
 
+    set(DPP_DLL_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/Debug/dpp.dll")
+    set(DPP_DLL_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/Release/dpp.dll")
+
     set(FIRMWARE_DIR "${PACKAGES_DIR}/PABotBase/PABotBase-Switch")
     set(SCRIPTS_DIR "${PACKAGES_DIR}/SerialPrograms/Scripts")
     set(RESOURCES_DIR "${PACKAGES_DIR}/SerialPrograms/Resources")
@@ -636,6 +639,15 @@ if (WIN32 AND DEPLOY_FILES)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<IF:$<CONFIG:Debug>,${DISCORD_DLL_DEBUG},${DISCORD_DLL_RELEASE}>"
             "${DEPLOY_DIR}/discord_partner_sdk.dll"
+    )
+
+    # Copy DPP DLL
+    add_custom_command(
+        TARGET SerialPrograms POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying DPP SDK DLL"
+        COMMAND ${CMAKE_COMMAND} -E copy_if_different
+            "$<IF:$<CONFIG:Debug>,${DPP_DLL_DEBUG},${DPP_DLL_RELEASE}>"
+            "${DEPLOY_DIR}/dpp.dll"
     )
 
     # Copy 3rd party DLLs if missing/different
