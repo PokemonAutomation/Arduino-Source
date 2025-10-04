@@ -21,7 +21,7 @@ namespace PokemonAutomation{
 //
 //  Here we store a map of all controller types in the program.
 //
-static std::map<ControllerInterface, std::unique_ptr<InterfaceType>>& all_controller_interfaces(){
+static std::map<ControllerInterface, std::unique_ptr<InterfaceType>>& ALL_CONTROLLER_INTERFACES(){
     static std::map<ControllerInterface, std::unique_ptr<InterfaceType>> instance;
     return instance;
 }
@@ -31,7 +31,7 @@ void InterfaceType::register_factory(
     ControllerInterface controller_interface,
     std::unique_ptr<InterfaceType> factory
 ){
-    auto ret = all_controller_interfaces().emplace(controller_interface, std::move(factory));
+    auto ret = ALL_CONTROLLER_INTERFACES().emplace(controller_interface, std::move(factory));
     if (!ret.second){
         throw InternalProgramError(
             nullptr, PA_CURRENT_FUNCTION,
@@ -79,7 +79,7 @@ void ControllerOption::load_json(const JsonValue& json){
             break;
         }
 
-        for (const auto& item : all_controller_interfaces()){
+        for (const auto& item : ALL_CONTROLLER_INTERFACES()){
             const JsonValue* params = obj->get_value(CONTROLLER_INTERFACE_STRINGS.get_string(item.first));
             if (params == nullptr){
                 continue;

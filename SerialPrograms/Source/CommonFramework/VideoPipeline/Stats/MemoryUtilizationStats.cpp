@@ -35,7 +35,7 @@ void MemoryUtilizationStats::update(){
         memory.total_system_memory,
         memory.total_used_system_memory
     )){
-        uint64_t free_memory = memory.process_physical_memory - memory.process_virtual_memory;
+        uint64_t free_memory = memory.total_system_memory - memory.total_used_system_memory;
 
         if (usage >= 0.90 || free_memory < 2*GB){
             system.color = COLOR_RED;
