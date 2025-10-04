@@ -4,8 +4,7 @@
 
 #ifdef PA_DPP
 #include <atomic>
-#include <dpp/dpp.h>
-#include <Integrations/DppIntegration/DppCommandHandler.h>
+#include "DppCommandHandler.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 
 namespace PokemonAutomation{

@@ -1,7 +1,6 @@
 #ifdef PA_DPP
 
 #include <format>
-#include <dpp/dpp.h>
 #include "Common/Cpp/Concurrency/ScheduledTaskRunner.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -26,7 +25,6 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
         log_dpp(log.message, "Internal Log", log.severity);
     });
 
-    owner = bot.current_application_get_sync().owner;
     auto cmd_type = GlobalSettings::instance().DISCORD->integration.command_type.get();
     std::string prefix = GlobalSettings::instance().DISCORD->integration.command_prefix;
 
@@ -37,14 +35,24 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
     }
 
     bot.on_ready([&bot, &handler, this](const ready_t&){
-        log_dpp("Logged in as: " + bot.current_user_get_sync().format_username() + ".", "Ready", ll_info);
+        log_dpp("Logged in as: " + bot.me.format_username() + ".", "Ready", ll_info);
         Handler::create_unified_commands(handler);
+        bot.current_application_get([&](const dpp::confirmation_callback_t& cc) {
+            if (cc.is_error()) {
+                log_dpp("Error getting application details: " + cc.get_error().message, "Current App", ll_error);
+                return;
+            }
+            dpp::application app = cc.get<dpp::application>();
+            log_dpp("Application Name: " + app.name, "Current App", ll_info);
+            log_dpp("Application ID: " + std::to_string(app.id), "Current App", ll_info);
+            owner = app.owner;
+        });
     });
 
     bot.on_guild_create([&bot, this](const guild_create_t& event){
         try{
-            std::string id = std::to_string(event.created->id);
-            log_dpp("Loaded guild: " + event.created->name + " (" + id + ").", "Guild Create", ll_info);
+            std::string id = std::to_string(event.created.id);
+            log_dpp("Loaded guild: " + event.created.name + " (" + id + ").", "Guild Create", ll_info);
             std::lock_guard<std::mutex> lg(m_count_lock);
             Utility::get_user_counts(bot, event);
         }catch (std::exception& e){
@@ -53,17 +61,17 @@ void Handler::initialize(cluster& bot, commandhandler& handler){
     });
 
     bot.on_guild_member_add([this](const guild_member_add_t& event){
-        std::string id = std::to_string(event.adding_guild->id);
+        std::string id = std::to_string(event.adding_guild.id);
         if (!user_counts.empty() && user_counts.count(id)){
-            log_dpp("New member joined " + event.adding_guild->name + ". Incrementing member count.", "Guild Member Add", ll_info);
+            log_dpp("New member joined " + event.adding_guild.name + ". Incrementing member count.", "Guild Member Add", ll_info);
             user_counts.at(id)++;
         }
     });
 
     bot.on_guild_member_remove([this](const guild_member_remove_t& event){
-        std::string id = std::to_string(event.removing_guild->id);
+        std::string id = std::to_string(event.removing_guild.id);
         if (!user_counts.empty() && user_counts.count(id)){
-            log_dpp("Member left " + event.removing_guild->name + ". Decrementing member count.", "Guild Member Remove", ll_info);
+            log_dpp("Member left " + event.removing_guild.name + ". Decrementing member count.", "Guild Member Remove", ll_info);
             user_counts.at(id)--;
         }
     });
