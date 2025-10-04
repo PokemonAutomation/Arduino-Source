@@ -74,7 +74,7 @@ void CaughtPokemonScreen::leave_summary(){
 
     pbf_press_button(m_context, BUTTON_B, 10, TICKS_PER_SECOND);
 
-    PokemonCaughtMenuDetector caught_menu;
+    PokemonCaughtMenuWatcher caught_menu;
 
     int result = wait_until(
         m_stream, m_context,

@@ -9,6 +9,7 @@
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
+#include "CommonTools/VisualDetector.h"
 
 namespace PokemonAutomation{
     class VideoOverlay;
@@ -17,15 +18,12 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-class PokemonCaughtMenuDetector : public VisualInferenceCallback{
+class PokemonCaughtMenuDetector : public StaticScreenDetector{
 public:
     PokemonCaughtMenuDetector();
 
-    bool detect(const ImageViewRGB32& screen);
-
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override final;
-
+    virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
     ImageFloatBox m_top_white;
@@ -36,6 +34,12 @@ private:
     ImageFloatBox m_bottom_black;
     ImageFloatBox m_bottom_options;
 
+};
+class PokemonCaughtMenuWatcher : public DetectorToFinder<PokemonCaughtMenuDetector>{
+public:
+    PokemonCaughtMenuWatcher()
+        : DetectorToFinder("PokemonCaughtMenuWatcher", std::chrono::milliseconds(250))
+    {}
 };
 
 

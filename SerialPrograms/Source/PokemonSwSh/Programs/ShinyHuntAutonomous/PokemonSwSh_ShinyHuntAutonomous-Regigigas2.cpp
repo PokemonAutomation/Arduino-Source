@@ -79,7 +79,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(VideoStream& stream, ProCont
     pbf_mash_button(context, BUTTON_A, 4000ms);
 
     while (true){
-        RaidCatchDetector detector(stream.overlay());
+        RaidCatchWatcher detector(stream.overlay());
         YCommIconDetector overworld(true);
         context.wait_for_all_requests();
         int result = wait_until(

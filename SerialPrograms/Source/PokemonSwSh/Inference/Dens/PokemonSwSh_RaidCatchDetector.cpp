@@ -15,8 +15,7 @@ namespace PokemonSwSh{
 
 
 RaidCatchDetector::RaidCatchDetector(VideoOverlay& overlay)
-    : VisualInferenceCallback("RaidCatchDetector")
-    , m_left0 (0.82, 0.85 + 0 * 0.078, 0.01, 0.04)
+    : m_left0 (0.82, 0.85 + 0 * 0.078, 0.01, 0.04)
     , m_right0(0.96, 0.85 + 0 * 0.078, 0.01, 0.04)
 //    , m_left1 (0.82, 0.85 + 1 * 0.078, 0.01, 0.04)
 //    , m_right1(0.96, 0.85 + 1 * 0.078, 0.01, 0.04)
@@ -77,15 +76,6 @@ bool RaidCatchDetector::detect(const ImageViewRGB32& screen){
     }
 
     return true;
-}
-bool RaidCatchDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    //  Need 5 consecutive successful detections.
-    if (!detect(frame)){
-        m_trigger_count = 0;
-        return false;
-    }
-    m_trigger_count++;
-    return m_trigger_count >= 5;
 }
 
 

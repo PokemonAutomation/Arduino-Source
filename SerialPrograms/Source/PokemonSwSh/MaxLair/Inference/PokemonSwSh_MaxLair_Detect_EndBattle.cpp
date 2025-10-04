@@ -19,8 +19,7 @@ namespace MaxLairInternal{
 
 
 PokemonCaughtMenuDetector::PokemonCaughtMenuDetector()
-    : VisualInferenceCallback("PokemonCaughtMenuDetector")
-    , m_top_white(0.550, 0.020, 0.400, 0.020)
+    : m_top_white(0.550, 0.020, 0.400, 0.020)
     , m_caught_left(0.500, 0.080, 0.050, 0.070)
     , m_caught_right(0.930, 0.080, 0.050, 0.070)
     , m_middle_pink(0.930, 0.300, 0.050, 0.200)
@@ -36,9 +35,6 @@ void PokemonCaughtMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_MAGENTA, m_bottom_white);
     items.add(COLOR_MAGENTA, m_bottom_black);
     items.add(COLOR_MAGENTA, m_bottom_options);
-}
-bool PokemonCaughtMenuDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return detect(frame);
 }
 
 

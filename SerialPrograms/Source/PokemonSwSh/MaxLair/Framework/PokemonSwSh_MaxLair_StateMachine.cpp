@@ -91,8 +91,8 @@ StateMachineAction run_state_iteration(
     ItemSelectDetector item_menu(false);
     ProfessorSwapDetector professor_swap(console.overlay(), !starting);
     BattleMenuDetector battle_menu;
-    RaidCatchDetector catch_select(console.overlay());
-    PokemonCaughtMenuDetector caught_menu;
+    RaidCatchWatcher catch_select(console.overlay());
+    PokemonCaughtMenuWatcher caught_menu;
     EntranceDetector entrance_detector(entrance);
     FrozenImageDetector frozen_screen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(30), 10);
 
