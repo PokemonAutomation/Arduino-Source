@@ -352,12 +352,6 @@ else() # macOS and Linux
             target_link_directories(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LIBRARY_DIRS})
             target_link_libraries(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LINK_LIBRARIES})
         endif()
-        # Find OpenCV
-        if(CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)")
-            find_package(OpenCV REQUIRED HINTS "/opt/homebrew/opt/opencv/lib/cmake/opencv4/")
-        else()
-            find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
-        endif()
     else() # Linux
         # ONNX RUNTIME LINUX CONFIG
         # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
@@ -435,13 +429,13 @@ else() # macOS and Linux
         else()
             message(FATAL_ERROR "Could not find ONNX Runtime headers or library.")
         endif()
-        # Find OpenCV
-        find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
     endif() # end Linux
 
-    include_directories(${OpenCV_INCLUDE_DIRS})
-    link_directories(${OpenCV_LIBRARY_DIRS})
-    target_link_libraries(SerialProgramsLib PRIVATE ${OpenCV_LIBS})
+    # Find OpenCV
+    pkg_search_module(OpenCV REQUIRED opencv4 opencv)
+    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${OpenCV_INCLUDE_DIRS}) # "SYSTEM" to suppress warnings
+    target_link_directories(SerialProgramsLib PUBLIC ${OpenCV_LIBRARY_DIRS})
+    target_link_libraries(SerialProgramsLib PUBLIC ${OpenCV_LINK_LIBRARIES})
 
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
@@ -468,10 +462,6 @@ else() # macOS and Linux
     endif()
 
     if (APPLE)
-        # Add -Wno-c11-extensions to avoid clang gives
-        # /usr/local/Cellar/opencv/4.5.5_3/include/opencv4/opencv2/core/mat.inl.hpp:2116:9: error: '_Atomic' is a C11 extension
-        # when compiling OpenCV
-        # target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
         target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
