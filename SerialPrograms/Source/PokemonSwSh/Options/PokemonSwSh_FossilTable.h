@@ -10,7 +10,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
-#include "Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h"
+#include "NintendoSwitch/Options/NintendoSwitch_SlotDatabase.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
