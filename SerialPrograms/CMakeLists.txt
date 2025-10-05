@@ -191,6 +191,9 @@ endfunction()
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
+set(DPP_DLL_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/Debug/dpp.dll")
+set(DPP_DLL_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/Release/dpp.dll")
+
 set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
 set(FIRMWARE_DIR "${PACKAGES_DIR}/PABotBase/PABotBase-Switch")
 set(SCRIPTS_DIR "${PACKAGES_DIR}/SerialPrograms/Scripts")
@@ -458,9 +461,8 @@ else() # macOS and Linux
         target_compile_definitions(SerialProgramsLib PRIVATE PA_DPP)
         target_compile_options(SerialProgramsLib PRIVATE ${DPP_CFLAGS_OTHER})
         target_include_directories(SerialProgramsLib PRIVATE ${DPP_INCLUDE_DIRS})
-        target_link_libraries(SerialProgramsLib PRIVATE ${DPP_LIBRARIES})
-        target_link_directories(SerialPrograms PRIVATE ${DPP_LIBRARY_DIRS})
-        target_link_libraries(SerialPrograms PRIVATE ${DPP_LIBRARIES})
+        target_link_directories(SerialProgramsLib PUBLIC ${DPP_LIBRARY_DIRS})
+        target_link_libraries(SerialProgramsLib PUBLIC ${DPP_LIBRARIES})
     endif()
 
     if (APPLE)
