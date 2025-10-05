@@ -654,12 +654,12 @@ if (WIN32 AND DEPLOY_FILES)
         )
     endforeach()
 
-    # Move built .exe and .pdb to deploy folder
+    # Move built .exe and .pdb to deploy folder, print if pdb is missing
     add_custom_command(
         TARGET SerialPrograms POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Moving built exe and pdb"
         COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:SerialPrograms> "${DEPLOY_DIR}/$<TARGET_FILE_NAME:SerialPrograms>"
-        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_PDB_FILE:SerialPrograms> "${DEPLOY_DIR}/$<TARGET_PDB_FILE_NAME:SerialPrograms>"
+        COMMAND cmd /c "if exist \"$<TARGET_PDB_FILE:SerialPrograms>\" ( \"${CMAKE_COMMAND}\" -E rename \"$<TARGET_PDB_FILE:SerialPrograms>\" \"${DEPLOY_DIR}/$<TARGET_PDB_FILE_NAME:SerialPrograms>\" ) else ( echo [Deploy] PDB file missing: $<TARGET_PDB_FILE:SerialPrograms> )"
     )
 
     # Extract Discord SDK if missing
