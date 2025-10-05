@@ -327,12 +327,6 @@ if (WIN32)
 else() # macOS and Linux
     find_package(PkgConfig REQUIRED)
     if (APPLE)
-        # Get root path where Homebrew installs libraries. Example root path: "/opt/homebrew/",
-        # where you can find libraries in "/opt/homebrew/lib/" and headers in "/opt/homebrew/include/".
-        # CMake does not support ONNX Runtime, so we have to add ONNX Runtime paths on our own.
-        # Save the root path as CMake variable HOMEBREW_PREFIX.
-        execute_process(COMMAND brew --prefix OUTPUT_VARIABLE HOMEBREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
-
         # ==== Get ONNX Runtime paths ====
         # First, try to see if there is an ONNX Runtime library built from source.
         # Assume the onnxruntime repo, https://github.com/microsoft/onnxruntime is placed in the same folder as
@@ -347,8 +341,10 @@ else() # macOS and Linux
         else()
             message("Built-from-source ONNX Runtime folder ${ONNXRUNTIME_ROOTDIR} does not exist.")
             message("Use ONNX Runtime installed by Homebrew.")
-            target_include_directories(SerialProgramsLib PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
-            target_link_libraries(SerialProgramsLib PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
+            pkg_search_module(ONNXRUNTIME REQUIRED libonnxruntime onnxruntime)
+            target_include_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_INCLUDE_DIRS})
+            target_link_directories(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LIBRARY_DIRS})
+            target_link_libraries(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LINK_LIBRARIES})
         endif()
         # Find OpenCV
         if(CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)")
