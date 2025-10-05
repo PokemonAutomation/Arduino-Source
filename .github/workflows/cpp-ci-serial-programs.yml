@@ -33,12 +33,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
       with:
-        path: Arduino-Source
         submodules: 'recursive'
-    - uses: actions/checkout@v4
-      with:
-        repository: 'PokemonAutomation/Packages'
-        path: Packages
     - uses: jurplel/install-qt-action@v4
       with:
         version: ${{ matrix.qt_version }}
@@ -55,30 +50,18 @@ jobs:
         brew install opencv onnxruntime
     - name: Generate binaries
       run: |
-        cd Arduino-Source/SerialPrograms
+        cd SerialPrograms
         mkdir bin
         cd bin
         cmake .. -DQT_MAJOR:STRING=${{ matrix.qt_version_major }} ${{ matrix.cmake_additional_param }}
-        cmake --build . --config Release --parallel 10
-    - name: Copy resources
+        cmake --build . --config RelWithDebInfo --parallel 10
+    - name: Prepare upload folder
       if: startsWith(matrix.os, 'windows')
       run: |
-        robocopy Packages/SerialPrograms/Resources          Output/Resources /s
-        robocopy Packages/PABotBase/PABotBase-Switch        Output/PABotBase /s
-        robocopy Arduino-Source/SerialPrograms/bin          Output/Binaries *.dll
-        robocopy Arduino-Source/SerialPrograms/bin/Release  Output/Binaries SerialPrograms.exe
-        echo https://github.com/${{github.repository}}/commit/${{github.sha}} > Output/version.txt
-        write-host "Robocopy exited with exit code:" $lastexitcode
-        if ($lastexitcode -eq 1)
-        {
-          exit 0
-        }
-        else
-        {
-          exit 1
-        }
+        del SerialPrograms/bin/RelWithDebInfo/SerialProgramsLib.lib
+        echo https://github.com/${{github.repository}}/commit/${{github.sha}} > SerialPrograms/bin/RelWithDebInfo/version.txt
     - uses: actions/upload-artifact@v4
       if: startsWith(matrix.os, 'windows')
       with:
         name: Serial Programs (os=${{ matrix.os }} - compiler=${{ matrix.compiler }} - qt_version=${{ matrix.qt_version }})
-        path: Output
+        path: SerialPrograms/bin/RelWithDebInfo
