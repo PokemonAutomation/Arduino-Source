@@ -193,8 +193,8 @@ apply_common_target_properties(SerialPrograms)
 
 set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
 set(FIRMWARE_DIR "${PACKAGES_DIR}/Firmware")
-set(SCRIPTS_DIR "${PACKAGES_DIR}/SerialPrograms/Scripts")
-set(RESOURCES_DIR "${PACKAGES_DIR}/SerialPrograms/Resources")
+set(SCRIPTS_DIR "${PACKAGES_DIR}/Scripts")
+set(RESOURCES_DIR "${PACKAGES_DIR}/Resources")
 
 # Clone Packages repo if not already present
 if (NOT EXISTS "${PACKAGES_DIR}")
