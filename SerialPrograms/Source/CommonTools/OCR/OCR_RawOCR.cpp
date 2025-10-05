@@ -155,8 +155,16 @@ private:
     std::vector<TesseractAPI*> m_idle;
 };
 
-SpinLock ocr_pool_lock;
-std::map<Language, TesseractPool> ocr_pool;
+struct OcrGlobals{
+    SpinLock ocr_pool_lock;
+    std::map<Language, TesseractPool> ocr_pool;
+
+    static OcrGlobals& instance(){
+        static OcrGlobals globals;
+        return globals;
+    }
+};
+
 
 
 std::string ocr_read(Language language, const ImageViewRGB32& image){
@@ -167,9 +175,12 @@ std::string ocr_read(Language language, const ImageViewRGB32& image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
     }
 
+    OcrGlobals& globals = OcrGlobals::instance();
+    std::map<Language, TesseractPool>& ocr_pool = globals.ocr_pool;
+
     std::map<Language, TesseractPool>::iterator iter;
     {
-        WriteSpinLock lg(ocr_pool_lock, "ocr_read()");
+        WriteSpinLock lg(globals.ocr_pool_lock, "ocr_read()");
         iter = ocr_pool.find(language);
         if (iter == ocr_pool.end()){
             iter = ocr_pool.emplace(language, language).first;
@@ -182,9 +193,12 @@ void ensure_instances(Language language, size_t instances){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to call OCR without a language.");
     }
 
+    OcrGlobals& globals = OcrGlobals::instance();
+    std::map<Language, TesseractPool>& ocr_pool = globals.ocr_pool;
+
     std::map<Language, TesseractPool>::iterator iter;
     {
-        WriteSpinLock lg(ocr_pool_lock, "ocr_read()");
+        WriteSpinLock lg(globals.ocr_pool_lock, "ocr_read()");
         iter = ocr_pool.find(language);
         if (iter == ocr_pool.end()){
             iter = ocr_pool.emplace(language, language).first;
