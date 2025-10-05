@@ -192,7 +192,7 @@ apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
 set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
-set(FIRMWARE_DIR "${PACKAGES_DIR}/PABotBase/PABotBase-Switch")
+set(FIRMWARE_DIR "${PACKAGES_DIR}/Firmware")
 set(SCRIPTS_DIR "${PACKAGES_DIR}/SerialPrograms/Scripts")
 set(RESOURCES_DIR "${PACKAGES_DIR}/SerialPrograms/Resources")
 
