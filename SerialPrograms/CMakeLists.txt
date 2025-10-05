@@ -238,10 +238,10 @@ endif()
 
 if (WIN32)
     add_library(OpenCV_lib IMPORTED UNKNOWN)
-    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/opencv-4.11.0/)
+    target_include_directories(SerialProgramsLib SYSTEM PRIVATE ../3rdParty/opencv-4.12.0/)
     set_target_properties(OpenCV_lib PROPERTIES
-        IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110.lib
-        IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4110d.lib
+        IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4120.lib
+        IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/opencv_world4120d.lib
         MAP_IMPORTED_CONFIG_DEBUG           DEBUG
         MAP_IMPORTED_CONFIG_RELEASE         RELEASE
         MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
@@ -578,8 +578,10 @@ SET_SOURCE_FILES_PROPERTIES(
 endif()
 
 if (WIN32)
-    set(OPENCV_DEBUG_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4110d.zip")
-    set(OPENCV_DEBUG_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4110d.dll")
+    set(OPENCV_DEBUG_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4120d.zip")
+    set(OPENCV_DEBUG_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4120d.dll")
+    set(OPENCV_RELEASE_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4120.zip")
+    set(OPENCV_RELEASE_DLL "${REPO_ROOT_DIR}/3rdPartyBinaries/opencv_world4120.dll")
 
     set(DISCORD_ZIP "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win.zip")
     set(DISCORD_DIR "${REPO_ROOT_DIR}/3rdPartyBinaries/discord_social_sdk_win")
@@ -644,6 +646,15 @@ if (WIN32)
         message(STATUS "OpenCV debug DLL not found, extracting from zip...")
         execute_process(
             COMMAND ${CMAKE_COMMAND} -E tar xf "${OPENCV_DEBUG_ZIP}"
+            WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
+        )
+    endif()
+
+    # Extract OpenCV release DLL if missing
+    if (NOT EXISTS "${OPENCV_RELEASE_DLL}")
+        message(STATUS "OpenCV release DLL not found, extracting from zip...")
+        execute_process(
+            COMMAND ${CMAKE_COMMAND} -E tar xf "${OPENCV_RELEASE_ZIP}"
             WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
         )
     endif()
