@@ -51,7 +51,7 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
             invert_blackwhite,
             combine_rgb(180, 180, 180), combine_rgb(255, 255, 255)
         );
-        
+
         // filterd_image.save("./tmp_fil_" + std::to_string(i) + ".png");
 
         ImageRGB32 dilated_image(filterd_image.width(), filterd_image.height());
@@ -75,7 +75,7 @@ void SandwichRecipeNumberDetector::detect_recipes(const ImageViewRGB32& screen, 
         }
 
         // dilated_image.save("./tmp_dil_" + std::to_string(i) + ".png");
-        
+
         const int number = OCR::read_number(m_logger, dilated_image);
         if (number <= 0 || number > 151){
             recipe_IDs[i] = 0;
