@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h"
+#include "NintendoSwitch/Options/NintendoSwitch_SlotDatabase.h"
 #include "PokemonSwSh_MultiHostTable.h"
 
 namespace PokemonAutomation{

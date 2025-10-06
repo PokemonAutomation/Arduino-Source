@@ -12,12 +12,12 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/RandomCodeOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
-#include "Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
+#include "PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

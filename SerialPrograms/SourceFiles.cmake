@@ -174,12 +174,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
     ../Common/Cpp/ValueDebouncer.h
-    ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h
-    ../Common/NintendoSwitch/NintendoSwitch_SlotDatabase.h
-    ../Common/PokemonSwSh/PokemonSwSh_FossilTable.h
-    ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.cpp
-    ../Common/PokemonSwSh/PokemonSwSh_MultiHostTable.h
     ../Common/Qt/AutoHeightTable.cpp
     ../Common/Qt/AutoHeightTable.h
     ../Common/Qt/AutoWidthLineEdit.cpp
@@ -250,7 +244,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS2_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
-    ../IconResource/IconResource.rc
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
@@ -1033,6 +1026,7 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.cpp
     Source/NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h
     Source/NintendoSwitch/Options/NintendoSwitch_ModelType.h
+    Source/NintendoSwitch/Options/NintendoSwitch_SlotDatabase.h
     Source/NintendoSwitch/Options/NintendoSwitch_StartInGripMenuOption.h
     Source/NintendoSwitch/Options/TurboMacroTable.cpp
     Source/NintendoSwitch/Options/TurboMacroTable.h
@@ -2149,6 +2143,9 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepOption.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepOption.h
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h
+    Source/PokemonSwSh/Options/PokemonSwSh_FossilTable.h
+    Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.cpp
+    Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.h

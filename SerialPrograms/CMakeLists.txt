@@ -158,6 +158,7 @@ if (APPLE)
     )
 else()
     add_executable(SerialPrograms WIN32 ${EXECUTABLE_SOURCES})
+    target_sources(SerialPrograms PRIVATE ../IconResource/IconResource.rc)
 endif()
 
 target_link_libraries(SerialPrograms PRIVATE SerialProgramsLib)
@@ -195,9 +196,9 @@ set(DPP_DLL_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/Debug/dpp.dll")
 set(DPP_DLL_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/Release/dpp.dll")
 
 set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
-set(FIRMWARE_DIR "${PACKAGES_DIR}/PABotBase/PABotBase-Switch")
-set(SCRIPTS_DIR "${PACKAGES_DIR}/SerialPrograms/Scripts")
-set(RESOURCES_DIR "${PACKAGES_DIR}/SerialPrograms/Resources")
+set(FIRMWARE_DIR "${PACKAGES_DIR}/Firmware")
+set(SCRIPTS_DIR "${PACKAGES_DIR}/Scripts")
+set(RESOURCES_DIR "${PACKAGES_DIR}/Resources")
 
 # Clone Packages repo if not already present
 if (NOT EXISTS "${PACKAGES_DIR}")
@@ -615,16 +616,6 @@ if (WIN32)
             "${DEPLOY_DIR}/dpp.dll"
     )
 
-    # Copy 3rd party DLLs if missing/different
-    file(GLOB THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/*.dll")
-    foreach(DLL IN LISTS THIRD_PARTY_DLLS)
-        get_filename_component(DLL_NAME "${DLL}" NAME)
-        add_custom_command(
-            TARGET SerialPrograms POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DLL}" "${DEPLOY_DIR}/${DLL_NAME}"
-        )
-    endforeach()
-
     # Move built .exe and .pdb to deploy folder, print if pdb is missing
     add_custom_command(
         TARGET SerialPrograms POST_BUILD
@@ -659,6 +650,16 @@ if (WIN32)
             WORKING_DIRECTORY "${REPO_ROOT_DIR}/3rdPartyBinaries"
         )
     endif()
+
+    # Copy 3rd party DLLs if missing/different
+    file(GLOB THIRD_PARTY_DLLS "${REPO_ROOT_DIR}/3rdPartyBinaries/*.dll")
+    foreach(DLL IN LISTS THIRD_PARTY_DLLS)
+        get_filename_component(DLL_NAME "${DLL}" NAME)
+        add_custom_command(
+            TARGET SerialPrograms POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DLL}" "${DEPLOY_DIR}/${DLL_NAME}"
+        )
+    endforeach()
 
     # Final target that depends on all deployment steps
     add_custom_target(DeployRuntime ALL
