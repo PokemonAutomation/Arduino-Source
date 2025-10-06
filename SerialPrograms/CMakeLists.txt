@@ -158,6 +158,7 @@ if (APPLE)
     )
 else()
     add_executable(SerialPrograms WIN32 ${EXECUTABLE_SOURCES})
+    target_sources(SerialPrograms PRIVATE ../IconResource/IconResource.rc)
 endif()
 
 target_link_libraries(SerialPrograms PRIVATE SerialProgramsLib)

@@ -244,7 +244,6 @@ file(GLOB LIBRARY_SOURCES
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS2_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
-    ../IconResource/IconResource.rc
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
