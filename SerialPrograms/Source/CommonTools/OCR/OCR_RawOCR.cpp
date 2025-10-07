@@ -206,7 +206,12 @@ void ensure_instances(Language language, size_t instances){
     }
     iter->second.ensure_instances(instances);
 }
-
+void clear_cache(){
+    OcrGlobals& globals = OcrGlobals::instance();
+    std::map<Language, TesseractPool>& ocr_pool = globals.ocr_pool;
+    WriteSpinLock lg(globals.ocr_pool_lock, "ocr_clear_cache()");
+    ocr_pool.clear();
+}
 
 
 

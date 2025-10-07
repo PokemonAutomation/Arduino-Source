@@ -23,6 +23,7 @@
 //#include "Windows/DpiScaler.h"
 #include "Startup/SetupSettings.h"
 #include "Startup/NewVersionCheck.h"
+#include "CommonTools/OCR/OCR_RawOCR.h"
 #include "Windows/MainWindow.h"
 
 #include <iostream>
@@ -144,5 +145,6 @@ int main(int argc, char *argv[]){
     Integration::DppClient::Client::instance().disconnect();
 #endif
 
+    OCR::clear_cache();
     return ret;
 }

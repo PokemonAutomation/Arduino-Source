@@ -26,6 +26,10 @@ std::string ocr_read(Language language, const ImageViewRGB32& image);
 //  want to preload the OCR instances.
 void ensure_instances(Language language, size_t instances);
 
+//  This is not safe to call while in any OCR is still running!
+void clear_cache();
+
+
 
 }
 }
