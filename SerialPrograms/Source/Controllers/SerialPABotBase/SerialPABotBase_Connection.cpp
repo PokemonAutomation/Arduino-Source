@@ -19,29 +19,34 @@
 #include "SerialPABotBase.h"
 #include "SerialPABotBase_Connection.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
 
 
-
 SerialPABotBase_Connection::SerialPABotBase_Connection(
     Logger& logger,
-    const QSerialPortInfo* port,
+    const std::string& name,
     bool set_to_null_controller
 )
     : m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
 {
     set_status_line0("Not Connected", COLOR_RED);
 
-    //  No port selected.
-    if (port == nullptr || port->isNull()){
+    QSerialPortInfo info(QString::fromStdString(name));
+
+    //  Port is invalid.
+    if (info.isNull()){
         return;
     }
 
-    //  Prolific is banned.
-    if (port->description().indexOf("Prolific") != -1){
+    //  Prolific is banned
+    if (info.description().indexOf("Prolific") != -1){
         QMessageBox box;
         box.critical(
             nullptr,
@@ -56,11 +61,11 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
         return;
     }
 
-    m_device_name = port->portName().toStdString();
+    m_device_name = info.portName().toStdString();
     std::string error;
     try{
         set_status_line0("Connecting...", COLOR_DARKGREEN);
-        std::unique_ptr<SerialConnection> connection(new SerialConnection(port->systemLocation().toStdString(), PABB_BAUD_RATE));
+        std::unique_ptr<SerialConnection> connection(new SerialConnection(info.systemLocation().toStdString(), PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
     }catch (const ConnectionException& e){
         error = e.message();

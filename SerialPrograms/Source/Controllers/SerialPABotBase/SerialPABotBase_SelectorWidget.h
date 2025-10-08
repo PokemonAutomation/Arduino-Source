@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Controllers_SerialPABotBase_SelectorWidget_H
 #define PokemonAutomation_Controllers_SerialPABotBase_SelectorWidget_H
 
+#include <QSerialPortInfo>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "Controllers/ControllerDescriptor.h"
 #include "Controllers/ControllerSelectorWidget.h"
@@ -89,7 +90,7 @@ public:
                 continue;
             }
 #endif
-            m_ports.emplace_back(new SerialPABotBase_Descriptor(port));
+            m_ports.emplace_back(new SerialPABotBase_Descriptor(port.portName().toStdString()));
         }
 
         size_t width = 6;

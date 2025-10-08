@@ -32,28 +32,22 @@ bool SerialPABotBase_Descriptor::operator==(const ControllerDescriptor& x) const
     if (typeid(*this) != typeid(x)){
         return false;
     }
-    return m_port.portName() == static_cast<const SerialPABotBase_Descriptor&>(x).m_port.portName();
+    return m_name == static_cast<const SerialPABotBase_Descriptor&>(x).m_name;
 }
 
 
 std::string SerialPABotBase_Descriptor::display_name() const{
-    if (m_port.isNull()){
-        return "";
-    }
-//    if (PreloadSettings::instance().DEVELOPER_MODE){
-        return m_port.portName().toStdString();
-//    }
-//    return m_port.portName().toStdString() + " - " + m_port.description().toStdString();
+    return m_name;
 }
 void SerialPABotBase_Descriptor::load_json(const JsonValue& json){
     const std::string* name = json.to_string();
     if (name == nullptr || name->empty()){
         return;
     }
-    m_port = (QSerialPortInfo(QString::fromStdString(*name)));
+    m_name = *name;
 }
 JsonValue SerialPABotBase_Descriptor::to_json() const{
-    return m_port.isNull() ? "" : m_port.portName().toStdString();
+    return m_name;
 }
 
 std::unique_ptr<ControllerConnection> SerialPABotBase_Descriptor::open_connection(
@@ -61,7 +55,7 @@ std::unique_ptr<ControllerConnection> SerialPABotBase_Descriptor::open_connectio
     bool set_to_null_controller
 ) const{
     return std::unique_ptr<ControllerConnection>(
-        new SerialPABotBase_Connection(logger, &m_port, set_to_null_controller)
+        new SerialPABotBase_Connection(logger, m_name, set_to_null_controller)
     );
 }
 std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(

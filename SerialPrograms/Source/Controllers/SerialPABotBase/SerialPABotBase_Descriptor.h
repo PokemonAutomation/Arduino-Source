@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_Controllers_SerialPABotBase_Descriptor_H
 #define PokemonAutomation_Controllers_SerialPABotBase_Descriptor_H
 
-#include <QSerialPortInfo>
 #include "Controllers/ControllerDescriptor.h"
 
 namespace PokemonAutomation{
@@ -24,13 +23,13 @@ public:
     SerialPABotBase_Descriptor()
         : ControllerDescriptor(INTERFACE_NAME)
     {}
-    SerialPABotBase_Descriptor(const QSerialPortInfo& info)
+    SerialPABotBase_Descriptor(std::string name)
         : ControllerDescriptor(INTERFACE_NAME)
-        , m_port(info)
+        , m_name(std::move(name))
     {}
 
-    const QSerialPortInfo& port() const{
-        return m_port;
+    const std::string& name() const{
+        return m_name;
     }
 
     virtual bool operator==(const ControllerDescriptor& x) const override;
@@ -53,7 +52,7 @@ public:
     virtual QWidget* make_selector_QtWidget(ControllerSelectorWidget& parent) const override;
 
 private:
-    QSerialPortInfo m_port;
+    std::string m_name;
 };
 
 

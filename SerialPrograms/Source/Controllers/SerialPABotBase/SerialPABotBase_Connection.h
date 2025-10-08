@@ -17,8 +17,6 @@
 #include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
 #include "Controllers/ControllerConnection.h"
 
-class QSerialPortInfo;
-
 namespace PokemonAutomation{
     class PABotBase;
 namespace SerialPABotBase{
@@ -28,7 +26,7 @@ class SerialPABotBase_Connection : public ControllerConnection{
 public:
     SerialPABotBase_Connection(
         Logger& logger,
-        const QSerialPortInfo* port,
+        const std::string& name,
         bool set_to_null_controller
     );
     ~SerialPABotBase_Connection();
