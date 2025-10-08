@@ -333,6 +333,8 @@ void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProController
 
 void move_from_fighting_base_to_north_province_area_two(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
+void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 
 
 
