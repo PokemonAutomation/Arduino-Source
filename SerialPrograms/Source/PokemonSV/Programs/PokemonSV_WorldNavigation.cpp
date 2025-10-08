@@ -346,6 +346,13 @@ void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, Video
     size_t MAX_ATTEMPTS = 20;
     for (size_t i = 0; i < MAX_ATTEMPTS; i++){
         const std::vector<ImageFloatBox> found_locations = get_flypoint_locations(info, stream, context, fly_point);
+        if (found_locations.empty()){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "move_cursor_to_position_offset_from_flypoint(): No visible " + fly_point_string + " found on map",
+                stream
+            );
+        }
         
         const double expected_x = marker_offset.x;
         const double expected_y = marker_offset.y;

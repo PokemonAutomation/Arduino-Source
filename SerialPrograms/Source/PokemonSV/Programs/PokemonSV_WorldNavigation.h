@@ -93,6 +93,7 @@ void print_flypoint_location(const ProgramInfo& info, VideoStream& stream, ProCo
 void place_marker_offset_from_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, MoveCursor move_cursor_near_flypoint, FlyPoint fly_point, ExpectedMarkerPosition marker_offset);
 
 // with the map open, move the cursor to a specific position offset from the flypoint, as per marker_offset
+// throw exception if no flypoints visible on map
 void move_cursor_to_position_offset_from_flypoint(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, FlyPoint fly_point, ExpectedMarkerPosition marker_offset);
 
 // While in the current map zoom level, detect pokecenter icons and move the map cursor there.
