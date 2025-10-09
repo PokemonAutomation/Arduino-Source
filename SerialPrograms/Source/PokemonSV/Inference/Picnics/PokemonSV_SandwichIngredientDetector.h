@@ -133,7 +133,7 @@ private:
 
 class SandwichFillingOCR : public OCR::SmallDictionaryMatcher{
 public:
-    static constexpr double MAX_LOG10P = -2.0;
+    static constexpr double MAX_LOG10P = -1.5;
     static constexpr double MAX_LOG10P_SPREAD = 0.5;
 
 public:
