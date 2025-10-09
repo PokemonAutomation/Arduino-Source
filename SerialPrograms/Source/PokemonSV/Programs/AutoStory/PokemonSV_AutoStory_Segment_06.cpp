@@ -93,7 +93,13 @@ void checkpoint_11(
                 pbf_move_left_joystick(context, 0, 128, 40, 50);
                 realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
             }
-        );          
+        );
+
+        // cover for case where you fall into water. 
+        // This will clear the dialog telling you that you fell into water, 
+        // therefore preventing false positives on clear_dialog() assuming we're talking to Nemona.
+        pbf_mash_button(context, BUTTON_A, 5000ms);
+        context.wait_for_all_requests();
         
 
         env.console.log("clear_dialog: Talk with Nemona at Los Platos. Clear Let's go tutorial. Stop when detect overworld.");
