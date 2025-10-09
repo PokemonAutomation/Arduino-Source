@@ -89,6 +89,17 @@ public:
             if (port.portName() == "COM1"){
                 continue;
             }
+#else // assume macOS or Linux
+            if (port.portName().startsWith("tty.")) {
+                continue;
+            }
+#if defined(__APPLE__) // exclude system builtin serial ports
+            if (port.portName() == "cu.debug-console" ||
+                port.portName() == "cu.Bluetooth-Incoming-Port"
+            ){
+                continue;
+            }
+#endif
 #endif
             m_ports.emplace_back(new SerialPABotBase_Descriptor(port.portName().toStdString()));
         }
