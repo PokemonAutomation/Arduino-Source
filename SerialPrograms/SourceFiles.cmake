@@ -1795,6 +1795,16 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_23.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_24.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_24.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_25.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_25.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_26.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_26.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_27.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_27.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_28.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_28.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_29.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_29.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.cpp
