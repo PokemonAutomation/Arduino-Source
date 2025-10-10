@@ -54,32 +54,6 @@ void checkpoint_57(
     AutoStoryStats& stats
 );
 
-// start: 
-// end: 
-void checkpoint_58(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
-
-// start: 
-// end: 
-void checkpoint_59(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
-
-// start: 
-// end: 
-void checkpoint_60(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context,
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-);
 
 
 

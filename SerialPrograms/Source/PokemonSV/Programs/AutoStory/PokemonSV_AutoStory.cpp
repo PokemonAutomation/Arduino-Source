@@ -95,7 +95,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_22>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_23>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_24>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_25>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_25>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_26>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_27>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_28>());
@@ -846,6 +846,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
     if (ENABLE_TEST_CHECKPOINTS){
         // test individual checkpoints
         test_checkpoints(env, env.console, context, START_CHECKPOINT, END_CHECKPOINT, LOOP_CHECKPOINT, START_LOOP, END_LOOP);
+        GO_HOME_WHEN_DONE.run_end_of_program(context);
         return;
     }
     
@@ -882,7 +883,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
 
     // test code
-    if (ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_MISC_TEST || TEST_PBF_LEFT_JOYSTICK || TEST_PBF_LEFT_JOYSTICK2 || TEST_CHANGE_DIRECTION || TEST_CURRENT_DIRECTION){
+    if (TEST_FLYPOINT_LOCATIONS || TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT || ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_MISC_TEST || TEST_PBF_LEFT_JOYSTICK || TEST_PBF_LEFT_JOYSTICK2 || TEST_CHANGE_DIRECTION || TEST_CURRENT_DIRECTION){
         test_code(env, context);
         return;
     }

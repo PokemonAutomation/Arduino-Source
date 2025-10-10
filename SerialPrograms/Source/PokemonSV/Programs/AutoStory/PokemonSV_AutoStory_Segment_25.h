@@ -26,6 +26,33 @@ public:
     ) const override;
 };
 
+// start: Beat Orthworm. At East Province (Area Three) Pokecenter.
+// end: Beat team star grunt. At gate of Team Star (Poison) base.
+void checkpoint_58(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+// start: Beat team star grunt. At gate of Team Star (Poison) base.
+// end: Beat Team Star (Poison)
+void checkpoint_59(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+// start: Beat Team Star (Poison)
+// end: At Medali Pokecenter.
+void checkpoint_60(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
 
 
 
