@@ -129,11 +129,11 @@ void json_to_cpp_code(Logger& logger, const JsonValue& json, const std::string& 
 
         std::string output_text;
         switch (controller_class){
-        case ControllerClass::PRO_CONTROLLER:
+        case ControllerClass::NintendoSwitch_ProController:
             output_text = json_to_cpp_code_pro_controller(history_json);
             break;
-        case ControllerClass::LEFT_JOYCON:
-        case ControllerClass::RIGHT_JOYCON:
+        case ControllerClass::NintendoSwitch_LeftJoycon:
+        case ControllerClass::NintendoSwitch_RightJoycon:
             output_text = json_to_cpp_code_joycon(history_json);
             break;
         default:
@@ -250,7 +250,7 @@ std::string json_to_cpp_code_joycon(const JsonArray& history){
             }            
         }
     );
-    
+
     cout << result << endl;
     return result;
 
@@ -270,14 +270,14 @@ void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& 
         const JsonArray& history_json = obj.get_array_throw("history");
 
         switch (controller_class){
-        case ControllerClass::PRO_CONTROLLER:
+        case ControllerClass::NintendoSwitch_ProController:
         {
             ProControllerContext context(scope, env.console.controller<ProController>());
             json_to_pbf_actions_pro_controller(context, history_json);
             break;
         }
-        case ControllerClass::LEFT_JOYCON:
-        case ControllerClass::RIGHT_JOYCON:
+        case ControllerClass::NintendoSwitch_LeftJoycon:
+        case ControllerClass::NintendoSwitch_RightJoycon:
         {
             JoyconContext context(scope, env.console.controller<JoyconController>());
             json_to_pbf_actions_joycon(context, history_json);

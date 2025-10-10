@@ -34,10 +34,11 @@ const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
 
 const EnumStringMap<ControllerClass>& CONTROLLER_CLASS_STRINGS(){
     static EnumStringMap<ControllerClass> database{
-        {ControllerClass::NONE,                                  "none"},
-        {ControllerClass::LEFT_JOYCON,                           "left-joycon"},
-        {ControllerClass::RIGHT_JOYCON,                          "right-joycon"},
-        {ControllerClass::PRO_CONTROLLER,                        "pro-controller"},
+        {ControllerClass::None,                             "None"},
+        {ControllerClass::HID_Keyboard,                     "HID: Keyboard"},
+        {ControllerClass::NintendoSwitch_ProController,     "NS1: Pro Controller"},
+        {ControllerClass::NintendoSwitch_LeftJoycon,        "NS1: Left Joycon"},
+        {ControllerClass::NintendoSwitch_RightJoycon,       "NS1: Right Joycon"},
     };
     return database;
 }

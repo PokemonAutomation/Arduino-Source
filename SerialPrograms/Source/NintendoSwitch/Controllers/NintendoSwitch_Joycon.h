@@ -192,7 +192,7 @@ public:
         return NAME;
     };
     virtual ControllerClass controller_class() const override{
-        return ControllerClass::LEFT_JOYCON;
+        return ControllerClass::NintendoSwitch_LeftJoycon;
     }    
 };
 class RightJoycon : public JoyconController{
@@ -204,7 +204,7 @@ public:
         return NAME;
     };
     virtual ControllerClass controller_class() const override{
-        return ControllerClass::RIGHT_JOYCON;
+        return ControllerClass::NintendoSwitch_RightJoycon;
     } 
 };
 

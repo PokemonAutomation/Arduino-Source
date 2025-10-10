@@ -45,11 +45,11 @@ enum class ControllerPerformanceClass{
 };
 
 enum class ControllerClass{
-    NONE,
-    LEFT_JOYCON,
-    RIGHT_JOYCON,
-    PRO_CONTROLLER,
-    KEYBOARD,
+    None,
+    HID_Keyboard,
+    NintendoSwitch_ProController,
+    NintendoSwitch_LeftJoycon,
+    NintendoSwitch_RightJoycon,
 };
 
 
