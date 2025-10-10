@@ -382,6 +382,7 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonFramework/Options/ScreenshotFormatOption.h
     Source/CommonFramework/Options/ThreadPoolOption.cpp
     Source/CommonFramework/Options/ThreadPoolOption.h
+    Source/CommonFramework/Panels/ConsoleSettingsStretch.h
     Source/CommonFramework/Panels/PanelDescriptor.cpp
     Source/CommonFramework/Panels/PanelDescriptor.h
     Source/CommonFramework/Panels/PanelInstance.cpp

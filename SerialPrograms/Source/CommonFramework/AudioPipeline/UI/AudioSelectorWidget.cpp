@@ -11,6 +11,7 @@
 #include <QPushButton>
 #include <QFileDialog>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/AudioPipeline/AudioSession.h"
 #include "CommonFramework/AudioPipeline/AudioPipelineOptions.h"
 #include "AudioDisplayWidget.h"
@@ -38,39 +39,43 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
     vbox->setContentsMargins(0, 0, 0, 0);
 
     {
-        QHBoxLayout* row0 = new QHBoxLayout();
-        row0->setContentsMargins(0, 0, 0, 0);
-        vbox->addLayout(row0);
+        QHBoxLayout* layout0 = new QHBoxLayout();
+        layout0->setContentsMargins(0, 0, 0, 0);
+        vbox->addLayout(layout0);
 
-        row0->addWidget(new QLabel("<b>Audio Input:</b>", this), 2);
-        row0->addSpacing(5);
+        layout0->addWidget(new QLabel("<b>Audio Input:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+
+        QHBoxLayout* layout1 = new QHBoxLayout();
+        layout0->addLayout(layout1, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
+        layout1->setContentsMargins(0, 0, 0, 0);
 
         QHBoxLayout* input_layout = new QHBoxLayout();
-        row0->addLayout(input_layout, 10);
+        layout1->addLayout(input_layout, CONSOLE_SETTINGS_STRETCH_L1_BODY);
 
         m_audio_input_box = new NoWheelComboBox(this);
         m_audio_input_box->setMaxVisibleItems(20);
-        input_layout->addWidget(m_audio_input_box, 10);
-        row0->addSpacing(5);
+        input_layout->addWidget(m_audio_input_box);
 
         m_audio_format_box = new NoWheelComboBox(this);
-        row0->addWidget(m_audio_format_box, 6);
-        row0->addSpacing(5);
+        layout1->addWidget(m_audio_format_box, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
 
         m_reset_button = new QPushButton("Reset Audio", this);
-        row0->addWidget(m_reset_button, 2);
+        layout1->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
     }
 
     {
-        QHBoxLayout* row1 = new QHBoxLayout();
-        row1->setContentsMargins(0, 0, 0, 0);
-        vbox->addLayout(row1);
+        QHBoxLayout* layout0 = new QHBoxLayout();
+        layout0->setContentsMargins(0, 0, 0, 0);
+        vbox->addLayout(layout0);
 
-        row1->addWidget(new QLabel("<b>Audio Output:</b>", this), 2);
-        row1->addSpacing(5);
+        layout0->addWidget(new QLabel("<b>Audio Output:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+
+        QHBoxLayout* layout1 = new QHBoxLayout();
+        layout0->addLayout(layout1, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
+        layout1->setContentsMargins(0, 0, 0, 0);
 
         QHBoxLayout* output_layout = new QHBoxLayout();
-        row1->addLayout(output_layout, 10);
+        layout1->addLayout(output_layout, CONSOLE_SETTINGS_STRETCH_L1_BODY);
         m_audio_output_box = new NoWheelComboBox(this);
         m_audio_output_box->setMaxVisibleItems(20);
         if (GlobalSettings::instance().AUDIO_PIPELINE->SHOW_RECORD_FREQUENCIES){
@@ -80,21 +85,19 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
         }else{
             output_layout->addWidget(m_audio_output_box, 10);
         }
-        row1->addSpacing(5);
 
         m_volume_slider = new QSlider(Qt::Horizontal, this);
         m_volume_slider->setRange(0, 100);
         m_volume_slider->setTickInterval(10);
         m_volume_slider->setMinimumWidth(40);
         m_volume_slider->setTickPosition(QSlider::TicksBothSides);
-        row1->addWidget(m_volume_slider, 4);
-        row1->addSpacing(5);
+        layout1->addWidget(m_volume_slider, 2);
 
         m_audio_vis_box = new NoWheelComboBox(this);
         m_audio_vis_box->addItem("No Display");
         m_audio_vis_box->addItem("Spectrum");
         m_audio_vis_box->addItem("Spectrogram");
-        row1->addWidget(m_audio_vis_box, 4);
+        layout1->addWidget(m_audio_vis_box, 2);
     }
 
     refresh_all();

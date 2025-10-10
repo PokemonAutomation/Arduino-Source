@@ -9,6 +9,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "VideoSourceSelectorWidget.h"
 
@@ -29,24 +30,25 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
     : m_logger(logger)
     , m_session(session)
 {
-    QHBoxLayout* camera_row = new QHBoxLayout(this);
-    camera_row->setContentsMargins(0, 0, 0, 0);
+    QHBoxLayout* layout0 = new QHBoxLayout(this);
+    layout0->setContentsMargins(0, 0, 0, 0);
 
-    camera_row->addWidget(new QLabel("<b>Video Input:</b>", this), 1);
-    camera_row->addSpacing(5);
+    layout0->addWidget(new QLabel("<b>Video Input:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+
+    QHBoxLayout* layout1 = new QHBoxLayout();
+    layout0->addLayout(layout1, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
+    layout1->setContentsMargins(0, 0, 0, 0);
 
     m_sources_box = new NoWheelComboBox(this);
     m_sources_box->setMaxVisibleItems(20);
-    camera_row->addWidget(m_sources_box, 5);
-    camera_row->addSpacing(5);
+    layout1->addWidget(m_sources_box, CONSOLE_SETTINGS_STRETCH_L1_BODY);
 
     m_resolution_box = new NoWheelComboBox(this);
     m_resolution_box->setMaxVisibleItems(20);
-    camera_row->addWidget(m_resolution_box, 3);
-    camera_row->addSpacing(5);
+    layout1->addWidget(m_resolution_box, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
 
     m_reset_button = new QPushButton("Reset Video", this);
-    camera_row->addWidget(m_reset_button, 1);
+    layout1->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
 
     update_source_list();
     update_resolution_list();

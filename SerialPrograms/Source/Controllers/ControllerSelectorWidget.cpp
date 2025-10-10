@@ -8,9 +8,10 @@
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
 //#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "Controllers/ControllerTypeStrings.h"
 #include "ControllerSelectorWidget.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+//#include "NintendoSwitch/NintendoSwitch_Settings.h"
 
 #include "SerialPABotBase/SerialPABotBase_SelectorWidget.h"
 #include "NintendoSwitch/Controllers/SysbotBase/SysbotBase_SelectorWidget.h"
@@ -31,18 +32,20 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     : QWidget(&parent)
     , m_session(session)
 {
-    QHBoxLayout* serial_row = new QHBoxLayout(this);
-    serial_row->setContentsMargins(0, 0, 0, 0);
+    QHBoxLayout* layout0 = new QHBoxLayout(this);
+    layout0->setContentsMargins(0, 0, 0, 0);
 
-    serial_row->addWidget(new QLabel("<b>Controller:</b>", this), 1);
-    serial_row->addSpacing(5);
+    layout0->addWidget(new QLabel("<b>Controller:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+
+    QHBoxLayout* layout1 = new QHBoxLayout();
+    layout0->addLayout(layout1, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
+    layout1->setContentsMargins(0, 0, 0, 0);
 
     m_dropdowns = new QHBoxLayout();
-    serial_row->addLayout(m_dropdowns, 5);
-    serial_row->addSpacing(5);
+    layout1->addLayout(m_dropdowns, CONSOLE_SETTINGS_STRETCH_L1_BODY);
 
     interface_dropdown = new NoWheelComboBox(this);
-    m_dropdowns->addWidget(interface_dropdown, 2);
+    m_dropdowns->addWidget(interface_dropdown);
 
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::SerialPABotBase)));
     interface_dropdown->addItem(QString::fromStdString(CONTROLLER_INTERFACE_STRINGS.get_string(ControllerInterface::TcpSysbotBase)));
@@ -57,29 +60,29 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     }
     interface_dropdown->setCurrentIndex((int)current->interface_type - 1);
     m_selector = current->make_selector_QtWidget(*this);
-    m_dropdowns->addWidget(m_selector);
+    m_dropdowns->addWidget(m_selector, 1);
 
 
     m_dropdowns->addSpacing(5);
     m_controllers_dropdown = new NoWheelComboBox(this);
-    m_dropdowns->addWidget(m_controllers_dropdown, 3);
+    m_controllers_dropdown->setSizeAdjustPolicy(QComboBox::AdjustToContents);
+    m_dropdowns->addWidget(m_controllers_dropdown);
     refresh_controllers(session.controller_type(), session.available_controllers());
 
     m_status_text = new QLabel(this);
-    serial_row->addWidget(m_status_text, 3);
-    serial_row->addSpacing(5);
+    layout1->addWidget(m_status_text, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
 
     m_status_text->setText(QString::fromStdString(session.status_text()));
 
     m_reset_button = new QPushButton("Reset Ctrl.", this);
 #if 1
     m_reset_button->setToolTip(
-        "<b>Click:</b> Reset the controller.<br><br>"
+        "<b>Click:</b> Reset controller and reconnect.<br><br>"
         "<b>Shift+Click:</b> Reset and clear the controller of any state. "
         "For controllers save pairing state, this will unpair it with any hosts it may be connected to."
     );
 #endif
-    serial_row->addWidget(m_reset_button, 1);
+    layout1->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
 
     bool options_locked = session.options_locked();
     if (m_selector){
@@ -150,12 +153,12 @@ void ControllerSelectorWidget::refresh_selection(ControllerInterface interface_t
     switch (interface_type){
     case ControllerInterface::SerialPABotBase:
         m_selector = new SerialPABotBase::SerialPABotBase_SelectorWidget(*this, m_session.descriptor().get());
-        m_dropdowns->insertWidget(1, m_selector);
+        m_dropdowns->insertWidget(1, m_selector, 1);
         break;
 
     case ControllerInterface::TcpSysbotBase:
         m_selector = new SysbotBase::TcpSysbotBase_SelectorWidget(*this, m_session.descriptor().get());
-        m_dropdowns->insertWidget(1, m_selector);
+        m_dropdowns->insertWidget(1, m_selector, 1);
         break;
 
     default:;

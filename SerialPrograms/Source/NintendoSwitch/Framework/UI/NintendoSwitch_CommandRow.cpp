@@ -8,6 +8,7 @@
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/Panels/ConsoleSettingsStretch.h"
 #include "CommonFramework/Recording/StreamHistoryOption.h"
 #include "NintendoSwitch_CommandRow.h"
 
@@ -39,31 +40,26 @@ CommandRow::CommandRow(
     , m_last_known_focus(false)
     , m_last_known_state(ProgramState::STOPPED)
 {
-    QHBoxLayout* command_row = new QHBoxLayout(this);
-    command_row->setContentsMargins(0, 0, 0, 0);
+    QHBoxLayout* layout0 = new QHBoxLayout(this);
+    layout0->setContentsMargins(0, 0, 0, 0);
 
-    command_row->addWidget(new QLabel("<b>Console Type:</b>", this), 2);
-    command_row->addSpacing(5);
+    layout0->addWidget(new QLabel("<b>Console Type:</b>", this), CONSOLE_SETTINGS_STRETCH_L0_LABEL);
+
+    QHBoxLayout* layout1 = new QHBoxLayout();
+    layout0->addLayout(layout1, CONSOLE_SETTINGS_STRETCH_L0_RIGHT);
+    layout1->setContentsMargins(0, 0, 0, 0);
 
     ConfigWidget* console_type_box = console_type.make_QtWidget(*this);
-    command_row->addWidget(&console_type_box->widget(), 4);
-    command_row->addSpacing(5);
-
-    QHBoxLayout* row = new QHBoxLayout();
-    command_row->addLayout(row, 12);
+    layout1->addWidget(&console_type_box->widget());
 
 
-#if 0
-    row->addWidget(new QLabel("<b>Keyboard Input:</b>", this), 2);
-    row->addSpacing(5);
-#endif
 
-    row->addStretch(100);
+    layout1->addStretch(100);
 
     m_status = new QLabel(this);
 //    m_status->setVisible(false);
-    row->addWidget(m_status);
-    row->addSpacing(5);
+    layout1->addWidget(m_status);
+    layout1->addSpacing(5);
 
 //    row->addWidget(new QLabel("<b>Overlays:<b>", this));
 
@@ -89,34 +85,32 @@ CommandRow::CommandRow(
         m_overlay_stats = overlays->addItem("Stats");
         m_overlay_stats->setChecked(session.enabled_stats());
     }
-    row->addWidget(overlays);
+    layout1->addWidget(overlays);
 
-    row->addSpacing(5);
+//    layout1->addSpacing(5);
 
     m_load_profile_button = new QPushButton("Load Profile", this);
-    row->addWidget(m_load_profile_button, 2);
+    layout1->addWidget(m_load_profile_button, 2);
 
     m_save_profile_button = new QPushButton("Save Profile", this);
-    row->addWidget(m_save_profile_button, 2);
+    layout1->addWidget(m_save_profile_button, 2);
 
     m_screenshot_button = new QPushButton("Screenshot", this);
 //    m_screenshot_button->setToolTip("Take a screenshot of the console and save to disk.");
-    row->addWidget(m_screenshot_button, 2);
-
-
-//    m_test_button = new QPushButton("Test Button", this);
-//    row->addWidget(m_test_button, 3);
+    layout1->addWidget(m_screenshot_button, 2);
 
     update_ui();
 
 #if 1
-    connect(
-        m_overlay_boxes, &CheckboxDropdownItem::checkStateChanged,
-        this, [this](Qt::CheckState state){
+    if (m_overlay_boxes){
+        connect(
+            m_overlay_boxes, &CheckboxDropdownItem::checkStateChanged,
+            this, [this](Qt::CheckState state){
 
-            m_session.set_enabled_boxes(state == Qt::Checked);
-        }
-    );
+                m_session.set_enabled_boxes(state == Qt::Checked);
+            }
+        );
+    }
     if (m_overlay_text){
         connect(
             m_overlay_text, &CheckboxDropdownItem::checkStateChanged,
@@ -133,18 +127,22 @@ CommandRow::CommandRow(
             }
         );
     }
-    connect(
-        m_overlay_log, &CheckboxDropdownItem::checkStateChanged,
-        this, [this](Qt::CheckState state){
-            m_session.set_enabled_log(state == Qt::Checked);
-        }
-    );
-    connect(
-        m_overlay_stats, &CheckboxDropdownItem::checkStateChanged,
-        this, [this](Qt::CheckState state){
-            m_session.set_enabled_stats(state == Qt::Checked);
-        }
-    );
+    if (m_overlay_log){
+        connect(
+            m_overlay_log, &CheckboxDropdownItem::checkStateChanged,
+            this, [this](Qt::CheckState state){
+                m_session.set_enabled_log(state == Qt::Checked);
+            }
+        );
+    }
+    if (m_overlay_stats){
+        connect(
+            m_overlay_stats, &CheckboxDropdownItem::checkStateChanged,
+            this, [this](Qt::CheckState state){
+                m_session.set_enabled_stats(state == Qt::Checked);
+            }
+        );
+    }
 #endif
 
     connect(
@@ -163,7 +161,7 @@ CommandRow::CommandRow(
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         m_video_button = new QPushButton("Video Capture", this);
-        command_row->addWidget(m_video_button, 2);
+        layout1->addWidget(m_video_button, 2);
         if (GlobalSettings::instance().STREAM_HISTORY->enabled()){
             connect(
                 m_video_button, &QPushButton::clicked,
@@ -284,27 +282,37 @@ void CommandRow::on_state_changed(ProgramState state){
 
 void CommandRow::on_overlay_enabled_boxes(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
-        this->m_overlay_boxes->setChecked(enabled);
+        if (m_overlay_boxes){
+            m_overlay_boxes->setChecked(enabled);
+        }
     }, Qt::QueuedConnection);
 }
 void CommandRow::on_overlay_enabled_text(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
-        this->m_overlay_text->setChecked(enabled);
+        if (m_overlay_text){
+            m_overlay_text->setChecked(enabled);
+        }
     }, Qt::QueuedConnection);
 }
 void CommandRow::on_overlay_enabled_images(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
-        this->m_overlay_images->setChecked(enabled);
+        if (m_overlay_images){
+            m_overlay_images->setChecked(enabled);
+        }
     }, Qt::QueuedConnection);
 }
 void CommandRow::on_overlay_enabled_log(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
-        this->m_overlay_log->setChecked(enabled);
+        if (m_overlay_log){
+            m_overlay_log->setChecked(enabled);
+        }
     }, Qt::QueuedConnection);
 }
 void CommandRow::on_overlay_enabled_stats(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
-        this->m_overlay_stats->setChecked(enabled);
+        if (m_overlay_stats){
+            m_overlay_stats->setChecked(enabled);
+        }
     }, Qt::QueuedConnection);
 }
 void CommandRow::ready_changed(bool ready){
