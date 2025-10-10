@@ -23,6 +23,32 @@ namespace SerialPABotBase{
 
 
 
+inline bool filter_serial_port(const QSerialPortInfo& port){
+#ifdef _WIN32
+    //  COM1 is never the correct port on Windows.
+    if (port.portName() == "COM1"){
+        return false;
+    }
+#endif
+
+    // assume macOS or Linux
+    if (port.portName().startsWith("tty.")) {
+        return false;
+    }
+
+#if defined(__APPLE__) // exclude system builtin serial ports
+    if (port.portName() == "cu.debug-console" ||
+        port.portName() == "cu.Bluetooth-Incoming-Port"
+    ){
+        return false;
+    }
+#endif
+
+    return true;
+}
+
+
+
 
 class SerialPABotBase_SelectorWidget : public NoWheelComboBox{
 public:
@@ -84,32 +110,19 @@ public:
 
         m_ports.emplace_back(new NullControllerDescriptor());
         for (QSerialPortInfo& port : QSerialPortInfo::availablePorts()){
-#ifdef _WIN32
-            //  COM1 is never the correct port on Windows.
-            if (port.portName() == "COM1"){
-                continue;
+            if (filter_serial_port(port)){
+                m_ports.emplace_back(
+                    new SerialPABotBase_Descriptor(port.portName().toStdString())
+                );
             }
-#else // assume macOS or Linux
-            if (port.portName().startsWith("tty.")) {
-                continue;
-            }
-#if defined(__APPLE__) // exclude system builtin serial ports
-            if (port.portName() == "cu.debug-console" ||
-                port.portName() == "cu.Bluetooth-Incoming-Port"
-            ){
-                continue;
-            }
-#endif
-#endif
-            m_ports.emplace_back(new SerialPABotBase_Descriptor(port.portName().toStdString()));
         }
 
-        size_t width = 6;
+//        size_t width = 6;
         int index = 0;
         int c = 0;
         for (const auto& port : m_ports){
             QString display_name = QString::fromStdString(port->display_name());
-            width = std::max<size_t>(width, display_name.size());
+//            width = std::max<size_t>(width, display_name.size());
             this->addItem(display_name);
             if (*m_parent.session().descriptor() == *m_ports[c]){
                 index = c;
@@ -118,9 +131,9 @@ public:
         }
 
         if (this->count() > this->maxVisibleItems()){
-            width++;
+//            width++;
         }
-        setMinimumContentsLength((int)width);
+//        setMinimumContentsLength((int)width);
         setCurrentIndex(index);
     }
 
