@@ -7,6 +7,8 @@
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
+#include "Globals.h"
+#include "GlobalSettingsPanel.h"
 #include "PersistentSettings.h"
 #include "Tests/CommandLineTests.h"
 #include "ErrorReports/ProgramDumper.h"
@@ -18,11 +20,10 @@
 #include "Logging/Logger.h"
 #include "Logging/OutputRedirector.h"
 //#include "Tools/StatsDatabase.h"
-#include "Globals.h"
-#include "GlobalSettingsPanel.h"
 //#include "Windows/DpiScaler.h"
 #include "Startup/SetupSettings.h"
 #include "Startup/NewVersionCheck.h"
+#include "CommonFramework/VideoPipeline/Backends/CameraImplementations.h"
 #include "CommonTools/OCR/OCR_RawOCR.h"
 #include "Windows/MainWindow.h"
 
@@ -72,6 +73,9 @@ int main(int argc, char *argv[]){
 
     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
     OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
+
+    //  Preload all the cameras now so we don't hang the UI later on.
+    get_all_cameras();
 
     QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
     QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
