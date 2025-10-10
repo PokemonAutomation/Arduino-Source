@@ -26,7 +26,7 @@ GlobalMediaServices::~GlobalMediaServices(){
 GlobalMediaServices::GlobalMediaServices()
     : m_refresh_cameras(true)
 {
-    refresh_cameras();
+//    refresh_cameras();
 
     m_media_devices.connect(
         &m_media_devices, &QMediaDevices::videoInputsChanged,
