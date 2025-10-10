@@ -9,15 +9,26 @@
 #include "DppClient.h"
 #include "DppCommandHandler.h"
 
-using namespace dpp;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Integration{
 namespace DppClient{
+
+using namespace dpp;
 
 
 Client& Client::instance(){
     static Client client;
     return client;
+}
+
+
+
+Client::~Client(){
+    disconnect();
 }
 
 bool Client::is_initialized(){
@@ -41,7 +52,7 @@ void Client::connect(){
             m_bot = std::make_unique<cluster>(token, intents);
             m_handler = std::make_unique<commandhandler>(m_bot.get(), false);
             m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
-            std::thread(&Client::run, this, token).detach();
+            m_start_thread = std::thread(&Client::run, this, token);
         }catch (std::exception& e){
             Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "connect()", ll_critical);
         }
@@ -50,15 +61,22 @@ void Client::connect(){
 
 void Client::disconnect(){
     std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_bot != nullptr && m_is_connected.load(std::memory_order_relaxed)){
-        try{
-            m_bot->shutdown();
-            m_handler.reset();
-            m_bot.reset();
-            m_is_connected.store(false, std::memory_order_release);
-        }catch (std::exception& e){
-            Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "disconnect()", ll_critical);
-        }
+//    cout << "Client::disconnect()" << endl;
+
+    if (m_start_thread.joinable()){
+        m_start_thread.join();
+    }
+
+    if (m_bot == nullptr || !m_is_connected.load(std::memory_order_relaxed)){
+        return;
+    }
+    try{
+        m_bot->shutdown();
+        m_handler.reset();
+        m_bot.reset();
+        m_is_connected.store(false, std::memory_order_release);
+    }catch (std::exception& e){
+        Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "disconnect()", ll_critical);
     }
 }
 
@@ -149,6 +167,8 @@ void Client::run(const std::string& token){
         m_bot.reset();
         m_is_connected.store(false, std::memory_order_release);
     }
+
+//    cout << "Client::run() - ending" << endl;
 }
 
 

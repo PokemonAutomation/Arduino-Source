@@ -17,6 +17,7 @@ namespace DppClient{
 class Client : protected DppCommandHandler::Handler{
 public:
     Client() : m_is_connected(false) {}
+    ~Client();
     static Client& instance();
 
 public:
@@ -41,6 +42,7 @@ private:
     std::unique_ptr<dpp::commandhandler> m_handler = nullptr;
     std::atomic<bool> m_is_connected;
     std::mutex m_client_lock;
+    std::thread m_start_thread;
 };
 
 
