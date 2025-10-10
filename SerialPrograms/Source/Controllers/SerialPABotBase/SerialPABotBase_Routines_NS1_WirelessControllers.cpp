@@ -96,14 +96,27 @@ void register_message_converters_NS1_WirelessControllers(){
             ss << "PABB_MSG_INFO_NS1_WIRELESS_CONTROLLER_RUMBLE(): ";
             if (body.size() != sizeof(pabb_MsgInfo_NS1_WirelessController_Rumble)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_MsgInfo_NS1_WirelessController_Rumble*)body.c_str();
-            if (!GlobalSettings::instance().LOG_EVERYTHING && memcmp(
-                    params,
-                    &pabb_NintendoSwitch_Rumble_NEUTRAL_STATE,
-                    sizeof(pabb_NintendoSwitch_Rumble_NEUTRAL_STATE)
-                ) == 0
-            ){
+
+            do{
+                if (GlobalSettings::instance().LOG_EVERYTHING){
+                    break;
+                }
+
+                uint32_t left, right;
+                memcpy(&left, params, sizeof(uint32_t));
+                memcpy(&right, (uint32_t*)params + 1, sizeof(uint32_t));
+
+                const uint32_t NEUTRAL = 0x40400100;
+                if (left != 0 && left != NEUTRAL){
+                    break;
+                }
+                if (right != 0 && right != NEUTRAL){
+                    break;
+                }
+
                 return std::string();
-            }
+            }while (false);
+
             static const char HEX_DIGITS[] = "0123456789abcdef";
             for (size_t c = 0; c < body.size(); c++){
                 uint8_t byte = body[c];
