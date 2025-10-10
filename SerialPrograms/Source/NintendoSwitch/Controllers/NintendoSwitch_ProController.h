@@ -67,7 +67,7 @@ public:
         return NAME;
     };
     virtual ControllerClass controller_class() const override{
-        return ControllerClass::PRO_CONTROLLER;
+        return ControllerClass::NintendoSwitch_ProController;
     }
 
 

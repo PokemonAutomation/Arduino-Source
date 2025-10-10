@@ -53,7 +53,7 @@ public:
         return ControllerType::HID_Keyboard;
     }
     virtual ControllerClass controller_class() const override{
-        return ControllerClass::KEYBOARD;
+        return ControllerClass::HID_Keyboard;
     }
     virtual ControllerPerformanceClass performance_class() const override{
         return ControllerPerformanceClass::SerialPABotBase_Wired;
