@@ -290,7 +290,7 @@ if (WIN32)
     )
 
     target_compile_definitions(
-        SerialProgramsLib PRIVATE
+        SerialProgramsLib PUBLIC
         _CRT_SECURE_NO_WARNINGS
         _DISABLE_CONSTEXPR_MUTEX_CONSTRUCTOR
         PA_TESSERACT
@@ -455,7 +455,7 @@ else() # macOS and Linux
 
     pkg_search_module(DPP dpp>=10.1)
     if (DPP_FOUND) # enable dpp integration
-        target_compile_definitions(SerialProgramsLib PRIVATE PA_DPP)
+        target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)
         target_compile_options(SerialProgramsLib PRIVATE ${DPP_CFLAGS_OTHER})
         target_include_directories(SerialProgramsLib PRIVATE ${DPP_INCLUDE_DIRS})
         target_link_directories(SerialProgramsLib PUBLIC ${DPP_LIBRARY_DIRS})
