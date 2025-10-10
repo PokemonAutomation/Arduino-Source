@@ -53,6 +53,8 @@ void checkpoint_60(
     AutoStoryStats& stats
 );
 
+// moves player from Porto Marinada Pokecenter to Medali West Pokecenter
+void move_from_porto_marinada_to_medali(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 
 
