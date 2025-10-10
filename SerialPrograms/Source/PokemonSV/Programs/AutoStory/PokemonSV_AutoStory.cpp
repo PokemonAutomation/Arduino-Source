@@ -95,7 +95,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_22>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_23>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_24>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_25>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_25>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_26>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_27>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_28>());
@@ -210,25 +210,25 @@ AutoStory::AutoStory()
         StorySection::TUTORIAL
     )    
     , STARTPOINT_TUTORIAL(
-        "<b>Start Point:</b><br>Program will start with this segment.",
+        "<b>Start Point:</b>", //<br>Program will start with this segment.
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
         LockMode::LOCK_WHILE_RUNNING,
         "0"
     )
     , ENDPOINT_TUTORIAL(
-        "<b>End Point:</b><br>Program will stop after completing this segment.",
+        "<b>End Point:</b>", //<br>Program will stop after completing this segment.
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         "9"
     )   
     , STARTPOINT_MAINSTORY(
-        "<b>Start Point:</b><br>Program will start with this segment.",
+        "<b>Start Point:</b>", //<br>Program will start with this segment.
         MAINSTORY_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         "10"
     )
     , ENDPOINT_MAINSTORY(
-        "<b>End Point:</b><br>Program will stop after completing this segment.",
+        "<b>End Point:</b>", //<br>Program will stop after completing this segment.
         MAINSTORY_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         "10"
@@ -237,7 +237,7 @@ AutoStory::AutoStory()
         "NOTE: Make sure you have selected the correct Start Point. "
         "Make sure your player character is in the exact correct start position for that Start Point, "
         "especially if your start point is NOT at the beginning of the Tutorial/Main Story. "
-        "Read the Start Point's description to help with finding the correct start position."
+        "Read the Start Point's description to help with finding the correct start position. "
         "For Start Points that are at Pokecenters, ensure that you fly there so that your character is in the exactly correct start position."
     }    
     , MAINSTORY_NOTE{
@@ -846,6 +846,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
     if (ENABLE_TEST_CHECKPOINTS){
         // test individual checkpoints
         test_checkpoints(env, env.console, context, START_CHECKPOINT, END_CHECKPOINT, LOOP_CHECKPOINT, START_LOOP, END_LOOP);
+        GO_HOME_WHEN_DONE.run_end_of_program(context);
         return;
     }
     
@@ -882,7 +883,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
 
     // test code
-    if (ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_MISC_TEST || TEST_PBF_LEFT_JOYSTICK || TEST_PBF_LEFT_JOYSTICK2 || TEST_CHANGE_DIRECTION || TEST_CURRENT_DIRECTION){
+    if (TEST_FLYPOINT_LOCATIONS || TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT || ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_MISC_TEST || TEST_PBF_LEFT_JOYSTICK || TEST_PBF_LEFT_JOYSTICK2 || TEST_CHANGE_DIRECTION || TEST_CURRENT_DIRECTION){
         test_code(env, context);
         return;
     }
