@@ -43,6 +43,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
     m_dropdowns = new QHBoxLayout();
     layout1->addLayout(m_dropdowns, CONSOLE_SETTINGS_STRETCH_L1_BODY);
+    layout1->addSpacing(5);
 
     interface_dropdown = new NoWheelComboBox(this);
     m_dropdowns->addWidget(interface_dropdown);
@@ -71,6 +72,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
 
     m_status_text = new QLabel(this);
     layout1->addWidget(m_status_text, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
+    layout1->addSpacing(5);
 
     m_status_text->setText(QString::fromStdString(session.status_text()));
 

@@ -51,6 +51,7 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
 
         QHBoxLayout* input_layout = new QHBoxLayout();
         layout1->addLayout(input_layout, CONSOLE_SETTINGS_STRETCH_L1_BODY);
+        layout1->addSpacing(5);
 
         m_audio_input_box = new NoWheelComboBox(this);
         m_audio_input_box->setMaxVisibleItems(20);
@@ -58,6 +59,7 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
 
         m_audio_format_box = new NoWheelComboBox(this);
         layout1->addWidget(m_audio_format_box, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
+        layout1->addSpacing(5);
 
         m_reset_button = new QPushButton("Reset Audio", this);
         layout1->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
@@ -76,6 +78,8 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
 
         QHBoxLayout* output_layout = new QHBoxLayout();
         layout1->addLayout(output_layout, CONSOLE_SETTINGS_STRETCH_L1_BODY);
+        layout1->addSpacing(5);
+
         m_audio_output_box = new NoWheelComboBox(this);
         m_audio_output_box->setMaxVisibleItems(20);
         if (GlobalSettings::instance().AUDIO_PIPELINE->SHOW_RECORD_FREQUENCIES){
@@ -92,6 +96,7 @@ AudioSelectorWidget::AudioSelectorWidget(QWidget& parent, AudioSession& session)
         m_volume_slider->setMinimumWidth(40);
         m_volume_slider->setTickPosition(QSlider::TicksBothSides);
         layout1->addWidget(m_volume_slider, 2);
+        layout1->addSpacing(5);
 
         m_audio_vis_box = new NoWheelComboBox(this);
         m_audio_vis_box->addItem("No Display");

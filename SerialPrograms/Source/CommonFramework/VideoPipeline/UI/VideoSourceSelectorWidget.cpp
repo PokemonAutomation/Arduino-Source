@@ -42,10 +42,12 @@ VideoSourceSelectorWidget::VideoSourceSelectorWidget(Logger& logger, VideoSessio
     m_sources_box = new NoWheelComboBox(this);
     m_sources_box->setMaxVisibleItems(20);
     layout1->addWidget(m_sources_box, CONSOLE_SETTINGS_STRETCH_L1_BODY);
+    layout1->addSpacing(5);
 
     m_resolution_box = new NoWheelComboBox(this);
     m_resolution_box->setMaxVisibleItems(20);
     layout1->addWidget(m_resolution_box, CONSOLE_SETTINGS_STRETCH_L1_RIGHT);
+    layout1->addSpacing(5);
 
     m_reset_button = new QPushButton("Reset Video", this);
     layout1->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
