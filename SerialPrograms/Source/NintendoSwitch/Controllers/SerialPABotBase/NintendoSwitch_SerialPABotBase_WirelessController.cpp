@@ -212,6 +212,7 @@ bool SerialPABotBase_WirelessController::populate_report_gyro(
     gyro_active |= gyro.rotation_x != 0;
     gyro_active |= gyro.rotation_y != 0;
     gyro_active |= gyro.rotation_z != 0;
+//    cout << "gyro_active = " << gyro_active << endl;
     return gyro_active;
 }
 

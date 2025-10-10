@@ -26,7 +26,7 @@ struct SwitchControllerState{
     uint8_t right_stick_x = 128;
     uint8_t right_stick_y = 128;
 
-    uint16_t gyro[6];
+    uint16_t gyro[6] = {};
 };
 
 
