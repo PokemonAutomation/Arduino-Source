@@ -145,6 +145,9 @@ int main(int argc, char *argv[]){
     Integration::DppClient::Client::instance().disconnect();
 #endif
 
+    //  We must clear the OCR cache or it will crash on Linux when the library
+    //  unloads before the cache is destructed from static memory.
     OCR::clear_cache();
+
     return ret;
 }
