@@ -210,25 +210,25 @@ AutoStory::AutoStory()
         StorySection::TUTORIAL
     )    
     , STARTPOINT_TUTORIAL(
-        "<b>Start Point:</b><br>Program will start with this segment.",
+        "<b>Start Point:</b>", //<br>Program will start with this segment.
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
         LockMode::LOCK_WHILE_RUNNING,
         "0"
     )
     , ENDPOINT_TUTORIAL(
-        "<b>End Point:</b><br>Program will stop after completing this segment.",
+        "<b>End Point:</b>", //<br>Program will stop after completing this segment.
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         "9"
     )   
     , STARTPOINT_MAINSTORY(
-        "<b>Start Point:</b><br>Program will start with this segment.",
+        "<b>Start Point:</b>", //<br>Program will start with this segment.
         MAINSTORY_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         "10"
     )
     , ENDPOINT_MAINSTORY(
-        "<b>End Point:</b><br>Program will stop after completing this segment.",
+        "<b>End Point:</b>", //<br>Program will stop after completing this segment.
         MAINSTORY_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         "10"
@@ -237,7 +237,7 @@ AutoStory::AutoStory()
         "NOTE: Make sure you have selected the correct Start Point. "
         "Make sure your player character is in the exact correct start position for that Start Point, "
         "especially if your start point is NOT at the beginning of the Tutorial/Main Story. "
-        "Read the Start Point's description to help with finding the correct start position."
+        "Read the Start Point's description to help with finding the correct start position. "
         "For Start Points that are at Pokecenters, ensure that you fly there so that your character is in the exactly correct start position."
     }    
     , MAINSTORY_NOTE{
