@@ -4,6 +4,7 @@
  *
  */
 
+#include <QSerialPortInfo>
 #include <QWidget>
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Controllers/ControllerTypeStrings.h"
@@ -37,7 +38,15 @@ bool SerialPABotBase_Descriptor::operator==(const ControllerDescriptor& x) const
 
 
 std::string SerialPABotBase_Descriptor::display_name() const{
+#if 0
+    QSerialPortInfo info(QString::fromStdString(m_name));
+    if (info.isNull()){
+        return m_name;
+    }
+    return m_name + " - " + info.manufacturer().toStdString();
+#else
     return m_name;
+#endif
 }
 void SerialPABotBase_Descriptor::load_json(const JsonValue& json){
     const std::string* name = json.to_string();
