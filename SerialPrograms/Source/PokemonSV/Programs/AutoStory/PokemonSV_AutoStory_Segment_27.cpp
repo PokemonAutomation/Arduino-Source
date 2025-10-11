@@ -246,7 +246,7 @@ void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& en
 
     // marker 3. go to Dondozo/Tatsugiri part 2       x=0.55625, y=0.324074
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::KEEP_ZOOM, 0, 255, 100}, 
+        {ZoomChange::KEEP_ZOOM, 128, 255, 40}, 
         FlyPoint::FAST_TRAVEL, 
         {0.55625, 0.324074}
     );
