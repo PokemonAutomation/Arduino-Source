@@ -1090,6 +1090,8 @@ void checkpoint_reattempt_loop(
 
         context.wait_for_all_requests();
         action(i);
+
+        enter_menu_from_overworld(env.program_info(), env.console, context, -1);
        
         break;
     }catch(OperationFailedException& e){
