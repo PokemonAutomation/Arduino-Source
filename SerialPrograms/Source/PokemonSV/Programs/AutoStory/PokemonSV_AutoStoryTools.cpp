@@ -1521,7 +1521,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
     context.wait_for_all_requests();
 
     DirectionDetector direction;
-    handle_unexpected_battles(env.program_info(), env.console, context,
+    do_action_and_monitor_for_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
         direction.change_direction(env.program_info(), env.console, context, 3.855289);
@@ -1632,7 +1632,7 @@ void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnviro
 
 void move_from_north_province_area_one_to_fighting_base(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DirectionDetector direction;
-    handle_unexpected_battles(env.program_info(), env.console, context,
+    do_action_and_monitor_for_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
         direction.change_direction(env.program_info(), env.console, context, 1.798578);
@@ -2087,7 +2087,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
     context.wait_for_all_requests();
     DirectionDetector direction;
 
-    handle_unexpected_battles(env.program_info(), env.console, context,
+    do_action_and_monitor_for_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
         // marker 1
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 140, 255, 30);
@@ -2188,7 +2188,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         {0.633333, 0.304630}
     );
     
-    handle_unexpected_battles(env.program_info(), env.console, context,
+    do_action_and_monitor_for_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
         // walk towards wall
         direction.change_direction(env.program_info(), env.console, context, 2.949863);
