@@ -4,6 +4,8 @@
  *
  */
 
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -52,7 +54,10 @@ void AutoStory_Segment_27::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    // checkpoint_(env, context, options.notif_status_update, stats);
+    checkpoint_64(env, context, options.notif_status_update, stats);
+    checkpoint_65(env, context, options.notif_status_update, stats);
+    checkpoint_66(env, context, options.notif_status_update, stats);
+    checkpoint_67(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -60,15 +65,38 @@ void AutoStory_Segment_27::run_segment(
 }
 
 void checkpoint_64(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        context.wait_for_all_requests();
+        move_from_glaseado_mountain_to_casseroya_watchtower3(env, context);
+        move_from_casseroya_watchtower3_to_dondozo_titan(env, context);
+
+    });         
 }
 
 void checkpoint_65(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        context.wait_for_all_requests();
+        move_from_dondozo_titan_phase1_to_phase2(env, context);
+    }); 
 }
 
 void checkpoint_66(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        context.wait_for_all_requests();
+        move_from_glaseado_mountain_to_north_province_area_three(env, context);
+    }); 
 }
 
 void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        context.wait_for_all_requests();
+        
+
+    }); 
 }
 
 void checkpoint_68(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
@@ -79,6 +107,257 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 void checkpoint_70(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
 }
+
+
+
+void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    context.wait_for_all_requests();
+
+    DirectionDetector direction;
+    direction.change_direction(env.program_info(), env.console, context, 1.448679);
+
+    pbf_move_left_joystick(context, 128, 0, 200, 50);
+
+
+    // marker 1   x=0.548438, y=0.273148
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        FlyPoint::POKECENTER, 
+        {0.548438, 0.273148}
+    );
+
+    get_on_ride(env.program_info(), env.console, context);
+
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    // marker 2.    :  x=0.693229, y=0.459259
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        FlyPoint::POKECENTER, 
+        {0.693229, 0.459259}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    fly_to_overlapping_flypoint(env.program_info(), env.console, context); 
+
+}
+
+
+void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    context.wait_for_all_requests();
+    
+    // marker 1     x=0.779167, y=0.274074
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        FlyPoint::POKECENTER, 
+        {0.779167, 0.274074}
+    );
+
+    // get_on_ride(env.program_info(), env.console, context);
+
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    mash_button_till_overworld(env.console, context, BUTTON_A);
+
+    // resume marker 1
+    realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    // marker 2.    :   x=0.76875, y=0.298148
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        FlyPoint::FAST_TRAVEL, 
+        {0.76875, 0.298148}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 30, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+
+    // marker 3.    :   x=0.752604, y=0.401852
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        FlyPoint::FAST_TRAVEL, 
+        {0.752604, 0.401852}
+    );        
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+    env.console.log("Battle Dondozo/Tatsugiri Titan phase 1.");
+    run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+
+
+}
+
+void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    context.wait_for_all_requests();
+    
+    // marker 1      x=0.832292, y=0.54537
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0}, 
+        FlyPoint::FAST_TRAVEL, 
+        {0.832292, 0.54537}
+    );
+
+    get_on_ride(env.program_info(), env.console, context);
+
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    // marker 2       x=0.393229, y=0.748148
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        FlyPoint::FAST_TRAVEL, 
+        {0.393229, 0.748148}
+    );
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+
+    // marker 3. go to Dondozo/Tatsugiri part 2       x=0.55625, y=0.324074
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 0, 255, 100}, 
+        FlyPoint::FAST_TRAVEL, 
+        {0.55625, 0.324074}
+    );
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 80, 40, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
+
+    clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+    
+    env.console.log("Battle Dondozo/Tatsugiri Titan phase 2.");
+    run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+    clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+    
+    env.console.log("Battle Dondozo/Tatsugiri Titan phase 3.");
+    run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG, {CallbackEnum::DIALOG_ARROW});
+    mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+
+}
+
+
+void move_from_glaseado_mountain_to_north_province_area_three(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    
+    context.wait_for_all_requests();
+
+    // marker 1. set marker to pokecenter
+    realign_player_from_landmark(
+        env.program_info(), env.console, context, 
+        {ZoomChange::KEEP_ZOOM, 128, 0, 50},
+        {ZoomChange::KEEP_ZOOM, 0, 0, 0}
+    );  
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 80, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    ); 
+
+
+    // marker 2. set marker past pokecenter
+    handle_unexpected_battles(env.program_info(), env.console, context,
+    [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 50);
+    });      
+    overworld_navigation(env.program_info(), env.console, context, 
+        NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
+        128, 15, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
+        
+
+    fly_to_overlapping_flypoint(env.program_info(), env.console, context); 
+
+}
+
 
 
 }
