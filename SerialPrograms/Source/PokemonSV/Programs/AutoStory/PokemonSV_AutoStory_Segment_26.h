@@ -29,6 +29,25 @@ public:
 
 
 
+// start: At Medali Pokecenter.
+// end: At Medali Gym
+void checkpoint_61(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+// start: At Medali Gym
+// end: Beat Medali Gym
+void checkpoint_62(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+
 }
 }
 }
