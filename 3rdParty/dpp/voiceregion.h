@@ -2,7 +2,6 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
- * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -22,7 +21,7 @@
 #pragma once
 #include <dpp/export.h>
 #include <unordered_map>
-#include <dpp/json_fwd.h>
+#include <dpp/nlohmann/json_fwd.hpp>
 #include <dpp/json_interface.h>
 
 namespace dpp {
@@ -31,45 +30,16 @@ namespace dpp {
  * @brief Flags related to a voice region
  */
 enum voiceregion_flags {
-    	/**
-	 * @brief The closest (optimal) voice region.
-	 */
-	v_optimal = 0x00000001,
-
-	/**
-	 * @brief A Deprecated voice region (avoid switching to these).
-	 */
-	v_deprecated = 0x00000010,
-
-	/**
-	 * @brief A custom voice region (used for events/etc).
-	 */
-	v_custom = 0x00000100
+	v_optimal	= 0x00000001,
+	v_deprecated	= 0x00000010,
+	v_custom	= 0x00000100,
+	v_vip		= 0x00001000
 };
 
 /**
  * @brief Represents a voice region on discord
  */
 class DPP_EXPORT voiceregion : public json_interface<voiceregion> {
-protected:
-	friend struct json_interface<voiceregion>;
-
-	/**
-	 * @brief Fill object properties from JSON
-	 * 
-	 * @param j JSON to fill from
-	 * @return voiceregion& Reference to self
-	 */
-	voiceregion& fill_from_json_impl(nlohmann::json* j);
-
-	/**
-	 * @brief Build a json for this object
-	 *
-	 * @param with_id Add ID to output
-	 * @return json JSON string
-	 */
-	virtual json to_json_impl(bool with_id = false) const;
-
 public:
 	/**
 	 * @brief Voice server ID
@@ -97,6 +67,22 @@ public:
 	virtual ~voiceregion() = default;
 
 	/**
+	 * @brief Fill object properties from JSON
+	 * 
+	 * @param j JSON to fill from
+	 * @return voiceregion& Reference to self
+	 */
+	voiceregion& fill_from_json(nlohmann::json* j);
+
+	/**
+	 * @brief Build a json string for this object
+	 * 
+	 * @param with_id Add ID to output
+	 * @return std::string JSON string
+	 */
+	virtual std::string build_json(bool with_id = false) const;
+
+	/**
 	 * @brief True if is the optimal voice server
 	 * 
 	 * @return true if optimal 
@@ -116,6 +102,13 @@ public:
 	 * @return true if custom
 	 */
 	bool is_custom() const;
+
+	/**
+	 * @brief True if is a VIP voice server
+	 * 
+	 * @return true if VIP 
+	 */
+	bool is_vip() const;
 };
 
 /**
@@ -123,4 +116,4 @@ public:
  */
 typedef std::unordered_map<std::string, voiceregion> voiceregion_map;
 
-}
+};

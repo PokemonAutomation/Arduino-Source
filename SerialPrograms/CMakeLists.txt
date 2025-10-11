@@ -192,9 +192,6 @@ endfunction()
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
-set(DPP_DLL_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/Debug/dpp.dll")
-set(DPP_DLL_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/Release/dpp.dll")
-
 set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
 set(FIRMWARE_DIR "${PACKAGES_DIR}/Firmware")
 set(SCRIPTS_DIR "${PACKAGES_DIR}/Scripts")
@@ -265,7 +262,12 @@ if (WIN32)
 
     add_library(dpp_lib IMPORTED UNKNOWN)
     set_target_properties(dpp_lib PROPERTIES
-        IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dppd.lib
+        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
+        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
+        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
 
     add_library(discord_lib IMPORTED UNKNOWN)
@@ -326,8 +328,13 @@ if (WIN32)
 #    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else() # macOS and Linux
-    find_package(PkgConfig REQUIRED)
     if (APPLE)
+        # Get root path where Homebrew installs libraries. Example root path: "/opt/homebrew/",
+        # where you can find libraries in "/opt/homebrew/lib/" and headers in "/opt/homebrew/include/".
+        # CMake does not support ONNX Runtime, so we have to add ONNX Runtime paths on our own.
+        # Save the root path as CMake variable HOMEBREW_PREFIX.
+        execute_process(COMMAND brew --prefix OUTPUT_VARIABLE HOMEBREW_PREFIX OUTPUT_STRIP_TRAILING_WHITESPACE)
+
         # ==== Get ONNX Runtime paths ====
         # First, try to see if there is an ONNX Runtime library built from source.
         # Assume the onnxruntime repo, https://github.com/microsoft/onnxruntime is placed in the same folder as
@@ -342,10 +349,8 @@ else() # macOS and Linux
         else()
             message("Built-from-source ONNX Runtime folder ${ONNXRUNTIME_ROOTDIR} does not exist.")
             message("Use ONNX Runtime installed by Homebrew.")
-            pkg_search_module(ONNXRUNTIME REQUIRED libonnxruntime onnxruntime)
-            target_include_directories(SerialProgramsLib PRIVATE ${ONNXRUNTIME_INCLUDE_DIRS})
-            target_link_directories(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LIBRARY_DIRS})
-            target_link_libraries(SerialProgramsLib PUBLIC ${ONNXRUNTIME_LINK_LIBRARIES})
+            target_include_directories(SerialProgramsLib PRIVATE ${HOMEBREW_PREFIX}/include/onnxruntime)
+            target_link_libraries(SerialProgramsLib PRIVATE ${HOMEBREW_PREFIX}/lib/libonnxruntime.dylib)
         endif()
         # Find OpenCV
         if(CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)")
@@ -356,7 +361,7 @@ else() # macOS and Linux
 
     else() # Linux
         # ONNX RUNTIME LINUX CONFIG
-        # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
+    # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
         # this can be done via -DONNX_ROOT_PATH=/path/to/onnx
 
         # If the path isn't provided, it'll automatically download the 1.23.0 release to the build folder,
@@ -442,6 +447,7 @@ else() # macOS and Linux
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
     if (UNIX_LINK_TESSERACT)
+        find_package(PkgConfig REQUIRED)
         target_compile_definitions(SerialProgramsLib PRIVATE PA_TESSERACT UNIX_LINK_TESSERACT)
         pkg_search_module(TESSERACT REQUIRED tesseract)
         pkg_search_module(LEPTONICA REQUIRED lept)
@@ -453,13 +459,15 @@ else() # macOS and Linux
         target_link_libraries(SerialProgramsLib PRIVATE ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    pkg_search_module(DPP dpp>=10.1)
-    if (DPP_FOUND) # enable dpp integration
-        target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)
-        target_compile_options(SerialProgramsLib PRIVATE ${DPP_CFLAGS_OTHER})
-        target_include_directories(SerialProgramsLib PRIVATE ${DPP_INCLUDE_DIRS})
-        target_link_directories(SerialProgramsLib PUBLIC ${DPP_LIBRARY_DIRS})
-        target_link_libraries(SerialProgramsLib PUBLIC ${DPP_LIBRARIES})
+    # enable dpp integration
+    if ((APPLE) AND (CMAKE_SYSTEM_PROCESSOR MATCHES "(arm64)|(ARM64)"))
+        add_library(libdpp STATIC IMPORTED)
+        set_target_properties(libdpp PROPERTIES
+            IMPORTED_LOCATION ${REPO_ROOT_DIR}/3rdPartyBinaries/libdpp_macos_arm64.a
+            INTERFACE_COMPILE_DEFINITIONS "PA_DPP"
+            INTERFACE_LINK_LIBRARIES "-L/opt/homebrew/lib -lssl -lcrypto -lopus -lsodium -lz" # add dpp's deps
+        )
+        target_link_libraries(SerialProgramsLib PRIVATE libdpp)
     endif()
 
     if (APPLE)
@@ -605,15 +613,6 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<IF:$<CONFIG:Debug>,${DISCORD_DLL_DEBUG},${DISCORD_DLL_RELEASE}>"
             "${DEPLOY_DIR}/discord_partner_sdk.dll"
-    )
-
-    # Copy DPP DLL
-    add_custom_command(
-        TARGET SerialPrograms POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying DPP SDK DLL"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<IF:$<CONFIG:Debug>,${DPP_DLL_DEBUG},${DPP_DLL_RELEASE}>"
-            "${DEPLOY_DIR}/dpp.dll"
     )
 
     # Move built .exe and .pdb to deploy folder, print if pdb is missing
