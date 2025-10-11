@@ -33,22 +33,14 @@
  * @see dpp::cluster::global_bulk_command_create
  * @see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
  * @param commands Vector of slash commands to create/update.
- * overwriting existing commands that are registered globally for this application.
+ * overwriting existing commands that are registered globally for this application. Updates will be available in all guilds after 1 hour.
  * Commands that do not already exist will count toward daily application command create limits.
  * @return slashcommand_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_global_bulk_command_create(const std::vector<slashcommand> &commands);
-
-/**
- * @brief Delete all existing global slash commands.
- * 
- * @see dpp::cluster::global_bulk_command_delete
- * @see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
- * @return slashcommand_map returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_global_bulk_command_delete();
+auto inline co_global_bulk_command_create(const std::vector<slashcommand> &commands) {
+	return dpp::awaitable(this, [&] (auto cc) { this->global_bulk_command_create(commands, cc); }); 
+}
 
 /**
  * @brief Create a global slash command (a bot can have a maximum of 100 of these).
@@ -59,7 +51,9 @@
  * @return slashcommand returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_global_command_create(const slashcommand &s);
+auto inline co_global_command_create(const slashcommand &s) {
+	return dpp::awaitable(this, [&] (auto cc) { this->global_command_create(s, cc); }); 
+}
 
 /**
  * @brief Get a global slash command
@@ -70,7 +64,9 @@
  * @return slashcommand returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_global_command_get(snowflake id);
+auto inline co_global_command_get(snowflake id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->global_command_get(id, cc); }); 
+}
 
 /**
  * @brief Delete a global slash command (a bot can have a maximum of 100 of these)
@@ -81,7 +77,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_global_command_delete(snowflake id);
+auto inline co_global_command_delete(snowflake id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->global_command_delete(id, cc); }); 
+}
 
 /**
  * @brief Edit a global slash command (a bot can have a maximum of 100 of these)
@@ -92,7 +90,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_global_command_edit(const slashcommand &s);
+auto inline co_global_command_edit(const slashcommand &s) {
+	return dpp::awaitable(this, [&] (auto cc) { this->global_command_edit(s, cc); }); 
+}
 
 /**
  * @brief Get the application's global slash commands
@@ -102,7 +102,9 @@
  * @return slashcommand_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_global_commands_get();
+auto inline co_global_commands_get() {
+	return dpp::awaitable(this, [&] (auto cc) { this->global_commands_get(cc); }); 
+}
 
 /**
  * @brief Create/overwrite guild slash commands.
@@ -116,18 +118,9 @@
  * @return slashcommand_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_bulk_command_create(const std::vector<slashcommand> &commands, snowflake guild_id);
-
-/**
- * @brief Delete all existing guild slash commands.
- * 
- * @see dpp::cluster::guild_bulk_command_delete
- * @see https://discord.com/developers/docs/interactions/application-commands#bulk-overwrite-global-application-commands
- * @param guild_id Guild ID to delete the slash commands in.
- * @return slashcommand_map returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_guild_bulk_command_delete(snowflake guild_id);
+auto inline co_guild_bulk_command_create(const std::vector<slashcommand> &commands, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_bulk_command_create(commands, guild_id, cc); }); 
+}
 
 /**
  * @brief Get all slash command permissions of a guild
@@ -138,7 +131,9 @@
  * @return guild_command_permissions_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_commands_get_permissions(snowflake guild_id);
+auto inline co_guild_commands_get_permissions(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_commands_get_permissions(guild_id, cc); }); 
+}
 
 /**
  * @brief Edit/Overwrite the permissions of all existing slash commands in a guild
@@ -154,7 +149,9 @@
  * @deprecated This has been disabled with updates to Permissions v2. You can use guild_command_edit_permissions instead
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_bulk_command_edit_permissions(const std::vector<slashcommand> &commands, snowflake guild_id);
+auto inline co_guild_bulk_command_edit_permissions(const std::vector<slashcommand> &commands, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_bulk_command_edit_permissions(commands, guild_id, cc); }); 
+}
 
 /**
  * @brief Create a slash command local to a guild
@@ -167,7 +164,9 @@
  * @return slashcommand returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_command_create(const slashcommand &s, snowflake guild_id);
+auto inline co_guild_command_create(const slashcommand &s, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_command_create(s, guild_id, cc); }); 
+}
 
 /**
  * @brief Delete a slash command local to a guild
@@ -179,7 +178,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_command_delete(snowflake id, snowflake guild_id);
+auto inline co_guild_command_delete(snowflake id, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_command_delete(id, guild_id, cc); }); 
+}
 
 /**
  * @brief Edit slash command permissions of a guild
@@ -192,7 +193,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_command_edit_permissions(const slashcommand &s, snowflake guild_id);
+auto inline co_guild_command_edit_permissions(const slashcommand &s, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_command_edit_permissions(s, guild_id, cc); }); 
+}
 
 /**
  * @brief Get a slash command of a guild
@@ -205,7 +208,9 @@
  * @return slashcommand returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_command_get(snowflake id, snowflake guild_id);
+auto inline co_guild_command_get(snowflake id, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_command_get(id, guild_id, cc); }); 
+}
 
 /**
  * @brief Get the permissions for a slash command of a guild
@@ -217,7 +222,9 @@
  * @return guild_command_permissions returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_command_get_permissions(snowflake id, snowflake guild_id);
+auto inline co_guild_command_get_permissions(snowflake id, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_command_get_permissions(id, guild_id, cc); }); 
+}
 
 /**
  * @brief Edit a slash command local to a guild
@@ -229,7 +236,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_command_edit(const slashcommand &s, snowflake guild_id);
+auto inline co_guild_command_edit(const slashcommand &s, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_command_edit(s, guild_id, cc); }); 
+}
 
 /**
  * @brief Get the application's slash commands for a guild
@@ -241,7 +250,9 @@
  * @return slashcommand_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_commands_get(snowflake guild_id);
+auto inline co_guild_commands_get(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_commands_get(guild_id, cc); }); 
+}
 
 /**
  * @brief Respond to a slash command
@@ -254,7 +265,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_interaction_response_create(snowflake interaction_id, const std::string &token, const interaction_response &r);
+auto inline co_interaction_response_create(snowflake interaction_id, const std::string &token, const interaction_response &r) {
+	return dpp::awaitable(this, [&] (auto cc) { this->interaction_response_create(interaction_id, token, r, cc); }); 
+}
 
 /**
  * @brief Edit response to a slash command
@@ -266,30 +279,21 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_interaction_response_edit(const std::string &token, const message &m);
-
-/**
- * @brief Get the original response to a slash command
- *
- * @see dpp::cluster::interaction_response_get_original
- * @see https://discord.com/developers/docs/interactions/receiving-and-responding#get-original-interaction-response
- * @param token Token for the interaction webhook
- * @return message returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_interaction_response_get_original(const std::string &token);
+auto inline co_interaction_response_edit(const std::string &token, const message &m) {
+	return dpp::awaitable(this, [&] (auto cc) { this->interaction_response_edit(token, m, cc); }); 
+}
 
 /**
  * @brief Create a followup message to a slash command
- *
- * @see dpp::cluster::interaction_followup_create
- * @see https://discord.com/developers/docs/interactions/receiving-and-responding#create-interaction-response
+ * 
  * @param token Token for the interaction webhook
  * @param m followup message to create
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_interaction_followup_create(const std::string &token, const message &m);
+auto inline co_interaction_followup_create(const std::string &token, const message &m) {
+	return dpp::awaitable(this, [&] (auto cc) { this->interaction_followup_create(token, m, cc); }); 
+}
 
 /**
  * @brief Edit original followup message to a slash command
@@ -302,55 +306,43 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_interaction_followup_edit_original(const std::string &token, const message &m);
+auto inline co_interaction_followup_edit_original(const std::string &token, const message &m) {
+	return dpp::awaitable(this, [&] (auto cc) { this->interaction_followup_edit_original(token, m, cc); }); 
+}
 
 /**
- * @brief Delete the initial interaction response
- *
- * @see dpp::cluster::interaction_followup_delete
- * @see https://discord.com/developers/docs/interactions/receiving-and-responding#delete-original-interaction-response
+ * @brief 
+ * 
  * @param token Token for the interaction webhook
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_interaction_followup_delete(const std::string &token);
+auto inline co_interaction_followup_delete(const std::string &token) {
+	return dpp::awaitable(this, [&] (auto cc) { this->interaction_followup_delete(token, cc); }); 
+}
 
 /**
  * @brief Edit followup message to a slash command
  * The message ID in the message you pass should be correctly set to that of a followup message you previously sent
- *
- * @see dpp::cluster::interaction_followup_edit
- * @see https://discord.com/developers/docs/interactions/receiving-and-responding#edit-followup-message
  * @param token Token for the interaction webhook
  * @param m message to edit, the ID should be set
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_interaction_followup_edit(const std::string &token, const message &m);
+auto inline co_interaction_followup_edit(const std::string &token, const message &m) {
+	return dpp::awaitable(this, [&] (auto cc) { this->interaction_followup_edit(token, m, cc); }); 
+}
 
 /**
  * @brief Get the followup message to a slash command
- *
- * @see dpp::cluster::interaction_followup_get
- * @see https://discord.com/developers/docs/interactions/receiving-and-responding#get-followup-message
  * @param token Token for the interaction webhook
  * @param message_id message to retrieve
  * @return message returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_interaction_followup_get(const std::string &token, snowflake message_id);
-
-/**
- * @brief Get the original followup message to a slash command
- * This is an alias for cluster::interaction_response_get_original
- * @see dpp::cluster::interaction_followup_get_original
- * @see cluster::interaction_response_get_original
- * 
- * @param token Token for the interaction webhook
- * @return message returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_interaction_followup_get_original(const std::string &token);
+auto inline co_interaction_followup_get(const std::string &token, snowflake message_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->interaction_followup_get(token, message_id, cc); }); 
+}
 
 /**
  * @brief Get all auto moderation rules for a guild
@@ -359,7 +351,9 @@
  * @return automod_rule_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_automod_rules_get(snowflake guild_id);
+auto inline co_automod_rules_get(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->automod_rules_get(guild_id, cc); }); 
+}
 
 /**
  * @brief Get a single auto moderation rule
@@ -369,7 +363,9 @@
  * @return automod_rule returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_automod_rule_get(snowflake guild_id, snowflake rule_id);
+auto inline co_automod_rule_get(snowflake guild_id, snowflake rule_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->automod_rule_get(guild_id, rule_id, cc); }); 
+}
 
 /**
  * @brief Create an auto moderation rule
@@ -379,7 +375,9 @@
  * @return automod_rule returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_automod_rule_create(snowflake guild_id, const automod_rule& r);
+auto inline co_automod_rule_create(snowflake guild_id, const automod_rule& r) {
+	return dpp::awaitable(this, [&] (auto cc) { this->automod_rule_create(guild_id, r, cc); }); 
+}
 
 /**
  * @brief Edit an auto moderation rule
@@ -389,7 +387,9 @@
  * @return automod_rule returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_automod_rule_edit(snowflake guild_id, const automod_rule& r);
+auto inline co_automod_rule_edit(snowflake guild_id, const automod_rule& r) {
+	return dpp::awaitable(this, [&] (auto cc) { this->automod_rule_edit(guild_id, r, cc); }); 
+}
 
 /**
  * @brief Delete an auto moderation rule
@@ -399,7 +399,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_automod_rule_delete(snowflake guild_id, snowflake rule_id);
+auto inline co_automod_rule_delete(snowflake guild_id, snowflake rule_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->automod_rule_delete(guild_id, rule_id, cc); }); 
+}
 
 /**
  * @brief Create a channel
@@ -417,7 +419,9 @@
  * @return channel returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_create(const class channel &c);
+auto inline co_channel_create(const class channel &c) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_create(c, cc); }); 
+}
 
 /**
  * @brief Remove a permission from a channel
@@ -429,7 +433,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_delete_permission(const class channel &c, snowflake overwrite_id);
+auto inline co_channel_delete_permission(const class channel &c, snowflake overwrite_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_delete_permission(c, overwrite_id, cc); }); 
+}
 
 /**
  * @brief Delete a channel
@@ -440,39 +446,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_delete(snowflake channel_id);
-
-/**
- * @brief Edit a channel's permissions
- *
- * @see dpp::cluster::channel_edit_permissions
- * @see https://discord.com/developers/docs/resources/channel#edit-channel-permissions
- * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
- * @param c Channel to set permissions for
- * @param overwrite_id Overwrite to change (a user or role ID)
- * @param allow Bitmask of allowed permissions (refer to enum dpp::permissions)
- * @param deny Bitmask of denied permissions (refer to enum dpp::permissions)
- * @param member true if the overwrite_id is a user id, false if it is a channel id
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_channel_edit_permissions(const class channel &c, const snowflake overwrite_id, const uint64_t allow, const uint64_t deny, const bool member);
-
-/**
- * @brief Edit a channel's permissions
- *
- * @see dpp::cluster::channel_edit_permissions
- * @see https://discord.com/developers/docs/resources/channel#edit-channel-permissions
- * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
- * @param channel_id ID of the channel to set permissions for
- * @param overwrite_id Overwrite to change (a user or role ID)
- * @param allow Bitmask of allowed permissions (refer to enum dpp::permissions)
- * @param deny Bitmask of denied permissions (refer to enum dpp::permissions)
- * @param member true if the overwrite_id is a user id, false if it is a channel id
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_channel_edit_permissions(const snowflake channel_id, const snowflake overwrite_id, const uint64_t allow, const uint64_t deny, const bool member);
+auto inline co_channel_delete(snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_delete(channel_id, cc); }); 
+}
 
 /**
  * @brief Edit multiple channels positions
@@ -487,7 +463,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_edit_positions(const std::vector<channel> &c);
+auto inline co_channel_edit_positions(const std::vector<channel> &c) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_edit_positions(c, cc); }); 
+}
 
 /**
  * @brief Edit a channel
@@ -498,7 +476,9 @@
  * @return channel returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_edit(const class channel &c);
+auto inline co_channel_edit(const class channel &c) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_edit(c, cc); }); 
+}
 
 /**
  * @brief Follow an announcement (news) channel
@@ -509,7 +489,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_follow_news(const class channel &c, snowflake target_channel_id);
+auto inline co_channel_follow_news(const class channel &c, snowflake target_channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_follow_news(c, target_channel_id, cc); }); 
+}
 
 /**
  * @brief Get a channel
@@ -520,7 +502,9 @@
  * @return channel returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_get(snowflake c);
+auto inline co_channel_get(snowflake c) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_get(c, cc); }); 
+}
 
 /**
  * @brief Create invite for a channel
@@ -529,10 +513,12 @@
  * @see https://discord.com/developers/docs/resources/channel#create-channel-invite
  * @param c Channel to create an invite on
  * @param i Invite to create
- * @return invite returned object on completion
+ * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_invite_create(const class channel &c, const class invite &i);
+auto inline co_channel_invite_create(const class channel &c, const class invite &i) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_invite_create(c, i, cc); }); 
+}
 
 /**
  * @brief Get invites for a channel
@@ -543,27 +529,9 @@
  * @return invite_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_invites_get(const class channel &c);
-
-/**
- * @brief Trigger channel typing indicator
- * @see dpp::cluster::channel_typing
- * @see https://discord.com/developers/docs/resources/channel#trigger-typing-indicator
- * @param c Channel to set as typing on
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_channel_typing(const class channel &c);
-
-/**
- * @brief Trigger channel typing indicator
- * @see dpp::cluster::channel_typing
- * @see https://discord.com/developers/docs/resources/channel#trigger-typing-indicator
- * @param cid Channel ID to set as typing on
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_channel_typing(snowflake cid);
+auto inline co_channel_invites_get(const class channel &c) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_invites_get(c, cc); }); 
+}
 
 /**
  * @brief Get all channels for a guild
@@ -574,19 +542,9 @@
  * @return channel_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channels_get(snowflake guild_id);
-
-/**
- * @brief Set the status of a voice channel.
- *
- * @see dpp::cluster::channel_set_voice_status
- * @see https://github.com/discord/discord-api-docs/pull/6400 (please replace soon).
- * @param channel_id The channel to update.
- * @param status The new status for the channel.
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_channel_set_voice_status(snowflake channel_id, const std::string& status);
+auto inline co_channels_get(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channels_get(guild_id, cc); }); 
+}
 
 /**
  * @brief Create a dm channel
@@ -596,7 +554,9 @@
  * @return channel returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_create_dm_channel(snowflake user_id);
+auto inline co_create_dm_channel(snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->create_dm_channel(user_id, cc); }); 
+}
 
 /**
  * @brief Get current user DM channels
@@ -604,7 +564,9 @@
  * @return channel_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_get_dms();
+auto inline co_current_user_get_dms() {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_user_get_dms(cc); }); 
+}
 
 /**
  * @brief Create a direct message, also create the channel for the direct message if needed
@@ -618,7 +580,9 @@
  * @return message returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_direct_message_create(snowflake user_id, const message &m);
+auto inline co_direct_message_create(snowflake user_id, const message &m) {
+	return dpp::awaitable(this, [&] (auto cc) { this->direct_message_create(user_id, m, cc); }); 
+}
 
 /**
  * @brief Adds a recipient to a Group DM using their access token
@@ -631,7 +595,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_gdm_add(snowflake channel_id, snowflake user_id, const std::string &access_token, const std::string &nick);
+auto inline co_gdm_add(snowflake channel_id, snowflake user_id, const std::string &access_token, const std::string &nick) {
+	return dpp::awaitable(this, [&] (auto cc) { this->gdm_add(channel_id, user_id, access_token, nick, cc); }); 
+}
 
 /**
  * @brief Removes a recipient from a Group DM
@@ -642,7 +608,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_gdm_remove(snowflake channel_id, snowflake user_id);
+auto inline co_gdm_remove(snowflake channel_id, snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->gdm_remove(channel_id, user_id, cc); }); 
+}
 
 /**
  * @brief Create single emoji.
@@ -656,7 +624,9 @@
  * @return emoji returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_emoji_create(snowflake guild_id, const class emoji& newemoji);
+auto inline co_guild_emoji_create(snowflake guild_id, const class emoji& newemoji) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_emoji_create(guild_id, newemoji, cc); }); 
+}
 
 /**
  * @brief Delete a guild emoji
@@ -669,21 +639,25 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_emoji_delete(snowflake guild_id, snowflake emoji_id);
+auto inline co_guild_emoji_delete(snowflake guild_id, snowflake emoji_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_emoji_delete(guild_id, emoji_id, cc); }); 
+}
 
 /**
  * @brief Edit a single emoji.
  * 
  * You must ensure that the emoji passed contained image data using the emoji::load_image() method.
  * @see dpp::cluster::guild_emoji_edit
- * @see https://discord.com/developers/docs/resources/emoji#modify-guild-emoji
+ * @see https://discord.com/developers/docs/resources/emoji#get-guild-emoji
  * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
  * @param guild_id Guild ID to edit emoji on
  * @param newemoji Emoji to edit
  * @return emoji returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_emoji_edit(snowflake guild_id, const class emoji& newemoji);
+auto inline co_guild_emoji_edit(snowflake guild_id, const class emoji& newemoji) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_emoji_edit(guild_id, newemoji, cc); }); 
+}
 
 /**
  * @brief Get a single emoji
@@ -695,126 +669,22 @@
  * @return emoji returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_emoji_get(snowflake guild_id, snowflake emoji_id);
+auto inline co_guild_emoji_get(snowflake guild_id, snowflake emoji_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_emoji_get(guild_id, emoji_id, cc); }); 
+}
 
 /**
  * @brief Get all emojis for a guild
  *
  * @see dpp::cluster::guild_emojis_get
- * @see https://discord.com/developers/docs/resources/emoji#list-guild-emojis
+ * @see https://discord.com/developers/docs/resources/emoji#get-guild-emojis
  * @param guild_id Guild ID to get emojis for
  * @return emoji_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_emojis_get(snowflake guild_id);
-
-/**
- * @brief List all Application Emojis
- *
- * @see dpp::cluster::application_emojis_get
- * @see https://discord.com/developers/docs/resources/emoji#list-application-emojis
- * @return emoji_map returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_application_emojis_get();
-
-/**
- * @brief Get an Application Emoji
- *
- * @see dpp::cluster::application_emoji_get
- * @see https://discord.com/developers/docs/resources/emoji#get-application-emoji
- * @param emoji_id The ID of the Emoji to get.
- * @return emoji returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_application_emoji_get(snowflake emoji_id);
-
-/**
- * @brief Create an Application Emoji
- *
- * @see dpp::cluster::application_emoji_create
- * @see https://discord.com/developers/docs/resources/emoji#create-application-emoji
- * @param newemoji The emoji to create
- * @return emoji returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_application_emoji_create(const class emoji& newemoji);
-
-/**
- * @brief Edit an Application Emoji
- *
- * @see dpp::cluster::application_emoji_edit
- * @see https://discord.com/developers/docs/resources/emoji#modify-application-emoji
- * @param newemoji The emoji to edit
- * @return emoji returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_application_emoji_edit(const class emoji& newemoji);
-
-/**
- * @brief Delete an Application Emoji
- *
- * @see dpp::cluster::application_emoji_delete
- * @see https://discord.com/developers/docs/resources/emoji#delete-application-emoji
- * @param emoji_id The emoji's ID to delete.
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_application_emoji_delete(snowflake emoji_id);
-
-/**
- * @brief Returns all entitlements for a given app, active and expired.
- *
- * @see dpp::cluster::entitlements_get
- * @see https://discord.com/developers/docs/monetization/entitlements#list-entitlements
- * @param user_id User ID to look up entitlements for.
- * @param sku_ids List of SKU IDs to check entitlements for.
- * @param before_id Retrieve entitlements before this entitlement ID.
- * @param after_id Retrieve entitlements after this entitlement ID.
- * @param limit Number of entitlements to return, 1-100 (default 100).
- * @param guild_id Guild ID to look up entitlements for.
- * @param exclude_ended Whether ended entitlements should be excluded from the search.
- * @return entitlement_map returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_entitlements_get(snowflake user_id = 0, const std::vector<snowflake>& sku_ids = {}, snowflake before_id = 0, snowflake after_id = 0, uint8_t limit = 100, snowflake guild_id = 0, bool exclude_ended = false);
-
-/**
- * @brief Creates a test entitlement to a given SKU for a given guild or user.
- * Discord will act as though that user or guild has entitlement to your premium offering.
- *
- * @see dpp::cluster::entitlement_test_create
- * @see https://discord.com/developers/docs/monetization/entitlements#create-test-entitlement
- * @param new_entitlement The entitlement to create.
- * Make sure your dpp::entitlement_type (inside your dpp::entitlement object) matches the type of the owner_id
- * (if type is guild, owner_id is a guild id), otherwise it won't work!
- * @return entitlement returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_entitlement_test_create(const class entitlement& new_entitlement);
-
-/**
- * @brief Deletes a currently-active test entitlement.
- * Discord will act as though that user or guild no longer has entitlement to your premium offering.
- *
- * @see dpp::cluster::entitlement_test_delete
- * @see https://discord.com/developers/docs/monetization/entitlements#delete-test-entitlement
- * @param entitlement_id The test entitlement to delete.
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_entitlement_test_delete(snowflake entitlement_id);
-
-/**
- * @brief For One-Time Purchase consumable SKUs, marks a given entitlement for the user as consumed.
- *
- * @see dpp::cluster::entitlement_consume
- * @see https://discord.com/developers/docs/monetization/entitlements#consume-an-entitlement
- * @param entitlement_id The entitlement to mark as consumed.
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_entitlement_consume(snowflake entitlement_id);
+auto inline co_guild_emojis_get(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_emojis_get(guild_id, cc); }); 
+}
 
 /**
  * @brief Get the gateway information for the bot using the token
@@ -823,7 +693,9 @@
  * @return gateway returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_get_gateway_bot();
+auto inline co_get_gateway_bot() {
+	return dpp::awaitable(this, [&] (auto cc) { this->get_gateway_bot(cc); }); 
+}
 
 /**
  * @brief Modify current member
@@ -839,7 +711,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_current_member_edit(snowflake guild_id, const std::string &nickname);
+auto inline co_guild_current_member_edit(snowflake guild_id, const std::string &nickname) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_current_member_edit(guild_id, nickname, cc); }); 
+}
 
 /**
  * @brief Get the audit log for a guild
@@ -849,13 +723,14 @@
  * @param guild_id Guild to get the audit log of
  * @param user_id Entries from a specific user ID. Set this to `0` will fetch any user
  * @param action_type Entries for a specific dpp::audit_type. Set this to `0` will fetch any type
- * @param before Entries with ID less than a specific audit log entry ID. Used for paginating
- * @param after Entries with ID greater than a specific audit log entry ID. Used for paginating
+ * @param before Entries that preceded a specific audit log entry ID. Used for paginating
  * @param limit Maximum number of entries (between 1-100) to return
  * @return auditlog returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_auditlog_get(snowflake guild_id, snowflake user_id, uint32_t action_type, snowflake before, snowflake after, uint32_t limit);
+auto inline co_guild_auditlog_get(snowflake guild_id, snowflake user_id, uint32_t action_type, snowflake before, uint32_t limit) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_auditlog_get(guild_id, user_id, action_type, before, limit, cc); }); 
+}
 
 /**
  * @brief Add guild ban
@@ -871,7 +746,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_ban_add(snowflake guild_id, snowflake user_id, uint32_t delete_message_seconds = 0);
+auto inline co_guild_ban_add(snowflake guild_id, snowflake user_id, uint32_t delete_message_seconds) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_ban_add(guild_id, user_id, delete_message_seconds, cc); }); 
+}
 
 /**
  * @brief Delete guild ban
@@ -886,7 +763,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_ban_delete(snowflake guild_id, snowflake user_id);
+auto inline co_guild_ban_delete(snowflake guild_id, snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_ban_delete(guild_id, user_id, cc); }); 
+}
 
 /**
  * @brief Create a guild
@@ -909,7 +788,9 @@
  * @return guild returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_create(const class guild &g);
+auto inline co_guild_create(const class guild &g) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_create(g, cc); }); 
+}
 
 /**
  * @brief Delete a guild
@@ -922,7 +803,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_delete(snowflake guild_id);
+auto inline co_guild_delete(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_delete(guild_id, cc); }); 
+}
 
 /**
  * @brief Delete guild integration
@@ -938,7 +821,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_delete_integration(snowflake guild_id, snowflake integration_id);
+auto inline co_guild_delete_integration(snowflake guild_id, snowflake integration_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_delete_integration(guild_id, integration_id, cc); }); 
+}
 
 /**
  * @brief Edit a guild
@@ -953,7 +838,9 @@
  * @return guild returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_edit(const class guild &g);
+auto inline co_guild_edit(const class guild &g) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_edit(g, cc); }); 
+}
 
 /**
  * @brief Edit guild widget
@@ -968,7 +855,9 @@
  * @return guild_widget returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_edit_widget(snowflake guild_id, const class guild_widget &gw);
+auto inline co_guild_edit_widget(snowflake guild_id, const class guild_widget &gw) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_edit_widget(guild_id, gw, cc); }); 
+}
 
 /**
  * @brief Get single guild ban
@@ -981,7 +870,9 @@
  * @return ban returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_ban(snowflake guild_id, snowflake user_id);
+auto inline co_guild_get_ban(snowflake guild_id, snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_ban(guild_id, user_id, cc); }); 
+}
 
 /**
  * @brief Get guild ban list
@@ -997,10 +888,14 @@
  * @return ban_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_bans(snowflake guild_id, snowflake before, snowflake after, snowflake limit);
+auto inline co_guild_get_bans(snowflake guild_id, snowflake before, snowflake after, snowflake limit) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_bans(guild_id, before, after, limit, cc); }); 
+}
 
 
-[[nodiscard]] async<confirmation_callback_t> co_guild_get(snowflake guild_id);
+auto inline co_guild_get(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get(guild_id, cc); }); 
+}
 
 /**
  * @brief Get guild integrations
@@ -1011,14 +906,16 @@
  * @see https://discord.com/developers/docs/resources/guild#get-guild-integrations
  * @param guild_id Guild ID to get integrations for
  * @return integration_map returned object on completion
- *
- * @note This endpoint returns a maximum of 50 integrations. If a guild has more integrations, they cannot be accessed.
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_integrations(snowflake guild_id);
+auto inline co_guild_get_integrations(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_integrations(guild_id, cc); }); 
+}
 
 
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_preview(snowflake guild_id);
+auto inline co_guild_get_preview(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_preview(guild_id, cc); }); 
+}
 
 /**
  * @brief Get guild vanity url, if enabled
@@ -1030,7 +927,9 @@
  * @return invite returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_vanity(snowflake guild_id);
+auto inline co_guild_get_vanity(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_vanity(guild_id, cc); }); 
+}
 
 /**
  * @brief Get guild widget
@@ -1043,7 +942,9 @@
  * @return guild_widget returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_widget(snowflake guild_id);
+auto inline co_guild_get_widget(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_widget(guild_id, cc); }); 
+}
 
 /**
  * @brief Modify guild integration
@@ -1056,7 +957,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_modify_integration(snowflake guild_id, const class integration &i);
+auto inline co_guild_modify_integration(snowflake guild_id, const class integration &i) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_modify_integration(guild_id, i, cc); }); 
+}
 
 /**
  * @brief Get prune counts
@@ -1073,7 +976,9 @@
  * @return prune returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_prune_counts(snowflake guild_id, const struct prune& pruneinfo);
+auto inline co_guild_get_prune_counts(snowflake guild_id, const struct prune& pruneinfo) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_prune_counts(guild_id, pruneinfo, cc); }); 
+}
 
 /**
  * @brief Begin guild prune
@@ -1092,7 +997,9 @@
  * @return prune returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_begin_prune(snowflake guild_id, const struct prune& pruneinfo);
+auto inline co_guild_begin_prune(snowflake guild_id, const struct prune& pruneinfo) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_begin_prune(guild_id, pruneinfo, cc); }); 
+}
 
 /**
  * @brief Change current user nickname
@@ -1109,7 +1016,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_set_nickname(snowflake guild_id, const std::string &nickname);
+auto inline co_guild_set_nickname(snowflake guild_id, const std::string &nickname) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_set_nickname(guild_id, nickname, cc); }); 
+}
 
 /**
  * @brief Sync guild integration
@@ -1121,62 +1030,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_sync_integration(snowflake guild_id, snowflake integration_id);
-
-/**
- * @brief Get the guild's onboarding configuration
- *
- * @see dpp::cluster::guild_get_onboarding
- * @see https://discord.com/developers/docs/resources/guild#get-guild-onboarding
- * @param guild_id The guild to pull the onboarding configuration from.
- * @return onboarding returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_onboarding(snowflake guild_id);
-
-/**
- * @brief Edit the guild's onboarding configuration
- *
- * Requires the `MANAGE_GUILD` and `MANAGE_ROLES` permissions.
- *
- * @note Onboarding enforces constraints when enabled. These constraints are that there must be at least 7 Default Channels and at least 5 of them must allow sending messages to the \@everyone role. The `onboarding::mode` field modifies what is considered when enforcing these constraints.
- *
- * @see dpp::cluster::guild_edit_onboarding
- * @see https://discord.com/developers/docs/resources/guild#modify-guild-onboarding
- * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
- * @param o The onboarding object
- * @return onboarding returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_guild_edit_onboarding(const struct onboarding& o);
-
-/**
- * @brief Get the guild's welcome screen
- *
- * If the welcome screen is not enabled, the `MANAGE_GUILD` permission is required.
- *
- * @see dpp::cluster::guild_get_welcome_screen
- * @see https://discord.com/developers/docs/resources/guild#get-guild-welcome-screen
- * @param guild_id The guild ID to get the welcome screen from
- * @return dpp::welcome_screen returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_welcome_screen(snowflake guild_id);
-
-/**
- * @brief Edit the guild's welcome screen
- *
- * Requires the `MANAGE_GUILD` permission. May fire a `Guild Update` Gateway event.
- *
- * @see dpp::cluster::guild_edit_welcome_screen
- * @see https://discord.com/developers/docs/resources/guild#modify-guild-welcome-screen
- * @param guild_id The guild ID to edit the welcome screen for
- * @param welcome_screen The welcome screen
- * @param enabled Whether the welcome screen should be enabled or disabled
- * @return dpp::welcome_screen returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_guild_edit_welcome_screen(snowflake guild_id, const struct welcome_screen& welcome_screen, bool enabled);
+auto inline co_guild_sync_integration(snowflake guild_id, snowflake integration_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_sync_integration(guild_id, integration_id, cc); }); 
+}
 
 /**
  * @brief Add guild member. Needs a specific oauth2 scope, from which you get the access_token.
@@ -1196,7 +1052,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_add_member(const guild_member& gm, const std::string &access_token);
+auto inline co_guild_add_member(const guild_member& gm, const std::string &access_token) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_add_member(gm, access_token, cc); }); 
+}
 
 /**
  * @brief Edit the properties of an existing guild member
@@ -1212,7 +1070,9 @@
  * @return guild_member returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_edit_member(const guild_member& gm);
+auto inline co_guild_edit_member(const guild_member& gm) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_edit_member(gm, cc); }); 
+}
 
 /**
  * @brief Get a guild member
@@ -1223,7 +1083,9 @@
  * @return guild_member returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_member(snowflake guild_id, snowflake user_id);
+auto inline co_guild_get_member(snowflake guild_id, snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_member(guild_id, user_id, cc); }); 
+}
 
 /**
  * @brief Get all guild members
@@ -1237,7 +1099,9 @@
  * @return guild_member_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_members(snowflake guild_id, uint16_t limit, snowflake after);
+auto inline co_guild_get_members(snowflake guild_id, uint16_t limit, snowflake after) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_members(guild_id, limit, after, cc); }); 
+}
 
 /**
  * @brief Add role to guild member
@@ -1253,7 +1117,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_member_add_role(snowflake guild_id, snowflake user_id, snowflake role_id);
+auto inline co_guild_member_add_role(snowflake guild_id, snowflake user_id, snowflake role_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_member_add_role(guild_id, user_id, role_id, cc); }); 
+}
 
 /**
  * @brief Remove (kick) a guild member
@@ -1269,7 +1135,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_member_delete(snowflake guild_id, snowflake user_id);
+auto inline co_guild_member_delete(snowflake guild_id, snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_member_delete(guild_id, user_id, cc); }); 
+}
 
 /**
  * @brief Remove (kick) a guild member
@@ -1284,7 +1152,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_member_kick(snowflake guild_id, snowflake user_id);
+auto inline co_guild_member_kick(snowflake guild_id, snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_member_kick(guild_id, user_id, cc); }); 
+}
 
 /**
  * @brief Set the timeout of a guild member
@@ -1299,21 +1169,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_member_timeout(snowflake guild_id, snowflake user_id, time_t communication_disabled_until);
-
-/**
- * @brief Remove the timeout of a guild member.
- * A shortcut for guild_member_timeout(guild_id, user_id, 0, callback)
- * Fires a `Guild Member Update` Gateway event.
- * @see dpp::cluster::guild_member_timeout_remove
- * @see https://discord.com/developers/docs/resources/guild#modify-guild-member
- * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
- * @param guild_id Guild ID to remove the member timeout from
- * @param user_id User ID to remove the timeout for
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_guild_member_timeout_remove(snowflake guild_id, snowflake user_id);
+auto inline co_guild_member_timeout(snowflake guild_id, snowflake user_id, time_t communication_disabled_until) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_member_timeout(guild_id, user_id, communication_disabled_until, cc); }); 
+}
 
 /**
  * @brief Remove role from guild member
@@ -1330,7 +1188,9 @@
  * @deprecated Use dpp::cluster::guild_member_remove_role instead
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_member_delete_role(snowflake guild_id, snowflake user_id, snowflake role_id);
+auto inline co_guild_member_delete_role(snowflake guild_id, snowflake user_id, snowflake role_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_member_delete_role(guild_id, user_id, role_id, cc); }); 
+}
 
 /**
  * @brief Remove role from guild member
@@ -1346,7 +1206,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_member_remove_role(snowflake guild_id, snowflake user_id, snowflake role_id);
+auto inline co_guild_member_remove_role(snowflake guild_id, snowflake user_id, snowflake role_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_member_remove_role(guild_id, user_id, role_id, cc); }); 
+}
 
 /**
  * @brief Moves the guild member to a other voice channel, if member is connected to one.
@@ -1363,7 +1225,9 @@
  * @return guild_member returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_member_move(const snowflake channel_id, const snowflake guild_id, const snowflake user_id);
+auto inline co_guild_member_move(const snowflake channel_id, const snowflake guild_id, const snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_member_move(channel_id, guild_id, user_id, cc); }); 
+}
 
 /**
  * @brief Search for guild members based on whether their username or nickname starts with the given string.
@@ -1377,7 +1241,9 @@
  * @return guild_member_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_search_members(snowflake guild_id, const std::string& query, uint16_t limit);
+auto inline co_guild_search_members(snowflake guild_id, const std::string& query, uint16_t limit) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_search_members(guild_id, query, limit, cc); }); 
+}
 
 /**
  * @brief Get guild invites
@@ -1390,46 +1256,19 @@
  * @return invite_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_invites(snowflake guild_id);
+auto inline co_guild_get_invites(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_invites(guild_id, cc); }); 
+}
 
 
-[[nodiscard]] async<confirmation_callback_t> co_invite_delete(const std::string &invitecode);
+auto inline co_invite_delete(const std::string &invitecode) {
+	return dpp::awaitable(this, [&] (auto cc) { this->invite_delete(invitecode, cc); }); 
+}
 
-/**
- * @brief Get details about an invite
- *
- * @see dpp::cluster::invite_get
- * @see https://discord.com/developers/docs/resources/invite#get-invite
- * @param invite_code Invite code to get information on
- * @return invite returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_invite_get(const std::string &invite_code);
 
-/**
- * @brief Add a reaction to a message. The reaction string must be either an `emojiname:id` or a unicode character.
- *
- * @see dpp::cluster::message_add_reaction
- * @see https://discord.com/developers/docs/resources/channel#create-reaction
- * @param m Message to add a reaction to
- * @param reaction Reaction to add. Emojis should be in the form emojiname:id
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_add_reaction(const struct message &m, const std::string &reaction);
-
-/**
- * @brief Add a reaction to a message by id. The reaction string must be either an `emojiname:id` or a unicode character.
- *
- * @see dpp::cluster::message_add_reaction
- * @see https://discord.com/developers/docs/topics/gateway#message-reaction-add
- * @param message_id Message to add reactions to
- * @param channel_id Channel to add reactions to
- * @param reaction Reaction to add. Emojis should be in the form emojiname:id
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_add_reaction(snowflake message_id, snowflake channel_id, const std::string &reaction);
+auto inline co_invite_get(const std::string &invitecode) {
+	return dpp::awaitable(this, [&] (auto cc) { this->invite_get(invitecode, cc); }); 
+}
 
 /**
  * @brief Send a message to a channel. The callback function is called when the message has been sent
@@ -1440,7 +1279,9 @@
  * @return message returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_message_create(const struct message &m);
+auto inline co_message_create(const message &m) {
+	return dpp::awaitable(this, [&] (auto cc) { this->message_create(m, cc); }); 
+}
 
 /**
  * @brief Crosspost a message. The callback function is called when the message has been sent
@@ -1452,30 +1293,9 @@
  * @return message returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_message_crosspost(snowflake message_id, snowflake channel_id);
-
-/**
- * @brief Delete all reactions on a message
- *
- * @see dpp::cluster::message_delete_all_reactions
- * @see https://discord.com/developers/docs/resources/channel#delete-all-reactions
- * @param m Message to delete reactions from
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete_all_reactions(const struct message &m);
-
-/**
- * @brief Delete all reactions on a message by id
- *
- * @see dpp::cluster::message_delete_all_reactions
- * @see https://discord.com/developers/docs/resources/channel#delete-all-reactions
- * @param message_id Message to delete reactions from
- * @param channel_id Channel to delete reactions from
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete_all_reactions(snowflake message_id, snowflake channel_id);
+auto inline co_message_crosspost(snowflake message_id, snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->message_crosspost(message_id, channel_id, cc); }); 
+}
 
 /**
  * @brief Bulk delete messages from a channel. The callback function is called when the message has been edited
@@ -1490,7 +1310,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete_bulk(const std::vector<snowflake> &message_ids, snowflake channel_id);
+auto inline co_message_delete_bulk(const std::vector<snowflake>& message_ids, snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->message_delete_bulk(message_ids, channel_id, cc); }); 
+}
 
 /**
  * @brief Delete a message from a channel. The callback function is called when the message has been edited
@@ -1503,84 +1325,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete(snowflake message_id, snowflake channel_id);
-
-/**
- * @brief Delete own reaction from a message. The reaction string must be either an `emojiname:id` or a unicode character.
- *
- * @see dpp::cluster::message_delete_own_reaction
- * @see https://discord.com/developers/docs/resources/channel#delete-own-reaction
- * @param m Message to delete own reaction from
- * @param reaction Reaction to delete. The reaction should be in the form emojiname:id
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete_own_reaction(const struct message &m, const std::string &reaction);
-
-/**
- * @brief Delete own reaction from a message by id. The reaction string must be either an `emojiname:id` or a unicode character.
- *
- * @see dpp::cluster::message_delete_own_reaction
- * @see https://discord.com/developers/docs/resources/channel#delete-own-reaction
- * @param message_id Message to delete reactions from
- * @param channel_id Channel to delete reactions from
- * @param reaction Reaction to delete. The reaction should be in the form emojiname:id
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete_own_reaction(snowflake message_id, snowflake channel_id, const std::string &reaction);
-
-/**
- * @brief Delete a user's reaction from a message. The reaction string must be either an `emojiname:id` or a unicode character
- *
- * @see dpp::cluster::message_delete_reaction
- * @see https://discord.com/developers/docs/resources/channel#delete-user-reaction
- * @param m Message to delete a user's reaction from
- * @param user_id User ID who's reaction you want to remove
- * @param reaction Reaction to remove. Reactions should be in the form emojiname:id
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete_reaction(const struct message &m, snowflake user_id, const std::string &reaction);
-
-/**
- * @brief Delete a user's reaction from a message by id. The reaction string must be either an `emojiname:id` or a unicode character
- *
- * @see dpp::cluster::message_delete_reaction
- * @see https://discord.com/developers/docs/resources/channel#delete-user-reaction
- * @param message_id Message to delete reactions from
- * @param channel_id Channel to delete reactions from
- * @param user_id User ID who's reaction you want to remove
- * @param reaction Reaction to remove. Reactions should be in the form emojiname:id
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete_reaction(snowflake message_id, snowflake channel_id, snowflake user_id, const std::string &reaction);
-
-/**
- * @brief Delete all reactions on a message using a particular emoji. The reaction string must be either an `emojiname:id` or a unicode character
- *
- * @see dpp::cluster::message_delete_reaction_emoji
- * @see https://discord.com/developers/docs/resources/channel#delete-all-reactions-for-emoji
- * @param m Message to delete reactions from
- * @param reaction Reaction to delete, in the form emojiname:id or a unicode character
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete_reaction_emoji(const struct message &m, const std::string &reaction);
-
-/**
- * @brief Delete all reactions on a message using a particular emoji by id. The reaction string must be either an `emojiname:id` or a unicode character
- *
- * @see dpp::cluster::message_delete_reaction_emoji
- * @see https://discord.com/developers/docs/resources/channel#delete-all-reactions-for-emoji
- * @param message_id Message to delete reactions from
- * @param channel_id Channel to delete reactions from
- * @param reaction Reaction to delete, in the form emojiname:id or a unicode character
- * @return confirmation returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_delete_reaction_emoji(snowflake message_id, snowflake channel_id, const std::string &reaction);
+auto inline co_message_delete(snowflake message_id, snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->message_delete(message_id, channel_id, cc); }); 
+}
 
 /**
  * @brief Edit a message on a channel. The callback function is called when the message has been edited
@@ -1591,16 +1338,9 @@
  * @return message returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_message_edit(const struct message &m);
-
-/**
- * @brief Edit the flags of a message on a channel. The callback function is called when the message has been edited
- *
- * @param m Message to edit the flags of
- * @return message returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_edit_flags(const struct message &m);
+auto inline co_message_edit(const message &m) {
+	return dpp::awaitable(this, [&] (auto cc) { this->message_edit(m, cc); }); 
+}
 
 /**
  * @brief Get a message
@@ -1612,38 +1352,9 @@
  * @return message returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_message_get(snowflake message_id, snowflake channel_id);
-
-/**
- * @brief Get reactions on a message for a particular emoji. The reaction string must be either an `emojiname:id` or a unicode character
- *
- * @see dpp::cluster::message_get_reactions
- * @see https://discord.com/developers/docs/resources/channel#get-reactions
- * @param m Message to get reactions for
- * @param reaction Reaction should be in the form emojiname:id or a unicode character
- * @param before Reactions before this ID should be retrieved if this is set to non-zero
- * @param after Reactions before this ID should be retrieved if this is set to non-zero
- * @param limit This number of reactions maximum should be returned
- * @return user_map returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_get_reactions(const struct message &m, const std::string &reaction, snowflake before, snowflake after, snowflake limit);
-
-/**
- * @brief Get reactions on a message for a particular emoji by id. The reaction string must be either an `emojiname:id` or a unicode character
- *
- * @see dpp::cluster::message_get_reactions
- * @see https://discord.com/developers/docs/resources/channel#get-reactions
- * @param message_id Message to get reactions for
- * @param channel_id Channel to get reactions for
- * @param reaction Reaction should be in the form emojiname:id or a unicode character
- * @param before Reactions before this ID should be retrieved if this is set to non-zero
- * @param after Reactions before this ID should be retrieved if this is set to non-zero
- * @param limit This number of reactions maximum should be returned
- * @return emoji_map returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_message_get_reactions(snowflake message_id, snowflake channel_id, const std::string &reaction, snowflake before, snowflake after, snowflake limit);
+auto inline co_message_get(snowflake message_id, snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->message_get(message_id, channel_id, cc); }); 
+}
 
 /**
  * @brief Pin a message
@@ -1655,7 +1366,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_message_pin(snowflake channel_id, snowflake message_id);
+auto inline co_message_pin(snowflake channel_id, snowflake message_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->message_pin(channel_id, message_id, cc); }); 
+}
 
 /**
  * @brief Get multiple messages.
@@ -1672,7 +1385,9 @@
  * @return message_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_messages_get(snowflake channel_id, snowflake around, snowflake before, snowflake after, uint64_t limit);
+auto inline co_messages_get(snowflake channel_id, snowflake around, snowflake before, snowflake after, uint64_t limit) {
+	return dpp::awaitable(this, [&] (auto cc) { this->messages_get(channel_id, around, before, after, limit, cc); }); 
+}
 
 /**
  * @brief Unpin a message
@@ -1684,59 +1399,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_message_unpin(snowflake channel_id, snowflake message_id);
-
-/**
- * @brief Get a list of users that voted for this specific answer.
- *
- * @param m Message that contains the poll to retrieve the answers from
- * @param answer_id ID of the answer to retrieve votes from (see poll_answer::answer_id)
- * @param after Users after this ID should be retrieved if this is set to non-zero
- * @param limit This number of users maximum should be returned, up to 100
- * @return user_map returned object on completion
- * @see dpp::cluster::poll_get_answer_voters
- * @see https://discord.com/developers/docs/resources/poll#get-answer-voters
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_poll_get_answer_voters(const message& m, uint32_t answer_id, snowflake after, uint64_t limit);
-
-/**
- * @brief Get a list of users that voted for this specific answer.
- *
- * @param message_id ID of the message with the poll to retrieve the answers from
- * @param channel_id ID of the channel with the poll to retrieve the answers from
- * @param answer_id ID of the answer to retrieve votes from (see poll_answer::answer_id)
- * @param after Users after this ID should be retrieved if this is set to non-zero
- * @param limit This number of users maximum should be returned, up to 100
- * @return user_map returned object on completion
- * @see dpp::cluster::poll_get_answer_voters
- * @see https://discord.com/developers/docs/resources/poll#get-answer-voters
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_poll_get_answer_voters(snowflake message_id, snowflake channel_id, uint32_t answer_id, snowflake after, uint64_t limit);
-
-/**
- * @brief Immediately end a poll.
- *
- * @param m Message that contains the poll
- * @return message returned object on completion
- * @see dpp::cluster::poll_end
- * @see https://discord.com/developers/docs/resources/poll#end-poll
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_poll_end(const message &m);
-
-/**
- * @brief Immediately end a poll.
- *
- * @param message_id ID of the message with the poll to end
- * @param channel_id ID of the channel with the poll to end
- * @return message returned object on completion
- * @see dpp::cluster::poll_end
- * @see https://discord.com/developers/docs/resources/poll#end-poll
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_poll_end(snowflake message_id, snowflake channel_id);
+auto inline co_message_unpin(snowflake channel_id, snowflake message_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->message_unpin(channel_id, message_id, cc); }); 
+}
 
 /**
  * @brief Get a channel's pins
@@ -1746,7 +1411,9 @@
  * @return message_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_channel_pins_get(snowflake channel_id);
+auto inline co_channel_pins_get(snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->channel_pins_get(channel_id, cc); }); 
+}
 
 /**
  * @brief Create a role on a guild
@@ -1761,7 +1428,9 @@
  * @return role returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_role_create(const class role &r);
+auto inline co_role_create(const class role &r) {
+	return dpp::awaitable(this, [&] (auto cc) { this->role_create(r, cc); }); 
+}
 
 /**
  * @brief Delete a role
@@ -1776,7 +1445,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_role_delete(snowflake guild_id, snowflake role_id);
+auto inline co_role_delete(snowflake guild_id, snowflake role_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->role_delete(guild_id, role_id, cc); }); 
+}
 
 /**
  * @brief Edit a role on a guild
@@ -1790,7 +1461,9 @@
  * @return role returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_role_edit(const class role &r);
+auto inline co_role_edit(const class role &r) {
+	return dpp::awaitable(this, [&] (auto cc) { this->role_edit(r, cc); }); 
+}
 
 /**
  * @brief Edit multiple role's position in a guild. Returns a list of all roles of the guild on success.
@@ -1806,7 +1479,9 @@
  * @return role_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_roles_edit_position(snowflake guild_id, const std::vector<role> &roles);
+auto inline co_roles_edit_position(snowflake guild_id, const std::vector<role> &roles) {
+	return dpp::awaitable(this, [&] (auto cc) { this->roles_edit_position(guild_id, roles, cc); }); 
+}
 
 /**
  * @brief Get a role for a guild
@@ -1817,54 +1492,9 @@
  * @return role_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_roles_get(snowflake guild_id);
-
-/**
- * @brief Get the application's role connection metadata records
- *
- * @see dpp::cluster::application_role_connection_get
- * @see https://discord.com/developers/docs/resources/application-role-connection-metadata#get-application-role-connection-metadata-records
- * @param application_id The application ID
- * @return application_role_connection returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_application_role_connection_get(snowflake application_id);
-
-/**
- * @brief Update the application's role connection metadata records
- *
- * @see dpp::cluster::application_role_connection_update
- * @see https://discord.com/developers/docs/resources/application-role-connection-metadata#update-application-role-connection-metadata-records
- * @param application_id The application ID
- * @param connection_metadata The application role connection metadata to update
- * @return application_role_connection returned object on completion
- * @note An application can have a maximum of 5 metadata records.
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_application_role_connection_update(snowflake application_id, const std::vector<application_role_connection_metadata> &connection_metadata);
-
-/**
- * @brief Get user application role connection
- *
- * @see dpp::cluster::user_application_role_connection_get
- * @see https://discord.com/developers/docs/resources/user#get-user-application-role-connection
- * @param application_id The application ID
- * @return application_role_connection returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_user_application_role_connection_get(snowflake application_id);
-
-/**
- * @brief Update user application role connection
- *
- * @see dpp::cluster::user_application_role_connection_update
- * @see https://discord.com/developers/docs/resources/user#update-user-application-role-connection
- * @param application_id The application ID
- * @param connection The application role connection to update
- * @return application_role_connection returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_user_application_role_connection_update(snowflake application_id, const application_role_connection &connection);
+auto inline co_roles_get(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->roles_get(guild_id, cc); }); 
+}
 
 /**
  * @brief Get all scheduled events for a guild
@@ -1874,7 +1504,9 @@
  * @return scheduled_event_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_events_get(snowflake guild_id);
+auto inline co_guild_events_get(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_events_get(guild_id, cc); }); 
+}
 
 /**
  * @brief Create a scheduled event on a guild
@@ -1885,7 +1517,9 @@
  * @return scheduled_event returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_event_create(const scheduled_event& event);
+auto inline co_guild_event_create(const scheduled_event& event) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_event_create(event, cc); }); 
+}
 
 /**
  * @brief Delete a scheduled event from a guild
@@ -1897,7 +1531,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_event_delete(snowflake event_id, snowflake guild_id);
+auto inline co_guild_event_delete(snowflake event_id, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_event_delete(event_id, guild_id, cc); }); 
+}
 
 /**
  * @brief Edit/modify a scheduled event on a guild
@@ -1908,7 +1544,9 @@
  * @return scheduled_event returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_event_edit(const scheduled_event& event);
+auto inline co_guild_event_edit(const scheduled_event& event) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_event_edit(event, cc); }); 
+}
 
 /**
  * @brief Get a scheduled event for a guild
@@ -1920,22 +1558,14 @@
  * @return scheduled_event returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_event_get(snowflake guild_id, snowflake event_id);
-
-/**
- * @brief Returns all SKUs for a given application.
- * @note Because of how Discord's SKU and subscription systems work, you will see two SKUs for your premium offering.
- * For integration and testing entitlements, you should use the SKU with type: 5.
- *
- * @see dpp::cluster::skus_get
- * @see https://discord.com/developers/docs/monetization/skus#list-skus
- * @return sku_map returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_skus_get();
+auto inline co_guild_event_get(snowflake guild_id, snowflake event_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_event_get(guild_id, event_id, cc); }); 
+}
 
 
-[[nodiscard]] async<confirmation_callback_t> co_stage_instance_create(const stage_instance& si);
+auto inline co_stage_instance_create(const stage_instance& si) {
+	return dpp::awaitable(this, [&] (auto cc) { this->stage_instance_create(si, cc); }); 
+}
 
 /**
  * @brief Get the stage instance associated with the channel id, if it exists.
@@ -1945,10 +1575,14 @@
  * @return stage_instance returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_stage_instance_get(const snowflake channel_id);
+auto inline co_stage_instance_get(const snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->stage_instance_get(channel_id, cc); }); 
+}
 
 
-[[nodiscard]] async<confirmation_callback_t> co_stage_instance_edit(const stage_instance& si);
+auto inline co_stage_instance_edit(const stage_instance& si) {
+	return dpp::awaitable(this, [&] (auto cc) { this->stage_instance_edit(si, cc); }); 
+}
 
 /**
  * @brief Delete a stage instance.
@@ -1959,7 +1593,9 @@
  * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_stage_instance_delete(const snowflake channel_id);
+auto inline co_stage_instance_delete(const snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->stage_instance_delete(channel_id, cc); }); 
+}
 
 /**
  * @brief Create a sticker in a guild
@@ -1970,7 +1606,9 @@
  * @return sticker returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_sticker_create(const sticker &s);
+auto inline co_guild_sticker_create(sticker &s) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_sticker_create(s, cc); }); 
+}
 
 /**
  * @brief Delete a sticker from a guild
@@ -1982,7 +1620,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_sticker_delete(snowflake sticker_id, snowflake guild_id);
+auto inline co_guild_sticker_delete(snowflake sticker_id, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_sticker_delete(sticker_id, guild_id, cc); }); 
+}
 
 /**
  * @brief Get a guild sticker
@@ -1993,7 +1633,9 @@
  * @return sticker returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_sticker_get(snowflake id, snowflake guild_id);
+auto inline co_guild_sticker_get(snowflake id, snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_sticker_get(id, guild_id, cc); }); 
+}
 
 /**
  * @brief Modify a sticker in a guild
@@ -2004,17 +1646,21 @@
  * @return sticker returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_sticker_modify(const sticker &s);
+auto inline co_guild_sticker_modify(sticker &s) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_sticker_modify(s, cc); }); 
+}
 
 /**
  * @brief Get all guild stickers
  * @see dpp::cluster::guild_stickers_get
- * @see https://discord.com/developers/docs/resources/sticker#list-guild-stickers
+ * @see https://discord.com/developers/docs/resources/sticker#get-guild-stickers
  * @param guild_id Guild ID of the guild where the sticker is
  * @return sticker_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_stickers_get(snowflake guild_id);
+auto inline co_guild_stickers_get(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_stickers_get(guild_id, cc); }); 
+}
 
 /**
  * @brief Get a nitro sticker
@@ -2024,16 +1670,20 @@
  * @return sticker returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_nitro_sticker_get(snowflake id);
+auto inline co_nitro_sticker_get(snowflake id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->nitro_sticker_get(id, cc); }); 
+}
 
 /**
- * @brief Get a list of available sticker packs
+ * @brief Get sticker packs
  * @see dpp::cluster::sticker_packs_get
- * @see https://discord.com/developers/docs/resources/sticker#list-sticker-packs
+ * @see https://discord.com/developers/docs/resources/sticker#list-nitro-sticker-packs
  * @return sticker_pack_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_sticker_packs_get();
+auto inline co_sticker_packs_get() {
+	return dpp::awaitable(this, [&] (auto cc) { this->sticker_packs_get(cc); }); 
+}
 
 /**
  * @brief Create a new guild based on a template.
@@ -2045,7 +1695,9 @@
  * @return guild returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_create_from_template(const std::string &code, const std::string &name);
+auto inline co_guild_create_from_template(const std::string &code, const std::string &name) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_create_from_template(code, name, cc); }); 
+}
 
 /**
  * @brief Creates a template for the guild
@@ -2058,7 +1710,9 @@
  * @return dtemplate returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_template_create(snowflake guild_id, const std::string &name, const std::string &description);
+auto inline co_guild_template_create(snowflake guild_id, const std::string &name, const std::string &description) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_template_create(guild_id, name, description, cc); }); 
+}
 
 /**
  * @brief Deletes the template
@@ -2070,7 +1724,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_template_delete(snowflake guild_id, const std::string &code);
+auto inline co_guild_template_delete(snowflake guild_id, const std::string &code) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_template_delete(guild_id, code, cc); }); 
+}
 
 /**
  * @brief Modifies the template's metadata.
@@ -2084,7 +1740,9 @@
  * @return dtemplate returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_template_modify(snowflake guild_id, const std::string &code, const std::string &name, const std::string &description);
+auto inline co_guild_template_modify(snowflake guild_id, const std::string &code, const std::string &name, const std::string &description) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_template_modify(guild_id, code, name, description, cc); }); 
+}
 
 /**
  * @brief Get guild templates
@@ -2095,7 +1753,9 @@
  * @return dtemplate_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_templates_get(snowflake guild_id);
+auto inline co_guild_templates_get(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_templates_get(guild_id, cc); }); 
+}
 
 /**
  * @brief Syncs the template to the guild's current state.
@@ -2107,7 +1767,9 @@
  * @return dtemplate returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_template_sync(snowflake guild_id, const std::string &code);
+auto inline co_guild_template_sync(snowflake guild_id, const std::string &code) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_template_sync(guild_id, code, cc); }); 
+}
 
 /**
  * @brief Get a template
@@ -2117,118 +1779,119 @@
  * @return dtemplate returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_template_get(const std::string &code);
+auto inline co_template_get(const std::string &code) {
+	return dpp::awaitable(this, [&] (auto cc) { this->template_get(code, cc); }); 
+}
 
 /**
  * @brief Join a thread
  * @see dpp::cluster::current_user_join_thread
- * @see https://discord.com/developers/docs/resources/channel#join-thread
+ * @see https://discord.com/developers/docs/topics/threads
  * @param thread_id Thread ID to join
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_join_thread(snowflake thread_id);
+auto inline co_current_user_join_thread(snowflake thread_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_user_join_thread(thread_id, cc); }); 
+}
 
 /**
  * @brief Leave a thread
  * @see dpp::cluster::current_user_leave_thread
- * @see https://discord.com/developers/docs/resources/channel#leave-thread
+ * @see https://discord.com/developers/docs/topics/threads
  * @param thread_id Thread ID to leave
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_leave_thread(snowflake thread_id);
+auto inline co_current_user_leave_thread(snowflake thread_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_user_leave_thread(thread_id, cc); }); 
+}
 
 /**
- * @brief Get all active threads in the guild, including public and private threads. Threads are ordered by their id, in descending order.
+ * @brief Get active threads in a channel (Sorted by ID in descending order)
  * @see dpp::cluster::threads_get_active
- * @see https://discord.com/developers/docs/resources/guild#list-active-guild-threads
- * @param guild_id Guild to get active threads for
- * @return active_threads returned object on completion
+ * @see https://discord.com/developers/docs/topics/threads
+ * @param channel_id Channel to get active threads for
+ * @return thread_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_threads_get_active(snowflake guild_id);
+auto inline co_threads_get_active(snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->threads_get_active(channel_id, cc); }); 
+}
 
 /**
  * @brief Get private archived threads in a channel which current user has joined (Sorted by ID in descending order)
  * @see dpp::cluster::threads_get_joined_private_archived
- * @see https://discord.com/developers/docs/resources/channel#list-joined-private-archived-threads
+ * @see https://discord.com/developers/docs/topics/threads
  * @param channel_id Channel to get public archived threads for
  * @param before_id Get threads before this id
  * @param limit Number of threads to get
  * @return thread_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_threads_get_joined_private_archived(snowflake channel_id, snowflake before_id, uint16_t limit);
+auto inline co_threads_get_joined_private_archived(snowflake channel_id, snowflake before_id, uint16_t limit) {
+	return dpp::awaitable(this, [&] (auto cc) { this->threads_get_joined_private_archived(channel_id, before_id, limit, cc); }); 
+}
 
 /**
  * @brief Get private archived threads in a channel (Sorted by archive_timestamp in descending order)
  * @see dpp::cluster::threads_get_private_archived
- * @see https://discord.com/developers/docs/resources/channel#list-private-archived-threads
+ * @see https://discord.com/developers/docs/topics/threads
  * @param channel_id Channel to get public archived threads for
- * @param before_timestamp Get threads archived before this timestamp
+ * @param before_timestamp Get threads before this timestamp
  * @param limit Number of threads to get
  * @return thread_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_threads_get_private_archived(snowflake channel_id,  time_t before_timestamp, uint16_t limit);
+auto inline co_threads_get_private_archived(snowflake channel_id, time_t before_timestamp, uint16_t limit) {
+	return dpp::awaitable(this, [&] (auto cc) { this->threads_get_private_archived(channel_id, before_timestamp, limit, cc); }); 
+}
 
 /**
  * @brief Get public archived threads in a channel (Sorted by archive_timestamp in descending order)
  * @see dpp::cluster::threads_get_public_archived
- * @see https://discord.com/developers/docs/resources/channel#list-public-archived-threads
+ * @see https://discord.com/developers/docs/topics/threads
  * @param channel_id Channel to get public archived threads for
- * @param before_timestamp Get threads archived before this timestamp
+ * @param before_timestamp Get threads before this timestamp
  * @param limit Number of threads to get
  * @return thread_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_threads_get_public_archived(snowflake channel_id, time_t before_timestamp, uint16_t limit);
+auto inline co_threads_get_public_archived(snowflake channel_id, time_t before_timestamp, uint16_t limit) {
+	return dpp::awaitable(this, [&] (auto cc) { this->threads_get_public_archived(channel_id, before_timestamp, limit, cc); }); 
+}
 
 /**
  * @brief Get a thread member
  * @see dpp::cluster::thread_member_get
- * @see https://discord.com/developers/docs/resources/channel#get-thread-member
+ * @see https://discord.com/developers/docs/topics/threads
  * @param thread_id Thread to get member for
  * @param user_id ID of the user to get
  * @return thread_member returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_thread_member_get(const snowflake thread_id, const snowflake user_id);
+auto inline co_thread_member_get(const snowflake thread_id, const snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->thread_member_get(thread_id, user_id, cc); }); 
+}
 
 /**
  * @brief Get members of a thread
  * @see dpp::cluster::thread_members_get
- * @see https://discord.com/developers/docs/resources/channel#list-thread-members
+ * @see https://discord.com/developers/docs/topics/threads
  * @param thread_id Thread to get members for
  * @return thread_member_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_thread_members_get(snowflake thread_id);
-
-/**
- * @brief Create a thread in a forum or media channel
- * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
- *
- * @see dpp::cluster::thread_create_in_forum
- * @see https://discord.com/developers/docs/resources/channel#start-thread-in-forum-channel
- * @param thread_name Name of the forum thread
- * @param channel_id Forum channel in which thread to create
- * @param msg The message to start the thread with
- * @param auto_archive_duration Duration to automatically archive the thread after recent activity
- * @param rate_limit_per_user amount of seconds a user has to wait before sending another message (0-21600); bots, as well as users with the permission manage_messages, manage_thread, or manage_channel, are unaffected
- * @param applied_tags List of IDs of forum tags (dpp::forum_tag) to apply to this thread
- * @return thread returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_thread_create_in_forum(const std::string& thread_name, snowflake channel_id, const message& msg, auto_archive_duration_t auto_archive_duration, uint16_t rate_limit_per_user, std::vector<snowflake> applied_tags = {});
+auto inline co_thread_members_get(snowflake thread_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->thread_members_get(thread_id, cc); }); 
+}
 
 /**
  * @brief Create a thread
  * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
  *
  * @see dpp::cluster::thread_create
- * @see https://discord.com/developers/docs/resources/channel#start-thread-without-message
+ * @see https://discord.com/developers/docs/resources/guild#create-guild-channel
  * @param thread_name Name of the thread
  * @param channel_id Channel in which thread to create
  * @param auto_archive_duration Duration after which thread auto-archives. Can be set to - 60, 1440 (for boosted guilds can also be: 4320, 10080)
@@ -2238,25 +1901,15 @@
  * @return thread returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_thread_create(const std::string& thread_name, snowflake channel_id, uint16_t auto_archive_duration, channel_type thread_type, bool invitable, uint16_t rate_limit_per_user);
-
-/**
- * @brief Edit a thread
- * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
- *
- * @see dpp::cluster::thread_edit
- * @see https://discord.com/developers/docs/topics/threads#editing-deleting-threads
- * @param t Thread to edit
- * @return thread returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_thread_edit(const thread &t);
+auto inline co_thread_create(const std::string& thread_name, snowflake channel_id, uint16_t auto_archive_duration, channel_type thread_type, bool invitable, uint16_t rate_limit_per_user) {
+	return dpp::awaitable(this, [&] (auto cc) { this->thread_create(thread_name, channel_id, auto_archive_duration, thread_type, invitable, rate_limit_per_user, cc); }); 
+}
 
 /**
  * @brief Create a thread with a message (Discord: ID of a thread is same as message ID)
  * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
  * @see dpp::cluster::thread_create_with_message
- * @see https://discord.com/developers/docs/resources/channel#start-thread-from-message
+ * @see https://discord.com/developers/docs/topics/threads
  * @param thread_name Name of the thread
  * @param channel_id Channel in which thread to create
  * @param message_id message to start thread with
@@ -2265,60 +1918,53 @@
  * @return thread returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_thread_create_with_message(const std::string& thread_name, snowflake channel_id, snowflake message_id, uint16_t auto_archive_duration, uint16_t rate_limit_per_user);
+auto inline co_thread_create_with_message(const std::string& thread_name, snowflake channel_id, snowflake message_id, uint16_t auto_archive_duration, uint16_t rate_limit_per_user) {
+	return dpp::awaitable(this, [&] (auto cc) { this->thread_create_with_message(thread_name, channel_id, message_id, auto_archive_duration, rate_limit_per_user, cc); }); 
+}
 
 /**
  * @brief Add a member to a thread
  * @see dpp::cluster::thread_member_add
- * @see https://discord.com/developers/docs/resources/channel#add-thread-member
+ * @see https://discord.com/developers/docs/topics/threads
  * @param thread_id Thread ID to add to
  * @param user_id Member ID to add
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_thread_member_add(snowflake thread_id, snowflake user_id);
+auto inline co_thread_member_add(snowflake thread_id, snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->thread_member_add(thread_id, user_id, cc); }); 
+}
 
 /**
  * @brief Remove a member from a thread
  * @see dpp::cluster::thread_member_remove
- * @see https://discord.com/developers/docs/resources/channel#remove-thread-member
+ * @see https://discord.com/developers/docs/topics/threads
  * @param thread_id Thread ID to remove from
  * @param user_id Member ID to remove
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_thread_member_remove(snowflake thread_id, snowflake user_id);
+auto inline co_thread_member_remove(snowflake thread_id, snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->thread_member_remove(thread_id, user_id, cc); }); 
+}
 
 /**
- * @brief Get the thread specified by thread_id. This uses the same call as dpp::cluster::channel_get but returns a thread object.
- * @see dpp::cluster::thread_get
- * @see https://discord.com/developers/docs/resources/channel#get-channel
- * @param thread_id The id of the thread to obtain.
- * @return thread returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_thread_get(snowflake thread_id);
-
-/**
- * @brief Edit current (bot) user.
+ * @brief Edit current (bot) user
  *
- * Modify the requester's user account settings. Returns a dpp::user object on success.
- * Fires a User Update Gateway event.
- *
- * @note There appears to be no limit to the image size, however, if your image cannot be processed/uploaded in time, you will receive a malformed http request.
- *
+ * Modifies the current member in a guild. Returns the updated guild_member object on success.
+ * Fires a `Guild Member Update` Gateway event.
  * @see dpp::cluster::current_user_edit
  * @see https://discord.com/developers/docs/resources/user#modify-current-user
  * @param nickname Nickname to set
- * @param avatar_blob Avatar data to upload
- * @param avatar_type Type of image for avatar. It can be one of `i_gif`, `i_jpg` or `i_png`.
- * @param banner_blob Banner data to upload
- * @param banner_type Type of image for Banner. It can be one of `i_gif`, `i_jpg` or `i_png`.
+ * @param image_blob Avatar data to upload (NOTE: Very heavily rate limited!)
+ * @param type Type of image for avatar
  * @return user returned object on completion
- 	 * @throw dpp::length_exception Image data is larger than the maximum size of 256 kilobytes
+ 	 * @throw dpp::exception Image data is larger than the maximum size of 256 kilobytes
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_edit(const std::string &nickname, const std::string& avatar_blob = "", const image_type avatar_type = i_png, const std::string& banner_blob = "", const image_type banner_type = i_png);
+auto inline co_current_user_edit(const std::string &nickname, const std::string& image_blob, const image_type type) {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_user_edit(nickname, image_blob, type, cc); }); 
+}
 
 /**
  * @brief Get current (bot) application
@@ -2328,7 +1974,9 @@
  * @return application returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_application_get();
+auto inline co_current_application_get() {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_application_get(cc); }); 
+}
 
 /**
  * @brief Get current (bot) user
@@ -2340,7 +1988,9 @@
  * If you do not have these scopes, these fields are empty. You can safely convert a user_identified to user with `dynamic_cast`.
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_get();
+auto inline co_current_user_get() {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_user_get(cc); }); 
+}
 
 /**
  * @brief Set the bot's voice state on a stage channel
@@ -2365,18 +2015,9 @@
  * @throw std::logic_exception You attempted to set a request_to_speak_timestamp in the past which is not the value of 0.
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_set_voice_state(snowflake guild_id, snowflake channel_id, bool suppress = false, time_t request_to_speak_timestamp = 0);
-
-/**
- * @brief Get the bot's voice state in a guild without a Gateway connection
- *
- * @see dpp::cluster::current_user_get_voice_state
- * @see https://discord.com/developers/docs/resources/voice#get-current-user-voice-state
- * @param guild_id Guild to get the voice state for
- * @return voicestate returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_get_voice_state(snowflake guild_id);
+auto inline co_current_user_set_voice_state(snowflake guild_id, snowflake channel_id, bool suppress, time_t request_to_speak_timestamp) {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_user_set_voice_state(guild_id, channel_id, suppress, request_to_speak_timestamp, cc); }); 
+}
 
 /**
  * @brief Set a user's voice state on a stage channel
@@ -2400,19 +2041,9 @@
  * @param suppress True if the user's audio should be suppressed, false if it should not
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_user_set_voice_state(snowflake user_id, snowflake guild_id, snowflake channel_id, bool suppress = false);
-
-/**
- * @brief Get a user's voice state in a guild without a Gateway connection
- *
- * @see dpp::cluster::user_get_voice_state
- * @see https://discord.com/developers/docs/resources/voice#get-user-voice-state
- * @param guild_id Guild to get the voice state for
- * @param user_id The user to get the voice state of
- * @return voicestate returned object on completion
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_user_get_voice_state(snowflake guild_id, snowflake user_id);
+auto inline co_user_set_voice_state(snowflake user_id, snowflake guild_id, snowflake channel_id, bool suppress) {
+	return dpp::awaitable(this, [&] (auto cc) { this->user_set_voice_state(user_id, guild_id, channel_id, suppress, cc); }); 
+}
 
 /**
  * @brief Get current user's connections (linked accounts, e.g. steam, xbox).
@@ -2423,7 +2054,9 @@
  * @return connection_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_connections_get();
+auto inline co_current_user_connections_get() {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_user_connections_get(cc); }); 
+}
 
 /**
  * @brief Get current (bot) user guilds
@@ -2432,7 +2065,9 @@
  * @return guild_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_get_guilds();
+auto inline co_current_user_get_guilds() {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_user_get_guilds(cc); }); 
+}
 
 /**
  * @brief Leave a guild
@@ -2442,10 +2077,12 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_current_user_leave_guild(snowflake guild_id);
+auto inline co_current_user_leave_guild(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->current_user_leave_guild(guild_id, cc); }); 
+}
 
 /**
- * @brief Get a user by id, without using the cache
+ * @brief Get a user by id
  *
  * @see dpp::cluster::user_get
  * @see https://discord.com/developers/docs/resources/user#get-user
@@ -2457,22 +2094,9 @@
  * Call `dpp::find_user` instead that looks up the user in the cache rather than a REST call.
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_user_get(snowflake user_id);
-
-/**
- * @brief Get a user by id, checking in the cache first
- *
- * @see dpp::cluster::user_get_cached
- * @see https://discord.com/developers/docs/resources/user#get-user
- * @param user_id User ID to retrieve
- * @return user_identified returned object on completion
- * @note The user_identified object is a subclass of dpp::user which contains further details if you have the oauth2 identify or email scopes.
- * If you do not have these scopes, these fields are empty. You can safely convert a user_identified to user with `dynamic_cast`.
- * @note If the user is found in the cache, special values set in `dpp::user_identified` will be undefined. This call should be used
- * where you want to for example resolve a user who may no longer be in the bot's guilds, for something like a ban log message.
- * \memberof dpp::cluster
- */
-[[nodiscard]] async<confirmation_callback_t> co_user_get_cached(snowflake user_id);
+auto inline co_user_get(snowflake user_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->user_get(user_id, cc); }); 
+}
 
 /**
  * @brief Get all voice regions
@@ -2481,7 +2105,9 @@
  * @return voiceregion_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_get_voice_regions();
+auto inline co_get_voice_regions() {
+	return dpp::awaitable(this, [&] (auto cc) { this->get_voice_regions(cc); }); 
+}
 
 /**
  * @brief Get guild voice regions.
@@ -2496,10 +2122,22 @@
  * @return voiceregion_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_guild_get_voice_regions(snowflake guild_id);
+auto inline co_guild_get_voice_regions(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->guild_get_voice_regions(guild_id, cc); }); 
+}
 
-
-[[nodiscard]] async<confirmation_callback_t> co_create_webhook(const class webhook &wh);
+/**
+ * @brief Create a webhook
+ * @note This method supports audit log reasons set by the cluster::set_audit_reason() method.
+ * @see dpp::cluster::create_webhook
+ * @see https://discord.com/developers/docs/resources/webhook#create-webhook
+ * @param w Webhook to create
+ * @return webhook returned object on completion
+ * \memberof dpp::cluster
+ */
+auto inline co_create_webhook(const class webhook &w) {
+	return dpp::awaitable(this, [&] (auto cc) { this->create_webhook(w, cc); }); 
+}
 
 /**
  * @brief Delete a webhook
@@ -2510,7 +2148,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_delete_webhook(snowflake webhook_id);
+auto inline co_delete_webhook(snowflake webhook_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->delete_webhook(webhook_id, cc); }); 
+}
 
 /**
  * @brief Delete webhook message
@@ -2523,7 +2163,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_delete_webhook_message(const class webhook &wh, snowflake message_id, snowflake thread_id = 0);
+auto inline co_delete_webhook_message(const class webhook &wh, snowflake message_id, snowflake thread_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->delete_webhook_message(wh, message_id, thread_id, cc); }); 
+}
 
 /**
  * @brief Delete webhook with token
@@ -2534,7 +2176,9 @@
  * @return confirmation returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_delete_webhook_with_token(snowflake webhook_id, const std::string &token);
+auto inline co_delete_webhook_with_token(snowflake webhook_id, const std::string &token) {
+	return dpp::awaitable(this, [&] (auto cc) { this->delete_webhook_with_token(webhook_id, token, cc); }); 
+}
 
 /**
  * @brief Edit webhook
@@ -2545,7 +2189,9 @@
  * @return webhook returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_edit_webhook(const class webhook& wh);
+auto inline co_edit_webhook(const class webhook& wh) {
+	return dpp::awaitable(this, [&] (auto cc) { this->edit_webhook(wh, cc); }); 
+}
 
 /**
  * @brief Edit webhook message
@@ -2564,7 +2210,9 @@
  * @return message returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_edit_webhook_message(const class webhook &wh, const struct message &m, snowflake thread_id = 0);
+auto inline co_edit_webhook_message(const class webhook &wh, const struct message& m, snowflake thread_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->edit_webhook_message(wh, m, thread_id, cc); }); 
+}
 
 /**
  * @brief Edit webhook with token (token is encapsulated in the webhook object)
@@ -2574,7 +2222,9 @@
  * @return webhook returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_edit_webhook_with_token(const class webhook& wh);
+auto inline co_edit_webhook_with_token(const class webhook& wh) {
+	return dpp::awaitable(this, [&] (auto cc) { this->edit_webhook_with_token(wh, cc); }); 
+}
 
 /**
  * @brief Execute webhook
@@ -2590,7 +2240,9 @@
  * @note If the webhook channel is a forum channel, you must provide either `thread_id` or `thread_name`. If `thread_id` is provided, the message will send in that thread. If `thread_name` is provided, a thread with that name will be created in the forum channel.
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_execute_webhook(const class webhook &wh, const struct message &m, bool wait = false, snowflake thread_id = 0, const std::string& thread_name = "");
+auto inline co_execute_webhook(const class webhook &wh, const struct message& m, bool wait, snowflake thread_id, const std::string& thread_name) {
+	return dpp::awaitable(this, [&] (auto cc) { this->execute_webhook(wh, m, wait, thread_id, thread_name, cc); }); 
+}
 
 /**
  * @brief Get channel webhooks
@@ -2600,7 +2252,9 @@
  * @return webhook_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_get_channel_webhooks(snowflake channel_id);
+auto inline co_get_channel_webhooks(snowflake channel_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->get_channel_webhooks(channel_id, cc); }); 
+}
 
 /**
  * @brief Get guild webhooks
@@ -2610,7 +2264,9 @@
  * @return webhook_map returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_get_guild_webhooks(snowflake guild_id);
+auto inline co_get_guild_webhooks(snowflake guild_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->get_guild_webhooks(guild_id, cc); }); 
+}
 
 /**
  * @brief Get webhook
@@ -2620,7 +2276,9 @@
  * @return webhook returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_get_webhook(snowflake webhook_id);
+auto inline co_get_webhook(snowflake webhook_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->get_webhook(webhook_id, cc); }); 
+}
 
 /**
  * @brief Get webhook message
@@ -2633,7 +2291,9 @@
  * @return message returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_get_webhook_message(const class webhook &wh, snowflake message_id, snowflake thread_id = 0);
+auto inline co_get_webhook_message(const class webhook &wh, snowflake message_id, snowflake thread_id) {
+	return dpp::awaitable(this, [&] (auto cc) { this->get_webhook_message(wh, message_id, thread_id, cc); }); 
+}
 
 /**
  * @brief Get webhook using token
@@ -2644,9 +2304,13 @@
  * @return webhook returned object on completion
  * \memberof dpp::cluster
  */
-[[nodiscard]] async<confirmation_callback_t> co_get_webhook_with_token(snowflake webhook_id, const std::string &token);
+auto inline co_get_webhook_with_token(snowflake webhook_id, const std::string &token) {
+	return dpp::awaitable(this, [&] (auto cc) { this->get_webhook_with_token(webhook_id, token, cc); }); 
+}
 
 
 /* End of auto-generated definitions */
-[[nodiscard]] async<http_request_completion_t> co_request(const std::string &url, http_method method, const std::string &postdata = "", const std::string &mimetype = "text/plain", const std::multimap<std::string, std::string> &headers = {}, const std::string &protocol = "1.1");
+auto inline co_request(const std::string &url, http_method method, const std::string &postdata = "", const std::string &mimetype = "text/plain", const std::multimap<std::string, std::string> &headers = {}) {
+	return dpp::awaitable(this, [&] (auto cc) { this->request(url, method, cc, mimetype, headers); }); 
+}
 

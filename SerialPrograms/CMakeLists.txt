@@ -192,9 +192,6 @@ endfunction()
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
-set(DPP_DLL_DEBUG "${REPO_ROOT_DIR}/3rdPartyBinaries/Debug/dpp.dll")
-set(DPP_DLL_RELEASE "${REPO_ROOT_DIR}/3rdPartyBinaries/Release/dpp.dll")
-
 set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
 set(FIRMWARE_DIR "${PACKAGES_DIR}/Firmware")
 set(SCRIPTS_DIR "${PACKAGES_DIR}/Scripts")
@@ -265,7 +262,12 @@ if (WIN32)
 
     add_library(dpp_lib IMPORTED UNKNOWN)
     set_target_properties(dpp_lib PROPERTIES
-        IMPORTED_LOCATION ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_RELEASE           ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dpp.lib
+        IMPORTED_LOCATION_DEBUG             ${CMAKE_CURRENT_SOURCE_DIR}/../3rdPartyBinaries/dppd.lib
+        MAP_IMPORTED_CONFIG_DEBUG           DEBUG
+        MAP_IMPORTED_CONFIG_RELEASE         RELEASE
+        MAP_IMPORTED_CONFIG_RELWITHDEBINFO  RELEASE
+        MAP_IMPORTED_CONFIG_MINSIZEREL      RELEASE
     )
 
     add_library(discord_lib IMPORTED UNKNOWN)
@@ -356,7 +358,7 @@ else() # macOS and Linux
 
     else() # Linux
         # ONNX RUNTIME LINUX CONFIG
-        # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
+    # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
         # this can be done via -DONNX_ROOT_PATH=/path/to/onnx
 
         # If the path isn't provided, it'll automatically download the 1.23.0 release to the build folder,
@@ -453,11 +455,12 @@ else() # macOS and Linux
         target_link_libraries(SerialProgramsLib PRIVATE ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
-    pkg_search_module(DPP dpp>=10.1)
+    pkg_search_module(DPP dpp=10.0.22)
     if (DPP_FOUND) # enable dpp integration
         target_compile_definitions(SerialProgramsLib PUBLIC PA_DPP)
-        target_compile_options(SerialProgramsLib PRIVATE ${DPP_CFLAGS_OTHER})
-        target_include_directories(SerialProgramsLib PRIVATE ${DPP_INCLUDE_DIRS})
+        ## to build against headers within this repo and properly set flags ##
+        ## don't enable the following line ##
+        # target_include_directories(SerialProgramsLib PRIVATE ${DPP_INCLUDE_DIRS})
         target_link_directories(SerialProgramsLib PUBLIC ${DPP_LIBRARY_DIRS})
         target_link_libraries(SerialProgramsLib PUBLIC ${DPP_LIBRARIES})
     endif()
@@ -605,15 +608,6 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<IF:$<CONFIG:Debug>,${DISCORD_DLL_DEBUG},${DISCORD_DLL_RELEASE}>"
             "${DEPLOY_DIR}/discord_partner_sdk.dll"
-    )
-
-    # Copy DPP DLL
-    add_custom_command(
-        TARGET SerialPrograms POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying DPP SDK DLL"
-        COMMAND ${CMAKE_COMMAND} -E copy_if_different
-            "$<IF:$<CONFIG:Debug>,${DPP_DLL_DEBUG},${DPP_DLL_RELEASE}>"
-            "${DEPLOY_DIR}/dpp.dll"
     )
 
     # Move built .exe and .pdb to deploy folder, print if pdb is missing
