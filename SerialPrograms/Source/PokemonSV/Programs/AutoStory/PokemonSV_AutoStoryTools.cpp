@@ -251,6 +251,52 @@ bool confirm_marker_present(
 
 }
 
+void realign_player(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
+    PlayerRealignMode realign_mode,
+    uint8_t move_x, uint8_t move_y, uint16_t move_duration
+){
+    stream.log("Realigning player direction...");
+    switch (realign_mode){
+    case PlayerRealignMode::REALIGN_NEW_MARKER:
+        stream.log("Setting new map marker...");
+
+        handle_unexpected_battles(info, stream, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            open_map_from_overworld(info, stream, context);
+        });
+
+        pbf_press_button(context, BUTTON_ZR, 20, 105);
+        pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105);
+
+        handle_unexpected_battles(info, stream, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){        
+            leave_phone_to_overworld(info, stream, context);
+        });
+        return;     
+    case PlayerRealignMode::REALIGN_OLD_MARKER:
+        handle_unexpected_battles(info, stream, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            open_map_from_overworld(info, stream, context, false);
+        });
+
+        handle_unexpected_battles(info, stream, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){        
+            leave_phone_to_overworld(info, stream, context);
+        });
+
+        pbf_press_button(context, BUTTON_L, 20, 105);
+        return;
+    case PlayerRealignMode::REALIGN_NO_MARKER:
+        pbf_move_left_joystick(context, move_x, move_y, move_duration, 1 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_L, 20, 105);
+        return;
+    }  
+
+}
+
+
 void overworld_navigation(
     const ProgramInfo& info, 
     VideoStream& stream,
