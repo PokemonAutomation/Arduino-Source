@@ -48,6 +48,19 @@ void checkpoint_62(
 );
 
 
+// start: Beat Medali Gym
+// end: At Glaseado Mountain Pokecenter
+void checkpoint_63(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+// moves player from Medali West Pokecenter to Glaseado Mountain Pokecenter
+void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+
 }
 }
 }
