@@ -50,7 +50,14 @@ bool gamemenu_to_ingame(
     //Includes choosing the controller.
     //Controllers are disconnected? on selection screen so make sure to mash.
     stream.log("Mashing A to enter game and select controller...");
-    pbf_mash_button(context, BUTTON_A, mash_duration);
+
+    //  Slow mash to minimize chance of silent disconnect while the controller
+    //  disconnects and reconnects.
+    for (Milliseconds t = 0ms; t < mash_duration; t += 1000ms){
+        pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    }
+//    pbf_mash_button(context, BUTTON_A, mash_duration);
+
     context.wait_for_all_requests();
 
     //White screen, Pikachu/Eevee running across the screen. Mash will not speed it up.
@@ -61,8 +68,9 @@ bool gamemenu_to_ingame(
         stream, context,
         [&enter_game_timeout](JoyconContext& context){
             pbf_wait(context, enter_game_timeout);
-            pbf_press_button(context, BUTTON_A, 400ms, 10ms);
-            pbf_wait(context, 5000ms);
+            for (int c = 0; c < 20; c++){
+                pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+            }
         },
         {detector}
     );
@@ -81,8 +89,9 @@ bool gamemenu_to_ingame(
     int ret2 = run_until<JoyconContext>(
         stream, context,
         [](JoyconContext& context){
-            pbf_press_button(context, BUTTON_A, 400ms, 10ms);
-            pbf_wait(context, 5000ms);
+            for (int c = 0; c < 20; c++){
+                pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+            }
         },
         {detector2}
     );
