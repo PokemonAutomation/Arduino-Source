@@ -6,6 +6,7 @@
 
 #include <chrono>
 #include "Common/CRC32.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "NintendoSwitch_ControllerSettings.h"
 
 //#include <iostream>
@@ -418,22 +419,12 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
 
     bool found = false;
     this->run_on_all_rows([&, controller](ControllerSettingsRow& row){
-        if (row.controller_mac_address == mac_address){
-//            row.name.set(name);
-            row.controller_mac_address.set(mac_address);
-            row.controller.set(controller);
-            found = true;
-            profile = row;
-            return true;
-        }
-        if ((std::string)row.name != name){
-            return false;
-        }
-        if (row.controller != controller){
+        if (row.controller_mac_address != mac_address){
             return false;
         }
 
-        row.controller_mac_address.set(mac_address);
+        global_logger_tagged().log("ControllerSettingsTable: Found matching MAC address. Loading profile...");
+        row.controller.set(controller);
         found = true;
         profile = row;
         return true;
@@ -442,6 +433,8 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
     if (found){
         return profile;
     }
+
+    global_logger_tagged().log("ControllerSettingsTable: Creating new profile...");
 
     profile = random_profile(controller);
 
