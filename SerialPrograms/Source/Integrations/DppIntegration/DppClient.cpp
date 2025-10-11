@@ -1,13 +1,14 @@
 #ifdef PA_DPP
 
 #include <set>
+#include <dpp/dpp.h>
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Qt/StringToolsQt.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "DppClient.h"
-#include "DppCommandHandler.h"
+#include "Integrations/DppIntegration/DppClient.h"
+#include "Integrations/DppIntegration/DppCommandHandler.h"
 
 //#include <iostream>
 //using std::cout;

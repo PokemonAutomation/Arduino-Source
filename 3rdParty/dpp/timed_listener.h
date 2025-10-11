@@ -40,30 +40,20 @@ namespace dpp {
 template <typename attached_event, class listening_function> class timed_listener 
 {
 private:
-	/**
-	 * @brief Owning cluster.
-	 */
+	/// Owning cluster
 	cluster* owner;
 
-	/**
-	 * @brief Duration of listen.
-	 */
+	/// Duration of listen
 	time_t duration;
 
-	/**
-	 * @brief Reference to attached event in cluster.
-	 */
+	/// Reference to attached event in cluster
 	//event_router_t<thread_member_update_t> on_thread_member_update;
 	attached_event& ev;
 
-	/**
-	 * @brief Timer handle.
-	 */
+	/// Timer handle
 	timer th;
 
-	/**
-	 * @brief Event handle.
-	 */
+	/// Event handle
 	event_handle listener_handle;
 	
 public:
@@ -83,7 +73,7 @@ public:
 		/* Attach event */
 		listener_handle = ev(listener);
 		/* Create timer */
-		th = cl->start_timer([this]([[maybe_unused]] dpp::timer timer_handle) {
+		th = cl->start_timer([this](dpp::timer timer_handle) {
 			/* Timer has finished, detach it from event.
 			 * Only allowed to tick once.
 			 */
@@ -102,4 +92,4 @@ public:
 	}
 };
 
-}
+};
