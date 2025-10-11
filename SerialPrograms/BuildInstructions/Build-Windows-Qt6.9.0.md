@@ -1,6 +1,6 @@
-# How to Build (Qt 6.9.0) - Windows
+# How to Build (Qt 6.9.0) - Windows (does not work)
 
-**(Note: These instructions have not been fully tested for 6.9.0. Let us know if you encounter any issues.)**
+**Qt 6.9 does not work due to https://bugreports.qt.io/browse/QTBUG-131892. You must use Qt 6.8.3.**
 
 ## Build Tools:
 
@@ -123,4 +123,5 @@ When building, if you get the error `yvals_core.h:931: error: STL1001: Unexpecte
 
 
 [<img src="https://canary.discordapp.com/api/guilds/695809740428673034/widget.png?style=banner2">](https://discord.gg/cQ4gWxN)
+
 
