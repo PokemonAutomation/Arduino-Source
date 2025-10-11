@@ -47,61 +47,79 @@ bool gamemenu_to_ingame(
     VideoStream& stream, JoyconContext& context,
     Milliseconds mash_duration, Milliseconds enter_game_timeout
 ){
-    //Includes choosing the controller.
-    //Controllers are disconnected? on selection screen so make sure to mash.
+    //  Includes choosing the controller.
+    //  Controllers are disconnected? on selection screen so make sure to mash.
     stream.log("Mashing A to enter game and select controller...");
 
     //  Slow mash to minimize chance of silent disconnect while the controller
     //  disconnects and reconnects.
-    for (Milliseconds t = 0ms; t < mash_duration; t += 1000ms){
-        pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+    {
+        BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
+        stream.log("Connecting controller...");
+        int ret = run_until<JoyconContext>(
+            stream, context,
+            [](JoyconContext& context){
+                for (int c = 0; c < 20; c++){
+                    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+                }
+            },
+            {detector}
+        );
+        if (ret == 0){
+            stream.log("Loading game...");
+        }else{
+            stream.log("Timed out waiting to connect controller.", COLOR_RED);
+            return false;
+        }
     }
 //    pbf_mash_button(context, BUTTON_A, mash_duration);
 
     context.wait_for_all_requests();
 
-    //White screen, Pikachu/Eevee running across the screen. Mash will not speed it up.
-    //Mash A at then end to enter continue screen
-    BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
-    stream.log("Waiting to enter game...");
-    int ret = run_until<JoyconContext>(
-        stream, context,
-        [&enter_game_timeout](JoyconContext& context){
-            pbf_wait(context, enter_game_timeout);
-            for (int c = 0; c < 20; c++){
-                pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-            }
-        },
-        {detector}
-    );
-    context.wait_for_all_requests();
-    if (ret == 0){
-        stream.log("At continue screen.");
-    }else{
-        stream.log("Timed out waiting to enter game and select continue.", COLOR_RED);
-        return false;
+    //  White screen, Pikachu/Eevee running across the screen. Mash will not speed it up.
+    //  Mash A at then end to enter continue screen
+    {
+        BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
+        stream.log("Waiting to enter game...");
+        int ret = run_until<JoyconContext>(
+            stream, context,
+            [&enter_game_timeout](JoyconContext& context){
+                pbf_wait(context, enter_game_timeout);
+                for (int c = 0; c < 20; c++){
+                    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+                }
+            },
+            {detector}
+        );
+        if (ret == 0){
+            stream.log("At continue screen.");
+        }else{
+            stream.log("Timed out waiting to enter game and select continue.", COLOR_RED);
+            return false;
+        }
     }
     pbf_wait(context, 1000ms);
     context.wait_for_all_requests();
 
-    //Continue your adventure.
-    BlackScreenOverWatcher detector2(COLOR_YELLOW, {0.2, 0.2, 0.6, 0.6});
-    int ret2 = run_until<JoyconContext>(
-        stream, context,
-        [](JoyconContext& context){
-            for (int c = 0; c < 20; c++){
-                pbf_press_button(context, BUTTON_A, 200ms, 800ms);
-            }
-        },
-        {detector2}
-    );
-    context.wait_for_all_requests();
-    if (ret2 == 0){
-        stream.log("Entered game!");
-        return true;
-    }else{
-        stream.log("Timed out waiting to enter game.", COLOR_RED);
-        return false;
+    //  Continue your adventure.
+    {
+        BlackScreenOverWatcher detector(COLOR_YELLOW, {0.2, 0.2, 0.6, 0.6});
+        int ret = run_until<JoyconContext>(
+            stream, context,
+            [](JoyconContext& context){
+                for (int c = 0; c < 20; c++){
+                    pbf_press_button(context, BUTTON_A, 200ms, 800ms);
+                }
+            },
+            {detector}
+        );
+        if (ret == 0){
+            stream.log("Entered game!");
+            return true;
+        }else{
+            stream.log("Timed out waiting to enter game.", COLOR_RED);
+            return false;
+        }
     }
 }
 
