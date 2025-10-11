@@ -57,6 +57,7 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, Pro
         }
 
         int ret = 0;
+        NormalBattleMenuWatcher battle(COLOR_BLUE);
         OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
         WhiteButtonWatcher map(COLOR_RED, WhiteButton::ButtonY, {0.800, 0.118, 0.030, 0.060});
         GradientArrowWatcher spot_dialog_watcher(COLOR_YELLOW, GradientArrowType::RIGHT, {0.469, 0.500, 0.215, 0.150});
@@ -66,8 +67,8 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, Pro
 
         context.wait_for_all_requests();
 
-        std::vector<PeriodicInferenceCallback> callbacks{overworld, map, spot_dialog_watcher, confirm_watcher};
-        if (check_fly_menuitem){
+        std::vector<PeriodicInferenceCallback> callbacks{overworld, map, spot_dialog_watcher, confirm_watcher, battle};
+        if (check_fly_menuitem){ // callbacks: overworld, map, flyMenuItemWatcher, confirm_watcher, battle, destinationMenuItemWatcher
             callbacks[2] = flyMenuItemWatcher;
             callbacks.push_back(destinationMenuItemWatcher);
         }
@@ -75,24 +76,31 @@ bool fly_to_overworld_from_map(const ProgramInfo& info, VideoStream& stream, Pro
         ret = wait_until(stream, context, std::chrono::minutes(2), callbacks);
         context.wait_for(std::chrono::milliseconds(100));
         switch (ret){
-        case 0:
+        case 0: // overworld
             stream.log("Detected overworld. Fly successful.");
             return true;
-        case 1:
+        case 1: // map
             stream.log("Detected map. Pressing A to open map menu.");
             // Press A to bring up the promp dialog on choosing "Fly here", "Set as destination", "Never mind".
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
-        case 2:
+        case 2: // spot_dialog_watcher or flyMenuItemWatcher
             stream.log("Detected fly here prompt dialog.");
             stream.overlay().add_log("Fly");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
-        case 3:
+        case 3: //confirm_watcher
             stream.log("Detected fly confirmation prompt.");
             pbf_press_button(context, BUTTON_A, 20, 130);
             continue;
-        case 4:
+        case 4: //battle
+            stream.log("Detected battle.");
+            throw_and_log<UnexpectedBattleException>(
+                stream.logger(), ErrorReport::SEND_ERROR_REPORT,
+                "fly_to_overworld_from_map(): Unexpectedly detected battle.",
+                stream
+            ); 
+        case 5: //destinationMenuItemWatcher
             stream.log("Detected no fly spot here.");
             stream.overlay().add_log("No fly spot", COLOR_RED);
             return false;
