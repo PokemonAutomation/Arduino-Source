@@ -129,6 +129,25 @@ OpenCV is a software package for various computer vision algorithms. We need it 
 brew install opencv
 ```
 
+### Install DPP (optional)
+DPP is a library for Discord integration. If you need discord webhooks for notification you need to install it.
+You can do this step after [Part 3: Download Codebase](#part-3-download-codebase).
+
+However we are using an old version of DPP (for compatibility and stability) that's not available directly on Homebrew. But you can simply tap one:
+
+```shell
+brew tap-new --no-git <yourname>/libdpp # change <yourname> to any desired name, e.g. "my"
+```
+Copy the formula into the tap:
+```shell
+cp <SOURCE_DIR_ROOT>/3rdPartyBinaries/libdpp@10.0.22.rb $(brew --prefix)/Library/Taps/<yourname>/homebrew-libdpp/Formula/ # change <SOURCE_DIR_ROOT> to where *Arduino-Source* located
+```
+And then install it with:
+```shell
+brew unlink libdpp # if you have already install the official one
+brew install libdpp@10.0.22
+```
+
 ### Verify Clang Version
 
 Before building the code of the automation program, make sure the software that builds the code into program is up-to-date. This software is called compilers by programmers. Apple provides a compiler called Clang on macOS. Verify its version by executing the command in Terminal:
