@@ -29,6 +29,38 @@ public:
 
 
 
+// start: At Medali Pokecenter.
+// end: At Medali Gym
+void checkpoint_61(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+// start: At Medali Gym
+// end: Beat Medali Gym
+void checkpoint_62(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+
+// start: Beat Medali Gym
+// end: At Glaseado Mountain Pokecenter
+void checkpoint_63(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+);
+
+// moves player from Medali West Pokecenter to Glaseado Mountain Pokecenter
+void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+
 }
 }
 }

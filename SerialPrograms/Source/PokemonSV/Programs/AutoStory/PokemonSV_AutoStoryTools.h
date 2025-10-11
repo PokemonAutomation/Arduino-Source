@@ -297,8 +297,6 @@ void checkpoint_reattempt_loop_tutorial(
 );
 
 
-// moves player from Medali West Pokecenter to Glaseado Mountain Pokecenter
-void move_from_medali_to_glaseado_mountain(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 // moves player from Glaseado Mountain Pokecenter to Casseroya Watchtower 3
 void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
