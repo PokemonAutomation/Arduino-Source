@@ -21,12 +21,12 @@ const std::map<pabb_ProgramID, uint32_t>& SUPPORTED_DEVICES(){
         {PABB_PID_PABOTBASE_ProMicro,           2025090303},
         {PABB_PID_PABOTBASE_Teensy2,            2025090303},
         {PABB_PID_PABOTBASE_TeensyPP2,          2025090303},
-        {PABB_PID_PABOTBASE_ESP32,              2025092304},
+        {PABB_PID_PABOTBASE_ESP32,              2025092305},
         {PABB_PID_PABOTBASE_ESP32S3,            2025090304},
-        {PABB_PID_PABOTBASE_Pico1W_USB,         2025090406},
-        {PABB_PID_PABOTBASE_Pico1W_UART,        2025090406},
-        {PABB_PID_PABOTBASE_Pico2W_USB,         2025090406},
-        {PABB_PID_PABOTBASE_Pico2W_UART,        2025090406},
+        {PABB_PID_PABOTBASE_Pico1W_USB,         2025090409},
+        {PABB_PID_PABOTBASE_Pico1W_UART,        2025090409},
+        {PABB_PID_PABOTBASE_Pico2W_USB,         2025090409},
+        {PABB_PID_PABOTBASE_Pico2W_UART,        2025090409},
     };
     return database;
 }
