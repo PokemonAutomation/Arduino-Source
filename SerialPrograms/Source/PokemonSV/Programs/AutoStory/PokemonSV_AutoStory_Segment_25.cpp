@@ -170,7 +170,7 @@ void checkpoint_59(
             [&](ProControllerContext& context){
 
                 DirectionDetector direction;
-                uint16_t seconds_wait = 8; // todo: change back to 6-8
+                uint16_t seconds_wait = 8;
  
                 direction.change_direction(env.program_info(), env.console, context, 2.618972);
                 pbf_move_left_joystick(context, 128, 0, 100, 50);
