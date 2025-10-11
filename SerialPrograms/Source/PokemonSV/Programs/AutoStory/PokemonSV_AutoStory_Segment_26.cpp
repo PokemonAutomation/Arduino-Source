@@ -126,8 +126,8 @@ void checkpoint_62(
     EventNotificationOption& notif_status_update,
     AutoStoryStats& stats
 ){
-    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    // [&](size_t attempt_number){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
 
         pbf_move_left_joystick(context, 128, 255, 500, 100);
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
@@ -137,21 +137,61 @@ void checkpoint_62(
         // fly to Medali East Pokecenter
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 255, 128, 20}, FlyPoint::POKECENTER);
 
+        pbf_press_button(context, BUTTON_L, 50, 50);
+
         DirectionDetector direction;
         direction.change_direction(env.program_info(), env.console, context, 1.971173);
-        pbf_move_left_joystick(context, 128, 0, 700, 50);
+        pbf_move_left_joystick(context, 128, 0, 600, 50);
 
         direction.change_direction(env.program_info(), env.console, context, 3.191172);
         pbf_move_left_joystick(context, 128, 0, 300, 50);
 
-        direction.change_direction(env.program_info(), env.console, context, 4.975295);
+         
+        direction.change_direction(env.program_info(), env.console, context, 5.114177);  // old 4.975295
         pbf_move_left_joystick(context, 128, 0, 300, 50);
 
         pbf_wait(context, 3 * TICKS_PER_SECOND);        
         // wait for overworld after entering Eatery
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
-    // });    
+        pbf_move_left_joystick(context, 255, 128, 50, 50);
+        
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+
+        // grilled rice balls
+        pbf_press_button(context, BUTTON_A, 50, 50);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        // medium serving
+        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_button(context, BUTTON_A, 50, 50);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        // extra crispy
+        pbf_press_dpad(context, DPAD_UP, 13, 20);
+        pbf_press_button(context, BUTTON_A, 50, 50);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        // lemon
+        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_press_button(context, BUTTON_A, 50, 50);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
+
+
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
+
+        env.console.log("Battle Normal Gym leader.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 60);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+
+        env.console.log("Finish up with Larry, then speak to Geeta and Nemona.");
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::WHITE_A_BUTTON, CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
+        env.console.log("Battle Nemona.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+        
+
+    });    
 
 }
 

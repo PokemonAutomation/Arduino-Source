@@ -92,7 +92,7 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
 
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
         OverworldWatcher    overworld(stream.logger(), COLOR_CYAN);
-        PromptDialogWatcher prompt(COLOR_YELLOW);
+        PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.30, 0.40, 0.60});
         WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA_DarkBackground, {0.725, 0.833, 0.024, 0.045}); // {0.650, 0.650, 0.140, 0.240}
         DialogArrowWatcher dialog_arrow(COLOR_RED, stream.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
         NormalBattleMenuWatcher battle(COLOR_ORANGE);
