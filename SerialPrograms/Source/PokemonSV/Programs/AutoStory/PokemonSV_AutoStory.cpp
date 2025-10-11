@@ -695,13 +695,13 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_61(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_62(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_63(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_64(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_65(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_66(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_67(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_68(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_69(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_70(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_64(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_65(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_66(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_67(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_68(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_69(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_70(env, context, notif_status_update, stats);});
     
 
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
