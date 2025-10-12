@@ -59,6 +59,8 @@ If you are unable or unwilling to use the online installer, the alternative is t
 
 TODO
 
+![](Images/Windows-Install-Qt6.10.0-Configure.png)
+![](Images/Windows-Install-Qt6.10.0-Run.png)
 
 
 ## Troubleshooting
