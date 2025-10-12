@@ -117,6 +117,28 @@ bool confirm_marker_present(
     ProControllerContext& context
 );
 
+// align player orientation based on the alignment mode
+// The direction is specified by (x, y):
+// x = 0 : left
+// x = 128 : neutral
+// x = 255 : right
+// y = 0 : up
+// y = 128 : neutral
+// y = 255 : down
+// - REALIGN_NEW_MARKER: place down a map marker, which will align the player towards the marker
+// location of the marker is set with move_x, move_y, move_duration
+// - REALIGN_OLD_MARKER: assuming a marker is already set, open and close the map, 
+// which will align the player towards the marker
+// - REALIGN_NO_MARKER: move player towards in the direction set by move_x, move_y, move_duration
+// then re-align the camera
+void realign_player(
+    const ProgramInfo& info,
+    VideoStream& stream, ProControllerContext& context,
+    PlayerRealignMode realign_mode,
+    uint8_t move_x = 0, uint8_t move_y = 0, uint16_t move_duration = 0
+);
+
+
 // move character with ssf left joystick, as per given x, y, until 
 // stop_condition is met (e.g. Dialog detected). 
 // throw exception if reaches timeout before detecting stop condition
@@ -298,14 +320,7 @@ void checkpoint_reattempt_loop_tutorial(
 
 
 
-// moves player from Glaseado Mountain Pokecenter to Casseroya Watchtower 3
-void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-// moves player from Casseroya Watchtower 3 to Dondozo Titan. Defeat Dondozo Titan phase 1.
-void move_from_casseroya_watchtower3_to_dondozo_titan(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
-// moves player from Dondozo Titan phase 1 to phase 2. Defeat Dondozo Titan phase 2-3.
-void move_from_dondozo_titan_phase1_to_phase2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 // moves player from Glaseado Mountain Pokecenter to Montenevera Pokecenter
 void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
@@ -313,8 +328,7 @@ void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& 
 // moves player from Montenevera Pokecenter to Glaseado Gym Pokecenter
 void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-// moves player from Glaseado Mountain Pokecenter to North Province Area Three Pokecenter
-void move_from_glaseado_mountain_to_north_province_area_three(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 
 // moves player from Glaseado Gym Pokecenter to North Province Area One
 void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
