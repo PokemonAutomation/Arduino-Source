@@ -306,7 +306,9 @@ std::string MultiLanguageJoinTracker::dump() const{
 void MultiLanguageJoinTracker::dump(const std::string& filename) const{
     std::string str = dump();
     QFile file(QString::fromStdString(filename));
-    file.open(QIODevice::WriteOnly);
+    if (!file.open(QIODevice::WriteOnly)){
+        return;
+    }
     std::string bom = "\xef\xbb\xbf";
     file.write(bom.c_str(), bom.size());
     file.write(str.c_str(), str.size());

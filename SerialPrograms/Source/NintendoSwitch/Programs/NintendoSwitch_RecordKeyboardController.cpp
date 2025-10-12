@@ -142,8 +142,9 @@ void json_to_cpp_code(Logger& logger, const JsonValue& json, const std::string& 
         }
 
         QFile file(QString::fromStdString(output_file_name + ".txt"));
-        file.open(QIODevice::WriteOnly);
-        file.write(output_text.c_str(), output_text.size());
+        if (file.open(QIODevice::WriteOnly)){
+            file.write(output_text.c_str(), output_text.size());
+        }
 
     }catch (ParseException& e){
         logger.log(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.", COLOR_RED);

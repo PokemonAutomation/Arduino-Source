@@ -133,9 +133,10 @@ std::string StatSet::to_str() const{
 
 void StatSet::save_to_file(const std::string& filepath){
     QFile file(QString::fromStdString(filepath));
-    file.open(QIODevice::WriteOnly);
-    std::string data = to_str();
-    file.write(data.c_str(), data.size());
+    if (file.open(QIODevice::WriteOnly)){
+        std::string data = to_str();
+        file.write(data.c_str(), data.size());
+    }
 }
 void StatSet::open_from_file(const std::string& filepath){
     QFile file(QString::fromStdString(filepath));
