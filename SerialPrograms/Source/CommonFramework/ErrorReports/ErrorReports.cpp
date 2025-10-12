@@ -139,13 +139,14 @@ SendableErrorReport::SendableErrorReport(
         }
         QFile file(QString::fromStdString(m_directory + ERROR_LOGS_NAME));
         bool exists = file.exists();
-        file.open(QIODevice::WriteOnly);
-        if (!exists){
-            std::string bom = "\xef\xbb\xbf";
-            file.write(bom.c_str(), bom.size());
+        if (file.open(QIODevice::WriteOnly)){
+            if (!exists){
+                std::string bom = "\xef\xbb\xbf";
+                file.write(bom.c_str(), bom.size());
+            }
+            file.write(log.c_str());
+            file.flush();
         }
-        file.write(log.c_str());
-        file.flush();
         m_logs_name = ERROR_LOGS_NAME;
     }
     if (stream_history){

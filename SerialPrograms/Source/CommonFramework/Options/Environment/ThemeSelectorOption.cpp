@@ -32,7 +32,9 @@ void set_theme(size_t index){
 
     if (!stylesheet.isEmpty()){
         QFile f(stylesheet);
-        f.open(QFile::ReadOnly | QFile::Text);
+        if (!f.open(QFile::ReadOnly | QFile::Text)){
+            return;
+        }
         QTextStream ts(&f);
         stylesheet = scale_dpi_stylesheet(ts.readAll());
     }

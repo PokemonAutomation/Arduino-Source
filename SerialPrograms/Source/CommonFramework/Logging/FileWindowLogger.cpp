@@ -53,8 +53,8 @@ FileWindowLogger::FileWindowLogger(const std::string& path)
     , m_stopping(false)
 {
     bool exists = m_file.exists();
-    m_file.open(QIODevice::WriteOnly | QIODevice::Append);
-    if (!exists){
+    bool opened = m_file.open(QIODevice::WriteOnly | QIODevice::Append);
+    if (!exists && opened){
         std::string bom = "\xef\xbb\xbf";
         m_file.write(bom.c_str(), bom.size());
     }
