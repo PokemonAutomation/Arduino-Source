@@ -2,7 +2,6 @@
  *
  * D++, A Lightweight C++ library for Discord
  *
- * SPDX-License-Identifier: Apache-2.0
  * Copyright 2021 Craig Edwards and D++ contributors 
  * (https://github.com/brainboxdotcc/DPP/graphs/contributors)
  *
@@ -65,7 +64,7 @@ public:
 	/**
 	 * @brief Construct a new cache object.
 	 * 
-	 * @note Caches must contain classes derived from dpp::managed.
+	 * Caches must contain classes derived from dpp::managed.
 	 */
 	cache() {
 		cache_map = new std::unordered_map<snowflake, T*>;
@@ -109,7 +108,7 @@ public:
 		} else if (object != existing->second) {
 			/* Flag old pointer for deletion and replace */
 			std::lock_guard<std::mutex> delete_lock(deletion_mutex);
-			deletion_queue[existing->second] = time(nullptr);
+			deletion_queue[existing->second] = time(NULL);
 			(*cache_map)[object->id] = object;
 		}
 	}
@@ -134,7 +133,7 @@ public:
 		auto existing = cache_map->find(object->id);
 		if (existing != cache_map->end()) {
 			cache_map->erase(existing);
-			deletion_queue[object] = time(nullptr);
+			deletion_queue[object] = time(NULL);
 		}
 	}
 
@@ -250,18 +249,17 @@ public:
 	 */
 	size_t bytes() {
 		std::shared_lock l(cache_mutex);
-		return sizeof(*this) + (cache_map->bucket_count() * sizeof(size_t));
+		return sizeof(this) + (cache_map->bucket_count() * sizeof(size_t));
 	}
 
 };
 
-/**
- * Run garbage collection across all caches removing deleted items
+/** Run garbage collection across all caches removing deleted items
  * that have been deleted over 60 seconds ago.
  */
 void DPP_EXPORT garbage_collection();
 
-#define cache_decl(type, setter, getter, counter) /** Find an object in the cache by id. @return type* Pointer to the object or nullptr when it's not found */ DPP_EXPORT class type * setter (snowflake id); DPP_EXPORT cache<class type> * getter (); /** Get the amount of cached type objects. */ DPP_EXPORT uint64_t counter ();
+#define cache_decl(type, setter, getter, counter) DPP_EXPORT class type * setter (snowflake id); DPP_EXPORT cache<class type> * getter ();  DPP_EXPORT uint64_t counter ();
 
 /* Declare major caches */
 cache_decl(user, find_user, get_user_cache, get_user_count);
@@ -270,5 +268,5 @@ cache_decl(role, find_role, get_role_cache, get_role_count);
 cache_decl(channel, find_channel, get_channel_cache, get_channel_count);
 cache_decl(emoji, find_emoji, get_emoji_cache, get_emoji_count);
 
-}
+};
 
