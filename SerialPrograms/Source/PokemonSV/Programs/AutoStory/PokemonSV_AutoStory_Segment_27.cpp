@@ -30,15 +30,15 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_27::name() const{
-    return "";
+    return "27: Dondozo/Tatsugiri Titan";
 }
 
 std::string AutoStory_Segment_27::start_text() const{
-    return "Start: ";
+    return "Start: Beat Medali Gym (Normal). At Glaseado Mountain Pokecenter.";
 }
 
 std::string AutoStory_Segment_27::end_text() const{
-    return "End: ";
+    return "End: Beat Dondozo/Tatsugiri Titan. At North Province Area Three Pokecenter.";
 }
 
 void AutoStory_Segment_27::run_segment(
@@ -95,6 +95,8 @@ void checkpoint_67(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         context.wait_for_all_requests();
+        // fly to Glaseado Mountain Pokecenter
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0}, FlyPoint::POKECENTER);
         move_from_glaseado_mountain_to_north_province_area_three(env, context);
 
     }); 
