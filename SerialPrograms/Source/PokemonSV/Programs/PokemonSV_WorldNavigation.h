@@ -127,27 +127,7 @@ void jump_off_wall_until_map_open(const ProgramInfo& info, VideoStream& stream, 
 void reset_to_pokecenter(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context);
 
 
-// align player orientation based on the alignment mode
-// if battle detected, propagates UnexpectedBattleException to the calling function
-// The direction is specified by (x, y):
-// x = 0 : left
-// x = 128 : neutral
-// x = 255 : right
-// y = 0 : up
-// y = 128 : neutral
-// y = 255 : down
-// - REALIGN_NEW_MARKER: place down a map marker, which will align the player towards the marker
-// location of the marker is set with move_x, move_y, move_duration
-// - REALIGN_OLD_MARKER: assuming a marker is already set, open and close the map, 
-// which will align the player towards the marker
-// - REALIGN_NO_MARKER: move player towards in the direction set by move_x, move_y, move_duration
-// then re-align the camera
-void realign_player(
-    const ProgramInfo& info,
-    VideoStream& stream, ProControllerContext& context,
-    PlayerRealignMode realign_mode,
-    uint8_t move_x = 0, uint8_t move_y = 0, uint16_t move_duration = 0
-);
+
 
 
 
