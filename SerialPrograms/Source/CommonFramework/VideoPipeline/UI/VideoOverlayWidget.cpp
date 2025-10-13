@@ -103,8 +103,10 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
     {
         WriteSpinLock lg(m_lock, "VideoOverlay::paintEvent()");
 
-        if (m_session.enabled_stats()){
-            render_stats(painter);
+        //  The order here is important since the latter ones will go on top
+        //  of the earlier ones.
+        if (m_session.enabled_images()){
+            render_images(painter);
         }
         if (m_session.enabled_boxes()){
             render_boxes(painter);
@@ -112,11 +114,11 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
         if (m_session.enabled_text()){
             render_text(painter);
         }
-        if (m_session.enabled_images()){
-            render_images(painter);
-        }
         if (m_session.enabled_log()){
             render_log(painter);
+        }
+        if (m_session.enabled_stats()){
+            render_stats(painter);
         }
     }
 
