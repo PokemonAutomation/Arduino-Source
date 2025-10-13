@@ -13,7 +13,6 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -844,8 +843,7 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, ProControllerCont
 
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             fresh_from_reset = reset_game_from_home(
-                env, env.console, context,
-                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+                env, env.console, context
             );
         }
     }

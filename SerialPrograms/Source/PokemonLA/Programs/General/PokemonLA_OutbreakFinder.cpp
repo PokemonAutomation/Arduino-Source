@@ -19,8 +19,6 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonLA/PokemonLA_TravelLocations.h"
-#include "PokemonLA/Inference/Map/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_SelectedRegionDetector.h"
 #include "PokemonLA/Inference/Map/PokemonLA_OutbreakReader.h"
 #include "PokemonLA/PokemonLA_Settings.h"
@@ -497,10 +495,7 @@ std::vector<std::string> OutbreakFinder::run_iteration(
             env.log("No target MMO sprite found. Reset game...");
             env.console.overlay().add_log("No target MMO");
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-            fresh_from_reset = reset_game_from_home(
-                env, env.console, context,
-                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
-            );
+            fresh_from_reset = reset_game_from_home(env, env.console, context);
         }
     }
 
@@ -532,10 +527,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, ProControllerC
         // so we reset the game now and skip the ongoing outbreaks
         env.log("Reset game and skip ongoing outbreaks");
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
-        fresh_from_reset = reset_game_from_home(
-            env, env.console, context,
-            ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
-        );
+        fresh_from_reset = reset_game_from_home(env, env.console, context);
 
         //  Go to region and return.
         bool inside_travel_map = false;

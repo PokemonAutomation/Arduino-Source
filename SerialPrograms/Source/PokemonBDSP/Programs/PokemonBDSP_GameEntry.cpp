@@ -33,7 +33,7 @@ bool gamemenu_to_ingame(
     stream.log("Waiting to enter game...");
     int ret = wait_until(
         stream, context,
-        std::chrono::milliseconds(enter_game_timeout * (1000 / TICKS_PER_SECOND)),
+        enter_game_timeout,
         {{detector}}
     );
     if (ret == 0){

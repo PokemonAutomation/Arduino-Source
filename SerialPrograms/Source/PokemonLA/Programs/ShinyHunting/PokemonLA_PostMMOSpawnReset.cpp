@@ -8,7 +8,6 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
@@ -111,7 +110,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, ProCo
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [this, &env](ProControllerContext& context){
-                reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                reset_game_from_home(env, env.console, context);
                 env.console.log("Entered game! Checking shiny sound...");
 
                 // forward portion

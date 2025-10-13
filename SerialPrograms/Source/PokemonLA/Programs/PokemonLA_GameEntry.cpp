@@ -32,6 +32,8 @@ bool reset_game_to_gamemenu(
     return openedgame_to_gamemenu(console, context, GameSettings::instance().START_GAME_WAIT1);
 }
 
+//  From the game menu screen (where "Press A" is displayed to enter the game),
+//  mash A to enter the game and wait until the black screen is gone.
 bool gamemenu_to_ingame(
     VideoStream& stream, ProControllerContext& context,
     Milliseconds mash_duration, Milliseconds enter_game_timeout
@@ -43,7 +45,7 @@ bool gamemenu_to_ingame(
     stream.log("Waiting to enter game...");
     int ret = wait_until(
         stream, context,
-        std::chrono::milliseconds(enter_game_timeout * (1000 / TICKS_PER_SECOND)),
+        std::chrono::milliseconds(enter_game_timeout),
         {{detector}}
     );
     if (ret == 0){
@@ -58,15 +60,16 @@ bool gamemenu_to_ingame(
 bool reset_game_from_home(
     ProgramEnvironment& env,
     ConsoleHandle& console, ProControllerContext& context,
-    bool tolerate_update_menu,
-    uint16_t post_wait_time
+    Milliseconds enter_game_mash,
+    Milliseconds enter_game_timeout,
+    Milliseconds post_wait_time
 ){
     bool ok = true;
-    ok &= reset_game_to_gamemenu(console, context, tolerate_update_menu);
+    ok &= reset_game_to_gamemenu(console, context, true);
     ok &= gamemenu_to_ingame(
         console, context,
-        GameSettings::instance().ENTER_GAME_MASH0,
-        GameSettings::instance().ENTER_GAME_WAIT0
+        enter_game_mash,
+        enter_game_timeout
     );
     if (!ok){
         dump_image(console.logger(), env.program_info(), console.video(), "StartGame");
@@ -75,6 +78,18 @@ bool reset_game_from_home(
     pbf_wait(context, post_wait_time);
     context.wait_for_all_requests();
     return ok;
+}
+bool reset_game_from_home(
+    ProgramEnvironment& env,
+    ConsoleHandle& console, ProControllerContext& context,
+    Milliseconds post_wait_time
+){
+    return reset_game_from_home(
+        env, console, context,
+        GameSettings::instance().ENTER_GAME_MASH0,
+        GameSettings::instance().ENTER_GAME_WAIT0,
+        post_wait_time
+    );
 }
 
 

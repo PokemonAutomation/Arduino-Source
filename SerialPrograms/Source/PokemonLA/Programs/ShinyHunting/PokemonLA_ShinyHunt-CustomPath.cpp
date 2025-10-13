@@ -8,7 +8,6 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
@@ -304,8 +303,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProContro
                 env.console.log("Resetting by closing the game.");
                 pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
                 fresh_from_reset = reset_game_from_home(
-                    env, env.console, context,
-                    ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+                    env, env.console, context
                 );
             }else{
                 env.console.log("Resetting by going to village.");
@@ -332,8 +330,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, ProContro
             time_reset_run_count = 0;
             pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY0);
             fresh_from_reset = reset_game_from_home(
-                env, env.console, context,
-                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+                env, env.console, context
             );
         }
 
