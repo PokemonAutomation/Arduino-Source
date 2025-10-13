@@ -721,7 +721,11 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_75(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_76(env, context, notif_status_update, stats);});
     
-
+    
+    if (end == 0){
+        end = start;
+    }
+    stream.log("test_checkpoints: start: " + std::to_string(start) + ", end:" + std::to_string(end));
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
         if (checkpoint == 0){
             stream.log("checkpoint_0");
