@@ -862,11 +862,12 @@ void run_battle_press_A(
         DialogArrowWatcher dialog_arrow(COLOR_RED, stream.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
         GradientArrowWatcher next_pokemon(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
+        GradientArrowWatcher select_move_target(COLOR_BLUE, GradientArrowType::DOWN, {0.38, 0.08, 0.25, 0.1});
 
         std::vector<PeriodicInferenceCallback> callbacks; 
         std::vector<CallbackEnum> enum_all_callbacks;
         //  mandatory callbacks: Battle, Overworld, Advance Dialog, Swap menu, Move select
-        //  optional callbacks: DIALOG_ARROW, NEXT_POKEMON
+        //  optional callbacks: DIALOG_ARROW, NEXT_POKEMON, SELECT_MOVE_TARGET,
 
         // merge the mandatory and optional callbacks as a set, to avoid duplicates. then convert to vector
         std::unordered_set<CallbackEnum> enum_all_callbacks_set{CallbackEnum::BATTLE, CallbackEnum::OVERWORLD, CallbackEnum::ADVANCE_DIALOG, CallbackEnum::SWAP_MENU, CallbackEnum::MOVE_SELECT}; // mandatory callbacks
@@ -895,6 +896,9 @@ void run_battle_press_A(
                 break;                     
             case CallbackEnum::MOVE_SELECT:
                 callbacks.emplace_back(move_select_menu);
+                break;
+            case CallbackEnum::SELECT_MOVE_TARGET:
+                callbacks.emplace_back(select_move_target);
                 break;
             default:
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback requested.");
@@ -977,12 +981,27 @@ void run_battle_press_A(
                 ErrorReport::SEND_ERROR_REPORT,
                 "run_battle_press_A(): Lead pokemon fainted.",
                 stream
-            );        
+            );    
+        case CallbackEnum::SELECT_MOVE_TARGET:
+            stream.log("run_battle_press_A: Detected arrows to select move target. Press A.");
+            pbf_mash_button(context, BUTTON_A, 100);
+            break;
         default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback triggered.");
           
         }
     }
+}
+
+void run_trainer_double_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks,
+    bool detect_wipeout
+){
+    enum_optional_callbacks.insert(CallbackEnum::SELECT_MOVE_TARGET);  // always check for the "Select Move target" arrow, for double battles
+    run_battle_press_A(stream, context, stop_condition, enum_optional_callbacks, detect_wipeout);
 }
 
 void run_trainer_battle_press_A(

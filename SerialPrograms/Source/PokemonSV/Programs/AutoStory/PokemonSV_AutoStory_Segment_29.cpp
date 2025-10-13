@@ -112,6 +112,29 @@ void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
+        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        // wait for overworld after leaving gym
+        wait_for_overworld(env.program_info(), env.console, context, 30);
+
+        DirectionDetector direction;
+        direction.change_direction(env.program_info(), env.console, context, 2.462858);  // 2.496149  // 2.479418
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+
+        // speak to MC Sledge
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
+
+        env.console.log("Battle trainer 1 in the Gym challenge.");
+        run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
+        
+        env.console.log("Battle trainer 2 in the Gym challenge.");
+        run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
+
+        env.console.log("Battle MC Sledge in the Gym challenge.");
+        run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::OVERWORLD});
 
     });  
 }
