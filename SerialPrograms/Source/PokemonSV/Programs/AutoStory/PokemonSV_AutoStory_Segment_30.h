@@ -29,7 +29,7 @@ public:
 
 
 // start: At Glaseado Gym Pokecenter
-// end: Spoke to Glaseado Gym receptionist
+// end: Battled Nemona. Spoke to Glaseado Gym receptionist
 void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 // start: Spoke to Glaseado Gym receptionist

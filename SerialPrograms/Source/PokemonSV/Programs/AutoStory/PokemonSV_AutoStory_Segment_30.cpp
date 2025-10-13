@@ -70,6 +70,49 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
+        DirectionDetector direction;
+        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            // move marker away so it doesn't block the North symbol
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 50);
+
+            direction.change_direction(env.program_info(), env.console, context, 3.855289);
+            pbf_move_left_joystick(context, 128, 0, 200, 50);
+
+            direction.change_direction(env.program_info(), env.console, context, 3.056395);
+            pbf_move_left_joystick(context, 128, 0, 250, 50);
+
+            direction.change_direction(env.program_info(), env.console, context, 3.749788);
+            pbf_move_left_joystick(context, 128, 0, 680, 50);
+
+            direction.change_direction(env.program_info(), env.console, context, 1.589021);
+            pbf_move_left_joystick(context, 128, 0, 600, 50);
+            
+            direction.change_direction(env.program_info(), env.console, context, 1.343606);   //1.327724
+
+            handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+                [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                    walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+                }, 
+                [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                    pbf_move_left_joystick(context, 0, 0, 150, 50); // move left
+                    pbf_move_left_joystick(context, 255, 0, 150, 50);  // move right
+                }
+            );
+        });
+
+        // speak to Nemona, inside the gym
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
+
+        env.console.log("Battle Nemona.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        // speak to gym receptionist
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
+
+
 
     });   
 }
