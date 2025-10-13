@@ -143,6 +143,20 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
+        DirectionDetector direction;
+        direction.change_direction(env.program_info(), env.console, context, 5.478851);
+
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                pbf_move_left_joystick(context, 255, 128, 200, 50); // if to the left of the door, will move right
+                pbf_move_left_joystick(context, 128, 0, 200, 50);
+            }
+        );
+
+        mash_button_till_overworld(env.console, context, BUTTON_A, 360);
 
     });  
 }
