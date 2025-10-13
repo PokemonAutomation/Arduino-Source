@@ -51,6 +51,12 @@
 #include "PokemonSV_AutoStory_Segment_27.h"
 #include "PokemonSV_AutoStory_Segment_28.h"
 #include "PokemonSV_AutoStory_Segment_29.h"
+#include "PokemonSV_AutoStory_Segment_30.h"
+#include "PokemonSV_AutoStory_Segment_31.h"
+#include "PokemonSV_AutoStory_Segment_32.h"
+#include "PokemonSV_AutoStory_Segment_33.h"
+#include "PokemonSV_AutoStory_Segment_34.h"
+#include "PokemonSV_AutoStory_Segment_35.h"
 #include "PokemonSV_AutoStory.h"
 
 #include <iostream>
@@ -98,8 +104,14 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_25>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_26>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_27>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_28>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_28>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_29>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_30>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_31>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_32>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_33>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_34>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_35>());
 
     return segment_list;
 };
@@ -702,8 +714,18 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_68(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_69(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_70(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_71(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_72(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_73(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_74(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_75(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_76(env, context, notif_status_update, stats);});
     
-
+    
+    if (end == 0){
+        end = start;
+    }
+    stream.log("test_checkpoints: start: " + std::to_string(start) + ", end:" + std::to_string(end));
     for (int checkpoint = start; checkpoint <= end; checkpoint++){
         if (checkpoint == 0){
             stream.log("checkpoint_0");

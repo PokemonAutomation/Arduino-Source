@@ -1811,6 +1811,18 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_28.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_29.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_29.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_30.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_30.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_31.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_31.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_32.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_32.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_33.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_33.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_34.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_34.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_35.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_35.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.cpp

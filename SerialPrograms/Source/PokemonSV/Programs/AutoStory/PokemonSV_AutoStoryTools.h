@@ -322,8 +322,6 @@ void checkpoint_reattempt_loop_tutorial(
 
 
 
-// moves player from Glaseado Mountain Pokecenter to Montenevera Pokecenter
-void move_from_glaseado_mountain_to_montenevera(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 // moves player from Montenevera Pokecenter to Glaseado Gym Pokecenter
 void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
