@@ -13,7 +13,6 @@
 //#include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 //#include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "PokemonLGPE/PokemonLGPE_Settings.h"
@@ -32,7 +31,7 @@ bool reset_game_to_gamemenu(
     ConsoleHandle& console, JoyconContext& context
 ){
     close_game_from_home(console, context);
-    start_game_from_home_with_inference(
+    start_game_from_home(
         console,
         context,
         0, 0,

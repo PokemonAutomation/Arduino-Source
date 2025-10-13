@@ -31,6 +31,9 @@ namespace NintendoSwitch{
 
 
 
+//
+//  ensure_at_home()
+//
 
 void go_home(ConsoleHandle& console, ProControllerContext& context){
     console.log("Going Home...");
@@ -50,7 +53,6 @@ void go_home(ConsoleHandle& console, JoyconContext& context){
     }
     ensure_at_home(console, context);
 }
-
 
 template <typename ControllerContext>
 void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
@@ -88,7 +90,6 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
     );
 }
 
-
 void ensure_at_home(ConsoleHandle& console, ProControllerContext& context){
     ensure_at_home<ProControllerContext>(console, context);
 }
@@ -98,11 +99,55 @@ void ensure_at_home(ConsoleHandle& console, JoyconContext& context){
 
 
 
+//
+//  close_game_from_home()
+//
+
+void close_game_from_home(ConsoleHandle& console, ProControllerContext& context){
+    ensure_at_home(console, context);
+
+    //  Use mashing to ensure that the X press succeeds. If it fails, the SR
+    //  will fail and can kill a den for the autohosts.
+
+    // this sequence will close the game from the home screen,
+    // regardless of whether the game is initially open or closed.
+
+                                                    // if game initially open.  |  if game initially closed
+    pbf_mash_button(context, BUTTON_X, 100);        // - Close game.            |  - does nothing
+    ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
+    ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - Press Down a second time in case we drop one.
+    pbf_mash_button(context, BUTTON_A, 50);         // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
+    go_home(console, context);                      // - Does nothing.          |  - goes back to home screen.
+
+    // fail-safe against button drops and unexpected error messages.
+    pbf_mash_button(context, BUTTON_X, 50);
+    pbf_mash_button(context, BUTTON_B, 350);
+}
+void close_game_from_home(ConsoleHandle& console, JoyconContext& context){
+    ensure_at_home(console, context);
+    //  Use mashing to ensure that the X press succeeds. If it fails, the SR
+    //  will fail and can kill a den for the autohosts.
+
+    // this sequence will close the game from the home screen,
+    // regardless of whether the game is initially open or closed.
+
+                                                        // if game initially open.  |  if game initially closed
+    pbf_mash_button(context, BUTTON_X, 800ms);          // - Close game.            |  - does nothing
+    pbf_move_joystick(context, 128, 255, 100ms, 10ms);  // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
+    pbf_move_joystick(context, 128, 255, 100ms, 10ms);  // - Does nothing.          |  - Press Down a second time in case we drop one.
+    pbf_mash_button(context, BUTTON_A, 400ms);          // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
+    go_home(console, context);                          // - Does nothing.          |  - goes back to home screen.
+
+    // fail-safe against button drops and unexpected error messages.
+    pbf_mash_button(context, BUTTON_X, 400ms);
+    pbf_mash_button(context, BUTTON_B, 2000ms);
+}
 
 
 
-
-
+//
+//  resume_game_from_home()
+//
 
 void resume_game_from_home(
     ConsoleHandle& console, ProControllerContext& context,
@@ -142,16 +187,50 @@ void resume_game_from_home(
         }
     }
 }
+void resume_game_from_home(
+    ConsoleHandle& console, JoyconContext& context,
+    bool skip_home_press
+){
+    if (!skip_home_press){
+        pbf_press_button(context, BUTTON_HOME, 20ms, 10ms);
+    }
+    context.wait_for_all_requests();
+
+    while (true){
+        {
+            UpdateMenuWatcher update_detector(console);
+            int ret = wait_until(
+                console, context,
+                std::chrono::milliseconds(1000),
+                { update_detector }
+            );
+            if (ret == 0){
+                console.log("Detected update window.", COLOR_RED);
+
+                pbf_move_joystick(context, 128, 0, 10ms, 0ms);
+                pbf_press_button(context, BUTTON_A, 10ms, 500ms);
+                context.wait_for_all_requests();
+                continue;
+            }
+        }
+
+        //  In case we failed to enter the game.
+        HomeMenuWatcher home_detector(console);
+        if (home_detector.detect(console.video().snapshot())){
+            console.log("Failed to re-enter game. Trying again...", COLOR_RED);
+            pbf_press_button(context, BUTTON_HOME, 20ms, 10ms);
+            continue;
+        }else{
+            break;
+        }
+    }
+}
 
 
 
-
-
-
-
-
-
-
+//
+//  move_to_user()
+//
 
 void move_to_user(ProControllerContext& context, uint8_t user_slot){
     if (user_slot != 0){
@@ -164,7 +243,80 @@ void move_to_user(ProControllerContext& context, uint8_t user_slot){
         }
     }
 }
+void move_to_user(JoyconContext& context, uint8_t user_slot){
+    if (user_slot != 0){
+        //  Move to correct user.
+        for (uint8_t c = 0; c < 9; c++){    //  Extra iteration in case one gets dropped.
+            pbf_move_joystick(context, 0, 128, 160ms, 160ms);
+        }
+        for (uint8_t c = 1; c < user_slot; c++){
+            pbf_move_joystick(context, 0, 128, 160ms, 160ms);
+        }
+    }
+}
 
+
+
+//
+//  start_game_from_home_blind()
+//
+
+void start_game_from_home_blind(
+    Logger& logger, ProControllerContext& context,
+    bool tolerate_update_menu,
+    uint8_t game_slot,
+    uint8_t user_slot,
+    Milliseconds start_game_mash
+){
+    if (game_slot != 0){
+        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 160ms);
+        for (uint8_t c = 1; c < game_slot; c++){
+            ssf_press_dpad_ptv(context, DPAD_RIGHT, 80ms);
+        }
+    }
+
+    if (tolerate_update_menu){
+        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
+            throw UserSetupError(
+                logger,
+                "Cannot have both \"Tolerate Update Menu\" and \"Start Game Requires Internet\" enabled at the same time without video feedback."
+            );
+        }
+
+        //  If the update menu isn't there, these will get swallowed by the opening
+        //  animation for the select user menu.
+        pbf_press_button(context, BUTTON_A, 10, 175);    //  Choose game
+        pbf_press_dpad(context, DPAD_UP, 10, 0);         //  Skip the update window.
+        move_to_user(context, user_slot);
+    }
+
+//    cout << "START_GAME_REQUIRES_INTERNET = " << ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET << endl;
+    if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && user_slot == 0){
+        //  Mash your way into the game.
+        pbf_mash_button(context, BUTTON_A, start_game_mash);
+    }else{
+        pbf_press_button(context, BUTTON_A, 10, 175);   //  Enter select user menu.
+        move_to_user(context, user_slot);
+        ssf_press_button_ptv(context, BUTTON_A, 160ms); //  Enter game
+
+        //  Switch to mashing ZL instead of A to get into the game.
+        //  Mash your way into the game.
+        Milliseconds duration = start_game_mash;
+        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
+            //  Need to wait a bit longer for the internet check.
+            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY0;
+        }
+//        pbf_mash_button(context, BUTTON_ZL, duration);
+        pbf_wait(context, duration);
+    }
+    context.wait_for_all_requests();
+}
+
+
+
+//
+//  start_game_from_home_with_inference()
+//
 
 void start_game_from_home_with_inference(
     ConsoleHandle& console, ProControllerContext& context,
@@ -257,191 +409,6 @@ void start_game_from_home_with_inference(
         }
     }
 }
-
-
-void start_game_from_home(
-    ConsoleHandle& console, ProControllerContext& context,
-    bool tolerate_update_menu,
-    uint8_t game_slot,
-    uint8_t user_slot,
-    Milliseconds start_game_mash
-){
-    context.wait_for_all_requests();
-    if (console.video().snapshot()){
-        console.log("start_game_from_home(): Video capture available. Using inference...");
-        start_game_from_home_with_inference(
-            console, context,
-            game_slot, user_slot,
-            start_game_mash
-        );
-        return;
-    }else{
-        console.log("start_game_from_home(): Video capture not available.", COLOR_RED);
-    }
-
-    if (game_slot != 0){
-        ssf_press_button(context, BUTTON_HOME, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0, 160ms);
-        for (uint8_t c = 1; c < game_slot; c++){
-            ssf_press_dpad_ptv(context, DPAD_RIGHT, 80ms);
-        }
-    }
-
-    if (tolerate_update_menu){
-        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
-            throw UserSetupError(
-                console.logger(),
-                "Cannot have both \"Tolerate Update Menu\" and \"Start Game Requires Internet\" enabled at the same time without video feedback."
-            );
-        }
-
-        //  If the update menu isn't there, these will get swallowed by the opening
-        //  animation for the select user menu.
-        pbf_press_button(context, BUTTON_A, 10, 175);    //  Choose game
-        pbf_press_dpad(context, DPAD_UP, 10, 0);         //  Skip the update window.
-        move_to_user(context, user_slot);
-    }
-
-//    cout << "START_GAME_REQUIRES_INTERNET = " << ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET << endl;
-    if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && user_slot == 0){
-        //  Mash your way into the game.
-        pbf_mash_button(context, BUTTON_A, start_game_mash);
-    }else{
-        pbf_press_button(context, BUTTON_A, 10, 175);   //  Enter select user menu.
-        move_to_user(context, user_slot);
-        ssf_press_button_ptv(context, BUTTON_A, 160ms); //  Enter game
-
-        //  Switch to mashing ZL instead of A to get into the game.
-        //  Mash your way into the game.
-        Milliseconds duration = start_game_mash;
-        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
-            //  Need to wait a bit longer for the internet check.
-            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY0;
-        }
-//        pbf_mash_button(context, BUTTON_ZL, duration);
-        pbf_wait(context, duration);
-    }
-    context.wait_for_all_requests();
-}
-
-
-
-class GameLoadingDetector : public VisualInferenceCallback{
-public:
-    GameLoadingDetector(bool invert)
-        : VisualInferenceCallback("LoadingDetector")
-        , m_box0(0.2, 0.2, 0.6, 0.1)
-        , m_box1(0.2, 0.7, 0.6, 0.1)
-        , m_invert(invert)
-    {}
-
-    virtual void make_overlays(VideoOverlaySet& items) const override{
-        items.add(COLOR_RED, m_box0);
-        items.add(COLOR_RED, m_box1);
-    }
-
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
-        if (!is_black(extract_box_reference(frame, m_box0))){
-            return m_invert;
-        }
-        if (!is_black(extract_box_reference(frame, m_box1))){
-            return m_invert;
-        }
-        return !m_invert;
-   }
-
-private:
-    ImageFloatBox m_box0;
-    ImageFloatBox m_box1;
-    bool m_invert;
-};
-
-
-bool openedgame_to_gamemenu(
-    VideoStream& stream, ProControllerContext& context,
-    Milliseconds timeout
-){
-    {
-        stream.log("Waiting to load game...");
-        GameLoadingDetector detector(false);
-        int ret = wait_until(
-            stream, context,
-            timeout,
-            {{detector}}
-        );
-        if (ret < 0){
-            stream.log("Timed out waiting to enter game.", COLOR_RED);
-            return false;
-        }
-    }
-    {
-        stream.log("Waiting for game menu...");
-        GameLoadingDetector detector(true);
-        int ret = wait_until(
-            stream, context,
-            timeout,
-            {{detector}}
-        );
-        if (ret < 0){
-            stream.log("Timed out waiting for game menu.", COLOR_RED);
-            return false;
-        }
-    }
-    return true;
-}
-
-
-
-
-void resume_game_from_home(
-    ConsoleHandle& console, JoyconContext& context,
-    bool skip_home_press
-){
-    if (!skip_home_press){
-        pbf_press_button(context, BUTTON_HOME, 20ms, 10ms);
-    }
-    context.wait_for_all_requests();
-
-    while (true){
-        {
-            UpdateMenuWatcher update_detector(console);
-            int ret = wait_until(
-                console, context,
-                std::chrono::milliseconds(1000),
-                { update_detector }
-            );
-            if (ret == 0){
-                console.log("Detected update window.", COLOR_RED);
-
-                pbf_move_joystick(context, 128, 0, 10ms, 0ms);
-                pbf_press_button(context, BUTTON_A, 10ms, 500ms);
-                context.wait_for_all_requests();
-                continue;
-            }
-        }
-
-        //  In case we failed to enter the game.
-        HomeMenuWatcher home_detector(console);
-        if (home_detector.detect(console.video().snapshot())){
-            console.log("Failed to re-enter game. Trying again...", COLOR_RED);
-            pbf_press_button(context, BUTTON_HOME, 20ms, 10ms);
-            continue;
-        }else{
-            break;
-        }
-    }
-}
-void move_to_user(JoyconContext& context, uint8_t user_slot){
-    if (user_slot != 0){
-        //  Move to correct user.
-        for (uint8_t c = 0; c < 9; c++){    //  Extra iteration in case one gets dropped.
-            pbf_move_joystick(context, 0, 128, 160ms, 160ms);
-        }
-        for (uint8_t c = 1; c < user_slot; c++){
-            pbf_move_joystick(context, 0, 128, 160ms, 160ms);
-        }
-    }
-}
-
 void start_game_from_home_with_inference(
     ConsoleHandle& console, JoyconContext& context,
     uint8_t game_slot,
@@ -544,6 +511,152 @@ void start_game_from_home_with_inference(
     }
 }
 
+
+
+//
+//  start_game_from_home()
+//
+
+void start_game_from_home(
+    ConsoleHandle& console, ProControllerContext& context,
+    bool tolerate_update_menu,
+    uint8_t game_slot,
+    uint8_t user_slot,
+    Milliseconds start_game_mash
+){
+    context.wait_for_all_requests();
+    if (console.video().snapshot()){
+        console.log("start_game_from_home(): Video capture available. Using inference...");
+        start_game_from_home_with_inference(
+            console, context,
+            game_slot, user_slot,
+            start_game_mash
+        );
+    }else{
+        console.log("start_game_from_home(): Video capture not available.", COLOR_RED);
+        start_game_from_home_blind(
+            console, context,
+            tolerate_update_menu,
+            game_slot, user_slot,
+            start_game_mash
+        );
+    }
+}
+void start_game_from_home(
+    ConsoleHandle& console, JoyconContext& context,
+    uint8_t game_slot,
+    uint8_t user_slot,
+    Milliseconds start_game_wait
+){
+    //  Inference is required.
+    start_game_from_home_with_inference(
+        console, context,
+        game_slot, user_slot,
+        start_game_wait
+    );
+}
+
+
+
+//
+//  from_home_close_and_reopen_game()
+//
+
+void from_home_close_and_reopen_game(
+    ConsoleHandle& console, ProControllerContext& context,
+    bool tolerate_update_menu
+){
+    bool video_available = (bool)console.video().snapshot();
+    if (video_available ||
+        ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
+        tolerate_update_menu
+    ){
+        close_game_from_home(console, context);
+        start_game_from_home(
+            console,
+            context,
+            tolerate_update_menu,
+            0, 0,
+            ConsoleSettings::instance().START_GAME_MASH
+        );
+    }else{
+        pbf_press_button(context, BUTTON_X, 50, 0);
+        pbf_mash_button(context, BUTTON_A, ConsoleSettings::instance().START_GAME_MASH);
+    }
+}
+
+
+
+
+
+class GameLoadingDetector : public VisualInferenceCallback{
+public:
+    GameLoadingDetector(bool invert)
+        : VisualInferenceCallback("LoadingDetector")
+        , m_box0(0.2, 0.2, 0.6, 0.1)
+        , m_box1(0.2, 0.7, 0.6, 0.1)
+        , m_invert(invert)
+    {}
+
+    virtual void make_overlays(VideoOverlaySet& items) const override{
+        items.add(COLOR_RED, m_box0);
+        items.add(COLOR_RED, m_box1);
+    }
+
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
+        if (!is_black(extract_box_reference(frame, m_box0))){
+            return m_invert;
+        }
+        if (!is_black(extract_box_reference(frame, m_box1))){
+            return m_invert;
+        }
+        return !m_invert;
+   }
+
+private:
+    ImageFloatBox m_box0;
+    ImageFloatBox m_box1;
+    bool m_invert;
+};
+
+
+
+//
+//  openedgame_to_gamemenu()
+//
+
+bool openedgame_to_gamemenu(
+    VideoStream& stream, ProControllerContext& context,
+    Milliseconds timeout
+){
+    {
+        stream.log("Waiting to load game...");
+        GameLoadingDetector detector(false);
+        int ret = wait_until(
+            stream, context,
+            timeout,
+            {{detector}}
+        );
+        if (ret < 0){
+            stream.log("Timed out waiting to enter game.", COLOR_RED);
+            return false;
+        }
+    }
+    {
+        stream.log("Waiting for game menu...");
+        GameLoadingDetector detector(true);
+        int ret = wait_until(
+            stream, context,
+            timeout,
+            {{detector}}
+        );
+        if (ret < 0){
+            stream.log("Timed out waiting for game menu.", COLOR_RED);
+            return false;
+        }
+    }
+    return true;
+}
 bool openedgame_to_gamemenu(
     VideoStream& stream, JoyconContext& context,
     Milliseconds timeout

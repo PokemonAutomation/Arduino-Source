@@ -918,8 +918,6 @@ file(GLOB LIBRARY_SOURCES
     Source/ML/UI/ML_ImageAnnotationSourceSelectorWidget.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp
-    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.cpp
