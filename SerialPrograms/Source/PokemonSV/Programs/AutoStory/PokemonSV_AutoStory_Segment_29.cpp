@@ -399,12 +399,6 @@ void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, 
 
 
 
-void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-}
-
-void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-}
-
 
 }
 }

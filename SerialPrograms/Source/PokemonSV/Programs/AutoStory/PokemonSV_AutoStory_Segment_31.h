@@ -26,6 +26,15 @@ public:
     ) const override;
 };
 
+// start: 
+// end: 
+void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+
+
+// start: 
+// end: 
+void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+
 
 
 

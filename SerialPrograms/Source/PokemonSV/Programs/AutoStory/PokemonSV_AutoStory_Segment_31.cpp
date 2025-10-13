@@ -61,6 +61,15 @@ void AutoStory_Segment_31::run_segment(
 
 
 
+void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+
+
+
 }
 }
 }

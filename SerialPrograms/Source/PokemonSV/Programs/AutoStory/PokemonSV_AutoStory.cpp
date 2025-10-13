@@ -105,8 +105,8 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_26>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_27>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_28>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_29>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_30>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_29>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_30>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_31>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_32>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_33>());
@@ -720,6 +720,10 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_74(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_75(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_76(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_77(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_78(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_79(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_80(env, context, notif_status_update, stats);});
     
     
     if (end == 0){

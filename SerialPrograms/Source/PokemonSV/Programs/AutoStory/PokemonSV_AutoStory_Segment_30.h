@@ -28,6 +28,28 @@ public:
 
 
 
+// start: At Glaseado Gym Pokecenter
+// end: Spoke to Glaseado Gym receptionist
+void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+
+// start: Spoke to Glaseado Gym receptionist
+// end: Beat Glaseado Gym Challenge
+void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+
+// start: Beat Glaseado Gym Challenge
+// end: Beat Glaseado Gym (Ice). 
+void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+
+// start: Beat Glaseado Gym (Ice). 
+// end: At North Province Area One Pokecenter
+void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+
+
+// moves player from Glaseado Gym Pokecenter to North Province Area One
+void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+
+
 
 }
 }
