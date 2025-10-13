@@ -262,7 +262,14 @@ void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_70(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        context.wait_for_all_requests();
+        // fly back to North Province Area Three
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
 
+        // fly back to Glaseado Mountain Pokecenter
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 0, 0}, FlyPoint::POKECENTER);
+
+        move_from_glaseado_mountain_to_montenevera(env, context);
 
     });
 }
