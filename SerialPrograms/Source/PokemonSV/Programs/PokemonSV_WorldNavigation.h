@@ -57,6 +57,7 @@ enum class CallbackEnum{
     NEXT_POKEMON,
     SWAP_MENU,
     MOVE_SELECT,
+    SELECT_MOVE_TARGET,
 };
 
 enum class ZoomChange{
@@ -178,6 +179,17 @@ void heal_at_pokecenter(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context
+);
+
+// spam A button to choose the first move for double trainer battles
+// detect_wipeout: can be false if you have multiple pokemon in your party, since an exception will be thrown if your lead faints.
+// throw exception if wipeout or if your lead faints.
+void run_trainer_double_battle_press_A(
+    VideoStream& stream,
+    ProControllerContext& context,
+    BattleStopCondition stop_condition,
+    std::unordered_set<CallbackEnum> enum_optional_callbacks = {},
+    bool detect_wipeout = false
 );
 
 

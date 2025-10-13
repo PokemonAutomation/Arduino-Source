@@ -26,21 +26,26 @@ public:
     ) const override;
 };
 
-// start: 
-// end: 
+// start: At Montenevera Pokecenter
+// end: Spoke to gym receptionis
 void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+// start: Spoke to gym receptionis
+// end: Passed gym test with MC Sledge.
 void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+// start: Passed gym test with MC Sledge.
+// end: Beat Montenevera Gym. Inside gym building.
 void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+// start: Beat Montenevera Gym. Inside gym building.
+// end: At Glaseado gym Pokecenter.
 void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+
+// moves player from Montenevera Pokecenter to Glaseado Gym Pokecenter
+void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+
 
 // start: 
 // end: 
