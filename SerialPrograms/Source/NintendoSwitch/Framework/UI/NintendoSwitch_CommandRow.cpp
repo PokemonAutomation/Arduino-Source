@@ -66,6 +66,10 @@ CommandRow::CommandRow(
     CheckboxDropdown* overlays = new CheckboxDropdown(this, "Overlays");
     overlays->setMinimumWidth(80);
     {
+        m_overlay_stats = overlays->addItem("Stats");
+        m_overlay_stats->setChecked(session.enabled_stats());
+    }
+    {
         m_overlay_boxes = overlays->addItem("Boxes");
         m_overlay_boxes->setChecked(session.enabled_boxes());
     }
@@ -80,10 +84,6 @@ CommandRow::CommandRow(
     {
         m_overlay_log = overlays->addItem("Log");
         m_overlay_log->setChecked(session.enabled_log());
-    }
-    {
-        m_overlay_stats = overlays->addItem("Stats");
-        m_overlay_stats->setChecked(session.enabled_stats());
     }
     layout1->addWidget(overlays);
 
@@ -102,6 +102,14 @@ CommandRow::CommandRow(
     update_ui();
 
 #if 1
+    if (m_overlay_stats){
+        connect(
+            m_overlay_stats, &CheckboxDropdownItem::checkStateChanged,
+            this, [this](Qt::CheckState state){
+                m_session.set_enabled_stats(state == Qt::Checked);
+            }
+        );
+    }
     if (m_overlay_boxes){
         connect(
             m_overlay_boxes, &CheckboxDropdownItem::checkStateChanged,
@@ -132,14 +140,6 @@ CommandRow::CommandRow(
             m_overlay_log, &CheckboxDropdownItem::checkStateChanged,
             this, [this](Qt::CheckState state){
                 m_session.set_enabled_log(state == Qt::Checked);
-            }
-        );
-    }
-    if (m_overlay_stats){
-        connect(
-            m_overlay_stats, &CheckboxDropdownItem::checkStateChanged,
-            this, [this](Qt::CheckState state){
-                m_session.set_enabled_stats(state == Qt::Checked);
             }
         );
     }
@@ -280,6 +280,13 @@ void CommandRow::on_state_changed(ProgramState state){
 }
 
 
+void CommandRow::on_overlay_enabled_stats(bool enabled){
+    QMetaObject::invokeMethod(this, [this, enabled]{
+        if (m_overlay_stats){
+            m_overlay_stats->setChecked(enabled);
+        }
+    }, Qt::QueuedConnection);
+}
 void CommandRow::on_overlay_enabled_boxes(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         if (m_overlay_boxes){
@@ -305,13 +312,6 @@ void CommandRow::on_overlay_enabled_log(bool enabled){
     QMetaObject::invokeMethod(this, [this, enabled]{
         if (m_overlay_log){
             m_overlay_log->setChecked(enabled);
-        }
-    }, Qt::QueuedConnection);
-}
-void CommandRow::on_overlay_enabled_stats(bool enabled){
-    QMetaObject::invokeMethod(this, [this, enabled]{
-        if (m_overlay_stats){
-            m_overlay_stats->setChecked(enabled);
         }
     }, Qt::QueuedConnection);
 }

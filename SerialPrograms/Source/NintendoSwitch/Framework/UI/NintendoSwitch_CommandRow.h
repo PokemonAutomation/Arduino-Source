@@ -55,11 +55,11 @@ public:
     void on_state_changed(ProgramState state);
 
 private:
+    virtual void on_overlay_enabled_stats  (bool enabled) override;
     virtual void on_overlay_enabled_boxes  (bool enabled) override;
     virtual void on_overlay_enabled_text   (bool enabled) override;
     virtual void on_overlay_enabled_images (bool enabled) override;
     virtual void on_overlay_enabled_log    (bool enabled) override;
-    virtual void on_overlay_enabled_stats  (bool enabled) override;
     virtual void ready_changed(bool ready) override;
 
 private:
@@ -69,11 +69,11 @@ private:
     QComboBox* m_command_box = nullptr;
     QLabel* m_status = nullptr;
 
+    CheckboxDropdownItem* m_overlay_stats = nullptr;
     CheckboxDropdownItem* m_overlay_boxes = nullptr;
     CheckboxDropdownItem* m_overlay_text = nullptr;
     CheckboxDropdownItem* m_overlay_images = nullptr;
     CheckboxDropdownItem* m_overlay_log = nullptr;
-    CheckboxDropdownItem* m_overlay_stats = nullptr;
 
     QPushButton* m_load_profile_button = nullptr;
     QPushButton* m_save_profile_button = nullptr;

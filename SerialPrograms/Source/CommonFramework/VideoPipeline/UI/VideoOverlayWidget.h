@@ -69,6 +69,8 @@ private:
     // async_update() to avoid that.
     void async_update();
 
+    // render overlay stats
+    void render_stats  (QPainter& painter);
     // render overlay boxes
     void render_boxes  (QPainter& painter);
     // render overlay texts
@@ -77,8 +79,6 @@ private:
     void render_images (QPainter& painter);
     // render overlay log lines
     void render_log    (QPainter& painter);
-    // render overlay stats
-    void render_stats  (QPainter& painter);
 
 private:
     VideoOverlaySession& m_session;

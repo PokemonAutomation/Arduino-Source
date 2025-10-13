@@ -38,11 +38,11 @@ VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& opt
 
 
 void VideoOverlaySession::get(VideoOverlayOption& option){
+    bool stats = m_option.stats.load(std::memory_order_relaxed);
     bool boxes = m_option.boxes.load(std::memory_order_relaxed);
     bool text = m_option.text.load(std::memory_order_relaxed);
     bool images = m_option.images.load(std::memory_order_relaxed);
     bool log = m_option.log.load(std::memory_order_relaxed);
-    bool stats = m_option.stats.load(std::memory_order_relaxed);
     option.boxes.store(boxes, std::memory_order_relaxed);
     option.text.store(text, std::memory_order_relaxed);
     option.images.store(images, std::memory_order_relaxed);
@@ -50,21 +50,21 @@ void VideoOverlaySession::get(VideoOverlayOption& option){
     option.stats.store(stats, std::memory_order_relaxed);
 }
 void VideoOverlaySession::set(const VideoOverlayOption& option){
+    bool stats = option.stats.load(std::memory_order_relaxed);
     bool boxes = option.boxes.load(std::memory_order_relaxed);
     bool text = option.text.load(std::memory_order_relaxed);
     bool images = option.images.load(std::memory_order_relaxed);
     bool log = option.log.load(std::memory_order_relaxed);
-    bool stats = option.stats.load(std::memory_order_relaxed);
+    m_option.stats.store(stats, std::memory_order_relaxed);
     m_option.boxes.store(boxes, std::memory_order_relaxed);
     m_option.text.store(text, std::memory_order_relaxed);
     m_option.images.store(images, std::memory_order_relaxed);
     m_option.log.store(log, std::memory_order_relaxed);
-    m_option.stats.store(stats, std::memory_order_relaxed);
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_stats, stats);
     m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_boxes, boxes);
     m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_text, text);
     m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_images, images);
     m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_log, log);
-    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_stats, stats);
 }
 
 
@@ -87,6 +87,10 @@ void VideoOverlaySession::stats_thread(){
 }
 
 
+void VideoOverlaySession::set_enabled_stats(bool enabled){
+    m_option.stats.store(enabled, std::memory_order_relaxed);
+    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_stats, enabled);
+}
 void VideoOverlaySession::set_enabled_boxes(bool enabled){
     m_option.boxes.store(enabled, std::memory_order_relaxed);
     m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_boxes, enabled);
@@ -103,9 +107,43 @@ void VideoOverlaySession::set_enabled_log(bool enabled){
     m_option.log.store(enabled, std::memory_order_relaxed);
     m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_log, enabled);
 }
-void VideoOverlaySession::set_enabled_stats(bool enabled){
-    m_option.stats.store(enabled, std::memory_order_relaxed);
-    m_listeners.run_method_unique(&ContentListener::on_overlay_enabled_stats, enabled);
+
+
+//
+//  Stats
+//
+
+void VideoOverlaySession::add_stat(OverlayStat& stat){
+    WriteSpinLock lg(m_lock);
+    auto map_iter = m_stats.find(&stat);
+    if (map_iter != m_stats.end()){
+        return;
+    }
+
+    m_stats_order.emplace_back(&stat);
+    auto list_iter = m_stats_order.end();
+    --list_iter;
+    try{
+        m_stats.emplace(&stat, list_iter);
+    }catch (...){
+        m_stats_order.pop_back();
+        throw;
+    }
+}
+void VideoOverlaySession::remove_stat(OverlayStat& stat){
+    WriteSpinLock lg(m_lock);
+    auto iter = m_stats.find(&stat);
+    if (iter == m_stats.end()){
+        return;
+    }
+
+    m_stats_order.erase(iter->second);
+    m_stats.erase(iter);
+}
+
+std::vector<OverlayStatSnapshot> VideoOverlaySession::stats() const{
+    ReadSpinLock lg(m_lock);
+    return m_stat_lines;
 }
 
 
@@ -278,44 +316,6 @@ std::vector<OverlayLogLine> VideoOverlaySession::log_texts() const{
         ret.emplace_back(item);
     }
     return ret;
-}
-
-
-//
-//  Stats
-//
-
-void VideoOverlaySession::add_stat(OverlayStat& stat){
-    WriteSpinLock lg(m_lock);
-    auto map_iter = m_stats.find(&stat);
-    if (map_iter != m_stats.end()){
-        return;
-    }
-
-    m_stats_order.emplace_back(&stat);
-    auto list_iter = m_stats_order.end();
-    --list_iter;
-    try{
-        m_stats.emplace(&stat, list_iter);
-    }catch (...){
-        m_stats_order.pop_back();
-        throw;
-    }
-}
-void VideoOverlaySession::remove_stat(OverlayStat& stat){
-    WriteSpinLock lg(m_lock);
-    auto iter = m_stats.find(&stat);
-    if (iter == m_stats.end()){
-        return;
-    }
-
-    m_stats_order.erase(iter->second);
-    m_stats.erase(iter);
-}
-
-std::vector<OverlayStatSnapshot> VideoOverlaySession::stats() const{
-    ReadSpinLock lg(m_lock);
-    return m_stat_lines;
 }
 
 
