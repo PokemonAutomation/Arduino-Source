@@ -131,21 +131,7 @@ void reset_game_from_home_with_inference(
     bool backup_save,
     uint16_t post_wait_time
 ){
-    bool video_available = (bool)console.video().snapshot();
-    if (video_available ||
-        ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
-        tolerate_update_menu
-    ){
-//        cout << "close game" << endl;
-        close_game_from_home(console, context);
-//        cout << "start_game_from_home_with_inference game" << endl;
-        start_game_from_home_with_inference(
-            console, context, tolerate_update_menu, 0, 0, backup_save, post_wait_time
-        );
-        return;
-    }
-
-    fast_reset_game(context, ConsoleSettings::instance().START_GAME_MASH, 0ms, 0ms, 0ms);
+    from_home_close_and_reopen_game(console, context, tolerate_update_menu);
     context.wait_for_all_requests();
 
     //  Wait for game to load.

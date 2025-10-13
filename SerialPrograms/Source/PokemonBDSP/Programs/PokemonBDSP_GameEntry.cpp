@@ -4,12 +4,10 @@
  *
  */
 
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -73,23 +71,8 @@ bool reset_game_from_home(
     bool tolerate_update_menu,
     Milliseconds post_wait_time
 ){
-    bool video_available = (bool)console.video().snapshot();
-    if (video_available ||
-        ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
-        tolerate_update_menu
-    ){
-        close_game_from_home(console, context);
-        start_game_from_home(
-            console,
-            context,
-            tolerate_update_menu,
-            0, 0,
-            ConsoleSettings::instance().START_GAME_MASH
-        );
-    }else{
-        pbf_press_button(context, BUTTON_X, 50, 0);
-        pbf_mash_button(context, BUTTON_A, ConsoleSettings::instance().START_GAME_MASH);
-    }
+    from_home_close_and_reopen_game(console, context, true);
+
     bool ret = openedgame_to_ingame(
         env, console, context,
         GameSettings::instance().START_GAME_WAIT0,

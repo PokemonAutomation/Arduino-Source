@@ -566,6 +566,9 @@ void from_home_close_and_reopen_game(
     ConsoleHandle& console, ProControllerContext& context,
     bool tolerate_update_menu
 ){
+    Milliseconds start_game_mash = ConsoleSettings::instance().START_GAME_MASH;
+
+#if 1
     bool video_available = (bool)console.video().snapshot();
     if (video_available ||
         ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET ||
@@ -577,12 +580,19 @@ void from_home_close_and_reopen_game(
             context,
             tolerate_update_menu,
             0, 0,
-            ConsoleSettings::instance().START_GAME_MASH
+            start_game_mash
         );
-    }else{
-        pbf_press_button(context, BUTTON_X, 50, 0);
-        pbf_mash_button(context, BUTTON_A, ConsoleSettings::instance().START_GAME_MASH);
+        return;
     }
+#endif
+
+    //  Fastest setting. No internet needed and no update menu.
+    ssf_mash1_button(context, BUTTON_X, 50);
+
+    //  Use mashing to ensure that the X press succeeds. If it fails, the SR
+    //  will fail and can kill a den for the autohosts.
+    ssf_mash2_button(context, BUTTON_X, BUTTON_A, 3000ms + start_game_mash);
+    ssf_mash1_button(context, BUTTON_X, start_game_mash);
 }
 
 

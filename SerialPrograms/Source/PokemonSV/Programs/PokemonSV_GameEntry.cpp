@@ -13,12 +13,10 @@
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSV/PokemonSV_Settings.h"
 #include "PokemonSV_GameEntry.h"
-
 
 //#include <iostream>
 //using std::cout;
@@ -62,13 +60,7 @@ private:
 
 
 bool reset_game_to_gamemenu(ConsoleHandle& console, ProControllerContext& context){
-    close_game_from_home(console, context);
-    start_game_from_home(
-        console, context,
-        true,
-        0, 0,
-        ConsoleSettings::instance().START_GAME_MASH
-    );
+    from_home_close_and_reopen_game(console, context, true);
 
     Milliseconds timeout = GameSettings::instance().START_GAME_WAIT0;
 
