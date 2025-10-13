@@ -4,6 +4,8 @@
  *
  */
 
+#include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -28,15 +30,15 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_29::name() const{
-    return "";
+    return "29: Montenevera Gym (Ghost)";
 }
 
 std::string AutoStory_Segment_29::start_text() const{
-    return "Start: ";
+    return "Start: Beat Team Star (Fairy). At Montenevera Pokecenter.";
 }
 
 std::string AutoStory_Segment_29::end_text() const{
-    return "End: ";
+    return "End: Beat Montenevera Gym (Ghost). At Glaseado gym Pokecenter.";
 }
 
 void AutoStory_Segment_29::run_segment(
@@ -52,7 +54,10 @@ void AutoStory_Segment_29::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    // checkpoint_(env, context, options.notif_status_update, stats);
+    checkpoint_71(env, context, options.notif_status_update, stats);
+    checkpoint_72(env, context, options.notif_status_update, stats);
+    checkpoint_73(env, context, options.notif_status_update, stats);
+    checkpoint_74(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -61,12 +66,62 @@ void AutoStory_Segment_29::run_segment(
 
 
 void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        DirectionDetector direction;
+
+        direction.change_direction(env.program_info(), env.console, context, 1.536225);
+        pbf_move_left_joystick(context, 128, 0, 500, 50);
+
+        direction.change_direction(env.program_info(), env.console, context, 3.786414);
+        pbf_move_left_joystick(context, 128, 0, 1100, 50);
+
+        direction.change_direction(env.program_info(), env.console, context, 4.747153);
+        pbf_move_left_joystick(context, 128, 0, 200, 50);
+
+
+        direction.change_direction(env.program_info(), env.console, context, 4.222303);
+        pbf_move_left_joystick(context, 128, 0, 600, 50);
+
+        direction.change_direction(env.program_info(), env.console, context, 4.572071);
+
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                pbf_move_left_joystick(context, 255, 0, 100, 50); // if to the left of the door, will move right and enter
+                pbf_move_left_joystick(context, 0, 128, 300, 50); // if to the right of the door, will move left
+                pbf_move_left_joystick(context, 255, 0, 100, 50); // then move right and enter
+            }
+        );
+        
+        // speak to Jacq, inside the gym
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        // speak to gym receptionist
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
+
+
+
+    });  
 }
 
 void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
+
+    });  
 }
 
 void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
+
+    });  
 }
 
 void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
