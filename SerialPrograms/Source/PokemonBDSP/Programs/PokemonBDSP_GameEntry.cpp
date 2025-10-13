@@ -85,11 +85,11 @@ bool reset_game_from_home(
             context,
             tolerate_update_menu,
             0, 0,
-            GameSettings::instance().START_GAME_MASH0
+            ConsoleSettings::instance().START_GAME_MASH
         );
     }else{
         pbf_press_button(context, BUTTON_X, 50, 0);
-        pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH0);
+        pbf_mash_button(context, BUTTON_A, ConsoleSettings::instance().START_GAME_MASH);
     }
     bool ret = openedgame_to_ingame(
         env, console, context,

@@ -28,7 +28,6 @@ public:
     MillisecondsOption GAME_TO_HOME_DELAY0;
 
     SectionDividerOption m_start_game_timings;
-    MillisecondsOption START_GAME_MASH0;
     MillisecondsOption START_GAME_WAIT0;
     MillisecondsOption ENTER_GAME_MASH0;
     MillisecondsOption ENTER_GAME_WAIT0;

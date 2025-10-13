@@ -13,6 +13,7 @@
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -67,7 +68,7 @@ bool reset_game_to_gamemenu(ConsoleHandle& console, ProControllerContext& contex
         console, context,
         true,
         0, 0,
-        GameSettings::instance().START_GAME_MASH0
+        ConsoleSettings::instance().START_GAME_MASH
     );
 
     Milliseconds timeout = GameSettings::instance().START_GAME_WAIT0;
