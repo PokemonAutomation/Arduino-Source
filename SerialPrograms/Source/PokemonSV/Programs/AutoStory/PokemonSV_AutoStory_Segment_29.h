@@ -42,6 +42,11 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 // end: At Glaseado gym Pokecenter.
 void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
+// moves player from Montenevera Pokecenter to Glaseado Gym Pokecenter
+void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+
+
 // start: 
 // end: 
 void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
