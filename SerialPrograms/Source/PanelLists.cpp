@@ -21,6 +21,7 @@
 #include "PokemonLGPE/PokemonLGPE_Panels.h"
 #include "PokemonRSE/PokemonRSE_Panels.h"
 #include "PokemonSV/PokemonSV_Panels.h"
+#include "PokemonLZA/PokemonLZA_Panels.h"
 #include "ZeldaTotK/ZeldaTotK_Panels.h"
 #include "PanelLists.h"
 
@@ -51,10 +52,14 @@ ProgramSelect::ProgramSelect(QWidget& parent, PanelHolder& holder)
     add(std::make_unique<NintendoSwitch::PokemonBDSP::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonLA::PanelListFactory>());
     add(std::make_unique<NintendoSwitch::PokemonSV::PanelListFactory>());
+
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        add(std::make_unique<NintendoSwitch::PokemonLZA::PanelListFactory>());
         add(std::make_unique<NintendoSwitch::PokemonRSE::PanelListFactory>());
     }
+
     add(std::make_unique<NintendoSwitch::ZeldaTotK::PanelListFactory>());
+
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add(std::make_unique<ML::PanelListFactory>());
     }

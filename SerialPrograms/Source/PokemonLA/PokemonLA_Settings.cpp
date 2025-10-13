@@ -10,7 +10,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 
