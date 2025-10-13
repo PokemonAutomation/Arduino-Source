@@ -1,4 +1,4 @@
-/*  Shiny Hunt - Legendary Reset
+/*  Shiny Hunt - Overworld Watcher
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -15,7 +15,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-    using namespace Pokemon;
+
+using namespace Pokemon;
 
 
 OverworldWatcher_Descriptor::OverworldWatcher_Descriptor()
@@ -55,7 +56,7 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     InferenceSession session(
         context, env.console,
-        {{watcher}}
+        {watcher}
     );
     context.wait_until_cancel();
 }

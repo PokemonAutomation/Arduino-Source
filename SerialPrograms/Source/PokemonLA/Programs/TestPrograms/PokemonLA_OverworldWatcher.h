@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonLA_OverworldWatcher_H
 #define PokemonAutomation_PokemonLA_OverworldWatcher_H
 
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -26,8 +25,6 @@ public:
     OverworldWatcher();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
-
-
 };
 
 
