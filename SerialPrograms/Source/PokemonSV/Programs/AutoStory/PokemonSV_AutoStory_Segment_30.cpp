@@ -12,7 +12,7 @@
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
 #include "PokemonSV_AutoStoryTools.h"
-#include "PokemonSV_AutoStory_Segment_29.h"
+#include "PokemonSV_AutoStory_Segment_30.h"
 
 //#include <iostream>
 //using std::cout;
@@ -27,19 +27,19 @@ namespace PokemonSV{
 
 
 
-std::string AutoStory_Segment_29::name() const{
+std::string AutoStory_Segment_30::name() const{
     return "";
 }
 
-std::string AutoStory_Segment_29::start_text() const{
+std::string AutoStory_Segment_30::start_text() const{
     return "Start: ";
 }
 
-std::string AutoStory_Segment_29::end_text() const{
+std::string AutoStory_Segment_30::end_text() const{
     return "End: ";
 }
 
-void AutoStory_Segment_29::run_segment(
+void AutoStory_Segment_30::run_segment(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     AutoStoryOptions options,
@@ -59,24 +59,6 @@ void AutoStory_Segment_29::run_segment(
 
 }
 
-
-void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-}
-
-void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-}
-
-void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-}
-
-void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-}
-
-void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-}
-
-void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-}
 
 
 }
