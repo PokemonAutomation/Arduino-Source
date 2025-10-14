@@ -40,9 +40,6 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 // end: Beat Glaseado Gym (Ice). At North Province Area One Pokecenter
 void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
-void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 
 // moves player from Glaseado Gym Pokecenter to North Province Area One

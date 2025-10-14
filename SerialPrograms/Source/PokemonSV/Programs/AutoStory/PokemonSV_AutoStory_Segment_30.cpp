@@ -234,42 +234,40 @@ void checkpoint_77(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
+        pbf_move_left_joystick(context, 128, 255, 500, 100);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        // wait for overworld after leaving gym
+        wait_for_overworld(env.program_info(), env.console, context, 30);
+
+        move_from_glaseado_gym_to_north_province_area_one(env, context);
 
     });   
 }
 
-void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
-
-
-    });   
-}
 
 
 
 void move_from_glaseado_gym_to_north_province_area_one(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
 
-    DirectionDetector direction;
-    do_action_and_monitor_for_battles(env.program_info(), env.console, context,
-    [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+    // marker 0      {0.460938, 0.310185}
+    place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+        {ZoomChange::ZOOM_IN, 0, 0, 0}, 
+        FlyPoint::POKECENTER, 
+        {0.460938, 0.310185}
+    );
+    handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            overworld_navigation(env.program_info(), env.console, context, 
+                NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                128, 0, 20, 10, false);
+        }, 
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 255, 255, 40, 50);
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        }
+    );
 
-        direction.change_direction(env.program_info(), env.console, context, 3.855289);
-        pbf_move_left_joystick(context, 128, 0, 200, 50);
-
-        direction.change_direction(env.program_info(), env.console, context, 3.056395);
-        pbf_move_left_joystick(context, 128, 0, 300, 50);
-
-        direction.change_direction(env.program_info(), env.console, context, 3.805047);
-        pbf_move_left_joystick(context, 128, 0, 700, 50);
-
-        direction.change_direction(env.program_info(), env.console, context, 1.589021);
-        pbf_move_left_joystick(context, 128, 0, 600, 50);
-        
-        direction.change_direction(env.program_info(), env.console, context, 2.741829);
-        pbf_move_left_joystick(context, 128, 0, 300, 50);
-    });
 
     // marker 1     {0.33125, 0.314815}      {0.297396, 0.322222}        {0.313021, 0.322222}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
