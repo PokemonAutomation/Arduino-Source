@@ -36,8 +36,12 @@ void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
 // start: Beat Team Star (Fighting) grunt. At gate of base.
-// end: 
+// end: Beat Team Star (Fighting)
 void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+
+// start: Beat Team Star (Fighting)
+// end: At North Province Area Two Pokecenter
+void checkpoint_81(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 
 // moves player from North Province Area One to Team Star Fighting base

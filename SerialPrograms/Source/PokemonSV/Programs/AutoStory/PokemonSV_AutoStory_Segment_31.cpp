@@ -55,7 +55,10 @@ void AutoStory_Segment_31::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    // checkpoint_(env, context, options.notif_status_update, stats);
+    checkpoint_78(env, context, options.notif_status_update, stats);
+    checkpoint_79(env, context, options.notif_status_update, stats);
+    checkpoint_80(env, context, options.notif_status_update, stats);
+    checkpoint_81(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -65,16 +68,32 @@ void AutoStory_Segment_31::run_segment(
 void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-
+        move_from_north_province_area_one_to_fighting_base(env, context);
 
     });   
 }
 
 
 void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
+        beat_team_star_fighting1(env, context);
+    });
 }
 
 void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        beat_team_star_fighting2(env, context);
+    });
+}
+
+void checkpoint_81(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        move_from_fighting_base_to_north_province_area_two(env, context);
+    });
 }
 
 
