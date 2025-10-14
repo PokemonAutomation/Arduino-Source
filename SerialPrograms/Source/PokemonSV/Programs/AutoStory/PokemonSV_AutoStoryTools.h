@@ -326,15 +326,6 @@ void checkpoint_reattempt_loop_tutorial(
 
 
 
-// moves player from North Province Area One to Team Star Fighting base
-void move_from_north_province_area_one_to_fighting_base(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
-
-void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
-void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
-void move_from_fighting_base_to_north_province_area_two(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
