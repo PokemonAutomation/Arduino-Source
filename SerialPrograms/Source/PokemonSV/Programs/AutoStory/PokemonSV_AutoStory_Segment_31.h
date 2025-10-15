@@ -26,20 +26,33 @@ public:
     ) const override;
 };
 
-// start: 
-// end: 
+// start: At North Province Area One Pokecenter.
+// end: At Team Star (Fighting) base. Spoke to Clavell.
 void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+// start: At Team Star (Fighting) base. Spoke to Clavell.
+// end: Beat Team Star (Fighting) grunt. At gate of base.
 void checkpoint_79(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 
-// start: 
-// end: 
+// start: Beat Team Star (Fighting) grunt. At gate of base.
+// end: Beat Team Star (Fighting)
 void checkpoint_80(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
+// start: Beat Team Star (Fighting)
+// end: At North Province Area Two Pokecenter
+void checkpoint_81(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
+
+// moves player from North Province Area One to Team Star Fighting base
+void move_from_north_province_area_one_to_fighting_base(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+
+void beat_team_star_fighting1(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+void beat_team_star_fighting2(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+void move_from_fighting_base_to_north_province_area_two(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 
 }
