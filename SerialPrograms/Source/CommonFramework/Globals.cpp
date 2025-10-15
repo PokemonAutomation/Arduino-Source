@@ -45,17 +45,17 @@ const std::string PROGRAM_VERSION = PROGRAM_VERSION_BASE + "-user";
 
 const std::string PROGRAM_NAME = "Pok\u00e9mon Automation";
 
-const std::string ONLINE_DOC_URL_BASE = "https://github.com/PokemonAutomation/";
+const std::string ONLINE_DOC_URL_BASE = "https://pokemonautomation.github.io/";
 const std::string PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
 const std::string RESOURCES_URL_BASE = "https://github.com/PokemonAutomation/Packages/";
 
 
 
 //  This the URL that we display. We don't actually use this for linking.
-const std::string GITHUB_LINK_TEXT = "github.com/PokemonAutomation";
+const std::string GITHUB_LINK_TEXT = "pokemonautomation.github.io";
 
 //  This is the URL that we actually link to.
-const std::string GITHUB_LINK_URL = "https://github.com/PokemonAutomation/About/blob/master/README.md";
+const std::string GITHUB_LINK_URL = "https://pokemonautomation.github.io";
 
 
 
