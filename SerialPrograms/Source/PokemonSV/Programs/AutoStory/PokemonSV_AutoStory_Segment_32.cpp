@@ -68,6 +68,9 @@ void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
 
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 0, 170, 550}, FlyPoint::POKECENTER);
+        move_from_west_province_area_one_north_to_alfornada(env, context);
+
 
     });  
 }
@@ -124,7 +127,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
 
     // marker 2      zoom in{0.605729, 0.30463}, zoom out{0.684375, 0.616667}
     place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
-        {ZoomChange::ZOOM_OUT, 0, 0, 0}, 
+        {ZoomChange::ZOOM_OUT, 0, 150, 15}, 
         FlyPoint::POKECENTER, 
         {0.684375, 0.616667}
     );
@@ -217,7 +220,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         pbf_move_left_joystick(context, 128, 0, 100, 50);
         pbf_move_left_joystick(context, 0, 0, 400, 50);
 
-        direction.change_direction(env.program_info(), env.console, context, 2.566167);
+        direction.change_direction(env.program_info(), env.console, context, 2.575); //2.566167
 
         // climb the wall
         pbf_press_button(context, BUTTON_B, 31ms, 0ms);
@@ -230,7 +233,7 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 860ms);
         pbf_move_left_joystick(context, 128, 0, 220ms, 0ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 993ms);
-        pbf_move_left_joystick(context, 128, 0, 3572ms, 0ms);
+        pbf_move_left_joystick(context, 128, 0, 4072ms, 0ms);
 
         get_off_ride(env.program_info(), env.console, context);
 
