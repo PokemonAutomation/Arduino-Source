@@ -18,6 +18,7 @@
 #endif
 #if __APPLE__
 #define PA_ENABLE_SLEEP_SUPPRESS
+#define PA_ENABLE_SLEEP_SUPPRESS_NO_SLEEP
 #endif
 
 
