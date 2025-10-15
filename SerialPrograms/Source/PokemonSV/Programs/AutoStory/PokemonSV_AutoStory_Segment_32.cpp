@@ -233,14 +233,16 @@ void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvi
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 860ms);
         pbf_move_left_joystick(context, 128, 0, 220ms, 0ms);
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 993ms);
-        pbf_move_left_joystick(context, 128, 0, 4072ms, 0ms);
-
-        get_off_ride(env.program_info(), env.console, context);
-
-        // realign to marker 6
-        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
         
     });
+
+    // continue climbing wall
+    pbf_move_left_joystick(context, 128, 0, 4072ms, 0ms);
+
+    get_off_ride(env.program_info(), env.console, context);
+
+    // realign to marker 6
+    realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
 
     handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
