@@ -26,7 +26,7 @@ MassPurchase_Descriptor::MassPurchase_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:MassPurchase",
         STRING_POKEMON + " SV", "Mass Purchase",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MassPurchase.md",
+        "Programs/PokemonSV/MassPurchase.html",
         "Purchase a specified amount of items from a shop.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

@@ -44,7 +44,7 @@ ShinyHuntScatterbug_Descriptor::ShinyHuntScatterbug_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:ShinyHuntScatterbug",
         STRING_POKEMON + " SV", "Shiny Hunt - Scatterbug",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ShinyHunt-Scatterbug.md",
+        "Programs/PokemonSV/ShinyHunt-Scatterbug.html",
         "Shiny hunt Scatterbug.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,

@@ -30,7 +30,7 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:UnownFinder",
         STRING_POKEMON + " LA", "Unown Hunter",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/UnownHunter.md",
+        "Programs/PokemonLA/UnownHunter.html",
         "Constantly reset to find a Shiny Unown or any Shiny in the path.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,

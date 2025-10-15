@@ -29,7 +29,7 @@ ApplyGrits_Descriptor::ApplyGrits_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:ApplyGrits",
         STRING_POKEMON + " LA", "Apply Grits",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ApplyGrits.md",
+        "Programs/PokemonLA/ApplyGrits.html",
         "Use Grits items on " + STRING_POKEMON,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

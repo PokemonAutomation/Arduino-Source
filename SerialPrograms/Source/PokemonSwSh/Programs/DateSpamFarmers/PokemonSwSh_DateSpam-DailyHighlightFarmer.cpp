@@ -24,7 +24,7 @@ DailyHighlightFarmer_Descriptor::DailyHighlightFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:DailyHighlightFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Daily Highlight Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-DailyHighlightFarmer.md",
+        "Programs/PokemonSwSh/DateSpam-DailyHighlightFarmer.html",
         "Farm the daily highlight watt trader in Crown Tundra.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

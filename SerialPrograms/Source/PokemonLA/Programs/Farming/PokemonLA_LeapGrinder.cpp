@@ -32,7 +32,7 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:Leap Grinder",
         STRING_POKEMON + " LA", "Leap Grinder",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/LeapGrinder.md",
+        "Programs/PokemonLA/LeapGrinder.html",
         "Shake trees and ores to grind tasks",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,

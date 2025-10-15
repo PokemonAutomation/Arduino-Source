@@ -30,7 +30,7 @@ MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:MoneyFarmerRoute212",
         STRING_POKEMON + " BDSP", "Money Farmer (Route 212)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MoneyFarmerRoute212.md",
+        "Programs/PokemonBDSP/MoneyFarmerRoute212.html",
         "Farm money by using VS Seeker to rebattle the rich couple on Route 212.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,

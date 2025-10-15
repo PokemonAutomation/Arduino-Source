@@ -30,7 +30,7 @@ AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:AutoHostMultiGame",
         STRING_POKEMON + " SwSh", "Auto-Host Multi-Game",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-MultiGame.md",
+        "Programs/PokemonSwSh/AutoHost-MultiGame.html",
         "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,

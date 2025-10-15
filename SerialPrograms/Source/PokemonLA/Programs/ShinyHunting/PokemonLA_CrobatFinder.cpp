@@ -29,7 +29,7 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:CrobatFinder",
         STRING_POKEMON + " LA", "Alpha Crobat Hunter",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaCrobatHunter.md",
+        "Programs/PokemonLA/AlphaCrobatHunter.html",
         "Constantly reset the cave to find Shiny Alpha Crobat.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,

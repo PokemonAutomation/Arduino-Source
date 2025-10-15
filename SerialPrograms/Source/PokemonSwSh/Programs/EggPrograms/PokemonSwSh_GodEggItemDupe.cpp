@@ -23,7 +23,7 @@ GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:GodEggItemDupe",
         STRING_POKEMON + " SwSh", "God Egg Item Duplication",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/GodEggItemDuplication.md",
+        "Programs/PokemonSwSh/GodEggItemDuplication.html",
         "Mass duplicate items with the God Egg.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

@@ -30,7 +30,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:EggAutonomous",
         STRING_POKEMON + " BDSP", "Egg Autonomous",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggAutonomous.md",
+        "Programs/PokemonBDSP/EggAutonomous.html",
         "Automatically fetch+hatch eggs and keep all shinies.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

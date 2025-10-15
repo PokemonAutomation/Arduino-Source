@@ -26,7 +26,7 @@ TradeBot_Descriptor::TradeBot_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:TradeBot",
         STRING_POKEMON + " SwSh", "Trade Bot",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/TradeBot.md",
+        "Programs/PokemonSwSh/TradeBot.html",
         "Surprise trade with a code for hosting giveaways.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

@@ -175,7 +175,7 @@ AutoStory_Descriptor::AutoStory_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:AutoStory",
         STRING_POKEMON + " SV", "Auto Story",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutoStory.md",
+        "Programs/PokemonSV/AutoStory.html",
         "Progress through the mainstory of SV.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,

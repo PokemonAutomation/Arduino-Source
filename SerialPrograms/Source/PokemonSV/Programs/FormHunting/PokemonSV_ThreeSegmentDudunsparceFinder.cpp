@@ -28,7 +28,7 @@ ThreeSegmentDudunsparceFinder_Descriptor::ThreeSegmentDudunsparceFinder_Descript
     : SingleSwitchProgramDescriptor(
         "PokemonSV:ThreeSegmentDudunsparceFinder",
         STRING_POKEMON + " SV", "Three-Segment Dudunsparce Finder",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ThreeSegmentDudunsparceFinder.md",
+        "Programs/PokemonSV/ThreeSegmentDudunsparceFinder.html",
         "Check whether a box of Dunsparce contain at least one that evolves into Three-Segment Dudunsparce.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

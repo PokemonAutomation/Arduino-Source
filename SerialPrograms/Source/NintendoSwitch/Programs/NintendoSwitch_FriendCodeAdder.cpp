@@ -20,7 +20,7 @@ FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "NintendoSwitch:FriendCodeAdder",
         "Nintendo Switch", "Friend Code Adder",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/FriendCodeAdder.md",
+        "Programs/NintendoSwitch/FriendCodeAdder.html",
         "Add a list of friend codes.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

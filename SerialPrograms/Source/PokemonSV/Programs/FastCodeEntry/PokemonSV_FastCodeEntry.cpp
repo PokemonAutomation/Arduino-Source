@@ -30,7 +30,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSV:FastCodeEntry",
         STRING_POKEMON + " SV", "Fast Code Entry (FCE)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/FastCodeEntry.md",
+        "Programs/PokemonSV/FastCodeEntry.html",
         "Quickly enter a 4, 6, or 8 digit link code.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

@@ -31,7 +31,7 @@ BBQSoloFarmer_Descriptor::BBQSoloFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:BBQSoloFarmer",
         STRING_POKEMON + " SV", "BBQ Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/BBQSoloFarmer.md",
+        "Programs/PokemonSV/BBQSoloFarmer.html",
         "Farm Blueberry Quests in the Terarium for BP.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,

@@ -45,7 +45,7 @@ ClaimMysteryGift_Descriptor::ClaimMysteryGift_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:ClaimMysteryGift",
         STRING_POKEMON + " SV", "Claim Mystery Gift",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ClaimMysteryGift.md",
+        "Programs/PokemonSV/ClaimMysteryGift.html",
         "Claim the Mystery Gift in SV.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,

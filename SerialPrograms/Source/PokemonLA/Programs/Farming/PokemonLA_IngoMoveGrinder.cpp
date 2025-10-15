@@ -32,7 +32,7 @@ IngoMoveGrinder_Descriptor::IngoMoveGrinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:IngoMoveGrinder",
         STRING_POKEMON + " LA", "Ingo Move Grinder",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/IngoMoveGrinder.md",
+        "Programs/PokemonLA/IngoMoveGrinder.html",
         "Attend Ingo's battles to grind move related " + STRING_POKEDEX + " research tasks. "
         "More effective than Ingo Battle Grinder for " + STRING_POKEDEX + " research tasks but less effective for everything else.",
         ProgramControllerClass::StandardController_NoRestrictions,

@@ -286,7 +286,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         Color(),
         "PokemonSwSh:GlobalSettings",
         STRING_POKEMON + " SwSh", "Game Settings",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/PokemonSettings.md",
+        "Programs/PokemonSwSh/PokemonSettings.html",
         "Global " + STRING_POKEMON + " Sword and Shield Settings"
     )
 {}

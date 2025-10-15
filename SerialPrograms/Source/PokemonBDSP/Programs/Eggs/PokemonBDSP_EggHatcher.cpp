@@ -25,7 +25,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:EggHatcher",
         STRING_POKEMON + " BDSP", "Egg Hatcher",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggHatcher.md",
+        "Programs/PokemonBDSP/EggHatcher.html",
         "Hatch eggs from boxes.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::OPTIONAL_,

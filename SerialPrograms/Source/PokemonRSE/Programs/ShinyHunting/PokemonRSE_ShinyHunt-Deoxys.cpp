@@ -27,7 +27,7 @@ ShinyHuntDeoxys_Descriptor::ShinyHuntDeoxys_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonRSE:ShinyHuntDeoxys",
         Pokemon::STRING_POKEMON + " RSE", "Shiny Hunt - Deoxys",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/ShinyHuntDeoxys.md",
+        "Programs/PokemonRSE/ShinyHuntDeoxys.html",
         "Use the Run Away method to shiny hunt Deoxys in Emerald.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,

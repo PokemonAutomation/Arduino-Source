@@ -47,7 +47,7 @@ ItemPrinterRNG_Descriptor::ItemPrinterRNG_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:ItemPrinterRNG",
         Pokemon::STRING_POKEMON + " SV", "Item Printer RNG",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ItemPrinterRNG.md",
+        "Programs/PokemonSV/ItemPrinterRNG.html",
         "Farm the Item Printer using RNG Manipulation.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,

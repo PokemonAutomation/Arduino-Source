@@ -18,7 +18,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:ClothingBuyer",
         STRING_POKEMON + " LA", "Clothing Buyer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ClothingBuyer.md",
+        "Programs/PokemonLA/ClothingBuyer.html",
         "Buy out all the clothing in the store.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

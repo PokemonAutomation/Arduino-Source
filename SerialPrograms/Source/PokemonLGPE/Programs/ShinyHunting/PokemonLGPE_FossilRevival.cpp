@@ -27,7 +27,7 @@ FossilRevival_Descriptor::FossilRevival_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLGPE:FossilRevival",
         Pokemon::STRING_POKEMON + " LGPE", "Fossil Revival",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLGPE/FossilRevival.md",
+        "Programs/PokemonLGPE/FossilRevival.html",
         "Shiny hunt fossil Pokemon by reviving and resetting.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,

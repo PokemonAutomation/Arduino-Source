@@ -25,7 +25,7 @@ ShinyHuntUnattendedRegi_Descriptor::ShinyHuntUnattendedRegi_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedRegi",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Regi",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regi.md",
+        "Programs/PokemonSwSh/ShinyHuntUnattended-Regi.html",
         "Hunt for shiny Regis. Stop when a shiny is found.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

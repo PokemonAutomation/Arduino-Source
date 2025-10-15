@@ -35,7 +35,7 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:NuggetFarmerHighlands",
         STRING_POKEMON + " LA", "Nugget Farmer (Highlands)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/NuggetFarmerHighlands.md",
+        "Programs/PokemonLA/NuggetFarmerHighlands.html",
         "Farm nuggets off the Miss Fortune sisters in the Coronet Highlands.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,

@@ -30,7 +30,7 @@ GimmighoulRoamingFarmer_Descriptor::GimmighoulRoamingFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:GimmighoulRoamingFarmer",
         STRING_POKEMON + " SV", "Gimmighoul Roaming Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/GimmighoulRoamingFarmer.md",
+        "Programs/PokemonSV/GimmighoulRoamingFarmer.html",
         "Farm roaming Gimmighoul for coins.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,

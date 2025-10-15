@@ -19,7 +19,7 @@ BallThrower_Descriptor::BallThrower_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:BallThrower",
         STRING_POKEMON + " SwSh", "Ball Thrower",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BallThrower.md",
+        "Programs/PokemonSwSh/BallThrower.html",
         "Blindly throw balls at the opposing " + STRING_POKEMON + " until it catches.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

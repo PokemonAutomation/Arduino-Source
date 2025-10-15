@@ -20,7 +20,7 @@ PageSwap_Descriptor::PageSwap_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonHome:PageSwap",
         STRING_POKEMON + " Home", STRING_POKEMON + " Home: Page Swap",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonHome/PageSwap.md",
+        "Programs/PokemonHome/PageSwap.html",
         "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

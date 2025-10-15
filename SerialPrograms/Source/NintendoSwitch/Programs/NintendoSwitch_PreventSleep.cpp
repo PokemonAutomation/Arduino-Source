@@ -15,7 +15,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
     : SingleSwitchProgramDescriptor(
         "NintendoSwitch:PreventSleep",
         "Nintendo Switch", "Prevent Sleep",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PreventSleep.md",
+        "Programs/NintendoSwitch/PreventSleep.html",
         "Press B every 15 seconds to keep the Switch from sleeping.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

@@ -22,7 +22,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:MassRelease",
         STRING_POKEMON + " BDSP", "Mass Release",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MassRelease.md",
+        "Programs/PokemonBDSP/MassRelease.html",
         "Mass release boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

@@ -24,7 +24,7 @@ ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:ShinyHuntOverworld",
         STRING_POKEMON + " BDSP", "Shiny Hunt - Overworld",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Overworld.md",
+        "Programs/PokemonBDSP/ShinyHunt-Overworld.html",
         "Shiny hunt overworld " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

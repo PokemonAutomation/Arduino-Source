@@ -22,7 +22,7 @@ GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:GodEggDuplication",
         STRING_POKEMON + " SwSh", "God Egg Duplication",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/GodEggDuplication.md",
+        "Programs/PokemonSwSh/GodEggDuplication.html",
         "Mass duplicate " + STRING_POKEMON + " with the God Egg.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

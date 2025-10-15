@@ -16,7 +16,7 @@ PushJoySticks_Descriptor::PushJoySticks_Descriptor()
     : SingleSwitchProgramDescriptor(
         "NintendoSwitch:PushJoySticks",
         "Nintendo Switch", "Push Joy Sticks",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PushJoySticks.md",
+        "Programs/NintendoSwitch/PushJoySticks.html",
         "Push Joy Sticks continuously.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

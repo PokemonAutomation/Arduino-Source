@@ -24,7 +24,7 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:StowOnSideFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Stow-On-Side Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-StowOnSideFarmer.md",
+        "Programs/PokemonSwSh/DateSpam-StowOnSideFarmer.html",
         "Farm the Stow-on-Side items dealer.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

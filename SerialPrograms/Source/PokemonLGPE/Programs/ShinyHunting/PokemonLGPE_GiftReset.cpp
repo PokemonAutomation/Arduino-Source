@@ -27,7 +27,7 @@ GiftReset_Descriptor::GiftReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLGPE:GiftReset",
         Pokemon::STRING_POKEMON + " LGPE", "Gift Reset",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLGPE/GiftReset.md",
+        "Programs/PokemonLGPE/GiftReset.html",
         "Shiny hunt gift Pokemon by resetting the game.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,

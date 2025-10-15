@@ -21,7 +21,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:MassRelease",
         STRING_POKEMON + " SwSh", "Mass Release",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MassRelease.md",
+        "Programs/PokemonSwSh/MassRelease.html",
         "Mass release boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

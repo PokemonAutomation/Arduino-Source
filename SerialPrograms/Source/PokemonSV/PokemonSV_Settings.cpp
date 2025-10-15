@@ -95,7 +95,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         Color(),
         "PokemonSV:GlobalSettings",
         STRING_POKEMON + " SV", "Game Settings",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/PokemonSettings.md",
+        "Programs/PokemonSV/PokemonSettings.html",
         "Global " + STRING_POKEMON + " Scarlet and Violet Settings"
     )
 {}

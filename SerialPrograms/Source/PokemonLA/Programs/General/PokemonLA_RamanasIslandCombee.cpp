@@ -36,7 +36,7 @@ RamanasCombeeFinder_Descriptor::RamanasCombeeFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:Ramanas Island Combee Finder",
         STRING_POKEMON + " LA", "Ramanas Combee Finder",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/RamanasCombeeFinder.md",
+        "Programs/PokemonLA/RamanasCombeeFinder.html",
         "Check Ramanas Island Tree until a Combee is found.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

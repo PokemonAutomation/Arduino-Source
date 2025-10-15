@@ -18,7 +18,7 @@ TurboA_Descriptor::TurboA_Descriptor()
     : SingleSwitchProgramDescriptor(
         "NintendoSwitch:TurboA",
         "Nintendo Switch", "Turbo A",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboA.md",
+        "Programs/NintendoSwitch/TurboA.html",
         "Endlessly mash A.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

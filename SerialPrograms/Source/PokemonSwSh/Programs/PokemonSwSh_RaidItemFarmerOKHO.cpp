@@ -28,7 +28,7 @@ RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSwSh:RaidItemFarmerOHKO",
         STRING_POKEMON + " SwSh", "Raid Item Farmer (OHKO)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/RaidItemFarmerOHKO.md",
+        "Programs/PokemonSwSh/RaidItemFarmerOHKO.html",
         "Farm items from raids that can be OHKO'ed. (requires multiple Switches)",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

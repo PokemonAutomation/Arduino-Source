@@ -32,7 +32,7 @@ ShinyHuntLakeTrio_Descriptor::ShinyHuntLakeTrio_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:ShinyHunt-LakeTrio",
         STRING_POKEMON + " LA", "Shiny Hunt - Lake Trio",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-LakeTrio.md",
+        "Programs/PokemonLA/ShinyHunt-LakeTrio.html",
         "Shiny hunt the lake trio legendaries.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

@@ -23,7 +23,7 @@ EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:EggSuperCombined2",
         STRING_POKEMON + " SwSh", "Egg Super-Combined 2",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggSuperCombined2.md",
+        "Programs/PokemonSwSh/EggSuperCombined2.html",
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

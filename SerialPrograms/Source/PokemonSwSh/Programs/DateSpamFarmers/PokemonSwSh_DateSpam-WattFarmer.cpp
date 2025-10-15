@@ -25,7 +25,7 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:WattFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Watt Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-WattFarmer.md",
+        "Programs/PokemonSwSh/DateSpam-WattFarmer.html",
         "Farm watts. (7.2 seconds/fetch, 1 million watts/hour with a tick-precise controller)",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

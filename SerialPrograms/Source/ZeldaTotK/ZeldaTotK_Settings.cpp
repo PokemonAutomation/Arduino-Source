@@ -64,7 +64,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         Color(),
         "ZeldaTotK:GlobalSettings",
         "Zelda: TotK", "Tears of the Kingdom Settings",
-        "ComputerControl/blob/master/Wiki/Programs/ZeldaTotK/TotKSettings.md",
+        "Programs/ZeldaTotK/TotKSettings.html",
         "Global Zelda: Tears of the Kingom Settings"
     )
 {}

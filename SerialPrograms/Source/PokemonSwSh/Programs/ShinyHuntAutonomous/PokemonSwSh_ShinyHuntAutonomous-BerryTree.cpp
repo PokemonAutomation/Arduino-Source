@@ -33,7 +33,7 @@ ShinyHuntAutonomousBerryTree_Descriptor::ShinyHuntAutonomousBerryTree_Descriptor
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousBerryTree",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Berry Tree",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-BerryTree.md",
+        "Programs/PokemonSwSh/ShinyHuntAutonomous-BerryTree.html",
         "Automatically hunt for shiny berry tree " + STRING_POKEMON + " using video feedback.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,

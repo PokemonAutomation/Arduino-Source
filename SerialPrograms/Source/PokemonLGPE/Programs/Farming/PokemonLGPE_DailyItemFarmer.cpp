@@ -31,7 +31,7 @@ DailyItemFarmer_Descriptor::DailyItemFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLGPE:DailyItemFarmer",
         Pokemon::STRING_POKEMON + " LGPE", "Daily Item Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLGPE/DailyItemFarmer.md",
+        "Programs/PokemonLGPE/DailyItemFarmer.html",
         "Farm daily item respawns (ex. fossils) by date-skipping.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::REQUIRED,

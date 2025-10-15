@@ -41,7 +41,7 @@ TeraSelfFarmer_Descriptor::TeraSelfFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:TeraSelfFarmer",
         STRING_POKEMON + " SV", "Tera Self Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraSelfFarmer.md",
+        "Programs/PokemonSV/TeraSelfFarmer.html",
         "Farm items and " + STRING_POKEMON + " from Tera raids. Can also hunt for shiny and high reward raids.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,

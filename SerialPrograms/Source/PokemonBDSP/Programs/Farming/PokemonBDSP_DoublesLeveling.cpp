@@ -26,7 +26,7 @@ DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:DoublesLeveling",
         STRING_POKEMON + " BDSP", "Double Battle Leveling",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/DoublesLeveling.md",
+        "Programs/PokemonBDSP/DoublesLeveling.html",
         "Level up your party by spamming spread moves in a double battle with a partner that heals you forever.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

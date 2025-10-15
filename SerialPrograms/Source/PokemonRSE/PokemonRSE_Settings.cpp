@@ -62,7 +62,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         Color(),
         "PokemonRSE:GlobalSettings",
         STRING_POKEMON + " RSE", "Game Settings",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/RSESettings.md",
+        "Programs/PokemonRSE/RSESettings.html",
         "Global " + STRING_POKEMON + " Ruby, Sapphire, and Emerald Settings"
     )
 {}

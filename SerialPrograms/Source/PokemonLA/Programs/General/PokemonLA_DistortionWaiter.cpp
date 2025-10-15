@@ -26,7 +26,7 @@ DistortionWaiter_Descriptor::DistortionWaiter_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:DistortionWaiter",
         STRING_POKEMON + " LA", "Distortion Waiter",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/DistortionWaiter.md",
+        "Programs/PokemonLA/DistortionWaiter.html",
         "Wait for a distortion to appear.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

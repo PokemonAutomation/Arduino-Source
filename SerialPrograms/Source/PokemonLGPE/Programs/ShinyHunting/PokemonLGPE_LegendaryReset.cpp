@@ -28,7 +28,7 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLGPE:LegendaryReset",
         Pokemon::STRING_POKEMON + " LGPE", "Legendary Reset",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLGPE/LegendaryReset.md",
+        "Programs/PokemonLGPE/LegendaryReset.html",
         "Shiny hunt Legendary Pokemon by resetting the game.",
         ProgramControllerClass::SpecializedController,
         FeedbackType::VIDEO_AUDIO,

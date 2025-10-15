@@ -35,7 +35,7 @@ TournamentFarmer_Descriptor::TournamentFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:TournamentFarmer",
         STRING_POKEMON + " SV", "Tournament Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TournamentFarmer.md",
+        "Programs/PokemonSV/TournamentFarmer.html",
         "Farm the Academy Ace Tournament for money and prizes.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

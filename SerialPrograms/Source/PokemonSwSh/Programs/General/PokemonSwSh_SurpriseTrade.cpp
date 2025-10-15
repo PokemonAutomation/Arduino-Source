@@ -24,7 +24,7 @@ SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:SurpriseTrade",
         STRING_POKEMON + " SwSh", "Surprise Trade",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/SurpriseTrade.md",
+        "Programs/PokemonSwSh/SurpriseTrade.html",
         "Surprise trade away boxes of " + STRING_POKEMON,
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

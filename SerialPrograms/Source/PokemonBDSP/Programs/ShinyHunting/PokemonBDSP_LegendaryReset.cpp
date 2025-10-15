@@ -26,7 +26,7 @@ LegendaryReset_Descriptor::LegendaryReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:LegendaryReset",
         STRING_POKEMON + " BDSP", "Legendary Reset",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/LegendaryReset.md",
+        "Programs/PokemonBDSP/LegendaryReset.html",
         "Shiny hunt a standing legendary " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

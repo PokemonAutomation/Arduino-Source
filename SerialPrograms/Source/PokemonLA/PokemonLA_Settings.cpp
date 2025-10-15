@@ -118,7 +118,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         Color(),
         "PokemonLA:GlobalSettings",
         STRING_POKEMON + " LA", "Game Settings",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PokemonSettings.md",
+        "Programs/PokemonLA/PokemonSettings.html",
         "Global " + STRING_POKEMON + " Legends Arceus Settings"
     )
 {}

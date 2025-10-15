@@ -138,7 +138,7 @@ BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:BoxReorderNationalDex",
         STRING_POKEMON + " SwSh", "Box Reorder National Dex",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BoxReorderNationalDex.md",
+        "Programs/PokemonSwSh/BoxReorderNationalDex.html",
         "Order boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,

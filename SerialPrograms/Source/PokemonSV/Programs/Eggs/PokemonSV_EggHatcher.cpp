@@ -28,7 +28,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:EggHatcher",
         STRING_POKEMON + " SV", "Egg Hatcher",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggHatcher.md",
+        "Programs/PokemonSV/EggHatcher.html",
         "Automatically hatch eggs from boxes.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

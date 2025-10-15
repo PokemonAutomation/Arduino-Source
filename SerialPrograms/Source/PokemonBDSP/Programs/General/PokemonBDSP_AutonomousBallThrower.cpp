@@ -24,7 +24,7 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSPh:AutonomousBallThrower",
         STRING_POKEMON + " BDSP", "Autonomous Ball Thrower",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/AutonomousBallThrower.md",
+        "Programs/PokemonBDSP/AutonomousBallThrower.html",
         "Repeatedly throw a ball and reset until you catch the pokemon.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

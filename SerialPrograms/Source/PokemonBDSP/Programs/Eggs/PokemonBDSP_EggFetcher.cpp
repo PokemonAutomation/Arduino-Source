@@ -22,7 +22,7 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:EggFetcher",
         STRING_POKEMON + " BDSP", "Egg Fetcher",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggFetcher.md",
+        "Programs/PokemonBDSP/EggFetcher.html",
         "Automatically fetch eggs from the daycare man.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

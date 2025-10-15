@@ -22,7 +22,7 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSV:SelfBoxTrade",
         STRING_POKEMON + " SV", "Self Box Trade",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/SelfBoxTrade.md",
+        "Programs/PokemonSV/SelfBoxTrade.html",
         "Trade boxes of " + STRING_POKEMON + " between two local Switches.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

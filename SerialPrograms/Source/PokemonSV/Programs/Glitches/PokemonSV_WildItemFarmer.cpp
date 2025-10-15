@@ -31,7 +31,7 @@ WildItemFarmer_Descriptor::WildItemFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:WildItemFarmer",
         Pokemon::STRING_POKEMON + " SV", "Wild Item Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/WildItemFarmer.md",
+        "Programs/PokemonSV/WildItemFarmer.html",
         "Farm an item held by a wild " + Pokemon::STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

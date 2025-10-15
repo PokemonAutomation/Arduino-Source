@@ -23,7 +23,7 @@ EggFetcher2_Descriptor::EggFetcher2_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:EggFetcher2",
         STRING_POKEMON + " SwSh", "Egg Fetcher 2",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggFetcher2.md",
+        "Programs/PokemonSwSh/EggFetcher2.html",
         "Fetch eggs without hatching them.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

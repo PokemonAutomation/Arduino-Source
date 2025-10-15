@@ -31,7 +31,7 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousOverworld",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Overworld",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Overworld.md",
+        "Programs/PokemonSwSh/ShinyHuntAutonomous-Overworld.html",
         "Automatically shiny hunt overworld " + STRING_POKEMON + " with video feedback.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

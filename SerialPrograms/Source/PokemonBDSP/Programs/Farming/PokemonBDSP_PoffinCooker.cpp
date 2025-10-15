@@ -23,7 +23,7 @@ PoffinCooker_Descriptor::PoffinCooker_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:PoffinCooker",
         STRING_POKEMON + " BDSP", "Poffin Cooker",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/PoffinCooker.md",
+        "Programs/PokemonBDSP/PoffinCooker.html",
         "Cook Poffins.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,

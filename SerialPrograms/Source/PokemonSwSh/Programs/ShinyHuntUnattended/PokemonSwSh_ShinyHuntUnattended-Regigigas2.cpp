@@ -24,7 +24,7 @@ ShinyHuntUnattendedRegigigas2_Descriptor::ShinyHuntUnattendedRegigigas2_Descript
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedRegigigas2",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Regigigas2",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regigigas2.md",
+        "Programs/PokemonSwSh/ShinyHuntUnattended-Regigigas2.html",
         "A new version of the Regigigas program that is faster.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,
