@@ -31,12 +31,12 @@ inline bool filter_serial_port(const QSerialPortInfo& port){
     }
 #endif
 
-    // assume macOS or Linux
+#if defined(__APPLE__)
+    // exlude tty
     if (port.portName().startsWith("tty.")) {
         return false;
     }
-
-#if defined(__APPLE__) // exclude system builtin serial ports
+    // exclude system builtin serial ports
     if (port.portName() == "cu.debug-console" ||
         port.portName() == "cu.Bluetooth-Incoming-Port"
     ){
