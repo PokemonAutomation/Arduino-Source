@@ -4,7 +4,6 @@
  *
  */
 
-#include <iostream>
 #include <mutex>
 #include <IOKit/pwr_mgt/IOPMLib.h>
 #include "CommonFramework/Logging/Logger.h"
@@ -18,115 +17,104 @@ class AppleSleepController : public SystemSleepController{
 public:
     virtual ~AppleSleepController(){
         std::lock_guard<std::mutex> lg(m_lock);
-        m_screen_on_requests = 0;
-        m_no_sleep_requests = 0;
-        update_state();
+        update_state(SleepSuppress::NONE);
     }
     virtual void push_screen_on() override{
         std::lock_guard<std::mutex> lg(m_lock);
-        m_screen_on_requests++;
-        update_state();
+        update_state(SleepSuppress::SCREEN_ON);
     }
     virtual void pop_screen_on() override{
         std::lock_guard<std::mutex> lg(m_lock);
-        m_screen_on_requests--;
-        update_state();
+        update_state(SleepSuppress::NONE);
     }
     virtual void push_no_sleep() override{
         std::lock_guard<std::mutex> lg(m_lock);
-        m_no_sleep_requests++;
-        update_state();
+        update_state(SleepSuppress::NO_SLEEP);
     }
     virtual void pop_no_sleep() override{
         std::lock_guard<std::mutex> lg(m_lock);
-        m_no_sleep_requests--;
-        update_state();
+        update_state(SleepSuppress::NONE);
     }
 
 
 private:
-    //  Disable/Enable screen saver and OS sleep.
-    //  Return whether the setting is successful.
-    bool prevent_sleep(bool prevent);
-    void update_state();
+    void update_state(SleepSuppress state); // call after holding the lock
+    bool disable_sleep(CFStringRef prevention_type); // call after holding the lock
+    bool enable_sleep(); // call after holding the lock
 
-    bool disable_sleep();
-    bool enable_sleep();
-
-    IOReturn m_prevention_succeeded = kIOReturnError;
-    IOPMAssertionID m_session_id = 0;
-
-    size_t m_screen_on_requests = 0;
-    size_t m_no_sleep_requests = 0;
+    IOPMAssertionID m_session_id = kIOPMNullAssertionID;
 };
 
 
-// Code from https://stackoverflow.com/questions/5596319/how-to-programmatically-prevent-a-mac-from-going-to-sleep/8461182#8461182
-
-
-bool AppleSleepController::prevent_sleep(bool prevent){
-    if (prevent){
-        return disable_sleep();
-    }else{
-        return enable_sleep();
-    }
-}
-
-bool AppleSleepController::disable_sleep(){
-    if (m_prevention_succeeded == kIOReturnSuccess){
+bool AppleSleepController::disable_sleep(CFStringRef prevention_type){
+    if (m_session_id != kIOPMNullAssertionID){ // already disabled
         return true;
     }
-    std::cout << "Disabling display sleep and OS sleep" << std::endl;
-    // kIOPMAssertionTypeNoDisplaySleep prevents display sleep,
-    // kIOPMAssertionTypeNoIdleSleep prevents idle sleep
-
-    // NOTE: IOPMAssertionCreateWithName limits the string to 128 characters.
-    CFStringRef reasonForActivity = (CFStringRef) __builtin___CFStringMakeConstantString("SerialPrograms is running");
-
-    m_prevention_succeeded = kIOReturnError;
-    m_session_id = 0;
-    m_prevention_succeeded = IOPMAssertionCreateWithName(kIOPMAssertionTypeNoDisplaySleep,
-                                                         kIOPMAssertionLevelOn, reasonForActivity, &m_session_id);
-    if (m_prevention_succeeded != kIOReturnSuccess){
-        m_session_id = 0;
-        std::cerr << "Cannot disable sleep. Error code " << m_prevention_succeeded << std::endl;
+    auto ret = IOPMAssertionCreateWithDescription(
+        prevention_type,
+        CFSTR("SerialPrograms"),
+        CFSTR("SerialPrograms is running"),
+        nullptr,
+        nullptr,
+        0,
+        nullptr, &m_session_id
+    );
+    if (ret != kIOReturnSuccess){
+        m_session_id = kIOPMNullAssertionID;
+        global_logger_tagged().log("Unable to disaable sleep. Error code " + std::to_string(ret), COLOR_RED);
         return false;
     }
-
-    std::cout << "Disabled display sleep and OS sleep" << std::endl;
     return true;
 }
 
 bool AppleSleepController::enable_sleep(){
-    if (m_prevention_succeeded == kIOReturnSuccess){
-        IOPMAssertionRelease(m_session_id);
-        m_session_id = 0;
-        m_prevention_succeeded = kIOReturnError;
-        std::cout << "Enabled display sleep and OS sleep." << std::endl;
+    if (m_session_id != kIOPMNullAssertionID){
+        auto ret = IOPMAssertionRelease(m_session_id);
+        if (ret != kIOReturnSuccess) {
+            global_logger_tagged().log("Unable to enable sleep. Error code " + std::to_string(ret), COLOR_RED);
+            return false;
+        }
+        m_session_id = kIOPMNullAssertionID;
     }
     return true;
 }
 
 
 
-void AppleSleepController::update_state(){
-    //  Must call under lock.
-
+void AppleSleepController::update_state(SleepSuppress state){
     SleepSuppress before_state = m_state.load(std::memory_order_relaxed);
-    SleepSuppress after_state = SleepSuppress::NONE;
 
-    //  TODO: Distiguish these two.
-    bool enabled = m_screen_on_requests > 0 || m_no_sleep_requests > 0;
-    prevent_sleep(enabled);
+    // kIOPMAssertPreventUserIdleSystemSleep:
+    //    Prevents the system from sleeping automatically due to a lack of user activity.
+    // kIOPMAssertPreventUserIdleDisplaySleep:
+    //    Prevents the display from dimming automatically.
+    // kIOPMAssertionTypeNoDisplaySleep prevents display sleep - Deprecated in 10.7
+    // kIOPMAssertionTypeNoIdleSleep prevents idle sleep - Deprecated in 10.7
 
-    after_state = enabled
-        ? SleepSuppress::SCREEN_ON
-        : SleepSuppress::NONE,
+    switch (state) {
+    case SleepSuppress::NONE:
+        if (enable_sleep()) {
+            global_logger_tagged().log("Enabled display sleep and OS sleep.", COLOR_BLUE);
+        }
+        break;
+    case SleepSuppress::NO_SLEEP:
+        global_logger_tagged().log("Disabling OS sleep...", COLOR_BLUE);
+        if (disable_sleep(kIOPMAssertPreventUserIdleSystemSleep)) {
+            global_logger_tagged().log("Disabled OS sleep.", COLOR_BLUE);
+        }
+        break;
+    case SleepSuppress::SCREEN_ON:
+        global_logger_tagged().log("Disabling display sleep and OS sleep...", COLOR_BLUE);
+        if (disable_sleep(kIOPMAssertPreventUserIdleDisplaySleep)) {
+            global_logger_tagged().log("Disabled display sleep and OS sleep.", COLOR_BLUE);
+        }
+        break;
+    }
 
-    m_state.store(after_state, std::memory_order_release);
+    m_state.store(state, std::memory_order_release);
 
-    if (before_state != after_state){
-        notify_listeners(after_state);
+    if (before_state != state){
+        notify_listeners(state);
     }
 }
 
