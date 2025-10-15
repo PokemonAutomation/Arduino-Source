@@ -26,7 +26,7 @@ DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:DaySkipperJPN",
         STRING_POKEMON + " SwSh", "Day Skipper (JPN)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperJPN.md",
+        "Programs/PokemonSwSh/DaySkipperJPN.html",
         "A day skipper for Japanese date format. (Switch 1: 7600 skips/hour, Switch 2: 5655 skips/hour)",
         ProgramControllerClass::StandardController_WithRestrictions,
         FeedbackType::NONE,

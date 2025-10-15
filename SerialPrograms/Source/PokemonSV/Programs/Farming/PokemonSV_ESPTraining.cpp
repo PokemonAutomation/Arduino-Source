@@ -27,7 +27,7 @@ ESPTraining_Descriptor::ESPTraining_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:ESPTraining",
         STRING_POKEMON + " SV", "ESP Training",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/ESPTraining.md",
+        "Programs/PokemonSV/ESPTraining.html",
         "Clear the ESP Training to farm EV berries.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

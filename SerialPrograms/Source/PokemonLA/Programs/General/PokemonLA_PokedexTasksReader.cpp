@@ -64,7 +64,7 @@ PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:PokedexTasksReader",
         STRING_POKEMON + " LA", STRING_POKEDEX + " Tasks Reader",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PokedexTasksReader.md",
+        "Programs/PokemonLA/PokedexTasksReader.html",
         "Read all the tasks in your " + STRING_POKEDEX + " and output a file with the tasks you did.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

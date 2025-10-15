@@ -18,7 +18,7 @@ BraviaryHeightGlitch_Descriptor::BraviaryHeightGlitch_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:BraviaryHeightGlitch",
         STRING_POKEMON + " LA", "Braviary Height Glitch",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/BraviaryHeightGlitch.md",
+        "Programs/PokemonLA/BraviaryHeightGlitch.html",
         "Increase your height in place using the height glitch.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

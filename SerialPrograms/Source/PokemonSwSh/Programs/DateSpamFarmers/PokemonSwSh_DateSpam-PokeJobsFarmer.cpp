@@ -26,7 +26,7 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
         "PokemonSwSh:PokeJobsFarmer",
         STRING_POKEMON + " SwSh",
         "Date Spam - " + STRING_POKEJOB + "s Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-PokeJobsFarmer.md",
+        "Programs/PokemonSwSh/DateSpam-PokeJobsFarmer.html",
         "Farm " + STRING_POKEJOB + "s.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

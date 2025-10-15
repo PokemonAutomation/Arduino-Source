@@ -45,7 +45,7 @@ AuctionFarmer_Descriptor::AuctionFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:AuctionFarmer",
         STRING_POKEMON + " SV", "Auction Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AuctionFarmer.md",
+        "Programs/PokemonSV/AuctionFarmer.html",
         "Check auctions and bid on items.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,

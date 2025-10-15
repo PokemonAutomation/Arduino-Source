@@ -34,7 +34,7 @@ LabelImages_Descriptor::LabelImages_Descriptor()
         Color(),
         "ML:LabelImages",
         "ML", "Label Images",
-        "ComputerControl/blob/master/Wiki/Programs/ML/LabelImages.md",
+        "Programs/ML/LabelImages.html",
         "Label " + Pokemon::STRING_POKEMON + " on images" 
     )
 {}

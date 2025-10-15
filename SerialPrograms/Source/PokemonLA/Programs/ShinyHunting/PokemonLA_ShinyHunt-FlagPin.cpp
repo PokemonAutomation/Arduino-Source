@@ -28,7 +28,7 @@ ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:ShinyHunt-FlagPin",
         STRING_POKEMON + " LA", "Shiny Hunt - Flag Pin",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-FlagPin.md",
+        "Programs/PokemonLA/ShinyHunt-FlagPin.html",
         "Repeatedly travel to a flag pin to shiny hunt " + STRING_POKEMON + " around it.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,

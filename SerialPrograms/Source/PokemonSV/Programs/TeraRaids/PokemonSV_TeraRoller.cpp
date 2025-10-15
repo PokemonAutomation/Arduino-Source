@@ -38,7 +38,7 @@ TeraRoller_Descriptor::TeraRoller_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:TeraRoller",
         STRING_POKEMON + " SV", "Tera Roller",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraRoller.md",
+        "Programs/PokemonSV/TeraRoller.html",
         "Roll Tera raids to find shiny " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::REQUIRED,

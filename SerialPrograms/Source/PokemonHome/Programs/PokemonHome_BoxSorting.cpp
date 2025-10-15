@@ -59,7 +59,7 @@ BoxSorting_Descriptor::BoxSorting_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonHome:BoxSorter",
         STRING_POKEMON + " Home", "Box Sorter",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonHome/BoxSorter.md",
+        "Programs/PokemonHome/BoxSorter.html",
         "Order boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,

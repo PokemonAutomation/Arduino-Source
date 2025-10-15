@@ -43,7 +43,7 @@ BurmyFinder_Descriptor::BurmyFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:Burmy Hunter",
         STRING_POKEMON + " LA", "Burmy Hunter",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/BurmyHunter.md",
+        "Programs/PokemonLA/BurmyHunter.html",
         "Check nearby trees for a possible Shiny, Alpha or Alpha Shiny Burmy",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,

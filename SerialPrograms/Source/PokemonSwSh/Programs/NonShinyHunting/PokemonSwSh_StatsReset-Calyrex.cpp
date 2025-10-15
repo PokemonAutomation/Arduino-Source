@@ -28,7 +28,7 @@ StatsResetCalyrex_Descriptor::StatsResetCalyrex_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:StatsResetCalyrex",
         STRING_POKEMON + " SwSh", "Stats Reset - Calyrex",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Calyrex.md",
+        "Programs/PokemonSwSh/StatsReset-Calyrex.html",
         "Repeatedly catch calyrex (and its horse) until you get the stats you want.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

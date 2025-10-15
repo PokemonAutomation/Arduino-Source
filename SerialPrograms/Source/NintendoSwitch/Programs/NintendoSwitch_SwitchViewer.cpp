@@ -20,7 +20,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
         Color(),
         "NintendoSwitch:SwitchViewer",
         "Nintendo Switch", "Switch Viewer",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/SwitchViewer.md",
+        "Programs/NintendoSwitch/SwitchViewer.html",
         "View status information from one or more running programs."
     )
 {}

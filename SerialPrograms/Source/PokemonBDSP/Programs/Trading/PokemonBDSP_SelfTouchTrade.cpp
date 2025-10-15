@@ -22,7 +22,7 @@ SelfTouchTrade_Descriptor::SelfTouchTrade_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonBDSP:SelfTouchTrade",
         STRING_POKEMON + " BDSP", "Self Touch Trade",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/SelfTouchTrade.md",
+        "Programs/PokemonBDSP/SelfTouchTrade.html",
         "Touch trade boxes of " + STRING_POKEMON + " between two local Switches.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

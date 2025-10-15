@@ -53,7 +53,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:EggAutonomous",
         STRING_POKEMON + " SwSh", "Egg Autonomous",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggAutonomous.md",
+        "Programs/PokemonSwSh/EggAutonomous.html",
         "Automatically fetch+hatch eggs and keep all shinies.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

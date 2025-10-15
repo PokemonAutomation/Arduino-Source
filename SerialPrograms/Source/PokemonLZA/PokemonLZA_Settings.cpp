@@ -42,7 +42,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         Color(),
         "PokemonLZA:GlobalSettings",
         STRING_POKEMON + " LZA", "Game Settings",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLZA/PokemonSettings.md",
+        "Programs/PokemonLZA/PokemonSettings.html",
         "Global " + STRING_POKEMON + " Legends ZA Settings"
     )
 {}

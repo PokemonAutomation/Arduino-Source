@@ -25,7 +25,7 @@ ShinyHuntUnattendedIoATrade_Descriptor::ShinyHuntUnattendedIoATrade_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedIoATrade",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - IoA Trade",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-IoATrade.md",
+        "Programs/PokemonSwSh/ShinyHuntUnattended-IoATrade.html",
         "Hunt for shiny Isle of Armor trade. Stop when a shiny is found.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

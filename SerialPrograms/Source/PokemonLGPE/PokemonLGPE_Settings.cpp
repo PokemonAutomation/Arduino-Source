@@ -79,7 +79,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         Color(),
         "PokemonLGPE:GlobalSettings",
         STRING_POKEMON + " LGPE", "Game Settings",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLGPE/PokemonSettings.md",
+        "Programs/PokemonLGPE/PokemonSettings.html",
         "Global " + STRING_POKEMON + " Let's Go Settings"
     )
 {}

@@ -26,7 +26,7 @@ PostMMOSpawnReset_Descriptor::PostMMOSpawnReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:PostMMOSpawnReset",
         STRING_POKEMON + " LA", "Post-MMO Spawn Reset",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PostMMOSpawnReset.md",
+        "Programs/PokemonLA/PostMMOSpawnReset.html",
         "Constantly reset the spawn after MMO finishes.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,

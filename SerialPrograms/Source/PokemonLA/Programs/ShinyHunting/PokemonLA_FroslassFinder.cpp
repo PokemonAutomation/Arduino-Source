@@ -29,7 +29,7 @@ FroslassFinder_Descriptor::FroslassFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:AlphaFroslassFinder",
         STRING_POKEMON + " LA", "Alpha Froslass Hunter",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaFroslassHunter.md",
+        "Programs/PokemonLA/AlphaFroslassHunter.html",
         "Constantly reset to find a Alpha Froslass or any Shiny in the path.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,

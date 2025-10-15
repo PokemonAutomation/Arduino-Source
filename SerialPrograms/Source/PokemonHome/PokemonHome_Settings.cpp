@@ -33,7 +33,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         Color(),
         "PokemonHome:GlobalSettings",
         STRING_POKEMON + " Home", STRING_POKEMON + " Settings",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonHome/PokemonSettings.md",
+        "Programs/PokemonHome/PokemonSettings.html",
         "Global " + STRING_POKEMON + " Settings"
     )
 {}

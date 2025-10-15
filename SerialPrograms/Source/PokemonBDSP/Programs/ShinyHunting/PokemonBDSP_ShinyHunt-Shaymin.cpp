@@ -24,7 +24,7 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:ShinyHuntShaymin",
         STRING_POKEMON + " BDSP", "Shiny Hunt - Shaymin",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Shaymin.md",
+        "Programs/PokemonBDSP/ShinyHunt-Shaymin.html",
         "Shiny hunt Shaymin using the runaway method.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

@@ -32,7 +32,7 @@ FlyingTrialFarmer_Descriptor::FlyingTrialFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:FlyingTrialFarmer",
         STRING_POKEMON + " SV", "Flying Trial Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/FlyingTrialFarmer.md",
+        "Programs/PokemonSV/FlyingTrialFarmer.html",
         "Farm the flying trial for BP.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,

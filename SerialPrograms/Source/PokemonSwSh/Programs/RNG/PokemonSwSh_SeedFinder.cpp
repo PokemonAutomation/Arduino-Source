@@ -24,7 +24,7 @@ SeedFinder_Descriptor::SeedFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:SeedFinder",
         STRING_POKEMON + " SwSh", "Seed Finder",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/SeedFinder.md",
+        "Programs/PokemonSwSh/SeedFinder.html",
         "Finds the current state to be used for manual RNG manipulation.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

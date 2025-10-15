@@ -24,7 +24,7 @@ BerryFarmer_Descriptor::BerryFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:BerryFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Berry Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-BerryFarmer.md",
+        "Programs/PokemonSwSh/DateSpam-BerryFarmer.html",
         "Farm berries.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

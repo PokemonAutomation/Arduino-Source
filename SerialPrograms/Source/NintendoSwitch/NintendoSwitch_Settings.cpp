@@ -176,7 +176,7 @@ ConsoleSettings_Descriptor::ConsoleSettings_Descriptor()
         Color(),
         "NintendoSwitch:GlobalSettings",
         "Nintendo Switch", "Framework Settings",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/FrameworkSettings.md",
+        "Programs/NintendoSwitch/FrameworkSettings.html",
         "Switch Framework Settings"
     )
 {}

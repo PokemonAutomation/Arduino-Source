@@ -19,7 +19,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
         Color(),
         "NintendoSwitch:VirtualConsole",
         "Nintendo Switch", "Virtual Console",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/VirtualConsole.md",
+        "Programs/NintendoSwitch/VirtualConsole.html",
         "Play your Switch from your computer. Device logging is logged to the output window."
     )
 {}

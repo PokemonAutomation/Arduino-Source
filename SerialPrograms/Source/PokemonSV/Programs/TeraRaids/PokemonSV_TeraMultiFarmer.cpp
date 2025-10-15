@@ -108,7 +108,7 @@ TeraMultiFarmer_Descriptor::TeraMultiFarmer_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSV:TeraMultiFarmer",
         STRING_POKEMON + " SV", "Tera Multi-Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/TeraMultiFarmer.md",
+        "Programs/PokemonSV/TeraMultiFarmer.html",
         "Farm items and " + STRING_POKEMON + " from your own Tera raid using multiple Switches.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

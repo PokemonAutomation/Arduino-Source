@@ -29,7 +29,7 @@ DenRoller_Descriptor::DenRoller_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:DenRoller",
         STRING_POKEMON + " SwSh", "Den Roller",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DenRoller.md",
+        "Programs/PokemonSwSh/DenRoller.html",
         "Roll den to the N'th day, SR and repeat.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,

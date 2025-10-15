@@ -25,7 +25,7 @@ ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustic
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedSwordsOfJustice",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Swords Of Justice",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-SwordsOfJustice.md",
+        "Programs/PokemonSwSh/ShinyHuntUnattended-SwordsOfJustice.html",
         "Hunt for shiny SOJs. Stop when a shiny is found.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

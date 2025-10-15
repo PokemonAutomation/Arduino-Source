@@ -25,7 +25,7 @@ ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousRegi",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Regi",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Regi.md",
+        "Programs/PokemonSwSh/ShinyHuntAutonomous-Regi.html",
         "Automatically hunt for shiny Regi using video feedback.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

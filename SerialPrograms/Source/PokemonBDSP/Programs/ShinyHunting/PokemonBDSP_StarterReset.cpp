@@ -30,7 +30,7 @@ StarterReset_Descriptor::StarterReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:StarterReset",
         STRING_POKEMON + " BDSP", "Starter Reset",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/StarterReset.md",
+        "Programs/PokemonBDSP/StarterReset.html",
         "Shiny hunt your starter " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

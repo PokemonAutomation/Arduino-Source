@@ -20,7 +20,7 @@ ParaglideItemDuper_Descriptor::ParaglideItemDuper_Descriptor()
     : SingleSwitchProgramDescriptor(
         "ZeldaTotK:ParaglideItemDuper",
         "Zelda: TotK", "Paraglide Item Duper",
-        "ComputerControl/blob/master/Wiki/Programs/ZeldaTotK/ParaglideItemDuper.md",
+        "Programs/ZeldaTotK/ParaglideItemDuper.html",
         "Use the Paraglide Menu Sort glitch to duplicate items.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

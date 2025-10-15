@@ -20,7 +20,7 @@ ProgramName_Descriptor::ProgramName_Descriptor()
     : SingleSwitchProgramDescriptor(
         "GameName:ProgramName",
         "Game Name", "Program Name",
-        "ComputerControl/blob/master/Wiki/Programs/GameName/ProgramName.md",
+        "Programs/GameName/ProgramName.html",
         "<Description of this program>.",
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,

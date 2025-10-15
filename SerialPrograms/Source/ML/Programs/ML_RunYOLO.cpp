@@ -26,7 +26,7 @@ RunYOLO_Descriptor::RunYOLO_Descriptor()
     : SingleSwitchProgramDescriptor(
         "NintendoSwitch:RunYOLO",
         "Nintendo Switch", "Run YOLO",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/RunYOLO.md",
+        "Programs/NintendoSwitch/RunYOLO.html",
         "Run YOLO object detection model.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

@@ -24,7 +24,7 @@ ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descri
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedStrongSpawn",
         STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Strong Spawn",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-StrongSpawn.md",
+        "Programs/PokemonSwSh/ShinyHuntUnattended-StrongSpawn.html",
         "Hunt for shiny strong spawns. Stop when a shiny is found.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

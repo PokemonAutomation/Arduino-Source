@@ -26,7 +26,7 @@ ActivateMenuGlitch113_Descriptor::ActivateMenuGlitch113_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonBDSP:ActivateMenuGlitch113",
         STRING_POKEMON + " BDSP", "Activate Menu Glitch (1.1.3)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ActivateMenuGlitch-113.md",
+        "Programs/PokemonBDSP/ActivateMenuGlitch-113.html",
         "Activate the menu glitch using the strength/fly method. "
         "<font color=\"red\">(This works on game versions 1.1.1 - 1.1.3. It has been patched out in later versions.)</font>",
         ProgramControllerClass::StandardController_RequiresPrecision,

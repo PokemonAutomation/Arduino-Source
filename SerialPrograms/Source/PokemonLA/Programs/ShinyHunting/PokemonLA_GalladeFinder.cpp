@@ -26,7 +26,7 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:GalladeFinder",
         STRING_POKEMON + " LA", "Alpha Gallade Hunter",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AlphaGalladeHunter.md",
+        "Programs/PokemonLA/AlphaGalladeHunter.html",
         "Constantly reset the Snowpoint Temple to find Shiny Alpha Gallade.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,

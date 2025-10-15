@@ -44,7 +44,7 @@ EggAutonomous_Descriptor::EggAutonomous_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:EggAutonomous",
         STRING_POKEMON + " SV", "Egg Autonomous",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggAutonomous.md",
+        "Programs/PokemonSV/EggAutonomous.html",
         "Automatically get meal power, fetch eggs from a picnic and hatch them.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
@@ -112,7 +112,7 @@ EggAutonomous::EggAutonomous()
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>" +
         make_text_url(
-            ONLINE_DOC_URL_BASE + "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggAutonomous.md#auto-saving-mode",
+            ONLINE_DOC_URL_BASE + "Programs/PokemonSV/EggAutonomous.html#auto-saving-mode",
             "See the wiki for the full explanations of each mode."
         ),
         {

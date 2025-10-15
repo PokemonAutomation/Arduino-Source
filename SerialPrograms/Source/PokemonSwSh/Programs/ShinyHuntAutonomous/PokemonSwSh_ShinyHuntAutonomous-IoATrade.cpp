@@ -28,7 +28,7 @@ ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousIoATrade",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - IoA Trade",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-IoATrade.md",
+        "Programs/PokemonSwSh/ShinyHuntAutonomous-IoATrade.html",
         "Hunt for shiny Isle of Armor trade using video feedback.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

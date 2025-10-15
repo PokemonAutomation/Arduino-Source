@@ -27,7 +27,7 @@ LegendaryHuntEmerald_Descriptor::LegendaryHuntEmerald_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonRSE:LegendaryHuntEmerald",
         Pokemon::STRING_POKEMON + " RSE", "Legendary Hunt (Emerald)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonRSE/LegendaryHuntEmerald.md",
+        "Programs/PokemonRSE/LegendaryHuntEmerald.html",
         "Use the Run Away method to shiny hunt legendaries in Emerald.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::VIDEO_AUDIO,

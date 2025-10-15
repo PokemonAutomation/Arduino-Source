@@ -29,7 +29,7 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:PurpleBeamFinder",
         STRING_POKEMON + " SwSh", "Purple Beam Finder",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/PurpleBeamFinder.md",
+        "Programs/PokemonSwSh/PurpleBeamFinder.html",
         "Automatically reset for a purple beam.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

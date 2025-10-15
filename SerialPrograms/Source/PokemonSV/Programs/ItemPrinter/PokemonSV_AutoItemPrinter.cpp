@@ -32,7 +32,7 @@ AutoItemPrinter_Descriptor::AutoItemPrinter_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:AutoItemPrinter",
         STRING_POKEMON + " SV", "Auto Item Printer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/AutoItemPrinter.md",
+        "Programs/PokemonSV/AutoItemPrinter.html",
         "Automate the Item Printer for rare items.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

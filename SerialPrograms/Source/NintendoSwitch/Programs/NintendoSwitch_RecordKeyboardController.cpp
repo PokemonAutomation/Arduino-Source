@@ -23,7 +23,7 @@ RecordKeyboardController_Descriptor::RecordKeyboardController_Descriptor()
     : SingleSwitchProgramDescriptor(
         "NintendoSwitch:RecordKeyboardController",
         "Nintendo Switch", "Record Keyboard Controller",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/RecordKeyboardController.md",
+        "Programs/NintendoSwitch/RecordKeyboardController.html",
         "Record actions from the keyboard controller, then play it back.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

@@ -26,7 +26,7 @@ ShinyHuntAutonomousStrongSpawn_Descriptor::ShinyHuntAutonomousStrongSpawn_Descri
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousStrongSpawn",
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Strong Spawn",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-StrongSpawn.md",
+        "Programs/PokemonSwSh/ShinyHuntAutonomous-StrongSpawn.html",
         "Automatically hunt for shiny strong spawns using video feedback.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

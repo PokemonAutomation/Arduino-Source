@@ -23,7 +23,7 @@ BeamReset_Descriptor::BeamReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:BeamReset",
         STRING_POKEMON + " SwSh", "Beam Reset",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BeamReset.md",
+        "Programs/PokemonSwSh/BeamReset.html",
         "Reset a beam until you see a purple beam.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::NONE,

@@ -25,7 +25,7 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:LotoFarmer",
         STRING_POKEMON + " SwSh", "Date Spam - Loto Farmer",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-LotoFarmer.md",
+        "Programs/PokemonSwSh/DateSpam-LotoFarmer.html",
         "Farm the Loto ID.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::NONE,

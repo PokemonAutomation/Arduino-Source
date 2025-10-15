@@ -33,7 +33,7 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:DexRecFinder",
         STRING_POKEMON + " SwSh", "Dex Rec Finder",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DexRecFinder.md",
+        "Programs/PokemonSwSh/DexRecFinder.html",
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::OPTIONAL_,

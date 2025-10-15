@@ -63,7 +63,7 @@ GeneratePokemonImageTrainingData_Descriptor::GeneratePokemonImageTrainingData_De
     : SingleSwitchProgramDescriptor(
         "PokemonLA:GeneratePokemonImageTrainingData",
         STRING_POKEMON + " LA", "Generate " + STRING_POKEMON + " Image Training Data",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/GeneratePokemonImageTrainingData.md",
+        "Programs/PokemonLA/GeneratePokemonImageTrainingData.html",
         "Generate training images of " + STRING_POKEMON + " for machine learning purposes.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

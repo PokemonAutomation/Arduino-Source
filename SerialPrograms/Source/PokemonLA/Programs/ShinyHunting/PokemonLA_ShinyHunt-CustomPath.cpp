@@ -32,7 +32,7 @@ ShinyHuntCustomPath_Descriptor::ShinyHuntCustomPath_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:ShinyHunt-CustomPath",
         STRING_POKEMON + " LA", "Shiny Hunt - Custom Path",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-CustomPath.md",
+        "Programs/PokemonLA/ShinyHunt-CustomPath.html",
         "Repeatedly travel on a custom path to shiny hunt " + STRING_POKEMON + " around it.",
         ProgramControllerClass::StandardController_PerformanceClassSensitive,
         FeedbackType::VIDEO_AUDIO,

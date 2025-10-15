@@ -26,7 +26,7 @@ SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonLA:SelfBoxTrade",
         STRING_POKEMON + " LA", "Self Box Trade",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/SelfBoxTrade.md",
+        "Programs/PokemonLA/SelfBoxTrade.html",
         "Trade boxes across two Switches.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

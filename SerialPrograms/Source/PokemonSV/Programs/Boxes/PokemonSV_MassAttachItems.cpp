@@ -28,7 +28,7 @@ MassAttachItems_Descriptor::MassAttachItems_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:MassAttachItems",
         STRING_POKEMON + " SV", "Mass Attach Items",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MassAttachItems.md",
+        "Programs/PokemonSV/MassAttachItems.html",
         "Mass attach items to " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

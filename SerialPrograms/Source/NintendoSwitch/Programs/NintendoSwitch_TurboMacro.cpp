@@ -20,7 +20,7 @@ TurboMacro_Descriptor::TurboMacro_Descriptor()
     : SingleSwitchProgramDescriptor(
         "NintendoSwitch:TurboMacro",
         "Nintendo Switch", "Turbo Macro",
-        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboMacro.md",
+        "Programs/NintendoSwitch/TurboMacro.html",
         "Create macros",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::NONE,

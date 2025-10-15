@@ -175,7 +175,7 @@ GameSettings_Descriptor::GameSettings_Descriptor()
         Color(),
         "PokemonBDSP:GlobalSettings",
         STRING_POKEMON + " BDSP", "Game Settings",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/PokemonSettings.md",
+        "Programs/PokemonBDSP/PokemonSettings.html",
         "Global " + STRING_POKEMON + " Brilliant Diamond and Shing Pearl Settings"
     )
 {}

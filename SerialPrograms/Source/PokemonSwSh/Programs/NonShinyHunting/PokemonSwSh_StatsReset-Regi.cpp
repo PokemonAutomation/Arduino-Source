@@ -28,7 +28,7 @@ StatsResetRegi_Descriptor::StatsResetRegi_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSwSh:StatsResetRegi",
         STRING_POKEMON + " SwSh", "Stats Reset - Regi",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Regi.md",
+        "Programs/PokemonSwSh/StatsReset-Regi.html",
         "Repeatedly catch regi until you get the stats you want.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

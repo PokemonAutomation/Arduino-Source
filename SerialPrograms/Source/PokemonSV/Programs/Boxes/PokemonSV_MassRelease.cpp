@@ -29,7 +29,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:MassRelease",
         STRING_POKEMON + " SV", "Mass Release",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/MassRelease.md",
+        "Programs/PokemonSV/MassRelease.html",
         "Mass release boxes of " + STRING_POKEMON + ".",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

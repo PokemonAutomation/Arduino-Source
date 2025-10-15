@@ -26,7 +26,7 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonSV:EggFetcher",
         STRING_POKEMON + " SV", "Egg Fetcher",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSV/EggFetcher.md",
+        "Programs/PokemonSV/EggFetcher.html",
         "Automatically fetch eggs from a picnic.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

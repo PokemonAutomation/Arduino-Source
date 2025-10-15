@@ -101,7 +101,7 @@ OutbreakFinder_Descriptor::OutbreakFinder_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:OutbreakFinder",
         STRING_POKEMON + " LA", "Outbreak Finder",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/OutbreakFinder.md",
+        "Programs/PokemonLA/OutbreakFinder.html",
         "Search for an outbreak for a specific " + STRING_POKEMON,
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,

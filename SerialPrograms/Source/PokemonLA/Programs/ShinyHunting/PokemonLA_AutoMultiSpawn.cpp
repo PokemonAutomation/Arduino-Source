@@ -204,7 +204,7 @@ AutoMultiSpawn_Descriptor::AutoMultiSpawn_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLA:AutoMultiSpawn",
         STRING_POKEMON + " LA", "Auto Multi-Spawn",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/AutoMultiSpawn.md",
+        "Programs/PokemonLA/AutoMultiSpawn.html",
         "Advance a path in MultiSpawn shiny hunting method.",
         ProgramControllerClass::StandardController_RequiresPrecision,
         FeedbackType::REQUIRED,
