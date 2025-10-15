@@ -27,21 +27,28 @@ public:
 };
 
 
-// start: 
-// end: 
+// start: At North Province Area Two Pokecenter
+// end: At Alfornada Pokecenter.
 void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+// start: At Alfornada Pokecenter.
+// end: At Alfornada gym building. Spoke to receptionist.
 void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+// start: At Alfornada gym building. Spoke to receptionist.
+// end: Beat Alfornada gym challenge.
 void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+// start: Beat Alfornada gym challenge (ESP training).
+// end: Beat Alfornada gym.
 void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
+
+
+
+void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+
+
 
 // start: 
 // end: 
