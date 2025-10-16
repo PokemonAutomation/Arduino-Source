@@ -80,20 +80,35 @@ void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
         DirectionDetector direction;
 
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 140, 70);
+
         direction.change_direction(env.program_info(), env.console, context, 3.104878);
         pbf_move_left_joystick(context, 128, 0, 520, 50);
 
-        //  {0.251563, 0.428704}  {0.251563, 0.440741}   {0.259896, 0.440741}
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                overworld_navigation(env.program_info(), env.console, context, 
+                    NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
+                    128, 0, 50, 10, false);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_move_left_joystick(context, 0, 255, 40, 50);
+                realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+            }
+        );
+
+        // {0.326042, 0.438889}
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
             {ZoomChange::ZOOM_IN, 0, 0, 0}, 
             FlyPoint::POKECENTER, 
-            {0.259896, 0.440741}
+            {0.326042, 0.438889}
         );
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 40, 10, false);
+                    128, 0, 30, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 255, 40, 50);
@@ -102,7 +117,7 @@ void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
 
-        direction.change_direction(env.program_info(), env.console, context, 0.332923); // 0.225695  0.332923
+        direction.change_direction(env.program_info(), env.console, context, 0.225386); //  0.225386
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
@@ -110,7 +125,7 @@ void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
                 pbf_move_left_joystick(context, 0, 0, 300, 50); // move left
-                pbf_move_left_joystick(context, 255, 128, 80, 50); // move right. center on door
+                pbf_move_left_joystick(context, 255, 128, 60, 50); // move right. center on door
                 pbf_move_left_joystick(context, 128, 0, 300, 50);  // move forward
             }
         );
