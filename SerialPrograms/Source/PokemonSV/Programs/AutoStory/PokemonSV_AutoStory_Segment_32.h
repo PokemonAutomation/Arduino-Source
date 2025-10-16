@@ -36,39 +36,12 @@ void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 // start: At Alfornada gym building. Spoke to receptionist.
-// end: Beat Alfornada gym challenge.
+// end: Beat Alfornada gym challenge. Beat Alfornada gym. At Alfronada Pokecenter.
 void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
-
-// start: Beat Alfornada gym challenge (ESP training).
-// end: Beat Alfornada gym.
-void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 
 
 void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
-
-
-
-// start: 
-// end: 
-void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
-
-// start: 
-// end: 
-void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
-
-// start: 
-// end: 
-void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
-
-// start: 
-// end: 
-void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
-
-// start: 
-// end: 
-void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 
 
