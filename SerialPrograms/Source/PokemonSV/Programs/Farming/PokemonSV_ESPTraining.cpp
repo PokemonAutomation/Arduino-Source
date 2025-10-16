@@ -6,7 +6,6 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -34,34 +33,9 @@ ESPTraining_Descriptor::ESPTraining_Descriptor()
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
-struct ESPTraining_Descriptor::Stats : public StatsTracker{
-    Stats()
-        : m_emotions(m_stats["Emotions Shown"])
-        , m_joy(m_stats["Joy"])
-        , m_surprise(m_stats["Surprise"])
-        , m_excitement(m_stats["Excitement"])
-        , m_anger(m_stats["Anger"])
-        , m_clears(m_stats["Times Cleared"])
-        , errors(m_stats["Errors"])
-    {
-        m_display_order.emplace_back("Emotions Shown");
-        m_display_order.emplace_back("Joy");
-        m_display_order.emplace_back("Surprise");
-        m_display_order.emplace_back("Excitement");
-        m_display_order.emplace_back("Anger");
-        m_display_order.emplace_back("Times Cleared");
-        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
-    }
-    std::atomic<uint64_t>& m_emotions;
-    std::atomic<uint64_t>& m_joy;
-    std::atomic<uint64_t>& m_surprise;
-    std::atomic<uint64_t>& m_excitement;
-    std::atomic<uint64_t>& m_anger;
-    std::atomic<uint64_t>& m_clears;
-    std::atomic<uint64_t>& errors;
-};
+
 std::unique_ptr<StatsTracker> ESPTraining_Descriptor::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
+    return std::unique_ptr<StatsTracker>(new ESPTrainingStats());
 }
 ESPTraining::ESPTraining()
     : ROUNDS(
@@ -89,7 +63,7 @@ ESPTraining::ESPTraining()
 
 void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
-    ESPTraining_Descriptor::Stats& stats = env.current_stats<ESPTraining_Descriptor::Stats>();
+    ESPTrainingStats& stats = env.current_stats<ESPTrainingStats>();
 
     for (uint32_t c = 0; c < ROUNDS; c++){
         env.log("Round: " + tostr_u_commas(c));
@@ -122,104 +96,12 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
         context.wait_for(std::chrono::milliseconds(13000));
         context.wait_for_all_requests();
 
-        //Detect emotion and press the right button
-        //151 emotions + pauses but the game is inconsistent and sometimes displays an emotion during the transitions
-        //Note: can hit the wrong emotion and then the right one right after, as long as its before the timer
-        bool endflag = true;
-        while (endflag){
-            ESPStartDetector ESPstart;
-            ESPShowNewEmotionDetector ESPstop;
-            ESPEmotionDetector detector;
-            {
-                //Countdown -> Dialog w/emotion
-                int ret = wait_until(
-                    env.console, context,
-                    std::chrono::seconds(15),
-                    { { ESPstart } }
-                );
-                if (ret < 0){
-                    env.log("Timeout waiting for dialog.");
-                    endflag = false;
-                    break;
-                }
-                int ret2 = wait_until(
-                    env.console, context,
-                    std::chrono::seconds(5),
-                    { { detector } }
-                );
-                if (ret2 < 0){
-                    env.log("Timeout waiting for emotion.");
-                }
 
-                Button emotion_button = BUTTON_X;
 
-                switch (detector.result()){
-                case Detection::RED:
-                    env.log("ESPEmotionDetector: Angry - Red - Press X", COLOR_BLACK);
-                    emotion_button = BUTTON_X;
-                    stats.m_emotions++;
-                    stats.m_anger++;
-                    break;
-                case Detection::YELLOW:
-                    env.log("ESPEmotionDetector: Joy - Yellow - Press A", COLOR_BLACK);
-                    emotion_button = BUTTON_A;
-                    stats.m_emotions++;
-                    stats.m_joy++;
-                    break;
-                case Detection::BLUE:
-                    env.log("ESPEmotionDetector: Surprised - Blue - Press B", COLOR_BLACK);
-                    emotion_button = BUTTON_B;
-                    stats.m_emotions++;
-                    stats.m_surprise++;
-                    break;
-                case Detection::GREEN:
-                    env.log("ESPEmotionDetector: Excited - Green - Press Y", COLOR_BLACK);
-                    emotion_button = BUTTON_Y;
-                    stats.m_emotions++;
-                    stats.m_excitement++;
-                    break;
-                case Detection::GREY:
-                    //Press any button to start next round
-                    //Pressing A tends to make Dendra :D two extra times during the transition so press B instead
-                    //Sometimes this is detected as blue, the B press there also works
-                    env.log("ESPEmotionDetector: Grey - Mash though dialog", COLOR_BLACK);
-                    emotion_button = BUTTON_B;
-                    break;
-                default:
-                    endflag = false;
-                    break;
-                }
+        // Run the ESP training mini game
+        run_esp_training(env, context, stats);
 
-                // Press button and check it did not drop input. Press again if it did.
-                // This will result in a duplicate press between phases, but the press will do nothing.
-                pbf_press_button(context, emotion_button, 10, 50);
-                env.update_stats();
 
-                ESPPressedEmotionDetector emotion_press_detected;
-                int check = wait_until(
-                    env.console, context,
-                    std::chrono::seconds(1),
-                    { { emotion_press_detected } }
-                );
-                if (check < 0){
-                    env.log("Emotion press not detected in bottom right. Pressing button again.");
-                    pbf_press_button(context, emotion_button, 10, 50);
-                }else{
-                    env.log("Emotion press detected.");
-                }
-
-                //Look for the brief moment the dialog bubble vanishes
-                ret = wait_until(
-                    env.console, context,
-                    std::chrono::seconds(15),
-                    { { ESPstop } }
-                );
-                if (ret < 0){
-                    env.log("Timeout waiting for dialog to vanish.");
-                }
-            }
-            context.wait_for_all_requests();
-        }
 
         //Program done, mash B until overworld detected
         OverworldWatcher overworld(env.console, COLOR_CYAN);
@@ -248,6 +130,105 @@ void ESPTraining::program(SingleSwitchProgramEnvironment& env, ProControllerCont
     env.update_stats();
     GO_HOME_WHEN_DONE.run_end_of_program(context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+}
+
+void run_esp_training(SingleSwitchProgramEnvironment& env, ProControllerContext& context, ESPTrainingStats& stats){
+    bool endflag = true;
+    while (endflag){
+        ESPStartDetector ESPstart;
+        ESPShowNewEmotionDetector ESPstop;
+        ESPEmotionDetector detector;
+        {
+            //Countdown -> Dialog w/emotion
+            int ret = wait_until(
+                env.console, context,
+                std::chrono::seconds(15),
+                { { ESPstart } }
+            );
+            if (ret < 0){
+                env.log("Timeout waiting for dialog.");
+                endflag = false;
+                break;
+            }
+            int ret2 = wait_until(
+                env.console, context,
+                std::chrono::seconds(5),
+                { { detector } }
+            );
+            if (ret2 < 0){
+                env.log("Timeout waiting for emotion.");
+            }
+
+            Button emotion_button = BUTTON_X;
+
+            switch (detector.result()){
+            case Detection::RED:
+                env.log("ESPEmotionDetector: Angry - Red - Press X", COLOR_BLACK);
+                emotion_button = BUTTON_X;
+                stats.m_emotions++;
+                stats.m_anger++;
+                break;
+            case Detection::YELLOW:
+                env.log("ESPEmotionDetector: Joy - Yellow - Press A", COLOR_BLACK);
+                emotion_button = BUTTON_A;
+                stats.m_emotions++;
+                stats.m_joy++;
+                break;
+            case Detection::BLUE:
+                env.log("ESPEmotionDetector: Surprised - Blue - Press B", COLOR_BLACK);
+                emotion_button = BUTTON_B;
+                stats.m_emotions++;
+                stats.m_surprise++;
+                break;
+            case Detection::GREEN:
+                env.log("ESPEmotionDetector: Excited - Green - Press Y", COLOR_BLACK);
+                emotion_button = BUTTON_Y;
+                stats.m_emotions++;
+                stats.m_excitement++;
+                break;
+            case Detection::GREY:
+                //Press any button to start next round
+                //Pressing A tends to make Dendra :D two extra times during the transition so press B instead
+                //Sometimes this is detected as blue, the B press there also works
+                env.log("ESPEmotionDetector: Grey - Mash though dialog", COLOR_BLACK);
+                emotion_button = BUTTON_B;
+                break;
+            default:
+                endflag = false;
+                break;
+            }
+
+            // Press button and check it did not drop input. Press again if it did.
+            // This will result in a duplicate press between phases, but the press will do nothing.
+            pbf_press_button(context, emotion_button, 10, 50);
+            env.update_stats();
+
+            ESPPressedEmotionDetector emotion_press_detected;
+            int check = wait_until(
+                env.console, context,
+                std::chrono::seconds(1),
+                { { emotion_press_detected } }
+            );
+            if (check < 0){
+                env.log("Emotion press not detected in bottom right. Pressing button again.");
+                pbf_press_button(context, emotion_button, 10, 50);
+            }else{
+                env.log("Emotion press detected.");
+            }
+
+            //Look for the brief moment the dialog bubble vanishes
+            ret = wait_until(
+                env.console, context,
+                std::chrono::seconds(15),
+                { { ESPstop } }
+            );
+            if (ret < 0){
+                env.log("Timeout waiting for dialog to vanish.");
+            }
+        }
+        context.wait_for_all_requests();
+    }    
+
 }
     
 }
