@@ -4,13 +4,13 @@
  *
  */
 
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonTools/Images/SolidColorTest.h"
+//#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonLZA_DialogDetector.h"
-#include "Common/Cpp/AbstractLogger.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
@@ -27,9 +27,12 @@ class DialogTitleGreenLineMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
     // The white background for the template file is of color range [r=240, g=255, b=230] to [255, 255, 255]
     // the green line is of color range [r=180,g=200,b=75] to [190, 214, 110]
-    DialogTitleGreenLineMatcher() : WaterfillTemplateMatcher(
-        "PokemonLZA/DialogBox/DialogBoxTitleGreenLine-Template.png", Color(180,200,70), Color(200, 220, 115), 50
-    ) {
+    DialogTitleGreenLineMatcher()
+        : WaterfillTemplateMatcher(
+            "PokemonLZA/DialogBox/DialogBoxTitleGreenLine-Template.png",
+            Color(180,200,70), Color(200, 220, 115), 50
+        )
+    {
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.1;
         m_area_ratio_lower = 0.8;
@@ -44,11 +47,12 @@ public:
 
 class DialogBlackArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
-    // The white background for the template file is of color range [r=240, g=255, b=230] to [255, 255, 255]
-    // the black arrow color is about [r=36,g=38,b=51]
-    DialogBlackArrowMatcher() : WaterfillTemplateMatcher(
-        "PokemonLZA/DialogBox/DialogBoxBlackArrow-Template.png", Color(0,0,0), Color(90, 90, 90), 50
-    ) {
+    DialogBlackArrowMatcher()
+        : WaterfillTemplateMatcher(
+            "PokemonLZA/DialogBox/DialogBoxBlackArrow-Template.png",
+            Color(0,0,0), Color(90, 90, 90), 50
+        )
+    {
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.1;
         m_area_ratio_lower = 0.85;
@@ -57,6 +61,46 @@ public:
 
     static const ImageMatch::WaterfillTemplateMatcher& instance() {
         static DialogBlackArrowMatcher matcher;
+        return matcher;
+    }
+};
+
+class DialogWhiteArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    DialogWhiteArrowMatcher()
+        : WaterfillTemplateMatcher(
+            "PokemonLZA/DialogBox/DialogBoxWhiteArrow-Template.png",
+            Color(0xffc0c0c0), Color(0xffffffff), 50
+        )
+    {
+        m_aspect_ratio_lower = 0.9;
+        m_aspect_ratio_upper = 1.1;
+        m_area_ratio_lower = 0.85;
+        m_area_ratio_upper = 1.1;
+    }
+
+    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+        static DialogWhiteArrowMatcher matcher;
+        return matcher;
+    }
+};
+
+class DialogTealArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    DialogTealArrowMatcher()
+        : WaterfillTemplateMatcher(
+            "PokemonLZA/DialogBox/DialogBoxTealArrow-Template.png",
+            Color(0xff00c080), Color(0xff3fffff), 50
+        )
+    {
+        m_aspect_ratio_lower = 0.9;
+        m_aspect_ratio_upper = 1.1;
+        m_area_ratio_lower = 0.8;
+        m_area_ratio_upper = 1.1;
+    }
+
+    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+        static DialogTealArrowMatcher matcher;
         return matcher;
     }
 };
@@ -162,7 +206,176 @@ bool NormalDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock 
 
 
 
+FlatWhiteDialogDetector::FlatWhiteDialogDetector(Color color, VideoOverlay* overlay)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_top(0.267838, 0.785156, 0.467618, 0.019531)
+    , m_arrow_box(0.727, 0.868, 0.037, 0.086)
+{}
+void FlatWhiteDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_top);
+    items.add(m_color, m_arrow_box);
+}
+bool FlatWhiteDialogDetector::detect(const ImageViewRGB32& screen){
+    if (!is_white(extract_box_reference(screen, m_top))){
+        m_last_detected_box.reset();
+        return false;
+    }
+
+    double screen_rel_size = (screen.height() / 1080.0);
+    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
+
+    double min_area_1080p = 150.0;
+    double rmsd_threshold = 120.0;
+    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+
+    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {combine_rgb(0,0,0), combine_rgb(100, 100, 100)},
+    };
+
+    bool found = match_template_by_waterfill(
+        extract_box_reference(screen, m_arrow_box),
+        DialogBlackArrowMatcher::instance(),
+        FILTERS,
+        {min_area, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+            return true;
+        }
+    );
+
+    if (m_overlay){
+        if (found){
+            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+        }else{
+            m_last_detected_box.reset();
+        }
+    }
+
+    return found;
+}
+
+
+
+BlueDialogDetector::BlueDialogDetector(Color color, VideoOverlay* overlay)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_corner(0.765093, 0.933594, 0.006586, 0.013672)
+    , m_arrow_box(0.727, 0.868, 0.037, 0.086)
+{}
+void BlueDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_corner);
+    items.add(m_color, m_arrow_box);
+}
+bool BlueDialogDetector::detect(const ImageViewRGB32& screen){
+    if (!is_solid(
+        extract_box_reference(screen, m_corner),
+        {0.0186916, 0.252336, 0.728972}
+    )){
+        m_last_detected_box.reset();
+        return false;
+    }
+
+    double screen_rel_size = (screen.height() / 1080.0);
+    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
+
+    double min_area_1080p = 150.0;
+    double rmsd_threshold = 120.0;
+    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+
+    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {0xffc0c0c0, 0xffffffff},
+        {0xffb0b0b0, 0xffffffff},
+        {0xffa0a0a0, 0xffffffff},
+        {0xff909090, 0xffffffff},
+        {0xff808080, 0xffffffff},
+    };
+
+    bool found = match_template_by_waterfill(
+        extract_box_reference(screen, m_arrow_box),
+        DialogWhiteArrowMatcher::instance(),
+        FILTERS,
+        {min_area, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+            return true;
+        }
+    );
+
+    if (m_overlay){
+        if (found){
+            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+        }else{
+            m_last_detected_box.reset();
+        }
+    }
+
+    return found;
+}
+
+
+
+TealDialogDetector::TealDialogDetector(Color color, VideoOverlay* overlay)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_arrow_box(0.727, 0.868, 0.037, 0.086)
+{}
+void TealDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_arrow_box);
+}
+bool TealDialogDetector::detect(const ImageViewRGB32& screen){
+    double screen_rel_size = (screen.height() / 1080.0);
+    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
+
+    double min_area_1080p = 150.0;
+    double rmsd_threshold = 120.0;
+    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+
+    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {0xff00c080, 0xff3fffff},
+    };
+
+    bool found = match_template_by_waterfill(
+        extract_box_reference(screen, m_arrow_box),
+        DialogTealArrowMatcher::instance(),
+        FILTERS,
+        {min_area, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+            return true;
+        }
+    );
+
+    if (m_overlay){
+        if (found){
+            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+        }else{
+            m_last_detected_box.reset();
+        }
+    }
+
+    return found;
+}
+
+
+
+
 
 }
 }
 }
+
+
+
+
+
+
+
+
+
+
+
+

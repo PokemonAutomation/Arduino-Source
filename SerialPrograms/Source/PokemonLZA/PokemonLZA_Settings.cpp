@@ -23,6 +23,21 @@ GameSettings::GameSettings()
     : BatchOption(LockMode::LOCK_WHILE_RUNNING)
     , m_general("<font size=4><b>General Settings:</b></font>")
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
+    , START_GAME_WAIT(
+        "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "40 s"
+    )
+    , ENTER_GAME_MASH(
+        "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "5000 ms"
+    )
+    , ENTER_GAME_WAIT(
+        "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "15 s"
+    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -30,6 +45,9 @@ GameSettings::GameSettings()
     PA_ADD_STATIC(m_general);
 
     PA_ADD_STATIC(m_start_game_timings);
+    PA_ADD_OPTION(START_GAME_WAIT);
+    PA_ADD_OPTION(ENTER_GAME_MASH);
+    PA_ADD_OPTION(ENTER_GAME_WAIT);
 
     PA_ADD_STATIC(m_advanced_options);
 }

@@ -9,6 +9,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_GameEntry.h"
@@ -23,10 +24,9 @@ namespace PokemonLA{
 
 
 bool reset_game_to_gamemenu(
-    ConsoleHandle& console, ProControllerContext& context,
-    bool tolerate_update_menu
+    ConsoleHandle& console, ProControllerContext& context
 ){
-    from_home_close_and_reopen_game(console, context, tolerate_update_menu);
+    from_home_close_and_reopen_game(console, context, true);
 
     // Now the game has opened:
     return openedgame_to_gamemenu(console, context, GameSettings::instance().START_GAME_WAIT1);
@@ -60,12 +60,21 @@ bool gamemenu_to_ingame(
 bool reset_game_from_home(
     ProgramEnvironment& env,
     ConsoleHandle& console, ProControllerContext& context,
+    bool backup_save,
     Milliseconds enter_game_mash,
     Milliseconds enter_game_timeout,
     Milliseconds post_wait_time
 ){
     bool ok = true;
-    ok &= reset_game_to_gamemenu(console, context, true);
+    ok &= reset_game_to_gamemenu(console, context);
+
+    if (backup_save){
+        console.log("Loading backup save!");
+        pbf_wait(context, 1000ms);
+        ssf_press_dpad(context, DPAD_UP, 0ms, 200ms);
+        ssf_press_button(context, BUTTON_B | BUTTON_X, 1000ms, 200ms);
+    }
+
     ok &= gamemenu_to_ingame(
         console, context,
         enter_game_mash,
@@ -82,10 +91,12 @@ bool reset_game_from_home(
 bool reset_game_from_home(
     ProgramEnvironment& env,
     ConsoleHandle& console, ProControllerContext& context,
+    bool backup_save,
     Milliseconds post_wait_time
 ){
     return reset_game_from_home(
         env, console, context,
+        backup_save,
         GameSettings::instance().ENTER_GAME_MASH0,
         GameSettings::instance().ENTER_GAME_WAIT0,
         post_wait_time

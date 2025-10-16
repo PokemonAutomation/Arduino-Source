@@ -144,6 +144,8 @@
 #include "CommonTools/Images/SolidColorTest.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 
 
 
@@ -241,8 +243,24 @@ void TestProgram::on_press(){
 
 
 
+#if 0
+class TealDialogMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    TealDialogMatcher() : WaterfillTemplateMatcher(
+        "PokemonLZA/DialogBox/DialogBoxTitleGreenLine-Template.png", Color(180,200,70), Color(200, 220, 115), 50
+    ) {
+        m_aspect_ratio_lower = 0.9;
+        m_aspect_ratio_upper = 1.1;
+        m_area_ratio_lower = 0.8;
+        m_area_ratio_upper = 1.1;
+    }
 
-
+    static const ImageMatch::WaterfillTemplateMatcher& instance() {
+        static DialogTitleGreenLineMatcher matcher;
+        return matcher;
+    }
+};
+#endif
 
 
 
@@ -266,13 +284,61 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+#if 0
+    ImageRGB32 image("Screenshots/screenshot-20251012-174842583706.png");
+
+    PokemonLZA::BlueDialogDetector detector(COLOR_RED, &overlay);
+
+    cout << detector.detect(image) << endl;
+#endif
+
+
+#if 0
+    ImageRGB32 image("Screenshots/screenshot-20251012-174842583706.png");
+
+    ImageFloatBox box(0.724479, 0.869141, 0.039517, 0.070312);
+//    ImageFloatBox box(0.712404, 0.589844, 0.043908, 0.085938);
+
+    overlays.add(COLOR_RED, box);
+
+    ImageViewRGB32 cropped = extract_box_reference(image, box);
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        cropped,
+        0xffc0c0c0, 0xffffffff
+    );
+
+    cout << matrix.dump() << endl;
+
+    ImageRGB32 tmp = cropped.copy();
+    filter_by_mask(matrix, tmp, Color(0x00000000), true);
+
+#if 1
+    auto session = Waterfill::make_WaterfillSession(matrix);
+    auto iter = session->make_iterator(10);
+    WaterfillObject object;
+    while (iter->find_next(object, false)){
+
+
+    }
+    cout << "area = " << object.area << endl;
+
+    tmp.save("DialogBoxWhiteArrow-Template.png");
+//    extract_box_reference(tmp, object).save("SelectionArrow.png");
+
+
+
+
+#endif
+#endif
+
 
 //    reset_game_to_gamemenu(console, context);
 
-#if 0
+#if 1
     while (true){
         go_home(console, context);
-        PokemonLA::reset_game_from_home(env, console, context);
+        PokemonLZA::reset_game_from_home(env, console, context, true);
     }
 
 

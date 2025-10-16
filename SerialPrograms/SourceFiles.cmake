@@ -1541,12 +1541,16 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
     Source/PokemonLZA/PokemonLZA_Panels.cpp
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
-    Source/PokemonLZA/Programs/PokemonLZA_OverworldWatcher.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_OverworldWatcher.h
+    Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
