@@ -327,10 +327,6 @@ void checkpoint_reattempt_loop_tutorial(
 
 
 
-void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
-
-
 
 
 }
