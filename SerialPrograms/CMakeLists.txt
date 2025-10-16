@@ -445,16 +445,16 @@ else() # macOS and Linux
 
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
-    if (UNIX_LINK_TESSERACT)
+    pkg_search_module(TESSERACT REQUIRED tesseract)
+    pkg_search_module(LEPTONICA REQUIRED lept)
+    if (TESSERACT_FOUND AND LEPTONICA_FOUND)
         target_compile_definitions(SerialProgramsLib PRIVATE PA_TESSERACT UNIX_LINK_TESSERACT)
-        pkg_search_module(TESSERACT REQUIRED tesseract)
-        pkg_search_module(LEPTONICA REQUIRED lept)
-        include_directories(${TESSERACT_INCLUDE_DIRS})
-        include_directories(${LEPTONICA_INCLUDE_DIRS})
-        link_directories(${TESSERACT_LIBRARY_DIRS})
-        link_directories(${LEPTONICA_LIBRARY_DIRS})
-        target_link_libraries(SerialProgramsLib PRIVATE ${TESSERACT_LINK_LIBRARIES})
-        target_link_libraries(SerialProgramsLib PRIVATE ${LEPTONICA_LINK_LIBRARIES})
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${TESSERACT_INCLUDE_DIRS})
+        target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${LEPTONICA_INCLUDE_DIRS})
+        target_link_directories(SerialProgramsLib PUBLIC ${TESSERACT_LIBRARY_DIRS})
+        target_link_directories(SerialProgramsLib PUBLIC ${LEPTONICA_LIBRARY_DIRS})
+        target_link_libraries(SerialProgramsLib PUBLIC ${TESSERACT_LINK_LIBRARIES})
+        target_link_libraries(SerialProgramsLib PUBLIC ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
     pkg_search_module(DPP dpp=10.0.22)
