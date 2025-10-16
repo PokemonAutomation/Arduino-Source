@@ -42,7 +42,8 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, ProControlle
     FlatWhiteDialogWatcher dialog_white(COLOR_RED, &overlay);
     BlueDialogWatcher dialog_blue(COLOR_RED, &overlay);
     TealDialogWatcher dialog_teal(COLOR_RED, &overlay);
-    SelectionArrowWatcher selection_arrow(COLOR_RED, &overlay, {0, 0, 1, 1});
+    SelectionArrowWatcher selection_arrow_right(COLOR_RED, &overlay, SelectionArrowType::RIGHT, {0, 0, 1, 1});
+    SelectionArrowWatcher selection_arrow_down(COLOR_RED, &overlay, SelectionArrowType::DOWN, {0, 0, 1, 1});
 
     CancellableHolder<CancellableScope> scope(*context.scope());
     InferenceSession session(
@@ -51,7 +52,8 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, ProControlle
             dialog_white,
             dialog_blue,
             dialog_teal,
-            selection_arrow,
+            selection_arrow_right,
+            selection_arrow_down,
         }
     );
     context.wait_until_cancel();

@@ -293,16 +293,39 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
-    ImageRGB32 image("Screenshots/screenshot-20251012-174842583706.png");
+#if 1
+//    ImageRGB32 image("Screenshots/screenshot-20251012-174842583706.png");
 
-    ImageFloatBox box(0.724479, 0.869141, 0.039517, 0.070312);
+    auto screen = feed.snapshot();
+
+    ImageFloatBox box(0.763359, 0.089320, 0.021810, 0.044660);
 //    ImageFloatBox box(0.712404, 0.589844, 0.043908, 0.085938);
 
     overlays.add(COLOR_RED, box);
 
-    ImageViewRGB32 cropped = extract_box_reference(image, box);
+    ImageViewRGB32 cropped = extract_box_reference(screen, box);
 
+    //  Remove background.
+    {
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+            cropped,
+            0xffe0e0e0, 0xffffffff
+        );
+        matrix.invert();
+
+        cout << matrix.dump() << endl;
+
+        auto session = Waterfill::make_WaterfillSession(matrix);
+        auto iter = session->make_iterator(10);
+        WaterfillObject object;
+        iter->find_next(object, true);
+        ImageRGB32 masked = extract_box_reference(cropped, object).copy();
+        filter_by_mask(object.packed_matrix(), masked, Color(0x00000000), false);
+        masked.save("ButtonL.png");
+    }
+
+
+#if 0
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
         cropped,
         0xffc0c0c0, 0xffffffff
@@ -311,15 +334,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << matrix.dump() << endl;
 
     ImageRGB32 tmp = cropped.copy();
-    filter_by_mask(matrix, tmp, Color(0x00000000), true);
+//    filter_by_mask(matrix, tmp, Color(0x00000000), true);
 
-#if 1
+    {
+    }
+
     auto session = Waterfill::make_WaterfillSession(matrix);
     auto iter = session->make_iterator(10);
     WaterfillObject object;
     while (iter->find_next(object, false)){
-
-
+        break;
     }
     cout << "area = " << object.area << endl;
 
@@ -335,7 +359,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    reset_game_to_gamemenu(console, context);
 
-#if 1
+#if 0
     while (true){
         go_home(console, context);
         PokemonLZA::reset_game_from_home(env, console, context, true);

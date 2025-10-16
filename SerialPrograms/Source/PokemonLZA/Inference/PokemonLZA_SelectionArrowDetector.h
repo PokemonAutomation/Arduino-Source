@@ -17,12 +17,19 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
+enum class SelectionArrowType{
+    RIGHT,
+    DOWN,
+};
+
+
 
 class SelectionArrowDetector : public StaticScreenDetector{
 public:
     SelectionArrowDetector(
         Color color,
         VideoOverlay* overlay,
+        SelectionArrowType type,
         const ImageFloatBox& box
     );
 
@@ -36,6 +43,7 @@ private:
 
     const Color m_color;
     VideoOverlay* m_overlay;
+    const SelectionArrowType m_type;
     const ImageFloatBox m_arrow_box;
 
     ImageFloatBox m_last_detected;
@@ -46,10 +54,11 @@ public:
     SelectionArrowWatcher(
         Color color,
         VideoOverlay* overlay,
+        SelectionArrowType type,
         const ImageFloatBox& box,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("SelectionArrowWatcher", hold_duration, color, overlay, box)
+         : DetectorToFinder("SelectionArrowWatcher", hold_duration, color, overlay, type, box)
     {}
 };
 
