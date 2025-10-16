@@ -5,6 +5,7 @@
  */
 
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -57,7 +58,6 @@ void AutoStory_Segment_32::run_segment(
     checkpoint_82(env, context, options.notif_status_update, stats);
     checkpoint_83(env, context, options.notif_status_update, stats);
     checkpoint_84(env, context, options.notif_status_update, stats);
-    checkpoint_85(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -145,7 +145,90 @@ void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        pbf_move_left_joystick(context, 128, 255, 400, 100);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        // wait for overworld after leaving gym
+        wait_for_overworld(env.program_info(), env.console, context, 30);
 
+        DirectionDetector direction;
+
+        direction.change_direction(env.program_info(), env.console, context, 4.413989);
+        pbf_move_left_joystick(context, 128, 0, 180, 50);
+
+        direction.change_direction(env.program_info(), env.console, context, 5.516255);
+
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+
+        //mash past other dialog
+        pbf_mash_button(context, BUTTON_A, 360);
+            
+        //wait for start
+        context.wait_for(std::chrono::milliseconds(30000));
+        context.wait_for_all_requests();
+
+
+        // Run the ESP training mini game
+        ESPTrainingStats esp_training_stats; // dummy stats
+        run_esp_training(env, context, esp_training_stats);
+
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
+
+        env.console.log("Battle Gym Trainer 1.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+
+
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 5);
+        pbf_wait(context, 10000ms);
+
+        //mash past other dialog
+        pbf_mash_button(context, BUTTON_A, 360);
+            
+        //wait for start
+        context.wait_for(std::chrono::milliseconds(8000));
+        context.wait_for_all_requests();
+
+
+        // Run the ESP training mini game
+        run_esp_training(env, context, esp_training_stats);
+
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
+
+        env.console.log("Battle Gym Trainer 2.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
+
+        // Gym challenge now done
+
+        direction.change_direction(env.program_info(), env.console, context, 2.336990);
+        pbf_move_left_joystick(context, 128, 0, 400, 50);
+
+        direction.change_direction(env.program_info(), env.console, context, 0.156705);
+
+        handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 30);
+            }, 
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){           
+                pbf_move_left_joystick(context, 0, 0, 300, 50); // move left
+                pbf_move_left_joystick(context, 255, 128, 60, 50); // move right. center on door
+                pbf_move_left_joystick(context, 128, 0, 300, 50);  // move forward
+            }
+        );
+
+
+        // speak to receptionist. if we fail to detect a battle, then we know we failed the Gym test. we then reset.
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
+        env.console.log("Battle Psychic Gym leader.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+
+        pbf_move_left_joystick(context, 128, 255, 400, 100);
+        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        // wait for overworld after leaving gym
+        wait_for_overworld(env.program_info(), env.console, context, 30);
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
 
     });  
 }
