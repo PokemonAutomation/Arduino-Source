@@ -28,15 +28,15 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_33::name() const{
-    return "";
+    return "33: Starfall Street: Clavell battle";
 }
 
 std::string AutoStory_Segment_33::start_text() const{
-    return "Start: ";
+    return "Start: Beat Alfornada Gym (Psychic). At Alfornada Pokecenter.";
 }
 
 std::string AutoStory_Segment_33::end_text() const{
-    return "End: ";
+    return "End: Beat Clavell. At Academy fly point.";
 }
 
 void AutoStory_Segment_33::run_segment(
@@ -52,7 +52,7 @@ void AutoStory_Segment_33::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    // checkpoint_(env, context, options.notif_status_update, stats);
+    checkpoint_85(env, context, options.notif_status_update, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
@@ -63,8 +63,18 @@ void AutoStory_Segment_33::run_segment(
 void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 50, 320}, FlyPoint::FAST_TRAVEL);
 
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 0, 80);
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 30);
 
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
+
+        env.console.log("Battle Clavell.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0}, FlyPoint::FAST_TRAVEL);
     });  
 }
 

@@ -27,7 +27,7 @@ public:
 };
 
 // start: Beat Alfornada gym challenge. Beat Alfornada gym. At Alfronada Pokecenter.
-// end: 
+// end: Beat Clavell. At Naranja Academy fly point.
 void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 // start: 
