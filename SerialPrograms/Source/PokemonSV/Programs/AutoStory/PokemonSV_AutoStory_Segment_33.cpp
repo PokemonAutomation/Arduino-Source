@@ -265,8 +265,19 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // talk to Rika 10. do you like pokemon
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 20, {CallbackEnum::PROMPT_DIALOG});
 
-        // now done talking to Rika. walk around Rika's desk.
         pbf_move_left_joystick(context, 128, 0, 100, 50); // stand up
+
+
+    }); 
+}
+
+
+void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        // standing in front of Rika
+        // now done talking to Rika. walk around Rika's desk.
+
         pbf_move_left_joystick(context, 0, 128, 50, 50); // go left
         pbf_move_left_joystick(context, 128, 0, 200, 50); // straight
         pbf_move_left_joystick(context, 255, 128, 50, 50); // right
@@ -279,12 +290,24 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
+
+        env.console.log("Battle Elite Four 2.");
         // todo: run the third move when battling the Steel trainer
 
 
-
-    }); 
+    });     
 }
+
+void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
+
+    });     
+}
+
 
 
 GameTitle get_game_title(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
