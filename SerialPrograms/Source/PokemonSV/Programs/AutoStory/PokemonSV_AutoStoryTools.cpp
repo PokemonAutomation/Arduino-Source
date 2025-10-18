@@ -653,6 +653,36 @@ void handle_unexpected_battles(
     }
 }
 
+void do_action_and_monitor_for_overworld(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<void()>&& action
+){
+
+    OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
+
+    int ret = run_until<ProControllerContext>(
+        stream, context,
+        [&](ProControllerContext& context){
+            context.wait_for_all_requests();
+            action();
+        },
+        {overworld}        
+    );
+    if (ret < 0){
+        // successfully completed action detecting the overworld
+        return;
+    }else if (ret == 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "do_action_and_monitor_for_overworld(): Failed to complete action. Detected overworld.",
+            stream
+        );                
+    }
+
+}
+
 void handle_when_stationary_in_overworld(
     const ProgramInfo& info, 
     VideoStream& stream,

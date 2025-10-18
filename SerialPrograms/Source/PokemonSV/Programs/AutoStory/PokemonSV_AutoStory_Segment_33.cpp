@@ -189,81 +189,85 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
         mash_button_till_overworld(env.console, context, BUTTON_A);
         
-        // move left to sit down
-        pbf_move_left_joystick(context, 0, 128, 100, 50);
+        do_action_and_monitor_for_overworld(env.program_info(), env.console, context,
+        [&](){
+            // move left to sit down
+            pbf_move_left_joystick(context, 0, 128, 100, 50);
 
-        // talk to Rika 1. Choose first option. Walked here.
-        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-        pbf_mash_button(context, BUTTON_A, 1000ms);
-        
-        // talk to Rika 2. Choose option based on your game title
-        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+            // talk to Rika 1. Choose first option. Walked here.
+            clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+            pbf_mash_button(context, BUTTON_A, 1000ms);
+            
+            // talk to Rika 2. Choose option based on your game title
+            clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
 
-        switch(game_title){
-        case GameTitle::SCARLET:
+            switch(game_title){
+            case GameTitle::SCARLET:
+                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                break;
+            case GameTitle::VIOLET:
+                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                break;
+            default:
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "We don't know what game we are playing. We should know at this point.");
+                break;
+            }
+            pbf_mash_button(context, BUTTON_A, 1000ms);
+            
+            // talk to Rika 3. Came to become a Champion
+            clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
             pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-            break;
-        case GameTitle::VIOLET:
-            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-            break;
-        default:
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "We don't know what game we are playing. We should know at this point.");
-            break;
-        }
-        pbf_mash_button(context, BUTTON_A, 1000ms);
-        
-        // talk to Rika 3. Came to become a Champion
-        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        pbf_mash_button(context, BUTTON_A, 1000ms);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
-        // talk to Rika 4. Become stronger
-        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-        pbf_mash_button(context, BUTTON_A, 1000ms);
+            // talk to Rika 4. Become stronger
+            clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
-        // talk to Rika 5. Difficult gym: Alfornada
-        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-        pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_mash_button(context, BUTTON_A, 1000ms);
+            // talk to Rika 5. Difficult gym: Alfornada
+            clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
-        // talk to Rika 6. Difficult gym leader name: Tulip
-        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-        pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_mash_button(context, BUTTON_A, 1000ms);
+            // talk to Rika 6. Difficult gym leader name: Tulip
+            clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
-        // talk to Rika 7. Difficult gym leader type: Psychic
-        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-        pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_press_dpad(context, DPAD_UP, 13, 20);
-        pbf_mash_button(context, BUTTON_A, 1000ms);
+            // talk to Rika 7. Difficult gym leader type: Psychic
+            clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_press_dpad(context, DPAD_UP, 13, 20);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
-        // talk to Rika 8. Starter pokemon: Grass/Fire/Water
-        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
-        switch(starter_choice){
-        case StarterChoice::SPRIGATITO:
-            break;
-        case StarterChoice::FUECOCO:
-            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-            break;
-        case StarterChoice::QUAXLY:
-            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-            break;
-        default:
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid starter pokemon type. This shouldn't happen.");
-            break;
-        }
-        size_t num_extra_clicks = attempt_number % 3;  // we add extra clicks when attempt_number > 0, to account for the fact that the user might not be enterint the correct starter.
-        for (size_t i = 0; i < num_extra_clicks; i++){
-            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
-        }
+            // talk to Rika 8. Starter pokemon: Grass/Fire/Water
+            clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+            switch(starter_choice){
+            case StarterChoice::SPRIGATITO:
+                break;
+            case StarterChoice::FUECOCO:
+                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                break;
+            case StarterChoice::QUAXLY:
+                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+                break;
+            default:
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid starter pokemon type. This shouldn't happen.");
+                break;
+            }
+            size_t num_extra_clicks = attempt_number % 3;  // we add extra clicks when attempt_number > 0, to account for the fact that the user might not be enterint the correct starter.
+            for (size_t i = 0; i < num_extra_clicks; i++){
+                pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+            }
 
-        pbf_mash_button(context, BUTTON_A, 1000ms);
+            pbf_mash_button(context, BUTTON_A, 1000ms);
 
-        // talk to Rika 9. Become stronger
-        // talk to Rika 10. do you like pokemon
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 20, {CallbackEnum::PROMPT_DIALOG});
+            // talk to Rika 9. Become stronger
+            // talk to Rika 10. do you like pokemon
+            clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 20, {CallbackEnum::PROMPT_DIALOG});
+
+        });
 
         pbf_move_left_joystick(context, 128, 0, 100, 50); // stand up
 

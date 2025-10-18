@@ -180,6 +180,14 @@ void handle_unexpected_battles(
     >&& action
 );
 
+// run the given `action`. if detect the overworld, stop the action, and throw exception
+void do_action_and_monitor_for_overworld(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<void()>&& action
+);
+
 // if stationary in overworld for an amount of time (seconds_stationary), run `recovery_action` then try `action` again
 // return once successfully completed `action`
 // throw exception if fails to complete `action` within a certain amount of time (minutes_timeout).
