@@ -190,7 +190,7 @@ void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
         
         do_action_and_monitor_for_overworld(env.program_info(), env.console, context,
-        [&](){
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             // move left to sit down
             pbf_move_left_joystick(context, 0, 128, 100, 50);
 

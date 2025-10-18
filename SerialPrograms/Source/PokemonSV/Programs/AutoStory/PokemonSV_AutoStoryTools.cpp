@@ -657,7 +657,11 @@ void do_action_and_monitor_for_overworld(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context,
-    std::function<void()>&& action
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
 ){
 
     OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
@@ -666,7 +670,7 @@ void do_action_and_monitor_for_overworld(
         stream, context,
         [&](ProControllerContext& context){
             context.wait_for_all_requests();
-            action();
+            action(info, stream, context);
         },
         {overworld}        
     );

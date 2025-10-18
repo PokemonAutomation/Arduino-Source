@@ -185,7 +185,9 @@ void do_action_and_monitor_for_overworld(
     const ProgramInfo& info, 
     VideoStream& stream,
     ProControllerContext& context,
-    std::function<void()>&& action
+    std::function<void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)>&& action
 );
 
 // if stationary in overworld for an amount of time (seconds_stationary), run `recovery_action` then try `action` again
