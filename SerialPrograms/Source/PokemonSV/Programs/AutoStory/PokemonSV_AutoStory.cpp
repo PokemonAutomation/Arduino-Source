@@ -537,10 +537,10 @@ AutoStory::AutoStory()
 }
 
 void AutoStory::on_config_value_changed(void* object){
-    ConfigOptionState state = (STARTPOINT_TUTORIAL.index() <= 1 && STORY_SECTION == StorySection::TUTORIAL)
-        ? ConfigOptionState::ENABLED
-        : ConfigOptionState::HIDDEN;
-    STARTERCHOICE.set_visibility(state);
+    // ConfigOptionState state = (STARTPOINT_TUTORIAL.index() <= 1 && STORY_SECTION == StorySection::TUTORIAL)
+    //     ? ConfigOptionState::ENABLED
+    //     : ConfigOptionState::HIDDEN;
+    // STARTERCHOICE.set_visibility(state);
 
     if (STORY_SECTION == StorySection::TUTORIAL){
         STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);

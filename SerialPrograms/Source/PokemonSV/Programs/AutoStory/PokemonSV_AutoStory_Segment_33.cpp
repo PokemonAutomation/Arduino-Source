@@ -4,6 +4,7 @@
  *
  */
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Images/SolidColorTest.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
@@ -168,7 +169,149 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 }
 
 void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, Language language, StarterChoice starter_choice){
+    GameTitle game_title = GameTitle::UNKNOWN;
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        if (game_title == GameTitle::UNKNOWN){
+            game_title = get_game_title(env, context);
+            press_Bs_to_back_to_overworld(env.program_info(), env.console, context);
+        }
+
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_OLD_MARKER);
+
+        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                walk_forward_while_clear_front_path(env.program_info(), env.console, context, 100);
+                walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A);
+            }
+        );
+        // talk to door man
+        // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+        
+        // move left to sit down
+        pbf_move_left_joystick(context, 0, 128, 100, 50);
+
+        // talk to Rika 1. Choose first option. Walked here.
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+        
+        // talk to Rika 2. Choose option based on your game title
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+
+        switch(game_title){
+        case GameTitle::SCARLET:
+            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+            break;
+        case GameTitle::VIOLET:
+            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+            break;
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "We don't know what game we are playing. We should know at this point.");
+            break;
+        }
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+        
+        // talk to Rika 3. Came to become a Champion
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+
+        // talk to Rika 4. Become stronger
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+
+        // talk to Rika 5. Difficult gym: Alfornada
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        pbf_press_dpad(context, DPAD_UP, 13, 20);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+
+        // talk to Rika 6. Difficult gym leader name: Tulip
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        pbf_press_dpad(context, DPAD_UP, 13, 20);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+
+        // talk to Rika 7. Difficult gym leader type: Psychic
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        pbf_press_dpad(context, DPAD_UP, 13, 20);
+        pbf_press_dpad(context, DPAD_UP, 13, 20);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+
+        // talk to Rika 8. Starter pokemon: Grass/Fire/Water
+        clear_dialog(env.console, context, ClearDialogMode::STOP_PROMPT, 60, {CallbackEnum::PROMPT_DIALOG});
+        switch(starter_choice){
+        case StarterChoice::SPRIGATITO:
+            break;
+        case StarterChoice::FUECOCO:
+            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+            break;
+        case StarterChoice::QUAXLY:
+            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+            break;
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid starter pokemon type. This shouldn't happen.");
+            break;
+        }
+        size_t num_extra_clicks = attempt_number % 3;  // we add extra clicks when attempt_number > 0, to account for the fact that the user might not be enterint the correct starter.
+        for (size_t i = 0; i < num_extra_clicks; i++){
+            pbf_press_dpad(context, DPAD_DOWN, 13, 20);
+        }
+
+        pbf_mash_button(context, BUTTON_A, 1000ms);
+
+        // talk to Rika 9. Become stronger
+        // talk to Rika 10. do you like pokemon
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 20, {CallbackEnum::PROMPT_DIALOG});
+
+        // now done talking to Rika. walk around Rika's desk.
+        pbf_move_left_joystick(context, 128, 0, 100, 50); // stand up
+        pbf_move_left_joystick(context, 0, 128, 50, 50); // go left
+        pbf_move_left_joystick(context, 128, 0, 200, 50); // straight
+        pbf_move_left_joystick(context, 255, 128, 50, 50); // right
+        
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
+
+
+        env.console.log("Battle Elite Four 1.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        // todo: run the third move when battling the Steel trainer
+
+
+
+    }); 
 }
+
+
+GameTitle get_game_title(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    GameTitle game_title = GameTitle::UNKNOWN;
+    enter_menu_from_overworld(env.program_info(), env.console, context, 0, MenuSide::RIGHT);
+    context.wait_for_all_requests();
+
+    VideoSnapshot screen = env.console.video().snapshot();
+    ImageFloatBox box = {0.03, 0.94, 0.40, 0.04};
+    ImageStats bottom_stats = image_stats(extract_box_reference(screen, box));
+
+    if (is_solid(bottom_stats, {0.648549, 0.2861580, 0.0652928}, 0.15, 25)){
+        game_title = GameTitle::SCARLET;
+        env.console.log("Game title detected: Scarlet");
+    } else if (is_solid(bottom_stats, {0.367816, 0.0746615, 0.5575230}, 0.15, 25)){
+        game_title = GameTitle::VIOLET;
+        env.console.log("Game title detected: Violet");
+    }
+
+    if (game_title == GameTitle::UNKNOWN){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unable to determine what game we are playing. The color of the bottom bar in the Pokemon Summary page doesn't match of the expected colors.");
+    }
+
+    return game_title;
+
+}
+
 
 std::string get_ride_pokemon_name(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
     enter_menu_from_overworld(env.program_info(), env.console, context, -1);

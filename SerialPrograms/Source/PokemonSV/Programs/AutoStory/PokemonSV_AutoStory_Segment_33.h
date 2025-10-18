@@ -26,6 +26,12 @@ public:
     ) const override;
 };
 
+enum class GameTitle{
+    UNKNOWN,
+    SCARLET,
+    VIOLET,
+};
+
 // start: Beat Alfornada gym challenge. Beat Alfornada gym. At Alfronada Pokecenter.
 // end: Beat Clavell. At Academy fly point.
 void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
@@ -37,6 +43,8 @@ void checkpoint_86(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 // start: At Pokemon League entrance.
 // end: Beat Elite Four. At Pokemon League Pokecenter.
 void checkpoint_87(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats, Language language, StarterChoice starter_choice);
+
+GameTitle get_game_title(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 std::string get_ride_pokemon_name(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
 
