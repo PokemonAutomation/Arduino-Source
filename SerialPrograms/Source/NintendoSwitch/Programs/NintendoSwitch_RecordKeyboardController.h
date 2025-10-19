@@ -10,6 +10,7 @@
 #include <functional>
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
@@ -67,9 +68,9 @@ std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
 std::string json_to_cpp_code_joycon(const JsonArray& history);
 
 // given the json, with the controller history, run the controller actions using the pbf functions.
-void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerClass controller_class);
-void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history);
-void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history);
+void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerClass controller_class, uint32_t num_loops, uint32_t seconds_wait_between_loops);
+void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history, uint32_t num_loops, uint32_t seconds_wait_between_loops);
+void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history, uint32_t num_loops, uint32_t seconds_wait_between_loops);
 
 class RecordKeyboardController_Descriptor : public SingleSwitchProgramDescriptor{
 public:
@@ -132,6 +133,8 @@ private:
     };
     EnumDropdownOption<Mode> MODE;
     StringOption FILE_NAME;
+    SimpleIntegerOption<uint32_t> LOOP;
+    SimpleIntegerOption<uint32_t> WAIT;
     BooleanCheckBoxOption GENERATE_CPP_CODE_AFTER_RECORDING;
 
     std::vector<ControllerStateSnapshot> m_controller_history;
