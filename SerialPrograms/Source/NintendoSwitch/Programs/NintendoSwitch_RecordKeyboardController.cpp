@@ -56,6 +56,16 @@ RecordKeyboardController::RecordKeyboardController()
         "UserSettings/recording",
         "<name of JSON file>"
     )
+    , LOOP(
+        "<b>Number of times to loop:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        100, 0
+    )
+    , WAIT(
+        "<b>Number of seconds between loops:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        5, 0
+    )
     , GENERATE_CPP_CODE_AFTER_RECORDING(
         "<b>[For Developers]</b><br>"
         "<b>Automatically generate C++ code:</b><br>"
@@ -67,6 +77,8 @@ RecordKeyboardController::RecordKeyboardController()
 {
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(FILE_NAME);
+    PA_ADD_OPTION(LOOP);
+    PA_ADD_OPTION(WAIT);
     PA_ADD_OPTION(GENERATE_CPP_CODE_AFTER_RECORDING);
 }
 
@@ -105,7 +117,7 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
         
     }else if (MODE == Mode::REPLAY){
         JsonValue json = load_json_file(std::string(FILE_NAME) + ".json");
-        json_to_pbf_actions(env, scope, json, controller_class);
+        json_to_pbf_actions(env, scope, json, controller_class, LOOP, WAIT);
 
 
     }else if (MODE == Mode::CONVERT_JSON_TO_CODE){
@@ -207,7 +219,7 @@ std::string json_to_cpp_code_pro_controller(const JsonArray& history){
         }
     );
     
-    cout << result << endl;
+    cout << "\n" + result << endl;
     return result;
 
 }
@@ -252,13 +264,13 @@ std::string json_to_cpp_code_joycon(const JsonArray& history){
         }
     );
 
-    cout << result << endl;
+    cout << "\n" + result << endl;
     return result;
 
 }
 
 
-void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerClass controller_class){
+void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerClass controller_class, uint32_t num_loops, uint32_t seconds_wait_between_loops){
     try{
         const JsonObject& obj = json.to_object_throw();
 
@@ -274,14 +286,14 @@ void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& 
         case ControllerClass::NintendoSwitch_ProController:
         {
             ProControllerContext context(scope, env.console.controller<ProController>());
-            json_to_pbf_actions_pro_controller(context, history_json);
+            json_to_pbf_actions_pro_controller(context, history_json, num_loops, seconds_wait_between_loops);
             break;
         }
         case ControllerClass::NintendoSwitch_LeftJoycon:
         case ControllerClass::NintendoSwitch_RightJoycon:
         {
             JoyconContext context(scope, env.console.controller<JoyconController>());
-            json_to_pbf_actions_joycon(context, history_json);
+            json_to_pbf_actions_joycon(context, history_json, num_loops, seconds_wait_between_loops);
             break;
         }
         default:
@@ -296,77 +308,85 @@ void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& 
 
 }
 
-void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history){
+void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history, uint32_t num_loops, uint32_t seconds_wait_between_loops){
 
-    json_to_pro_controller_state(history, 
-        [&](int64_t duration_in_ms){
-            pbf_wait(context, Milliseconds(duration_in_ms));
-        },
-        [&](NonNeutralControllerField non_neutral_field,
-            Button button, 
-            DpadPosition dpad, 
-            uint8_t left_x, 
-            uint8_t left_y, 
-            uint8_t right_x, 
-            uint8_t right_y, 
-            int64_t duration_in_ms
-        ){
-            switch (non_neutral_field){
-            case NonNeutralControllerField::BUTTON:
-                pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::DPAD:
-                pbf_press_dpad(context, dpad, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::LEFT_JOYSTICK:
-                pbf_move_left_joystick(context, left_x, left_y, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::RIGHT_JOYSTICK:
-                pbf_move_right_joystick(context, right_x, right_y, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::MULTIPLE:
-                pbf_controller_state(context, button, dpad, left_x, left_y, right_x, right_y, Milliseconds(duration_in_ms));
-                break;
-            case NonNeutralControllerField::NONE:
+    for (uint32_t i = 0; i < num_loops; i++){
+        json_to_pro_controller_state(history, 
+            [&](int64_t duration_in_ms){
                 pbf_wait(context, Milliseconds(duration_in_ms));
-                break;
-            default:
-                throw ParseException("Unexpected NonNeutralControllerField enum.");
-            }            
-        }
-    );
+            },
+            [&](NonNeutralControllerField non_neutral_field,
+                Button button, 
+                DpadPosition dpad, 
+                uint8_t left_x, 
+                uint8_t left_y, 
+                uint8_t right_x, 
+                uint8_t right_y, 
+                int64_t duration_in_ms
+            ){
+                switch (non_neutral_field){
+                case NonNeutralControllerField::BUTTON:
+                    pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
+                    break;
+                case NonNeutralControllerField::DPAD:
+                    pbf_press_dpad(context, dpad, Milliseconds(duration_in_ms), Milliseconds(0));
+                    break;
+                case NonNeutralControllerField::LEFT_JOYSTICK:
+                    pbf_move_left_joystick(context, left_x, left_y, Milliseconds(duration_in_ms), Milliseconds(0));
+                    break;
+                case NonNeutralControllerField::RIGHT_JOYSTICK:
+                    pbf_move_right_joystick(context, right_x, right_y, Milliseconds(duration_in_ms), Milliseconds(0));
+                    break;
+                case NonNeutralControllerField::MULTIPLE:
+                    pbf_controller_state(context, button, dpad, left_x, left_y, right_x, right_y, Milliseconds(duration_in_ms));
+                    break;
+                case NonNeutralControllerField::NONE:
+                    pbf_wait(context, Milliseconds(duration_in_ms));
+                    break;
+                default:
+                    throw ParseException("Unexpected NonNeutralControllerField enum.");
+                }            
+            }
+        );
+
+        pbf_wait(context, Seconds(seconds_wait_between_loops));
+    }
 }
 
-void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history){
+void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history, uint32_t num_loops, uint32_t seconds_wait_between_loops){
 
-    json_to_joycon_state(history, 
-        [&](int64_t duration_in_ms){
-            pbf_wait(context, Milliseconds(duration_in_ms));
-        },
-        [&](NonNeutralControllerField non_neutral_field,
-            Button button, 
-            uint8_t x, 
-            uint8_t y, 
-            int64_t duration_in_ms
-        ){
-            switch (non_neutral_field){
-            case NonNeutralControllerField::BUTTON:
-                pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::JOYSTICK:
-                pbf_move_joystick(context, x, y, Milliseconds(duration_in_ms), Milliseconds(0));
-                break;
-            case NonNeutralControllerField::MULTIPLE:
-                pbf_controller_state(context, button, x, y, Milliseconds(duration_in_ms));
-                break;
-            case NonNeutralControllerField::NONE:
+    for (uint32_t i = 0; i < num_loops; i++){
+        json_to_joycon_state(history, 
+            [&](int64_t duration_in_ms){
                 pbf_wait(context, Milliseconds(duration_in_ms));
-                break;
-            default:
-                throw ParseException("Unexpected NonNeutralControllerField enum.");
-            }            
-        }
-    );
+            },
+            [&](NonNeutralControllerField non_neutral_field,
+                Button button, 
+                uint8_t x, 
+                uint8_t y, 
+                int64_t duration_in_ms
+            ){
+                switch (non_neutral_field){
+                case NonNeutralControllerField::BUTTON:
+                    pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
+                    break;
+                case NonNeutralControllerField::JOYSTICK:
+                    pbf_move_joystick(context, x, y, Milliseconds(duration_in_ms), Milliseconds(0));
+                    break;
+                case NonNeutralControllerField::MULTIPLE:
+                    pbf_controller_state(context, button, x, y, Milliseconds(duration_in_ms));
+                    break;
+                case NonNeutralControllerField::NONE:
+                    pbf_wait(context, Milliseconds(duration_in_ms));
+                    break;
+                default:
+                    throw ParseException("Unexpected NonNeutralControllerField enum.");
+                }            
+            }
+        );
+
+        pbf_wait(context, Seconds(seconds_wait_between_loops));
+    }
 }
 
 
