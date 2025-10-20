@@ -114,6 +114,38 @@ public:
 
 
 
+class ItemReceiveDetector : public StaticScreenDetector{
+public:
+    ItemReceiveDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    //  This is not const so that detectors can save/cache state.
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    friend class BlueDialogWatcher;
+
+    const Color m_color;
+    VideoOverlay* m_overlay;
+    const ImageFloatBox m_arrow_box;
+
+    ImageFloatBox m_last_detected;
+    std::optional<OverlayBoxScope> m_last_detected_box;
+};
+class ItemReceiveWatcher : public DetectorToFinder<ItemReceiveDetector>{
+public:
+    ItemReceiveWatcher(
+        Color color = COLOR_RED,
+        VideoOverlay* overlay = nullptr,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("BlueDialogWatcher", hold_duration, color, overlay)
+    {}
+};
+
+
+
 class TealDialogDetector : public StaticScreenDetector{
 public:
     TealDialogDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);

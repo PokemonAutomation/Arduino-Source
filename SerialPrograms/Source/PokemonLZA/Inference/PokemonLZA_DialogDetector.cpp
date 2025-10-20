@@ -14,9 +14,10 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -271,12 +272,63 @@ void BlueDialogDetector::make_overlays(VideoOverlaySet& items) const{
 bool BlueDialogDetector::detect(const ImageViewRGB32& screen){
     if (!is_solid(
         extract_box_reference(screen, m_corner),
-        {0.0186916, 0.252336, 0.728972}
+        {0.0869318, 0.255479, 0.65759},
+        0.20
     )){
+//        cout << "not solid" << endl;
         m_last_detected_box.reset();
         return false;
     }
 
+    double screen_rel_size = (screen.height() / 1080.0);
+    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
+
+    double min_area_1080p = 150.0;
+    double rmsd_threshold = 120.0;
+    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+
+    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {0xffc0c0c0, 0xffffffff},
+        {0xffb0b0b0, 0xffffffff},
+        {0xffa0a0a0, 0xffffffff},
+        {0xff909090, 0xffffffff},
+        {0xff808080, 0xffffffff},
+    };
+
+    bool found = match_template_by_waterfill(
+        extract_box_reference(screen, m_arrow_box),
+        DialogWhiteArrowMatcher::instance(),
+        FILTERS,
+        {min_area, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+            return true;
+        }
+    );
+
+    if (m_overlay){
+        if (found){
+            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+        }else{
+            m_last_detected_box.reset();
+        }
+    }
+
+    return found;
+}
+
+
+
+ItemReceiveDetector::ItemReceiveDetector(Color color, VideoOverlay* overlay)
+    : m_color(color)
+    , m_overlay(overlay)
+    , m_arrow_box(0.718648, 0.875728, 0.034896, 0.056311)
+{}
+void ItemReceiveDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_arrow_box);
+}
+bool ItemReceiveDetector::detect(const ImageViewRGB32& screen){
     double screen_rel_size = (screen.height() / 1080.0);
     double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 

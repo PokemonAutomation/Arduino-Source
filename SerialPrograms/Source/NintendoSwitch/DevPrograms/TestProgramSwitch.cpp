@@ -284,6 +284,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+    while (true){
+        ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
+        ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
+        pbf_press_button(context, BUTTON_A, 80ms, 24ms);
+        pbf_press_button(context, BUTTON_Y, 80ms, 24ms);
+        pbf_press_button(context, BUTTON_X, 80ms, 24ms);
+        pbf_press_button(context, BUTTON_B, 80ms, 24ms);
+    }
+
+
+
 #if 0
     ImageRGB32 image("Screenshots/screenshot-20251012-174842583706.png");
 
@@ -293,7 +305,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
 //    ImageRGB32 image("Screenshots/screenshot-20251012-174842583706.png");
 
     auto screen = feed.snapshot();
