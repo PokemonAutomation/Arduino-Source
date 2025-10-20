@@ -253,7 +253,7 @@ AutoStory::AutoStory()
         "For Start Points that are at Pokecenters, ensure that you fly there so that your character is in the exactly correct start position."
     }    
     , MAINSTORY_NOTE{
-        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Dazzling Gleam, Psychic, Mystical Fire.<br>"
+        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Dazzling Gleam, Mystical Fire, Misty Terrain.<br>"
         "Also, make sure you have two other strong pokemon (e.g. level 100 Talonflames)<br>"
         "Refer to the documentation on github for more details."
     }

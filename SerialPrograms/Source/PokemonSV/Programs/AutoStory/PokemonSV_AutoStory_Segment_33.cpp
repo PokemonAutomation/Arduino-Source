@@ -353,7 +353,26 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_89(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
 
+        env.console.log("Battle Elite Four 4.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+
+        // finished battle
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        // move to Pokecenter
+        handle_unexpected_battles(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 50, 50);
+        });      
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
+            128, 15, 12, 12, false);           // can't wrap in handle_when_stationary_in_overworld(), since we expect to be stationary when walking into the pokecenter
+            
+
+        fly_to_overlapping_flypoint(env.program_info(), env.console, context); 
 
     });     
 }
