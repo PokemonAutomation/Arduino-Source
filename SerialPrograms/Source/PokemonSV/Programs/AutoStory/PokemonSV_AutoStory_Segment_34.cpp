@@ -111,7 +111,8 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         wait_for_gradient_arrow(env.program_info(), env.console, context, {0.031, 0.790, 0.047, 0.078}, 10);
         pbf_mash_button(context, BUTTON_A, 1000ms);
 
-        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 60, {CallbackEnum::PROMPT_DIALOG});
+        pbf_mash_button(context, BUTTON_A, 1000ms);
         SinglesMoveEntry move1{SinglesMoveType::Move1, true};  // Moonblast
         std::vector<SinglesMoveEntry> move_table1 = {move1};
         bool terastallized = false;
@@ -153,6 +154,9 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
         // now in school lobby
+
+        context.wait_for_all_requests();
+        context.wait_for(1000ms);
 
         pbf_move_left_joystick(context, 128, 255, 1000, 100);
         // wait for dialog when leaving school lobby
