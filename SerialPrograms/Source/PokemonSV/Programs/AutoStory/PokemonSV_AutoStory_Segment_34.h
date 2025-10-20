@@ -26,28 +26,42 @@ public:
     ) const override;
 };
 
+static constexpr std::string segment_num = "34";
 
 
-// start: 
-// end: 
+
+inline std::string checkpoint90_start(){ return segment_num + ": Beat Geeta. At Pokemon League Pokecenter.";}
+inline std::string checkpoint90_end(){ return segment_num + ": Beat Nemona. At dormitory room, next to bed.";}
+// start: Beat Geeta. At Pokemon League Pokecenter.
+// end: Beat Nemona. At dormitory room, next to bed.
 void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+inline std::string checkpoint91_start(){ return checkpoint90_end();}
+inline std::string checkpoint91_end(){ return segment_num + ": Beat Penny. At Naranja Academy fly point.";}
+// start: Beat Nemona. At dormitory room, next to bed."
+// end: Beat Penny. At Naranja Academy fly point.
 void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+inline std::string checkpoint92_start(){ return checkpoint91_end();}
+inline std::string checkpoint92_end(){ return segment_num + ": Beat Arven. At Los Platos Pokecenter.";}
+// start: Beat Penny. At Naranja Academy fly point.
+// end: Beat Arven. At Los Platos Pokecenter.
 void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
+// std::string checkpoint_start(){ return segment_num + "";}
+// std::string checkpoint_end(){ return segment_num + "";}
 // start: 
 // end: 
 void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
+// std::string checkpoint_start(){ return segment_num + "";}
+// std::string checkpoint_end(){ return segment_num + "";}
 // start: 
 // end: 
 void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
+// std::string checkpoint_start(){ return segment_num + "";}
+// std::string checkpoint_end(){ return segment_num + "";}
 // start: 
 // end: 
 void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
