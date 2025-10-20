@@ -4,6 +4,7 @@
  *
  */
 
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -28,11 +29,11 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_34::name() const{
-    return "";
+    return "35: ";
 }
 
 std::string AutoStory_Segment_34::start_text() const{
-    return "Start: ";
+    return "Start: Beat Clavell. Beat Elite Four. At Pokemon League Pokecenter.";
 }
 
 std::string AutoStory_Segment_34::end_text() const{
@@ -58,6 +59,27 @@ void AutoStory_Segment_34::run_segment(
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+
+
+void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
 
 
 

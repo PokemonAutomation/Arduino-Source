@@ -109,7 +109,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_30>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_31>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_32>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_33>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_33>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_34>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_35>());
 
@@ -253,7 +253,7 @@ AutoStory::AutoStory()
         "For Start Points that are at Pokecenters, ensure that you fly there so that your character is in the exactly correct start position."
     }    
     , MAINSTORY_NOTE{
-        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Dazzling Gleam, Psychic, Mystical Fire.<br>"
+        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Dazzling Gleam, Mystical Fire, Misty Terrain.<br>"
         "Also, make sure you have two other strong pokemon (e.g. level 100 Talonflames)<br>"
         "Refer to the documentation on github for more details."
     }
@@ -537,10 +537,10 @@ AutoStory::AutoStory()
 }
 
 void AutoStory::on_config_value_changed(void* object){
-    ConfigOptionState state = (STARTPOINT_TUTORIAL.index() <= 1 && STORY_SECTION == StorySection::TUTORIAL)
-        ? ConfigOptionState::ENABLED
-        : ConfigOptionState::HIDDEN;
-    STARTERCHOICE.set_visibility(state);
+    // ConfigOptionState state = (STARTPOINT_TUTORIAL.index() <= 1 && STORY_SECTION == StorySection::TUTORIAL)
+    //     ? ConfigOptionState::ENABLED
+    //     : ConfigOptionState::HIDDEN;
+    // STARTERCHOICE.set_visibility(state);
 
     if (STORY_SECTION == StorySection::TUTORIAL){
         STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
@@ -730,10 +730,15 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_84(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_85(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_86(env, context, notif_status_update, stats);});
-    checkpoint_list.push_back([&](){checkpoint_87(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_87(env, context, notif_status_update, stats, language, starter_choice);});
     checkpoint_list.push_back([&](){checkpoint_88(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_89(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_90(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_91(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_92(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_93(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_94(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_95(env, context, notif_status_update, stats);});
     
     
     if (end == 0){

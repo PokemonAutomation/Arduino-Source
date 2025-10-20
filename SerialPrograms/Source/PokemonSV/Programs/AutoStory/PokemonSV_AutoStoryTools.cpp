@@ -92,7 +92,7 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
 
         AdvanceDialogWatcher    advance_dialog(COLOR_RED);
         OverworldWatcher    overworld(stream.logger(), COLOR_CYAN);
-        PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.30, 0.40, 0.60});
+        PromptDialogWatcher prompt(COLOR_YELLOW, {0.50, 0.25, 0.40, 0.65});
         WhiteButtonWatcher  whitebutton(COLOR_GREEN, WhiteButton::ButtonA_DarkBackground, {0.725, 0.833, 0.024, 0.045}); // {0.650, 0.650, 0.140, 0.240}
         DialogArrowWatcher dialog_arrow(COLOR_RED, stream.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
         NormalBattleMenuWatcher battle(COLOR_ORANGE);
@@ -651,6 +651,40 @@ void handle_unexpected_battles(
             run_wild_battle_press_A(stream, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
+}
+
+void do_action_and_monitor_for_overworld(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+){
+
+    OverworldWatcher overworld(stream.logger(), COLOR_CYAN);
+
+    int ret = run_until<ProControllerContext>(
+        stream, context,
+        [&](ProControllerContext& context){
+            context.wait_for_all_requests();
+            action(info, stream, context);
+        },
+        {overworld}        
+    );
+    if (ret < 0){
+        // successfully completed action detecting the overworld
+        return;
+    }else if (ret == 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "do_action_and_monitor_for_overworld(): Failed to complete action. Detected overworld.",
+            stream
+        );                
+    }
+
 }
 
 void handle_when_stationary_in_overworld(
