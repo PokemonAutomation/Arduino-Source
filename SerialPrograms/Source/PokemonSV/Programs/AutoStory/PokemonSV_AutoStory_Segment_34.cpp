@@ -96,15 +96,7 @@ void checkpoint_90(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
-
-
-    });   
-}
-
-void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
-
+        
         // walk down
         pbf_move_left_joystick(context, 128, 255, 100, 100);
         // walk right towards door
@@ -185,6 +177,15 @@ void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 0, 0, 0}, FlyPoint::FAST_TRAVEL);
 
+
+    });   
+}
+
+void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
+        
     });   
 }
 
