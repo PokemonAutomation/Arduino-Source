@@ -8,6 +8,8 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_Battles.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -291,15 +293,59 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         env.console.log("Battle Elite Four 1.");
-        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        SinglesMoveEntry move1{SinglesMoveType::Move1, false};  // Moonblast
+        SinglesMoveEntry move3{SinglesMoveType::Move3, false}; // Mystical Fire
+        SinglesMoveEntry move4{SinglesMoveType::Move4, false}; // Misty Terrain
+        std::vector<SinglesMoveEntry> move_table1 = {move1, move4, move1};
+        bool terastallized = false;
+        bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
+
+        // finished battle
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
+        // heal
+        auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
+
+        // engage next battle
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW});
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
 
-        env.console.log("Battle Elite Four 2.");
-        // todo: run the third move when battling the Steel trainer
+        env.console.log("Battle Elite Four 2.");  // select move 3, which should be a fire move. to battle the steel trainer
+        std::vector<SinglesMoveEntry> move_table2 = {move3};
+        is_won = run_pokemon(env.console, context, move_table2, true, terastallized);
+        if (!is_won){// throw exception if we lose
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to beat the Steel trainer. Reset.",
+                env.console
+            );
+        }
 
+        // finished battle
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        // heal
+        auto_heal_from_menu_or_overworld(env.program_info(), env.console, context, 0, true);
+
+        // engage next battle
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
+
+        env.console.log("Battle Elite Four 3.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+
+        // finished battle
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        // engage next battle
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
+
+        env.console.log("Battle Elite Four 4.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+
+        // finished battle
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
 
     });     
 }
