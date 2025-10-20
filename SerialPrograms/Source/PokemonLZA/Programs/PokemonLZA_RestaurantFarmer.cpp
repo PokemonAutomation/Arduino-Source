@@ -121,7 +121,7 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [=](ProControllerContext& context){
-            while (current_time() - start < 5min){
+            while (current_time() - start < 30min){
                 ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
                 ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
                 pbf_wait(context, 104ms);
@@ -157,7 +157,7 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "Battle took longer than 5 minutes.",
+            "Battle took longer than 30 minutes.",
             env.console
         );
     }
