@@ -357,9 +357,15 @@ void ControllerSettingsRow::on_config_value_changed(void* object){
 ControllerSettingsTable::ControllerSettingsTable()
     : EditableTableOption_t<ControllerSettingsRow>(
         "<b>Wireless Controller Settings:</b><br>"
-        "Changes take effect after resetting the device. "
-        "The MAC address is only for informational purposes as reported by the device. "
-        "Changing it will not change the actual address.",
+        "Changes take effect after resetting the device."
+        "<br><br>"
+        "The \"Name\" column is an arbitrary text field to help you identify which device it is. "
+        "By default it uses the name of the serial port. But this can be misleading if the port has changed. "
+        "<br><br>"
+        "Do not change the MAC address as it is used to identify which device the row belongs to. "
+        "Changing it will not actually change the MAC address of the device."
+        "<br><br>"
+        "Changes take effect after resetting the device.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )

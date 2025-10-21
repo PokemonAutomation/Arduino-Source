@@ -46,7 +46,7 @@ public:
         return Milliseconds(15);
     }
     Milliseconds timing_variation() const{
-        return ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS_ESP32;
+        return ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS;
     }
 
 

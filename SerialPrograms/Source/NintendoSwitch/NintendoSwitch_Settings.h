@@ -28,8 +28,8 @@ public:
     TimingOptions();
 
 public:
-    MillisecondsOption WIRED_MICROCONTROLLER;
-    MillisecondsOption WIRELESS_ESP32;
+    MillisecondsOption WIRED;
+    MillisecondsOption WIRELESS;
     MillisecondsOption SYSBOTBASE;
 };
 
@@ -50,7 +50,6 @@ public:
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_FAST;
     BooleanCheckBoxOption TOLERATE_SYSTEM_UPDATE_MENU_SLOW;
 
-    BooleanCheckBoxOption ENABLE_ESP32_RECONNECT;
     BooleanCheckBoxOption ENABLE_SBB3_PINGS;
     BooleanCheckBoxOption ENABLE_SBB3_LOGGING;
 

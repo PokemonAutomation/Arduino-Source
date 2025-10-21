@@ -53,7 +53,7 @@ public:
         return Milliseconds(8);
     }
     virtual Milliseconds timing_variation() const override{
-        return ConsoleSettings::instance().TIMING_OPTIONS.WIRED_MICROCONTROLLER;
+        return ConsoleSettings::instance().TIMING_OPTIONS.WIRED;
     }
     virtual bool atomic_multibutton() const override{
         return true;
