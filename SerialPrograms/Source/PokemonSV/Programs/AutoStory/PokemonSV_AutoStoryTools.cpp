@@ -135,20 +135,32 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
         }
 
 
-        int ret = wait_until(
+        // int ret = wait_until(
+        //     stream, context,
+        //     std::chrono::seconds(seconds_timeout),
+        //     callbacks
+        // );
+
+        WallClock start_inference = current_time();
+        int ret = run_until<ProControllerContext>(
             stream, context,
-            std::chrono::seconds(seconds_timeout),
+            [&](ProControllerContext& context){
+
+                if (mode == ClearDialogMode::STOP_TIMEOUT){
+                    context.wait_for(Seconds(seconds_timeout));
+                }else{ // press A every 8 seconds, until we time out.
+                    auto button_press_period = Seconds(8);
+                    while (true){
+                        if (current_time() - start_inference + button_press_period > Seconds(seconds_timeout)){
+                            break;
+                        }
+                        context.wait_for(button_press_period);
+                        pbf_press_button(context, BUTTON_A, 160ms, 0ms);
+                    }
+                }
+            },
             callbacks
         );
-        // int ret = run_until<ProControllerContext>(
-        //     console, context,
-        //     [&](ProControllerContext& context){
-        //         for (size_t j = 0; j < seconds_timeout/3; j++){
-        //             pbf_press_button(context, BUTTON_A, 20, 3*TICKS_PER_SECOND-20);
-        //         }
-        //     },
-        //     {overworld, prompt, whitebutton, advance_dialog, battle}
-        // );
         context.wait_for(std::chrono::milliseconds(100));
         if (ret < 0){
             stream.log("clear_dialog(): Timed out.");
