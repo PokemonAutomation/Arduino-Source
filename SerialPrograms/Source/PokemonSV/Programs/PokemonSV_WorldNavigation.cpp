@@ -908,7 +908,7 @@ void run_battle_press_A(
 
         int ret = wait_until(
             stream, context,
-            std::chrono::seconds(90),
+            std::chrono::seconds(360),
             callbacks
         );
         context.wait_for(std::chrono::milliseconds(100));

@@ -298,7 +298,19 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         SinglesMoveEntry move4{SinglesMoveType::Move4, false}; // Misty Terrain
         std::vector<SinglesMoveEntry> move_table1 = {move1, move4, move1};
         bool terastallized = false;
+        // use Moonblast to KO the Whiscash. Then setup Misty Terrain on the second pokemon, Camerupt.
+        // Then spam Moonblast to finish off the rest of the team.
+        // We setup Misty Terrain to prevent getting poisoned by the Donphan's Poison Jab, since it survives with Sturdy.
+        // Getting poisoned will cause us to fail the Elite Four since we have no easy way to heal off poison.
+        // We don't setup Misty Terrain on the Whiscash since Muddy Water can lower our accuracy.
         bool is_won = run_pokemon(env.console, context, move_table1, true, terastallized);
+        if (!is_won){// throw exception if we lose
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to beat the Ground trainer. Reset.",
+                env.console
+            );
+        }
 
         // finished battle
         mash_button_till_overworld(env.console, context, BUTTON_A);
