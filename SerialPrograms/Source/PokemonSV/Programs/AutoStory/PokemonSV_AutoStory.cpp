@@ -110,7 +110,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_31>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_32>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_33>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_34>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_34>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_35>());
 
     return segment_list;
