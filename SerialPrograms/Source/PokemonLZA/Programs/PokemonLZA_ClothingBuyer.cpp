@@ -36,7 +36,7 @@ ClothingBuyer::ClothingBuyer()
     : NUM_CATEGORY(
         "<b>Number of Categories:</b><br>The number of categories of clothing the shop has.",
         LockMode::LOCK_WHILE_RUNNING,
-        1, 1, 5
+        1, 1, 9
     )
     , GO_HOME_WHEN_DONE(false)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
