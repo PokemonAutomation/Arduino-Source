@@ -11,6 +11,7 @@
 #include "PokemonLZA_Settings.h"
 
 #include "Programs/PokemonLZA_RestaurantFarmer.h"
+#include "Programs/PokemonLZA_ClothingBuyer.h"
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
 
 namespace PokemonAutomation{
@@ -31,6 +32,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<RestaurantFarmer_Descriptor, RestaurantFarmer>());
+    ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
 
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
