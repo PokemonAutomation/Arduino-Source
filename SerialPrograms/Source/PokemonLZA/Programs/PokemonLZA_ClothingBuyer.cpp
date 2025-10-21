@@ -70,7 +70,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 
         //In sub-menu for item.
         while (true) {
-            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+            pbf_press_button(context, BUTTON_A, 160ms, 180ms);
 
             SelectionArrowWatcher buy_yes_no(
                 COLOR_YELLOW, &env.console.overlay(),
@@ -87,10 +87,14 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             case 0:
                 env.log("Purchase item.");
                 //Purchase Y/N detected.
-                pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+                pbf_press_button(context, BUTTON_A, 160ms, 500ms);
+                pbf_wait(context, 1000ms);
+                context.wait_for_all_requests();
 
                 //Would you like to wear this out today? (No.)
-                pbf_press_button(context, BUTTON_B, 160ms, 80ms);
+                pbf_press_button(context, BUTTON_B, 160ms, 500ms);
+                pbf_wait(context, 1000ms);
+                context.wait_for_all_requests();
 
                 send_program_status_notification(
                     env, NOTIFICATION_STATUS_UPDATE,
@@ -104,7 +108,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                     env, NOTIFICATION_STATUS_UPDATE,
                     "Item already bought or out of money."
                 );
-                pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+                pbf_press_button(context, BUTTON_A, 160ms, 180ms);
                 break;
             default:
                 env.log("Error looking for purchase prompt.");
@@ -118,7 +122,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             context.wait_for_all_requests();
 
             env.log("Moving on to next item.");
-            pbf_press_dpad(context, DPAD_DOWN, 80ms, 80ms);
+            pbf_press_dpad(context, DPAD_DOWN, 80ms, 180ms);
             context.wait_for_all_requests();
 
             //Check if we are back at the top of the sub-menu
@@ -132,6 +136,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
                 1000ms,
                 { top_category_item }
             );
+            context.wait_for_all_requests();
             if (retCatTop == 0) {
                 env.log("Reached top of the item sub-menu.");
                 break;
