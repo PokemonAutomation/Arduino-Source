@@ -29,7 +29,7 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_34::name() const{
-    return "34: ";
+    return "34: Battle Nemona, Penny, Arven";
 }
 
 std::string AutoStory_Segment_34::start_text() const{
@@ -37,7 +37,7 @@ std::string AutoStory_Segment_34::start_text() const{
 }
 
 std::string AutoStory_Segment_34::end_text() const{
-    return "End: ";
+    return "End: Beat Nemona, Penny, and Arven. At Los Platos Pokecenter.";
 }
 
 void AutoStory_Segment_34::run_segment(
@@ -114,6 +114,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         // clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 60, {CallbackEnum::PROMPT_DIALOG});
         // pbf_mash_button(context, BUTTON_A, 1000ms);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
+        env.console.log("Battle Penny.");
         SinglesMoveEntry move1{SinglesMoveType::Move1, true};  // Moonblast
         std::vector<SinglesMoveEntry> move_table1 = {move1};
         bool terastallized = false;
@@ -189,8 +190,36 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void checkpoint_92(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 145, 255, 350}, FlyPoint::FAST_TRAVEL);
+        handle_unexpected_battles(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_move_left_joystick(context, 0, 128, 1000ms, 100ms);
+        });
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+        // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
 
+        // leave the inside of the lighthouse and go outside
+        pbf_move_left_joystick(context, 128, 255, 100, 50);
+        pbf_move_left_joystick(context, 0, 128, 300, 50);
+        pbf_move_left_joystick(context, 255, 255, 100, 50);
+
+        pbf_wait(context, 3 * TICKS_PER_SECOND);        
+        // wait for overworld after building
+        wait_for_overworld(env.program_info(), env.console, context, 30);
+
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 0, 190, 50);
+        overworld_navigation(env.program_info(), env.console, context, 
+            NavigationStopCondition::STOP_DIALOG, NavigationMovementMode::DIRECTIONAL_SPAM_A, 
+            128, 0, 30, 30, false);
         
+
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
+        env.console.log("Battle Arven.");
+        run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0}, FlyPoint::POKECENTER);
     });   
 }
 
