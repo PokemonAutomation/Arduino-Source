@@ -28,10 +28,10 @@ using namespace Pokemon;
 
 BeldumHunter_Descriptor::BeldumHunter_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonLZA:BeldumHunter",
-        STRING_POKEMON + " LZA", "Beldum Hunter",
+        "PokemonLZA:ShinyHunt-Beldum",
+        STRING_POKEMON + " LZA", "Shiny Hunt - Beldum",
         "Programs/PokemonLZA/BeldumHunter.html",
-        "Reset in Lysandre Labs to shiny hunt Beldum.",
+        "Repeatedly enter Lysandre Labs to shiny hunt Beldum.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::VIDEO_AUDIO,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
@@ -135,8 +135,9 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 340);
 
                 env.log("Final hallway to Beldum room.");
-                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 350);
-
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 400);
+                pbf_press_button(context, BUTTON_L, 40ms, 40ms);
+                context.wait_for_all_requests();
             },
             { {shiny_detector} }
             );
@@ -181,6 +182,9 @@ void BeldumHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             if (shiny_found) {
                 stats.shinies++;
                 env.update_stats();
+
+                pbf_press_button(context, BUTTON_HOME, 160ms, 3000ms);
+
                 send_program_notification(env, NOTIFICATION_SHINY,
                     COLOR_YELLOW, "Shiny sound detected!", {},
                     "", env.console.video().snapshot(), true);
