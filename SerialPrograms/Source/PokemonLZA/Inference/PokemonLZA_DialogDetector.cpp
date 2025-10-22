@@ -9,15 +9,14 @@
 //#include "CommonTools/Images/SolidColorTest.h"
 #include "PokemonLZA_DialogDetector.h"
 #include "CommonTools/Images/SolidColorTest.h"
-#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -138,6 +137,7 @@ bool NormalDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock 
     const double green_line_rmsd_threshold = 50.0;
     const size_t min_green_line_size = size_t(screen_rel_size_2 * min_green_line_size_1080P);
     match_template_by_waterfill(
+        frame.size(),
         extract_box_reference(frame, m_title_green_line_box), 
         DialogTitleGreenLineMatcher::instance(),
         green_line_filters,
@@ -160,6 +160,7 @@ bool NormalDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock 
     const double black_arrow_rmsd_threshold = 120.0;
     const size_t min_black_arrow_size = size_t(screen_rel_size_2 * min_black_arrow_size_1080P);
     match_template_by_waterfill(
+        frame.size(),
         extract_box_reference(frame, m_black_arrow_box), 
         DialogBlackArrowMatcher::instance(),
         black_arrow_filters,
@@ -235,6 +236,7 @@ bool FlatWhiteDialogDetector::detect(const ImageViewRGB32& screen){
     };
 
     bool found = match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_arrow_box),
         DialogBlackArrowMatcher::instance(),
         FILTERS,
@@ -296,6 +298,7 @@ bool BlueDialogDetector::detect(const ImageViewRGB32& screen){
     };
 
     bool found = match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_arrow_box),
         DialogWhiteArrowMatcher::instance(),
         FILTERS,
@@ -345,6 +348,7 @@ bool ItemReceiveDetector::detect(const ImageViewRGB32& screen){
     };
 
     bool found = match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_arrow_box),
         DialogWhiteArrowMatcher::instance(),
         FILTERS,
@@ -390,6 +394,7 @@ bool TealDialogDetector::detect(const ImageViewRGB32& screen){
     };
 
     bool found = match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_arrow_box),
         DialogTealArrowMatcher::instance(),
         FILTERS,

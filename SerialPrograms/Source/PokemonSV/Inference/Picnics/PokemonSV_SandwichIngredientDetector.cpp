@@ -119,6 +119,7 @@ bool SandwichCondimentsPageDetector::detect(const ImageViewRGB32& screen){
 
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * 700);
     return match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_box), 
         SandwichCondimentsPageMatcher::instance(),
         filters,
@@ -146,6 +147,7 @@ bool SandwichPicksPageDetector::detect(const ImageViewRGB32& screen){
 
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * 300);
     return match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_box), 
         SandwichPicksPageMatcher::instance(),
         filters,

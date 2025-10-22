@@ -162,7 +162,7 @@ std::vector<ImageFloatBox> WhiteButtonDetector::detect_all(const ImageViewRGB32&
         ){
             continue;
         }
-        double rmsd = m_matcher.rmsd_original(region, object);
+        double rmsd = m_matcher.rmsd_original(screen.size(), region, object);
 //        cout << "rmsd = " << rmsd << endl;
         if (rmsd < m_matcher.m_max_rmsd){
             hits.emplace_back(translate_to_parent(screen, m_box, object));

@@ -90,6 +90,7 @@ std::vector<ImageFloatBox> FastTravelDetector::detect_all(const ImageViewRGB32& 
 
     ImagePixelBox pixel_search_area = floatbox_to_pixelbox(screen.width(), screen.height(), m_box);    
     match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_box), 
         FastTravelMatcher::instance(),
         filters,

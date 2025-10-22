@@ -10,6 +10,7 @@
 
 #include <functional>
 #include <utility>
+#include "Common/Cpp/ImageResolution.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 
 namespace PokemonAutomation{
@@ -54,10 +55,11 @@ std::pair<PackedBinaryMatrix, size_t> remove_center_pixels(
 // check_matched_object: if a matcher is found, pass the matched object to this function. If the function returns true, stop the
 //   entire template matching operation.
 bool match_template_by_waterfill(
-    const ImageViewRGB32 &image,
-    const ImageMatch::WaterfillTemplateMatcher &matcher,
+    Resolution input_resolution,
+    const ImageViewRGB32& image,
+    const ImageMatch::WaterfillTemplateMatcher& matcher,
     const std::vector<std::pair<uint32_t, uint32_t>> &filters,
-    const std::pair<size_t, size_t> &area_thresholds,
+    const std::pair<size_t, size_t>& area_thresholds,
     double rmsd_threshold,
     std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object);
 

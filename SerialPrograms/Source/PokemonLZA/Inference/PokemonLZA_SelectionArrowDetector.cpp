@@ -82,6 +82,7 @@ bool SelectionArrowDetector::detect(const ImageViewRGB32& screen){
     };
 
     bool found = match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_arrow_box),
         SelectionArrowMatcher::matcher(m_type),
         FILTERS,

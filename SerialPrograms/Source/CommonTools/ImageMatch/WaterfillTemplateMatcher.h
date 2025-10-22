@@ -9,6 +9,7 @@
 
 #include <memory>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/ImageResolution.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonTools/ImageMatch/ExactImageMatcher.h"
 
@@ -51,7 +52,7 @@ public:
     //  In case the image is invalid, return a large value.
     //  It also calls the virtual function `check_image()` on the image.
     //  If the function returns false, then return a large value. 
-    double rmsd(const ImageViewRGB32& image) const;
+    double rmsd(Resolution input_resolution, const ImageViewRGB32& image) const;
 
     //  Compute RMSD of the object on the image against the template.
     //  The input `cropped_image` is already cropped from a full image using the bounding box of the input waterfill `object`.
@@ -59,7 +60,11 @@ public:
     //  The waterfill object's aspect ratio and area ratio are checked against template's. Return a large value 
     //  if the check fails.
     //  See `double rmsd(const ImageViewRGB32& image) const` on the details of comparing the image against the template.
-    virtual double rmsd_precropped(const ImageViewRGB32& cropped_image, const WaterfillObject& object) const;
+    virtual double rmsd_precropped(
+        Resolution input_resolution,
+        const ImageViewRGB32& cropped_image,
+        const WaterfillObject& object
+    ) const;
 
     //  Compute RMSD of the object on the image against the template.
     //  It will crop the original image using the bounding box of the waterfill object, then compare the cropped
@@ -67,13 +72,17 @@ public:
     //  The waterfill object's aspect ratio and area ratio are checked against template's. Return a large value 
     //  if the check fails.
     //  See `double rmsd(const ImageViewRGB32& image) const` on the details of comparing the image against the template.
-    virtual double rmsd_original(const ImageViewRGB32& original_image, const WaterfillObject& object) const;
+    virtual double rmsd_original(
+        Resolution input_resolution,
+        const ImageViewRGB32& original_image,
+        const WaterfillObject& object
+    ) const;
 
     //  Return the image template mesh
     const ImageRGB32& image_template() const { return m_matcher->image_template(); }
 
 protected:
-    virtual bool check_image(const ImageViewRGB32& image) const{ return true; };
+    virtual bool check_image(Resolution input_resolution, const ImageViewRGB32& image) const{ return true; };
     bool check_aspect_ratio(size_t candidate_width, size_t candidate_height) const;
     bool check_area_ratio(double candidate_area_ratio) const;
 

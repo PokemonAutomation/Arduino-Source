@@ -77,8 +77,8 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     }
 }
 
-double WaterfillTemplateMatcher::rmsd(const ImageViewRGB32& image) const{
-    if (!image || !check_image(image)){
+double WaterfillTemplateMatcher::rmsd(Resolution input_resolution, const ImageViewRGB32& image) const{
+    if (!image || !check_image(input_resolution, image)){
         return 99999.;
     }
     return m_matcher->rmsd(image);
@@ -125,7 +125,11 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
 
     return pass;
 }
-double WaterfillTemplateMatcher::rmsd_precropped(const ImageViewRGB32& cropped_image, const WaterfillObject& object) const{
+double WaterfillTemplateMatcher::rmsd_precropped(
+    Resolution input_resolution,
+    const ImageViewRGB32& cropped_image,
+    const WaterfillObject& object
+) const{
 
     // XXX
     // dump_debug_image(global_logger_command_line(), "CommonFramework/WaterfillTemplateMatcher", "rmsd_precropped_input", cropped_image);
@@ -142,7 +146,7 @@ double WaterfillTemplateMatcher::rmsd_precropped(const ImageViewRGB32& cropped_i
 //    static int c = 0;
 //    cout << c << endl;
 
-    double rmsd = this->rmsd(cropped_image);
+    double rmsd = this->rmsd(input_resolution, cropped_image);
 
 //    cout << "rmsd  = " << rmsd << endl;
 
@@ -153,7 +157,11 @@ double WaterfillTemplateMatcher::rmsd_precropped(const ImageViewRGB32& cropped_i
 
     return rmsd;
 }
-double WaterfillTemplateMatcher::rmsd_original(const ImageViewRGB32& original_image, const WaterfillObject& object) const{
+double WaterfillTemplateMatcher::rmsd_original(
+    Resolution input_resolution,
+    const ImageViewRGB32& original_image,
+    const WaterfillObject& object
+) const{
 
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         cout << "rmsd_original()" << endl;
@@ -172,7 +180,10 @@ double WaterfillTemplateMatcher::rmsd_original(const ImageViewRGB32& original_im
         return 99999.;
     }
 
-    double rmsd = this->rmsd(extract_box_reference(original_image, object));
+    double rmsd = this->rmsd(
+        input_resolution,
+        extract_box_reference(original_image, object)
+    );
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         cout << "Passed aspect and area ratio check, rmsd = " << rmsd << endl;
     }

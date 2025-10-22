@@ -74,10 +74,11 @@ std::pair<PackedBinaryMatrix, size_t> remove_center_pixels(
 }
 
 bool match_template_by_waterfill(
-    const ImageViewRGB32 &image,
-    const ImageMatch::WaterfillTemplateMatcher &matcher,
-    const std::vector<std::pair<uint32_t, uint32_t>> &filters,
-    const std::pair<size_t, size_t> &area_thresholds,
+    Resolution input_resolution,
+    const ImageViewRGB32& image,
+    const ImageMatch::WaterfillTemplateMatcher& matcher,
+    const std::vector<std::pair<uint32_t, uint32_t>>& filters,
+    const std::pair<size_t, size_t>& area_thresholds,
     double rmsd_threshold,
     std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object)
 {
@@ -133,12 +134,13 @@ bool match_template_by_waterfill(
             if (object.area > area_thresholds.second){
                 continue;
             }
-            double rmsd = matcher.rmsd_original(image, object);
+            double rmsd = matcher.rmsd_original(input_resolution, image, object);
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
                 std::cout << "Object rmsd: " << rmsd << std::endl;
             }
 
             if (rmsd < rmsd_threshold){
+//                std::cout << "Object rmsd: " << rmsd << std::endl;
                 detected = true;
                 
                 if (check_matched_object(object)){

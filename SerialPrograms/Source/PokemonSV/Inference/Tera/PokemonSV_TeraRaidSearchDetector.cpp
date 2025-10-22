@@ -64,7 +64,7 @@ bool TeraRaidSearchDetector::detect_search_location(ImageFloatBox& box, const Im
 //        cout << "yellow = " << object.area << endl;
 //        extract_box_reference(screen, object).save("object-" + std::to_string(c++) + ".png");
 //        yellows.emplace_back(std::move(object));
-        double rmsd = MATCHER.rmsd(extract_box_reference(screen, object));
+        double rmsd = MATCHER.rmsd(screen.size(), extract_box_reference(screen, object));
 //        cout << "rmsd = " << rmsd << endl;
         if (rmsd < 100){
 

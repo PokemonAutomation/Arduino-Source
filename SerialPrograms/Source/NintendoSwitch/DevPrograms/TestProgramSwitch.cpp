@@ -146,6 +146,7 @@
 #include "PokemonLGPE/Inference/Battles/PokemonLGPE_BattleArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
+#include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 
 
 
@@ -274,6 +275,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
 //    using namespace PokemonSV;
+    using namespace PokemonLZA;
 
     [[maybe_unused]] Logger& logger = env.logger();
     [[maybe_unused]] ConsoleHandle& console = env.consoles[0];
@@ -284,7 +286,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    while (true){
+        sit_on_bench(console, context);
+    }
 
+
+
+#if 0
     while (true){
         ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
         ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
@@ -293,7 +301,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         pbf_press_button(context, BUTTON_X, 80ms, 24ms);
         pbf_press_button(context, BUTTON_B, 80ms, 24ms);
     }
-
+#endif
 
 
 #if 0

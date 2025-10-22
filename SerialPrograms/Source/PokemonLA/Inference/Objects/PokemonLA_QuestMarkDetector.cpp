@@ -63,7 +63,11 @@ QuestMarkDetector::QuestMarkDetector()
         }
     )
 {}
-void QuestMarkDetector::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
+void QuestMarkDetector::process_object(
+    Resolution input_resolution,
+    const ImageViewRGB32& image,
+    const WaterfillObject& object
+){
     ImagePixelBox object_box;
     if (QuestMarkMatcher::instance().matches(object_box, image, object)){
         m_detections.emplace_back(object_box);

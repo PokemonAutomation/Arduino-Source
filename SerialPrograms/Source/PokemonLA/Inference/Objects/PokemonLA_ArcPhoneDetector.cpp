@@ -45,7 +45,11 @@ ArcPhoneTracker::ArcPhoneTracker()
     )
 {}
 
-void ArcPhoneTracker::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
+void ArcPhoneTracker::process_object(
+    Resolution input_resolution,
+    const ImageViewRGB32& image,
+    const WaterfillObject& object
+){
 //    cout << "asdf" << endl;
 //    static int c = 0;
 //    cout << "c = " << c << endl;
@@ -60,7 +64,7 @@ void ArcPhoneTracker::process_object(const ImageViewRGB32& image, const Waterfil
 
 //    cout << (double)object.width() / image.width() << endl;
 
-    double rmsd = ArcPhoneMatcher::instance().rmsd_original(image, object);
+    double rmsd = ArcPhoneMatcher::instance().rmsd_original(input_resolution, image, object);
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd < 80){
 //        cout << "rmsd = " << rmsd << endl;

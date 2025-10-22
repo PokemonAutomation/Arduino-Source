@@ -103,6 +103,7 @@ std::pair<double, double> OverworldDetector::locate_ball(const ImageViewRGB32& s
     ImageViewRGB32 cropped = extract_box_reference(screen, m_ball);
     ImagePixelBox pixel_box = floatbox_to_pixelbox(screen.width(), screen.height(), m_ball);
     match_template_by_waterfill(
+        screen.size(),
         cropped, 
         RadarBallMatcher::instance(),
         filters,

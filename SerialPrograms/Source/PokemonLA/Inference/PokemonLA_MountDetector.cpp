@@ -58,17 +58,17 @@ ImageRGB32 make_MountMatcher2Image(const char* path){
         ImageViewRGB32 cropped = extract_box_reference(image, object);
 //        cropped.save("test-" + std::to_string(c++) + ".png");
 
-        double current_rmsd_plus = ButtonMatcher::Plus().rmsd_precropped(cropped, object);
+        double current_rmsd_plus = ButtonMatcher::Plus().rmsd_precropped(image.size(), cropped, object);
         if (rmsd_plus > current_rmsd_plus){
             rmsd_plus = current_rmsd_plus;
             plus = object;
         }
-        double current_rmsd_arrowL = ButtonMatcher::ArrowLeft().rmsd_precropped(cropped, object);
+        double current_rmsd_arrowL = ButtonMatcher::ArrowLeft().rmsd_precropped(image.size(), cropped, object);
         if (rmsd_arrowL > current_rmsd_arrowL){
             rmsd_arrowL = current_rmsd_arrowL;
             arrowL = object;
         }
-        double current_rmsd_arrowR = ButtonMatcher::ArrowRight().rmsd_precropped(cropped, object);
+        double current_rmsd_arrowR = ButtonMatcher::ArrowRight().rmsd_precropped(image.size(), cropped, object);
         if (rmsd_arrowR > current_rmsd_arrowR){
             rmsd_arrowR = current_rmsd_arrowR;
             arrowR = object;
@@ -430,19 +430,19 @@ MountState MountDetector::detect(const ImageViewRGB32& screen) const{
 
 
                 //  Read the buttons.
-                double current_rmsd_plus = ButtonMatcher::Plus().rmsd_precropped(cropped, object);
+                double current_rmsd_plus = ButtonMatcher::Plus().rmsd_precropped(screen.size(), cropped, object);
                 if (rmsd_plus > current_rmsd_plus){
                     rmsd_plus = current_rmsd_plus;
                     plus = object;
                 }
 //                cout << "Arrow (left)" << endl;
-                double current_rmsd_arrowL = ButtonMatcher::ArrowLeft().rmsd_precropped(cropped, object);
+                double current_rmsd_arrowL = ButtonMatcher::ArrowLeft().rmsd_precropped(screen.size(), cropped, object);
                 if (rmsd_arrowL > current_rmsd_arrowL){
                     rmsd_arrowL = current_rmsd_arrowL;
                     arrowL = object;
                 }
 //                cout << "Arrow (right)" << endl;
-                double current_rmsd_arrowR = ButtonMatcher::ArrowRight().rmsd_precropped(cropped, object);
+                double current_rmsd_arrowR = ButtonMatcher::ArrowRight().rmsd_precropped(screen.size(), cropped, object);
 //                cout << "rmsd_arrowR = " << rmsd_arrowR << endl;
                 if (rmsd_arrowR > current_rmsd_arrowR){
                     rmsd_arrowR = current_rmsd_arrowR;
@@ -459,16 +459,16 @@ MountState MountDetector::detect(const ImageViewRGB32& screen) const{
 
                 ImageViewRGB32 filtered_cropped = extract_box_reference(filtered.image, object);
 #if 1
-                candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd_precropped(filtered_cropped, object), MountState::WYRDEER_OFF);
-                candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd_precropped(cropped         , object), MountState::WYRDEER_OFF);
-                candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd_precropped(filtered_cropped, object), MountState::URSALUNA_OFF);
-                candidates.add_direct  (MountUrsalunaMatcher     ::off().rmsd_precropped(cropped         , object), MountState::URSALUNA_OFF);
-                candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd_precropped(filtered_cropped, object), MountState::BASCULEGION_OFF);
-                candidates.add_direct  (MountBasculegionMatcher  ::off().rmsd_precropped(cropped         , object), MountState::BASCULEGION_OFF);
-                candidates.add_filtered(MountSneaslerMatcher     ::off().rmsd_precropped(filtered_cropped, object), MountState::SNEASLER_OFF);
-                candidates.add_direct  (MountSneaslerMatcher     ::off().rmsd_precropped(cropped         , object), MountState::SNEASLER_OFF);
-                candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd_precropped(filtered_cropped, object), MountState::BRAVIARY_OFF);
-                candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd_precropped(cropped         , object), MountState::BRAVIARY_OFF);
+                candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd_precropped(screen.size(), filtered_cropped, object), MountState::WYRDEER_OFF);
+                candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd_precropped(screen.size(), cropped         , object), MountState::WYRDEER_OFF);
+                candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd_precropped(screen.size(), filtered_cropped, object), MountState::URSALUNA_OFF);
+                candidates.add_direct  (MountUrsalunaMatcher     ::off().rmsd_precropped(screen.size(), cropped         , object), MountState::URSALUNA_OFF);
+                candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd_precropped(screen.size(), filtered_cropped, object), MountState::BASCULEGION_OFF);
+                candidates.add_direct  (MountBasculegionMatcher  ::off().rmsd_precropped(screen.size(), cropped         , object), MountState::BASCULEGION_OFF);
+                candidates.add_filtered(MountSneaslerMatcher     ::off().rmsd_precropped(screen.size(), filtered_cropped, object), MountState::SNEASLER_OFF);
+                candidates.add_direct  (MountSneaslerMatcher     ::off().rmsd_precropped(screen.size(), cropped         , object), MountState::SNEASLER_OFF);
+                candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd_precropped(screen.size(), filtered_cropped, object), MountState::BRAVIARY_OFF);
+                candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd_precropped(screen.size(), cropped         , object), MountState::BRAVIARY_OFF);
 #endif
 
             }
@@ -548,16 +548,16 @@ MountState MountDetector::detect(const ImageViewRGB32& screen) const{
                 ImageViewRGB32 cropped = extract_box_reference(image, object);
                 ImageViewRGB32 filtered_cropped = extract_box_reference(filtered.image, object);
 #if 1
-                candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(filtered_cropped), MountState::WYRDEER_ON);
-                candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(cropped         ), MountState::WYRDEER_ON);
-                candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(filtered_cropped), MountState::URSALUNA_ON);
-                candidates.add_direct  (MountUrsalunaMatcher     ::on().rmsd(cropped         ), MountState::URSALUNA_ON);
-                candidates.add_filtered(MountBasculegionMatcher  ::on().rmsd(filtered_cropped), MountState::BASCULEGION_ON);
-                candidates.add_direct  (MountBasculegionMatcher  ::on().rmsd(cropped         ), MountState::BASCULEGION_ON);
-                candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(filtered_cropped), MountState::SNEASLER_ON);
-                candidates.add_direct  (MountSneaslerMatcher     ::on().rmsd(cropped         ), MountState::SNEASLER_ON);
-                candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered_cropped), MountState::BRAVIARY_ON);
-                candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(cropped         ), MountState::BRAVIARY_ON);
+                candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(screen.size(), filtered_cropped), MountState::WYRDEER_ON);
+                candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(screen.size(), cropped         ), MountState::WYRDEER_ON);
+                candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(screen.size(), filtered_cropped), MountState::URSALUNA_ON);
+                candidates.add_direct  (MountUrsalunaMatcher     ::on().rmsd(screen.size(), cropped         ), MountState::URSALUNA_ON);
+                candidates.add_filtered(MountBasculegionMatcher  ::on().rmsd(screen.size(), filtered_cropped), MountState::BASCULEGION_ON);
+                candidates.add_direct  (MountBasculegionMatcher  ::on().rmsd(screen.size(), cropped         ), MountState::BASCULEGION_ON);
+                candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(screen.size(), filtered_cropped), MountState::SNEASLER_ON);
+                candidates.add_direct  (MountSneaslerMatcher     ::on().rmsd(screen.size(), cropped         ), MountState::SNEASLER_ON);
+                candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(screen.size(), filtered_cropped), MountState::BRAVIARY_ON);
+                candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(screen.size(), cropped         ), MountState::BRAVIARY_ON);
 #endif
 //                extract_box(image, object).save("test-" + std::to_string(i) + ".png");
 //                i++;

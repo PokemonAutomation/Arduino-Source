@@ -105,7 +105,11 @@ FlagDetector::FlagDetector()
         }
     )
 {}
-void FlagDetector::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
+void FlagDetector::process_object(
+    Resolution input_resolution,
+    const ImageViewRGB32& image,
+    const WaterfillObject& object
+){
 //    cout << "FlagDetector::process_object()" << endl;
     if (object.area < 50){
         return;
@@ -234,13 +238,17 @@ std::vector<std::pair<int, DigitMatcher>> make_digit_matchers(){
 }
 
 
-std::pair<double, int> read_digit(const ImageViewRGB32& image, const WaterfillObject& object){
+std::pair<double, int> read_digit(
+    Resolution input_resolution,
+    const ImageViewRGB32& image,
+    const WaterfillObject& object
+){
     static const std::vector<std::pair<int, DigitMatcher>> MATCHERS = make_digit_matchers();
     double best_rmsd = 99999;
     int best_digit = -1;
     for (const auto& item : MATCHERS){
 //        cout << item.first << " : " <<  << endl;
-        double rmsd = item.second.rmsd_original(image, object);
+        double rmsd = item.second.rmsd_original(input_resolution, image, object);
         if (best_rmsd > rmsd){
             best_rmsd = rmsd;
             best_digit = item.first;
@@ -307,7 +315,7 @@ int read_flag_distance(const ImageViewRGB32& screen, double flag_x, double flag_
 //                static int c = 0;
 //                extract_box_reference(image, object).save("image-" + std::to_string(c++) + ".png");
 
-                std::pair<double, int> digit = read_digit(image, object);
+                std::pair<double, int> digit = read_digit(screen.size(), image, object);
                 if (digit.second >= 0){
                     hits.emplace(
                         object.min_x,

@@ -17,7 +17,7 @@ namespace PokemonLA{
 
 namespace{
 
-const char* templatePath(ButtonType type){
+const char* template_path(ButtonType type){
     switch (type){
     case ButtonType::ButtonA:
         return "PokemonLA/Buttons/ButtonA-Template.png";
@@ -55,7 +55,7 @@ const char* button_name(ButtonType type){
     }
 }
 
-const ButtonMatcher& getButtonMatcher(ButtonType type){
+const ButtonMatcher& get_button_matcher(ButtonType type){
     switch (type){
     case ButtonType::ButtonA:
         return ButtonMatcher::A();
@@ -76,12 +76,15 @@ const ButtonMatcher& getButtonMatcher(ButtonType type){
 
 }
 
-ButtonMatcher::ButtonMatcher(ButtonType type, size_t min_width, size_t max_width, double max_rmsd)
+ButtonMatcher::ButtonMatcher(ButtonType type, size_t min_width, size_t min_height, double max_rmsd)
     : WaterfillTemplateMatcher(
-        templatePath(type), Color(0xff808008), Color(0xffffffff), 100
+        template_path(type),
+        Color(0xff808008),
+        Color(0xffffffff),
+        100
     )
     , m_min_width(min_width)
-    , m_min_height(max_width)
+    , m_min_height(min_height)
     , m_max_rmsd(max_rmsd)
 {}
 const ButtonMatcher& ButtonMatcher::A(){
@@ -125,17 +128,25 @@ ButtonTracker::ButtonTracker(ButtonType type)
             Color(0xffd0d0d0),
         }
     )
-    , m_matcher(getButtonMatcher(type))
+    , m_matcher(get_button_matcher(type))
 {}
 
-void ButtonTracker::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
+void ButtonTracker::process_object(
+    Resolution input_resolution,
+    const ImageViewRGB32& image,
+    const WaterfillObject& object
+){
 //    cout << "asdf" << endl;
 //    static int c = 0;
 //    extract_box(image, object).save("test-" + std::to_string(c++) + ".png");
 //    image.save("test-" + std::to_string(c++) + "-A.png");
 //    extract_box(image, object).save("test-" + std::to_string(c++) + "-B.png");
 
-    double rmsd = m_matcher.rmsd_precropped(extract_box_reference(image, object), object);
+    double rmsd = m_matcher.rmsd_precropped(
+        input_resolution,
+        extract_box_reference(image, object),
+        object
+    );
 //    cout << "rmsd = " << rmsd << endl;
 //    cout << "max = " << m_matcher.m_max_rmsd << endl;
     if (rmsd < m_matcher.m_max_rmsd){
