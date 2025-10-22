@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_BeldumHunter_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
@@ -35,6 +36,8 @@ private:
 
 private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
+    BooleanCheckBoxOption TAKE_VIDEO;
 
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_STATUS;
