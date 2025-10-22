@@ -1,0 +1,191 @@
+/*  Beldum Hunter
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLZA/PokemonLZA_Settings.h"
+#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLZA_BeldumHunter.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLZA{
+
+using namespace Pokemon;
+
+BeldumHunter_Descriptor::BeldumHunter_Descriptor()
+    : SingleSwitchProgramDescriptor(
+        "PokemonLZA:BeldumHunter",
+        STRING_POKEMON + " LZA", "Beldum Hunter",
+        "Programs/PokemonLZA/BeldumHunter.html",
+        "Reset in Lysandre Labs to shiny hunt Beldum.",
+        ProgramControllerClass::StandardController_NoRestrictions,
+        FeedbackType::VIDEO_AUDIO,
+        AllowCommandsWhenRunning::DISABLE_COMMANDS
+    )
+{}
+class BeldumHunter_Descriptor::Stats : public StatsTracker, public PokemonLA::ShinyStatIncrementer{
+public:
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , errors(m_stats["Errors"])
+        , shinies(m_stats["Shinies"])
+    {
+        m_display_order.emplace_back("Attempts");
+        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Shinies");
+    }
+    virtual void add_shiny() override{
+        shinies++;
+    }
+
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& shinies;
+};
+std::unique_ptr<StatsTracker> BeldumHunter_Descriptor::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+
+BeldumHunter::BeldumHunter()
+    : NOTIFICATION_SHINY(
+        "Shiny Found",
+        true, true, ImageAttachmentMode::JPG,
+        {"Notifs", "Showcase"}
+    )
+    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_SHINY,
+        &NOTIFICATION_STATUS,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_RECOVERABLE,
+        &NOTIFICATION_ERROR_FATAL,
+    })
+{
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    PA_ADD_OPTION(NOTIFICATIONS);
+}
+
+bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    BeldumHunter_Descriptor::Stats& stats = env.current_stats<BeldumHunter_Descriptor::Stats>();
+    stats.attempts++;
+
+    float shiny_coefficient = 1.0;
+    PokemonLA::ShinySoundDetector shiny_detector(env.logger(), [&](float error_coefficient) -> bool{
+        shiny_coefficient = error_coefficient;
+        return true;
+    });
+
+    int res = run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context) {
+        BlackScreenOverWatcher warped(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
+
+        env.log("Using warp panel.");
+        pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            env.console, context,
+            8000ms,
+            {{warped}}
+        );
+        if (ret == 0){
+            env.log("Successful warp.");
+        }else{
+            env.log("Failed to warp.");
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Failed to warp.",
+                env.console
+            );
+        }
+        pbf_wait(context, 1000ms);
+        context.wait_for_all_requests();
+
+        env.log("Into the Houndoom room.");
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 255, 128, 128, 128, 80);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, 60);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 255, 128, 128, 128, 140);
+
+        env.log("Through the room and down the hallway.");
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, 210);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 340);
+
+        env.log("Final hallway to Beldum room.");
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, 350);
+
+        },
+        {{shiny_detector}}
+    );
+    shiny_detector.throw_if_no_sound();
+
+    if (res == 0){
+        env.log("Shiny detected!");
+        return true;
+    }
+
+    env.console.log("No shiny detected. Resetting.");
+
+    pbf_press_button(context, BUTTON_HOME, 160ms, 3000ms);
+    reset_game_from_home(env, env.console, context, false);
+
+    return false;
+}
+
+
+void BeldumHunter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    BeldumHunter_Descriptor::Stats& stats = env.current_stats<BeldumHunter_Descriptor::Stats>();
+
+    /*
+    * Setup: Clear out the Noivern, Houndour, and Houndoom spawns.
+    * Use the warp panel near the Noivern and save the game.
+    * 
+    * Program will use the warp panel and then run to the Beldum room.
+    * No shiny, reset the game. Repeat.
+    * On warp the Beldum will reroll. We reset the game instead of running back to the panel
+    * to prevent the wild Pokemon from respawning.
+    */
+
+    while (true){
+        env.update_stats();
+        send_program_status_notification(env, NOTIFICATION_STATUS);
+        try{
+            bool shiny_found = run_iteration(env, context);
+            if (shiny_found) {
+                stats.shinies++;
+                env.update_stats();
+                send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
+                break;
+            }
+        }catch (OperationFailedException& e){
+            stats.errors++;
+            e.send_notification(env, NOTIFICATION_ERROR_RECOVERABLE);
+
+            pbf_press_button(context, BUTTON_HOME, 160ms, 3000ms);
+            reset_game_from_home(env, env.console, context, false);
+        }
+    }
+
+    env.update_stats();
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+}
+
+
+
+}
+}
+}

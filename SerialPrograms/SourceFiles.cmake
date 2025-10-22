@@ -1553,6 +1553,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Settings.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_BeldumHunter.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_BeldumHunter.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
