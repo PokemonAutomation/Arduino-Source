@@ -62,7 +62,8 @@ std::unique_ptr<StatsTracker> BeldumHunter_Descriptor::make_stats() const{
 
 
 BeldumHunter::BeldumHunter()
-    : NOTIFICATION_SHINY(
+    : TAKE_VIDEO("<b>Take Video:</b>", LockMode::UNLOCK_WHILE_RUNNING, true)
+    , NOTIFICATION_SHINY(
         "Shiny Found",
         true, true, ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
@@ -77,36 +78,36 @@ BeldumHunter::BeldumHunter()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     BeldumHunter_Descriptor::Stats& stats = env.current_stats<BeldumHunter_Descriptor::Stats>();
     stats.attempts++;
+    {
+        float shiny_coefficient = 1.0;
+        PokemonLA::ShinySoundDetector shiny_detector(env.logger(), [&](float error_coefficient) -> bool {
+            shiny_coefficient = error_coefficient;
+            return true;
+            });
 
-    float shiny_coefficient = 1.0;
-    PokemonLA::ShinySoundDetector shiny_detector(env.logger(), [&](float error_coefficient) -> bool{
-        shiny_coefficient = error_coefficient;
-        return true;
-    });
+        BlackScreenOverWatcher entered(COLOR_RED, { 0.074, 0.044, 0.826, 0.278 });
 
-    int res = run_until<ProControllerContext>(
-        env.console, context,
-        [&](ProControllerContext& context) {
-        BlackScreenOverWatcher warped(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
-
-        env.log("Using warp panel.");
-        pbf_press_button(context, BUTTON_A, 40ms, 40ms);
+        env.log("Entering the lab.");
         context.wait_for_all_requests();
-        int ret = wait_until(
+        int ret = run_until<ProControllerContext>(
             env.console, context,
-            8000ms,
-            {{warped}}
-        );
-        if (ret == 0){
-            env.log("Successful warp.");
-        }else{
-            env.log("Failed to warp.");
+            [&](ProControllerContext& context) {
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 100);
+                pbf_wait(context, 5000ms);
+            },
+            { {entered} }
+            );
+        if (ret == 0) {
+            env.log("Entered the lab.");
+        } else {
+            env.log("Failed to enter the lab.");
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "Failed to warp.",
@@ -116,28 +117,40 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
         pbf_wait(context, 1000ms);
         context.wait_for_all_requests();
 
-        env.log("Into the Houndoom room.");
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 255, 128, 128, 128, 80);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, 60);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 255, 128, 128, 128, 140);
+        int res = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context) {
 
-        env.log("Through the room and down the hallway.");
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, 210);
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 340);
+                env.log("Go straight toward the elevator.");
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 460);
 
-        env.log("Final hallway to Beldum room.");
-        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, 350);
+                env.log("Go left to where the Noivern spawns, then forward and then left.");
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 300);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 80);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 180);
 
-        },
-        {{shiny_detector}}
-    );
-    shiny_detector.throw_if_no_sound();
+                env.log("Through the Houndoom room and down the hallway.");
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, 140);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 200);
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, 340);
 
-    if (res == 0){
-        env.log("Shiny detected!");
-        return true;
+                env.log("Final hallway to Beldum room.");
+                pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, 350);
+
+            },
+            { {shiny_detector} }
+            );
+        shiny_detector.throw_if_no_sound();
+
+        if (res == 0) {
+            env.log("Shiny detected!");
+            if (TAKE_VIDEO) {
+                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            }
+
+            return true;
+        }
     }
-
     env.console.log("No shiny detected. Resetting.");
 
     pbf_press_button(context, BUTTON_HOME, 160ms, 3000ms);
@@ -151,13 +164,13 @@ void BeldumHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCon
     BeldumHunter_Descriptor::Stats& stats = env.current_stats<BeldumHunter_Descriptor::Stats>();
 
     /*
-    * Setup: Clear out the Noivern, Houndour, and Houndoom spawns.
-    * Use the warp panel near the Noivern and save the game.
+    * Setup: Face the opening to the labs. Save the game.
     * 
-    * Program will use the warp panel and then run to the Beldum room.
+    * Program will enter the Labs and then run to the Beldum room.
     * No shiny, reset the game. Repeat.
-    * On warp the Beldum will reroll. We reset the game instead of running back to the panel
-    * to prevent the wild Pokemon from respawning.
+    * Every time we enter the Beldum will reroll. We reset the game instead of running back
+    * due to the wild Pokemon spawns.
+    * This can also hunt Noivern, Houndour, and Houndoom.
     */
 
     while (true){
@@ -168,7 +181,9 @@ void BeldumHunter::program(SingleSwitchProgramEnvironment& env, ProControllerCon
             if (shiny_found) {
                 stats.shinies++;
                 env.update_stats();
-                send_program_notification(env, NOTIFICATION_SHINY, COLOR_YELLOW, "Shiny found!", {}, "", env.console.video().snapshot(), true);
+                send_program_notification(env, NOTIFICATION_SHINY,
+                    COLOR_YELLOW, "Shiny sound detected!", {},
+                    "", env.console.video().snapshot(), true);
                 break;
             }
         }catch (OperationFailedException& e){
