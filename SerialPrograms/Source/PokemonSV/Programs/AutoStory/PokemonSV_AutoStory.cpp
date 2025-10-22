@@ -170,6 +170,66 @@ const StringSelectDatabase& MAINSTORY_SEGMENTS_SELECT_DATABASE(){
     return database;
 }
 
+std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_list(){
+    std::vector<std::unique_ptr<AutoStory_Checkpoint>> checkpoint_list;
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_90>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_91>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_92>());
+    return checkpoint_list;
+};
+
+const std::vector<std::unique_ptr<AutoStory_Checkpoint>>& ALL_AUTO_STORY_CHECKPOINT_LIST(){
+    static std::vector<std::unique_ptr<AutoStory_Checkpoint>> checkpoint_list = make_autoStory_checkpoint_list();
+    return checkpoint_list;
+}
+
+StringSelectDatabase make_all_checkpoints_database(){
+    StringSelectDatabase ret;
+    int index_num = 0;
+    for (const auto& segment : ALL_AUTO_STORY_CHECKPOINT_LIST()){
+        ret.add_entry(StringSelectEntry(std::to_string(index_num), segment->name()));
+        index_num++;
+    }
+    return ret;
+}
+const StringSelectDatabase& ALL_CHECKPOINTS_SELECT_DATABASE(){
+    static StringSelectDatabase database = make_all_checkpoints_database();
+    return database;
+}
+
+StringSelectDatabase make_tutorial_checkpoints_database(){
+    StringSelectDatabase ret;
+    const StringSelectDatabase& all_segments = ALL_CHECKPOINTS_SELECT_DATABASE();
+    size_t start = 0;
+    size_t end = all_segments.case_list().size(); // INDEX_OF_LAST_TUTORIAL_SEGMENT + 1;
+    for (size_t i = start; i < end; i++){
+        const auto& segment = all_segments[i];
+        ret.add_entry(segment);
+    }
+    return ret;
+}
+
+const StringSelectDatabase& TUTORIAL_CHECKPOINTS_SELECT_DATABASE(){
+    static StringSelectDatabase database = make_tutorial_checkpoints_database();
+    return database;
+}
+
+StringSelectDatabase make_mainstory_checkpoints_database(){
+    StringSelectDatabase ret;
+    const StringSelectDatabase& all_segments = ALL_CHECKPOINTS_SELECT_DATABASE();
+    size_t start = 0; // INDEX_OF_LAST_TUTORIAL_SEGMENT + 1;
+    size_t end = all_segments.case_list().size();
+    for (size_t i = start; i < end; i++){
+        const auto& segment = all_segments[i];
+        ret.add_entry(segment);
+    }
+    return ret;
+}
+
+const StringSelectDatabase& MAINSTORY_CHECKPOINTS_SELECT_DATABASE(){
+    static StringSelectDatabase database = make_mainstory_checkpoints_database();
+    return database;
+}
 
 AutoStory_Descriptor::AutoStory_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -222,29 +282,53 @@ AutoStory::AutoStory()
         StorySection::TUTORIAL
     )    
     , STARTPOINT_TUTORIAL(
-        "<b>Start Point:</b>", //<br>Program will start with this segment.
+        "<b>Start Segment:</b>", //<br>Program will start with this segment.
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
         LockMode::LOCK_WHILE_RUNNING,
         "0"
     )
     , ENDPOINT_TUTORIAL(
-        "<b>End Point:</b>", //<br>Program will stop after completing this segment.
+        "<b>End Segment:</b>", //<br>Program will stop after completing this segment.
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         "9"
     )   
     , STARTPOINT_MAINSTORY(
-        "<b>Start Point:</b>", //<br>Program will start with this segment.
+        "<b>Start Segment:</b>", //<br>Program will start with this segment.
         MAINSTORY_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         "10"
     )
     , ENDPOINT_MAINSTORY(
-        "<b>End Point:</b>", //<br>Program will stop after completing this segment.
+        "<b>End Segment:</b>", //<br>Program will stop after completing this segment.
         MAINSTORY_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
         "10"
     )       
+    , START_CHECKPOINT_TUTORIAL(
+        "<b>Start Checkpoint:</b>", //<br>Program will start with this checkpoint.
+        TUTORIAL_CHECKPOINTS_SELECT_DATABASE(),
+        LockMode::LOCK_WHILE_RUNNING,
+        "0"
+    )
+    , END_CHECKPOINT_TUTORIAL(
+        "<b>End Checkpoint:</b>", //<br>Program will stop after completing this checkpoint.
+        TUTORIAL_CHECKPOINTS_SELECT_DATABASE(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "2" //TODO: update this
+    ) 
+    , START_CHECKPOINT_MAINSTORY(
+        "<b>Start Checkpoint:</b>", //<br>Program will start with this checkpoint.
+        MAINSTORY_CHECKPOINTS_SELECT_DATABASE(),
+        LockMode::LOCK_WHILE_RUNNING,
+        "0" //TODO: update this
+    )
+    , END_CHECKPOINT_MAINSTORY(
+        "<b>End Checkpoint:</b>", //<br>Program will stop after completing this checkpoint.
+        MAINSTORY_CHECKPOINTS_SELECT_DATABASE(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        "2" //TODO: update this
+    ) 
     , SETUP_NOTE{
         "NOTE: Make sure you have selected the correct Start Point. "
         "Make sure your player character is in the exact correct start position for that Start Point, "
@@ -516,6 +600,10 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(ENDPOINT_MAINSTORY);
     PA_ADD_OPTION(END_DESCRIPTION);
     PA_ADD_OPTION(STARTERCHOICE);
+
+    PA_ADD_OPTION(START_CHECKPOINT_TUTORIAL);
+    PA_ADD_OPTION(END_CHECKPOINT_TUTORIAL);
+
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 
@@ -799,7 +887,7 @@ std::string AutoStory::start_segment_description(){
     }else if (STORY_SECTION == StorySection::MAIN_STORY){
         segment_index = STARTPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1);
     }
-    return ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->start_text();
+    return "    " + ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->start_text();
 }
 
 std::string AutoStory::end_segment_description(){
@@ -809,7 +897,7 @@ std::string AutoStory::end_segment_description(){
     }else if (STORY_SECTION == StorySection::MAIN_STORY){
         segment_index = ENDPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1);
     }    
-    return ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->end_text();
+    return "    " + ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->end_text();
 }
 
 size_t AutoStory::get_start_segment_index(){
