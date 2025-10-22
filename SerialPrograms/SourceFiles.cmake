@@ -1545,6 +1545,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
+    Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp
+    Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h
     Source/PokemonLZA/PokemonLZA_Panels.cpp
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
@@ -1557,6 +1559,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.h
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_Bench.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_Bench.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
