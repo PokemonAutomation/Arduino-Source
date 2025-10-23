@@ -35,7 +35,7 @@ public:
     ShinyDetectedActionOption(
         std::string label, std::string description,
         std::string default_delay,
-        ShinyDetectedActionType default_action = ShinyDetectedActionType::STOP_AFTER_COUNT
+        ShinyDetectedActionType default_action = ShinyDetectedActionType::IGNORE
     );
 
     bool stop_on_shiny(uint8_t current_count) const;
@@ -48,6 +48,8 @@ public:
     BooleanCheckBoxOption TAKE_VIDEO;
     MillisecondsOption SCREENSHOT_DELAY;
     EventNotificationOption NOTIFICATIONS;
+
+    StaticTextOption NOTES;
 };
 
 

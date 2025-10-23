@@ -62,13 +62,7 @@ std::unique_ptr<StatsTracker> ShinyHunt_Bench_Descriptor::make_stats() const{
 
 
 ShinyHunt_Bench::ShinyHunt_Bench()
-    : SHINY_DETECTED(
-        "Shiny Detected",
-        "<font color=\"red\">The shiny sound plays on a smaller radius than the shiny spawn radius. "
-        "Therefore most shinies will be inaudible and will not be detected by this program. "
-        "You will still need to manually run around to see if any shinies spawned out-of-range.<\font>",
-        "2000ms"
-    )
+    : SHINY_DETECTED("Shiny Detected", "", "2000ms")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -79,7 +73,7 @@ ShinyHunt_Bench::ShinyHunt_Bench()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_STATIC(SHINY_DETECTED);
+    PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
