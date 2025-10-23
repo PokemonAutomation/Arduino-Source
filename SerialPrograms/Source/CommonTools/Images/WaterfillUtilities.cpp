@@ -140,7 +140,12 @@ bool match_template_by_waterfill(
             }
 
             if (rmsd < rmsd_threshold){
-//                std::cout << "Object rmsd: " << rmsd << std::endl;
+#if 0
+                std::cout << "Object rmsd: " << rmsd << std::endl;
+//                static int c = 0;
+//                extract_box_reference(image, object).save("match-" + std::to_string(c++) + ".png");
+#endif
+
                 detected = true;
                 
                 if (check_matched_object(object)){
