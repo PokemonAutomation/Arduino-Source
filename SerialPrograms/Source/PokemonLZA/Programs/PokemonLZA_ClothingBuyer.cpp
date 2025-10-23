@@ -80,7 +80,7 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerCo
             FlatWhiteDialogWatcher already_bought(COLOR_RED, &env.console.overlay());
             int ret = wait_until(
                 env.console, context,
-                std::chrono::seconds(2),
+                std::chrono::seconds(3),
                 { buy_yes_no, already_bought }
             );
             switch (ret) {
