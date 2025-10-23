@@ -14,6 +14,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA_RestaurantFarmer.h"
 
 namespace PokemonAutomation{
@@ -57,11 +58,17 @@ RestaurantFarmer::RestaurantFarmer(){}
 
 
 void RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-//    RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
+    RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
 
     while (true){
         context.wait_for_all_requests();
 
+        ButtonWatcher buttonA(
+            COLOR_RED,
+            ButtonType::ButtonA,
+            {0.1, 0.1, 0.8, 0.8},
+            &env.console.overlay()
+        );
         SelectionArrowWatcher arrow(
             COLOR_YELLOW, &env.console.overlay(),
             SelectionArrowType::RIGHT,
@@ -69,37 +76,55 @@ void RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         );
         FlatWhiteDialogWatcher dialog0(COLOR_RED, &env.console.overlay());
         BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay());
+        ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay());
 
         int ret = wait_until(
             env.console, context,
-            1000ms,
+            10000ms,
             {
+                buttonA,
                 arrow,
                 dialog0,
                 dialog1,
+                item_receive,
             }
         );
         context.wait_for(100ms);
 
         switch (ret){
         case 0:
+            env.log("Detected A button.");
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+            continue;
+
+        case 1:
             env.log("Detected selection arrow.");
             pbf_mash_button(context, BUTTON_A, 5000ms);
             return;
 
-        case 1:
+        case 2:
             env.log("Detected white dialog.");
             pbf_press_button(context, BUTTON_B, 160ms, 80ms);
             continue;
 
-        case 2:
+        case 3:
             env.log("Detected blue dialog.");
             pbf_press_button(context, BUTTON_B, 160ms, 80ms);
             continue;
 
-        default:
-            env.log("Detected nothing.");
+        case 4:
+            env.log("Detected item receive.");
             pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+            continue;
+
+        default:
+            stats.errors++;
+            env.update_stats();
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Battle took longer than 30 minutes.",
+                env.console
+            );
         }
     }
 }
@@ -114,7 +139,7 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         SelectionArrowType::RIGHT,
         {0.654308, 0.481553, 0.295529, 0.312621}
     );
-    ItemReceiveWatcher dialog0(COLOR_RED, &env.console.overlay(), 1000ms);
+    ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay(), 1000ms);
     BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay());
 
 
@@ -132,7 +157,7 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
         },
         {
             arrow,
-            dialog0,
+            item_receive,
             dialog1,
         }
     );

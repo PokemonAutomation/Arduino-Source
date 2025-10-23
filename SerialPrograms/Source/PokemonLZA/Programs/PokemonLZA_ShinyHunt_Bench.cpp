@@ -39,12 +39,14 @@ class ShinyHunt_Bench_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : resets(m_stats["Bench Sits"])
-        , shinies(m_stats["Shinies"])
+        , shinies(m_stats["Shinies Detected"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Bench Sits");
-        m_display_order.emplace_back("Shinies");
+        m_display_order.emplace_back("Shinies Detected");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+
+        m_aliases["Shinies"] = "Shinies Detected";
     }
 
     std::atomic<uint64_t>& resets;
@@ -63,7 +65,7 @@ ShinyHunt_Bench::ShinyHunt_Bench()
     : SHINY_DETECTED(
         "Shiny Detected",
         "<font color=\"red\">The shiny sound plays on a smaller radius than the shiny spawn radius. "
-        "Therefore some (if not most) of the shinies will be inaudible and will not be detected by this program. "
+        "Therefore most shinies will be inaudible and will not be detected by this program. "
         "You will still need to manually run around to see if any shinies spawned out-of-range.<\font>",
         "2000ms"
     )
