@@ -77,6 +77,12 @@ private:
     StringSelectOption STARTPOINT_MAINSTORY;
     StringSelectOption ENDPOINT_MAINSTORY;
 
+    StringSelectOption START_CHECKPOINT_TUTORIAL;
+    StringSelectOption END_CHECKPOINT_TUTORIAL;
+
+    StringSelectOption START_CHECKPOINT_MAINSTORY;
+    StringSelectOption END_CHECKPOINT_MAINSTORY;
+
     StaticTextOption SETUP_NOTE;
     StaticTextOption MAINSTORY_NOTE;
 

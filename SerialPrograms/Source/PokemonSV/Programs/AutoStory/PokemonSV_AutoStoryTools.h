@@ -95,6 +95,19 @@ public:
         AutoStoryStats& stats) const = 0;
 };
 
+class AutoStory_Checkpoint {
+public:
+    virtual ~AutoStory_Checkpoint() = default;
+    virtual std::string name() const = 0;
+    virtual std::string start_text() const = 0;
+    virtual std::string end_text() const = 0;
+    virtual void run_checkpoint(
+        SingleSwitchProgramEnvironment& env, 
+        ProControllerContext& context,
+        AutoStoryOptions options,
+        AutoStoryStats& stats) const = 0;
+};
+
 
 // press A to clear tutorial screens
 // throw exception if tutorial screen never detected
