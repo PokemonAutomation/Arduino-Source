@@ -122,7 +122,7 @@ void RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Battle took longer than 30 minutes.",
+                "run_lobby(): No recognized state after 60 seconds.",
                 env.console
             );
         }
