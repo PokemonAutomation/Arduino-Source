@@ -11,7 +11,7 @@
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options//TimeDurationOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
+//#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
@@ -22,29 +22,29 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
-enum class ShinyDetectedActionType{
-    IGNORE,
+enum class ShinySoundDetectedAction{
     STOP_PROGRAM,
-    STOP_AFTER_COUNT,
+    NOTIFY_ON_FIRST_ONLY,
+    NOTIFY_ON_ALL,
 };
 
 
-class ShinyDetectedActionOption : public GroupOption, public ConfigOption::Listener{
+class ShinySoundDetectedActionOption : public GroupOption, public ConfigOption::Listener{
 public:
-    ~ShinyDetectedActionOption();
-    ShinyDetectedActionOption(
+    ShinySoundDetectedActionOption(
         std::string label, std::string description,
         std::string default_delay,
-        ShinyDetectedActionType default_action = ShinyDetectedActionType::IGNORE
+        ShinySoundDetectedAction default_action
     );
 
-    bool stop_on_shiny(uint8_t current_count) const;
-
-    virtual void on_config_value_changed(void* object) override;
+    bool on_shiny_sound(
+        ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
+        size_t current_count,
+        float error_coefficient
+    );
 
     StaticTextOption DESCRIPTION;
-    EnumDropdownOption<ShinyDetectedActionType> ACTION;
-    SimpleIntegerOption<uint8_t> MAX_COUNT;
+    EnumDropdownOption<ShinySoundDetectedAction> ACTION;
     BooleanCheckBoxOption TAKE_VIDEO;
     MillisecondsOption SCREENSHOT_DELAY;
     EventNotificationOption NOTIFICATIONS;
@@ -52,14 +52,6 @@ public:
     StaticTextOption NOTES;
 };
 
-
-
-bool on_shiny_sound(
-    ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
-    ShinyDetectedActionOption& options,
-    uint8_t current_count,
-    float error_coefficient
-);
 
 
 

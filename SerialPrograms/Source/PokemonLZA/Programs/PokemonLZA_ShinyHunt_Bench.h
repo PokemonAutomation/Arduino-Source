@@ -37,7 +37,7 @@ public:
 private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
-    ShinyDetectedActionOption SHINY_DETECTED;
+    ShinySoundDetectedActionOption SHINY_DETECTED;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

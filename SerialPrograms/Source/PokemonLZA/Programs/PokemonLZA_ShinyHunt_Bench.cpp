@@ -8,6 +8,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -39,14 +40,15 @@ class ShinyHunt_Bench_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : resets(m_stats["Bench Sits"])
-        , shinies(m_stats["Shinies Detected"])
+        , shinies(m_stats["Shiny Sounds"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Bench Sits");
-        m_display_order.emplace_back("Shinies Detected");
+        m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 
-        m_aliases["Shinies"] = "Shinies Detected";
+        m_aliases["Shinies"] = "Shiny Sounds";
+        m_aliases["Shinies Detected"] = "Shiny Sounds";
     }
 
     std::atomic<uint64_t>& resets;
@@ -62,7 +64,11 @@ std::unique_ptr<StatsTracker> ShinyHunt_Bench_Descriptor::make_stats() const{
 
 
 ShinyHunt_Bench::ShinyHunt_Bench()
-    : SHINY_DETECTED("Shiny Detected", "", "2000ms")
+    : SHINY_DETECTED(
+        "Shiny Detected", "",
+        "2000ms",
+        ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -112,9 +118,12 @@ void ShinyHunt_Bench::program(SingleSwitchProgramEnvironment& env, ProController
         }
 
         shiny_count++;
-        if (on_shiny_sound(
+
+        //  Wait for the day/night transition to finish.
+        context.wait_for(std::chrono::milliseconds(2000));
+
+        if (SHINY_DETECTED.on_shiny_sound(
             env, env.console, context,
-            SHINY_DETECTED,
             shiny_count,
             shiny_coefficient
         )){
@@ -122,6 +131,7 @@ void ShinyHunt_Bench::program(SingleSwitchProgramEnvironment& env, ProController
         }
     }
 
+    go_home(env.console, context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 
 }
