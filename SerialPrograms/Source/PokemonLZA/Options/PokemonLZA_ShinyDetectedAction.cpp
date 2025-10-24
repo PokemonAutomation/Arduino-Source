@@ -58,16 +58,25 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
         ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
+    , NOTES(
+        "<font color=\"red\">"
+        "The shiny sound is not a reliable measure of shinies encountered. "
+        "First, the sound only plays on a smaller radius than the spawn radius, so the vast majority of shinies are inaudible. "
+        "Secondly, it may play multiple times for the same shiny, so it may overcount. "
+        "You will still need to manually run around to see if any shinies spawned out-of-range.<\font>"
+    )
 {
     if (!DESCRIPTION.text().empty()){
-        PA_ADD_OPTION(DESCRIPTION);
+        PA_ADD_STATIC(DESCRIPTION);
     }
     PA_ADD_OPTION(ACTION);
     PA_ADD_OPTION(MAX_COUNT);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(SCREENSHOT_DELAY);
 
-    on_config_value_changed(this);
+    PA_ADD_STATIC(NOTES);
+
+    ShinyDetectedActionOption::on_config_value_changed(this);
 
     ACTION.add_listener(*this);
 }

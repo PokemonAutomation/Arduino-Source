@@ -8,6 +8,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
@@ -73,7 +74,12 @@ void sit_on_bench(
         int ret = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 30000ms);
+                pbf_mash_button(context, BUTTON_A, 5000ms);
+                for (int c = 0; c < 3; c++){
+                    pbf_move_left_joystick(context, 128, 255, 1000ms, 0ms);
+                    pbf_mash_button(context, BUTTON_B, 1000ms);
+                    pbf_mash_button(context, BUTTON_A, 5000ms);
+                }
             },
             {black_screen}
         );
@@ -85,7 +91,7 @@ void sit_on_bench(
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "sit_on_bench(): No transition deteted after 30 seconds of mashing A.",
+                "sit_on_bench(): No transition detected after 4 attempts.",
                 console
             );
         }
