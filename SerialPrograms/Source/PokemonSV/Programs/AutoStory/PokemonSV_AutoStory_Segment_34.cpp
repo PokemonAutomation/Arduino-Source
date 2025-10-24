@@ -62,25 +62,23 @@ void AutoStory_Segment_34::run_segment(
 
 }
 
-static constexpr std::string segment_num = "34";
-
 std::string AutoStory_Checkpoint_90::name() const{ return "90 - " + AutoStory_Segment_34().name(); }
-std::string AutoStory_Checkpoint_90::start_text() const{ return segment_num + ": Beat Geeta. At Pokemon League Pokecenter.";}
-std::string AutoStory_Checkpoint_90::end_text() const{ return segment_num + ": Beat Nemona. At dormitory room, next to bed.";}
+std::string AutoStory_Checkpoint_90::start_text() const{ return "Beat Geeta. At Pokemon League Pokecenter.";}
+std::string AutoStory_Checkpoint_90::end_text() const{ return "Beat Nemona. At dormitory room, next to bed.";}
 void AutoStory_Checkpoint_90::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_90(env, context, options.notif_status_update, stats);
 }
 
 std::string AutoStory_Checkpoint_91::name() const{ return "91 - " + AutoStory_Segment_34().name(); }
 std::string AutoStory_Checkpoint_91::start_text() const{ return AutoStory_Checkpoint_90().end_text();}
-std::string AutoStory_Checkpoint_91::end_text() const{ return segment_num + ": Beat Penny. At Academy fly point.";}
+std::string AutoStory_Checkpoint_91::end_text() const{ return "Beat Penny. At Academy fly point.";}
 void AutoStory_Checkpoint_91::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_91(env, context, options.notif_status_update, stats);
 }
 
 std::string AutoStory_Checkpoint_92::name() const{ return "92 - " + AutoStory_Segment_34().name(); }
 std::string AutoStory_Checkpoint_92::start_text() const{ return AutoStory_Checkpoint_91().end_text();}
-std::string AutoStory_Checkpoint_92::end_text() const{ return segment_num + ": Beat Arven. At Los Platos Pokecenter.";}
+std::string AutoStory_Checkpoint_92::end_text() const{ return "Beat Arven. At Los Platos Pokecenter.";}
 void AutoStory_Checkpoint_92::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_92(env, context, options.notif_status_update, stats);
 }
