@@ -1561,8 +1561,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.h
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_Bench.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_Bench.h
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.h
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp

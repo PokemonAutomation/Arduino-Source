@@ -13,7 +13,8 @@
 #include "Programs/PokemonLZA_BeldumHunter.h"
 #include "Programs/PokemonLZA_ClothingBuyer.h"
 #include "Programs/PokemonLZA_RestaurantFarmer.h"
-#include "Programs/PokemonLZA_ShinyHunt_Bench.h"
+#include "Programs/PokemonLZA_ShinyHunt_BenchSit.h"
+#include "Programs/PokemonLZA_ShinyHunt_OverworldReset.h"
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
 
 namespace PokemonAutomation{
@@ -38,7 +39,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Shiny Hunting ----");
-        ret.emplace_back(make_single_switch_program<ShinyHunt_Bench_Descriptor, ShinyHunt_Bench>());
+        ret.emplace_back(make_single_switch_program<ShinyHunt_BenchSit_Descriptor, ShinyHunt_BenchSit>());
+        ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldReset_Descriptor, ShinyHunt_OverworldReset>());
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
     }
 

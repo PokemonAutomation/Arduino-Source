@@ -1,11 +1,11 @@
-/*  Shiny Hunt - Bench
+/*  Shiny Hunt - Bench Sit
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonLZA_ShinyHunt_Bench_H
-#define PokemonAutomation_PokemonLZA_ShinyHunt_Bench_H
+#ifndef PokemonAutomation_PokemonLZA_ShinyHunt_BenchSit_H
+#define PokemonAutomation_PokemonLZA_ShinyHunt_BenchSit_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -19,18 +19,18 @@ namespace PokemonLZA{
 
 
 
-class ShinyHunt_Bench_Descriptor : public SingleSwitchProgramDescriptor{
+class ShinyHunt_BenchSit_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    ShinyHunt_Bench_Descriptor();
+    ShinyHunt_BenchSit_Descriptor();
 
     class Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
-class ShinyHunt_Bench : public SingleSwitchProgramInstance{
+class ShinyHunt_BenchSit : public SingleSwitchProgramInstance{
 public:
-    ShinyHunt_Bench();
+    ShinyHunt_BenchSit();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
