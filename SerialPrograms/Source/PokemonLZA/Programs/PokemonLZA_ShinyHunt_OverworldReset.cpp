@@ -128,6 +128,7 @@ void ShinyHunt_OverworldReset::program(SingleSwitchProgramEnvironment& env, ProC
             },
             {{shiny_detector}}
         );
+        shiny_detector.throw_if_no_sound();
 
         if (ret < 0){
             continue;
