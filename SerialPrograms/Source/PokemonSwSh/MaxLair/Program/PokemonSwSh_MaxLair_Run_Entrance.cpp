@@ -39,12 +39,12 @@ void run_entrance(
 
     OverlayBoxScope box(stream.overlay(), {0.782, 0.850, 0.030, 0.050});
 
-    pbf_wait(context, 2 * TICKS_PER_SECOND);
+    pbf_wait(context, 2000ms);
     while (true){
         if (save_path){
-            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
         }else{
-            pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
         }
         context.wait_for_all_requests();
 

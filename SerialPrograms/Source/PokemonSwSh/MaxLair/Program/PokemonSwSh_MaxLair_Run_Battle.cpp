@@ -255,10 +255,10 @@ StateMachineAction run_move_select(
             //  If we had trouble selecting a move, then we're probably stuck in a self-target loop.
             //  Force target the opponent.
             stream.log("Force targeting opponent due to inability to select a move after multiple attempts...", COLOR_RED);
-            pbf_press_button(context, BUTTON_A, 20, 2 * TICKS_PER_SECOND);
-            pbf_press_dpad(context, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
+            pbf_press_button(context, BUTTON_A, 160ms, 2000ms);
+            pbf_press_dpad(context, DPAD_UP, 2000ms, 0ms);
         }
-        pbf_mash_button(context, BUTTON_A, 2 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_A, 2000ms);
         context.wait_for_all_requests();
 
 //        inference.stop();
@@ -268,7 +268,7 @@ StateMachineAction run_move_select(
         int result = run_until<ProControllerContext>(
             stream, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 5000ms);
             },
             {{detector}},
             INFERENCE_RATE
@@ -300,9 +300,10 @@ StateMachineAction run_move_select(
         state_tracker.push_update(console_index);
 
         //  Reset position.
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
-        pbf_press_dpad(context, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
-        pbf_press_dpad(context, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
+        pbf_mash_button(context, BUTTON_B, 2000ms);
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
+        pbf_press_dpad(context, DPAD_RIGHT, 2000ms, 0ms);
+        pbf_press_dpad(context, DPAD_UP, 2000ms, 0ms);
         state.move_slot = 0;
 
         inferred = state_tracker.infer_actual_state(console_index);
