@@ -52,6 +52,8 @@ public:
 
     size_t get_start_segment_index();
     size_t get_end_segment_index();
+    size_t get_start_checkpoint_index();
+    size_t get_end_checkpoint_index();
 
     void run_autostory(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
@@ -60,6 +62,8 @@ private:
 
     std::string start_segment_description();
     std::string end_segment_description();
+    std::string start_checkpoint_description();
+    std::string end_checkpoint_description();
 
 private:
     OCR::LanguageOCROption LANGUAGE;
@@ -88,6 +92,9 @@ private:
 
     StaticTextOption START_DESCRIPTION;
     StaticTextOption END_DESCRIPTION;
+
+    StaticTextOption START_CHECKPOINT_DESCRIPTION;
+    StaticTextOption END_CHECKPOINT_DESCRIPTION;
 
 
     EnumDropdownOption<StarterChoice> STARTERCHOICE;
