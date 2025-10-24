@@ -35,6 +35,7 @@ const std::map<std::string, std::string> STATS_DATABASE_ALIASES{
     {"Shiny Hunt Autonomous - Fishing", "PokemonSwSh:ShinyHuntAutonomousFishing"},
     {"Shiny Hunt Autonomous - Overworld", "PokemonSwSh:ShinyHuntAutonomousOverworld"},
     {"PokemonSV:StatsResetBloodmoon", "PokemonSV:StatsResetEventBattle"},
+    {"PokemonLZA:ShinyHunt-Bench", "PokemonLZA:ShinyHunt-BenchSit"},
 };
 
 
