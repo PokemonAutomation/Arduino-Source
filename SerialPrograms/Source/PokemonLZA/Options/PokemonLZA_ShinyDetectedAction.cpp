@@ -43,7 +43,7 @@ ShinySoundDetectedActionOption::ShinySoundDetectedActionOption(
     , SCREENSHOT_DELAY(
         "<b>Screenshot Delay:</b><br>"
         "Wait this long before taking a screenshot + video of the shiny.<br>"
-        "Set to zero to skip this. Don't set this too large or the shiny may run away!",
+        "Don't set this too large or the shiny may run away!",
         LockMode::UNLOCK_WHILE_RUNNING,
         std::move(default_delay)
     )

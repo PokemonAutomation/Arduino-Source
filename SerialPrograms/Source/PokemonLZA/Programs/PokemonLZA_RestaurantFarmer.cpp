@@ -59,7 +59,8 @@ RestaurantFarmer::~RestaurantFarmer(){
     STOP_AFTER_CURRENT.remove_listener(*this);
 }
 
-RestaurantFarmer::RestaurantFarmer(): m_stop_after_current(false)
+RestaurantFarmer::RestaurantFarmer()
+    : m_stop_after_current(false)
 {
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
     STOP_AFTER_CURRENT.set_idle();
@@ -77,11 +78,11 @@ RestaurantFarmer::StopButton::StopButton()
 {}
 void RestaurantFarmer::StopButton::set_idle(){
     this->set_enabled(false);
-    this->set_text("Stop after current battle");
+    this->set_text("Stop after Current Battle");
 }
 void RestaurantFarmer::StopButton::set_ready(){
     this->set_enabled(true);
-    this->set_text("Stop after current battle");
+    this->set_text("Stop after Current Battle");
 }
 void RestaurantFarmer::StopButton::set_pressed(){
     this->set_enabled(false);
