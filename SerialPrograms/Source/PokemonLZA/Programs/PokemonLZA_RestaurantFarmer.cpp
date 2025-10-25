@@ -91,7 +91,7 @@ void RestaurantFarmer::StopButton::set_pressed(){
 
 
 
-void RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
 
     while (true){
@@ -129,15 +129,17 @@ void RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         case 0:
             env.log("Detected A button.");
             if (m_stop_after_current.load(std::memory_order_relaxed)){
-                return;
+                return true;
             }
             pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             continue;
 
         case 1:
             env.log("Detected selection arrow.");
+            // This is when the restaurant receptionist is asking whether you want
+            // to start the battle
             pbf_mash_button(context, BUTTON_A, 5000ms);
-            return;
+            return false;
 
         case 2:
             env.log("Detected white dialog.");
@@ -256,8 +258,7 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
 //    auto lobby = env.console.video().snapshot();
 
     while (true){
-        run_lobby(env, context);
-        if (m_stop_after_current.load(std::memory_order_relaxed)){
+        if (run_lobby(env, context)){
             break;
         }
         run_battle(env, context);

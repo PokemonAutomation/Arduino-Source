@@ -47,7 +47,7 @@ private:
 
 
 
-
+// Common white dialog box
 class FlatWhiteDialogDetector : public StaticScreenDetector{
 public:
     FlatWhiteDialogDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);
@@ -80,7 +80,7 @@ public:
 };
 
 
-
+// Blue dialog box for when receiving an item
 class BlueDialogDetector : public StaticScreenDetector{
 public:
     BlueDialogDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);
@@ -113,7 +113,8 @@ public:
 };
 
 
-
+// A blue dialog box slightly bigger than BlueDialogDetector with item profile picture
+// that appears after BlueDialogDetector to show the item description.
 class ItemReceiveDetector : public StaticScreenDetector{
 public:
     ItemReceiveDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);

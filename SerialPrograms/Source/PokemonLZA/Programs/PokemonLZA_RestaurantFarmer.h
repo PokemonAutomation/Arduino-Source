@@ -46,7 +46,12 @@ private:
     std::atomic<bool> m_stop_after_current;
     StopButton STOP_AFTER_CURRENT;
 
-    void run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    // Handle all the logic of talking to the restaurant receptionist.
+    // Return true when the user clicks the button STOP_AFTER_CURRENT and the player character stops talking to
+    // the receptionist. Return false when it enters battle.
+    bool run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    // Handle all battle logic. Return when it detects the blue dialog box meaning the player character is at
+    // the receptionist receiving reward items.
     void run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 };
 
