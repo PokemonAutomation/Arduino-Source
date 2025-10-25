@@ -1555,6 +1555,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
+    Source/PokemonLZA/Programs/PokemonLZA_AutoFossil.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_BeldumHunter.cpp
