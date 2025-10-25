@@ -486,13 +486,7 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
 
 }
 
-
-void change_settings_prior_to_autostory(
-    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    size_t current_segment_num,
-    Language language
-){
-
+void change_settings_prior_to_autostory_segment_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t current_segment_num, Language language){
     // get index of `Options` in the Main Menu, which depends on where you are in Autostory
     int8_t options_index;  
     std::string assumption_text = "";
@@ -555,6 +549,97 @@ void change_settings_prior_to_autostory(
     env.console.log("change_settings_prior_to_autostory: " + assumption_text + " The index of \"Options\" in the Menu is " + std::to_string(options_index) + ".");
         
     bool has_minimap = current_segment_num >= 2;  // the minimap only shows up in segment 2 and beyond
+    change_settings_prior_to_autostory(env, context, options_index, has_minimap, language);
+}
+
+void change_settings_prior_to_autostory_checkpoint_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t current_checkpoint_num, Language language){
+    // get index of `Options` in the Main Menu, which depends on where you are in Autostory
+    int8_t options_index;  
+    std::string assumption_text = "";
+    switch(current_checkpoint_num){
+        case 0:
+            return; // can't change settings in the intro cutscene
+        case 1:
+        case 2:
+        // after Intro cutscene done, in room
+            // Menu
+            // - Options
+            // - Save        
+            options_index = 0;
+            assumption_text = "We assume 'Bag' is not yet unlocked.";
+            break;
+        case 3:
+        case 4:
+            // Menu
+            // - Bag  --> unlocked after picked up bag/hat in room. Segment 01, checkpoint 02
+            // - Options
+            // - Save
+            options_index = 1;
+            assumption_text = "We assume 'Boxes' is not yet unlocked.";
+            break;
+        case 5:
+        case 6:
+        case 7:
+        case 8:
+        case 9:
+        case 10:
+        case 11:
+            // Menu
+            // - Bag
+            // - Boxes --> unlocked after battling Nemona and receiving Pokedex app. Segment 02, checkpoint 04
+            // - Options
+            // - Save        
+            options_index = 2;
+            assumption_text = "We assume 'Poke Portal' is not yet unlocked.";
+            break;
+        case 12:
+        case 13:
+        case 14:
+        case 15:
+        case 16:
+        case 17:
+        case 18:
+        case 19:
+        case 20:
+            // Menu
+            // - Bag
+            // - Boxes
+            // - Poke Portal --> unlocked after arriving at Los Platos and talking to Nemona. Segment 06, checkpoint 11
+            // - Options
+            // - Save  
+            options_index = 3;
+            assumption_text = "We assume 'Picnic' is not yet unlocked.";
+            break;                    
+        default:
+            if(current_checkpoint_num <= 20){
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "change_settings_prior_to_autostory_checkpoint_mode: current_checkpoint_num should be greater than 20.");           
+            }
+
+            // Menu
+            // - Bag
+            // - Boxes
+            // - Picnic --> unlocked after finishing tutorial. Segment 09, checkpoint 20
+            // - Poke Portal
+            // - Options
+            // - Save          
+            options_index = 4;
+            assumption_text = "We assume that the tutorial is done, and all menu items are unlocked.";
+            break;
+    }
+    
+    env.console.log("change_settings_prior_to_autostory: " + assumption_text + " The index of \"Options\" in the Menu is " + std::to_string(options_index) + ".");
+        
+    bool has_minimap = current_checkpoint_num >= 3;  // the minimap only shows up in checkpoint 3 and beyond
+    change_settings_prior_to_autostory(env, context, options_index, has_minimap, language);
+}
+
+
+void change_settings_prior_to_autostory(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    int options_index,
+    bool has_minimap,
+    Language language
+){
 
     enter_menu_from_overworld(env.program_info(), env.console, context, options_index, MenuSide::RIGHT, has_minimap);
     change_settings(env, context, language);

@@ -1086,29 +1086,29 @@ std::string AutoStory::end_checkpoint_description(){
     return "    End: " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->end_text();
 }
 
-// size_t AutoStory::get_start_checkpoint_index(){
-//     size_t start = 0;
+size_t AutoStory::get_start_checkpoint_index(){
+    size_t start = 0;
 
-//     if (STORY_SECTION == StorySection::TUTORIAL){
-//         start = START_CHECKPOINT_TUTORIAL.index();
-//     }else if (STORY_SECTION == StorySection::MAIN_STORY){
-//         start = (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1) + START_CHECKPOINT_MAINSTORY.index();
-//     }
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        start = START_CHECKPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        start = (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1) + START_CHECKPOINT_MAINSTORY.index();
+    }
     
-//     return start;
-// }
+    return start;
+}
 
-// size_t AutoStory::get_end_checkpoint_index(){
-//     size_t end = 0;
+size_t AutoStory::get_end_checkpoint_index(){
+    size_t end = 0;
 
-//     if (STORY_SECTION == StorySection::TUTORIAL){
-//         end = END_CHECKPOINT_TUTORIAL.index();
-//     }else if (STORY_SECTION == StorySection::MAIN_STORY){
-//         end = (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1) + END_CHECKPOINT_MAINSTORY.index();     
-//     }
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        end = END_CHECKPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        end = (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1) + END_CHECKPOINT_MAINSTORY.index();     
+    }
     
-//     return end;
-// }
+    return end;
+}
 
 
 void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -1119,12 +1119,19 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProController
     };    
 
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
-    if (get_start_segment_index() > get_end_segment_index()){
-        throw UserSetupError(env.logger(), "The start segment cannot be later than the end segment.");
-    }
-    
-    for (size_t segment_index = get_start_segment_index(); segment_index <= get_end_segment_index(); segment_index++){
-        ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options, stats);
+    context.wait_for_all_requests();
+
+    if (ENABLE_ADVANCED_MODE){
+        for (size_t checkpoint_index = get_start_checkpoint_index(); checkpoint_index <= get_end_checkpoint_index(); checkpoint_index++){
+            env.console.log("Start Checkpoint " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->name(), COLOR_ORANGE);
+            ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->run_checkpoint(env, context, options, stats);
+        }
+
+    }else{
+        for (size_t segment_index = get_start_segment_index(); segment_index <= get_end_segment_index(); segment_index++){
+            ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options, stats);
+        }
+
     }
 }
 
@@ -1213,14 +1220,33 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         return;
     }
 
+    if (ENABLE_ADVANCED_MODE){
+        if (get_start_checkpoint_index() > get_end_checkpoint_index()){
+            throw UserSetupError(env.logger(), "The start checkpoint cannot be later than the end segment.");
+        }
+
+    }else{
+        if (get_start_segment_index() > get_end_segment_index()){
+            throw UserSetupError(env.logger(), "The start segment cannot be later than the end segment.");
+        }
+    }
+
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    env.console.log("Start Segment " + ALL_AUTO_STORY_SEGMENT_LIST()[get_start_segment_index()]->name(), COLOR_ORANGE);
+    if (ENABLE_ADVANCED_MODE){
+        env.console.log("Start Checkpoint " + ALL_AUTO_STORY_CHECKPOINT_LIST()[get_start_checkpoint_index()]->name(), COLOR_ORANGE);        
+    }else{
+        env.console.log("Start Segment " + ALL_AUTO_STORY_SEGMENT_LIST()[get_start_segment_index()]->name(), COLOR_ORANGE);
+    }
 
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
-        change_settings_prior_to_autostory(env, context, get_start_segment_index(), LANGUAGE);
+        if (ENABLE_ADVANCED_MODE){
+            change_settings_prior_to_autostory_checkpoint_mode(env, context, get_start_checkpoint_index(), LANGUAGE);
+        }else{
+            change_settings_prior_to_autostory_segment_mode(env, context, get_start_segment_index(), LANGUAGE);
+        }
     }
 
     run_autostory(env, context);

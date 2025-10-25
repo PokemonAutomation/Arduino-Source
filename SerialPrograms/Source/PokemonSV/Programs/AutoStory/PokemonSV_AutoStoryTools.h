@@ -275,12 +275,15 @@ void get_off_ride(const ProgramInfo& info, VideoStream& stream, ProControllerCon
 
 void get_on_or_off_ride(const ProgramInfo& info, VideoStream& stream, ProControllerContext& context, bool get_on);
 
+void change_settings_prior_to_autostory_segment_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t current_segment_num, Language language);
+void change_settings_prior_to_autostory_checkpoint_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t current_checkpoint_num, Language language);
 
 // change the settings prior to Autostory
 // Assumes that `current_segment` represents where we currently are in the story.
 void change_settings_prior_to_autostory(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    size_t current_segment_num,
+    int options_index,
+    bool has_minimap,
     Language language
 );
 
