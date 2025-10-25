@@ -147,6 +147,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 
 
 
@@ -309,7 +310,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto screen = feed.snapshot();
 
-    PokemonLZA::FlatWhiteDialogDetector detector(COLOR_RED, &overlay);
+//    PokemonLZA::FlatWhiteDialogDetector detector(COLOR_RED, &overlay);
+    PokemonLZA::ButtonDetector detector(COLOR_RED, ButtonType::ButtonA, {0.526718, 0.535922, 0.033806, 0.100971},  &overlay);
 
     cout << detector.detect(screen) << endl;
 #endif
