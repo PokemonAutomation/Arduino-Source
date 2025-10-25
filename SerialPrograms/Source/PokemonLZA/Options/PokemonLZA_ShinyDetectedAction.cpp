@@ -80,7 +80,7 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
 ){
     ShinySoundDetectedAction action = ACTION;
 
-    if (action == ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY && current_count > 0){
+    if (action == ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY && current_count > 1){
         return false;
     }
 
