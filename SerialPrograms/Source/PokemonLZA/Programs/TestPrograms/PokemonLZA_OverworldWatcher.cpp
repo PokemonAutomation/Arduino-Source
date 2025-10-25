@@ -8,6 +8,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA_OverworldWatcher.h"
 
 namespace PokemonAutomation{
@@ -44,6 +45,7 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, ProControlle
     TealDialogWatcher dialog_teal(COLOR_RED, &overlay);
     SelectionArrowWatcher selection_arrow_right(COLOR_RED, &overlay, SelectionArrowType::RIGHT, {0, 0, 1, 1});
     SelectionArrowWatcher selection_arrow_down(COLOR_RED, &overlay, SelectionArrowType::DOWN, {0, 0, 1, 1});
+    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0, 0, 1, 1}, &overlay);
 
     CancellableHolder<CancellableScope> scope(*context.scope());
     InferenceSession session(
@@ -54,6 +56,7 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, ProControlle
             dialog_teal,
             selection_arrow_right,
             selection_arrow_down,
+            buttonA,
         }
     );
     context.wait_until_cancel();

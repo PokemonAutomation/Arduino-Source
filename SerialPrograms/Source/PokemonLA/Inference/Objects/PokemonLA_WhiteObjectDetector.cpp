@@ -22,6 +22,7 @@ using namespace Kernels::Waterfill;
 
 
 void find_overworld_white_objects(
+    Resolution input_resolution,
     const std::vector<std::pair<WhiteObjectDetector&, bool>>& detectors,
     const ImageViewRGB32& image
 ){
@@ -62,7 +63,7 @@ void find_overworld_white_objects(
                 for (const auto& detector : detectors){
                     const std::set<Color>& thresholds = detector.first.thresholds();
                     if (thresholds.find((Color)filters[c].first) != thresholds.end()){
-                        detector.first.process_object(image, object);
+                        detector.first.process_object(input_resolution, image, object);
                     }
                 }
             }
@@ -132,7 +133,11 @@ bool WhiteObjectWatcher::process_frame(const ImageViewRGB32& frame, WallClock ti
         detector.first.clear();
     }
 
-    find_overworld_white_objects(m_detectors, extract_box_reference(frame, m_box));
+    find_overworld_white_objects(
+        frame.size(),
+        m_detectors,
+        extract_box_reference(frame, m_box)
+    );
     m_overlays.clear();
 
     for (auto& detector : m_detectors){

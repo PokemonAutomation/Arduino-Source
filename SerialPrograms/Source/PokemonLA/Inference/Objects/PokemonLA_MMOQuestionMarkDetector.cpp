@@ -85,7 +85,7 @@ const std::array<ImageFloatBox, 5> hisui_map_boxes{{
 }};
 
 
-bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &frame, const ImageFloatBox& box){
+bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32& frame, const ImageFloatBox& box){
     auto image = extract_box_reference(frame, box);
 
     const double screen_rel_size = (frame.height() / 1080.0);
@@ -99,6 +99,7 @@ bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &frame, co
     };
 
     bool detected = match_template_by_waterfill(
+        frame.size(),
         image,
         MMOQuestionMarkBackgroundMatcher::instance(),
         {
@@ -116,6 +117,7 @@ bool detect_MMO_question_mark(const PokemonAutomation::ImageViewRGB32 &frame, co
         const size_t min_curve_size = 250;
         const size_t max_curve_size = 450;
         detected = match_template_by_waterfill(
+            frame.size(),
             image, MMOQuestionMarkCurveMatcher::instance(),
             {{combine_rgb(180, 180, 180), combine_rgb(255, 255, 255)}},
             {scale(min_curve_size), scale(max_curve_size)}, 100,
@@ -181,6 +183,7 @@ std::vector<ImagePixelBox> MMOQuestionMarkDetector::detect_MMOs_on_region_map(co
     };
 
     match_template_by_waterfill(
+        frame.size(),
         map_image, MMOQuestionMarkBackgroundMatcher::instance(),
         {{combine_rgb(0, 5, 30), combine_rgb(100, 130, 130)}},
         {scale(min_bg_size), scale(max_bg_size)}, 110,

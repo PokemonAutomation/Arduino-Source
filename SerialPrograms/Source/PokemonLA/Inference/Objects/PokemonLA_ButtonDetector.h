@@ -31,7 +31,7 @@ enum class ButtonType{
 
 class ButtonMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
-    ButtonMatcher(ButtonType type, size_t min_width, size_t max_width, double max_rmsd);
+    ButtonMatcher(ButtonType type, size_t min_width, size_t min_height, double max_rmsd);
     static const ButtonMatcher& A();
     static const ButtonMatcher& B();
     static const ButtonMatcher& Plus();
@@ -39,7 +39,7 @@ public:
     static const ButtonMatcher& ArrowLeft();
     static const ButtonMatcher& ArrowRight();
 
-    virtual bool check_image(const ImageViewRGB32& image) const override{
+    virtual bool check_image(Resolution input_resolution, const ImageViewRGB32& image) const override{
         return image.width() >= m_min_width && image.height() >= m_min_height;
     };
 
@@ -55,7 +55,11 @@ class ButtonTracker : public WhiteObjectDetector{
 public:
     ButtonTracker(ButtonType type);
 
-    virtual void process_object(const ImageViewRGB32& image, const WaterfillObject& object) override;
+    virtual void process_object(
+        Resolution input_resolution,
+        const ImageViewRGB32& image,
+        const WaterfillObject& object
+    ) override;
     virtual void finish(const ImageViewRGB32& image) override;
 
 private:

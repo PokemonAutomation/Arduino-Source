@@ -50,7 +50,7 @@ public:
     static const WhiteButtonMatcher& ArrowRight();
     static const WhiteButtonMatcher& LStick();
 
-    virtual bool check_image(const ImageViewRGB32& image) const override{
+    virtual bool check_image(Resolution input_resolution, const ImageViewRGB32& image) const override{
         return image.width() >= m_min_width && image.height() >= m_min_height;
     };
 

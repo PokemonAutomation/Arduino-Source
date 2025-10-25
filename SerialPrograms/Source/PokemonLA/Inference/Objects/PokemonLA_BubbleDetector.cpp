@@ -56,7 +56,11 @@ public:
 BubbleDetector::BubbleDetector()
     : WhiteObjectDetector(COLOR_GREEN, {Color(0xffb0b0b0)})
 {}
-void BubbleDetector::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
+void BubbleDetector::process_object(
+    Resolution input_resolution,
+    const ImageViewRGB32& image,
+    const WaterfillObject& object
+){
     if (object.area < 200){
         return;
     }

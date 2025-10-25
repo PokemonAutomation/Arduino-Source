@@ -1539,20 +1539,32 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
+    Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
+    Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp
+    Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h
     Source/PokemonLZA/PokemonLZA_Panels.cpp
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
+    Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_BeldumHunter.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_BeldumHunter.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.h
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.h
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp

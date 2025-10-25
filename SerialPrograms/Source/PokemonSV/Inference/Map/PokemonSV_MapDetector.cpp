@@ -78,6 +78,7 @@ bool MapFixedViewDetector::detect(const ImageViewRGB32& frame){
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * 150.0);
     
     const bool detected = match_template_by_waterfill(
+        frame.size(),
         extract_box_reference(frame, m_arrow_box), 
         MapOrangleFixedViewArrowMatcher::instance(),
         filters,
@@ -106,6 +107,7 @@ bool MapRotatedViewDetector::detect(const ImageViewRGB32& frame){
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * 450.0);
     
     const bool detected = match_template_by_waterfill(
+        frame.size(),
         extract_box_reference(frame, m_arrow_box), 
         MapOrangleRotatedViewArrowMatcher::instance(),
         filters,

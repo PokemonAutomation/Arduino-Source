@@ -86,6 +86,7 @@ bool BoxEggDetector::detect(const ImageViewRGB32& frame){
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * 700);
     
     return match_template_by_waterfill(
+        frame.size(),
         extract_box_reference(frame, m_box), 
         EggMatcher::instance(),
         filters,

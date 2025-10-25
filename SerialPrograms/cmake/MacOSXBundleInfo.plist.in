@@ -31,10 +31,10 @@
 	<key>NSHumanReadableCopyright</key>
 	<string>${MACOSX_BUNDLE_COPYRIGHT}</string>
 	<key>NSCameraUsageDescription</key>
-	<string>The cameras are listed to choose the Switch video stream from the captrue card.</string>
+	<string>The cameras are listed to choose the Switch video stream from the capture card.</string>
 	<key>NSCameraUseContinuityCameraDeviceType</key>
 	<true/>
 	<key>NSMicrophoneUsageDescription</key>
-	<string>The microphones are listed to choose the Switch audio stream from the captrue card.</string>
+	<string>The microphones are listed to choose the Switch audio stream from the capture card.</string>
 </dict>
 </plist>

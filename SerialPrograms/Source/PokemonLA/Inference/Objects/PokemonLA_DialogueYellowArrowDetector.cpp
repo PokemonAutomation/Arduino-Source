@@ -77,6 +77,7 @@ bool DialogueYellowArrowDetector::process_frame(const ImageViewRGB32& frame, Wal
     const size_t min_size = size_t(200 * screen_scale * screen_scale);
     
     const bool detected = match_template_by_waterfill(
+        frame.size(),
         extract_box_reference(frame, YELLOW_ARROW_BOX), 
         DialogueYellowArrowMatcher::instance(),
         filters,

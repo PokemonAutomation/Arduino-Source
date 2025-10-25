@@ -88,6 +88,7 @@ std::pair<double, double> DirectionDetector::locate_north(Logger& logger, const 
 
     ImagePixelBox pixel_search_area = floatbox_to_pixelbox(screen.width(), screen.height(), m_minimap_box);
     match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_minimap_box), 
         DirectionMatcher::instance(),
         filters,

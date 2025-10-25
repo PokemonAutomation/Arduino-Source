@@ -104,6 +104,7 @@ std::pair<double, double> SandwichHandLocator::locate_sandwich_hand(const ImageV
 
     ImagePixelBox pixel_box = floatbox_to_pixelbox(frame.width(), frame.height(), area_to_search);
     match_template_by_waterfill(
+        frame.size(),
         extract_box_reference(frame, area_to_search), 
         ((m_type == HandType::FREE) ? SandwichFreeHandMatcher::instance() : SandwichGrabbingHandMatcher::instance()),
         filters,

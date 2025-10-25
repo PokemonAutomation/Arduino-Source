@@ -48,7 +48,11 @@ public:
     const std::vector<ImagePixelBox>& detections() const{ return m_detections; }
     void clear(){ m_detections.clear(); }
 
-    virtual void process_object(const ImageViewRGB32& image, const WaterfillObject& object) = 0;
+    virtual void process_object(
+        Resolution input_resolution,
+        const ImageViewRGB32& image,
+        const WaterfillObject& object
+    ) = 0;
     virtual void finish(const ImageViewRGB32& image){}
 
 protected:
@@ -66,6 +70,7 @@ protected:
 
 
 void find_overworld_white_objects(
+    Resolution input_resolution,
     const std::vector<std::pair<WhiteObjectDetector&, bool>>& detectors,
     const ImageViewRGB32& screen
 );

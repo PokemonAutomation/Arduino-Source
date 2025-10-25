@@ -105,6 +105,7 @@ bool YCommIconDetector::process_frame(const ImageViewRGB32& frame, WallClock tim
     const size_t min_size = (size_t)(350. * frame.total_pixels() / (1920 * 1080.));
     
     const bool detected = match_template_by_waterfill(
+        frame.size(),
         extract_box_reference(frame, YCOMM_ICON_BOX), 
         YCommIconMatcher::instance(),
         filters,

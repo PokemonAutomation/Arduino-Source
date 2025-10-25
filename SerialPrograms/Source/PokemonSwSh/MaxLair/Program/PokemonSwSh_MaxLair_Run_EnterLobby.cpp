@@ -68,7 +68,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 ){
-    pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_B, 2000ms);
 
     if (connect_to_internet){
         connect_to_internet_with_inference(info, stream, context);
@@ -89,7 +89,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
     size_t ore_dialog_count = 0;
     while (presses < 50){
         presses++;
-        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
         context.wait_for_all_requests();
 
         VideoSnapshot screen = stream.video().snapshot();
@@ -141,7 +141,7 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
             stream.log("Detected save dialog.");
             context.wait_for_all_requests();
             VideoSnapshot entrance = stream.video().snapshot();
-            pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 160ms, 5000ms);
             context.wait_for_all_requests();
             return std::move(entrance.frame);
         }
@@ -151,11 +151,11 @@ std::shared_ptr<const ImageRGB32> enter_lobby(
             stream.log("Detected boss selection.");
             if (boss_slot > 0){
                 for (size_t c = 1; c < boss_slot; c++){
-                    pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+                    pbf_press_dpad(context, DPAD_DOWN, 160ms, 400ms);
                 }
-                pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_A, 160ms, 1000ms);
             }else{
-                pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, 160ms, 1000ms);
             }
         }
     }

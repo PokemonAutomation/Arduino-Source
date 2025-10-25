@@ -71,6 +71,7 @@ bool WhiteTriangleDetector::detect(const ImageViewRGB32& screen) {
 
     bool is_found = false;
     match_template_by_waterfill(
+        screen.size(),
         extract_box_reference(screen, m_box), 
         WhiteTriangleMatcher::instance(),
         filters,

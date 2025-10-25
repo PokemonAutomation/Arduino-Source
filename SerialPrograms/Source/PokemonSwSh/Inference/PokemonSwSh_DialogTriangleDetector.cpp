@@ -75,6 +75,7 @@ bool DialogTriangleDetector::process_frame(const ImageViewRGB32& frame, WallCloc
     const size_t min_size = size_t(screen_rel_size * screen_rel_size * 500.0);
 
     const bool detected = match_template_by_waterfill(
+        frame.size(),
         extract_box_reference(frame, BLACK_TRIANGLE_BOX), 
         DialogTriangleMatcher::instance(),
         filters,

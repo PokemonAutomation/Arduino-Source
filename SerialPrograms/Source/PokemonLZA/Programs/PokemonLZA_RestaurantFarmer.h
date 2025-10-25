@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 #define PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

@@ -67,7 +67,12 @@ std::pair<double, double> box_center(ImageFloatBox& box){
     return std::make_pair(x, y);
 }
 
-ImageFloatBox OliveDetector::get_olive_floatbox(const ImageViewRGB32& screen, ProControllerContext& context, uint8_t rgb_gap, ImageFloatBox box){
+ImageFloatBox OliveDetector::get_olive_floatbox(
+    const ImageViewRGB32& screen,
+    ProControllerContext& context,
+    uint8_t rgb_gap,
+    ImageFloatBox box
+){
     const std::vector<std::pair<uint32_t, uint32_t>> filters = {
         {combine_rgb(0, 10, 0), combine_rgb(255, 255, 255)},
     };
@@ -85,6 +90,7 @@ ImageFloatBox OliveDetector::get_olive_floatbox(const ImageViewRGB32& screen, Pr
     ImageViewRGB32 cropped = extract_box_reference(green_only, box);
     ImagePixelBox pixel_search_area = floatbox_to_pixelbox(screen.width(), screen.height(), box);
     match_template_by_waterfill(
+        screen.size(),
         cropped, 
         OliveMatcher::instance(),
         filters,

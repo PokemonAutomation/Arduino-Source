@@ -42,8 +42,16 @@ BattleSpriteArrowTracker::BattleSpriteArrowTracker()
     )
 {}
 
-void BattleSpriteArrowTracker::process_object(const ImageViewRGB32& image, const WaterfillObject& object){
-    double rmsd = BattleSpriteArrowMatcher::instance().rmsd_original(image, object);
+void BattleSpriteArrowTracker::process_object(
+    Resolution input_resolution,
+    const ImageViewRGB32& image,
+    const WaterfillObject& object
+){
+    double rmsd = BattleSpriteArrowMatcher::instance().rmsd_original(
+        input_resolution,
+        image,
+        object
+    );
     if (rmsd < 80){
         m_detections.emplace_back(object);
     }

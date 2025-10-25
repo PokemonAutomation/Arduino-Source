@@ -29,17 +29,17 @@ GameSettings::GameSettings()
     )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_WAIT1(
-        "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
+        "<b>Start Game Wait:</b><br>Wait this long for the game to load.",
         LockMode::LOCK_WHILE_RUNNING,
         "20 s"
     )
     , ENTER_GAME_MASH0(
-        "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
+        "<b>Enter Game Mash:</b><br>Mash A for this long to enter the game.",
         LockMode::LOCK_WHILE_RUNNING,
         "5 s"
     )
     , ENTER_GAME_WAIT0(
-        "<b>4. Enter Game Wait:</b><br>Wait this long for the opening animations to finish.",
+        "<b>Enter Game Wait:</b><br>Wait this long for the opening animations to finish.",
         LockMode::LOCK_WHILE_RUNNING,
         "15 s"
     )
