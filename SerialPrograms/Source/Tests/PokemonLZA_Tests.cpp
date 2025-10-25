@@ -38,8 +38,16 @@ int test_pokemonZLA_NormalDialogBoxDetector(const ImageViewRGB32& image, bool ta
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
-    NormalDialogDetector detector(logger, overlay, stop_on_detected); 
+    NormalDialogDetector detector(logger, overlay, stop_on_detected);
     bool result = detector.process_frame(image, current_time());
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonLZA_FlatWhiteDialogDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    FlatWhiteDialogDetector detector(COLOR_RED, &overlay);
+    bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }

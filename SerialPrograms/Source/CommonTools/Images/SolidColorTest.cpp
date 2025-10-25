@@ -73,15 +73,15 @@ bool is_solid(
 ){
     double stddev = stats.stddev.sum();
     if (stddev > max_stddev_sum){
-//        cout << "bad stddev = " << stddev << endl;
+        // cout << "bad stddev = " << stddev << endl;
         return false;
     }
 
     double average = stats.average.sum();
     FloatPixel actual = stats.average / average;
     double distance = euclidean_distance(actual, expected_color_ratio);
-//    cout << "actual color ratio " << actual << endl;
-//    cout << "distance = " << distance << endl;
+    // cout << "actual color ratio " << actual << endl;
+    // cout << "distance = " << distance << endl;
 
     return distance <= max_euclidean_distance;
 }

@@ -14,9 +14,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -219,7 +219,7 @@ void FlatWhiteDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_arrow_box);
 }
 bool FlatWhiteDialogDetector::detect(const ImageViewRGB32& screen){
-    if (!is_white(extract_box_reference(screen, m_top), 500, 20)){
+    if (!is_white(extract_box_reference(screen, m_top), 500.0, 20.0)){
         m_last_detected_box.reset();
         return false;
     }
