@@ -275,7 +275,7 @@ bool BlueDialogDetector::detect(const ImageViewRGB32& screen){
     if (!is_solid(
         extract_box_reference(screen, m_corner),
         {0.0869318, 0.255479, 0.65759},
-        0.20
+        0.25
     )){
 //        cout << "not solid" << endl;
         m_last_detected_box.reset();

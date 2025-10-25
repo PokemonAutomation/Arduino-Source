@@ -80,8 +80,9 @@ bool is_solid(
     double average = stats.average.sum();
     FloatPixel actual = stats.average / average;
     double distance = euclidean_distance(actual, expected_color_ratio);
-    // cout << "actual color ratio " << actual << endl;
-    // cout << "distance = " << distance << endl;
+
+//    cout << "actual color ratio " << actual << endl;
+//    cout << "distance = " << distance << endl;
 
     return distance <= max_euclidean_distance;
 }

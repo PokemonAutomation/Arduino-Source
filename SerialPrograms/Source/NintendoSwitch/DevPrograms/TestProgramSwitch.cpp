@@ -311,7 +311,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     auto screen = feed.snapshot();
 
 //    PokemonLZA::FlatWhiteDialogDetector detector(COLOR_RED, &overlay);
-    PokemonLZA::ButtonDetector detector(COLOR_RED, ButtonType::ButtonA, {0.526718, 0.535922, 0.033806, 0.100971},  &overlay);
+    PokemonLZA::BlueDialogDetector detector(COLOR_RED, &overlay);
+//    PokemonLZA::ButtonDetector detector(COLOR_RED, ButtonType::ButtonA, {0.526718, 0.535922, 0.033806, 0.100971},  &overlay);
 
     cout << detector.detect(screen) << endl;
 #endif
