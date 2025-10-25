@@ -285,11 +285,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.controller<ProController>());
     VideoOverlaySet overlays(overlay);
 
-
+#if 0
     while (true){
         sit_on_bench(console, context);
     }
-
+#endif
 
 
 #if 0
@@ -304,12 +304,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
-    ImageRGB32 image("Screenshots/screenshot-20251012-174842583706.png");
+#if 1
+//    ImageRGB32 image("Screenshots/screenshot-20251025-153957561163.png");
 
-    PokemonLZA::BlueDialogDetector detector(COLOR_RED, &overlay);
+    auto screen = feed.snapshot();
 
-    cout << detector.detect(image) << endl;
+    PokemonLZA::FlatWhiteDialogDetector detector(COLOR_RED, &overlay);
+
+    cout << detector.detect(screen) << endl;
 #endif
 
 

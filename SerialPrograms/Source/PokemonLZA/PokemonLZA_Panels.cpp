@@ -37,10 +37,11 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
     ret.emplace_back(make_single_switch_program<RestaurantFarmer_Descriptor, RestaurantFarmer>());
 
+    ret.emplace_back("---- Shiny Hunting ----");
+    ret.emplace_back(make_single_switch_program<ShinyHunt_BenchSit_Descriptor, ShinyHunt_BenchSit>());
+    ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldReset_Descriptor, ShinyHunt_OverworldReset>());
+
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back("---- Shiny Hunting ----");
-        ret.emplace_back(make_single_switch_program<ShinyHunt_BenchSit_Descriptor, ShinyHunt_BenchSit>());
-        ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldReset_Descriptor, ShinyHunt_OverworldReset>());
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
     }
 

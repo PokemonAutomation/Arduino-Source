@@ -51,7 +51,10 @@ inline bool is_white(
     double min_rgb_sum = 500,
     double max_stddev_sum = 10
 ){
-    return is_white(image_stats(image), min_rgb_sum, max_stddev_sum);
+    ImageStats stats = image_stats(image);
+//    cout << stats.average << stats.stddev << endl;
+//    cout << is_white(stats, min_rgb_sum, max_stddev_sum) << endl;
+    return is_white(stats, min_rgb_sum, max_stddev_sum);
 }
 inline bool is_black(
     const ImageViewRGB32& image,

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 #define PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 
+#include <atomic>
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 

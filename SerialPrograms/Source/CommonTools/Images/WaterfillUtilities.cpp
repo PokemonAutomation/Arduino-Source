@@ -139,6 +139,8 @@ bool match_template_by_waterfill(
                 std::cout << "Object rmsd: " << rmsd << std::endl;
             }
 
+//            std::cout << "Object rmsd: " << rmsd << std::endl;
+
             if (rmsd < rmsd_threshold){
 #if 0
                 std::cout << "Object rmsd: " << rmsd << std::endl;

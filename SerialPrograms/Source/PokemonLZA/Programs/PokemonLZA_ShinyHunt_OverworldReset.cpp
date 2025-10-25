@@ -29,7 +29,7 @@ ShinyHunt_OverworldReset_Descriptor::ShinyHunt_OverworldReset_Descriptor()
         "PokemonLZA:ShinyHunt-OverworldReset",
         STRING_POKEMON + " LZA", "Shiny Hunt - Overworld Reset",
         "Programs/PokemonLZA/ShinyHunt-OverworldReset.html",
-        "Shiny hunt by repeatedly sitting on a bench to reset spawns.",
+        "Shiny hunt by soft-resetting a " + STRING_POKEMON + " that spawns next to you.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
