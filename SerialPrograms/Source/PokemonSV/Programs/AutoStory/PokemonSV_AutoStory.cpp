@@ -276,7 +276,7 @@ std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_lis
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_91>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_92>());
 
-    
+
     return checkpoint_list;
 };
 
@@ -465,6 +465,13 @@ AutoStory::AutoStory()
         LockMode::LOCK_WHILE_RUNNING,
         StarterChoice::FUECOCO
     )
+    , ENABLE_ADVANCED_MODE(
+        "<b>Advanced mode:</b><br>"
+        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.<br>"
+        "Also, this enables the option to toggle 'Change settings at Program Start'.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    ) 
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(30))
     , NOTIFICATIONS({
@@ -481,7 +488,8 @@ AutoStory::AutoStory()
     )    
     , CHANGE_SETTINGS(
         "<b>Change settings at Program Start:</b><br>"
-        "This is to ensure the program has the correct settings, particularly with Autosave turned off.",
+        "This is to ensure the program has the correct settings, particularly with Autosave turned off, and Camera Support off.<br>"
+        "WARNING: if you disable this, make sure you manually set the in-game settings as laid out in the wiki.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )  
@@ -654,7 +662,6 @@ AutoStory::AutoStory()
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
-        PA_ADD_OPTION(CHANGE_SETTINGS);
 
         PA_ADD_OPTION(FLYPOINT_TYPE);
         PA_ADD_OPTION(TEST_FLYPOINT_LOCATIONS);
@@ -700,14 +707,14 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SETUP_NOTE);
     PA_ADD_OPTION(STORY_SECTION);
+
     PA_ADD_OPTION(STARTPOINT_TUTORIAL);
     PA_ADD_OPTION(MAINSTORY_NOTE);
     PA_ADD_OPTION(STARTPOINT_MAINSTORY);
     PA_ADD_OPTION(START_DESCRIPTION);
     PA_ADD_OPTION(ENDPOINT_TUTORIAL);
     PA_ADD_OPTION(ENDPOINT_MAINSTORY);
-    PA_ADD_OPTION(END_DESCRIPTION);
-    PA_ADD_OPTION(STARTERCHOICE);
+    PA_ADD_OPTION(END_DESCRIPTION);    
 
     PA_ADD_OPTION(START_CHECKPOINT_TUTORIAL);
     PA_ADD_OPTION(START_CHECKPOINT_MAINSTORY);
@@ -716,7 +723,13 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(END_CHECKPOINT_MAINSTORY);
     PA_ADD_OPTION(END_CHECKPOINT_DESCRIPTION);
 
+    PA_ADD_OPTION(STARTERCHOICE);
+
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+
+    PA_ADD_OPTION(ENABLE_ADVANCED_MODE);
+    PA_ADD_OPTION(CHANGE_SETTINGS);
+    
     PA_ADD_OPTION(NOTIFICATIONS);
 
 
@@ -733,6 +746,8 @@ AutoStory::AutoStory()
     START_CHECKPOINT_MAINSTORY.add_listener(*this);
     END_CHECKPOINT_MAINSTORY.add_listener(*this);  
 
+    ENABLE_ADVANCED_MODE.add_listener(*this); 
+
     ENABLE_TEST_CHECKPOINTS.add_listener(*this);
     ENABLE_TEST_REALIGN.add_listener(*this);
     ENABLE_MISC_TEST.add_listener(*this);
@@ -748,35 +763,32 @@ void AutoStory::on_config_value_changed(void* object){
     //     : ConfigOptionState::HIDDEN;
     // STARTERCHOICE.set_visibility(state);
 
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
-        ENDPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
+    bool tutorial_segments = STORY_SECTION == StorySection::TUTORIAL && !ENABLE_ADVANCED_MODE;
+    bool tutorial_checkpoints = STORY_SECTION == StorySection::TUTORIAL && ENABLE_ADVANCED_MODE;
+    bool mainstory_segments = STORY_SECTION == StorySection::MAIN_STORY && !ENABLE_ADVANCED_MODE;
+    bool mainstory_checkpoints = STORY_SECTION == StorySection::MAIN_STORY && ENABLE_ADVANCED_MODE;
 
-        STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
-        ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
+    STARTPOINT_TUTORIAL.set_visibility(tutorial_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    ENDPOINT_TUTORIAL.set_visibility(tutorial_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    STARTPOINT_MAINSTORY.set_visibility(mainstory_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    ENDPOINT_MAINSTORY.set_visibility(mainstory_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
-        START_CHECKPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
-        END_CHECKPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
-        START_CHECKPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
-        END_CHECKPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
-        ENDPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
-
-        STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);
-        ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);        
-
-        START_CHECKPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
-        END_CHECKPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
-        START_CHECKPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);
-        END_CHECKPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);
-    }
+    START_CHECKPOINT_TUTORIAL.set_visibility(tutorial_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    END_CHECKPOINT_TUTORIAL.set_visibility(tutorial_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    START_CHECKPOINT_MAINSTORY.set_visibility(mainstory_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    END_CHECKPOINT_MAINSTORY.set_visibility(mainstory_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     MAINSTORY_NOTE.set_visibility(STORY_SECTION == StorySection::TUTORIAL ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
     START_DESCRIPTION.set_text(start_segment_description());
     END_DESCRIPTION.set_text(end_segment_description());
     START_CHECKPOINT_DESCRIPTION.set_text(start_checkpoint_description());
     END_CHECKPOINT_DESCRIPTION.set_text(end_checkpoint_description());
+
+    START_DESCRIPTION.set_visibility(!ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    END_DESCRIPTION.set_visibility(!ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    START_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    END_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    CHANGE_SETTINGS.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     if (ENABLE_TEST_CHECKPOINTS){
         START_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);

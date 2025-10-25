@@ -99,6 +99,8 @@ private:
 
     EnumDropdownOption<StarterChoice> STARTERCHOICE;
 
+    BooleanCheckBoxOption ENABLE_ADVANCED_MODE;
+
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
