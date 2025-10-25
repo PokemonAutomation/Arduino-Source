@@ -55,15 +55,46 @@ void AutoStory_Segment_31::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_78(env, context, options.notif_status_update, stats);
-    checkpoint_79(env, context, options.notif_status_update, stats);
-    checkpoint_80(env, context, options.notif_status_update, stats);
-    checkpoint_81(env, context, options.notif_status_update, stats);
+	AutoStory_Checkpoint_78().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_79().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_80().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_81().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_78::name() const{ return "078 - " + AutoStory_Segment_31().name(); }
+std::string AutoStory_Checkpoint_78::start_text() const{ return "At North Province Area One Pokecenter";}
+std::string AutoStory_Checkpoint_78::end_text() const{ return "At Team Star (Fighting) base. Spoke to Clavell.";}
+void AutoStory_Checkpoint_78::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_78(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_79::name() const{ return "079 - " + AutoStory_Segment_31().name(); }
+std::string AutoStory_Checkpoint_79::start_text() const{ return AutoStory_Checkpoint_78().end_text();}
+std::string AutoStory_Checkpoint_79::end_text() const{ return "Beat Team Star (Fighting) grunt. At gate of base.";}
+void AutoStory_Checkpoint_79::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_79(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_80::name() const{ return "080 - " + AutoStory_Segment_31().name(); }
+std::string AutoStory_Checkpoint_80::start_text() const{ return AutoStory_Checkpoint_79().end_text();}
+std::string AutoStory_Checkpoint_80::end_text() const{ return "Beat Team Star (Fighting)";}
+void AutoStory_Checkpoint_80::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_80(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_81::name() const{ return "081 - " + AutoStory_Segment_31().name(); }
+std::string AutoStory_Checkpoint_81::start_text() const{ return AutoStory_Checkpoint_80().end_text();}
+std::string AutoStory_Checkpoint_81::end_text() const{ return "At North Province Area Two Pokecenter";}
+void AutoStory_Checkpoint_81::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_81(env, context, options.notif_status_update, stats);
+}
+
+
 
 void checkpoint_78(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,

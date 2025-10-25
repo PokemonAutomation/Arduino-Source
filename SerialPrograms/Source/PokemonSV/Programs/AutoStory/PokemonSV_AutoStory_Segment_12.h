@@ -26,6 +26,16 @@ public:
     ) const override;
 };
 
+class AutoStory_Checkpoint_28 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+
+
 // start: At Cortondo East Pokecenter.
 // end: Beat Cortondo Gym. At Cortondo West Pokecenter.
 void checkpoint_28(

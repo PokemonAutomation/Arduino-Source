@@ -54,15 +54,48 @@ void AutoStory_Segment_29::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_71(env, context, options.notif_status_update, stats);
-    checkpoint_72(env, context, options.notif_status_update, stats);
-    checkpoint_73(env, context, options.notif_status_update, stats);
-    checkpoint_74(env, context, options.notif_status_update, stats);
+	AutoStory_Checkpoint_71().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_72().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_73().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_74().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+
+std::string AutoStory_Checkpoint_71::name() const{ return "071 - " + AutoStory_Segment_29().name(); }
+std::string AutoStory_Checkpoint_71::start_text() const{ return "At Montenevera Pokecenter";}
+std::string AutoStory_Checkpoint_71::end_text() const{ return "Spoke to Montenevera gym receptionist";}
+void AutoStory_Checkpoint_71::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_71(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_72::name() const{ return "072 - " + AutoStory_Segment_29().name(); }
+std::string AutoStory_Checkpoint_72::start_text() const{ return AutoStory_Checkpoint_71().end_text();}
+std::string AutoStory_Checkpoint_72::end_text() const{ return "Passed gym test with MC Sledge.";}
+void AutoStory_Checkpoint_72::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_72(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_73::name() const{ return "073 - " + AutoStory_Segment_29().name(); }
+std::string AutoStory_Checkpoint_73::start_text() const{ return AutoStory_Checkpoint_72().end_text();}
+std::string AutoStory_Checkpoint_73::end_text() const{ return "Beat Montenevera Gym. Inside gym building.";}
+void AutoStory_Checkpoint_73::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_73(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_74::name() const{ return "074 - " + AutoStory_Segment_29().name(); }
+std::string AutoStory_Checkpoint_74::start_text() const{ return AutoStory_Checkpoint_73().end_text();}
+std::string AutoStory_Checkpoint_74::end_text() const{ return "At Glaseado gym Pokecenter.";}
+void AutoStory_Checkpoint_74::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_74(env, context, options.notif_status_update, stats);
+}
+
 
 
 void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){

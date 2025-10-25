@@ -55,13 +55,36 @@ void AutoStory_Segment_25::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_58(env, context, options.notif_status_update, stats);
-    checkpoint_59(env, context, options.notif_status_update, stats);
-    checkpoint_60(env, context, options.notif_status_update, stats);
+	AutoStory_Checkpoint_58().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_59().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_60().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
+}
+
+
+std::string AutoStory_Checkpoint_58::name() const{ return "058 - " + AutoStory_Segment_25().name(); }
+std::string AutoStory_Checkpoint_58::start_text() const{ return "Beat Orthworm. At East Province (Area Three) Pokecenter.";}
+std::string AutoStory_Checkpoint_58::end_text() const{ return "Beat team star grunt. At gate of Team Star (Poison) base.";}
+void AutoStory_Checkpoint_58::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_58(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_59::name() const{ return "059 - " + AutoStory_Segment_25().name(); }
+std::string AutoStory_Checkpoint_59::start_text() const{ return AutoStory_Checkpoint_58().end_text();}
+std::string AutoStory_Checkpoint_59::end_text() const{ return "Beat Team Star (Poison)";}
+void AutoStory_Checkpoint_59::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_59(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_60::name() const{ return "060 - " + AutoStory_Segment_25().name(); }
+std::string AutoStory_Checkpoint_60::start_text() const{ return AutoStory_Checkpoint_59().end_text();}
+std::string AutoStory_Checkpoint_60::end_text() const{ return "At Medali Pokecenter.";}
+void AutoStory_Checkpoint_60::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_60(env, context, options.notif_status_update, stats);
 }
 
 void checkpoint_58(
