@@ -52,5 +52,13 @@ int test_pokemonLZA_FlatWhiteDialogDetector(const ImageViewRGB32& image, bool ta
     return 0;
 }
 
+int test_pokemonLZA_BlueDialogDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    BlueDialogDetector detector(COLOR_RED, &overlay);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
 
 } 

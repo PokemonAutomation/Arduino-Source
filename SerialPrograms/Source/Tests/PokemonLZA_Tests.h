@@ -23,6 +23,8 @@
 
  int test_pokemonLZA_FlatWhiteDialogDetector(const ImageViewRGB32& image, bool target);
 
+ int test_pokemonLZA_BlueDialogDetector(const ImageViewRGB32& image, bool target);
+
  }
 
  #endif
