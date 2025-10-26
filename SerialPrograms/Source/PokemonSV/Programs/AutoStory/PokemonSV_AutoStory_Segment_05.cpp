@@ -51,15 +51,31 @@ void AutoStory_Segment_05::run_segment(
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 05: First Arven Battle", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_09(env, context, options.notif_status_update, stats);
-    checkpoint_10(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_09().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_10().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 05: First Arven Battle", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_09::name() const{ return "009 - " + AutoStory_Segment_05().name(); }
+std::string AutoStory_Checkpoint_09::start_text() const{ return "Rescued Koraidon/Miraidon and escaped from the Houndoom Cave. Standing next to Koraidon/Miraidon just outside the cave exit.";}
+std::string AutoStory_Checkpoint_09::end_text() const{ return "Battled Arven and received Legendary's Pokeball.";}
+void AutoStory_Checkpoint_09::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_09(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_10::name() const{ return "010 - " + AutoStory_Segment_05().name(); }
+std::string AutoStory_Checkpoint_10::start_text() const{ return AutoStory_Checkpoint_09().end_text();}
+std::string AutoStory_Checkpoint_10::end_text() const{ return "Talked to Nemona at roof of the Lighthouse.";}
+void AutoStory_Checkpoint_10::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_10(env, context, options.notif_status_update, stats);
+}
+
 
 
 void checkpoint_09(

@@ -53,13 +53,29 @@ void AutoStory_Segment_19::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_41(env, context, options.notif_status_update, stats);
-    checkpoint_42(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_41().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_42().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_41::name() const{ return "041 - " + AutoStory_Segment_19().name(); }
+std::string AutoStory_Checkpoint_41::start_text() const{ return "At South Province (Area Three) Pokecenter.";}
+std::string AutoStory_Checkpoint_41::end_text() const{ return "Defeated Klawf.";}
+void AutoStory_Checkpoint_41::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_41(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_42::name() const{ return "042 - " + AutoStory_Segment_19().name(); }
+std::string AutoStory_Checkpoint_42::start_text() const{ return AutoStory_Checkpoint_41().end_text();}
+std::string AutoStory_Checkpoint_42::end_text() const{ return "Defeated Klawf. At Artazon (West) Pokecenter.";}
+void AutoStory_Checkpoint_42::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_42(env, context, options.notif_status_update, stats);
+}
+
+
 
 
 

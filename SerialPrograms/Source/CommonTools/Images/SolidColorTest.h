@@ -51,7 +51,11 @@ inline bool is_white(
     double min_rgb_sum = 500,
     double max_stddev_sum = 10
 ){
-    return is_white(image_stats(image), min_rgb_sum, max_stddev_sum);
+    ImageStats stats = image_stats(image);
+    bool ret = is_white(stats, min_rgb_sum, max_stddev_sum);
+//    cout << stats.average << stats.stddev << endl;
+//    cout << ret << endl;
+    return ret;
 }
 inline bool is_black(
     const ImageViewRGB32& image,
@@ -59,9 +63,10 @@ inline bool is_black(
     double max_stddev_sum = 10
 ){
     ImageStats stats = image_stats(image);
+    bool ret = is_black(stats, max_rgb_sum, max_stddev_sum);
 //    cout << stats.average << stats.stddev << endl;
-//    cout << is_black(stats, max_rgb_sum, max_stddev_sum) << endl;
-    return is_black(stats, max_rgb_sum, max_stddev_sum);
+//    cout << ret << endl;
+    return ret;
 }
 inline bool is_grey(
     const ImageViewRGB32& image,
@@ -78,7 +83,11 @@ inline bool is_solid(
     double max_euclidean_distance = 0.15,
     double max_stddev_sum = 10
 ){
-    return is_solid(image_stats(image), expected_color_ratio, max_euclidean_distance, max_stddev_sum);
+    ImageStats stats = image_stats(image);
+    bool ret = is_solid(stats, expected_color_ratio, max_euclidean_distance, max_stddev_sum);
+//    cout << stats.average << stats.stddev << endl;
+//    cout << ret << endl;
+    return ret;
 }
 
 // A convenience struct to do solid checks on images.

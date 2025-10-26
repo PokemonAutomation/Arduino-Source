@@ -26,6 +26,21 @@ public:
     ) const override;
 };
 
+class AutoStory_Checkpoint_09 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_10 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
 
 // start: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave. Standing next to Koraidon/Miraidon just outside the cave exit.
 // end: Battled Arven and received Legendary's Pokeball.

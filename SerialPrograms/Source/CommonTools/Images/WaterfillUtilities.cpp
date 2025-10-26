@@ -125,6 +125,9 @@ bool match_template_by_waterfill(
         auto finder = session->make_iterator(min_area);
         const bool keep_object_matrix = false;
         while (finder->find_next(object, keep_object_matrix)){
+//            static int c = 0;
+//            extract_box_reference(image, object).save("test-" + std::to_string(c++) + ".png");
+
 //            cout << "object.area = " << object.area << endl;
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
                 std::cout << "------------" << std::endl;
@@ -138,6 +141,8 @@ bool match_template_by_waterfill(
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
                 std::cout << "Object rmsd: " << rmsd << std::endl;
             }
+
+//            std::cout << "Object rmsd: " << rmsd << std::endl;
 
             if (rmsd < rmsd_threshold){
 #if 0

@@ -26,6 +26,40 @@ public:
     ) const override;
 };
 
+class AutoStory_Checkpoint_50 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_51 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_52 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_53 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+
+
 
 // start: Defeated Team Star (Fire). At East Province (Area Two) Pokecenter.
 // end: At Levincia (South) Pokecenter.

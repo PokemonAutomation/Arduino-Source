@@ -55,14 +55,40 @@ void AutoStory_Segment_32::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_82(env, context, options.notif_status_update, stats);
-    checkpoint_83(env, context, options.notif_status_update, stats);
-    checkpoint_84(env, context, options.notif_status_update, stats);
+	AutoStory_Checkpoint_82().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_83().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_84().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+
+std::string AutoStory_Checkpoint_82::name() const{ return "082 - " + AutoStory_Segment_32().name(); }
+std::string AutoStory_Checkpoint_82::start_text() const{ return "At North Province Area Two Pokecenter";}
+std::string AutoStory_Checkpoint_82::end_text() const{ return "At Alfornada Pokecenter.";}
+void AutoStory_Checkpoint_82::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_82(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_83::name() const{ return "083 - " + AutoStory_Segment_32().name(); }
+std::string AutoStory_Checkpoint_83::start_text() const{ return AutoStory_Checkpoint_82().end_text();}
+std::string AutoStory_Checkpoint_83::end_text() const{ return "At Alfornada gym building. Spoke to receptionist.";}
+void AutoStory_Checkpoint_83::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_83(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_84::name() const{ return "084 - " + AutoStory_Segment_32().name(); }
+std::string AutoStory_Checkpoint_84::start_text() const{ return AutoStory_Checkpoint_83().end_text();}
+std::string AutoStory_Checkpoint_84::end_text() const{ return "Beat Alfornada gym challenge. Beat Alfornada gym. At Alfronada Pokecenter.";}
+void AutoStory_Checkpoint_84::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_84(env, context, options.notif_status_update, stats);
+}
+
+
 
 void checkpoint_82(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,

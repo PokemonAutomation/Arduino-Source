@@ -52,14 +52,36 @@ void AutoStory_Segment_21::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_47(env, context, options.notif_status_update, stats);
-    checkpoint_48(env, context, options.notif_status_update, stats);
-    checkpoint_49(env, context, options.notif_status_update, stats);    
+    AutoStory_Checkpoint_47().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_48().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_49().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_47::name() const{ return "047 - " + AutoStory_Segment_21().name(); }
+std::string AutoStory_Checkpoint_47::start_text() const{ return "At East Province (Area One) Pokecenter.";}
+std::string AutoStory_Checkpoint_47::end_text() const{ return "At gate of Team Star (Fire) base.";}
+void AutoStory_Checkpoint_47::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_47(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_48::name() const{ return "048 - " + AutoStory_Segment_21().name(); }
+std::string AutoStory_Checkpoint_48::start_text() const{ return AutoStory_Checkpoint_47().end_text();}
+std::string AutoStory_Checkpoint_48::end_text() const{ return "Beat Team Star (Fire)";}
+void AutoStory_Checkpoint_48::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_48(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_49::name() const{ return "049 - " + AutoStory_Segment_21().name(); }
+std::string AutoStory_Checkpoint_49::start_text() const{ return AutoStory_Checkpoint_48().end_text();}
+std::string AutoStory_Checkpoint_49::end_text() const{ return "At East Province (Area Two) Pokecenter.";}
+void AutoStory_Checkpoint_49::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_49(env, context, options.notif_status_update, stats);
+}
+
 
 
 void checkpoint_47(

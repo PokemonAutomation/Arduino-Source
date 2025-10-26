@@ -50,13 +50,20 @@ void AutoStory_Segment_06::run_segment(
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 06: Go to Los Platos", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_11(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_11().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 06: Go to Los Platos", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
+}
+
+std::string AutoStory_Checkpoint_11::name() const{ return "011 - " + AutoStory_Segment_06().name(); }
+std::string AutoStory_Checkpoint_11::start_text() const{ return "Talked to Nemona at roof of the Lighthouse.";}
+std::string AutoStory_Checkpoint_11::end_text() const{ return "Arrived at Los Platos pokecenter. Cleared Let's go tutorial.";}
+void AutoStory_Checkpoint_11::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_11(env, context, options.notif_status_update, stats);
 }
 
 

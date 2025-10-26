@@ -53,13 +53,34 @@ void AutoStory_Segment_34::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_90(env, context, options.notif_status_update, stats);
-    checkpoint_91(env, context, options.notif_status_update, stats);
-    checkpoint_92(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_90().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_91().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_92().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
+}
+
+std::string AutoStory_Checkpoint_90::name() const{ return "090 - " + AutoStory_Segment_34().name(); }
+std::string AutoStory_Checkpoint_90::start_text() const{ return "Beat Geeta. At Pokemon League Pokecenter.";}
+std::string AutoStory_Checkpoint_90::end_text() const{ return "Beat Nemona. At dormitory room, next to bed.";}
+void AutoStory_Checkpoint_90::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_90(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_91::name() const{ return "091 - " + AutoStory_Segment_34().name(); }
+std::string AutoStory_Checkpoint_91::start_text() const{ return AutoStory_Checkpoint_90().end_text();}
+std::string AutoStory_Checkpoint_91::end_text() const{ return "Beat Penny. At Academy fly point.";}
+void AutoStory_Checkpoint_91::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_91(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_92::name() const{ return "092 - " + AutoStory_Segment_34().name(); }
+std::string AutoStory_Checkpoint_92::start_text() const{ return AutoStory_Checkpoint_91().end_text();}
+std::string AutoStory_Checkpoint_92::end_text() const{ return "Beat Arven. At Los Platos Pokecenter.";}
+void AutoStory_Checkpoint_92::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_92(env, context, options.notif_status_update, stats);
 }
 
 

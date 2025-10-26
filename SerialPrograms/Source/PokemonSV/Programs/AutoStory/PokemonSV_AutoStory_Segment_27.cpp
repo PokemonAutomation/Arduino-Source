@@ -54,15 +54,49 @@ void AutoStory_Segment_27::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_64(env, context, options.notif_status_update, stats);
-    checkpoint_65(env, context, options.notif_status_update, stats);
-    checkpoint_66(env, context, options.notif_status_update, stats);
-    checkpoint_67(env, context, options.notif_status_update, stats);
+	AutoStory_Checkpoint_64().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_65().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_66().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_67().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+
+std::string AutoStory_Checkpoint_64::name() const{ return "064 - " + AutoStory_Segment_27().name(); }
+std::string AutoStory_Checkpoint_64::start_text() const{ return "At Glaseado Mountain Pokecenter";}
+std::string AutoStory_Checkpoint_64::end_text() const{ return "At Casseroya Watchtower 3";}
+void AutoStory_Checkpoint_64::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_64(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_65::name() const{ return "065 - " + AutoStory_Segment_27().name(); }
+std::string AutoStory_Checkpoint_65::start_text() const{ return AutoStory_Checkpoint_64().end_text();}
+std::string AutoStory_Checkpoint_65::end_text() const{ return "Defeat Dondozo Titan phase 1.";}
+void AutoStory_Checkpoint_65::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_65(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_66::name() const{ return "066 - " + AutoStory_Segment_27().name(); }
+std::string AutoStory_Checkpoint_66::start_text() const{ return AutoStory_Checkpoint_65().end_text();}
+std::string AutoStory_Checkpoint_66::end_text() const{ return "Defeat Dondozo Titan phase 2-3.";}
+void AutoStory_Checkpoint_66::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_66(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_67::name() const{ return "067 - " + AutoStory_Segment_27().name(); }
+std::string AutoStory_Checkpoint_67::start_text() const{ return AutoStory_Checkpoint_66().end_text();}
+std::string AutoStory_Checkpoint_67::end_text() const{ return "At North Province Area Three Pokecenter";}
+void AutoStory_Checkpoint_67::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_67(env, context, options.notif_status_update, stats);
+}
+
+
 
 void checkpoint_64(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,

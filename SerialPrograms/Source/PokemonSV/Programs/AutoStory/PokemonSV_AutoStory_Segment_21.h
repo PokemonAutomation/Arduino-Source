@@ -26,6 +26,32 @@ public:
     ) const override;
 };
 
+class AutoStory_Checkpoint_47 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_48 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_49 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+
+
 // start: At East Province (Area One) Pokecenter.
 // end: At gate of Team Star (Fire) base.
 void checkpoint_47(

@@ -54,13 +54,40 @@ void AutoStory_Segment_26::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_61(env, context, options.notif_status_update, stats);
-    checkpoint_62(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_61().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_62().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_63().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+
+std::string AutoStory_Checkpoint_61::name() const{ return "061 - " + AutoStory_Segment_26().name(); }
+std::string AutoStory_Checkpoint_61::start_text() const{ return "At Medali Pokecenter.";}
+std::string AutoStory_Checkpoint_61::end_text() const{ return "At Medali Gym";}
+void AutoStory_Checkpoint_61::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_61(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_62::name() const{ return "062 - " + AutoStory_Segment_26().name(); }
+std::string AutoStory_Checkpoint_62::start_text() const{ return AutoStory_Checkpoint_61().end_text();}
+std::string AutoStory_Checkpoint_62::end_text() const{ return "Beat Medali Gym";}
+void AutoStory_Checkpoint_62::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_62(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_63::name() const{ return "063 - " + AutoStory_Segment_26().name(); }
+std::string AutoStory_Checkpoint_63::start_text() const{ return AutoStory_Checkpoint_62().end_text();}
+std::string AutoStory_Checkpoint_63::end_text() const{ return "At Glaseado Mountain Pokecenter";}
+void AutoStory_Checkpoint_63::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_63(env, context, options.notif_status_update, stats);
+}
+
+
+
 
 void checkpoint_61(
     SingleSwitchProgramEnvironment& env, 

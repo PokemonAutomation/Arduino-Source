@@ -49,17 +49,42 @@ void AutoStory_Segment_08::run_segment(
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 08: Beat Team Star and arrive at School", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_13(env, context, options.notif_status_update, stats);
-    checkpoint_14(env, context, options.notif_status_update, stats);
-    checkpoint_15(env, context, options.notif_status_update, stats);
-    
+    AutoStory_Checkpoint_13().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_14().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_15().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 08: Beat Team Star and arrive at School", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_13::name() const{ return "013 - " + AutoStory_Segment_08().name(); }
+std::string AutoStory_Checkpoint_13::start_text() const{ return "Arrived at Mesagoza (South) Pokecenter.";}
+std::string AutoStory_Checkpoint_13::end_text() const{ return "Battled Nemona at Mesagoza gate. Entered Mesagoza.";}
+void AutoStory_Checkpoint_13::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_13(env, context, options.notif_status_update, stats);
+}
+
+
+
+std::string AutoStory_Checkpoint_14::name() const{ return "014 - " + AutoStory_Segment_08().name(); }
+std::string AutoStory_Checkpoint_14::start_text() const{ return AutoStory_Checkpoint_13().end_text();}
+std::string AutoStory_Checkpoint_14::end_text() const{ return "Battled Team Star at school entrance.";}
+void AutoStory_Checkpoint_14::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_14(env, context, options.notif_status_update, stats);
+}
+
+
+
+std::string AutoStory_Checkpoint_15::name() const{ return "015 - " + AutoStory_Segment_08().name(); }
+std::string AutoStory_Checkpoint_15::start_text() const{ return AutoStory_Checkpoint_14().end_text();}
+std::string AutoStory_Checkpoint_15::end_text() const{ return "Talked to Jacq in classroom. Standing in classroom.";}
+void AutoStory_Checkpoint_15::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_15(env, context, options.notif_status_update, stats);
+}
+
 
 
 void checkpoint_13(

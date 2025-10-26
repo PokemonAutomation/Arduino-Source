@@ -147,6 +147,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
+#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 
 
 
@@ -285,11 +286,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.controller<ProController>());
     VideoOverlaySet overlays(overlay);
 
-
+#if 0
     while (true){
         sit_on_bench(console, context);
     }
-
+#endif
 
 
 #if 0
@@ -304,12 +305,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
-    ImageRGB32 image("Screenshots/screenshot-20251012-174842583706.png");
+#if 1
+//    ImageRGB32 image("Screenshots/screenshot-20251025-153957561163.png");
 
+    auto screen = feed.snapshot();
+
+//    PokemonLZA::FlatWhiteDialogDetector detector(COLOR_RED, &overlay);
     PokemonLZA::BlueDialogDetector detector(COLOR_RED, &overlay);
+//    PokemonLZA::ButtonDetector detector(COLOR_RED, ButtonType::ButtonA, {0.526718, 0.535922, 0.033806, 0.100971},  &overlay);
 
-    cout << detector.detect(image) << endl;
+    cout << detector.detect(screen) << endl;
 #endif
 
 

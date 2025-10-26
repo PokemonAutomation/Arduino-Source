@@ -54,13 +54,29 @@ void AutoStory_Segment_18::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_39(env, context, options.notif_status_update, stats);
-    checkpoint_40(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_39().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_40().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_39::name() const{ return "039 - " + AutoStory_Segment_18().name(); }
+std::string AutoStory_Checkpoint_39::start_text() const{ return "Defeated Cascarrafa Gym (Water). At Porto Marinada Pokecenter.";}
+std::string AutoStory_Checkpoint_39::end_text() const{ return "Defeated Great Tusk/Iron Treads.";}
+void AutoStory_Checkpoint_39::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_39(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_40::name() const{ return "040 - " + AutoStory_Segment_18().name(); }
+std::string AutoStory_Checkpoint_40::start_text() const{ return AutoStory_Checkpoint_39().end_text();}
+std::string AutoStory_Checkpoint_40::end_text() const{ return "At South Province (Area Three) Pokecenter.";}
+void AutoStory_Checkpoint_40::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_40(env, context, options.notif_status_update, stats);
+}
+
+
 
 
 void checkpoint_39(

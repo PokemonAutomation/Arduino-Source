@@ -26,6 +26,23 @@ public:
     ) const override;
 };
 
+class AutoStory_Checkpoint_37 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+class AutoStory_Checkpoint_38 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
+
 
 // start: At Porto Marinada Pokecenter.
 // end: Won auction at Porto Marinada, passed Gym challenge.

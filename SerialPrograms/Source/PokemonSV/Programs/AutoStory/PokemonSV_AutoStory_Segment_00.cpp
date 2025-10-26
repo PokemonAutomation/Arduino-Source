@@ -42,14 +42,20 @@ void AutoStory_Segment_00::run_segment(
 ) const{
 
     context.wait_for_all_requests();
-    env.console.log("Start Segment 00: Intro Cutscene", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_00(env, context);
+    AutoStory_Checkpoint_00().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 00: Intro Cutscene", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 }
 
+std::string AutoStory_Checkpoint_00::name() const{ return "000 - " + AutoStory_Segment_00().name(); }
+std::string AutoStory_Checkpoint_00::start_text() const{ return "After selecting character name, style and the cutscene has started.";}
+std::string AutoStory_Checkpoint_00::end_text() const{ return "Done cutscene. Stood up from chair. Walked to left side of room.";}
+void AutoStory_Checkpoint_00::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_00(env, context);
+}
 
 void checkpoint_00(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 

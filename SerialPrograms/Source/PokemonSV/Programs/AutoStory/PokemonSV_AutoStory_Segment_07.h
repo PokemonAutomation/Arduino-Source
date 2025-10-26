@@ -26,6 +26,14 @@ public:
     ) const override;
 };
 
+class AutoStory_Checkpoint_12 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
+
 
 // start: Arrived at Los Platos pokecenter. Cleared Let's go tutorial.
 // end: Arrived at Mesagoza (South) Pokecenter

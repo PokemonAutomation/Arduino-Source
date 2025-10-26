@@ -53,14 +53,27 @@ void AutoStory_Segment_16::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_35(env, context, options.notif_status_update, stats);
-    checkpoint_36(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_35().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_36().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 
+std::string AutoStory_Checkpoint_35::name() const{ return "035 - " + AutoStory_Segment_16().name(); }
+std::string AutoStory_Checkpoint_35::start_text() const{ return "At Cascarrafa (West) Pokecenter.";}
+std::string AutoStory_Checkpoint_35::end_text() const{ return "At Cascarrafa Gym. Received Kofu's wallet.";}
+void AutoStory_Checkpoint_35::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_35(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_36::name() const{ return "036 - " + AutoStory_Segment_16().name(); }
+std::string AutoStory_Checkpoint_36::start_text() const{ return AutoStory_Checkpoint_35().end_text();}
+std::string AutoStory_Checkpoint_36::end_text() const{ return "At Porto Marinada Pokecenter.";}
+void AutoStory_Checkpoint_36::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_36(env, context, options.notif_status_update, stats);
+}
 
 void checkpoint_35(
     SingleSwitchProgramEnvironment& env, 
