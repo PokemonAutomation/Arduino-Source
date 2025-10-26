@@ -85,13 +85,10 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
 void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHunt_BenchSit_Descriptor::Stats& stats = env.current_stats<ShinyHunt_BenchSit_Descriptor::Stats>();
 
-    uint8_t shiny_count = 0;
-
     while (true){
         float shiny_coefficient = 1.0;
         PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
-            shiny_count++;
             stats.shinies++;
             env.update_stats();
             shiny_coefficient = error_coefficient;
@@ -121,7 +118,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
 
         if (SHINY_DETECTED.on_shiny_sound(
             env, env.console, context,
-            shiny_count,
+            stats.shinies,
             shiny_coefficient
         )){
             break;
