@@ -232,7 +232,7 @@ void SendableErrorReport::add_file(std::string filename){
     m_files.emplace_back(std::move(filename));
 }
 
-void SendableErrorReport::save(Logger* logger) const{
+void SendableErrorReport::save_report_json(Logger* logger) const{
     if (logger){
         logger->log("Saving Error Report...");
     }else{
@@ -421,7 +421,7 @@ void report_error(
             full_file_paths.emplace_back(report.directory() + file);
         }
 
-        report.save(logger);
+        report.save_report_json(logger);
     }
 
     send_all_unsent_reports(*logger, false);

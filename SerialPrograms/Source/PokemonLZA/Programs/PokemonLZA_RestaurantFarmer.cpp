@@ -7,6 +7,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 //#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -204,6 +205,7 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
     switch (ret){
     case 0:
         env.log("Detected selection arrow. (unexpected)", COLOR_RED);
+        dump_image(env.console.logger(), env.program_info(), env.console.video(), "UnexpectedSelectionArrow");
         stats.errors++;
         stats.battles++;
         env.update_stats();

@@ -30,13 +30,18 @@ std::string dump_image_alone(
 );
 #endif
 
-// Dump error image to ./ErrorDumps/ folder. Also send image as telemetry if user allows.
+// Call CommonFramework/ErrorReports/ErrorReports.h:report_error() to create an error
+// report with image. Check the comments of report_error() for more details.
 void dump_image(
     Logger& logger,
     const ProgramInfo& program_info, const std::string& label,
     const ImageViewRGB32& image,
     const StreamHistorySession* stream_history = nullptr
 );
+
+// Take a screenshot from the video stream and call
+// CommonFramework/ErrorReports/ErrorReports.h:report_error() to create an error
+// report with the screenshot. Check the comments of report_error() for more details.
 void dump_image(
     Logger& logger,
     const ProgramInfo& program_info,
@@ -44,10 +49,8 @@ void dump_image(
     const std::string& label
 );
 
-// dump a screenshot to ./ErrorDumps/ folder and throw an OperationFailedException.
-// error_name: the error name, used as the image name and show up on video overlay log. Typical format example:
-//   "NoHatchEnd", "NoYCommFound".
-// error_message: the exception mesage.
+// Throw an OperationFailedException that will trigger error report creation.
+// Check OperationFailedException::fire() for more details.
 [[noreturn]] void dump_image_and_throw_recoverable_exception(
     const ProgramInfo& program_info,
     VideoStream& stream,
