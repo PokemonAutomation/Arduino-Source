@@ -1539,6 +1539,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.cpp
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
@@ -1567,6 +1569,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.h
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp

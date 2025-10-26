@@ -14,7 +14,8 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h" 
+#include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h" 
 #include <QFileInfo>
 #include <QDir>
 #include <algorithm>
@@ -120,5 +121,68 @@ int test_pokemonLZA_MainMenuDetector(const ImageViewRGB32& image, bool target){
     return 0;
 }
 
+int test_pokemonLZA_BoxDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // Filename format: <name>_<row>_<col>_<True/False>.png
+    // Last three words: row, col, in_box_system (True/False)
+    if (words.size() < 3){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
 
-} 
+    // Parse row from third-to-last word
+    int expected_row;
+    if (parse_int(words[words.size() - 3], expected_row) == false){
+        cerr << "Error: third-to-last word in filename should be row number (0-5)." << endl;
+        return 1;
+    }
+    if (expected_row < 0 || expected_row > 5){
+        cerr << "Error: row must be between 0 and 5, got " << expected_row << "." << endl;
+        return 1;
+    }
+
+    // Parse col from second-to-last word
+    int expected_col;
+    if (parse_int(words[words.size() - 2], expected_col) == false){
+        cerr << "Error: second-to-last word in filename should be col number (0-5)." << endl;
+        return 1;
+    }
+    if (expected_col < 0 || expected_col > 5){
+        cerr << "Error: col must be between 0 and 5, got " << expected_col << "." << endl;
+        return 1;
+    }
+
+    // Parse in_box_system (True/False) from last word
+    bool expected_in_box_system;
+    if (parse_bool(words[words.size() - 1], expected_in_box_system) == false){
+        cerr << "Error: last word in filename should be True or False." << endl;
+        return 1;
+    }
+
+    // Run detector
+    auto overlay = DummyVideoOverlay();
+    BoxDetector detector(COLOR_RED, &overlay);
+
+    // Test if we're in box system view
+    bool in_box_system = detector.detect(image);
+    TEST_RESULT_COMPONENT_EQUAL(in_box_system, expected_in_box_system, "in_box_system");
+
+    // If we're in box system, also check the cursor location
+    if (expected_in_box_system){
+        BoxCursorCoordinates coords = detector.detected_location();
+
+        // Check that coordinates are valid (detect_location should have succeeded)
+        if (coords.row == BoxCursorCoordinates::INVALID || coords.col == BoxCursorCoordinates::INVALID){
+            cerr << "Error: detect_location() returned INVALID coordinates but should have detected the cursor." << endl;
+            return 1;
+        }
+
+        // cout << "Detected selection arrow at box cell " << int(coords.row) << ", " << int(coords.col) << endl;
+        TEST_RESULT_COMPONENT_EQUAL((int)coords.row, expected_row, "row");
+        TEST_RESULT_COMPONENT_EQUAL((int)coords.col, expected_col, "col");
+    }
+
+    return 0;
+}
+
+
+}
