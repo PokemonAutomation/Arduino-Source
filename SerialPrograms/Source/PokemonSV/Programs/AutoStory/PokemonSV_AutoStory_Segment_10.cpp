@@ -54,14 +54,37 @@ void AutoStory_Segment_10::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_21(env, context, options.notif_status_update, stats);
-    checkpoint_22(env, context, options.notif_status_update, stats);
-    checkpoint_23(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_21().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_22().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_23().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_21::name() const{ return "021 - " + AutoStory_Segment_10().name(); }
+std::string AutoStory_Checkpoint_21::start_text() const{ return "After the break, with level 100 Gardevoir. At Mesagoza West pokecenter.";}
+std::string AutoStory_Checkpoint_21::end_text() const{ return "At Mesagoza West gate flypoint.";}
+void AutoStory_Checkpoint_21::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_21(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_22::name() const{ return "022 - " + AutoStory_Segment_10().name(); }
+std::string AutoStory_Checkpoint_22::start_text() const{ return AutoStory_Checkpoint_21().end_text();}
+std::string AutoStory_Checkpoint_22::end_text() const{ return "At South Province Area Two Pokecenter.";}
+void AutoStory_Checkpoint_22::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_22(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_23::name() const{ return "023 - " + AutoStory_Segment_10().name(); }
+std::string AutoStory_Checkpoint_23::start_text() const{ return AutoStory_Checkpoint_22().end_text();}
+std::string AutoStory_Checkpoint_23::end_text() const{ return "At Cortondo East Pokecenter";}
+void AutoStory_Checkpoint_23::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_23(env, context, options.notif_status_update, stats);
+}
+
+
 
 void checkpoint_21(
     SingleSwitchProgramEnvironment& env, 

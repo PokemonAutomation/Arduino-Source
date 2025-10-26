@@ -72,6 +72,7 @@ namespace PokemonSV{
 using namespace Pokemon;
 
 static constexpr size_t INDEX_OF_LAST_TUTORIAL_SEGMENT = 9;
+static constexpr size_t INDEX_OF_LAST_TUTORIAL_CHECKPOINT = 20;
 
 
 std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
@@ -170,6 +171,167 @@ const StringSelectDatabase& MAINSTORY_SEGMENTS_SELECT_DATABASE(){
     return database;
 }
 
+std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_list(){
+    std::vector<std::unique_ptr<AutoStory_Checkpoint>> checkpoint_list;
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_00>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_01>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_02>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_03>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_04>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_05>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_06>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_07>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_08>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_09>());
+
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_10>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_11>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_12>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_13>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_14>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_15>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_16>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_17>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_18>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_19>());
+
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_20>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_21>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_22>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_23>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_24>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_25>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_26>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_27>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_28>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_29>());
+
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_30>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_31>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_32>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_33>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_34>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_35>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_36>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_37>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_38>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_39>());
+
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_40>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_41>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_42>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_43>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_44>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_45>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_46>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_47>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_48>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_49>());
+
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_50>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_51>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_52>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_53>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_54>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_55>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_56>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_57>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_58>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_59>());
+
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_60>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_61>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_62>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_63>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_64>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_65>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_66>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_67>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_68>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_69>());
+
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_70>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_71>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_72>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_73>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_74>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_75>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_76>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_77>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_78>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_79>());
+
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_80>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_81>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_82>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_83>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_84>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_85>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_86>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_87>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_88>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_89>());
+
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_90>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_91>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_92>());
+
+
+    return checkpoint_list;
+};
+
+const std::vector<std::unique_ptr<AutoStory_Checkpoint>>& ALL_AUTO_STORY_CHECKPOINT_LIST(){
+    static std::vector<std::unique_ptr<AutoStory_Checkpoint>> checkpoint_list = make_autoStory_checkpoint_list();
+    return checkpoint_list;
+}
+
+StringSelectDatabase make_all_checkpoints_database(){
+    StringSelectDatabase ret;
+    int index_num = 0;
+    for (const auto& segment : ALL_AUTO_STORY_CHECKPOINT_LIST()){
+        ret.add_entry(StringSelectEntry(std::to_string(index_num), segment->name()));
+        index_num++;
+    }
+    return ret;
+}
+const StringSelectDatabase& ALL_CHECKPOINTS_SELECT_DATABASE(){
+    static StringSelectDatabase database = make_all_checkpoints_database();
+    return database;
+}
+
+StringSelectDatabase make_tutorial_checkpoints_database(){
+    StringSelectDatabase ret;
+    const StringSelectDatabase& all_checkpoints = ALL_CHECKPOINTS_SELECT_DATABASE();
+    size_t start = 0;
+    size_t end = INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1;
+    for (size_t i = start; i < end; i++){
+        const auto& segment = all_checkpoints[i];
+        ret.add_entry(segment);
+    }
+    return ret;
+}
+
+const StringSelectDatabase& TUTORIAL_CHECKPOINTS_SELECT_DATABASE(){
+    static StringSelectDatabase database = make_tutorial_checkpoints_database();
+    return database;
+}
+
+StringSelectDatabase make_mainstory_checkpoints_database(){
+    StringSelectDatabase ret;
+    const StringSelectDatabase& all_checkpoints = ALL_CHECKPOINTS_SELECT_DATABASE();
+    size_t start = INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1;
+    size_t end = all_checkpoints.case_list().size();
+    for (size_t i = start; i < end; i++){
+        const auto& segment = all_checkpoints[i];
+        ret.add_entry(segment);
+    }
+    return ret;
+}
+
+const StringSelectDatabase& MAINSTORY_CHECKPOINTS_SELECT_DATABASE(){
+    static StringSelectDatabase database = make_mainstory_checkpoints_database();
+    return database;
+}
 
 AutoStory_Descriptor::AutoStory_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -222,29 +384,53 @@ AutoStory::AutoStory()
         StorySection::TUTORIAL
     )    
     , STARTPOINT_TUTORIAL(
-        "<b>Start Point:</b>", //<br>Program will start with this segment.
+        "<b>Start Segment:</b>", //<br>Program will start with this segment.
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
         LockMode::LOCK_WHILE_RUNNING,
         "0"
     )
     , ENDPOINT_TUTORIAL(
-        "<b>End Point:</b>", //<br>Program will stop after completing this segment.
+        "<b>End Segment:</b>", //<br>Program will stop after completing this segment.
         TUTORIAL_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        "9"
+        std::to_string(INDEX_OF_LAST_TUTORIAL_SEGMENT)
     )   
     , STARTPOINT_MAINSTORY(
-        "<b>Start Point:</b>", //<br>Program will start with this segment.
+        "<b>Start Segment:</b>", //<br>Program will start with this segment.
         MAINSTORY_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        "10"
+        std::to_string(INDEX_OF_LAST_TUTORIAL_SEGMENT+1)
     )
     , ENDPOINT_MAINSTORY(
-        "<b>End Point:</b>", //<br>Program will stop after completing this segment.
+        "<b>End Segment:</b>", //<br>Program will stop after completing this segment.
         MAINSTORY_SEGMENTS_SELECT_DATABASE(),
         LockMode::UNLOCK_WHILE_RUNNING,
-        "10"
+        std::to_string(ALL_SEGMENTS_SELECT_DATABASE().case_list().size()-1)
     )       
+    , START_CHECKPOINT_TUTORIAL(
+        "<b>Start Checkpoint:</b>", //<br>Program will start with this checkpoint.
+        TUTORIAL_CHECKPOINTS_SELECT_DATABASE(),
+        LockMode::LOCK_WHILE_RUNNING,
+        "0"
+    )
+    , END_CHECKPOINT_TUTORIAL(
+        "<b>End Checkpoint:</b>", //<br>Program will stop after completing this checkpoint.
+        TUTORIAL_CHECKPOINTS_SELECT_DATABASE(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        std::to_string(INDEX_OF_LAST_TUTORIAL_CHECKPOINT)
+    ) 
+    , START_CHECKPOINT_MAINSTORY(
+        "<b>Start Checkpoint:</b>", //<br>Program will start with this checkpoint.
+        MAINSTORY_CHECKPOINTS_SELECT_DATABASE(),
+        LockMode::LOCK_WHILE_RUNNING,
+        std::to_string(INDEX_OF_LAST_TUTORIAL_CHECKPOINT+1)
+    )
+    , END_CHECKPOINT_MAINSTORY(
+        "<b>End Checkpoint:</b>", //<br>Program will stop after completing this checkpoint.
+        MAINSTORY_CHECKPOINTS_SELECT_DATABASE(),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        std::to_string(ALL_CHECKPOINTS_SELECT_DATABASE().case_list().size()-1)
+    ) 
     , SETUP_NOTE{
         "NOTE: Make sure you have selected the correct Start Point. "
         "Make sure your player character is in the exact correct start position for that Start Point, "
@@ -262,6 +448,12 @@ AutoStory::AutoStory()
     )
     , END_DESCRIPTION(
         ""
+    ) 
+    , START_CHECKPOINT_DESCRIPTION(
+        ""
+    )
+    , END_CHECKPOINT_DESCRIPTION(
+        ""
     )    
     , STARTERCHOICE(
         "<b>Starter " + STRING_POKEMON + ":",
@@ -273,6 +465,13 @@ AutoStory::AutoStory()
         LockMode::LOCK_WHILE_RUNNING,
         StarterChoice::FUECOCO
     )
+    , ENABLE_ADVANCED_MODE(
+        "<b>Advanced mode:</b><br>"
+        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.<br>"
+        "Also, this enables the option to toggle 'Change settings at Program Start'.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    ) 
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(30))
     , NOTIFICATIONS({
@@ -289,7 +488,8 @@ AutoStory::AutoStory()
     )    
     , CHANGE_SETTINGS(
         "<b>Change settings at Program Start:</b><br>"
-        "This is to ensure the program has the correct settings, particularly with Autosave turned off.",
+        "This is to ensure the program has the correct settings, particularly with Autosave turned off, and Camera Support off.<br>"
+        "WARNING: if you disable this, make sure you manually set the in-game settings as laid out in the wiki.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )  
@@ -462,7 +662,6 @@ AutoStory::AutoStory()
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
-        PA_ADD_OPTION(CHANGE_SETTINGS);
 
         PA_ADD_OPTION(FLYPOINT_TYPE);
         PA_ADD_OPTION(TEST_FLYPOINT_LOCATIONS);
@@ -508,15 +707,29 @@ AutoStory::AutoStory()
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(SETUP_NOTE);
     PA_ADD_OPTION(STORY_SECTION);
+
     PA_ADD_OPTION(STARTPOINT_TUTORIAL);
     PA_ADD_OPTION(MAINSTORY_NOTE);
     PA_ADD_OPTION(STARTPOINT_MAINSTORY);
     PA_ADD_OPTION(START_DESCRIPTION);
     PA_ADD_OPTION(ENDPOINT_TUTORIAL);
     PA_ADD_OPTION(ENDPOINT_MAINSTORY);
-    PA_ADD_OPTION(END_DESCRIPTION);
+    PA_ADD_OPTION(END_DESCRIPTION);    
+
+    PA_ADD_OPTION(START_CHECKPOINT_TUTORIAL);
+    PA_ADD_OPTION(START_CHECKPOINT_MAINSTORY);
+    PA_ADD_OPTION(START_CHECKPOINT_DESCRIPTION);
+    PA_ADD_OPTION(END_CHECKPOINT_TUTORIAL);
+    PA_ADD_OPTION(END_CHECKPOINT_MAINSTORY);
+    PA_ADD_OPTION(END_CHECKPOINT_DESCRIPTION);
+
     PA_ADD_OPTION(STARTERCHOICE);
+
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+
+    PA_ADD_OPTION(ENABLE_ADVANCED_MODE);
+    PA_ADD_OPTION(CHANGE_SETTINGS);
+    
     PA_ADD_OPTION(NOTIFICATIONS);
 
 
@@ -527,6 +740,14 @@ AutoStory::AutoStory()
     ENDPOINT_TUTORIAL.add_listener(*this);
     STARTPOINT_MAINSTORY.add_listener(*this);
     ENDPOINT_MAINSTORY.add_listener(*this);    
+
+    START_CHECKPOINT_TUTORIAL.add_listener(*this);
+    END_CHECKPOINT_TUTORIAL.add_listener(*this);
+    START_CHECKPOINT_MAINSTORY.add_listener(*this);
+    END_CHECKPOINT_MAINSTORY.add_listener(*this);  
+
+    ENABLE_ADVANCED_MODE.add_listener(*this); 
+
     ENABLE_TEST_CHECKPOINTS.add_listener(*this);
     ENABLE_TEST_REALIGN.add_listener(*this);
     ENABLE_MISC_TEST.add_listener(*this);
@@ -542,23 +763,32 @@ void AutoStory::on_config_value_changed(void* object){
     //     : ConfigOptionState::HIDDEN;
     // STARTERCHOICE.set_visibility(state);
 
-    if (STORY_SECTION == StorySection::TUTORIAL){
-        STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
-        ENDPOINT_TUTORIAL.set_visibility(ConfigOptionState::ENABLED);
+    bool tutorial_segments = STORY_SECTION == StorySection::TUTORIAL && !ENABLE_ADVANCED_MODE;
+    bool tutorial_checkpoints = STORY_SECTION == StorySection::TUTORIAL && ENABLE_ADVANCED_MODE;
+    bool mainstory_segments = STORY_SECTION == StorySection::MAIN_STORY && !ENABLE_ADVANCED_MODE;
+    bool mainstory_checkpoints = STORY_SECTION == StorySection::MAIN_STORY && ENABLE_ADVANCED_MODE;
 
-        STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
-        ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::HIDDEN);
-    }else if (STORY_SECTION == StorySection::MAIN_STORY){
-        STARTPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
-        ENDPOINT_TUTORIAL.set_visibility(ConfigOptionState::HIDDEN);
+    STARTPOINT_TUTORIAL.set_visibility(tutorial_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    ENDPOINT_TUTORIAL.set_visibility(tutorial_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    STARTPOINT_MAINSTORY.set_visibility(mainstory_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    ENDPOINT_MAINSTORY.set_visibility(mainstory_segments ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
-        STARTPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);
-        ENDPOINT_MAINSTORY.set_visibility(ConfigOptionState::ENABLED);        
-    }
+    START_CHECKPOINT_TUTORIAL.set_visibility(tutorial_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    END_CHECKPOINT_TUTORIAL.set_visibility(tutorial_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    START_CHECKPOINT_MAINSTORY.set_visibility(mainstory_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    END_CHECKPOINT_MAINSTORY.set_visibility(mainstory_checkpoints ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     MAINSTORY_NOTE.set_visibility(STORY_SECTION == StorySection::TUTORIAL ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
     START_DESCRIPTION.set_text(start_segment_description());
     END_DESCRIPTION.set_text(end_segment_description());
+    START_CHECKPOINT_DESCRIPTION.set_text(start_checkpoint_description());
+    END_CHECKPOINT_DESCRIPTION.set_text(end_checkpoint_description());
+
+    START_DESCRIPTION.set_visibility(!ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    END_DESCRIPTION.set_visibility(!ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    START_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    END_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    CHANGE_SETTINGS.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     if (ENABLE_TEST_CHECKPOINTS){
         START_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);
@@ -799,7 +1029,7 @@ std::string AutoStory::start_segment_description(){
     }else if (STORY_SECTION == StorySection::MAIN_STORY){
         segment_index = STARTPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1);
     }
-    return ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->start_text();
+    return "    " + ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->start_text();
 }
 
 std::string AutoStory::end_segment_description(){
@@ -809,7 +1039,7 @@ std::string AutoStory::end_segment_description(){
     }else if (STORY_SECTION == StorySection::MAIN_STORY){
         segment_index = ENDPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_SEGMENT + 1);
     }    
-    return ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->end_text();
+    return "    " + ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->end_text();
 }
 
 size_t AutoStory::get_start_segment_index(){
@@ -836,6 +1066,50 @@ size_t AutoStory::get_end_segment_index(){
     return end;
 }
 
+std::string AutoStory::start_checkpoint_description(){
+    size_t checkpoint_index = 0;
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        checkpoint_index = START_CHECKPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        checkpoint_index = START_CHECKPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1);
+    }
+    return "    Start: " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->start_text();
+}
+
+std::string AutoStory::end_checkpoint_description(){
+    size_t checkpoint_index = 0;
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        checkpoint_index = END_CHECKPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        checkpoint_index = END_CHECKPOINT_MAINSTORY.index() + (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1);
+    }    
+    return "    End: " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->end_text();
+}
+
+size_t AutoStory::get_start_checkpoint_index(){
+    size_t start = 0;
+
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        start = START_CHECKPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        start = (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1) + START_CHECKPOINT_MAINSTORY.index();
+    }
+    
+    return start;
+}
+
+size_t AutoStory::get_end_checkpoint_index(){
+    size_t end = 0;
+
+    if (STORY_SECTION == StorySection::TUTORIAL){
+        end = END_CHECKPOINT_TUTORIAL.index();
+    }else if (STORY_SECTION == StorySection::MAIN_STORY){
+        end = (INDEX_OF_LAST_TUTORIAL_CHECKPOINT + 1) + END_CHECKPOINT_MAINSTORY.index();     
+    }
+    
+    return end;
+}
+
 
 void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     AutoStoryOptions options{
@@ -845,12 +1119,19 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProController
     };    
 
     AutoStoryStats& stats = env.current_stats<AutoStoryStats>();
-    if (get_start_segment_index() > get_end_segment_index()){
-        throw UserSetupError(env.logger(), "The start segment cannot be later than the end segment.");
-    }
-    
-    for (size_t segment_index = get_start_segment_index(); segment_index <= get_end_segment_index(); segment_index++){
-        ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options, stats);
+    context.wait_for_all_requests();
+
+    if (ENABLE_ADVANCED_MODE){
+        for (size_t checkpoint_index = get_start_checkpoint_index(); checkpoint_index <= get_end_checkpoint_index(); checkpoint_index++){
+            env.console.log("Start Checkpoint " + ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->name(), COLOR_ORANGE);
+            ALL_AUTO_STORY_CHECKPOINT_LIST()[checkpoint_index]->run_checkpoint(env, context, options, stats);
+        }
+
+    }else{
+        for (size_t segment_index = get_start_segment_index(); segment_index <= get_end_segment_index(); segment_index++){
+            ALL_AUTO_STORY_SEGMENT_LIST()[segment_index]->run_segment(env, context, options, stats);
+        }
+
     }
 }
 
@@ -939,14 +1220,33 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         return;
     }
 
+    if (ENABLE_ADVANCED_MODE){
+        if (get_start_checkpoint_index() > get_end_checkpoint_index()){
+            throw UserSetupError(env.logger(), "The start checkpoint cannot be later than the end segment.");
+        }
+
+    }else{
+        if (get_start_segment_index() > get_end_segment_index()){
+            throw UserSetupError(env.logger(), "The start segment cannot be later than the end segment.");
+        }
+    }
+
     // Connect controller
     pbf_press_button(context, BUTTON_L, 20, 20);
 
-    env.console.log("Start Segment " + ALL_AUTO_STORY_SEGMENT_LIST()[get_start_segment_index()]->name(), COLOR_ORANGE);
+    if (ENABLE_ADVANCED_MODE){
+        env.console.log("Start Checkpoint " + ALL_AUTO_STORY_CHECKPOINT_LIST()[get_start_checkpoint_index()]->name(), COLOR_ORANGE);        
+    }else{
+        env.console.log("Start Segment " + ALL_AUTO_STORY_SEGMENT_LIST()[get_start_segment_index()]->name(), COLOR_ORANGE);
+    }
 
     // Set settings. to ensure autosave is off.
     if (CHANGE_SETTINGS){
-        change_settings_prior_to_autostory(env, context, get_start_segment_index(), LANGUAGE);
+        if (ENABLE_ADVANCED_MODE){
+            change_settings_prior_to_autostory_checkpoint_mode(env, context, get_start_checkpoint_index(), LANGUAGE);
+        }else{
+            change_settings_prior_to_autostory_segment_mode(env, context, get_start_segment_index(), LANGUAGE);
+        }
     }
 
     run_autostory(env, context);

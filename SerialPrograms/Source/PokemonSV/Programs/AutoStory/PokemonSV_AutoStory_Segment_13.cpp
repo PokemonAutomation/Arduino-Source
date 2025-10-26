@@ -52,11 +52,18 @@ void AutoStory_Segment_13::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_29(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_29().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
+}
+
+std::string AutoStory_Checkpoint_29::name() const{ return "029 - " + AutoStory_Segment_13().name(); }
+std::string AutoStory_Checkpoint_29::start_text() const{ return "At Cortondo West Pokecenter.";}
+std::string AutoStory_Checkpoint_29::end_text() const{ return "At West Province Area One Central Pokecenter.";}
+void AutoStory_Checkpoint_29::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_29(env, context, options.notif_status_update, stats);
 }
 
 void checkpoint_29(

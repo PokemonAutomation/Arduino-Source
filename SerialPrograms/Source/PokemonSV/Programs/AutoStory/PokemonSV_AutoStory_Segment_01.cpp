@@ -56,15 +56,36 @@ void AutoStory_Segment_01::run_segment(
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 01: Pick Starter", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_01(env, context, options.notif_status_update, stats, options.language);
-    checkpoint_02(env, context, options.notif_status_update, stats);
-    checkpoint_03(env, context, options.notif_status_update, stats, options.language, options.starter_choice);
-
+    AutoStory_Checkpoint_01().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_02().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_03().run_checkpoint(env, context, options, stats);
+    
     context.wait_for_all_requests();
-    env.console.log("End Segment 01: Pick Starter", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
+}
+
+std::string AutoStory_Checkpoint_01::name() const{ return "001 - " + AutoStory_Segment_01().name(); }
+std::string AutoStory_Checkpoint_01::start_text() const{ return "Done cutscene. Stood up from chair. Walked to left side of room.";}
+std::string AutoStory_Checkpoint_01::end_text() const{ return "Standing in room. Updated settings";}
+void AutoStory_Checkpoint_01::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_01(env, context, options.notif_status_update, stats, options.language);
+}
+
+std::string AutoStory_Checkpoint_02::name() const{ return "002 - " + AutoStory_Segment_01().name(); }
+std::string AutoStory_Checkpoint_02::start_text() const{ return AutoStory_Checkpoint_01().end_text();}
+std::string AutoStory_Checkpoint_02::end_text() const{ return "Standing in front of the 'power of science' NPC. Cleared map tutorial.";}
+void AutoStory_Checkpoint_02::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_02(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_03::name() const{ return "003 - " + AutoStory_Segment_01().name(); }
+std::string AutoStory_Checkpoint_03::start_text() const{ return  AutoStory_Checkpoint_02().end_text();}
+std::string AutoStory_Checkpoint_03::end_text() const{ return "Received starter Pokemon. Changed move order. Cleared autoheal tutorial.";}
+void AutoStory_Checkpoint_03::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_03(env, context, options.notif_status_update, stats, options.language, options.starter_choice);
 }
 
 

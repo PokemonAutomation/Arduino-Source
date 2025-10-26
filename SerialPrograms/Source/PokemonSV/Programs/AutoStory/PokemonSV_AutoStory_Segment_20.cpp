@@ -55,15 +55,45 @@ void AutoStory_Segment_20::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_43(env, context, options.notif_status_update, stats);
-    checkpoint_44(env, context, options.notif_status_update, stats);
-    checkpoint_45(env, context, options.notif_status_update, stats);
-    checkpoint_46(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_43().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_44().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_45().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_46().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_43::name() const{ return "043 - " + AutoStory_Segment_20().name(); }
+std::string AutoStory_Checkpoint_43::start_text() const{ return "Defeated Klawf. At Artazon (West) Pokecenter.";}
+std::string AutoStory_Checkpoint_43::end_text() const{ return "At Artazon Gym building. Battled Nemona. Received Sunflora gym challenge.";}
+void AutoStory_Checkpoint_43::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_43(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_44::name() const{ return "044 - " + AutoStory_Segment_20().name(); }
+std::string AutoStory_Checkpoint_44::start_text() const{ return AutoStory_Checkpoint_43().end_text();}
+std::string AutoStory_Checkpoint_44::end_text() const{ return "Finished Sunflora gym challenge.";}
+void AutoStory_Checkpoint_44::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_44(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_45::name() const{ return "045 - " + AutoStory_Segment_20().name(); }
+std::string AutoStory_Checkpoint_45::start_text() const{ return AutoStory_Checkpoint_44().end_text();}
+std::string AutoStory_Checkpoint_45::end_text() const{ return "Defeated Artazon Gym (Grass). Inside gym building.";}
+void AutoStory_Checkpoint_45::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_45(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_46::name() const{ return "046 - " + AutoStory_Segment_20().name(); }
+std::string AutoStory_Checkpoint_46::start_text() const{ return AutoStory_Checkpoint_45().end_text();}
+std::string AutoStory_Checkpoint_46::end_text() const{ return "At East Province (Area One) Pokecenter.";}
+void AutoStory_Checkpoint_46::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_46(env, context, options.notif_status_update, stats);
+}
+
+
 
 
 void checkpoint_43(

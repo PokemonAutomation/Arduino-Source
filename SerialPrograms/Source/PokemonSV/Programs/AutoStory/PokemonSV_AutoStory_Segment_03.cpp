@@ -46,17 +46,37 @@ void AutoStory_Segment_03::run_segment(SingleSwitchProgramEnvironment& env, ProC
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 03: Catch Tutorial", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_05(env, context, options.notif_status_update, stats);
-    checkpoint_06(env, context, options.notif_status_update, stats);
-    checkpoint_07(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_05().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_06().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_07().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 03: Catch Tutorial", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
 
+std::string AutoStory_Checkpoint_05::name() const{ return "005 - " + AutoStory_Segment_03().name(); }
+std::string AutoStory_Checkpoint_05::start_text() const{ return "Battled Nemona on the beach.";}
+std::string AutoStory_Checkpoint_05::end_text() const{ return "Met mom at gate. Received mom's sandwich.";}
+void AutoStory_Checkpoint_05::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_05(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_06::name() const{ return "006 - " + AutoStory_Segment_03().name(); }
+std::string AutoStory_Checkpoint_06::start_text() const{ return AutoStory_Checkpoint_05().end_text();}
+std::string AutoStory_Checkpoint_06::end_text() const{ return "Cleared catch tutorial.";}
+void AutoStory_Checkpoint_06::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_06(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_07::name() const{ return "007 - " + AutoStory_Segment_03().name(); }
+std::string AutoStory_Checkpoint_07::start_text() const{ return AutoStory_Checkpoint_06().end_text();}
+std::string AutoStory_Checkpoint_07::end_text() const{ return "Moved to cliff. Heard mystery cry. Standing in front of Nemona near the cliff.";}
+void AutoStory_Checkpoint_07::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_07(env, context, options.notif_status_update, stats);
+}
 
 void checkpoint_05(
     SingleSwitchProgramEnvironment& env, 

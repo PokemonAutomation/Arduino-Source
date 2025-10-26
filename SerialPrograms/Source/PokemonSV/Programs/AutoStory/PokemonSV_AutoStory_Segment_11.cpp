@@ -61,15 +61,46 @@ void AutoStory_Segment_11::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_24(env, context, options.notif_status_update, stats);
-    checkpoint_25(env, context, options.notif_status_update, stats);
-    checkpoint_26(env, context, options.notif_status_update, stats);
-    checkpoint_27(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_24().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_25().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_26().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_27().run_checkpoint(env, context, options, stats);
+
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_24::name() const{ return "024 - " + AutoStory_Segment_11().name(); }
+std::string AutoStory_Checkpoint_24::start_text() const{ return "At Cortondo East Pokecenter";}
+std::string AutoStory_Checkpoint_24::end_text() const{ return "Spoke to Cortondo Gym reception. At Cortondo West Pokecenter.";}
+void AutoStory_Checkpoint_24::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_24(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_25::name() const{ return "025 - " + AutoStory_Segment_11().name(); }
+std::string AutoStory_Checkpoint_25::start_text() const{ return AutoStory_Checkpoint_24().end_text();}
+std::string AutoStory_Checkpoint_25::end_text() const{ return "Defeated the trainers at Olive Roll, but left Olive unmoved. Then backed out, standing in front of the Olive Roll NPC.";}
+void AutoStory_Checkpoint_25::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_25(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_26::name() const{ return "026 - " + AutoStory_Segment_11().name(); }
+std::string AutoStory_Checkpoint_26::start_text() const{ return AutoStory_Checkpoint_25().end_text();}
+std::string AutoStory_Checkpoint_26::end_text() const{ return "Completed Olive roll gym challenge.";}
+void AutoStory_Checkpoint_26::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_26(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_27::name() const{ return "027 - " + AutoStory_Segment_11().name(); }
+std::string AutoStory_Checkpoint_27::start_text() const{ return AutoStory_Checkpoint_26().end_text();}
+std::string AutoStory_Checkpoint_27::end_text() const{ return "At Cortondo East Pokecenter.";}
+void AutoStory_Checkpoint_27::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_27(env, context, options.notif_status_update, stats);
+}
+
+
 
 void checkpoint_24(
     SingleSwitchProgramEnvironment& env, 

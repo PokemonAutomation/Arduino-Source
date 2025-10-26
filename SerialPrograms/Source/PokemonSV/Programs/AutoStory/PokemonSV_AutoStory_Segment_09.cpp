@@ -49,17 +49,53 @@ void AutoStory_Segment_09::run_segment(
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 09: Complete tutorial", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_16(env, context, options.notif_status_update, stats);
-    checkpoint_17(env, context, options.notif_status_update, stats);
-    checkpoint_18(env, context, options.notif_status_update, stats);
-    checkpoint_19(env, context, options.notif_status_update, stats);
-    checkpoint_20(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_16().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_17().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_18().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_19().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_20().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 09: Complete tutorial", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
+}
+
+std::string AutoStory_Checkpoint_16::name() const{ return "016 - " + AutoStory_Segment_09().name(); }
+std::string AutoStory_Checkpoint_16::start_text() const{ return "Talked to Jacq in classroom. Standing in classroom.";}
+std::string AutoStory_Checkpoint_16::end_text() const{ return "Talked to Arven. Received Titan questline (Path of Legends). Talked to Cassiopeia. Standing in main hall.";}
+void AutoStory_Checkpoint_16::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_16(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_17::name() const{ return "017 - " + AutoStory_Segment_09().name(); }
+std::string AutoStory_Checkpoint_17::start_text() const{ return AutoStory_Checkpoint_16().end_text();}
+std::string AutoStory_Checkpoint_17::end_text() const{ return "Talked to Cassiopeia. Saw Geeta. Talked to Nemona. Received Gym/Elite Four questline (Victory Road). Standing in staff room.";}
+void AutoStory_Checkpoint_17::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_17(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_18::name() const{ return "018 - " + AutoStory_Segment_09().name(); }
+std::string AutoStory_Checkpoint_18::start_text() const{ return AutoStory_Checkpoint_17().end_text();}
+std::string AutoStory_Checkpoint_18::end_text() const{ return "Talked to Clavell and the professor.";}
+void AutoStory_Checkpoint_18::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_18(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_19::name() const{ return "019 - " + AutoStory_Segment_09().name(); }
+std::string AutoStory_Checkpoint_19::start_text() const{ return AutoStory_Checkpoint_18().end_text();}
+std::string AutoStory_Checkpoint_19::end_text() const{ return "Talked to Nemona, visited dorm, time passed.";}
+void AutoStory_Checkpoint_19::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_19(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_20::name() const{ return "020 - " + AutoStory_Segment_09().name(); }
+std::string AutoStory_Checkpoint_20::start_text() const{ return AutoStory_Checkpoint_19().end_text();}
+std::string AutoStory_Checkpoint_20::end_text() const{ return "Get on ride for first time.";}
+void AutoStory_Checkpoint_20::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_20(env, context, options.notif_status_update, stats);
 }
 
 

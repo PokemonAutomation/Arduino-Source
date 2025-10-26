@@ -52,14 +52,23 @@ void AutoStory_Segment_04::run_segment(
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 04: Rescue Legendary", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_08(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_08().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 04: Rescue Legendary", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_08::name() const{ return "008 - " + AutoStory_Segment_04().name(); }
+std::string AutoStory_Checkpoint_08::start_text() const{ return "Moved to cliff. Heard mystery cry. Standing in front of Nemona near the cliff.";}
+std::string AutoStory_Checkpoint_08::end_text() const{ return "Rescued Koraidon/Miraidon and escaped from the Houndoom Cave. Standing next to Koraidon/Miraidon just outside the cave exit.";}
+void AutoStory_Checkpoint_08::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_08(env, context, options.notif_status_update, stats);
+}
+
+
 
 void checkpoint_08(
     SingleSwitchProgramEnvironment& env, 

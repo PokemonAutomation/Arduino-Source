@@ -59,14 +59,58 @@ void AutoStory_Segment_33::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_85(env, context, options.notif_status_update, stats);
-    checkpoint_86(env, context, options.notif_status_update, stats);
-    checkpoint_87(env, context, options.notif_status_update, stats, options.language, options.starter_choice);
+	AutoStory_Checkpoint_85().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_86().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_87().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_88().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_89().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+
+std::string AutoStory_Checkpoint_85::name() const{ return "085 - " + AutoStory_Segment_33().name(); }
+std::string AutoStory_Checkpoint_85::start_text() const{ return "Beat Alfornada gym challenge. Beat Alfornada gym. At Alfronada Pokecenter.";}
+std::string AutoStory_Checkpoint_85::end_text() const{ return "Beat Clavell. At Academy fly point.";}
+void AutoStory_Checkpoint_85::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_85(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_86::name() const{ return "086 - " + AutoStory_Segment_33().name(); }
+std::string AutoStory_Checkpoint_86::start_text() const{ return AutoStory_Checkpoint_85().end_text();}
+std::string AutoStory_Checkpoint_86::end_text() const{ return "At Pokemon League entrance.";}
+void AutoStory_Checkpoint_86::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_86(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_87::name() const{ return "087 - " + AutoStory_Segment_33().name(); }
+std::string AutoStory_Checkpoint_87::start_text() const{ return AutoStory_Checkpoint_86().end_text();}
+std::string AutoStory_Checkpoint_87::end_text() const{ return "Finished the Entrance quiz. Standing in front of Rika.";}
+void AutoStory_Checkpoint_87::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_87(env, context, options.notif_status_update, stats, options.language, options.starter_choice);
+}
+
+
+std::string AutoStory_Checkpoint_88::name() const{ return "088 - " + AutoStory_Segment_33().name(); }
+std::string AutoStory_Checkpoint_88::start_text() const{ return AutoStory_Checkpoint_87().end_text();}
+std::string AutoStory_Checkpoint_88::end_text() const{ return "Beat Elite Four.";}
+void AutoStory_Checkpoint_88::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_88(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_89::name() const{ return "089 - " + AutoStory_Segment_33().name(); }
+std::string AutoStory_Checkpoint_89::start_text() const{ return AutoStory_Checkpoint_88().end_text();}
+std::string AutoStory_Checkpoint_89::end_text() const{ return "Beat Geeta. At Pokemon League Pokecenter.";}
+void AutoStory_Checkpoint_89::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_89(env, context, options.notif_status_update, stats);
+}
+
+
 
 
 void checkpoint_85(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){

@@ -55,13 +55,37 @@ void AutoStory_Segment_30::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_75(env, context, options.notif_status_update, stats);
-    checkpoint_76(env, context, options.notif_status_update, stats);
-    checkpoint_77(env, context, options.notif_status_update, stats);
+	AutoStory_Checkpoint_75().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_76().run_checkpoint(env, context, options, stats);
+	AutoStory_Checkpoint_77().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
+}
+
+
+std::string AutoStory_Checkpoint_75::name() const{ return "075 - " + AutoStory_Segment_30().name(); }
+std::string AutoStory_Checkpoint_75::start_text() const{ return "At Glaseado gym Pokecenter.";}
+std::string AutoStory_Checkpoint_75::end_text() const{ return "Battled Nemona. Spoke to Glaseado Gym receptionist";}
+void AutoStory_Checkpoint_75::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_75(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_76::name() const{ return "076 - " + AutoStory_Segment_30().name(); }
+std::string AutoStory_Checkpoint_76::start_text() const{ return AutoStory_Checkpoint_75().end_text();}
+std::string AutoStory_Checkpoint_76::end_text() const{ return "Beat Glaseado Gym Challenge. Beat Glaseado Gym (Ice).";}
+void AutoStory_Checkpoint_76::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_76(env, context, options.notif_status_update, stats);
+}
+
+
+std::string AutoStory_Checkpoint_77::name() const{ return "077 - " + AutoStory_Segment_30().name(); }
+std::string AutoStory_Checkpoint_77::start_text() const{ return AutoStory_Checkpoint_76().end_text();}
+std::string AutoStory_Checkpoint_77::end_text() const{ return "At North Province Area One Pokecenter";}
+void AutoStory_Checkpoint_77::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_77(env, context, options.notif_status_update, stats);
 }
 
 

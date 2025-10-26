@@ -51,14 +51,23 @@ void AutoStory_Segment_07::run_segment(
     stats.m_segment++;
     env.update_stats();
     context.wait_for_all_requests();
-    env.console.log("Start Segment 07: Go to Mesagoza South", COLOR_ORANGE);
+    env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    checkpoint_12(env, context, options.notif_status_update, stats);
+    AutoStory_Checkpoint_12().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
-    env.console.log("End Segment 07: Go to Mesagoza South", COLOR_GREEN);
+    env.console.log("End Segment " + name(), COLOR_GREEN);
 
 }
+
+std::string AutoStory_Checkpoint_12::name() const{ return "012 - " + AutoStory_Segment_07().name(); }
+std::string AutoStory_Checkpoint_12::start_text() const{ return "Arrived at Los Platos pokecenter. Cleared Let's go tutorial.";}
+std::string AutoStory_Checkpoint_12::end_text() const{ return "Arrived at Mesagoza (South) Pokecenter.";}
+void AutoStory_Checkpoint_12::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_12(env, context, options.notif_status_update, stats);
+}
+
+
 
 void checkpoint_12(
     SingleSwitchProgramEnvironment& env, 

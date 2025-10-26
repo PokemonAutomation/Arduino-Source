@@ -26,6 +26,13 @@ public:
     ) const override;
 };
 
+class AutoStory_Checkpoint_08 : public AutoStory_Checkpoint{
+public:
+    virtual std::string name() const override;
+    virtual std::string start_text() const override;
+    virtual std::string end_text() const override;
+    virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
+};
 
 // start: Moved to cliff. Heard mystery cry. Standing in front of Nemona near the cliff.
 // end: Rescued Koraidon/Miraidon and escaped from the Houndoom Cave. Standing next to Koraidon/Miraidon just outside the cave exit.
