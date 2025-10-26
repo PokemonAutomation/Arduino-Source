@@ -88,8 +88,12 @@ void send_raw_notification(
     const std::vector<std::pair<std::string, std::string>>& messages,
     const ImageAttachment& image
 ){
-    std::shared_ptr<PendingFileSend> file = std::make_shared<PendingFileSend>(logger, image);
-    bool hasFile = !file->filepath().empty();
+    bool hasImageFile = false;
+    std::shared_ptr<PendingFileSend> file;
+    if (image.image.width() > 0 && image.image.height() > 0){ // if image not empty
+        file = std::make_shared<PendingFileSend>(logger, image);
+        hasImageFile = !file->filepath().empty();
+    };
 
     JsonObject embed;
     JsonArray embeds;
@@ -106,7 +110,7 @@ void send_raw_notification(
         fields.push_back(make_credits_field(info));
         embed["fields"] = std::move(fields);
 
-        if (hasFile){
+        if (hasImageFile){
             JsonObject field;
             field["url"] = "attachment://" + file->filename();
             embed["image"] = std::move(field);
@@ -117,7 +121,7 @@ void send_raw_notification(
     Integration::DiscordWebhook::send_embed(
         logger, should_ping, tags,
         std::move(embeds),
-        hasFile ? file : nullptr
+        hasImageFile ? file : nullptr
     );
 
 #ifdef PA_DPP
