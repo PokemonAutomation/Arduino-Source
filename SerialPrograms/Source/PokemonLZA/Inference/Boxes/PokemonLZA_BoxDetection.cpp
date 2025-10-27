@@ -94,8 +94,8 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
     std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(image_crop, filters);
 
     const size_t total_crop_area = image_crop.width() * image_crop.height();
-    const size_t min_area = total_crop_area / 60.0;
-    const size_t max_area = total_crop_area / 15.0;
+    const size_t min_area = static_cast<size_t>(total_crop_area / 60.0);
+    const size_t max_area = static_cast<size_t>(total_crop_area / 15.0);
 
     int saved_object_id = 0;
     if (debug_switch){
@@ -161,8 +161,8 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
     m_found_row = m_found_col = BoxCursorCoordinates::INVALID;
 
     bool arrow_found = false;
-    for(size_t row = 0, cell_idx = 0; row < 6; row++){
-        for(size_t col = 0; col < 6; col++, cell_idx++){
+    for(uint8_t row = 0, cell_idx = 0; row < 6; row++){
+        for(uint8_t col = 0; col < 6; col++, cell_idx++){
             ImageViewRGB32 image_crop = extract_box_reference(screen, m_arrow_boxes[cell_idx]);
             // image_crop.save("cell_" + std::to_string(row) + "_" + std::to_string(col) + ".png");
             if (row == 2 && col == 0){
