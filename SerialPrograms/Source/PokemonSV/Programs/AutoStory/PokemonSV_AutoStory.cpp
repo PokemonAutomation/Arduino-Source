@@ -57,6 +57,11 @@
 #include "PokemonSV_AutoStory_Segment_33.h"
 #include "PokemonSV_AutoStory_Segment_34.h"
 #include "PokemonSV_AutoStory_Segment_35.h"
+#include "PokemonSV_AutoStory_Segment_36.h"
+#include "PokemonSV_AutoStory_Segment_37.h"
+#include "PokemonSV_AutoStory_Segment_38.h"
+#include "PokemonSV_AutoStory_Segment_39.h"
+#include "PokemonSV_AutoStory_Segment_40.h"
 #include "PokemonSV_AutoStory.h"
 
 #include <iostream>
@@ -112,7 +117,12 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_32>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_33>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_34>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_35>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_35>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_36>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_37>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_38>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
+    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_40>());
 
     return segment_list;
 };
@@ -275,6 +285,13 @@ std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_lis
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_90>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_91>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_92>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_93>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_94>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_95>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_96>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_97>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_98>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_99>());
 
 
     return checkpoint_list;
