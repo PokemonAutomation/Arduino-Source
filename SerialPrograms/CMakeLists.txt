@@ -58,13 +58,12 @@ endif()
 
 if(APPLE)
     set(DEST_DIR "$<TARGET_FILE_DIR:SerialPrograms>/..")
-    set(DEPLOY_DIR "${DEST_DIR}")
 elseif(PACKAGE_BUILD)
     set(DEST_DIR "$<TARGET_FILE_DIR:SerialPrograms>/Output")
-    set(DEPLOY_DIR "${DEST_DIR}/Binaries64")
+    set(WIN_DEPLOY_DIR "${DEST_DIR}/Binaries64")
 else()
     set(DEST_DIR "$<TARGET_FILE_DIR:SerialPrograms>")
-    set(DEPLOY_DIR "${DEST_DIR}")
+    set(WIN_DEPLOY_DIR "${DEST_DIR}")
 endif()
 
 #Find threads library
@@ -195,6 +194,7 @@ endfunction()
 apply_common_target_properties(SerialProgramsLib)
 apply_common_target_properties(SerialPrograms)
 
+# REPO_ROOT_DIR: the root folder of the git repository, "Arduino-Source/"
 set(PACKAGES_DIR "${REPO_ROOT_DIR}/Packages")
 set(FIRMWARE_DIR "${PACKAGES_DIR}/Firmware")
 set(SCRIPTS_DIR "${PACKAGES_DIR}/Scripts")
@@ -217,7 +217,7 @@ endif()
 if(NOT EXISTS "${DEST_DIR}/Resources")
     add_custom_command(
         TARGET SerialPrograms POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying resources"
+        COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying resources ${RESOURCES_DIR} to ${DEST_DIR}/Resources"
         COMMAND ${CMAKE_COMMAND} -E copy_directory "${RESOURCES_DIR}" "${DEST_DIR}/Resources"
     )
 endif()
@@ -358,10 +358,9 @@ else() # macOS and Linux
         else()
             find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
         endif()
-
     else() # Linux
         # ONNX RUNTIME LINUX CONFIG
-    # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
+        # NOTE: users can specify their own ONNX_ROOT_PATH (this is the base folder for ONNX) on the command line when evoking cmake.
         # this can be done via -DONNX_ROOT_PATH=/path/to/onnx
 
         # If the path isn't provided, it'll automatically download the 1.23.0 release to the build folder,
@@ -438,7 +437,7 @@ else() # macOS and Linux
         endif()
         # Find OpenCV
         find_package(OpenCV REQUIRED HINTS "/usr/local/opt/opencv/lib/cmake/opencv4/")
-    endif()
+    endif() # end Linux
 
     include_directories(${OpenCV_INCLUDE_DIRS})
     link_directories(${OpenCV_LIBRARY_DIRS})
@@ -474,15 +473,11 @@ else() # macOS and Linux
         # when compiling OpenCV
         # target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wno-c11-extensions)
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
+        # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
+        target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
     else()
         # Assume GCC
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
-    endif()
-
-    # Set OS-specific flags
-    if (APPLE)
-        # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
-        target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
     endif()
 
     IF(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
@@ -589,12 +584,12 @@ if (WIN32)
 
     if(QT_DEPLOY_FILES)
         # Run windeployqt if Qt DLLs are missing
-        if(WINDEPLOYQT_EXECUTABLE AND NOT EXISTS "${DEPLOY_DIR}/Qt6Core.dll")
+        if(WINDEPLOYQT_EXECUTABLE AND NOT EXISTS "${WIN_DEPLOY_DIR}/Qt6Core.dll")
             add_custom_command(
                 TARGET SerialPrograms POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Running windeployqt"
                 COMMAND "${WINDEPLOYQT_EXECUTABLE}"
-                    --dir "${DEPLOY_DIR}"
+                    --dir "${WIN_DEPLOY_DIR}"
                     $<IF:$<CONFIG:Debug>,--debug,--release>
                     $<TARGET_FILE:SerialPrograms>
             )
@@ -610,15 +605,15 @@ if (WIN32)
         COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Copying Discord SDK DLL"
         COMMAND ${CMAKE_COMMAND} -E copy_if_different
             "$<IF:$<CONFIG:Debug>,${DISCORD_DLL_DEBUG},${DISCORD_DLL_RELEASE}>"
-            "${DEPLOY_DIR}/discord_partner_sdk.dll"
+            "${WIN_DEPLOY_DIR}/discord_partner_sdk.dll"
     )
 
     # Move built .exe and .pdb to deploy folder, print if pdb is missing
     add_custom_command(
         TARGET SerialPrograms POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E echo "[Deploy] Moving built exe and pdb"
-        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:SerialPrograms> "${DEPLOY_DIR}/$<TARGET_FILE_NAME:SerialPrograms>"
-        COMMAND cmd /c "if exist \"$<TARGET_PDB_FILE:SerialPrograms>\" ( \"${CMAKE_COMMAND}\" -E rename \"$<TARGET_PDB_FILE:SerialPrograms>\" \"${DEPLOY_DIR}/$<TARGET_PDB_FILE_NAME:SerialPrograms>\" ) else ( echo [Deploy] PDB file missing: $<TARGET_PDB_FILE:SerialPrograms> )"
+        COMMAND ${CMAKE_COMMAND} -E rename $<TARGET_FILE:SerialPrograms> "${WIN_DEPLOY_DIR}/$<TARGET_FILE_NAME:SerialPrograms>"
+        COMMAND cmd /c "if exist \"$<TARGET_PDB_FILE:SerialPrograms>\" ( \"${CMAKE_COMMAND}\" -E rename \"$<TARGET_PDB_FILE:SerialPrograms>\" \"${WIN_DEPLOY_DIR}/$<TARGET_PDB_FILE_NAME:SerialPrograms>\" ) else ( echo [Deploy] PDB file missing: $<TARGET_PDB_FILE:SerialPrograms> )"
     )
 
     # Extract Discord SDK if missing
@@ -654,17 +649,17 @@ if (WIN32)
         get_filename_component(DLL_NAME "${DLL}" NAME)
         add_custom_command(
             TARGET SerialPrograms POST_BUILD
-            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DLL}" "${DEPLOY_DIR}/${DLL_NAME}"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different "${DLL}" "${WIN_DEPLOY_DIR}/${DLL_NAME}"
         )
     endforeach()
 
     # Final target that depends on all deployment steps
     add_custom_target(DeployRuntime ALL
         DEPENDS SerialPrograms clone_packages run_windeployqt
-        COMMENT "Deploying runtime (Qt, packages, DLLs) to ${DEPLOY_DIR}"
+        COMMENT "Deploying runtime (Qt, packages, DLLs) to ${WIN_DEPLOY_DIR}"
         VERBATIM
     )
-endif()
+endif() # end WIN32
 
 if (QT_MAJOR GREATER_EQUAL 6)
     qt_finalize_target(SerialPrograms)
