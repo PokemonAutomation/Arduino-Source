@@ -18,6 +18,7 @@
 #include "Programs/PokemonLZA_ShinyHunt_OverworldReset.h"
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
 #include "Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h"
+#include "Programs/TestPrograms/PokemonLZA_CheckBoxCellInfo.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -53,6 +54,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back("---- Developer Tools ----");
         ret.emplace_back(make_single_switch_program<OverworldWatcher_Descriptor, OverworldWatcher>());
         ret.emplace_back(make_single_switch_program<MoveBoxArrow_Descriptor, MoveBoxArrow>());
+        ret.emplace_back(make_single_switch_program<CheckBoxCellInfo_Descriptor, CheckBoxCellInfo>());
     }
     return ret;
 }
