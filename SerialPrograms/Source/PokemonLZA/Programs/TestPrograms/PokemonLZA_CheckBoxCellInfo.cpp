@@ -24,12 +24,12 @@ CheckBoxCellInfo_Descriptor::CheckBoxCellInfo_Descriptor()
         "PokemonLZA:CheckBoxCellInfo",
         STRING_POKEMON + " LZA", "Check Box Cell Info",
         "",
-        "Test program to check information about the currently selected box cell. "
-        "Detects whether the cell is empty, and whether the Pokemon is shiny or alpha. "
-        "Start this program while in the box system view with a Pokemon selected.",
+        "Test program to check inference on pokemon info in box system. "
+        "When started, this program detects whether the cell is empty, and whether the Pokemon is shiny or alpha "
+        "before immidiately finishes. Check the detection result on log overlay or in logs.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        AllowCommandsWhenRunning::ENABLE_COMMANDS,
         {}
     )
 {}

@@ -27,7 +27,7 @@ MoveBoxArrow_Descriptor::MoveBoxArrow_Descriptor()
         "Start this program while in the box system view.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
-        AllowCommandsWhenRunning::DISABLE_COMMANDS,
+        AllowCommandsWhenRunning::ENABLE_COMMANDS,
         {}
     )
 {}
