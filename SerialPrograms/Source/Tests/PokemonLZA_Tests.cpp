@@ -16,7 +16,8 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
-#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.h" 
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.h"
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.h" 
 #include <QFileInfo>
 #include <QDir>
 #include <algorithm>
@@ -196,6 +197,14 @@ int test_pokemonLZA_SomethingInBoxCellDetector(const ImageViewRGB32& image, bool
 int test_pokemonLZA_BoxShinyDetector(const ImageViewRGB32& image, bool target){
     auto overlay = DummyVideoOverlay();
     BoxShinyDetector detector(COLOR_RED, &overlay);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonLZA_BoxAlphaDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    BoxAlphaDetector detector(COLOR_RED, &overlay);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;

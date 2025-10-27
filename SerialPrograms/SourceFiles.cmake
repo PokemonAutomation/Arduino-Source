@@ -1539,6 +1539,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.cpp
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.cpp
