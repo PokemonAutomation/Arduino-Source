@@ -173,59 +173,62 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
 
     WallClock start = current_time();
 
-
-    SelectionArrowWatcher arrow(
-        COLOR_YELLOW, &env.console.overlay(),
-        SelectionArrowType::RIGHT,
-        {0.654308, 0.481553, 0.295529, 0.312621}
-    );
-    ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay(), 1000ms);
-    BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay());
-
-
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [=](ProControllerContext& context){
-            while (current_time() - start < 30min){
-                ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
-                ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
-                pbf_wait(context, 104ms);
-                pbf_press_button(context, BUTTON_X, 80ms, 24ms);
-                pbf_press_button(context, BUTTON_Y, 80ms, 24ms);
-                pbf_press_button(context, BUTTON_B, 80ms, 24ms);
-            }
-        },
-        {
-            arrow,
-            item_receive,
-            dialog1,
-        }
-    );
-
-    switch (ret){
-    case 0:
-        env.log("Detected selection arrow. (unexpected)", COLOR_RED);
-        dump_image(env.console.logger(), env.program_info(), env.console.video(), "UnexpectedSelectionArrow");
-        stats.errors++;
-        stats.battles++;
-        env.update_stats();
-        return;
-
-    case 1:
-    case 2:
-        env.log("Detected blue dialog. End of battle!");
-        stats.battles++;
-        env.update_stats();
-        return;
-
-    default:
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "Battle took longer than 30 minutes.",
-            env.console
+    while (true){
+        SelectionArrowWatcher arrow(
+            COLOR_YELLOW, &env.console.overlay(),
+            SelectionArrowType::RIGHT,
+            {0.654308, 0.481553, 0.295529, 0.312621}
         );
+        ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay(), 1000ms);
+        BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay());
+
+
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [=](ProControllerContext& context){
+                while (current_time() - start < 30min){
+                    ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
+                    ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
+                    pbf_wait(context, 104ms);
+                    pbf_press_button(context, BUTTON_X, 80ms, 24ms);
+                    pbf_press_button(context, BUTTON_Y, 80ms, 24ms);
+                    pbf_press_button(context, BUTTON_B, 80ms, 24ms);
+                }
+            },
+            {
+                arrow,
+                item_receive,
+                dialog1,
+            }
+        );
+
+        switch (ret){
+        case 0:
+            env.log("Detected selection arrow. (unexpected)", COLOR_RED);
+            dump_image(env.console.logger(), env.program_info(), env.console.video(), "UnexpectedSelectionArrow");
+            stats.errors++;
+//            stats.battles++;
+            env.update_stats();
+//            return;
+           continue;
+
+        case 1:
+        case 2:
+            env.log("Detected blue dialog. End of battle!");
+            stats.battles++;
+            env.update_stats();
+            return;
+
+        default:
+            stats.errors++;
+            env.update_stats();
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Battle took longer than 30 minutes.",
+                env.console
+            );
+        }
+
     }
 }
 

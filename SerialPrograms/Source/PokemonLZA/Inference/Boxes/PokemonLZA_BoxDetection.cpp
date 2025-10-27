@@ -40,7 +40,7 @@ namespace{
 class BoxCellSelectionArrowMatcher : public ImageMatch::SubObjectTemplateMatcher{
 public:
     BoxCellSelectionArrowMatcher()
-        : SubObjectTemplateMatcher("PokemonLZA/BoxArrow-Template.png", 100)
+        : SubObjectTemplateMatcher("PokemonLZA/SelectionArrowDown.png", 100)
     {
         // relaxed area ratio upper bound
         m_area_ratio_upper = 1.5;
