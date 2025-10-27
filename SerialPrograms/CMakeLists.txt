@@ -331,7 +331,7 @@ if (WIN32)
 #    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialProgramsLib PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else() # macOS and Linux
-    find_package(PkgConfig REQUIRED)
+    find_package(PkgConfig REQUIRED)  # required to execute `pkg_search_module()` below
     if (APPLE)
         # ==== Get ONNX Runtime paths ====
         # First, try to see if there is an ONNX Runtime library built from source.
@@ -475,7 +475,7 @@ else() # macOS and Linux
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
         target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
-    else()
+    else() # Linux
         # Assume GCC
         target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -fno-strict-aliasing)
     endif()
@@ -484,7 +484,6 @@ else() # macOS and Linux
         # Arm CPU
         #   Run-time ISA dispatching
         target_compile_definitions(SerialProgramsLib PRIVATE PA_AutoDispatch_arm64_20_M1)
-
     else()
         # Intel CPU
         target_compile_options(SerialProgramsLib PRIVATE -march=nehalem)
