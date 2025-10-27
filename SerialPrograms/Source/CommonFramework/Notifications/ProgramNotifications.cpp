@@ -127,7 +127,7 @@ void send_raw_notification(
 #ifdef PA_DPP
     Integration::DppClient::Client::instance().send_embed_dpp(
         should_ping, color, tags, std::move(embed),
-        hasFile ? file : nullptr
+        hasImageFile ? file : nullptr
     );
 #endif
 }
