@@ -33,6 +33,8 @@
 
  int test_pokemonLZA_SomethingInBoxCellDetector(const ImageViewRGB32& image, bool target);
 
+ int test_pokemonLZA_BoxShinyDetector(const ImageViewRGB32& image, bool target);
+
  }
 
  #endif

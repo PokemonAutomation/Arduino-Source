@@ -1541,6 +1541,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.cpp
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
