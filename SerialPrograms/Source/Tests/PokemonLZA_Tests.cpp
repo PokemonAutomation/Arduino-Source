@@ -184,5 +184,13 @@ int test_pokemonLZA_BoxDetector(const ImageViewRGB32& image, const std::vector<s
     return 0;
 }
 
+int test_pokemonLZA_SomethingInBoxCellDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    SomethingInBoxCellDetector detector(COLOR_RED, &overlay);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
 
 }

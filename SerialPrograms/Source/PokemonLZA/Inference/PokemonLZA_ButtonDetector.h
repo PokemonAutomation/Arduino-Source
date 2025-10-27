@@ -28,11 +28,15 @@ enum class ButtonType{
     ButtonPlus,
     ButtonMinus,
     ButtonRight,
+    RightStickUpDown,
 };
 
 
 class ButtonMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
+    // image template matcher for buttons
+    // - min_width: candidate image min width if video stream is 4k
+    // - min_height: candidate image min height if video stream is 4k
     ButtonMatcher(ButtonType type, size_t min_width, size_t min_height, double max_rmsd);
     static const ButtonMatcher& A(){
         static ButtonMatcher matcher(ButtonType::ButtonA, 60, 60, 70);
@@ -68,6 +72,10 @@ public:
     }
     static const ButtonMatcher& Right(){
         static ButtonMatcher matcher(ButtonType::ButtonRight, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& RightStickUpDown(){
+        static ButtonMatcher matcher(ButtonType::RightStickUpDown, 20, 20, 150);
         return matcher;
     }
 

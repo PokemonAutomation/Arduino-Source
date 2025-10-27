@@ -9,7 +9,6 @@
 
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -21,6 +20,8 @@ namespace PokemonAutomation{
     struct ProgramInfo;
     class VideoStream;
     template <typename Type> class ControllerContext;
+    class VideoOverlay;
+    class VideoOverlaySet;
 namespace NintendoSwitch{
     class ProController;
     using ProControllerContext = ControllerContext<ProController>;
@@ -73,6 +74,25 @@ public:
     {}
 };
 
+
+//  Detect whether the cursor is over a Pokemon or an empty cell in the box.
+//  It detects the right stick up and down icon on the right edge of the screen
+class SomethingInBoxCellDetector : public StaticScreenDetector{
+public:
+    SomethingInBoxCellDetector(Color color, VideoOverlay* overlay = nullptr);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    ButtonDetector m_right_stick_up_down_detector;
+};
+class SomethingInBoxCellWatcher : public DetectorToFinder<SomethingInBoxCellDetector>{
+public:
+    SomethingInBoxCellWatcher(Color color, VideoOverlay* overlay = nullptr)
+         : DetectorToFinder("SomethingInBoxCell", std::chrono::milliseconds(250), color, overlay)
+    {}
+};
 
 
 

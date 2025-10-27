@@ -8,6 +8,7 @@
 // #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -263,6 +264,16 @@ void BoxDetector::move_cursor(
 }
 
 
+SomethingInBoxCellDetector::SomethingInBoxCellDetector(Color color, VideoOverlay* overlay)
+: m_right_stick_up_down_detector(color, ButtonType::RightStickUpDown, {0.933, 0.381, 0.027, 0.051}, overlay) {}
+
+void SomethingInBoxCellDetector::make_overlays(VideoOverlaySet& items) const{
+    m_right_stick_up_down_detector.make_overlays(items);
+}
+
+bool SomethingInBoxCellDetector::detect(const ImageViewRGB32& screen){
+    return m_right_stick_up_down_detector.detect(screen);
+}
 
 
 }
