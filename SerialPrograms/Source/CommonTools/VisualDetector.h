@@ -42,6 +42,17 @@ public:
         CONSISTENT, //  process_frame() returns true when detected consecutively or not detected consecutively
     };
 
+    DetectorToFinder(
+        std::string label,
+        std::chrono::milliseconds duration
+    )
+        : Detector()
+        , VisualInferenceCallback(std::move(label))
+        , m_duration(duration)
+        , m_finder_type(FinderType::PRESENT)
+    {}
+    
+
     template <class... Args>
     DetectorToFinder(
         std::string label,
