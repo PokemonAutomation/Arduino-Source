@@ -148,6 +148,8 @@
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
+#include "PokemonSV/Inference/PokemonSV_PokemonMovesReader.h"
+#include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
 
 
 
@@ -285,6 +287,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     ProControllerContext context(scope, console.controller<ProController>());
     VideoOverlaySet overlays(overlay);
+
+    
+#if 0
+    ImageRGB32 image1("swap-moves.png");
+    PokemonSV::PokemonMovesReader reader(Language::Korean);
+    std::string top_move = reader.read_move(env.logger(), image1, 2);
+    env.log("Current top move: " + top_move);
+
+    ImageRGB32 image2(IMAGE_PATH);
+    ImageFloatBox box{0.396429, 0.506356, 0.069048, 0.059322};
+    PokemonSV::MenuOption session(console, context, Language::Korean);
+    session.read_option(extract_box_reference(image2, box));
+#endif
 
 #if 0
     while (true){
