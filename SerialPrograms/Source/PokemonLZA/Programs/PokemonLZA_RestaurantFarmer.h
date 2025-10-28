@@ -9,8 +9,11 @@
 
 #include <atomic>
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include <Common/Cpp/Options/SimpleIntegerOption.h>
 #include "Common/Cpp/Options/ButtonOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -57,6 +60,10 @@ private:
 
     std::atomic<bool> m_stop_after_current;
     StopButton STOP_AFTER_CURRENT;
+    SimpleIntegerOption<uint32_t> NUM_ROUNDS;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationsOption NOTIFICATIONS;
 
     BooleanCheckBoxOption MOVE_AI;
     BooleanCheckBoxOption USE_PLUS_MOVES;
