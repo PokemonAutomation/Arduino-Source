@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_ButtonDetector_H
 #define PokemonAutomation_PokemonLZA_ButtonDetector_H
 
+#include <optional>
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/VisualDetector.h"
