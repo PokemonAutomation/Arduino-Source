@@ -82,10 +82,10 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
     bool seen_dialog = false;
     WallClock start = current_time();
     while (true){
-        if (current_time() - start > std::chrono::minutes(3)){
+        if (current_time() - start > std::chrono::minutes(5)){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "clear_dialog(): Failed to clear dialog after 3 minutes.",
+                "clear_dialog(): Failed to clear dialog after 5 minutes.",
                 stream
             );
         }

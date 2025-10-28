@@ -50,8 +50,8 @@ public:
     virtual void run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const override;
 };
 
-// start: 
-// end: 
+// start: Beat Arven. At Los Platos Pokecenter.
+// end: Entered Area Zero Gate. Flew down to Area Zero from the platform.
 void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 // start: 
