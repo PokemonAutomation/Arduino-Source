@@ -33,6 +33,8 @@ public:
     void set_options(
         const std::vector<std::pair<MenuOptionItemEnum, std::vector<MenuOptionToggleEnum>>>& options) const;
 
+    std::string read_option(const ImageViewRGB32& cropped) const;
+
 private:
 
     // set the current selected option, to one of the option_toggle in the given list.
@@ -46,8 +48,6 @@ private:
     //  Move to the target_option. 
     //  Returns empty string if not found.
     void move_to_option(const MenuOptionItemEnum target_option) const;
-
-    std::string read_option(const ImageViewRGB32& cropped) const;
 
     int16_t read_number(Logger& logger, const ImageViewRGB32& cropped) const;
 
