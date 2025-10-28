@@ -439,8 +439,8 @@ else() # macOS and Linux
 
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
-    pkg_search_module(TESSERACT REQUIRED tesseract)
-    pkg_search_module(LEPTONICA REQUIRED lept)
+    pkg_search_module(TESSERACT tesseract)
+    pkg_search_module(LEPTONICA lept)
     if (TESSERACT_FOUND AND LEPTONICA_FOUND)
         target_compile_definitions(SerialProgramsLib PRIVATE PA_TESSERACT UNIX_LINK_TESSERACT)
         target_include_directories(SerialProgramsLib SYSTEM PRIVATE ${TESSERACT_INCLUDE_DIRS})
