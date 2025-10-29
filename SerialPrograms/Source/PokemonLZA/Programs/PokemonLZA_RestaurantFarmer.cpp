@@ -256,7 +256,7 @@ bool RestaurantFarmer::attempt_attack(SingleSwitchProgramEnvironment& env, ProCo
         context
     );
 
-    MoveEffectivenessSymbolWatcher move_watcher(COLOR_RED, &env.console.overlay());
+    MoveEffectivenessSymbolWatcher move_watcher(COLOR_RED, &env.console.overlay(), 100ms);
     command.dispatch([](ProControllerContext& context){
         pbf_press_button(context, BUTTON_ZL, 10000ms, 0ms);
     });
@@ -267,7 +267,7 @@ bool RestaurantFarmer::attempt_attack(SingleSwitchProgramEnvironment& env, ProCo
     );
     if (ret < 0){
         command.stop_session_and_rethrow();
-        context.wait_for(500ms);
+        context.wait_for(250ms);
         pbf_press_button(context, BUTTON_B, 160ms, 80ms);
         return false;
     }
