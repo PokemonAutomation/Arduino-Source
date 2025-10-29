@@ -74,6 +74,14 @@ public:
     //  This is not const so that detectors can save/cache state.
     virtual bool detect(const ImageViewRGB32& screen) override;
 
+    //  index 0: top
+    //  index 1: left
+    //  index 2: right
+    //  index 3: bottom
+    MoveEffectivenessSymbol operator[](size_t index) const{
+        return m_last_detection[index];
+    }
+
 
 private:
     bool detect_box(

@@ -79,8 +79,8 @@ bool MoveEffectivenessSymbolDetector::detect_box(
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS{
 //        {0xff808080, 0xffffffff},
 //        {0xff909090, 0xffffffff},
-        {0xffa0a0a0, 0xffffffff},
-        {0xffb0b0b0, 0xffffffff},
+//        {0xffa0a0a0, 0xffffffff},
+//        {0xffb0b0b0, 0xffffffff},
         {0xffc0c0c0, 0xffffffff},
         {0xffd0d0d0, 0xffffffff},
         {0xffe0e0e0, 0xffffffff},
@@ -152,7 +152,7 @@ bool MoveEffectivenessSymbolDetector::detect_box(
 
 //    cout << "best_symbol = " << (int)best_symbol << ", rmsd = " << best_rmsd << endl;
 
-    if (best_rmsd > 100){
+    if (best_rmsd > 150){
         m_last_detection[index] = MoveEffectivenessSymbol::None;
         m_last_detection_boxes[index].reset();
         return false;
