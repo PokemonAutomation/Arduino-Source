@@ -74,16 +74,19 @@ BoxDetector::BoxDetector(Color color, VideoOverlay* overlay)
     , m_plus_button(color, ButtonType::ButtonPlus, {0.581, 0.940, 0.310, 0.046}, overlay)
 {
     for(size_t row = 0; row < 6; row++){
-        double y = row == 0 ? 0.120 : 0.331 + (0.797 - 0.331)/ 4.0 * (row-1);
+         double y = (row == 0 ? 0.122 : 0.333 + (0.797 - 0.331)/ 4.0 * (row-1));
         for(size_t col = 0; col < 6; col++){
-            double x = 0.058 + col * (0.386 - 0.059)/5.0;
-            m_arrow_boxes.emplace_back(x, y, 0.020, 0.03);
+            double x = 0.060 + col * (0.386 - 0.059)/5.0;
+            m_arrow_boxes.emplace_back(x, y, 0.016, 0.026);
         }
     }
 }
 
 void BoxDetector::make_overlays(VideoOverlaySet& items) const{
     m_plus_button.make_overlays(items);
+    for(const ImageFloatBox& box : m_arrow_boxes){
+        items.add(m_color, box);
+    }
 }
 
 // detect arrow's white interior first
@@ -91,7 +94,11 @@ void BoxDetector::make_overlays(VideoOverlaySet& items) const{
 bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
     // the arrow's white interior has color between rgb [220, 220, 220] to [255, 255, 255]
     // the arrow's green border has color between rgb [170, 230, 50] to [190, 255, 80]
-    std::vector<std::pair<uint32_t, uint32_t>> filters = {{uint32_t(Color(220, 220, 220)), 0xffffffff}};
+    std::vector<std::pair<uint32_t, uint32_t>> filters = {
+        {uint32_t(Color(220, 220, 220)), 0xffffffff},
+        {uint32_t(Color(180, 180, 180)), 0xffffffff},
+        {uint32_t(Color(140, 140, 140)), 0xffffffff}
+    };
     std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(image_crop, filters);
 
     const size_t total_crop_area = image_crop.width() * image_crop.height();
@@ -100,8 +107,8 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
 
     int saved_object_id = 0;
     if (debug_switch){
-        cout << "detect_at_cell() area threshold " << min_area << " " << max_area << endl;
-        cout << "input image size " << image_crop.width() << " " << image_crop.height() << endl;
+        cout << "detect_at_cell() area threshold " << min_area << "-" << max_area << endl;
+        cout << "input image size " << image_crop.width() << "x" << image_crop.height() << endl;
     }
     
     bool detected = false;
@@ -117,7 +124,7 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
         const bool keep_object_matrix = false;
         while (finder->find_next(object, keep_object_matrix)){
             if (debug_switch){
-                cout << "Find object: " << object.area << endl;
+                cout << "Find object: area " << object.area << ", save to found_object" << saved_object_id << ".png" << endl;
                 ImagePixelBox box(object);
                 extract_box_reference(image_crop, box).save("found_object" + std::to_string(saved_object_id++) + ".png");
             }
@@ -166,11 +173,12 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
         for(uint8_t col = 0; col < 6; col++, cell_idx++){
             ImageViewRGB32 image_crop = extract_box_reference(screen, m_arrow_boxes[cell_idx]);
             // image_crop.save("cell_" + std::to_string(row) + "_" + std::to_string(col) + ".png");
-            if (row == 2 && col == 0){
-                debug_switch = false; // true;
+            const uint8_t debug_cell_row = 255, debug_cell_col = 255;
+            if (row == debug_cell_row && col == debug_cell_col){
+                debug_switch = true;
             }
             bool detected = detect_at_cell(image_crop);
-            if (row == 2 && col == 0){
+            if (row == debug_cell_row && col == debug_cell_col){
                 debug_switch = false;
             }
             if (detected){
@@ -187,6 +195,10 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
         if (arrow_found){
             break;
         }
+    }
+    // cout << "Box detector arrow found ? " << arrow_found << endl;
+    if (!arrow_found){
+        // screen.save("mac_box_fletchling_shiny_alpha.png");
     }
     return arrow_found;
 }
@@ -272,7 +284,9 @@ void SomethingInBoxCellDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool SomethingInBoxCellDetector::detect(const ImageViewRGB32& screen){
-    return m_right_stick_up_down_detector.detect(screen);
+    bool detected = m_right_stick_up_down_detector.detect(screen);
+    // cout << "SomethingInBoxCellDetector detected? " << detected << endl;
+    return detected;
 }
 
 

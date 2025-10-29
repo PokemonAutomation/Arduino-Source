@@ -46,7 +46,7 @@ public:
         VideoOverlay* overlay = nullptr,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("BoxAlphaWatcher", hold_duration, color, overlay)
+         : DetectorToFinder("BoxAlphaWatcher", FinderType::CONSISTENT, hold_duration, color, overlay)
     {}
 };
 

@@ -69,8 +69,8 @@ private:
 
 class BoxWatcher : public DetectorToFinder<BoxDetector>{
 public:
-    BoxWatcher(Color color = COLOR_RED)
-         : DetectorToFinder("BoxWatcher", std::chrono::milliseconds(250), color)
+    BoxWatcher(Color color = COLOR_RED, VideoOverlay* overlay = nullptr)
+         : DetectorToFinder("BoxWatcher", std::chrono::milliseconds(250), color, overlay)
     {}
 };
 
@@ -90,7 +90,7 @@ private:
 class SomethingInBoxCellWatcher : public DetectorToFinder<SomethingInBoxCellDetector>{
 public:
     SomethingInBoxCellWatcher(Color color, VideoOverlay* overlay = nullptr)
-         : DetectorToFinder("SomethingInBoxCell", std::chrono::milliseconds(250), color, overlay)
+         : DetectorToFinder("SomethingInBoxCell", FinderType::CONSISTENT, std::chrono::milliseconds(250), color, overlay)
     {}
 };
 

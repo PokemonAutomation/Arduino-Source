@@ -301,7 +301,7 @@ void VideoOverlaySession::clear_log(){
         WriteSpinLock lg(m_lock, "VideoOverlaySession::clear_log_texts()");
         m_log_texts.clear();
 
-        //  We create a newly allocated Box vector to avoid listener accessing
+        //  We create a newly allocated log text vector to avoid listener accessing
         //  `m_log_texts` asynchronously.
         for(const auto& item : m_log_texts){
             ptr->emplace_back(item);

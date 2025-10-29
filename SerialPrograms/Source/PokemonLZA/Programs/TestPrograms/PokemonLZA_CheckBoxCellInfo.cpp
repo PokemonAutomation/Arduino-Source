@@ -7,10 +7,16 @@
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.h"
 #include "PokemonLZA_CheckBoxCellInfo.h"
+
+#include <iostream>
+#include <sstream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,38 +44,114 @@ CheckBoxCellInfo_Descriptor::CheckBoxCellInfo_Descriptor()
 CheckBoxCellInfo::CheckBoxCellInfo() {}
 
 
+// A watcher that keeps shows current box cell info
+class BoxInfoWatcher : public VisualInferenceCallback{
+public:
+    BoxInfoWatcher(SingleSwitchProgramEnvironment& env, Color color = COLOR_RED, VideoOverlay* overlay = nullptr)
+    : VisualInferenceCallback("BoxInfoWatcher")
+    , m_box_detector(color, overlay)
+    , m_sth_in_cell_detector(color, overlay)
+    , m_shiny_detector(color, overlay)
+    , m_alpha_detector(color, overlay)
+    , m_env(env)
+    {}
+
+    virtual ~BoxInfoWatcher() {}
+
+    virtual void make_overlays(VideoOverlaySet& items) const override{
+        m_box_detector.make_overlays(items);
+        m_sth_in_cell_detector.make_overlays(items);
+        m_shiny_detector.make_overlays(items);
+        m_alpha_detector.make_overlays(items);
+    }
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
+        bool box_cursor_found = m_box_detector.process_frame(frame, timestamp);
+        if (!box_cursor_found){
+            return false; // not in box view
+        }
+
+        auto coord = m_box_detector.detected_location();
+        if (coord.row != m_last_row || coord.col != m_last_col){
+            // cout << "selected cell location moved: (" << int(m_last_row) << ", " << int(m_last_col)
+            //      << ") -> (" << int(coord.row) << ", " << int(coord.col) << ")"
+            //      << " need to update log" << endl;
+            m_last_row = coord.row;
+            m_last_col = coord.col;
+
+            // we are in a new cell, reset detectors. Prepare to update log once determined info on the new cell
+            m_sth_in_cell_detector.reset_state();
+            m_alpha_detector.reset_state();
+            m_shiny_detector.reset_state();
+            m_need_to_update_log_once_determined = true;
+        }
+
+        bool sth_in_cell_determined = m_sth_in_cell_detector.process_frame(frame, timestamp);
+        bool is_shiny_determined = m_shiny_detector.process_frame(frame, timestamp);
+        bool is_alpha_determined = m_alpha_detector.process_frame(frame, timestamp);
+
+        
+
+        // detector is not determined, this means sth may have changed, we need to update the log
+        if (!sth_in_cell_determined || !is_shiny_determined || !is_alpha_determined){
+            // cout << "sth not determined! need to update log" << endl;
+            // cout << "box cursor found? " << box_cursor_found << " sth in cell determined? " << sth_in_cell_determined
+            //      << " shiny determined? " << is_shiny_determined << " alpha determined? " << is_alpha_determined << endl;
+            m_need_to_update_log_once_determined = true;
+        }
+
+        if (m_need_to_update_log_once_determined && sth_in_cell_determined && is_shiny_determined && is_alpha_determined){
+            bool sth_in_cell = m_sth_in_cell_detector.consistent_result();
+            bool is_shiny = m_shiny_detector.consistent_result();
+            bool is_alpha = m_alpha_detector.consistent_result();
+
+            std::ostringstream os;
+            os << "Cell (" << int(m_last_row) << ", " << int(m_last_col) << ") ";
+            if (!sth_in_cell){
+                os << "Empty";
+            } else{
+                if (is_shiny && is_alpha){
+                    os << "Shiny Alpha Pokemon";
+                }
+                else if (is_shiny){
+                    os << " Shiny Pokemon";
+                } else if (is_alpha){
+                    os << " Alpha Pokemon";
+                } else {
+                    os << " Normal Pokemon";
+                }
+            }
+            m_env.console.overlay().add_log(os.str());
+            m_need_to_update_log_once_determined = false;
+        }
+        // cout << "detection result: (" << int(coord.row) << ", " << int(coord.col) << ")"
+        //      << " sth in cell? " << m_sth_in_cell_detector.consistent_result()
+        //      << " shiny? " << m_shiny_detector.consistent_result()
+        //      << " alpha? " << m_alpha_detector.consistent_result() << endl;
+
+        return false;
+    }
+
+
+protected:
+    uint8_t m_last_row = BoxCursorCoordinates::INVALID;
+    uint8_t m_last_col = BoxCursorCoordinates::INVALID;
+    BoxWatcher m_box_detector;
+    SomethingInBoxCellWatcher m_sth_in_cell_detector;
+    BoxShinyWatcher m_shiny_detector;
+    BoxAlphaWatcher m_alpha_detector;
+    SingleSwitchProgramEnvironment& m_env;
+    bool m_need_to_update_log_once_determined = true;
+};
+
+
 void CheckBoxCellInfo::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     env.log("Starting Check Box Cell Info test program...");
 
-    // Take a snapshot of the current screen
-    VideoSnapshot screen = env.console.video().snapshot();
+    BoxInfoWatcher watcher(env);
 
-    // Create detectors
-    SomethingInBoxCellDetector cell_detector(COLOR_RED, &env.console.overlay());
-    BoxShinyDetector shiny_detector(COLOR_BLUE, &env.console.overlay());
-    BoxAlphaDetector alpha_detector(COLOR_PURPLE, &env.console.overlay());
-
-    bool has_pokemon = cell_detector.detect(screen);
-    bool is_shiny = shiny_detector.detect(screen);
-    bool is_alpha = alpha_detector.detect(screen);
-
-    // Summary - log to both text log and video overlay
-    std::string pokemon_status = "Has Pokemon: " + std::string(has_pokemon ? "Yes" : "No");
-    env.log(pokemon_status, COLOR_BLUE);
-    env.console.overlay().add_log(pokemon_status, has_pokemon ? COLOR_GREEN : COLOR_ORANGE);
-
-    std::string shiny_status = "Is Shiny: " + std::string(is_shiny ? "Yes" : "No");
-    env.log(shiny_status, COLOR_BLUE);
-    env.console.overlay().add_log(shiny_status, is_shiny ? COLOR_GREEN : COLOR_ORANGE);
-
-    std::string alpha_status = "Is Alpha: " + std::string(is_alpha ? "Yes" : "No");
-    env.log(alpha_status, COLOR_BLUE);
-    env.console.overlay().add_log(alpha_status, is_alpha ? COLOR_GREEN : COLOR_ORANGE);
-
-    env.log("Check Box Cell Info test program complete!", COLOR_GREEN);
-    env.console.overlay().add_log("Detection Complete!", COLOR_GREEN);
+    wait_until(env.console, context, WallClock::max(), {watcher});
 }
 
 
