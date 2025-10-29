@@ -1551,6 +1551,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp

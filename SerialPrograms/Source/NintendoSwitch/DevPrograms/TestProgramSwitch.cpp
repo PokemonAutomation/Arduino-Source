@@ -150,6 +150,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonMovesReader.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
+#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
 
 
 
@@ -288,6 +289,18 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.controller<ProController>());
     VideoOverlaySet overlays(overlay);
 
+
+//    MoveEffectivenessSymbolMatcher::NoEffect();
+
+
+#if 1
+
+    auto snapshot = feed.snapshot();
+
+    MoveEffectivenessSymbolDetector detector(COLOR_RED, &overlay);
+    cout << detector.detect(snapshot) << endl;
+#endif
+
     
 #if 0
     ImageRGB32 image1("swap-moves.png");
@@ -320,7 +333,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 1
+#if 0
 //    ImageRGB32 image("Screenshots/screenshot-20251025-153957561163.png");
 
     auto screen = feed.snapshot();
@@ -334,11 +347,33 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 0
+    auto screen = feed.snapshot();
+
+    ImageFloatBox box(0.776445, 0.844660, 0.027263, 0.050485);
+
+    overlays.add(COLOR_RED, box);
+
+    ImageViewRGB32 cropped = extract_box_reference(screen, box);
+
+    {
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+            cropped,
+            0xffe0e0e0, 0xffffffff
+        );
+
+        ImageRGB32 masked = cropped.copy();
+        filter_by_mask(matrix, masked, Color(0xff000000), true);
+        masked.save("MoveEffectivenessNormal.png");
+    }
+#endif
+
+
+#if 0
 //    ImageRGB32 image("Screenshots/screenshot-20251012-174842583706.png");
 
     auto screen = feed.snapshot();
 
-    ImageFloatBox box(0.763359, 0.089320, 0.021810, 0.044660);
+    ImageFloatBox box(0.776445, 0.741748, 0.029444, 0.056311);
 //    ImageFloatBox box(0.712404, 0.589844, 0.043908, 0.085938);
 
     overlays.add(COLOR_RED, box);
@@ -351,7 +386,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
             cropped,
             0xffe0e0e0, 0xffffffff
         );
-        matrix.invert();
+//        matrix.invert();
 
         cout << matrix.dump() << endl;
 
@@ -361,7 +396,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         iter->find_next(object, true);
         ImageRGB32 masked = extract_box_reference(cropped, object).copy();
         filter_by_mask(object.packed_matrix(), masked, Color(0x00000000), false);
-        masked.save("ButtonL.png");
+        masked.save("MoveEffectivenessNormal.png");
     }
 
 
