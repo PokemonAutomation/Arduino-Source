@@ -100,8 +100,8 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
             [&](ProControllerContext& context){
                 while (true){
                     send_program_status_notification(env, NOTIFICATION_STATUS);
-                    sit_on_bench(env.console, context);
                     stats.resets++;
+                    sit_on_bench(env.console, context);
                     env.update_stats();
                 }
             },
