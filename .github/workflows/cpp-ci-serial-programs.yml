@@ -9,7 +9,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [windows-2025, macos-15, ubuntu-24.04]
+        os: [windows-2025, macos-15, macos-15-intel, ubuntu-24.04]
         compiler: ['default', 'clang']
         qt_version: ['6.10.0']
         include:
@@ -27,6 +27,8 @@ jobs:
 
         exclude:
           - os: 'macos-15'
+            compiler: 'clang'
+          - os: 'macos-15-intel'
             compiler: 'clang'
             # Excluded because macos default toolset is already clang
 
