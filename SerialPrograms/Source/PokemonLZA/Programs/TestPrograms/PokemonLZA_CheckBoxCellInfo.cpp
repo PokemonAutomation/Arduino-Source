@@ -31,8 +31,7 @@ CheckBoxCellInfo_Descriptor::CheckBoxCellInfo_Descriptor()
         STRING_POKEMON + " LZA", "Check Box Cell Info",
         "",
         "Test program to check inference on pokemon info in box system. "
-        "When started, this program detects whether the cell is empty, and whether the Pokemon is shiny or alpha "
-        "before immidiately finishes. Check the detection result on log overlay or in logs.",
+        "Move around on box cells while running the pokemon. Log overlay will show current selected cell and pokemon info of the cell.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::ENABLE_COMMANDS,
