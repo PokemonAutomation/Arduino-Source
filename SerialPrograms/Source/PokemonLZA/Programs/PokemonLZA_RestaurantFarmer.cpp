@@ -372,7 +372,7 @@ void RestaurantFarmer::on_press(){
 }
 
 void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-
+    RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
     m_stop_after_current.store(false, std::memory_order_relaxed);
     STOP_AFTER_CURRENT.set_ready();
     ResetOnExit reset_button_on_exit(STOP_AFTER_CURRENT);
@@ -380,10 +380,9 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
 
 //    auto lobby = env.console.video().snapshot();
 
-    uint32_t current_round = 0;
     while (true){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        if (NUM_ROUNDS != 0 && current_round >= NUM_ROUNDS) {
+        if (NUM_ROUNDS != 0 && stats.battles >= NUM_ROUNDS) {
             m_stop_after_current.store(true, std::memory_order_relaxed);
             STOP_AFTER_CURRENT.set_pressed();
         }
@@ -391,7 +390,6 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
             break;
         }
         run_battle(env, context);
-        current_round++;
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
