@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 
 #include <atomic>
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -56,6 +57,9 @@ private:
 
     std::atomic<bool> m_stop_after_current;
     StopButton STOP_AFTER_CURRENT;
+
+    BooleanCheckBoxOption MOVE_AI;
+    BooleanCheckBoxOption USE_PLUS_MOVES;
 };
 
 

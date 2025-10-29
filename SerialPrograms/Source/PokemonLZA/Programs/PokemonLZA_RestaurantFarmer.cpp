@@ -64,8 +64,25 @@ RestaurantFarmer::~RestaurantFarmer(){
 
 RestaurantFarmer::RestaurantFarmer()
     : m_stop_after_current(false)
+    , MOVE_AI(
+        "<b>Move Selection AI:</b><br>"
+        "If enabled, it will be smarter with move selection.<br>"
+        "However, this adds a split-second delay which may cause the opponent attacks to land first.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , USE_PLUS_MOVES(
+        "<b>Use Plus Moves:</b><br>"
+        "If enabled, it will attempt to use plus moves.<br>"
+        "However, this adds a 320ms delay which may cause the opponent attacks to land first.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
 {
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
+    PA_ADD_OPTION(MOVE_AI);
+    PA_ADD_OPTION(USE_PLUS_MOVES);
+
     STOP_AFTER_CURRENT.set_idle();
     STOP_AFTER_CURRENT.add_listener(*this);
 }
@@ -192,16 +209,7 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
             env.console, context,
             [&](ProControllerContext& context){
                 while (current_time() - start < 30min){
-#if 1
                     attempt_attack(env, context);
-#else
-                    ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
-                    ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
-                    pbf_wait(context, 104ms);
-                    pbf_press_button(context, BUTTON_X, 80ms, 24ms);
-                    pbf_press_button(context, BUTTON_Y, 80ms, 24ms);
-                    pbf_press_button(context, BUTTON_B, 80ms, 24ms);
-#endif
                 }
             },
             {
@@ -249,6 +257,18 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
 
 
 bool RestaurantFarmer::attempt_attack(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    if (!MOVE_AI){
+        ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
+        if (USE_PLUS_MOVES){
+            ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
+//          pbf_wait(context, 104ms);
+        }
+        pbf_press_button(context, BUTTON_X, 80ms, 24ms);
+        pbf_press_button(context, BUTTON_Y, 80ms, 24ms);
+        pbf_press_button(context, BUTTON_B, 80ms, 24ms);
+        return true;
+    }
+
     AsyncCommandSession<ProController> command(
         context,
         env.logger(),
@@ -293,10 +313,12 @@ bool RestaurantFarmer::attempt_attack(SingleSwitchProgramEnvironment& env, ProCo
 
     env.log(best_string, COLOR_BLUE);
 
-    command.dispatch([=](ProControllerContext& context){
+    command.dispatch([&](ProControllerContext& context){
         ssf_press_button(context, BUTTON_ZL, 0ms, 800ms, 200ms);
-        ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
-        pbf_wait(context, 104ms);
+        if (USE_PLUS_MOVES){
+            ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
+//            pbf_wait(context, 104ms);
+        }
         pbf_press_button(context, best_move, 160ms, 320ms);
     });
 
