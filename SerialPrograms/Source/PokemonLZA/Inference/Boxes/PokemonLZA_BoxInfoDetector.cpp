@@ -157,6 +157,36 @@ bool BoxAlphaDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
+BoxPageInfoWatcher::BoxPageInfoWatcher(VideoOverlay* overlay)
+: VisualInferenceCallback("BoxPageInfoWatcher")
+, m_shiny_watcher(COLOR_BLACK, overlay)
+, m_alpha_watcher(COLOR_RED, overlay)
+{}
+
+void BoxPageInfoWatcher::make_overlays(VideoOverlaySet& items) const{
+    m_shiny_watcher.make_overlays(items);
+    m_alpha_watcher.make_overlays(items);
+}
+
+bool BoxPageInfoWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    bool shiny_determined = m_shiny_watcher.process_frame(frame, timestamp);
+    bool alpha_determined = m_alpha_watcher.process_frame(frame, timestamp);
+    return shiny_determined && alpha_determined;
+}
+
+std::string BoxPageInfoWatcher::info_str() const{
+    const bool is_shiny = m_shiny_watcher.consistent_result();
+    const bool is_alpha = m_alpha_watcher.consistent_result();
+
+    if (is_shiny && is_alpha){
+        return "Shiny Alpha";
+    } else if (is_shiny){
+        return "Shiny";
+    } else if (is_alpha){
+        return "Alpha";
+    }
+    return "Normal";
+}
 
 
 
