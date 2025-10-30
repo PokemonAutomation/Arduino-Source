@@ -116,6 +116,10 @@ void enter_wild_zone_entrance(ConsoleHandle& console, ProControllerContext& cont
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats =
         env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
+    
+    if (SHINY_DETECTED.ACTION == ShinySoundDetectedAction::NOTIFY_ON_ALL) {
+        throw UserSetupError(env.console, "Shiny would be detected/notified at most once. Choose one of the other 2 options");
+    }
 
     uint8_t shiny_count = 0;
 
@@ -153,7 +157,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
         SHINY_DETECTED.on_shiny_sound(env, env.console, context, shiny_count, shiny_coefficient);
     }
 
-    // continue with shiny detection if pointless
+    // continue with shiny sound detection is pointless
     if (SHINY_DETECTED.ACTION != ShinySoundDetectedAction::STOP_PROGRAM) {
         while (true) {
             send_program_status_notification(env, NOTIFICATION_STATUS);
