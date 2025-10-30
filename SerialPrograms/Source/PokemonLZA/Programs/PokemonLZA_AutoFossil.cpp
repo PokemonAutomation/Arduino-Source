@@ -198,6 +198,10 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
         case 3:
             env.log("Detected blue dialog.");
             pbf_press_button(context, BUTTON_B, 80ms, 40ms);
+            // in normal cases when blue dialog box is detected, we already seen the selection
+            // arrow. But just in case somehow the program misses the selection arrow detection,
+            // we can still set it to true here to ensure subsequent program execution is smooth.
+            seen_selection_arrow = true;
             continue;
 
         default:
@@ -215,7 +219,7 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
 // start at box system, check fossils one by one
 bool AutoFossil::check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     AutoFossil_Descriptor::Stats& stats = env.current_stats<AutoFossil_Descriptor::Stats>();
-    
+
     uint8_t box_row = 1, box_col = 0;
     bool next_cell_right = true;
     BoxDetector box_detector(COLOR_RED, &env.console.overlay());
