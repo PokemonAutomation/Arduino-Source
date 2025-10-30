@@ -1559,12 +1559,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
-    Source/PokemonLZA/Programs/PokemonLZA_AutoFossil.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
-    Source/PokemonLZA/Programs/PokemonLZA_BeldumHunter.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_BeldumHunter.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
@@ -1575,10 +1571,14 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.h
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.h
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp

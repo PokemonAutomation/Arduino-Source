@@ -16,10 +16,10 @@
 #include "Programs/PokemonLZA_MegaShardFarmer.h"
 
 //  Shiny Hunting
-#include "Programs/PokemonLZA_ShinyHunt_BenchSit.h"
-#include "Programs/PokemonLZA_ShinyHunt_OverworldReset.h"
-#include "Programs/PokemonLZA_BeldumHunter.h"
-#include "Programs/PokemonLZA_AutoFossil.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h"
+#include "Programs/ShinyHunting/PokemonLZA_BeldumHunter.h"
+#include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
 
 //  Developer
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
