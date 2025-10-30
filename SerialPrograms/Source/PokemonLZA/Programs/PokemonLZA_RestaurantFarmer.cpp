@@ -67,14 +67,14 @@ RestaurantFarmer::RestaurantFarmer()
     , MOVE_AI(
         "<b>Move Selection AI:</b><br>"
         "If enabled, it will be smarter with move selection.<br>"
-        "However, this adds a split-second delay which may cause the opponent attacks to land first.",
+        "However, this adds a split-second delay which may cause opponent attacks to land first.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
     , USE_PLUS_MOVES(
         "<b>Use Plus Moves:</b><br>"
         "If enabled, it will attempt to use plus moves.<br>"
-        "However, this adds a 320ms delay which may cause the opponent attacks to land first.",
+        "However, this adds a 320ms delay which may cause opponent attacks to land first.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )

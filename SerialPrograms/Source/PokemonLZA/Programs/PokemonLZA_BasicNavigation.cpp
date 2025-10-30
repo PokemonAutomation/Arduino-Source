@@ -8,10 +8,10 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+//#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
+//#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
 namespace PokemonAutomation{
@@ -97,7 +97,7 @@ void sit_on_bench(
         }
     }
     {
-        ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0, 0, 1, 1}, &console.overlay());
+        ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.4, 0.3, 0.2, 0.7}, &console.overlay());
 
         int ret = run_until<ProControllerContext>(
             console, context,
