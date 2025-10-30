@@ -76,10 +76,8 @@ void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerConte
     size_t num_fossils_to_revive = 3;
     for(size_t i = 0; i < num_fossils_to_revive; i++){
         revive_one_fossil(env, context);
-        stats.fossils++;
-        env.update_stats();
         std::ostringstream os;
-        os << "Fossil " << i + 1 << "/" << num_fossils_to_revive;
+        os << "Got Fossil " << i + 1 << "/" << num_fossils_to_revive;
         std::string log_str = os.str();
         env.log(log_str);
         env.console.overlay().add_log(log_str);
@@ -122,6 +120,12 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
         switch (ret){
         case 0:
             env.log("Detected A button.");
+            if (seen_selection_arrow){
+                // we finish one round of fossil reviving
+                stats.fossils++;
+                env.update_stats();
+                return;
+            }
             // press A to start dialog with researcher Reg to start reviving a new fossil
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
