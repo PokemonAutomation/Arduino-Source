@@ -1571,18 +1571,20 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
+    Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.h
-    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.cpp
-    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.h
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.cpp
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp

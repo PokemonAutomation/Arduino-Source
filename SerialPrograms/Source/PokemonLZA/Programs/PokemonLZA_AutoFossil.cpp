@@ -12,6 +12,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Programs/PokemonLZA_MenuNavigation.h"
 #include "PokemonLZA_AutoFossil.h"
 
 #include <sstream>
@@ -70,7 +71,9 @@ AutoFossil::AutoFossil(){}
 
 
 void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    AutoFossil_Descriptor::Stats& stats = env.current_stats<AutoFossil_Descriptor::Stats>();
+    // AutoFossil_Descriptor::Stats& stats = env.current_stats<AutoFossil_Descriptor::Stats>();
+    overworld_to_box_system(env.console, context);
+    return;
 
     // Example loop structure
     size_t num_fossils_to_revive = 3;

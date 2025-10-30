@@ -1,11 +1,11 @@
-/*  Basic Navigation
+/*  Menu Navigation
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonLZA_BasicNavigation_H
-#define PokemonAutomation_PokemonLZA_BasicNavigation_H
+#ifndef PokemonAutomation_PokemonLZA_MenuNavigation_H
+#define PokemonAutomation_PokemonLZA_MenuNavigation_H
 
 namespace PokemonAutomation{
 
@@ -19,11 +19,15 @@ using ProControllerContext = ControllerContext<ProController>;
 
 namespace PokemonLZA{
 
-
-void sit_on_bench(
+// From overworld, press X to enter main menu
+void overworld_to_main_menu(
     ConsoleHandle& console, ProControllerContext& context
 );
 
+// From overworld, press X to enter main menu, then A to enter box system
+void overworld_to_box_system(
+    ConsoleHandle& console, ProControllerContext& context
+);
 
 
 }
