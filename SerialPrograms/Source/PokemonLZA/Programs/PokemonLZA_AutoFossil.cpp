@@ -14,6 +14,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_MenuNavigation.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
 #include "PokemonLZA_AutoFossil.h"
 
 #include <sstream>
@@ -72,6 +73,9 @@ AutoFossil::AutoFossil(){}
 
 
 void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    check_fossils_in_box(env, context, 1);
+    return;
+
     // AutoFossil_Descriptor::Stats& stats = env.current_stats<AutoFossil_Descriptor::Stats>();
     overworld_to_box_system(env.console, context);
     return;
@@ -165,10 +169,39 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
 
 // start at box system, check fossils one by one
 void AutoFossil::check_fossils_in_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t num_boxes){
-    uint8_t box_x = 0, box_y = 0;
+    uint8_t box_row = 1, box_col = 0;
+    bool next_cell_right = true;
     BoxDetector box_detector(COLOR_RED, &env.console.overlay());
+    BoxPageInfoWatcher info_watcher(&env.console.overlay());
     for(size_t i = 0; i < 30; i++){
-        box_detector.move_cursor(env.program_info(), env.console, context, box_x, box_y);
+        info_watcher.reset_state();
+        wait_until(env.console, context, WallClock::max(), {info_watcher});
+        
+        std::ostringstream os;
+        os << i + 1 << "/" << (num_boxes*30) << ": " << info_watcher.info_str();
+        std::string log_str = os.str();
+        env.log(log_str);
+        env.console.overlay().add_log(log_str);
+
+        if (next_cell_right){
+            if (box_col == 5){
+                box_row++;
+                next_cell_right = false;
+            } else{
+                box_col++;
+            }
+        } else{
+            if (box_col == 0){
+                box_row++;
+                next_cell_right = true;
+            } else{
+                box_col--;
+            }
+        }
+        if (i != 29){
+            env.console.overlay().add_log("Next cell: (" + std::to_string(box_row) + ", " + std::to_string(box_col) + ")");
+            box_detector.move_cursor(env.program_info(), env.console, context, box_row, box_col);
+        }
     }
 }
 

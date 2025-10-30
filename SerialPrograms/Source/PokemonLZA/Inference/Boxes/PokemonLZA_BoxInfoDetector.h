@@ -102,8 +102,16 @@ public:
         m_alpha_watcher.reset_state();
     }
 
+    // After detection is done, call this to check shiny-ness
     bool is_shiny() const { return m_shiny_watcher.consistent_result(); }
+    // After detection is done, call this to check alpha-ness
     bool is_alpha() const { return m_alpha_watcher.consistent_result(); }
+    // Return string of detected shiny and alpha-ness for logging. It can be:
+    // - "Normal"
+    // - "Shiny"
+    // - "Alpha"
+    // - "Shiny Alpha"
+    std::string info_str() const;
 
 private:
     BoxShinyWatcher m_shiny_watcher;

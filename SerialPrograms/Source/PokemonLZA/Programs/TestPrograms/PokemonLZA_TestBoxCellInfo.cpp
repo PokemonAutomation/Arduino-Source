@@ -95,24 +95,13 @@ public:
 
         if (m_need_to_update_log_once_determined && sth_in_cell_determined && is_info_determined){
             bool sth_in_cell = m_sth_in_cell_detector.consistent_result();
-            bool is_shiny = m_info_watcher.is_shiny();
-            bool is_alpha = m_info_watcher.is_alpha();
 
             std::ostringstream os;
             os << "Cell (" << int(m_last_row) << ", " << int(m_last_col) << ") ";
             if (!sth_in_cell){
                 os << "Empty";
             } else{
-                if (is_shiny && is_alpha){
-                    os << "Shiny Alpha Pokemon";
-                }
-                else if (is_shiny){
-                    os << " Shiny Pokemon";
-                } else if (is_alpha){
-                    os << " Alpha Pokemon";
-                } else {
-                    os << " Normal Pokemon";
-                }
+                os << m_info_watcher.info_str() << " Pokemon"; 
             }
             m_env.console.overlay().add_log(os.str());
             m_need_to_update_log_once_determined = false;
