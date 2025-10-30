@@ -33,18 +33,19 @@ print(f"Size: {width} x {height}")
 raw_image = image.copy()
 
 # ==================================================================
-# LZA box system cursor detection
-triangle_upper_edge_width = 0.008
-traingle_full_height = 0.03
-for row in range(6):
-	y = 0.120 if row == 0 else 0.331 + (0.797 - 0.331)/ 4.0 * (row-1)
-	for col in range(6):
-		x = 0.058 + col*(0.386 - 0.059)/5.0
-		add_infer_box_to_image(raw_image, x, y, 0.020, traingle_full_height, image)
+# LZA fossil selection green arrow when reviving fossils
+add_infer_box_to_image(raw_image, 0.630, 0.444, 0.226, 0.319, image)
 
-# 0.386, 0.797, 0.018, 0.008
-# add_infer_box_to_image(raw_image, 0.059, 0.121, 0.017, 0.006, image)
-# add_infer_box_to_image(raw_image, 0.386, 0.119, 0.019, 0.008, image)
+
+# ==================================================================
+# LZA box system cursor detection
+# triangle_upper_edge_width = 0.008
+# traingle_full_height = 0.03
+# for row in range(6):
+# 	y = 0.120 if row == 0 else 0.331 + (0.797 - 0.331)/ 4.0 * (row-1)
+# 	for col in range(6):
+# 		x = 0.058 + col*(0.386 - 0.059)/5.0
+# 		add_infer_box_to_image(raw_image, x, y, 0.020, traingle_full_height, image)
 # Pixel (x,y) = (775, 136), (0.404, 0.126), rgb=[255,188,245,71] hsv=[ 80 181 245]
 # Pixel (x,y) = (759, 135), (0.395, 0.125), rgb=[255,182,233,70] hsv=[ 81 178 233]
 # Pixel (x,y) = (796, 135), (0.415, 0.125), rgb=[255,181,239,63] hsv=[ 80 188 239]

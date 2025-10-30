@@ -2,6 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/
  *
+ *  Hunt shiny and/or alpha fossils by repeated reviving fossils and check them in box
  */
 
 #ifndef PokemonAutomation_PokemonLZA_AutoFossil_H
@@ -29,6 +30,9 @@ public:
     AutoFossil();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+
+private:
+    void revive_one_fossil(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 };
 
 
