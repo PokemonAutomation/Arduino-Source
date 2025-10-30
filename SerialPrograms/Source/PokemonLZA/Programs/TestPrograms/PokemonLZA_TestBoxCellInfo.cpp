@@ -9,8 +9,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
-#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.h"
-#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.h"
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
 #include "PokemonLZA_TestBoxCellInfo.h"
 
 #include <iostream>

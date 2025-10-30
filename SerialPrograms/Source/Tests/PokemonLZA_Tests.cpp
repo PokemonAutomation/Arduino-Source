@@ -16,8 +16,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
-#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.h"
-#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.h" 
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h" 
 #include <QFileInfo>
 #include <QDir>
 #include <algorithm>
