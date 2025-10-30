@@ -39,6 +39,8 @@ private:
     std::optional<OverlayBoxScope> m_last_detected_box;
 };
 
+// Detect whether there is a shiny symbol on the current pokemon in the box system.
+// Call BoxShinyWatcher::consistent_result() to know if the pokemon is shiny or not.
 class BoxShinyWatcher : public DetectorToFinder<BoxShinyDetector>{
 public:
     BoxShinyWatcher(
@@ -71,6 +73,8 @@ private:
     std::optional<OverlayBoxScope> m_last_detected_box;
 };
 
+// Detect whether there is an alpha symbol on the current pokemon in the box system.
+// Call BoxAlphaWatcher::consistent_result() to know if the pokemon is alpha or not.
 class BoxAlphaWatcher : public DetectorToFinder<BoxAlphaDetector>{
 public:
     BoxAlphaWatcher(
@@ -82,7 +86,29 @@ public:
     {}
 };
 
+// Check both shiny and alpha-ness of the current pokemon in the box view
+class BoxPageInfoWatcher : public VisualInferenceCallback{
+public:
+    BoxPageInfoWatcher(VideoOverlay* overlay);
 
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    // return true when the watcher determines the shiny and alpha-ness of the pokemon
+    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
+
+    // reset internal state so the watcher is ready for detect another pokemon's info
+    void reset_state(){
+        m_shiny_watcher.reset_state();
+        m_alpha_watcher.reset_state();
+    }
+
+    bool is_shiny() const { return m_shiny_watcher.consistent_result(); }
+    bool is_alpha() const { return m_alpha_watcher.consistent_result(); }
+
+private:
+    BoxShinyWatcher m_shiny_watcher;
+    BoxAlphaWatcher m_alpha_watcher;
+};
 
 
 }
