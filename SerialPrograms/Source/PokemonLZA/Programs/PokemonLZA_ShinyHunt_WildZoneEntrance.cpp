@@ -52,7 +52,9 @@ std::unique_ptr<StatsTracker> ShinyHunt_WildZoneEntrance_Descriptor::make_stats(
 
 
 ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
-    : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY),
+    : WALK_IN_ZONE("<b>WALK IN ZONE:</b><br>Walk this long in the zone after passing through the gate.",
+                   LockMode::UNLOCK_WHILE_RUNNING, "500 ms"),
+      SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY),
       NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600)),
       NOTIFICATIONS({
           &NOTIFICATION_STATUS,
@@ -62,6 +64,7 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
           &NOTIFICATION_ERROR_FATAL,
       }) {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    PA_ADD_OPTION(WALK_IN_ZONE);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -86,14 +89,14 @@ void run_to_gate(ConsoleHandle& console, ProControllerContext& context) {
     }
 }
 
-void enter_wild_zone_entrance(ConsoleHandle& console, ProControllerContext& context) {
+void enter_wild_zone_entrance(ConsoleHandle& console, ProControllerContext& context, Milliseconds walk_in_zone) {
     BlackScreenOverWatcher black_screen(COLOR_BLUE);
     int ret = run_until<ProControllerContext>(console, context,
                                               [&](ProControllerContext& context) {
                                                   pbf_mash_button(context, BUTTON_B, 200ms);  // dismiss menu if any
                                                   run_to_gate(console, context);
                                                   pbf_mash_button(context, BUTTON_A, 2000ms);
-                                                  pbf_move_left_joystick(context, 128, 0, 500ms, 200ms);
+                                                  pbf_move_left_joystick(context, 128, 0, walk_in_zone, 200ms);
                                                   context.wait_for_all_requests();
                                                   pbf_press_button(context, BUTTON_PLUS, 100ms, 100ms);  // open map
                                               },
@@ -132,7 +135,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                                             while (true) {
                                                 send_program_status_notification(env, NOTIFICATION_STATUS);
                                                 stats.resets++;
-                                                enter_wild_zone_entrance(env.console, context);
+                                                enter_wild_zone_entrance(env.console, context, WALK_IN_ZONE);
                                                 env.update_stats();
                                             }
                                         },
@@ -155,7 +158,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
         while (true) {
             send_program_status_notification(env, NOTIFICATION_STATUS);
             stats.resets++;
-            enter_wild_zone_entrance(env.console, context);
+            enter_wild_zone_entrance(env.console, context, WALK_IN_ZONE);
             env.update_stats();
         }
     }
