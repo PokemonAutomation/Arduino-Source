@@ -293,31 +293,6 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    MoveEffectivenessSymbolMatcher::NoEffect();
 
 
-    pbf_move_left_joystick(context, 0, 96, 400ms, 400ms);
-    pbf_press_button(context, BUTTON_L, 160ms, 440ms);
-    pbf_move_left_joystick(context, 128, 0, 3000ms, 400ms);
-    pbf_move_left_joystick(context, 255, 128, 400ms, 400ms);
-    pbf_press_button(context, BUTTON_L, 160ms, 440ms);
-    pbf_move_left_joystick(context, 128, 0, 2500ms, 400ms);
-    pbf_move_left_joystick(context, 255, 64, 400ms, 400ms);
-    pbf_press_button(context, BUTTON_L, 160ms, 440ms);
-    pbf_move_left_joystick(context, 128, 0, 2000ms, 0ms);
-    pbf_move_left_joystick(context, 160, 0, 1000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 2000ms, 0ms);
-    pbf_move_left_joystick(context, 160, 0, 1500ms, 1000ms);
-
-    pbf_move_right_joystick(context, 128, 0, 240ms, 0ms);
-    pbf_press_dpad(context, DPAD_UP, 240ms, 0ms);
-
-    for (int c = 0; c < 50; c++){
-        ssf_press_button(context, BUTTON_ZL, 240ms, 1000ms, 240ms);
-        pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
-        pbf_move_right_joystick(context, 255, 128, 240ms, 0ms);
-    }
-
-    pbf_press_button(context, BUTTON_PLUS, 240ms, 1000ms);
-    pbf_move_left_joystick(context, 0, 128, 80ms, 500ms);
-    pbf_mash_button(context, BUTTON_A, 1000ms);
 
 
 
@@ -362,7 +337,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
+#if 1
 //    ImageRGB32 image("Screenshots/screenshot-20251025-153957561163.png");
 
     auto screen = feed.snapshot();

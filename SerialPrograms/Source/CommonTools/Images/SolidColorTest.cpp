@@ -73,7 +73,7 @@ bool is_solid(
 ){
     double stddev = stats.stddev.sum();
     if (stddev > max_stddev_sum){
-        // cout << "bad stddev = " << stddev << endl;
+//        cout << "bad stddev = " << stddev << endl;
         return false;
     }
 
