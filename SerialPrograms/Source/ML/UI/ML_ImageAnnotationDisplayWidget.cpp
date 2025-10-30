@@ -109,6 +109,12 @@ void ImageAnnotationDisplayWidget::key_release(QKeyEvent* event){
     if (m_command_receiver){
         m_command_receiver->key_release(event);
     }
+
+    if (event->key() == Qt::Key::Key_Z){
+        m_selector_widget->go_to_previous_image();
+    } else if (event->key() == Qt::Key::Key_X){
+        m_selector_widget->go_to_next_image();
+    }
 }
 
 void ImageAnnotationDisplayWidget::focus_in(QFocusEvent* event){

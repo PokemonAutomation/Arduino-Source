@@ -107,19 +107,13 @@ ImageAnnotationSourceSelectorWidget::ImageAnnotationSourceSelectorWidget(ImageAn
     connect(
         prev_image_button, &QPushButton::clicked,
         this, [this](bool){
-            if (m_cur_image_file_idx_in_folder != SIZE_MAX && m_cur_image_file_idx_in_folder > 0){
-                m_cur_image_file_idx_in_folder--;
-                m_session.set_image_source(m_image_paths_in_folder[m_cur_image_file_idx_in_folder]);
-            }
+            this->go_to_previous_image();
         }  
     );
     connect(
         next_image_button, &QPushButton::clicked,
         this, [this](bool){
-            if (m_cur_image_file_idx_in_folder != SIZE_MAX && m_cur_image_file_idx_in_folder + 1 < m_image_paths_in_folder.size()){
-                m_cur_image_file_idx_in_folder++;
-                m_session.set_image_source(m_image_paths_in_folder[m_cur_image_file_idx_in_folder]);
-            }
+            this->go_to_next_image();
         }  
     );
 
@@ -129,6 +123,20 @@ ImageAnnotationSourceSelectorWidget::ImageAnnotationSourceSelectorWidget(ImageAn
     if(image_path.size() > 0){
         m_source_file_path_label->setText(QString::fromStdString(image_path));
         m_session.set_image_source(image_path);
+    }
+}
+
+void ImageAnnotationSourceSelectorWidget::go_to_previous_image(){
+    if (m_cur_image_file_idx_in_folder != SIZE_MAX && m_cur_image_file_idx_in_folder > 0){
+        m_cur_image_file_idx_in_folder--;
+        m_session.set_image_source(m_image_paths_in_folder[m_cur_image_file_idx_in_folder]);
+    }
+}
+
+void ImageAnnotationSourceSelectorWidget::go_to_next_image(){
+    if (m_cur_image_file_idx_in_folder != SIZE_MAX && m_cur_image_file_idx_in_folder + 1 < m_image_paths_in_folder.size()){
+        m_cur_image_file_idx_in_folder++;
+        m_session.set_image_source(m_image_paths_in_folder[m_cur_image_file_idx_in_folder]);
     }
 }
 
