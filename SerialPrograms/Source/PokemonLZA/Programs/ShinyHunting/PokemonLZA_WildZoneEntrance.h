@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonLZA_ShinyHunt_WildZoneEntrance_H
-#define PokemonAutomation_PokemonLZA_ShinyHunt_WildZoneEntrance_H
+#ifndef PokemonAutomation_PokemonLZA_WildZoneEntrance_H
+#define PokemonAutomation_PokemonLZA_WildZoneEntrance_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

@@ -15,7 +15,7 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
-#include "PokemonLZA_ShinyHunt_WildZoneEntrance.h"
+#include "PokemonLZA_WildZoneEntrance.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
