@@ -1,11 +1,11 @@
-/*  Check Box Cell Info
+/*  Test Box Cell Info
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonLZA_CheckBoxCellInfo_H
-#define PokemonAutomation_PokemonLZA_CheckBoxCellInfo_H
+#ifndef PokemonAutomation_PokemonLZA_TestBoxCellInfo_H
+#define PokemonAutomation_PokemonLZA_TestBoxCellInfo_H
 
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -14,15 +14,15 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
-class CheckBoxCellInfo_Descriptor : public SingleSwitchProgramDescriptor{
+class TestBoxCellInfo_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    CheckBoxCellInfo_Descriptor();
+    TestBoxCellInfo_Descriptor();
 };
 
 
-class CheckBoxCellInfo : public SingleSwitchProgramInstance{
+class TestBoxCellInfo : public SingleSwitchProgramInstance{
 public:
-    CheckBoxCellInfo();
+    TestBoxCellInfo();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 };

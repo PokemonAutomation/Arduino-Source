@@ -1,4 +1,4 @@
-/*  Check Box Cell Info
+/*  Test Box Cell Info
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -11,7 +11,7 @@
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.h"
-#include "PokemonLZA_CheckBoxCellInfo.h"
+#include "PokemonLZA_TestBoxCellInfo.h"
 
 #include <iostream>
 #include <sstream>
@@ -25,10 +25,10 @@ namespace PokemonLZA{
 using namespace Pokemon;
 
 
-CheckBoxCellInfo_Descriptor::CheckBoxCellInfo_Descriptor()
+TestBoxCellInfo_Descriptor::TestBoxCellInfo_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonLZA:CheckBoxCellInfo",
-        STRING_POKEMON + " LZA", "Check Box Cell Info",
+        "PokemonLZA:TestBoxCellInfo",
+        STRING_POKEMON + " LZA", "Test Box Cell Info",
         "",
         "Test program to check inference on pokemon info in box system. "
         "Move around on box cells while running the pokemon. Log overlay will show current selected cell and pokemon info of the cell.",
@@ -40,7 +40,7 @@ CheckBoxCellInfo_Descriptor::CheckBoxCellInfo_Descriptor()
 {}
 
 
-CheckBoxCellInfo::CheckBoxCellInfo() {}
+TestBoxCellInfo::TestBoxCellInfo() {}
 
 
 // A watcher that keeps shows current box cell info
@@ -143,10 +143,10 @@ protected:
 };
 
 
-void CheckBoxCellInfo::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void TestBoxCellInfo::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
-    env.log("Starting Check Box Cell Info test program...");
+    env.log("Starting Test Box Cell Info test program...");
 
     BoxInfoWatcher watcher(env);
 
