@@ -33,6 +33,8 @@ public:
 
 private:
     void revive_one_fossil(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+    void check_fossils_in_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t num_boxes);
 };
 
 

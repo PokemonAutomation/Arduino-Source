@@ -13,6 +13,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_MenuNavigation.h"
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA_AutoFossil.h"
 
 #include <sstream>
@@ -162,7 +163,14 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
     }
 }
 
-
+// start at box system, check fossils one by one
+void AutoFossil::check_fossils_in_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t num_boxes){
+    uint8_t box_x = 0, box_y = 0;
+    BoxDetector box_detector(COLOR_RED, &env.console.overlay());
+    for(size_t i = 0; i < 30; i++){
+        box_detector.move_cursor(env.program_info(), env.console, context, box_x, box_y);
+    }
+}
 
 }
 }
