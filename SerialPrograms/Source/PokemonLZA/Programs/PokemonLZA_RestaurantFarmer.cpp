@@ -20,6 +20,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
 #include "PokemonLZA_RestaurantFarmer.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -64,6 +65,19 @@ RestaurantFarmer::~RestaurantFarmer(){
 
 RestaurantFarmer::RestaurantFarmer()
     : m_stop_after_current(false)
+    , NUM_ROUNDS(
+        "<b>Number of Battles to run:</b><br>Zero will run until 'Stop after Current Battle' is pressed.</b>", 
+        LockMode::UNLOCK_WHILE_RUNNING, 
+        100, 
+        0
+        ),
+      GO_HOME_WHEN_DONE(false),
+      NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600)),
+      NOTIFICATIONS({
+          &NOTIFICATION_STATUS_UPDATE,
+          &NOTIFICATION_PROGRAM_FINISH,
+          &NOTIFICATION_ERROR_FATAL,
+      })
     , MOVE_AI(
         "<b>Move Selection AI:</b><br>"
         "If enabled, it will be smarter with move selection.<br>"
@@ -82,6 +96,10 @@ RestaurantFarmer::RestaurantFarmer()
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
     PA_ADD_OPTION(MOVE_AI);
     PA_ADD_OPTION(USE_PLUS_MOVES);
+
+    PA_ADD_OPTION(NUM_ROUNDS);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(NOTIFICATIONS);
 
     STOP_AFTER_CURRENT.set_idle();
     STOP_AFTER_CURRENT.add_listener(*this);
@@ -354,7 +372,7 @@ void RestaurantFarmer::on_press(){
 }
 
 void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-
+    RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
     m_stop_after_current.store(false, std::memory_order_relaxed);
     STOP_AFTER_CURRENT.set_ready();
     ResetOnExit reset_button_on_exit(STOP_AFTER_CURRENT);
@@ -363,13 +381,19 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
 //    auto lobby = env.console.video().snapshot();
 
     while (true){
+        send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
+        if (NUM_ROUNDS != 0 && stats.battles >= NUM_ROUNDS) {
+            m_stop_after_current.store(true, std::memory_order_relaxed);
+            STOP_AFTER_CURRENT.set_pressed();
+        }
         if (run_lobby(env, context)){
             break;
         }
         run_battle(env, context);
     }
 
-
+    send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 
