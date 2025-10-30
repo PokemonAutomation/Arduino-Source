@@ -209,7 +209,7 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "run_lobby(): No recognized state after 60 seconds.",
+                "revive_one_fossil(): No recognized state after 60 seconds.",
                 env.console
             );
         }
