@@ -20,7 +20,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h"
 #include "Programs/ShinyHunting/PokemonLZA_BeldumHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
-#include "Programs/PokemonLZA_ShinyHunt_WildZoneEntrance.h"
+#include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
 
 //  Developer
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
