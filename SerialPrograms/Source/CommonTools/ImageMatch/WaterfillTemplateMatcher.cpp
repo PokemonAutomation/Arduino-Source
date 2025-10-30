@@ -44,8 +44,12 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
             global_logger_command_line(), 
             "CommonFramework/WaterfillTemplateMatcher", 
             "waterfill_template_image_black_background", 
-            binaryImage);
+            binaryImage
+        );
     }
+
+//    cout << matrix.dump() << endl;
+
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area);
     if (objects.empty()){
         throw FileException(

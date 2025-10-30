@@ -6,7 +6,7 @@
 
 #ifdef PA_AutoDispatch_x64_17_Skylake
 
-#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
+#include <immintrin.h>
 #include "Kernels_SpikeConvolution_Routines.h"
 
 namespace PokemonAutomation{
@@ -22,7 +22,7 @@ struct Context_x86_AVX512{
     }
     static PA_FORCE_INLINE __m512 load_partial(const float* ptr, size_t length){
         __mmask16 mask = ((uint16_t)1 << length) - 1;
-        return _mm512_maskz_load_ps(mask, ptr);
+        return _mm512_maskz_loadu_ps(mask, ptr);
     }
     static PA_FORCE_INLINE void store_partial(float* ptr, __m512 x, size_t length){
         __mmask16 mask = ((uint16_t)1 << length) - 1;

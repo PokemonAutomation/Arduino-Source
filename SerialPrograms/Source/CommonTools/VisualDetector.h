@@ -24,6 +24,8 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) = 0;
 
     virtual void commit_state(){}
+
+    virtual void reset_state(){}
 };
 
 
@@ -111,13 +113,11 @@ public:
             const bool enough_time = timestamp - m_start_of_detection >= m_duration;
             if (enough_time){
                 m_consistent_result = m_last_detected > 0;
-            }
-            if (enough_time){
                 this->commit_state();
                 return true;
-            }else{
-                return false;
             }
+            
+            return false;
         }
         default:;
         }
@@ -128,8 +128,15 @@ public:
     //  whether it is consecutively detected , or consecutively not detected.
     bool consistent_result() const { return m_consistent_result; }
 
+    virtual void reset_state() override {
+        Detector::reset_state();
+        m_start_of_detection = WallClock::min();
+        m_last_detected = 0;
+        m_consistent_result = false;
+    }
+
 private:
-    std::chrono::milliseconds m_duration;
+    std::chrono::milliseconds m_duration;  // duration of frames to decide detection outcome
     FinderType m_finder_type;
     WallClock m_start_of_detection = WallClock::min();
     int8_t m_last_detected = 0; // 0: no prior detection, 1: last detected positive, -1: last detected negative

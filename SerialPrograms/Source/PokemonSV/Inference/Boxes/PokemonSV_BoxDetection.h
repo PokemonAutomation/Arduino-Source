@@ -16,6 +16,7 @@
 
 namespace PokemonAutomation{
     struct ProgramInfo;
+    class VideoStream;
 namespace NintendoSwitch{
 namespace PokemonSV{
 

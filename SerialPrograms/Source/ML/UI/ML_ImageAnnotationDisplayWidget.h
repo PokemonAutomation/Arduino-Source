@@ -59,6 +59,9 @@ public:
     //  Overwrites CommandReceiver::key_release().
     //  The public versions of the private QWidget key event handling functions.
     //  They are needed to accept key passed from CommonFramework/VideoPipeline/UI:VideoDisplayWindow.
+    //  Shortkey implemented:
+    //  - z: move to the previous image in current image folder
+    //  - x: move to the next image in current image folder
     virtual void key_release(QKeyEvent* event) override;
 
     //  Overwrites CommandReceiver::focus_in().

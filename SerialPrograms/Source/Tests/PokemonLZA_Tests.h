@@ -29,6 +29,14 @@
 
  int test_pokemonLZA_MainMenuDetector(const ImageViewRGB32& image, bool target);
 
+ int test_pokemonLZA_BoxDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
+
+ int test_pokemonLZA_SomethingInBoxCellDetector(const ImageViewRGB32& image, bool target);
+
+ int test_pokemonLZA_BoxShinyDetector(const ImageViewRGB32& image, bool target);
+
+ int test_pokemonLZA_BoxAlphaDetector(const ImageViewRGB32& image, bool target);
+
  }
 
  #endif

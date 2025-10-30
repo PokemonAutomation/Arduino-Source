@@ -16,6 +16,10 @@
 #include "Kernels_Waterfill_Session.tpp"
 #include "Kernels_Waterfill.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 namespace Waterfill{

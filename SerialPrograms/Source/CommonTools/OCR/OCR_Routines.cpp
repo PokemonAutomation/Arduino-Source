@@ -90,6 +90,7 @@ const std::vector<TextColorRange>& BLACK_TEXT_FILTERS(){
         {0xff000000, 0xff404040},
         {0xff000000, 0xff606060},
         {0xff000000, 0xff808080},
+        {0xff000000, 0xff909090},
     };
     return filters;
 }

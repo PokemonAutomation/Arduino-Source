@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 
 #include <atomic>
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -34,6 +35,17 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+    bool attempt_attack(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+    // Handle all the logic of talking to the restaurant receptionist.
+    // Return true when the user clicks the button STOP_AFTER_CURRENT and the player character stops talking to
+    // the receptionist. Return false when it enters battle.
+    bool run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    // Handle all battle logic. Return when it detects the blue dialog box meaning the player character is at
+    // the receptionist receiving reward items.
+    void run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
+private:
     class StopButton : public ButtonOption{
     public:
         StopButton();
@@ -46,13 +58,8 @@ private:
     std::atomic<bool> m_stop_after_current;
     StopButton STOP_AFTER_CURRENT;
 
-    // Handle all the logic of talking to the restaurant receptionist.
-    // Return true when the user clicks the button STOP_AFTER_CURRENT and the player character stops talking to
-    // the receptionist. Return false when it enters battle.
-    bool run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    // Handle all battle logic. Return when it detects the blue dialog box meaning the player character is at
-    // the receptionist receiving reward items.
-    void run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    BooleanCheckBoxOption MOVE_AI;
+    BooleanCheckBoxOption USE_PLUS_MOVES;
 };
 
 
