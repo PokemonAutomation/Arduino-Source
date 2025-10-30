@@ -116,7 +116,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
 
     uint8_t shiny_count = 0;
 
-    while (true) {
+    {  // first run with shiny detection
         float shiny_coefficient = 1.0;
         PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool {
             //  Warning: This callback will be run from a different thread than this function.
@@ -127,21 +127,16 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
             return true;
         });
 
-        int ret = run_until<ProControllerContext>(env.console, context,
-                                                  [&](ProControllerContext& context) {
-                                                      while (true) {
-                                                          send_program_status_notification(env, NOTIFICATION_STATUS);
-                                                          stats.resets++;
-                                                          enter_wild_zone_entrance(env.console, context);
-                                                          env.update_stats();
-                                                      }
-                                                  },
-                                                  {{shiny_detector}});
-
-        //  This should never happen.
-        if (ret != 0) {
-            continue;
-        }
+        run_until<ProControllerContext>(env.console, context,
+                                        [&](ProControllerContext& context) {
+                                            while (true) {
+                                                send_program_status_notification(env, NOTIFICATION_STATUS);
+                                                stats.resets++;
+                                                enter_wild_zone_entrance(env.console, context);
+                                                env.update_stats();
+                                            }
+                                        },
+                                        {{shiny_detector}});
 
         context.wait_for(std::chrono::milliseconds(1000));
 
@@ -152,8 +147,16 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
         pbf_mash_button(context, BUTTON_A, 600ms);             // teleporting or just mashing button
         pbf_mash_button(context, BUTTON_B, 200ms);             // in case need to dismiss map
 
-        if (SHINY_DETECTED.on_shiny_sound(env, env.console, context, shiny_count, shiny_coefficient)) {
-            break;
+        SHINY_DETECTED.on_shiny_sound(env, env.console, context, shiny_count, shiny_coefficient);
+    }
+
+    // continue with shiny detection if pointless
+    if (SHINY_DETECTED.ACTION != ShinySoundDetectedAction::STOP_PROGRAM) {
+        while (true) {
+            send_program_status_notification(env, NOTIFICATION_STATUS);
+            stats.resets++;
+            enter_wild_zone_entrance(env.console, context);
+            env.update_stats();
         }
     }
 
