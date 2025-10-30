@@ -67,8 +67,8 @@ ImageAnnotationSourceSelectorWidget::ImageAnnotationSourceSelectorWidget(ImageAn
     m_folder_info_label = new QLabel(this);
     folder_info_row->addWidget(m_folder_info_label, 1);
 
-    QPushButton* prev_image_button = new QPushButton("Prev Image in Folder", this);
-    QPushButton* next_image_button = new QPushButton("Next Image in Folder", this);
+    QPushButton* prev_image_button = new QPushButton("Prev Image in Folder (Z)", this);
+    QPushButton* next_image_button = new QPushButton("Next Image in Folder (X)", this);
     folder_info_row->addWidget(prev_image_button, 2);
     folder_info_row->addSpacing(2);
     folder_info_row->addWidget(next_image_button, 2);
