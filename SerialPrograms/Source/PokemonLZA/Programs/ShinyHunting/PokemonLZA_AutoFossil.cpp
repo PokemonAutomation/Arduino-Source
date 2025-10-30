@@ -41,6 +41,8 @@ using namespace Pokemon;
 // Flat white dialog box (?) with name Reg x 2
 // Back to overworld, A button shown
 
+// TODOs:
+// - change program to set num fossils not num boxes. Too expensive otherwise
 
 AutoFossil_Descriptor::AutoFossil_Descriptor()
     : SingleSwitchProgramDescriptor(
@@ -91,6 +93,16 @@ AutoFossil::AutoFossil()
         ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
+    , TAKE_VIDEO(
+        "Take a video on Switch when found",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , GO_HOME_WHEN_DONE(
+        "Go home when done",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -102,6 +114,8 @@ AutoFossil::AutoFossil()
 {
     PA_ADD_OPTION(STOP_ON);
     PA_ADD_OPTION(NUM_BOXES);
+    PA_ADD_OPTION(TAKE_VIDEO);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -122,6 +136,7 @@ void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         for(uint8_t i = 0; i < NUM_BOXES; i++){
             bool found_match = check_fossils_in_one_box(env, context);
             if (found_match){
+                send_program_finished_notification(env, NOTIFICATION_STATUS);
                 return;
             }
             if (i != NUM_BOXES - 1){
@@ -268,6 +283,14 @@ bool AutoFossil::check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, P
                 {}, "",
                 env.console.video().snapshot(), true
             );
+
+            if (TAKE_VIDEO){
+                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+                context.wait_for_all_requests();
+            }
+            if (GO_HOME_WHEN_DONE){
+                go_home(env.console, context);
+            }
             return true;
         }
 

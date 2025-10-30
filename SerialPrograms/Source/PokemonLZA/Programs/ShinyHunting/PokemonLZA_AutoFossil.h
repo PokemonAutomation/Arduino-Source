@@ -8,6 +8,7 @@
 #ifndef PokemonAutomation_PokemonLZA_AutoFossil_H
 #define PokemonAutomation_PokemonLZA_AutoFossil_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
@@ -44,8 +45,11 @@ private:
     PokemonLA::StopOnOption STOP_ON;
 
     SimpleIntegerOption<uint8_t> NUM_BOXES;
-
     EventNotificationOption FOUND_SHINY_OR_ALPHA;
+    
+    BooleanCheckBoxOption TAKE_VIDEO;
+    BooleanCheckBoxOption GO_HOME_WHEN_DONE;
+
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
 };
