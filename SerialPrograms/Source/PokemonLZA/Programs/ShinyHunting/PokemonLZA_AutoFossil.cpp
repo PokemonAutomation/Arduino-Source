@@ -83,9 +83,9 @@ std::unique_ptr<StatsTracker> AutoFossil_Descriptor::make_stats() const{
 
 
 AutoFossil::AutoFossil()
-    : NUM_BOXES("<b>Boxes of Fossils to Revive:</b>",
+    : NUM_FOSSILS("<b>How many fossils to revive before checking them in box:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        1, 1, 32
+        30, 1, 32*30
     )
     , FOUND_SHINY_OR_ALPHA(
         "Found Shiny or Alpha",
@@ -113,7 +113,7 @@ AutoFossil::AutoFossil()
     })
 {
     PA_ADD_OPTION(STOP_ON);
-    PA_ADD_OPTION(NUM_BOXES);
+    PA_ADD_OPTION(NUM_FOSSILS);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -121,8 +121,9 @@ AutoFossil::AutoFossil()
 
 
 void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    const size_t num_fossils_to_revive = NUM_FOSSILS; // at least 1
+    const size_t num_boxes = (num_fossils_to_revive+29) / 30;  // at least 1
     while(true){
-        size_t num_fossils_to_revive = size_t(NUM_BOXES) * 30;
         for(size_t i = 0; i < num_fossils_to_revive; i++){
             revive_one_fossil(env, context);
             std::ostringstream os;
@@ -133,13 +134,15 @@ void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
 
         overworld_to_box_system(env.console, context);
-        for(uint8_t i = 0; i < NUM_BOXES; i++){
-            bool found_match = check_fossils_in_one_box(env, context);
+        size_t checked_fossils = 0;
+        for(uint8_t i = 0; i < num_boxes; i++, checked_fossils++){
+            size_t num_fossils_in_box = (i == num_boxes - 1 ? num_fossils_to_revive - i*30 : 30);
+            bool found_match = check_fossils_in_one_box(env, context, num_fossils_in_box);
             if (found_match){
                 send_program_finished_notification(env, NOTIFICATION_STATUS);
                 return;
             }
-            if (i != NUM_BOXES - 1){
+            if (i != num_boxes - 1){
                 // go to next page
                 pbf_press_button(context, BUTTON_R, 200ms, 200ms);
             }
@@ -232,14 +235,16 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
 }
 
 // start at box system, check fossils one by one
-bool AutoFossil::check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+bool AutoFossil::check_fossils_in_one_box(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t num_fossils_in_box)
+{
     AutoFossil_Descriptor::Stats& stats = env.current_stats<AutoFossil_Descriptor::Stats>();
 
     uint8_t box_row = 1, box_col = 0;
     bool next_cell_right = true;
     BoxDetector box_detector(COLOR_RED, &env.console.overlay());
     BoxPageInfoWatcher info_watcher(&env.console.overlay());
-    for(size_t i = 0; i < 30; i++){
+    for(size_t i = 0; i < num_fossils_in_box; i++){
         env.console.overlay().add_log("To cell: (" + std::to_string(box_row) + ", " + std::to_string(box_col) + ")");
         box_detector.move_cursor(env.program_info(), env.console, context, box_row, box_col);
 
@@ -247,7 +252,7 @@ bool AutoFossil::check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, P
         wait_until(env.console, context, WallClock::max(), {info_watcher});
         
         std::ostringstream os;
-        os << i + 1 << "/" << int(NUM_BOXES)*30 << ": " << info_watcher.info_str();
+        os << i + 1 << "/" << NUM_FOSSILS << ": " << info_watcher.info_str();
         std::string log_str = os.str();
         env.log(log_str);
         env.console.overlay().add_log(log_str);
@@ -294,10 +299,19 @@ bool AutoFossil::check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, P
             return true;
         }
 
+        
         if (next_cell_right){
             if (box_col == 5){
                 box_row++;
-                next_cell_right = false;
+                size_t remaining_fossils = num_fossils_in_box - 1 - i;
+                if (remaining_fossils < 6){
+                    // we don't have enough fossils in this last row, so we move
+                    // from left to right
+                    box_col = 0;
+                    next_cell_right = true;
+                } else{
+                    next_cell_right = false;
+                }
             } else{
                 box_col++;
             }
