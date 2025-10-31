@@ -22,7 +22,7 @@ public:
     BoxShinySymbolMatcher(const char* path)
         : WaterfillTemplateMatcher(
             path,
-            Color(0xff000000), Color(0xff3c3c3c), 40
+            Color(0xff000000), Color(0xffb4b4b4), 40
         )
     {
         m_aspect_ratio_lower = 0.9;
@@ -62,7 +62,7 @@ bool BoxShinyDetector::detect(const ImageViewRGB32& screen){
         {0xff000000, 0xffb4b4b4}, // 180
     };
 
-    const double max_rsmd = 250.0;
+    const double max_rsmd = 100.0;
     bool found = match_template_by_waterfill(
         screen.size(),
         extract_box_reference(screen, m_box),
