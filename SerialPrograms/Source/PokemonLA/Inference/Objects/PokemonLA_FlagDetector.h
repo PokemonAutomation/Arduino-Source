@@ -15,6 +15,10 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
+// Detect white flag, which is a user placed marker on map and visible
+// on overworld.
+// The white flag is made by two separate white part: the pole and the flag
+// itself.
 class FlagDetector : public WhiteObjectDetector{
 public:
     FlagDetector();
