@@ -92,7 +92,7 @@ public:
 
 
 
-class CameraVideoSource : public QObject, public VideoSource{
+class CameraVideoSource : public VideoSource{
 public:
     virtual ~CameraVideoSource();
     CameraVideoSource(
@@ -118,11 +118,14 @@ public:
     virtual QWidget* make_display_QtWidget(QWidget* parent) override;
 
 private:
+    void init(const CameraInfo& info, Resolution desired_resolution);
     void set_video_output(QGraphicsVideoItem& item);
 
 
 private:
     friend class CameraVideoDisplay;
+
+    std::unique_ptr<QObject> m_metaobject;
 
     Logger& m_logger;
     Resolution m_resolution;

@@ -200,6 +200,7 @@ private:
 private:
     mutable std::recursive_mutex m_reset_lock;
     mutable SpinLock m_state_lock;
+//    bool m_shutting_down = false;
 
     Logger& m_logger;
     VideoSourceOption& m_option;
