@@ -44,14 +44,16 @@ RestaurantFarmer_Descriptor::RestaurantFarmer_Descriptor()
 class RestaurantFarmer_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
-        : battles(m_stats["Battles"])
+        : rounds(m_stats["Rounds"])
         , errors(m_stats["Errors"])
     {
-        m_display_order.emplace_back("Battles");
+        m_display_order.emplace_back("Rounds");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+
+        m_aliases["Battles"] = "Rounds";
     }
 
-    std::atomic<uint64_t>& battles;
+    std::atomic<uint64_t>& rounds;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> RestaurantFarmer_Descriptor::make_stats() const{
@@ -66,18 +68,13 @@ RestaurantFarmer::~RestaurantFarmer(){
 RestaurantFarmer::RestaurantFarmer()
     : m_stop_after_current(false)
     , NUM_ROUNDS(
-        "<b>Number of Battles to run:</b><br>Zero will run until 'Stop after Current Battle' is pressed.</b>", 
+        "<b>Number of Battles to Run:</b><br>"
+        "Zero will run until 'Stop after Current Battle' is pressed or the program is manually stopped.</b>",
         LockMode::UNLOCK_WHILE_RUNNING, 
         100, 
         0
-        ),
-      GO_HOME_WHEN_DONE(false),
-      NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600)),
-      NOTIFICATIONS({
-          &NOTIFICATION_STATUS_UPDATE,
-          &NOTIFICATION_PROGRAM_FINISH,
-          &NOTIFICATION_ERROR_FATAL,
-      })
+    )
+    , GO_HOME_WHEN_DONE(false)
     , MOVE_AI(
         "<b>Move Selection AI:</b><br>"
         "If enabled, it will be smarter with move selection.<br>"
@@ -92,6 +89,12 @@ RestaurantFarmer::RestaurantFarmer()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_ERROR_FATAL,
+    })
 {
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
     PA_ADD_OPTION(MOVE_AI);
@@ -255,8 +258,8 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
 
         case 1:
         case 3:
-            env.log("Detected blue dialog. End of battle!");
-            stats.battles++;
+            env.log("Detected blue dialog. End of round!");
+            stats.rounds++;
             env.update_stats();
             return;
 
@@ -382,7 +385,7 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     while (true){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
-        if (NUM_ROUNDS != 0 && stats.battles >= NUM_ROUNDS) {
+        if (NUM_ROUNDS != 0 && stats.rounds >= NUM_ROUNDS) {
             m_stop_after_current.store(true, std::memory_order_relaxed);
             STOP_AFTER_CURRENT.set_pressed();
         }

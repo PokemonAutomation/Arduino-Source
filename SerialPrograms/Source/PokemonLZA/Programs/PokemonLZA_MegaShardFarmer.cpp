@@ -83,7 +83,7 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
             for (int c = 0; c < 5; c++){
                 ssf_press_button(context, BUTTON_ZL, 240ms, 1000ms, 240ms);
                 pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
-                pbf_move_right_joystick(context, 255, 160, 240ms, 0ms);
+                pbf_move_right_joystick(context, 255, 144, 240ms, 0ms);
             }
         }
 

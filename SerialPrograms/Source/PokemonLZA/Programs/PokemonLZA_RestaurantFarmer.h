@@ -62,11 +62,12 @@ private:
     StopButton STOP_AFTER_CURRENT;
     SimpleIntegerOption<uint32_t> NUM_ROUNDS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationsOption NOTIFICATIONS;
 
     BooleanCheckBoxOption MOVE_AI;
     BooleanCheckBoxOption USE_PLUS_MOVES;
+
+    EventNotificationOption NOTIFICATION_STATUS_UPDATE;
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 
