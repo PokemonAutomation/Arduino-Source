@@ -9,6 +9,8 @@
 
 #include <functional>
 
+class QObject;
+
 namespace PokemonAutomation{
 
 
@@ -18,6 +20,7 @@ void queue_on_main_thread(std::function<void()> lambda);
 
 
 void run_on_main_thread_and_wait(std::function<void()> lambda);
+void run_on_object_thread_and_wait(QObject* object, std::function<void()> lambda);
 
 
 
