@@ -68,8 +68,8 @@ RestaurantFarmer::~RestaurantFarmer(){
 RestaurantFarmer::RestaurantFarmer()
     : m_stop_after_current(false)
     , NUM_ROUNDS(
-        "<b>Number of Battles to Run:</b><br>"
-        "Zero will run until 'Stop after Current Battle' is pressed or the program is manually stopped.</b>",
+        "<b>Number of Rounds to Run:</b><br>"
+        "Zero will run until 'Stop after Current Round' is pressed or the program is manually stopped.</b>",
         LockMode::UNLOCK_WHILE_RUNNING, 
         100, 
         0
@@ -112,22 +112,22 @@ RestaurantFarmer::RestaurantFarmer()
 
 RestaurantFarmer::StopButton::StopButton()
     : ButtonOption(
-      "<b>Stop after current battle:",
-      "Stop after current battle",
+      "<b>Stop after current round:",
+      "Stop after current round",
       0, 16
     )
 {}
 void RestaurantFarmer::StopButton::set_idle(){
     this->set_enabled(false);
-    this->set_text("Stop after Current Battle");
+    this->set_text("Stop after Current Round");
 }
 void RestaurantFarmer::StopButton::set_ready(){
     this->set_enabled(true);
-    this->set_text("Stop after Current Battle");
+    this->set_text("Stop after Current Round");
 }
 void RestaurantFarmer::StopButton::set_pressed(){
     this->set_enabled(false);
-    this->set_text("Program will stop after current battle...");
+    this->set_text("Program will stop after current round...");
 }
 
 
@@ -178,7 +178,7 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         case 1:
             env.log("Detected selection arrow.");
             // This is when the restaurant receptionist is asking whether you want
-            // to start the battle
+            // to start the round
             pbf_mash_button(context, BUTTON_A, 5000ms);
             return false;
 
@@ -208,7 +208,7 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         }
     }
 }
-void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
 
     WallClock start = current_time();
@@ -246,9 +246,7 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
             env.log("Detected selection arrow. (unexpected)", COLOR_RED);
             dump_image(env.console.logger(), env.program_info(), env.console.video(), "UnexpectedSelectionArrow");
             stats.errors++;
-//            stats.battles++;
             env.update_stats();
-//            return;
            continue;
 
         case 2:
@@ -268,7 +266,7 @@ void RestaurantFarmer::run_battle(SingleSwitchProgramEnvironment& env, ProContro
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Battle took longer than 30 minutes.",
+                "Round took longer than 30 minutes.",
                 env.console
             );
         }
@@ -392,7 +390,7 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
         if (run_lobby(env, context)){
             break;
         }
-        run_battle(env, context);
+        run_round(env, context);
     }
 
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

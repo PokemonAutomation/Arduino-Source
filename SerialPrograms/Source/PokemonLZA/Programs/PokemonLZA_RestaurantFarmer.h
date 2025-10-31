@@ -42,11 +42,11 @@ private:
 
     // Handle all the logic of talking to the restaurant receptionist.
     // Return true when the user clicks the button STOP_AFTER_CURRENT and the player character stops talking to
-    // the receptionist. Return false when it enters battle.
+    // the receptionist. Return false when it enters round.
     bool run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    // Handle all battle logic. Return when it detects the blue dialog box meaning the player character is at
+    // Handle all round logic. Return when it detects the blue dialog box meaning the player character is at
     // the receptionist receiving reward items.
-    void run_battle(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void run_round(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
     class StopButton : public ButtonOption{
