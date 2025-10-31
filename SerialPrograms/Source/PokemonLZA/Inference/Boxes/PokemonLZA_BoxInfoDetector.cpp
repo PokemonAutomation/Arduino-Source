@@ -62,7 +62,7 @@ bool BoxShinyDetector::detect(const ImageViewRGB32& screen){
         {0xff000000, 0xffb4b4b4}, // 180
     };
 
-    const double max_rsmd = 200.0;
+    const double max_rsmd = 250.0;
     bool found = match_template_by_waterfill(
         screen.size(),
         extract_box_reference(screen, m_box),
@@ -127,6 +127,7 @@ bool BoxAlphaDetector::detect(const ImageViewRGB32& screen){
     size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {combine_rgb(200, 50, 50), combine_rgb(255, 150, 100)},
         {combine_rgb(200, 50, 50), combine_rgb(255, 100, 100)},
         {combine_rgb(150, 0, 0), combine_rgb(255, 100, 100)},
     };
