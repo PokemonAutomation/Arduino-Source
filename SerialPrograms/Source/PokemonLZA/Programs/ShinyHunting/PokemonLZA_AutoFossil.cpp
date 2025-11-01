@@ -98,11 +98,7 @@ AutoFossil::AutoFossil()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
-    , GO_HOME_WHEN_DONE(
-        "Go home when done",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
+    , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -293,9 +289,7 @@ bool AutoFossil::check_fossils_in_one_box(
                 pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
                 context.wait_for_all_requests();
             }
-            if (GO_HOME_WHEN_DONE){
-                go_home(env.console, context);
-            }
+            GO_HOME_WHEN_DONE.run_end_of_program(context);
             return true;
         }
 

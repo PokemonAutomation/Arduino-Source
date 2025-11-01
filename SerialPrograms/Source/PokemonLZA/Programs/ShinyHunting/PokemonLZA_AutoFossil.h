@@ -14,6 +14,7 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "PokemonLA/Options/PokemonLA_MiscOptions.h"
 
 namespace PokemonAutomation{
@@ -48,7 +49,7 @@ private:
     EventNotificationOption FOUND_SHINY_OR_ALPHA;
     
     BooleanCheckBoxOption TAKE_VIDEO;
-    BooleanCheckBoxOption GO_HOME_WHEN_DONE;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
