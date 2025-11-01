@@ -46,8 +46,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
     ret.emplace_back(make_single_switch_program<RestaurantFarmer_Descriptor, RestaurantFarmer>());
+    ret.emplace_back(make_single_switch_program<MegaShardFarmer_Descriptor, MegaShardFarmer>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
-        ret.emplace_back(make_single_switch_program<MegaShardFarmer_Descriptor, MegaShardFarmer>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
