@@ -119,6 +119,12 @@ public:
         , IntegerEnumDropdownCell(database, lock_while_running, default_value)
         , m_label(std::move(label))
     {}
+    // you can construct IntegerEnumDropdownDatabase using initializer list:
+    // {
+    //      {0, "<slug_0>", "Display Name 0"},
+    //      {1, "<slug 1>", "Display Name 1"},
+    //      {2, "<slug 2>", "Display Name 2"},
+    // }
     IntegerEnumDropdownOption(
         std::string label,
         IntegerEnumDropdownDatabase&& database,
