@@ -7,6 +7,8 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
@@ -63,7 +65,14 @@ std::unique_ptr<StatsTracker> ShinyHunt_BenchSit_Descriptor::make_stats() const{
 
 
 ShinyHunt_BenchSit::ShinyHunt_BenchSit()
-    : SHINY_DETECTED(
+    : WALK_FORWARD_DURATION(
+        "<b>Walk Forward Duration</b><br>"
+        "Walk forward and backward for this long after each day change to "
+        "increase the spawn radius. Set to zero to disable this.",
+        LockMode::LOCK_WHILE_RUNNING,
+        "2000 ms"
+    )
+    , SHINY_DETECTED(
         "Shiny Detected", "",
         "2000 ms",
         ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY
@@ -78,6 +87,7 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    PA_ADD_STATIC(WALK_FORWARD_DURATION);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -102,6 +112,12 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                     send_program_status_notification(env, NOTIFICATION_STATUS);
                     stats.resets++;
                     sit_on_bench(env.console, context);
+                    Milliseconds duration = WALK_FORWARD_DURATION;
+                    if (duration > Milliseconds::zero()){
+                        ssf_press_button(context, BUTTON_B, 0ms, 2 * duration, 0ms);
+                        pbf_move_left_joystick(context, 128, 0, duration, 0ms);
+                        pbf_move_left_joystick(context, 128, 255, duration + 250ms, 0ms);
+                    }
                     env.update_stats();
                 }
             },
