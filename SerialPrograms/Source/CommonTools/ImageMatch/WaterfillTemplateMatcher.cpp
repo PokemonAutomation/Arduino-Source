@@ -69,6 +69,8 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     m_matcher.reset(new ExactImageMatcher(extract_box_reference(reference, *best).copy()));
     m_area_ratio = best->area_ratio();
 
+//    cout << "template area ratio = " << m_area_ratio << endl;
+
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         const auto exact_image = extract_box_reference(reference, *best);
         cout << "Build waterfil template matcher from " << full_path << ", W x H: " << exact_image.width()
@@ -114,8 +116,16 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
     if (m_area_ratio == 0){
         return true;
     }
+
+//    cout << "candidate_area_ratio = " << candidate_area_ratio << endl;
+
     double error = candidate_area_ratio / m_area_ratio;
     bool pass = m_area_ratio_lower <= error && error <= m_area_ratio_upper;
+
+//    cout << "m_area_ratio_lower = " << m_area_ratio_lower << endl;
+//    cout << "m_area_ratio_upper = " << m_area_ratio_upper << endl;
+//    cout << "m_area_ratio = " << m_area_ratio << endl;
+//    cout << "candidate_area_ratio = " << candidate_area_ratio << endl;
 
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
         if (!pass){
@@ -178,9 +188,11 @@ double WaterfillTemplateMatcher::rmsd_original(
     }
 
     if (!check_aspect_ratio(object.width(), object.height())){
+//        cout << "bad aspect ratio" << endl;
         return 99999.;
     }
     if (!check_area_ratio(object.area_ratio())){
+//        cout << "bad area ratio" << endl;
         return 99999.;
     }
 

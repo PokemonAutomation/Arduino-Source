@@ -126,6 +126,7 @@ bool match_template_by_waterfill(
         const bool keep_object_matrix = false;
         while (finder->find_next(object, keep_object_matrix)){
 //            static int c = 0;
+//            cout << "start: " << c << endl;
 //            extract_box_reference(image, object).save("test-" + std::to_string(c++) + ".png");
 
 //            cout << "object.area = " << object.area << endl;

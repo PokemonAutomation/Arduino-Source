@@ -87,16 +87,18 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
             }
         }
 
-        //  Fly back to Restaurant Le Yeah
-        pbf_press_button(context, BUTTON_PLUS, 240ms, 1000ms);
-        pbf_move_left_joystick(context, 0, 128, 80ms, 500ms);
-        pbf_mash_button(context, BUTTON_A, 5000ms);
+        fly_back(env, context);
 
         stats.rounds++;
     }
 
 }
+void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    pbf_press_button(context, BUTTON_PLUS, 240ms, 1000ms);
+    pbf_move_left_joystick(context, 0, 128, 80ms, 500ms);
+    pbf_mash_button(context, BUTTON_A, 5000ms);
 
+}
 
 
 }
