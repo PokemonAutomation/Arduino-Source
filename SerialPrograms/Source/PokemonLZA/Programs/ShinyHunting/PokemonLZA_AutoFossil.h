@@ -43,14 +43,14 @@ private:
     // return true if found a match
     bool check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t num_fossils_in_box);
 
-    PokemonLA::StopOnOption STOP_ON;
-
     SimpleIntegerOption<uint32_t> NUM_FOSSILS;
-    EventNotificationOption FOUND_SHINY_OR_ALPHA;
+    IntegerEnumDropdownOption WHICIH_FOSSIL;
+    PokemonLA::StopOnOption STOP_ON;
     
     BooleanCheckBoxOption TAKE_VIDEO;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
+    EventNotificationOption FOUND_SHINY_OR_ALPHA;
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
 };
