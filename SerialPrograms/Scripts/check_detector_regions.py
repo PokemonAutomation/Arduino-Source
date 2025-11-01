@@ -32,9 +32,15 @@ print(f"Size: {width} x {height}")
 
 raw_image = image.copy()
 
+
+# ==================================================================
+# LZA main menu detector
+add_infer_box_to_image(raw_image, 0.87, 0.940, 0.077, 0.044, image)  # detect button B
+
+
 # ==================================================================
 # LZA fossil selection green arrow when reviving fossils
-add_infer_box_to_image(raw_image, 0.630, 0.444, 0.226, 0.319, image)
+# add_infer_box_to_image(raw_image, 0.630, 0.444, 0.226, 0.319, image)
 
 
 # ==================================================================
