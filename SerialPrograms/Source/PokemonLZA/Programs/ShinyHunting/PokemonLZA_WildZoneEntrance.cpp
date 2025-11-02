@@ -97,11 +97,14 @@ void run_to_gate(ConsoleHandle& console, ProControllerContext& context){
     case 0:
         break;
     default:
+        console.log("Unable to detect entrance. Assuming already inside.", COLOR_RED);
+#if 0
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "run_to_gate(): Unable to detect entrance after 10 seconds.",
             console
         );
+#endif
     }
 }
 
@@ -179,7 +182,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
             continue;
         }
 
-        context.wait_for(std::chrono::milliseconds(1000));
+        pbf_mash_button(context, BUTTON_B, 1000ms);
 
         bool exit = SHINY_DETECTED.on_shiny_sound(
             env, env.console, context,
@@ -189,7 +192,6 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
 
         // when shiny sound is detected, it's most likely happened inside the zone
         // now try to reset position
-        pbf_mash_button(context, BUTTON_B, 200ms);
         open_map(env.console, context);
         if (!fly_from_map(env.console, context)){
             pbf_mash_button(context, BUTTON_B, 5000ms);
