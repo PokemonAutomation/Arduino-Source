@@ -1561,18 +1561,18 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
-    Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h
-    Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp

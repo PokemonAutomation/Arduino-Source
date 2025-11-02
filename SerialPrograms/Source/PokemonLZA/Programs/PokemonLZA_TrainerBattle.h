@@ -25,8 +25,10 @@ namespace PokemonLZA{
 //   left then bottom move in quick succession to ensure at least one of the three moves are launched
 //   despite potential move cooldown.
 // - use_plus_moves: if True, press + to launch plus moves.
-bool attempt_one_attack(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    bool use_move_ai, bool use_plus_moves);
+bool attempt_one_attack(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    bool use_move_ai, bool use_plus_moves
+);
 
 }
 }

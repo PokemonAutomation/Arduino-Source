@@ -19,9 +19,10 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
-bool attempt_one_attack(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    bool use_move_ai, bool use_plus_moves)
-{
+bool attempt_one_attack(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    bool use_move_ai, bool use_plus_moves
+){
     if (!use_move_ai){
         ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
         if (use_plus_moves){
