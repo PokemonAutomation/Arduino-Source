@@ -185,9 +185,15 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
         // when shiny sound is detected, it's most likely happened inside the zone
         // now try to reset position
         pbf_mash_button(context, BUTTON_B, 200ms);             // dismiss menu if any
-        pbf_press_button(context, BUTTON_PLUS, 100ms, 100ms);  // open map
-        pbf_mash_button(context, BUTTON_A, 600ms);             // teleporting or just mashing button
-        pbf_mash_button(context, BUTTON_B, 200ms);             // in case need to dismiss map
+        open_map(env.console, context);
+        try{
+            fly_from_map(env.console, context);
+        }catch (OperationFailedException&){
+            pbf_mash_button(context, BUTTON_B, 5000ms);
+        }
+//        pbf_press_button(context, BUTTON_PLUS, 100ms, 100ms);  // open map
+//        pbf_mash_button(context, BUTTON_A, 600ms);             // teleporting or just mashing button
+//        pbf_mash_button(context, BUTTON_B, 200ms);             // in case need to dismiss map
 
         if (SHINY_DETECTED.on_shiny_sound(
             env, env.console, context,

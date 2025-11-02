@@ -85,7 +85,7 @@ void fly_from_map(ConsoleHandle& console, ProControllerContext& context){
         int ret = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 30000ms);
+                pbf_mash_button(context, BUTTON_B, 30000ms);
             },
             {done_flying,}
         );
