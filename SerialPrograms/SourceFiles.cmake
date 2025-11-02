@@ -1573,6 +1573,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.h
+    Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp

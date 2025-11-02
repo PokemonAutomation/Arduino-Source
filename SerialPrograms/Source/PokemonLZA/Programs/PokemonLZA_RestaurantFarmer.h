@@ -9,14 +9,21 @@
 
 #include <atomic>
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include <Common/Cpp/Options/SimpleIntegerOption.h>
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
+
+template <typename Type> class ControllerContext;
+
 namespace NintendoSwitch{
+
+class ProController;
+using ProControllerContext = ControllerContext<ProController>;
+
 namespace PokemonLZA{
 
 
@@ -38,8 +45,6 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    bool attempt_attack(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-
     // Handle all the logic of talking to the restaurant receptionist.
     // Return true when the user clicks the button STOP_AFTER_CURRENT and the player character stops talking to
     // the receptionist. Return false when it enters round.

@@ -19,6 +19,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
+#include "PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
 #include "PokemonLZA_RestaurantFarmer.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 
@@ -230,7 +231,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
             env.console, context,
             [&](ProControllerContext& context){
                 while (current_time() - start < 30min){
-                    attempt_attack(env, context);
+                    attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES);
                 }
             },
             {
@@ -273,84 +274,6 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
 
     }
 }
-
-
-bool RestaurantFarmer::attempt_attack(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    if (!MOVE_AI){
-        ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
-        if (USE_PLUS_MOVES){
-            ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
-//          pbf_wait(context, 104ms);
-        }
-        pbf_press_button(context, BUTTON_X, 80ms, 24ms);
-        pbf_press_button(context, BUTTON_Y, 80ms, 24ms);
-        pbf_press_button(context, BUTTON_B, 80ms, 24ms);
-        return true;
-    }
-
-    AsyncCommandSession<ProController> command(
-        context,
-        env.logger(),
-        env.realtime_dispatcher(),
-        context
-    );
-
-    MoveEffectivenessSymbolWatcher move_watcher(COLOR_RED, &env.console.overlay(), 100ms);
-    command.dispatch([](ProControllerContext& context){
-        pbf_press_button(context, BUTTON_ZL, 10000ms, 0ms);
-    });
-
-    int ret = wait_until(
-        env.console, context, 1000ms,
-        {move_watcher}
-    );
-    if (ret < 0){
-        command.stop_session_and_rethrow();
-        context.wait_for(250ms);
-        pbf_press_button(context, BUTTON_B, 160ms, 80ms);
-        return false;
-    }
-
-    MoveEffectivenessSymbol best_type = move_watcher[0];
-    Button best_move = BUTTON_X;
-    const char* best_string = "Picking Move: Top";
-    if (best_type < move_watcher[1]){
-        best_type = move_watcher[1];
-        best_move = BUTTON_Y;
-        best_string = "Picking Move: Left";
-    }
-    if (best_type < move_watcher[2]){
-        best_type = move_watcher[2];
-        best_move = BUTTON_A;
-        best_string = "Picking Move: Right";
-    }
-    if (best_type < move_watcher[3]){
-//        best_type = move_watcher[3];
-        best_move = BUTTON_B;
-        best_string = "Picking Move: Bottom";
-    }
-
-    env.log(best_string, COLOR_BLUE);
-
-    command.dispatch([&](ProControllerContext& context){
-        ssf_press_button(context, BUTTON_ZL, 0ms, 800ms, 200ms);
-        if (USE_PLUS_MOVES){
-            ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
-//            pbf_wait(context, 104ms);
-        }
-        pbf_press_button(context, best_move, 160ms, 320ms);
-    });
-
-    command.wait();
-
-    command.stop_session_and_rethrow();
-    return true;
-}
-
-
-
-
-
 
 
 class RestaurantFarmer::ResetOnExit{
