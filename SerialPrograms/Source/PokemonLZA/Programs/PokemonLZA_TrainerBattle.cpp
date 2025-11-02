@@ -54,6 +54,7 @@ bool attempt_one_attack(
     if (ret < 0){
         command.stop_session_and_rethrow();
         context.wait_for(250ms);
+        // No move effectiveness symbol found
         pbf_press_button(context, BUTTON_B, 160ms, 80ms);
         return false;
     }
@@ -78,6 +79,7 @@ bool attempt_one_attack(
     }
 
     env.log(best_string, COLOR_BLUE);
+    env.console.overlay().add_log(best_string);
 
     command.dispatch([&](ProControllerContext& context){
         ssf_press_button(context, BUTTON_ZL, 0ms, 800ms, 200ms);

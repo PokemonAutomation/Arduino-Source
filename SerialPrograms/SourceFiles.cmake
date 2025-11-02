@@ -1563,6 +1563,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.cpp
@@ -1575,6 +1577,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
+    Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
