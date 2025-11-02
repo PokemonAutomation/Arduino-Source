@@ -237,6 +237,10 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
         case 3:
             env.log("Detected black screen.");
             env.console.overlay().add_log("Transition to Battle");
+            // mash B for 10 sec to clear up any pre-battle transparency dialog
+            pbf_mash_button(context, BUTTON_B, 10s);
+            context.wait_for_all_requests();
+            env.console.overlay().add_log("Cleared Transparent Dialog");
             // battle starts
             return false;
 
@@ -265,7 +269,8 @@ void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProC
             env.console, context,
             [&](ProControllerContext& context){
                 while (current_time() - start < 30min){
-                    attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES);
+                    const bool allow_button_B_press = false;
+                    attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES, allow_button_B_press);
                 }
             },
             {
