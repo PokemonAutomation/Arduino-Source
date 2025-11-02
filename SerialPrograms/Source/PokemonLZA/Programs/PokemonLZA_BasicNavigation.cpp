@@ -73,11 +73,14 @@ bool fly_from_map(ConsoleHandle& console, ProControllerContext& context){
             console.log("Flying from map... Started!");
             break;
         default:
+            return false;
+#if 0
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "fly_from_map(): Unable to fly.",
                 console
             );
+#endif
         }
     }
     {
