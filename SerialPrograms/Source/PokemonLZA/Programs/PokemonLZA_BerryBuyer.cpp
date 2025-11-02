@@ -155,7 +155,8 @@ void BerryBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 env.update_stats();
 
                 if (stats.purchases == NUM_PURCHASE) {
-                    pbf_mash_button(context, BUTTON_B, 5000ms);
+                    // pbf_mash_button(context, BUTTON_B, 5000ms);
+                    // intentionally don't leave the purchase menu to not get attacked
                     GO_HOME_WHEN_DONE.run_end_of_program(context);
                     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
                     return;
