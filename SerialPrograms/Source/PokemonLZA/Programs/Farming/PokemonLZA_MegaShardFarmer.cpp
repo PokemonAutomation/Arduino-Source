@@ -11,6 +11,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_MegaShardFarmer.h"
 
 namespace PokemonAutomation{
@@ -131,7 +132,7 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
 }
 void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     while (true){
-        pbf_press_button(context, BUTTON_PLUS, 240ms, 1500ms);
+        open_map(env.console, context);
 
         //  Middle Zoom
         pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);

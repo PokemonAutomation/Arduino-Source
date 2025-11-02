@@ -20,9 +20,10 @@ using ProControllerContext = ControllerContext<ProController>;
 namespace PokemonLZA{
 
 
-void sit_on_bench(
-    ConsoleHandle& console, ProControllerContext& context
-);
+
+void open_map(ConsoleHandle& console, ProControllerContext& context);
+
+void sit_on_bench(ConsoleHandle& console, ProControllerContext& context);
 
 
 

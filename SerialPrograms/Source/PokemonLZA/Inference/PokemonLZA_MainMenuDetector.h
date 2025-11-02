@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_MainMenuDetector_H
 #define PokemonAutomation_PokemonLZA_MainMenuDetector_H
 
-#include <optional>
+//#include <optional>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -31,8 +31,6 @@ public:
     virtual bool detect(const ImageViewRGB32& screen) override;
 
 private:
-    friend class MainMenuWatcher;
-
     ButtonDetector m_right_arrow_button;
     ButtonDetector m_b_button;
 };

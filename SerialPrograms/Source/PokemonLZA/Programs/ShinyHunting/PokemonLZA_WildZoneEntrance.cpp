@@ -118,8 +118,7 @@ void enter_wild_zone_entrance(
             run_to_gate(env.console, context);
             pbf_mash_button(context, BUTTON_A, 2000ms);
             pbf_move_left_joystick(context, 128, 0, walk_in_zone, 200ms);
-            context.wait_for_all_requests();
-            pbf_press_button(context, BUTTON_PLUS, 100ms, 100ms);  // open map
+            open_map(env.console, context);
         },
         {{black_screen}}
     );
