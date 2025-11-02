@@ -338,12 +338,39 @@ bool BlueDialogDetector::detect(const ImageViewRGB32& screen){
 ItemReceiveDetector::ItemReceiveDetector(Color color, VideoOverlay* overlay)
     : m_color(color)
     , m_overlay(overlay)
+    , m_top(0.309013, 0.719466, 0.418455, 0.015267)
     , m_arrow_box(0.718648, 0.875728, 0.034896, 0.056311)
 {}
 void ItemReceiveDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, m_top);
     items.add(m_color, m_arrow_box);
 }
 bool ItemReceiveDetector::detect(const ImageViewRGB32& screen){
+    ImageStats top = image_stats(extract_box_reference(screen, m_top));
+    if (top.average.sum() > 250){
+        return false;
+    }
+
+    do{
+        //  We will probably need to add more color ratios here later.
+        if (is_solid(top, {0.153583, 0.245751, 0.600666}, 0.25, 40)){
+            break;
+        }
+#if 0
+        if (is_solid(
+            extract_box_reference(screen, m_top),
+            {0, 0.134207, 0.865793},
+            40
+        )){
+            break;
+        }
+#endif
+
+        m_last_detected_box.reset();
+//        cout << "not solid" << endl;
+        return false;
+    }while (false);
+
     double screen_rel_size = (screen.height() / 1080.0);
     double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 
