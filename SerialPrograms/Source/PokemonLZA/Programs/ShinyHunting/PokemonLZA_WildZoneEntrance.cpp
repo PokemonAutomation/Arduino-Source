@@ -131,11 +131,13 @@ void enter_wild_zone_entrance(
         context.wait_for(std::chrono::milliseconds(2000));
         pbf_mash_button(context, BUTTON_B, 200ms);             // dismiss menu if any
         open_map(env.console, context);
+        fly_from_map(env.console, context);
+    }else{
+        if (!fly_from_map(env.console, context)){
+            stats.errors++;
+        }
     }
 
-    if (!fly_from_map(env.console, context)){
-        stats.errors++;
-    }
 }
 
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
