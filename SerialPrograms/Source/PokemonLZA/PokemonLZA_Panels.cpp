@@ -16,6 +16,7 @@
 
 //  Farming
 #include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
+#include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_MegaShardFarmer.h"
 
 //  Shiny Hunting
@@ -54,6 +55,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RestaurantFarmer_Descriptor, RestaurantFarmer>());
     ret.emplace_back(make_single_switch_program<MegaShardFarmer_Descriptor, MegaShardFarmer>());
     if (PreloadSettings::instance().DEVELOPER_MODE){
+        ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");

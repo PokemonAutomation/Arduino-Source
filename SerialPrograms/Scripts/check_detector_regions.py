@@ -34,6 +34,11 @@ raw_image = image.copy()
 
 
 # ==================================================================
+# LZA selection arrow
+# add_infer_box_to_image(raw_image, 0.654308, 0.481553, 0.295529, 0.312621, image)  # restaurant farmer
+add_infer_box_to_image(raw_image, 0.543, 0.508, 0.365, 0.253, image)  # Jacinthe farmer
+
+# ==================================================================
 # LZA main menu detector
 add_infer_box_to_image(raw_image, 0.87, 0.940, 0.077, 0.044, image)  # detect button B
 
