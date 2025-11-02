@@ -141,7 +141,7 @@ public:
         VideoOverlay* overlay = nullptr,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("BlueDialogWatcher", hold_duration, color, overlay)
+         : DetectorToFinder("ItemReceiveWatcher", hold_duration, color, overlay)
     {}
 };
 
