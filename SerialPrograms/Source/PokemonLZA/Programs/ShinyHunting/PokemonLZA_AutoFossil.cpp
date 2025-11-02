@@ -41,9 +41,6 @@ using namespace Pokemon;
 // Flat white dialog box (?) with name Reg x 2
 // Back to overworld, A button shown
 
-// TODOs:
-// - change program to set num fossils not num boxes. Too expensive otherwise
-
 AutoFossil_Descriptor::AutoFossil_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLZA:AutoFossil",
@@ -83,22 +80,32 @@ std::unique_ptr<StatsTracker> AutoFossil_Descriptor::make_stats() const{
 
 
 AutoFossil::AutoFossil()
-    : NUM_FOSSILS("<b>How many fossils to revive before checking them in box:</b>",
+    : NUM_FOSSILS("<b>How Many Fossils to Revive Before Checking Them in Box:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         30, 1, 32*30
     )
+    , WHICIH_FOSSIL(
+        "<b>Which Fossil to Choose in the Dialog Menu:</b>",
+        {
+            {0, "1st-fossil", "1st Fossil"},
+            {1, "2nd-fossil", "2nd Fossil"},
+            {2, "3rd-fossil", "3rd Fossil"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        0
+    )
+    , TAKE_VIDEO(
+        "Take a video When Found:",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , GO_HOME_WHEN_DONE(true)
     , FOUND_SHINY_OR_ALPHA(
         "Found Shiny or Alpha",
         true, true,
         ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
-    , TAKE_VIDEO(
-        "Take a video on Switch when found",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
-    , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -108,8 +115,9 @@ AutoFossil::AutoFossil()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(STOP_ON);
     PA_ADD_OPTION(NUM_FOSSILS);
+    PA_ADD_OPTION(WHICIH_FOSSIL);
+    PA_ADD_OPTION(STOP_ON);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -199,6 +207,9 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
         case 1:
             env.log("Detected selection arrow.");
             // This is when the Reg asks you which fossil to revive
+            for(size_t i = 0; i < WHICIH_FOSSIL.current_value(); i++){
+                pbf_press_dpad(context, DPAD_DOWN, 40ms, 40ms);
+            }
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             seen_selection_arrow = true;
             continue;
