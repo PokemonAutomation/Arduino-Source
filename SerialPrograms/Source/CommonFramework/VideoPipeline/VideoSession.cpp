@@ -253,11 +253,11 @@ void VideoSession::internal_set_resolution(Resolution resolution){
 }
 
 void VideoSession::run_commands(){
-    std::unique_lock<std::mutex> lg0(m_reset_lock, std::defer_lock);
-    if (!lg0.try_lock()){
+    if (!m_reset_lock.try_acquire_write()){
         m_logger.log("Suppressing re-entrant command...", COLOR_RED);
         return;
     }
+
     try{
         while (true){
             Command command;
@@ -285,7 +285,9 @@ void VideoSession::run_commands(){
                 break;
             }
         }
+        m_reset_lock.unlock_write();
     }catch (...){
+        m_reset_lock.unlock_write();
         throw;
     }
 }

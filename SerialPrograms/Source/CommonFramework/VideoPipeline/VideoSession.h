@@ -198,7 +198,7 @@ private:
 
 
 private:
-    mutable std::mutex m_reset_lock;
+    mutable SpinLock m_reset_lock;
     mutable SpinLock m_state_lock;
 //    bool m_shutting_down = false;
 
