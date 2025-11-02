@@ -133,11 +133,8 @@ void enter_wild_zone_entrance(
         open_map(env.console, context);
     }
 
-    try{
-        fly_from_map(env.console, context);
-    }catch (OperationFailedException&){
+    if (!fly_from_map(env.console, context)){
         stats.errors++;
-        throw;
     }
 }
 
@@ -182,24 +179,21 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
 
         context.wait_for(std::chrono::milliseconds(1000));
 
-        // when shiny sound is detected, it's most likely happened inside the zone
-        // now try to reset position
-        pbf_mash_button(context, BUTTON_B, 200ms);             // dismiss menu if any
-        open_map(env.console, context);
-        try{
-            fly_from_map(env.console, context);
-        }catch (OperationFailedException&){
-            pbf_mash_button(context, BUTTON_B, 5000ms);
-        }
-//        pbf_press_button(context, BUTTON_PLUS, 100ms, 100ms);  // open map
-//        pbf_mash_button(context, BUTTON_A, 600ms);             // teleporting or just mashing button
-//        pbf_mash_button(context, BUTTON_B, 200ms);             // in case need to dismiss map
-
-        if (SHINY_DETECTED.on_shiny_sound(
+        bool exit = SHINY_DETECTED.on_shiny_sound(
             env, env.console, context,
             stats.shinies,
             shiny_coefficient
-        )){
+        );
+
+        // when shiny sound is detected, it's most likely happened inside the zone
+        // now try to reset position
+        pbf_mash_button(context, BUTTON_B, 200ms);
+        open_map(env.console, context);
+        if (!fly_from_map(env.console, context)){
+            pbf_mash_button(context, BUTTON_B, 5000ms);
+        }
+
+        if (exit){
             break;
         }
     }

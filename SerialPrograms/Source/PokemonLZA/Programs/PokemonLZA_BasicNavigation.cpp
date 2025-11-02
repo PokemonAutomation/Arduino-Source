@@ -56,7 +56,7 @@ void open_map(ConsoleHandle& console, ProControllerContext& context){
     pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
     ensure_map(console, context);
 }
-void fly_from_map(ConsoleHandle& console, ProControllerContext& context){
+bool fly_from_map(ConsoleHandle& console, ProControllerContext& context){
     console.log("Flying from map...");
 
     {
@@ -81,7 +81,7 @@ void fly_from_map(ConsoleHandle& console, ProControllerContext& context){
         }
     }
     {
-        BlackScreenOverWatcher done_flying(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
+        BlackScreenOverWatcher done_flying(COLOR_RED, {0.1, 0.7, 0.8, 0.2});
         int ret = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context){
@@ -94,13 +94,18 @@ void fly_from_map(ConsoleHandle& console, ProControllerContext& context){
             console.log("Flying from map... Done!");
             break;
         default:
+            return false;
+#if 0
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "fly_from_map(): Unable to fly. Timed out.",
                 console
             );
+#endif
         }
     }
+
+    return true;
 }
 
 

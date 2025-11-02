@@ -144,15 +144,13 @@ void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControlle
         pbf_move_left_joystick(context, 128, 192, 40ms, 120ms);
         pbf_move_left_joystick(context, 128, 64, 40ms, 500ms);
 
-        try{
-            fly_from_map(env.console, context);
+        if (fly_from_map(env.console, context)){
             return;
-        }catch (OperationFailedException&){
+        }else{
             MegaShardFarmer_Descriptor::Stats& stats = env.current_stats<MegaShardFarmer_Descriptor::Stats>();
             stats.errors++;
             pbf_mash_button(context, BUTTON_B, 5000ms);
         }
-
     }
 }
 
