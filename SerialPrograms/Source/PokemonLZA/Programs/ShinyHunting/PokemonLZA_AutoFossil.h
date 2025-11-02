@@ -44,7 +44,7 @@ private:
     bool check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t num_fossils_in_box);
 
     SimpleIntegerOption<uint32_t> NUM_FOSSILS;
-    IntegerEnumDropdownOption WHICIH_FOSSIL;
+    IntegerEnumDropdownOption WHICH_FOSSIL;
     PokemonLA::StopOnOption STOP_ON;
     
     BooleanCheckBoxOption TAKE_VIDEO;
