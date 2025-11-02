@@ -84,7 +84,7 @@ AutoFossil::AutoFossil()
         LockMode::LOCK_WHILE_RUNNING,
         30, 1, 32*30
     )
-    , WHICIH_FOSSIL(
+    , WHICH_FOSSIL(
         "<b>Which Fossil to Choose in the Dialog Menu:</b>",
         {
             {0, "1st-fossil", "1st Fossil"},
@@ -116,7 +116,7 @@ AutoFossil::AutoFossil()
     })
 {
     PA_ADD_OPTION(NUM_FOSSILS);
-    PA_ADD_OPTION(WHICIH_FOSSIL);
+    PA_ADD_OPTION(WHICH_FOSSIL);
     PA_ADD_OPTION(STOP_ON);
     PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -207,7 +207,7 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
         case 1:
             env.log("Detected selection arrow.");
             // This is when the Reg asks you which fossil to revive
-            for(size_t i = 0; i < WHICIH_FOSSIL.current_value(); i++){
+            for(size_t i = 0; i < WHICH_FOSSIL.current_value(); i++){
                 pbf_press_dpad(context, DPAD_DOWN, 40ms, 40ms);
             }
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
