@@ -222,8 +222,8 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
             {0.654308, 0.481553, 0.295529, 0.312621}
         );
         ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay(), 1000ms);
-        FlatWhiteDialogWatcher dialog0(COLOR_RED, &env.console.overlay());
-        BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay());
+        FlatWhiteDialogWatcher dialog0(COLOR_RED, &env.console.overlay(), 1000ms);
+        BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay(), 1000ms);
 
 
         int ret = run_until<ProControllerContext>(
@@ -247,7 +247,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
             dump_image(env.console.logger(), env.program_info(), env.console.video(), "UnexpectedSelectionArrow");
             stats.errors++;
             env.update_stats();
-           continue;
+            continue;
 
         case 2:
             env.log("Detected white dialog.");

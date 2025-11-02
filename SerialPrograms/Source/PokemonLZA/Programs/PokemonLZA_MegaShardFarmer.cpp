@@ -99,9 +99,9 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
                 //  Break all the shards.
                 uint8_t x = stats.rounds % 2 == 0 ? 128 - 32 : 128 + 32;
                 ssf_press_right_joystick(context, x, 128, 0ms, 40000ms, 0ms);
-                for (int c = 0; c < 20; c++){
-                    ssf_press_button(context, BUTTON_ZL, 240ms, 1000ms, 240ms);
-                    pbf_press_button(context, BUTTON_B, 160ms, 1840ms);
+                for (int c = 0; c < 40; c++){
+                    ssf_press_button(context, BUTTON_ZL, 240ms, 400ms, 80ms);
+                    pbf_press_button(context, BUTTON_B, 160ms, 520ms);
                 }
 #endif
             },
@@ -119,35 +119,36 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
 
 }
 void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_PLUS, 240ms, 1500ms);
+    while (true){
+        pbf_press_button(context, BUTTON_PLUS, 240ms, 1500ms);
 
-    //  We want the middle zoom.
-    pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);
-    pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);
-    pbf_move_right_joystick(context, 128, 255, 80ms, 80ms);
+        //  Middle Zoom
+        pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);
+        pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);
+        pbf_move_right_joystick(context, 128, 255, 80ms, 80ms);
 
-    //  Tap the stick to lock on to Le Yeah if you're already on top of it.
-    pbf_move_left_joystick(context, 64, 128, 80ms, 500ms);
-//    pbf_move_left_joystick(context, 128, 255, 80ms, 500ms);
+        //  Tap the stick to lock on to Le Yeah if you're already on top of it.
+        pbf_move_left_joystick(context, 32, 128, 40ms, 500ms);
+    //    pbf_move_left_joystick(context, 128, 255, 80ms, 500ms);
 
-    BlackScreenOverWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.2});
+        BlackScreenOverWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.2});
 
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [&](ProControllerContext& context){
-            pbf_mash_button(context, BUTTON_A, 10000ms);
-        },
-        {{black_screen}}
-    );
-    if (ret == 0){
-        return;
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 10000ms);
+            },
+            {{black_screen}}
+        );
+        if (ret == 0){
+            return;
+        }
+
+        MegaShardFarmer_Descriptor::Stats& stats = env.current_stats<MegaShardFarmer_Descriptor::Stats>();
+        stats.errors++;
+        env.log("Unable to fly back.", COLOR_RED);
+        pbf_mash_button(context, BUTTON_B, 5000ms);
     }
-
-    MegaShardFarmer_Descriptor::Stats& stats = env.current_stats<MegaShardFarmer_Descriptor::Stats>();
-    stats.errors++;
-    env.log("Unable to fly back.", COLOR_RED);
-    pbf_mash_button(context, BUTTON_B, 5000ms);
-
 }
 
 
