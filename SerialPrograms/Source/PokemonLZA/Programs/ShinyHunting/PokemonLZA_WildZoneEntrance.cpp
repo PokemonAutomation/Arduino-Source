@@ -38,15 +38,18 @@ class ShinyHunt_WildZoneEntrance_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : resets(m_stats["Wild Zone"])
+        , day_changes(m_stats["Day/Night Changes"])
         , shinies(m_stats["Shiny Sounds"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Wild Zone");
+        m_display_order.emplace_back("Day/Night Changes");
         m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& resets;
+    std::atomic<uint64_t>& day_changes;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
 };
@@ -102,13 +105,17 @@ void run_to_gate(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
-void enter_wild_zone_entrance(ConsoleHandle& console, ProControllerContext& context, Milliseconds walk_in_zone){
+void enter_wild_zone_entrance(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    Milliseconds walk_in_zone
+){
     BlackScreenOverWatcher black_screen(COLOR_BLUE);
     int ret = run_until<ProControllerContext>(
-        console, context,
+        env.console, context,
         [&](ProControllerContext& context){
             pbf_mash_button(context, BUTTON_B, 200ms);  // dismiss menu if any
-            run_to_gate(console, context);
+            run_to_gate(env.console, context);
             pbf_mash_button(context, BUTTON_A, 2000ms);
             pbf_move_left_joystick(context, 128, 0, walk_in_zone, 200ms);
             context.wait_for_all_requests();
@@ -117,10 +124,14 @@ void enter_wild_zone_entrance(ConsoleHandle& console, ProControllerContext& cont
         {{black_screen}}
     );
     if (ret == 0){
-        console.log("[WildZoneEntrance] Detected day/night change after entering.");
+        env.console.log("[WildZoneEntrance] Detected day/night change after entering.");
         context.wait_for(std::chrono::milliseconds(2000));
         pbf_mash_button(context, BUTTON_B, 200ms);             // dismiss menu if any
         pbf_press_button(context, BUTTON_PLUS, 100ms, 100ms);  // open map again
+    }else{
+        ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats =
+            env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
+        stats.day_changes++;
     }
     pbf_mash_button(context, BUTTON_A, 800ms);  // teleporting or just mashing button
     pbf_mash_button(context, BUTTON_B, 200ms);  // in case need to dismiss map
@@ -155,7 +166,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                 while (true){
                     send_program_status_notification(env, NOTIFICATION_STATUS);
                     stats.resets++;
-                    enter_wild_zone_entrance(env.console, context, WALK_IN_ZONE);
+                    enter_wild_zone_entrance(env, context, WALK_IN_ZONE);
                     env.update_stats();
                 }
             },
