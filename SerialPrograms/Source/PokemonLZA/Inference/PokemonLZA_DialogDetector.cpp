@@ -211,7 +211,7 @@ bool NormalDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock 
 FlatWhiteDialogDetector::FlatWhiteDialogDetector(Color color, VideoOverlay* overlay)
     : m_color(color)
     , m_overlay(overlay)
-    , m_top(0.267838, 0.785156, 0.467618, 0.019531)
+    , m_top(0.267838, 0.784156, 0.467618, 0.019531)
     , m_arrow_box(0.727, 0.868, 0.037, 0.086)
 {}
 void FlatWhiteDialogDetector::make_overlays(VideoOverlaySet& items) const{
