@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_MegaShardFarmer_H
 #define PokemonAutomation_PokemonLZA_MegaShardFarmer_H
 
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -32,7 +33,7 @@ public:
 private:
     void fly_back(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-
+    BooleanCheckBoxOption SKIP_SHARDS;
 };
 
 

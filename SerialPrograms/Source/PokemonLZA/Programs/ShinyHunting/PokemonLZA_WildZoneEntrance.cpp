@@ -125,13 +125,13 @@ void enter_wild_zone_entrance(
     );
     if (ret == 0){
         env.console.log("[WildZoneEntrance] Detected day/night change after entering.");
+        ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats =
+            env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
+        stats.day_changes++;
         context.wait_for(std::chrono::milliseconds(2000));
         pbf_mash_button(context, BUTTON_B, 200ms);             // dismiss menu if any
         pbf_press_button(context, BUTTON_PLUS, 100ms, 100ms);  // open map again
     }else{
-        ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats =
-            env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
-        stats.day_changes++;
     }
     pbf_mash_button(context, BUTTON_A, 800ms);  // teleporting or just mashing button
     pbf_mash_button(context, BUTTON_B, 200ms);  // in case need to dismiss map
