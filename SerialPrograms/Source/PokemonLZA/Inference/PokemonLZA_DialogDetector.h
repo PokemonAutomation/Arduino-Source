@@ -62,7 +62,7 @@ private:
 
     const Color m_color;
     VideoOverlay* m_overlay;
-    const ImageFloatBox m_top;
+    const ImageFloatBox m_bottom;
     const ImageFloatBox m_arrow_box;
 
     ImageFloatBox m_last_detected;
