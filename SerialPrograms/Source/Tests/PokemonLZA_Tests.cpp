@@ -127,7 +127,7 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
     // Where status is one of: Empty, Shiny, Alpha, ShinyAlpha
     // Examples:
     //   test_2_3_Empty.png -> row 2, col 3, empty cell
-    //   test_2_3_Normal.png -> row 2, col 3, non-shiny, non-alpha pokemon
+    //   test_2_3_Regular.png -> row 2, col 3, non-shiny, non-alpha pokemon
     //   test_2_3_Shiny.png -> row 2, col 3, shiny (non-alpha)
     //   test_2_3_Alpha.png -> row 2, col 3, alpha (non-shiny)
     //   test_2_3_ShinyAlpha.png -> row 2, col 3, shiny alpha
@@ -169,7 +169,7 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
         expected_something_in_cell = false;
         expected_shiny = false;
         expected_alpha = false;
-    } else if (status_word == "Normal"){
+    } else if (status_word == "Regular"){
         expected_something_in_cell = true;
         expected_shiny = false;
         expected_alpha = false;
