@@ -22,10 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
-
-void open_map(ConsoleHandle& console, ProControllerContext& context){
-    pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
-
+void ensure_map(ConsoleHandle& console, ProControllerContext& context){
     WallClock deadline = current_time() + 30000ms;
     do{
         context.wait_for_all_requests();
@@ -54,6 +51,60 @@ void open_map(ConsoleHandle& console, ProControllerContext& context){
         console
     );
 }
+void open_map(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Opening Map...");
+    pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+    ensure_map(console, context);
+}
+void fly_from_map(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Flying from map...");
+
+    {
+        BlackScreenWatcher start_flying(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 5000ms);
+            },
+            {start_flying,}
+        );
+        switch (ret){
+        case 0:
+            console.log("Flying from map... Started!");
+            break;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "fly_from_map(): Unable to fly.",
+                console
+            );
+        }
+    }
+    {
+        BlackScreenOverWatcher done_flying(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 30000ms);
+            },
+            {done_flying,}
+        );
+        switch (ret){
+        case 0:
+            console.log("Flying from map... Done!");
+            break;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "fly_from_map(): Unable to fly. Timed out.",
+                console
+            );
+        }
+    }
+}
+
+
+
 
 void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
     {

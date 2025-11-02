@@ -60,7 +60,7 @@ std::unique_ptr<StatsTracker> ShinyHunt_WildZoneEntrance_Descriptor::make_stats(
 
 ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
     : WALK_IN_ZONE(
-        "<b>WALK IN ZONE:</b><br>Walk this long in the zone after passing through the gate.",
+        "<b>Walk in Zone:</b><br>Walk this long in the zone after passing through the gate.",
         LockMode::UNLOCK_WHILE_RUNNING,
         "500 ms"
     )
@@ -110,6 +110,9 @@ void enter_wild_zone_entrance(
     ProControllerContext& context,
     Milliseconds walk_in_zone
 ){
+    ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
+    context.wait_for_all_requests();
+
     BlackScreenOverWatcher black_screen(COLOR_BLUE);
     int ret = run_until<ProControllerContext>(
         env.console, context,
@@ -124,18 +127,18 @@ void enter_wild_zone_entrance(
     );
     if (ret == 0){
         env.console.log("[WildZoneEntrance] Detected day/night change after entering.");
-        ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats =
-            env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
         stats.day_changes++;
         context.wait_for(std::chrono::milliseconds(2000));
         pbf_mash_button(context, BUTTON_B, 200ms);             // dismiss menu if any
-        pbf_press_button(context, BUTTON_PLUS, 100ms, 100ms);  // open map again
-    }else{
+        open_map(env.console, context);
     }
-    pbf_mash_button(context, BUTTON_A, 800ms);  // teleporting or just mashing button
-    pbf_mash_button(context, BUTTON_B, 200ms);  // in case need to dismiss map
-    context.wait_for_all_requests();
-    context.wait_for(std::chrono::milliseconds(4000));  // TODO: differ NS1 wait time from NS2
+
+    try{
+        fly_from_map(env.console, context);
+    }catch (OperationFailedException&){
+        stats.errors++;
+        throw;
+    }
 }
 
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
