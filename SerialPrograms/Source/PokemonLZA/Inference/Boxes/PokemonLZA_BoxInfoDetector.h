@@ -107,7 +107,7 @@ public:
     // After detection is done, call this to check alpha-ness
     bool is_alpha() const { return m_alpha_watcher.consistent_result(); }
     // Return string of detected shiny and alpha-ness for logging. It can be:
-    // - "Normal"
+    // - "Regular"
     // - "Shiny"
     // - "Alpha"
     // - "Shiny Alpha"

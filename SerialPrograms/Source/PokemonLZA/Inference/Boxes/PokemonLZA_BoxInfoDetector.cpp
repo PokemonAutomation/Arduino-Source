@@ -186,7 +186,7 @@ std::string BoxPageInfoWatcher::info_str() const{
     } else if (is_alpha){
         return "Alpha";
     }
-    return "Normal";
+    return "Regular";
 }
 
 
