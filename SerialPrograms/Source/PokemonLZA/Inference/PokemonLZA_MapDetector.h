@@ -27,6 +27,8 @@ public:
 
 private:
     ButtonDetector m_b_button;
+    ButtonDetector m_x_button;
+    ButtonDetector m_y_button;
 };
 
 class MapWatcher : public DetectorToFinder<MapDetector>{

@@ -19,14 +19,30 @@ MapDetector::MapDetector(Color color, VideoOverlay* overlay)
         {0.760730, 0.937023, 0.241416, 0.064885},
         overlay
     )
+    , m_x_button(
+        color,
+        ButtonType::ButtonX,
+        {0.004292, 0.208015, 0.028970, 0.049618},
+        overlay
+    )
+    , m_y_button(
+        color,
+        ButtonType::ButtonY,
+        {0.004292, 0.276718, 0.028970, 0.047710},
+        overlay
+    )
 {}
 
 void MapDetector::make_overlays(VideoOverlaySet& items) const{
     m_b_button.make_overlays(items);
+    m_x_button.make_overlays(items);
+    m_y_button.make_overlays(items);
 }
 
 bool MapDetector::detect(const ImageViewRGB32& screen){
-    return m_b_button.detect(screen);
+    return m_b_button.detect(screen)
+        && m_x_button.detect(screen)
+        && m_y_button.detect(screen);
 }
 
 
