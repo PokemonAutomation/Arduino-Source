@@ -15,6 +15,7 @@
 #include <QVideoSink>
 //#include "Common/Cpp/Exceptions.h"
 //#include "Common/Cpp/Time.h"
+#include "Common/Qt/Redispatch.h"
 #include "VideoFrameQt.h"
 #include "MediaServicesQt6.h"
 #include "CameraWidgetQt6.h"
@@ -74,10 +75,15 @@ CameraVideoSource::~CameraVideoSource(){
         m_logger.log("Stopping Camera...");
     }catch (...){}
 
-//    m_camera->stop();
-    m_capture.reset();
-    m_video_sink.reset();
-    m_camera.reset();
+//    cout << "Stopping Camera..." << endl;
+
+    run_on_main_thread_and_wait([&]{
+        m_metaobject.reset();
+//        m_camera->stop();
+        m_capture.reset();
+        m_video_sink.reset();
+        m_camera.reset();
+    });
 }
 CameraVideoSource::CameraVideoSource(
     Logger& logger,
@@ -93,6 +99,13 @@ CameraVideoSource::CameraVideoSource(
         return;
     }
     m_logger.log("Starting Camera: Backend = CameraQt6QVideoSink");
+
+    run_on_main_thread_and_wait([&]{
+        init(info, desired_resolution);
+    });
+}
+void CameraVideoSource::init(const CameraInfo& info, Resolution desired_resolution){
+    m_metaobject.reset(new QObject());
 
     auto cameras = QMediaDevices::videoInputs();
     const QCameraDevice* device = nullptr;
@@ -152,7 +165,7 @@ CameraVideoSource::CameraVideoSource(
         }
     });
 #endif
-    connect(
+    m_metaobject->connect(
         m_video_sink.get(), &QVideoSink::videoFrameChanged,
         &m_camera->camera(), [&](const QVideoFrame& frame){
             //  This runs on the QCamera's thread. So it is off the critical path.

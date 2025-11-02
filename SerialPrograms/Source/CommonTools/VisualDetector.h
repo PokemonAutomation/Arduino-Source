@@ -15,6 +15,7 @@ class ImageViewRGB32;
 class VideoOverlaySet;
 
 
+// An abstract base class for per-frame (aka per-image) detector
 class StaticScreenDetector{
 public:
     virtual ~StaticScreenDetector() = default;
@@ -22,9 +23,14 @@ public:
 
     //  This is not const so that detectors can save/cache state.
     virtual bool detect(const ImageViewRGB32& screen) = 0;
-
+    //  Called this to lock in the detected state in the detector, if
+    //  needed. Leave this function empty if you don't wish the derived
+    //  class to "remember" past detection.
     virtual void commit_state(){}
-
+    //  Reset the locked state so the detector is ready to work on a
+    //  new detection task.
+    //  If you implement some lock-in/memory mechanism in `commit_state()`,
+    //  implement this function to unlock/forget.
     virtual void reset_state(){}
 };
 
@@ -43,6 +49,17 @@ public:
         GONE,       //  process_frame() returns true only when not detected consecutively
         CONSISTENT, //  process_frame() returns true when detected consecutively or not detected consecutively
     };
+
+    DetectorToFinder(
+        std::string label,
+        std::chrono::milliseconds duration
+    )
+        : Detector()
+        , VisualInferenceCallback(std::move(label))
+        , m_duration(duration)
+        , m_finder_type(FinderType::PRESENT)
+    {}
+    
 
     template <class... Args>
     DetectorToFinder(
@@ -74,9 +91,12 @@ public:
         Detector::make_overlays(items);
     }
 
-    //  If m_finder_type is PRESENT, return true only when it is consecutively detected.
-    //  If m_finder_type is GONE, return true only when it is consecutively not detected.
-    //  if m_finder_type is CONSISTENT, return true when it is consecutively detected, or consecutively not detected.
+    //  If m_finder_type is PRESENT, return true only when it is consecutively detected for the duration.
+    //  If m_finder_type is GONE, return true only when it is consecutively not detected for the duration.
+    //  If m_finder_type is CONSISTENT, return true when it is consecutively detected, or consecutively not detected
+    //    for the duration.
+    //  Before returning True, this->commit_state() is called to lock-in the detection result if lock-in mechanism
+    //    is implemented.
     using VisualInferenceCallback::process_frame;
     virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override{
         switch (m_finder_type){
@@ -128,6 +148,9 @@ public:
     //  whether it is consecutively detected , or consecutively not detected.
     bool consistent_result() const { return m_consistent_result; }
 
+    //  Reset internal state so the finder is ready for next round of detection.
+    //  If there is some kind of "lock-in" mechanism to lock the detection result during
+    //  `process_frame()`, this function should unlock it.
     virtual void reset_state() override {
         Detector::reset_state();
         m_start_of_detection = WallClock::min();

@@ -9,6 +9,8 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 //#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 //#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"

@@ -7,6 +7,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/WaterfillUtilities.h"
+#include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLZA_ButtonDetector.h"
 
 //#include <iostream>
@@ -16,6 +17,72 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
+
+
+
+class ButtonMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    // image template matcher for buttons
+    // - min_width: candidate image min width if video stream is 4k
+    // - min_height: candidate image min height if video stream is 4k
+    ButtonMatcher(ButtonType type, size_t min_width, size_t min_height, double max_rmsd);
+    static const ButtonMatcher& A(){
+        static ButtonMatcher matcher(ButtonType::ButtonA, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& B(){
+        static ButtonMatcher matcher(ButtonType::ButtonB, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& X(){
+        static ButtonMatcher matcher(ButtonType::ButtonX, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& Y(){
+        static ButtonMatcher matcher(ButtonType::ButtonY, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& L(){
+        static ButtonMatcher matcher(ButtonType::ButtonL, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& R(){
+        static ButtonMatcher matcher(ButtonType::ButtonR, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& Plus(){
+        static ButtonMatcher matcher(ButtonType::ButtonPlus, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& Minus(){
+        static ButtonMatcher matcher(ButtonType::ButtonMinus, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& Right(){
+        static ButtonMatcher matcher(ButtonType::ButtonRight, 60, 60, 70);
+        return matcher;
+    }
+    static const ButtonMatcher& RightStickUpDown(){
+        static ButtonMatcher matcher(ButtonType::RightStickUpDown, 20, 20, 150);
+        return matcher;
+    }
+
+    virtual bool check_image(Resolution input_resolution, const ImageViewRGB32& image) const override{
+        size_t min_width = m_min_width * input_resolution.width / 3840;
+        size_t min_height = m_min_height * input_resolution.height / 2160;
+        return image.width() >= min_width && image.height() >= min_height;
+    };
+
+    size_t m_min_width;
+    size_t m_min_height;
+    double m_max_rmsd;
+};
+
+
+
+
+
+
 
 const char* template_path(ButtonType type){
     switch (type){
@@ -97,6 +164,8 @@ const ButtonMatcher& get_button_matcher(ButtonType type){
         throw std::runtime_error("No corresponding ButtonMatcher for ButtonType");
     }
 }
+
+
 
 
 ButtonMatcher::ButtonMatcher(ButtonType type, size_t min_width, size_t min_height, double max_rmsd)

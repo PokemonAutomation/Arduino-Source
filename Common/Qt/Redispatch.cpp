@@ -22,7 +22,11 @@ void queue_on_main_thread(std::function<void()> lambda){
 
 
 void run_on_main_thread_and_wait(std::function<void()> lambda){
-    if (QCoreApplication::instance()->thread() == QThread::currentThread()){
+    run_on_object_thread_and_wait(QCoreApplication::instance(), std::move(lambda));
+}
+
+void run_on_object_thread_and_wait(QObject* object, std::function<void()> lambda){
+    if (object->thread() == QThread::currentThread()){
         lambda();
         return;
     }
@@ -30,7 +34,7 @@ void run_on_main_thread_and_wait(std::function<void()> lambda){
     std::mutex lock;
     std::condition_variable cv;
     bool done = false;
-    QMetaObject::invokeMethod(QCoreApplication::instance(), [&]{
+    QMetaObject::invokeMethod(object, [&]{
         lambda();
         std::lock_guard<std::mutex> lg(lock);
         done = true;
@@ -39,6 +43,7 @@ void run_on_main_thread_and_wait(std::function<void()> lambda){
     std::unique_lock<std::mutex> lg(lock);
     cv.wait(lg, [&]{ return done; });
 }
+
 
 
 

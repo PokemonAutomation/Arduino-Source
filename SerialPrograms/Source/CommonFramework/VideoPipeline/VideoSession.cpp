@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Qt/Redispatch.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/GlobalServices.h"
 #include "CommonFramework/VideoPipeline/VideoPipelineOptions.h"
@@ -101,7 +100,7 @@ void VideoSession::reset(){
             }
         );
     }
-    dispatch_to_main_thread([this]{ run_commands(); });
+    run_commands();
 }
 void VideoSession::set_source(
     const std::shared_ptr<VideoSourceDescriptor>& device,
@@ -118,7 +117,7 @@ void VideoSession::set_source(
             }
         );
     }
-    dispatch_to_main_thread([this]{ run_commands(); });
+    run_commands();
 }
 void VideoSession::set_resolution(Resolution resolution){
     {
@@ -132,7 +131,7 @@ void VideoSession::set_resolution(Resolution resolution){
             }
         );
     }
-    dispatch_to_main_thread([this]{ run_commands(); });
+    run_commands();
 }
 
 void VideoSession::internal_reset(){

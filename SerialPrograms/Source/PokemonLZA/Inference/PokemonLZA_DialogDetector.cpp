@@ -272,15 +272,27 @@ void BlueDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_arrow_box);
 }
 bool BlueDialogDetector::detect(const ImageViewRGB32& screen){
-    if (!is_solid(
-        extract_box_reference(screen, m_corner),
-        {0.0869318, 0.255479, 0.65759},
-        0.25
-    )){
-//        cout << "not solid" << endl;
+    do{
+        //  Check 2 shades of blue.
+        if (is_solid(
+            extract_box_reference(screen, m_corner),
+            {0.0869318, 0.255479, 0.65759},
+            0.25
+        )){
+            break;
+        }
+        if (is_solid(
+            extract_box_reference(screen, m_corner),
+            {0, 0.134207, 0.865793},
+            0.25
+        )){
+            break;
+        }
+
         m_last_detected_box.reset();
+//        cout << "not solid" << endl;
         return false;
-    }
+    }while (false);
 
     double screen_rel_size = (screen.height() / 1080.0);
     double screen_rel_size_2 = screen_rel_size * screen_rel_size;

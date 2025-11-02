@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-// #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -211,6 +210,11 @@ void BoxDetector::move_cursor(
     const ProgramInfo& info, VideoStream& stream, ProControllerContext& context,
     uint8_t row, uint8_t col
 ){
+    if (row >= 6 || col >= 6){
+        throw InternalProgramError(&stream.logger(), "BoxDetector::move_cursor",
+            "row or col out of range: " + std::to_string(row) + ", " + std::to_string(col));
+    }
+
     WallClock start = current_time();
     while (true){
         if (current_time() - start > std::chrono::seconds(60)){

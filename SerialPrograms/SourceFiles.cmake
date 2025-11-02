@@ -1539,18 +1539,18 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
-    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.cpp
-    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h
-    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.cpp
-    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.h
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.cpp
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_MapIconDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_MapIconDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
@@ -1561,28 +1561,36 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
-    Source/PokemonLZA/Programs/PokemonLZA_AutoFossil.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_AutoFossil.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
-    Source/PokemonLZA/Programs/PokemonLZA_BeldumHunter.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_BeldumHunter.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
-    Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_RestaurantFarmer.h
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_BenchSit.h
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_ShinyHunt_OverworldReset.h
-    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.cpp
-    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.h
+    Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.h
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.cpp
+    Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp

@@ -16,8 +16,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
-#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxShinyDetector.h"
-#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxAlphaDetector.h" 
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h" 
 #include <QFileInfo>
 #include <QDir>
 #include <algorithm>
@@ -123,11 +122,18 @@ int test_pokemonLZA_MainMenuDetector(const ImageViewRGB32& image, bool target){
     return 0;
 }
 
-int test_pokemonLZA_BoxDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
-    // Filename format: <name>_<row>_<col>_<True/False>.png
-    // Last three words: row, col, in_box_system (True/False)
+int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // Expected filename format: <...>_<row>_<col>_<status>.png
+    // Where status is one of: Empty, Shiny, Alpha, ShinyAlpha
+    // Examples:
+    //   test_2_3_Empty.png -> row 2, col 3, empty cell
+    //   test_2_3_Regular.png -> row 2, col 3, non-shiny, non-alpha pokemon
+    //   test_2_3_Shiny.png -> row 2, col 3, shiny (non-alpha)
+    //   test_2_3_Alpha.png -> row 2, col 3, alpha (non-shiny)
+    //   test_2_3_ShinyAlpha.png -> row 2, col 3, shiny alpha
+
     if (words.size() < 3){
-        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        cerr << "Error: filename must have at least 3 words (row, col, status)." << endl;
         return 1;
     }
 
@@ -153,60 +159,72 @@ int test_pokemonLZA_BoxDetector(const ImageViewRGB32& image, const std::vector<s
         return 1;
     }
 
-    // Parse in_box_system (True/False) from last word
-    bool expected_in_box_system;
-    if (parse_bool(words[words.size() - 1], expected_in_box_system) == false){
-        cerr << "Error: last word in filename should be True or False." << endl;
+    // Parse status from last word
+    const std::string& status_word = words[words.size() - 1];
+    bool expected_something_in_cell;
+    bool expected_shiny;
+    bool expected_alpha;
+
+    if (status_word == "Empty"){
+        expected_something_in_cell = false;
+        expected_shiny = false;
+        expected_alpha = false;
+    } else if (status_word == "Regular"){
+        expected_something_in_cell = true;
+        expected_shiny = false;
+        expected_alpha = false;
+    } else if (status_word == "Shiny"){
+        expected_something_in_cell = true;
+        expected_shiny = true;
+        expected_alpha = false;
+    } else if (status_word == "Alpha"){
+        expected_something_in_cell = true;
+        expected_shiny = false;
+        expected_alpha = true;
+    } else if (status_word == "ShinyAlpha"){
+        expected_something_in_cell = true;
+        expected_shiny = true;
+        expected_alpha = true;
+    } else {
+        cerr << "Error: last word must be 'Empty', 'Shiny', 'Alpha', or 'ShinyAlpha', got '" << status_word << "'." << endl;
         return 1;
     }
 
-    // Run detector
+    // Run detectors
     auto overlay = DummyVideoOverlay();
-    BoxDetector detector(COLOR_RED, &overlay);
 
-    // Test if we're in box system view
-    bool in_box_system = detector.detect(image);
-    TEST_RESULT_COMPONENT_EQUAL(in_box_system, expected_in_box_system, "in_box_system");
-
-    // If we're in box system, also check the cursor location
-    if (expected_in_box_system){
-        BoxCursorCoordinates coords = detector.detected_location();
-
-        // Check that coordinates are valid (detect_location should have succeeded)
-        if (coords.row == BoxCursorCoordinates::INVALID || coords.col == BoxCursorCoordinates::INVALID){
-            cerr << "Error: detect_location() returned INVALID coordinates but should have detected the cursor." << endl;
-            return 1;
-        }
-
-        // cout << "Detected selection arrow at box cell " << int(coords.row) << ", " << int(coords.col) << endl;
-        TEST_RESULT_COMPONENT_EQUAL((int)coords.row, expected_row, "row");
-        TEST_RESULT_COMPONENT_EQUAL((int)coords.col, expected_col, "col");
+    // Test BoxDetector for row and col
+    BoxDetector box_detector(COLOR_RED, &overlay);
+    bool in_box_system = box_detector.detect(image);
+    if (!in_box_system){
+        cerr << "Error: BoxDetector did not detect box system view." << endl;
+        return 1;
     }
 
-    return 0;
-}
+    BoxCursorCoordinates coords = box_detector.detected_location();
+    if (coords.row == BoxCursorCoordinates::INVALID || coords.col == BoxCursorCoordinates::INVALID){
+        cerr << "Error: detect_location() returned INVALID coordinates." << endl;
+        return 1;
+    }
 
-int test_pokemonLZA_SomethingInBoxCellDetector(const ImageViewRGB32& image, bool target){
-    auto overlay = DummyVideoOverlay();
-    SomethingInBoxCellDetector detector(COLOR_RED, &overlay);
-    bool result = detector.detect(image);
-    TEST_RESULT_EQUAL(result, target);
-    return 0;
-}
+    TEST_RESULT_COMPONENT_EQUAL((int)coords.row, expected_row, "row");
+    TEST_RESULT_COMPONENT_EQUAL((int)coords.col, expected_col, "col");
 
-int test_pokemonLZA_BoxShinyDetector(const ImageViewRGB32& image, bool target){
-    auto overlay = DummyVideoOverlay();
-    BoxShinyDetector detector(COLOR_RED, &overlay);
-    bool result = detector.detect(image);
-    TEST_RESULT_EQUAL(result, target);
-    return 0;
-}
+    // Test SomethingInBoxCellDetector
+    SomethingInBoxCellDetector something_detector(COLOR_RED, &overlay);
+    bool detected_something = something_detector.detect(image);
+    TEST_RESULT_COMPONENT_EQUAL(detected_something, expected_something_in_cell, "something_in_cell");
 
-int test_pokemonLZA_BoxAlphaDetector(const ImageViewRGB32& image, bool target){
-    auto overlay = DummyVideoOverlay();
-    BoxAlphaDetector detector(COLOR_RED, &overlay);
-    bool result = detector.detect(image);
-    TEST_RESULT_EQUAL(result, target);
+    // Test BoxShinyDetector
+    BoxShinyDetector shiny_detector(COLOR_RED, &overlay);
+    bool detected_shiny = shiny_detector.detect(image);
+    TEST_RESULT_COMPONENT_EQUAL(detected_shiny, expected_shiny, "shiny");
+
+    // Test BoxAlphaDetector
+    BoxAlphaDetector alpha_detector(COLOR_RED, &overlay);
+    bool detected_alpha = alpha_detector.detect(image);
+    TEST_RESULT_COMPONENT_EQUAL(detected_alpha, expected_alpha, "alpha");
+
     return 0;
 }
 

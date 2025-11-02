@@ -9,6 +9,7 @@
 #include <QLineEdit>
 #include <QMouseEvent>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Qt/Redispatch.h"
 #include "VideoDisplayWidget.h"
 #include "VideoDisplayWindow.h"
 
@@ -127,6 +128,7 @@ VideoDisplayWidget::~VideoDisplayWidget(){
 }
 
 void VideoDisplayWidget::clear_video_source(){
+//    cout << "clear_video_source() = " << m_video << endl;
     if (m_video){
         this->remove_widget(m_video);
         m_video = nullptr;
@@ -134,16 +136,23 @@ void VideoDisplayWidget::clear_video_source(){
 }
 
 void VideoDisplayWidget::post_startup(VideoSource* source){
-    clear_video_source();
-    if (source){
-        m_video = source->make_display_QtWidget(this);
-        this->add_widget(*m_video);
-        set_aspect_ratio(source->current_resolution().aspect_ratio());
-        m_overlay->raise();
-    }
+//    cout << "post_startup() = " << m_video << endl;
+    run_on_object_thread_and_wait(this, [&]{
+        clear_video_source();
+        if (source){
+            m_video = source->make_display_QtWidget(this);
+//            cout << "post_startup() - creating = " << m_video << endl;
+            this->add_widget(*m_video);
+            set_aspect_ratio(source->current_resolution().aspect_ratio());
+            m_overlay->raise();
+        }
+    });
 }
 void VideoDisplayWidget::pre_shutdown(){
-    clear_video_source();
+//    cout << "pre_shutdown()" << endl;
+    run_on_object_thread_and_wait(this, [&]{
+        clear_video_source();
+    });
 }
 
 

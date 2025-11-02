@@ -17,7 +17,7 @@ namespace PokemonLZA{
 
 MainMenuDetector::MainMenuDetector(Color color, VideoOverlay* overlay)
     : m_right_arrow_button(color, ButtonType::ButtonRight, {0.382, 0.081, 0.029, 0.056}, overlay)
-    , m_b_button(color, ButtonType::ButtonB, {0.911, 0.940, 0.027, 0.044}, overlay)
+    , m_b_button(color, ButtonType::ButtonB, {0.87, 0.940, 0.077, 0.044}, overlay)
 {}
 
 void MainMenuDetector::make_overlays(VideoOverlaySet& items) const{

@@ -16,7 +16,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+// Press Home button to go from game to Switch Home screen
 void go_home(ConsoleHandle& console, ProControllerContext& context);
+// Press Home button to go from game to Switch Home screen
 void go_home(ConsoleHandle& console, JoyconContext& context);
 void ensure_at_home(ConsoleHandle& console, ProControllerContext& context);
 void ensure_at_home(ConsoleHandle& console, JoyconContext& context);
