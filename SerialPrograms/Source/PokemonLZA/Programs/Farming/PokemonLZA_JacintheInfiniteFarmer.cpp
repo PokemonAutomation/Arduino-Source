@@ -75,15 +75,18 @@ class JacintheInfiniteFarmer_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : rounds(m_stats["Rounds"])
+        , defeats(m_stats["Defeats"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Rounds");
+        m_display_order.emplace_back("Defeats", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 
         m_aliases["Battles"] = "Rounds";
     }
 
     std::atomic<uint64_t>& rounds;
+    std::atomic<uint64_t>& defeats;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> JacintheInfiniteFarmer_Descriptor::make_stats() const{
@@ -167,6 +170,7 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
 
     bool seen_selection_arrow = false;
     bool confirm_entering_battle = false;
+    bool seen_flat_white_dialog = false;
     while (true){
         context.wait_for_all_requests();
 
@@ -203,12 +207,22 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
 
         switch (ret){
         case 0:
+            // There cases where the function detects A button:
+            // - At start of the program, press A to start talking to Jacinthe
+            // - When stopping the battle, the program fininshes all the dialog with Jacinethe and returns
+            //   to the overworld, where button A appears.
+            // - When we lose to Jacinthe, we have some dialog after the battle and returns to the overworld.
             env.log("Detected A button.");
             env.console.overlay().add_log("Button A Detected");
             if (m_stop_after_current.load(std::memory_order_relaxed)){
-                return true;
+                return true; // true means the program should stop
             }
-
+            
+            if (seen_flat_white_dialog){
+                // we shouldn't stop the program but we find A button. This means we lost.
+                stats.defeats++;
+                env.update_stats();
+            }
             pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             continue;
 
@@ -231,6 +245,7 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
         case 2:
             env.log("Detected white dialog.");
             env.console.overlay().add_log("Advance Dialog");
+            seen_flat_white_dialog = true;
             pbf_press_button(context, BUTTON_B, 160ms, 80ms);
             continue;
         
