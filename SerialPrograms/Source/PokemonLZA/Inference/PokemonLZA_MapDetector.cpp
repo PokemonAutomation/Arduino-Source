@@ -22,13 +22,13 @@ MapDetector::MapDetector(Color color, VideoOverlay* overlay)
     , m_x_button(
         color,
         ButtonType::ButtonX,
-        {0.004292, 0.208015, 0.028970, 0.049618},
+        {0.005000, 0.150000, 0.025000, 0.110000},
         overlay
     )
     , m_y_button(
         color,
         ButtonType::ButtonY,
-        {0.004292, 0.276718, 0.028970, 0.047710},
+        {0.005000, 0.210000, 0.025000, 0.110000},
         overlay
     )
 {}
