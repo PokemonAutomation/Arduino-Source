@@ -23,8 +23,16 @@ namespace ML{
 
 class YOLOv5Detector : public StaticScreenDetector{
 public:
-    YOLOv5Detector();
+    // - model_path: path to the onnx model file. The label name file should be the same
+    //   file path and basename and with _label.txt suffix.
+    //   e.g. .../yolo.onnx, .../yolo_label.txt
+    // If model loading fails, no exception is thrown but you can call `model_loaded()` to
+    // check.
+    YOLOv5Detector(const std::string& model_path);
     virtual ~YOLOv5Detector();
+
+    // If it loads the model successfully
+    bool model_loaded() const { return m_yolo_session != nullptr; }
 
     virtual void make_overlays(VideoOverlaySet& items) const override {}
     virtual bool detect(const ImageViewRGB32& screen) override;
@@ -42,7 +50,12 @@ protected:
 
 class YOLOv5Watcher : public VisualInferenceCallback{
 public:
-    YOLOv5Watcher(VideoOverlay& overlay);
+    // - model_path: path to the onnx model file. The label name file should be the same
+    //   file path and basename and with _label.txt suffix.
+    //   e.g. .../yolo.onnx, .../yolo_label.txt
+    // If model loading fails, no exception is thrown but you can call `model_loaded()` to
+    // check.
+    YOLOv5Watcher(VideoOverlay& overlay, const std::string& model_path);
     virtual ~YOLOv5Watcher() {}
 
     virtual void make_overlays(VideoOverlaySet& items) const override {}

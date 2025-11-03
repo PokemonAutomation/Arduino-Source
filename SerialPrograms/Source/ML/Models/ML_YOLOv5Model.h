@@ -19,8 +19,12 @@ namespace ML{
 class YOLOv5Session{
 public:
     struct DetectionBox{
+        // Confidence value the model predicts on the detection. Range: [0.0, 1.0].
+        // The higher the value, the more confident the model thinks the prediction is.
         double score;
+        // Bounding box of the detected object.
         ImageFloatBox box;
+        // Object label ID.
         size_t label_idx;
     };
 
