@@ -232,19 +232,19 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
             // This is when Jacinthe is asking whether you want
             // to start the battle or continue the battle
             if (m_stop_after_current.load(std::memory_order_relaxed)){
-                env.console.overlay().add_log("Selection Arrow: Cancel");
+                env.console.overlay().add_log("Dialog Choice: Cancel");
                 pbf_press_button(context, BUTTON_B, 160ms, 80ms);
                 continue;
             } else{
                 confirm_entering_battle = true;
                 // confirm entering battle
-                env.console.overlay().add_log("Selection Arrow: Confirm");
+                env.console.overlay().add_log("Dialog Choice: Confirm");
                 pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             }
 
         case 2:
             env.log("Detected white dialog.");
-            env.console.overlay().add_log("Advance Dialog");
+            // env.console.overlay().add_log("Advance Dialog");
             seen_flat_white_dialog = true;
             pbf_press_button(context, BUTTON_B, 160ms, 80ms);
             continue;
@@ -255,7 +255,7 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
             // mash B for 10 sec to clear up any pre-battle transparency dialog
             pbf_mash_button(context, BUTTON_B, 10s);
             context.wait_for_all_requests();
-            env.console.overlay().add_log("Cleared Transparent Dialog");
+            env.console.overlay().add_log("Cleared Pre-Battle Dialog");
             // battle starts
             return false;
 
