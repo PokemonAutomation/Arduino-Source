@@ -163,11 +163,13 @@ void export_image_annotations_to_yolo_dataset(
         line.clear();
     }
 
-    std::map<std::string, size_t> label_indices;
+    std::map<std::string, size_t> label_counts; // label name -> how many such label in the dataseet
+    std::map<std::string, size_t> label_indices; // label name -> label ID
     cout << "Load dataset labels: " << endl;
     for(size_t i = 0; i < label_names.size(); i++){
         cout << "- " << label_names[i] << endl;
         label_indices[label_names[i]] = i;
+        label_counts[label_names[i]] = 0;
     }
     
 
@@ -183,8 +185,8 @@ void export_image_annotations_to_yolo_dataset(
             QString::fromStdString("Folder " + target_folder.string() + " already exists."));
         return;
     }
-    const auto target_image_folder = target_folder / "images";
-    const auto target_label_folder = target_folder / "labels";
+    const auto target_image_folder = target_folder / "images/train";
+    const auto target_label_folder = target_folder / "labels/train";
     cout << "Export to image folder: " << target_image_folder << endl;
     cout << "Export to label folder: " << target_label_folder << endl;
 
@@ -192,6 +194,7 @@ void export_image_annotations_to_yolo_dataset(
     fs::create_directories(target_label_folder);
 
     fs::path anno_folder(annotation_folder_path);
+    std::set<std::string> missing_labels;
     for(size_t i = 0; i < image_paths.size(); i++){
         const auto& image_path = image_paths[i];
         const auto image_file = fs::path(image_path);
@@ -255,8 +258,10 @@ void export_image_annotations_to_yolo_dataset(
                     }
                 }
                 if (it == label_indices.end()){
+                    missing_labels.insert(label);
                     continue; // label not part of the YOLO dataset. Ignored.
                 }
+                label_counts[label]++;
 
                 const size_t label_id = it->second;
 
@@ -284,6 +289,17 @@ void export_image_annotations_to_yolo_dataset(
         std::ofstream fout(target_label_file.string());
         for(const auto& file_line : label_file_lines){
             fout << file_line << "\n";
+        }
+    }
+
+    cout << "Found labels -> count: " << endl;
+    for(const auto& p : label_counts){
+        cout << "- " << p.first << ": " << p.second << endl;
+    }
+    if (missing_labels.size() > 0){
+        cout << "Labels not exported: " << endl;
+        for(const auto& label : missing_labels){
+            cout << "- " << label << endl;
         }
     }
     cout << "Done exporting " << image_paths.size() << " annotations to YOLOv5 dataset" << endl;
