@@ -75,11 +75,10 @@ public:
     SnapshotClickTrigger(VideoStream& stream, VideoOverlay& overlay, Format format)
         : m_stream(stream)
         , m_overlay(overlay)
-        // , m_overlay_set(overlay)
         , m_format(format)
     {
         try{
-            overlay.add_listener(*this);
+            overlay.add_mouse_listener(*this);
         }catch (...){
             detach();
             throw;
@@ -93,15 +92,13 @@ public:
 
 private:
     void detach(){
-        m_overlay.remove_listener(*this);
+        m_overlay.remove_mouse_listener(*this);
     }
 
 private:
     VideoStream& m_stream;
     VideoOverlay& m_overlay;
-    // VideoOverlaySet m_overlay_set;
     Format m_format;
-    // std::mutex m_lock;
 
 };
 

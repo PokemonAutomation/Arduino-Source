@@ -85,8 +85,8 @@ public:
         virtual void on_mouse_release(double x, double y){};
         virtual void on_mouse_move(double x, double y){};
     };
-    void add_listener(MouseListener& listener);
-    void remove_listener(MouseListener& listener);
+    void add_mouse_listener(MouseListener& listener);
+    void remove_mouse_listener(MouseListener& listener);
     // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_press().
     void issue_mouse_press(double x, double y);
     // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_release().
@@ -110,8 +110,8 @@ public:
     void issue_key_release(QKeyEvent* event);
 
 private:
-    struct Data;
-    Pimpl<Data> m_data;
+    struct DataMouseEvent;
+    Pimpl<DataMouseEvent> m_data_mouseevent;
 
     struct DataKeyEvent;
     Pimpl<DataKeyEvent> m_data_keyevent;

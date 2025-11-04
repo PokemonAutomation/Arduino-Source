@@ -63,7 +63,7 @@ public:
             m_parent.WIDTH.add_listener(*this);
             m_parent.HEIGHT.add_listener(*this);
             m_parent.BOX_COORDINATES.add_listener(*this);
-            overlay.add_listener(*this);
+            overlay.add_mouse_listener(*this);
         }catch (...){
             detach();
             throw;
@@ -123,7 +123,7 @@ public:
 
 private:
     void detach(){
-        m_overlay.remove_listener(*this);
+        m_overlay.remove_mouse_listener(*this);
         m_parent.X.remove_listener(*this);
         m_parent.Y.remove_listener(*this);
         m_parent.WIDTH.remove_listener(*this);

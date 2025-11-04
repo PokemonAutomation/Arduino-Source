@@ -103,6 +103,8 @@ public:
     void move_to_new_window();
     void move_back_from_window();
 
+    // likely triggered by SwitchSystemWidget::key_press().
+    // this forwards the QKeyEvent to VideoOverlaySession::issue_key_press().
     void on_key_press(QKeyEvent* event);
     void on_key_release(QKeyEvent* event);
 
@@ -117,11 +119,6 @@ protected:
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
-
-    // virtual void keyPressEvent(QKeyEvent* event) override;
-    // virtual void keyReleaseEvent(QKeyEvent* event) override;
-    // virtual void focusInEvent(QFocusEvent* event) override;
-    // virtual void focusOutEvent(QFocusEvent* event) override;
 
     virtual void paintEvent(QPaintEvent*) override;
     virtual void resizeEvent(QResizeEvent* event) override;

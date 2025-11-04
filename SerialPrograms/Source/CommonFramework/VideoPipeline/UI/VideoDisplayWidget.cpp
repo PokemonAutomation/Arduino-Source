@@ -239,39 +239,6 @@ void VideoDisplayWidget::on_key_release(QKeyEvent* event){
     m_overlay_session.issue_key_release(event);
 }
 
-// void VideoDisplayWidget::keyPressEvent(QKeyEvent* event){
-//     // QtKeyMap::QtKey qkey = QtKeyMap::QtKey((Qt::Key)event->key());
-//     // const std::map<QtKeyMap::QtKey, StandardHid::KeyboardKey>& hid_map = StandardHid::KEYID_TO_HID_QWERTY();
-//     // auto iter = hid_map.find(qkey);
-//     // if (iter != hid_map.end()){
-//     //     // cout << "hid-key = " << (uint16_t)iter->second << endl;
-//     //     m_overlay_session.issue_key_press((StandardHid::KeyboardKey)iter->second);
-//     // }
-
-//     WidgetStackFixedAspectRatio::keyPressEvent(event);
-//     m_overlay_session.issue_key_press(event);
-    
-// }
-
-// void VideoDisplayWidget::keyReleaseEvent(QKeyEvent* event){
-//     // QtKeyMap::QtKey qkey = QtKeyMap::QtKey((Qt::Key)event->key());
-//     // const std::map<QtKeyMap::QtKey, StandardHid::KeyboardKey>& hid_map = StandardHid::KEYID_TO_HID_QWERTY();
-//     // auto iter = hid_map.find(qkey);
-//     // if (iter != hid_map.end()){
-//     //     // cout << "hid-key = " << (uint16_t)iter->second << endl;
-//     //     m_overlay_session.issue_key_release((StandardHid::KeyboardKey)iter->second);
-//     // }
-//     WidgetStackFixedAspectRatio::keyReleaseEvent(event);
-//     m_overlay_session.issue_key_release(event);
-// }
-
-// void VideoDisplayWidget::focusInEvent(QFocusEvent* event){
-//     m_overlay_session.issue_focus_in(event);
-// }
-
-// void VideoDisplayWidget::focusOutEvent(QFocusEvent* event){
-//     m_overlay_session.issue_focus_in(event);
-// }
 
 OverlayStatSnapshot VideoSourceFPS::get_current(){
     double fps = m_parent.m_video_session.fps_source();

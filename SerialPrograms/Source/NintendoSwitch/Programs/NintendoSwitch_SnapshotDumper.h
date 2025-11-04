@@ -44,6 +44,8 @@ private:
     BooleanCheckBoxOption CLICK_TO_SNAPSHOT;
     EnumDropdownOption<Format> FORMAT;
 };
+
+
 class SnapshotKeyTrigger : public VideoOverlay::KeyEventListener{
 public:
     ~SnapshotKeyTrigger();
