@@ -59,22 +59,23 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
         );
     }
 
-    const WaterfillObject* best = &objects[0];
+    const WaterfillObject* largest_object = &objects[0];
     for (const WaterfillObject& object : objects){
-        if (best->area < object.area){
-            best = &object;
+        if (largest_object->area < object.area){
+            largest_object = &object;
         }
     }
 
-    m_matcher.reset(new ExactImageMatcher(extract_box_reference(reference, *best).copy()));
-    m_area_ratio = best->area_ratio();
+    m_matcher.reset(new ExactImageMatcher(extract_box_reference(reference, *largest_object).copy()));
+    m_area_ratio = largest_object->area_ratio();
 
 //    cout << "template area ratio = " << m_area_ratio << endl;
 
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        const auto exact_image = extract_box_reference(reference, *best);
+        const auto exact_image = extract_box_reference(reference, *largest_object);
         cout << "Build waterfil template matcher from " << full_path << ", W x H: " << exact_image.width()
-             << " x " << exact_image.height() <<  ", area ratio: " << m_area_ratio << ", Object area: " << best->area << endl;
+             << " x " << exact_image.height() <<  ", area ratio: " << m_area_ratio << ", Object area: "
+             << largest_object->area << endl;
         dump_debug_image(
             global_logger_command_line(),
             "CommonFramework/WaterfillTemplateMatcher",

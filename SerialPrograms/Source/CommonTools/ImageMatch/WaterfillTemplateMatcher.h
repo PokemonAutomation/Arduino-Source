@@ -28,11 +28,12 @@ public:
 
 
 public:
-    // Load a template image from disk, min_color and max_color denote the color range of the object
-    // displayed in the image file while min_area is the minimum number of pixels required for the
-    // object in the template to be loaded.
+    // Load a template image from disk, use waterfill to find the biggest object in the template image that
+    // matches the color range of min_color and max_color. 
+    // min_area is the minimum number of pixels required for the found object in the template.
     // 
-    // The portion of the image holding the found object will get cropped and saved as the actual template image.
+    // The portion of the image holding the biggest object will get cropped and saved as the actual template
+    // image.
     // So if someone changes the template image by padding it to make it larger, as long as the padded color
     // does not fall into [min_color and max_color] range, it will not affect the template matching outcome
     // in any way.
@@ -49,6 +50,7 @@ public:
     //  Compute RMSD of the current image against the template as-is, using `ExactImageMatcher`.
     // `ExactImageMatcher` will resize the image to match template size and scale template brightness to match the image
     //  before computing RMSD.
+    //  The part of the image template where alpha is 0 is not used to compare with the corresponding part in the input image.
     //  In case the image is invalid, return a large value.
     //  It also calls the virtual function `check_image()` on the image.
     //  If the function returns false, then return a large value. 
@@ -59,7 +61,8 @@ public:
     //  This cropped image is compared against the template as-is.
     //  The waterfill object's aspect ratio and area ratio are checked against template's. Return a large value 
     //  if the check fails.
-    //  See `double rmsd(const ImageViewRGB32& image) const` on the details of comparing the image against the template.
+    //  See `double rmsd(Resolution input_resolution, const ImageViewRGB32& image) const` on the details of comparing the
+    //  image against the template.
     virtual double rmsd_precropped(
         Resolution input_resolution,
         const ImageViewRGB32& cropped_image,
@@ -71,7 +74,8 @@ public:
     //  image against the template as-is.
     //  The waterfill object's aspect ratio and area ratio are checked against template's. Return a large value 
     //  if the check fails.
-    //  See `double rmsd(const ImageViewRGB32& image) const` on the details of comparing the image against the template.
+    //  See `double rmsd(Resolution input_resolution, const ImageViewRGB32& image) const` on the details of comparing the
+    //  image against the template.
     virtual double rmsd_original(
         Resolution input_resolution,
         const ImageViewRGB32& original_image,
