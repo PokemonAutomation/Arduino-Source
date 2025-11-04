@@ -27,7 +27,7 @@ TradeStats::TradeStats()
     , errors(m_stats["Errors"])
 {
     m_display_order.emplace_back("Trades");
-    m_display_order.emplace_back("Skipped");
+    m_display_order.emplace_back("Skipped", HIDDEN_IF_ZERO);
     m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 }
 
