@@ -41,6 +41,7 @@ std::unique_ptr<StatsTracker> SelfBoxTrade_Descriptor::make_stats() const{
 
 
 SelfBoxTrade::SelfBoxTrade()
+#if 0
     : LANGUAGE_LEFT(
         "<b>Game Language of Left Switch:</b>",
         Pokemon::PokemonNameReader::instance().languages(),
@@ -52,8 +53,8 @@ SelfBoxTrade::SelfBoxTrade()
         Pokemon::PokemonNameReader::instance().languages(),
         LockMode::LOCK_WHILE_RUNNING,
         true
-    )
-    , BOXES_TO_TRADE(
+#endif
+    : BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         2, 0, 32
@@ -81,8 +82,8 @@ SelfBoxTrade::SelfBoxTrade()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(LANGUAGE_LEFT);
-    PA_ADD_OPTION(LANGUAGE_RIGHT);
+//    PA_ADD_OPTION(LANGUAGE_LEFT);
+//    PA_ADD_OPTION(LANGUAGE_RIGHT);
     PA_ADD_OPTION(BOXES_TO_TRADE);
     PA_ADD_OPTION(START_ROW);
     PA_ADD_OPTION(START_COL);

@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonLZA_SelfBoxTrade_H
 #define PokemonAutomation_PokemonLZA_SelfBoxTrade_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonTools/Options/LanguageOCROption.h"
+//#include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -45,8 +45,8 @@ private:
     );
 
 private:
-    OCR::LanguageOCROption LANGUAGE_LEFT;
-    OCR::LanguageOCROption LANGUAGE_RIGHT;
+//    OCR::LanguageOCROption LANGUAGE_LEFT;
+//    OCR::LanguageOCROption LANGUAGE_RIGHT;
 
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
 
