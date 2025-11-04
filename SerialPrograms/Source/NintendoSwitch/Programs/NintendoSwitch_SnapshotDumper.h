@@ -41,7 +41,12 @@ private:
 
 private:
     SimpleIntegerOption<uint32_t> PERIOD_MILLISECONDS;
-    BooleanCheckBoxOption CLICK_TO_SNAPSHOT;
+    enum class SnapshotMode{
+        KEYPRESS,
+        MOUSE_CLICK,
+        PERIODIC,
+    };
+    EnumDropdownOption<SnapshotMode> SNAPSHOT_MODE;
     EnumDropdownOption<Format> FORMAT;
 };
 

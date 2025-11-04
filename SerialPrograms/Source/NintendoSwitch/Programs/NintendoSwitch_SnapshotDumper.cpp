@@ -33,7 +33,7 @@ SnapshotDumper_Descriptor::SnapshotDumper_Descriptor()
 {}
 
 SnapshotDumper::~SnapshotDumper(){
-    CLICK_TO_SNAPSHOT.remove_listener(*this);
+    SNAPSHOT_MODE.remove_listener(*this);
 }
 
 SnapshotDumper::SnapshotDumper()
@@ -42,11 +42,16 @@ SnapshotDumper::SnapshotDumper()
         LockMode::UNLOCK_WHILE_RUNNING,
         1000
     )
-    , CLICK_TO_SNAPSHOT(
-        "<b>Click screen to trigger snapshot</b><br>",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
+    , SNAPSHOT_MODE(
+        "<b>Snapshot trigger:",
+        {
+            {SnapshotMode::KEYPRESS,         "key-press",           "Key Press. Press 'Page Down', while the screen is focused."},
+            {SnapshotMode::MOUSE_CLICK,            "mouse-click",              "Mouse click on the screen."},
+            {SnapshotMode::PERIODIC,            "periodic",              "Periodic: every X milliseconds as defined below."},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        SnapshotMode::KEYPRESS
+    ) 
     , FORMAT(
         "<b>Image Format:</b>",
         {
@@ -57,14 +62,14 @@ SnapshotDumper::SnapshotDumper()
         Format::JPG
     )
 {
-    PA_ADD_OPTION(CLICK_TO_SNAPSHOT);
+    PA_ADD_OPTION(SNAPSHOT_MODE);
     PA_ADD_OPTION(PERIOD_MILLISECONDS);
     PA_ADD_OPTION(FORMAT);
-    CLICK_TO_SNAPSHOT.add_listener(*this);
+    SNAPSHOT_MODE.add_listener(*this);
 }
 
 void SnapshotDumper::on_config_value_changed(void* object){
-    PERIOD_MILLISECONDS.set_visibility(CLICK_TO_SNAPSHOT ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
+    PERIOD_MILLISECONDS.set_visibility(SNAPSHOT_MODE == SnapshotMode::PERIODIC ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 }
 
 class SnapshotClickTrigger : public VideoOverlay::MouseListener{
@@ -135,17 +140,22 @@ void SnapshotKeyTrigger::on_key_release(QKeyEvent* event){
 void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::string folder_path = USER_FILE_PATH() + "ScreenshotDumper/";
     QDir().mkpath(folder_path.c_str());
-    if (CLICK_TO_SNAPSHOT){
-        // SnapshotClickTrigger trigger(env.console, env.console.overlay(), FORMAT);
-        SnapshotKeyTrigger trigger(env.console, env.console.overlay(), FORMAT);
+
+    if (SNAPSHOT_MODE == SnapshotMode::KEYPRESS){
+        SnapshotKeyTrigger key_trigger(env.console, env.console.overlay(), FORMAT);
         context.wait_until_cancel();
-    }else{
+    }else if (SNAPSHOT_MODE == SnapshotMode::MOUSE_CLICK){
+        SnapshotClickTrigger click_trigger(env.console, env.console.overlay(), FORMAT);
+        context.wait_until_cancel();
+    }else if (SNAPSHOT_MODE == SnapshotMode::PERIODIC){
         while (true){
             VideoSnapshot last = env.console.video().snapshot();
             std::string filename = folder_path + now_to_filestring();
             last->save(filename + to_format_string(FORMAT));
             context.wait_until(last.timestamp + std::chrono::milliseconds(PERIOD_MILLISECONDS));
         }
+    }else{
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unexpected SNAPSHOT_MODE enum.");
     }
 }
 
