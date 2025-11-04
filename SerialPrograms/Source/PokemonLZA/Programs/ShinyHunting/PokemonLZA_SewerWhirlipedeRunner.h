@@ -7,10 +7,9 @@
 #ifndef PokemonAutomation_PokemonLZA_Sewer_Whirlipede_Runner_H
 #define PokemonAutomation_PokemonLZA_Sewer_Whirlipede_Runner_H
 
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
-#include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -33,10 +32,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
-
-    ShinySoundDetectedActionOption SHINY_DETECTED;
-
+    MillisecondsOption DURATION;
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
 };
