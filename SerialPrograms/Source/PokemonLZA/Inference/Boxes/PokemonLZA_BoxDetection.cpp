@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -102,7 +103,7 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
 
     const size_t total_crop_area = image_crop.width() * image_crop.height();
     const size_t min_area = static_cast<size_t>(total_crop_area / 60.0);
-    const size_t max_area = static_cast<size_t>(total_crop_area / 15.0);
+    const size_t max_area = static_cast<size_t>(total_crop_area / 10.0);
 
     int saved_object_id = 0;
     if (debug_switch){
@@ -181,17 +182,19 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
                 debug_switch = false;
             }
             if (detected){
-                // if (arrow_found){
-                //     throw FatalProgramException(ErrorReport::SEND_ERROR_REPORT,
-                //         "Multiple box selection arrows detected!", nullptr, screen.copy());
-                // }
+                if (arrow_found && m_debug_mode){
+                    cout << "Multiple box selection arrows detected! First detection (" << int(m_found_row) << ", " << int(m_found_col) << ")"
+                         << " second detection (" << int(row) << ", " << int(col) << ")" << endl;
+                    throw FatalProgramException(ErrorReport::SEND_ERROR_REPORT,
+                        "Multiple box selection arrows detected!", nullptr, screen.copy());
+                }
                 arrow_found = true;
                 m_found_row = row;
                 m_found_col = col;
                 break;
             }
         }
-        if (arrow_found){
+        if (arrow_found && !m_debug_mode){
             break;
         }
     }

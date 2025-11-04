@@ -195,6 +195,7 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
 
     // Test BoxDetector for row and col
     BoxDetector box_detector(COLOR_RED, &overlay);
+    box_detector.set_debug_mode(true);
     bool in_box_system = box_detector.detect(image);
     if (!in_box_system){
         cerr << "Error: BoxDetector did not detect box system view." << endl;

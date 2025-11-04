@@ -55,6 +55,10 @@ public:
         uint8_t row, uint8_t col
     );
 
+    // Under debug mode, will throw FatalProgramException when more than one box cell
+    // detects a cursor. This is used for debugging.
+    void set_debug_mode(bool debug_mode) { m_debug_mode = debug_mode; }
+
 private:
     // called for each box cell to check if the selection arrow is above that cell
     bool detect_at_cell(const ImageViewRGB32& image_crop);
@@ -65,6 +69,7 @@ private:
     std::vector<ImageFloatBox> m_arrow_boxes;  // all 6 x 6 potential locations of the arrow interiors on box view
     uint8_t m_found_row = 0;
     uint8_t m_found_col = 0;
+    bool m_debug_mode = false;
 };
 
 class BoxWatcher : public DetectorToFinder<BoxDetector>{
