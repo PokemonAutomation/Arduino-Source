@@ -37,10 +37,21 @@ RunYOLO_Descriptor::RunYOLO_Descriptor()
 
 
 
-RunYOLO::RunYOLO() {}
+RunYOLO::RunYOLO()
+    : MODEL_PATH(
+        "<b>YOLO Model Path:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        RESOURCE_PATH() + "ML/yolov5.onnx",
+        "*.onnx",
+        "Path to YOLO .onnx model file"
+    )
+{
+    PA_ADD_OPTION(MODEL_PATH);
+}
 
 void RunYOLO::program(NintendoSwitch::SingleSwitchProgramEnvironment& env, NintendoSwitch::ProControllerContext& context){
-    YOLOv5Watcher watcher(env.console.overlay());
+    std::string model_path = MODEL_PATH;
+    YOLOv5Watcher watcher(env.console.overlay(), model_path);
 
     wait_until(env.console, context, WallClock::max(), {watcher});
 }

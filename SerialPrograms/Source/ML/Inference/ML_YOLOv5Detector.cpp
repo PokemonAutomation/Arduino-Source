@@ -6,6 +6,7 @@
 
 #include <filesystem>
 #include <iostream>
+#include <fstream>
 #include <QMessageBox>
 #include <opencv2/imgproc.hpp>
 #include <opencv2/imgcodecs.hpp>
@@ -13,6 +14,8 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonFramework/Globals.h"
+#include "Common/Cpp/StringTools.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "ML_YOLOv5Detector.h"
 
 //#include <iostream>
@@ -25,18 +28,45 @@ namespace ML{
 
 YOLOv5Detector::~YOLOv5Detector() = default;
 
-YOLOv5Detector::YOLOv5Detector()
+
+YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
 {
-    const std::string sam_model_path = RESOURCE_PATH() + "ML/yolov5.onnx";
-    std::vector<std::string> labels = {"Bidoof"};
-    if (std::filesystem::exists(sam_model_path)){
-        m_yolo_session = std::make_unique<YOLOv5Session>(sam_model_path, std::move(labels));
-    } else{
-        std::cerr << "Error: no such YOLOv5 model path " << sam_model_path << "." << std::endl;
+    if (!model_path.ends_with(".onnx")){
+        std::cerr << "Error: wrong model path extension: " << model_path << ". It must be .onnx" << std::endl;
         QMessageBox box;
-        box.critical(nullptr, "YOLOv5 Model Does Not Exist",
-            QString::fromStdString("YOLOv5 model path" + sam_model_path + " does not exist."));
+        box.critical(nullptr, "Wrong Model Extension",
+            QString::fromStdString("YOLOv5 model path must end with .onnx. But got " + model_path + "."));
+        return;
     }
+
+    std::string label_file_path = model_path.substr(0, model_path.size() - 5) + "_label.txt";
+    std::vector<std::string> labels;
+    if (!std::filesystem::exists(label_file_path)){
+        std::cerr << "Error: no such YOLOv5 label file path " << label_file_path << "." << std::endl;
+        QMessageBox box;
+        box.critical(nullptr, "YOLOv5 Label File Does Not Exist",
+            QString::fromStdString("YOLOv5 label file path " + label_file_path + " does not exist."));
+        return;
+    }
+    std::ifstream label_file(label_file_path);
+    if (!label_file.is_open()){
+        std::cerr << "Error: failed to open YOLOv5 label file " << label_file_path << "." << std::endl;
+        QMessageBox box;
+        box.critical(nullptr, "Cannot Open YOLOv5 Label File",
+            QString::fromStdString("YOLOv5 label file " + label_file_path + " cannot be opened."));
+        return;
+    }
+    std::string line;
+    while (std::getline(label_file, line)){
+        line = StringTools::strip(line);
+        if (line.empty() || line[0] == '#'){
+            continue;
+        }
+        labels.push_back(line);
+    }
+    label_file.close();
+
+    m_yolo_session = std::make_unique<YOLOv5Session>(model_path, std::move(labels));
 }
 
 bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
@@ -55,14 +85,15 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
 }
 
 
-YOLOv5Watcher::YOLOv5Watcher(VideoOverlay& overlay)
+YOLOv5Watcher::YOLOv5Watcher(VideoOverlay& overlay, const std::string& model_path)
     : VisualInferenceCallback("YOLOv5")
     , m_overlay_set(overlay)
+    , m_detector(model_path)
 {
 }
 
 bool YOLOv5Watcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    if (!m_detector.session()){
+    if (!m_detector.model_loaded()){
         return false;
     }
 
@@ -70,7 +101,8 @@ bool YOLOv5Watcher::process_frame(const ImageViewRGB32& frame, WallClock timesta
 
     m_overlay_set.clear();
     for(const auto& box : m_detector.detected_boxes()){
-        m_overlay_set.add(COLOR_RED, box.box, m_detector.session()->label_name(box.label_idx));
+        std::string text = m_detector.session()->label_name(box.label_idx) + ": " + tostr_fixed(box.score, 2);
+        m_overlay_set.add(COLOR_RED, box.box, text);
     }
     return false;
 }

@@ -152,6 +152,7 @@
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
 #include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
 #include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_MapDetector.h"
 
 
 
@@ -293,7 +294,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    MoveEffectivenessSymbolMatcher::NoEffect();
 
-#if 1
+#if 0
+    auto snapshot = feed.snapshot();
+    ImageViewRGB32 cropped = extract_box_reference(snapshot, ImageFloatBox(0.309013, 0.719466, 0.418455, 0.015267));
+    ImageStats stats = image_stats(cropped);
+    cout << stats.average << stats.stddev << endl;
+#endif
+
+
+#if 0
     MapIconDetector detector0(COLOR_RED, MapIconType::PokemonCenter, {0, 0, 1, 1}, &overlay);
     MapIconDetector detector1(COLOR_RED, MapIconType::Building, {0, 0, 1, 1}, &overlay);
     MapIconDetector detector2(COLOR_RED, MapIconType::BuildingFlyable, {0, 0, 1, 1}, &overlay);
@@ -315,11 +324,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 0
+#if 1
 
     auto snapshot = feed.snapshot();
 
-    MoveEffectivenessSymbolDetector detector(COLOR_RED, &overlay);
+    ItemReceiveDetector detector(COLOR_RED, &overlay);
     cout << detector.detect(snapshot) << endl;
 #endif
 

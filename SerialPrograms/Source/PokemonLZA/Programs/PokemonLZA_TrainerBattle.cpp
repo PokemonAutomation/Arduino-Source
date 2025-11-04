@@ -21,7 +21,7 @@ namespace PokemonLZA{
 
 bool attempt_one_attack(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    bool use_move_ai, bool use_plus_moves
+    bool use_move_ai, bool use_plus_moves, bool allow_button_B_press
 ){
     if (!use_move_ai){
         ssf_press_button(context, BUTTON_ZL, 160ms, 800ms, 200ms);
@@ -31,7 +31,9 @@ bool attempt_one_attack(
         }
         pbf_press_button(context, BUTTON_X, 80ms, 24ms);
         pbf_press_button(context, BUTTON_Y, 80ms, 24ms);
-        pbf_press_button(context, BUTTON_B, 80ms, 24ms);
+        if (allow_button_B_press){
+            pbf_press_button(context, BUTTON_B, 80ms, 24ms);
+        }
         return true;
     }
 
@@ -54,7 +56,12 @@ bool attempt_one_attack(
     if (ret < 0){
         command.stop_session_and_rethrow();
         context.wait_for(250ms);
-        pbf_press_button(context, BUTTON_B, 160ms, 80ms);
+        // No move effectiveness symbol found
+        if (allow_button_B_press){
+            // It could be the game is in a transparent pre-battle dialog,
+            // press B to clear it.
+            pbf_press_button(context, BUTTON_B, 160ms, 80ms);
+        }
         return false;
     }
 
@@ -78,6 +85,7 @@ bool attempt_one_attack(
     }
 
     env.log(best_string, COLOR_BLUE);
+    env.console.overlay().add_log(best_string);
 
     command.dispatch([&](ProControllerContext& context){
         ssf_press_button(context, BUTTON_ZL, 0ms, 800ms, 200ms);

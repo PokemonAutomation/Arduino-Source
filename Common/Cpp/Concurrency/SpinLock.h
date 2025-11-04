@@ -89,6 +89,11 @@ public:
         }
     }
 
+    PA_FORCE_INLINE bool try_acquire_write(){
+        size_t state = 0;
+        return m_readers.compare_exchange_strong(state, (size_t)-1);
+    }
+
     PA_FORCE_INLINE void unlock_read(){
         m_readers.fetch_sub(1);
     }
@@ -134,7 +139,11 @@ public:
     WriteSpinLock(const WriteSpinLock&) = delete;
     void operator=(const WriteSpinLock&) = delete;
 
-    PA_FORCE_INLINE WriteSpinLock(SpinLockMRSW& lock, const char* label = "(unnamed lock)")
+    PA_FORCE_INLINE WriteSpinLock(
+        SpinLockMRSW& lock,
+        const char* label = "(unnamed lock)",
+        bool try_acquire = false
+    )
         : m_lock(lock)
     {
         lock.acquire_write(label);

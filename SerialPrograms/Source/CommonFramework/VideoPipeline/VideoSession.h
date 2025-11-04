@@ -198,7 +198,7 @@ private:
 
 
 private:
-    mutable std::recursive_mutex m_reset_lock;
+    mutable SpinLock m_reset_lock;
     mutable SpinLock m_state_lock;
 //    bool m_shutting_down = false;
 
@@ -215,7 +215,6 @@ private:
     //  We need to queue up all reset commands and run them on the main thread.
     //  This is needed to prevent re-entrant calls from event processing.
     SpinLock m_queue_lock;
-    size_t m_recursion_depth = 0;
     std::deque<Command> m_queued_commands;
 
     ListenerSet<StateListener> m_state_listeners;

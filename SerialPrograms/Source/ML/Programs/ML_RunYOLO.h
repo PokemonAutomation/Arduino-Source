@@ -8,6 +8,7 @@
 #ifndef PokemonAutomation_ML_RunYOLO_H
 #define PokemonAutomation_ML_RunYOLO_H
 
+#include "Common/Cpp/Options/PathOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -27,6 +28,7 @@ public:
     virtual void program(NintendoSwitch::SingleSwitchProgramEnvironment& env, NintendoSwitch::ProControllerContext& context) override;
 
 private:
+    PathOption MODEL_PATH;
 };
 
 

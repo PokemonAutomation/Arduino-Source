@@ -129,6 +129,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/MacAddressOption.h
     ../Common/Cpp/Options/RandomCodeOption.cpp
     ../Common/Cpp/Options/RandomCodeOption.h
+    ../Common/Cpp/Options/PathOption.cpp
+    ../Common/Cpp/Options/PathOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
     ../Common/Cpp/Options/SimpleIntegerOption.h
     ../Common/Cpp/Options/StaticTableOption.cpp
@@ -216,6 +218,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/MacAddressWidget.h
     ../Common/Qt/Options/RandomCodeWidget.cpp
     ../Common/Qt/Options/RandomCodeWidget.h
+    ../Common/Qt/Options/PathWidget.cpp
+    ../Common/Qt/Options/PathWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
     ../Common/Qt/Options/SimpleIntegerWidget.h
     ../Common/Qt/Options/StaticTableWidget.cpp
@@ -1549,6 +1553,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_MapDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_MapDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MapIconDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MapIconDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.cpp
@@ -1561,16 +1567,22 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_BerryBuyer.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_BerryBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
+    Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp

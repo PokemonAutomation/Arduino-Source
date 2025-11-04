@@ -62,7 +62,7 @@ private:
 
     const Color m_color;
     VideoOverlay* m_overlay;
-    const ImageFloatBox m_top;
+    const ImageFloatBox m_bottom;
     const ImageFloatBox m_arrow_box;
 
     ImageFloatBox m_last_detected;
@@ -129,6 +129,7 @@ private:
 
     const Color m_color;
     VideoOverlay* m_overlay;
+    const ImageFloatBox m_top;
     const ImageFloatBox m_arrow_box;
 
     ImageFloatBox m_last_detected;
@@ -141,7 +142,7 @@ public:
         VideoOverlay* overlay = nullptr,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
-         : DetectorToFinder("BlueDialogWatcher", hold_duration, color, overlay)
+         : DetectorToFinder("ItemReceiveWatcher", hold_duration, color, overlay)
     {}
 };
 

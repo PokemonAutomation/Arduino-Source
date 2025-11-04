@@ -1,4 +1,4 @@
-/*  Restaurant Farmer
+/*  Jacinthe Infinite Farmer
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -8,10 +8,9 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-//#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-//#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -20,7 +19,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
 #include "PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
-#include "PokemonLZA_RestaurantFarmer.h"
+#include "PokemonLZA_JacintheInfiniteFarmer.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 
 namespace PokemonAutomation{
@@ -30,49 +29,82 @@ namespace PokemonLZA{
 using namespace Pokemon;
 
 
-RestaurantFarmer_Descriptor::RestaurantFarmer_Descriptor()
+// Jacinthe infinite battle flow:
+// - Button A overworld
+// - Flat white dialog x 2
+// - Selection arrow for three menuitem: "give a try", "can you give me spiel again", "I'll pass"
+// - Flat white excited dialog
+// - Flat white dialog
+// - Black screen
+// - Enter pre-battle animation
+// - Pre-battle dialog (no background, white arrow)
+// - Battle
+//   - Aurorus uses protect first turn
+//   - Mega evolve Clefable
+//   - Clefable uses protect first turn
+// - Given +8100 poke dollar
+// - Flat white dialog
+// - Black screen
+// - Flat white dialog
+// - Selection arrow for two item: "let's start", "no thanks"
+// - If choose let's start:
+//   - Flat white dialog
+//   - Pre-battle dialog
+//   - <loop> ...
+// - If choose no thanks:
+//  - Flat white dialg
+//  - Selection arrow for two item: "let's keep going", "I'm done"
+//  - choose 2nd
+//  - Flat white dialog x3
+//  - Button A overworld <finish battle>
+
+
+JacintheInfiniteFarmer_Descriptor::JacintheInfiniteFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonLZA:RestaurantFarmer",
-        STRING_POKEMON + " LZA", "Restaurant Farmer",
-        "Programs/PokemonLZA/RestaurantFarmer.html",
-        "Farm the restaurants for exp, items, and money.",
+        "PokemonLZA:JacintheInfiniteFarmer",
+        STRING_POKEMON + " LZA", "Jacinthe Infinite Farmer",
+        "Programs/PokemonLZA/JacintheInfiniteFarmer.html",
+        "Farm Jacinthe Infinite for exp and money.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         {}
     )
 {}
-class RestaurantFarmer_Descriptor::Stats : public StatsTracker{
+class JacintheInfiniteFarmer_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : rounds(m_stats["Rounds"])
+        , defeats(m_stats["Defeats"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Rounds");
+        m_display_order.emplace_back("Defeats", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 
         m_aliases["Battles"] = "Rounds";
     }
 
     std::atomic<uint64_t>& rounds;
+    std::atomic<uint64_t>& defeats;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> RestaurantFarmer_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> JacintheInfiniteFarmer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 
-RestaurantFarmer::~RestaurantFarmer(){
+JacintheInfiniteFarmer::~JacintheInfiniteFarmer(){
     STOP_AFTER_CURRENT.remove_listener(*this);
 }
 
-RestaurantFarmer::RestaurantFarmer()
+JacintheInfiniteFarmer::JacintheInfiniteFarmer()
     : m_stop_after_current(false)
     , NUM_ROUNDS(
         "<b>Number of Rounds to Run:</b><br>"
         "Zero will run until 'Stop after Current Round' is pressed or the program is manually stopped.</b>",
-        LockMode::UNLOCK_WHILE_RUNNING, 
-        100, 
+        LockMode::UNLOCK_WHILE_RUNNING,
+        100,
         0
     )
     , GO_HOME_WHEN_DONE(false)
@@ -111,31 +143,34 @@ RestaurantFarmer::RestaurantFarmer()
 
 
 
-RestaurantFarmer::StopButton::StopButton()
+JacintheInfiniteFarmer::StopButton::StopButton()
     : ButtonOption(
       "<b>Stop after current round:",
       "Stop after current round",
       0, 16
     )
 {}
-void RestaurantFarmer::StopButton::set_idle(){
+void JacintheInfiniteFarmer::StopButton::set_idle(){
     this->set_enabled(false);
     this->set_text("Stop after Current Round");
 }
-void RestaurantFarmer::StopButton::set_ready(){
+void JacintheInfiniteFarmer::StopButton::set_ready(){
     this->set_enabled(true);
     this->set_text("Stop after Current Round");
 }
-void RestaurantFarmer::StopButton::set_pressed(){
+void JacintheInfiniteFarmer::StopButton::set_pressed(){
     this->set_enabled(false);
     this->set_text("Program will stop after current round...");
 }
 
 
 
-bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
+bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    JacintheInfiniteFarmer_Descriptor::Stats& stats = env.current_stats<JacintheInfiniteFarmer_Descriptor::Stats>();
 
+    bool seen_selection_arrow = false;
+    bool confirm_entering_battle = false;
+    bool seen_flat_white_dialog = false;
     while (true){
         context.wait_for_all_requests();
 
@@ -148,117 +183,121 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         SelectionArrowWatcher arrow(
             COLOR_YELLOW, &env.console.overlay(),
             SelectionArrowType::RIGHT,
-            {0.654308, 0.481553, 0.295529, 0.312621}
+            {0.543, 0.508, 0.365, 0.253}
         );
-        FlatWhiteDialogWatcher dialog0(COLOR_RED, &env.console.overlay());
-        BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay());
-        ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay());
+        FlatWhiteDialogWatcher dialog(COLOR_RED, &env.console.overlay());
+        BlackScreenWatcher black_screen(COLOR_BLACK);
+
+        std::vector<PeriodicInferenceCallback> callbacks = {
+            buttonA,
+            arrow,
+            dialog
+        };
+        if (seen_selection_arrow && confirm_entering_battle){
+            // seen selection arrow means we may now enter battle, which transitions with a black screen
+            callbacks.push_back(black_screen);
+        }
 
         int ret = wait_until(
             env.console, context,
             10000ms,
-            {
-                buttonA,
-                arrow,
-                dialog0,
-                dialog1,
-                item_receive,
-            }
+            callbacks
         );
         context.wait_for(100ms);
 
         switch (ret){
         case 0:
+            // There cases where the function detects A button:
+            // - At start of the program, press A to start talking to Jacinthe
+            // - When stopping the battle, the program fininshes all the dialog with Jacinethe and returns
+            //   to the overworld, where button A appears.
+            // - When we lose to Jacinthe, we have some dialog after the battle and returns to the overworld.
             env.log("Detected A button.");
+            env.console.overlay().add_log("Button A Detected");
             if (m_stop_after_current.load(std::memory_order_relaxed)){
-                return true;
+                return true; // true means the program should stop
+            }
+            
+            if (seen_flat_white_dialog){
+                // we shouldn't stop the program but we find A button. This means we lost.
+                stats.defeats++;
+                env.update_stats();
             }
             pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             continue;
 
         case 1:
             env.log("Detected selection arrow.");
-            // This is when the restaurant receptionist is asking whether you want
-            // to start the round
-            // Mash A for 5 sec to clear rest of the dialog and enter battle
-            pbf_mash_button(context, BUTTON_A, 5000ms);
-            return false;
+            seen_selection_arrow = true;
+            // This is when Jacinthe is asking whether you want
+            // to start the battle or continue the battle
+            if (m_stop_after_current.load(std::memory_order_relaxed)){
+                env.console.overlay().add_log("Dialog Choice: Cancel");
+                pbf_press_button(context, BUTTON_B, 160ms, 80ms);
+                continue;
+            } else{
+                confirm_entering_battle = true;
+                // confirm entering battle
+                env.console.overlay().add_log("Dialog Choice: Confirm");
+                pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+            }
 
         case 2:
             env.log("Detected white dialog.");
+            // env.console.overlay().add_log("Advance Dialog");
+            seen_flat_white_dialog = true;
             pbf_press_button(context, BUTTON_B, 160ms, 80ms);
             continue;
-
+        
         case 3:
-            env.log("Detected blue dialog.");
-            pbf_press_button(context, BUTTON_B, 160ms, 80ms);
-            continue;
-
-        case 4:
-            env.log("Detected item receive.");
-            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
-            continue;
+            env.log("Detected black screen.");
+            env.console.overlay().add_log("Transition to Battle");
+            // mash B for 10 sec to clear up any pre-battle transparency dialog
+            pbf_mash_button(context, BUTTON_B, 10s);
+            context.wait_for_all_requests();
+            env.console.overlay().add_log("Cleared Pre-Battle Dialog");
+            // battle starts
+            return false;
 
         default:
             stats.errors++;
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "run_lobby(): No recognized state after 60 seconds.",
+                "talk_to_jacinthe(): No recognized state after 60 seconds.",
                 env.console
             );
         }
     }
 }
-void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
+void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    JacintheInfiniteFarmer_Descriptor::Stats& stats = env.current_stats<JacintheInfiniteFarmer_Descriptor::Stats>();
 
     WallClock start = current_time();
 
     while (true){
         context.wait_for_all_requests();
 
-        SelectionArrowWatcher arrow(
-            COLOR_YELLOW, &env.console.overlay(),
-            SelectionArrowType::RIGHT,
-            {0.654308, 0.481553, 0.295529, 0.312621}
-        );
-        ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay(), 1000ms);
-        FlatWhiteDialogWatcher dialog0(COLOR_RED, &env.console.overlay(), 1000ms);
-        BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay(), 1000ms);
-
+        FlatWhiteDialogWatcher dialog(COLOR_RED, &env.console.overlay(), 250ms);
 
         int ret = run_until<ProControllerContext>(
             env.console, context,
             [&](ProControllerContext& context){
                 while (current_time() - start < 30min){
-                    attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES);
+                    const bool allow_button_B_press = false;
+                    attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES, allow_button_B_press);
                 }
             },
             {
-                arrow,
-                item_receive,
-                dialog0,
-                dialog1,
+                dialog,
             }
         );
 
         switch (ret){
         case 0:
-            env.log("Detected selection arrow. (unexpected)", COLOR_RED);
-            dump_image(env.console.logger(), env.program_info(), env.console.video(), "UnexpectedSelectionArrow");
-            stats.errors++;
-            env.update_stats();
-            continue;
-
-        case 2:
             env.log("Detected white dialog.");
+            env.console.overlay().add_log("Post-Battle Dialog");
             pbf_press_button(context, BUTTON_B, 160ms, 80ms);
-            continue;
-
-        case 1:
-        case 3:
-            env.log("Detected blue dialog. End of round!");
             stats.rounds++;
             env.update_stats();
             return;
@@ -272,12 +311,11 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
                 env.console
             );
         }
-
     }
 }
 
 
-class RestaurantFarmer::ResetOnExit{
+class JacintheInfiniteFarmer::ResetOnExit{
 public:
     ResetOnExit(StopButton& button)
         : m_button(button)
@@ -290,14 +328,14 @@ private:
     StopButton& m_button;
 };
 
-void RestaurantFarmer::on_press(){
+void JacintheInfiniteFarmer::on_press(){
     global_logger_tagged().log("Stop after current requested...");
     m_stop_after_current.store(true, std::memory_order_relaxed);
     STOP_AFTER_CURRENT.set_pressed();
 }
 
-void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
+void JacintheInfiniteFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    JacintheInfiniteFarmer_Descriptor::Stats& stats = env.current_stats<JacintheInfiniteFarmer_Descriptor::Stats>();
     m_stop_after_current.store(false, std::memory_order_relaxed);
     STOP_AFTER_CURRENT.set_ready();
     ResetOnExit reset_button_on_exit(STOP_AFTER_CURRENT);
@@ -311,7 +349,7 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
             m_stop_after_current.store(true, std::memory_order_relaxed);
             STOP_AFTER_CURRENT.set_pressed();
         }
-        if (run_lobby(env, context)){
+        if (talk_to_jacinthe(env, context)){
             break;
         }
         run_round(env, context);

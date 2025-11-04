@@ -73,7 +73,7 @@ const std::string& TRAINING_PATH();
 // Folder path (end with "/") to hold data annotation for ML labeling programs
 const std::string& ML_ANNOTATION_PATH();
 // Folder path (end with "/") to hold model cache for model inferences. This is only used on macOS
-// for the Apple CoreML model acceleration framework can create model cache for faster model inference
+// for the Apple CoreML model acceleration framework to create model cache for faster model inference
 // sessions.
 const std::string& ML_MODEL_CACHE_PATH();
 

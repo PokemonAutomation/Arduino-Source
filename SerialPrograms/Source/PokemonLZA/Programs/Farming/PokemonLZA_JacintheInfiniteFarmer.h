@@ -1,11 +1,11 @@
-/*  Restaurant Farmer
+/*  Jacinthe Infinite Farmer
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_PokemonLZA_RestaurantFarmer_H
-#define PokemonAutomation_PokemonLZA_RestaurantFarmer_H
+#ifndef PokemonAutomation_PokemonLZA_JacintheInfiniteFarmer_H
+#define PokemonAutomation_PokemonLZA_JacintheInfiniteFarmer_H
 
 #include <atomic>
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
@@ -27,29 +27,33 @@ using ProControllerContext = ControllerContext<ProController>;
 namespace PokemonLZA{
 
 
-class RestaurantFarmer_Descriptor : public SingleSwitchProgramDescriptor{
+class JacintheInfiniteFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-    RestaurantFarmer_Descriptor();
+    JacintheInfiniteFarmer_Descriptor();
 
     class Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
-class RestaurantFarmer : public SingleSwitchProgramInstance, public ButtonListener{
+class JacintheInfiniteFarmer : public SingleSwitchProgramInstance, public ButtonListener{
 public:
-    ~RestaurantFarmer();
-    RestaurantFarmer();
+    ~JacintheInfiniteFarmer();
+    JacintheInfiniteFarmer();
 
     virtual void on_press() override;
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    // Handle all the logic of talking to the restaurant receptionist.
+    // Advance dialog windows and select dialog menuitems when talking to the Jacinthe in overworld.
+    // This function can be called in two cases:
+    // - When starting the proram, player is in overworld with Button A floating in front of Jacinthe.
+    // - When a battle finishes, player is in dialog with Jacinthe, where the program can choose to continue
+    //   battling or exit.
     // Return true when the user clicks the button STOP_AFTER_CURRENT to stop or the required amount of rounds is
-    // reached. Return false when it enters battle.
-    bool run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-    // Handle all battle logic. Return when it detects the blue dialog box meaning the player character is at
+    // reached. Return false when it finishes the dialog menuitem selection to confirm entering the battle.
+    bool talk_to_jacinthe(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    // Handle all round logic. Return when it detects the blue dialog box meaning the player character is at
     // the receptionist receiving reward items.
     void run_round(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 

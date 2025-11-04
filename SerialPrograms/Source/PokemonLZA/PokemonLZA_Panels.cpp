@@ -12,9 +12,11 @@
 
 //  General
 #include "Programs/PokemonLZA_ClothingBuyer.h"
+#include "Programs/PokemonLZA_BerryBuyer.h"
 
 //  Farming
 #include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
+#include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_MegaShardFarmer.h"
 
 //  Shiny Hunting
@@ -47,21 +49,25 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
+    ret.emplace_back(make_single_switch_program<BerryBuyer_Descriptor, BerryBuyer>());
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<RestaurantFarmer_Descriptor, RestaurantFarmer>());
     ret.emplace_back(make_single_switch_program<MegaShardFarmer_Descriptor, MegaShardFarmer>());
-    if (PreloadSettings::instance().DEVELOPER_MODE){
+    if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
     ret.emplace_back(make_single_switch_program<ShinyHunt_BenchSit_Descriptor, ShinyHunt_BenchSit>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldReset_Descriptor, ShinyHunt_OverworldReset>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneEntrance_Descriptor, ShinyHunt_WildZoneEntrance>());
+    if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<AutoFossil_Descriptor, AutoFossil>());
+    }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
-        ret.emplace_back(make_single_switch_program<AutoFossil_Descriptor, AutoFossil>());
     }
 
 

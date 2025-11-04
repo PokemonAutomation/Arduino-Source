@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -11,6 +12,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_MegaShardFarmer.h"
 
 namespace PokemonAutomation{
@@ -131,7 +133,7 @@ void MegaShardFarmer::program(SingleSwitchProgramEnvironment& env, ProController
 }
 void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     while (true){
-        pbf_press_button(context, BUTTON_PLUS, 240ms, 1500ms);
+        open_map(env.console, context);
 
         //  Middle Zoom
         pbf_move_right_joystick(context, 128, 0, 80ms, 80ms);
@@ -142,23 +144,13 @@ void MegaShardFarmer::fly_back(SingleSwitchProgramEnvironment& env, ProControlle
         pbf_move_left_joystick(context, 128, 192, 40ms, 120ms);
         pbf_move_left_joystick(context, 128, 64, 40ms, 500ms);
 
-        BlackScreenOverWatcher black_screen(COLOR_BLUE, {0.1, 0.1, 0.8, 0.2});
-
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [&](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 10000ms);
-            },
-            {{black_screen}}
-        );
-        if (ret == 0){
+        if (fly_from_map(env.console, context)){
             return;
+        }else{
+            MegaShardFarmer_Descriptor::Stats& stats = env.current_stats<MegaShardFarmer_Descriptor::Stats>();
+            stats.errors++;
+            pbf_mash_button(context, BUTTON_B, 5000ms);
         }
-
-        MegaShardFarmer_Descriptor::Stats& stats = env.current_stats<MegaShardFarmer_Descriptor::Stats>();
-        stats.errors++;
-        env.log("Unable to fly back.", COLOR_RED);
-        pbf_mash_button(context, BUTTON_B, 5000ms);
     }
 }
 

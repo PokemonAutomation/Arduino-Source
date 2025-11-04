@@ -32,7 +32,7 @@ void scale_brightness(ImageRGB32& image, const FloatPixel& multiplier);
 //
 //      If (reference.alpha == 255)  Count the pixel.
 //      If (reference.alpha ==   0)  Ignore the pixel and exclude from pixel count.
-//
+//      Alpha channel of "image" is ignored.
 double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image);
 
 
@@ -42,7 +42,7 @@ double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image);
 //
 //      If (reference.alpha == 255)  Count the pixel.
 //      If (reference.alpha ==   0)  Replace reference pixel with "background".
-//
+//      Alpha channel of "image" is ignored.
 double pixel_RMSD(const ImageViewRGB32& reference, const ImageViewRGB32& image, Color background);
 
 

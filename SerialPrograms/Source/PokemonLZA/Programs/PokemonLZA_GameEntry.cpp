@@ -34,7 +34,7 @@ bool gamemenu_to_ingame(
     Milliseconds mash_duration, Milliseconds enter_game_timeout
 ){
     stream.log("Mashing A to enter game...");
-    BlackScreenOverWatcher detector(COLOR_RED, {0.074, 0.044, 0.826, 0.278});
+    BlackScreenOverWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
     pbf_mash_button(context, BUTTON_A, mash_duration);
     context.wait_for_all_requests();
     stream.log("Waiting to enter game...");

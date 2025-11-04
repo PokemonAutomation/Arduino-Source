@@ -253,17 +253,16 @@ void VideoSession::internal_set_resolution(Resolution resolution){
 }
 
 void VideoSession::run_commands(){
-    std::lock_guard<std::recursive_mutex> lg0(m_reset_lock);
-    if (m_recursion_depth != 0){
+    if (!m_reset_lock.try_acquire_write()){
         m_logger.log("Suppressing re-entrant command...", COLOR_RED);
         return;
     }
-    m_recursion_depth++;
+
     try{
         while (true){
             Command command;
             {
-                WriteSpinLock lg(m_queue_lock);
+                WriteSpinLock lg1(m_queue_lock);
 //                cout << "VideoSession::run_commands(): " << m_queued_commands.size() << endl;
                 if (m_queued_commands.empty()){
                     break;
@@ -286,9 +285,9 @@ void VideoSession::run_commands(){
                 break;
             }
         }
-        m_recursion_depth--;
+        m_reset_lock.unlock_write();
     }catch (...){
-        m_recursion_depth--;
+        m_reset_lock.unlock_write();
         throw;
     }
 }

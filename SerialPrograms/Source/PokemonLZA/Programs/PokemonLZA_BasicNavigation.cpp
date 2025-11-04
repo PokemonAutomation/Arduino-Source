@@ -14,6 +14,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 //#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 //#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_MapDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
 namespace PokemonAutomation{
@@ -21,55 +22,99 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
+void ensure_map(ConsoleHandle& console, ProControllerContext& context){
+    WallClock deadline = current_time() + 30000ms;
+    do{
+        context.wait_for_all_requests();
 
-void sit_on_bench(
-    ConsoleHandle& console, ProControllerContext& context
-){
-#if 0
-    while (true){
-        ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0, 0, 1, 1}, &console.overlay());
-        BlueDialogWatcher dialog(COLOR_YELLOW, &console.overlay());
-        SelectionArrowWatcher arrow(COLOR_BLUE, &console.overlay(), SelectionArrowType::RIGHT, {0.5, 0.4, 0.3, 0.3});
-        BlackScreenOverWatcher black_screen(COLOR_BLUE);
+        MapWatcher map_detector(COLOR_RED, &console.overlay());
 
         int ret = wait_until(
             console, context,
-            10000ms,
-            {
-                buttonA,
-                dialog,
-                arrow,
-                black_screen,
-            }
+            3000ms,
+            {map_detector}
         );
-        context.wait_for(100ms);
-
         switch (ret){
         case 0:
-            console.log("Detected floating A button...");
-            pbf_press_button(context, BUTTON_A, 200ms, 200ms);
-            continue;
-        case 1:
-            console.log("Detected dialog...");
-            pbf_press_button(context, BUTTON_B, 200ms, 200ms);
-            continue;
-        case 2:
-            console.log("Detected selection arrow...");
-            pbf_press_button(context, BUTTON_A, 200ms, 200ms);
-            continue;
-        case 3:
-            console.log("Detected day change.");
+            console.log("Detected map!", COLOR_BLUE);
+            return;
+        default:
+            console.log("Unable to detect map.", COLOR_ORANGE);
+            pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+        }
+
+    }while (current_time() < deadline);
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "open_map(): Unable to find map after 30 seconds.",
+        console
+    );
+}
+void open_map(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Opening Map...");
+    pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+    ensure_map(console, context);
+}
+bool fly_from_map(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Flying from map...");
+
+    {
+        BlackScreenWatcher start_flying(COLOR_RED);
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 5000ms);
+            },
+            {start_flying,}
+        );
+        switch (ret){
+        case 0:
+            console.log("Flying from map... Started!");
             break;
         default:
+            return false;
+#if 0
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "sit_on_bench(): No recognized state after 10 seconds.",
+                "fly_from_map(): Unable to fly.",
                 console
             );
+#endif
         }
     }
+    {
+        BlackScreenOverWatcher done_flying(COLOR_RED, {0.1, 0.7, 0.8, 0.2});
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_B, 30000ms);
+            },
+            {done_flying,}
+        );
+        switch (ret){
+        case 0:
+            console.log("Flying from map... Done!");
+            break;
+        default:
+            return false;
+#if 0
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "fly_from_map(): Unable to fly. Timed out.",
+                console
+            );
 #endif
+        }
+    }
 
+    return true;
+}
+
+
+
+
+void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
     {
         BlackScreenOverWatcher black_screen(COLOR_BLUE);
 

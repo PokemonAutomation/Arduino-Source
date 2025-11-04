@@ -17,7 +17,9 @@ std::string tostr_padded(size_t digits, uint64_t x);
 std::string tostr_u_commas(int64_t x);
 std::string tostr_bytes(uint64_t bytes);
 
+// Convert double to string using the default precision on ostream.
 std::string tostr_default(double x);
+// Convert double to string with fixed precision.
 std::string tostr_fixed(double x, int precision);
 
 // Format current time to a string to be used as filenames.

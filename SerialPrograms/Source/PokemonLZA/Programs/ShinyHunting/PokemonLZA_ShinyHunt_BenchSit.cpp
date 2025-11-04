@@ -129,14 +129,17 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
             continue;
         }
 
-        //  Wait for the day/night transition to finish.
-        context.wait_for(std::chrono::milliseconds(2000));
+        pbf_mash_button(context, BUTTON_B, 1000ms);
 
-        if (SHINY_DETECTED.on_shiny_sound(
+        bool exit = SHINY_DETECTED.on_shiny_sound(
             env, env.console, context,
             stats.shinies,
             shiny_coefficient
-        )){
+        );
+
+        pbf_move_left_joystick(context, 128, 255, WALK_FORWARD_DURATION, 0ms);
+
+        if (exit){
             break;
         }
     }
