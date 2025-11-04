@@ -103,6 +103,9 @@ public:
     void move_to_new_window();
     void move_back_from_window();
 
+    void on_key_press(QKeyEvent* event);
+    void on_key_release(QKeyEvent* event);
+
 protected:
     virtual void post_startup(VideoSource* source) override;
     virtual void pre_shutdown() override;
@@ -114,6 +117,11 @@ protected:
     virtual void mousePressEvent(QMouseEvent* event) override;
     virtual void mouseReleaseEvent(QMouseEvent* event) override;
     virtual void mouseMoveEvent(QMouseEvent* event) override;
+
+    // virtual void keyPressEvent(QKeyEvent* event) override;
+    // virtual void keyReleaseEvent(QKeyEvent* event) override;
+    // virtual void focusInEvent(QFocusEvent* event) override;
+    // virtual void focusOutEvent(QFocusEvent* event) override;
 
     virtual void paintEvent(QPaintEvent*) override;
     virtual void resizeEvent(QResizeEvent* event) override;

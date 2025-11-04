@@ -5,6 +5,7 @@
  */
 
 #include <QDir>
+#include <QKeyEvent>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -66,12 +67,12 @@ void SnapshotDumper::on_config_value_changed(void* object){
     PERIOD_MILLISECONDS.set_visibility(CLICK_TO_SNAPSHOT ? ConfigOptionState::HIDDEN : ConfigOptionState::ENABLED);
 }
 
-class SnapshotTrigger : public VideoOverlay::MouseListener{
+class SnapshotClickTrigger : public VideoOverlay::MouseListener{
 public:
-    ~SnapshotTrigger(){
+    ~SnapshotClickTrigger(){
         detach();
     }
-    SnapshotTrigger(VideoStream& stream, VideoOverlay& overlay, Format format)
+    SnapshotClickTrigger(VideoStream& stream, VideoOverlay& overlay, Format format)
         : m_stream(stream)
         , m_overlay(overlay)
         // , m_overlay_set(overlay)
@@ -104,11 +105,42 @@ private:
 
 };
 
+
+SnapshotKeyTrigger::~SnapshotKeyTrigger(){
+    detach();
+}
+SnapshotKeyTrigger::SnapshotKeyTrigger(VideoStream& stream, VideoOverlay& overlay, Format format)
+    : m_stream(stream)
+    , m_overlay(overlay)
+    , m_format(format)
+{
+    try{
+        overlay.add_keyevent_listener(*this);
+    }catch (...){
+        detach();
+        throw;
+    }
+}
+
+void SnapshotKeyTrigger::detach(){
+    m_overlay.remove_keyevent_listener(*this);
+}
+
+void SnapshotKeyTrigger::on_key_press(QKeyEvent* event){
+    if (event->key() == Qt::Key::Key_PageDown){
+        dump_snapshot(m_stream, "ScreenshotDumper", to_format_string(m_format));
+    } 
+}
+void SnapshotKeyTrigger::on_key_release(QKeyEvent* event){
+}
+
+
 void SnapshotDumper::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     std::string folder_path = USER_FILE_PATH() + "ScreenshotDumper/";
     QDir().mkpath(folder_path.c_str());
     if (CLICK_TO_SNAPSHOT){
-        SnapshotTrigger trigger(env.console, env.console.overlay(), FORMAT);
+        // SnapshotClickTrigger trigger(env.console, env.console.overlay(), FORMAT);
+        SnapshotKeyTrigger trigger(env.console, env.console.overlay(), FORMAT);
         context.wait_until_cancel();
     }else{
         while (true){
