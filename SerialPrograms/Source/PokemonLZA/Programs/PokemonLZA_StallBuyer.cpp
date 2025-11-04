@@ -7,8 +7,10 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
@@ -67,11 +69,6 @@ StallBuyer::StallBuyer()
         LockMode::LOCK_WHILE_RUNNING,
         ItemPosition::FirstItem
     )
-    , NUM_ITEM(
-        "<b>Number of available items in the stall:</b><br>Number of available items in the stall.",
-        LockMode::LOCK_WHILE_RUNNING,
-        6, 2, 7
-    )
     , NUM_PURCHASE(
         "<b>Number to Purchase:</b><br>The number of items you want to purchase.",
         LockMode::LOCK_WHILE_RUNNING,
@@ -86,15 +83,57 @@ StallBuyer::StallBuyer()
     })
 {
     PA_ADD_OPTION(ITEM_POSITION);
-    PA_ADD_OPTION(NUM_ITEM);
     PA_ADD_OPTION(NUM_PURCHASE);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-std::pair<DpadPosition, int> compute_needed_inputs(int item_position, int num_item){
+int detect_stall_amount_item(SingleSwitchProgramEnvironment& env, StallBuyer_Descriptor::Stats& stats){
+    // When buying from a stall, the first item is always selected.
+    // Detect which one is currently selected (with white background)
+    // 0.700 as y is the bottom option, then each one is shifted by 0.072
+    ImageFloatBox seven_item_stall_box  (0.858, 0.700 - 7 * 0.072, 0.024, 0.019);
+    ImageFloatBox six_item_stall_box    (0.858, 0.700 - 6 * 0.072, 0.024, 0.019);
+    ImageFloatBox five_item_stall_box   (0.858, 0.700 - 5 * 0.072, 0.024, 0.019);
+    ImageFloatBox two_item_stall_box    (0.858, 0.700 - 2 * 0.072, 0.024, 0.019);
+
+    WhiteScreenDetector seven_item_stall_detector(COLOR_BLUE, seven_item_stall_box);
+    WhiteScreenDetector six_item_stall_detector(COLOR_BLUE, six_item_stall_box);
+    WhiteScreenDetector five_item_stall_detector(COLOR_BLUE, five_item_stall_box);
+    WhiteScreenDetector two_item_stall_detector(COLOR_BLUE, two_item_stall_box);
+
+    VideoSnapshot snapshot = env.console.video().snapshot();
+    bool is_seven_item_stall = seven_item_stall_detector.detect(snapshot);
+    bool is_six_item_stall = six_item_stall_detector.detect(snapshot);
+    bool is_five_item_stall = five_item_stall_detector.detect(snapshot);
+    bool is_two_item_stall = two_item_stall_detector.detect(snapshot);
+
+    int count = is_seven_item_stall + is_six_item_stall + is_five_item_stall + is_two_item_stall;
+    if (count == 1){
+        // Exactly one kind of stall detected
+        if (is_seven_item_stall){
+            return 7;
+        }else if (is_six_item_stall){
+            return 6;
+        }else if (is_five_item_stall){
+            return 5;
+        }else{
+            return 2;
+        }
+    }else{
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "No recognized stall size.",
+            env.console
+        );
+    }
+}
+
+std::pair<DpadPosition, int> compute_needed_inputs(int item_position, int stall_amount_item){
     int down_presses = item_position;
-    int up_presses = num_item - item_position + 1;
+    int up_presses = stall_amount_item - item_position + 1;
 
     if (down_presses <= up_presses){
         return { DPAD_DOWN, down_presses };
@@ -106,13 +145,6 @@ std::pair<DpadPosition, int> compute_needed_inputs(int item_position, int num_it
 void StallBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     StallBuyer_Descriptor::Stats& stats = env.current_stats<StallBuyer_Descriptor::Stats>();
     assert_16_9_720p_min(env.logger(), env.console);
-    int item_position = static_cast<int>(ITEM_POSITION.get());
-    if (item_position >= NUM_ITEM){
-        throw UserSetupError(
-            env.logger(),
-            "Item position to purchase must be less than or equal to number of available items in the stall."
-        );
-    }
 
     while (true) {
         context.wait_for_all_requests();
@@ -147,7 +179,6 @@ void StallBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             );
         context.wait_for(100ms);
 
-        auto [direction, presses] = compute_needed_inputs(item_position, NUM_ITEM);
         switch (ret){
             case 0:
                 env.log("Detected A button.");
@@ -155,13 +186,17 @@ void StallBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 continue;
 
             case 1:
+            {
                 env.log("Detected item selection screen.");
+                int stall_amount_item = detect_stall_amount_item(env, stats);
+                env.log("Detected stall with " + std::to_string(stall_amount_item) + " items to sell.");
+                auto [direction, presses] = compute_needed_inputs(static_cast<int>(ITEM_POSITION.get()), stall_amount_item);
                 for (int i = 0; i < presses; i++){
                     pbf_press_dpad(context, direction, 160ms, 80ms);
                 }
                 pbf_press_button(context, BUTTON_A, 160ms, 80ms);
                 continue;
-
+            }
             case 2:
                 env.log("Detected purchase confirm screen.");
                 pbf_press_button(context, BUTTON_A, 160ms, 80ms);
