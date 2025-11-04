@@ -1,4 +1,4 @@
-/*  Berry Buyer
+/*  Stall Buyer
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -14,7 +14,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
-#include "PokemonLZA_BerryBuyer.h"
+#include "PokemonLZA_StallBuyer.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -22,19 +22,19 @@ namespace PokemonLZA{
 
 using namespace Pokemon;
 
-BerryBuyer_Descriptor::BerryBuyer_Descriptor()
+StallBuyer_Descriptor::StallBuyer_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonLZA:BerryBuyer",
-        STRING_POKEMON + " LZA", "Berry Buyer",
-        "Programs/PokemonLZA/BerryBuyer.html",
-        "Buy EV reducing berries from stall.",
+        "PokemonLZA:StallBuyer",
+        STRING_POKEMON + " LZA", "Stall Buyer",
+        "Programs/PokemonLZA/StallBuyer.html",
+        "Buy berries or mints from stall.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
     )
 {}
 
-class BerryBuyer_Descriptor::Stats : public StatsTracker{
+class StallBuyer_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : purchases(m_stats["Purchases"])
@@ -47,27 +47,33 @@ public:
     std::atomic<uint64_t>& purchases;
     std::atomic<uint64_t>& errors;
 };
-std::unique_ptr<StatsTracker> BerryBuyer_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> StallBuyer_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 
-BerryBuyer::BerryBuyer()
-    : BERRY_TYPE(
-        "<b>Berry to Purchase:</b>",
+StallBuyer::StallBuyer()
+    : ITEM_POSITION(
+        "<b>Item Position to Purchase:</b>",
         {
-            {BerryType::POMEG,  "pomeg",  "Pomeg (HP)"},
-            {BerryType::KELPSY, "kelpsy", "Kelpsy (Attack)"},
-            {BerryType::QUALOT, "qualot", "Qualot (Defence)"},
-            {BerryType::HONDEW, "hondew", "Hondew (Special Attack)"},
-            {BerryType::GREPA,  "grepa",  "Grepa (Special Defence)"},
-            {BerryType::TAMATO, "tamato", "Tamato (Speed)"},
+            {ItemPosition::FirstItem,   "FirstItem",    "First Item"    },
+            {ItemPosition::SecondItem,  "SecondItem",   "Second Item"   },
+            {ItemPosition::ThirdItem,   "ThirdItem",    "Third Item"    },
+            {ItemPosition::FourthItem,  "FourthItem",   "Fourth Item"   },
+            {ItemPosition::FifthItem,   "FifthItem",    "Fifth Item"    },
+            {ItemPosition::SixthItem,   "SixthItem",    "Sixth Item"    },
+            {ItemPosition::SeventhItem, "SeventhItem",  "Seventh Item"  },
         },
         LockMode::LOCK_WHILE_RUNNING,
-        BerryType::POMEG
+        ItemPosition::FirstItem
+    )
+    , NUM_ITEM(
+        "<b>Number of available items in the stall:</b><br>Number of available items in the stall.",
+        LockMode::LOCK_WHILE_RUNNING,
+        6, 2, 7
     )
     , NUM_PURCHASE(
-        "<b>Number to Purchase:</b><br>The number of berries you want to purchase.",
+        "<b>Number to Purchase:</b><br>The number of items you want to purchase.",
         LockMode::LOCK_WHILE_RUNNING,
         100, 1, 999
     )
@@ -79,15 +85,35 @@ BerryBuyer::BerryBuyer()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(BERRY_TYPE);
+    PA_ADD_OPTION(ITEM_POSITION);
+    PA_ADD_OPTION(NUM_ITEM);
     PA_ADD_OPTION(NUM_PURCHASE);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void BerryBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    BerryBuyer_Descriptor::Stats& stats = env.current_stats<BerryBuyer_Descriptor::Stats>();
+std::pair<DpadPosition, int> compute_needed_inputs(int item_position, int num_item){
+    int down_presses = item_position;
+    int up_presses = num_item - item_position + 1;
+
+    if (down_presses <= up_presses){
+        return { DPAD_DOWN, down_presses };
+    }else{
+        return { DPAD_UP, up_presses };
+    }
+}
+
+void StallBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    StallBuyer_Descriptor::Stats& stats = env.current_stats<StallBuyer_Descriptor::Stats>();
     assert_16_9_720p_min(env.logger(), env.console);
+    int item_position = static_cast<int>(ITEM_POSITION.get());
+    if (item_position >= NUM_ITEM){
+        throw UserSetupError(
+            env.logger(),
+            "Item position to purchase must be less than or equal to number of available items in the stall."
+        );
+    }
+
     while (true) {
         context.wait_for_all_requests();
 
@@ -100,12 +126,12 @@ void BerryBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         SelectionArrowWatcher select(
             COLOR_YELLOW, &env.console.overlay(),
             SelectionArrowType::RIGHT,
-            {0.715, 0.235, 0.045, 0.080}
+            {0.715, 0.165, 0.045, 0.440}
         );
         SelectionArrowWatcher confirm(
             COLOR_YELLOW, &env.console.overlay(),
             SelectionArrowType::RIGHT,
-            {0.715, 0.600, 0.045, 0.080}
+            {0.665, 0.600, 0.145, 0.080}
         );
         FlatWhiteDialogWatcher dialog(COLOR_RED, &env.console.overlay());
 
@@ -121,6 +147,7 @@ void BerryBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
             );
         context.wait_for(100ms);
 
+        auto [direction, presses] = compute_needed_inputs(item_position, NUM_ITEM);
         switch (ret){
             case 0:
                 env.log("Detected A button.");
@@ -128,22 +155,9 @@ void BerryBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 continue;
 
             case 1:
-                env.log("Detected berry selection screen.");
-                switch(BERRY_TYPE){
-                    case BerryType::HONDEW:
-                        pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
-                    case BerryType::QUALOT:
-                        pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
-                    case BerryType::KELPSY:
-                        pbf_press_dpad(context, DPAD_DOWN, 160ms, 80ms);
-                    case BerryType::POMEG:
-                        break;
-                    case BerryType::GREPA:
-                        pbf_press_dpad(context, DPAD_UP,   160ms, 80ms);
-                    case BerryType::TAMATO:
-                        pbf_press_dpad(context, DPAD_UP,   160ms, 80ms);
-                        pbf_press_dpad(context, DPAD_UP,   160ms, 80ms);
-                        break;
+                env.log("Detected item selection screen.");
+                for (int i = 0; i < presses; i++){
+                    pbf_press_dpad(context, direction, 160ms, 80ms);
                 }
                 pbf_press_button(context, BUTTON_A, 160ms, 80ms);
                 continue;
