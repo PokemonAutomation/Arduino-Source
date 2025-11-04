@@ -8,7 +8,6 @@
 #define PokemonAutomation_VideoOverlaySet_H
 
 #include <string>
-// #include "Controllers/StandardHid/StandardHid_Keyboard_KeyMappings.h"
 #include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Containers/Pimpl.h"
@@ -110,11 +109,8 @@ public:
     void issue_key_release(QKeyEvent* event);
 
 private:
-    struct DataMouseEvent;
-    Pimpl<DataMouseEvent> m_data_mouseevent;
-
-    struct DataKeyEvent;
-    Pimpl<DataKeyEvent> m_data_keyevent;
+    struct Data;
+    Pimpl<Data> m_data;
 };
 
 
