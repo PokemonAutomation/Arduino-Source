@@ -14,9 +14,9 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 
-// #include <iostream>
-// using std::cout;
-// using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -347,6 +347,7 @@ void ItemReceiveDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool ItemReceiveDetector::detect(const ImageViewRGB32& screen){
     ImageStats top = image_stats(extract_box_reference(screen, m_top));
+//    cout << top.average << top.stddev << endl;
     if (top.average.sum() > 250){
         return false;
     }
@@ -356,15 +357,9 @@ bool ItemReceiveDetector::detect(const ImageViewRGB32& screen){
         if (is_solid(top, {0.153583, 0.245751, 0.600666}, 0.25, 40)){
             break;
         }
-#if 0
-        if (is_solid(
-            extract_box_reference(screen, m_top),
-            {0, 0.134207, 0.865793},
-            40
-        )){
+        if (is_solid(top, {0.00228537, 0.070115, 0.9276}, 0.25, 40)){
             break;
         }
-#endif
 
         m_last_detected_box.reset();
 //        cout << "not solid" << endl;
