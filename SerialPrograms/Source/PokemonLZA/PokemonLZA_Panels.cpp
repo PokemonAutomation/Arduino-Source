@@ -12,7 +12,7 @@
 
 //  General
 #include "Programs/PokemonLZA_ClothingBuyer.h"
-#include "Programs/PokemonLZA_BerryBuyer.h"
+#include "Programs/PokemonLZA_StallBuyer.h"
 
 //  Trading
 #include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
@@ -52,7 +52,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
 
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
-    ret.emplace_back(make_single_switch_program<BerryBuyer_Descriptor, BerryBuyer>());
+    ret.emplace_back(make_single_switch_program<StallBuyer_Descriptor, StallBuyer>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
     }
