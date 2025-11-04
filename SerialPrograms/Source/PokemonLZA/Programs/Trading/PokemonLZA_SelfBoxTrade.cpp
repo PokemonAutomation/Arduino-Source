@@ -5,31 +5,35 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-//#include "PokemonSV/PokemonSV_Settings.h"
-#include "PokemonSV_TradeRoutines.h"
-#include "PokemonSV_SelfBoxTrade.h"
-#include "PokemonSV/Programs/Boxes/PokemonSV_BoxRoutines.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "PokemonLZA_TradeRoutines.h"
+#include "PokemonLZA_SelfBoxTrade.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonSV{
-    using namespace Pokemon;
+namespace PokemonLZA{
+
+using namespace Pokemon;
+
+
 
 
 SelfBoxTrade_Descriptor::SelfBoxTrade_Descriptor()
     : MultiSwitchProgramDescriptor(
-        "PokemonSV:SelfBoxTrade",
-        STRING_POKEMON + " SV", "Self Box Trade",
-        "Programs/PokemonSV/SelfBoxTrade.html",
-        "Trade boxes of " + STRING_POKEMON + " between two local Switches.",
+        "PokemonLZA:SelfBoxTrade",
+        STRING_POKEMON + " LZA", "Self Box Trade",
+        "Programs/PokemonLZA/SelfBoxTrade.html",
+        "Trade boxes across two Switches.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS,
         2, 2, 2
     )
 {}
+
 std::unique_ptr<StatsTracker> SelfBoxTrade_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new TradeStats());
 }
@@ -37,9 +41,21 @@ std::unique_ptr<StatsTracker> SelfBoxTrade_Descriptor::make_stats() const{
 
 
 SelfBoxTrade::SelfBoxTrade()
-    : BOXES_TO_TRADE(
-        "<b>Number of Boxes to Trade:</b>",
+    : LANGUAGE_LEFT(
+        "<b>Game Language of Left Switch:</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
         LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , LANGUAGE_RIGHT(
+        "<b>Game Language of Right Switch:</b>",
+        Pokemon::PokemonNameReader::instance().languages(),
+        LockMode::LOCK_WHILE_RUNNING,
+        true
+    )
+    , BOXES_TO_TRADE(
+        "<b>Number of Boxes to Trade:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
         2, 0, 32
     )
     , START_ROW(
@@ -52,6 +68,12 @@ SelfBoxTrade::SelfBoxTrade()
         LockMode::LOCK_WHILE_RUNNING,
         1, 1, 6
     )
+#if 0
+    , SKIP_TRADE_EVOLUTIONS(
+        "<b>Skip Trade Evolutions:</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+#endif
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -59,14 +81,14 @@ SelfBoxTrade::SelfBoxTrade()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(LANGUAGE_LEFT);
+    PA_ADD_OPTION(LANGUAGE_RIGHT);
     PA_ADD_OPTION(BOXES_TO_TRADE);
     PA_ADD_OPTION(START_ROW);
     PA_ADD_OPTION(START_COL);
+//    PA_ADD_OPTION(SKIP_TRADE_EVOLUTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
-
-
-
 void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.current_stats<TradeStats>();
     env.update_stats();
@@ -77,11 +99,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
             env.run_in_parallel(scope, [](ConsoleHandle& console, ProControllerContext& context){
-                move_to_right_box(context);
-//                pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
-//                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-//                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
-//                pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+                pbf_press_button(context, BUTTON_R, 60, 100);
             });
         }
         trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats, start_row, start_col);
@@ -92,6 +110,11 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
     env.update_stats();
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
 }
+
+
+
+
+
 
 
 

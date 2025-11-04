@@ -7,14 +7,16 @@
 #ifndef PokemonAutomation_PokemonLZA_BerryBuyer_H
 #define PokemonAutomation_PokemonLZA_BerryBuyer_H
 
-#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
+
+
 
 class BerryBuyer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
@@ -23,6 +25,8 @@ public:
     class Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
+
+
 
 class BerryBuyer : public SingleSwitchProgramInstance{
 public:

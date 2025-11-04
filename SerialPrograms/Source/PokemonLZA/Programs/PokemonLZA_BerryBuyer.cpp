@@ -54,7 +54,7 @@ std::unique_ptr<StatsTracker> BerryBuyer_Descriptor::make_stats() const{
 
 BerryBuyer::BerryBuyer()
     : BERRY_TYPE(
-        "<b>Berry to Purchase:",
+        "<b>Berry to Purchase:</b>",
         {
             {BerryType::POMEG,  "pomeg",  "Pomeg (HP)"},
             {BerryType::KELPSY, "kelpsy", "Kelpsy (Attack)"},
