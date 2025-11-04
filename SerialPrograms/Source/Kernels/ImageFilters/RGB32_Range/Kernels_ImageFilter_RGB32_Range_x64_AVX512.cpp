@@ -25,7 +25,7 @@ namespace Kernels{
 class PixelTest_Rgb32Range_x64_AVX512{
 public:
     static const size_t VECTOR_SIZE = 16;
-    using Mask = PartialWordMask;
+    using Mask = PartialWordMask_x64_AVX512;
 
 public:
     PA_FORCE_INLINE PixelTest_Rgb32Range_x64_AVX512(

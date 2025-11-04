@@ -14,10 +14,10 @@ namespace Kernels{
 
 
 
-struct PartialWordMask{
+struct PartialWordMask_x64_AVX512{
     __mmask16 m;
 
-    PA_FORCE_INLINE PartialWordMask(size_t left)
+    PA_FORCE_INLINE PartialWordMask_x64_AVX512(size_t left)
         : m(((__mmask16)1 << left) - 1)
     {}
 };
@@ -29,7 +29,7 @@ template <typename PixelTester>
 class FilterImage_Rgb32_x64_AVX512{
 public:
     static const size_t VECTOR_SIZE = 16;
-    using Mask = PartialWordMask;
+    using Mask = PartialWordMask_x64_AVX512;
 
 public:
     FilterImage_Rgb32_x64_AVX512(
@@ -88,7 +88,7 @@ template <typename PixelTester>
 class ToBlackWhite_Rgb32_x64_AVX512{
 public:
     static const size_t VECTOR_SIZE = 16;
-    using Mask = PartialWordMask;
+    using Mask = PartialWordMask_x64_AVX512;
 
 public:
     ToBlackWhite_Rgb32_x64_AVX512(

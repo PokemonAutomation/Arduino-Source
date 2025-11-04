@@ -15,11 +15,11 @@ namespace Kernels{
 
 
 
-struct PartialWordMask{
+struct PartialWordMask_x64_SSE42{
     size_t left;
     PartialWordAccess_x64_SSE41 loader;
 
-    PA_FORCE_INLINE PartialWordMask(size_t p_left)
+    PA_FORCE_INLINE PartialWordMask_x64_SSE42(size_t p_left)
         : left(p_left)
         , loader(left * sizeof(uint32_t))
     {}
@@ -33,7 +33,7 @@ template <typename PixelTester>
 class FilterImage_Rgb32_x64_SSE42{
 public:
     static const size_t VECTOR_SIZE = 4;
-    using Mask = PartialWordMask;
+    using Mask = PartialWordMask_x64_SSE42;
 
 public:
     FilterImage_Rgb32_x64_SSE42(
@@ -104,7 +104,7 @@ template <typename PixelTester>
 class ToBlackWhite_Rgb32_x64_SSE42{
 public:
     static const size_t VECTOR_SIZE = 4;
-    using Mask = PartialWordMask;
+    using Mask = PartialWordMask_x64_SSE42;
 
 public:
     ToBlackWhite_Rgb32_x64_SSE42(
