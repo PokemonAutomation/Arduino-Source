@@ -76,8 +76,8 @@ BoxDetector::BoxDetector(Color color, VideoOverlay* overlay)
     for(size_t row = 0; row < 6; row++){
          double y = (row == 0 ? 0.122 : 0.333 + (0.797 - 0.331)/ 4.0 * (row-1));
         for(size_t col = 0; col < 6; col++){
-            double x = 0.060 + col * (0.386 - 0.059)/5.0;
-            m_arrow_boxes.emplace_back(x, y, 0.016, 0.026);
+            double x = 0.058 + col * (0.386 - 0.059)/5.0;
+            m_arrow_boxes.emplace_back(x, y, 0.018, 0.026);
         }
     }
 }
@@ -109,6 +109,8 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
     if (debug_switch){
         cout << "detect_at_cell() area threshold " << min_area << " - " << max_area << endl;
         cout << "input image size " << image_crop.width() << "x" << image_crop.height() << endl;
+        cout << "Saving image_crop to input_image_crop.png" << endl;
+        image_crop.save("input_image_crop.png");
     }
     
     bool detected = false;
