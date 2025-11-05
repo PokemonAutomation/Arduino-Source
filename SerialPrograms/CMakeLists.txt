@@ -462,7 +462,11 @@ else() # macOS and Linux
     endif()
 
     if (APPLE)
-        target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror -Wshorten-64-to-32)
+        target_compile_options(SerialProgramsLib PRIVATE -Wall -Wextra -Wpedantic -Werror)
+        if(${CMAKE_SYSTEM_PROCESSOR} MATCHES "arm")
+            target_compile_options(SerialProgramsLib PRIVATE -Wshorten-64-to-32)
+        endif()
+        
         # on macOS, need this framework to query OS API to control display sleep and system sleep behavior
         target_link_libraries(SerialProgramsLib PRIVATE "-framework IOKit -framework CoreFoundation")
     else() # Linux
