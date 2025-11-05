@@ -14,6 +14,7 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h" 
@@ -118,6 +119,42 @@ int test_pokemonLZA_MainMenuDetector(const ImageViewRGB32& image, bool target){
     auto overlay = DummyVideoOverlay();
     MainMenuDetector detector(COLOR_RED, &overlay);
     bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonLZA_SelectionArrowDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // two words: <situation> <True/False>
+    if (words.size() < 2){
+        cerr << "Error: not enough number of words in the filename. Found only " << words.size() << "." << endl;
+        return 1;
+    }
+
+    // Parse situation from second to last word
+    const std::string& situation_str = words[words.size() - 2];
+    SelectionArrowType arrow_type;
+    ImageFloatBox search_box;
+
+    if (situation_str == "Fossil"){
+        arrow_type = SelectionArrowType::RIGHT;
+        search_box = ImageFloatBox(0.6300, 0.4440, 0.2260, 0.3190);
+    }else{
+        cerr << "Error: unknown situation '" << situation_str << "' in filename." << endl;
+        return 1;
+    }
+
+    // Parse True/False from last word
+    bool target = false;
+    if (parse_bool(words[words.size() - 1], target) == false){
+        cerr << "Error: last word in filename should be True or False." << endl;
+        return 1;
+    }
+
+    // Run detector with the specified search box and arrow type
+    auto overlay = DummyVideoOverlay();
+    SelectionArrowDetector detector(COLOR_RED, &overlay, arrow_type, search_box);
+    bool result = detector.detect(image);
+
     TEST_RESULT_EQUAL(result, target);
     return 0;
 }
