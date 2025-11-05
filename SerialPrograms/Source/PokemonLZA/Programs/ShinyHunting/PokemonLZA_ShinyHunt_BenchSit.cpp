@@ -116,7 +116,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                     if (duration > Milliseconds::zero()){
                         ssf_press_button(context, BUTTON_B, 0ms, 2 * duration, 0ms);
                         pbf_move_left_joystick(context, 128, 0, duration, 0ms);
-                        pbf_move_left_joystick(context, 128, 255, duration + 250ms, 0ms);
+                        pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
                     }
                     env.update_stats();
                 }
