@@ -108,7 +108,7 @@ void run_to_gate(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
-void enter_wild_zone_entrance(
+void enter_wild_zone(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     Milliseconds walk_in_zone
@@ -170,7 +170,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                 while (true){
                     send_program_status_notification(env, NOTIFICATION_STATUS);
                     stats.resets++;
-                    enter_wild_zone_entrance(env, context, WALK_IN_ZONE);
+                    enter_wild_zone(env, context, WALK_IN_ZONE);
                     env.update_stats();
                 }
             },
