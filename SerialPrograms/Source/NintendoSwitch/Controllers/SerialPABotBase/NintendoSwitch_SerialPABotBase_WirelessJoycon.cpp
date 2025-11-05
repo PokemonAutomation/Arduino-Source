@@ -221,7 +221,11 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_right_joycon(
         controller_state.right_stick_x, controller_state.right_stick_y
     );
 
-//    cout << (int)m_right_joystick.x << " - " << (int)m_right_joystick.y << ": " << std::chrono::duration_cast<Milliseconds>(duration).count() << endl;
+#if 0
+    cout << (int)controller_state.right_stick_x << " - "
+         << (int)controller_state.right_stick_y << ": "
+         << std::chrono::duration_cast<Milliseconds>(entry.duration).count() << endl;
+#endif
 
     pabb_NintendoSwitch_WirelessController_State0x30_Gyro gyro{};
     bool gyro_active = populate_report_gyro(gyro, controller_state);
