@@ -40,7 +40,7 @@ QWidget* LabelImages::make_widget(QWidget& parent, PanelHolder& holder){
 
 
 LabelImages_Widget::~LabelImages_Widget(){
-    m_display_session.overlay().remove_listener(*this);
+    m_display_session.overlay().remove_mouse_listener(*this);
     m_display_session.video_session().remove_state_listener(*this);
 
     delete m_image_display_widget;
@@ -54,7 +54,7 @@ LabelImages_Widget::LabelImages_Widget(
     , m_program(program)
     , m_display_session(m_program.m_display_session)
 {
-    m_display_session.overlay().add_listener(*this);
+    m_display_session.overlay().add_mouse_listener(*this);
     m_display_session.video_session().add_state_listener(*this);
 
     m_embedding_info_label = new QLabel(this);

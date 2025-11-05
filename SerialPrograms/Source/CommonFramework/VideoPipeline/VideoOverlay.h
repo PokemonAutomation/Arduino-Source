@@ -13,6 +13,8 @@
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "VideoOverlayTypes.h"
 
+class QKeyEvent;
+
 namespace PokemonAutomation{
 
 // Interface to add overlay objects (e.g. bounding boxes and texts) on top of rendered
@@ -82,14 +84,29 @@ public:
         virtual void on_mouse_release(double x, double y){};
         virtual void on_mouse_move(double x, double y){};
     };
-    void add_listener(MouseListener& listener);
-    void remove_listener(MouseListener& listener);
+    void add_mouse_listener(MouseListener& listener);
+    void remove_mouse_listener(MouseListener& listener);
     // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_press().
     void issue_mouse_press(double x, double y);
     // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_release().
     void issue_mouse_release(double x, double y);
     // Called by VideoDisplayWidget to call attached mouse listeners' on_mouse_move().
     void issue_mouse_move(double x, double y);
+
+    struct KeyEventListener{
+        virtual void on_key_press(QKeyEvent* event){}
+        virtual void on_key_release(QKeyEvent* event){};
+    };
+    void add_keyevent_listener(KeyEventListener& listener);
+    void remove_keyevent_listener(KeyEventListener& listener);
+
+    // Keypresses are detected by SwitchSystemWidget::keyPressEvent, which overrides QWidget::keyPressEvent
+    // this is then passed to SwitchSystemWidget::key_press. This then triggers the controller commands.
+    // But we also want to eventually pass this event to VideoOverlay. So, we also trigger VideoDisplayWidget::on_key_press.
+    // VideoDisplayWidget::on_key_press then passes the event to VideoOverlaySession::issue_key_press. VideoOverlaySession inherits VideoOverlay.
+    // When issue_key_press is called, it triggers on_key_press in all KeyEventListeners.
+    void issue_key_press(QKeyEvent* event);
+    void issue_key_release(QKeyEvent* event);
 
 private:
     struct Data;
