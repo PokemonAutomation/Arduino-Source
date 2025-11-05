@@ -107,7 +107,7 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
 
     int saved_object_id = 0;
     if (debug_switch){
-        cout << "detect_at_cell() area threshold " << min_area << "-" << max_area << endl;
+        cout << "detect_at_cell() area threshold " << min_area << " - " << max_area << endl;
         cout << "input image size " << image_crop.width() << "x" << image_crop.height() << endl;
     }
     
@@ -176,6 +176,7 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
             const uint8_t debug_cell_row = 255, debug_cell_col = 255;
             if (row == debug_cell_row && col == debug_cell_col){
                 debug_switch = true;
+                cout << "start debugging switch at " << int(row) << ", " << int(col) << endl;
             }
             bool detected = detect_at_cell(image_crop);
             if (row == debug_cell_row && col == debug_cell_col){
@@ -191,7 +192,9 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
                 arrow_found = true;
                 m_found_row = row;
                 m_found_col = col;
-                break;
+                if (!m_debug_mode){
+                    break;
+                }
             }
         }
         if (arrow_found && !m_debug_mode){
