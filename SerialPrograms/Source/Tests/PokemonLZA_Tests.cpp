@@ -4,27 +4,17 @@
 *
 */
 
-#include "Common/Compiler.h"
 #include "PokemonLZA_Tests.h"
 #include "TestUtils.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Language.h"
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Recording/StreamHistorySession.h"
-#include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
-#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h" 
-#include <QFileInfo>
-#include <QDir>
-#include <algorithm>
-#include <cmath>
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
 #include <iostream>
-#include <iomanip>
-#include <sstream>
 #include <map>
 using std::cout;
 using std::cerr;
@@ -118,6 +108,14 @@ int test_pokemonLZA_ButtonDetector(const ImageViewRGB32& image, const std::vecto
 int test_pokemonLZA_MainMenuDetector(const ImageViewRGB32& image, bool target){
     auto overlay = DummyVideoOverlay();
     MainMenuDetector detector(COLOR_RED, &overlay);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonLZA_AlertEyeDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    AlertEyeDetector detector(COLOR_RED, &overlay);
     bool result = detector.detect(image);
     TEST_RESULT_EQUAL(result, target);
     return 0;

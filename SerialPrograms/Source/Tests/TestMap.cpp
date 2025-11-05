@@ -293,6 +293,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLZA_BlueDialogDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_BlueDialogDetector, _1)},
     {"PokemonLZA_ButtonDetector", std::bind(image_words_detector_helper, test_pokemonLZA_ButtonDetector, _1)},
     {"PokemonLZA_MainMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_MainMenuDetector, _1)},
+    {"PokemonLZA_AlertEyeDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_AlertEyeDetector, _1)},
     {"PokemonLZA_BoxCellInfoDetector", std::bind(image_words_detector_helper, test_pokemonLZA_BoxCellInfoDetector, _1)},
     {"PokemonLZA_SelectionArrowDetector", std::bind(image_words_detector_helper, test_pokemonLZA_SelectionArrowDetector, _1)},
 };

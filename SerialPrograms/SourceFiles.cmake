@@ -127,10 +127,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/KeyBindingOption.h
     ../Common/Cpp/Options/MacAddressOption.cpp
     ../Common/Cpp/Options/MacAddressOption.h
-    ../Common/Cpp/Options/RandomCodeOption.cpp
-    ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/PathOption.cpp
     ../Common/Cpp/Options/PathOption.h
+    ../Common/Cpp/Options/RandomCodeOption.cpp
+    ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
     ../Common/Cpp/Options/SimpleIntegerOption.h
     ../Common/Cpp/Options/StaticTableOption.cpp
@@ -216,10 +216,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/KeyBindingWidget.h
     ../Common/Qt/Options/MacAddressWidget.cpp
     ../Common/Qt/Options/MacAddressWidget.h
-    ../Common/Qt/Options/RandomCodeWidget.cpp
-    ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/PathWidget.cpp
     ../Common/Qt/Options/PathWidget.h
+    ../Common/Qt/Options/RandomCodeWidget.cpp
+    ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
     ../Common/Qt/Options/SimpleIntegerWidget.h
     ../Common/Qt/Options/StaticTableWidget.cpp
@@ -1547,6 +1547,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
