@@ -155,7 +155,7 @@ void enter_wild_zone(
         open_map(env.console, context);
         fly_from_map(env.console, context);
     }else{
-        if (!fly_from_map(env.console, context)){
+        if (fly_from_map(env.console, context) != FastTravelState::SUCCESS){
             stats.errors++;
         }
     }
@@ -212,7 +212,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
         // when shiny sound is detected, it's most likely happened inside the zone
         // now try to reset position
         open_map(env.console, context);
-        if (!fly_from_map(env.console, context)){
+        if (fly_from_map(env.console, context) != FastTravelState::SUCCESS){
             pbf_mash_button(context, BUTTON_B, 5000ms);
         }
 

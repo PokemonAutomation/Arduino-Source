@@ -13,7 +13,7 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 //#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
-//#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MapDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
@@ -60,27 +60,34 @@ void open_map(ConsoleHandle& console, ProControllerContext& context){
 }
 
 
-bool fly_from_map(ConsoleHandle& console, ProControllerContext& context){
+FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context){
     console.log("Flying from map...");
 
     {
         BlackScreenWatcher start_flying(COLOR_RED);
+        BlueDialogWatcher blue_dialog(COLOR_BLUE, &console.overlay());
         int ret = run_until<ProControllerContext>(
             console, context,
             [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 5000ms);
+                for(int i = 0; i < 5; i++){
+                    pbf_press_button(context, BUTTON_A, 50ms, 2s);
+                }
             },
-            {start_flying,}
+            {start_flying, blue_dialog,}
         );
         switch (ret){
         case 0:
             console.log("Flying from map... Started!");
             console.overlay().add_log("Fast traveling");
             break;
+        case 1:
+            console.log("Spotted by wild pokemon, cannot fly");
+            console.overlay().add_log("Spotted by Wild Pokemon");
+            return FastTravelState::PURSUED;
         default:
-            console.log("Flying from map... Failed!");
-            console.overlay().add_log("Failed to fast travel");
-            return false;
+            console.log("Map cursor not on fast travel location");
+            console.overlay().add_log("Not On Fast Travel Location");
+            return FastTravelState::NON_FLY_SPOT;
 #if 0
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
@@ -110,7 +117,7 @@ bool fly_from_map(ConsoleHandle& console, ProControllerContext& context){
         );
     }
 
-    return true;
+    return FastTravelState::SUCCESS;
 }
 
 
