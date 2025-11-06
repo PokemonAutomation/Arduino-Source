@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonLZA_BasicNavigation_H
 #define PokemonAutomation_PokemonLZA_BasicNavigation_H
 
+#include "PokemonLZA/Programs/PokemonLZA_Locations.h"
+
 namespace PokemonAutomation{
 
 template <typename Type> class ControllerContext;
@@ -43,9 +45,11 @@ void open_map(ConsoleHandle& console, ProControllerContext& context);
 //   returns, the game is in fly map.
 FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context);
 
+// Blind movement of map cursor from zone entrance to that zone fast travel icon on map
+void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, WildZone zone);
+
+
 void sit_on_bench(ConsoleHandle& console, ProControllerContext& context);
-
-
 
 }
 }

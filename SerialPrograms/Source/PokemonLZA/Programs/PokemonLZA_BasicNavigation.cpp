@@ -62,15 +62,17 @@ void open_map(ConsoleHandle& console, ProControllerContext& context){
 
 FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context){
     console.log("Flying from map...");
-
+    context.wait_for_all_requests();
     {
         BlackScreenWatcher start_flying(COLOR_RED);
-        BlueDialogWatcher blue_dialog(COLOR_BLUE, &console.overlay());
+        BlueDialogWatcher blue_dialog(COLOR_BLUE, &console.overlay(), 50ms);
         int ret = run_until<ProControllerContext>(
             console, context,
-            [](ProControllerContext& context){
-                for(int i = 0; i < 5; i++){
-                    pbf_press_button(context, BUTTON_A, 50ms, 2s);
+            [&](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 1000ms);
+                context.wait_for_all_requests();
+                for(int i = 0; i < 10; i++){
+                    pbf_press_button(context, BUTTON_A, 30ms, 200ms);
                 }
             },
             {start_flying, blue_dialog,}
@@ -120,6 +122,73 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
     return FastTravelState::SUCCESS;
 }
 
+
+void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, WildZone zone){
+    pbf_wait(context, 300ms);
+    switch(zone){
+    case WildZone::WILD_ZONE_1:
+        pbf_move_left_joystick(context, 0, 150, 230ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_2:
+        pbf_move_left_joystick(context, 120, 0, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_3:
+        pbf_move_left_joystick(context, 128, 0, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_4:
+        pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_5:
+        pbf_move_left_joystick(context, 170, 0, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_6:
+        pbf_move_left_joystick(context, 80, 0, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_7:
+        pbf_move_left_joystick(context, 0, 100, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_8:
+        pbf_move_left_joystick(context, 0, 160, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_9:
+        pbf_move_left_joystick(context, 70, 0, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_10:
+        pbf_move_left_joystick(context, 255, 90, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_11:
+        pbf_move_left_joystick(context, 0, 40, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_12:
+        pbf_move_left_joystick(context, 20, 0, 150ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_13:
+        pbf_move_left_joystick(context, 0, 160, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_14:
+        pbf_move_left_joystick(context, 110, 255, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_15:
+        pbf_move_left_joystick(context, 0, 0, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_16:
+        pbf_move_left_joystick(context, 220, 0, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_17:
+        pbf_move_left_joystick(context, 210, 0, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_18:
+        pbf_move_left_joystick(context, 20, 255, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_19:
+        pbf_move_left_joystick(context, 80, 255, 100ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_20:
+        pbf_move_left_joystick(context, 0, 90, 140ms, 0ms);
+        break;
+    }
+    pbf_wait(context, 300ms);
+}
 
 
 
