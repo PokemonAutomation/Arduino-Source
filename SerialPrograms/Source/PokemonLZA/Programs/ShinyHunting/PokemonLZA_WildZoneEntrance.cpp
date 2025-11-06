@@ -11,6 +11,7 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
@@ -37,18 +38,19 @@ ShinyHunt_WildZoneEntrance_Descriptor::ShinyHunt_WildZoneEntrance_Descriptor()
 class ShinyHunt_WildZoneEntrance_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
-        : resets(m_stats["Wild Zone"])
+        : visits(m_stats["Visits"])
         , day_changes(m_stats["Day/Night Changes"])
         , shinies(m_stats["Shiny Sounds"])
         , errors(m_stats["Errors"])
     {
-        m_display_order.emplace_back("Wild Zone");
+        m_display_order.emplace_back("Visits");
         m_display_order.emplace_back("Day/Night Changes");
         m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_aliases["Wild Zone"] = "Visits";
     }
 
-    std::atomic<uint64_t>& resets;
+    std::atomic<uint64_t>& visits;
     std::atomic<uint64_t>& day_changes;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
@@ -64,6 +66,11 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
         LockMode::UNLOCK_WHILE_RUNNING,
         "500 ms"
     )
+    , RUNNING(
+        "<b>Running:</b><br>Running instead of walking while in the zone",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -76,6 +83,7 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(WALK_IN_ZONE);
+    PA_ADD_OPTION(RUNNING);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -111,7 +119,8 @@ void run_to_gate(ConsoleHandle& console, ProControllerContext& context){
 void enter_wild_zone(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
-    Milliseconds walk_in_zone
+    Milliseconds walk_in_zone,
+    bool running
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
     context.wait_for_all_requests();
@@ -123,7 +132,17 @@ void enter_wild_zone(
             pbf_mash_button(context, BUTTON_B, 200ms);  // dismiss menu if any
             run_to_gate(env.console, context);
             pbf_mash_button(context, BUTTON_A, 2000ms);
-            pbf_move_left_joystick(context, 128, 0, walk_in_zone, 200ms);
+            // move forward
+            if (walk_in_zone > Milliseconds::zero()){
+                if (running){
+                    env.console.overlay().add_log("Running");
+                    ssf_press_button(context, BUTTON_B, 0ms, walk_in_zone, 0ms);
+                } else{
+                    env.console.overlay().add_log("Walking");
+                }
+                pbf_move_left_joystick(context, 128, 0, walk_in_zone, 200ms);
+            }
+            context.wait_for_all_requests();
             open_map(env.console, context);
         },
         {{black_screen}}
@@ -140,7 +159,8 @@ void enter_wild_zone(
             stats.errors++;
         }
     }
-
+    stats.visits++;
+    env.update_stats();
 }
 
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -169,8 +189,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
             [&](ProControllerContext& context){
                 while (true){
                     send_program_status_notification(env, NOTIFICATION_STATUS);
-                    stats.resets++;
-                    enter_wild_zone(env, context, WALK_IN_ZONE);
+                    enter_wild_zone(env, context, WALK_IN_ZONE, RUNNING);
                     env.update_stats();
                 }
             },

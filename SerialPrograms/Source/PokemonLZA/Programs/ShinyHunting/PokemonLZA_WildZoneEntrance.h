@@ -35,6 +35,7 @@ public:
 private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     MillisecondsOption WALK_IN_ZONE;
+    BooleanCheckBoxOption RUNNING;
 
     ShinySoundDetectedActionOption SHINY_DETECTED;
 

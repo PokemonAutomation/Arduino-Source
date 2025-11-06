@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -60,6 +61,8 @@ bool reset_game_from_home(
     Milliseconds enter_game_timeout,
     Milliseconds post_wait_time
 ){
+    console.log("Resetting game from Home...");
+    console.overlay().add_log("Resetting game...");
     bool ok = true;
     ok &= reset_game_to_gamemenu(console, context);
 
