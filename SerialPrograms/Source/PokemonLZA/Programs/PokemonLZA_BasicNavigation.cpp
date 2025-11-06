@@ -22,40 +22,44 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
-void ensure_map(ConsoleHandle& console, ProControllerContext& context){
-    WallClock deadline = current_time() + 30000ms;
+void open_map(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Opening Map...");
+    console.overlay().add_log("Open Map");
+    pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+    context.wait_for_all_requests();
+    
+    WallClock deadline = current_time() + 30s;
     do{
-        context.wait_for_all_requests();
-
         MapWatcher map_detector(COLOR_RED, &console.overlay());
 
         int ret = wait_until(
             console, context,
-            3000ms,
+            2000ms,
             {map_detector}
         );
         switch (ret){
         case 0:
             console.log("Detected map!", COLOR_BLUE);
+            console.overlay().add_log("Map Detected");
             return;
         default:
-            console.log("Unable to detect map.", COLOR_ORANGE);
+            console.log("Map not found. Press + again", COLOR_ORANGE);
             pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+            console.overlay().add_log("Map not Found. Press + Again");
+            context.wait_for_all_requests();
         }
 
     }while (current_time() < deadline);
 
+    console.overlay().add_log("Failed to Open Map After 30 sec", COLOR_RED);
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
         "open_map(): Unable to find map after 30 seconds.",
         console
     );
 }
-void open_map(ConsoleHandle& console, ProControllerContext& context){
-    console.log("Opening Map...");
-    pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
-    ensure_map(console, context);
-}
+
+
 bool fly_from_map(ConsoleHandle& console, ProControllerContext& context){
     console.log("Flying from map...");
 
@@ -71,8 +75,11 @@ bool fly_from_map(ConsoleHandle& console, ProControllerContext& context){
         switch (ret){
         case 0:
             console.log("Flying from map... Started!");
+            console.overlay().add_log("Fast traveling");
             break;
         default:
+            console.log("Flying from map... Failed!");
+            console.overlay().add_log("Failed to fast travel");
             return false;
 #if 0
             OperationFailedException::fire(
@@ -83,29 +90,24 @@ bool fly_from_map(ConsoleHandle& console, ProControllerContext& context){
 #endif
         }
     }
-    {
-        BlackScreenOverWatcher done_flying(COLOR_RED, {0.1, 0.7, 0.8, 0.2});
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_B, 30000ms);
-            },
-            {done_flying,}
+
+    BlackScreenOverWatcher done_flying(COLOR_RED, {0.1, 0.7, 0.8, 0.2});
+    int ret = wait_until(
+        console, context, 5000ms,
+        {done_flying,}
+    );
+    switch (ret){
+    case 0:
+        console.log("Flying from map... Done!");
+        console.overlay().add_log("Fast Travel Done");
+        break;
+    default:
+        // return false;
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "fly_from_map(): Does not detect end of black screen while fast travel.",
+            console
         );
-        switch (ret){
-        case 0:
-            console.log("Flying from map... Done!");
-            break;
-        default:
-            return false;
-#if 0
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "fly_from_map(): Unable to fly. Timed out.",
-                console
-            );
-#endif
-        }
     }
 
     return true;
