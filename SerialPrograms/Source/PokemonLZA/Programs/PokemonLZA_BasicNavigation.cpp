@@ -102,7 +102,7 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
 
     BlackScreenOverWatcher done_flying(COLOR_RED, {0.1, 0.7, 0.8, 0.2});
     int ret = wait_until(
-        console, context, 5000ms,
+        console, context, 10000ms,
         {done_flying,}
     );
     switch (ret){
