@@ -55,7 +55,7 @@ public:
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
             m_thread = Thread([&, this]{
-                thread_loop(this, address, port);
+                thread_loop(address, port);
             });
         }catch (...){
             m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
