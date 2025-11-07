@@ -16,10 +16,10 @@
 
 #include <map>
 #include <mutex>
-#include <thread>
 #include <condition_variable>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 
 namespace PokemonAutomation{
 
@@ -92,7 +92,7 @@ private:
     std::mutex m_sleep_lock;
 
     std::condition_variable m_cv;
-    std::thread m_thread;
+    Thread m_thread;
 };
 
 

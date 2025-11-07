@@ -4,13 +4,13 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+//#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "FireForgetDispatcher.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -28,9 +28,7 @@ FireForgetDispatcher::~FireForgetDispatcher(){
         m_stopping = true;
         m_cv.notify_all();
     }
-    if (m_thread.joinable()){
-        m_thread.join();
-    }
+    m_thread.join();
 }
 void FireForgetDispatcher::dispatch(std::function<void()>&& func){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -38,9 +36,16 @@ void FireForgetDispatcher::dispatch(std::function<void()>&& func){
     m_cv.notify_one();
 
     //  Lazy create thread.
-    if (!m_thread.joinable()){
-        m_thread = std::thread(run_with_catch, "FireForgetDispatcher::thread_loop()", [this]{ thread_loop(); });
+    if (m_thread){
+        return;
     }
+
+    m_thread = Thread([this]{
+        run_with_catch(
+            "FireForgetDispatcher::thread_loop()",
+            [this]{ thread_loop(); }
+        );
+    });
 }
 
 void FireForgetDispatcher::thread_loop(){

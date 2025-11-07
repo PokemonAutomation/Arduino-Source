@@ -15,9 +15,6 @@
 #include <QFileInfo>
 
 #include <iostream>
-#include <chrono>
-#include <thread>
-#include <map>
 #include <list>
 #include <functional>
 using std::cout;

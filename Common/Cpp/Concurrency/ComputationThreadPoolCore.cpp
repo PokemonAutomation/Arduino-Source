@@ -189,11 +189,12 @@ void ComputationThreadPoolCore::spawn_thread(){
     //  Must call under lock.
     ThreadData& handle = m_threads.emplace_back();
     try{
-        handle.thread = std::thread(
-            run_with_catch,
-            "ParallelTaskRunner::thread_loop()",
-            [&, this]{ thread_loop(handle); }
-        );
+        handle.thread = Thread([&, this]{
+            run_with_catch(
+                "ParallelTaskRunner::thread_loop()",
+                [&, this]{ thread_loop(handle); }
+            );
+        });
     }catch (...){
         m_threads.pop_back();
         throw;

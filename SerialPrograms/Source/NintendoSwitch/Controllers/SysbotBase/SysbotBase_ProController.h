@@ -10,6 +10,7 @@
 
 #include <condition_variable>
 #include "Common/Cpp/Containers/CircularBuffer.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
@@ -244,7 +245,7 @@ private:
     WallClock m_next_state_change;
 
     std::condition_variable m_cv;
-    std::thread m_dispatch_thread;
+    Thread m_dispatch_thread;
 };
 
 

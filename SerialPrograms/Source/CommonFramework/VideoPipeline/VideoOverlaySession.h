@@ -21,11 +21,11 @@
 #include <deque>
 #include <mutex>
 #include <condition_variable>
-#include <thread>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/ListenerSet.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "VideoOverlay.h"
 #include "VideoOverlayOption.h"
 
@@ -154,7 +154,7 @@ private:
     std::vector<OverlayStatSnapshot> m_stat_lines;
     std::mutex m_stats_lock;
     std::condition_variable m_stats_cv;
-    std::thread m_stats_updater;
+    Thread m_stats_updater;
 };
 
 

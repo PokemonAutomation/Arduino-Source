@@ -11,7 +11,7 @@
 #include <functional>
 #include <mutex>
 #include <condition_variable>
-#include <thread>
+#include "Thread.h"
 
 namespace PokemonAutomation{
 
@@ -31,7 +31,7 @@ private:
 
 private:
     std::deque<std::function<void()>> m_queue;
-    std::thread m_thread;
+    Thread m_thread;
     bool m_stopping;
     std::mutex m_lock;
     std::condition_variable m_cv;

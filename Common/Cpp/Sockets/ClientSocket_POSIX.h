@@ -11,13 +11,13 @@
 
 #include <iostream>
 #include <mutex>
-#include <thread>
 #include <condition_variable>
 #include <sys/socket.h>
 #include <fcntl.h>
 #include <netinet/in.h>
 #include <arpa/inet.h>
 #include <unistd.h>
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "AbstractClientSocket.h"
 
 namespace PokemonAutomation{
@@ -34,9 +34,7 @@ public:
 
     virtual ~ClientSocket_POSIX(){
         close();
-        if (m_thread.joinable()){
-            m_thread.join();
-        }
+        m_thread.join();
         if (m_socket != -1){
             ::close(m_socket);
         }
@@ -56,10 +54,9 @@ public:
         }
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = std::thread(
-                &ClientSocket_POSIX::thread_loop,
-                this, address, port
-            );
+            m_thread = Thread([this]{
+                thread_loop(this, address, port);
+            });
         }catch (...){
             m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
             throw;
@@ -233,7 +230,7 @@ private:
 
     mutable std::mutex m_lock;
     std::condition_variable m_cv;
-    std::thread m_thread;
+    Thread m_thread;
 };
 
 

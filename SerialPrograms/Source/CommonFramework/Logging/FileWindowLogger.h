@@ -11,13 +11,13 @@
 #include <set>
 #include <mutex>
 #include <condition_variable>
-#include <thread>
 #include <QFile>
 #include <QTextEdit>
 #include <QMainWindow>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Options/ConfigOption.h"
 //#include "Common/Cpp/LifetimeSanitizer.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 
 namespace PokemonAutomation{
 
@@ -67,7 +67,7 @@ private:
     bool m_stopping;
     std::deque<std::pair<std::string, Color>> m_queue;
     std::set<FileWindowLoggerWindow*> m_windows;
-    std::thread m_thread;
+    Thread m_thread;
 
 //    LifetimeSanitizer m_sanitizer;
 };

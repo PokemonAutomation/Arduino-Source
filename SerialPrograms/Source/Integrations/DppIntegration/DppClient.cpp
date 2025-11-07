@@ -53,7 +53,7 @@ void Client::connect(){
             m_bot = std::make_unique<cluster>(token, intents);
             m_handler = std::make_unique<commandhandler>(m_bot.get(), false);
             m_bot->cache_policy = { cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_lazy, cache_policy_setting_t::cp_aggressive };
-            m_start_thread = std::thread(&Client::run, this, token);
+            m_start_thread = Thread([&, this]{ run(token); });
         }catch (std::exception& e){
             Handler::log_dpp("DPP thew an exception: " + (std::string)e.what(), "connect()", ll_critical);
         }
@@ -64,9 +64,7 @@ void Client::disconnect(){
     std::lock_guard<std::mutex> lg(m_client_lock);
 //    cout << "Client::disconnect()" << endl;
 
-    if (m_start_thread.joinable()){
-        m_start_thread.join();
-    }
+    m_start_thread.join();
 
     if (m_bot == nullptr || !m_is_connected.load(std::memory_order_relaxed)){
         return;

@@ -79,11 +79,12 @@ SerialPABotBase_Connection::SerialPABotBase_Connection(
         return;
     }
 
-    m_status_thread = std::thread(
-        run_with_catch,
-        "SerialPABotBase_Connection::thread_body()",
-        [=, this]{ thread_body(set_to_null_controller); }
-    );
+    m_status_thread = Thread([=, this]{
+        run_with_catch(
+            "SerialPABotBase_Connection::thread_body()",
+            [=, this]{ thread_body(set_to_null_controller); }
+        );
+    });
 }
 SerialPABotBase_Connection::~SerialPABotBase_Connection(){
     m_ready.store(false, std::memory_order_release);
@@ -96,9 +97,7 @@ SerialPABotBase_Connection::~SerialPABotBase_Connection(){
         std::lock_guard<std::mutex> lg(m_lock);
         m_cv.notify_all();
     }
-    if (m_status_thread.joinable()){
-        m_status_thread.join();
-    }
+    m_status_thread.join();
     m_botbase.reset();
 }
 

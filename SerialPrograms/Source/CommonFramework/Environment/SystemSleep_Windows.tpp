@@ -7,7 +7,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <Windows.h>
-#include "Common/Qt/Redispatch.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "SystemSleep.h"
 
@@ -31,7 +31,7 @@ public:
         : m_screen_on_requests(0)
         , m_no_sleep_requests(0)
         , m_stopping(false)
-        , m_thread(&WindowsSleepController::thread_loop, this)
+        , m_thread([this]{ thread_loop(); })
     {}
 
     virtual void push_screen_on() override{
@@ -110,7 +110,7 @@ private:
 
     bool m_stopping;
     std::condition_variable m_cv;
-    std::thread m_thread;
+    Thread m_thread;
 };
 
 

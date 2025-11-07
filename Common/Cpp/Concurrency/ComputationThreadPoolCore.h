@@ -22,6 +22,7 @@
 #include <thread>
 #include "Common/Cpp/CpuUtilization/CpuUtilization.h"
 #include "Common/Cpp/Stopwatch.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "AsyncTask.h"
 
 namespace PokemonAutomation{
@@ -74,7 +75,7 @@ public:
 
 private:
     struct ThreadData{
-        std::thread thread;
+        Thread thread;
         ThreadHandle handle;
         Stopwatch runtime;
     };

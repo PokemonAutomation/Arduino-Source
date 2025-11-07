@@ -43,6 +43,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/SpinLock.cpp
     ../Common/Cpp/Concurrency/SpinLock.h
     ../Common/Cpp/Concurrency/SpinPause.h
+    ../Common/Cpp/Concurrency/Thread.cpp
+    ../Common/Cpp/Concurrency/Thread.h
     ../Common/Cpp/Concurrency/Watchdog.cpp
     ../Common/Cpp/Concurrency/Watchdog.h
     ../Common/Cpp/Containers/AlignedMalloc.cpp

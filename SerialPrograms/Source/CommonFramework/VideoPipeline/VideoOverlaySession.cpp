@@ -33,7 +33,7 @@ VideoOverlaySession::~VideoOverlaySession(){
 VideoOverlaySession::VideoOverlaySession(Logger& logger, VideoOverlayOption& option)
     : m_logger(logger)
     , m_option(option)
-    , m_stats_updater(&VideoOverlaySession::stats_thread, this)
+    , m_stats_updater([this]{ stats_thread(); })
 {}
 
 
