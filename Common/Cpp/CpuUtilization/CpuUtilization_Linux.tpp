@@ -4,6 +4,7 @@
  *
  */
 
+#include <thread>
 #include <sys/resource.h>
 #include <sys/types.h>
 #include <unistd.h>
