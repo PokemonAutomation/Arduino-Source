@@ -31,20 +31,39 @@ ComputationThreadPoolCore::ComputationThreadPoolCore(
         spawn_thread();
     }
 }
-ComputationThreadPoolCore::~ComputationThreadPoolCore(){
+
+void ComputationThreadPoolCore::stop() {
     {
         std::lock_guard<std::mutex> lg(m_lock);
+        if (m_stopping) return;
         m_stopping = true;
         m_thread_cv.notify_all();
 //        m_dispatch_cv.notify_all();
     }
     for (ThreadData& thread : m_threads){
-        thread.thread.join();
+        if (thread.thread.joinable()) {
+            thread.thread.join();
+        }
     }
+
+    // DO NOT JOIN AGAIN IN DESTRUCTOR
+    m_threads.clear();
+
     for (auto& task : m_queue){
         task->report_cancelled();
     }
+
+    // DO NOT CLEAR AGAIN IN DESTRUCTOR
+    m_queue.clear();
+
 }
+
+ComputationThreadPoolCore::~ComputationThreadPoolCore(){
+    stop();
+}
+
+
+
 
 WallDuration ComputationThreadPoolCore::cpu_time() const{
     //  TODO: Don't lock the entire queue.

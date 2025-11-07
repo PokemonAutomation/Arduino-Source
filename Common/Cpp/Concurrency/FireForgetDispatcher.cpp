@@ -22,14 +22,22 @@ FireForgetDispatcher global_dispatcher;
 FireForgetDispatcher::FireForgetDispatcher()
     : m_stopping(false)
 {}
-FireForgetDispatcher::~FireForgetDispatcher(){
+
+void FireForgetDispatcher::stop() {
     {
         std::lock_guard<std::mutex> lg(m_lock);
+        // like with the other thread option, make sure we're not double stopping
+        if (m_stopping) return;
         m_stopping = true;
         m_cv.notify_all();
     }
     m_thread.join();
 }
+
+FireForgetDispatcher::~FireForgetDispatcher(){
+    stop();
+}
+
 void FireForgetDispatcher::dispatch(std::function<void()>&& func){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(std::move(func));

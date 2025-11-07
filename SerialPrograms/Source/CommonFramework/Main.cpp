@@ -5,8 +5,10 @@
 //#include <QTextStream>
 #include <QMessageBox>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
 #include "PersistentSettings.h"
@@ -148,6 +150,12 @@ int main(int argc, char *argv[]){
 #ifdef PA_DPP
     Integration::DppClient::Client::instance().disconnect();
 #endif
+
+    // Force stop the thread pool
+    PokemonAutomation::GlobalThreadPools::realtime_inference().stop();
+    PokemonAutomation::GlobalThreadPools::normal_inference().stop();
+
+    PokemonAutomation::global_dispatcher.stop();
 
     //  We must clear the OCR cache or it will crash on Linux when the library
     //  unloads before the cache is destructed from static memory.

@@ -64,7 +64,10 @@ void ComputationThreadPool::run_in_parallel(
 ){
     m_core->run_in_parallel(func, start, end, block_size);
 }
-
+void ComputationThreadPool::stop() {
+    // force call stop in computation thread pool
+    m_core->stop();
+}
 
 
 
