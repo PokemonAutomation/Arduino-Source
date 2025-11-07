@@ -69,7 +69,7 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
         "<b>Walk Forward Duration</b><br>"
         "Walk forward and backward for this long after each day change to "
         "increase the spawn radius. Set to zero to disable this.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "2000 ms"
     )
     , SHINY_DETECTED(
