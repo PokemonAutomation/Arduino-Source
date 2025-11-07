@@ -4,6 +4,7 @@
  *
  */
 
+#include <thread>
 #include "Common/Cpp/PanicDump.h"
 #include "ReverseLockGuard.h"
 #include "ComputationThreadPoolCore.h"
