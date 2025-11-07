@@ -122,32 +122,7 @@ bool WhiteScreenOverWatcher::white_is_over(const ImageViewRGB32& frame){
 }
 
 
-WhiteScreenBeginWatcher::WhiteScreenBeginWatcher(
-    Color color, const ImageFloatBox& box,
-    double min_rgb_sum,
-    double max_stddev_sum
-)
-    : VisualInferenceCallback("WhiteScreenBeginWatcher")
-    , m_detector(color, box, min_rgb_sum, max_stddev_sum)
-{}
-void WhiteScreenBeginWatcher::make_overlays(VideoOverlaySet& items) const{
-    m_detector.make_overlays(items);
-}
 
-bool WhiteScreenBeginWatcher::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
-    return white_has_begun(frame);
-}
-bool WhiteScreenBeginWatcher::white_has_begun(const ImageViewRGB32& frame){
-    if (m_triggered) {
-        return false;
-    }
-
-    if (m_detector.detect(frame)){
-        m_triggered = true;
-        return true;
-    }
-    return false;
-}
 
 
 

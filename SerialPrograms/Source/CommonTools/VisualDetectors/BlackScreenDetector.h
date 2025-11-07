@@ -122,28 +122,5 @@ private:
 
 
 
-
-class WhiteScreenBeginWatcher : public VisualInferenceCallback{
-public:
-    WhiteScreenBeginWatcher(
-        Color color = COLOR_RED,
-        const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        double min_rgb_sum = 500,
-        double max_stddev_sum = 10
-    );
-
-    bool white_has_begun(const ImageViewRGB32& frame);
-
-    virtual void make_overlays(VideoOverlaySet& items) const override;
-
-    virtual bool process_frame(const ImageViewRGB32& frame, WallClock timestamp) override;
-
-private:
-    WhiteScreenDetector m_detector;
-    bool m_triggered = false;
-};
-
-
-
 }
 #endif
