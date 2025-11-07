@@ -28,7 +28,7 @@ public:
     Thread& operator=(Thread&&);
 
 public:
-    Thread() = default;
+    Thread();
     Thread(std::function<void()>&& function);
 
     operator bool() const{

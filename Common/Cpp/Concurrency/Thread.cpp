@@ -45,6 +45,8 @@ Thread& Thread::operator=(Thread&&) = default;
 Thread::~Thread(){
     join();
 }
+
+Thread::Thread() = default;
 Thread::Thread(std::function<void()>&& function)
     : m_data(CONSTRUCT_TOKEN, std::move(function))
 {}
