@@ -102,7 +102,11 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
             stats.shinies++;
             env.update_stats();
             shiny_coefficient = error_coefficient;
-            return true;
+            if (SHINY_DETECTED.ACTION != ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY){
+                return true;
+            }
+
+            return stats.shinies == 1;
         });
 
         int ret = run_until<ProControllerContext>(
