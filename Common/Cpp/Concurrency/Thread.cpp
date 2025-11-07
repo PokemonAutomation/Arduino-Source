@@ -82,6 +82,10 @@ void Thread::join(){
 }
 
 
+bool Thread::joinable() const{
+    return m_data && m_data->m_thread.joinable();
+}
+
 
 
 }

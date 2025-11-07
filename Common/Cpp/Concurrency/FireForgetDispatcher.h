@@ -25,6 +25,8 @@ public:
     //  Call "handle->wait()" to wait for the task to finish.
     void dispatch(std::function<void()>&& func);
 
+    void stop();
+
 
 private:
     void thread_loop();

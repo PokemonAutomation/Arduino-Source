@@ -35,6 +35,7 @@ public:
         return m_data;
     }
     void join();
+    bool joinable() const;
 
 private:
     enum class State;
