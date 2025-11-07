@@ -267,9 +267,10 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
                 );
             }
             // mash B to clear up pre-battle transparency dialog
-            pbf_mash_button(context, BUTTON_B, 3s);
+            env.log("Clearing transparent battle dialog");
+            env.console.overlay().add_log("Clear Battle Dialog");
+            pbf_mash_button(context, BUTTON_B, 6s);
             context.wait_for_all_requests();
-            env.console.overlay().add_log("Cleared Pre-Battle Dialog");
             // battle starts
             return false;
 
