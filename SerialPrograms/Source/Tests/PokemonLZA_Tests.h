@@ -25,6 +25,8 @@
 
  int test_pokemonLZA_BlueDialogDetector(const ImageViewRGB32& image, bool target);
 
+ int test_pokemonLZA_TransparentBattleDialogDetector(const ImageViewRGB32& image, bool target);
+
  int test_pokemonLZA_ButtonDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
 
  int test_pokemonLZA_MainMenuDetector(const ImageViewRGB32& image, bool target);

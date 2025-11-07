@@ -55,6 +55,14 @@ int test_pokemonLZA_BlueDialogDetector(const ImageViewRGB32& image, bool target)
     return 0;
 }
 
+int test_pokemonLZA_TransparentBattleDialogDetector(const ImageViewRGB32& image, bool target){
+    auto overlay = DummyVideoOverlay();
+    TransparentBattleDialogDetector detector(COLOR_RED, &overlay);
+    bool result = detector.detect(image);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
 int test_pokemonLZA_ButtonDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
     // two words: <button type> <True/False>
     if (words.size() < 2){
