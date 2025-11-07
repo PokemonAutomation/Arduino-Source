@@ -54,7 +54,7 @@ public:
         }
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = Thread([this]{
+            m_thread = Thread([&, this]{
                 thread_loop(this, address, port);
             });
         }catch (...){

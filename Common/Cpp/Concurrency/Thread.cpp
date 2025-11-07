@@ -4,6 +4,7 @@
  *
  */
 
+#include <atomic>
 #include <thread>
 #include <mutex>
 #include <condition_variable>
@@ -16,9 +17,9 @@ namespace PokemonAutomation{
 
 
 struct Thread::Data{
-    std::mutex m_lock;
-    std::condition_variable m_cv;
-    bool m_stopped;
+//    std::mutex m_lock;
+//    std::condition_variable m_cv;
+    std::atomic<bool> m_stopped;
     std::thread m_thread;
 
     Data(std::function<void()>&& function)
@@ -26,9 +27,10 @@ struct Thread::Data{
         , m_thread(
             [this, function = std::move(function)]{
                 function();
-                std::lock_guard<std::mutex> lg(m_lock);
-                m_stopped = true;
-                m_cv.notify_all();
+//                std::lock_guard<std::mutex> lg(m_lock);
+//                m_stopped = true;
+//                m_cv.notify_all();
+                m_stopped.store(true, std::memory_order_release);
             }
         )
     {}
@@ -52,14 +54,27 @@ void Thread::join(){
     }
 
     Data& data = m_data;
-    std::unique_lock<std::mutex> lg(data.m_lock);
-    data.m_cv.wait(lg, [&data]{
-        return data.m_stopped;
-    });
+
+#if 0
+    //
+    //  Even std::condition_variable is broken!
+    //
+//    std::unique_lock<std::mutex> lg(data.m_lock);
+//    data.m_cv.wait(lg, [&data]{
+//        return data.m_stopped;
+//    });
+
+    while (!data.m_stopped.load(std::memory_order_acquire)){
+        std::this_thread::sleep_for(std::chrono::milliseconds(1));
+    }
 
     //  Here we detach() instead of join() due to Qt bug.
     //  It is safe because the thread no longer touches anything in this class.
     data.m_thread.detach();
+#else
+    //  Fuck it, just stick with Qt 6.8.3 for now.
+    data.m_thread.join();
+#endif
 
     m_data.clear();
 }
