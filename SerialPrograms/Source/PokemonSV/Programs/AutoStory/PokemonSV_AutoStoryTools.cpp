@@ -1331,6 +1331,244 @@ void checkpoint_reattempt_loop_tutorial(
     }    
 }
 
+void move_player_forward(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    uint8_t num_rounds, 
+    uint16_t forward_ticks, 
+    uint8_t y, 
+    uint16_t delay_after_forward_move, 
+    uint16_t delay_after_lets_go
+){
+
+    context.wait_for_all_requests();
+    for (size_t i = 0; i < num_rounds; i++){
+        try{
+            pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+            pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+        }catch (UnexpectedBattleException&){
+            run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+        }
+    }
+
+}
+
+ImageFloatBox get_yolo_box(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    VideoOverlaySet& overlays,
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label
+){
+    context.wait_for_all_requests();
+    overlays.clear();
+    const std::vector<YOLOv5Session::DetectionBox>& detected_boxes = yolo_detector.detected_boxes();
+    auto snapshot = env.console.video().snapshot();
+    yolo_detector.detect(snapshot);
+
+    ImageFloatBox target_box{-1, -1, -1, -1};
+    for (YOLOv5Session::DetectionBox detected_box : detected_boxes){
+        ImageFloatBox box = detected_box.box;
+        std::string label = yolo_detector.session()->label_name(detected_box.label_idx);
+        if (target_label == label){
+            target_box = box;
+        }
+        overlays.add(COLOR_RED, box, label);
+    }
+
+    return target_box;
+}
+
+void move_forward_until_yolo_object_above_min_size(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double min_width, double min_height,
+    std::function<void()>&& recovery_action, 
+    uint16_t forward_ticks, 
+    uint8_t y, 
+    uint16_t delay_after_forward_move, 
+    uint16_t delay_after_lets_go
+){
+    VideoOverlaySet overlays(env.console.overlay());
+    size_t num_reattempts = 0;
+    for (size_t i = 0;;i++){
+    try{
+
+        context.wait_for_all_requests();
+        ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
+
+        bool not_found_target = target_box.x == -1;
+        if (not_found_target){
+            num_reattempts++;
+            if (num_reattempts > 3){
+                break;      // just assume we're too close to the target to detect it. and continue
+            }
+            context.wait_for(1000ms); // if we can't see the object, it might just be temporarily obscured. wait one second and reattempt.
+            continue;
+        }else{
+            num_reattempts = 0;
+        }
+
+        if (target_box.width < min_width && target_box.height < min_height){
+            break; // stop when the target is above a certain size. i.e. we are close enough to the target.
+        }
+    
+    
+        pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+        pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+    }catch (UnexpectedBattleException&){
+        recovery_action();
+        // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+        // move_camera_yolo();
+    }
+    }
+}
+
+
+
+void move_forward_until_yolo_object_detected(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,   
+    std::function<void()>&& recovery_action, 
+    uint16_t max_rounds, 
+    uint16_t forward_ticks, 
+    uint8_t y, 
+    uint16_t delay_after_forward_move, 
+    uint16_t delay_after_lets_go
+){
+    VideoOverlaySet overlays(env.console.overlay());
+    for (size_t i = 0; ; i++){
+    try{
+        context.wait_for_all_requests();
+        ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
+        bool found_target = target_box.x != -1;
+        if (found_target){
+            break;
+        }
+
+        if (i > max_rounds){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "move_forward_until_yolo_object_detected(): Unable to detect target object.",
+                env.console
+            );  
+        }
+
+        pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+        pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+        
+    }catch (UnexpectedBattleException&){
+        recovery_action();
+        // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+        // move_camera_yolo();
+    }
+    }
+}
+
+
+void move_camera_yolo(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    CameraAxis axis,
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double target_line
+){
+    VideoOverlaySet overlays(env.console.overlay());
+    size_t max_attempts = 10;
+    size_t num_reattempts = 0;
+    for (size_t i = 0; i < max_attempts; i++){
+    try{
+        context.wait_for_all_requests();
+        ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
+
+        bool not_found_target = target_box.x == -1;
+        if (not_found_target){
+            num_reattempts++;
+            if (num_reattempts > 3){
+                break;      // just assume we're too close to the target to detect it. stop.
+            }
+            context.wait_for(1000ms); // if we can't see the object, it might just be temporarily obscured. wait one second and reattempt.
+            continue;
+        }else{
+            num_reattempts = 0;
+        }
+        
+        double diff;
+        switch(axis){
+        case CameraAxis::X:{
+            double object_x_pos = target_box.x + target_box.width/2;
+            diff =  target_line - object_x_pos;
+            break;
+        }
+        case CameraAxis::Y:{
+            double object_y_pos = target_box.y + target_box.height/2;
+            diff =  target_line - object_y_pos;
+            break;
+        }
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "move_camera_yolo: Unknown CameraAxis enum.");  
+        }
+
+        env.console.log("diff: " + std::to_string(diff));
+        if (std::abs(diff) < 0.01){
+            break;    // close enough to target_x. stop.
+        }
+
+        
+        double duration_scale_factor;
+        double push_magnitude_scale_factor;
+        switch(axis){
+        case CameraAxis::X:
+            duration_scale_factor = 300 / std::sqrt(std::abs(diff));
+            if (std::abs(diff) < 0.05){
+                duration_scale_factor /= 2;
+            }
+            push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
+            break;
+        case CameraAxis::Y:
+            duration_scale_factor = 200 / std::sqrt(std::abs(diff));
+            if (std::abs(diff) < 0.05){
+                duration_scale_factor *= 0.75;
+            }
+            push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
+            break;
+        
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "move_camera_yolo: Unknown CameraAxis enum.");  
+        }
+
+        uint16_t push_duration = std::max(uint16_t(std::abs(diff * duration_scale_factor)), uint16_t(8));
+        int16_t push_direction = (diff > 0) ? -1 : 1;
+        double push_magnitude = std::max(double(std::abs(diff * push_magnitude_scale_factor)), double(15)); 
+        uint8_t axis_push = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
+
+        // env.console.log("object_x: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
+        // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
+        env.console.log("axis push: " + std::to_string(axis_push) + ", push duration: " +  std::to_string(push_duration));
+        switch(axis){
+        case CameraAxis::X:{
+            pbf_move_right_joystick(context, axis_push, 128, push_duration, 100);
+            break;
+        }
+        case CameraAxis::Y:{
+            pbf_move_right_joystick(context, 128, axis_push, push_duration, 100);
+            break;
+        }
+        default:
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "move_camera_yolo: Unknown CameraAxis enum.");  
+        }
+    
+    }catch (UnexpectedBattleException&){
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+    }
+    }
+}
+
 
 
 

@@ -8,17 +8,18 @@
 #define PokemonAutomation_PokemonSV_AutoStoryTools_H
 
 #include <functional>
+#include "ML/Inference/ML_YOLOv5Detector.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
-// #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+using namespace ML;
 
 struct AutoStoryStats : public StatsTracker{
     AutoStoryStats()
@@ -74,6 +75,10 @@ enum class NavigationStopCondition{
     STOP_BATTLE,
 };
 
+// struct MinimumDetectedSize{
+//     double width;
+//     double height;
+// };
 
 
 struct AutoStoryOptions{
@@ -345,11 +350,75 @@ void checkpoint_reattempt_loop_tutorial(
 );
 
 
+// clear path with Let's Go. walk forward forward_ticks. repeat this for num_rounds.
+// if detect battle, kill the Pokemon. then continue. If we run into a battle, this round is considered to be done and will not be repeated.
+void move_player_forward(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    uint8_t num_rounds, 
+    uint16_t forward_ticks, 
+    uint8_t y, 
+    uint16_t delay_after_forward_move, 
+    uint16_t delay_after_lets_go
+);
 
+// get the box of the target object
+// return ImageFloatBox{-1, -1, -1, -1} if target object not found
+ImageFloatBox get_yolo_box(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    VideoOverlaySet& overlays,
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label
+);
 
+// move forward until detected object is a certain width and height on screen (min_size)
+// walk forward forward_ticks each time, while clearing path with Let's Go.
+// if caught in battle, run recovery_action
+void move_forward_until_yolo_object_above_min_size(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double min_width, double min_height,
+    std::function<void()>&& recovery_action, 
+    uint16_t forward_ticks = 100, 
+    uint8_t y = 0, 
+    uint16_t delay_after_forward_move = 50, 
+    uint16_t delay_after_lets_go = 105
+);
 
+// walk forward forward_ticks each time, while clearing path with Let's Go.
+// walk until we find the target object.
+// if caught in battle, run recovery_action
+// throw exception if exceed max_rounds.
+void move_forward_until_yolo_object_detected(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    std::function<void()>&& recovery_action, 
+    uint16_t max_rounds, 
+    uint16_t forward_ticks = 100, 
+    uint8_t y = 0, 
+    uint16_t delay_after_forward_move = 50, 
+    uint16_t delay_after_lets_go = 105
+);
 
+enum class CameraAxis{
+    X,
+    Y,
+};
 
+// move the camera along `axis` until the target object is aligned with target_line
+void move_camera_yolo(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    CameraAxis axis,
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double target_line
+);
 
 
 
