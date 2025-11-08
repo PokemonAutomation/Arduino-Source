@@ -17,6 +17,11 @@ DiscordSocial& DiscordSocial::instance(){
     return instance;
 }
 
+void DiscordSocial::stop(){
+    m_running.store(false, std::memory_order_release);
+    m_thread.join();
+    if (m_client) m_client.reset();
+}
 void DiscordSocial::run(){
     auto client = std::make_shared<Client>();
     if (!client){

@@ -16,13 +16,12 @@ class DiscordSocial{
 public:
     DiscordSocial() : m_running(false) {}
     ~DiscordSocial(){
-        m_running.store(false, std::memory_order_release);
-        m_thread.join();
-        if (m_client) m_client.reset();
+        stop();
     }
 
     static DiscordSocial& instance();
     void run();
+    void stop();
 
 private:
     Logger& logger();
