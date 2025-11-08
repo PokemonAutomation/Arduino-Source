@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/AbstractLogger.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
+#include "CommonTools/DetectedBoxes.h"
 #include "PokemonLA_ArcPhoneDetector.h"
 
 //#include <iostream>
@@ -75,7 +76,7 @@ void ArcPhoneTracker::process_object(
 void ArcPhoneTracker::finish(const ImageViewRGB32& image){
 //    static int count = 0;
 //    image.save("test0-" + std::to_string(count++) + ".png");
-    merge_heavily_overlapping();
+    merge_overlapping_boxes(m_detections);
 }
 
 

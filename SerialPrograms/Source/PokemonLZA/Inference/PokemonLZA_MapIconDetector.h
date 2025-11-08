@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_MapIconDetector_H
 
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonTools/DetectedBoxes.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 
@@ -40,12 +41,6 @@ MapIconType string_to_map_icon_type(const std::string& str);
 
 class MapIconDetector : public StaticScreenDetector{
 public:
-    struct Detection{
-        const std::string& name;
-        ImageFloatBox box;
-    };
-
-
     MapIconDetector(
         Color color,
         MapIconType button_type,
@@ -55,10 +50,7 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
 
-    const std::vector<Detection>& last_detected() const{
-        return m_last_detected;
-    }
-
+    const std::vector<DetectedBox>& last_detected();
 
 private:
     Color m_color;
@@ -66,7 +58,7 @@ private:
     ImageFloatBox m_box;
     VideoOverlay* m_overlay;
 
-    std::vector<Detection> m_last_detected;
+    std::vector<DetectedBox> m_last_detected;
     std::deque<OverlayBoxScope> m_last_detected_box;
 };
 

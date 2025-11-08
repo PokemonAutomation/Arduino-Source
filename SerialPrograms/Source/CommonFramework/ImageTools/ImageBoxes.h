@@ -127,6 +127,7 @@ ImageFloatBox translate_to_parent(
 
 //  Given a ImagePixelBox within an image, get the ImageFloatBox for it.
 ImagePixelBox floatbox_to_pixelbox(size_t width, size_t height, const ImageFloatBox& float_box);
+ImagePixelBox floatbox_to_pixelbox(const ImageViewRGB32& image, const ImageFloatBox& float_box);
 ImageFloatBox pixelbox_to_floatbox(size_t width, size_t height, const ImagePixelBox& pixel_box);
 ImageFloatBox pixelbox_to_floatbox(const ImageViewRGB32& image, const ImagePixelBox& pixel_box);
 

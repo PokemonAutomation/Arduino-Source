@@ -517,6 +517,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/Audio/AudioTemplateCache.h
     Source/CommonTools/Audio/SpectrogramMatcher.cpp
     Source/CommonTools/Audio/SpectrogramMatcher.h
+    Source/CommonTools/DetectedBoxes.cpp
+    Source/CommonTools/DetectedBoxes.h
     Source/CommonTools/DetectionDebouncer.h
     Source/CommonTools/FailureWatchdog.h
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.cpp

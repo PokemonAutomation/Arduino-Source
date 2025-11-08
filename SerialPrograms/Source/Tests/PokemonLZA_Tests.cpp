@@ -333,8 +333,11 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
 
     // Load image and run detector for each expected icon type
     ImageRGB32 image(filepath);
-    auto debug_image = image.copy();
 
+// #define SAVE_DEBUG_IMAGE
+#ifdef SAVE_DEBUG_IMAGE
+    auto debug_image = image.copy();
+    
     // Color palette for different icon types
     const uint32_t colors[] = {
         uint32_t(COLOR_RED),
@@ -349,6 +352,7 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
         0xFFFF0080, // Pink
     };
     size_t color_index = 0;
+#endif
 
     for (const auto& pair : expected_counts){
         MapIconType icon_type = pair.first;
@@ -363,23 +367,28 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
 
         std::string icon_type_name = map_icon_type_to_string(icon_type);
 
+#ifdef SAVE_DEBUG_IMAGE
+        uint32_t box_color = colors[color_index++ % (sizeof(colors) / sizeof(colors[0]))];
+#endif
         cout << icon_type_name << ": " << detected_count << endl;
         // Draw detected boxes on debug image
-        uint32_t box_color = colors[color_index % (sizeof(colors) / sizeof(colors[0]))];
         for (const auto& detection : detections){
-            cout << "  Box: x=" << detection.box.x << ", y=" << detection.box.y
-                    << ", width=" << detection.box.width << ", height=" << detection.box.height << endl;
-            auto p_box = floatbox_to_pixelbox(debug_image.width(), debug_image.height(), detection.box);
-            draw_box(debug_image, p_box, box_color);
+            const auto& box = detection.box;
+            cout << "  Box: x=" << box.min_x << ", y=" << box.min_y
+                    << ", width=" << box.width() << ", height=" << box.height() << endl;
+#ifdef SAVE_DEBUG_IMAGE
+            draw_box(debug_image, detection.box, box_color);
+#endif
         }
-        color_index++;
-        // TEST_RESULT_COMPONENT_EQUAL(detected_count, pair.second, icon_type_name);
+        TEST_RESULT_COMPONENT_EQUAL(detected_count, pair.second, icon_type_name);
     }
 
+#ifdef SAVE_DEBUG_IMAGE
     // Save debug image
     const QString debug_path = parent_dir.filePath("_" + fileinfo.baseName() + "_debug.png");
     debug_image.save(debug_path.toStdString());
     cout << "Debug image saved to: " << debug_path.toStdString() << endl;
+#endif
 
     return 0;
 }

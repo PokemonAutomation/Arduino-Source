@@ -272,9 +272,9 @@ bool MapIconDetector::detect(const ImageViewRGB32& screen){
         [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
 //            cout << "width = " << object.width() << ", height = " << object.height() << endl;
             m_last_detected.emplace_back(
-                Detection{
+                DetectedBox{
                     m_matcher.name(),
-                    translate_to_parent(screen, m_box, object)
+                    floatbox_to_pixelbox(screen, translate_to_parent(screen, m_box, object))
                 }
             );
             return false;
@@ -283,11 +283,11 @@ bool MapIconDetector::detect(const ImageViewRGB32& screen){
 
     if (m_overlay){
         m_last_detected_box.clear();
-        for (const Detection& detection : m_last_detected){
+        for (const DetectedBox& detection : m_last_detected){
             m_last_detected_box.emplace_back(
                 *m_overlay,
                 COLOR_GREEN,
-                detection.box,
+                pixelbox_to_floatbox(screen, detection.box),
                 detection.name
             );
         }
@@ -296,6 +296,11 @@ bool MapIconDetector::detect(const ImageViewRGB32& screen){
     return !m_last_detected_box.empty();
 }
 
+
+const std::vector<DetectedBox>& MapIconDetector::last_detected(){
+    merge_overlapping_boxes(m_last_detected);
+    return m_last_detected;
+}
 
 
 

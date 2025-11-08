@@ -7,6 +7,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/SubObjectTemplateMatcher.h"
+#include "CommonTools/DetectedBoxes.h"
 #include "PokemonLA_QuestMarkDetector.h"
 
 namespace PokemonAutomation{
@@ -72,7 +73,7 @@ void QuestMarkDetector::process_object(
     if (QuestMarkMatcher::instance().matches(object_box, image, object)){
         m_detections.emplace_back(object_box);
     }
-    merge_heavily_overlapping();
+    merge_overlapping_boxes(m_detections);
 }
 
 

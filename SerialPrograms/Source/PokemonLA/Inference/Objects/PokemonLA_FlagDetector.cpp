@@ -11,6 +11,7 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonTools/ImageMatch/SubObjectTemplateMatcher.h"
+#include "CommonTools/DetectedBoxes.h"
 #include "PokemonLA_FlagDetector.h"
 
 //#include <iostream>
@@ -206,7 +207,7 @@ void FlagDetector::finish(const ImageViewRGB32& image){
     m_left.clear();
     m_right.clear();
 //    cout << "m_detections = " << m_detections.size() << endl;
-    merge_heavily_overlapping(0.3);
+    merge_overlapping_boxes(m_detections, 0.3);
 }
 
 
