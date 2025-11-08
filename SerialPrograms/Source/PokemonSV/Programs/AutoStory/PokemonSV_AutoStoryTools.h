@@ -356,10 +356,10 @@ void move_player_forward(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     uint8_t num_rounds, 
-    uint16_t forward_ticks, 
-    uint8_t y, 
-    uint16_t delay_after_forward_move, 
-    uint16_t delay_after_lets_go
+    uint16_t forward_ticks = 100, 
+    uint8_t y = 0, 
+    uint16_t delay_after_forward_move = 50, 
+    uint16_t delay_after_lets_go = 105
 );
 
 // get the box of the target object
