@@ -25,10 +25,6 @@ namespace PokemonLZA {
 using namespace Pokemon;
 
 
-// TODO:
-// Tell user to set text speed to fast!
-
-
 ShinyHunt_WildZoneEntrance_Descriptor::ShinyHunt_WildZoneEntrance_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLZA:ShinyHunt-WildZoneEntrance", STRING_POKEMON + " LZA",
@@ -69,7 +65,17 @@ std::unique_ptr<StatsTracker> ShinyHunt_WildZoneEntrance_Descriptor::make_stats(
 
 
 ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
-    : WALK_TIME_IN_ZONE(
+    : MOVEMENT(
+        "<b>Movement:</b>",
+        {
+            {0, "no-movement", "No Movement"},
+            {1, "approach-gate", "Approach Gate But Don't Enter"},
+            {2, "enter-zone", "Enter Zone (DANGER! Avoid Wild " + Pokemon::STRING_POKEMON + " Noticing You!)"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        2
+    )
+    , WALK_TIME_IN_ZONE(
         "<b>Walk in Zone:</b><br>Walk this long in the zone after passing through the gate.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0ms, 10s,
@@ -92,10 +98,25 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(WILD_ZONE);
+    PA_ADD_OPTION(MOVEMENT);
     PA_ADD_OPTION(WALK_TIME_IN_ZONE);
     PA_ADD_OPTION(RUNNING);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
+
+    MOVEMENT.add_listener(*this);
+}
+
+void ShinyHunt_WildZoneEntrance::on_config_value_changed(void* object){
+    if (MOVEMENT.current_value() <= 1){
+        // no entering zone, disable related options
+        WALK_TIME_IN_ZONE.set_visibility(ConfigOptionState::DISABLED);
+        RUNNING.set_visibility(ConfigOptionState::DISABLED);
+    } else{
+        // entering zone
+        WALK_TIME_IN_ZONE.set_visibility(ConfigOptionState::ENABLED);
+        RUNNING.set_visibility(ConfigOptionState::ENABLED);
+    }
 }
 
 // After fast travel, move forward to enter wild zone.
@@ -109,7 +130,8 @@ void go_to_entrance(
         env.console, context,
         [](ProControllerContext& context){
             for (int c = 0; c < 30; c++){
-                pbf_move_left_joystick(context, 128, 0, 800ms, 200ms);
+                ssf_press_button(context, BUTTON_B, 0ms, 2s, 0ms);
+                pbf_move_left_joystick(context, 128, 0, 2s, 200ms);
             }
         },
         {{buttonA}}
@@ -118,15 +140,55 @@ void go_to_entrance(
 }
 
 
-// Fast travel back to zone entrance.
+void fast_travel_outside_zone(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    WildZone wild_zone,
+    std::string extra_error_msg = ""
+){
+    ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
+
+    bool can_fast_travel = open_map(env.console, context);
+    if (!can_fast_travel){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "fast_travel_outside_zone(): Fast travel disabled from supposedly outside the entrance." + extra_error_msg,
+            env.console
+        );
+    }
+
+    move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
+
+    FastTravelState travel_status = fly_from_map(env.console, context);
+    if (travel_status != FastTravelState::SUCCESS){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "fast_travel_outside_zone(): After moving map cursor, cannot fast travel to the zone." + extra_error_msg,
+            env.console
+        );
+    }
+}
+
+
+// Go back to zone entrance by fast travel if possible or by running backwards
+// if under attack by wild pokemon.
+// After leaving the gate, do a fast travel to the current zone to reset spawns.
+//
 // This is called by do_one_wild_zone_trip() at end of a trip, or by
 // program() when a shiny sound is detected.
+//
 // The function handles day/night changes on its own.
+// TODO: day/night change handling is still under development
+//
 // Note: day/night change can happen at any time, including when the player
 // character is pressing A to enter the zone. When this happens, the button
 // press is eaten and the character will be still outside the zone.
-// leave_zone() also handles this case.
-void leave_zone(
+// leave_zone_and_reset_spawns() also handles this case.
+void leave_zone_and_reset_spawns(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     Milliseconds walk_time_in_zone,
@@ -143,10 +205,7 @@ void leave_zone(
     }
     if (travel_status == FastTravelState::SUCCESS){
         // we were in the zone and now successfully travel back to entrance
-        env.log("Finish one trip");
-        env.console.overlay().add_log("Finish One Trip");
-        stats.visits++;
-        env.update_stats();
+        env.log("Leave zone successfully by fast travel");
         return;
     } else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
         // we cannot fast travel at current location. This means we are actually outside
@@ -167,13 +226,11 @@ void leave_zone(
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "leave_zone(): Cannot fast travel to zone from outside the entrance.",
+                "leave_zone_and_reset_spawns(): Cannot fast travel to zone from outside the entrance.",
                 env.console
             );
         }
-
-        stats.visits++;
-        env.update_stats();
+        env.log("Fast travel after failed to enter zone by day/night change");
         return;
     } 
     // travel_status == FastTravelState::PURSUED
@@ -202,7 +259,7 @@ void leave_zone(
         env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "leave_zone(): Cannot run back to entrance after being chased by wild pokemon.",
+            "leave_zone_and_reset_spawns(): Cannot run back to entrance after being chased by wild pokemon.",
             env.console
         );
     }
@@ -211,82 +268,71 @@ void leave_zone(
     env.log("Found button A. Leaving Zone");
     env.console.overlay().add_log("Found Button A. Leaving Zone");
     pbf_mash_button(context, BUTTON_A, 2000ms);
-    // From zone entrance, fast travel back to the zone entrance
-    // to reset aggressive pokemon
-    can_fast_travel = open_map(env.console, context);
-    
-    if (!can_fast_travel){
-        stats.errors++;
-        env.update_stats();
 
-        // we should be outside zone but we cannot fast travel. Probably:
-        // - The button A is actually from a nearby bench! We are lost
-        // - The button A mashing sequence was eaten by day/night change
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "leave_zone(): Failed to mash A to exit zone despite finding Button A.",
-            env.console
-        );
-    }
-    
-    move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
-
-    travel_status = fly_from_map(env.console, context);
-    if (travel_status == FastTravelState::SUCCESS){
-        stats.visits++;
-        env.update_stats();
-        return;
-    }
-    // we are outside the zone but cannot move to the zone fast travel icon
-    stats.errors++;
-    env.update_stats();
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
-        "leave_zone(): Cannot move to the fast travel icon of zone " + 
-        std::to_string(int(wild_zone)+1) + " after leaving entrance",
-        env.console
-    );
+    // Do a fast travel outside the gate to reset spawns
+    std::string extra_eror_msg = " This is after leaving zone.";
+    fast_travel_outside_zone(env, context, wild_zone, std::move(extra_eror_msg));
 }
 
 // After fast travel back to a wild zone, go through entrance and move forward.
-// Then open map to fast travel back to entrance.
-// If encountered day/night change, wait till change is complete and fast travel back to entrance.
-// If targeted by wild pokemon, run back to entrance and fast travel to reset spawns and aggro.
-// The function handles day/night changes on its own.
+// Then call `leave_zone_and_reset_spawns()` to leave zone and reset the spawns
+//
+// The part of moving into zone is robust against day/night change while
+// `leave_zone_and_reset_spawns()` will handle the day/night change there.
+//
+// movement_mode:
+// 0: No movement between fast travel. Always outside gate. Safe from wild pokemon
+// 1: Approach the gate but don't enter. Always outside gate. Safe from wild pokemon
+// 2: Enter gate and may go deep based on `walk_time_in_zone` and `running`. Not safe.
 void do_one_wild_zone_trip(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
+    size_t movement_mode,
     Milliseconds walk_time_in_zone,
     bool running,
     WildZone wild_zone
 ){
+    ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
     context.wait_for_all_requests();
 
-    go_to_entrance(env, context);
-
-    // Mash button A to enter the zone.
-    pbf_mash_button(context, BUTTON_A, 2000ms);
-    context.wait_for_all_requests();
-    // Day/night change can happen before or after the button A mash, so we are not
-    // sure if we are in the zone or not! But at end of the travel we will fast
-    // travel back to entrance and have a way to work on both cases.
-    // move forward
-    if (walk_time_in_zone > Milliseconds::zero()){
-        if (running){
-            env.console.overlay().add_log("Running");
-            ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
-        } else{
-            env.console.overlay().add_log("Walking");
+    if (movement_mode >= 1){
+        go_to_entrance(env, context);
+    }
+    if (movement_mode == 2){
+        // Mash button A to enter the zone.
+        pbf_mash_button(context, BUTTON_A, 2000ms);
+        context.wait_for_all_requests();
+        // Day/night change can happen before or after the button A mash, so we are not
+        // sure if we are in the zone or not! But at end of the travel we will fast
+        // travel back to entrance and have a way to work on both cases.
+        // move forward
+        if (walk_time_in_zone > Milliseconds::zero()){
+            if (running){
+                env.console.overlay().add_log("Running");
+                ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
+            } else{
+                env.console.overlay().add_log("Walking");
+            }
+            pbf_move_left_joystick(context, 128, 0, walk_time_in_zone, 200ms);
         }
-        pbf_move_left_joystick(context, 128, 0, walk_time_in_zone, 200ms);
     }
     context.wait_for_all_requests();
-    leave_zone(env, context, walk_time_in_zone, wild_zone);
+
+    if (movement_mode <= 1){
+        // we are not in the zone. so no wild pokemon handling!
+        fast_travel_outside_zone(env, context, wild_zone);
+    } else {
+        leave_zone_and_reset_spawns(env, context, walk_time_in_zone, wild_zone);
+    }
+    // wait 0.5 sec for the game to be ready to control player character again
+    pbf_wait(context, 500ms);
+
+    stats.visits++;
+    env.update_stats();
 }
 
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats =
-        env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
+    ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
     if (SHINY_DETECTED.ACTION == ShinySoundDetectedAction::NOTIFY_ON_ALL){
         throw UserSetupError(
@@ -311,11 +357,11 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
             env.console, context,
             [&](ProControllerContext& context){
                 if (leave_zone_first){
-                    leave_zone(env, context, WALK_TIME_IN_ZONE, WILD_ZONE);
+                    leave_zone_and_reset_spawns(env, context, WALK_TIME_IN_ZONE, WILD_ZONE);
                     leave_zone_first = false;
                 }
                 while (true){
-                    do_one_wild_zone_trip(env, context, WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE);
+                    do_one_wild_zone_trip(env, context, MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE);
                     send_program_status_notification(env, NOTIFICATION_STATUS);
                 }
             },

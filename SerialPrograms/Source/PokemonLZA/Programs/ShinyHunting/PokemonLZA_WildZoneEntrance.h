@@ -63,14 +63,17 @@ public:
 };
 
 
-class ShinyHunt_WildZoneEntrance : public SingleSwitchProgramInstance {
+class ShinyHunt_WildZoneEntrance : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
     ShinyHunt_WildZoneEntrance();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+    virtual void on_config_value_changed(void* object) override;
+
     WildZoneOption WILD_ZONE;
+    IntegerEnumDropdownOption MOVEMENT;
 
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     MillisecondsOption WALK_TIME_IN_ZONE;
