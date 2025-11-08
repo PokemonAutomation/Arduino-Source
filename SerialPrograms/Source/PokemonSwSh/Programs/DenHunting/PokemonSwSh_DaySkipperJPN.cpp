@@ -4,8 +4,6 @@
  *
  */
 
-#ifdef PA_OFFICIAL
-
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Controllers/ControllerTypes.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -210,4 +208,3 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, ProControllerCo
 }
 }
 }
-#endif
