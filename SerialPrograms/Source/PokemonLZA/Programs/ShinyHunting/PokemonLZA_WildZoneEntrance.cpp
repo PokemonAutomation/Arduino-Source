@@ -51,7 +51,7 @@ public:
         m_display_order.emplace_back("Visits");
         m_display_order.emplace_back("Chased");
         m_display_order.emplace_back("Shiny Sounds");
-        m_display_order.emplace_back("Game Resets");
+        m_display_order.emplace_back("Game Resets", ALWAYS_HIDDEN);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Day/Night Changes", ALWAYS_HIDDEN);
         m_aliases["Wild Zone"] = "Visits";
