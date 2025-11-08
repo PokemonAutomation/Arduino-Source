@@ -1431,6 +1431,7 @@ void move_forward_until_yolo_object_above_min_size(
             pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });
     }catch (UnexpectedBattleException&){
+        overlays.clear();
         recovery_action();
         // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
         // move_camera_yolo();
@@ -1479,6 +1480,7 @@ void move_forward_until_yolo_object_detected(
         });
         
     }catch (UnexpectedBattleException&){
+        overlays.clear();
         recovery_action();
         // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
         // move_camera_yolo();
@@ -1586,6 +1588,7 @@ void move_camera_yolo(
         }
     
     }catch (UnexpectedBattleException&){
+        overlays.clear();
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
     }
     }
