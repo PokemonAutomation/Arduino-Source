@@ -252,7 +252,6 @@ void MapIconDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool MapIconDetector::detect(const ImageViewRGB32& screen){
-
     double screen_rel_size = (screen.height() / 2160.0);
     double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 

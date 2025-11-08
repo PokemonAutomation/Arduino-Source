@@ -32,6 +32,10 @@ print(f"Size: {width} x {height}")
 
 raw_image = image.copy()
 
+# ==================================================================
+# LZA map view dialog change
+add_infer_box_to_image(raw_image, 0.216, 0.757, 0.565, 0.174, image)
+
 
 # ==================================================================
 # LZA selection arrow

@@ -80,10 +80,8 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
         int ret = run_until<ProControllerContext>(
             console, context,
             [&](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 1000ms);
-                context.wait_for_all_requests();
-                for(int i = 0; i < 10; i++){
-                    pbf_press_button(context, BUTTON_A, 30ms, 200ms);
+                for(int i = 0; i < 4; i++){
+                    pbf_mash_button(context, BUTTON_A, 1000ms);
                 }
             },
             {start_flying, blue_dialog,}
