@@ -3,6 +3,13 @@
  *  From: https://github.com/PokemonAutomation/
  *
  */
+
+
+#include "ML/Inference/ML_YOLOv5Detector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Exceptions/UnexpectedBattleException.h"
+
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 
@@ -75,6 +82,7 @@ namespace NintendoSwitch{
 namespace PokemonSV{
 
 using namespace Pokemon;
+using namespace ML;
 
 static constexpr size_t INDEX_OF_LAST_TUTORIAL_SEGMENT = 9;
 static constexpr size_t INDEX_OF_LAST_TUTORIAL_CHECKPOINT = 20;
@@ -675,10 +683,33 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
+    , TEST_YOLO_BOX(
+        "<b>TEST: get_yolo_box():</b>",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
+    , YOLO_PATH(
+        false,
+        "<b>YOLO Path:</b>", 
+        LockMode::LOCK_WHILE_RUNNING, 
+        "PokemonSV/YOLO/yolo_area0_station1.onnx",
+        "<.onnx file>"
+    )
+    , TARGET_LABEL(
+        false,
+        "<b>YOLO Object Label:</b>", 
+        LockMode::LOCK_WHILE_RUNNING, 
+        "rock-1",
+        "<target label>"
+    )
 {
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(m_advanced_options);
+
+        PA_ADD_OPTION(TEST_YOLO_BOX);
+        PA_ADD_OPTION(YOLO_PATH);
+        PA_ADD_OPTION(TARGET_LABEL);
 
         PA_ADD_OPTION(FLYPOINT_TYPE);
         PA_ADD_OPTION(TEST_FLYPOINT_LOCATIONS);
@@ -1154,6 +1185,18 @@ void AutoStory::run_autostory(SingleSwitchProgramEnvironment& env, ProController
 
 void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 
+
+    if (TEST_YOLO_BOX){
+        VideoOverlaySet overlays(env.console.overlay());
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + std::string(YOLO_PATH));
+        
+        ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, TARGET_LABEL);
+
+        context.wait_for(Milliseconds(1000));
+        return;
+    }
+
+
     if (TEST_FLYPOINT_LOCATIONS){
         print_flypoint_location(env.program_info(), env.console, context, FLYPOINT_TYPE);
         // print_flypoint_location(env.program_info(), env.console, context, FlyPoint::FAST_TRAVEL);
@@ -1217,6 +1260,18 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         DirectionDetector direction;
 
 
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/yolo_area0_station1.onnx");
+        // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
+
+        // VideoOverlaySet overlays(env.console.overlay());
+        // ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, "rock-6");
+        // env.console.log("box: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
+
+        // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-6", 0.5);
+        // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-6", 0.2);
+
+        // move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-6", 0.221875, 0.158333, )
 
         return;
     }
