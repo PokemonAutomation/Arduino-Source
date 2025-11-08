@@ -324,7 +324,7 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
         try{
             MapIconType type = string_to_map_icon_type(type_str);
             expected_counts[type] = count;
-        }catch (const std::exception& e){
+        }catch (const std::exception&){
             cerr << "Error: unknown MapIconType in " << target_detections_path.toStdString() << ": " << type_str << endl;
             return 1;
         }

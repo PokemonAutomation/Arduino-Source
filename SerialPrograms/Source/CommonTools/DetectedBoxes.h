@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonTools_DetectedBoxes_H
 #define PokemonAutomation_CommonTools_DetectedBoxes_H
 
+#include <string>
 #include <vector>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
