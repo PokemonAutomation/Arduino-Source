@@ -14,6 +14,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 //#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MapDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
@@ -22,15 +23,25 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
-void open_map(ConsoleHandle& console, ProControllerContext& context){
+bool open_map(ConsoleHandle& console, ProControllerContext& context){
     console.log("Opening Map...");
     console.overlay().add_log("Open Map");
     pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
     context.wait_for_all_requests();
     
     WallClock deadline = current_time() + 30s;
+
+    const ImageFloatBox icon_region{0.0, 0.089, 1.0, 0.911};
+    MapIconDetector pokecenter_icon(COLOR_RED, MapIconType::PokemonCenter, icon_region, &console.overlay());
+    MapIconDetector flyable_building_icon(COLOR_BLACK, MapIconType::BuildingFlyable, icon_region, &console.overlay());
+    MapIconDetector flayble_cafe_icon(COLOR_ORANGE, MapIconType::CafeFlyable, icon_region, &console.overlay());
+    MapWatcher map_detector(COLOR_RED, &console.overlay());
+    map_detector.attach_map_icon_detector(pokecenter_icon);
+    map_detector.attach_map_icon_detector(flyable_building_icon);
+    map_detector.attach_map_icon_detector(flayble_cafe_icon);
+
     do{
-        MapWatcher map_detector(COLOR_RED, &console.overlay());
+        map_detector.reset_state();
 
         int ret = wait_until(
             console, context,
@@ -41,7 +52,7 @@ void open_map(ConsoleHandle& console, ProControllerContext& context){
         case 0:
             console.log("Detected map!", COLOR_BLUE);
             console.overlay().add_log("Map Detected");
-            return;
+            return map_detector.detected_map_icons().size() > 0;
         default:
             console.log("Map not found. Press + again", COLOR_ORANGE);
             pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
@@ -89,7 +100,7 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
         default:
             console.log("Map cursor not on fast travel location");
             console.overlay().add_log("Not On Fast Travel Location");
-            return FastTravelState::NON_FLY_SPOT;
+            return FastTravelState::NOT_AT_FLY_SPOT;
 #if 0
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,

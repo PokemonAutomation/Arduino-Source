@@ -132,10 +132,13 @@ void leave_zone(
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
-    open_map(env.console, context);
+    FastTravelState travel_status = FastTravelState::PURSUED;
+    bool can_fast_travel = open_map(env.console, context);
     // Open map is robust against day/night change. So after open_map()
     // we are sure we are in map view
-    FastTravelState travel_status = fly_from_map(env.console, context);
+    if (can_fast_travel){
+        travel_status = fly_from_map(env.console, context);
+    }
     if (travel_status == FastTravelState::SUCCESS){
         // we were in the zone and now successfully travel back to entrance
         env.log("Finish one trip");
@@ -143,18 +146,15 @@ void leave_zone(
         stats.visits++;
         env.update_stats();
         return;
-    } else if (travel_status == FastTravelState::NON_FLY_SPOT){
+    } else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
         // we cannot fast travel at current location. This means we are actually outside
         // the wild zone!
         // Assume we are still outside the entrance, probably due to the mashing A to enter
         // zone button press was eaten by a day/night change.
         
-        // Mash B to close menu and return from overworld
-        pbf_mash_button(context, BUTTON_B, 3000ms);
-        env.log("Didn't entered the zone.");
-        env.console.overlay().add_log("Didn't Entered Zone.");
+        env.log("Not at fly spot now, probably still outside zone at entrance.");
+        env.console.overlay().add_log("Still at Entrance");
 
-        open_map(env.console, context);
         // From zone entrance, fast travel back to the zone entrance
         // to reset player character orientation
         move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
@@ -185,51 +185,63 @@ void leave_zone(
     stats.chased++;
     env.update_stats();
 
-    for(int i_try = 0; i_try < 3; i_try++){
-        ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [&walk_time_in_zone](ProControllerContext& context){
-                // running back
-                ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
-                pbf_move_left_joystick(context, 128, 255, walk_time_in_zone, 0ms);
-            },
-            {{buttonA}}
+    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [&walk_time_in_zone](ProControllerContext& context){
+            // running back
+            ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
+            pbf_move_left_joystick(context, 128, 255, walk_time_in_zone, 0ms);
+        },
+        {{buttonA}}
+    );
+    if (ret != 0){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "leave_zone(): Cannot run back to entrance after being chased by wild pokemon.",
+            env.console
         );
-        if (ret != 0){
-            stats.errors++;
-            env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "leave_zone(): Cannot run back to entrance after being chased by wild pokemon.",
-                env.console
-            );
-        }
-        // Found button A, so we are at the entrance.
-        // Mash A to leave Zone.
-        env.log("Found button A. Leaving Zone");
-        env.console.overlay().add_log("Found Button A. Leaving Zone");
-        pbf_mash_button(context, BUTTON_A, 2000ms);
-        open_map(env.console, context);
-        // From zone entrance, fast travel back to the zone entrance
-        // to reset aggressive pokemon
-        
-        move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
-
-        travel_status = fly_from_map(env.console, context);
-        if (travel_status == FastTravelState::SUCCESS){
-            stats.visits++;
-            env.update_stats();
-            return;
-        }
-        // travel_status can be non-SUCCESS due to day/night change eating up mashing button A
-        // sequence. In this case we are still in the zone being chased.
     }
+    // Found button A, so we are at the entrance.
+    // Mash A to leave Zone.
+    env.log("Found button A. Leaving Zone");
+    env.console.overlay().add_log("Found Button A. Leaving Zone");
+    pbf_mash_button(context, BUTTON_A, 2000ms);
+    // From zone entrance, fast travel back to the zone entrance
+    // to reset aggressive pokemon
+    can_fast_travel = open_map(env.console, context);
+    
+    if (!can_fast_travel){
+        stats.errors++;
+        env.update_stats();
+
+        // we should be outside zone but we cannot fast travel. Probably:
+        // - The button A is actually from a nearby bench! We are lost
+        // - The button A mashing sequence was eaten by day/night change
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "leave_zone(): Failed to mash A to exit zone despite finding Button A.",
+            env.console
+        );
+    }
+    
+    move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
+
+    travel_status = fly_from_map(env.console, context);
+    if (travel_status == FastTravelState::SUCCESS){
+        stats.visits++;
+        env.update_stats();
+        return;
+    }
+    // we are outside the zone but cannot move to the zone fast travel icon
     stats.errors++;
     env.update_stats();
     OperationFailedException::fire(
         ErrorReport::SEND_ERROR_REPORT,
-        "leave_zone(): Failed to mash A to exit zone depsite finding Button A.",
+        "leave_zone(): Cannot move to the fast travel icon of zone " + 
+        std::to_string(int(wild_zone)+1) + " after leaving entrance",
         env.console
     );
 }
