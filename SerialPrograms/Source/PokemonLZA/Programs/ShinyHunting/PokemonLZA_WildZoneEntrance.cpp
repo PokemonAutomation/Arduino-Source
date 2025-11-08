@@ -76,7 +76,7 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
         2
     )
     , WALK_TIME_IN_ZONE(
-        "<b>Walk in Zone:</b><br>Walk this long in the zone after passing through the gate.",
+        "<b>Walk Time in Zone:</b><br>Walk this long in the zone after passing through the gate.",
         LockMode::UNLOCK_WHILE_RUNNING,
         0ms, 10s,
         "500 ms"
