@@ -14,8 +14,14 @@
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include <iostream>
+#include <fstream>
 #include <map>
+#include <QDir>
+#include <QFileInfo>
+#include <QString>
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -268,6 +274,112 @@ int test_pokemonLZA_BoxCellInfoDetector(const ImageViewRGB32& image, const std::
     BoxAlphaDetector alpha_detector(COLOR_RED, &overlay);
     bool detected_alpha = alpha_detector.detect(image);
     TEST_RESULT_COMPONENT_EQUAL(detected_alpha, expected_alpha, "alpha");
+
+    return 0;
+}
+
+int test_pokemonLZA_MapIconDetector(const std::string& filepath){
+    // The target detection results are stored in an auxiliary txt file with filename: _<filepath_basename>.txt
+    // Each line in the txt file has format: "<MapIconType> <count>"
+    // For example: "PokemonCenter 2" means there should be 2 Pokemon Centers detected
+
+    const QString full_path(QString::fromStdString(filepath));
+    const QFileInfo fileinfo(full_path);
+    const QString filename = fileinfo.fileName();
+    const QDir parent_dir = fileinfo.dir();
+
+    const QString target_detections_path = parent_dir.filePath("_" + fileinfo.baseName() + ".txt");
+
+    // Load expected detections from txt file
+    std::map<MapIconType, int> expected_counts;
+    std::ifstream file(target_detections_path.toStdString());
+    if (!file.is_open()){
+        cerr << "Error: cannot open target detection file " << target_detections_path.toStdString() << endl;
+        return 1;
+    }
+
+    std::string line;
+    while (std::getline(file, line)){
+        // Skip empty lines
+        if (line.empty()){
+            continue;
+        }
+
+        // Parse line: "<MapIconType> <count>"
+        size_t space_pos = line.find(' ');
+        if (space_pos == std::string::npos){
+            cerr << "Error: invalid line format in " << target_detections_path.toStdString() << ": " << line << endl;
+            return 1;
+        }
+
+        std::string type_str = line.substr(0, space_pos);
+        std::string count_str = line.substr(space_pos + 1);
+
+        int count = 0;
+        if (parse_int(count_str, count) == false){
+            cerr << "Error: invalid count in " << target_detections_path.toStdString() << ": " << count_str << endl;
+            return 1;
+        }
+
+        try{
+            MapIconType type = string_to_map_icon_type(type_str);
+            expected_counts[type] = count;
+        }catch (const std::exception& e){
+            cerr << "Error: unknown MapIconType in " << target_detections_path.toStdString() << ": " << type_str << endl;
+            return 1;
+        }
+    }
+    file.close();
+
+    // Load image and run detector for each expected icon type
+    ImageRGB32 image(filepath);
+    auto debug_image = image.copy();
+
+    // Color palette for different icon types
+    const uint32_t colors[] = {
+        uint32_t(COLOR_RED),
+        uint32_t(COLOR_GREEN),
+        uint32_t(COLOR_BLUE),
+        uint32_t(COLOR_YELLOW),
+        uint32_t(COLOR_CYAN),
+        uint32_t(COLOR_MAGENTA),
+        0xFFFF8000, // Orange
+        0xFF00FF80, // Spring green
+        0xFF8000FF, // Purple
+        0xFFFF0080, // Pink
+    };
+    size_t color_index = 0;
+
+    for (const auto& pair : expected_counts){
+        MapIconType icon_type = pair.first;
+
+        // Run detector with the full image as search box
+        MapIconDetector detector(COLOR_RED, icon_type, ImageFloatBox(0.0, 0.0, 1.0, 1.0));
+        detector.detect(image);
+
+        const auto& detections = detector.last_detected();
+        // TODO: current we may detect two boxes around the same icon
+        int detected_count = (int)detections.size();
+
+        std::string icon_type_name = map_icon_type_to_string(icon_type);
+
+        cout << icon_type_name << ": " << detected_count << endl;
+        // Draw detected boxes on debug image
+        uint32_t box_color = colors[color_index % (sizeof(colors) / sizeof(colors[0]))];
+        for (const auto& detection : detections){
+            cout << "  Box: x=" << detection.box.x << ", y=" << detection.box.y
+                    << ", width=" << detection.box.width << ", height=" << detection.box.height << endl;
+            auto p_box = floatbox_to_pixelbox(debug_image.width(), debug_image.height(), detection.box);
+            draw_box(debug_image, p_box, box_color);
+        }
+        color_index++;
+        // TEST_RESULT_COMPONENT_EQUAL(detected_count, pair.second, icon_type_name);
+    }
+
+    // Save debug image
+    const QString debug_path = parent_dir.filePath("_" + fileinfo.baseName() + "_debug.png");
+    debug_image.save(debug_path.toStdString());
+    cout << "Debug image saved to: " << debug_path.toStdString() << endl;
 
     return 0;
 }

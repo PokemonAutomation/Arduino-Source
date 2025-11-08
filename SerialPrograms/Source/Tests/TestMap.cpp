@@ -297,6 +297,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLZA_AlertEyeDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_AlertEyeDetector, _1)},
     {"PokemonLZA_BoxCellInfoDetector", std::bind(image_words_detector_helper, test_pokemonLZA_BoxCellInfoDetector, _1)},
     {"PokemonLZA_SelectionArrowDetector", std::bind(image_words_detector_helper, test_pokemonLZA_SelectionArrowDetector, _1)},
+    {"PokemonLZA_MapIconDetector", test_pokemonLZA_MapIconDetector},
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){

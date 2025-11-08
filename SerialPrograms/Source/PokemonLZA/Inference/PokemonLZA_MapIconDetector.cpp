@@ -185,6 +185,53 @@ const MapIconMatcher& get_map_icon_matcher(MapIconType icon){
     }
 }
 
+const char* map_icon_type_to_string(MapIconType type){
+    switch (type){
+    case MapIconType::PokemonCenter:
+        return "PokemonCenter";
+    case MapIconType::Building:
+        return "Building";
+    case MapIconType::BuildingFlyable:
+        return "BuildingFlyable";
+    case MapIconType::CafeFlyable:
+        return "CafeFlyable";
+    case MapIconType::Clothing:
+        return "Clothing";
+    case MapIconType::Haircut:
+        return "Haircut";
+    case MapIconType::Shopping:
+        return "Shopping";
+    case MapIconType::WildZone:
+        return "WildZone";
+    case MapIconType::WildZoneFlyable:
+        return "WildZoneFlyable";
+    case MapIconType::BattleZone:
+        return "BattleZone";
+    default:
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Unknown MapIconType: " + std::to_string((int)type)
+        );
+    }
+}
+
+MapIconType string_to_map_icon_type(const std::string& str){
+    if (str == "PokemonCenter") return MapIconType::PokemonCenter;
+    if (str == "Building") return MapIconType::Building;
+    if (str == "BuildingFlyable") return MapIconType::BuildingFlyable;
+    if (str == "CafeFlyable") return MapIconType::CafeFlyable;
+    if (str == "Clothing") return MapIconType::Clothing;
+    if (str == "Haircut") return MapIconType::Haircut;
+    if (str == "Shopping") return MapIconType::Shopping;
+    if (str == "WildZone") return MapIconType::WildZone;
+    if (str == "WildZoneFlyable") return MapIconType::WildZoneFlyable;
+    if (str == "BattleZone") return MapIconType::BattleZone;
+    throw InternalProgramError(
+        nullptr, PA_CURRENT_FUNCTION,
+        "Unknown MapIconType string: " + str
+    );
+}
+
 
 
 
