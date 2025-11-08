@@ -11,7 +11,6 @@
 #include <atomic>
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "CommonTools/Async/InferenceSession.h"
 #include "CommonTools/Options/LanguageOCROption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_EncounterStats.h"

@@ -8,7 +8,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -47,12 +46,14 @@ public:
         , chased(m_stats["Chased"])
         , shinies(m_stats["Shiny Sounds"])
         , errors(m_stats["Errors"])
+        , day_changes(m_stats["Day/Night Changes"])
     {
         m_display_order.emplace_back("Visits");
         m_display_order.emplace_back("Chased");
         m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Game Resets");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Day/Night Changes", ALWAYS_HIDDEN);
         m_aliases["Wild Zone"] = "Visits";
     }
 
@@ -60,6 +61,7 @@ public:
     std::atomic<uint64_t>& chased;
     std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& day_changes;
 };
 std::unique_ptr<StatsTracker> ShinyHunt_WildZoneEntrance_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());

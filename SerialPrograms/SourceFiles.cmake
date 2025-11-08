@@ -1555,6 +1555,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp

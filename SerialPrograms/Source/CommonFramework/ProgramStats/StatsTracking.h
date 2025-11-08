@@ -70,6 +70,8 @@ protected:
 };
 
 
+// Create a markup string to show current and past stats.
+// If override_current is not empty, replace the string for current stats with override_current.
 std::string stats_to_bar(
     Logger& logger,
     const StatsTracker* historical,
