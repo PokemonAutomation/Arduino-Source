@@ -65,9 +65,19 @@ std::unique_ptr<StatsTracker> ShinyHunt_BenchSit_Descriptor::make_stats() const{
 
 
 ShinyHunt_BenchSit::ShinyHunt_BenchSit()
-    : WALK_FORWARD_DURATION(
-        "<b>Walk Forward Duration</b><br>"
-        "Walk forward and backward for this long after each day change to "
+    : WALK_DIRECTION(
+        "<b>Run Direction:</b><br>The direction of running after each day change to increase the spawn radius.",
+        {
+            {0, "forward", "Forward"},
+            {1, "left", "Turn Left"},
+            {2, "right", "Turn Right"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )
+    , WALK_FORWARD_DURATION(
+        "<b>Run Forward Duration</b><br>"
+        "Run forward and backward for this long after each day change to "
         "increase the spawn radius. Set to zero to disable this.",
         LockMode::UNLOCK_WHILE_RUNNING,
         "2000 ms"
@@ -87,6 +97,7 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    PA_ADD_OPTION(WALK_DIRECTION);
     PA_ADD_OPTION(WALK_FORWARD_DURATION);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -118,9 +129,25 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                     sit_on_bench(env.console, context);
                     Milliseconds duration = WALK_FORWARD_DURATION;
                     if (duration > Milliseconds::zero()){
-                        ssf_press_button(context, BUTTON_B, 0ms, 2 * duration, 0ms);
-                        pbf_move_left_joystick(context, 128, 0, duration, 0ms);
-                        pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
+                        if (WALK_DIRECTION.current_value() == 0){ // forward
+                            ssf_press_button(context, BUTTON_B, 0ms, 2 * duration, 0ms);
+                            pbf_move_left_joystick(context, 128, 0, duration, 0ms);
+                            pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
+                        } else if (WALK_DIRECTION.current_value() == 1){ // left
+                            ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                            pbf_move_left_joystick(context, 0, 128, duration, 0ms);
+                            pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+                            ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                            pbf_move_left_joystick(context, 128, 255, duration, 0ms);
+                            pbf_move_left_joystick(context, 0, 128, 100ms, 0ms);
+                        } else if (WALK_DIRECTION.current_value() == 2){ // right
+                            ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                            pbf_move_left_joystick(context, 255, 128, duration, 0ms);
+                            pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+                            ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                            pbf_move_left_joystick(context, 128, 255, duration, 0ms);
+                            pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
+                        }
                     }
                     env.update_stats();
                 }
