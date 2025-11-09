@@ -148,7 +148,7 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         ButtonWatcher buttonA(
             COLOR_RED,
             ButtonType::ButtonA,
-            {0.1, 0.1, 0.8, 0.8},
+            {0.4, 0.3, 0.2, 0.7},
             &env.console.overlay()
         );
         SelectionArrowWatcher arrow(
@@ -229,7 +229,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
         ButtonWatcher buttonA(
             COLOR_RED,
             ButtonType::ButtonA,
-            {0.1, 0.1, 0.8, 0.8},
+            {0.4, 0.3, 0.2, 0.7},
             &env.console.overlay(),
             1000ms
         );

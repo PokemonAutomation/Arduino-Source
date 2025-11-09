@@ -232,7 +232,12 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
         }
     }
     {
-        ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.4, 0.3, 0.2, 0.7}, &console.overlay());
+        ButtonWatcher buttonA(
+            COLOR_RED,
+            ButtonType::ButtonA,
+            {0.4, 0.3, 0.2, 0.7},
+            &console.overlay()
+        );
 
         int ret = run_until<ProControllerContext>(
             console, context,
