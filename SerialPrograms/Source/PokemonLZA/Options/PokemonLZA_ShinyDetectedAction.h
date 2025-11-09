@@ -23,9 +23,9 @@ namespace PokemonLZA{
 
 
 enum class ShinySoundDetectedAction{
-    STOP_PROGRAM,
-    NOTIFY_ON_FIRST_ONLY,
-    NOTIFY_ON_ALL,
+    STOP_PROGRAM,         // stop program at first detected shiny sound
+    NOTIFY_ON_FIRST_ONLY, // notify user only on the first shiny sound, keep running the program
+    NOTIFY_ON_ALL,        // notify on all shiny sounds, keep running the program
 };
 
 
@@ -37,9 +37,19 @@ public:
         ShinySoundDetectedAction default_action
     );
 
+    // Handle shiny sound according to ACTION.
+    // May log the sound, take a video and send notification.
+    // Return whether to stop the program according to ACTION.
     bool on_shiny_sound(
         ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
         size_t current_count,
+        float error_coefficient
+    );
+
+    // Assuming a shiny sound is detected, this function logs and sends a notification.
+    // This function is called by `on_shiny_sound()`.
+    void send_shiny_sound_notification(
+        ProgramEnvironment& env, VideoStream& stream,
         float error_coefficient
     );
 

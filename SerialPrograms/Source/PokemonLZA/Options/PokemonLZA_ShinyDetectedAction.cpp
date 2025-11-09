@@ -41,8 +41,8 @@ ShinySoundDetectedActionOption::ShinySoundDetectedActionOption(
         true
     )
     , SCREENSHOT_DELAY(
-        "<b>Screenshot Delay:</b><br>"
-        "Wait this long before taking a screenshot + video of the shiny.<br>"
+        "<b>Video Delay:</b><br>"
+        "Wait this long before taking a video of the shiny.<br>"
         "Don't set this too large or the shiny may run away!",
         LockMode::UNLOCK_WHILE_RUNNING,
         std::move(default_delay)
@@ -84,19 +84,27 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
         return false;
     }
 
+    if (TAKE_VIDEO){
+        context.wait_for(SCREENSHOT_DELAY);
+        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+    }
+
+    send_shiny_sound_notification(env, stream, error_coefficient);
+
+    return action == ShinySoundDetectedAction::STOP_PROGRAM;
+}
+
+
+void ShinySoundDetectedActionOption::send_shiny_sound_notification(
+    ProgramEnvironment& env, VideoStream& stream, float error_coefficient
+){
     {
         std::ostringstream ss;
         ss << "Detected Shiny Sound! (error coefficient = " << error_coefficient << ")";
         stream.log(ss.str(), COLOR_BLUE);
     }
 
-    if (TAKE_VIDEO){
-        context.wait_for(SCREENSHOT_DELAY);
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
-    }
-
     std::vector<std::pair<std::string, std::string>> embeds;
-
     {
         std::ostringstream ss;
         ss << "Error Coefficient: ";
@@ -112,10 +120,7 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
         embeds, "",
         stream.video().snapshot(), true
     );
-
-    return action == ShinySoundDetectedAction::STOP_PROGRAM;
 }
-
 
 
 

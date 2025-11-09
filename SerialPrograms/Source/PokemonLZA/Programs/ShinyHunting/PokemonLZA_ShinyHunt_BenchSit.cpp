@@ -141,81 +141,96 @@ void reapproach_bench_after_getting_up(SingleSwitchProgramEnvironment& env, ProC
 void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHunt_BenchSit_Descriptor::Stats& stats = env.current_stats<ShinyHunt_BenchSit_Descriptor::Stats>();
 
-    while (true){
-        float shiny_coefficient = 1.0;
-        PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-            //  Warning: This callback will be run from a different thread than this function.
-            stats.shinies++;
-            env.update_stats();
-            shiny_coefficient = error_coefficient;
-            if (SHINY_DETECTED.ACTION != ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY){
-                return true;
+    std::atomic<uint8_t> to_take_shiny_sound_video{0};
+    // Store shiny detection time as milliseconds since epoch for thread-safe access
+    std::atomic<int64_t> shiny_detection_time_ms{0};
+
+    // once shiny sound detector finds a shiny and user decides to take a video of it,
+    // we need to take the video on Switch as part of the program loop.
+    auto handle_shiny_sound_video_request = [&]() -> void {
+        if (to_take_shiny_sound_video.load(std::memory_order_relaxed) && SHINY_DETECTED.TAKE_VIDEO){
+            // Calculate elapsed time since shiny detection
+            int64_t detection_time_ms = shiny_detection_time_ms.load(std::memory_order_relaxed);
+            WallDuration elapsed = current_time() - WallClock(Milliseconds(detection_time_ms));
+            auto elapsed_ms = std::chrono::duration_cast<Milliseconds>(elapsed);
+
+            // Calculate remaining time to wait
+            Milliseconds requested_delay = SHINY_DETECTED.SCREENSHOT_DELAY.get();
+            if (requested_delay > elapsed_ms){
+                context.wait_for(requested_delay - elapsed_ms);
             }
+            // Otherwise, take screenshot immediately (no additional wait needed)
 
-            return stats.shinies == 1;
-        });
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            to_take_shiny_sound_video.store(0, std::memory_order_relaxed);
+        }
+    };
 
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [&](ProControllerContext& context){
-                while (true){
-                    send_program_status_notification(env, NOTIFICATION_STATUS);
-                    sit_on_bench(env.console, context);
-                    stats.resets++;
-                    env.update_stats();
-                    Milliseconds duration = WALK_FORWARD_DURATION;
-                    if (duration > Milliseconds::zero()){
-                        if (WALK_DIRECTION.current_value() == 0){ // forward
-                            ssf_press_button(context, BUTTON_B, 0ms, 2 * duration, 0ms);
-                            pbf_move_left_joystick(context, 128, 0, duration, 0ms);
-                            pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
-                        } else if (WALK_DIRECTION.current_value() == 1){ // left
-                            ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                            pbf_move_left_joystick(context, 0, 128, duration, 0ms);
-                            pbf_press_button(context, BUTTON_L, 100ms, 400ms);
-                            ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                            pbf_move_left_joystick(context, 128, 255, duration, 0ms);
-                            pbf_move_left_joystick(context, 0, 128, 100ms, 0ms);
-                        } else if (WALK_DIRECTION.current_value() == 2){ // right
-                            ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                            pbf_move_left_joystick(context, 255, 128, duration, 0ms);
-                            pbf_press_button(context, BUTTON_L, 100ms, 400ms);
-                            ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
-                            pbf_move_left_joystick(context, 128, 255, duration, 0ms);
-                            pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
-                        }
-                    }
-                    else{
-                        reapproach_bench_after_getting_up(env, context);
+    PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        //  Warning: This callback will be run from a different thread than this function.
+        stats.shinies++;
+        env.update_stats();
+
+        if ((SHINY_DETECTED.ACTION == ShinySoundDetectedAction::STOP_PROGRAM) || stats.shinies == 1){
+            // Record the detection time for video delay calculation
+            WallClock now = current_time();
+            int64_t now_ms = std::chrono::duration_cast<Milliseconds>(now.time_since_epoch()).count();
+            shiny_detection_time_ms.store(now_ms, std::memory_order_relaxed);
+
+            SHINY_DETECTED.send_shiny_sound_notification(env, env.console, error_coefficient);
+            to_take_shiny_sound_video.store(1, std::memory_order_relaxed);
+        }
+
+        return SHINY_DETECTED.ACTION == ShinySoundDetectedAction::STOP_PROGRAM;
+    });
+
+    run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            while (true){
+                send_program_status_notification(env, NOTIFICATION_STATUS);
+                sit_on_bench(env.console, context);
+                handle_shiny_sound_video_request();
+                stats.resets++;
+                env.update_stats();
+                Milliseconds duration = WALK_FORWARD_DURATION;
+                if (duration > Milliseconds::zero()){
+                    if (WALK_DIRECTION.current_value() == 0){ // forward
+                        ssf_press_button(context, BUTTON_B, 0ms, 2 * duration, 0ms);
+                        pbf_move_left_joystick(context, 128, 0, duration, 0ms);
+                        pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
+                    } else if (WALK_DIRECTION.current_value() == 1){ // left
+                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                        pbf_move_left_joystick(context, 0, 128, duration, 0ms);
+                        pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                        pbf_move_left_joystick(context, 128, 255, duration, 0ms);
+                        pbf_move_left_joystick(context, 0, 128, 100ms, 0ms);
+                    } else if (WALK_DIRECTION.current_value() == 2){ // right
+                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                        pbf_move_left_joystick(context, 255, 128, duration, 0ms);
+                        pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                        pbf_move_left_joystick(context, 128, 255, duration, 0ms);
+                        pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
                     }
                 }
-            },
-            {{shiny_detector}}
-        );
+                else{
+                    reapproach_bench_after_getting_up(env, context);
+                }
 
-        //  This should never happen.
-        if (ret != 0){
-            continue;
-        }
+                handle_shiny_sound_video_request();
+            }
+        },
+        {{shiny_detector}}
+    );
 
-        pbf_mash_button(context, BUTTON_B, 1000ms);
+    // Shiny sound detected and user requested stopping the program when detected shiny sound
 
-        bool exit = SHINY_DETECTED.on_shiny_sound(
-            env, env.console, context,
-            stats.shinies,
-            shiny_coefficient
-        );
-
-        pbf_move_left_joystick(context, 128, 255, WALK_FORWARD_DURATION, 0ms);
-
-        if (exit){
-            break;
-        }
-    }
+    handle_shiny_sound_video_request();
 
     go_home(env.console, context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-
 }
 
 
