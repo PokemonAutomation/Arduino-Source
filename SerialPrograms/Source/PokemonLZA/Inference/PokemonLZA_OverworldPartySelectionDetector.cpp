@@ -39,20 +39,20 @@ const std::array<ImageFloatBox, 6>& BOXES(){
 
 OverworldPartySelectionDetector::OverworldPartySelectionDetector(Color color, VideoOverlay* overlay)
     : m_dpad_ups{
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadUp, BOXES()[0], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadUp, BOXES()[1], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadUp, BOXES()[2], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadUp, BOXES()[3], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadUp, BOXES()[4], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadUp, BOXES()[5], overlay)
+        ButtonDetector(color, ButtonType::ButtonDpadUp, BOXES()[0], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadUp, BOXES()[1], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadUp, BOXES()[2], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadUp, BOXES()[3], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadUp, BOXES()[4], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadUp, BOXES()[5], overlay)
     }
     , m_dpad_downs{
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadDown, BOXES()[0], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadDown, BOXES()[1], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadDown, BOXES()[2], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadDown, BOXES()[3], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadDown, BOXES()[4], overlay),
-        ButtonDetector(COLOR_WHITE, ButtonType::ButtonDpadDown, BOXES()[5], overlay)
+        ButtonDetector(color, ButtonType::ButtonDpadDown, BOXES()[0], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadDown, BOXES()[1], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadDown, BOXES()[2], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadDown, BOXES()[3], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadDown, BOXES()[4], overlay),
+        ButtonDetector(color, ButtonType::ButtonDpadDown, BOXES()[5], overlay)
     }
 {}
 

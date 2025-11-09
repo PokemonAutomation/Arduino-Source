@@ -11,11 +11,11 @@
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 //#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MapDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
 namespace PokemonAutomation{
@@ -231,38 +231,20 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
             );
         }
     }
-    {
-        ButtonWatcher buttonA(
-            COLOR_RED,
-            ButtonType::ButtonA,
-            {0.4, 0.3, 0.2, 0.7},
-            &console.overlay()
-        );
 
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                //  Can't just hold it down since sometimes it doesn't register.
-                for (int c = 0; c < 60; c++){
-                    pbf_move_left_joystick(context, 128, 255, 800ms, 200ms);
-                }
-            },
-            {buttonA}
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay());
+    int ret = wait_until(
+        console, context,
+        30s,
+        {overworld}
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "sit_on_bench(): Unable to go back to overworld after day/night change on bench after 30 seconds.",
+            console
         );
-
-        switch (ret){
-        case 0:
-            console.log("Detected floating A button...");
-            break;
-        default:
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "sit_on_bench(): Unable to detect bench after 60 seconds.",
-                console
-            );
-        }
     }
-
 }
 
 

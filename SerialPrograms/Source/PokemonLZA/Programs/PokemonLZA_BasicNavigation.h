@@ -50,6 +50,9 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
 void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, WildZone zone);
 
 
+// Assuming the player character is facing the bench with buton A available, this function
+// presses button A repeated to initiate day/night change and returns when the game finishes
+// day/night change transition animation and is back to overworld.
 void sit_on_bench(ConsoleHandle& console, ProControllerContext& context);
 
 }

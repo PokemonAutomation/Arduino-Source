@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -12,6 +13,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_ShinyHunt_BenchSit.h"
 
@@ -103,6 +105,39 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+
+void reapproach_bench_after_getting_up(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    ButtonWatcher buttonA(
+        COLOR_RED,
+        ButtonType::ButtonA,
+        {0.4, 0.3, 0.2, 0.7},
+        &env.console.overlay()
+    );
+
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            //  Can't just hold it down since sometimes it doesn't register.
+            for (int c = 0; c < 60; c++){
+                pbf_move_left_joystick(context, 128, 255, 800ms, 200ms);
+            }
+        },
+        {buttonA}
+    );
+
+    switch (ret){
+    case 0:
+        env.console.log("Detected floating A button...");
+        break;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "sit_on_bench(): Unable to detect bench after 60 seconds.",
+            env.console
+        );
+    }
+}
+
 void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHunt_BenchSit_Descriptor::Stats& stats = env.current_stats<ShinyHunt_BenchSit_Descriptor::Stats>();
 
@@ -125,8 +160,9 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
             [&](ProControllerContext& context){
                 while (true){
                     send_program_status_notification(env, NOTIFICATION_STATUS);
-                    stats.resets++;
                     sit_on_bench(env.console, context);
+                    stats.resets++;
+                    env.update_stats();
                     Milliseconds duration = WALK_FORWARD_DURATION;
                     if (duration > Milliseconds::zero()){
                         if (WALK_DIRECTION.current_value() == 0){ // forward
@@ -149,7 +185,9 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                             pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
                         }
                     }
-                    env.update_stats();
+                    else{
+                        reapproach_bench_after_getting_up(env, context);
+                    }
                 }
             },
             {{shiny_detector}}
