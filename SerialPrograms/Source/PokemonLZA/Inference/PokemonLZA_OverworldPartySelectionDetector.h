@@ -14,6 +14,8 @@
 #include "CommonTools/InferenceCallbacks/VisualInferenceCallback.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 
+#include <array>
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
