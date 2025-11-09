@@ -467,6 +467,20 @@ void move_player_to_realign_via_yolo_with_recovery(
     std::function<void()>&& recovery_action
 );
 
+// move camera in X direction until we find the target object.
+// if caught in battle, run recovery_action
+// throw exception if exceed max_rounds.
+void move_camera_until_yolo_object_detected(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    uint8_t initial_x_move, 
+    uint16_t initial_hold_ticks, 
+    std::function<void()>&& recovery_action, 
+    uint16_t max_rounds = 50
+);
+
 
 }
 }

@@ -1790,6 +1790,57 @@ void move_player_to_realign_via_yolo_with_recovery(
 }
 
 
+void move_camera_until_yolo_object_detected(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    uint8_t initial_x_move, 
+    uint16_t initial_hold_ticks,
+    std::function<void()>&& recovery_action, 
+    uint16_t max_rounds
+){
+    VideoOverlaySet overlays(env.console.overlay());
+    bool found_target = false;
+    size_t round_num = 0;
+    uint8_t x_move = initial_x_move > 128 ? 255 : 0;
+    while(!found_target){
+    try{
+        do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+
+            if (round_num == 0){
+                pbf_move_right_joystick(context, initial_x_move, 128, initial_hold_ticks, 50);
+            }
+            context.wait_for_all_requests();
+            ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
+            found_target = target_box.x != -1;
+            if (found_target){
+                return;
+            }
+
+            if (round_num > max_rounds){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "move_camera_until_yolo_object_detected(): Unable to detect target object.",
+                    env.console
+                );  
+            }
+
+            pbf_move_right_joystick(context, x_move, 128, 10, 50);
+        });
+        
+    }catch (UnexpectedBattleException&){
+        overlays.clear();
+        recovery_action();
+        // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+        // move_camera_yolo();
+    }
+    round_num++;
+    }
+}
+
+
 
 }
 }
