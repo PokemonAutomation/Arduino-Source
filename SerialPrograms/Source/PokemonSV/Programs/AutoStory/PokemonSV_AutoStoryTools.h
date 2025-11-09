@@ -419,13 +419,14 @@ void move_forward_until_yolo_object_detected(
 );
 
 // walk forward forward_ticks each time, while clearing path with Let's Go.
-// walk until we no longer see the target object.
+// walk until we no longer see the target object. and haven't seen `it times_not_seen_threshold` times.
 // if caught in battle, run recovery_action
 void move_forward_until_yolo_object_not_detected(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     YOLOv5Detector& yolo_detector, 
     const std::string& target_label,
+    size_t times_not_seen_threshold,
     std::function<void()>&& recovery_action, 
     uint16_t forward_ticks = 100, 
     uint8_t y = 0, 

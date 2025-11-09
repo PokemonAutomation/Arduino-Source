@@ -1539,6 +1539,7 @@ void move_forward_until_yolo_object_not_detected(
     ProControllerContext& context, 
     YOLOv5Detector& yolo_detector, 
     const std::string& target_label,   
+    size_t times_not_seen_threshold,
     std::function<void()>&& recovery_action, 
     uint16_t forward_ticks, 
     uint8_t y, 
@@ -1547,16 +1548,20 @@ void move_forward_until_yolo_object_not_detected(
 ){
     VideoOverlaySet overlays(env.console.overlay());
     bool target_visible = true;
+    size_t times_not_seen = 0;
     size_t round_num = 0;
-    while(target_visible){
+    while(times_not_seen < times_not_seen_threshold){
     try{
-        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+        do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             context.wait_for_all_requests();
             ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
             target_visible = target_box.x != -1;
             if (!target_visible){  // stop when target not visible
-                return;
+                times_not_seen++;
+                if (times_not_seen >= times_not_seen_threshold){
+                    return;
+                }
             }
             
             pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
@@ -1588,7 +1593,7 @@ void move_camera_yolo(
     bool reached_target_line = false;
     for (size_t i = 0; i < max_attempts; i++){
     try{
-        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+        do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             context.wait_for_all_requests();
             ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
