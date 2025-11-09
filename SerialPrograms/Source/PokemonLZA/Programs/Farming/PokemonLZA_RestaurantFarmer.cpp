@@ -46,15 +46,21 @@ class RestaurantFarmer_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : rounds(m_stats["Rounds"])
+        , wins(m_stats["Wins"])
+        , losses(m_stats["Losses"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Rounds");
+        m_display_order.emplace_back("Wins");
+        m_display_order.emplace_back("Losses");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
 
         m_aliases["Battles"] = "Rounds";
     }
 
     std::atomic<uint64_t>& rounds;
+    std::atomic<uint64_t>& wins;
+    std::atomic<uint64_t>& losses;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> RestaurantFarmer_Descriptor::make_stats() const{
@@ -215,13 +221,23 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
 
     WallClock start = current_time();
 
+    bool won = false;
+
     while (true){
         context.wait_for_all_requests();
 
+        ButtonWatcher buttonA(
+            COLOR_RED,
+            ButtonType::ButtonA,
+            {0.1, 0.1, 0.8, 0.8},
+            &env.console.overlay(),
+            1000ms
+        );
         SelectionArrowWatcher arrow(
             COLOR_YELLOW, &env.console.overlay(),
             SelectionArrowType::RIGHT,
-            {0.654308, 0.481553, 0.295529, 0.312621}
+            {0.654308, 0.481553, 0.295529, 0.312621},
+            1000ms
         );
         ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay(), 1000ms);
         FlatWhiteDialogWatcher dialog0(COLOR_RED, &env.console.overlay(), 1000ms);
@@ -236,6 +252,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
                 }
             },
             {
+                buttonA,
                 arrow,
                 item_receive,
                 dialog0,
@@ -245,6 +262,17 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
 
         switch (ret){
         case 0:
+            env.log("Detected Lobby.");
+            stats.rounds++;
+            if (won){
+                stats.wins++;
+            }else{
+                stats.losses++;
+            }
+            env.update_stats();
+            return;
+
+        case 1:
             env.log("Detected selection arrow. (unexpected)", COLOR_RED);
             dump_image(env.console.logger(), env.program_info(), env.console.video(), "UnexpectedSelectionArrow");
             stats.errors++;
@@ -252,16 +280,20 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
             continue;
 
         case 2:
+            env.log("Detected item receive.");
+            won = true;
+            pbf_press_button(context, BUTTON_A, 160ms, 80ms);
+            continue;
+
+        case 3:
             env.log("Detected white dialog.");
             pbf_press_button(context, BUTTON_B, 160ms, 80ms);
             continue;
 
-        case 1:
-        case 3:
-            env.log("Detected blue dialog. End of round!");
-            stats.rounds++;
-            env.update_stats();
-            return;
+        case 4:
+            env.log("Detected blue dialog.");
+            pbf_press_button(context, BUTTON_B, 160ms, 80ms);
+            continue;
 
         default:
             stats.errors++;
