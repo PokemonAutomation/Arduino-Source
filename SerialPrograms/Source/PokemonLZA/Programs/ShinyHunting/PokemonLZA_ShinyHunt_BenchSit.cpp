@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -99,7 +100,9 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_OPTION(WALK_DIRECTION);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(WALK_DIRECTION);
+    }
     PA_ADD_OPTION(WALK_FORWARD_DURATION);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -162,6 +165,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
             // Otherwise, take screenshot immediately (no additional wait needed)
 
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            env.console.overlay().add_log("Take Video");
             to_take_shiny_sound_video.store(0, std::memory_order_relaxed);
         }
     };
@@ -178,6 +182,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
             shiny_detection_time_ms.store(now_ms, std::memory_order_relaxed);
 
             SHINY_DETECTED.send_shiny_sound_notification(env, env.console, error_coefficient);
+            env.console.overlay().add_log("Shiny sound detected!", COLOR_YELLOW);
             to_take_shiny_sound_video.store(1, std::memory_order_relaxed);
         }
 
@@ -196,10 +201,12 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 Milliseconds duration = WALK_FORWARD_DURATION;
                 if (duration > Milliseconds::zero()){
                     if (WALK_DIRECTION.current_value() == 0){ // forward
+                        env.console.overlay().add_log("Move Forward");
                         ssf_press_button(context, BUTTON_B, 0ms, 2 * duration, 0ms);
                         pbf_move_left_joystick(context, 128, 0, duration, 0ms);
                         pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
                     } else if (WALK_DIRECTION.current_value() == 1){ // left
+                        env.console.overlay().add_log("Move Left");
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
                         pbf_move_left_joystick(context, 0, 128, duration, 0ms);
                         pbf_press_button(context, BUTTON_L, 100ms, 400ms);
@@ -207,6 +214,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                         pbf_move_left_joystick(context, 128, 255, duration, 0ms);
                         pbf_move_left_joystick(context, 0, 128, 100ms, 0ms);
                     } else if (WALK_DIRECTION.current_value() == 2){ // right
+                        env.console.overlay().add_log("Move Right");
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
                         pbf_move_left_joystick(context, 255, 128, duration, 0ms);
                         pbf_press_button(context, BUTTON_L, 100ms, 400ms);

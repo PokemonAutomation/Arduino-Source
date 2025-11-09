@@ -202,6 +202,7 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
 
 
 void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
+    console.overlay().add_log("Sitting on Bench");
     {
         BlackScreenOverWatcher black_screen(COLOR_BLUE);
 
@@ -232,6 +233,7 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
         }
     }
 
+    console.overlay().add_log("Waiting for New Day/Night");
     OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay());
     int ret = wait_until(
         console, context,
