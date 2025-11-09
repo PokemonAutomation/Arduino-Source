@@ -17,6 +17,7 @@
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_StationaryOverworldWatcher.h"
+#include "PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 #include "PokemonSV/Programs/PokemonSV_MenuNavigation.h"
 #include "PokemonSV/Programs/PokemonSV_GameEntry.h"
@@ -728,6 +729,41 @@ void do_action_and_monitor_for_battles(
     }
 }
 
+void do_action_and_monitor_for_battles_early(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+){
+    NoMinimapWatcher no_minimap(stream.logger(), COLOR_RED, Milliseconds(250));
+    int ret = run_until<ProControllerContext>(
+        stream, context,
+        [&](ProControllerContext& context){
+            context.wait_for_all_requests();
+            action(info, stream, context);
+        },
+        {no_minimap}
+    );
+    if (ret == 0){  // if see no minimap. stop and see if we detect a battle. if so, throw Battl exception
+        do_action_and_monitor_for_battles(info, stream, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            pbf_wait(context, Seconds(10));
+        });
+
+        // if no battle seen, then throw Exception.
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "do_action_and_monitor_for_battles_early(): Expected to see a battle, but didn't. Possible false positive on NoMinimapWatcher.",
+            stream
+        ); 
+    }
+
+}
+
 
 void handle_unexpected_battles(
     const ProgramInfo& info, 
@@ -1344,7 +1380,7 @@ void move_player_forward(
     context.wait_for_all_requests();
     for (size_t i = 0; i < num_rounds; i++){
         try{
-            do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+            do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
@@ -1409,7 +1445,7 @@ void move_forward_until_yolo_object_above_min_size(
     bool exceed_reattempts = false;
     while(!reached_target && !exceed_reattempts){  
     try{
-        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+        do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             context.wait_for_all_requests();
             ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
@@ -1467,7 +1503,7 @@ void move_forward_until_yolo_object_detected(
     size_t round_num = 0;
     while(!found_target){
     try{
-        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+        do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             context.wait_for_all_requests();
             ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
