@@ -29,6 +29,8 @@ enum class ButtonType{
     ButtonMinus,
     ButtonRight,
     RightStickUpDown,
+    ButtonDpadUp,
+    ButtonDpadDown,
 };
 
 class ButtonMatcher;
