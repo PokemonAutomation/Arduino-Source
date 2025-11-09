@@ -10,9 +10,9 @@
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLZA_ButtonDetector.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -67,17 +67,19 @@ public:
         return matcher;
     }
     static const ButtonMatcher& DpadUp(){
-        static ButtonMatcher matcher(ButtonType::ButtonDpadUp, 50, 50, 70);
+        static ButtonMatcher matcher(ButtonType::ButtonDpadUp, 30, 30, 80);
         return matcher;
     }
     static const ButtonMatcher& DpadDown(){
-        static ButtonMatcher matcher(ButtonType::ButtonDpadDown, 50, 50, 70);
+        static ButtonMatcher matcher(ButtonType::ButtonDpadDown, 30, 30, 80);
         return matcher;
     }
 
     virtual bool check_image(Resolution input_resolution, const ImageViewRGB32& image) const override{
         size_t min_width = m_min_width * input_resolution.width / 3840;
         size_t min_height = m_min_height * input_resolution.height / 2160;
+        // cout << "???? check_image() ???? min size " << min_width << " x " << min_height
+        //      << " got " << image.width() << " x " << image.height() << endl;
         return image.width() >= min_width && image.height() >= min_height;
     };
 

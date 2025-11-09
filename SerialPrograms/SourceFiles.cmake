@@ -1039,6 +1039,7 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Options/TurboMacroTable.h
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
+    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch2_DateSkippers.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManipBase.h
@@ -1050,7 +1051,6 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateSkippers.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateSkippers.h
-    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch2_DateSkippers.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch1_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch2_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.cpp
@@ -1570,6 +1570,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_MapIconDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h
+    Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp

@@ -39,6 +39,8 @@
 
  int test_pokemonLZA_MapIconDetector(const std::string& filepath);
 
+ int test_pokemonLZA_OverworldPartySelectionDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
+
  }
 
  #endif

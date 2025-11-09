@@ -15,6 +15,7 @@
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include <iostream>
 #include <fstream>
@@ -389,6 +390,73 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
     debug_image.save(debug_path.toStdString());
     cout << "Debug image saved to: " << debug_path.toStdString() << endl;
 #endif
+
+    return 0;
+}
+
+int test_pokemonLZA_OverworldPartySelectionDetector(const ImageViewRGB32& image, const std::vector<std::string>& words){
+    // Expected filename format: <...>_<dpad_up_idx>_<dpad_down_idx>.png
+    // Where indices are 0-5 for party positions, or 6 for INVALID_PARTY_IDX
+    // Examples:
+    //   test_0_1.png -> dpad_up_idx = 0, dpad_down_idx = 1
+    //   test_6_2.png -> dpad_up_idx = 6 (INVALID), dpad_down_idx = 2
+    //   test_1_6.png -> dpad_up_idx = 1, dpad_down_idx = 6 (INVALID)
+
+    if (words.size() < 2){
+        cerr << "Error: filename must have at least 2 words (dpad_up_idx, dpad_down_idx)." << endl;
+        return 1;
+    }
+
+    // Parse dpad_up_idx from second-to-last word
+    int expected_up_idx;
+    if (parse_int(words[words.size() - 2], expected_up_idx) == false){
+        cerr << "Error: second-to-last word in filename should be dpad_up_idx (0-6)." << endl;
+        return 1;
+    }
+    if (expected_up_idx < 0 || expected_up_idx > 6){
+        cerr << "Error: dpad_up_idx must be between 0 and 6, got " << expected_up_idx << "." << endl;
+        return 1;
+    }
+
+    // Parse dpad_down_idx from last word
+    int expected_down_idx;
+    if (parse_int(words[words.size() - 1], expected_down_idx) == false){
+        cerr << "Error: last word in filename should be dpad_down_idx (0-6)." << endl;
+        return 1;
+    }
+    if (expected_down_idx < 0 || expected_down_idx > 6){
+        cerr << "Error: dpad_down_idx must be between 0 and 6, got " << expected_down_idx << "." << endl;
+        return 1;
+    }
+
+    // Run detector
+    auto overlay = DummyVideoOverlay();
+    OverworldPartySelectionDetector detector(COLOR_RED, &overlay);
+    detector.set_debug_mode(true);
+    bool detected = detector.detect(image);
+
+    // Check if detection matches expectations
+    uint8_t detected_up_idx = detector.dpad_up_idx();
+    uint8_t detected_down_idx = detector.dpad_down_idx();
+
+    // If both expected indices are INVALID_PARTY_IDX (6), detection should fail
+    if (expected_up_idx == 6 && expected_down_idx == 6){
+        if (detected){
+            cerr << "Error: detector should not detect anything when both indices are INVALID." << endl;
+            return 1;
+        }
+        TEST_RESULT_EQUAL(detected, false);
+        return 0;
+    }
+
+    // Otherwise, detection should succeed
+    if (!detected){
+        cerr << "Error: detector failed to detect party selection screen." << endl;
+        return 1;
+    }
+
+    TEST_RESULT_COMPONENT_EQUAL((int)detected_up_idx, expected_up_idx, "dpad_up_idx");
+    TEST_RESULT_COMPONENT_EQUAL((int)detected_down_idx, expected_down_idx, "dpad_down_idx");
 
     return 0;
 }
