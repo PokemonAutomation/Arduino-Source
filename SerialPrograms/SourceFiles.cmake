@@ -1567,6 +1567,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Panels.h
     Source/PokemonLZA/PokemonLZA_Settings.cpp
     Source/PokemonLZA/PokemonLZA_Settings.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.cpp
