@@ -1375,8 +1375,11 @@ ImageFloatBox get_yolo_box(
         std::string label = yolo_detector.session()->label_name(detected_box.label_idx);
         if (target_label == label){
             target_box = box;
+            overlays.add(COLOR_RED, box, label);
+        }else{
+            overlays.add(COLOR_BLUE, box, label);
         }
-        overlays.add(COLOR_RED, box, label);
+        
     }
 
     env.console.log(std::string(target_label) + ": {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
@@ -1397,6 +1400,9 @@ void move_forward_until_yolo_object_above_min_size(
     uint16_t delay_after_forward_move, 
     uint16_t delay_after_lets_go
 ){
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+
     VideoOverlaySet overlays(env.console.overlay());
     size_t num_reattempts = 0;
     bool reached_target = false;
@@ -1453,6 +1459,9 @@ void move_forward_until_yolo_object_detected(
     uint16_t delay_after_forward_move, 
     uint16_t delay_after_lets_go
 ){
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+
     VideoOverlaySet overlays(env.console.overlay());
     bool found_target = false;
     size_t round_num = 0;
@@ -1475,6 +1484,45 @@ void move_forward_until_yolo_object_detected(
                 );  
             }
 
+            pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+            pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+        });
+        
+    }catch (UnexpectedBattleException&){
+        overlays.clear();
+        recovery_action();
+        // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+        // move_camera_yolo();
+    }
+    round_num++;
+    }
+}
+
+void move_forward_until_yolo_object_not_detected(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,   
+    std::function<void()>&& recovery_action, 
+    uint16_t forward_ticks, 
+    uint8_t y, 
+    uint16_t delay_after_forward_move, 
+    uint16_t delay_after_lets_go
+){
+    VideoOverlaySet overlays(env.console.overlay());
+    bool target_visible = true;
+    size_t round_num = 0;
+    while(target_visible){
+    try{
+        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            context.wait_for_all_requests();
+            ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
+            target_visible = target_box.x != -1;
+            if (!target_visible){  // stop when target not visible
+                return;
+            }
+            
             pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
             pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });

@@ -405,6 +405,21 @@ void move_forward_until_yolo_object_detected(
     uint16_t delay_after_lets_go = 105
 );
 
+// walk forward forward_ticks each time, while clearing path with Let's Go.
+// walk until we no longer see the target object.
+// if caught in battle, run recovery_action
+void move_forward_until_yolo_object_not_detected(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    std::function<void()>&& recovery_action, 
+    uint16_t forward_ticks = 100, 
+    uint8_t y = 0, 
+    uint16_t delay_after_forward_move = 50, 
+    uint16_t delay_after_lets_go = 105
+);
+
 enum class CameraAxis{
     X,
     Y,
