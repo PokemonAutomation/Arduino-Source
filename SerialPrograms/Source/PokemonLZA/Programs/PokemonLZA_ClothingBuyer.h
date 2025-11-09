@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonLZA_ClothingBuyer_H
 #define PokemonAutomation_PokemonLZA_ClothingBuyer_H
 
-#include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
@@ -16,6 +15,8 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
+
+
 
 class ClothingBuyer_Descriptor : public SingleSwitchProgramDescriptor{
 public:

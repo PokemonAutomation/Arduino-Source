@@ -1595,6 +1595,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_PostKillCatcher.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_PostKillCatcher.h
     Source/PokemonLZA/Programs/PokemonLZA_StallBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_StallBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
