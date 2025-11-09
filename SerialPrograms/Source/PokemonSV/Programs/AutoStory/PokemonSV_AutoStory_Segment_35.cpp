@@ -4,6 +4,9 @@
  *
  */
 
+#include "ML/Inference/ML_YOLOv5Detector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -17,15 +20,13 @@
 //#include <iostream>
 //using std::cout;
 //using std::endl;
-//#include <unordered_map>
-//#include <algorithm>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
 
-
+using namespace ML;
 
 std::string AutoStory_Segment_35::name() const{
     return "35: Area Zero Gate, Station 1";
@@ -237,11 +238,122 @@ void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 }
 
 void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
-       
+    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    // [&](size_t attempt_number){
 
-    });     
+
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/yolo_area0_station1.onnx");
+
+        #if 0
+        #endif
+
+        move_player_forward(env, context, 6);
+
+        // confirm we can see tree-tera
+        move_forward_until_yolo_object_detected(env, context, yolo_detector, "tree-tera", 
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+            },
+            5
+        );
+        // align to tree-tera. center-y: 0.294444   center-x: 0.604688
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
+        
+        // move towards tree-tera until {0.721875, 0.277778, 0.146875, 0.180556}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "tree-tera",
+            0.146, 0.180,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.583594);
+            }
+        );
+
+        // align to rock-1. center-y: 0.191667   center-x: 0.583594
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-1", 0.191667);
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-1", 0.583594);
+
+        // move towards rock-1 until {0.626563, 0.113889, 0.279688, 0.230556}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-1",
+            0.279, 0.230,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-1", 0.564063);
+            }
+        );
+        
+
+        // align to rock-2. center-y: 0.194444   center-x: 0.508594
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-2", 0.194444);
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-2", 0.508594);
+        
+
+        // move towards rock-2 until {0.471875, 0.244444, 0.103125, 0.266667}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-2",
+            0.103, 0.266,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-2", 0.535937);
+            }
+        );
+
+        // align to rock-3. center-y: 0.190278   center-x: 0.566406
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-3", 0.190278);
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-3", 0.566406);
+
+        // move towards rock-3 until   {0.598438, 0.186111, 0.121875, 0.136111}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-3",
+            0.121, 0.136,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-3", 0.535937);
+            }
+        );
+        
+
+        // align to stream.  center-y: 0.481944   center-x: 0.528906
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "stream", 0.481944);
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "stream", 0.528906);
+
+
+        // move forward until stream not detected
+        move_forward_until_yolo_object_not_detected(env, context, yolo_detector, "stream", 
+            3,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "stream", 0.5);
+            }
+        );
+
+        // confirm we can see rock-3
+        move_forward_until_yolo_object_detected(env, context, yolo_detector, "rock-3", 
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+            },
+            9
+        );
+
+        // align to rock-3.  center-y: 0.291667   center-x: 0.501563
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-3", 0.291667);
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-3", 0.501563);
+
+        // move towards rock-3 until {0.371875, 0.038889, 0.257812, 0.286111}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-3",
+            0.257, 0.25,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-3", 0.501563);
+            }
+        );
+
+        
+
+
+ 
+
+
+
+    // });
 }
 
 void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){

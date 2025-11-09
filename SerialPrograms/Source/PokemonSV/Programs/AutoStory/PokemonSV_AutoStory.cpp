@@ -1262,16 +1262,9 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
 
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/yolo_area0_station1.onnx");
         // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
+        // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
 
-        // VideoOverlaySet overlays(env.console.overlay());
-        // ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, "rock-6");
-        // env.console.log("box: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
 
-        // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-6", 0.5);
-        // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-6", 0.2);
-
-        // move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-6", 0.221875, 0.158333, )
 
         return;
     }
