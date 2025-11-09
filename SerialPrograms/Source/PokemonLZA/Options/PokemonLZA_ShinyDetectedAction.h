@@ -66,6 +66,47 @@ public:
 
 
 
+class ShinySoundHandler{
+public:
+    ShinySoundHandler(ShinySoundDetectedActionOption& option)
+        : m_option(option)
+        , m_pending_video(false)
+    {}
+
+    //  Only call this from shiny inference thread.
+    //  Returns true if we should exit from routine.
+    bool on_shiny_sound(
+        ProgramEnvironment& env,
+        VideoStream& stream,
+        size_t current_count,
+        float error_coefficient
+    );
+
+    //  Only call this from program thread.
+    void process_pending(ProControllerContext& context);
+
+
+private:
+    ShinySoundDetectedActionOption& m_option;
+
+    //  Set to true by the shiny inference thread.
+    //  Set to false by the program thread after it processes the pending video.
+    std::atomic<bool> m_pending_video;
+
+    WallClock m_detected_time;
+};
+
+
+
+
+
+
+
+
+
+
+
+
 }
 }
 }
