@@ -141,14 +141,14 @@ bool ShinySoundHandler::on_shiny_sound(
         return false;
     }
 
+    m_option.send_shiny_sound_notification(env, stream, error_coefficient);
+
     if (m_pending_video.load(std::memory_order_acquire)){
         stream.log("Back-to-back shiny sounds. Suppressing video.", COLOR_RED);
     }else{
         m_detected_time = now;
         m_pending_video.store(true, std::memory_order_release);
     }
-
-    m_option.send_shiny_sound_notification(env, stream, error_coefficient);
 
     return action == ShinySoundDetectedAction::STOP_PROGRAM;
 }
@@ -171,9 +171,11 @@ void ShinySoundHandler::process_pending(ProControllerContext& context){
     if (requested_delay > elapsed_ms){
         context.wait_for(requested_delay - elapsed_ms);
     }
-    //  Otherwise, take screenshot immediately (no additional wait needed)
 
+    //  Otherwise, take screenshot immediately (no additional wait needed)
     pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+
+    //  Now we can unlock.
     m_pending_video.store(false, std::memory_order_release);
 }
 
