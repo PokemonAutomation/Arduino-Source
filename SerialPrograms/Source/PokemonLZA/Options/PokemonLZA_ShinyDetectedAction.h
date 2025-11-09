@@ -15,6 +15,7 @@
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include <atomic>
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
