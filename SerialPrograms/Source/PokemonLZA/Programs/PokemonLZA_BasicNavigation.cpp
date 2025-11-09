@@ -209,12 +209,12 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
             console, context,
             [](ProControllerContext& context){
                 // mash A to start day/night change and into the transition animation
-                pbf_mash_button(context, BUTTON_A, 5000ms);
-                for (int c = 0; c < 3; c++){
-                    pbf_move_left_joystick(context, 128, 255, 1000ms, 0ms);
-                    pbf_mash_button(context, BUTTON_B, 1000ms);
-                    pbf_mash_button(context, BUTTON_A, 5000ms);
-                }
+                pbf_mash_button(context, BUTTON_A, 10000ms);
+                // for (int c = 0; c < 3; c++){
+                //     pbf_move_left_joystick(context, 128, 255, 1000ms, 0ms);
+                //     pbf_mash_button(context, BUTTON_B, 1000ms);
+                //     pbf_mash_button(context, BUTTON_A, 5000ms);
+                // }
             },
             {black_screen}
         );
