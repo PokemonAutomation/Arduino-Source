@@ -1589,8 +1589,9 @@ void move_camera_yolo(
 ){
     VideoOverlaySet overlays(env.console.overlay());
     size_t max_attempts = 10;
-    // size_t num_reattempts = 0;
+    size_t num_reattempts = 0;
     bool reached_target_line = false;
+    bool exceed_reattempts = false;
     for (size_t i = 0; i < max_attempts; i++){
     try{
         do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
@@ -1600,8 +1601,15 @@ void move_camera_yolo(
 
             bool not_found_target = target_box.x == -1;
             if (not_found_target){
+                num_reattempts++;
+                if (num_reattempts > 3){
+                    exceed_reattempts = true;
+                    return;      // when too many failed attempts, just assume we're too close to the target to detect it.
+                }
                 context.wait_for(1000ms); // if we can't see the object, it might just be temporarily obscured. wait one second and reattempt.
                 return;
+            }else{
+                num_reattempts = 0;
             }
        
             
@@ -1672,7 +1680,7 @@ void move_camera_yolo(
             }
         });
 
-        if(reached_target_line){
+        if(reached_target_line || exceed_reattempts){
             break;
         }
     
@@ -1683,6 +1691,103 @@ void move_camera_yolo(
     }
 }
 
+bool move_player_to_realign_via_yolo(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double x_target
+){
+
+    VideoOverlaySet overlays(env.console.overlay());
+    size_t max_attempts = 10;
+    size_t num_reattempts = 0;
+    bool reached_target_line = false;
+    bool exceed_reattempts = false;
+    for (size_t i = 0; i < max_attempts; i++){
+    try{
+        do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
+        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+            context.wait_for_all_requests();
+            ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
+
+            bool not_found_target = target_box.x == -1;
+            if (not_found_target){
+                num_reattempts++;
+                if (num_reattempts > 3){
+                    exceed_reattempts = true;
+                    return;      // when too many failed attempts, just assume we're too close to the target to detect it.
+                }
+                context.wait_for(1000ms); // if we can't see the object, it might just be temporarily obscured. wait one second and reattempt.
+                return;
+            }else{
+                num_reattempts = 0;
+            }
+       
+            double object_x_pos = target_box.x + target_box.width/2;
+            double diff =  x_target - object_x_pos;
+
+            env.console.log("diff: " + std::to_string(diff));
+            if (std::abs(diff) < 0.05){
+                reached_target_line = true;
+                return;    // close enough to target_line. stop.
+            }
+            
+            double duration_scale_factor = 500 / std::sqrt(std::abs(diff));
+            // if (std::abs(diff) < 0.05){
+            //     duration_scale_factor /= 2;
+            // }
+            double push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
+
+            uint16_t push_duration = std::max(uint16_t(std::abs(diff * duration_scale_factor)), uint16_t(8));
+            int16_t push_direction = (diff > 0) ? -1 : 1;
+            double push_magnitude = std::max(double(std::abs(diff * push_magnitude_scale_factor)), double(15)); 
+            uint8_t x_push = uint8_t(std::max(std::min(int(128 + (push_direction * push_magnitude)), 255), 0));
+
+            // env.console.log("object_x: {" + std::to_string(target_box.x) + ", " + std::to_string(target_box.y) + ", " + std::to_string(target_box.width) + ", " + std::to_string(target_box.height) + "}");
+            // env.console.log("object_x_pos: " + std::to_string(object_x_pos));
+            env.console.log("x push: " + std::to_string(x_push) + ", push duration: " +  std::to_string(push_duration));
+            if (i == 0){
+                pbf_move_left_joystick(context, x_push, 128, 10, 50);
+                pbf_press_button(context, BUTTON_R, 20, 105);
+            }
+            
+            pbf_move_left_joystick(context, x_push, 128, push_duration, 100);
+            
+        });
+
+        if (exceed_reattempts){
+            return false;
+        }
+
+        if(reached_target_line){
+            return true;
+        }
+    
+    }catch (UnexpectedBattleException&){
+        overlays.clear();
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+    }
+    }
+
+    return false;
+}
+
+
+void move_player_to_realign_via_yolo_with_recovery(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double x_target,
+    std::function<void()>&& recovery_action
+){
+    bool succeed_realign_attempt_1 = move_player_to_realign_via_yolo(env, context, yolo_detector, target_label, x_target);
+    if (!succeed_realign_attempt_1){
+        recovery_action();
+        move_player_to_realign_via_yolo(env, context, yolo_detector, target_label, x_target); // second attempt.
+    }
+}
 
 
 

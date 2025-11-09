@@ -449,8 +449,23 @@ void move_camera_yolo(
     double target_line
 );
 
+// move the player sideways until the target object is aligned with x_target
+bool move_player_to_realign_via_yolo(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double x_target
+);
 
-
+void move_player_to_realign_via_yolo_with_recovery(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double x_target,
+    std::function<void()>&& recovery_action
+);
 
 
 }
