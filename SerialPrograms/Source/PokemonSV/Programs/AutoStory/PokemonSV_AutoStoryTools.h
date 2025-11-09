@@ -186,8 +186,8 @@ void do_action_and_monitor_for_battles(
     >&& action
 );
 
-// run the given `action`. if detect a no minimap, stop the action. 
-// wait 10 seconds and see if we find a battle. if so, throw Battle exception. if no battle, then throw OperationFailedException
+// run the given `action`. if detect no minimap, stop the action. 
+// wait 15 seconds and see if we find a battle. if so, throw Battle exception. if no battle, then throw OperationFailedException
 void do_action_and_monitor_for_battles_early(
     const ProgramInfo& info, 
     VideoStream& stream,
@@ -198,6 +198,18 @@ void do_action_and_monitor_for_battles_early(
         ProControllerContext& context)
     >&& action
 );
+
+void do_action_until_dialog(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+);
+
 
 // catch any UnexpectedBattle exceptions from `action`. then use run_battle_press_A until overworld, and re-try the `action`.
 void handle_unexpected_battles(
@@ -369,6 +381,7 @@ void move_player_forward(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     uint8_t num_rounds, 
+    std::function<void()>&& recovery_action,
     uint16_t forward_ticks = 100, 
     uint8_t y = 0, 
     uint16_t delay_after_forward_move = 50, 
@@ -477,7 +490,6 @@ void move_camera_until_yolo_object_detected(
     const std::string& target_label,
     uint8_t initial_x_move, 
     uint16_t initial_hold_ticks, 
-    std::function<void()>&& recovery_action, 
     uint16_t max_rounds = 50
 );
 

@@ -751,7 +751,7 @@ void do_action_and_monitor_for_battles_early(
     if (ret == 0){  // if see no minimap. stop and see if we detect a battle. if so, throw Battl exception
         do_action_and_monitor_for_battles(info, stream, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_wait(context, Seconds(10));
+            pbf_wait(context, Seconds(15));
         });
 
         // if no battle seen, then throw Exception.
@@ -763,6 +763,44 @@ void do_action_and_monitor_for_battles_early(
     }
 
 }
+
+
+void do_action_until_dialog(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+){
+    AdvanceDialogWatcher    dialog(COLOR_RED);
+    int ret = run_until<ProControllerContext>(
+        stream, context,
+        [&](ProControllerContext& context){
+            context.wait_for_all_requests();
+            action(info, stream, context);
+        },
+        {dialog}
+    );
+    context.wait_for(std::chrono::milliseconds(100));
+
+    switch (ret){
+    case 0: // dialog
+        stream.log("do_action_until_dialog(): Detected dialog.");
+        return;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "do_action_until_dialog(): Finished action. Did not detect dialog.",
+            stream
+        );
+    }
+
+}
+
+
 
 
 void handle_unexpected_battles(
@@ -1371,6 +1409,7 @@ void move_player_forward(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     uint8_t num_rounds, 
+    std::function<void()>&& recovery_action,
     uint16_t forward_ticks, 
     uint8_t y, 
     uint16_t delay_after_forward_move, 
@@ -1386,7 +1425,8 @@ void move_player_forward(
                 pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
         }catch (UnexpectedBattleException&){
-            run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+            recovery_action();
+            // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
         }
     }
 
@@ -1647,7 +1687,7 @@ void move_camera_yolo(
                 push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
                 break;
             case CameraAxis::Y:
-                duration_scale_factor = 150 / std::sqrt(std::abs(diff));
+                duration_scale_factor = 100 / std::sqrt(std::abs(diff));
                 if (std::abs(diff) < 0.1){
                     duration_scale_factor *= 0.5;
                 }
@@ -1797,7 +1837,6 @@ void move_camera_until_yolo_object_detected(
     const std::string& target_label,
     uint8_t initial_x_move, 
     uint16_t initial_hold_ticks,
-    std::function<void()>&& recovery_action, 
     uint16_t max_rounds
 ){
     VideoOverlaySet overlays(env.console.overlay());
@@ -1832,9 +1871,7 @@ void move_camera_until_yolo_object_detected(
         
     }catch (UnexpectedBattleException&){
         overlays.clear();
-        recovery_action();
-        // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-        // move_camera_yolo();
+        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
     }
     round_num++;
     }
