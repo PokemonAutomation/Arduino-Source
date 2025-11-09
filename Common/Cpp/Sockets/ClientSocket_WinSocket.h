@@ -9,9 +9,9 @@
 
 #include <iostream>
 #include <mutex>
-#include <thread>
 #include <condition_variable>
 #include <winsock.h>
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "AbstractClientSocket.h"
 
 #pragma comment(lib, "Ws2_32.lib")
@@ -35,9 +35,7 @@ public:
 
     virtual ~ClientSocket_WinSocket(){
         close();
-        if (m_thread.joinable()){
-            m_thread.join();
-        }
+        m_thread.join();
         close_socket();
     }
     virtual void close() noexcept override{
@@ -55,10 +53,9 @@ public:
         }
         try{
             m_state.store(State::CONNECTING, std::memory_order_relaxed);
-            m_thread = std::thread(
-                &ClientSocket_WinSocket::thread_loop,
-                this, address, port
-            );
+            m_thread = Thread([&, this]{
+                thread_loop(address, port);
+            });
         }catch (...){
             m_state.store(State::NOT_RUNNING, std::memory_order_relaxed);
             throw;
@@ -241,7 +238,7 @@ private:
 
     mutable std::mutex m_lock;
     std::condition_variable m_cv;
-    std::thread m_thread;
+    Thread m_thread;
 };
 
 

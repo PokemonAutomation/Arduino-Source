@@ -8,11 +8,11 @@
 #define PokemonAutomation_Controllers_KeyboardInput_H
 
 #include <map>
-#include <thread>
 #include <condition_variable>
 #include <Qt>
 #include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "Controllers/Controller.h"
 #include "Controllers/KeyboardInput/GlobalQtKeyMap.h"
 #include "KeyboardEventHandler.h"
@@ -83,7 +83,7 @@ private:
 
     std::mutex m_sleep_lock;
     std::condition_variable m_cv;
-    std::thread m_thread;
+    Thread m_thread;
 };
 
 

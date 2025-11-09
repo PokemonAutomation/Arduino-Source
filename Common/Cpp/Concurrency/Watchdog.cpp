@@ -25,7 +25,7 @@ Watchdog::~Watchdog(){
     m_thread.join();
 }
 Watchdog::Watchdog()
-    : m_thread(&Watchdog::thread_body, this)
+    : m_thread([this]{ thread_body(); })
 {}
 
 

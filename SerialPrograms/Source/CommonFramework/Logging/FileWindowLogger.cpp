@@ -59,7 +59,9 @@ FileWindowLogger::FileWindowLogger(const std::string& path)
         m_file.write(bom.c_str(), bom.size());
     }
 
-    m_thread = std::thread(&FileWindowLogger::thread_loop, this);
+    m_thread = Thread([this]{
+        thread_loop();
+    });
 }
 void FileWindowLogger::operator+=(FileWindowLoggerWindow& widget){
 //    auto scope_check = m_sanitizer.check_scope();

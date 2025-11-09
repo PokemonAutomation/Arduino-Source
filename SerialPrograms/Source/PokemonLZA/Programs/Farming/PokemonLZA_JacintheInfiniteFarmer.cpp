@@ -171,6 +171,8 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
     bool seen_selection_arrow = false;
     bool confirm_entering_battle = false;
     bool seen_flat_white_dialog = false;
+
+    TransparentBattleDialogWatcher transparent_battle_dialog(COLOR_WHITE, &env.console.overlay());
     while (true){
         context.wait_for_all_requests();
 
@@ -234,14 +236,13 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
             if (m_stop_after_current.load(std::memory_order_relaxed)){
                 env.console.overlay().add_log("Dialog Choice: Cancel");
                 pbf_press_button(context, BUTTON_B, 160ms, 80ms);
-                continue;
             } else{
                 confirm_entering_battle = true;
                 // confirm entering battle
                 env.console.overlay().add_log("Dialog Choice: Confirm");
                 pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             }
-
+            continue;
         case 2:
             env.log("Detected white dialog.");
             // env.console.overlay().add_log("Advance Dialog");
@@ -252,10 +253,24 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
         case 3:
             env.log("Detected black screen.");
             env.console.overlay().add_log("Transition to Battle");
-            // mash B for 10 sec to clear up any pre-battle transparency dialog
-            pbf_mash_button(context, BUTTON_B, 10s);
+
+            ret = wait_until(
+                env.console, context, 20s, {transparent_battle_dialog}
+            );
+            if (ret != 0){
+                stats.errors++;
+                env.update_stats();
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "talk_to_jacinthe(): Does not detect transparent battle dialog 20 sec after black screen.",
+                    env.console
+                );
+            }
+            // mash B to clear up pre-battle transparency dialog
+            env.log("Clearing transparent battle dialog");
+            env.console.overlay().add_log("Clear Battle Dialog");
+            pbf_mash_button(context, BUTTON_B, 6s);
             context.wait_for_all_requests();
-            env.console.overlay().add_log("Cleared Pre-Battle Dialog");
             // battle starts
             return false;
 

@@ -9,10 +9,10 @@
 
 #include <mutex>
 #include <condition_variable>
-#include <thread>
 #include <QCameraDevice>
 #include <QMediaDevices>
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 
 namespace PokemonAutomation{
 
@@ -49,7 +49,7 @@ private:
     SpinLock m_camera_lock;
     QList<QCameraDevice> m_cameras;
 
-    std::thread m_thread;
+    Thread m_thread;
 };
 
 

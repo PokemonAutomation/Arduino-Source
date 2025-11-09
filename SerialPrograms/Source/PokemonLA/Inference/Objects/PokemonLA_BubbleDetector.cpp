@@ -9,6 +9,7 @@
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/SubObjectTemplateMatcher.h"
+#include "CommonTools/DetectedBoxes.h"
 #include "PokemonLA_BubbleDetector.h"
 
 namespace PokemonAutomation{
@@ -76,7 +77,7 @@ void BubbleDetector::process_object(
     }
 }
 void BubbleDetector::finish(const ImageViewRGB32& image){
-    merge_heavily_overlapping();
+    merge_overlapping_boxes(m_detections);
 }
 
 

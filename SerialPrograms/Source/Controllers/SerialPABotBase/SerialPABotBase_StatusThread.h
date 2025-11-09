@@ -40,7 +40,7 @@ public:
         , m_callback(callback)
         , m_stopping(false)
         , m_error(false)
-        , m_status_thread(&ControllerStatusThread::status_thread, this)
+        , m_status_thread([this]{ status_thread(); })
     {}
     ~ControllerStatusThread(){
         if (m_stopping.exchange(true)){
@@ -63,7 +63,7 @@ private:
         constexpr std::chrono::milliseconds PERIOD(1000);
         std::atomic<WallClock> last_ack(current_time());
 
-        std::thread watchdog([&, this]{
+        Thread watchdog([&, this]{
             WallClock next_ping = current_time();
             while (true){
                 if (m_stopping.load(std::memory_order_relaxed) ||
@@ -155,7 +155,7 @@ private:
     std::atomic<bool> m_error;
     std::mutex m_sleep_lock;
     std::condition_variable m_cv;
-    std::thread m_status_thread;
+    Thread m_status_thread;
 };
 
 

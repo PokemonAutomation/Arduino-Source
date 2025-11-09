@@ -5,6 +5,7 @@
  */
 
 #include "PokemonLZA_MapDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -40,9 +41,27 @@ void MapDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool MapDetector::detect(const ImageViewRGB32& screen){
-    return m_b_button.detect(screen)
+    const bool detected = m_b_button.detect(screen)
         && m_x_button.detect(screen)
         && m_y_button.detect(screen);
+
+    if (detected){
+        for (MapIconDetector* detector : m_map_icon_detectors){
+            detector->detect(screen);
+        }
+    }
+    return detected;
+}
+
+std::vector<DetectedBox> MapDetector::detected_map_icons() const{
+    std::vector<DetectedBox> ret;
+    for (MapIconDetector* detector : m_map_icon_detectors){
+        const auto& detected_boxes = detector->last_detected();
+        for(const auto& box: detected_boxes){
+            ret.emplace_back(box.name, box.box);
+        }
+    }
+    return ret;
 }
 
 

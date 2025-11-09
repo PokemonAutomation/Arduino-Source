@@ -28,9 +28,9 @@
 #include <map>
 #include <atomic>
 #include <condition_variable>
-#include <thread>
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol.h"
 #include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
 #include "Controllers/SerialPABotBase/Connection/PABotBaseConnection.h"
@@ -195,7 +195,7 @@ private:
     std::atomic<State> m_state;
     std::atomic<bool> m_error;
     std::string m_error_message;
-    std::thread m_retransmit_thread;
+    Thread m_retransmit_thread;
 
     LifetimeSanitizer m_sanitizer;
 };

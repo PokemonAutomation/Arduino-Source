@@ -45,7 +45,6 @@ private:
         SeventhItem
     };
     EnumDropdownOption<ItemPosition> ITEM_POSITION;
-    SimpleIntegerOption<uint8_t> NUM_ITEM;
     SimpleIntegerOption<uint16_t> NUM_PURCHASE;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;

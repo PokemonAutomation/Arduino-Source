@@ -7,7 +7,6 @@
 #include <set>
 //#include <atomic>
 #include <chrono>
-//#include <thread>
 #include <iterator>
 #include <sstream>
 #include "CommonFramework/GlobalSettingsPanel.h"

@@ -17,7 +17,7 @@
 #include <functional>
 #include <mutex>
 #include <condition_variable>
-#include <thread>
+#include "Thread.h"
 #include "AsyncTask.h"
 
 namespace PokemonAutomation{
@@ -44,13 +44,14 @@ public:
     );
 
 private:
+    void add_thread();
     void dispatch_task(AsyncTask& task);
     void thread_loop();
 
 private:
     std::function<void()> m_new_thread_callback;
     std::deque<AsyncTask*> m_queue;
-    std::vector<std::thread> m_threads;
+    std::vector<Thread> m_threads;
     bool m_stopping;
     size_t m_busy_count;
     std::mutex m_lock;

@@ -1,7 +1,6 @@
 #ifdef PA_SOCIAL_SDK
 #define DISCORDPP_IMPLEMENTATION
 
-#include <thread>
 #include "DiscordSocial.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Integrations/ProgramTracker.h"
@@ -18,6 +17,11 @@ DiscordSocial& DiscordSocial::instance(){
     return instance;
 }
 
+void DiscordSocial::stop(){
+    m_running.store(false, std::memory_order_release);
+    m_thread.join();
+    if (m_client) m_client.reset();
+}
 void DiscordSocial::run(){
     auto client = std::make_shared<Client>();
     if (!client){
@@ -32,7 +36,7 @@ void DiscordSocial::run(){
             log(message, "Internal", severity);
         }, m_log_level);
 
-        m_thread = std::thread(&DiscordSocial::thread_loop, this);
+        m_thread = Thread([this]{ thread_loop(); });
     }catch (...){
         m_client.reset();
         log("Failed to start DiscordSocialSDK.", "run()", LoggingSeverity::Error);

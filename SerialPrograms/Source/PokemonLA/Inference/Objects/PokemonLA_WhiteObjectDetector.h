@@ -63,7 +63,7 @@ public:
     // Note due to multiple color filters with different thresholds, we may end up with multiple
     // versions of the same objects/parts stored in `m_detections` (an object can be picked by more
     // than one color filter). This is OK. We will use `finish()` to finalize detection, which can
-    // call `merge_heavily_overlapping()` to deduplicate found objects.
+    // call `merge_overlapping_boxes()` to deduplicate found objects.
     // - input_resolution: full screen resolution
     // - image: the image region on screen where the white object detection is run on.
     // - object: a waterfill object found by one of the color filters (one in `m_thresholds`) on
@@ -83,11 +83,6 @@ public:
     // representing the pole and the flag based on their relative position and size to determine
     // a flag match.
     virtual void finish(const ImageViewRGB32& image){}
-
-protected:
-    // After getting candidate white object parts stored in `m_detections`, deduplicate
-    // overlapping parts stored in `m_detections`.
-    void merge_heavily_overlapping(double tolerance = 0.2);
 
 protected:
     Color m_box_color;  // inference box color

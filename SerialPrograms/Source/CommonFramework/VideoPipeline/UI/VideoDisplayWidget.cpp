@@ -231,6 +231,15 @@ void VideoDisplayWidget::mouseMoveEvent(QMouseEvent* event){
     m_overlay_session.issue_mouse_move(x, y);
 }
 
+void VideoDisplayWidget::on_key_press(QKeyEvent* event){
+    m_overlay_session.issue_key_press(event);
+}
+
+void VideoDisplayWidget::on_key_release(QKeyEvent* event){
+    m_overlay_session.issue_key_release(event);
+}
+
+
 OverlayStatSnapshot VideoSourceFPS::get_current(){
     double fps = m_parent.m_video_session.fps_source();
     return OverlayStatSnapshot{

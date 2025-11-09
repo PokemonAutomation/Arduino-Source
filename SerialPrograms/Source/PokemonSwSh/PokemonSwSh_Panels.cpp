@@ -135,12 +135,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- Den Hunting ----");
     ret.emplace_back(make_single_switch_program<PurpleBeamFinder_Descriptor, PurpleBeamFinder>());
     ret.emplace_back(make_single_switch_program<EventBeamFinder_Descriptor, EventBeamFinder>());
-#ifdef PA_OFFICIAL
     ret.emplace_back(make_single_switch_program<DaySkipperJPN_Descriptor, DaySkipperJPN>());
     ret.emplace_back(make_single_switch_program<DaySkipperEU_Descriptor, DaySkipperEU>());
     ret.emplace_back(make_single_switch_program<DaySkipperUS_Descriptor, DaySkipperUS>());
     ret.emplace_back(make_single_switch_program<DaySkipperJPN7p8k_Descriptor, DaySkipperJPN7p8k>());
-#endif
 
     ret.emplace_back("---- Hosting ----");
     ret.emplace_back(make_single_switch_program<DenRoller_Descriptor, DenRoller>());

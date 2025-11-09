@@ -18,9 +18,9 @@
 
 #include <mutex>
 #include <atomic>
-#include <thread>
 #include "Common/Cpp/Time.h"
 #include "Common/Cpp/ListenerSet.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Integrations/ProgramTrackerInterfaces.h"
@@ -131,7 +131,7 @@ private:
 
     std::atomic<WallClock> m_timestamp;
     std::atomic<ProgramState> m_state;
-    std::thread m_thread;
+    Thread m_thread;
 
 //    std::mutex m_stats_lock;
     std::unique_ptr<StatsTracker> m_historical_stats;

@@ -28,7 +28,7 @@ AsyncDispatcher::AsyncDispatcher(std::function<void()>&& new_thread_callback, si
     , m_busy_count(0)
 {
     for (size_t c = 0; c < starting_threads; c++){
-        m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [this]{ thread_loop(); });
+        add_thread();
     }
 }
 AsyncDispatcher::~AsyncDispatcher(){
@@ -37,7 +37,7 @@ AsyncDispatcher::~AsyncDispatcher(){
         m_stopping = true;
         m_cv.notify_all();
     }
-    for (std::thread& thread : m_threads){
+    for (Thread& thread : m_threads){
 //        cout << "AsyncDispatcher::~AsyncDispatcher() joining = " << thread.get_id() << endl;
         thread.join();
     }
@@ -50,8 +50,16 @@ AsyncDispatcher::~AsyncDispatcher(){
 void AsyncDispatcher::ensure_threads(size_t threads){
     std::lock_guard<std::mutex> lg(m_lock);
     while (m_threads.size() < threads){
-        m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [this]{ thread_loop(); });
+        add_thread();
     }
+}
+void AsyncDispatcher::add_thread(){
+    m_threads.emplace_back([this]{
+        run_with_catch(
+            "AsyncDispatcher::thread_loop()",
+            [this]{ thread_loop(); }
+        );
+    });
 }
 
 void AsyncDispatcher::dispatch_task(AsyncTask& task){
@@ -63,7 +71,7 @@ void AsyncDispatcher::dispatch_task(AsyncTask& task){
 
     //  Make sure a thread is ready for it.
     if (m_queue.size() > m_threads.size() - m_busy_count){
-        m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [this]{ thread_loop(); });
+        add_thread();
     }
 
     m_cv.notify_one();
@@ -103,7 +111,7 @@ void AsyncDispatcher::run_in_parallel(
 
         //  Make sure there are enough threads.
         while (m_queue.size() > m_threads.size() - m_busy_count){
-            m_threads.emplace_back(run_with_catch, "AsyncDispatcher::thread_loop()", [this]{ thread_loop(); });
+            add_thread();
         }
 
         for (size_t c = 0; c < tasks.size(); c++){

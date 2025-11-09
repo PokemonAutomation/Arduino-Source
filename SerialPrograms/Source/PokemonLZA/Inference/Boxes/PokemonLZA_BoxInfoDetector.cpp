@@ -127,10 +127,10 @@ bool BoxAlphaDetector::detect(const ImageViewRGB32& screen){
     size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
-        // {combine_rgb(200, 50, 50), combine_rgb(255, 150, 150)},
         {combine_rgb(200, 50, 50), combine_rgb(255, 150, 150)},
         {combine_rgb(200, 50, 50), combine_rgb(255, 100, 100)},
         {combine_rgb(150, 0, 0), combine_rgb(255, 100, 100)},
+        {combine_rgb(100, 0, 0), combine_rgb(255, 100, 100)},
     };
 
     const double max_rsmd = 100.0;

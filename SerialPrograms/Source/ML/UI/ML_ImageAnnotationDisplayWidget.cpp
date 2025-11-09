@@ -9,7 +9,6 @@
 #include <QGroupBox>
 #include <QFileDialog>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"

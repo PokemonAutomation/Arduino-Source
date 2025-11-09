@@ -10,11 +10,11 @@
 #include <deque>
 #include <mutex>
 #include <condition_variable>
-#include <thread>
 #include <QUrl>
 #include <QHostAddress>
 #include <QTcpSocket>
 #include "Common/Cpp/Time.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "Common/Cpp/Sockets/ClientSocket.h"
 #include "Controllers/ControllerConnection.h"
 
@@ -76,7 +76,7 @@ private:
     SpinLock m_send_lock;
     std::mutex m_lock;
     std::condition_variable m_cv;
-    std::thread m_thread;
+    Thread m_thread;
 
     ListenerSet<Listener> m_listeners;
 };

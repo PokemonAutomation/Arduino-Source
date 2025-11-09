@@ -83,13 +83,14 @@ bool match_template_by_waterfill(
     std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object)
 {
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
+        std::cout << "============ match_template_by_waterfill ============" << std::endl;
         dump_debug_image(
             global_logger_command_line(), 
             "CommonFramework/WaterfillTemplateMatcher", 
             "match_template_by_waterfill_input_image", 
             image
         );
-        std::cout << "Match template by waterfill, " << filters.size() << " filter(s), size range ("
+        std::cout << "Use " << filters.size() << " filter(s), size range ("
                   << area_thresholds.first << ", ";
         if (area_thresholds.second == SIZE_MAX){
             std::cout << "SIZE_MAX";
@@ -131,7 +132,7 @@ bool match_template_by_waterfill(
 
 //            cout << "object.area = " << object.area << endl;
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-                std::cout << "------------" << std::endl;
+                std::cout << "------------ Matching One WaterfillObject ------------" << std::endl;
                 std::cout << "Object area: " << object.area << std::endl;
             }
 
@@ -140,7 +141,8 @@ bool match_template_by_waterfill(
             }
             double rmsd = matcher.rmsd_original(input_resolution, image, object);
             if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-                std::cout << "Object rmsd: " << rmsd << std::endl;
+                std::cout << "Final rmsd: " << rmsd << " vs " << rmsd_threshold << std::endl;
+                std::cout << "------------ End of Matching one WaterfillObject ------------" << std::endl;
             }
 
 //            std::cout << "Object rmsd: " << rmsd << std::endl;
@@ -166,7 +168,7 @@ bool match_template_by_waterfill(
         }
     }
     if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        std::cout << "End match template by waterfill" << std::endl;
+        std::cout << "============ End of match_template_by_waterfill ============" << std::endl;
     }
     return detected;
 }

@@ -27,11 +27,12 @@ KeyboardInputController::KeyboardInputController(Logger& logger, bool enabled)
 {}
 
 void KeyboardInputController::start(){
-    m_thread = std::thread(
-        run_with_catch,
-        "KeyboardInputController::thread_loop()",
-        [this]{ thread_loop(); }
-    );
+    m_thread = Thread([this]{
+        run_with_catch(
+            "KeyboardInputController::thread_loop()",
+            [this]{ thread_loop(); }
+        );
+    });
 }
 void KeyboardInputController::stop() noexcept{
     bool expected = false;
@@ -43,9 +44,7 @@ void KeyboardInputController::stop() noexcept{
         std::lock_guard<std::mutex> lg(m_sleep_lock);
         m_cv.notify_all();
     }
-    if (m_thread.joinable()){
-        m_thread.join();
-    }
+    m_thread.join();
 }
 
 void KeyboardInputController::clear_state(){

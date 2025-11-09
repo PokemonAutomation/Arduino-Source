@@ -5,8 +5,10 @@
 //#include <QTextStream>
 #include <QMessageBox>
 #include "Common/Cpp/Concurrency/AsyncTask.h"
+#include "Common/Cpp/Concurrency/FireForgetDispatcher.h"
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
+#include "CommonFramework/Tools/GlobalThreadPools.h"
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
 #include "PersistentSettings.h"
@@ -46,39 +48,14 @@ void set_working_directory(){
     }
 }
 
-int main(int argc, char *argv[]){
-    setup_crash_handler();
 
-#if defined(__linux) || defined(__APPLE__)
-    // By default Qt uses native menubar but this only works on Windows.
-    // We use menubar in our ButtonDiagram window to choose which controller's button mapping image to show.
-    // So we fix it by don't using native menubar on non-Windows OS.
-    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
-#endif
-
-//#if QT_VERSION_MAJOR == 5 // AA_EnableHighDpiScaling is deprecated in Qt6
-//    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-//#endif
+int run_qt(int argc, char *argv[]){
     QApplication application(argc, argv);
-
-    Logger& logger = global_logger_tagged();
-
-    logger.log("================================================================================");
-    logger.log("Starting Program...");
-
-    qRegisterMetaType<size_t>("size_t");
-    qRegisterMetaType<uint8_t>("uint8_t");
-    qRegisterMetaType<std::string>("std::string");
-    qRegisterMetaType<Resolution>("Resolution");
-
-    OutputRedirector redirect_stdout(std::cout, "stdout", Color());
-    OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 
     //  Preload all the cameras now so we don't hang the UI later on.
     get_all_cameras();
 
-    QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
-    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
+    Logger& logger = global_logger_tagged();
 
     //  Several novice developers struggled to build and run the program due to missing Resources folder.
     //  Add this check to pop a message box when Resources folder is missing.
@@ -114,6 +91,51 @@ int main(int argc, char *argv[]){
 
     check_new_version(logger);
 
+    set_working_directory();
+
+    //  Run this asynchronously to we don't block startup.
+    std::unique_ptr<AsyncTask> task = send_all_unsent_reports(logger, true);
+
+
+    MainWindow w;
+    w.show();
+    w.raise(); // bring the window to front on macOS
+    set_permissions(w);
+
+    return application.exec();
+}
+
+
+int main(int argc, char *argv[]){
+    setup_crash_handler();
+
+#if defined(__linux) || defined(__APPLE__)
+    // By default Qt uses native menubar but this only works on Windows.
+    // We use menubar in our ButtonDiagram window to choose which controller's button mapping image to show.
+    // So we fix it by don't using native menubar on non-Windows OS.
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
+#endif
+
+//#if QT_VERSION_MAJOR == 5 // AA_EnableHighDpiScaling is deprecated in Qt6
+//    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+//#endif
+
+    Logger& logger = global_logger_tagged();
+
+    logger.log("================================================================================");
+    logger.log("Starting Program...");
+
+    qRegisterMetaType<size_t>("size_t");
+    qRegisterMetaType<uint8_t>("uint8_t");
+    qRegisterMetaType<std::string>("std::string");
+    qRegisterMetaType<Resolution>("Resolution");
+
+    OutputRedirector redirect_stdout(std::cout, "stdout", Color());
+    OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
+
+    QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
+    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
+
     Integration::DiscordIntegrationSettingsOption& discord_settings = GlobalSettings::instance().DISCORD->integration;
     if (discord_settings.run_on_start){
 #ifdef PA_DPP
@@ -128,26 +150,27 @@ int main(int argc, char *argv[]){
     }
 #endif
 
-    set_working_directory();
 
-    //  Run this asynchronously to we don't block startup.
-    std::unique_ptr<AsyncTask> task = send_all_unsent_reports(logger, true);
+    int ret = run_qt(argc, argv);
 
-    int ret = 0;
-    {
-        MainWindow w;
-        w.show();
-        w.raise(); // bring the window to front on macOS
-        set_permissions(w);
-        ret = application.exec();
-    }
 
     // Write program settings back to the json file.
     PERSISTENT_SETTINGS().write();
 
+
+#ifdef PA_SOCIAL_SDK
+    Integration::DiscordSocialSDK::DiscordSocial::instance().stop();
+#endif
+
 #ifdef PA_DPP
     Integration::DppClient::Client::instance().disconnect();
 #endif
+
+    // Force stop the thread pool
+    PokemonAutomation::GlobalThreadPools::realtime_inference().stop();
+    PokemonAutomation::GlobalThreadPools::normal_inference().stop();
+
+    PokemonAutomation::global_dispatcher.stop();
 
     //  We must clear the OCR cache or it will crash on Linux when the library
     //  unloads before the cache is destructed from static memory.

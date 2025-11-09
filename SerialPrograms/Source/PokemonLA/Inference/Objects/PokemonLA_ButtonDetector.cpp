@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/AbstractLogger.h"
+#include "CommonTools/DetectedBoxes.h"
 #include "PokemonLA_ButtonDetector.h"
 
 //#include <iostream>
@@ -155,7 +156,7 @@ void ButtonTracker::process_object(
     }
 }
 void ButtonTracker::finish(const ImageViewRGB32& image){
-    merge_heavily_overlapping();
+    merge_overlapping_boxes(m_detections);
 }
 
 

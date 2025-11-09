@@ -7,9 +7,12 @@
 #ifndef PokemonAutomation_NintendoSwitch_SnapshotDumper_H
 #define PokemonAutomation_NintendoSwitch_SnapshotDumper_H
 
+#include "CommonFramework/VideoPipeline/UI/VideoDisplayWidget.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Panels/UI/PanelWidget.h"
+#include "CommonFramework/Panels/PanelInstance.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -38,9 +41,34 @@ private:
 
 private:
     SimpleIntegerOption<uint32_t> PERIOD_MILLISECONDS;
-    BooleanCheckBoxOption CLICK_TO_SNAPSHOT;
+    enum class SnapshotMode{
+        KEYPRESS,
+        MOUSE_CLICK,
+        PERIODIC,
+    };
+    EnumDropdownOption<SnapshotMode> SNAPSHOT_MODE;
     EnumDropdownOption<Format> FORMAT;
 };
+
+
+class SnapshotKeyTrigger : public VideoOverlay::KeyEventListener{
+public:
+    ~SnapshotKeyTrigger();
+    SnapshotKeyTrigger(VideoStream& stream, VideoOverlay& overlay, Format format);
+
+
+private:
+    void detach();
+
+    virtual void on_key_press(QKeyEvent* event) override;
+    virtual void on_key_release(QKeyEvent* event) override;
+
+private:
+    VideoStream& m_stream;
+    VideoOverlay& m_overlay;
+    Format m_format;
+};
+
 
 std::string to_format_string(Format format);
 

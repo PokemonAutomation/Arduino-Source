@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_ShinyHunt_BenchSit_H
 #define PokemonAutomation_PokemonLZA_ShinyHunt_BenchSit_H
 
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -38,6 +39,7 @@ public:
 private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
+    IntegerEnumDropdownOption WALK_DIRECTION;
     MillisecondsOption WALK_FORWARD_DURATION;
     ShinySoundDetectedActionOption SHINY_DETECTED;
 

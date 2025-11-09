@@ -26,7 +26,7 @@ namespace PokemonAutomation{
 const bool IS_BETA_VERSION = true;
 const int PROGRAM_VERSION_MAJOR = 0;
 const int PROGRAM_VERSION_MINOR = 59;
-const int PROGRAM_VERSION_PATCH = 9;
+const int PROGRAM_VERSION_PATCH = 10;
 
 const std::string PROGRAM_VERSION_BASE =
     "v" + std::to_string(PROGRAM_VERSION_MAJOR) +
@@ -137,7 +137,10 @@ std::string get_training_path(){
 std::string get_runtime_base_path(){
     //  On MacOS, find the writable application support directory
     if (QSysInfo::productType() == "macos" || QSysInfo::productType() == "osx"){
-        QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::AppDataLocation);
+        // QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) returns
+        // "/Users/$USERNAME/Library/Application Support/SerialPrograms/UserSettings", the parent folder
+        // to hold application-specific persistent data
+        QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/SerialPrograms";
         QDir dir(appSupportPath);
         if (!dir.exists()) {
             dir.mkpath(".");

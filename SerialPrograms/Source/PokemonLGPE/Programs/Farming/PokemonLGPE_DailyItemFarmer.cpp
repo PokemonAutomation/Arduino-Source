@@ -95,12 +95,10 @@ DailyItemFarmer::DailyItemFarmer()
 void DailyItemFarmer::start_local_trade(SingleSwitchProgramEnvironment& env, JoyconContext& context){
     env.log("Starting local trade.");
     //Open Menu -> Communication -> Nearby player -> Local Trade
-    pbf_press_button(context, BUTTON_X, 200ms, 500ms);
-    pbf_move_joystick(context, 255, 128, 100ms, 100ms);
+    pbf_press_button(context, BUTTON_X, 200ms, 800ms);
+    pbf_move_joystick(context, 255, 128, 100ms, 400ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-    pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
-    pbf_wait(context, 1000ms); //Black screen
-    context.wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 200ms, 2000ms); //  Black screen
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
     pbf_press_button(context, BUTTON_A, 200ms, 1000ms);
 
@@ -172,27 +170,55 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
 
     //Roll the date back before doing anything else.
     start_local_trade(env, context);
-    pbf_press_button(context, BUTTON_HOME, 160ms, 1000ms);
+
+    go_home(env.console, context);
+
+    //  Initiating a local connection tends to mess up the wireless schedule.
+    //  Thus we wait a bit for the connection to clear up.
+    pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+    pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+    context.wait_for_all_requests();
+    context.wait_for(1000ms);
+
     home_to_date_time(env.console, context, true);
+
     env.log("Rolling date back.");
     roll_date_backward_N(context, MAX_YEAR);
     year = 0;
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
     pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+
+    //  Start with one B press while the poll rate changes.
+    //  If we mash here we silent disconnect the ESP32.
+    pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
     pbf_mash_button(context, BUTTON_B, 5000ms);
     context.wait_for_all_requests();
 
     env.log("Starting pickup loop.");
     for (uint32_t count = 0; count < ATTEMPTS; count++) {
         env.log("Pick up item.");
+
         pbf_mash_button(context, BUTTON_A, 4000ms);
         context.wait_for_all_requests();
 
         start_local_trade(env, context);
 
-        //Dateskip
-        pbf_press_button(context, BUTTON_HOME, 160ms, 1000ms);
+        //  Dateskip
+        go_home(env.console, context);
+
+#if 1
+        //  Initiating a local connection tends to mess up the wireless schedule.
+        //  Thus we wait a bit for the connection to clear up.
+        pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+        pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+        pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+        context.wait_for_all_requests();
+        context.wait_for(1000ms);
+#endif
+
         home_to_date_time(env.console, context, true);
+
         if (year >= MAX_YEAR){
             env.log("Rolling date back.");
             roll_date_backward_N(context, MAX_YEAR);
@@ -204,8 +230,12 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
         }
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
 
-        //Re-enter game and close out link menu
+        //  Re-enter game and close out link menu
         pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+
+        //  Start with one B press while the poll rate changes.
+        //  If we mash here we silent disconnect the ESP32.
+        pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
         pbf_mash_button(context, BUTTON_B, 5000ms);
         context.wait_for_all_requests();
 

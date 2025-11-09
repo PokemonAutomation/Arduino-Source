@@ -32,6 +32,25 @@ print(f"Size: {width} x {height}")
 
 raw_image = image.copy()
 
+# ==================================================================
+# LZA overworld party selection buttons
+for i in range(6):
+	# loctions for the dpad up buttons to send party pokemon from ball to outside
+	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.954, 0.017, 0.030, image)
+	# locations for the dpad down buttons to retrieve outside pokemon back to ball while
+	# current party selection is on another in-ball pokemon
+	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.926, 0.017, 0.030, image)
+	# locations for the dpad down buttons to retrieve outside pokemon back to ball while
+	# current party selection is this outside pokemon. In this case, dpad up button is not
+	# present.
+	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.939, 0.017, 0.030, image)
+
+	add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.926, 0.017, 0.058, image)
+
+
+# ==================================================================
+# LZA map view dialog change
+# add_infer_box_to_image(raw_image, 0.216, 0.757, 0.565, 0.174, image)
 
 # ==================================================================
 # LZA selection arrow

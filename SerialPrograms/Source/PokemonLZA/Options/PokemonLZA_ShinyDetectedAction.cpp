@@ -41,8 +41,8 @@ ShinySoundDetectedActionOption::ShinySoundDetectedActionOption(
         true
     )
     , SCREENSHOT_DELAY(
-        "<b>Screenshot Delay:</b><br>"
-        "Wait this long before taking a screenshot + video of the shiny.<br>"
+        "<b>Video Delay:</b><br>"
+        "Wait this long before taking a video of the shiny.<br>"
         "Don't set this too large or the shiny may run away!",
         LockMode::UNLOCK_WHILE_RUNNING,
         std::move(default_delay)
@@ -84,19 +84,27 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
         return false;
     }
 
+    if (TAKE_VIDEO){
+        context.wait_for(SCREENSHOT_DELAY);
+        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+    }
+
+    send_shiny_sound_notification(env, stream, error_coefficient);
+
+    return action == ShinySoundDetectedAction::STOP_PROGRAM;
+}
+
+
+void ShinySoundDetectedActionOption::send_shiny_sound_notification(
+    ProgramEnvironment& env, VideoStream& stream, float error_coefficient
+){
     {
         std::ostringstream ss;
         ss << "Detected Shiny Sound! (error coefficient = " << error_coefficient << ")";
         stream.log(ss.str(), COLOR_BLUE);
     }
 
-    if (TAKE_VIDEO){
-        context.wait_for(SCREENSHOT_DELAY);
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
-    }
-
     std::vector<std::pair<std::string, std::string>> embeds;
-
     {
         std::ostringstream ss;
         ss << "Error Coefficient: ";
@@ -112,13 +120,64 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
         embeds, "",
         stream.video().snapshot(), true
     );
-
-    return action == ShinySoundDetectedAction::STOP_PROGRAM;
 }
 
 
 
 
+
+
+bool ShinySoundHandler::on_shiny_sound(
+    ProgramEnvironment& env,
+    VideoStream& stream,
+    size_t current_count,
+    float error_coefficient
+){
+    WallClock now = current_time();
+
+    ShinySoundDetectedAction action = m_option.ACTION;
+
+    if (action == ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY && current_count > 1){
+        return false;
+    }
+
+    m_option.send_shiny_sound_notification(env, stream, error_coefficient);
+
+    if (m_pending_video.load(std::memory_order_acquire)){
+        stream.log("Back-to-back shiny sounds. Suppressing video.", COLOR_RED);
+    }else{
+        m_detected_time = now;
+        m_pending_video.store(true, std::memory_order_release);
+    }
+
+    return action == ShinySoundDetectedAction::STOP_PROGRAM;
+}
+
+void ShinySoundHandler::process_pending(ProControllerContext& context){
+    if (!m_pending_video.load(std::memory_order_acquire)){
+        return;
+    }
+    if (!m_option.TAKE_VIDEO){
+        m_pending_video.store(false, std::memory_order_release);
+        return;
+    }
+
+    //  Calculate elapsed time since shiny detection.
+    WallDuration elapsed = current_time() - m_detected_time;
+    auto elapsed_ms = std::chrono::duration_cast<Milliseconds>(elapsed);
+
+    //  Calculate remaining time to wait.
+    Milliseconds requested_delay = m_option.SCREENSHOT_DELAY.get();
+    if (requested_delay > elapsed_ms){
+        context.wait_for(requested_delay - elapsed_ms);
+    }
+
+    //  Otherwise, take screenshot immediately (no additional wait needed)
+    pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
+
+    //  Now we can unlock.
+    m_pending_video.store(false, std::memory_order_release);
+}
 
 
 

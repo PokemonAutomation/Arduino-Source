@@ -291,10 +291,14 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLZA_NormalDialogBoxDetector", std::bind(image_bool_detector_helper, test_pokemonZLA_NormalDialogBoxDetector, _1)},
     {"PokemonLZA_FlatWhiteDialogDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_FlatWhiteDialogDetector, _1)},
     {"PokemonLZA_BlueDialogDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_BlueDialogDetector, _1)},
+    {"PokemonLZA_TransparentBattleDialogDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_TransparentBattleDialogDetector, _1)},
     {"PokemonLZA_ButtonDetector", std::bind(image_words_detector_helper, test_pokemonLZA_ButtonDetector, _1)},
     {"PokemonLZA_MainMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_MainMenuDetector, _1)},
+    {"PokemonLZA_AlertEyeDetector", std::bind(image_bool_detector_helper, test_pokemonLZA_AlertEyeDetector, _1)},
     {"PokemonLZA_BoxCellInfoDetector", std::bind(image_words_detector_helper, test_pokemonLZA_BoxCellInfoDetector, _1)},
     {"PokemonLZA_SelectionArrowDetector", std::bind(image_words_detector_helper, test_pokemonLZA_SelectionArrowDetector, _1)},
+    {"PokemonLZA_MapIconDetector", test_pokemonLZA_MapIconDetector},
+    {"PokemonLZA_OverworldPartySelectionDetector", std::bind(image_words_detector_helper, test_pokemonLZA_OverworldPartySelectionDetector, _1)},
 };
 
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){
