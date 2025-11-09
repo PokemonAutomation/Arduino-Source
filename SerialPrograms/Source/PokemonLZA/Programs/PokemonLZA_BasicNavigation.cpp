@@ -202,6 +202,7 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
 
 
 void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
+    context.wait_for_all_requests();
     console.overlay().add_log("Sitting on Bench");
     {
         BlackScreenOverWatcher black_screen(COLOR_BLUE);
@@ -227,7 +228,7 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
         default:
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "sit_on_bench(): No transition detected after 4 attempts.",
+                "sit_on_bench(): No day/night transition detected after mashing A.",
                 console
             );
         }
