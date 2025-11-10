@@ -1554,6 +1554,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.cpp
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h
     Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
@@ -1603,6 +1605,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_StallBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.cpp
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
