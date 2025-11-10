@@ -1625,7 +1625,8 @@ void move_camera_yolo(
     CameraAxis axis,
     YOLOv5Detector& yolo_detector, 
     const std::string& target_label,
-    double target_line
+    double target_line,
+    std::function<void()>&& recovery_action
 ){
     VideoOverlaySet overlays(env.console.overlay());
     size_t max_attempts = 10;
@@ -1726,7 +1727,8 @@ void move_camera_yolo(
     
     }catch (UnexpectedBattleException&){
         overlays.clear();
-        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+        recovery_action();
+        // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
     }
     }
 }

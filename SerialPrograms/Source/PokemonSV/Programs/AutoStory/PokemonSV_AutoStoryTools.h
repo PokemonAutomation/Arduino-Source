@@ -453,13 +453,15 @@ enum class CameraAxis{
 };
 
 // move the camera along `axis` until the target object is aligned with target_line
+// if caught in battle, run recovery_action
 void move_camera_yolo(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     CameraAxis axis,
     YOLOv5Detector& yolo_detector, 
     const std::string& target_label,
-    double target_line
+    double target_line,
+    std::function<void()>&& recovery_action
 );
 
 // move the player sideways until the target object is aligned with x_target

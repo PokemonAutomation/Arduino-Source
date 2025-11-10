@@ -261,8 +261,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             5
         );
         // align to tree-tera. center-y: 0.294444   center-x: 0.604688
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444, 
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-tera", 0.277344);  // x-position of tree-tera prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-tera", 0.277344);  // x-position of tree-tera prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
         
         // move towards tree-tera until {0.721875, 0.277778, 0.146875, 0.180556}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "tree-tera",
@@ -275,8 +287,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // align to rock-1. center-y: 0.191667   center-x: 0.583594
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-1", 0.191667);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-1", 0.583594);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-1", 0.191667,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-1", 0.578);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-1", 0.583594,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-1", 0.578);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         // move towards rock-1 until {0.626563, 0.113889, 0.279688, 0.230556}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-1",
@@ -290,8 +314,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         
 
         // align to rock-2. center-y: 0.194444   center-x: 0.508594
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-2", 0.194444);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-2", 0.508594);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-2", 0.194444,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-2", 0.223);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-2", 0.508594,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-2", 0.223);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
         
 
         // move towards rock-2 until {0.471875, 0.244444, 0.103125, 0.266667}
@@ -305,8 +341,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // align to rock-3. center-y: 0.190278   center-x: 0.566406
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-3", 0.190278);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-3", 0.566406);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-3", 0.190278,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-3", 0.724);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-3", 0.566406,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-3", 0.724);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         // move towards rock-3 until   {0.598438, 0.186111, 0.121875, 0.136111}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-3",
@@ -320,8 +368,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         
 
         // align to stream.  center-y: 0.481944   center-x: 0.528906
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "stream", 0.481944);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "stream", 0.528906);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "stream", 0.481944,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "stream", 0.404);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "stream", 0.528906,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "stream", 0.404);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
 
         // move forward until stream not detected
@@ -343,8 +403,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // align to rock-3.  center-y: 0.291667   center-x: 0.501563
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-3", 0.291667);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-3", 0.501563);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-3", 0.291667,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-3", 0.8);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-3", 0.501563,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-3", 0.8);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         // move towards rock-3 until {0.371875, 0.038889, 0.257812, 0.286111}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-3",
@@ -360,8 +432,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         // align to rock-4.  center-y: 0.200000   center-x: 0.575000
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-4", 0.200000);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-4", 0.575000);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-4", 0.200000,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-4", 0.8);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-4", 0.575000,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-4", 0.8);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         // move towards rock-4 until {0.621875, 0.202778, 0.262500, 0.177778}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-4",
@@ -376,8 +460,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         move_camera_until_yolo_object_detected(env, context, yolo_detector, "tree-1", 0, 70);
 
         // align to tree-1.   center-y: 0.390278   center-x: 0.5
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-1", 0.390278);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-1", 0.5);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-1", 0.390278,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-1", 0.3);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-1", 0.5,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-1", 0.3);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         // move towards tree-1 until  {0.064063, 0.002778, 0.523438, 0.305556} 
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "tree-1",
@@ -391,8 +487,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         // align to tree-1.  center-y: 0.341667   center-x: 0.500000
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-1", 0.341667);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-1", 0.500000);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-1", 0.341667,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-1", 0.5);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-1", 0.500000,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-1", 0.5);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         // move towards tree-1 until   {-0.064063, -0.008333, 1.073438, 0.602778}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "tree-1",
@@ -407,8 +515,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         move_camera_until_yolo_object_detected(env, context, yolo_detector, "rock-5", 255, 50);
 
         // align to rock-5.  center-y: 0.206944   center-x: 0.600000
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-5", 0.206944);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-5", 0.600000);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-5", 0.206944,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-5", 0.7);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-5", 0.600000,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-5", 0.7);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         // move towards rock-5 until   {0.548438, -0.002778, 0.271875, 0.327778}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-5",
@@ -425,8 +545,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         
 
         // align to rock-6.  center-y: 0.333333   center-x: 0.372656
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-6", 0.333333);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-6", 0.372656);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock-6", 0.333333,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-6", 0.7);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock-6", 0.372656,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-6", 0.7);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         // move towards rock-6 until   {0.148438, 0.313889, 0.225000, 0.119444}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-6",
@@ -440,15 +572,32 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         // align to station-1.  center-y: 0.286111   center-x: 0.483594
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "station-1", 0.286111);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-1", 0.483594);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "station-1", 0.286111,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-1", 0.64);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-1", 0.483594,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-1", 0.64);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         do_action_until_dialog(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 move_player_forward(env, context, 10,
                     [&](){
                         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-1", 0.5);
+                        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-1", 0.5,
+                            [&](){
+                                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+                            } 
+                        );
                         pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
                     }
                 );
@@ -457,8 +606,20 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         #if 0
         // align to rock.  
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock", 0.000);
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock", 0.000);
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock", 0.000,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock", 0.000);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock", 0.000,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock", 0.000);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
 
         // move towards rock until   
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock",
