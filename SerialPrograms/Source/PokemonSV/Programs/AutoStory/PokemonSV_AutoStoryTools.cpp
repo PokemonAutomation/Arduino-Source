@@ -1421,8 +1421,9 @@ void move_player_forward(
         try{
             do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
-                pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+                pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+                // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
         }catch (UnexpectedBattleException&){
             recovery_action();
@@ -1508,9 +1509,9 @@ void move_forward_until_yolo_object_above_min_size(
                 return; // stop when the target is above a certain size. i.e. we are close enough to the target.
             }
         
-        
-            pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
-            pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+            pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+            // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+            // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });
     }catch (UnexpectedBattleException&){
         overlays.clear();
@@ -1560,8 +1561,9 @@ void move_forward_until_yolo_object_detected(
                 );  
             }
 
-            pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
-            pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+            pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+            // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+            // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });
         
     }catch (UnexpectedBattleException&){
@@ -1604,8 +1606,9 @@ void move_forward_until_yolo_object_not_detected(
                 }
             }
             
-            pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
-            pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+            pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+            // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+            // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
         });
         
     }catch (UnexpectedBattleException&){

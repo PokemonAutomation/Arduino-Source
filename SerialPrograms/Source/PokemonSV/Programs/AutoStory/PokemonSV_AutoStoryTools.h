@@ -375,7 +375,7 @@ void checkpoint_reattempt_loop_tutorial(
 );
 
 
-// clear path with Let's Go. walk forward forward_ticks. repeat this for num_rounds.
+// walk forward forward_ticks. repeat this for num_rounds.
 // if detect battle, kill the Pokemon. then continue. If we run into a battle, this round is considered to be done and will not be repeated.
 void move_player_forward(
     SingleSwitchProgramEnvironment& env, 
@@ -399,7 +399,7 @@ ImageFloatBox get_yolo_box(
 );
 
 // move forward until detected object is a certain width and height on screen (min_size)
-// walk forward forward_ticks each time, while clearing path with Let's Go.
+// walk forward forward_ticks each time
 // if caught in battle, run recovery_action
 void move_forward_until_yolo_object_above_min_size(
     SingleSwitchProgramEnvironment& env, 
@@ -414,7 +414,7 @@ void move_forward_until_yolo_object_above_min_size(
     uint16_t delay_after_lets_go = 105
 );
 
-// walk forward forward_ticks each time, while clearing path with Let's Go.
+// walk forward forward_ticks each time
 // walk until we find the target object.
 // if caught in battle, run recovery_action
 // throw exception if exceed max_rounds.
@@ -431,7 +431,7 @@ void move_forward_until_yolo_object_detected(
     uint16_t delay_after_lets_go = 105
 );
 
-// walk forward forward_ticks each time, while clearing path with Let's Go.
+// walk forward forward_ticks each time
 // walk until we no longer see the target object. and haven't seen `it times_not_seen_threshold` times.
 // if caught in battle, run recovery_action
 void move_forward_until_yolo_object_not_detected(
@@ -473,6 +473,9 @@ bool move_player_to_realign_via_yolo(
     double x_target
 );
 
+
+// move the player sideways until the target object is aligned with x_target
+// if failed. try recovery action once, then re-try.
 void move_player_to_realign_via_yolo_with_recovery(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
