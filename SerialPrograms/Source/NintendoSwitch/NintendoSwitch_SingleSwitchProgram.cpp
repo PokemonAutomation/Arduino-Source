@@ -81,6 +81,7 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, C
 
     auto record_debug_video = [&](){
         if (GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
+            context.cancel_now();
             env.log("Saving debug video on Switch...");
             env.console.overlay().add_log("Save Debug Video on Switch");
             pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
