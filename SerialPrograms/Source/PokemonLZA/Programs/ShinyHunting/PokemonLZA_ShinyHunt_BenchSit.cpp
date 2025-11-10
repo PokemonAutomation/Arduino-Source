@@ -150,7 +150,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
         //  Warning: This callback will be run from a different thread than this function.
         stats.shinies++;
         env.update_stats();
-        env.console.overlay().add_log("Shiny sound detected!", COLOR_YELLOW);
+        env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
         return shiny_sound_handler.on_shiny_sound(
             env, env.console,
             stats.shinies,
