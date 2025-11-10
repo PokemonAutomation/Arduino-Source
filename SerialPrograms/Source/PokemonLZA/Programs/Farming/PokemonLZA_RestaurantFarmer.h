@@ -68,6 +68,8 @@ private:
     SimpleIntegerOption<uint32_t> NUM_ROUNDS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
+    SimpleIntegerOption<uint32_t> PERIODIC_SAVE;
+
     BooleanCheckBoxOption MOVE_AI;
     BooleanCheckBoxOption USE_PLUS_MOVES;
 

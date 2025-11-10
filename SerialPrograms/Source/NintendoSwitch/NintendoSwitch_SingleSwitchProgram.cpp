@@ -7,14 +7,14 @@
 #include "Common/Cpp/Json/JsonValue.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Controllers/ControllerSession.h"
-#include "NintendoSwitch_SingleSwitchProgram.h"
+#include "Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Framework/NintendoSwitch_SingleSwitchProgramOption.h"
+#include "NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -90,10 +90,10 @@ void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, C
 
     try{
         program(env, context);
-    } catch(FatalProgramException& e){
+    } catch(FatalProgramException&){
         record_debug_video();
         throw;
-    } catch(OperationFailedException& e){
+    } catch(OperationFailedException&){
         record_debug_video();
         throw;
     }

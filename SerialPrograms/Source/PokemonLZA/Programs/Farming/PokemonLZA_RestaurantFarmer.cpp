@@ -13,12 +13,13 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 //#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
+//#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
+#include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
 #include "PokemonLZA_RestaurantFarmer.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -82,6 +83,13 @@ RestaurantFarmer::RestaurantFarmer()
         0
     )
     , GO_HOME_WHEN_DONE(false)
+    , PERIODIC_SAVE(
+        "<b>Periodically Save:</b><br>"
+        "Save the game every this many rounds. This reduces the loss to game crashes. Set to zero to disable.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        10,
+        0
+    )
     , MOVE_AI(
         "<b>Move Selection AI:</b><br>"
         "If enabled, it will be smarter with move selection.<br>"
@@ -109,6 +117,8 @@ RestaurantFarmer::RestaurantFarmer()
 
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(PERIODIC_SAVE);
+
     PA_ADD_OPTION(NOTIFICATIONS);
 
     STOP_AFTER_CURRENT.set_idle();
@@ -337,12 +347,20 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
 
 //    auto lobby = env.console.video().snapshot();
 
-    while (true){
+    for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         if (NUM_ROUNDS != 0 && stats.rounds >= NUM_ROUNDS) {
             m_stop_after_current.store(true, std::memory_order_relaxed);
             STOP_AFTER_CURRENT.set_pressed();
         }
+
+        uint32_t periodic_save = PERIODIC_SAVE;
+        if (periodic_save != 0 && rounds_since_last_save >= periodic_save){
+            save_game_to_menu(env.console, context);
+            pbf_mash_button(context, BUTTON_B, 2000ms);
+            rounds_since_last_save = 0;
+        }
+
         if (run_lobby(env, context)){
             break;
         }

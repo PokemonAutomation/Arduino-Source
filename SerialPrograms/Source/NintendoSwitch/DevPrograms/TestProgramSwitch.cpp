@@ -292,6 +292,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    save_game_to_menu(console, context);
+
+
+
 //    MoveEffectivenessSymbolMatcher::NoEffect();
 
 #if 0
@@ -324,7 +328,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 1
+#if 0
 
     auto snapshot = feed.snapshot();
 

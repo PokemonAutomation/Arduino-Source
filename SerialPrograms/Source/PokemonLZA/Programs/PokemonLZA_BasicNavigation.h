@@ -22,6 +22,12 @@ using ProControllerContext = ControllerContext<ProController>;
 namespace PokemonLZA{
 
 
+//  Starting from either the overworld or the main menu, save the game.
+//  This function returns in the main menu.
+void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context);
+
+
+
 // retrun type of the function fly_from_map()
 enum class FastTravelState{
     SUCCESS,      // Successfully did a fast travel
@@ -54,6 +60,7 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
 // presses button A repeated to initiate day/night change and returns when the game finishes
 // day/night change transition animation and is back to overworld.
 void sit_on_bench(ConsoleHandle& console, ProControllerContext& context);
+
 
 }
 }
