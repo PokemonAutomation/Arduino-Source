@@ -64,7 +64,7 @@ public:
 
     // Load image related data:
     // - Image SAM embedding data file, which has the same file path but with a name suffix ".embedding"
-    // - Existing annotation file, which is stored in a pre-defined ML_ANNOTATION_PATH() and with the same filename as
+    // - Existing annotation file, which is stored in the same folder as the image and with the same filename as
     //   the image but with name extension replaced to be ".json".
     void load_image_related_data(const std::string& image_path, const size_t source_image_width, const size_t source_image_height);
 
