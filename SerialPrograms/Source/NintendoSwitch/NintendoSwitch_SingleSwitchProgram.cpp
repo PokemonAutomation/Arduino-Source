@@ -6,7 +6,11 @@
 
 #include "Common/Cpp/Json/JsonValue.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
-//#include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "Controllers/ControllerSession.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
@@ -74,7 +78,25 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(
 
 void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     ProControllerContext context(scope, env.console.controller<ProController>());
-    program(env, context);
+
+    auto record_debug_video = [&](){
+        if (GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
+            env.log("Saving debug video on Switch...");
+            env.console.overlay().add_log("Save Debug Video on Switch");
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            context.wait_for_all_requests();
+        }
+    };
+
+    try{
+        program(env, context);
+    } catch(FatalProgramException& e){
+        record_debug_video();
+        throw;
+    } catch(OperationFailedException& e){
+        record_debug_video();
+        throw;
+    }
 }
 void SingleSwitchProgramInstance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Not implemented.");
