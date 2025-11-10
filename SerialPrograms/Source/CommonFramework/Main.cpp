@@ -49,13 +49,38 @@ void set_working_directory(){
 }
 
 
-int run_qt(int argc, char *argv[]){
+int run_program(int argc, char *argv[]){
     QApplication application(argc, argv);
+
+    OutputRedirector redirect_stdout(std::cout, "stdout", Color());
+    OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
+
+    Logger& logger = global_logger_tagged();
+
+    logger.log("================================================================================");
+    logger.log("Starting Program...");
+
+    qRegisterMetaType<size_t>("size_t");
+    qRegisterMetaType<uint8_t>("uint8_t");
+    qRegisterMetaType<std::string>("std::string");
+    qRegisterMetaType<Resolution>("Resolution");
+
+#if defined(__linux) || defined(__APPLE__)
+    // By default Qt uses native menubar but this only works on Windows.
+    // We use menubar in our ButtonDiagram window to choose which controller's button mapping image to show.
+    // So we fix it by don't using native menubar on non-Windows OS.
+    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
+#endif
+
+//#if QT_VERSION_MAJOR == 5 // AA_EnableHighDpiScaling is deprecated in Qt6
+//    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+//#endif
+
+    QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
+    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
 
     //  Preload all the cameras now so we don't hang the UI later on.
     get_all_cameras();
-
-    Logger& logger = global_logger_tagged();
 
     //  Several novice developers struggled to build and run the program due to missing Resources folder.
     //  Add this check to pop a message box when Resources folder is missing.
@@ -97,44 +122,6 @@ int run_qt(int argc, char *argv[]){
     std::unique_ptr<AsyncTask> task = send_all_unsent_reports(logger, true);
 
 
-    MainWindow w;
-    w.show();
-    w.raise(); // bring the window to front on macOS
-    set_permissions(w);
-
-    return application.exec();
-}
-
-
-int main(int argc, char *argv[]){
-    setup_crash_handler();
-
-#if defined(__linux) || defined(__APPLE__)
-    // By default Qt uses native menubar but this only works on Windows.
-    // We use menubar in our ButtonDiagram window to choose which controller's button mapping image to show.
-    // So we fix it by don't using native menubar on non-Windows OS.
-    QCoreApplication::setAttribute(Qt::AA_DontUseNativeMenuBar);
-#endif
-
-//#if QT_VERSION_MAJOR == 5 // AA_EnableHighDpiScaling is deprecated in Qt6
-//    QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
-//#endif
-
-    Logger& logger = global_logger_tagged();
-
-    logger.log("================================================================================");
-    logger.log("Starting Program...");
-
-    qRegisterMetaType<size_t>("size_t");
-    qRegisterMetaType<uint8_t>("uint8_t");
-    qRegisterMetaType<std::string>("std::string");
-    qRegisterMetaType<Resolution>("Resolution");
-
-    OutputRedirector redirect_stdout(std::cout, "stdout", Color());
-    OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
-
-    QDir().mkpath(QString::fromStdString(SETTINGS_PATH()));
-    QDir().mkpath(QString::fromStdString(SCREENSHOTS_PATH()));
 
     Integration::DiscordIntegrationSettingsOption& discord_settings = GlobalSettings::instance().DISCORD->integration;
     if (discord_settings.run_on_start){
@@ -151,7 +138,20 @@ int main(int argc, char *argv[]){
 #endif
 
 
-    int ret = run_qt(argc, argv);
+    MainWindow w;
+    w.show();
+    w.raise(); // bring the window to front on macOS
+    set_permissions(w);
+
+    return application.exec();
+}
+
+
+int main(int argc, char *argv[]){
+    setup_crash_handler();
+
+
+    int ret = run_program(argc, argv);
 
 
     // Write program settings back to the json file.
