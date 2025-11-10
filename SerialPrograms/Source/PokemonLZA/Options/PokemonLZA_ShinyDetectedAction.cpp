@@ -146,7 +146,10 @@ bool ShinySoundHandler::on_shiny_sound(
     if (m_pending_video.load(std::memory_order_acquire)){
         stream.log("Back-to-back shiny sounds. Suppressing video.", COLOR_RED);
     }else{
+        // Write timestamp to be read by process_pending() to determine whether
+        // to delay video recording
         m_detected_time = now;
+        // Signals to process_pending() to record video
         m_pending_video.store(true, std::memory_order_release);
     }
 
@@ -155,9 +158,13 @@ bool ShinySoundHandler::on_shiny_sound(
 
 void ShinySoundHandler::process_pending(ProControllerContext& context){
     if (!m_pending_video.load(std::memory_order_acquire)){
+        // No pending video to record
         return;
     }
+    // Need to process video recording request
     if (!m_option.TAKE_VIDEO){
+        // User does not ask to take a video
+        // Unlock: set m_pending_video to false to be done with video recording request
         m_pending_video.store(false, std::memory_order_release);
         return;
     }
@@ -171,11 +178,10 @@ void ShinySoundHandler::process_pending(ProControllerContext& context){
     if (requested_delay > elapsed_ms){
         context.wait_for(requested_delay - elapsed_ms);
     }
-
     //  Otherwise, take screenshot immediately (no additional wait needed)
     pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
 
-    //  Now we can unlock.
+    // Unlock: set m_pending_video to false to be done with video recording
     m_pending_video.store(false, std::memory_order_release);
 }
 
