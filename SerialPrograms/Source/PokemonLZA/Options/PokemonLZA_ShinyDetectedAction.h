@@ -43,7 +43,7 @@ public:
     // Return whether to stop the program according to ACTION.
     // NOTE:
     // Since this function may file button presses to record a video on Switch, it must be
-    // in the main thread that allows sending button presses. Don't call this function on
+    // in the program thread that allows sending button presses. Don't call this function on
     // audio callback thread!
     bool on_shiny_sound(
         ProgramEnvironment& env, VideoStream& stream, ProControllerContext& context,
@@ -75,7 +75,7 @@ public:
 //
 // THREADING MODEL:
 // - on_shiny_sound() is called from the shiny inference thread (audio detector callback)
-// - process_pending() is called from the main program thread (sending button presses)
+// - process_pending() is called from the program thread (sending button presses)
 class ShinySoundHandler{
 public:
     ShinySoundHandler(ShinySoundDetectedActionOption& option)
@@ -93,7 +93,7 @@ public:
         float error_coefficient
     );
 
-    // Must be called from main program thread (sending button presses).
+    // Must be called from program thread (sending button presses).
     // According to option, takes video after waiting for the appropriate delay
     // based on elapsed time.
     void process_pending(ProControllerContext& context);
@@ -105,7 +105,7 @@ private:
     // Uses the atomic flag m_pending_video with release-acquire memory ordering to synchronize
     // access to the non-atomic m_detected_time:
     //
-    //   Inference Thread:                      Main Thread:
+    //   Inference Thread:                      Program Thread:
     //   on_shiny_sound()                       process_pending()
     //   ─────────────────                      ───────────────
     //   m_detected_time = now;
@@ -119,9 +119,9 @@ private:
     // m_pending_video:
     // - Set to true with memory_order_release by inference thread (signals need for recording a
     //   video and publishes timestamp)
-    // - Read with memory_order_acquire by main thread (reads whether to record a video and
+    // - Read with memory_order_acquire by program thread (reads whether to record a video and
     //   gets published timestamp)
-    // - Set to false with memory_order_release by main thread after processing
+    // - Set to false with memory_order_release by program thread after processing
     std::atomic<bool> m_pending_video;
 
     // Time when shiny was detected (non-atomic, protected by m_pending_video flag).
