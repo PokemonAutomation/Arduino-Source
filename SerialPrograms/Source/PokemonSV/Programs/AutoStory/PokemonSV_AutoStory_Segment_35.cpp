@@ -611,6 +611,11 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+        run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+
         #if 0
         // align to rock.  
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock", 0.000,
