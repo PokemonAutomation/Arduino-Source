@@ -112,14 +112,19 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 
         overworld_to_main_menu(env.console, context);
         pbf_press_button(context, BUTTON_PLUS, 500ms, 500ms);
+        // enlarge map view, do this every time since we are resetting the game
         pbf_move_right_joystick(context, 128, 0, 500ms, 500ms);
         pbf_move_right_joystick(context, 128, 0, 500ms, 500ms);
+        // nudge left to snap to location
         pbf_move_left_joystick(context, 50, 128, 100ms, 500ms);
         pbf_mash_button(context, BUTTON_A, 5000ms);
 
+        // TODO: detect when the player has reached the door
         pbf_move_left_joystick(context, 128, 0, 10s, 500ms);
+        // carry the dialog midway
         pbf_mash_button(context, BUTTON_A, 30s);
 
+        // smash A until dialog is done
         context.wait_for_all_requests();
         {
             BlackScreenOverWatcher detector;
@@ -186,3 +191,4 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 }
 }
 }
+
