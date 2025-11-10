@@ -4,7 +4,7 @@
  *
  */
 
-#include "PokemonLZA_FreindshipFarmer.h"
+#include "PokemonLZA_FriendshipFarmer.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/ScreenshotException.h"

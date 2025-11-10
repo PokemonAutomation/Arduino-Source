@@ -19,7 +19,7 @@
 #include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
 
 //  Farming
-#include "Programs/Farming/PokemonLZA_FreindshipFarmer.h"
+#include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"
 #include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
 #include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_MegaShardFarmer.h"
