@@ -181,6 +181,8 @@ void ShinySoundHandler::process_pending(ProControllerContext& context){
     //  Otherwise, take screenshot immediately (no additional wait needed)
     pbf_press_button(context, BUTTON_CAPTURE, 2000ms, 0ms);
 
+    context.wait_for_all_requests();
+
     // Unlock: set m_pending_video to false to be done with video recording
     m_pending_video.store(false, std::memory_order_release);
 }
