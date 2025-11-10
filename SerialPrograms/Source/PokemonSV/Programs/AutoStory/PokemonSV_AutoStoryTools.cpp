@@ -1672,7 +1672,7 @@ void move_camera_yolo(
             default:
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "move_camera_yolo: Unknown CameraAxis enum.");  
             }
-
+            env.console.log("target_line: " + std::to_string(target_line));
             env.console.log("diff: " + std::to_string(diff));
             if (std::abs(diff) < 0.01){
                 reached_target_line = true;
