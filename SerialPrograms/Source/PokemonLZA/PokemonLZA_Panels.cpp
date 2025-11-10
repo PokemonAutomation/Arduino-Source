@@ -30,6 +30,9 @@
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
 
+//  Non-Shiny Hunting
+#include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
+
 //  Developer
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
 #include "Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h"
@@ -73,11 +76,14 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<AutoFossil_Descriptor, AutoFossil>());
     }
-
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
     }
 
+    if (IS_BETA_VERSION){
+        ret.emplace_back("---- Non-Shiny Hunting ----");
+        ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
+    }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
