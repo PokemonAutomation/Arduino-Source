@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -76,7 +77,7 @@ public:
         , day_changes(m_stats["Day/Night Changes"])
     {
         m_display_order.emplace_back("Visits");
-        m_display_order.emplace_back("Chased");
+        m_display_order.emplace_back("Chased", PreloadSettings::instance().DEVELOPER_MODE ? ALWAYS_VISIBLE : ALWAYS_HIDDEN);
         m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Game Resets", ALWAYS_HIDDEN);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
