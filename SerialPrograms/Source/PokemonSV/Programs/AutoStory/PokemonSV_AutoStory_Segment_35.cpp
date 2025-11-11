@@ -368,7 +368,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // move towards rock-3 until   {0.598438, 0.186111, 0.121875, 0.136111}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-3",
-            0.121, 0.136,
+            0.121, 0.1,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
                 move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-3", 0.566406);
