@@ -181,10 +181,10 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     
     // see if we can load the previously created labels
     const std::string anno_filename = std::filesystem::path(image_path).filename().replace_extension(".json").string();
+    const std::string image_folder_path = std::filesystem::path(image_path).parent_path().string() + "/";
 
-    // ensure the folder exists
     // std::filesystem::create_directory(ML_ANNOTATION_PATH());
-    m_annotation_file_path = image_path + anno_filename; // ML_ANNOTATION_PATH() + anno_filename;
+    m_annotation_file_path = image_folder_path + anno_filename; // ML_ANNOTATION_PATH() + anno_filename;
     if (!std::filesystem::exists(m_annotation_file_path)){
         cout << "Annotataion output path, " << m_annotation_file_path << " does not exist yet" << endl;
         return;
