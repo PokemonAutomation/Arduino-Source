@@ -1666,7 +1666,7 @@ void move_camera_yolo(
 ){
     VideoOverlaySet overlays(env.console.overlay());
     bool seen_object = false;
-    size_t max_attempts = 10;
+    size_t max_attempts = 20;
     size_t not_detected_count = 0;
     size_t max_not_detected = 5;
     bool reached_target_line = false;
