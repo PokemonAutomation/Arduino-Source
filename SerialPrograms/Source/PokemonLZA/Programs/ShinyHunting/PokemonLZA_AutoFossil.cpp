@@ -138,10 +138,9 @@ void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerConte
         }
 
         overworld_to_box_system(env.console, context);
-        size_t checked_fossils = 0;
-        for(uint8_t i = 0; i < num_boxes; i++, checked_fossils++){
+        for(uint8_t i = 0; i < num_boxes; i++){
             size_t num_fossils_in_box = (i == num_boxes - 1 ? num_fossils_to_revive - i*30 : 30);
-            bool found_match = check_fossils_in_one_box(env, context, num_fossils_in_box);
+            bool found_match = check_fossils_in_one_box(env, context, i*30, num_fossils_in_box);
             if (found_match){
                 send_program_finished_notification(env, NOTIFICATION_STATUS);
                 return;
@@ -243,7 +242,8 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
 
 // start at box system, check fossils one by one
 bool AutoFossil::check_fossils_in_one_box(
-    SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t num_fossils_in_box)
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    size_t num_checked_fossils_in_previous_boxes, size_t num_fossils_in_box)
 {
     AutoFossil_Descriptor::Stats& stats = env.current_stats<AutoFossil_Descriptor::Stats>();
 
@@ -259,7 +259,7 @@ bool AutoFossil::check_fossils_in_one_box(
         wait_until(env.console, context, WallClock::max(), {info_watcher});
         
         std::ostringstream os;
-        os << i + 1 << "/" << NUM_FOSSILS << ": " << info_watcher.info_str();
+        os << num_checked_fossils_in_previous_boxes + i + 1 << "/" << NUM_FOSSILS << ": " << info_watcher.info_str();
         std::string log_str = os.str();
         env.log(log_str);
         env.console.overlay().add_log(log_str);
