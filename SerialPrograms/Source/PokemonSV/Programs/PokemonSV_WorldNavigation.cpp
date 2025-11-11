@@ -665,7 +665,7 @@ void walk_forward_until_dialog(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
-            ssf_press_left_joystick(context, 128, y, 0, seconds_timeout * TICKS_PER_SECOND);
+            ssf_press_left_joystick(context, x, y, 0, seconds_timeout * TICKS_PER_SECOND);
             if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                 pbf_wait(context, seconds_timeout * TICKS_PER_SECOND);
             } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
@@ -861,13 +861,14 @@ void run_battle_press_A(
         AdvanceDialogWatcher    dialog(COLOR_RED);
         DialogArrowWatcher dialog_arrow(COLOR_RED, stream.overlay(), {0.850, 0.820, 0.020, 0.050}, 0.8365, 0.846);
         GradientArrowWatcher next_pokemon(COLOR_BLUE, GradientArrowType::RIGHT, {0.50, 0.51, 0.30, 0.10});
+        GradientArrowWatcher bag(COLOR_BLUE, GradientArrowType::RIGHT, {0.10, 0.10, 0.05, 0.90});
         MoveSelectWatcher move_select_menu(COLOR_YELLOW);
         GradientArrowWatcher select_move_target(COLOR_BLUE, GradientArrowType::DOWN, {0.38, 0.08, 0.25, 0.1});
 
         std::vector<PeriodicInferenceCallback> callbacks; 
         std::vector<CallbackEnum> enum_all_callbacks;
         //  mandatory callbacks: Battle, Overworld, Advance Dialog, Swap menu, Move select
-        //  optional callbacks: DIALOG_ARROW, NEXT_POKEMON, SELECT_MOVE_TARGET,
+        //  optional callbacks: DIALOG_ARROW, NEXT_POKEMON, SELECT_MOVE_TARGET, BATTLE_BAG
 
         // merge the mandatory and optional callbacks as a set, to avoid duplicates. then convert to vector
         std::unordered_set<CallbackEnum> enum_all_callbacks_set{CallbackEnum::BATTLE, CallbackEnum::OVERWORLD, CallbackEnum::ADVANCE_DIALOG, CallbackEnum::SWAP_MENU, CallbackEnum::MOVE_SELECT}; // mandatory callbacks
@@ -899,6 +900,9 @@ void run_battle_press_A(
                 break;
             case CallbackEnum::SELECT_MOVE_TARGET:
                 callbacks.emplace_back(select_move_target);
+                break;
+            case CallbackEnum::BATTLE_BAG:
+                callbacks.emplace_back(bag);
                 break;
             default:
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback requested.");
@@ -986,6 +990,11 @@ void run_battle_press_A(
             stream.log("run_battle_press_A: Detected arrows to select move target. Press A.");
             pbf_mash_button(context, BUTTON_A, 100);
             break;
+        case CallbackEnum::BATTLE_BAG:
+            stream.log("run_battle_press_A: Detected Bag. Press B. Hold Dpad Up so cursor is back on 'Battle'.");
+            pbf_mash_button(context, BUTTON_B, 100);
+            pbf_press_dpad(context, DPAD_UP, 2000ms, 100ms);
+            break;
         default:
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "run_battle_press_A: Unknown callback triggered.");
           
@@ -1022,6 +1031,7 @@ void run_wild_battle_press_A(
     std::unordered_set<CallbackEnum> enum_optional_callbacks,
     bool detect_wipeout
 ){
+    enum_optional_callbacks.insert(CallbackEnum::BATTLE_BAG);  // check for Bag.
     run_battle_press_A(stream, context, stop_condition, enum_optional_callbacks, detect_wipeout);
 }
 

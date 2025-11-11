@@ -8,17 +8,18 @@
 #define PokemonAutomation_PokemonSV_AutoStoryTools_H
 
 #include <functional>
+#include "ML/Inference/ML_YOLOv5Detector.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSV/Programs/PokemonSV_WorldNavigation.h"
-// #include "PokemonSV/Programs/PokemonSV_Navigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSV{
 
+using namespace ML;
 
 struct AutoStoryStats : public StatsTracker{
     AutoStoryStats()
@@ -74,6 +75,10 @@ enum class NavigationStopCondition{
     STOP_BATTLE,
 };
 
+// struct MinimumDetectedSize{
+//     double width;
+//     double height;
+// };
 
 
 struct AutoStoryOptions{
@@ -180,6 +185,31 @@ void do_action_and_monitor_for_battles(
         ProControllerContext& context)
     >&& action
 );
+
+// run the given `action`. if detect no minimap, stop the action. 
+// wait 15 seconds and see if we find a battle. if so, throw Battle exception. if no battle, then throw OperationFailedException
+void do_action_and_monitor_for_battles_early(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+);
+
+void do_action_until_dialog(
+    const ProgramInfo& info, 
+    VideoStream& stream,
+    ProControllerContext& context,
+    std::function<
+        void(const ProgramInfo& info, 
+        VideoStream& stream,
+        ProControllerContext& context)
+    >&& action
+);
+
 
 // catch any UnexpectedBattle exceptions from `action`. then use run_battle_press_A until overworld, and re-try the `action`.
 void handle_unexpected_battles(
@@ -345,14 +375,134 @@ void checkpoint_reattempt_loop_tutorial(
 );
 
 
+// walk forward forward_ticks. repeat this for num_rounds.
+// if detect battle, kill the Pokemon. then continue. If we run into a battle, this round is considered to be done and will not be repeated.
+void move_player_forward(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    uint8_t num_rounds, 
+    std::function<void()>&& recovery_action,
+    bool use_lets_go = false,
+    uint16_t forward_ticks = 100, 
+    uint8_t y = 0, 
+    uint16_t delay_after_forward_move = 50, 
+    uint16_t delay_after_lets_go = 105
+);
+
+// get the box of the target object
+// return ImageFloatBox{-1, -1, -1, -1} if target object not found
+ImageFloatBox get_yolo_box(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    VideoOverlaySet& overlays,
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label
+);
+
+// move forward until detected object is a certain width and height on screen (min_size)
+// walk forward forward_ticks each time
+// if caught in battle, run recovery_action
+// throw exception if forward_move_count is above 50.
+// throw exception if never detected yolo object
+void move_forward_until_yolo_object_above_min_size(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double min_width, double min_height,
+    std::function<void()>&& recovery_action, 
+    uint16_t forward_ticks = 100, 
+    uint8_t y = 0, 
+    uint16_t delay_after_forward_move = 50, 
+    uint16_t delay_after_lets_go = 105
+);
+
+// walk forward forward_ticks each time
+// walk until we find the target object.
+// if caught in battle, run recovery_action
+// throw exception if exceed max_rounds.
+void move_forward_until_yolo_object_detected(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    std::function<void()>&& recovery_action, 
+    uint16_t max_rounds, 
+    uint16_t forward_ticks = 100, 
+    uint8_t y = 0, 
+    uint16_t delay_after_forward_move = 50, 
+    uint16_t delay_after_lets_go = 105
+);
+
+// walk forward forward_ticks each time
+// walk until we no longer see the target object. and haven't seen `it times_not_seen_threshold` times.
+// if caught in battle, run recovery_action
+// throw exception if exceed max_rounds.
+void move_forward_until_yolo_object_not_detected(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    size_t times_not_seen_threshold,
+    std::function<void()>&& recovery_action, 
+    uint16_t forward_ticks = 100, 
+    uint8_t y = 0, 
+    uint16_t delay_after_forward_move = 50, 
+    uint16_t delay_after_lets_go = 105
+);
+
+enum class CameraAxis{
+    X,
+    Y,
+};
+
+// move the camera along `axis` until the target object is aligned with target_line
+// if caught in battle, run recovery_action
+// throw exception if never detected yolo object
+void move_camera_yolo(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    CameraAxis axis,
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double target_line,
+    std::function<void()>&& recovery_action
+);
+
+// move the player sideways until the target object is aligned with x_target
+// throw exception if never detected yolo object
+bool move_player_to_realign_via_yolo(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double x_target
+);
 
 
+// move the player sideways until the target object is aligned with x_target
+// if failed. try recovery action once, then re-try.
+void move_player_to_realign_via_yolo_with_recovery(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    double x_target,
+    std::function<void()>&& recovery_action
+);
 
-
-
-
-
-
+// move camera in X direction until we find the target object.
+// if caught in battle, run recovery_action
+// throw exception if exceed max_rounds.
+void move_camera_until_yolo_object_detected(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    YOLOv5Detector& yolo_detector, 
+    const std::string& target_label,
+    uint8_t initial_x_move, 
+    uint16_t initial_hold_ticks, 
+    uint16_t max_rounds = 50
+);
 
 
 }
