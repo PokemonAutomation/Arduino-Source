@@ -33,7 +33,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    void purchase_water(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool& first);
+    void purchase_water(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool first);
     void handle_purchase(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     SimpleIntegerOption<uint32_t> PURCHASES;

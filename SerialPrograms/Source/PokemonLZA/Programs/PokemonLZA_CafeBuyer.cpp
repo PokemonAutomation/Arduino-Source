@@ -76,7 +76,7 @@ CafeBuyer::CafeBuyer()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-void CafeBuyer::purchase_water(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool& first){
+void CafeBuyer::purchase_water(SingleSwitchProgramEnvironment& env, ProControllerContext& context, bool first){
     CafeBuyer_Descriptor::Stats& stats = env.current_stats<CafeBuyer_Descriptor::Stats>();
     bool exit = false;
     while (!exit){
@@ -288,21 +288,14 @@ void CafeBuyer::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
     //Initial purchase to set Fresh Water as "same as last time"
     bool round1 = true;
-    purchase_water(env, context, round1);
-    handle_purchase(env, context);
-    stats.purchases++;
-    env.update_stats();
-    env.log("Completed initial purchase.");
-    send_program_status_notification(env, NOTIFICATION_STATUS);
-
-    round1 = false;
-    for (uint32_t i = 1; i < PURCHASES; i++){
+    for (uint32_t i = 0; i < PURCHASES; i++){
         purchase_water(env, context, round1);
         handle_purchase(env, context);
         stats.purchases++;
         env.update_stats();
         env.log("Purchased water.");
         send_program_status_notification(env, NOTIFICATION_STATUS);
+        round1 = false;
     }
 
     GO_HOME_WHEN_DONE.run_end_of_program(context);
