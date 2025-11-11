@@ -124,6 +124,14 @@ const std::vector<TextColorRange>& BLUE_TEXT_FILTERS(){
     };
     return filters;
 }
+const std::vector<TextColorRange>& LIME_TEXT_FILTERS(){
+    static std::vector<TextColorRange> filters{
+        {0xff6FA60D, 0xffBEEF36},
+        {0xff5E9400, 0xffC9F95C},
+        {0xff4D8100, 0xffD3FB7E},
+    };
+    return filters;
+}
 
 
 
