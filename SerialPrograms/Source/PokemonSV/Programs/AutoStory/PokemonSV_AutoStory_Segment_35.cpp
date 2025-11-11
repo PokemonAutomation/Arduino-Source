@@ -37,7 +37,7 @@ std::string AutoStory_Segment_35::start_text() const{
 }
 
 std::string AutoStory_Segment_35::end_text() const{
-    return "End: ";
+    return "End: At Area Zero Station 1. Deactivated the locks.";
 }
 
 void AutoStory_Segment_35::run_segment(
@@ -54,6 +54,8 @@ void AutoStory_Segment_35::run_segment(
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     AutoStory_Checkpoint_93().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_94().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_95().run_checkpoint(env, context, options, stats);
 
 
     context.wait_for_all_requests();
@@ -70,14 +72,14 @@ void AutoStory_Checkpoint_93::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_94::name() const{ return "094 - " + AutoStory_Segment_35().name(); }
 std::string AutoStory_Checkpoint_94::start_text() const{ return AutoStory_Checkpoint_93().end_text();}
-std::string AutoStory_Checkpoint_94::end_text() const{ return "At Area Zero Station 1.";}
+std::string AutoStory_Checkpoint_94::end_text() const{ return "Outside Area Zero Station 1. Defeated Glimmora.";}
 void AutoStory_Checkpoint_94::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_94(env, context, options.notif_status_update, stats);
 }
 
 std::string AutoStory_Checkpoint_95::name() const{ return "095 - " + AutoStory_Segment_35().name(); }
-std::string AutoStory_Checkpoint_95::start_text() const{ return "";}
-std::string AutoStory_Checkpoint_95::end_text() const{ return "";}
+std::string AutoStory_Checkpoint_95::start_text() const{ return AutoStory_Checkpoint_94().end_text();}
+std::string AutoStory_Checkpoint_95::end_text() const{ return "At Area Zero Station 1. Deactivated the locks.";}
 void AutoStory_Checkpoint_95::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_95(env, context, options.notif_status_update, stats);
 }
@@ -654,6 +656,33 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 }
 
 void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    // [&](size_t attempt_number){
+        #if 0
+        move_player_forward(env, context, 5,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+            }, 
+            true
+        );
+        // pbf_move_left_joystick(context, 0, 128, 200, 50);
+        // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::BLACK_DIALOG_BOX});
+        
+        pbf_move_left_joystick(context, 0, 128, 10, 0);
+        pbf_press_button(context, BUTTON_L, 20, 20);
+        #endif
+
+        // enter Station 1
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
+        mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog
+
+        // disable Lock at Station 1
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        mash_button_till_overworld(env.console, context, BUTTON_A);     // prompt, black dialog, 
+        
+        
+
+    // });     
 }
 
 // void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){

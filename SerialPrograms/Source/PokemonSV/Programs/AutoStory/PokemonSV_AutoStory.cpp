@@ -125,13 +125,14 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_32>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_33>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_34>());
+    if (PreloadSettings::instance().DEVELOPER_MODE){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_35>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_36>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_37>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_38>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_40>());
-
+    }
     return segment_list;
 };
 
