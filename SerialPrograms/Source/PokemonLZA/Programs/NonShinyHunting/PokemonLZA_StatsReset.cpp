@@ -55,7 +55,7 @@ std::unique_ptr<StatsTracker> StatsReset_Descriptor::make_stats() const{
 
 
 StatsReset::StatsReset()
-    : GO_HOME_WHEN_DONE(false)
+    : GO_HOME_WHEN_DONE(true)
     , LANGUAGE(
         "<b>Game Language:</b>",
         IV_READER().languages(),
@@ -81,7 +81,6 @@ StatsReset::StatsReset()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
     PA_ADD_OPTION(LANGUAGE);
@@ -183,3 +182,4 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerConte
 }
 }
 }
+
