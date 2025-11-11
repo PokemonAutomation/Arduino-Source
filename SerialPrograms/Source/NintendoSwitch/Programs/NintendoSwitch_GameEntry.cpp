@@ -107,7 +107,6 @@ void ensure_at_home(ConsoleHandle& console, JoyconContext& context){
 void close_game_from_home(ConsoleHandle& console, ProControllerContext& context){
     console.log("close_game_from_home");
     ensure_at_home(console, context);
-    context.wait_for_all_requests();
 
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.
@@ -116,7 +115,7 @@ void close_game_from_home(ConsoleHandle& console, ProControllerContext& context)
     // regardless of whether the game is initially open or closed.
 
                                                     // if game initially open.  |  if game initially closed
-    pbf_mash_button(context, BUTTON_X, 200);        // - Close game.            |  - does nothing
+    pbf_mash_button(context, BUTTON_X, 100);        // - Close game.            |  - does nothing
     ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
     ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - Press Down a second time in case we drop one.
     pbf_mash_button(context, BUTTON_A, 50);         // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
@@ -127,6 +126,7 @@ void close_game_from_home(ConsoleHandle& console, ProControllerContext& context)
     pbf_mash_button(context, BUTTON_B, 350);
 }
 void close_game_from_home(ConsoleHandle& console, JoyconContext& context){
+    console.log("close_game_from_home");
     ensure_at_home(console, context);
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.
