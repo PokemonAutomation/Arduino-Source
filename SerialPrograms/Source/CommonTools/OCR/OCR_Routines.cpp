@@ -11,6 +11,10 @@
 #include "OCR_DictionaryMatcher.h"
 #include "OCR_Routines.h"
 
+// #include <iostream>
+// using std::cout;
+// using std::endl;
+
 namespace PokemonAutomation{
 namespace OCR{
 
@@ -43,8 +47,8 @@ StringMatchResult multifiltered_OCR(
             const std::pair<ImageRGB32, size_t>& filtered = filtered_images[index];
 
             std::string text = ocr_read(language, filtered.first);
-//            cout << text.toStdString() << endl;
-//            filtered.first.save("test" + QString::number(c++) + ".png");
+        //    cout << text << endl;
+        //    filtered.first.save("test" + std::to_string(index) + ".png");
 
             //  Compute ratio of image that matches text color. Skip if it's out of range.
             double ratio = filtered.second * pixels_inv;
