@@ -32,9 +32,15 @@ print(f"Size: {width} x {height}")
 
 raw_image = image.copy()
 
+
+# ==================================================================
+# LZA bench sit button A when running back
+add_infer_box_to_image(raw_image, 0.486, 0.477, 0.115, 0.25, image)
+
+
 # ==================================================================
 # LZA overworld party selection buttons
-for i in range(6):
+# for i in range(6):
 	# loctions for the dpad up buttons to send party pokemon from ball to outside
 	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.954, 0.017, 0.030, image)
 	# locations for the dpad down buttons to retrieve outside pokemon back to ball while
@@ -44,8 +50,8 @@ for i in range(6):
 	# current party selection is this outside pokemon. In this case, dpad up button is not
 	# present.
 	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.939, 0.017, 0.030, image)
-
-	add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.926, 0.017, 0.058, image)
+	# combined boxes
+	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.926, 0.017, 0.058, image)
 
 
 # ==================================================================

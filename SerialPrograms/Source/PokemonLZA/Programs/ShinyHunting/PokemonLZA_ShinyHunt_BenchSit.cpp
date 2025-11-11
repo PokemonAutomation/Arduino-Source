@@ -115,7 +115,7 @@ void run_back_until_found_bench(
     ButtonWatcher buttonA(
         COLOR_RED,
         ButtonType::ButtonA,
-        {0.4, 0.3, 0.2, 0.7},
+        {0.486, 0.477, 0.115, 0.25},
         &env.console.overlay()
     );
 
