@@ -382,6 +382,7 @@ void move_player_forward(
     ProControllerContext& context, 
     uint8_t num_rounds, 
     std::function<void()>&& recovery_action,
+    bool use_lets_go = false,
     uint16_t forward_ticks = 100, 
     uint8_t y = 0, 
     uint16_t delay_after_forward_move = 50, 

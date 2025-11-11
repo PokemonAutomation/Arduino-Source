@@ -665,7 +665,7 @@ void walk_forward_until_dialog(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [&](ProControllerContext& context){
-            ssf_press_left_joystick(context, 128, y, 0, seconds_timeout * TICKS_PER_SECOND);
+            ssf_press_left_joystick(context, x, y, 0, seconds_timeout * TICKS_PER_SECOND);
             if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
                 pbf_wait(context, seconds_timeout * TICKS_PER_SECOND);
             } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){

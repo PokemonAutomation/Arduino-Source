@@ -1410,6 +1410,7 @@ void move_player_forward(
     ProControllerContext& context, 
     uint8_t num_rounds, 
     std::function<void()>&& recovery_action,
+    bool use_lets_go,
     uint16_t forward_ticks, 
     uint8_t y, 
     uint16_t delay_after_forward_move, 
@@ -1421,9 +1422,12 @@ void move_player_forward(
         try{
             do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-                pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
-                // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
-                // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+                if (!use_lets_go){
+                    pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                }else{
+                    pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+                    pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);    
+                }
             });
         }catch (UnexpectedBattleException&){
             recovery_action();
