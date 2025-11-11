@@ -401,6 +401,8 @@ ImageFloatBox get_yolo_box(
 // move forward until detected object is a certain width and height on screen (min_size)
 // walk forward forward_ticks each time
 // if caught in battle, run recovery_action
+// throw exception if forward_move_count is above 50.
+// throw exception if never detected yolo object
 void move_forward_until_yolo_object_above_min_size(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
@@ -434,6 +436,7 @@ void move_forward_until_yolo_object_detected(
 // walk forward forward_ticks each time
 // walk until we no longer see the target object. and haven't seen `it times_not_seen_threshold` times.
 // if caught in battle, run recovery_action
+// throw exception if exceed max_rounds.
 void move_forward_until_yolo_object_not_detected(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
@@ -454,6 +457,7 @@ enum class CameraAxis{
 
 // move the camera along `axis` until the target object is aligned with target_line
 // if caught in battle, run recovery_action
+// throw exception if never detected yolo object
 void move_camera_yolo(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
@@ -465,6 +469,7 @@ void move_camera_yolo(
 );
 
 // move the player sideways until the target object is aligned with x_target
+// throw exception if never detected yolo object
 bool move_player_to_realign_via_yolo(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 

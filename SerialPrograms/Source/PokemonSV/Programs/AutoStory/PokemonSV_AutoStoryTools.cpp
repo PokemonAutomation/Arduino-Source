@@ -1481,44 +1481,65 @@ void move_forward_until_yolo_object_above_min_size(
     pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
 
     VideoOverlaySet overlays(env.console.overlay());
-    size_t num_reattempts = 0;
+    bool seen_object = false;
+    size_t not_detected_cont = 0;
+    size_t max_not_detected = 5;
+    size_t forward_move_count = 0;
     bool reached_target = false;
-    bool exceed_reattempts = false;
-    while(!reached_target && !exceed_reattempts){  
-    try{
-        do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            context.wait_for_all_requests();
-            ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
+    bool exceed_times_not_detected = false;
+    while(!reached_target && !exceed_times_not_detected){  
+        forward_move_count++;
+        try{
+            do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                context.wait_for_all_requests();
+                ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
 
-            bool not_found_target = target_box.x == -1;
-            if (not_found_target){
-                num_reattempts++;
-                if (num_reattempts > 3){
-                    exceed_reattempts = true;
-                    return;      // when too many failed attempts, just assume we're too close to the target to detect it.
+                bool not_found_target = target_box.x == -1;
+                if (not_found_target){
+                    not_detected_cont++;
+                    if (not_detected_cont > max_not_detected){
+                        exceed_times_not_detected = true;
+                        return;      // when too many failed attempts, just assume we're too close to the target to detect it.
+                    }
+                    context.wait_for(1000ms); // if we can't see the object, it might just be temporarily obscured. wait one second and reattempt.
+                    return;
+                }else{
+                    seen_object = true;
+                    not_detected_cont = 0;
                 }
-                context.wait_for(1000ms); // if we can't see the object, it might just be temporarily obscured. wait one second and reattempt.
-                return;
-            }else{
-                num_reattempts = 0;
-            }
 
-            if (target_box.width > min_width && target_box.height > min_height){
-                reached_target = true;
-                return; // stop when the target is above a certain size. i.e. we are close enough to the target.
-            }
-        
-            pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
-            // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
-            // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
-        });
-    }catch (UnexpectedBattleException&){
-        overlays.clear();
-        recovery_action();
-        // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-        // move_camera_yolo();
+                if (target_box.width > min_width && target_box.height > min_height){
+                    reached_target = true;
+                    return; // stop when the target is above a certain size. i.e. we are close enough to the target.
+                }
+            
+                pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+                // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+            });
+        }catch (UnexpectedBattleException&){
+            overlays.clear();
+            recovery_action();
+            // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+            // move_camera_yolo();
+        }
+
+        if (forward_move_count > 50){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "move_forward_until_yolo_object_above_min_size(): Unable to reach target object after many attempts.",
+                env.console
+            );
+        }
     }
+
+    if (!seen_object){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "move_forward_until_yolo_object_above_min_size(): Never detected the yolo object.",
+            env.console
+        );
     }
 }
 
@@ -1543,36 +1564,39 @@ void move_forward_until_yolo_object_detected(
     bool found_target = false;
     size_t round_num = 0;
     while(!found_target){
-    try{
-        do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            context.wait_for_all_requests();
-            ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
-            found_target = target_box.x != -1;
-            if (found_target){
-                return;
-            }
+        try{
+            do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                context.wait_for_all_requests();
+                ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
+                found_target = target_box.x != -1;
+                if (found_target){
+                    return;
+                }
 
-            if (round_num > max_rounds){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "move_forward_until_yolo_object_detected(): Unable to detect target object.",
-                    env.console
-                );  
-            }
+                
 
-            pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
-            // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
-            // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
-        });
-        
-    }catch (UnexpectedBattleException&){
-        overlays.clear();
-        recovery_action();
-        // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-        // move_camera_yolo();
-    }
-    round_num++;
+                pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
+                // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
+            });
+            
+        }catch (UnexpectedBattleException&){
+            overlays.clear();
+            recovery_action();
+            // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+            // move_camera_yolo();
+        }
+
+
+        round_num++;
+        if (round_num > max_rounds){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "move_forward_until_yolo_object_detected(): Unable to detect target object.",
+                env.console
+            );  
+        }
     }
 }
 
@@ -1590,6 +1614,7 @@ void move_forward_until_yolo_object_not_detected(
 ){
     VideoOverlaySet overlays(env.console.overlay());
     bool target_visible = true;
+    size_t max_rounds = 50;
     size_t times_not_seen = 0;
     size_t round_num = 0;
     while(times_not_seen < times_not_seen_threshold){
@@ -1618,6 +1643,14 @@ void move_forward_until_yolo_object_not_detected(
         // move_camera_yolo();
     }
     round_num++;
+
+    if (round_num > max_rounds){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "move_forward_until_yolo_object_not_detected(): Unable to walk away from target object.",
+            env.console
+        );  
+    }
     }
 }
 
@@ -1632,10 +1665,12 @@ void move_camera_yolo(
     std::function<void()>&& recovery_action
 ){
     VideoOverlaySet overlays(env.console.overlay());
+    bool seen_object = false;
     size_t max_attempts = 10;
-    size_t num_reattempts = 0;
+    size_t not_detected_count = 0;
+    size_t max_not_detected = 5;
     bool reached_target_line = false;
-    bool exceed_reattempts = false;
+    bool exceed_max_not_detected = false;
     for (size_t i = 0; i < max_attempts; i++){
     try{
         do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
@@ -1645,15 +1680,16 @@ void move_camera_yolo(
 
             bool not_found_target = target_box.x == -1;
             if (not_found_target){
-                num_reattempts++;
-                if (num_reattempts > 3){
-                    exceed_reattempts = true;
+                not_detected_count++;
+                if (not_detected_count > max_not_detected){
+                    exceed_max_not_detected = true;
                     return;      // when too many failed attempts, just assume we're too close to the target to detect it.
                 }
                 context.wait_for(1000ms); // if we can't see the object, it might just be temporarily obscured. wait one second and reattempt.
                 return;
             }else{
-                num_reattempts = 0;
+                not_detected_count = 0;
+                seen_object = true;
             }
        
             
@@ -1712,11 +1748,11 @@ void move_camera_yolo(
             env.console.log("axis push: " + std::to_string(axis_push) + ", push duration: " +  std::to_string(push_duration));
             switch(axis){
             case CameraAxis::X:{
-                pbf_move_right_joystick(context, axis_push, 128, push_duration, 100);
+                pbf_move_right_joystick(context, axis_push, 128, push_duration, 0);
                 break;
             }
             case CameraAxis::Y:{
-                pbf_move_right_joystick(context, 128, axis_push, push_duration, 100);
+                pbf_move_right_joystick(context, 128, axis_push, push_duration, 0);
                 break;
             }
             default:
@@ -1724,7 +1760,7 @@ void move_camera_yolo(
             }
         });
 
-        if(reached_target_line || exceed_reattempts){
+        if(reached_target_line || exceed_max_not_detected){
             break;
         }
     
@@ -1733,6 +1769,14 @@ void move_camera_yolo(
         recovery_action();
         // run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
     }
+    }
+
+    if (!seen_object){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "move_camera_yolo(): Never detected the yolo object.",
+            env.console
+        );
     }
 }
 
@@ -1745,10 +1789,12 @@ bool move_player_to_realign_via_yolo(
 ){
 
     VideoOverlaySet overlays(env.console.overlay());
+    bool seen_object = false;
     size_t max_attempts = 10;
-    size_t num_reattempts = 0;
+    size_t not_detected_count = 0;
+    size_t max_not_detected = 5;
     bool reached_target_line = false;
-    bool exceed_reattempts = false;
+    bool exceed_max_not_detected = false;
     for (size_t i = 0; i < max_attempts; i++){
     try{
         do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
@@ -1758,20 +1804,22 @@ bool move_player_to_realign_via_yolo(
 
             bool not_found_target = target_box.x == -1;
             if (not_found_target){
-                num_reattempts++;
-                if (num_reattempts > 3){
-                    exceed_reattempts = true;
+                not_detected_count++;
+                if (not_detected_count > max_not_detected){
+                    exceed_max_not_detected = true;
                     return;      // when too many failed attempts, just assume we're too close to the target to detect it.
                 }
                 context.wait_for(1000ms); // if we can't see the object, it might just be temporarily obscured. wait one second and reattempt.
                 return;
             }else{
-                num_reattempts = 0;
+                seen_object = true;
+                not_detected_count = 0;
             }
        
             double object_x_pos = target_box.x + target_box.width/2;
             double diff =  x_target - object_x_pos;
 
+            env.console.log("x_target: " + std::to_string(x_target));
             env.console.log("diff: " + std::to_string(diff));
             if (std::abs(diff) < 0.05){
                 reached_target_line = true;
@@ -1797,11 +1845,11 @@ bool move_player_to_realign_via_yolo(
                 pbf_press_button(context, BUTTON_R, 20, 105);
             }
             
-            pbf_move_left_joystick(context, x_push, 128, push_duration, 100);
+            pbf_move_left_joystick(context, x_push, 128, push_duration, 0);
             
         });
 
-        if (exceed_reattempts){
+        if (exceed_max_not_detected){
             return false;
         }
 
@@ -1813,6 +1861,14 @@ bool move_player_to_realign_via_yolo(
         overlays.clear();
         run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
     }
+    }
+
+    if (!seen_object){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "move_player_to_realign_via_yolo(): Never detected the yolo object.",
+            env.console
+        );
     }
 
     return false;
@@ -1849,36 +1905,37 @@ void move_camera_until_yolo_object_detected(
     size_t round_num = 0;
     uint8_t x_move = initial_x_move > 128 ? 255 : 0;
     while(!found_target){
-    try{
-        do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
-        [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+        try{
+            do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 
-            if (round_num == 0){
-                pbf_move_right_joystick(context, initial_x_move, 128, initial_hold_ticks, 50);
-            }
-            context.wait_for_all_requests();
-            ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
-            found_target = target_box.x != -1;
-            if (found_target){
-                return;
-            }
+                if (round_num == 0){
+                    pbf_move_right_joystick(context, initial_x_move, 128, initial_hold_ticks, 50);
+                }
+                context.wait_for_all_requests();
+                ImageFloatBox target_box = get_yolo_box(env, context, overlays, yolo_detector, target_label);
+                found_target = target_box.x != -1;
+                if (found_target){
+                    return;
+                }
 
-            if (round_num > max_rounds){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "move_camera_until_yolo_object_detected(): Unable to detect target object.",
-                    env.console
-                );  
-            }
+                
 
-            pbf_move_right_joystick(context, x_move, 128, 10, 50);
-        });
-        
-    }catch (UnexpectedBattleException&){
-        overlays.clear();
-        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-    }
-    round_num++;
+                pbf_move_right_joystick(context, x_move, 128, 10, 50);
+            });
+            
+        }catch (UnexpectedBattleException&){
+            overlays.clear();
+            run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+        }
+        round_num++;
+        if (round_num > max_rounds){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "move_camera_until_yolo_object_detected(): Unable to detect target object.",
+                env.console
+            );  
+        }
     }
 }
 
