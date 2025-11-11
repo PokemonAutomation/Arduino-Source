@@ -111,8 +111,11 @@ public:
         const std::vector<std::string>& error_notification_tags = {"Notifs"}
     );
 
-    //  Child classes should override one of these.
+    //  Called by SingleSwitchProgramSession::run_program_instance() to start an automation program.
+    //  Child classes should override one of the overloaded functions.
     virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope);
+    //  Called by SingleSwitchProgramSession::run_program_instance() to start an automation program.
+    //  Child classes should override one of the overloaded functions.
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 

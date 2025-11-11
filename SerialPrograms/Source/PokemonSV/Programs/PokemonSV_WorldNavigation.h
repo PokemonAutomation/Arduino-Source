@@ -58,6 +58,7 @@ enum class CallbackEnum{
     SWAP_MENU,
     MOVE_SELECT,
     SELECT_MOVE_TARGET,
+    BATTLE_BAG,
 };
 
 enum class ZoomChange{

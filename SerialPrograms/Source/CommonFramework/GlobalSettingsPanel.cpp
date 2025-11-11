@@ -191,6 +191,12 @@ GlobalSettings::GlobalSettings()
         LockMode::LOCK_WHILE_RUNNING,
         true
     )
+    , SAVE_DEBUG_VIDEOS_ON_SWITCH(
+        "<b>Save Debug Videos on Switch:</b><br>"
+        "If the program fails, save a video on Switch for debugging purposes.",
+        LockMode::LOCK_WHILE_RUNNING,
+        false
+    )
 //    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
     , HIDE_NOTIF_DISCORD_LINK(
         "<b>Hide Discord Link in Notifications:</b><br>"
@@ -247,6 +253,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(LOG_EVERYTHING);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
+    PA_ADD_OPTION(SAVE_DEBUG_VIDEOS_ON_SWITCH);
 //    PA_ADD_OPTION(NAUGHTY_MODE);
 //    PA_ADD_OPTION(HIDE_NOTIF_DISCORD_LINK);
 
@@ -275,8 +282,10 @@ void GlobalSettings::load_json(const JsonValue& json){
     }
 
     PreloadSettings::instance().load(json);
-
+    const bool developer_mode = PreloadSettings::instance().DEVELOPER_MODE;
     BatchOption::load_json(json);
+
+    SAVE_DEBUG_VIDEOS_ON_SWITCH.set_visibility(developer_mode ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     //  Remake this to update the color.
     m_discord_settings.set_text(

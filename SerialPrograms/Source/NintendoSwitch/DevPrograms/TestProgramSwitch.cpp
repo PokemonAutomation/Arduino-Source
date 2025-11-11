@@ -292,6 +292,25 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+
+#if 0
+    ImageRGB32 image1("itemprinter.png");
+    PokemonSV::ItemPrinterMaterialDetector detector(COLOR_RED, Language::ChineseTraditional);
+    // detector.detect_material_name(console, image1, context, 0);
+    
+    // detector.detect_material_name(console, image1, context, 2);
+    detector.detect_material_name(console, image1, context, 1);
+
+
+
+#endif
+
+#if 0
+    save_game_to_menu(console, context);
+#endif
+
+
+
 //    MoveEffectivenessSymbolMatcher::NoEffect();
 
 #if 0
@@ -324,7 +343,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-#if 1
+#if 0
 
     auto snapshot = feed.snapshot();
 

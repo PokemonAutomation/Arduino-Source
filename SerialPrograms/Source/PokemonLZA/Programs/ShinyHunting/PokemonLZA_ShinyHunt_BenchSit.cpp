@@ -109,11 +109,13 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
 }
 
 
-void reapproach_bench_after_getting_up(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void run_back_until_found_bench(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context
+){
     ButtonWatcher buttonA(
         COLOR_RED,
         ButtonType::ButtonA,
-        {0.4, 0.3, 0.2, 0.7},
+        {0.486, 0.477, 0.115, 0.25},
         &env.console.overlay()
     );
 
@@ -121,7 +123,8 @@ void reapproach_bench_after_getting_up(SingleSwitchProgramEnvironment& env, ProC
         env.console, context,
         [](ProControllerContext& context){
             //  Can't just hold it down since sometimes it doesn't register.
-            for (int c = 0; c < 60; c++){
+            for (int c = 0; c < 10; c++){
+                ssf_press_button(context, BUTTON_B, 0ms, 800ms, 0ms);
                 pbf_move_left_joystick(context, 128, 255, 800ms, 200ms);
             }
         },
@@ -135,7 +138,7 @@ void reapproach_bench_after_getting_up(SingleSwitchProgramEnvironment& env, ProC
     default:
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "sit_on_bench(): Unable to detect bench after 60 seconds.",
+            "run_back_until_found_bench(): Unable to detect bench after 10 seconds.",
             env.console
         );
     }
@@ -150,7 +153,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
         //  Warning: This callback will be run from a different thread than this function.
         stats.shinies++;
         env.update_stats();
-        env.console.overlay().add_log("Shiny sound detected!", COLOR_YELLOW);
+        env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
         return shiny_sound_handler.on_shiny_sound(
             env, env.console,
             stats.shinies,
@@ -171,9 +174,11 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 if (duration > Milliseconds::zero()){
                     if (WALK_DIRECTION.current_value() == 0){ // forward
                         env.console.overlay().add_log("Move Forward");
-                        ssf_press_button(context, BUTTON_B, 0ms, 2 * duration, 0ms);
+                        ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
                         pbf_move_left_joystick(context, 128, 0, duration, 0ms);
+                        // run back
                         pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
+                        run_back_until_found_bench(env, context);
                     }else if (WALK_DIRECTION.current_value() == 1){ // left
                         env.console.overlay().add_log("Move Left");
                         ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
@@ -192,7 +197,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                         pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
                     }
                 }else{
-                    reapproach_bench_after_getting_up(env, context);
+                    run_back_until_found_bench(env, context);
                 }
 
                 shiny_sound_handler.process_pending(context);
@@ -203,7 +208,6 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
 
     //  Shiny sound detected and user requested stopping the program when
     //  detected shiny sound.
-
     shiny_sound_handler.process_pending(context);
 
     go_home(env.console, context);

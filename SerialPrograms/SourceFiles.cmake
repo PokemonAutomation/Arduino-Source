@@ -1554,6 +1554,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.cpp
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h
     Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
@@ -1605,6 +1607,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_StallBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.cpp
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
@@ -1899,6 +1903,16 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_34.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_35.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_35.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_36.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_36.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_37.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_37.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_38.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_38.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_39.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_39.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_40.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_40.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.cpp

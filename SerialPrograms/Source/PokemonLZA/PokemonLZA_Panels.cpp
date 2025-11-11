@@ -31,6 +31,9 @@
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
 
+//  Non-Shiny Hunting
+#include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
+
 //  Developer
 #include "Programs/TestPrograms/PokemonLZA_OverworldWatcher.h"
 #include "Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h"
@@ -55,16 +58,16 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back("---- General ----");
     ret.emplace_back(make_single_switch_program<ClothingBuyer_Descriptor, ClothingBuyer>());
     ret.emplace_back(make_single_switch_program<StallBuyer_Descriptor, StallBuyer>());
+    ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
+    ret.emplace_back(make_single_switch_program<PostKillCatcher_Descriptor, PostKillCatcher>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_multi_switch_program<SelfBoxTrade_Descriptor, SelfBoxTrade>());
-        ret.emplace_back(make_single_switch_program<PostKillCatcher_Descriptor, PostKillCatcher>());
     }
 
     ret.emplace_back("---- Farming ----");
     ret.emplace_back(make_single_switch_program<RestaurantFarmer_Descriptor, RestaurantFarmer>());
     ret.emplace_back(make_single_switch_program<MegaShardFarmer_Descriptor, MegaShardFarmer>());
+    ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
         ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     }
 
@@ -72,14 +75,17 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_BenchSit_Descriptor, ShinyHunt_BenchSit>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldReset_Descriptor, ShinyHunt_OverworldReset>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneEntrance_Descriptor, ShinyHunt_WildZoneEntrance>());
+    ret.emplace_back(make_single_switch_program<AutoFossil_Descriptor, AutoFossil>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<AutoFossil_Descriptor, AutoFossil>());
     }
-
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
     }
 
+    if (IS_BETA_VERSION){
+        ret.emplace_back("---- Non-Shiny Hunting ----");
+        ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
+    }
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");

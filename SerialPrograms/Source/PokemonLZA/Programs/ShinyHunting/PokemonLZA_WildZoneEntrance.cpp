@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -23,6 +24,37 @@ namespace NintendoSwitch {
 namespace PokemonLZA {
 
 using namespace Pokemon;
+
+WildZoneOption::WildZoneOption()
+    : EnumDropdownOption<WildZone>(
+            "<b>Wild Zone:</b>",
+            {
+                {WildZone::WILD_ZONE_1,  "wild-zone-1",  "Wild Zone 1"},
+                {WildZone::WILD_ZONE_2,  "wild-zone-2",  "Wild Zone 2"},
+                {WildZone::WILD_ZONE_3,  "wild-zone-3",  "Wild Zone 3"},
+                {WildZone::WILD_ZONE_4,  "wild-zone-4",  "Wild Zone 4"},
+                {WildZone::WILD_ZONE_5,  "wild-zone-5",  "Wild Zone 5"},
+                {WildZone::WILD_ZONE_6,  "wild-zone-6",  "Wild Zone 6"},
+                {WildZone::WILD_ZONE_7,  "wild-zone-7",  "Wild Zone 7"},
+                {WildZone::WILD_ZONE_8,  "wild-zone-8",  "Wild Zone 8"},
+                {WildZone::WILD_ZONE_9,  "wild-zone-9",  "Wild Zone 9"},
+                {WildZone::WILD_ZONE_10, "wild-zone-10", "Wild Zone 10"},
+                {WildZone::WILD_ZONE_11, "wild-zone-11", "Wild Zone 11"},
+                {WildZone::WILD_ZONE_12, "wild-zone-12", "Wild Zone 12"},
+                {WildZone::WILD_ZONE_13, "wild-zone-13", "Wild Zone 13"},
+                {WildZone::WILD_ZONE_14, "wild-zone-14", "Wild Zone 14"},
+                {WildZone::WILD_ZONE_15, "wild-zone-15", "Wild Zone 15"},
+                {WildZone::WILD_ZONE_16, "wild-zone-16", "Wild Zone 16"},
+                {WildZone::WILD_ZONE_17, "wild-zone-17", "Wild Zone 17"},
+                {WildZone::WILD_ZONE_18, "wild-zone-18", "Wild Zone 18"},
+                {WildZone::WILD_ZONE_19, "wild-zone-19", "Wild Zone 19"},
+                {WildZone::WILD_ZONE_20, "wild-zone-20", "Wild Zone 20"},
+            },
+            LockMode::LOCK_WHILE_RUNNING,
+            WildZone::WILD_ZONE_1
+        )
+    {}
+        
 
 
 ShinyHunt_WildZoneEntrance_Descriptor::ShinyHunt_WildZoneEntrance_Descriptor()
@@ -45,7 +77,7 @@ public:
         , day_changes(m_stats["Day/Night Changes"])
     {
         m_display_order.emplace_back("Visits");
-        m_display_order.emplace_back("Chased");
+        m_display_order.emplace_back("Chased", PreloadSettings::instance().DEVELOPER_MODE ? ALWAYS_VISIBLE : ALWAYS_HIDDEN);
         m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Game Resets", ALWAYS_HIDDEN);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
@@ -192,7 +224,8 @@ void leave_zone_and_reset_spawns(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     Milliseconds walk_time_in_zone,
-    WildZone wild_zone
+    WildZone wild_zone,
+    ShinySoundHandler& shiny_sound_handler
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
@@ -263,11 +296,15 @@ void leave_zone_and_reset_spawns(
             env.console
         );
     }
+    shiny_sound_handler.process_pending(context);
+
     // Found button A, so we are at the entrance.
     // Mash A to leave Zone.
     env.log("Found button A. Leaving Zone");
     env.console.overlay().add_log("Found Button A. Leaving Zone");
     pbf_mash_button(context, BUTTON_A, 2000ms);
+    context.wait_for_all_requests();
+    shiny_sound_handler.process_pending(context);
 
     // Do a fast travel outside the gate to reset spawns
     std::string extra_eror_msg = " This is after leaving zone.";
@@ -290,18 +327,23 @@ void do_one_wild_zone_trip(
     size_t movement_mode,
     Milliseconds walk_time_in_zone,
     bool running,
-    WildZone wild_zone
+    WildZone wild_zone,
+    ShinySoundHandler& shiny_sound_handler
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
     context.wait_for_all_requests();
+    shiny_sound_handler.process_pending(context);
 
     if (movement_mode >= 1){
         go_to_entrance(env, context);
+        context.wait_for_all_requests();
+        shiny_sound_handler.process_pending(context);
     }
     if (movement_mode == 2){
         // Mash button A to enter the zone.
         pbf_mash_button(context, BUTTON_A, 2000ms);
         context.wait_for_all_requests();
+        shiny_sound_handler.process_pending(context);
         // Day/night change can happen before or after the button A mash, so we are not
         // sure if we are in the zone or not! But at end of the travel we will fast
         // travel back to entrance and have a way to work on both cases.
@@ -315,17 +357,23 @@ void do_one_wild_zone_trip(
             }
             pbf_move_left_joystick(context, 128, 0, walk_time_in_zone, 200ms);
         }
+        context.wait_for_all_requests();
+        shiny_sound_handler.process_pending(context);
     }
-    context.wait_for_all_requests();
 
     if (movement_mode <= 1){
         // we are not in the zone. so no wild pokemon handling!
         fast_travel_outside_zone(env, context, wild_zone);
     } else {
-        leave_zone_and_reset_spawns(env, context, walk_time_in_zone, wild_zone);
+        leave_zone_and_reset_spawns(
+            env, context,
+            walk_time_in_zone, wild_zone,
+            shiny_sound_handler
+        );  
     }
     // wait 0.5 sec for the game to be ready to control player character again
     pbf_wait(context, 500ms);
+    // Now if everything works fine, we are back at the entrance via a fast travel
 
     stats.visits++;
     env.update_stats();
@@ -334,59 +382,39 @@ void do_one_wild_zone_trip(
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
-    if (SHINY_DETECTED.ACTION == ShinySoundDetectedAction::NOTIFY_ON_ALL){
-        throw UserSetupError(
-            env.console,
-            "Shiny would be detected/notified at most once. Choose one of the other 2 options."
-        );
-    }
+    ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);
 
-    bool leave_zone_first = false;
-    while (true){
-        float shiny_coefficient = 1.0;
-        PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool {
-            //  Warning: This callback will be run from a different thread than this function.
-            stats.shinies++;
-            env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
-            env.update_stats();
-            shiny_coefficient = error_coefficient;
-            return true;
-        });
-
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [&](ProControllerContext& context){
-                if (leave_zone_first){
-                    leave_zone_and_reset_spawns(env, context, WALK_TIME_IN_ZONE, WILD_ZONE);
-                    leave_zone_first = false;
-                }
-                while (true){
-                    do_one_wild_zone_trip(env, context, MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE);
-                    send_program_status_notification(env, NOTIFICATION_STATUS);
-                }
-            },
-            {{shiny_detector}}
-        );
-
-        //  This should never happen.
-        if (ret != 0){
-            continue;
-        }
-
-        // heard shiny sound. Mash B to go back from any already opened menus
-        pbf_mash_button(context, BUTTON_B, 1000ms);
-
-        // decide whether to exit the program
-        bool exit = SHINY_DETECTED.on_shiny_sound(
-            env, env.console, context,
+    PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool {
+        //  Warning: This callback will be run from a different thread than this function.
+        stats.shinies++;
+        env.update_stats();
+        env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
+       
+        return shiny_sound_handler.on_shiny_sound(
+            env, env.console,
             stats.shinies,
-            shiny_coefficient
+            error_coefficient
         );
-        if (exit){
-            break;
-        }
-        leave_zone_first = true;
-    }
+    });
+
+    run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            while (true){
+                do_one_wild_zone_trip(
+                    env, context, 
+                    MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE,
+                    shiny_sound_handler
+                );
+                send_program_status_notification(env, NOTIFICATION_STATUS);
+            }
+        },
+        {{shiny_detector}}
+    );
+    
+    //  Shiny sound detected and user requested stopping the program when
+    //  detected shiny sound.
+    shiny_sound_handler.process_pending(context);
 
     go_home(env.console, context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);

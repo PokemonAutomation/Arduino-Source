@@ -11,6 +11,7 @@
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/FloatingPointOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/StringOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonTools/Options/StringSelectOption.h"
 #include "CommonTools/Options/LanguageOCROption.h"
@@ -147,6 +148,12 @@ private:
     BooleanCheckBoxOption TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT;
     FloatingPointOption X_OFFSET;
     FloatingPointOption Y_OFFSET;
+
+    BooleanCheckBoxOption TEST_YOLO_BOX;
+    StringOption YOLO_PATH;
+    StringOption TARGET_LABEL;
+    
+
 };
 
 const std::vector<std::unique_ptr<AutoStory_Segment>>& ALL_AUTO_STORY_SEGMENT_LIST();

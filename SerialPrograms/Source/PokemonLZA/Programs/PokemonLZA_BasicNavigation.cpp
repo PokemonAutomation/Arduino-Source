@@ -11,16 +11,86 @@
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-//#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MapDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
+
+
+
+void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
+
+    bool seen_save_button = false;
+    bool seen_saved_dialog = false;
+
+    WallClock start = current_time();
+    while (true){
+        context.wait_for_all_requests();
+
+        if (current_time() - start > std::chrono::seconds(120)){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "save_game_to_menu(): Unable to save game after 2 minutes.",
+                console
+            );
+        }
+
+        OverworldPartySelectionWatcher overworld(COLOR_RED, &console.overlay());
+        MainMenuWatcher main_menu(COLOR_YELLOW, &console.overlay());
+        SelectionArrowWatcher save_button(
+            COLOR_GREEN,
+            &console.overlay(),
+            SelectionArrowType::RIGHT,
+            {0.287118, 0.638835, 0.064410, 0.108738}
+        );
+        BlueDialogWatcher dialog(COLOR_YELLOW, &console.overlay());
+
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(30),
+            {
+                overworld,
+                main_menu,
+                save_button,
+                dialog,
+            }
+        );
+        context.wait_for(100ms);
+        switch (ret){
+        case 0:
+            console.log("Detected overworld...");
+            pbf_press_button(context, BUTTON_X, 160ms, 240ms);
+            continue;
+        case 1:
+            console.log("Detected main menu...");
+            if (seen_save_button && seen_saved_dialog){
+                return;
+            }
+            pbf_press_button(context, BUTTON_R, 160ms, 240ms);
+            continue;
+        case 2:
+            console.log("Detected save button...");
+            seen_save_button = true;
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
+            continue;
+        case 3:
+            console.log("Detected dialog...");
+            seen_saved_dialog = true;
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+            continue;
+        }
+    }
+}
+
+
+
 
 
 bool open_map(ConsoleHandle& console, ProControllerContext& context){
