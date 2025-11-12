@@ -9,7 +9,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QDir>
-#include <filesystem>
 #include "Globals.h"
 
 namespace PokemonAutomation{
@@ -141,8 +140,7 @@ std::string get_runtime_base_path(){
         // QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) returns
         // "/Users/$USERNAME/Library/Application Support/SerialPrograms/UserSettings", the parent folder
         // to hold application-specific persistent data
-        QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + 
-            "/" + QString::fromStdString(PROGRAM_BASENAME());
+        QString appSupportPath = QStandardPaths::writableLocation(QStandardPaths::GenericDataLocation) + "/SerialPrograms";
         QDir dir(appSupportPath);
         if (!dir.exists()) {
             dir.mkpath(".");
@@ -216,34 +214,6 @@ const std::string& ML_ANNOTATION_PATH(){
 const std::string& ML_MODEL_CACHE_PATH(){
     static const std::string path = RUNTIME_BASE_PATH() + "ModelCache/";
     return path;
-}
-
-// Program executable path information
-namespace {
-    std::string g_program_absolute_path;
-    std::string g_program_filename;
-    std::string g_program_basename;
-}
-
-void set_program_path(const char* argv0) {
-    if (argv0 != nullptr) {
-        std::filesystem::path program_path(argv0);
-        g_program_absolute_path = std::filesystem::absolute(program_path).string();
-        g_program_filename = program_path.filename().string();
-        g_program_basename = program_path.stem().string();
-    }
-}
-
-const std::string& PROGRAM_ABSOLUTE_PATH() {
-    return g_program_absolute_path;
-}
-
-const std::string& PROGRAM_FILENAME() {
-    return g_program_filename;
-}
-
-const std::string& PROGRAM_BASENAME() {
-    return g_program_basename;
 }
 
 }

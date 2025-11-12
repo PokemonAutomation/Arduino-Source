@@ -43,15 +43,8 @@ extern const std::string COMPILER_VERSION;
 
 extern const size_t LOG_HISTORY_LINES;
 
-// Path to the parent folder that holds all other folders, e.g. settings folder, screenshot folder, etc.
+// Path to the parent folder that holds all other folders, e.g. settings folder, screenshot folder, etc. 
 const std::string& RUNTIME_BASE_PATH();
-
-// Program executable information (retrieved from argv[0])
-// These must be initialized by calling set_program_path() from main() before use.
-void set_program_path(const char* argv0);
-const std::string& PROGRAM_ABSOLUTE_PATH();  // Full absolute path to executable
-const std::string& PROGRAM_FILENAME();       // Filename with extension
-const std::string& PROGRAM_BASENAME();       // Filename without extension
 
 // Folder path (end with "/") to hold program setting files.
 const std::string& SETTINGS_PATH();

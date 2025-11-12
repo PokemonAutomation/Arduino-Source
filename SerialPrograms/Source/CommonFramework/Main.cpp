@@ -148,9 +148,6 @@ int run_program(int argc, char *argv[]){
 
 
 int main(int argc, char *argv[]){
-    // Retrieve and store program name
-    set_program_path(argv[0]);
-
     setup_crash_handler();
 
 
