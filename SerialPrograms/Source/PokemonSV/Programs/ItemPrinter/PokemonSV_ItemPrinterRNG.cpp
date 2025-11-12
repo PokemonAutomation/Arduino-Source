@@ -117,11 +117,11 @@ ItemPrinterRNG::ItemPrinterRNG()
     , MODE(
         "<b>Item Printer mode:</b><br>",
         {
-            {ItemPrinterMode::STANDARD_MODE, "standard", "Standard Mode: Manually select exactly what is being printed for each print job."},
             {ItemPrinterMode::AUTO_MODE, "auto", "Auto Mode: Select your desired item and its quantity, and items will be automatically printed."},
+            {ItemPrinterMode::STANDARD_MODE, "standard", "Standard Mode: Manually select exactly what is being printed for each print job."},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        ItemPrinterMode::STANDARD_MODE
+        ItemPrinterMode::AUTO_MODE
     )
     , DESIRED_ITEM_TABLE(
         "<b>Item Table:</b><br>"
@@ -191,6 +191,15 @@ ItemPrinterRNG::ItemPrinterRNG()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
+    , AVOID_STRING_OCR(
+        "<b>Avoid using OCR on strings:</b><br>"
+        "Only use this if you're having issues (particularly with Asian languages). "
+        "This will detect all materials with a value of 68%, and the highest quantity of this is assumed to be your Happiny Dust quantity. "
+        "i.e. This only detects numbers, therefore sidestepping the issue of poor OCR with Asian languages. "
+        "If you enable this, I recommend ensuring that your quantity of Happiny Dust is greater than the other materials with a value of 68% (Beldum Claw, Ditto Goo, Magby Hair).",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        false
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -214,6 +223,7 @@ ItemPrinterRNG::ItemPrinterRNG()
     PA_ADD_OPTION(MATERIAL_FARMER_FIXED_NUM_JOBS);
     PA_ADD_OPTION(MIN_HAPPINY_DUST);
     PA_ADD_OPTION(MATERIAL_FARMER_OPTIONS);
+    PA_ADD_OPTION(AVOID_STRING_OCR);
     if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(ENABLE_SEED_CALC);
     }
@@ -988,19 +998,25 @@ uint32_t ItemPrinterRNG::check_num_happiny_dust(
         case 3:{
             env.log("Detected material selection.");
             ItemPrinterMaterialDetector detector(COLOR_RED, LANGUAGE);
-            
-            int8_t happiny_dust_row_num = detector.find_happiny_dust_row_index(
-                env.console, context
-            );
+            if (AVOID_STRING_OCR){
+                uint32_t highest_quantity_of_value_68 = detector.find_highest_quantity_of_value_68(env.console, context);
+                return highest_quantity_of_value_68;
 
-            context.wait_for_all_requests();
-            VideoSnapshot snapshot = env.console.video().snapshot();
-            num_happiny_dust = detector.detect_material_quantity(
-                env.console, snapshot, context,
-                happiny_dust_row_num
-            );
-            pbf_mash_button(context, BUTTON_B, 100);
-            return num_happiny_dust;
+            }else{
+                int8_t happiny_dust_row_num = detector.find_happiny_dust_row_index(
+                    env.console, context
+                );
+
+                context.wait_for_all_requests();
+                VideoSnapshot snapshot = env.console.video().snapshot();
+                num_happiny_dust = detector.detect_material_quantity(
+                    env.console, snapshot, context,
+                    happiny_dust_row_num
+                );
+                pbf_mash_button(context, BUTTON_B, 100);
+                return num_happiny_dust;
+            }
+            
         }
         default:
             stats.errors++;

@@ -195,6 +195,42 @@ int8_t ItemPrinterMaterialDetector::find_happiny_dust_row_index(
 
 }
 
+
+int16_t ItemPrinterMaterialDetector::find_highest_quantity_of_value_68(VideoStream& stream, ProControllerContext& context) const{
+    int16_t highest_quantity_of_value_68 = 0;
+    bool seen_material_value_68 = false;
+    for (size_t c = 0; c < 30; c++){
+        context.wait_for_all_requests();
+        VideoSnapshot snapshot = stream.video().snapshot();
+
+        std::vector<int8_t> value_68_row_indexes = find_material_value_row_index(stream, context, 68);
+        if (!value_68_row_indexes.empty()){
+            seen_material_value_68 = true;
+        }
+
+        for (int8_t row_index : value_68_row_indexes){            
+            int16_t quantity = detect_material_quantity(stream, snapshot, context, row_index);
+            if (quantity > highest_quantity_of_value_68){
+                highest_quantity_of_value_68 = quantity;
+            }
+        }
+
+        // keep searching for highest quantity of value 68.
+        pbf_press_dpad(context, DPAD_RIGHT, 20, 30);
+    }
+
+    if (!seen_material_value_68){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "find_highest_quantity_of_value_68: Failed to find any material with value of 68, after multiple attempts.",
+            stream
+        );
+    }
+
+    return highest_quantity_of_value_68;
+
+}
+
 std::string ItemPrinterMaterialDetector::detect_material_name(
     VideoStream& stream,
     const ImageViewRGB32& screen,
