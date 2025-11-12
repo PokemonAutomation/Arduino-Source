@@ -137,6 +137,8 @@ private:
 
     BooleanCheckBoxOption ENABLE_SEED_CALC;
 
+    BooleanCheckBoxOption AVOID_STRING_OCR;
+
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;
 };
