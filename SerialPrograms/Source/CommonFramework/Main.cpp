@@ -9,6 +9,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/ImageResolution.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
+#include "VideoPipeline/Backends/MediaServicesQt6.h"
 #include "Globals.h"
 #include "GlobalSettingsPanel.h"
 #include "PersistentSettings.h"
@@ -143,11 +144,20 @@ int run_program(int argc, char *argv[]){
     w.raise(); // bring the window to front on macOS
     set_permissions(w);
 
-    return application.exec();
+    int ret = application.exec();
+
+    GlobalMediaServices::instance().stop();
+
+    return ret;
 }
 
 
 int main(int argc, char *argv[]){
+#if 0
+    // Retrieve and store program name
+    set_program_path(argv[0]);
+#endif
+
     setup_crash_handler();
 
 
