@@ -82,7 +82,7 @@ std::unique_ptr<StatsTracker> AutoFossil_Descriptor::make_stats() const{
 AutoFossil::AutoFossil()
     : NUM_FOSSILS("<b>How Many Fossils to Revive Before Checking Them in Box:</b>",
         LockMode::LOCK_WHILE_RUNNING,
-        30, 1, 32*30
+        30, 1, 1*30
     )
     , WHICH_FOSSIL(
         "<b>Which Fossil to Choose in the Dialog Menu:</b>",
@@ -181,7 +181,7 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
         
         int ret = wait_until(
             env.console, context,
-            10s,
+            10000ms,
             {
                 buttonA_watcher,
                 selection_arrow_watcher,
@@ -233,7 +233,7 @@ void AutoFossil::revive_one_fossil(SingleSwitchProgramEnvironment& env, ProContr
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "revive_one_fossil(): No recognized state after 10 seconds.",
+                "revive_one_fossil(): No recognized state after 60 seconds.",
                 env.console
             );
         }
@@ -256,15 +256,7 @@ bool AutoFossil::check_fossils_in_one_box(
         box_detector.move_cursor(env.program_info(), env.console, context, box_row, box_col);
 
         info_watcher.reset_state();
-        const int ret = wait_until(env.console, context, std::chrono::seconds(10), {info_watcher});
-        if (ret < 0) {
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Failed to detect box info at cell idx " + std::to_string(i) + " after 30 seconds",
-                env.console
-            );
-        }
-
+        wait_until(env.console, context, WallClock::max(), {info_watcher});
         
         std::ostringstream os;
         os << num_checked_fossils_in_previous_boxes + i + 1 << "/" << NUM_FOSSILS << ": " << info_watcher.info_str();
