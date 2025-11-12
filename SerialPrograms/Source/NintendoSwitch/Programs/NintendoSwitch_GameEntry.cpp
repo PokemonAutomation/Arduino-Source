@@ -18,6 +18,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch_GameEntry.h"
@@ -99,6 +100,11 @@ void ensure_at_home(ConsoleHandle& console, JoyconContext& context){
 }
 
 
+bool is_close_game_menu_visible(ConsoleHandle& console){
+    CloseGameDetector close_game(console);
+    auto snapshot = console.video().snapshot();
+    return close_game.detect(snapshot);
+}
 
 //
 //  close_game_from_home()
@@ -116,10 +122,31 @@ void close_game_from_home(ConsoleHandle& console, ProControllerContext& context)
 
                                                     // if game initially open.  |  if game initially closed
     pbf_mash_button(context, BUTTON_X, 100);        // - Close game.            |  - does nothing
-    ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
-    ssf_press_dpad_ptv(context, DPAD_DOWN);         // - Does nothing.          |  - Press Down a second time in case we drop one.
-    pbf_mash_button(context, BUTTON_A, 50);         // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
-    go_home(console, context);                      // - Does nothing.          |  - goes back to home screen.
+    context.wait_for_all_requests();
+    if (is_close_game_menu_visible(console)){  // game was initially open. 
+        console.log("Detected close game menu.");
+        pbf_mash_button(context, BUTTON_A, 50);
+        ensure_at_home(console, context);
+    }else{  // either game is initially closed, or the game is not selected. The game not being selected can happen in Switch 2, when you touch the touchscreen on empty space on the Home screen.
+        console.log("Either game is initially closed, or the game is not selected.");
+        ssf_press_dpad_ptv(context, DPAD_DOWN);  // moving the DPAD/joystick will allow the selection to come back.
+        ssf_press_dpad_ptv(context, DPAD_DOWN);
+        ssf_press_dpad_ptv(context, DPAD_DOWN);
+        console.log("Click the Home button to ensure that current game is selected.");
+        pbf_press_button(context, BUTTON_HOME, 160ms, 500ms);  // clicking home ensures that the cursor is selected on the current game.
+        go_home(console, context);
+
+        pbf_mash_button(context, BUTTON_X, 100);   // try again to close the game.
+        context.wait_for_all_requests();
+        if (is_close_game_menu_visible(console)){  // If close game menu visible, then close the game. Otherwise, we assume the game is already closed.
+            console.log("Detected close game menu.");
+            pbf_mash_button(context, BUTTON_A, 50);
+            ensure_at_home(console, context);
+        }else{
+            console.log("Game was already closed.");
+        }
+        
+    }
 
     // fail-safe against button drops and unexpected error messages.
     pbf_mash_button(context, BUTTON_X, 50);
@@ -136,11 +163,31 @@ void close_game_from_home(ConsoleHandle& console, JoyconContext& context){
 
                                                         // if game initially open.  |  if game initially closed
     pbf_mash_button(context, BUTTON_X, 800ms);          // - Close game.            |  - does nothing
-    pbf_move_joystick(context, 128, 255, 100ms, 10ms);  // - Does nothing.          |  - moves selector away from the closed game to avoid opening it.
-    pbf_move_joystick(context, 128, 255, 100ms, 10ms);  // - Does nothing.          |  - Press Down a second time in case we drop one.
-    pbf_mash_button(context, BUTTON_A, 400ms);          // - Confirm close game.    |  - opens an app on the home screen (e.g. Online)
-    go_home(console, context);                          // - Does nothing.          |  - goes back to home screen.
+    context.wait_for_all_requests();
+    if (is_close_game_menu_visible(console)){  // game was initially open. 
+        console.log("Detected close game menu.");
+        pbf_mash_button(context, BUTTON_A, 400ms);
+        ensure_at_home(console, context);
+    }else{  // either game is initially closed, or the game is not selected. The game not being selected can happen in Switch 2, when you touch the touchscreen on empty space on the Home screen.
+        console.log("Either game is initially closed, or the game is not selected.");
+        pbf_move_joystick(context, 128, 255, 100ms, 10ms);  // press down
+        pbf_move_joystick(context, 128, 255, 100ms, 10ms);
+        pbf_move_joystick(context, 128, 255, 100ms, 10ms);
+        console.log("Click the Home button to ensure that current game is selected.");
+        pbf_press_button(context, BUTTON_HOME, 160ms, 500ms);  // clicking home ensures that the cursor is selected on the current game.
+        go_home(console, context);
 
+        pbf_mash_button(context, BUTTON_X, 800ms);   // try again to close the game.
+        context.wait_for_all_requests();
+        if (is_close_game_menu_visible(console)){  // If close game menu visible, then close the game. Otherwise, we assume the game is already closed.
+            console.log("Detected close game menu.");
+            pbf_mash_button(context, BUTTON_A, 400ms);
+            ensure_at_home(console, context);
+        }else{
+            console.log("Game was already closed.");
+        }
+
+    }
     // fail-safe against button drops and unexpected error messages.
     pbf_mash_button(context, BUTTON_X, 400ms);
     pbf_mash_button(context, BUTTON_B, 2000ms);
