@@ -81,7 +81,7 @@ ControllerSelectorWidget::ControllerSelectorWidget(QWidget& parent, ControllerSe
     m_reset_button->setToolTip(
         "<b>Click:</b> Reset controller and reconnect.<br><br>"
         "<b>Shift+Click:</b> Reset and clear the controller of any state. "
-        "For controllers save pairing state, this will unpair it with any hosts it may be connected to."
+        "If the controller supports pairing, this will unpair it and allow it to pair with a new host."
     );
 #endif
     layout1->addWidget(m_reset_button, CONSOLE_SETTINGS_STRETCH_L1_BUTTON);
