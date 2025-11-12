@@ -24,7 +24,7 @@ namespace Kernels{
 class PixelTest_Rgb32Euclidean_x64_SSE42{
 public:
     static const size_t VECTOR_SIZE = 4;
-    using Mask = PartialWordMask;
+    using Mask = PartialWordMask_x64_SSE42;
 
 public:
     PA_FORCE_INLINE PixelTest_Rgb32Euclidean_x64_SSE42(

@@ -173,7 +173,6 @@ void trade_current_pokemon(
             break;
         default:
             stats.m_errors++;
-
             tracker.report_unrecoverable_error(stream, "Failed to return to box after 2 minutes after a trade.");
         }
     }
@@ -193,10 +192,8 @@ void trade_current_box(
 
             MultiConsoleErrorState error_state;
             env.run_in_parallel(scope, [&](ConsoleHandle& console, ProControllerContext& context){
-                VideoOverlaySet overlays(console.overlay());
-
+//                VideoOverlaySet overlays(console.overlay());
                 move_box_cursor(env.program_info(), console, context, BoxCursorLocation::SLOTS, row, col);
-
                 trade_current_pokemon(console, context, error_state, stats);
             });
             stats.m_trades++;

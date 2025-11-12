@@ -4,6 +4,7 @@
  *
  */
 
+#include <thread>
 #include "Common/Cpp/PanicDump.h"
 #include "ReverseLockGuard.h"
 #include "ComputationThreadPoolCore.h"
@@ -30,20 +31,39 @@ ComputationThreadPoolCore::ComputationThreadPoolCore(
         spawn_thread();
     }
 }
-ComputationThreadPoolCore::~ComputationThreadPoolCore(){
+
+void ComputationThreadPoolCore::stop() {
     {
         std::lock_guard<std::mutex> lg(m_lock);
+        if (m_stopping) return;
         m_stopping = true;
         m_thread_cv.notify_all();
 //        m_dispatch_cv.notify_all();
     }
     for (ThreadData& thread : m_threads){
-        thread.thread.join();
+        if (thread.thread.joinable()) {
+            thread.thread.join();
+        }
     }
+
+    // DO NOT JOIN AGAIN IN DESTRUCTOR
+    m_threads.clear();
+
     for (auto& task : m_queue){
         task->report_cancelled();
     }
+
+    // DO NOT CLEAR AGAIN IN DESTRUCTOR
+    m_queue.clear();
+
 }
+
+ComputationThreadPoolCore::~ComputationThreadPoolCore(){
+    stop();
+}
+
+
+
 
 WallDuration ComputationThreadPoolCore::cpu_time() const{
     //  TODO: Don't lock the entire queue.
@@ -189,11 +209,12 @@ void ComputationThreadPoolCore::spawn_thread(){
     //  Must call under lock.
     ThreadData& handle = m_threads.emplace_back();
     try{
-        handle.thread = std::thread(
-            run_with_catch,
-            "ParallelTaskRunner::thread_loop()",
-            [&, this]{ thread_loop(handle); }
-        );
+        handle.thread = Thread([&, this]{
+            run_with_catch(
+                "ParallelTaskRunner::thread_loop()",
+                [&, this]{ thread_loop(handle); }
+            );
+        });
     }catch (...){
         m_threads.pop_back();
         throw;

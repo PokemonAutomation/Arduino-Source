@@ -35,7 +35,7 @@ ScreenWatchDisplayWidget::ScreenWatchDisplayWidget(ScreenWatchOption& option, Sc
     , m_holder(parent)
     , m_option(option)
     , m_stop(false)
-    , m_updater(&ScreenWatchDisplayWidget::thread_loop, this)
+    , m_updater([this]{ thread_loop(); })
 {}
 ScreenWatchDisplayWidget::~ScreenWatchDisplayWidget(){
     {

@@ -9,7 +9,6 @@
 
 #include <string>
 #include <atomic>
-#include <thread>
 #include <windows.h>
 #include "Common/Compiler.h"
 #include "Common/Cpp/Time.h"
@@ -17,7 +16,7 @@
 #include "Common/Cpp/Unicode.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
-//#include "Common/Cpp/Concurrency/SpinPause.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "StreamInterface.h"
 
 namespace PokemonAutomation{
@@ -103,7 +102,12 @@ public:
 
         //  Start receiver thread.
         try{
-            m_listener = std::thread(run_with_catch, "SerialConnection::SerialConnection()", [this]{ recv_loop(); });
+            m_listener = Thread([this]{
+                run_with_catch(
+                    "SerialConnection::SerialConnection()",
+                    [this]{ recv_loop(); }
+                );
+            });
         }catch (...){
             CloseHandle(m_handle);
             throw;
@@ -217,7 +221,7 @@ private:
     std::atomic<bool> m_exit;
     uint64_t m_errors = 0;
     SpinLock m_send_lock;
-    std::thread m_listener;
+    Thread m_listener;
 };
 
 

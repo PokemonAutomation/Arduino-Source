@@ -42,9 +42,7 @@ ProgramSession::~ProgramSession(){
 }
 
 void ProgramSession::join_program_thread(){
-    if (m_thread.joinable()){
-        m_thread.join();
-    }
+    m_thread.join();
 }
 
 
@@ -168,11 +166,12 @@ std::string ProgramSession::start_program(){
         m_logger.log("Starting program...");
         m_timestamp.store(current_time(), std::memory_order_relaxed);
         set_state(ProgramState::RUNNING);
-        m_thread = std::thread(
-            run_with_catch,
-            "ProgramSession::start_program()",
-            [this]{ run_program(); }
-        );
+        m_thread = Thread([this]{
+            run_with_catch(
+                "ProgramSession::start_program()",
+                [this]{ run_program(); }
+            );
+        });
 
         return "";
     }

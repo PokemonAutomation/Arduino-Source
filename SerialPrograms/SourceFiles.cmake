@@ -43,6 +43,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Concurrency/SpinLock.cpp
     ../Common/Cpp/Concurrency/SpinLock.h
     ../Common/Cpp/Concurrency/SpinPause.h
+    ../Common/Cpp/Concurrency/Thread.cpp
+    ../Common/Cpp/Concurrency/Thread.h
     ../Common/Cpp/Concurrency/Watchdog.cpp
     ../Common/Cpp/Concurrency/Watchdog.h
     ../Common/Cpp/Containers/AlignedMalloc.cpp
@@ -127,10 +129,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/KeyBindingOption.h
     ../Common/Cpp/Options/MacAddressOption.cpp
     ../Common/Cpp/Options/MacAddressOption.h
-    ../Common/Cpp/Options/RandomCodeOption.cpp
-    ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/PathOption.cpp
     ../Common/Cpp/Options/PathOption.h
+    ../Common/Cpp/Options/RandomCodeOption.cpp
+    ../Common/Cpp/Options/RandomCodeOption.h
     ../Common/Cpp/Options/SimpleIntegerOption.cpp
     ../Common/Cpp/Options/SimpleIntegerOption.h
     ../Common/Cpp/Options/StaticTableOption.cpp
@@ -216,10 +218,10 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/KeyBindingWidget.h
     ../Common/Qt/Options/MacAddressWidget.cpp
     ../Common/Qt/Options/MacAddressWidget.h
-    ../Common/Qt/Options/RandomCodeWidget.cpp
-    ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/PathWidget.cpp
     ../Common/Qt/Options/PathWidget.h
+    ../Common/Qt/Options/RandomCodeWidget.cpp
+    ../Common/Qt/Options/RandomCodeWidget.h
     ../Common/Qt/Options/SimpleIntegerWidget.cpp
     ../Common/Qt/Options/SimpleIntegerWidget.h
     ../Common/Qt/Options/StaticTableWidget.cpp
@@ -515,6 +517,8 @@ file(GLOB LIBRARY_SOURCES
     Source/CommonTools/Audio/AudioTemplateCache.h
     Source/CommonTools/Audio/SpectrogramMatcher.cpp
     Source/CommonTools/Audio/SpectrogramMatcher.h
+    Source/CommonTools/DetectedBoxes.cpp
+    Source/CommonTools/DetectedBoxes.h
     Source/CommonTools/DetectionDebouncer.h
     Source/CommonTools/FailureWatchdog.h
     Source/CommonTools/ImageMatch/CroppedImageDictionaryMatcher.cpp
@@ -1035,6 +1039,7 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Options/TurboMacroTable.h
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.cpp
     Source/NintendoSwitch/Options/UI/NintendoSwitch_FriendCodeListWidget.h
+    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch2_DateSkippers.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManipBase.h
@@ -1044,6 +1049,8 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_24h.h
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.cpp
     Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip_US.h
+    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateSkippers.cpp
+    Source/NintendoSwitch/Programs/DateManip/NintendoSwitch_DateSkippers.h
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch1_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch2_HomeToDateTime.cpp
     Source/NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.cpp
@@ -1547,8 +1554,14 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.cpp
+    Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h
+    Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.h
+    Source/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
@@ -1559,6 +1572,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_MapIconDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h
+    Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp
+    Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp
@@ -1575,18 +1590,23 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
-    Source/PokemonLZA/Programs/PokemonLZA_BerryBuyer.cpp
-    Source/PokemonLZA/Programs/PokemonLZA_BerryBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.cpp
     Source/PokemonLZA/Programs/PokemonLZA_GameEntry.h
+    Source/PokemonLZA/Programs/PokemonLZA_Locations.h
     Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.cpp
     Source/PokemonLZA/Programs/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_MenuNavigation.h
+    Source/PokemonLZA/Programs/PokemonLZA_PostKillCatcher.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_PostKillCatcher.h
+    Source/PokemonLZA/Programs/PokemonLZA_StallBuyer.cpp
+    Source/PokemonLZA/Programs/PokemonLZA_StallBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.cpp
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
@@ -1603,6 +1623,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_TestBoxCellInfo.h
+    Source/PokemonLZA/Programs/Trading/PokemonLZA_SelfBoxTrade.cpp
+    Source/PokemonLZA/Programs/Trading/PokemonLZA_SelfBoxTrade.h
+    Source/PokemonLZA/Programs/Trading/PokemonLZA_TradeRoutines.cpp
+    Source/PokemonLZA/Programs/Trading/PokemonLZA_TradeRoutines.h
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.cpp
     Source/PokemonRSE/Inference/Dialogs/PokemonRSE_DialogDetector.h
     Source/PokemonRSE/Inference/PokemonRSE_ShinyNumberDetector.cpp
@@ -1877,6 +1901,16 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_34.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_35.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_35.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_36.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_36.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_37.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_37.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_38.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_38.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_39.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_39.h
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_40.cpp
+    Source/PokemonSV/Programs/AutoStory/PokemonSV_AutoStory_Segment_40.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.cpp
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h
     Source/PokemonSV/Programs/AutoStory/PokemonSV_MenuOptionDatabase.cpp

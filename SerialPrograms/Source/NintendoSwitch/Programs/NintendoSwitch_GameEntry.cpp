@@ -70,6 +70,7 @@ void ensure_at_home(ConsoleHandle& console, ControllerContext& context){
             {home_menu}
         );
         if (ret == 0){
+            console.log("Home detected.");
             //  While we're on the Home screen, we might as well read the
             //  console type as well.
             if (console.state().console_type_confirmed()){
@@ -104,6 +105,7 @@ void ensure_at_home(ConsoleHandle& console, JoyconContext& context){
 //
 
 void close_game_from_home(ConsoleHandle& console, ProControllerContext& context){
+    console.log("close_game_from_home");
     ensure_at_home(console, context);
 
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
@@ -124,6 +126,7 @@ void close_game_from_home(ConsoleHandle& console, ProControllerContext& context)
     pbf_mash_button(context, BUTTON_B, 350);
 }
 void close_game_from_home(ConsoleHandle& console, JoyconContext& context){
+    console.log("close_game_from_home");
     ensure_at_home(console, context);
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.

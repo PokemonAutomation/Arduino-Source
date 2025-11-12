@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/AbstractLogger.h"
+#include "CommonTools/DetectedBoxes.h"
 #include "PokemonLA_BattleSpriteArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -58,7 +59,7 @@ void BattleSpriteArrowTracker::process_object(
 }
 
 void BattleSpriteArrowTracker::finish(const ImageViewRGB32& image){
-    merge_heavily_overlapping();
+    merge_overlapping_boxes(m_detections);
 }
 
 

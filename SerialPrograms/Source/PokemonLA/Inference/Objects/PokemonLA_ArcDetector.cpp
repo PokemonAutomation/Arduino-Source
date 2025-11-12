@@ -8,6 +8,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/ImageMatch/SubObjectTemplateMatcher.h"
+#include "CommonTools/DetectedBoxes.h"
 #include "PokemonLA_ArcDetector.h"
 
 namespace PokemonAutomation{
@@ -120,7 +121,7 @@ void ArcDetector::finish(const ImageViewRGB32& image){
     }
     m_left.clear();
     m_right.clear();
-    merge_heavily_overlapping();
+    merge_overlapping_boxes(m_detections);
 }
 
 

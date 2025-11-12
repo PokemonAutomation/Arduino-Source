@@ -79,54 +79,6 @@ void find_overworld_white_objects(
 }
 
 
-void WhiteObjectDetector::merge_heavily_overlapping(double tolerance){
-    // Algorithm overview:
-    // Order detection boxes by their areas, then starting at the smallest box, trying to deduplicate
-    // boxes close to the current box.
-    // the duplication criteria is:
-    //   box.area <= current_box_area * (1+tolerance), and 
-    //   overlap_area(box, current_box) * (1+tolerance) > current_box_area.
-
-    std::multimap<size_t, ImagePixelBox> boxes; // detection box area -> box
-    for (const ImagePixelBox& box : m_detections){
-        boxes.emplace(box.area(), box);
-    }
-    m_detections.clear();
-//    cout << "boxes.size() = " << boxes.size() << endl;
-
-    // default ratio is 1.2
-    double ratio = 1.0 + tolerance;
-
-    while (!boxes.empty()){
-        // Start from the smallest box:
-        auto current = boxes.begin();
-        const size_t current_area = current->first;
-        // get a max limit of area, e.g. current_box_area * 1.2
-        const size_t limit = (size_t)(current_area * ratio);
-        auto candidate = current;
-        ++candidate;
-        while (candidate != boxes.end()){
-            // skip if candidate area > limit
-            if (candidate->first > limit){
-                break;
-            }
-            // candiate area <= limit, further testing there overlapped area
-            size_t overlap_area = current->second.overlapping_area(candidate->second);
-            if ((double)overlap_area * ratio > current_area){
-                current->second.merge_with(candidate->second);
-                candidate = boxes.erase(candidate);
-            }else{
-                ++candidate;
-            }
-        }
-        m_detections.emplace_back(current->second);
-        boxes.erase(current);
-    }
-//    cout << "m_detections.size() = " << m_detections.size() << endl;
-}
-
-
-
 
 WhiteObjectWatcher::WhiteObjectWatcher(
     VideoOverlay& overlay,

@@ -15,9 +15,6 @@
 #include <QFileInfo>
 
 #include <iostream>
-#include <chrono>
-#include <thread>
-#include <map>
 #include <list>
 #include <functional>
 using std::cout;
@@ -53,8 +50,10 @@ void print_equals(){
             _ret = test_func(file_path); \
         } catch (const std::exception& e) { \
             cout << "Test: " << (file_path) << " threw exception: " << e.what() << endl; \
+            _ret = 1; \
         } catch (const Exception& e) {\
            cout << "Test: " << (file_path) << " threw " << e.name() << ": <<<" << e.message() << ">>>" << endl; \
+           _ret = 1; \
         } \
         if (_ret > 0) {\
             print_equals(); \
@@ -87,9 +86,9 @@ int run_test_obj_dir(TestFunction test_func, const QString& directory_path, size
 
         const QString next_file = file_iter.next();
         
-        // If filename starts with _, its considered a "hidden" file so skip it.
+        // If filename or folder name starts with _, its considered a "hidden" file so skip it.
         const QFileInfo file_info(next_file);
-        if (file_info.fileName().startsWith('_')){
+        if (file_info.fileName().startsWith('_') || file_info.dir().dirName().startsWith("_")){
             continue;
         }
         const std::string file_path = next_file.toStdString();

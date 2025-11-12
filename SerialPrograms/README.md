@@ -8,7 +8,7 @@ Source code for the "Computer Control" programs.
 
 Currently, we build with Qt 6.8.3.
 
-***We cannot use Qt 6.9 due to: https://bugreports.qt.io/browse/QTBUG-131892***
+***We cannot use Qt 6.9 and later due to: https://github.com/PokemonAutomation/Arduino-Source/issues/570***
 
 ### Windows:
 

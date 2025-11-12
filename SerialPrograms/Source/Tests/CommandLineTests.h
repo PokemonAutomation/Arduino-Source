@@ -44,8 +44,10 @@
  *  If you have put some test files for experimental code in a folder and later decide to not run that code for a while, you can use
  *  "20-GlobalSettings": "COMMAND_LINE_TESTS": "IGNORE_LIST" as a list of strings to skip the paths to those tests.
  *  Each string in the list serves as a prefix to the test path that the test framework uses to filter out paths.
- *  
- * Those "hidden" files are useful for storing some metadata in the folder, or serving as an extra file in case some tests need more than one test files.
+ * 
+ * You can also change a filename to be starting with "_" to skip those file. Those skipped files are useful for storing metadata
+ * or serving as an extra file in case some tests need more than one test files. Files whose parent directory name starts with "_"
+ * are skipped as well.
  * 
  *  How to add new test code:
  * 

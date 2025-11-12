@@ -36,13 +36,11 @@ ProController_SysbotBase::ProController_SysbotBase(
         return;
     }
 
-    m_dispatch_thread = std::thread(&ProController_SysbotBase::thread_body, this);
+    m_dispatch_thread = Thread([this]{ thread_body(); });
 }
 ProController_SysbotBase::~ProController_SysbotBase(){
     stop();
-    if (m_dispatch_thread.joinable()){
-        m_dispatch_thread.join();
-    }
+    m_dispatch_thread.join();
 }
 void ProController_SysbotBase::stop(){
     if (m_stopping.exchange(true)){

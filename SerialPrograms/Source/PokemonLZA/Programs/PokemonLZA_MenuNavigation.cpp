@@ -30,7 +30,7 @@ void overworld_to_main_menu(ConsoleHandle& console, ProControllerContext& contex
         console, context,
         [&](ProControllerContext& context){
             for(int i = 0; i < 5; i++){
-                pbf_press_button(context, BUTTON_X, 100ms, 2s);
+                pbf_press_button(context, BUTTON_X, 100ms, 3s);
             }
         },
         {{main_menu_watcher}}

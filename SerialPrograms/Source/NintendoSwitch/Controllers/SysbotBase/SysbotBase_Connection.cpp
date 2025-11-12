@@ -93,9 +93,7 @@ TcpSysbotBase_Connection::~TcpSysbotBase_Connection(){
         std::lock_guard<std::mutex> lg(m_lock);
         m_cv.notify_all();
     }
-    if (m_thread.joinable()){
-        m_thread.join();
-    }
+    m_thread.join();
 }
 
 
@@ -163,12 +161,6 @@ void TcpSysbotBase_Connection::on_connect_finished(const std::string& error_mess
 
         write_data("configure echoCommands 0\r\n");
         write_data("getVersion\r\n");
-
-//        m_thread = std::thread(&TcpSysbotBase_Connection::thread_loop, this);
-
-//        set_status_line0(m_version);
-
-//        declare_ready(controller_mode_status());
     }catch (...){}
 }
 void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
@@ -231,7 +223,7 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
             }
         }
 
-        if (!m_thread.joinable()){
+        if (!m_thread){
             set_mode(str);
         }
     }
@@ -288,7 +280,7 @@ void TcpSysbotBase_Connection::set_mode(const std::string& sbb_version){
         return;
     }
 
-    m_thread = std::thread(&TcpSysbotBase_Connection::thread_loop, this);
+    m_thread = Thread([this]{ thread_loop(); });
     declare_ready();
 }
 

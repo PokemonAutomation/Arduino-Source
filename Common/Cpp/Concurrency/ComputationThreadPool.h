@@ -41,6 +41,8 @@ public:
 
     void ensure_threads(size_t threads);
 
+    void stop();
+
 //    void wait_for_everything();
 
 

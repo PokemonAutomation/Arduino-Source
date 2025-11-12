@@ -29,6 +29,8 @@ enum class ButtonType{
     ButtonMinus,
     ButtonRight,
     RightStickUpDown,
+    ButtonDpadUp,
+    ButtonDpadDown,
 };
 
 class ButtonMatcher;
@@ -46,6 +48,8 @@ public:
     );
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const ImageViewRGB32& screen) override;
+
+    virtual void reset_state() override { m_last_detected_box.reset(); }
 
 private:
     Color m_color;

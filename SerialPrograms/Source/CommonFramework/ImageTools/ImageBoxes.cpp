@@ -213,6 +213,10 @@ ImagePixelBox floatbox_to_pixelbox(size_t width, size_t height, const ImageFloat
         (size_t)(height * (float_box.y + float_box.height) + 0.5)
     );
 }
+ImagePixelBox floatbox_to_pixelbox(const ImageViewRGB32& image, const ImageFloatBox& float_box){
+    return floatbox_to_pixelbox(image.width(), image.height(), float_box);
+}
+
 ImageFloatBox pixelbox_to_floatbox(size_t width, size_t height, const ImagePixelBox& pixel_box){
     double image_inverse_width = 1. / (double)width;
     double image_inverse_height = 1. / (double)height;

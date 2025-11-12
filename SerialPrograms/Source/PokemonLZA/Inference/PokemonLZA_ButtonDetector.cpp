@@ -10,9 +10,9 @@
 #include "CommonTools/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLZA_ButtonDetector.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+// #include <iostream>
+// using std::cout;
+// using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -66,10 +66,20 @@ public:
         static ButtonMatcher matcher(ButtonType::RightStickUpDown, 20, 20, 150);
         return matcher;
     }
+    static const ButtonMatcher& DpadUp(){
+        static ButtonMatcher matcher(ButtonType::ButtonDpadUp, 30, 30, 80);
+        return matcher;
+    }
+    static const ButtonMatcher& DpadDown(){
+        static ButtonMatcher matcher(ButtonType::ButtonDpadDown, 30, 30, 80);
+        return matcher;
+    }
 
     virtual bool check_image(Resolution input_resolution, const ImageViewRGB32& image) const override{
         size_t min_width = m_min_width * input_resolution.width / 3840;
         size_t min_height = m_min_height * input_resolution.height / 2160;
+        // cout << "???? check_image() ???? min size " << min_width << " x " << min_height
+        //      << " got " << image.width() << " x " << image.height() << endl;
         return image.width() >= min_width && image.height() >= min_height;
     };
 
@@ -106,6 +116,10 @@ const char* template_path(ButtonType type){
         return "PokemonLZA/Buttons/ButtonRight.png";
     case ButtonType::RightStickUpDown:
         return "PokemonLZA/Buttons/RightStickUpDown.png";
+    case ButtonType::ButtonDpadUp:
+        return "PokemonLZA/Buttons/ButtonDpadUp.png";
+    case ButtonType::ButtonDpadDown:
+        return "PokemonLZA/Buttons/ButtonDpadDown.png";
     default:
         return "";
     }
@@ -133,6 +147,10 @@ const char* button_name(ButtonType type){
         return "ButtonR";
     case ButtonType::RightStickUpDown:
         return "RightStickUpDown";
+    case ButtonType::ButtonDpadUp:
+        return "ButtonDpadUp";
+    case ButtonType::ButtonDpadDown:
+        return "ButtonDpadDown";
     default:
         return "";
     }
@@ -160,6 +178,10 @@ const ButtonMatcher& get_button_matcher(ButtonType type){
         return ButtonMatcher::Right();
     case ButtonType::RightStickUpDown:
         return ButtonMatcher::RightStickUpDown();
+    case ButtonType::ButtonDpadUp:
+        return ButtonMatcher::DpadUp();
+    case ButtonType::ButtonDpadDown:
+        return ButtonMatcher::DpadDown();
     default:
         throw std::runtime_error("No corresponding ButtonMatcher for ButtonType");
     }

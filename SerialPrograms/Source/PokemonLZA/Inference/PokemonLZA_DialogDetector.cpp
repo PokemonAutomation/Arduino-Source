@@ -55,7 +55,7 @@ public:
     {
         m_aspect_ratio_lower = 0.9;
         m_aspect_ratio_upper = 1.1;
-        m_area_ratio_lower = 0.85;
+        m_area_ratio_lower = 0.83;
         m_area_ratio_upper = 1.1;
     }
 
@@ -106,17 +106,57 @@ public:
 };
 
 
+namespace {
+
+const static ImageFloatBox DIALOG_ARROW_BOX{0.727, 0.868, 0.037, 0.086};
+
+
+// detect the white arrow in blue dialog box and transparent battle dialog box
+bool detect_white_arrow(const ImageViewRGB32& screen, PokemonAutomation::ImageFloatBox& found_box){
+    double screen_rel_size = (screen.height() / 1080.0);
+    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
+
+    double min_area_1080p = 150.0;
+    double rmsd_threshold = 120.0;
+    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+
+    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
+        {0xffc0c0c0, 0xffffffff},
+        {0xffb0b0b0, 0xffffffff},
+        {0xffa0a0a0, 0xffffffff},
+        {0xff909090, 0xffffffff},
+        {0xff808080, 0xffffffff},
+    };
+
+    bool found = match_template_by_waterfill(
+        screen.size(),
+        extract_box_reference(screen, DIALOG_ARROW_BOX),
+        DialogWhiteArrowMatcher::instance(),
+        FILTERS,
+        {min_area, SIZE_MAX},
+        rmsd_threshold,
+        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+            found_box = translate_to_parent(screen, DIALOG_ARROW_BOX, object);
+            return true;
+        }
+    );
+    return found;
+}
+
+} // end anonymous namespace
+
+
+
  
 NormalDialogDetector::NormalDialogDetector(Logger& logger, VideoOverlay& overlay, bool stop_on_detected)
     : VisualInferenceCallback("NormalDialogDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
     , m_title_green_line_box(0.224, 0.727, 0.016, 0.056)
-    , m_black_arrow_box (0.727, 0.868, 0.037, 0.086)
 {}
 void NormalDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_title_green_line_box);
-    items.add(COLOR_RED, m_black_arrow_box);
+    items.add(COLOR_RED, DIALOG_ARROW_BOX);
 }
 bool NormalDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
     const double screen_rel_size = (frame.height() / 1080.0);
@@ -161,7 +201,7 @@ bool NormalDialogDetector::process_frame(const ImageViewRGB32& frame, WallClock 
     const size_t min_black_arrow_size = size_t(screen_rel_size_2 * min_black_arrow_size_1080P);
     match_template_by_waterfill(
         frame.size(),
-        extract_box_reference(frame, m_black_arrow_box), 
+        extract_box_reference(frame, DIALOG_ARROW_BOX), 
         DialogBlackArrowMatcher::instance(),
         black_arrow_filters,
         {min_black_arrow_size, SIZE_MAX},
@@ -212,15 +252,14 @@ FlatWhiteDialogDetector::FlatWhiteDialogDetector(Color color, VideoOverlay* over
     : m_color(color)
     , m_overlay(overlay)
     , m_bottom(0.265, 0.931, 0.465, 0.020)
-    , m_arrow_box(0.727, 0.868, 0.037, 0.086)
 {}
 void FlatWhiteDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom);
-    items.add(m_color, m_arrow_box);
+    items.add(m_color, DIALOG_ARROW_BOX);
 }
 bool FlatWhiteDialogDetector::detect(const ImageViewRGB32& screen){
     if (!is_white(extract_box_reference(screen, m_bottom), 500.0, 20.0)){
-        m_last_detected_box.reset();
+        m_last_detected_box_scope.reset();
         return false;
     }
 
@@ -237,22 +276,22 @@ bool FlatWhiteDialogDetector::detect(const ImageViewRGB32& screen){
 
     bool found = match_template_by_waterfill(
         screen.size(),
-        extract_box_reference(screen, m_arrow_box),
+        extract_box_reference(screen, DIALOG_ARROW_BOX),
         DialogBlackArrowMatcher::instance(),
         FILTERS,
         {min_area, SIZE_MAX},
         rmsd_threshold,
         [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
-            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+            m_last_detected_box = translate_to_parent(screen, DIALOG_ARROW_BOX, object);
             return true;
         }
     );
 
     if (m_overlay){
         if (found){
-            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+            m_last_detected_box_scope.emplace(*m_overlay, m_last_detected_box, COLOR_GREEN);
         }else{
-            m_last_detected_box.reset();
+            m_last_detected_box_scope.reset();
         }
     }
 
@@ -265,11 +304,10 @@ BlueDialogDetector::BlueDialogDetector(Color color, VideoOverlay* overlay)
     : m_color(color)
     , m_overlay(overlay)
     , m_corner(0.765093, 0.933594, 0.006586, 0.013672)
-    , m_arrow_box(0.727, 0.868, 0.037, 0.086)
 {}
 void BlueDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_corner);
-    items.add(m_color, m_arrow_box);
+    items.add(m_color, DIALOG_ARROW_BOX);
 }
 bool BlueDialogDetector::detect(const ImageViewRGB32& screen){
     do{
@@ -289,44 +327,18 @@ bool BlueDialogDetector::detect(const ImageViewRGB32& screen){
             break;
         }
 
-        m_last_detected_box.reset();
+        m_last_detected_box_scope.reset();
 //        cout << "not solid" << endl;
         return false;
     }while (false);
 
-    double screen_rel_size = (screen.height() / 1080.0);
-    double screen_rel_size_2 = screen_rel_size * screen_rel_size;
-
-    double min_area_1080p = 150.0;
-    double rmsd_threshold = 120.0;
-    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
-
-    const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
-        {0xffc0c0c0, 0xffffffff},
-        {0xffb0b0b0, 0xffffffff},
-        {0xffa0a0a0, 0xffffffff},
-        {0xff909090, 0xffffffff},
-        {0xff808080, 0xffffffff},
-    };
-
-    bool found = match_template_by_waterfill(
-        screen.size(),
-        extract_box_reference(screen, m_arrow_box),
-        DialogWhiteArrowMatcher::instance(),
-        FILTERS,
-        {min_area, SIZE_MAX},
-        rmsd_threshold,
-        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
-            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
-            return true;
-        }
-    );
+    const bool found = detect_white_arrow(screen, m_last_detected_box);
 
     if (m_overlay){
         if (found){
-            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+            m_last_detected_box_scope.emplace(*m_overlay, m_last_detected_box, COLOR_GREEN);
         }else{
-            m_last_detected_box.reset();
+            m_last_detected_box_scope.reset();
         }
     }
 
@@ -361,7 +373,7 @@ bool ItemReceiveDetector::detect(const ImageViewRGB32& screen){
             break;
         }
 
-        m_last_detected_box.reset();
+        m_last_detected_box_scope.reset();
 //        cout << "not solid" << endl;
         return false;
     }while (false);
@@ -389,16 +401,16 @@ bool ItemReceiveDetector::detect(const ImageViewRGB32& screen){
         {min_area, SIZE_MAX},
         rmsd_threshold,
         [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
-            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+            m_last_detected_box = translate_to_parent(screen, m_arrow_box, object);
             return true;
         }
     );
 
     if (m_overlay){
         if (found){
-            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+            m_last_detected_box_scope.emplace(*m_overlay, m_last_detected_box, COLOR_GREEN);
         }else{
-            m_last_detected_box.reset();
+            m_last_detected_box_scope.reset();
         }
     }
 
@@ -410,10 +422,9 @@ bool ItemReceiveDetector::detect(const ImageViewRGB32& screen){
 TealDialogDetector::TealDialogDetector(Color color, VideoOverlay* overlay)
     : m_color(color)
     , m_overlay(overlay)
-    , m_arrow_box(0.727, 0.868, 0.037, 0.086)
 {}
 void TealDialogDetector::make_overlays(VideoOverlaySet& items) const{
-    items.add(m_color, m_arrow_box);
+    items.add(m_color, DIALOG_ARROW_BOX);
 }
 bool TealDialogDetector::detect(const ImageViewRGB32& screen){
     double screen_rel_size = (screen.height() / 1080.0);
@@ -429,22 +440,22 @@ bool TealDialogDetector::detect(const ImageViewRGB32& screen){
 
     bool found = match_template_by_waterfill(
         screen.size(),
-        extract_box_reference(screen, m_arrow_box),
+        extract_box_reference(screen, DIALOG_ARROW_BOX),
         DialogTealArrowMatcher::instance(),
         FILTERS,
         {min_area, SIZE_MAX},
         rmsd_threshold,
         [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
-            m_last_detected = translate_to_parent(screen, m_arrow_box, object);
+            m_last_detected_box = translate_to_parent(screen, DIALOG_ARROW_BOX, object);
             return true;
         }
     );
 
     if (m_overlay){
         if (found){
-            m_last_detected_box.emplace(*m_overlay, m_last_detected, COLOR_GREEN);
+            m_last_detected_box_scope.emplace(*m_overlay, m_last_detected_box, COLOR_GREEN);
         }else{
-            m_last_detected_box.reset();
+            m_last_detected_box_scope.reset();
         }
     }
 
@@ -452,6 +463,27 @@ bool TealDialogDetector::detect(const ImageViewRGB32& screen){
 }
 
 
+
+TransparentBattleDialogDetector::TransparentBattleDialogDetector(Color color, VideoOverlay* overlay)
+    : m_color(color)
+    , m_overlay(overlay)
+{}
+void TransparentBattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(m_color, DIALOG_ARROW_BOX);
+}
+bool TransparentBattleDialogDetector::detect(const ImageViewRGB32& screen){
+    const bool found = detect_white_arrow(screen, m_last_detected_box);
+
+    if (m_overlay){
+        if (found){
+            m_last_detected_box_scope.emplace(*m_overlay, m_last_detected_box, COLOR_GREEN);
+        }else{
+            m_last_detected_box_scope.reset();
+        }
+    }
+
+    return found;
+}
 
 
 

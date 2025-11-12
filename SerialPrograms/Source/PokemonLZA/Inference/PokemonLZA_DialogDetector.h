@@ -41,7 +41,6 @@ private:
     bool m_stop_on_detected;
     std::atomic<bool> m_detected;
     ImageFloatBox m_title_green_line_box;
-    ImageFloatBox m_black_arrow_box;
 };
 
 
@@ -63,10 +62,9 @@ private:
     const Color m_color;
     VideoOverlay* m_overlay;
     const ImageFloatBox m_bottom;
-    const ImageFloatBox m_arrow_box;
 
-    ImageFloatBox m_last_detected;
-    std::optional<OverlayBoxScope> m_last_detected_box;
+    ImageFloatBox m_last_detected_box;
+    std::optional<OverlayBoxScope> m_last_detected_box_scope;
 };
 class FlatWhiteDialogWatcher : public DetectorToFinder<FlatWhiteDialogDetector>{
 public:
@@ -96,10 +94,9 @@ private:
     const Color m_color;
     VideoOverlay* m_overlay;
     const ImageFloatBox m_corner;
-    const ImageFloatBox m_arrow_box;
 
-    ImageFloatBox m_last_detected;
-    std::optional<OverlayBoxScope> m_last_detected_box;
+    ImageFloatBox m_last_detected_box;
+    std::optional<OverlayBoxScope> m_last_detected_box_scope;
 };
 class BlueDialogWatcher : public DetectorToFinder<BlueDialogDetector>{
 public:
@@ -132,8 +129,8 @@ private:
     const ImageFloatBox m_top;
     const ImageFloatBox m_arrow_box;
 
-    ImageFloatBox m_last_detected;
-    std::optional<OverlayBoxScope> m_last_detected_box;
+    ImageFloatBox m_last_detected_box;
+    std::optional<OverlayBoxScope> m_last_detected_box_scope;
 };
 class ItemReceiveWatcher : public DetectorToFinder<ItemReceiveDetector>{
 public:
@@ -162,10 +159,9 @@ private:
 
     const Color m_color;
     VideoOverlay* m_overlay;
-    const ImageFloatBox m_arrow_box;
 
-    ImageFloatBox m_last_detected;
-    std::optional<OverlayBoxScope> m_last_detected_box;
+    ImageFloatBox m_last_detected_box;
+    std::optional<OverlayBoxScope> m_last_detected_box_scope;
 };
 class TealDialogWatcher : public DetectorToFinder<TealDialogDetector>{
 public:
@@ -179,6 +175,35 @@ public:
 };
 
 
+// Transparent dialog box shows when entering a trainer battle 
+class TransparentBattleDialogDetector : public StaticScreenDetector{
+public:
+    TransparentBattleDialogDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    //  This is not const so that detectors can save/cache state.
+    virtual bool detect(const ImageViewRGB32& screen) override;
+
+private:
+    friend class TransparentBattleDialogWatcher;
+
+    const Color m_color;
+    VideoOverlay* m_overlay;
+
+    ImageFloatBox m_last_detected_box;
+    std::optional<OverlayBoxScope> m_last_detected_box_scope;
+};
+class TransparentBattleDialogWatcher : public DetectorToFinder<TransparentBattleDialogDetector>{
+public:
+    TransparentBattleDialogWatcher(
+        Color color = COLOR_RED,
+        VideoOverlay* overlay = nullptr,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("TransparentBattleDialogWatcher", hold_duration, color, overlay)
+    {}
+};
 
 
 

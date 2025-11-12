@@ -34,13 +34,38 @@ raw_image = image.copy()
 
 
 # ==================================================================
+# LZA bench sit button A when running back
+add_infer_box_to_image(raw_image, 0.486, 0.477, 0.115, 0.25, image)
+
+
+# ==================================================================
+# LZA overworld party selection buttons
+# for i in range(6):
+	# loctions for the dpad up buttons to send party pokemon from ball to outside
+	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.954, 0.017, 0.030, image)
+	# locations for the dpad down buttons to retrieve outside pokemon back to ball while
+	# current party selection is on another in-ball pokemon
+	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.926, 0.017, 0.030, image)
+	# locations for the dpad down buttons to retrieve outside pokemon back to ball while
+	# current party selection is this outside pokemon. In this case, dpad up button is not
+	# present.
+	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.939, 0.017, 0.030, image)
+	# combined boxes
+	# add_infer_box_to_image(raw_image, 0.048 + 0.0398*i, 0.926, 0.017, 0.058, image)
+
+
+# ==================================================================
+# LZA map view dialog change
+# add_infer_box_to_image(raw_image, 0.216, 0.757, 0.565, 0.174, image)
+
+# ==================================================================
 # LZA selection arrow
 # add_infer_box_to_image(raw_image, 0.654308, 0.481553, 0.295529, 0.312621, image)  # restaurant farmer
-add_infer_box_to_image(raw_image, 0.543, 0.508, 0.365, 0.253, image)  # Jacinthe farmer
+# add_infer_box_to_image(raw_image, 0.543, 0.508, 0.365, 0.253, image)  # Jacinthe farmer
 
 # ==================================================================
 # LZA main menu detector
-add_infer_box_to_image(raw_image, 0.87, 0.940, 0.077, 0.044, image)  # detect button B
+# add_infer_box_to_image(raw_image, 0.87, 0.940, 0.077, 0.044, image)  # detect button B
 
 
 # ==================================================================
@@ -51,12 +76,12 @@ add_infer_box_to_image(raw_image, 0.87, 0.940, 0.077, 0.044, image)  # detect bu
 # ==================================================================
 # LZA box system cursor detection
 # triangle_upper_edge_width = 0.008
-# traingle_full_height = 0.03
+# traingle_full_height = 0.026
 # for row in range(6):
-# 	y = 0.120 if row == 0 else 0.331 + (0.797 - 0.331)/ 4.0 * (row-1)
+# 	y = 0.122 if row == 0 else 0.333 + (0.797 - 0.331)/ 4.0 * (row-1)
 # 	for col in range(6):
 # 		x = 0.058 + col*(0.386 - 0.059)/5.0
-# 		add_infer_box_to_image(raw_image, x, y, 0.020, traingle_full_height, image)
+# 		add_infer_box_to_image(raw_image, x, y, 0.018, traingle_full_height, image)
 # Pixel (x,y) = (775, 136), (0.404, 0.126), rgb=[255,188,245,71] hsv=[ 80 181 245]
 # Pixel (x,y) = (759, 135), (0.395, 0.125), rgb=[255,182,233,70] hsv=[ 81 178 233]
 # Pixel (x,y) = (796, 135), (0.415, 0.125), rgb=[255,181,239,63] hsv=[ 80 188 239]

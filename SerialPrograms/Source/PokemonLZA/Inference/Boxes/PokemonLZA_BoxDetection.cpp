@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Exceptions/FatalProgramException.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
@@ -75,8 +76,8 @@ BoxDetector::BoxDetector(Color color, VideoOverlay* overlay)
     for(size_t row = 0; row < 6; row++){
          double y = (row == 0 ? 0.122 : 0.333 + (0.797 - 0.331)/ 4.0 * (row-1));
         for(size_t col = 0; col < 6; col++){
-            double x = 0.060 + col * (0.386 - 0.059)/5.0;
-            m_arrow_boxes.emplace_back(x, y, 0.016, 0.026);
+            double x = 0.058 + col * (0.386 - 0.059)/5.0;
+            m_arrow_boxes.emplace_back(x, y, 0.018, 0.026);
         }
     }
 }
@@ -102,12 +103,14 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
 
     const size_t total_crop_area = image_crop.width() * image_crop.height();
     const size_t min_area = static_cast<size_t>(total_crop_area / 60.0);
-    const size_t max_area = static_cast<size_t>(total_crop_area / 15.0);
+    const size_t max_area = static_cast<size_t>(total_crop_area / 10.0);
 
     int saved_object_id = 0;
     if (debug_switch){
-        cout << "detect_at_cell() area threshold " << min_area << "-" << max_area << endl;
+        cout << "detect_at_cell() area threshold " << min_area << " - " << max_area << endl;
         cout << "input image size " << image_crop.width() << "x" << image_crop.height() << endl;
+        cout << "Saving image_crop to input_image_crop.png" << endl;
+        image_crop.save("input_image_crop.png");
     }
     
     bool detected = false;
@@ -175,23 +178,28 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
             const uint8_t debug_cell_row = 255, debug_cell_col = 255;
             if (row == debug_cell_row && col == debug_cell_col){
                 debug_switch = true;
+                cout << "start debugging switch at " << int(row) << ", " << int(col) << endl;
             }
             bool detected = detect_at_cell(image_crop);
             if (row == debug_cell_row && col == debug_cell_col){
                 debug_switch = false;
             }
             if (detected){
-                // if (arrow_found){
-                //     throw FatalProgramException(ErrorReport::SEND_ERROR_REPORT,
-                //         "Multiple box selection arrows detected!", nullptr, screen.copy());
-                // }
+                if (arrow_found && m_debug_mode){
+                    cout << "Multiple box selection arrows detected! First detection (" << int(m_found_row) << ", " << int(m_found_col) << ")"
+                         << " second detection (" << int(row) << ", " << int(col) << ")" << endl;
+                    throw FatalProgramException(ErrorReport::NO_ERROR_REPORT,
+                        "Multiple box selection arrows detected!", nullptr, screen.copy());
+                }
                 arrow_found = true;
                 m_found_row = row;
                 m_found_col = col;
-                break;
+                if (!m_debug_mode){
+                    break;
+                }
             }
         }
-        if (arrow_found){
+        if (arrow_found && !m_debug_mode){
             break;
         }
     }

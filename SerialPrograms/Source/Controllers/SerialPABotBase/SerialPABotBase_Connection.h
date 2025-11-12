@@ -11,8 +11,7 @@
 //#include <set>
 #include <mutex>
 #include <condition_variable>
-#include <thread>
-//#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "Controllers/SerialPABotBase/Connection/BotBase.h"
 #include "Controllers/SerialPABotBase/Connection/MessageLogger.h"
 #include "Controllers/ControllerConnection.h"
@@ -58,7 +57,7 @@ private:
     uint8_t m_program_id = 0;
     std::string m_program_name;
 
-    std::thread m_status_thread;
+    Thread m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;
     mutable std::mutex m_lock;
     std::mutex m_sleep_lock;

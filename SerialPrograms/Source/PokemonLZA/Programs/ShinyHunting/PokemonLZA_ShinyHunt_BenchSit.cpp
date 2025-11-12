@@ -4,6 +4,8 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -12,6 +14,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_ShinyHunt_BenchSit.h"
 
@@ -65,11 +68,21 @@ std::unique_ptr<StatsTracker> ShinyHunt_BenchSit_Descriptor::make_stats() const{
 
 
 ShinyHunt_BenchSit::ShinyHunt_BenchSit()
-    : WALK_FORWARD_DURATION(
-        "<b>Walk Forward Duration</b><br>"
-        "Walk forward and backward for this long after each day change to "
+    : WALK_DIRECTION(
+        "<b>Run Direction:</b><br>The direction of running after each day change to increase the spawn radius.",
+        {
+            {0, "forward", "Forward"},
+            {1, "left", "Turn Left"},
+            {2, "right", "Turn Right"},
+        },
+        LockMode::UNLOCK_WHILE_RUNNING,
+        0
+    )
+    , WALK_FORWARD_DURATION(
+        "<b>Run Forward Duration</b><br>"
+        "Run forward and backward for this long after each day change to "
         "increase the spawn radius. Set to zero to disable this.",
-        LockMode::LOCK_WHILE_RUNNING,
+        LockMode::UNLOCK_WHILE_RUNNING,
         "2000 ms"
     )
     , SHINY_DETECTED(
@@ -87,66 +100,118 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(WALK_DIRECTION);
+    }
     PA_ADD_OPTION(WALK_FORWARD_DURATION);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+
+void run_back_until_found_bench(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context
+){
+    ButtonWatcher buttonA(
+        COLOR_RED,
+        ButtonType::ButtonA,
+        {0.486, 0.477, 0.115, 0.25},
+        &env.console.overlay()
+    );
+
+    int ret = run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            //  Can't just hold it down since sometimes it doesn't register.
+            for (int c = 0; c < 10; c++){
+                ssf_press_button(context, BUTTON_B, 0ms, 800ms, 0ms);
+                pbf_move_left_joystick(context, 128, 255, 800ms, 200ms);
+            }
+        },
+        {buttonA}
+    );
+
+    switch (ret){
+    case 0:
+        env.console.log("Detected floating A button...");
+        break;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "run_back_until_found_bench(): Unable to detect bench after 10 seconds.",
+            env.console
+        );
+    }
+}
+
 void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     ShinyHunt_BenchSit_Descriptor::Stats& stats = env.current_stats<ShinyHunt_BenchSit_Descriptor::Stats>();
 
-    while (true){
-        float shiny_coefficient = 1.0;
-        PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-            //  Warning: This callback will be run from a different thread than this function.
-            stats.shinies++;
-            env.update_stats();
-            shiny_coefficient = error_coefficient;
-            return true;
-        });
+    ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);
 
-        int ret = run_until<ProControllerContext>(
-            env.console, context,
-            [&](ProControllerContext& context){
-                while (true){
-                    send_program_status_notification(env, NOTIFICATION_STATUS);
-                    stats.resets++;
-                    sit_on_bench(env.console, context);
-                    Milliseconds duration = WALK_FORWARD_DURATION;
-                    if (duration > Milliseconds::zero()){
-                        ssf_press_button(context, BUTTON_B, 0ms, 2 * duration, 0ms);
-                        pbf_move_left_joystick(context, 128, 0, duration, 0ms);
-                        pbf_move_left_joystick(context, 128, 255, duration + 250ms, 0ms);
-                    }
-                    env.update_stats();
-                }
-            },
-            {{shiny_detector}}
-        );
-
-        //  This should never happen.
-        if (ret != 0){
-            continue;
-        }
-
-        pbf_mash_button(context, BUTTON_B, 1000ms);
-
-        bool exit = SHINY_DETECTED.on_shiny_sound(
-            env, env.console, context,
+    PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        //  Warning: This callback will be run from a different thread than this function.
+        stats.shinies++;
+        env.update_stats();
+        env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
+        return shiny_sound_handler.on_shiny_sound(
+            env, env.console,
             stats.shinies,
-            shiny_coefficient
+            error_coefficient
         );
+    });
 
-        pbf_move_left_joystick(context, 128, 255, WALK_FORWARD_DURATION, 0ms);
+    run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            while (true){
+                send_program_status_notification(env, NOTIFICATION_STATUS);
+                sit_on_bench(env.console, context);
+                shiny_sound_handler.process_pending(context);
+                stats.resets++;
+                env.update_stats();
+                Milliseconds duration = WALK_FORWARD_DURATION;
+                if (duration > Milliseconds::zero()){
+                    if (WALK_DIRECTION.current_value() == 0){ // forward
+                        env.console.overlay().add_log("Move Forward");
+                        ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
+                        pbf_move_left_joystick(context, 128, 0, duration, 0ms);
+                        // run back
+                        pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
+                        run_back_until_found_bench(env, context);
+                    }else if (WALK_DIRECTION.current_value() == 1){ // left
+                        env.console.overlay().add_log("Move Left");
+                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                        pbf_move_left_joystick(context, 0, 128, duration, 0ms);
+                        pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                        pbf_move_left_joystick(context, 128, 255, duration, 0ms);
+                        pbf_move_left_joystick(context, 0, 128, 100ms, 0ms);
+                    }else if (WALK_DIRECTION.current_value() == 2){ // right
+                        env.console.overlay().add_log("Move Right");
+                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                        pbf_move_left_joystick(context, 255, 128, duration, 0ms);
+                        pbf_press_button(context, BUTTON_L, 100ms, 400ms);
+                        ssf_press_button(context, BUTTON_B, 0ms, duration, 0ms);
+                        pbf_move_left_joystick(context, 128, 255, duration, 0ms);
+                        pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
+                    }
+                }else{
+                    run_back_until_found_bench(env, context);
+                }
 
-        if (exit){
-            break;
-        }
-    }
+                shiny_sound_handler.process_pending(context);
+            }
+        },
+        {{shiny_detector}}
+    );
+
+    //  Shiny sound detected and user requested stopping the program when
+    //  detected shiny sound.
+    shiny_sound_handler.process_pending(context);
 
     go_home(env.console, context);
     send_program_finished_notification(env, NOTIFICATION_PROGRAM_FINISH);
-
 }
 
 

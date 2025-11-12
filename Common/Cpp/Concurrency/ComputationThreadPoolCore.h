@@ -17,11 +17,10 @@
 #define PokemonAutomation_ComputationThreadPoolCore_H
 
 #include <functional>
-//#include <list>
 #include <deque>
-#include <thread>
 #include "Common/Cpp/CpuUtilization/CpuUtilization.h"
 #include "Common/Cpp/Stopwatch.h"
+#include "Common/Cpp/Concurrency/Thread.h"
 #include "AsyncTask.h"
 
 namespace PokemonAutomation{
@@ -48,6 +47,8 @@ public:
     WallDuration cpu_time() const;
 
     void ensure_threads(size_t threads);
+
+    void stop();
 //    void wait_for_everything();
 
 
@@ -74,7 +75,7 @@ public:
 
 private:
     struct ThreadData{
-        std::thread thread;
+        Thread thread;
         ThreadHandle handle;
         Stopwatch runtime;
     };

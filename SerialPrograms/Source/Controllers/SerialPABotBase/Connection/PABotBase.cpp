@@ -56,11 +56,12 @@ PABotBase::PABotBase(
 
     //  We must initialize this last because it will trigger the lifetime
     //  sanitizer if it beats it to construction.
-    m_retransmit_thread = std::thread(
-        run_with_catch,
-        "PABotBase::retransmit_thread()",
-        [this]{ retransmit_thread(); }
-    );
+    m_retransmit_thread = Thread([this]{
+        run_with_catch(
+            "PABotBase::retransmit_thread()",
+            [this]{ retransmit_thread(); }
+        );
+    });
 }
 PABotBase::~PABotBase(){
     stop();

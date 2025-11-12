@@ -37,7 +37,9 @@ GlobalMediaServices::GlobalMediaServices()
         }
     );
 
-    m_thread = std::thread(&GlobalMediaServices::thread_body, this);
+    m_thread = Thread([this]{
+        thread_body();
+    });
 }
 
 

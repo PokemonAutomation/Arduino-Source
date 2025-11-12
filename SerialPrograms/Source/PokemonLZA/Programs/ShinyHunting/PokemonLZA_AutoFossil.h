@@ -10,6 +10,7 @@
 
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -41,7 +42,8 @@ private:
     void revive_one_fossil(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     // return true if found a match
-    bool check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t num_fossils_in_box);
+    bool check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context, 
+        size_t num_checked_fossils_in_previous_boxes, size_t num_fossils_in_box);
 
     SimpleIntegerOption<uint32_t> NUM_FOSSILS;
     IntegerEnumDropdownOption WHICH_FOSSIL;
