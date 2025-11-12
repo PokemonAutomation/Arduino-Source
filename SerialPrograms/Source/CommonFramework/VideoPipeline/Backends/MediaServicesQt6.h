@@ -29,9 +29,11 @@ public:
         return m_cameras;
     }
 
+    void stop();
+
 private:
-    ~GlobalMediaServices();
     GlobalMediaServices();
+    ~GlobalMediaServices();
 
     void thread_body();
 
