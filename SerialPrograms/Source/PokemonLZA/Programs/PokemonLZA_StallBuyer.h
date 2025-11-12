@@ -54,6 +54,13 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
+    void make_purchase(
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+        StallBuyerRow& stall_buyer_row,
+        uint16_t& purchases
+    );
+
+private:
     StallBuyerTable NUM_PURCHASE;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
