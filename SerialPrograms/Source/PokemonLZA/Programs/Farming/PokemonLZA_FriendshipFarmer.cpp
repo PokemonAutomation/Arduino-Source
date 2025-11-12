@@ -12,11 +12,13 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 
 namespace PokemonAutomation{
@@ -116,6 +118,8 @@ void FriendshipFarmer::on_config_value_changed(void* object) {
 void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 
+    bool seen_selection_arrow = false;
+
     while (true)
     {
         ButtonWatcher buttonA_watcher(
@@ -137,6 +141,7 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
         );
         FlatWhiteDialogWatcher white_dialog_watcher(COLOR_WHITE, &env.console.overlay());
         BlueDialogWatcher blue_dialog_watcher(COLOR_BLUE, &env.console.overlay());
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
 
         int ret = wait_until(
             env.console, context,
@@ -147,9 +152,13 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
                 selection_arrow_watcher,
                 white_dialog_watcher,
                 blue_dialog_watcher,
+                black_screen
             }
             );
         context.wait_for(100ms);
+
+        OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+        int ret2 = 0;
 
         switch (ret) {
         case 0:
@@ -162,6 +171,7 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
             return;
         case 2:
             env.log("Detected selection arrow.");
+            seen_selection_arrow = true;
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
         case 3:
@@ -172,12 +182,37 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
             env.log("Detected blue dialog.");
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
+        case 5:
+            if (seen_selection_arrow){
+                env.log("Detected loading screen. Entering cafe.");
+                continue;
+            }
+
+            env.log("Detected day change.");
+            ret2 = wait_until(
+                env.console, context,
+                30s,
+                { overworld }
+            );
+
+            if (ret2 == 0) {
+                env.log("Returned to overworld.");
+                continue;
+            }
+
+            ++stats.errors;
+            env.update_stats();
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "enter_cafe(): Unable to detect overworld after day/night change.",
+                env.console
+            );
         default:
             ++stats.errors;
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "enter_cafe(): No recognized state after 60 seconds.",
+                "enter_cafe(): No recognized state after 10 seconds.",
                 env.console
             );
         }
@@ -205,6 +240,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
         );
         FlatWhiteDialogWatcher white_dialog_watcher(COLOR_WHITE, &env.console.overlay());
         BlueDialogWatcher blue_dialog_watcher(COLOR_RED, &env.console.overlay());
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
 
         int ret = wait_until(
             env.console, context,
@@ -214,9 +250,13 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
                 selection_arrow_watcher,
                 white_dialog_watcher,
                 blue_dialog_watcher,
+				black_screen
             }
             );
         context.wait_for(100ms);
+
+        OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+        int ret2 = 0;
 
         switch (ret) {
         case 0:
@@ -235,6 +275,26 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
             env.log("Detected blue dialog.");
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
+        case 5:
+            env.log("Detected day change.");
+            ret2 = wait_until(
+	            env.console, context,
+	            30s,
+	            {overworld}
+            );
+
+            if (ret2 == 0){
+                env.log("Returned to overworld.");
+                continue;
+			}
+
+            ++stats.errors;
+            env.update_stats();
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "exit_bench(): Unable to detect overworld after day/night change.",
+                env.console
+            );
         default:
             if (seen_selection_arrow && ++reset_attempt <= 10) {
                 env.log("Attempting to face the bench.");
@@ -246,7 +306,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "exit_bench(): No recognized state after 60 seconds.",
+                "exit_bench(): No recognized state after 10 seconds.",
                 env.console
             );
         }
@@ -255,9 +315,6 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
 
 void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
-
-    int reset_attempt = 0;
-    bool seen_selection_arrow = false;
 
     while (true)
     {
@@ -274,6 +331,7 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
         );
         FlatWhiteDialogWatcher white_dialog_watcher(COLOR_WHITE, &env.console.overlay());
         BlueDialogWatcher blue_dialog_watcher(COLOR_RED, &env.console.overlay());
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
 
         int ret = wait_until(
             env.console, context,
@@ -283,9 +341,13 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
                 selection_arrow_watcher,
                 white_dialog_watcher,
                 blue_dialog_watcher,
+                black_screen
             }
             );
         context.wait_for(100ms);
+
+        OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+        int ret2 = 0;
 
         switch (ret) {
         case 0:
@@ -303,10 +365,16 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
             env.log("Detected blue dialog.");
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
-        default:
-            if (seen_selection_arrow && ++reset_attempt <= 10) {
-                env.log("No recognized state, possible day/night change. Waiting..");
-                context.wait_for(1000ms);
+        case 5:
+            env.log("Detected loading screen while leaving cafe caused by day/night change. Waiting..");
+            ret2 = wait_until(
+                env.console, context,
+                30s,
+                { overworld }
+            );
+
+            if (ret2 == 0) {
+                env.log("Returned to overworld.");
                 continue;
             }
 
@@ -314,7 +382,15 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "exit_cafe(): No recognized state after 60 seconds.",
+                "exit_cafe(): Unable to detect overworld after day/night change.",
+                env.console
+            );
+        default:
+            ++stats.errors;
+            env.update_stats();
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "exit_cafe(): No recognized state after 10 seconds.",
                 env.console
             );
         }
@@ -324,6 +400,7 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
 void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 
+    bool seen_selection_arrow = false;
     while (true)
     {
         ButtonWatcher buttonA_watcher(
@@ -345,6 +422,7 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
         );
         FlatWhiteDialogWatcher white_dialog_watcher(COLOR_WHITE, &env.console.overlay());
         BlueDialogWatcher blue_dialog_watcher(COLOR_BLUE, &env.console.overlay());
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
 
         int ret = wait_until(
             env.console, context,
@@ -355,9 +433,13 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
                 selection_arrow_watcher,
                 white_dialog_watcher,
                 blue_dialog_watcher,
+				black_screen
             }
             );
         context.wait_for(100ms);
+
+        OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
+        int ret2 = 0;
 
         switch (ret) {
         case 0:
@@ -365,12 +447,14 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
         case 1:
-            env.log("Detected B button. Waiting 10 Seconds.");
+			env.log("Detected B button. Waiting 10 Seconds."); //Wait 10 seconds to gain friendship points.
             context.wait_for(10000ms);
             pbf_press_button(context, BUTTON_B, 80ms, 40ms);
             return;
         case 2:
             env.log("Detected selection arrow.");
+            seen_selection_arrow = true;
+			//Select second option to hang out on bench.
             pbf_press_dpad(context, DPAD_DOWN, 40ms, 40ms);
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
@@ -382,12 +466,37 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
             env.log("Detected blue dialog.");
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
+        case 5:
+            if (seen_selection_arrow){
+                env.log("Detected loading screen. Hanging out on bench.");
+                continue;
+			}
+
+            env.log("Detected day change.");
+            ret2 = wait_until(
+                env.console, context,
+                30s,
+                { overworld }
+            );
+
+            if (ret2 == 0) {
+                env.log("Returned to overworld.");
+                continue;
+            }
+
+            ++stats.errors;
+            env.update_stats();
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "hang_out_bench(): Unable to detect overworld after day/night change.",
+                env.console
+            );
         default:
             ++stats.errors;
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "hang_out_bench(): No recognized state after 60 seconds.",
+                "hang_out_bench(): No recognized state after 10 seconds.",
                 env.console
             );
         }
