@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/EarlyShutdown.h"
 #include "CommonFramework/VideoPipeline/Stats/MemoryUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/CpuUtilizationStats.h"
 #include "CommonFramework/VideoPipeline/Stats/ThreadUtilizationStats.h"
@@ -20,10 +21,8 @@ namespace NintendoSwitch{
 
 
 
-SwitchSystemSession::~SwitchSystemSession(){
-    try{
-        m_logger.log("Shutting down SwitchSystemSession...");
-    }catch (...){}
+bool SwitchSystemSession::try_shutdown(){
+    bool success = true;
 
     m_video.remove_state_listener(m_history);
     m_video.add_frame_listener(m_history);
@@ -35,6 +34,17 @@ SwitchSystemSession::~SwitchSystemSession(){
     m_overlay.remove_stat(*m_cpu_utilization);
     m_overlay.remove_stat(m_memory_usage->m_process);
     m_overlay.remove_stat(m_memory_usage->m_system);
+
+    success &= m_video.try_shutdown();
+
+    return success;
+}
+SwitchSystemSession::~SwitchSystemSession(){
+    blocking_shutdown(
+        m_logger,
+        "SwitchSystemSession",
+        [this]{ return try_shutdown(); }
+    );
 }
 SwitchSystemSession::SwitchSystemSession(
     SwitchSystemOption& option,

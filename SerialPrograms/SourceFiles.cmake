@@ -73,6 +73,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/CpuUtilization/CpuUtilization_Windows.h
     ../Common/Cpp/CpuUtilization/CpuUtilization_Windows.tpp
     ../Common/Cpp/DateTime.h
+    ../Common/Cpp/EarlyShutdown.h
     ../Common/Cpp/EnumStringMap.h
     ../Common/Cpp/EventRateTracker.h
     ../Common/Cpp/Exceptions.cpp
@@ -238,6 +239,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/TimeExpressionWidget.h
     ../Common/Qt/Redispatch.cpp
     ../Common/Qt/Redispatch.h
+    ../Common/Qt/ShutdownWithEvents.h
     ../Common/Qt/SpinWaitWithEvents.h
     ../Common/Qt/StringToolsQt.cpp
     ../Common/Qt/StringToolsQt.h

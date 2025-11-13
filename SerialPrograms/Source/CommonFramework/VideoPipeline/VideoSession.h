@@ -58,6 +58,9 @@ public:
     //  Remove the state listener.
     void remove_state_listener(StateListener& listener);
 
+    bool try_add_state_listener(StateListener& listener);
+    bool try_remove_state_listener(StateListener& listener);
+
     //  Implements VideoFeed::add_frame_listener().
     //  Add a VideoFrameListener for it to react to incoming frames in the video source.
     //  Whenever the video source sends a frame, VideoSession will call the callback functions
@@ -69,6 +72,7 @@ public:
 
 
 public:
+    bool try_shutdown();
     ~VideoSession();
     //  Built from a VideoSourceOption.
     //  VideoSourceOption manages the current VideoSourceDescriptor, which are the descriptors

@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "NintendoSwitch_MultiSwitchSystemSession.h"
 
@@ -23,7 +24,21 @@ void MultiSwitchSystemSession::remove_listener(Listener& listener){
 }
 
 
-MultiSwitchSystemSession::~MultiSwitchSystemSession() = default;
+bool MultiSwitchSystemSession::try_shutdown(){
+    bool success = true;
+    for (SwitchSystemSession& console : m_consoles){
+        success &= console.try_shutdown();
+    }
+    return success;
+}
+MultiSwitchSystemSession::~MultiSwitchSystemSession(){
+    blocking_shutdown(
+        global_logger_tagged(),
+        "MultiSwitchSystemSession",
+        [this]{ return try_shutdown(); }
+    );
+}
+
 MultiSwitchSystemSession::MultiSwitchSystemSession(
     MultiSwitchSystemOption& option,
     uint64_t program_id

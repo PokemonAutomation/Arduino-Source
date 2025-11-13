@@ -40,6 +40,7 @@ public:
     //  call will be set to (now + period).
     void add(WatchdogCallback& callback, std::chrono::milliseconds period);
     void remove(WatchdogCallback& callback);
+    bool try_remove(WatchdogCallback& callback);
 
     //  Delay the specified callback. If the callback is current running, this
     //  function does nothing.

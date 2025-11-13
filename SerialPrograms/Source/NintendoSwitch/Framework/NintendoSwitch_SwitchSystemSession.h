@@ -42,6 +42,7 @@ class SwitchSystemOption;
 
 class SwitchSystemSession final : public TrackableConsole{
 public:
+    bool try_shutdown();
     ~SwitchSystemSession();
     SwitchSystemSession(
         SwitchSystemOption& option,
