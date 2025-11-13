@@ -33,7 +33,10 @@ public:
     {
         start();
 
-        m_spin_waiter.process_events_while_waiting();
+//        m_spin_waiter.process_events_while_waiting();
+        do{
+            pause();
+        }while (m_camera.load(std::memory_order_acquire) == nullptr);
     }
     ~QCameraThread(){
         quit();
@@ -41,14 +44,15 @@ public:
     }
 
     QCamera& camera() const{
-        return *m_camera;
+        return *m_camera.load(std::memory_order_acquire);
     }
 
 
 private:
     virtual void run() override{
         QCamera camera(m_device);
-        m_camera = &camera;
+        m_camera.store(&camera, std::memory_order_release);
+
         camera.setCameraFormat(m_format);
 
         connect(&camera, &QCamera::errorOccurred, this, [&](){
@@ -60,7 +64,7 @@ private:
 
         camera.start();
 
-        m_spin_waiter.signal();
+//        m_spin_waiter.signal();
 
 //        cout << "start" << endl;
         exec();
@@ -74,8 +78,8 @@ private:
     Logger& m_logger;
     QCameraDevice m_device;
     QCameraFormat m_format;
-    QCamera* m_camera;
-    SpinWaitWithEvents m_spin_waiter;
+    std::atomic<QCamera*> m_camera;
+//    SpinWaitWithEvents m_spin_waiter;
 };
 
 
