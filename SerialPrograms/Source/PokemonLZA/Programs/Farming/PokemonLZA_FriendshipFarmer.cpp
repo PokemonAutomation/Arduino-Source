@@ -29,7 +29,7 @@ FriendshipFarmer_Descriptor::FriendshipFarmer_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLZA:FriendshipFarmer",
         Pokemon::STRING_POKEMON + " LZA", "Friendship Farmer",
-        "Programs/PokemonLZA/Farming/FriendshipFarmer.html",
+        "Programs/PokemonLZA/FriendshipFarmer.html",
         "Farm friendship for pokemon in your party using either the cafe or bench method.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
@@ -137,7 +137,7 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
         SelectionArrowWatcher selection_arrow_watcher(
             COLOR_GREEN, &env.console.overlay(),
             SelectionArrowType::RIGHT,
-            { 0.6300, 0.4440, 0.2260, 0.3190 }
+            { 0.6300, 0.153, 0.2260, 0.627 }
         );
         FlatWhiteDialogWatcher white_dialog_watcher(COLOR_WHITE, &env.console.overlay());
         BlueDialogWatcher blue_dialog_watcher(COLOR_BLUE, &env.console.overlay());
