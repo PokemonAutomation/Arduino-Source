@@ -290,10 +290,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     ProControllerContext context(scope, console.controller<ProController>());
+    // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
 
-
+#if 0
+close_game_from_home(console, context);
+// ssf_issue_scroll(context, DPAD_DOWN, 24ms);
+#endif  
 
 #if 0
     // auto snapshot = feed.snapshot();
