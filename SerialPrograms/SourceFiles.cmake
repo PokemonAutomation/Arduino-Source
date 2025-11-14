@@ -1570,10 +1570,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
-    Source/PokemonLZA/Inference/PokemonLZA_MapDetector.cpp
-    Source/PokemonLZA/Inference/PokemonLZA_MapDetector.h
-    Source/PokemonLZA/Inference/PokemonLZA_MapIconDetector.cpp
-    Source/PokemonLZA/Inference/PokemonLZA_MapIconDetector.h
+    Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.cpp
+    Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h
+    Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.cpp
+    Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp

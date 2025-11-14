@@ -152,8 +152,8 @@
 #include "PokemonSV/Inference/PokemonSV_PokemonMovesReader.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
 #include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
-#include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MapDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 
 
 

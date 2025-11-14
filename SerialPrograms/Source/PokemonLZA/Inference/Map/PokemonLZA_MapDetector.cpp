@@ -5,7 +5,7 @@
  */
 
 #include "PokemonLZA_MapDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA_MapIconDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
