@@ -290,11 +290,19 @@ void leave_zone_and_reset_spawns(
     if (ret != 0){
         stats.errors++;
         env.update_stats();
+#if 0
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "leave_zone_and_reset_spawns(): Cannot run back to entrance after being chased by wild pokemon.",
             env.console
         );
+#else
+        throw UserSetupError(
+            env.logger(),
+            "This program requires that you do not get attacked. "
+            "Please choose a location/route that is safe from attack."
+        );
+#endif
     }
     shiny_sound_handler.process_pending(context);
 
