@@ -17,7 +17,7 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
-//#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
+#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
 
 namespace PokemonAutomation {
@@ -340,52 +340,60 @@ void do_one_wild_zone_trip(
     ShinySoundHandler& shiny_sound_handler
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
-    context.wait_for_all_requests();
-    shiny_sound_handler.process_pending(context);
+    try{
+        context.wait_for_all_requests();
+        shiny_sound_handler.process_pending(context);
 
-    if (movement_mode >= 1){
-        go_to_entrance(env, context);
-        context.wait_for_all_requests();
-        shiny_sound_handler.process_pending(context);
-    }
-    if (movement_mode == 2){
-        // Mash button A to enter the zone.
-        pbf_mash_button(context, BUTTON_A, 2000ms);
-        context.wait_for_all_requests();
-        shiny_sound_handler.process_pending(context);
-        // Day/night change can happen before or after the button A mash, so we are not
-        // sure if we are in the zone or not! But at end of the travel we will fast
-        // travel back to entrance and have a way to work on both cases.
-        // move forward
-        if (walk_time_in_zone > Milliseconds::zero()){
-            if (running){
-                env.console.overlay().add_log("Running");
-                ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
-            } else{
-                env.console.overlay().add_log("Walking");
-            }
-            pbf_move_left_joystick(context, 128, 0, walk_time_in_zone, 200ms);
+        if (movement_mode >= 1){
+            go_to_entrance(env, context);
+            context.wait_for_all_requests();
+            shiny_sound_handler.process_pending(context);
         }
-        context.wait_for_all_requests();
-        shiny_sound_handler.process_pending(context);
-    }
+        if (movement_mode == 2){
+            // Mash button A to enter the zone.
+            pbf_mash_button(context, BUTTON_A, 2000ms);
+            context.wait_for_all_requests();
+            shiny_sound_handler.process_pending(context);
+            // Day/night change can happen before or after the button A mash, so we are not
+            // sure if we are in the zone or not! But at end of the travel we will fast
+            // travel back to entrance and have a way to work on both cases.
+            // move forward
+            if (walk_time_in_zone > Milliseconds::zero()){
+                if (running){
+                    env.console.overlay().add_log("Running");
+                    ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
+                } else{
+                    env.console.overlay().add_log("Walking");
+                }
+                pbf_move_left_joystick(context, 128, 0, walk_time_in_zone, 200ms);
+            }
+            context.wait_for_all_requests();
+            shiny_sound_handler.process_pending(context);
+        }
 
-    if (movement_mode <= 1){
-        // we are not in the zone. so no wild pokemon handling!
-        fast_travel_outside_zone(env, context, wild_zone);
-    } else {
-        leave_zone_and_reset_spawns(
-            env, context,
-            walk_time_in_zone, wild_zone,
-            shiny_sound_handler
-        );  
-    }
-    // wait 0.5 sec for the game to be ready to control player character again
-    pbf_wait(context, 500ms);
-    // Now if everything works fine, we are back at the entrance via a fast travel
+        if (movement_mode <= 1){
+            // we are not in the zone. so no wild pokemon handling!
+            fast_travel_outside_zone(env, context, wild_zone);
+        } else {
+            leave_zone_and_reset_spawns(
+                env, context,
+                walk_time_in_zone, wild_zone,
+                shiny_sound_handler
+            );
+        }
+        // wait 0.5 sec for the game to be ready to control player character again
+        pbf_wait(context, 500ms);
+        // Now if everything works fine, we are back at the entrance via a fast travel
 
-    stats.visits++;
-    env.update_stats();
+        stats.visits++;
+        env.update_stats();
+    }catch (OperationFailedException&){
+        env.log("Error encountered. Resetting...", COLOR_RED);
+        stats.errors++;
+        env.update_stats();
+        go_home(env.console, context);
+        reset_game_from_home(env, env.console, context);
+    }
 }
 
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
