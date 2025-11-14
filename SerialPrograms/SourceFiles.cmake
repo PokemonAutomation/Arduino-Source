@@ -1570,6 +1570,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
+    Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.cpp
+    Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.cpp
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.cpp
