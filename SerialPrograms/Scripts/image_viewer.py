@@ -99,8 +99,14 @@ class ImageViewer:
 
 	def _print_pixel(self, coord):
 		p = self.image[coord[1], coord[0]]
-		print(f"Pixel (x,y) = ({coord[0]}, {coord[1]}), ({coord[0]/self.width:0.3}, {coord[1]/self.height:0.3}), "
-		+ f"rgb=[{str(p[3]) + ',' if self.nc == 4 else ''}{p[2]},{p[1]},{p[0]}] hsv={self.hsv_image[coord[1], coord[0]]}")
+		msg = f"Pixel (x,y) = ({coord[0]}, {coord[1]}), ({coord[0]/self.width:0.3}, {coord[1]/self.height:0.3}), "
+		if self.nc == 4:
+			msg += f"argb=[{p[3]}, {p[2]}, {p[1]}, {p[0]}], {hex(((int(p[3])*256+int(p[2]))*256+int(p[1]))*256+int(p[0]))}"
+		else:
+			mgs += f"rgb=[{p[2]}, {p[1]}, {p[0]}]"
+		p = self.hsv_image[coord[1], coord[0]]
+		msg += f", hsv=[{p[2]}, {p[1]}, {p[0]}]"
+		print(msg)
 
 	def _print_rect(self, i, rect):
 		crop = self.image[rect[1]:rect[3], rect[0]:rect[2]].astype(float) / 255.0

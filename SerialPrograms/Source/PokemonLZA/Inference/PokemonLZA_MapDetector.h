@@ -18,6 +18,8 @@ namespace PokemonLZA{
 
 class MapIconDetector;
 
+
+// Detect whether the map view is opened or not
 class MapDetector : public StaticScreenDetector{
 public:
     MapDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);
