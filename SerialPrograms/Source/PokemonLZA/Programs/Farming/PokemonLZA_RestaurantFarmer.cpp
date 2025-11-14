@@ -12,6 +12,7 @@
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 //#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -339,6 +340,8 @@ void RestaurantFarmer::on_press(){
 }
 
 void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
     m_stop_after_current.store(false, std::memory_order_relaxed);
     STOP_AFTER_CURRENT.set_ready();

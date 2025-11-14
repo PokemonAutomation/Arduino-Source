@@ -5,10 +5,11 @@
  */
 
 #include "CommonFramework/ProgramStats/StatsTracking.h"
-#include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "Pokemon/Pokemon_Notification.h"
@@ -125,6 +126,8 @@ AutoFossil::AutoFossil()
 
 
 void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     const size_t num_fossils_to_revive = NUM_FOSSILS; // at least 1
     const size_t num_boxes = (num_fossils_to_revive+29) / 30;  // at least 1
     while(true){

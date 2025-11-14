@@ -9,6 +9,7 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -98,6 +99,8 @@ StatsReset::StatsReset()
 
 
 void StatsReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
 
     StatsReset_Descriptor::Stats& stats = env.current_stats<StatsReset_Descriptor::Stats>();
 

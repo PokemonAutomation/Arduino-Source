@@ -7,6 +7,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -93,6 +94,8 @@ ShinyHunt_OverworldReset::ShinyHunt_OverworldReset()
 }
 
 void ShinyHunt_OverworldReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     ShinyHunt_OverworldReset_Descriptor::Stats& stats = env.current_stats<ShinyHunt_OverworldReset_Descriptor::Stats>();
 
     uint8_t shiny_count = 0;

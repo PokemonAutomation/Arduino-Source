@@ -11,13 +11,14 @@
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
+//#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
 #include "PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
 #include "PokemonLZA_JacintheInfiniteFarmer.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -350,6 +351,8 @@ void JacintheInfiniteFarmer::on_press(){
 }
 
 void JacintheInfiniteFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     JacintheInfiniteFarmer_Descriptor::Stats& stats = env.current_stats<JacintheInfiniteFarmer_Descriptor::Stats>();
     m_stop_after_current.store(false, std::memory_order_relaxed);
     STOP_AFTER_CURRENT.set_ready();

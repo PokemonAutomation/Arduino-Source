@@ -9,6 +9,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -16,7 +17,7 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
-#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
+//#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
 
 namespace PokemonAutomation {
@@ -388,6 +389,8 @@ void do_one_wild_zone_trip(
 }
 
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
     ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);

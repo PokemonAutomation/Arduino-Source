@@ -8,11 +8,12 @@
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/ScreenshotException.h"
-#include "CommonFramework/Logging/Logger.h"
+//#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
@@ -115,7 +116,7 @@ void FriendshipFarmer::on_config_value_changed(void* object) {
     }
 }
 
-void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 
     bool seen_selection_arrow = false;
@@ -154,7 +155,7 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
                 blue_dialog_watcher,
                 black_screen
             }
-            );
+        );
         context.wait_for(100ms);
 
         OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
@@ -252,7 +253,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
                 blue_dialog_watcher,
 				black_screen
             }
-            );
+        );
         context.wait_for(100ms);
 
         OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
@@ -316,8 +317,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
 void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 
-    while (true)
-    {
+    while (true){
         ButtonWatcher buttonA_watcher(
             COLOR_WHITE,
             ButtonType::ButtonA,
@@ -343,7 +343,7 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
                 blue_dialog_watcher,
                 black_screen
             }
-            );
+        );
         context.wait_for(100ms);
 
         OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
@@ -401,8 +401,7 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 
     bool seen_selection_arrow = false;
-    while (true)
-    {
+    while (true){
         ButtonWatcher buttonA_watcher(
             COLOR_WHITE,
             ButtonType::ButtonA,
@@ -435,7 +434,7 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
                 blue_dialog_watcher,
 				black_screen
             }
-            );
+        );
         context.wait_for(100ms);
 
         OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
@@ -504,6 +503,8 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
 }
 
 void FriendshipFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 
 	if (FARMING_OPTION.get() == FarmingOption::Cafe){
