@@ -124,6 +124,7 @@
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
@@ -289,9 +290,28 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     ProControllerContext context(scope, console.controller<ProController>());
+    // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
 
+#if 0
+close_game_from_home(console, context);
+// ssf_issue_scroll(context, DPAD_DOWN, 24ms);
+#endif  
+
+#if 0
+    // auto snapshot = feed.snapshot();
+    // CloseGameDetector detector(console);
+    // cout << detector.detect(snapshot) << endl;
+    CloseGameWatcher watcher(console);
+
+    int ret = wait_until(console, context, Seconds(10), {watcher});
+
+    if (ret == 0){
+        console.log("CloseGameWatcher detected.");
+    }
+    
+#endif    
 
 #if 0
     ImageRGB32 image1("itemprinter.png");

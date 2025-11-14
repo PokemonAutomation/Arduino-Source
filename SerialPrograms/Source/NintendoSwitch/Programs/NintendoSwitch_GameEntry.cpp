@@ -18,6 +18,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_DetectHome.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch_GameEntry.h"
@@ -99,13 +100,12 @@ void ensure_at_home(ConsoleHandle& console, JoyconContext& context){
 }
 
 
-
 //
 //  close_game_from_home()
 //
 
-void close_game_from_home(ConsoleHandle& console, ProControllerContext& context){
-    console.log("close_game_from_home");
+void close_game_from_home_blind(ConsoleHandle& console, ProControllerContext& context){
+    console.log("close_game_from_home_blind");
     ensure_at_home(console, context);
 
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
@@ -125,8 +125,9 @@ void close_game_from_home(ConsoleHandle& console, ProControllerContext& context)
     pbf_mash_button(context, BUTTON_X, 50);
     pbf_mash_button(context, BUTTON_B, 350);
 }
-void close_game_from_home(ConsoleHandle& console, JoyconContext& context){
-    console.log("close_game_from_home");
+
+void close_game_from_home_blind(ConsoleHandle& console, JoyconContext& context){
+    console.log("close_game_from_home_blind");
     ensure_at_home(console, context);
     //  Use mashing to ensure that the X press succeeds. If it fails, the SR
     //  will fail and can kill a den for the autohosts.
@@ -146,6 +147,87 @@ void close_game_from_home(ConsoleHandle& console, JoyconContext& context){
     pbf_mash_button(context, BUTTON_B, 2000ms);
 }
 
+template <typename ControllerContext>
+void close_game_from_home(ConsoleHandle& console, ControllerContext& context){
+    if (!console.video().snapshot()){  // no visual feedback available
+        close_game_from_home_blind(console, context);
+        return;
+    }
+
+    console.log("close_game_from_home");
+    ensure_at_home(console, context);
+
+    // this sequence will close the game from the home screen,
+    // regardless of whether the game is initially open or closed.
+    bool seen_close_game = false;
+    size_t times_seen_home_before = 0;
+    while (true){
+        context.wait_for_all_requests();
+
+        CloseGameWatcher close_game(console);
+        HomeMenuWatcher home(console);
+        int ret = wait_until(
+            console, context,
+            Seconds(10), 
+            {close_game, home}
+        );
+
+        switch(ret){
+        case 0: // close_game
+            console.log("Detected close game menu.");
+            pbf_mash_button(context, BUTTON_A, 400ms);
+            seen_close_game = true;
+            continue;
+        case 1: // home
+            if (seen_close_game){ // successfully closed the game
+                return;
+            }
+
+            if (times_seen_home_before == 0){  // Try closing the game
+                pbf_mash_button(context, BUTTON_X, 800ms);
+                times_seen_home_before++;
+                continue;
+            }
+
+            if (times_seen_home_before == 1){  // The game not being selected can happen in Switch 2, when you touch the touchscreen on empty space on the Home screen.
+                console.log("Failed to close game once. Either game is already closed, or the game is not selected.");
+                ssf_issue_scroll(context, DPAD_DOWN, 24ms);     // moving the DPAD/joystick will allow the selection to come back.
+                ssf_issue_scroll(context, DPAD_DOWN, 24ms);
+                ssf_issue_scroll(context, DPAD_DOWN, 24ms);
+                console.log("Click the Home button to ensure that current game is selected.");
+                pbf_press_button(context, BUTTON_HOME, 160ms, 500ms);  // clicking home ensures that the cursor is selected on the current game.
+                go_home(console, context);
+                console.log("Try again to close the game.");
+                pbf_mash_button(context, BUTTON_X, 800ms);   // try again to close the game.
+                times_seen_home_before++;
+                continue;
+            }
+
+            if (times_seen_home_before == 2){
+                console.log("Game was already closed.");
+                return;
+            }
+
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "close_game_from_home: Unexpected state.");  
+
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "close_game_from_home(): Failed to detect either the Home screen or the Close game menu after 10 seconds.",
+                console
+            );
+        }
+    }
+
+}
+
+void close_game_from_home(ConsoleHandle& console, ProControllerContext& context){
+    close_game_from_home<ProControllerContext>(console, context);
+}
+
+void close_game_from_home(ConsoleHandle& console, JoyconContext& context){
+    close_game_from_home<JoyconContext>(console, context);
+}
 
 
 //
