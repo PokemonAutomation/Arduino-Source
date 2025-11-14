@@ -117,10 +117,12 @@ VideoDisplayWidget::VideoDisplayWidget(
     overlay.add_stat(m_source_fps);
     overlay.add_stat(m_display_fps);
 
-
+    video_session.add_state_listener(*this);
+}
+VideoDisplayWidget::~VideoDisplayWidget(){
     //  This is an ugly work-around for deadlock that can occur if the
-    //  constructor or destructor of this is class is called while a reset on
-    //  the VideoSession is in flight.
+    //  destructor of this is class is called while a reset on the VideoSession
+    //  is in flight.
     //
     //  Because Qt requires everything to run on the main thread, outside
     //  threads that reset the VideoSession will get redispatched to the main
@@ -131,15 +133,6 @@ VideoDisplayWidget::VideoDisplayWidget(
     //  The work-around is that if we fail to acquire this lock, we process the
     //  event queue to eventually run the task that is holding the lock.
     //
-    while (!video_session.try_add_state_listener(*this)){
-        m_video_session.logger().log(
-            "VideoDisplayWidget::VideoDisplayWidget(): Lock already held. Processing events...",
-            COLOR_ORANGE
-        );
-        QApplication::processEvents();
-    }
-}
-VideoDisplayWidget::~VideoDisplayWidget(){
     while (!m_video_session.try_remove_state_listener(*this)){
         m_video_session.logger().log(
             "VideoDisplayWidget::~VideoDisplayWidget(): Lock already held. Processing events...",
