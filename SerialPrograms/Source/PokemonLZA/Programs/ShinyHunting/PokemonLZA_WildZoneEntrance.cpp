@@ -60,7 +60,7 @@ WildZoneOption::WildZoneOption()
 ShinyHunt_WildZoneEntrance_Descriptor::ShinyHunt_WildZoneEntrance_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLZA:ShinyHunt-WildZoneEntrance", STRING_POKEMON + " LZA",
-        "Shiny Hunt - Wild Zone Entrance",
+        "Wild Zone Entrance",
         "Programs/PokemonLZA/ShinyHunt-WildZoneEntrance.html",
         "Shiny hunt by repeatedly entering Wild Zone from its entrance.",
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,

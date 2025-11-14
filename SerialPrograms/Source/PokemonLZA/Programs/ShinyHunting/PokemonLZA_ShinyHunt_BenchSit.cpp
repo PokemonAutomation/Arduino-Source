@@ -31,7 +31,7 @@ using namespace Pokemon;
 ShinyHunt_BenchSit_Descriptor::ShinyHunt_BenchSit_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLZA:ShinyHunt-BenchSit",
-        STRING_POKEMON + " LZA", "Shiny Hunt - Bench Sit",
+        STRING_POKEMON + " LZA", "Bench Sit",
         "Programs/PokemonLZA/ShinyHunt-BenchSit.html",
         "Shiny hunt by repeatedly sitting on a bench to reset spawns.",
         ProgramControllerClass::StandardController_NoRestrictions,

@@ -27,7 +27,7 @@ using namespace Pokemon;
 ShinyHunt_OverworldReset_Descriptor::ShinyHunt_OverworldReset_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLZA:ShinyHunt-OverworldReset",
-        STRING_POKEMON + " LZA", "Shiny Hunt - Overworld Reset",
+        STRING_POKEMON + " LZA", "Overworld Reset",
         "Programs/PokemonLZA/ShinyHunt-OverworldReset.html",
         "Shiny hunt by soft-resetting a " + STRING_POKEMON + " that spawns next to you.",
         ProgramControllerClass::StandardController_NoRestrictions,
