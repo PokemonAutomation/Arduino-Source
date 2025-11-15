@@ -78,7 +78,7 @@ RestaurantFarmer::RestaurantFarmer()
     : m_stop_after_current(false)
     , NUM_ROUNDS(
         "<b>Number of Rounds to Run:</b><br>"
-        "Zero will run until 'Stop after Current Round' is pressed or the program is manually stopped.</b>",
+        "Zero will run until 'Stop after Current Round' is pressed or the program is manually stopped.",
         LockMode::UNLOCK_WHILE_RUNNING,
         500,
         0
@@ -93,8 +93,7 @@ RestaurantFarmer::RestaurantFarmer()
     )
     , MOVE_AI(
         "<b>Move Selection AI:</b><br>"
-        "If enabled, it will be smarter with move selection.<br>"
-        "However, this adds a split-second delay which may cause opponent attacks to land first.",
+        "If enabled, it will be smarter with move selection.",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
