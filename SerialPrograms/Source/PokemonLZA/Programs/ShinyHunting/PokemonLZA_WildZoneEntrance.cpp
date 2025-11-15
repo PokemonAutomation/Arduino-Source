@@ -16,6 +16,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
@@ -353,6 +354,25 @@ void do_one_wild_zone_trip(
             // Mash button A to enter the zone.
             pbf_mash_button(context, BUTTON_A, 2000ms);
             context.wait_for_all_requests();
+
+            {
+                OverworldPartySelectionWatcher overworld;
+                int ret = wait_until(
+                    env.console, context,
+                    std::chrono::milliseconds(10000ms),
+                    {overworld}
+                );
+                if (ret < 0){
+                    OperationFailedException::fire(
+                        ErrorReport::SEND_ERROR_REPORT,
+                        "Unable to detect overworld after entering zone.",
+                        env.console
+                    );
+                }
+                env.console.log("Detected overworld after entering zone.");
+            }
+            context.wait_for(100ms);
+
             shiny_sound_handler.process_pending(context);
             // Day/night change can happen before or after the button A mash, so we are not
             // sure if we are in the zone or not! But at end of the travel we will fast
@@ -374,7 +394,7 @@ void do_one_wild_zone_trip(
         if (movement_mode <= 1){
             // we are not in the zone. so no wild pokemon handling!
             fast_travel_outside_zone(env, context, wild_zone);
-        } else {
+        }else{
             leave_zone_and_reset_spawns(
                 env, context,
                 walk_time_in_zone, wild_zone,

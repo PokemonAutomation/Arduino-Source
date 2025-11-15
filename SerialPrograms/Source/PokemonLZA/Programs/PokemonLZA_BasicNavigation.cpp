@@ -115,7 +115,7 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context){
 
         int ret = wait_until(
             console, context,
-            2000ms,
+            5000ms,
             {map_detector}
         );
         switch (ret){
