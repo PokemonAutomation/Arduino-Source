@@ -1629,6 +1629,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_Zone11Alpha.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_Zone11Alpha.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_Zone19Runner.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_Zone19Runner.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_OverworldWatcher.cpp
