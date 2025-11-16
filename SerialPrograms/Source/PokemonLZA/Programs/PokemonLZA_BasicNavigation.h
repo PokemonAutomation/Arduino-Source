@@ -45,7 +45,7 @@ enum class FastTravelState{
 // Return True if you are not chased by wild pokemon and can fast travel, False otherwise.
 // Note the function uses flyable fast travel icons on map to detect if you are being chased. This
 // means for most reliable detection, set zoom_to_max to True.
-bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max);
+bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max = false);
 // Starting at map view, press A to fast travel to the current selected fast travel location
 // Return FastTravelState:
 // - SUCCESS: fast travel successful. After the function returns, the player character is on the overworld
