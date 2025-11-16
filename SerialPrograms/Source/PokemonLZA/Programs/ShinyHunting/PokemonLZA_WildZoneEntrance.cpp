@@ -125,6 +125,11 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
+    , NO_PAUSE(
+        "<b>No Pause:</b><br>Always run back to entrance",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+        )
     , SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -140,6 +145,7 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
     PA_ADD_OPTION(MOVEMENT);
     PA_ADD_OPTION(WALK_TIME_IN_ZONE);
     PA_ADD_OPTION(RUNNING);
+    PA_ADD_OPTION(NO_PAUSE);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 
@@ -184,6 +190,7 @@ void fast_travel_outside_zone(
     ProControllerContext& context,
     WildZone wild_zone,
     bool to_max_zoom_level_on_map,
+    bool no_pause,
     std::string extra_error_msg = ""
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
@@ -234,57 +241,70 @@ void leave_zone_and_reset_spawns(
     Milliseconds walk_time_in_zone,
     WildZone wild_zone,
     ShinySoundHandler& shiny_sound_handler,
-    bool to_max_zoom_level_on_map
-){
+    bool to_max_zoom_level_on_map,
+    bool no_pause
+    ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
     FastTravelState travel_status = FastTravelState::PURSUED;
-    bool can_fast_travel = open_map(env.console, context, to_max_zoom_level_on_map);
-    // Open map is robust against day/night change. So after open_map()
-    // we are sure we are in map view
-    if (can_fast_travel){
-        travel_status = fly_from_map(env.console, context);
-    }
-    if (travel_status == FastTravelState::SUCCESS){
-        // we were in the zone and now successfully travel back to entrance
-        env.log("Leave zone successfully by fast travel");
-        return;
-    } else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
-        // we cannot fast travel at current location. This means we are actually outside
-        // the wild zone!
-        // Assume we are still outside the entrance, probably due to the mashing A to enter
-        // zone button press was eaten by a day/night change.
-        
-        env.log("Not at fly spot now, probably still outside zone at entrance.");
-        env.console.overlay().add_log("Still at Entrance");
 
-        // From zone entrance, fast travel back to the zone entrance
-        // to reset player character orientation
-        move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
-
-        travel_status = fly_from_map(env.console, context);
-        if (travel_status != FastTravelState::SUCCESS){
-            stats.errors++;
-            env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "leave_zone_and_reset_spawns(): Cannot fast travel to zone from outside the entrance.",
-                env.console
-            );
+    if (!no_pause) {
+        // Original behavior: try to fast travel first
+        bool can_fast_travel = open_map(env.console, context, to_max_zoom_level_on_map);
+        // Open map is robust against day/night change. So after open_map()
+        // we are sure we are in map view
+        if (can_fast_travel){
+            travel_status = fly_from_map(env.console, context);
         }
-        env.log("Fast travel after failed to enter zone by day/night change");
-        return;
-    } 
-    // travel_status == FastTravelState::PURSUED
-    // we are being attacked by wild pokemon.
-    
-    // mash B to close map and return to overworld
-    pbf_mash_button(context, BUTTON_B, 1600ms);
+        if (travel_status == FastTravelState::SUCCESS){
+            // we were in the zone and now successfully travel back to entrance
+            env.log("Leave zone successfully by fast travel");
+            return;
+        } else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
+            // we cannot fast travel at current location. This means we are actually outside
+            // the wild zone!
+            // Assume we are still outside the entrance, probably due to the mashing A to enter
+            // zone button press was eaten by a day/night change.
+
+            env.log("Not at fly spot now, probably still outside zone at entrance.");
+            env.console.overlay().add_log("Still at Entrance");
+
+            // From zone entrance, fast travel back to the zone entrance
+            // to reset player character orientation
+            move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
+
+            travel_status = fly_from_map(env.console, context);
+            if (travel_status != FastTravelState::SUCCESS){
+                stats.errors++;
+                env.update_stats();
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "leave_zone_and_reset_spawns(): Cannot fast travel to zone from outside the entrance.",
+                    env.console
+                    );
+            }
+            env.log("Fast travel after failed to enter zone by day/night change");
+            return;
+        }
+        // travel_status == FastTravelState::PURSUED
+        // we are being attacked by wild pokemon, so close map and walk back
+        pbf_mash_button(context, BUTTON_B, 1600ms);
+    } else {
+        // NO_PAUSE enabled: skip fast travel and walk back immediately
+        env.log("NO_PAUSE enabled - walking back to entrance");
+        env.console.overlay().add_log("Walking back to entrance");
+    }
+
+    // At this point, we need to walk/run back to the entrance
+    // (either because NO_PAUSE is on, or we were pursued)
     walk_time_in_zone += 2s; // give some extra time
-    env.log("Escaping");
-    env.console.overlay().add_log("Escaping Back to Entrance");
-    stats.chased++;
-    env.update_stats();
+
+    if (travel_status == FastTravelState::PURSUED) {
+        env.log("Escaping");
+        env.console.overlay().add_log("Escaping Back to Entrance");
+        stats.chased++;
+        env.update_stats();
+    }
 
     ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
     int ret = run_until<ProControllerContext>(
@@ -295,7 +315,7 @@ void leave_zone_and_reset_spawns(
             pbf_move_left_joystick(context, 128, 255, walk_time_in_zone, 0ms);
         },
         {{buttonA}}
-    );
+        );
     if (ret != 0){
         stats.errors++;
         env.update_stats();
@@ -310,7 +330,7 @@ void leave_zone_and_reset_spawns(
             env.logger(),
             "This program requires that you do not get attacked. "
             "Please choose a location/route that is safe from attack."
-        );
+            );
 #endif
     }
     shiny_sound_handler.process_pending(context);
@@ -325,10 +345,10 @@ void leave_zone_and_reset_spawns(
 
     // Do a fast travel outside the gate to reset spawns
     std::string extra_eror_msg = " This is after leaving zone.";
-    
+
     // since we already set up max zoom before, we don't need to do that again when calling fast_travel_outside_zone()
     bool _go_to_max_zoom_level = false;
-    fast_travel_outside_zone(env, context, wild_zone, _go_to_max_zoom_level, std::move(extra_eror_msg));
+    fast_travel_outside_zone(env, context, wild_zone, _go_to_max_zoom_level, false, std::move(extra_eror_msg));
 }
 
 // After fast travel back to a wild zone, go through entrance and move forward.
@@ -349,8 +369,9 @@ void do_one_wild_zone_trip(
     bool running,
     WildZone wild_zone,
     ShinySoundHandler& shiny_sound_handler,
-    bool to_max_zoom_level_on_map
-){
+    bool to_max_zoom_level_on_map,
+    bool no_pause
+    ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
     context.wait_for_all_requests();
     shiny_sound_handler.process_pending(context);
@@ -405,13 +426,14 @@ void do_one_wild_zone_trip(
 
     if (movement_mode <= 1){
         // we are not in the zone. so no wild pokemon handling!
-        fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map);
+        fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map, false);
     }else{
         leave_zone_and_reset_spawns(
             env, context,
             walk_time_in_zone, wild_zone,
             shiny_sound_handler,
-            to_max_zoom_level_on_map
+            to_max_zoom_level_on_map,
+            no_pause
         );
     }
     
@@ -456,7 +478,8 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                         env, context, 
                         MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE,
                         shiny_sound_handler,
-                        to_max_zoom_level_on_map
+                        to_max_zoom_level_on_map,
+                        NO_PAUSE
                     );
                     // Fast travel auto saves the game. So now the map is fixed at max zoom level.
                     // We no longer needs to zoom in future.
