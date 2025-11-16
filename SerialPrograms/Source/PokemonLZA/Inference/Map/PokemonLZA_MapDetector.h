@@ -57,6 +57,16 @@ public:
          : DetectorToFinder("MapWatcher", hold_duration, color, overlay)
     {}
 };
+class MapOverWatcher : public DetectorToFinder<MapDetector>{
+public:
+    MapOverWatcher(
+        Color color = COLOR_RED,
+        VideoOverlay* overlay = nullptr,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("MapWatcher", FinderType::GONE, hold_duration, color, overlay)
+    {}
+};
 
 
 

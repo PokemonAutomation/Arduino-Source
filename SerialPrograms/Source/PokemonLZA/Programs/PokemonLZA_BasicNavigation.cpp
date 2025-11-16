@@ -163,6 +163,7 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
     context.wait_for_all_requests();
     {
         BlackScreenWatcher start_flying(COLOR_RED);
+        MapOverWatcher map_over(COLOR_RED, &console.overlay());
         BlueDialogWatcher blue_dialog(COLOR_BLUE, &console.overlay(), 50ms);
         int ret = run_until<ProControllerContext>(
             console, context,
@@ -171,14 +172,15 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
                     pbf_mash_button(context, BUTTON_A, 1000ms);
                 }
             },
-            {start_flying, blue_dialog,}
+            {start_flying, map_over, blue_dialog,}
         );
         switch (ret){
         case 0:
+        case 1:
             console.log("Flying from map... Started!");
             console.overlay().add_log("Fast traveling");
             break;
-        case 1:
+        case 2:
             console.log("Spotted by wild pokemon, cannot fly");
             console.overlay().add_log("Spotted by Wild Pokemon");
             return FastTravelState::PURSUED;
@@ -196,10 +198,10 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
         }
     }
 
-    BlackScreenOverWatcher done_flying(COLOR_RED, {0.1, 0.7, 0.8, 0.2});
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay());
     int ret = wait_until(
-        console, context, 10000ms,
-        {done_flying,}
+        console, context, 15s,
+        {overworld,}
     );
     switch (ret){
     case 0:

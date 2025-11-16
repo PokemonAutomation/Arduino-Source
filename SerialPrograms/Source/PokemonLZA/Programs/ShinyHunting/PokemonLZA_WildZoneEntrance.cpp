@@ -366,6 +366,8 @@ void do_one_wild_zone_trip(
         context.wait_for_all_requests();
 
         {
+            // Wait for the overworld party view to be back. That is when
+            // the player is given control again after the entering gate animation.
             OverworldPartySelectionWatcher overworld;
             int ret = wait_until(
                 env.console, context,
@@ -412,8 +414,7 @@ void do_one_wild_zone_trip(
             to_max_zoom_level_on_map
         );
     }
-    // wait 0.5 sec for the game to be ready to control player character again
-    pbf_wait(context, 500ms);
+    
     // Now if everything works fine, we are back at the entrance via a fast travel
 
     stats.visits++;
@@ -460,7 +461,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                     // Fast travel auto saves the game. So now the map is fixed at max zoom level.
                     // We no longer needs to zoom in future.
                     to_max_zoom_level_on_map = false;
-                    
+
                     // No failure. Reset consecutive failure counter.
                     consecutive_failures = 0;
                 }catch (OperationFailedException&){
