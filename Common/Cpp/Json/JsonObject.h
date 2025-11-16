@@ -19,12 +19,14 @@ public:
     JsonObject(JsonObject&& x) = default;
     JsonObject& operator=(JsonObject&& x) = default;
 
-    bool operator==(const JsonObject& x){ // TODO: implement == properly. For JsonValue as well.
-        return dump() == x.dump();
+    //  TODO: implement == properly. For JsonValue as well.
+    friend bool operator==(const JsonObject& x, const JsonObject& y){
+        return x.dump() == y.dump();
     }
-    bool operator!=(const JsonObject& x){
-        return !(*this == x);
+    friend bool operator!=(const JsonObject& x, const JsonObject& y){
+        return !(x == y);
     }
+
 private:
     //  Private to avoid accidental copying.
     JsonObject(const JsonObject& x);
