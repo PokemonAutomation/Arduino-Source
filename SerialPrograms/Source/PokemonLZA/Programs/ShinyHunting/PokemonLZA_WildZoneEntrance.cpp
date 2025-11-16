@@ -75,13 +75,14 @@ public:
         : visits(m_stats["Visits"])
         , chased(m_stats["Chased"])
         , shinies(m_stats["Shiny Sounds"])
+        , game_resets(m_stats["Game Resets"])
         , errors(m_stats["Errors"])
         , day_changes(m_stats["Day/Night Changes"])
     {
         m_display_order.emplace_back("Visits");
         m_display_order.emplace_back("Chased", PreloadSettings::instance().DEVELOPER_MODE ? ALWAYS_VISIBLE : ALWAYS_HIDDEN);
         m_display_order.emplace_back("Shiny Sounds");
-        m_display_order.emplace_back("Game Resets", ALWAYS_HIDDEN);
+        m_display_order.emplace_back("Game Resets");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Day/Night Changes", ALWAYS_HIDDEN);
         m_aliases["Wild Zone"] = "Visits";
@@ -90,6 +91,7 @@ public:
     std::atomic<uint64_t>& visits;
     std::atomic<uint64_t>& chased;
     std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& game_resets;
     std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& day_changes;
 };
@@ -341,79 +343,71 @@ void do_one_wild_zone_trip(
     ShinySoundHandler& shiny_sound_handler
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
-    try{
+    context.wait_for_all_requests();
+    shiny_sound_handler.process_pending(context);
+
+    if (movement_mode >= 1){
+        go_to_entrance(env, context);
         context.wait_for_all_requests();
         shiny_sound_handler.process_pending(context);
-
-        if (movement_mode >= 1){
-            go_to_entrance(env, context);
-            context.wait_for_all_requests();
-            shiny_sound_handler.process_pending(context);
-        }
-        if (movement_mode == 2){
-            // Mash button A to enter the zone.
-            pbf_mash_button(context, BUTTON_A, 2000ms);
-            context.wait_for_all_requests();
-
-            {
-                OverworldPartySelectionWatcher overworld;
-                int ret = wait_until(
-                    env.console, context,
-                    std::chrono::milliseconds(10000ms),
-                    {overworld}
-                );
-                if (ret < 0){
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "Unable to detect overworld after entering zone.",
-                        env.console
-                    );
-                }
-                env.console.log("Detected overworld after entering zone.");
-            }
-            context.wait_for(100ms);
-
-            shiny_sound_handler.process_pending(context);
-            // Day/night change can happen before or after the button A mash, so we are not
-            // sure if we are in the zone or not! But at end of the travel we will fast
-            // travel back to entrance and have a way to work on both cases.
-            // move forward
-            if (walk_time_in_zone > Milliseconds::zero()){
-                if (running){
-                    env.console.overlay().add_log("Running");
-                    ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
-                } else{
-                    env.console.overlay().add_log("Walking");
-                }
-                pbf_move_left_joystick(context, 128, 0, walk_time_in_zone, 200ms);
-            }
-            context.wait_for_all_requests();
-            shiny_sound_handler.process_pending(context);
-        }
-
-        if (movement_mode <= 1){
-            // we are not in the zone. so no wild pokemon handling!
-            fast_travel_outside_zone(env, context, wild_zone);
-        }else{
-            leave_zone_and_reset_spawns(
-                env, context,
-                walk_time_in_zone, wild_zone,
-                shiny_sound_handler
-            );
-        }
-        // wait 0.5 sec for the game to be ready to control player character again
-        pbf_wait(context, 500ms);
-        // Now if everything works fine, we are back at the entrance via a fast travel
-
-        stats.visits++;
-        env.update_stats();
-    }catch (OperationFailedException&){
-        env.log("Error encountered. Resetting...", COLOR_RED);
-        stats.errors++;
-        env.update_stats();
-        go_home(env.console, context);
-        reset_game_from_home(env, env.console, context);
     }
+    if (movement_mode == 2){
+        // Mash button A to enter the zone.
+        pbf_mash_button(context, BUTTON_A, 2000ms);
+        context.wait_for_all_requests();
+
+        {
+            OverworldPartySelectionWatcher overworld;
+            int ret = wait_until(
+                env.console, context,
+                std::chrono::milliseconds(10000ms),
+                {overworld}
+            );
+            if (ret < 0){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "Unable to detect overworld after entering zone.",
+                    env.console
+                );
+            }
+            env.console.log("Detected overworld after entering zone.");
+        }
+        context.wait_for(100ms);
+
+        shiny_sound_handler.process_pending(context);
+        // Day/night change can happen before or after the button A mash, so we are not
+        // sure if we are in the zone or not! But at end of the travel we will fast
+        // travel back to entrance and have a way to work on both cases.
+        // move forward
+        if (walk_time_in_zone > Milliseconds::zero()){
+            if (running){
+                env.console.overlay().add_log("Running");
+                ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
+            } else{
+                env.console.overlay().add_log("Walking");
+            }
+            pbf_move_left_joystick(context, 128, 0, walk_time_in_zone, 200ms);
+        }
+        context.wait_for_all_requests();
+        shiny_sound_handler.process_pending(context);
+    }
+
+    if (movement_mode <= 1){
+        // we are not in the zone. so no wild pokemon handling!
+        fast_travel_outside_zone(env, context, wild_zone);
+    }else{
+        leave_zone_and_reset_spawns(
+            env, context,
+            walk_time_in_zone, wild_zone,
+            shiny_sound_handler
+        );
+    }
+    // wait 0.5 sec for the game to be ready to control player character again
+    pbf_wait(context, 500ms);
+    // Now if everything works fine, we are back at the entrance via a fast travel
+
+    stats.visits++;
+    env.update_stats();
 }
 
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -436,15 +430,34 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
         );
     });
 
+    int consecutive_failures = 0;
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
             while (true){
-                do_one_wild_zone_trip(
-                    env, context, 
-                    MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE,
-                    shiny_sound_handler
-                );
+                try{
+                    do_one_wild_zone_trip(
+                        env, context, 
+                        MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE,
+                        shiny_sound_handler
+                    );
+                    // No failure. Reset consecutive failure counter.
+                    consecutive_failures = 0;
+                }catch (OperationFailedException&){
+                    consecutive_failures++;
+                    env.log("Consecutive failures: " + std::to_string(consecutive_failures), COLOR_RED);
+                    if (consecutive_failures >= 3){
+                        go_home(env.console, context);
+                        throw;
+                    }
+                    env.log("Error encountered. Resetting...", COLOR_RED);
+                    stats.game_resets++;
+                    stats.errors++;
+                    env.update_stats();
+                    env.console.overlay().add_log("Error Found. Reset Game", COLOR_RED);
+                    go_home(env.console, context);
+                    reset_game_from_home(env, env.console, context);
+                }
                 send_program_status_notification(env, NOTIFICATION_STATUS);
             }
         },
