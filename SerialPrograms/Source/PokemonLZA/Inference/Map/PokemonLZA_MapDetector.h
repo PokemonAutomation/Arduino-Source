@@ -38,6 +38,8 @@ public:
     //  Return last detected map icons from attached MapIconDetectors.
     std::vector<DetectedBox> detected_map_icons() const;
 
+    void reset_state() override;
+
 private:
     ButtonDetector m_b_button;
     ButtonDetector m_x_button;

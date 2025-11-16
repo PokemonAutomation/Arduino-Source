@@ -41,8 +41,11 @@ enum class FastTravelState{
 // Will repeatedly pressing button + to ensure the map is opened.
 // Robust against day/night changes: if there is a day/night chane before opening the map,
 // it will keep trying to open the map until day/night change finishes.
-// Return True if you are not pursued by wild pokemon and can fast travel, False otherwise.
-bool open_map(ConsoleHandle& console, ProControllerContext& context);
+// zoom_to_max: whether to go to max zoom level after opening the map
+// Return True if you are not chased by wild pokemon and can fast travel, False otherwise.
+// Note the function uses flyable fast travel icons on map to detect if you are being chased. This
+// means for most reliable detection, set zoom_to_max to True.
+bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max);
 // Starting at map view, press A to fast travel to the current selected fast travel location
 // Return FastTravelState:
 // - SUCCESS: fast travel successful. After the function returns, the player character is on the overworld

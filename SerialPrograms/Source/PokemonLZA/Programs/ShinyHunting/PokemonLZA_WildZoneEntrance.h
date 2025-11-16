@@ -55,6 +55,9 @@ private:
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
+
+    // Record when we should zoom out the map for flyable fast travel icon detection on map during fast traveling.
+    bool to_max_zoom_level_on_map = true;
 };
 
 

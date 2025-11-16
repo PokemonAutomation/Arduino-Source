@@ -21,6 +21,9 @@
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
 
+// #include <iostream>
+// using std::cout, std::endl;
+
 namespace PokemonAutomation {
 namespace NintendoSwitch {
 namespace PokemonLZA {
@@ -180,11 +183,12 @@ void fast_travel_outside_zone(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     WildZone wild_zone,
+    bool to_max_zoom_level_on_map,
     std::string extra_error_msg = ""
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
-    bool can_fast_travel = open_map(env.console, context);
+    bool can_fast_travel = open_map(env.console, context, to_max_zoom_level_on_map);
     if (!can_fast_travel){
         stats.errors++;
         env.update_stats();
@@ -229,12 +233,13 @@ void leave_zone_and_reset_spawns(
     ProControllerContext& context,
     Milliseconds walk_time_in_zone,
     WildZone wild_zone,
-    ShinySoundHandler& shiny_sound_handler
+    ShinySoundHandler& shiny_sound_handler,
+    bool to_max_zoom_level_on_map
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
     FastTravelState travel_status = FastTravelState::PURSUED;
-    bool can_fast_travel = open_map(env.console, context);
+    bool can_fast_travel = open_map(env.console, context, to_max_zoom_level_on_map);
     // Open map is robust against day/night change. So after open_map()
     // we are sure we are in map view
     if (can_fast_travel){
@@ -320,7 +325,10 @@ void leave_zone_and_reset_spawns(
 
     // Do a fast travel outside the gate to reset spawns
     std::string extra_eror_msg = " This is after leaving zone.";
-    fast_travel_outside_zone(env, context, wild_zone, std::move(extra_eror_msg));
+    
+    // since we already set up max zoom before, we don't need to do that again when calling fast_travel_outside_zone()
+    bool _go_to_max_zoom_level = false;
+    fast_travel_outside_zone(env, context, wild_zone, _go_to_max_zoom_level, std::move(extra_eror_msg));
 }
 
 // After fast travel back to a wild zone, go through entrance and move forward.
@@ -340,7 +348,8 @@ void do_one_wild_zone_trip(
     Milliseconds walk_time_in_zone,
     bool running,
     WildZone wild_zone,
-    ShinySoundHandler& shiny_sound_handler
+    ShinySoundHandler& shiny_sound_handler,
+    bool to_max_zoom_level_on_map
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
     context.wait_for_all_requests();
@@ -394,12 +403,13 @@ void do_one_wild_zone_trip(
 
     if (movement_mode <= 1){
         // we are not in the zone. so no wild pokemon handling!
-        fast_travel_outside_zone(env, context, wild_zone);
+        fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map);
     }else{
         leave_zone_and_reset_spawns(
             env, context,
             walk_time_in_zone, wild_zone,
-            shiny_sound_handler
+            shiny_sound_handler,
+            to_max_zoom_level_on_map
         );
     }
     // wait 0.5 sec for the game to be ready to control player character again
@@ -410,8 +420,13 @@ void do_one_wild_zone_trip(
     env.update_stats();
 }
 
+
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
+    to_max_zoom_level_on_map = true;
+
+    // Mash button B to let Switch register the controller
+    pbf_mash_button(context, BUTTON_B, 500ms);
 
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
@@ -439,8 +454,13 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                     do_one_wild_zone_trip(
                         env, context, 
                         MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE,
-                        shiny_sound_handler
+                        shiny_sound_handler,
+                        to_max_zoom_level_on_map
                     );
+                    // Fast travel auto saves the game. So now the map is fixed at max zoom level.
+                    // We no longer needs to zoom in future.
+                    to_max_zoom_level_on_map = false;
+                    
                     // No failure. Reset consecutive failure counter.
                     consecutive_failures = 0;
                 }catch (OperationFailedException&){

@@ -93,11 +93,11 @@ void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
 
 
 
-bool open_map(ConsoleHandle& console, ProControllerContext& context){
-    console.log("Opening Map...");
-    console.overlay().add_log("Open Map");
+bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max){
     pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
     context.wait_for_all_requests();
+    console.log("Opening Map...");
+    console.overlay().add_log("Open Map");
     
     WallClock deadline = current_time() + 30s;
 
@@ -122,6 +122,23 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context){
         case 0:
             console.log("Detected map!", COLOR_BLUE);
             console.overlay().add_log("Map Detected");
+
+            if (zoom_to_max){
+                map_detector.reset_state();
+                // move right joystick to zoom out the map
+                for(int i = 0; i < 3; i++){
+                    pbf_move_right_joystick(context, 128, 255, 100ms, 300ms);
+                }
+                context.wait_for_all_requests();
+                console.log("Set to fully zoomed out");
+                console.overlay().add_log("Zoom to Max");
+                wait_until(
+                    console, context,
+                    5000ms,
+                    {map_detector}
+                );
+                return map_detector.detected_map_icons().size();
+            }
             return map_detector.detected_map_icons().size() > 0;
         default:
             console.log("Map not found. Press + again", COLOR_ORANGE);
