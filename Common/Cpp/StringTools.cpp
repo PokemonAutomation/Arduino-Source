@@ -74,7 +74,7 @@ std::string capitalize(const std::string& str){
         if (std::isspace(result[i])){
             new_word = true;
         } else if (new_word){
-            result[i] = std::toupper(result[i]);
+            result[i] = (char)std::toupper(result[i]);
             new_word = false;
         }
     }
@@ -91,7 +91,7 @@ std::string uncapitalize(const std::string& str){
         if (std::isspace(result[i])){
             new_word = true;
         } else if (new_word){
-            result[i] = std::tolower(result[i]);
+            result[i] = (char)std::tolower(result[i]);
             new_word = false;
         }
     }
