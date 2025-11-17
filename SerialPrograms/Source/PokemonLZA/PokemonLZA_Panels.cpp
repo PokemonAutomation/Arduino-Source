@@ -32,6 +32,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
 #include "Programs/ShinyHunting/PokemonLZA_Zone11Alpha.h"
 #include "Programs/ShinyHunting/PokemonLZA_Zone19Runner.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
@@ -81,6 +82,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<ShinyHunt_Zone11Alpha_Descriptor, ShinyHunt_Zone11Alpha>());
         ret.emplace_back(make_single_switch_program<ShinyHunt_Zone19Runner_Descriptor, ShinyHunt_Zone19Runner>());
+        ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
