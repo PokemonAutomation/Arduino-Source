@@ -1635,6 +1635,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShuttleRun.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShuttleRun.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp
