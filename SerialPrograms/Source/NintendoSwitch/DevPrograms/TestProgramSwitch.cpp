@@ -151,7 +151,8 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonMovesReader.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
-#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
+#include "PokemonLZA/Inference/Battles/PokemonLZA_MoveEffectivenessSymbol.h"
+#include "PokemonLZA/Inference/Battles/PokemonLZA_RunFromBattleDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 
@@ -292,6 +293,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     ProControllerContext context(scope, console.controller<ProController>());
     // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
+
+
+
+    auto snapshot = feed.snapshot();
+    cout << snapshot->width() << " x " << snapshot->height() << endl;
+
+    RunFromBattleDetector detector(COLOR_RED, &overlay);
+    cout << detector.detect(snapshot) << endl;
 
 
 #if 0

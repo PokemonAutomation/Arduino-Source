@@ -11,7 +11,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
+#include "PokemonLZA/Inference/Battles/PokemonLZA_MoveEffectivenessSymbol.h"
 #include "PokemonLZA_TrainerBattle.h"
 
 namespace PokemonAutomation{
@@ -30,10 +30,12 @@ bool attempt_one_attack(
         context
     );
 
-    MoveEffectivenessSymbolWatcher move_watcher(COLOR_RED, &env.console.overlay(), 100ms);
+    MoveEffectivenessSymbolWatcher move_watcher(COLOR_RED, &env.console.overlay(), 20ms);
     command.dispatch([](ProControllerContext& context){
-        pbf_press_button(context, BUTTON_ZL, 10000ms, 0ms);
+        pbf_press_button(context, BUTTON_ZL, 5000ms, 0ms);
     });
+
+    env.log("Begin looking for type symbols.");
 
     int ret = wait_until(
         env.console, context, 1000ms,

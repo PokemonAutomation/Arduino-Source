@@ -1554,6 +1554,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLGPE/Programs/ShinyHunting/PokemonLGPE_LegendaryReset.h
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.cpp
     Source/PokemonLGPE/Programs/TestPrograms/PokemonLGPE_SoundListener.h
+    Source/PokemonLZA/Inference/Battles/PokemonLZA_MoveEffectivenessSymbol.cpp
+    Source/PokemonLZA/Inference/Battles/PokemonLZA_MoveEffectivenessSymbol.h
+    Source/PokemonLZA/Inference/Battles/PokemonLZA_RunFromBattleDetector.cpp
+    Source/PokemonLZA/Inference/Battles/PokemonLZA_RunFromBattleDetector.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.cpp
@@ -1576,8 +1580,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.cpp
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h
-    Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.cpp
-    Source/PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp

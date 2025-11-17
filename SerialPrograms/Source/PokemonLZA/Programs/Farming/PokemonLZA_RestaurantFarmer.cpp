@@ -4,22 +4,22 @@
  *
  */
 
-#include "CommonFramework/Logging/Logger.h"
+//#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 //#include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonTools/Async/InterruptableCommands.h"
+//#include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 //#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
-//#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
+#include "PokemonLZA/Inference/Battles/PokemonLZA_RunFromBattleDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
 #include "PokemonLZA_RestaurantFarmer.h"
@@ -139,6 +139,7 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         FlatWhiteDialogWatcher dialog0(COLOR_RED, &env.console.overlay());
         BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay());
         ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay());
+        RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 250ms);
 
         int ret = wait_until(
             env.console, context,
@@ -149,6 +150,7 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
                 dialog0,
                 dialog1,
                 item_receive,
+                battle_menu,
             }
         );
         context.wait_for(100ms);
@@ -185,12 +187,17 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
             pbf_press_button(context, BUTTON_A, 160ms, 80ms);
             continue;
 
+        case 5:
+            env.log("Detected battle menu. (unexpected)", COLOR_RED);
+            stats.errors++;
+            return false;
+
         default:
             stats.errors++;
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "run_lobby(): No recognized state after 60 seconds.",
+                "run_lobby(): No recognized state after 10 seconds.",
                 env.console
             );
         }
@@ -199,13 +206,12 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
 void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
 
-    WallClock start = current_time();
+//    WallClock start = current_time();
 
     bool won = false;
+    Milliseconds rotate_duration = 100ms;
 
     while (true){
-        context.wait_for_all_requests();
-
         ButtonWatcher buttonA(
             COLOR_RED,
             ButtonType::ButtonA,
@@ -222,14 +228,14 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
         ItemReceiveWatcher item_receive(COLOR_RED, &env.console.overlay(), 1000ms);
         FlatWhiteDialogWatcher dialog0(COLOR_RED, &env.console.overlay(), 1000ms);
         BlueDialogWatcher dialog1(COLOR_RED, &env.console.overlay(), 1000ms);
+        RunFromBattleWatcher battle_menu(COLOR_GREEN, &env.console.overlay(), 10ms);
 
+        context.wait_for_all_requests();
 
         int ret = run_until<ProControllerContext>(
             env.console, context,
-            [&](ProControllerContext& context){
-                while (current_time() - start < 30min){
-                    attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES);
-                }
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_B, 120s);
             },
             {
                 buttonA,
@@ -237,6 +243,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
                 item_receive,
                 dialog0,
                 dialog1,
+                battle_menu,
             }
         );
 
@@ -275,12 +282,32 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
             pbf_press_button(context, BUTTON_B, 160ms, 80ms);
             continue;
 
+        case 5:
+            env.log("Detected battle menu.");
+            if (attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES)){
+                rotate_duration = 100ms;
+            }else{
+                env.log("Failed to select move. Rotating camera...", COLOR_ORANGE);
+                ssf_press_button(context, BUTTON_ZL, 200ms, 400ms, 200ms);
+                if (rotate_duration > Milliseconds(0)){
+                    pbf_move_right_joystick(context, 0, 128, rotate_duration, 0ms);
+                }else{
+                    pbf_move_right_joystick(context, 255, 128, -rotate_duration, 0ms);
+                }
+                rotate_duration *= -2;
+
+                if (rotate_duration < -2000ms || rotate_duration > 2000ms){
+                    rotate_duration = 100ms;
+                }
+            }
+            continue;
+
         default:
             stats.errors++;
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Round took longer than 30 minutes.",
+                "run_round(): No state detected for 2 minutes.",
                 env.console
             );
         }
