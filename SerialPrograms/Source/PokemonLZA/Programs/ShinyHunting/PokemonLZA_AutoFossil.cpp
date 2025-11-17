@@ -81,7 +81,8 @@ std::unique_ptr<StatsTracker> AutoFossil_Descriptor::make_stats() const{
 
 
 AutoFossil::AutoFossil()
-    : NUM_FOSSILS("<b>How Many Fossils to Revive Before Checking Them in Box:</b>",
+    : STOP_AFTER_CURRENT("Batch")
+    , NUM_FOSSILS("<b>How Many Fossils to Revive Before Checking Them in Box:</b>",
         LockMode::LOCK_WHILE_RUNNING,
         30, 1, 32*30
     )
@@ -116,6 +117,7 @@ AutoFossil::AutoFossil()
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(STOP_AFTER_CURRENT);
     PA_ADD_OPTION(NUM_FOSSILS);
     PA_ADD_OPTION(WHICH_FOSSIL);
     PA_ADD_OPTION(STOP_ON);
@@ -128,9 +130,14 @@ AutoFossil::AutoFossil()
 void AutoFossil::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
+    DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
+
     const size_t num_fossils_to_revive = NUM_FOSSILS; // at least 1
     const size_t num_boxes = (num_fossils_to_revive+29) / 30;  // at least 1
     while(true){
+        if (STOP_AFTER_CURRENT.should_stop()){
+            break;
+        }
         for(size_t i = 0; i < num_fossils_to_revive; i++){
             revive_one_fossil(env, context);
             std::ostringstream os;

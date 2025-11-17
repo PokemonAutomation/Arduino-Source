@@ -95,12 +95,8 @@ std::unique_ptr<StatsTracker> JacintheInfiniteFarmer_Descriptor::make_stats() co
 }
 
 
-JacintheInfiniteFarmer::~JacintheInfiniteFarmer(){
-    STOP_AFTER_CURRENT.remove_listener(*this);
-}
-
 JacintheInfiniteFarmer::JacintheInfiniteFarmer()
-    : m_stop_after_current(false)
+    : STOP_AFTER_CURRENT("Round")
     , NUM_ROUNDS(
         "<b>Number of Rounds to Run:</b><br>"
         "Zero will run until 'Stop after Current Round' is pressed or the program is manually stopped.</b>",
@@ -137,33 +133,7 @@ JacintheInfiniteFarmer::JacintheInfiniteFarmer()
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(NOTIFICATIONS);
-
-    STOP_AFTER_CURRENT.set_idle();
-    STOP_AFTER_CURRENT.add_listener(*this);
 }
-
-
-
-JacintheInfiniteFarmer::StopButton::StopButton()
-    : ButtonOption(
-      "<b>Stop after current round:",
-      "Stop after current round",
-      0, 16
-    )
-{}
-void JacintheInfiniteFarmer::StopButton::set_idle(){
-    this->set_enabled(false);
-    this->set_text("Stop after Current Round");
-}
-void JacintheInfiniteFarmer::StopButton::set_ready(){
-    this->set_enabled(true);
-    this->set_text("Stop after Current Round");
-}
-void JacintheInfiniteFarmer::StopButton::set_pressed(){
-    this->set_enabled(false);
-    this->set_text("Program will stop after current round...");
-}
-
 
 
 bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -217,7 +187,7 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
             // - When we lose to Jacinthe, we have some dialog after the battle and returns to the overworld.
             env.log("Detected A button.");
             env.console.overlay().add_log("Button A Detected");
-            if (m_stop_after_current.load(std::memory_order_relaxed)){
+            if (STOP_AFTER_CURRENT.should_stop()){
                 return true; // true means the program should stop
             }
             
@@ -234,7 +204,7 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
             seen_selection_arrow = true;
             // This is when Jacinthe is asking whether you want
             // to start the battle or continue the battle
-            if (m_stop_after_current.load(std::memory_order_relaxed)){
+            if (STOP_AFTER_CURRENT.should_stop()){
                 env.console.overlay().add_log("Dialog Choice: Cancel");
                 pbf_press_button(context, BUTTON_B, 160ms, 80ms);
             } else{
@@ -331,32 +301,12 @@ void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProC
 }
 
 
-class JacintheInfiniteFarmer::ResetOnExit{
-public:
-    ResetOnExit(StopButton& button)
-        : m_button(button)
-    {}
-    ~ResetOnExit(){
-        m_button.set_idle();
-    }
-
-private:
-    StopButton& m_button;
-};
-
-void JacintheInfiniteFarmer::on_press(){
-    global_logger_tagged().log("Stop after current requested...");
-    m_stop_after_current.store(true, std::memory_order_relaxed);
-    STOP_AFTER_CURRENT.set_pressed();
-}
-
 void JacintheInfiniteFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     JacintheInfiniteFarmer_Descriptor::Stats& stats = env.current_stats<JacintheInfiniteFarmer_Descriptor::Stats>();
-    m_stop_after_current.store(false, std::memory_order_relaxed);
-    STOP_AFTER_CURRENT.set_ready();
-    ResetOnExit reset_button_on_exit(STOP_AFTER_CURRENT);
+
+    DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
     pbf_mash_button(context, BUTTON_B, 1000ms);
 
 //    auto lobby = env.console.video().snapshot();
@@ -364,8 +314,7 @@ void JacintheInfiniteFarmer::program(SingleSwitchProgramEnvironment& env, ProCon
     while (true){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         if (NUM_ROUNDS != 0 && stats.rounds >= NUM_ROUNDS) {
-            m_stop_after_current.store(true, std::memory_order_relaxed);
-            STOP_AFTER_CURRENT.set_pressed();
+            break;
         }
         if (talk_to_jacinthe(env, context)){
             break;

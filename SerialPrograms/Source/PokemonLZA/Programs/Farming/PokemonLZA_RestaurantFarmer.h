@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 #define PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 
-#include <atomic>
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
@@ -36,12 +35,10 @@ public:
 };
 
 
-class RestaurantFarmer : public SingleSwitchProgramInstance, public ButtonListener{
+class RestaurantFarmer : public SingleSwitchProgramInstance{
 public:
-    ~RestaurantFarmer();
     RestaurantFarmer();
 
-    virtual void on_press() override;
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
@@ -54,17 +51,7 @@ private:
     void run_round(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
 private:
-    class StopButton : public ButtonOption{
-    public:
-        StopButton();
-        void set_idle();
-        void set_ready();
-        void set_pressed();
-    };
-    class ResetOnExit;
-
-    std::atomic<bool> m_stop_after_current;
-    StopButton STOP_AFTER_CURRENT;
+    DeferredStopButtonOption STOP_AFTER_CURRENT;
     SimpleIntegerOption<uint32_t> NUM_ROUNDS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

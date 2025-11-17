@@ -70,12 +70,8 @@ std::unique_ptr<StatsTracker> RestaurantFarmer_Descriptor::make_stats() const{
 }
 
 
-RestaurantFarmer::~RestaurantFarmer(){
-    STOP_AFTER_CURRENT.remove_listener(*this);
-}
-
 RestaurantFarmer::RestaurantFarmer()
-    : m_stop_after_current(false)
+    : STOP_AFTER_CURRENT("Round")
     , NUM_ROUNDS(
         "<b>Number of Rounds to Run:</b><br>"
         "Zero will run until 'Stop after Current Round' is pressed or the program is manually stopped.",
@@ -120,33 +116,7 @@ RestaurantFarmer::RestaurantFarmer()
     PA_ADD_OPTION(PERIODIC_SAVE);
 
     PA_ADD_OPTION(NOTIFICATIONS);
-
-    STOP_AFTER_CURRENT.set_idle();
-    STOP_AFTER_CURRENT.add_listener(*this);
 }
-
-
-
-RestaurantFarmer::StopButton::StopButton()
-    : ButtonOption(
-      "<b>Stop after current round:",
-      "Stop after current round",
-      0, 16
-    )
-{}
-void RestaurantFarmer::StopButton::set_idle(){
-    this->set_enabled(false);
-    this->set_text("Stop after Current Round");
-}
-void RestaurantFarmer::StopButton::set_ready(){
-    this->set_enabled(true);
-    this->set_text("Stop after Current Round");
-}
-void RestaurantFarmer::StopButton::set_pressed(){
-    this->set_enabled(false);
-    this->set_text("Program will stop after current round...");
-}
-
 
 
 bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -186,7 +156,7 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
         switch (ret){
         case 0:
             env.log("Detected A button.");
-            if (m_stop_after_current.load(std::memory_order_relaxed)){
+            if (STOP_AFTER_CURRENT.should_stop()){
                 return true;
             }
             pbf_press_button(context, BUTTON_A, 160ms, 80ms);
@@ -319,32 +289,12 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
 }
 
 
-class RestaurantFarmer::ResetOnExit{
-public:
-    ResetOnExit(StopButton& button)
-        : m_button(button)
-    {}
-    ~ResetOnExit(){
-        m_button.set_idle();
-    }
-
-private:
-    StopButton& m_button;
-};
-
-void RestaurantFarmer::on_press(){
-    global_logger_tagged().log("Stop after current requested...");
-    m_stop_after_current.store(true, std::memory_order_relaxed);
-    STOP_AFTER_CURRENT.set_pressed();
-}
-
 void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     RestaurantFarmer_Descriptor::Stats& stats = env.current_stats<RestaurantFarmer_Descriptor::Stats>();
-    m_stop_after_current.store(false, std::memory_order_relaxed);
-    STOP_AFTER_CURRENT.set_ready();
-    ResetOnExit reset_button_on_exit(STOP_AFTER_CURRENT);
+
+    DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_AFTER_CURRENT);
     pbf_mash_button(context, BUTTON_B, 1000ms);
 
 //    auto lobby = env.console.video().snapshot();
@@ -352,8 +302,7 @@ void RestaurantFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
     for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++){
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
         if (NUM_ROUNDS != 0 && stats.rounds >= NUM_ROUNDS) {
-            m_stop_after_current.store(true, std::memory_order_relaxed);
-            STOP_AFTER_CURRENT.set_pressed();
+            break;
         }
 
         uint32_t periodic_save = PERIODIC_SAVE;

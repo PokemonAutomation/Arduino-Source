@@ -42,13 +42,15 @@ private:
     void revive_one_fossil(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
     // return true if found a match
-    bool check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context, 
+    bool check_fossils_in_one_box(SingleSwitchProgramEnvironment& env, ProControllerContext& context,
         size_t num_checked_fossils_in_previous_boxes, size_t num_fossils_in_box);
 
+private:
+    DeferredStopButtonOption STOP_AFTER_CURRENT;
     SimpleIntegerOption<uint32_t> NUM_FOSSILS;
     IntegerEnumDropdownOption WHICH_FOSSIL;
     PokemonLA::StopOnOption STOP_ON;
-    
+
     BooleanCheckBoxOption TAKE_VIDEO;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 

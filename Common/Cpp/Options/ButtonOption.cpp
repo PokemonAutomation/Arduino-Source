@@ -8,6 +8,7 @@
 #include <atomic>
 #include "Common/Cpp/Containers/Pimpl.tpp"
 #include "Common/Cpp/Concurrency/SpinLock.h"
+#include "Common/Cpp/StringTools.h"
 //#include "Common/Cpp/Json/JsonValue.h"
 #include "ButtonOption.h"
 
@@ -178,6 +179,68 @@ void ButtonOption::set_label(std::string label){
 
 
 
+struct DeferredStopButtonOption::Data{
+    std::atomic<bool> m_stop_requested;
+    std::string m_ready_text;
+    std::string m_pressed_text;
+
+    Data(const std::string& iteration_name)
+        : m_stop_requested(false)
+        , m_ready_text("Stop after Current " + StringTools::capitalize(iteration_name))
+        , m_pressed_text("Program will stop after current " + StringTools::uncapitalize(iteration_name) + "...")
+    {}
+};
+
+
+DeferredStopButtonOption::ResetOnExit::ResetOnExit(DeferredStopButtonOption& button)
+    : m_button(button)
+{
+    button.reset_and_ready();
+}
+
+DeferredStopButtonOption::ResetOnExit::~ResetOnExit(){
+    m_button.set_idle();
+}
+
+
+DeferredStopButtonOption::~DeferredStopButtonOption(){
+}
+
+DeferredStopButtonOption::DeferredStopButtonOption(
+    const std::string& iteration_name,
+    int button_height,
+    int text_size
+)
+    : ButtonOption(
+        "<b>Stop after current " + StringTools::uncapitalize(iteration_name) + ":",
+        ButtonCell::DISABLED,
+        "Stop after Current " + StringTools::capitalize(iteration_name),
+        button_height,
+        text_size
+    )
+    , m_data(CONSTRUCT_TOKEN, iteration_name)
+{}
+
+bool DeferredStopButtonOption::should_stop() const{
+    return m_data->m_stop_requested.load(std::memory_order_relaxed);
+}
+
+void DeferredStopButtonOption::reset_and_ready(){
+    m_data->m_stop_requested.store(false, std::memory_order_relaxed);
+    this->set_enabled(true);
+    this->set_text(m_data->m_ready_text);
+}
+
+void DeferredStopButtonOption::set_idle(){
+    this->set_enabled(false);
+    this->set_text(m_data->m_ready_text);
+}
+
+void DeferredStopButtonOption::press_button(){
+    m_data->m_stop_requested.store(true, std::memory_order_relaxed);
+    this->set_enabled(false);
+    this->set_text(m_data->m_pressed_text);
+}
 
 
 }
