@@ -104,14 +104,14 @@ private:
 
 
 
-//  A button that allows graceful stopping after completing the current unit of work.
-//  This button manages its own state and can be queried to determine if a stop has been requested.
+//  A button that allows graceful stopping after completing the iteration in a looping program.
+//  This button manages its own state and can be queried to determine if a stop has been requested
+//  by user.
 //
 //  Usage:
 //    1. Add as a member: DeferredStopButtonOption STOP_BUTTON;
 //    2. In constructor: PA_ADD_OPTION(STOP_BUTTON);
 //    3. At program start:
-//       STOP_BUTTON.reset_and_enable();
 //       DeferredStopButtonOption::ResetOnExit reset_on_exit(STOP_BUTTON);
 //    4. In main loop: if (STOP_BUTTON.should_stop()) break;
 //    5. On program exit: ResetOnExit will automatically reset the button via RAII
