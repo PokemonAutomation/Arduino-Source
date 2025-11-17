@@ -53,15 +53,49 @@ std::vector<std::string> split(const std::string& str, const std::string& delimi
     std::vector<std::string> tokens;
     size_t start = 0;
     size_t end = str.find(delimiter);
-    
+
     while (end != std::string::npos) {
         tokens.push_back(str.substr(start, end - start));
         start = end + delimiter.length();
         end = str.find(delimiter, start);
     }
-    
+
     tokens.push_back(str.substr(start));
     return tokens;
+}
+
+std::string capitalize(const std::string& str){
+    if (str.empty()){
+        return str;
+    }
+    std::string result = str;
+    bool new_word = true;
+    for (size_t i = 0; i < result.size(); i++){
+        if (std::isspace(result[i])){
+            new_word = true;
+        } else if (new_word){
+            result[i] = std::toupper(result[i]);
+            new_word = false;
+        }
+    }
+    return result;
+}
+
+std::string uncapitalize(const std::string& str){
+    if (str.empty()){
+        return str;
+    }
+    std::string result = str;
+    bool new_word = true;
+    for (size_t i = 0; i < result.size(); i++){
+        if (std::isspace(result[i])){
+            new_word = true;
+        } else if (new_word){
+            result[i] = std::tolower(result[i]);
+            new_word = false;
+        }
+    }
+    return result;
 }
 
 

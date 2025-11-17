@@ -22,7 +22,17 @@ std::string strip(const std::string& str);
 // Parse str to size_t. Return SIZE_MAX if parsing fails
 size_t to_size_t(const std::string& str);
 
+// Break a string with a delimiter sub-string.
+// e.g. split("a; b; c", "; ") -> ["a", "b", "c"]
+// Note, if the string ends with a delimiter, the last element in the returned vector is an empty sub-string.
+// e.g. split("a; b; ", "; ") -> ["a", "b", ""]
 std::vector<std::string> split(const std::string& str, const std::string& delimiter);
+
+// Capitalize each word in str. Words are separated by space characters.
+std::string capitalize(const std::string& str);
+// Uncapitalize each word in str. Words are separated by space characters.
+std::string uncapitalize(const std::string& str);
+
 
 }
 }
