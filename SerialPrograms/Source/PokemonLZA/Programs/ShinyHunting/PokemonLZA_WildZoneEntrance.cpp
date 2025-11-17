@@ -371,13 +371,13 @@ void do_one_wild_zone_trip(
             OverworldPartySelectionWatcher overworld;
             int ret = wait_until(
                 env.console, context,
-                std::chrono::milliseconds(10000ms),
+                std::chrono::seconds(10),
                 {overworld}
             );
             if (ret < 0){
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
-                    "Unable to detect overworld after entering zone.",
+                    "do_one_wild_zone_trip(): Unable to detect overworld after entering zone.",
                     env.console
                 );
             }
@@ -414,7 +414,7 @@ void do_one_wild_zone_trip(
             to_max_zoom_level_on_map
         );
     }
-    
+
     // Now if everything works fine, we are back at the entrance via a fast travel
 
     stats.visits++;
