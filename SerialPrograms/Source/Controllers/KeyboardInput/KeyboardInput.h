@@ -72,7 +72,7 @@ private:
     void thread_loop();
 
 
-private:
+protected:
     Logger& m_logger;
 
     //  Controller State

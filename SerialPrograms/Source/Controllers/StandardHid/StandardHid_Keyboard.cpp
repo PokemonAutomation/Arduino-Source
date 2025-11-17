@@ -70,6 +70,32 @@ public:
 
 
 
+void log_qtkey(Logger& logger, const QtKeyMap::QtKey& qtkey){
+    std::stringstream ss;
+    ss << "Pressed key " << QTKEY_TO_STRING().at(qtkey.key);
+    if (qtkey.keypad){
+        ss << " (keypad)";
+    }else{
+        ss << " (main keyboard)";
+    }
+
+    const std::map<QtKeyMap::QtKey, KeyboardKey>& qwerty_hid_map = KEYID_TO_HID_QWERTY();
+    if (auto iter = qwerty_hid_map.find(qtkey); iter != qwerty_hid_map.end()){
+        ss << " mapped to QWERTY HID key " << KEYBOARDKEY_TO_STRING().at(iter->second);
+    }else{
+        ss << " has no QWERTY HID mapping";
+    }
+
+    const std::map<QtKeyMap::QtKey, KeyboardKey>& azerty_hid_map = KEYID_TO_HID_AZERTY();
+    if (auto iter = azerty_hid_map.find(qtkey); iter != azerty_hid_map.end()){
+        ss << " mapped to AZERTY HID key " << KEYBOARDKEY_TO_STRING().at(iter->second);
+    }
+    else {
+        ss << " has no AZERTY HID mapping";
+    }
+
+    logger.log(ss.str(), COLOR_BLUE);
+}
 
 class Keyboard::KeyboardManager final : public PokemonAutomation::KeyboardInputController{
 public:
@@ -105,12 +131,11 @@ public:
         for (uint32_t native_key : pressed_keys){
             std::set<QtKeyMap::QtKey> qkeys = qkey_map.get_QtKeys(native_key);
             for (QtKeyMap::QtKey qkey : qkeys){
-//                cout << "qkey = " << qkey << endl;
                 auto iter = hid_map.find(qkey);
                 if (iter != hid_map.end()){
-//                    cout << "hid-key = " << (uint16_t)iter->second << endl;
                     local_state.keys.insert(iter->second);
                 }
+                log_qtkey(m_logger, qkey);
             }
         }
     }
