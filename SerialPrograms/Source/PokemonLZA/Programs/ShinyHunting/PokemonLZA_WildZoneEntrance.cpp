@@ -199,6 +199,7 @@ void go_to_entrance(
         },
         {{buttonA}}
     );
+    env.log("Detected button A. At Wild Zone gate.");
     env.console.overlay().add_log("Detect Entrance");
 }
 
