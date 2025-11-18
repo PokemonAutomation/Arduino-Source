@@ -81,6 +81,17 @@ public:
     {}
 };
 
+class OverworldPartySelectionOverWatcher : public DetectorToFinder<OverworldPartySelectionDetector>{
+public:
+    OverworldPartySelectionOverWatcher(
+        Color color = COLOR_RED,
+        VideoOverlay* overlay = nullptr,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(150)
+    )
+         : DetectorToFinder("OverworldPartySelectionOverWatcher", FinderType::GONE, hold_duration, color, overlay)
+    {}
+};
+
 
 
 
