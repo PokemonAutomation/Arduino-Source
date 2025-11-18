@@ -21,7 +21,7 @@ namespace PokemonLZA{
 // Detect the direction arrow on the map that shows where the device is facing
 class DirectionArrowDetector : public StaticScreenDetector{
 public:
-    DirectionArrowDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);
+    DirectionArrowDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
@@ -30,18 +30,13 @@ public:
 
     // Get the last detected angle in degrees [0, 360)
     // Returns -1 if no arrow was detected
-    double detected_angle() const { return m_detected_angle; }
-
-    // Check if arrow is present in the last detection
-    bool is_arrow_present() const { return m_arrow_present; }
+    double detected_angle_deg() const { return m_detected_angle; }
 
 private:
     Color m_color;
-    VideoOverlay* m_overlay;
     ImageFloatBox m_search_box;
 
     // Detection results
-    bool m_arrow_present;
     double m_detected_angle;  // in degrees [0, 360), or -1 if not detected
 };
 
@@ -49,10 +44,9 @@ class DirectionArrowWatcher : public DetectorToFinder<DirectionArrowDetector>{
 public:
     DirectionArrowWatcher(
         Color color = COLOR_RED,
-        VideoOverlay* overlay = nullptr,
-        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(100)
     )
-         : DetectorToFinder("DirectionArrowWatcher", hold_duration, color, overlay)
+         : DetectorToFinder("DirectionArrowWatcher", hold_duration, color)
     {}
 };
 

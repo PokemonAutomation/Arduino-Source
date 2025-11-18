@@ -477,8 +477,7 @@ int test_pokemonLZA_DirectionArrowDetector(const ImageViewRGB32& image, int targ
     }
 
     // Run detector
-    auto overlay = DummyVideoOverlay();
-    DirectionArrowDetector detector(COLOR_RED, &overlay);
+    DirectionArrowDetector detector(COLOR_RED);
     bool detected = detector.detect(image);
 
     if (!detected){
@@ -486,7 +485,7 @@ int test_pokemonLZA_DirectionArrowDetector(const ImageViewRGB32& image, int targ
         return 1;
     }
 
-    double detected_angle = detector.detected_angle();
+    double detected_angle = detector.detected_angle_deg();
 
     cout << "Target angle: " << target_angle << ", Detected angle: " << detected_angle << endl;
 

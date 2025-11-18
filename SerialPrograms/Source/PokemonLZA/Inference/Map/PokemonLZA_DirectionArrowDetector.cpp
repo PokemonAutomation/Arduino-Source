@@ -23,11 +23,9 @@ namespace PokemonLZA{
 
 
 
-DirectionArrowDetector::DirectionArrowDetector(Color color, VideoOverlay* overlay)
+DirectionArrowDetector::DirectionArrowDetector(Color color)
     : m_color(color)
-    , m_overlay(overlay)
     , m_search_box(0.076, 0.138, 0.031, 0.062)  // Default: search entire image
-    , m_arrow_present(false)
     , m_detected_angle(-1.0)
 {
 }
@@ -37,12 +35,7 @@ void DirectionArrowDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
-    // Reset detection state
-    m_arrow_present = false;
     m_detected_angle = -1.0;
-
-    // Suppress unused variable warning if overlay is not provided
-    (void)m_overlay;
 
     ImageViewRGB32 image_crop = extract_box_reference(screen, m_search_box);
 
@@ -177,8 +170,7 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
 #ifdef DEBUG_DIRECTION_ARROW
     cout << "Found angle: " << eigenvec_angle_deg << " degrees." << endl;
 #endif
-    // Store results
-    m_arrow_present = true;
+    // Store result
     m_detected_angle = eigenvec_angle_deg;
 
     return true;
