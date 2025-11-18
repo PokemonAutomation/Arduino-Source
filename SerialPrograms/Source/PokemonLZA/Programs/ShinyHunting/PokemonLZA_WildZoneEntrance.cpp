@@ -9,6 +9,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Globals.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -421,7 +422,18 @@ void leave_zone_and_reset_spawns(
     // Mash A to leave Zone.
     env.log("Found button A. Leaving Zone");
     env.console.overlay().add_log("Found Button A. Leaving Zone");
-    pbf_mash_button(context, BUTTON_A, 2000ms);
+    
+    // XXX TODO day night change can eat button A that leaves the zone
+    
+    overworld_watcher.reset_state();
+    run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_A, 1s);
+        },
+        {{overworld_watcher}}
+    );
+    pbf_wait(context, 600ms);
     context.wait_for_all_requests();
     shiny_sound_handler.process_pending(context);
 
@@ -563,7 +575,13 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                     consecutive_failures++;
                     env.log("Consecutive failures: " + std::to_string(consecutive_failures), COLOR_RED);
                     if (consecutive_failures >= 3){
-                        go_home(env.console, context);
+                        if (PreloadSettings::instance().DEVELOPER_MODE && GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
+                            env.log("Saving debug video on Switch...");
+                            env.console.overlay().add_log("Save Debug Video on Switch");
+                            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+                            context.wait_for_all_requests();
+                        }
+                        go_home(env.console, context); // go Home to preserve game state for debugging
                         throw;
                     }
                     env.log("Error encountered. Resetting...", COLOR_RED);
