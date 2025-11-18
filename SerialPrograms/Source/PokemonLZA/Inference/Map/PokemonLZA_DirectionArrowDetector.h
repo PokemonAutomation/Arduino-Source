@@ -9,6 +9,7 @@
 
 #include <chrono>
 #include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/VisualDetector.h"
 
@@ -27,8 +28,21 @@ public:
     //  This is not const so that detectors can save/cache state.
     virtual bool detect(const ImageViewRGB32& screen) override;
 
+    // Get the last detected angle in degrees [0, 360)
+    // Returns -1 if no arrow was detected
+    double detected_angle() const { return m_detected_angle; }
+
+    // Check if arrow is present in the last detection
+    bool is_arrow_present() const { return m_arrow_present; }
+
 private:
-    // TODO: Add member variables for implementation
+    Color m_color;
+    VideoOverlay* m_overlay;
+    ImageFloatBox m_search_box;
+
+    // Detection results
+    bool m_arrow_present;
+    double m_detected_angle;  // in degrees [0, 360), or -1 if not detected
 };
 
 class DirectionArrowWatcher : public DetectorToFinder<DirectionArrowDetector>{

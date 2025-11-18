@@ -41,6 +41,8 @@
 
  int test_pokemonLZA_OverworldPartySelectionDetector(const ImageViewRGB32& image, const std::vector<std::string>& words);
 
+ int test_pokemonLZA_DirectionArrowDetector(const ImageViewRGB32& image, int target_angle);
+
  }
 
  #endif
