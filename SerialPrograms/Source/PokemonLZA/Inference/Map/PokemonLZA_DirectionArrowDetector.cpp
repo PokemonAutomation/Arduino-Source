@@ -138,65 +138,182 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
     }
 
 #ifdef DEBUG_DIRECTION_ARROW
-    cout << "Using " << points.size() << " pixels from largest component for PCA" << endl;
+    cout << "Using " << points.size() << " pixels from largest component" << endl;
 #endif
-    // Perform PCA
-    cv::Mat data_pts = cv::Mat(static_cast<int>(points.size()), 2, CV_32F);
-    for (size_t i = 0; i < points.size(); ++i){
-        data_pts.at<float>(static_cast<int>(i), 0) = points[i].x;
-        data_pts.at<float>(static_cast<int>(i), 1) = points[i].y;
+
+    // Find convex hull to get the arrow outline
+    std::vector<cv::Point> points_int;
+    points_int.reserve(points.size());
+    for (const auto& pt : points){
+        points_int.push_back(cv::Point(static_cast<int>(pt.x), static_cast<int>(pt.y)));
     }
 
-    cv::PCA pca_analysis(data_pts, cv::Mat(), cv::PCA::DATA_AS_ROW);
+    std::vector<cv::Point> hull;
+    cv::convexHull(points_int, hull);
 
-    // Get the centroid and principal axis
-    cv::Point2f center(pca_analysis.mean.at<float>(0, 0), pca_analysis.mean.at<float>(0, 1));
-    cv::Point2f eigenvec(pca_analysis.eigenvectors.at<float>(0, 0), pca_analysis.eigenvectors.at<float>(0, 1));
+    // Calculate centroid of arrow pixels
+    cv::Point2f arrow_center(0, 0);
+    for (const auto& pt : points){
+        arrow_center.x += pt.x;
+        arrow_center.y += pt.y;
+    }
+    arrow_center.x /= points.size();
+    arrow_center.y /= points.size();
 
 #ifdef DEBUG_DIRECTION_ARROW
-    cout << "PCA center (centroid): (" << center.x << ", " << center.y << ")" << endl;
-    cout << "PCA principal eigenvector: (" << eigenvec.x << ", " << eigenvec.y << ")" << endl;
+    cout << "Arrow center: (" << arrow_center.x << ", " << arrow_center.y << ")" << endl;
+    cout << "Convex hull has " << hull.size() << " points" << endl;
 #endif
 
-    // Determine arrow direction by counting pixels on each side of the eigenvector
-    // Arrow has more pixels at the base (wide) than tip (pointy)
-    // So if more pixels on positive side, arrow points to negative side
-    int positive_side_count = 0;
-    int negative_side_count = 0;
+    // Create a mask for the convex hull
+    cv::Mat hull_mask = cv::Mat::zeros(labels.size(), CV_8U);
+    std::vector<std::vector<cv::Point>> hull_contours;
+    hull_contours.push_back(hull);
+    cv::fillPoly(hull_mask, hull_contours, cv::Scalar(255));
 
-    for (const auto& pt : points){
-        // Vector from center to this pixel
-        cv::Point2f centered = pt - center;
-
-        // Dot product with eigenvector determines which side
-        float projection = centered.dot(eigenvec);
-
-        if (projection > 0){
-            positive_side_count++;
-        } else {
-            negative_side_count++;
+    // Find background pixels inside the convex hull
+    std::vector<cv::Point2f> background_pixels_in_hull;
+    for (int y = 0; y < labels.rows; ++y){
+        for (int x = 0; x < labels.cols; ++x){
+            // Check if pixel is inside hull but not part of the arrow
+            if (hull_mask.at<uint8_t>(y, x) > 0 && labels.at<int>(y, x) != largest_component){
+                background_pixels_in_hull.push_back(cv::Point2f(static_cast<float>(x), static_cast<float>(y)));
+            }
         }
     }
 
 #ifdef DEBUG_DIRECTION_ARROW
-    cout << "Pixels on positive side: " << positive_side_count << endl;
-    cout << "Pixels on negative side: " << negative_side_count << endl;
-#endif
-    // If more pixels on positive side, the base is there, so arrow points negative
-    // Flip the eigenvector to point towards the tip
-    if (positive_side_count > negative_side_count){
-        eigenvec = -eigenvec;
-#ifdef DEBUG_DIRECTION_ARROW
-        cout << "Arrow points in negative eigenvector direction (flipped)" << endl;
-#endif
-    } else {
-#ifdef DEBUG_DIRECTION_ARROW
-        cout << "Arrow points in positive eigenvector direction" << endl;
-#endif
+    cout << "Found " << background_pixels_in_hull.size() << " background pixels inside convex hull" << endl;
+
+    // Save convex hull visualization
+    cv::Mat hull_image = cv::Mat::zeros(labels.size(), CV_8UC3);
+    // Draw the filled arrow region in white
+    for (int y = 0; y < labels.rows; ++y){
+        for (int x = 0; x < labels.cols; ++x){
+            if (labels.at<int>(y, x) == largest_component){
+                hull_image.at<cv::Vec3b>(y, x) = cv::Vec3b(255, 255, 255);
+            }
+        }
+    }
+    // Draw convex hull in green
+    cv::drawContours(hull_image, hull_contours, 0, cv::Scalar(0, 255, 0), 2);
+
+    // Draw background pixels inside hull in blue
+    for (const auto& bg_pt : background_pixels_in_hull){
+        int x = static_cast<int>(bg_pt.x);
+        int y = static_cast<int>(bg_pt.y);
+        if (x >= 0 && x < hull_image.cols && y >= 0 && y < hull_image.rows){
+            hull_image.at<cv::Vec3b>(y, x) = cv::Vec3b(255, 0, 0); // Blue
+        }
     }
 
-    // Calculate and print eigenvector angle
-    double eigenvec_angle_deg = std::atan2(eigenvec.y, eigenvec.x) * 180.0 / CV_PI + 90.0;
+    // Draw arrow center in red
+    cv::circle(hull_image, cv::Point(static_cast<int>(arrow_center.x), static_cast<int>(arrow_center.y)),
+               3, cv::Scalar(0, 0, 255), -1);
+
+    cv::imwrite("./convex_hull.png", hull_image);
+    cout << "Saved convex hull visualization to ./convex_hull.png (before finding furthest pixel)" << endl;
+#endif
+
+    if (background_pixels_in_hull.empty()){
+#ifdef DEBUG_DIRECTION_ARROW
+        cout << "No background pixels found inside convex hull" << endl;
+#endif
+        return false;
+    }
+
+    // Compute average vector from arrow center to background pixels
+    cv::Point2f avg_vector(0, 0);
+    for (const auto& bg_pt : background_pixels_in_hull){
+        cv::Point2f vec = bg_pt - arrow_center;
+        avg_vector.x += vec.x;
+        avg_vector.y += vec.y;
+    }
+    avg_vector.x /= background_pixels_in_hull.size();
+    avg_vector.y /= background_pixels_in_hull.size();
+
+#ifdef DEBUG_DIRECTION_ARROW
+    cout << "Average vector to background pixels: (" << avg_vector.x << ", " << avg_vector.y << ")" << endl;
+#endif
+
+    // Negate the average vector to get arrow direction
+    // (background pixels are at the base/notch, opposite to arrow direction)
+    cv::Point2f direction = -avg_vector;
+
+#ifdef DEBUG_DIRECTION_ARROW
+    cout << "Initial arrow direction vector (negated): (" << direction.x << ", " << direction.y << ")" << endl;
+#endif
+
+    // Normalize the direction vector
+    float dir_length = std::sqrt(direction.x * direction.x + direction.y * direction.y);
+    if (dir_length < 0.001f){
+#ifdef DEBUG_DIRECTION_ARROW
+        cout << "Direction vector too small to normalize" << endl;
+#endif
+        return false;
+    }
+    cv::Point2f normalized_direction(direction.x / dir_length, direction.y / dir_length);
+
+    // Find the arrow pixel that is furthest along this direction
+    float max_projection = -std::numeric_limits<float>::max();
+    cv::Point2f furthest_pixel;
+
+    for (const auto& pt : points){
+        cv::Point2f vec = pt - arrow_center;
+        float projection = vec.dot(normalized_direction);
+
+        if (projection > max_projection){
+            max_projection = projection;
+            furthest_pixel = pt;
+        }
+    }
+
+#ifdef DEBUG_DIRECTION_ARROW
+    cout << "Furthest pixel along direction: (" << furthest_pixel.x << ", " << furthest_pixel.y << ")" << endl;
+    cout << "Projection distance: " << max_projection << endl;
+#endif
+
+    // Refine the direction by using vector from arrow center to furthest pixel
+    cv::Point2f refined_direction = furthest_pixel - arrow_center;
+
+#ifdef DEBUG_DIRECTION_ARROW
+    cout << "Refined arrow direction vector: (" << refined_direction.x << ", " << refined_direction.y << ")" << endl;
+
+    // Create final visualization with arrow direction
+    cv::Mat final_image = cv::Mat::zeros(labels.size(), CV_8UC3);
+    // Draw the filled arrow region in white
+    for (int y = 0; y < labels.rows; ++y){
+        for (int x = 0; x < labels.cols; ++x){
+            if (labels.at<int>(y, x) == largest_component){
+                final_image.at<cv::Vec3b>(y, x) = cv::Vec3b(255, 255, 255);
+            }
+        }
+    }
+    // Draw convex hull in green
+    std::vector<std::vector<cv::Point>> hull_viz;
+    hull_viz.push_back(hull);
+    cv::drawContours(final_image, hull_viz, 0, cv::Scalar(0, 255, 0), 1);
+
+    // Draw arrow center in red
+    cv::circle(final_image, cv::Point(static_cast<int>(arrow_center.x), static_cast<int>(arrow_center.y)),
+               3, cv::Scalar(0, 0, 255), -1);
+
+    // Draw furthest pixel in cyan
+    cv::circle(final_image, cv::Point(static_cast<int>(furthest_pixel.x), static_cast<int>(furthest_pixel.y)),
+               3, cv::Scalar(255, 255, 0), -1);
+
+    // Draw arrow direction line from center to furthest pixel in yellow
+    cv::line(final_image,
+             cv::Point(static_cast<int>(arrow_center.x), static_cast<int>(arrow_center.y)),
+             cv::Point(static_cast<int>(furthest_pixel.x), static_cast<int>(furthest_pixel.y)),
+             cv::Scalar(0, 255, 255), 2);
+
+    cv::imwrite("./arrow_direction.png", final_image);
+    cout << "Saved arrow direction visualization to ./arrow_direction.png" << endl;
+#endif
+
+    // Calculate angle from refined direction vector
+    double eigenvec_angle_deg = std::atan2(refined_direction.y, refined_direction.x) * 180.0 / CV_PI + 90.0;
     while (eigenvec_angle_deg < 0.0){
         eigenvec_angle_deg += 360.0;
     }
