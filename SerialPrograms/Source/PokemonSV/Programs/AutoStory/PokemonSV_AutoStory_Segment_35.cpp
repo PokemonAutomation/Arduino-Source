@@ -37,7 +37,7 @@ std::string AutoStory_Segment_35::start_text() const{
 }
 
 std::string AutoStory_Segment_35::end_text() const{
-    return "End: At Area Zero Station 1. Deactivated the locks.";
+    return "End: Inside Area Zero Station 1. Deactivated the locks.";
 }
 
 void AutoStory_Segment_35::run_segment(
@@ -79,7 +79,7 @@ void AutoStory_Checkpoint_94::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 std::string AutoStory_Checkpoint_95::name() const{ return "095 - " + AutoStory_Segment_35().name(); }
 std::string AutoStory_Checkpoint_95::start_text() const{ return AutoStory_Checkpoint_94().end_text();}
-std::string AutoStory_Checkpoint_95::end_text() const{ return "At Area Zero Station 1. Deactivated the locks.";}
+std::string AutoStory_Checkpoint_95::end_text() const{ return "Inside Area Zero Station 1. Deactivated the locks.";}
 void AutoStory_Checkpoint_95::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_95(env, context, options.notif_status_update, stats);
 }
@@ -246,8 +246,6 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/yolo_area0_station1.onnx");
 
-        #if 0
-        #endif
 
         move_player_forward(env, context, 6,
             [&](){
@@ -656,21 +654,26 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 }
 
 void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    // [&](size_t attempt_number){
-        #if 0
-        move_player_forward(env, context, 5,
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+        
+
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/station-door-1.onnx");
+        move_player_forward(env, context, 4,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
             }, 
             true
         );
-        // pbf_move_left_joystick(context, 0, 128, 200, 50);
-        // clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::BLACK_DIALOG_BOX});
         
-        pbf_move_left_joystick(context, 0, 128, 10, 0);
-        pbf_press_button(context, BUTTON_L, 20, 20);
-        #endif
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "station-door-1", 0, 50);
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-door-1", 0.5,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        
 
         // enter Station 1
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 20);
@@ -682,7 +685,7 @@ void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         
         
 
-    // });     
+    });     
 }
 
 // void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
