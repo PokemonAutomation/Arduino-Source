@@ -65,6 +65,12 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
 // day/night change transition animation and is back to overworld.
 void sit_on_bench(ConsoleHandle& console, ProControllerContext& context);
 
+// default wait time is long enough to wait for day/night change to end
+void wait_until_overworld(
+    ConsoleHandle& console, ProControllerContext& context,
+    std::chrono::milliseconds max_wait_time = std::chrono::seconds(40)
+);
+
 
 }
 }

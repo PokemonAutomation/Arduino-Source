@@ -340,6 +340,28 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
 }
 
 
+void wait_until_overworld(
+    ConsoleHandle& console, ProControllerContext& context,
+    std::chrono::milliseconds max_wait_time
+){
+    OverworldPartySelectionWatcher overworld;
+    int ret = wait_until(
+        console, context,
+        max_wait_time,
+        {overworld}
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "wait_until_overworld(): Unable to detect overworld after " + 
+                std::to_string(max_wait_time.count()) + " milliseconds.",
+            console
+        );
+    }
+    console.log("Detected overworld after day night change.");
+    context.wait_for(100ms); // extra 0.1 sec to let game give player control
+}
+
 
 }
 }
