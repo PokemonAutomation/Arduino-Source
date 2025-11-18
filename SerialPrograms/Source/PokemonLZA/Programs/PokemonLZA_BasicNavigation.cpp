@@ -360,7 +360,7 @@ void wait_until_overworld(
             console
         );
     }
-    console.log("Detected overworld after day night change.");
+    console.log("Detected overworld within " + std::to_string(max_wait_time.count()) + " milliseconds");
     context.wait_for(100ms); // extra 0.1 sec to let game give player control
 }
 
