@@ -97,6 +97,18 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
 #ifdef DEBUG_DIRECTION_ARROW
     cout << "Found " << num_components - 1 << " connected components" << endl;
     cout << "Largest component: " << largest_component << " with " << largest_area << " pixels" << endl;
+
+    // Save mask with only the largest component for debugging
+    cv::Mat largest_comp_mask = cv::Mat::zeros(labels.size(), CV_8U);
+    for (int y = 0; y < labels.rows; ++y){
+        for (int x = 0; x < labels.cols; ++x){
+            if (labels.at<int>(y, x) == largest_component){
+                largest_comp_mask.at<uint8_t>(y, x) = 255;
+            }
+        }
+    }
+    cv::imwrite("./cyan_filter_largest_comp.png", largest_comp_mask);
+    cout << "Saved largest component mask to ./cyan_filter_largest_comp.png" << endl;
 #endif
 
     // Extract all pixels from the largest connected component for PCA
