@@ -28,6 +28,9 @@ import numpy as np
 
 class ImageViewer:
 	def __init__(self, image: np.ndarray, highlight_list = []):
+		if image.ndim == 2:
+			# convert gray scale image to RGB image
+			image = cv2.cvtColor(image, cv2.COLOR_GRAY2BGR)
 		self.image = image  # bgr or bgra channel order
 		self.nc = image.shape[2]  # num_channel
 		if self.nc == 4:
@@ -99,7 +102,7 @@ class ImageViewer:
 			if i == 0 or dist < min_dist:
 				min_dist = dist
 				self.cur_rect_index = i
-		print(f"Selected rect No.{self.cur_rect_index}/{len(self.rects)}: {rect}.")
+		print(f"Selected rect No.{self.cur_rect_index}/{len(self.rects)}: {self.rects[self.cur_rect_index]}.")
 
 	def _print_pixel(self, coord):
 		p = self.image[coord[1], coord[0]]
@@ -107,7 +110,7 @@ class ImageViewer:
 		if self.nc == 4:
 			msg += f"argb=[{p[3]}, {p[2]}, {p[1]}, {p[0]}], {hex(((int(p[3])*256+int(p[2]))*256+int(p[1]))*256+int(p[0]))}"
 		else:
-			mgs += f"rgb=[{p[2]}, {p[1]}, {p[0]}]"
+			msg += f"rgb=[{p[2]}, {p[1]}, {p[0]}]"
 		p = self.hsv_image[coord[1], coord[0]]
 		msg += f", hsv=[{p[0]}, {p[1]}, {p[2]}]"
 		print(msg)
@@ -134,14 +137,6 @@ class ImageViewer:
 
 		stddev_sum = np.sum(crop_stddev)
 		print(f"Rect No.{i}, ({x:.3f}, {y:.3f}, {w:.3f}, {h:.3f}) rgb ratio: {avg_ratio[0]:.3f}:{avg_ratio[1]:.3f}:{avg_ratio[2]:.3f}, stddev sum: {stddev_sum:.3g}")
-
-	def _move_crop(self, o0, o1, o2, o3):
-		if self.cur_crop_index >= 0 and self.cur_crop_index < len(self.crops):
-			self.crops[self.cur_crop_index][0] += o0
-			self.crops[self.cur_crop_index][1] += o1
-			self.crops[self.cur_crop_index][2] += o2
-			self.crops[self.cur_crop_index][3] += o3
-			self._render()
 
 	def _mouse_callback(self, event, x, y, flags, param):
 		redraw = False
@@ -235,7 +230,7 @@ class ImageViewer:
 				mouse_move_counter = 0
 				if len(self.rects) > 0:
 					if self.cur_rect_index < 0:
-						self.cur_rect_index = len(self.crops) - 1
+						self.cur_rect_index = len(self.rects) - 1
 					del self.rects[self.cur_rect_index]
 					if len(self.rects) == 0:
 						self.cur_rect_index = -1
@@ -256,6 +251,7 @@ if __name__ == '__main__':
 
 	# bgr or bgra channel order
 	image = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
+	assert image is not None
 
 	height = image.shape[0]
 	width = image.shape[1]
