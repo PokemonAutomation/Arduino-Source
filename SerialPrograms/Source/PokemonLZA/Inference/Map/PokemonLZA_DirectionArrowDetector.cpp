@@ -92,11 +92,14 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
     double screen_rel_size = (screen.height() / 1080.0);
     double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 
-    double min_area_1080p = 200.0;
-    size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
-    if (points.size() < min_area){
+    // For 1080P screenshots, the arrow takes about 300 pixels
+    double min_area_1080p = 250.0, max_area_1080p = 350.0;
+    const size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
+    const size_t max_area = size_t(screen_rel_size_2 * max_area_1080p);
+
+    if (points.size() < min_area || points.size() > max_area){
 #ifdef DEBUG_DIRECTION_ARROW
-        cout << "Not enough cyan pixels found: " << points.size() << " (minimum: " << min_area << ")" << endl;
+        cout << "Not cyan pixel count out of range: " << points.size() << " (" << min_area << "," << max_area << ")" << endl;
 #endif
         return false;
     }
