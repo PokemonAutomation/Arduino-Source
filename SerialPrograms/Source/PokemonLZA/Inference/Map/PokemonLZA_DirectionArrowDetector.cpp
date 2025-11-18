@@ -70,18 +70,46 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
     cout << "Saved cyan-filtered mask to ./cyan_filter.png" << endl;
 #endif
 
-    // Extract all cyan pixels from the mask for PCA
+    // Find connected components and select the largest one
+    cv::Mat labels, stats, centroids;
+    int num_components = cv::connectedComponentsWithStats(mask, labels, stats, centroids, 4, CV_32S);
+
+    if (num_components <= 1){
+        // No components found (component 0 is background)
+#ifdef DEBUG_DIRECTION_ARROW
+        cout << "No connected components found in cyan mask" << endl;
+#endif
+        return false;
+    }
+
+    // Find the largest connected component (excluding background at index 0)
+    int largest_component = 1;
+    int largest_area = stats.at<int>(1, cv::CC_STAT_AREA);
+
+    for (int i = 2; i < num_components; ++i){
+        int area = stats.at<int>(i, cv::CC_STAT_AREA);
+        if (area > largest_area){
+            largest_area = area;
+            largest_component = i;
+        }
+    }
+
+#ifdef DEBUG_DIRECTION_ARROW
+    cout << "Found " << num_components - 1 << " connected components" << endl;
+    cout << "Largest component: " << largest_component << " with " << largest_area << " pixels" << endl;
+#endif
+
+    // Extract all pixels from the largest connected component for PCA
     std::vector<cv::Point2f> points;
-    for (int y = 0; y < mask.rows; ++y){
-        for (int x = 0; x < mask.cols; ++x){
-            if (mask.at<uint8_t>(y, x) > 0){  // White pixel in mask (cyan pixel in original)
+    for (int y = 0; y < labels.rows; ++y){
+        for (int x = 0; x < labels.cols; ++x){
+            if (labels.at<int>(y, x) == largest_component){
                 points.push_back(cv::Point2f(static_cast<float>(x), static_cast<float>(y)));
             }
         }
     }
 
-    // Check if we found enough cyan pixels to be considered an arrow
-
+    // Check if the largest component is the right size to be an arrow
     double screen_rel_size = (screen.height() / 1080.0);
     double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 
@@ -90,14 +118,15 @@ bool DirectionArrowDetector::detect(const ImageViewRGB32& screen){
     const size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
     const size_t max_area = size_t(screen_rel_size_2 * max_area_1080p);
 
-    if (points.size() < min_area || points.size() > max_area){
+    if (static_cast<size_t>(largest_area) < min_area || static_cast<size_t>(largest_area) > max_area){
 #ifdef DEBUG_DIRECTION_ARROW
-        cout << "Not cyan pixel count out of range: " << points.size() << " (" << min_area << "," << max_area << ")" << endl;
+        cout << "Largest component size out of range: " << largest_area << " (" << min_area << "," << max_area << ")" << endl;
 #endif
         return false;
     }
+
 #ifdef DEBUG_DIRECTION_ARROW
-    cout << "Found " << points.size() << " cyan pixels for PCA" << endl;
+    cout << "Using " << points.size() << " pixels from largest component for PCA" << endl;
 #endif
     // Perform PCA
     cv::Mat data_pts = cv::Mat(static_cast<int>(points.size()), 2, CV_32F);
