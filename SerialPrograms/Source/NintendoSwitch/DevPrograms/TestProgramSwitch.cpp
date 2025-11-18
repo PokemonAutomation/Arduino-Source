@@ -295,13 +295,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
-
+#if 0
     auto snapshot = feed.snapshot();
     cout << snapshot->width() << " x " << snapshot->height() << endl;
 
     RunFromBattleDetector detector(COLOR_RED, &overlay);
     cout << detector.detect(snapshot) << endl;
-
+#endif
 
 #if 0
 close_game_from_home(console, context);
@@ -350,7 +350,7 @@ close_game_from_home(console, context);
 #endif
 
 
-#if 0
+#if 1
     MapIconDetector detector0(COLOR_RED, MapIconType::PokemonCenter, {0, 0, 1, 1}, &overlay);
     MapIconDetector detector1(COLOR_RED, MapIconType::Building, {0, 0, 1, 1}, &overlay);
     MapIconDetector detector2(COLOR_RED, MapIconType::BuildingFlyable, {0, 0, 1, 1}, &overlay);
@@ -362,12 +362,12 @@ close_game_from_home(console, context);
 
     auto snapshot = feed.snapshot();
     detector0.detect(snapshot);
-    detector1.detect(snapshot);
-    detector2.detect(snapshot);
-    detector3.detect(snapshot);
-    detector4.detect(snapshot);
-    detector5.detect(snapshot);
-    detector6.detect(snapshot);
+//    detector1.detect(snapshot);
+//    detector2.detect(snapshot);
+//    detector3.detect(snapshot);
+//    detector4.detect(snapshot);
+//    detector5.detect(snapshot);
+//    detector6.detect(snapshot);
 #endif
 
 
