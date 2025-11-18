@@ -209,7 +209,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
 //    WallClock start = current_time();
 
     bool won = false;
-    Milliseconds rotate_duration = 100ms;
+    TrainerBattleState battle_state;
 
     while (true){
         ButtonWatcher buttonA(
@@ -284,7 +284,10 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
 
         case 5:
             env.log("Detected battle menu.");
-            if (attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES)){
+#if 1
+            battle_state.attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES);
+#else
+            if (battle_state.attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES)){
                 rotate_duration = 100ms;
             }else{
                 env.log("Failed to select move. Rotating camera...", COLOR_ORANGE);
@@ -300,6 +303,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
                     rotate_duration = 100ms;
                 }
             }
+#endif
             continue;
 
         default:

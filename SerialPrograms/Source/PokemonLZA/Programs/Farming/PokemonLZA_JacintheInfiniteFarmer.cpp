@@ -260,6 +260,7 @@ void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProC
     JacintheInfiniteFarmer_Descriptor::Stats& stats = env.current_stats<JacintheInfiniteFarmer_Descriptor::Stats>();
 
     WallClock start = current_time();
+    TrainerBattleState battle_state;
 
     while (true){
         context.wait_for_all_requests();
@@ -271,7 +272,12 @@ void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProC
             [&](ProControllerContext& context){
                 while (current_time() - start < 30min){
                     const bool allow_button_B_press = false;
-                    attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES, allow_button_B_press);
+                    battle_state.attempt_one_attack(
+                        env, context,
+                        MOVE_AI,
+                        USE_PLUS_MOVES,
+                        allow_button_B_press
+                    );
                 }
             },
             {

@@ -19,9 +19,19 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
-bool attempt_one_attack(
-    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    bool use_move_ai, bool use_plus_moves, bool allow_button_B_press
+TrainerBattleState::TrainerBattleState()
+    : m_consecutive_failures(0)
+{}
+
+
+
+
+bool TrainerBattleState::attempt_one_attack(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    bool use_move_ai,
+    bool use_plus_moves,
+    bool allow_button_B_press
 ){
     AsyncCommandSession<ProController> command(
         context,
@@ -49,6 +59,10 @@ bool attempt_one_attack(
             // It could be the game is in a transparent pre-battle dialog,
             // press B to clear it.
             pbf_press_button(context, BUTTON_B, 160ms, 80ms);
+        }
+        m_consecutive_failures++;
+        if (m_consecutive_failures >= 3){
+            run_lock_recovery(env.console, context);
         }
         return false;
     }
@@ -96,8 +110,35 @@ bool attempt_one_attack(
 
     command.wait();
     command.stop_session_and_rethrow();
+    m_consecutive_failures = 0;
     return true;
 }
+
+
+
+
+void TrainerBattleState::run_lock_recovery(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Failed to lock on. Rotating camera...", COLOR_RED);
+
+    ssf_press_right_joystick(context, 0, 128, 0ms, 1000ms, 0ms);
+    pbf_mash_button(context, BUTTON_ZL, 1000ms);
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }
