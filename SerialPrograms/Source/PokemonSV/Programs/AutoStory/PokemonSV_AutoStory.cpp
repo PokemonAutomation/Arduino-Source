@@ -128,7 +128,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_35>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_36>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_36>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_37>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_38>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
@@ -300,8 +300,8 @@ std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_lis
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_93>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_94>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_95>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_96>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_97>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_96>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_97>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_98>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_99>());
     }
@@ -1021,6 +1021,10 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_93(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_94(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_95(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_96(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_97(env, context, notif_status_update, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_95(env, context, notif_status_update, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_95(env, context, notif_status_update, stats);});
     
     
     if (end == 0){
