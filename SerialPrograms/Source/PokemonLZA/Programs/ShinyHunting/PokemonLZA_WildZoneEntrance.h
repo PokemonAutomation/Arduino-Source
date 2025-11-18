@@ -58,6 +58,8 @@ private:
 
     // Record when we should zoom out the map for flyable fast travel icon detection on map during fast traveling.
     bool to_max_zoom_level_on_map = true;
+    // Record the direction the character facing when the program starts
+    double m_starting_angle = -1.0;
 };
 
 

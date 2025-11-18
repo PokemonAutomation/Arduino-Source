@@ -8,6 +8,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -17,6 +18,7 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
@@ -158,6 +160,28 @@ void ShinyHunt_WildZoneEntrance::on_config_value_changed(void* object){
     }
 }
 
+double get_current_facing_angle(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context
+){
+    DirectionArrowWatcher arrow_watcher(COLOR_YELLOW, std::chrono::milliseconds(100));
+    int ret = wait_until(
+        env.console, context,
+        std::chrono::seconds(1),
+        {arrow_watcher}
+    );
+    if (ret == 0){
+        double angle = arrow_watcher.detected_angle_deg();
+        env.log("Direction arrow detected! Angle: " + tostr_fixed(angle, 0) + " degrees");
+        env.console.overlay().add_log("Minimap Arrow: " + tostr_fixed(angle, 0) + " deg", COLOR_YELLOW);
+        return angle;
+    } else {
+        env.log("Direction arrow not detected within 1 second");
+        env.console.overlay().add_log("No Minimap Arrow Found", COLOR_RED);
+        return -1.0;
+    }
+}
+
 // After fast travel, move forward to enter wild zone.
 // This function is robust against day/night changes
 void go_to_entrance(
@@ -234,7 +258,8 @@ void leave_zone_and_reset_spawns(
     Milliseconds walk_time_in_zone,
     WildZone wild_zone,
     ShinySoundHandler& shiny_sound_handler,
-    bool to_max_zoom_level_on_map
+    bool to_max_zoom_level_on_map,
+    double starting_angle
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
@@ -279,7 +304,17 @@ void leave_zone_and_reset_spawns(
     // we are being attacked by wild pokemon.
     
     // mash B to close map and return to overworld
-    pbf_mash_button(context, BUTTON_B, 1600ms);
+    OverworldPartySelectionWatcher overworld_watcher(COLOR_WHITE, &env.console.overlay());
+    run_until<ProControllerContext>(
+        env.console, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, 2s);
+        },
+        {{overworld_watcher}}
+    );
+    pbf_wait(context, 100ms);
+    context.wait_for_all_requests();
+
     walk_time_in_zone += 2s; // give some extra time
     env.log("Escaping");
     env.console.overlay().add_log("Escaping Back to Entrance");
@@ -287,6 +322,7 @@ void leave_zone_and_reset_spawns(
     env.update_stats();
 
     ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
+    OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &env.console.overlay());
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [&walk_time_in_zone](ProControllerContext& context){
@@ -294,9 +330,74 @@ void leave_zone_and_reset_spawns(
             ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
             pbf_move_left_joystick(context, 128, 255, walk_time_in_zone, 0ms);
         },
-        {{buttonA}}
+        {{buttonA, overworld_gone}}
     );
-    if (ret != 0){
+    switch (ret){
+    case 0:
+        break;
+    case 1:
+        env.log("Day/night change happened while escaping");
+        env.console.overlay().add_log("Day/Night Change Detected");
+        {
+            wait_until_overworld(env.console, context);
+            double current_facing_angle = get_current_facing_angle(env, context);
+            if (current_facing_angle < 0){
+                throw UserSetupError(
+                    env.logger(),
+                    "This program requires that you do not get attacked. "
+                    "Please choose a location/route that is safe from attack."
+                );
+            }
+            double angle_between = std::fabs(starting_angle - current_facing_angle);
+            if (angle_between > 180.0){
+                angle_between = 360.0 - angle_between;
+            }
+            env.log("Facing angle difference after day/night change: " + tostr_fixed(angle_between, 0) + " deg, from "
+                + tostr_fixed(starting_angle, 0) + " to " + tostr_fixed(current_facing_angle, 0) + " deg");
+            
+            buttonA.reset_state();
+            uint8_t joystick_y = 0;
+            if (angle_between > 150.0){
+                // we are facing towards the gate
+                env.log("Running forward");
+                env.console.overlay().add_log("Running Forward");
+                joystick_y = 0;
+            }else if(angle_between < 30.0){
+                // we are facing away from the gate
+                env.log("Running back");
+                env.console.overlay().add_log("Running Back");
+                joystick_y = 255;
+            }else{
+                stats.errors++;
+                env.update_stats();
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "leave_zone_and_reset_spawns(): Facing direction after day/night change is wrong: " + tostr_fixed(angle_between, 0) + " deg",
+                    env.console
+                );
+            }
+
+            ret = run_until<ProControllerContext>(
+                env.console, context,
+                [&walk_time_in_zone, &joystick_y](ProControllerContext& context){
+                    // running forward
+                    ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
+                    pbf_move_left_joystick(context, 128, joystick_y, walk_time_in_zone, 0ms);
+                },
+                {{buttonA}}
+            );
+            if (ret != 0){
+                stats.errors++;
+                env.update_stats();
+                throw UserSetupError(
+                    env.logger(),
+                    "This program requires that you do not get attacked. "
+                    "Please choose a location/route that is safe from attack."
+                );
+            }
+        }
+        break;
+    default:
         stats.errors++;
         env.update_stats();
 #if 0
@@ -349,8 +450,10 @@ void do_one_wild_zone_trip(
     bool running,
     WildZone wild_zone,
     ShinySoundHandler& shiny_sound_handler,
-    bool to_max_zoom_level_on_map
+    bool to_max_zoom_level_on_map,
+    double starting_angle
 ){
+    env.log("Starting one wild zone trip");
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
     context.wait_for_all_requests();
     shiny_sound_handler.process_pending(context);
@@ -365,25 +468,11 @@ void do_one_wild_zone_trip(
         pbf_mash_button(context, BUTTON_A, 2000ms);
         context.wait_for_all_requests();
 
-        {
-            // Wait for the overworld party view to be back. That is when
-            // the player is given control again after the entering gate animation.
-            OverworldPartySelectionWatcher overworld;
-            int ret = wait_until(
-                env.console, context,
-                std::chrono::seconds(50), // wait for 50 sec to account for possible day/night change happening
-                {overworld}
-            );
-            if (ret < 0){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "do_one_wild_zone_trip(): Unable to detect overworld after entering zone.",
-                    env.console
-                );
-            }
-            env.console.log("Detected overworld after entering zone.");
-        }
-        context.wait_for(100ms);
+        // Wait for the overworld party view to be back. That is when
+        // the player is given control again after the entering gate animation.
+        // We use 50s here to account for day night change
+        wait_until_overworld(env.console, context, 50s);
+        env.console.log("Detected overworld after entering zone.");
 
         shiny_sound_handler.process_pending(context);
         // Day/night change can happen before or after the button A mash, so we are not
@@ -411,7 +500,8 @@ void do_one_wild_zone_trip(
             env, context,
             walk_time_in_zone, wild_zone,
             shiny_sound_handler,
-            to_max_zoom_level_on_map
+            to_max_zoom_level_on_map,
+            starting_angle
         );
     }
 
@@ -428,6 +518,9 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
 
     // Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 500ms);
+
+    // Detect direction arrow to test the detector
+    m_starting_angle = get_current_facing_angle(env, context);
 
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
@@ -456,7 +549,8 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                         env, context, 
                         MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE,
                         shiny_sound_handler,
-                        to_max_zoom_level_on_map
+                        to_max_zoom_level_on_map,
+                        m_starting_angle
                     );
                     // Fast travel auto saves the game. So now the map is fixed at max zoom level.
                     // We no longer needs to zoom in future.
