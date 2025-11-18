@@ -56,6 +56,7 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
 FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context);
 
 // Blind movement of map cursor from zone entrance to that zone fast travel icon on map
+// this blind movement only works on max zoom level (fully zoomed out)!
 void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, WildZone zone);
 
 

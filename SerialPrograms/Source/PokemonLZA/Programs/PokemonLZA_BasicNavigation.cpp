@@ -225,7 +225,7 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
     pbf_wait(context, 300ms);
     switch(zone){
     case WildZone::WILD_ZONE_1:
-        pbf_move_left_joystick(context, 0, 150, 230ms, 0ms);
+        pbf_move_left_joystick(context, 0, 150, 120ms, 0ms);
         break;
     case WildZone::WILD_ZONE_2:
         pbf_move_left_joystick(context, 120, 0, 100ms, 0ms);
