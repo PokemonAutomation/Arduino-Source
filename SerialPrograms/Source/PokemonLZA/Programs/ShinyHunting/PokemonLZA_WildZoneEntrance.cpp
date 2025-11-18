@@ -371,7 +371,7 @@ void do_one_wild_zone_trip(
             OverworldPartySelectionWatcher overworld;
             int ret = wait_until(
                 env.console, context,
-                std::chrono::seconds(10),
+                std::chrono::seconds(50), // wait for 50 sec to account for possible day/night change happening
                 {overworld}
             );
             if (ret < 0){
