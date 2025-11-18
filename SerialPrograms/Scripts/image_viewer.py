@@ -27,9 +27,14 @@ import cv2
 import numpy as np
 
 class ImageViewer:
-	def __init__(self, image, highlight_list = []):
-		self.image = image
-		self.hsv_image = cv2.cvtColor(image, cv2.COLOR_RGB2HSV)
+	def __init__(self, image: np.ndarray, highlight_list = []):
+		self.image = image  # bgr or bgra channel order
+		self.nc = image.shape[2]  # num_channel
+		if self.nc == 4:
+			alpha_free_image = cv2.cvtColor(image, cv2.COLOR_BGRA2BGR)
+		else:
+			alpha_free_image = image
+		self.hsv_image = cv2.cvtColor(alpha_free_image, cv2.COLOR_BGR2HSV)
 		self.selected_pixel = (-1, -1)
 		self.buffer = image.copy()
 		self.window_name = 'image'
@@ -41,7 +46,6 @@ class ImageViewer:
 		self.cur_rect_index = -1
 		self.mouse_down = False
 		self.mouse_move_counter = 0
-		self.nc = image.shape[2]  # num_channel
 		# The size of the cross used to highlight a selected pixel
 		self.cross_size = max(1, min(self.width, self.height) // 200)
 
@@ -105,7 +109,7 @@ class ImageViewer:
 		else:
 			mgs += f"rgb=[{p[2]}, {p[1]}, {p[0]}]"
 		p = self.hsv_image[coord[1], coord[0]]
-		msg += f", hsv=[{p[2]}, {p[1]}, {p[0]}]"
+		msg += f", hsv=[{p[0]}, {p[1]}, {p[2]}]"
 		print(msg)
 
 	def _print_rect(self, i, rect):
@@ -250,6 +254,7 @@ if __name__ == '__main__':
 
 	filename = sys.argv[1]
 
+	# bgr or bgra channel order
 	image = cv2.imread(filename, cv2.IMREAD_UNCHANGED)
 
 	height = image.shape[0]
