@@ -180,7 +180,7 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
         case 0:
         case 1:
             console.log("Flying from map... Started!");
-            console.overlay().add_log("Fast traveling");
+            console.overlay().add_log("Fast Traveling");
             break;
         case 2:
             console.log("Spotted by wild pokemon, cannot fly");
