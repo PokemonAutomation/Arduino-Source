@@ -55,9 +55,19 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
 //   returns, the game is in fly map.
 FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context);
 
+// Fast travel without moving map cursor.
+// This is useful to fast travel back to the wild zone gate while in the zone.
+// This function basically just calls `open_map()` and `fly_from_map()`. See the comments of those two
+// functions for details.
+FastTravelState open_map_and_fly_in_place(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max = false);
+
 // Blind movement of map cursor from zone entrance to that zone fast travel icon on map
 // this blind movement only works on max zoom level (fully zoomed out)!
 void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, WildZone zone);
+
+// Mash button B to leave map view and back to overworld
+// If there is a day/night change, this function will wait for day/night change to finish.
+void map_to_overworld(ConsoleHandle& console, ProControllerContext& context);
 
 
 // Assuming the player character is facing the bench with buton A available, this function
