@@ -390,6 +390,7 @@ void move_player_forward(
 );
 
 // get the box of the target object
+// if multiple objects have the same label, choose the one with the highest score
 // return ImageFloatBox{-1, -1, -1, -1} if target object not found
 ImageFloatBox get_yolo_box(
     SingleSwitchProgramEnvironment& env, 

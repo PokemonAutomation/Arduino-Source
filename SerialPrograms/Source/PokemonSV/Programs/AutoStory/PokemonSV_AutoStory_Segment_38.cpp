@@ -59,7 +59,65 @@ void AutoStory_Segment_38::run_segment(
 
 }
 
+std::string AutoStory_Checkpoint_100::name() const{ return "0100 - " + AutoStory_Segment_38().name(); }
+std::string AutoStory_Checkpoint_100::start_text() const{ return "";}
+std::string AutoStory_Checkpoint_100::end_text() const{ return "";}
+void AutoStory_Checkpoint_100::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_100(env, context, options.notif_status_update, stats);
+}
 
+std::string AutoStory_Checkpoint_101::name() const{ return "0101 - " + AutoStory_Segment_38().name(); }
+std::string AutoStory_Checkpoint_101::start_text() const{ return "";}
+std::string AutoStory_Checkpoint_101::end_text() const{ return "";}
+void AutoStory_Checkpoint_101::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_101(env, context, options.notif_status_update, stats);
+}
+
+std::string AutoStory_Checkpoint_102::name() const{ return "0102 - " + AutoStory_Segment_38().name(); }
+std::string AutoStory_Checkpoint_102::start_text() const{ return "";}
+std::string AutoStory_Checkpoint_102::end_text() const{ return "";}
+void AutoStory_Checkpoint_102::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_102(env, context, options.notif_status_update, stats);
+}
+
+// std::string AutoStory_Checkpoint_103::name() const{ return "0103 - " + AutoStory_Segment_3().name(); }
+// std::string AutoStory_Checkpoint_103::start_text() const{ return "";}
+// std::string AutoStory_Checkpoint_103::end_text() const{ return "";}
+// void AutoStory_Checkpoint_103::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+//     checkpoint_103(env, context, options.notif_status_update, stats);
+// }
+
+// std::string AutoStory_Checkpoint_104::name() const{ return "0104 - " + AutoStory_Segment_3().name(); }
+// std::string AutoStory_Checkpoint_104::start_text() const{ return "";}
+// std::string AutoStory_Checkpoint_104::end_text() const{ return "";}
+// void AutoStory_Checkpoint_104::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+//     checkpoint_104(env, context, options.notif_status_update, stats);
+// }
+
+// std::string AutoStory_Checkpoint_105::name() const{ return "0105 - " + AutoStory_Segment_3().name(); }
+// std::string AutoStory_Checkpoint_105::start_text() const{ return "";}
+// std::string AutoStory_Checkpoint_105::end_text() const{ return "";}
+// void AutoStory_Checkpoint_105::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+//     checkpoint_105(env, context, options.notif_status_update, stats);
+// }
+
+void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
+
+void checkpoint_105(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+}
 
 }
 }

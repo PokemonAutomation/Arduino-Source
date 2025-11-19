@@ -84,33 +84,6 @@ void AutoStory_Checkpoint_95::run_checkpoint(SingleSwitchProgramEnvironment& env
     checkpoint_95(env, context, options.notif_status_update, stats);
 }
 
-// std::string AutoStory_Checkpoint_96::name() const{ return "096 - " + AutoStory_Segment_3().name(); }
-// std::string AutoStory_Checkpoint_96::start_text() const{ return "";}
-// std::string AutoStory_Checkpoint_96::end_text() const{ return "";}
-// void AutoStory_Checkpoint_96::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-//     checkpoint_96(env, context, options.notif_status_update, stats);
-// }
-
-// std::string AutoStory_Checkpoint_97::name() const{ return "097 - " + AutoStory_Segment_3().name(); }
-// std::string AutoStory_Checkpoint_97::start_text() const{ return "";}
-// std::string AutoStory_Checkpoint_97::end_text() const{ return "";}
-// void AutoStory_Checkpoint_97::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-//     checkpoint_97(env, context, options.notif_status_update, stats);
-// }
-
-// std::string AutoStory_Checkpoint_98::name() const{ return "098 - " + AutoStory_Segment_3().name(); }
-// std::string AutoStory_Checkpoint_98::start_text() const{ return "";}
-// std::string AutoStory_Checkpoint_98::end_text() const{ return "";}
-// void AutoStory_Checkpoint_98::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-//     checkpoint_98(env, context, options.notif_status_update, stats);
-// }
-
-// std::string AutoStory_Checkpoint_99::name() const{ return "099 - " + AutoStory_Segment_3().name(); }
-// std::string AutoStory_Checkpoint_99::start_text() const{ return "";}
-// std::string AutoStory_Checkpoint_99::end_text() const{ return "";}
-// void AutoStory_Checkpoint_99::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
-//     checkpoint_99(env, context, options.notif_status_update, stats);
-// }
 
 void checkpoint_93(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
@@ -616,38 +589,6 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
 
-        #if 0
-        // align to rock.  
-        // center before:
-        // center after: 
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock", 0.000,
-            [&](){
-                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock", 0.000);  // x-position of target object prior to camera move
-                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
-            }        
-        );
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock", 0.000,
-            [&](){
-                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
-            }        
-        );
-
-        // move towards rock until box:  
-        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock",
-            0.000, 0.000,
-            [&](){
-                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock", 0.000);
-                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
-            }
-        );
-
-        #endif
-
- 
-
 
 
     });
@@ -687,18 +628,6 @@ void checkpoint_95(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
     });     
 }
-
-// void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-// }
-
-// void checkpoint_97(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-// }
-
-// void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-// }
-
-// void checkpoint_99(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-// }
 
 
 
