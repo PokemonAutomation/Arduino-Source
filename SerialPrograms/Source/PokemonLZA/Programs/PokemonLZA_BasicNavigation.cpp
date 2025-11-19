@@ -222,6 +222,14 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
     return FastTravelState::SUCCESS;
 }
 
+FastTravelState open_map_and_fly_in_place(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max){
+    bool can_fast_travel = open_map(console, context, zoom_to_max);
+    if (!can_fast_travel){
+        return FastTravelState::PURSUED;
+    }
+    return fly_from_map(console, context);
+}
+
 
 void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, WildZone zone){
     pbf_wait(context, 300ms);
@@ -290,6 +298,20 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
     pbf_wait(context, 300ms);
 }
 
+
+void map_to_overworld(ConsoleHandle& console, ProControllerContext& context){
+    OverworldPartySelectionWatcher overworld_watcher(COLOR_WHITE, &console.overlay());
+    run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, 2s);
+            pbf_wait(context, 40s); // wait a long time in case day/night change immidiately happens
+        },
+        {{overworld_watcher}}
+    );
+    pbf_wait(context, 100ms); // wait 100ms for the game to give back control to player
+    context.wait_for_all_requests();
+}
 
 
 void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
