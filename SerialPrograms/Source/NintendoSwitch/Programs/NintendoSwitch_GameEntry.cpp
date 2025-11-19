@@ -175,7 +175,7 @@ void close_game_from_home(ConsoleHandle& console, ControllerContext& context){
         switch(ret){
         case 0: // close_game
             console.log("Detected close game menu.");
-            pbf_mash_button(context, BUTTON_A, 400ms);
+            pbf_mash_button(context, BUTTON_A, 100ms);
             seen_close_game = true;
             continue;
         case 1: // home

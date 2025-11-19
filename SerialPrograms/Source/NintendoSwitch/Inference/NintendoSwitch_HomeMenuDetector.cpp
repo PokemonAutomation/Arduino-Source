@@ -29,6 +29,7 @@ HomeMenuDetector::HomeMenuDetector(ConsoleHandle& console, Color color)
     , m_bottom_icons(0.70, 0.92, 0.28, 0.05)
     , m_user_icons(0.05, 0.05, 0.2, 0.08)
     , m_game_slot(0.08, 0.25, 0.10, 0.38)
+    , m_close_game_top(0.226358, 0.272648, 0.407445, 0.033989)
 {}
 void HomeMenuDetector::make_overlays(VideoOverlaySet& items) const{
     m_console_type.make_overlays(items);
@@ -40,6 +41,7 @@ void HomeMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom_icons);
     items.add(m_color, m_user_icons);
     items.add(m_color, m_game_slot);
+    items.add(m_color, m_close_game_top);
 }
 
 //
@@ -66,6 +68,12 @@ void HomeMenuDetector::commit_state(){
 }
 
 bool HomeMenuDetector::detect_only(const ImageViewRGB32& screen){
+    ImageStats stats_close_game_top = image_stats(extract_box_reference(screen, m_close_game_top));  // the top portion of the Close game popup
+    // ensure m_close_game_top is NOT uniform in color. If it is, then we likely are looking at the Close Game popup.
+    if (stats_close_game_top.stddev.sum() < 50){
+        return false;
+    }
+
     ImageStats stats_bottom_row = image_stats(extract_box_reference(screen, m_bottom_row));
 //    cout << stats_bottom_row.average << stats_bottom_row.stddev << endl;
     bool white;
