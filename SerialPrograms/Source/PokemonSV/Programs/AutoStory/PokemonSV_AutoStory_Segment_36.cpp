@@ -91,8 +91,8 @@ void AutoStory_Checkpoint_97::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 
 void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    // [&](size_t attempt_number){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
 
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
         
@@ -112,7 +112,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // move towards tree-2-1 until box:   {0.721875, -0.005556, 0.087500, 0.366667}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "tree-2-1",
-            0.087500, 0.30,
+            0.0900, 0.15,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
                 move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-2-1", 0.7);
@@ -169,7 +169,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // move towards rock-2-2 until box:  {0.385938, 0.175000, 0.223438, 0.355556}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-2-2",
-            0.223438, 0.355556,
+            0.223438, 0.30,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
                 move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-2-2", 0.5);  // realign to target X
@@ -200,7 +200,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             0.081250, 0.30,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-2-2", 0.000);  // realign to target X
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-2-2", 0.5);  // realign to target X
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }
         );
@@ -224,7 +224,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // move forward until dirt-ramp not detected
         move_forward_until_yolo_object_not_detected(env, context, yolo_detector, "dirt-ramp", 
-            3,
+            6,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
                 move_player_to_realign_via_yolo(env, context, yolo_detector, "dirt-ramp", 0.5);
@@ -323,7 +323,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         #endif
 
 
-    // });  
+    });  
 }
 
 void checkpoint_97(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
