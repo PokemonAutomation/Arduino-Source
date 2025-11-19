@@ -133,7 +133,7 @@ private:
     SimpleIntegerOption<uint16_t> HOLD_TICKS;
     SimpleIntegerOption<uint16_t> RELEASE_TICKS;
 
-    BooleanCheckBoxOption TEST_PBF_LEFT_JOYSTICK2;
+    BooleanCheckBoxOption TEST_PBF_JOYSTICK2;
     SimpleIntegerOption<uint8_t> X_MOVE2;
     SimpleIntegerOption<uint8_t> Y_MOVE2;
     SimpleIntegerOption<uint16_t> HOLD_TICKS2;

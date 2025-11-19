@@ -302,8 +302,15 @@ std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_lis
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_95>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_96>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_97>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_98>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_99>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_98>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_99>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_100>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_101>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_102>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_103>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_104>());
+    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_105>());
+
     }
 
     return checkpoint_list;
@@ -391,7 +398,7 @@ AutoStory::~AutoStory(){
     ENABLE_TEST_REALIGN.remove_listener(*this);
     ENABLE_MISC_TEST.remove_listener(*this);
     TEST_PBF_LEFT_JOYSTICK.remove_listener(*this);
-    TEST_PBF_LEFT_JOYSTICK2.remove_listener(*this);
+    TEST_PBF_JOYSTICK2.remove_listener(*this);
     TEST_CURRENT_DIRECTION.remove_listener(*this);
     TEST_CHANGE_DIRECTION.remove_listener(*this);    
 }
@@ -617,8 +624,8 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         0
     )
-    , TEST_PBF_LEFT_JOYSTICK2(
-        "<b>TEST2: pbf_move_left_joystick():</b>",
+    , TEST_PBF_JOYSTICK2(
+        "<b>TEST2: pbf_move_right_joystick():</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )     
@@ -731,7 +738,7 @@ AutoStory::AutoStory()
         PA_ADD_OPTION(HOLD_TICKS);
         PA_ADD_OPTION(RELEASE_TICKS);  
 
-        PA_ADD_OPTION(TEST_PBF_LEFT_JOYSTICK2);
+        PA_ADD_OPTION(TEST_PBF_JOYSTICK2);
         PA_ADD_OPTION(X_MOVE2);
         PA_ADD_OPTION(Y_MOVE2);
         PA_ADD_OPTION(HOLD_TICKS2);
@@ -804,7 +811,7 @@ AutoStory::AutoStory()
     ENABLE_TEST_REALIGN.add_listener(*this);
     ENABLE_MISC_TEST.add_listener(*this);
     TEST_PBF_LEFT_JOYSTICK.add_listener(*this);
-    TEST_PBF_LEFT_JOYSTICK2.add_listener(*this);
+    TEST_PBF_JOYSTICK2.add_listener(*this);
     TEST_CURRENT_DIRECTION.add_listener(*this);
     TEST_CHANGE_DIRECTION.add_listener(*this);
 }
@@ -886,7 +893,7 @@ void AutoStory::on_config_value_changed(void* object){
         RELEASE_TICKS.set_visibility(ConfigOptionState::DISABLED);      
     }   
 
-    if (TEST_PBF_LEFT_JOYSTICK2){
+    if (TEST_PBF_JOYSTICK2){
         X_MOVE2.set_visibility(ConfigOptionState::ENABLED);
         Y_MOVE2.set_visibility(ConfigOptionState::ENABLED);
         HOLD_TICKS2.set_visibility(ConfigOptionState::ENABLED);
@@ -1023,8 +1030,14 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_95(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_96(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_97(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_95(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_95(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_98(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_99(env, context, notif_status_update, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_100(env, context, notif_status_update, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_101(env, context, notif_status_update, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_104(env, context, notif_status_update, stats);});
+    // checkpoint_list.push_back([&](){checkpoint_105(env, context, notif_status_update, stats);});
     
     
     if (end == 0){
@@ -1239,8 +1252,8 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         return;
     } 
 
-    if (TEST_PBF_LEFT_JOYSTICK2){
-        pbf_move_left_joystick(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2, RELEASE_TICKS2);
+    if (TEST_PBF_JOYSTICK2){
+        pbf_move_right_joystick(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2, RELEASE_TICKS2);
         return;
     }            
 
@@ -1289,7 +1302,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
 
 
     // test code
-    if (TEST_FLYPOINT_LOCATIONS || TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT || ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_MISC_TEST || TEST_PBF_LEFT_JOYSTICK || TEST_PBF_LEFT_JOYSTICK2 || TEST_CHANGE_DIRECTION || TEST_CURRENT_DIRECTION){
+    if (TEST_FLYPOINT_LOCATIONS || TEST_MOVE_CURSOR_OFFSET_FROM_FLYPOINT || ENABLE_TEST_CHECKPOINTS || ENABLE_TEST_REALIGN || ENABLE_MISC_TEST || TEST_PBF_LEFT_JOYSTICK || TEST_PBF_JOYSTICK2 || TEST_CHANGE_DIRECTION || TEST_CURRENT_DIRECTION){
         test_code(env, context);
         return;
     }
