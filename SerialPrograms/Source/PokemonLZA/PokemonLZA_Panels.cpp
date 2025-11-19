@@ -67,8 +67,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RestaurantFarmer_Descriptor, RestaurantFarmer>());
     ret.emplace_back(make_single_switch_program<MegaShardFarmer_Descriptor, MegaShardFarmer>());
     ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
+    ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
@@ -82,10 +82,12 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
     }
 
+//    ret.emplace_back("---- Non-Shiny Hunting ----");
     if (IS_BETA_VERSION){
-        ret.emplace_back("---- Non-Shiny Hunting ----");
-        ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
     }
+
+    ret.emplace_back("---- Public Betas ----");
+    ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");
