@@ -27,6 +27,7 @@ namespace PokemonAutomation{
 class CheckForUpdatesOption;
 class ThemeSelectorOption;
 class ResolutionOption;
+class KeyboardLayoutOption;
 class StreamHistoryOption;
 class SleepSuppressOptions;
 namespace Integration{
@@ -101,6 +102,8 @@ public:
     Pimpl<ResolutionOption> WINDOW_SIZE;
     Pimpl<ResolutionOption> LOG_WINDOW_SIZE;
     BooleanCheckBoxOption LOG_WINDOW_STARTUP;
+
+    Pimpl<KeyboardLayoutOption> KEYBOARD_CONTROLS_LAYOUT;
 
     Pimpl<StreamHistoryOption> STREAM_HISTORY;
     Pimpl<SleepSuppressOptions> SLEEP_SUPPRESS;

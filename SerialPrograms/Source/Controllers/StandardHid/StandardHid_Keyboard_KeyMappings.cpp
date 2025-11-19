@@ -475,7 +475,7 @@ const std::map<Qt::Key, std::string>& QTKEY_TO_STRING(){
         {Qt::Key_Settings, "Key_Settings"},
         {Qt::Key_MicVolumeUp, "Key_MicVolumeUp"},
         {Qt::Key_MicVolumeDown, "Key_MicVolumeDown"},
-        {Qt::Key_Keyboard, "Key_Keyboard"},
+//        {Qt::Key_Keyboard, "Key_Keyboard"},
         {Qt::Key_New, "Key_New"},
         {Qt::Key_Open, "Key_Open"},
         {Qt::Key_Find, "Key_Find"},

@@ -128,6 +128,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/IntegerRangeOption.h
     ../Common/Cpp/Options/KeyBindingOption.cpp
     ../Common/Cpp/Options/KeyBindingOption.h
+    ../Common/Cpp/Options/KeyboardLayoutOption.cpp
+    ../Common/Cpp/Options/KeyboardLayoutOption.h
     ../Common/Cpp/Options/MacAddressOption.cpp
     ../Common/Cpp/Options/MacAddressOption.h
     ../Common/Cpp/Options/PathOption.cpp

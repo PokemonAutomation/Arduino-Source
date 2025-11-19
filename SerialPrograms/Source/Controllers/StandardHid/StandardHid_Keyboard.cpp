@@ -5,6 +5,8 @@
  */
 
 #include "Common/Cpp/Containers/Pimpl.tpp"
+#include "Common/Cpp/Options/KeyboardLayoutOption.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/Async/InterruptableCommands.tpp"
 #include "CommonTools/Async/SuperControlSession.tpp"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
@@ -97,6 +99,25 @@ void log_qtkey(Logger& logger, const QtKeyMap::QtKey& qtkey){
     logger.log(ss.str(), COLOR_BLUE);
 }
 
+
+
+const std::map<QtKeyMap::QtKey, KeyboardKey>& get_keyid_to_hid_map(){
+    KeyboardLayout layout = *GlobalSettings::instance().KEYBOARD_CONTROLS_LAYOUT;
+    switch (layout){
+    case KeyboardLayout::QWERTY:
+        return KEYID_TO_HID_QWERTY();
+    case KeyboardLayout::AZERTY:
+        return KEYID_TO_HID_AZERTY();
+    default:
+        throw InternalProgramError(
+            nullptr,
+            PA_CURRENT_FUNCTION,
+            "Invalid KeyboardLayout Enum: " + std::to_string((int)layout)
+        );
+    }
+}
+
+
 class Keyboard::KeyboardManager final : public PokemonAutomation::KeyboardInputController{
 public:
     KeyboardManager(Logger& logger, Keyboard& controller)
@@ -122,8 +143,7 @@ public:
     virtual void update_state(ControllerState& state, const std::set<uint32_t>& pressed_keys) override{
         const QtKeyMap& qkey_map = QtKeyMap::instance();
 
-        //  TODO: Support other keyboard layouts.
-        const std::map<QtKeyMap::QtKey, KeyboardKey>& hid_map = KEYID_TO_HID_QWERTY();
+        const std::map<QtKeyMap::QtKey, KeyboardKey>& hid_map = get_keyid_to_hid_map();
 
         KeyboardState& local_state = static_cast<KeyboardState&>(state);
         local_state.clear();
@@ -135,7 +155,7 @@ public:
                 if (iter != hid_map.end()){
                     local_state.keys.insert(iter->second);
                 }
-                log_qtkey(m_logger, qkey);
+//                log_qtkey(m_logger, qkey);
             }
         }
     }
