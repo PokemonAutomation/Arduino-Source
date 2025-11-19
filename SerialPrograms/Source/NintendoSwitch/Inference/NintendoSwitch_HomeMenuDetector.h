@@ -38,6 +38,7 @@ private:
     ImageFloatBox m_bottom_icons;
     ImageFloatBox m_user_icons;
     ImageFloatBox m_game_slot;
+    ImageFloatBox m_close_game_top;
 };
 class HomeMenuWatcher : public DetectorToFinder<HomeMenuDetector>{
 public:
