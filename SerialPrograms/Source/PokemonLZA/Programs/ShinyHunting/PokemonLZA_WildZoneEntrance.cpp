@@ -24,6 +24,7 @@
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
+#include <cmath>
 
 // #include <iostream>
 // using std::cout, std::endl;
