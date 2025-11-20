@@ -96,6 +96,7 @@ void ShinyHunt_CafeReset::program(SingleSwitchProgramEnvironment& env, ProContro
         );
     });
 
+    bool to_zoom_to_max = true;
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
@@ -104,7 +105,8 @@ void ShinyHunt_CafeReset::program(SingleSwitchProgramEnvironment& env, ProContro
                 shiny_sound_handler.process_pending(context);
 
                 // Open map
-                bool can_fast_travel = open_map(env.console, context, false);
+                bool can_fast_travel = open_map(env.console, context, to_zoom_to_max);
+                to_zoom_to_max = false;
                 if (!can_fast_travel){
                     stats.errors++;
                     env.update_stats();
