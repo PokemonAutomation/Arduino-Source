@@ -426,7 +426,6 @@ void LabelImages::delete_selected_annotation(){
         return;
     }
 
-    std::string old_label = m_annotations[m_selected_obj_idx].label;
     m_annotations.erase(m_annotations.begin() + m_selected_obj_idx);
 
     if (m_annotations.size() == 0){ // no more annotations
@@ -443,6 +442,7 @@ void LabelImages::delete_selected_annotation(){
 
     
     m_selected_obj_idx = m_annotations.size();  // don't select anything after deleting an object, but keep the old selected label
+    std::string old_label = selected_label();
     set_selected_label(old_label);
     update_rendered_objects();
 }
@@ -458,6 +458,8 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
 
     const size_t old_selected_idx = m_selected_obj_idx;
     
+    m_selected_obj_idx = m_annotations.size();  // de-select annotations by default, when clicking the screen
+
     size_t closest_distance = SIZE_MAX;
     std::vector<size_t> zero_distance_annotations;
     for(size_t i = 0; i < m_annotations.size(); i++){
@@ -490,7 +492,11 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
         }
     }
 
-    if (old_selected_idx != m_selected_obj_idx){
+    if (m_selected_obj_idx == m_annotations.size()){ // no annotation selected
+        std::string old_label = selected_label();
+        set_selected_label(old_label);
+        update_rendered_objects();
+    }else if (old_selected_idx != m_selected_obj_idx){ // different object selected
         std::string new_label = m_annotations[m_selected_obj_idx].label;
         set_selected_label(new_label);
         update_rendered_objects();
