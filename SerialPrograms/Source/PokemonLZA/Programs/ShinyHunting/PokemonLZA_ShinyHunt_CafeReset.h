@@ -6,8 +6,8 @@
  *  This is mostly for a single spawner: alpha Swirlix near Nouveau Cafe (Truck No. 3).
  */
 
-#ifndef PokemonAutomation_PokemonLZA_CafeReset_H
-#define PokemonAutomation_PokemonLZA_CafeReset_H
+#ifndef PokemonAutomation_PokemonLZA_ShinyHunt_CafeReset_H
+#define PokemonAutomation_PokemonLZA_ShinyHunt_CafeReset_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"

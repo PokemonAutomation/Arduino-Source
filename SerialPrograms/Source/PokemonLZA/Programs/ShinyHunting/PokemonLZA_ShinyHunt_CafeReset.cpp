@@ -14,7 +14,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
-#include "PokemonLZA_CafeReset.h"
+#include "PokemonLZA_ShinyHunt_CafeReset.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {

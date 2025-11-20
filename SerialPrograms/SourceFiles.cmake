@@ -1623,8 +1623,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.h
-    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_CafeReset.cpp
-    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_CafeReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_CafeReset.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_CafeReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp

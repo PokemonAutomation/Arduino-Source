@@ -30,7 +30,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_BeldumHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
-#include "Programs/ShinyHunting/PokemonLZA_CafeReset.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_CafeReset.h"
 
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
