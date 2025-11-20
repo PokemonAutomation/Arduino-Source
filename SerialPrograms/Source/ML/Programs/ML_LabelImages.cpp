@@ -452,6 +452,7 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0){
         return;
     }
+    const size_t screen_normalize_factor = (source_image_height/1080);
 
     std::pair<size_t, size_t> p = float_to_pixel(x, y);
 
@@ -468,7 +469,7 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
         }
         if (d2 < closest_distance){
             closest_distance = d2;
-            if (d2 < 500){
+            if (d2 < (500 * screen_normalize_factor * screen_normalize_factor)){
                 m_selected_obj_idx = i; // only select the object if the mouse click is very close to the object box, or within it.
             }
             
