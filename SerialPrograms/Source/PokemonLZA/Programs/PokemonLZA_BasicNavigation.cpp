@@ -132,6 +132,8 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
                 context.wait_for_all_requests();
                 console.log("Set to fully zoomed out");
                 console.overlay().add_log("Zoom to Max");
+                // Re-run the map icon detectors to find flyable icons on the now fully
+                // zoomed out map.
                 wait_until(
                     console, context,
                     5000ms,
