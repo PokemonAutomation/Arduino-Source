@@ -1566,6 +1566,12 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.cpp
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h
+    Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.cpp
+    Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h
+    Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.cpp
+    Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h
+    Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.cpp
+    Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_ButtonDetector.cpp
@@ -1576,12 +1582,6 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_DialogDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h
-    Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.cpp
-    Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h
-    Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.cpp
-    Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h
-    Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.cpp
-    Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
@@ -1600,6 +1600,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_RestaurantFarmer.h
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.cpp
+    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.cpp
     Source/PokemonLZA/Programs/PokemonLZA_BasicNavigation.h
     Source/PokemonLZA/Programs/PokemonLZA_ClothingBuyer.cpp
@@ -1617,12 +1619,12 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/PokemonLZA_StallBuyer.h
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.cpp
     Source/PokemonLZA/Programs/PokemonLZA_TrainerBattle.h
-    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.cpp
-    Source/PokemonLZA/Programs/NonShinyHunting/PokemonLZA_StatsReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_CafeReset.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_CafeReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp

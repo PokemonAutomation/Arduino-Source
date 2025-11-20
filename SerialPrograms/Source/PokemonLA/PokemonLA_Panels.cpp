@@ -54,7 +54,7 @@ namespace PokemonLA{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Legends Arceus")
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Legends: Arceus")
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{

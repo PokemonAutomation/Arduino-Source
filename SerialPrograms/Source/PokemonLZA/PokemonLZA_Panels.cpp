@@ -30,6 +30,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_BeldumHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
+#include "Programs/ShinyHunting/PokemonLZA_CafeReset.h"
 
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
@@ -46,7 +47,7 @@ namespace PokemonLZA{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Legends ZA")
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Legends: Z-A")
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{
@@ -80,6 +81,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
+        ret.emplace_back(make_single_switch_program<ShinyHunt_CafeReset_Descriptor, ShinyHunt_CafeReset>());
     }
 
 //    ret.emplace_back("---- Non-Shiny Hunting ----");
