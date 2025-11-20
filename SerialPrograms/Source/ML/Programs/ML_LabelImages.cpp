@@ -426,6 +426,7 @@ void LabelImages::delete_selected_annotation(){
         return;
     }
 
+    std::string old_label = m_annotations[m_selected_obj_idx].label;
     m_annotations.erase(m_annotations.begin() + m_selected_obj_idx);
 
     if (m_annotations.size() == 0){ // no more annotations
@@ -434,14 +435,15 @@ void LabelImages::delete_selected_annotation(){
         return;
     }
 
-    if (m_selected_obj_idx >= m_annotations.size()){
-        m_selected_obj_idx = m_annotations.size() - 1;
-    } else{
-        // no change to the currently selected index
-    }
+    // if (m_selected_obj_idx >= m_annotations.size()){
+    //     m_selected_obj_idx = m_annotations.size() - 1;
+    // } else{
+    //     // no change to the currently selected index
+    // }
 
-    std::string cur_label = m_annotations[m_selected_obj_idx].label;
-    set_selected_label(cur_label);
+    
+    m_selected_obj_idx = m_annotations.size();  // don't select anything after deleting an object, but keep the old selected label
+    set_selected_label(old_label);
     update_rendered_objects();
 }
 
@@ -466,7 +468,10 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
         }
         if (d2 < closest_distance){
             closest_distance = d2;
-            m_selected_obj_idx = i;
+            if (d2 < 500){
+                m_selected_obj_idx = i; // only select the object if the mouse click is very close to the object box, or within it.
+            }
+            
         }
     }
 
