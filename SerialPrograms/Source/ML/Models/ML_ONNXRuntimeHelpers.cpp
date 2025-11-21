@@ -58,7 +58,7 @@ Ort::SessionOptions create_session_options(const std::string& model_cache_path){
     so.AppendExecutionProvider("CoreML", provider_options);
     std::cout << "Using CoreML execution provider for GPU acceleration" << std::endl;
 #elif _WIN32
-// #define ENABLE_WIN_GPU
+#define ENABLE_WIN_GPU
 #ifdef ENABLE_WIN_GPU
     // Try CUDA first for NVIDIA GPUs (best performance)
     // CUDA requires NVIDIA GPU and CUDA runtime installation
