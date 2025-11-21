@@ -342,7 +342,7 @@ void leave_zone_and_reset_spawns(
     const double starting_angle = get_current_facing_angle(env, context);
 
     ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
-    OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &env.console.overlay());
+    OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &env.console.overlay(), std::chrono::milliseconds(400));
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [&walk_time_in_zone](ProControllerContext& context){
