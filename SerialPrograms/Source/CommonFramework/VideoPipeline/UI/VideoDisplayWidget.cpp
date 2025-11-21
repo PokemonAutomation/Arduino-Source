@@ -4,6 +4,7 @@
  *
  */
 
+#include <QApplication>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
@@ -115,10 +116,30 @@ VideoDisplayWidget::VideoDisplayWidget(
 
     overlay.add_stat(m_source_fps);
     overlay.add_stat(m_display_fps);
+
     video_session.add_state_listener(*this);
 }
 VideoDisplayWidget::~VideoDisplayWidget(){
-    m_video_session.remove_state_listener(*this);
+    //  This is an ugly work-around for deadlock that can occur if the
+    //  destructor of this is class is called while a reset on the VideoSession
+    //  is in flight.
+    //
+    //  Because Qt requires everything to run on the main thread, outside
+    //  threads that reset the VideoSession will get redispatched to the main
+    //  thread while holding a lock on the listener. If this redispatch gets
+    //  queued behind the task running here, it will wait on the same listener
+    //  thus deadlocking.
+    //
+    //  The work-around is that if we fail to acquire this lock, we process the
+    //  event queue to eventually run the task that is holding the lock.
+    //
+    while (!m_video_session.try_remove_state_listener(*this)){
+        m_video_session.logger().log(
+            "VideoDisplayWidget::~VideoDisplayWidget(): Lock already held. Processing events...",
+            COLOR_ORANGE
+        );
+        QApplication::processEvents();
+    }
 
     //  Close the window popout first since it holds references to this class.
     move_back_from_window();

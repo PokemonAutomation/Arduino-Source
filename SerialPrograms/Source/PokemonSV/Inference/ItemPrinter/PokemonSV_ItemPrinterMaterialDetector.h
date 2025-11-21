@@ -52,6 +52,9 @@ public:
         VideoStream& stream, ProControllerContext& context
     ) const;
 
+    // find the quantity of all materials with a value of 68. return the highest quantity.
+    int16_t find_highest_quantity_of_value_68(VideoStream& stream, ProControllerContext& context) const;
+
     std::vector<int8_t> find_material_value_row_index(
         VideoStream& stream,
         ProControllerContext& context,

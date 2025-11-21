@@ -14,7 +14,7 @@
 namespace PokemonAutomation{
 
 struct DetectedBox{
-    const std::string& name;
+    std::string name;
     ImagePixelBox box;
 };
 

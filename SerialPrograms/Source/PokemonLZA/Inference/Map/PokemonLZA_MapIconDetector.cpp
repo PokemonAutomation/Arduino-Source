@@ -66,7 +66,7 @@ const MapIconMatcher& MapIcon_PokemonCenter(){
         Color(0xffc04030),
         Color(0xffff8f6f),
         100,
-        100.0,
+        80.0,
         {
             {0xffc04030, 0xffff8f6f},
             {0xffc05040, 0xffffaf8f},

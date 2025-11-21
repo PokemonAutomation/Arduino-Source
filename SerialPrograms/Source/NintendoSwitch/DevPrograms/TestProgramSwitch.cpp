@@ -124,6 +124,7 @@
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_HomeToDateTime.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_ConsoleTypeDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
+#include "NintendoSwitch/Inference/NintendoSwitch_CloseGameDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_StartGameUserSelectDetector.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_UpdatePopupDetector.h"
 #include "NintendoSwitch/Programs/DateSpam/NintendoSwitch_RollDateForward1.h"
@@ -150,9 +151,10 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonSV/Inference/PokemonSV_PokemonMovesReader.h"
 #include "PokemonSV/Programs/AutoStory/PokemonSV_MenuOption.h"
-#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
-#include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MapDetector.h"
+#include "PokemonLZA/Inference/Battles/PokemonLZA_MoveEffectivenessSymbol.h"
+#include "PokemonLZA/Inference/Battles/PokemonLZA_RunFromBattleDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 
 
 
@@ -289,9 +291,36 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     [[maybe_unused]] VideoFeed& feed = env.consoles[0];
     [[maybe_unused]] VideoOverlay& overlay = env.consoles[0];
     ProControllerContext context(scope, console.controller<ProController>());
+    // JoyconContext context(scope, console.controller<JoyconController>());
     VideoOverlaySet overlays(overlay);
 
 
+#if 0
+    auto snapshot = feed.snapshot();
+    cout << snapshot->width() << " x " << snapshot->height() << endl;
+
+    RunFromBattleDetector detector(COLOR_RED, &overlay);
+    cout << detector.detect(snapshot) << endl;
+#endif
+
+#if 0
+close_game_from_home(console, context);
+// ssf_issue_scroll(context, DPAD_DOWN, 24ms);
+#endif  
+
+#if 0
+    // auto snapshot = feed.snapshot();
+    // CloseGameDetector detector(console);
+    // cout << detector.detect(snapshot) << endl;
+    CloseGameWatcher watcher(console);
+
+    int ret = wait_until(console, context, Seconds(10), {watcher});
+
+    if (ret == 0){
+        console.log("CloseGameWatcher detected.");
+    }
+    
+#endif    
 
 #if 0
     ImageRGB32 image1("itemprinter.png");
@@ -321,7 +350,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #endif
 
 
-#if 0
+#if 1
     MapIconDetector detector0(COLOR_RED, MapIconType::PokemonCenter, {0, 0, 1, 1}, &overlay);
     MapIconDetector detector1(COLOR_RED, MapIconType::Building, {0, 0, 1, 1}, &overlay);
     MapIconDetector detector2(COLOR_RED, MapIconType::BuildingFlyable, {0, 0, 1, 1}, &overlay);
@@ -333,12 +362,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     auto snapshot = feed.snapshot();
     detector0.detect(snapshot);
-    detector1.detect(snapshot);
-    detector2.detect(snapshot);
-    detector3.detect(snapshot);
-    detector4.detect(snapshot);
-    detector5.detect(snapshot);
-    detector6.detect(snapshot);
+//    detector1.detect(snapshot);
+//    detector2.detect(snapshot);
+//    detector3.detect(snapshot);
+//    detector4.detect(snapshot);
+//    detector5.detect(snapshot);
+//    detector6.detect(snapshot);
 #endif
 
 

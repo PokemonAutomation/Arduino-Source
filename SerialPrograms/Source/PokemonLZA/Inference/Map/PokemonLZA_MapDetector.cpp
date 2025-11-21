@@ -5,7 +5,7 @@
  */
 
 #include "PokemonLZA_MapDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA_MapIconDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -64,6 +64,15 @@ std::vector<DetectedBox> MapDetector::detected_map_icons() const{
     return ret;
 }
 
+
+void MapDetector::reset_state(){
+    m_b_button.reset_state();
+    m_x_button.reset_state();
+    m_y_button.reset_state();
+    for(MapIconDetector* detector : m_map_icon_detectors){
+        detector->reset_state();
+    }
+}
 
 
 

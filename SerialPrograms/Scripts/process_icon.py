@@ -1,4 +1,3 @@
-#!/usr/bin/env python3
 """
 Image icon processor that filters pixels by color range.
 Sets pixels within specified color bounds to black with alpha = 0.
@@ -9,7 +8,7 @@ from PIL import Image
 import sys
 
 
-def parse_color(color_str):
+def parse_color(color_str: str) -> tuple[int, int , int]:
     """Parse color string in format 'R,G,B' to tuple (R, G, B)."""
     try:
         parts = color_str.split(',')
@@ -37,9 +36,15 @@ def is_within_bounds(pixel, lower_bound, upper_bound):
             lb <= b <= ub)
 
 
-def process_image(input_path, lower_color, upper_color, output_path):
+def process_image(
+    input_path: str,
+    lower_color: tuple[int, int, int],
+    upper_color: tuple[int, int, int],
+    inverse: bool,
+    output_path: str
+):
     """
-    Process image by setting pixels within color bounds to black with alpha = 0.
+    Process image by setting background pixels within color bounds to black with alpha = 0.
 
     Args:
         input_path: Path to input image
@@ -64,7 +69,8 @@ def process_image(input_path, lower_color, upper_color, output_path):
         for y in range(height):
             for x in range(width):
                 pixel = pixels[x, y]
-                if is_within_bounds(pixel, lower_color, upper_color):
+                within_bounds = is_within_bounds(pixel, lower_color, upper_color)
+                if (not inverse and within_bounds) or (inverse and not within_bounds):
                     pixels[x, y] = (0, 0, 0, 0)  # Black with alpha = 0
                     count += 1
 
@@ -83,7 +89,7 @@ def process_image(input_path, lower_color, upper_color, output_path):
 
 def main():
     parser = argparse.ArgumentParser(
-        description='Process image icon by filtering pixels within color bounds.',
+        description='Process image icon by removing background pixels within color bounds.',
         formatter_class=argparse.RawDescriptionHelpFormatter,
         epilog='''
 Examples:
@@ -93,8 +99,9 @@ Examples:
     )
 
     parser.add_argument('input', help='Path to input image')
-    parser.add_argument('lower_color', help='Lower bound color in format "R,G,B"')
-    parser.add_argument('upper_color', help='Upper bound color in format "R,G,B"')
+    parser.add_argument('lower_color', help='Lower bound background color in format "R,G,B"')
+    parser.add_argument('upper_color', help='Upper bound background color in format "R,G,B"')
+    parser.add_argument('-i', '--inverse', action='store_true', help='inverse color range, defining the color outside of the bounds as background')
     parser.add_argument('-o', '--output', default='output.png',
                         help='Output path (default: output.png)')
 
@@ -109,7 +116,7 @@ Examples:
         sys.exit(1)
 
     # Process the image
-    process_image(args.input, lower, upper, args.output)
+    process_image(args.input, lower, upper,  args.inverse, args.output)
 
 
 if __name__ == '__main__':

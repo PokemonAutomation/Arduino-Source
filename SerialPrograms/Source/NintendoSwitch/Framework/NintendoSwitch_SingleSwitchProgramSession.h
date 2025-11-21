@@ -27,7 +27,8 @@ class SingleSwitchProgramOption;
 
 class SingleSwitchProgramSession final : public ProgramSession{
 public:
-    virtual ~SingleSwitchProgramSession();
+    bool try_shutdown();
+    ~SingleSwitchProgramSession();
     SingleSwitchProgramSession(SingleSwitchProgramOption& option, size_t console_number);
 
     void restore_defaults();

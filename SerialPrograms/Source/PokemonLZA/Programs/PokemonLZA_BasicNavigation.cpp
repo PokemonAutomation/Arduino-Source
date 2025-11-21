@@ -13,8 +13,8 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MapDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
@@ -93,11 +93,11 @@ void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
 
 
 
-bool open_map(ConsoleHandle& console, ProControllerContext& context){
-    console.log("Opening Map...");
-    console.overlay().add_log("Open Map");
+bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max){
     pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
     context.wait_for_all_requests();
+    console.log("Opening Map...");
+    console.overlay().add_log("Open Map");
     
     WallClock deadline = current_time() + 30s;
 
@@ -115,13 +115,32 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context){
 
         int ret = wait_until(
             console, context,
-            2000ms,
+            5000ms,
             {map_detector}
         );
         switch (ret){
         case 0:
             console.log("Detected map!", COLOR_BLUE);
             console.overlay().add_log("Map Detected");
+
+            if (zoom_to_max){
+                map_detector.reset_state();
+                // move right joystick to zoom out the map
+                for(int i = 0; i < 3; i++){
+                    pbf_move_right_joystick(context, 128, 255, 100ms, 300ms);
+                }
+                context.wait_for_all_requests();
+                console.log("Set to fully zoomed out");
+                console.overlay().add_log("Zoom to Max");
+                // Re-run the map icon detectors to find flyable icons on the now fully
+                // zoomed out map.
+                wait_until(
+                    console, context,
+                    5000ms,
+                    {map_detector}
+                );
+                return map_detector.detected_map_icons().size();
+            }
             return map_detector.detected_map_icons().size() > 0;
         default:
             console.log("Map not found. Press + again", COLOR_ORANGE);
@@ -146,6 +165,7 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
     context.wait_for_all_requests();
     {
         BlackScreenWatcher start_flying(COLOR_RED);
+        MapOverWatcher map_over(COLOR_RED, &console.overlay());
         BlueDialogWatcher blue_dialog(COLOR_BLUE, &console.overlay(), 50ms);
         int ret = run_until<ProControllerContext>(
             console, context,
@@ -154,14 +174,15 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
                     pbf_mash_button(context, BUTTON_A, 1000ms);
                 }
             },
-            {start_flying, blue_dialog,}
+            {start_flying, map_over, blue_dialog,}
         );
         switch (ret){
         case 0:
+        case 1:
             console.log("Flying from map... Started!");
             console.overlay().add_log("Fast traveling");
             break;
-        case 1:
+        case 2:
             console.log("Spotted by wild pokemon, cannot fly");
             console.overlay().add_log("Spotted by Wild Pokemon");
             return FastTravelState::PURSUED;
@@ -179,10 +200,10 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
         }
     }
 
-    BlackScreenOverWatcher done_flying(COLOR_RED, {0.1, 0.7, 0.8, 0.2});
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay());
     int ret = wait_until(
-        console, context, 10000ms,
-        {done_flying,}
+        console, context, 15s,
+        {overworld,}
     );
     switch (ret){
     case 0:
@@ -206,7 +227,7 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
     pbf_wait(context, 300ms);
     switch(zone){
     case WildZone::WILD_ZONE_1:
-        pbf_move_left_joystick(context, 0, 150, 230ms, 0ms);
+        pbf_move_left_joystick(context, 0, 150, 120ms, 0ms);
         break;
     case WildZone::WILD_ZONE_2:
         pbf_move_left_joystick(context, 120, 0, 100ms, 0ms);
@@ -320,6 +341,28 @@ void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
     }
 }
 
+
+void wait_until_overworld(
+    ConsoleHandle& console, ProControllerContext& context,
+    std::chrono::milliseconds max_wait_time
+){
+    OverworldPartySelectionWatcher overworld;
+    int ret = wait_until(
+        console, context,
+        max_wait_time,
+        {overworld}
+    );
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "wait_until_overworld(): Unable to detect overworld after " + 
+                std::to_string(max_wait_time.count()) + " milliseconds.",
+            console
+        );
+    }
+    console.log("Detected overworld after day night change.");
+    context.wait_for(100ms); // extra 0.1 sec to let game give player control
+}
 
 
 }

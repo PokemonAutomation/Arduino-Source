@@ -72,10 +72,17 @@ VideoSource_StillImage::VideoSource_StillImage(Logger& logger, const std::string
     : VideoSource(logger, false)
     , m_original_image(QString::fromStdString(path))
 {
-    m_snapshot = VideoSnapshot(
-        ImageRGB32(m_original_image).scale_to(resolution.width, resolution.height),
-        current_time()
-    );
+    if (resolution){
+        m_snapshot = VideoSnapshot(
+            ImageRGB32(m_original_image).scale_to(resolution.width, resolution.height),
+            current_time()
+        );
+    }else{
+        m_snapshot = VideoSnapshot(
+            m_original_image,
+            current_time()
+        );
+    }
     m_resolution = resolution;
     m_resolutions = {
         {1280, 720},

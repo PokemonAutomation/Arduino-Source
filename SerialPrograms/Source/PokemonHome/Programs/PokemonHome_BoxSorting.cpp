@@ -566,7 +566,7 @@ void BoxSorting::program(SingleSwitchProgramEnvironment& env, ProControllerConte
                 ss << current_box_value;
 
                 //checking color to know if a pokemon is on the slot or not
-                if(current_box_value < 5){
+                if(current_box_value < 10){
                     box_render.add(COLOR_RED, slot_box);
                     stats.empty++;
                     env.update_stats();

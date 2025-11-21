@@ -35,7 +35,8 @@ public:
     void remove_listener(Listener& listener);
 
 public:
-    virtual ~MultiSwitchProgramSession();
+    bool try_shutdown();
+    ~MultiSwitchProgramSession();
     MultiSwitchProgramSession(MultiSwitchProgramOption& option);
 
     void restore_defaults();

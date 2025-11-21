@@ -9,12 +9,31 @@
 
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonFramework/Options/LabelCellOption.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLZA{
+
+
+
+class StallBuyerRow : public StaticTableRow{
+public:
+    StallBuyerRow(int index, std::string&& ordinal);
+
+    LabelCellOption item;
+    SimpleIntegerCell<uint16_t> quantity;
+    std::string ordinal;
+    int index;
+};
+
+class StallBuyerTable : public StaticTableOption {
+public:
+    StallBuyerTable();
+    virtual std::vector<std::string> make_header() const;
+};
 
 
 
@@ -35,17 +54,14 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-    enum class ItemPosition{
-        FirstItem,
-        SecondItem,
-        ThirdItem,
-        FourthItem,
-        FifthItem,
-        SixthItem,
-        SeventhItem
-    };
-    EnumDropdownOption<ItemPosition> ITEM_POSITION;
-    SimpleIntegerOption<uint16_t> NUM_PURCHASE;
+    void make_purchase(
+        SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+        StallBuyerRow& stall_buyer_row,
+        uint16_t& purchases
+    );
+
+private:
+    StallBuyerTable NUM_PURCHASE;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

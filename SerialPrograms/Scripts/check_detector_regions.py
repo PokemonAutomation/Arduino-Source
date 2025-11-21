@@ -35,7 +35,7 @@ raw_image = image.copy()
 
 # ==================================================================
 # LZA bench sit button A when running back
-add_infer_box_to_image(raw_image, 0.486, 0.477, 0.115, 0.25, image)
+add_infer_box_to_image(raw_image, 0.486, 0.477, 0.115, 0.5, image)
 
 
 # ==================================================================

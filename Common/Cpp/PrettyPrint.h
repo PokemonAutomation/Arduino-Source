@@ -20,6 +20,7 @@ std::string tostr_bytes(uint64_t bytes);
 // Convert double to string using the default precision on ostream.
 std::string tostr_default(double x);
 // Convert double to string with fixed precision.
+// The precision specifies the number of digits after the decimal point.
 std::string tostr_fixed(double x, int precision);
 
 // Format current time to a string to be used as filenames.

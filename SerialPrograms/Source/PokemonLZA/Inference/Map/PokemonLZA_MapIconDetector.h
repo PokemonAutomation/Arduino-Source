@@ -52,6 +52,11 @@ public:
 
     const std::vector<DetectedBox>& last_detected();
 
+    virtual void reset_state() override {
+        m_last_detected.clear();
+        m_last_detected_box.clear();
+    }
+
 private:
     Color m_color;
     const MapIconMatcher& m_matcher;

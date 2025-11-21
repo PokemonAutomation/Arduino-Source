@@ -33,96 +33,21 @@ public:
         return m_count.load(std::memory_order_relaxed);
     }
 
-    void add(ListenerType& listener){
-#ifdef PA_DEBUG_ListenerSet
-        auto scope = m_sanitizer.check_scope();
-#endif
-        WriteSpinLock lg(m_lock);
-//        std::lock_guard<std::mutex> lg(m_lock);
-        m_listeners[&listener]++;
-        m_count.store(m_listeners.size(), std::memory_order_relaxed);
-    }
-    void remove(ListenerType& listener){
-#ifdef PA_DEBUG_ListenerSet
-        auto scope = m_sanitizer.check_scope();
-#endif
-        WriteSpinLock lg(m_lock);
-//        std::lock_guard<std::mutex> lg(m_lock);
-        auto iter = m_listeners.find(&listener);
-        if (iter == m_listeners.end()){
-            return;
-        }
-        if (--iter->second == 0){
-            m_listeners.erase(iter);
-        }
-        m_count.store(m_listeners.size(), std::memory_order_relaxed);
-    }
+    void add(ListenerType& listener);
+    void remove(ListenerType& listener);
+
+    bool try_add(ListenerType& listener);
+    bool try_remove(ListenerType& listener);
 
     template <typename Lambda>
-    void run_lambda_unique(Lambda&& lambda){
-#ifdef PA_DEBUG_ListenerSet
-        auto scope = m_sanitizer.check_scope();
-#endif
-        if (empty()){
-            return;
-        }
-        ReadSpinLock lg(m_lock);
-//        std::lock_guard<std::mutex> lg(m_lock);
-        for (auto& item : m_listeners){
-            lambda(*item.first);
-        }
-    }
+    void run_lambda_unique(Lambda&& lambda);
     template <typename Lambda>
-    void run_lambda_with_duplicates(Lambda&& lambda){
-#ifdef PA_DEBUG_ListenerSet
-        auto scope = m_sanitizer.check_scope();
-#endif
-        if (empty()){
-            return;
-        }
-        ReadSpinLock lg(m_lock);
-//        std::lock_guard<std::mutex> lg(m_lock);
-        for (auto& item : m_listeners){
-            ListenerType& listener = *item.first;
-            size_t count = item.second;
-            do{
-                lambda(listener);
-            }while (--count);
-        }
-    }
+    void run_lambda_with_duplicates(Lambda&& lambda);
 
     template <typename Function, class... Args>
-    void run_method_unique(Function function, Args&&... args){
-#ifdef PA_DEBUG_ListenerSet
-        auto scope = m_sanitizer.check_scope();
-#endif
-        if (empty()){
-            return;
-        }
-        ReadSpinLock lg(m_lock);
-//        std::lock_guard<std::mutex> lg(m_lock);
-        for (auto& item : m_listeners){
-            (item.first->*function)(std::forward<Args>(args)...);
-        }
-    }
+    void run_method_unique(Function function, Args&&... args);
     template <typename Function, class... Args>
-    void run_method_with_duplicates(Function function, Args&&... args){
-#ifdef PA_DEBUG_ListenerSet
-        auto scope = m_sanitizer.check_scope();
-#endif
-        if (empty()){
-            return;
-        }
-        ReadSpinLock lg(m_lock);
-//        std::lock_guard<std::mutex> lg(m_lock);
-        for (auto& item : m_listeners){
-            ListenerType& listener = *item.first;
-            size_t count = item.second;
-            do{
-                (listener->*function)(std::forward<Args>(args)...);
-            }while (--count);
-        }
-    }
+    void run_method_with_duplicates(Function function, Args&&... args);
 
 private:
     //  Optimization. Keep an atomic version of the count. This will let us
@@ -137,6 +62,156 @@ private:
     LifetimeSanitizer m_sanitizer;
 #endif
 };
+
+
+
+
+
+
+
+
+
+
+
+template <typename ListenerType>
+void ListenerSet<ListenerType>::add(ListenerType& listener){
+#ifdef PA_DEBUG_ListenerSet
+    auto scope = m_sanitizer.check_scope();
+#endif
+    WriteSpinLock lg(m_lock);
+    m_listeners[&listener]++;
+    m_count.store(m_listeners.size(), std::memory_order_relaxed);
+}
+template <typename ListenerType>
+void ListenerSet<ListenerType>::remove(ListenerType& listener){
+#ifdef PA_DEBUG_ListenerSet
+    auto scope = m_sanitizer.check_scope();
+#endif
+    WriteSpinLock lg(m_lock);
+    auto iter = m_listeners.find(&listener);
+    if (iter == m_listeners.end()){
+        return;
+    }
+    if (--iter->second == 0){
+        m_listeners.erase(iter);
+    }
+    m_count.store(m_listeners.size(), std::memory_order_relaxed);
+}
+
+
+
+template <typename ListenerType>
+bool ListenerSet<ListenerType>::try_add(ListenerType& listener){
+#ifdef PA_DEBUG_ListenerSet
+    auto scope = m_sanitizer.check_scope();
+#endif
+    if (!m_lock.try_acquire_write()){
+        return false;
+    }
+    m_listeners[&listener]++;
+    m_count.store(m_listeners.size(), std::memory_order_relaxed);
+    m_lock.unlock_write();
+    return true;
+}
+template <typename ListenerType>
+bool ListenerSet<ListenerType>::try_remove(ListenerType& listener){
+    if (!m_lock.try_acquire_write()){
+        return false;
+    }
+    auto iter = m_listeners.find(&listener);
+    if (iter == m_listeners.end()){
+        m_lock.unlock_write();
+        return true;
+    }
+    if (--iter->second == 0){
+        m_listeners.erase(iter);
+    }
+    m_count.store(m_listeners.size(), std::memory_order_relaxed);
+    m_lock.unlock_write();
+    return true;
+}
+
+
+
+template <typename ListenerType>
+template <typename Lambda>
+void ListenerSet<ListenerType>::run_lambda_unique(Lambda&& lambda){
+#ifdef PA_DEBUG_ListenerSet
+    auto scope = m_sanitizer.check_scope();
+#endif
+    if (empty()){
+        return;
+    }
+    ReadSpinLock lg(m_lock);
+    for (auto& item : m_listeners){
+        lambda(*item.first);
+    }
+}
+
+
+
+template <typename ListenerType>
+template <typename Lambda>
+void ListenerSet<ListenerType>::run_lambda_with_duplicates(Lambda&& lambda){
+#ifdef PA_DEBUG_ListenerSet
+    auto scope = m_sanitizer.check_scope();
+#endif
+    if (empty()){
+        return;
+    }
+    ReadSpinLock lg(m_lock);
+    for (auto& item : m_listeners){
+        ListenerType& listener = *item.first;
+        size_t count = item.second;
+        do{
+            lambda(listener);
+        }while (--count);
+    }
+}
+
+
+
+template <typename ListenerType>
+template <typename Function, class... Args>
+void ListenerSet<ListenerType>::run_method_unique(Function function, Args&&... args){
+#ifdef PA_DEBUG_ListenerSet
+    auto scope = m_sanitizer.check_scope();
+#endif
+    if (empty()){
+        return;
+    }
+    ReadSpinLock lg(m_lock);
+    for (auto& item : m_listeners){
+        (item.first->*function)(std::forward<Args>(args)...);
+    }
+}
+
+
+
+template <typename ListenerType>
+template <typename Function, class... Args>
+void ListenerSet<ListenerType>::run_method_with_duplicates(Function function, Args&&... args){
+#ifdef PA_DEBUG_ListenerSet
+    auto scope = m_sanitizer.check_scope();
+#endif
+    if (empty()){
+        return;
+    }
+    ReadSpinLock lg(m_lock);
+    for (auto& item : m_listeners){
+        ListenerType& listener = *item.first;
+        size_t count = item.second;
+        do{
+            (listener->*function)(std::forward<Args>(args)...);
+        }while (--count);
+    }
+}
+
+
+
+
+
+
 
 
 

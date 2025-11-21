@@ -41,6 +41,7 @@ public:
 
 
 public:
+    bool try_shutdown();
     ~MultiSwitchSystemSession();
     MultiSwitchSystemSession(
         MultiSwitchSystemOption& option,

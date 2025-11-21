@@ -64,27 +64,33 @@ void Watchdog::add(WatchdogCallback& callback, std::chrono::milliseconds period)
 }
 void Watchdog::remove(WatchdogCallback& callback){
     while (true){
-        {
-            WriteSpinLock slg(m_state_lock);
-            auto iter_c = m_callbacks.find(&callback);
-            if (iter_c == m_callbacks.end()){
-                return;
-            }
-
-            std::mutex& entry_lock = iter_c->second.lock;
-            if (entry_lock.try_lock()){
-                //  Remove from the schedule first.
-                auto iter_s = iter_c->second.iter;
-                m_schedule.erase(iter_s);
-
-                //  Unlock and remove from callback set.
-                entry_lock.unlock();
-                m_callbacks.erase(iter_c);
-                return;
-            }
+        if (try_remove(callback)){
+            return;
         }
         pause();
     }
+}
+bool Watchdog::try_remove(WatchdogCallback& callback){
+    WriteSpinLock slg(m_state_lock);
+    auto iter_c = m_callbacks.find(&callback);
+    if (iter_c == m_callbacks.end()){
+        return true;
+    }
+
+    std::mutex& entry_lock = iter_c->second.lock;
+    if (!entry_lock.try_lock()){
+        return false;
+    }
+
+    //  Remove from the schedule first.
+    auto iter_s = iter_c->second.iter;
+    m_schedule.erase(iter_s);
+
+    //  Unlock and remove from callback set.
+    entry_lock.unlock();
+    m_callbacks.erase(iter_c);
+
+    return true;
 }
 
 

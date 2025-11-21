@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "Common/Cpp/Containers/FixedLimitVector.tpp"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -14,7 +15,6 @@
 #include "CommonFramework/Options/Environment/SleepSuppressOption.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_MultiSwitchProgramOption.h"
 #include "NintendoSwitch_MultiSwitchProgramSession.h"
 
@@ -47,10 +47,18 @@ MultiSwitchProgramSession::MultiSwitchProgramSession(MultiSwitchProgramOption& o
     m_system.add_listener(*this);
 }
 
-MultiSwitchProgramSession::~MultiSwitchProgramSession(){
+bool MultiSwitchProgramSession::try_shutdown(){
     MultiSwitchProgramSession::internal_stop_program();
     m_system.remove_listener(*this);
     join_program_thread();
+    return m_system.try_shutdown();
+}
+MultiSwitchProgramSession::~MultiSwitchProgramSession(){
+    blocking_shutdown(
+        logger(),
+        "SingleSwitchProgramSession",
+        [this]{ return try_shutdown(); }
+    );
 }
 
 

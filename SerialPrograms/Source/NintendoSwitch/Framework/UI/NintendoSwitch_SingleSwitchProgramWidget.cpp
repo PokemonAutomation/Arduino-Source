@@ -8,6 +8,7 @@
 #include <QLabel>
 #include <QMessageBox>
 #include <QScrollArea>
+#include "Common/Qt/ShutdownWithEvents.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "Common/Qt/Options/ConfigWidget.h"
 #include "CommonFramework/Startup/NewVersionCheck.h"
@@ -32,6 +33,12 @@ SingleSwitchProgramWidget2::~SingleSwitchProgramWidget2(){
     delete m_stats_bar;
     delete m_options;
     delete m_system;
+
+    shutdown_with_events(
+        m_session.logger(),
+        "SingleSwitchProgramWidget2",
+        [this]{ return m_session.try_shutdown(); }
+    );
 }
 SingleSwitchProgramWidget2::SingleSwitchProgramWidget2(
     QWidget& parent,

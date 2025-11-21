@@ -6,9 +6,10 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "Pokemon/Inference/Pokemon_NameReader.h"
+//#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLZA_TradeRoutines.h"
 #include "PokemonLZA_SelfBoxTrade.h"
 
@@ -91,6 +92,13 @@ SelfBoxTrade::SelfBoxTrade()
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
+    env.run_in_parallel(
+        scope,
+        [](ConsoleHandle& console, ProControllerContext& context){
+            assert_16_9_720p_min(console, console);
+        }
+    );
+
     TradeStats& stats = env.current_stats<TradeStats>();
     env.update_stats();
 

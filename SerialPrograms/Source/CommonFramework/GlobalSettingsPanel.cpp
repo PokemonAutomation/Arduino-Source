@@ -15,6 +15,7 @@
 #include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Json/JsonArray.h"
 #include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Options/KeyboardLayoutOption.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/CheckForUpdatesOption.h"
 #include "CommonFramework/Options/ResolutionOption.h"
@@ -155,6 +156,14 @@ GlobalSettings::GlobalSettings()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )
+    , KEYBOARD_CONTROLS_LAYOUT(
+        CONSTRUCT_TOKEN,
+        "<b>System Keyboard Layout:</b><br>"
+        "This is the keyboard layout of your system. "
+        "This is needed for the HID keyboard controller to work correctly.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        KeyboardLayout::QWERTY
+    )
     , STREAM_HISTORY(CONSTRUCT_TOKEN)
     , SLEEP_SUPPRESS(CONSTRUCT_TOKEN)
     , m_discord_settings(
@@ -232,6 +241,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_SIZE);
     PA_ADD_OPTION(LOG_WINDOW_STARTUP);
+
+    PA_ADD_OPTION(KEYBOARD_CONTROLS_LAYOUT);
+
 #if (QT_VERSION_MAJOR == 6) && (QT_VERSION_MINOR >= 8)
     if (IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(STREAM_HISTORY);

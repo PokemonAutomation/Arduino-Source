@@ -18,6 +18,7 @@
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA_MenuNavigation.h"
 
 namespace PokemonAutomation{
@@ -25,48 +26,93 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 void overworld_to_main_menu(ConsoleHandle& console, ProControllerContext& context){
-    MainMenuWatcher main_menu_watcher(COLOR_RED, &console.overlay());
-    int ret = run_until<ProControllerContext>(
-        console, context,
-        [&](ProControllerContext& context){
-            for(int i = 0; i < 5; i++){
-                pbf_press_button(context, BUTTON_X, 100ms, 3s);
+    WallClock deadline = current_time() + std::chrono::seconds(120);
+    while (current_time() < deadline){
+        OverworldPartySelectionWatcher overworld(COLOR_RED, &console.overlay());
+        MainMenuWatcher main_menu(COLOR_GREEN, &console.overlay());
+        BoxWatcher box(COLOR_BLUE, &console.overlay());
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(30),
+            {
+                overworld,
+                main_menu,
+                box,
             }
-        },
-        {{main_menu_watcher}}
-    );
-
-    if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "overworld_to_main_menu(): No main menu detected after pressing \"X\" 5 times.",
-            console
         );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            console.log("Detected Overworld...");
+            pbf_press_button(context, BUTTON_X, 160ms, 240ms);
+            continue;
+        case 1:
+            console.log("Detected Main Menu...");
+            return;
+        case 2:
+            console.log("Detected Box System...");
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+            continue;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "overworld_to_main_menu(): No state detected after 30 seconds.",
+                console
+            );
+        }
     }
-    console.log("Entered main menu.");
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "overworld_to_main_menu(): Failed to enter box system after 2 minutes.",
+        console
+    );
 }
 
 void overworld_to_box_system(ConsoleHandle& console, ProControllerContext& context){
-    overworld_to_main_menu(console, context);
-    BoxWatcher box_watcher(COLOR_RED, &console.overlay());
-    int ret = run_until<ProControllerContext>(
-        console, context,
-        [&](ProControllerContext& context){
-            for(int i = 0; i < 5; i++){
-                pbf_press_button(context, BUTTON_A, 100ms, 2s);
+    WallClock deadline = current_time() + std::chrono::seconds(120);
+    while (current_time() < deadline){
+        OverworldPartySelectionWatcher overworld(COLOR_RED, &console.overlay());
+        MainMenuWatcher main_menu(COLOR_GREEN, &console.overlay());
+        BoxWatcher box(COLOR_BLUE, &console.overlay());
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(30),
+            {
+                overworld,
+                main_menu,
+                box,
             }
-        },
-        {{box_watcher}}
-    );
-
-    if (ret < 0){
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "overworld_to_box_system(): No box system view detected after pressing \"A\" 5 times from main menu.",
-            console
         );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            console.log("Detected Overworld...");
+            pbf_press_button(context, BUTTON_X, 160ms, 240ms);
+            continue;
+        case 1:
+            console.log("Detected Main Menu...");
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
+            continue;
+        case 2:
+            console.log("Detected Box System...");
+            return;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "overworld_to_box_system(): No state detected after 30 seconds.",
+                console
+            );
+        }
     }
-    console.log("Entered box system.");
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "overworld_to_box_system(): Failed to enter box system after 2 minutes.",
+        console
+    );
 }
 
 

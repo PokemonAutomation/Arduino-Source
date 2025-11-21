@@ -9,6 +9,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
@@ -31,7 +32,7 @@ using namespace Pokemon;
 ShinyHunt_BenchSit_Descriptor::ShinyHunt_BenchSit_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLZA:ShinyHunt-BenchSit",
-        STRING_POKEMON + " LZA", "Shiny Hunt - Bench Sit",
+        STRING_POKEMON + " LZA", "Bench Sit",
         "Programs/PokemonLZA/ShinyHunt-BenchSit.html",
         "Shiny hunt by repeatedly sitting on a bench to reset spawns.",
         ProgramControllerClass::StandardController_NoRestrictions,
@@ -115,7 +116,7 @@ void run_back_until_found_bench(
     ButtonWatcher buttonA(
         COLOR_RED,
         ButtonType::ButtonA,
-        {0.486, 0.477, 0.115, 0.25},
+        {0.486, 0.477, 0.115, 0.5},
         &env.console.overlay()
     );
 
@@ -145,6 +146,8 @@ void run_back_until_found_bench(
 }
 
 void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     ShinyHunt_BenchSit_Descriptor::Stats& stats = env.current_stats<ShinyHunt_BenchSit_Descriptor::Stats>();
 
     ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);

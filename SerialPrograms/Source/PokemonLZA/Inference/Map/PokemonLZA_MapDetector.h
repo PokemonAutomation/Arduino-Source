@@ -18,6 +18,8 @@ namespace PokemonLZA{
 
 class MapIconDetector;
 
+
+// Detect whether the map view is opened or not
 class MapDetector : public StaticScreenDetector{
 public:
     MapDetector(Color color = COLOR_RED, VideoOverlay* overlay = nullptr);
@@ -36,6 +38,8 @@ public:
     //  Return last detected map icons from attached MapIconDetectors.
     std::vector<DetectedBox> detected_map_icons() const;
 
+    void reset_state() override;
+
 private:
     ButtonDetector m_b_button;
     ButtonDetector m_x_button;
@@ -51,6 +55,16 @@ public:
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
     )
          : DetectorToFinder("MapWatcher", hold_duration, color, overlay)
+    {}
+};
+class MapOverWatcher : public DetectorToFinder<MapDetector>{
+public:
+    MapOverWatcher(
+        Color color = COLOR_RED,
+        VideoOverlay* overlay = nullptr,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("MapWatcher", FinderType::GONE, hold_duration, color, overlay)
     {}
 };
 

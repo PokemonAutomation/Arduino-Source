@@ -14,7 +14,8 @@
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxInfoDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include <iostream>
@@ -458,6 +459,53 @@ int test_pokemonLZA_OverworldPartySelectionDetector(const ImageViewRGB32& image,
     TEST_RESULT_COMPONENT_EQUAL((int)detected_up_idx, expected_up_idx, "dpad_up_idx");
     TEST_RESULT_COMPONENT_EQUAL((int)detected_down_idx, expected_down_idx, "dpad_down_idx");
 
+    return 0;
+}
+
+int test_pokemonLZA_DirectionArrowDetector(const ImageViewRGB32& image, int target_angle){
+    // Expected filename format: <...>_<angle>.png
+    // Where angle is an integer in range [0, 360)
+    // Examples:
+    //   arrow_0.png -> pointing right (0 degrees)
+    //   arrow_90.png -> pointing down (90 degrees)
+    //   arrow_180.png -> pointing left (180 degrees)
+    //   arrow_270.png -> pointing up (270 degrees)
+
+    if (target_angle < 0 || target_angle >= 360){
+        cerr << "Error: target angle must be in range [0, 360), got " << target_angle << "." << endl;
+        return 1;
+    }
+
+    // Run detector
+    DirectionArrowDetector detector(COLOR_RED);
+    bool detected = detector.detect(image);
+
+    if (!detected){
+        cerr << "Error: detector failed to detect arrow in image." << endl;
+        return 1;
+    }
+
+    double detected_angle = detector.detected_angle_deg();
+
+    cout << "Target angle: " << target_angle << ", Detected angle: " << detected_angle << endl;
+
+    // Allow some tolerance in angle detection (±10 degrees)
+    const double tolerance = 10.0;
+
+    // Calculate the angular difference, accounting for wrap-around
+    double diff = std::abs(detected_angle - target_angle);
+    if (diff > 180.0){
+        diff = 360.0 - diff;
+    }
+
+    if (diff > tolerance){
+        cerr << "Error: detected angle " << detected_angle
+             << " differs from target angle " << target_angle
+             << " by " << diff << " degrees (tolerance: " << tolerance << " degrees)." << endl;
+        return 1;
+    }
+
+    cout << "Angle detection successful within tolerance (diff: " << diff << " degrees)." << endl;
     return 0;
 }
 

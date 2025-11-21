@@ -18,8 +18,8 @@ namespace ML{
 
 // Create an ONNX SessionOptions
 // If on macOS, will use CoreML as the backend.
+// If on Windows, will try CUDA first (NVIDIA GPUs), then DirectML (all GPU vendors).
 // Otherwise, use CPU to run the model.
-// TODO: add Cuda backend for Windows machine.
 //
 // model_cache_path: the path to store model caches. This path is better
 //   to be unique for each model for easier file management.

@@ -19,6 +19,7 @@
 #include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
 
 //  Farming
+#include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"
 #include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
 #include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_MegaShardFarmer.h"
@@ -29,6 +30,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_BeldumHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_CafeReset.h"
 
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
@@ -45,7 +47,7 @@ namespace PokemonLZA{
 
 
 PanelListFactory::PanelListFactory()
-    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Legends ZA")
+    : PanelListDescriptor(Pokemon::STRING_POKEMON + " Legends: Z-A")
 {}
 
 std::vector<PanelEntry> PanelListFactory::make_panels() const{
@@ -66,6 +68,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<RestaurantFarmer_Descriptor, RestaurantFarmer>());
     ret.emplace_back(make_single_switch_program<MegaShardFarmer_Descriptor, MegaShardFarmer>());
     ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
+    ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     if (IS_BETA_VERSION){
     }
 
@@ -78,12 +81,15 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
+        ret.emplace_back(make_single_switch_program<ShinyHunt_CafeReset_Descriptor, ShinyHunt_CafeReset>());
     }
 
+//    ret.emplace_back("---- Non-Shiny Hunting ----");
     if (IS_BETA_VERSION){
-        ret.emplace_back("---- Non-Shiny Hunting ----");
-        ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
     }
+
+    ret.emplace_back("---- Public Betas ----");
+    ret.emplace_back(make_single_switch_program<StatsReset_Descriptor, StatsReset>());
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back("---- Developer Tools ----");

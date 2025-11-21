@@ -9,15 +9,20 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
+
+// #include <iostream>
+// using std::cout, std::endl;
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -60,7 +65,7 @@ WildZoneOption::WildZoneOption()
 ShinyHunt_WildZoneEntrance_Descriptor::ShinyHunt_WildZoneEntrance_Descriptor()
     : SingleSwitchProgramDescriptor(
         "PokemonLZA:ShinyHunt-WildZoneEntrance", STRING_POKEMON + " LZA",
-        "Shiny Hunt - Wild Zone Entrance",
+        "Wild Zone Entrance",
         "Programs/PokemonLZA/ShinyHunt-WildZoneEntrance.html",
         "Shiny hunt by repeatedly entering Wild Zone from its entrance.",
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
@@ -73,13 +78,14 @@ public:
         : visits(m_stats["Visits"])
         , chased(m_stats["Chased"])
         , shinies(m_stats["Shiny Sounds"])
+        , game_resets(m_stats["Game Resets"])
         , errors(m_stats["Errors"])
         , day_changes(m_stats["Day/Night Changes"])
     {
         m_display_order.emplace_back("Visits");
         m_display_order.emplace_back("Chased", PreloadSettings::instance().DEVELOPER_MODE ? ALWAYS_VISIBLE : ALWAYS_HIDDEN);
         m_display_order.emplace_back("Shiny Sounds");
-        m_display_order.emplace_back("Game Resets", ALWAYS_HIDDEN);
+        m_display_order.emplace_back("Game Resets");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Day/Night Changes", ALWAYS_HIDDEN);
         m_aliases["Wild Zone"] = "Visits";
@@ -88,6 +94,7 @@ public:
     std::atomic<uint64_t>& visits;
     std::atomic<uint64_t>& chased;
     std::atomic<uint64_t>& shinies;
+    std::atomic<uint64_t>& game_resets;
     std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& day_changes;
 };
@@ -176,11 +183,12 @@ void fast_travel_outside_zone(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
     WildZone wild_zone,
+    bool to_max_zoom_level_on_map,
     std::string extra_error_msg = ""
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
-    bool can_fast_travel = open_map(env.console, context);
+    bool can_fast_travel = open_map(env.console, context, to_max_zoom_level_on_map);
     if (!can_fast_travel){
         stats.errors++;
         env.update_stats();
@@ -225,12 +233,13 @@ void leave_zone_and_reset_spawns(
     ProControllerContext& context,
     Milliseconds walk_time_in_zone,
     WildZone wild_zone,
-    ShinySoundHandler& shiny_sound_handler
+    ShinySoundHandler& shiny_sound_handler,
+    bool to_max_zoom_level_on_map
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
     FastTravelState travel_status = FastTravelState::PURSUED;
-    bool can_fast_travel = open_map(env.console, context);
+    bool can_fast_travel = open_map(env.console, context, to_max_zoom_level_on_map);
     // Open map is robust against day/night change. So after open_map()
     // we are sure we are in map view
     if (can_fast_travel){
@@ -290,11 +299,19 @@ void leave_zone_and_reset_spawns(
     if (ret != 0){
         stats.errors++;
         env.update_stats();
+#if 0
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "leave_zone_and_reset_spawns(): Cannot run back to entrance after being chased by wild pokemon.",
             env.console
         );
+#else
+        throw UserSetupError(
+            env.logger(),
+            "This program requires that you do not get attacked. "
+            "Please choose a location/route that is safe from attack."
+        );
+#endif
     }
     shiny_sound_handler.process_pending(context);
 
@@ -308,7 +325,10 @@ void leave_zone_and_reset_spawns(
 
     // Do a fast travel outside the gate to reset spawns
     std::string extra_eror_msg = " This is after leaving zone.";
-    fast_travel_outside_zone(env, context, wild_zone, std::move(extra_eror_msg));
+    
+    // since we already set up max zoom before, we don't need to do that again when calling fast_travel_outside_zone()
+    bool _go_to_max_zoom_level = false;
+    fast_travel_outside_zone(env, context, wild_zone, _go_to_max_zoom_level, std::move(extra_eror_msg));
 }
 
 // After fast travel back to a wild zone, go through entrance and move forward.
@@ -328,7 +348,8 @@ void do_one_wild_zone_trip(
     Milliseconds walk_time_in_zone,
     bool running,
     WildZone wild_zone,
-    ShinySoundHandler& shiny_sound_handler
+    ShinySoundHandler& shiny_sound_handler,
+    bool to_max_zoom_level_on_map
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
     context.wait_for_all_requests();
@@ -343,6 +364,27 @@ void do_one_wild_zone_trip(
         // Mash button A to enter the zone.
         pbf_mash_button(context, BUTTON_A, 2000ms);
         context.wait_for_all_requests();
+
+        {
+            // Wait for the overworld party view to be back. That is when
+            // the player is given control again after the entering gate animation.
+            OverworldPartySelectionWatcher overworld;
+            int ret = wait_until(
+                env.console, context,
+                std::chrono::seconds(50), // wait for 50 sec to account for possible day/night change happening
+                {overworld}
+            );
+            if (ret < 0){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "do_one_wild_zone_trip(): Unable to detect overworld after entering zone.",
+                    env.console
+                );
+            }
+            env.console.log("Detected overworld after entering zone.");
+        }
+        context.wait_for(100ms);
+
         shiny_sound_handler.process_pending(context);
         // Day/night change can happen before or after the button A mash, so we are not
         // sure if we are in the zone or not! But at end of the travel we will fast
@@ -363,23 +405,30 @@ void do_one_wild_zone_trip(
 
     if (movement_mode <= 1){
         // we are not in the zone. so no wild pokemon handling!
-        fast_travel_outside_zone(env, context, wild_zone);
-    } else {
+        fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map);
+    }else{
         leave_zone_and_reset_spawns(
             env, context,
             walk_time_in_zone, wild_zone,
-            shiny_sound_handler
-        );  
+            shiny_sound_handler,
+            to_max_zoom_level_on_map
+        );
     }
-    // wait 0.5 sec for the game to be ready to control player character again
-    pbf_wait(context, 500ms);
+
     // Now if everything works fine, we are back at the entrance via a fast travel
 
     stats.visits++;
     env.update_stats();
 }
 
+
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+    to_max_zoom_level_on_map = true;
+
+    // Mash button B to let Switch register the controller
+    pbf_mash_button(context, BUTTON_B, 500ms);
+
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
     ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);
@@ -397,15 +446,39 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
         );
     });
 
+    int consecutive_failures = 0;
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
             while (true){
-                do_one_wild_zone_trip(
-                    env, context, 
-                    MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE,
-                    shiny_sound_handler
-                );
+                try{
+                    do_one_wild_zone_trip(
+                        env, context, 
+                        MOVEMENT.current_value(), WALK_TIME_IN_ZONE, RUNNING, WILD_ZONE,
+                        shiny_sound_handler,
+                        to_max_zoom_level_on_map
+                    );
+                    // Fast travel auto saves the game. So now the map is fixed at max zoom level.
+                    // We no longer needs to zoom in future.
+                    to_max_zoom_level_on_map = false;
+
+                    // No failure. Reset consecutive failure counter.
+                    consecutive_failures = 0;
+                }catch (OperationFailedException&){
+                    consecutive_failures++;
+                    env.log("Consecutive failures: " + std::to_string(consecutive_failures), COLOR_RED);
+                    if (consecutive_failures >= 3){
+                        go_home(env.console, context);
+                        throw;
+                    }
+                    env.log("Error encountered. Resetting...", COLOR_RED);
+                    stats.game_resets++;
+                    stats.errors++;
+                    env.update_stats();
+                    env.console.overlay().add_log("Error Found. Reset Game", COLOR_RED);
+                    go_home(env.console, context);
+                    reset_game_from_home(env, env.console, context);
+                }
                 send_program_status_notification(env, NOTIFICATION_STATUS);
             }
         },

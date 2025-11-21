@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/EarlyShutdown.h"
 #include "Common/Cpp/Concurrency/SpinPause.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Exceptions/ProgramFinishedException.h"
@@ -35,9 +36,18 @@ SingleSwitchProgramSession::SingleSwitchProgramSession(SingleSwitchProgramOption
     , m_scope(nullptr)
 {}
 
-SingleSwitchProgramSession::~SingleSwitchProgramSession(){
+
+bool SingleSwitchProgramSession::try_shutdown(){
     SingleSwitchProgramSession::internal_stop_program();
     join_program_thread();
+    return m_system.try_shutdown();
+}
+SingleSwitchProgramSession::~SingleSwitchProgramSession(){
+    blocking_shutdown(
+        logger(),
+        "SingleSwitchProgramSession",
+        [this]{ return try_shutdown(); }
+    );
 }
 
 

@@ -10,12 +10,13 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "PokemonLZA/PokemonLZA_Settings.h"
-#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+//#include "PokemonLZA/PokemonLZA_Settings.h"
+//#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
+//#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA_BeldumHunter.h"
@@ -162,6 +163,8 @@ bool BeldumHunter::run_iteration(SingleSwitchProgramEnvironment& env, ProControl
 
 
 void BeldumHunter::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    assert_16_9_720p_min(env.logger(), env.console);
+
     BeldumHunter_Descriptor::Stats& stats = env.current_stats<BeldumHunter_Descriptor::Stats>();
 
     /*

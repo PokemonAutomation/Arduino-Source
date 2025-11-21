@@ -70,8 +70,6 @@ public:
     MoveEffectivenessSymbolDetector(Color color, VideoOverlay* overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-
-    //  This is not const so that detectors can save/cache state.
     virtual bool detect(const ImageViewRGB32& screen) override;
 
     //  index 0: top
