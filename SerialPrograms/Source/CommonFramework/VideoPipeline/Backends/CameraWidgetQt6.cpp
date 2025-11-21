@@ -11,6 +11,8 @@
 #include <iostream>
 #include <QCamera>
 #include <QPainter>
+#include <QImage>
+#include <QTransform>
 #include <QMediaDevices>
 #include <QVideoSink>
 //#include "Common/Cpp/Exceptions.h"
@@ -213,11 +215,34 @@ void CameraVideoDisplay::paintEvent(QPaintEvent* event){
         return;
     }
 
-    QRect rect(0, 0, this->width(), this->height());
-    QVideoFrame::PaintOptions options;
-    QPainter painter(this);
+    // Convert to image to bypass Qt's automatic rotation based on camera metadata
+    // This ensures the display matches the raw frame orientation used for inference
+    QImage image = frame.toImage();
+    if (image.isNull()){
+        // Fallback to frame.paint() if conversion fails
+        QRect rect(0, 0, this->width(), this->height());
+        QVideoFrame::PaintOptions options;
+        QPainter painter(this);
+        frame.paint(&painter, rect, options);
+        m_source.report_rendered_frame(current_time());
+        return;
+    }
 
-    frame.paint(&painter, rect, options);
+    QPainter painter(this);
+    
+    // Rotate 90 degrees clockwise to compensate for counter-clockwise rotation
+    painter.save();
+    
+    // Transform: move to center, rotate 90° clockwise, move back
+    painter.translate(this->width() / 2.0, this->height() / 2.0);
+    painter.rotate(90.0);
+    
+    // Draw image centered, but with dimensions swapped due to rotation
+    // After 90° rotation, image width becomes height and vice versa
+    QRect imageRect(-this->height() / 2.0, -this->width() / 2.0, this->height(), this->width());
+    painter.drawImage(imageRect, image);
+    
+    painter.restore();
     m_source.report_rendered_frame(current_time());
 }
 
