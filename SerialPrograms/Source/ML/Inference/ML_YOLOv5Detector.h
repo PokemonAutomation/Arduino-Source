@@ -52,8 +52,7 @@ public:
     // - model_path: path to the onnx model file. The label name file should be the same
     //   file path and basename and with _label.txt suffix.
     //   e.g. .../yolo.onnx, .../yolo_label.txt
-    // If model loading fails, no exception is thrown but you can call `model_loaded()` to
-    // check.
+    // If model loading fails, InternalProgramError exception is thrown
     YOLOv5Watcher(VideoOverlay& overlay, const std::string& model_path);
     virtual ~YOLOv5Watcher() {}
 
