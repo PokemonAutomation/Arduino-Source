@@ -1456,14 +1456,7 @@ ImageFloatBox get_yolo_box(
         ImageFloatBox box = detected_box.box;
         std::string label = yolo_detector.session()->label_name(detected_box.label_idx);
         double score = detected_box.score;
-        std::string score_string = std::to_string(std::round(score * 100.0) / 100.0);
-        size_t end = score_string.find_last_not_of('0');
-        if (end != std::string::npos){
-            score_string.erase(end + 1);  // remove trailing zeros
-        }else{
-            score_string.clear();
-        }
-        std::string label_score = label + ": " + score_string;
+        std::string label_score = label + ": " + tostr_fixed(score, 2);
         if (target_label == label){
             overlays.add(COLOR_RED, box, label_score);
             
