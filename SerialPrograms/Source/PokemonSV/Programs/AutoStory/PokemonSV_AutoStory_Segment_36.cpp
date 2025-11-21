@@ -126,7 +126,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         // move towards rock-2-1 until box:  {0.007812, 0.363889, 0.203125, 0.300000}. center-y: 0.513889   center-x: 0.109375
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock-2-1",
-            0.15, 0.300,
+            0.15, 0.25,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
                 move_player_to_realign_via_yolo(env, context, yolo_detector, "rock-2-1", 0.15);  // realign to target X
