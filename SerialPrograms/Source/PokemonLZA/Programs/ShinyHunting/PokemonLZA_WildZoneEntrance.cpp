@@ -356,6 +356,7 @@ void leave_zone_and_reset_spawns(
     case 0:
         break;
     case 1:
+        overworld_gone.output_debug();
         env.log("Day/night change happened while escaping");
         env.console.overlay().add_log("Day/Night Change Detected");
         {

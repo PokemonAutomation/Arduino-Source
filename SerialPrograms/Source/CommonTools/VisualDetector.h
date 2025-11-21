@@ -104,11 +104,14 @@ public:
         case FinderType::GONE:
             if (this->detect(frame) == (m_finder_type == FinderType::GONE)){
                 m_start_of_detection = WallClock::min();
+                m_end_of_detection = WallClock::min();
                 return false;
             }
             if (m_start_of_detection == WallClock::min()){
                 m_start_of_detection = timestamp;
             }
+
+            m_end_of_detection = timestamp;
 
             if (timestamp - m_start_of_detection >= m_duration){
                 this->commit_state();
@@ -154,14 +157,16 @@ public:
     virtual void reset_state() override {
         Detector::reset_state();
         m_start_of_detection = WallClock::min();
+        m_end_of_detection = WallClock::min();
         m_last_detected = 0;
         m_consistent_result = false;
     }
 
-private:
+protected:
     std::chrono::milliseconds m_duration;  // duration of frames to decide detection outcome
     FinderType m_finder_type;
     WallClock m_start_of_detection = WallClock::min();
+    WallClock m_end_of_detection = WallClock::min();
     int8_t m_last_detected = 0; // 0: no prior detection, 1: last detected positive, -1: last detected negative
     bool m_consistent_result = false;
 };

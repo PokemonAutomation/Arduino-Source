@@ -15,6 +15,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 
 #include <array>
+#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -90,6 +91,24 @@ public:
     )
          : DetectorToFinder("OverworldPartySelectionOverWatcher", FinderType::GONE, hold_duration, color, overlay)
     {}
+
+    ~OverworldPartySelectionOverWatcher()
+    {
+        output_debug();
+    }
+
+    void output_debug()
+    {
+        if (printed)
+        {
+            return;
+        }
+        printed = true;
+        WallDuration duration = m_end_of_detection - m_start_of_detection;
+        std::cout << "OverworldPartySelectionOverWatcher. m_start_of_detection:" << m_start_of_detection << " m_end_of_detection:" << m_end_of_detection << " duration:" << duration << std::endl;
+    }
+
+    bool printed = false;
 };
 
 
