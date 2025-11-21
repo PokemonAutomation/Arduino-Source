@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h" 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/Exceptions/UnexpectedBattleException.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
