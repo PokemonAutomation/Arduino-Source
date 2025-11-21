@@ -85,7 +85,7 @@ Ort::SessionOptions create_session_options(const std::string& model_cache_path){
             std::cout << "DirectML execution provider not available, falling back to CPU: " << e.what() << std::endl;
         }
     }
-#endif ENABLE_WIN_GPU
+#endif // ENABLE_WIN_GPU
 #endif
 
     // CPU fallback is always available
