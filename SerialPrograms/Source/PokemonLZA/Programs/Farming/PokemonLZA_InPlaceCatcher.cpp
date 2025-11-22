@@ -13,10 +13,12 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Inference/Battles/PokemonLZA_MoveEffectivenessSymbol.h"
+#include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
 #include "PokemonLZA_InPlaceCatcher.h"
 
@@ -34,7 +36,8 @@ InPlaceCatcher_Descriptor::InPlaceCatcher_Descriptor()
         Pokemon::STRING_POKEMON + " LZA", "In-Place Catcher",
         "Programs/PokemonLZA/InPlaceCatcher.html",
         "Stand in one spot and catch everything that spawns nearby. "
-        "Useful for filling up your boxes.",
+        "Useful for filling up your boxes for the purpose of running Floette "
+        "stats reset or to mass transfer " + Pokemon::STRING_POKEMON + " between saves via Box Trade.",
         ProgramControllerClass::StandardController_NoRestrictions,
         FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS
@@ -48,17 +51,20 @@ public:
         : balls_thrown(m_stats["Balls Thrown"])
         , attacks_fired(m_stats["Attacks Launched"])
         , day_changes(m_stats["Day/Night Changes"])
+        , deaths(m_stats["Day/Night Changes"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Balls Thrown");
         m_display_order.emplace_back("Attacks Launched");
         m_display_order.emplace_back("Day/Night Changes");
+        m_display_order.emplace_back("Deaths", HIDDEN_IF_ZERO);
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& balls_thrown;
     std::atomic<uint64_t>& attacks_fired;
     std::atomic<uint64_t>& day_changes;
+    std::atomic<uint64_t>& deaths;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> InPlaceCatcher_Descriptor::make_stats() const{
@@ -121,12 +127,15 @@ void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerC
         {attack_tracker}
     );
 
+    WallClock last_attack = WallClock::min();
     while (stats.balls_thrown.load(std::memory_order_relaxed) < MAX_BALLS){
         env.update_stats();
         send_program_status_notification(env, NOTIFICATION_STATUS_UPDATE);
 
         MoveEffectivenessSymbolWatcher battle_menu(COLOR_RED, &env.console.overlay(), 100ms);
         DayNightChangeWatcher day_night(COLOR_RED);
+        BlueDialogWatcher dialog(COLOR_BLUE, &env.console.overlay());
+
         context.wait_for_all_requests();
 
         int ret = run_until<ProControllerContext>(
@@ -145,6 +154,7 @@ void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerC
             {
                 battle_menu,
                 day_night,
+                dialog,
             }
         );
         context.wait_for(100ms);
@@ -152,13 +162,19 @@ void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerC
         switch (ret){
         case 0:
             break;
-        case 1:{
+        case 1:
             day_night_handler(env, context);
             continue;
-        }
+        case 2:
+            env.log("You died... Resetting game.", COLOR_RED);
+            stats.deaths++;
+            env.update_stats();
+            go_home(env.console, context);
+            reset_game_from_home(env, env.console, context);
+            continue;
         }
 
-        if (!attack_tracker.currently_active()){
+        if (!attack_tracker.currently_active() || last_attack + 5000ms > current_time()){
             env.log("Detected battle menu. Throwing ball...", COLOR_BLUE);
             pbf_press_button(
                 context,
@@ -176,6 +192,7 @@ void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerC
 
         TrainerBattleState state;
         if (state.attempt_one_attack(env, env.console, context, true, false, false)){
+            last_attack = current_time();
             stats.attacks_fired++;
             env.update_stats();
             pbf_wait(context, 2000ms);
