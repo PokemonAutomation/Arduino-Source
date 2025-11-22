@@ -32,6 +32,7 @@ private:
     void convert(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
     bool try_dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
     void dispatch_conversion(uint64_t seqnum, QVideoFrame frame, WallClock timestamp) noexcept;
+    void cleanup();
 
 private:
     Logger& m_logger;

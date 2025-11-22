@@ -8,9 +8,9 @@
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "VisualInferencePivot.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -97,7 +97,13 @@ void VisualInferencePivot::run(void* event, bool is_back_to_back) noexcept{
                 min_time = current_time() - 2 * callback.period;
             }
 
-            m_last = m_feed.snapshot_recent_nonblocking(min_time);
+            //  TODO: Destructing "m_last" is really slow so this is not the
+            //  best place to do it.
+//            WallClock start = current_time();
+//            cout << "m_feed.snapshot_recent_nonblocking() - start" << endl;
+            m_last = m_feed.snapshot_recent_nonblocking(min_time);  //  Implied destruction.
+//            WallClock end = current_time();
+//            cout << "m_feed.snapshot_recent_nonblocking() - end" << std::chrono::duration_cast<Milliseconds>(end - start).count() << endl;
         }
 
         if (!m_last){

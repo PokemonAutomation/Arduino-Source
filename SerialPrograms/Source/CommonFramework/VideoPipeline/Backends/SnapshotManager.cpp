@@ -73,6 +73,8 @@ void SnapshotManager::convert(uint64_t seqnum, QVideoFrame frame, WallClock time
         }
     }
 
+    cleanup();
+
     //  Warning: The moment we release the lock with (m_active_conversions == 0),
     //  this class can be immediately destructed.
 
@@ -123,6 +125,9 @@ void SnapshotManager::dispatch_conversion(uint64_t seqnum, QVideoFrame frame, Wa
     if (!try_dispatch_conversion(seqnum, std::move(frame), timestamp)){
         m_active_conversions--;
     }
+}
+void SnapshotManager::cleanup(){
+    //  Must call under the lock.
 
     //  Cleanup finished tasks.
     while (!m_pending_conversions.empty()){
@@ -134,7 +139,6 @@ void SnapshotManager::dispatch_conversion(uint64_t seqnum, QVideoFrame frame, Wa
         }
     }
 }
-
 
 
 VideoSnapshot SnapshotManager::snapshot_latest_blocking(){
@@ -201,8 +205,6 @@ VideoSnapshot SnapshotManager::snapshot_recent_nonblocking(WallClock min_time){
 //    WallClock now = current_time();
 
     std::lock_guard<std::mutex> lg(m_lock);
-
-//    cout << "snapshot_recent_nonblocking()" << endl;
 
     //  Already up-to-date. Return it.
     uint64_t seqnum = m_cache.seqnum();
