@@ -117,7 +117,7 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
         {
             {0, "no-movement", "No Movement"},
             {1, "approach-gate", "Approach Gate But Don't Enter"},
-            {2, "enter-zone", "Enter Zone (DANGER! Avoid Wild " + Pokemon::STRING_POKEMON + " Noticing You!)"},
+            {2, "enter-zone", "Enter Zone (Don't Go Too Far or May Get Stuck by Obstacles When Running Back)"},
         },
         LockMode::UNLOCK_WHILE_RUNNING,
         2
