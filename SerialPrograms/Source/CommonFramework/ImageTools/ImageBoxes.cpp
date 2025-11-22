@@ -124,6 +124,32 @@ size_t ImagePixelBox::center_distance_to_point_y(const size_t y) const{
 }
 
 
+
+void ImageFloatBox::merge_with(const ImageFloatBox& box){
+    double max_x = std::max(x + width, box.x + box.width);
+    double max_y = std::max(y + height, box.y + box.height);
+    x = std::min(x, box.x);
+    y = std::min(y, box.y);
+    width = max_x - x;
+    height = max_y - y;
+}
+double ImageFloatBox::overlapping_area(const ImageFloatBox& box) const{
+    double min_x = std::max(this->x, box.x);
+    double max_x = std::min(this->x + this->width, box.x + box.width);
+    if (min_x >= max_x){
+        return 0;
+    }
+    double min_y = std::max(this->y, box.y);
+    double max_y = std::min(this->y + this->height, box.y + box.height);
+    if (min_y >= max_y){
+        return 0;
+    }
+    return (max_x - min_x) * (max_y - min_y);
+}
+
+
+
+
 ImageViewRGB32 extract_box_reference(const ImageViewRGB32& image, const ImagePixelBox& box){
     return image.sub_image(box.min_x, box.min_y, box.width(), box.height());
 }
@@ -192,15 +218,30 @@ ImageFloatBox translate_to_parent(
     const ImageFloatBox& inference_box,
     const ImagePixelBox& box
 ){
-    double width = (double)original_image.width();
-    double height = (double)original_image.height();
-    ptrdiff_t box_x = (ptrdiff_t)(width * inference_box.x + 0.5);
-    ptrdiff_t box_y = (ptrdiff_t)(height * inference_box.y + 0.5);
+    size_t width = original_image.width();
+    size_t height = original_image.height();
+    size_t box_min_x = (size_t)(width * inference_box.x + 0.5);
+    size_t box_min_y = (size_t)(height * inference_box.y + 0.5);
+
+    double inv_width = 1. / (double)width;
+    double inv_height = 1. / (double)height;
+
     return ImageFloatBox(
-        (box_x + box.min_x) / width,
-        (box_y + box.min_y) / height,
-        (box.max_x - box.min_x) / width,
-        (box.max_y - box.min_y) / height
+        (box_min_x + box.min_x) * inv_width,
+        (box_min_y + box.min_y) * inv_height,
+        (box.max_x - box.min_x) * inv_width,
+        (box.max_y - box.min_y) * inv_height
+    );
+}
+ImageFloatBox translate_to_parent(
+    const ImageFloatBox& inference_box,
+    const ImageFloatBox& box
+){
+    return ImageFloatBox(
+        inference_box.x + box.x * inference_box.width,
+        inference_box.y + box.y * inference_box.height,
+        box.width * inference_box.width,
+        box.height * inference_box.height
     );
 }
 

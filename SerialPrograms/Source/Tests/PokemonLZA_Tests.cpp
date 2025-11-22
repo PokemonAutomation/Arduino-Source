@@ -377,8 +377,8 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
         // Draw detected boxes on debug image
         for (const auto& detection : detections){
             const auto& box = detection.box;
-            cout << "  Box: x=" << box.min_x << ", y=" << box.min_y
-                    << ", width=" << box.width() << ", height=" << box.height() << endl;
+            cout << "  Box: x=" << box.x << ", y=" << box.y
+                    << ", width=" << box.width << ", height=" << box.height << endl;
 #ifdef SAVE_DEBUG_IMAGE
             draw_box(debug_image, detection.box, box_color);
 #endif

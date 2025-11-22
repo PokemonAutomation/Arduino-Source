@@ -56,7 +56,7 @@ void merge_overlapping_boxes(
     std::vector<DetectedBox>& input_boxes,
     double tolerance
 ){
-    std::multimap<size_t, DetectedBox> boxes; // detection box area -> box
+    std::multimap<double, DetectedBox> boxes; // detection box area -> box
     for (const DetectedBox& box : input_boxes){
         boxes.emplace(box.box.area(), box);
     }
@@ -69,9 +69,9 @@ void merge_overlapping_boxes(
     while (!boxes.empty()){
         // Start from the smallest box:
         auto current = boxes.begin();
-        const size_t current_area = current->first;
+        const double current_area = current->first;
         // get a max limit of area, e.g. current_box_area * 1.2
-        const size_t limit = (size_t)(current_area * ratio);
+        const double limit = (current_area * ratio);
         auto candidate = current;
         ++candidate;
         while (candidate != boxes.end()){
@@ -80,8 +80,8 @@ void merge_overlapping_boxes(
                 break;
             }
             // candiate area <= limit, further testing there overlapped area
-            size_t overlap_area = current->second.box.overlapping_area(candidate->second.box);
-            if ((double)overlap_area * ratio > current_area){
+            double overlap_area = current->second.box.overlapping_area(candidate->second.box);
+            if (overlap_area * ratio > current_area){
                 current->second.box.merge_with(candidate->second.box);
                 candidate = boxes.erase(candidate);
             }else{
