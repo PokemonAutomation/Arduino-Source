@@ -284,26 +284,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
 
         case 5:
             env.log("Detected battle menu.");
-#if 1
-            battle_state.attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES);
-#else
-            if (battle_state.attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES)){
-                rotate_duration = 100ms;
-            }else{
-                env.log("Failed to select move. Rotating camera...", COLOR_ORANGE);
-                ssf_press_button(context, BUTTON_ZL, 200ms, 400ms, 200ms);
-                if (rotate_duration > Milliseconds(0)){
-                    pbf_move_right_joystick(context, 0, 128, rotate_duration, 0ms);
-                }else{
-                    pbf_move_right_joystick(context, 255, 128, -rotate_duration, 0ms);
-                }
-                rotate_duration *= -2;
-
-                if (rotate_duration < -2000ms || rotate_duration > 2000ms){
-                    rotate_duration = 100ms;
-                }
-            }
-#endif
+            battle_state.attempt_one_attack(env, env.console, context, MOVE_AI, USE_PLUS_MOVES);
             continue;
 
         default:

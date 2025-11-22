@@ -13,10 +13,10 @@
 namespace PokemonAutomation{
 
 template <typename Type> class ControllerContext;
+class ProgramEnvironment;
 
 namespace NintendoSwitch{
 
-class SingleSwitchProgramEnvironment;
 class ProController;
 using ProControllerContext = ControllerContext<ProController>;
 
@@ -42,7 +42,8 @@ public:
     //   detecting flat white dialog windows but it will be external code's responsibility to clear
     //   pre-battle transparent dialog windows.
     bool attempt_one_attack(
-        SingleSwitchProgramEnvironment& env,
+        ProgramEnvironment& env,
+        ConsoleHandle& console,
         ProControllerContext& context,
         bool use_move_ai,
         bool use_plus_moves,

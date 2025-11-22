@@ -97,6 +97,37 @@ bool AlertEyeDetector::detect(const ImageViewRGB32& screen){
 
 
 
+AlertEyeTracker::AlertEyeTracker(Color color, VideoOverlay* overlay, WallDuration min_duration)
+    : AlertEyeDetector(color, overlay)
+    , VisualInferenceCallback("AlertEyeTracker")
+    , m_min_duration(min_duration)
+    , m_first_detection(WallClock::max())
+{}
+
+bool AlertEyeTracker::currently_active() const{
+    ReadSpinLock lg(m_lock);
+    return m_first_detection <= current_time() - m_min_duration;
+}
+
+void AlertEyeTracker::make_overlays(VideoOverlaySet& items) const{
+    AlertEyeDetector::make_overlays(items);
+}
+
+bool AlertEyeTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    if (!detect(frame)){
+        WriteSpinLock lg(m_lock);
+        m_first_detection = WallClock::max();
+        return false;
+    }
+
+    WriteSpinLock lg(m_lock);
+    m_first_detection = std::min(m_first_detection, timestamp);
+
+    return false;
+}
+
+
+
 
 
 

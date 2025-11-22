@@ -84,7 +84,7 @@ FriendshipFarmer::FriendshipFarmer()
         FriendshipAmount::Evolve
     )
     , NUM_PARTY_MEMBERS(
-        "<b>Number of Party Members</b><br><i>Only used for Cafe Method</i>",
+        "<b>Number of Party Members:</b><br><i>Only used for Cafe Method</i>",
         LockMode::LOCK_WHILE_RUNNING,
         6, 1, 6
     )

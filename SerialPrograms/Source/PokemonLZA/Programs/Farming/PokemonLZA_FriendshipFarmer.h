@@ -23,9 +23,9 @@ namespace NintendoSwitch{
 class ProController;
 using ProControllerContext = ControllerContext<ProController>;
 
-namespace PokemonLZA {
+namespace PokemonLZA{
 
-class FriendshipFarmer_Descriptor : public SingleSwitchProgramDescriptor {
+class FriendshipFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
 	FriendshipFarmer_Descriptor();
 

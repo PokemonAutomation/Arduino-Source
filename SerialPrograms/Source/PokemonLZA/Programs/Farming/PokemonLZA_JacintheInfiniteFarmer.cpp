@@ -273,7 +273,7 @@ void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProC
                 while (current_time() - start < 30min){
                     const bool allow_button_B_press = false;
                     battle_state.attempt_one_attack(
-                        env, context,
+                        env, env.console, context,
                         MOVE_AI,
                         USE_PLUS_MOVES,
                         allow_button_B_press

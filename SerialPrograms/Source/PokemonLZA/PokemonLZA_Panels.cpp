@@ -19,10 +19,11 @@
 #include "Programs/Trading/PokemonLZA_SelfBoxTrade.h"
 
 //  Farming
-#include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"
 #include "Programs/Farming/PokemonLZA_RestaurantFarmer.h"
-#include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
 #include "Programs/Farming/PokemonLZA_MegaShardFarmer.h"
+#include "Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h"
+#include "Programs/Farming/PokemonLZA_FriendshipFarmer.h"
+#include "Programs/Farming/PokemonLZA_InPlaceCatcher.h"
 
 //  Shiny Hunting
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h"
@@ -70,6 +71,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
     ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
     if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
@@ -78,10 +80,10 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneEntrance_Descriptor, ShinyHunt_WildZoneEntrance>());
     ret.emplace_back(make_single_switch_program<AutoFossil_Descriptor, AutoFossil>());
     if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<ShinyHunt_CafeReset_Descriptor, ShinyHunt_CafeReset>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
-        ret.emplace_back(make_single_switch_program<ShinyHunt_CafeReset_Descriptor, ShinyHunt_CafeReset>());
     }
 
 //    ret.emplace_back("---- Non-Shiny Hunting ----");
