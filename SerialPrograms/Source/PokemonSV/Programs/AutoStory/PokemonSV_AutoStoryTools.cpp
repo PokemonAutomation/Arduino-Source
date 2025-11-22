@@ -1452,7 +1452,7 @@ ImageFloatBox get_yolo_box(
     yolo_detector.detect(snapshot);
 
     ImageFloatBox target_box{-1, -1, -1, -1};
-    double target_score = 0;
+    double best_score = 0;
     for (YOLOv5Session::DetectionBox detected_box : detected_boxes){
         ImageFloatBox box = detected_box.box;
         std::string label = yolo_detector.session()->label_name(detected_box.label_idx);
@@ -1461,8 +1461,9 @@ ImageFloatBox get_yolo_box(
         if (target_label == label){
             overlays.add(COLOR_RED, box, label_score);
             
-            if (score > target_score){
+            if (score > best_score){
                 target_box = box;
+                best_score = score;
             }
         }else{
             overlays.add(COLOR_BLUE, box, label);
