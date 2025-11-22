@@ -173,7 +173,7 @@ double get_current_facing_angle(
     DirectionArrowWatcher arrow_watcher(COLOR_YELLOW, std::chrono::milliseconds(100));
     int ret = wait_until(
         env.console, context,
-        std::chrono::seconds(1),
+        std::chrono::seconds(40), // 40 sec to account for possible day/night change
         {arrow_watcher}
     );
     if (ret != 0){
