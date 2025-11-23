@@ -40,7 +40,7 @@ namespace{
 class BoxCellSelectionArrowMatcher : public ImageMatch::SubObjectTemplateMatcher{
 public:
     BoxCellSelectionArrowMatcher()
-        : SubObjectTemplateMatcher("PokemonLZA/SelectionArrowDown.png", 100)
+        : SubObjectTemplateMatcher("PokemonLZA/SelectionArrowDown.png", 115)
     {
         // relaxed area ratio upper bound
         m_area_ratio_upper = 1.5;
@@ -60,6 +60,8 @@ public:
         }
         
         set_subobject(objects[0]);
+
+//        extract_box_reference(m_matcher.image_template(), objects[0]).save("template.png");
     }
 
     static const BoxCellSelectionArrowMatcher& matcher(){
@@ -95,9 +97,14 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
     // the arrow's white interior has color between rgb [220, 220, 220] to [255, 255, 255]
     // the arrow's green border has color between rgb [170, 230, 50] to [190, 255, 80]
     std::vector<std::pair<uint32_t, uint32_t>> filters = {
-        {uint32_t(Color(220, 220, 220)), 0xffffffff},
-        {uint32_t(Color(180, 180, 180)), 0xffffffff},
-        {uint32_t(Color(140, 140, 140)), 0xffffffff}
+        {0xff808080, 0xffffffff},
+        {0xff909090, 0xffffffff},
+        {0xffa0a0a0, 0xffffffff},
+        {0xffb0b0b0, 0xffffffff},
+        {0xffc0c0c0, 0xffffffff},
+        {0xffd0d0d0, 0xffffffff},
+        {0xffe0e0e0, 0xffffffff},
+        {0xfff0f0f0, 0xffffffff},
     };
     std::vector<PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(image_crop, filters);
 
@@ -120,11 +127,25 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
 
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
         Kernels::Waterfill::WaterfillObject object;
-        
+
         session->set_source(matrix);
         auto finder = session->make_iterator(min_area);
         const bool keep_object_matrix = false;
         while (finder->find_next(object, keep_object_matrix)){
+            //  Exclude everything that touches the boundaries.
+            if (object.min_x == 0 ||
+                object.min_y == 0 ||
+                object.max_x >= image_crop.width() ||
+                object.max_y >= image_crop.height()
+            ){
+#if 0
+                cout << "object.min_x = " << object.min_x << ", object.min_y = " << object.min_y
+                     << ", object.max_x = " << object.max_x << ", object.max_y = " << object.max_y
+                     << " : " << image_crop.width() << " x " << image_crop.height() << endl;
+#endif
+                continue;
+            }
+
             if (debug_switch){
                 cout << "Find object: area " << object.area << ", save to found_object" << saved_object_id << ".png" << endl;
                 ImagePixelBox box(object);
@@ -139,13 +160,14 @@ bool BoxDetector::detect_at_cell(const ImageViewRGB32& image_crop){
             if (debug_switch){
                 double rmsd_value = matcher.rmsd(found_arrow_box, image_crop, object);
                 cout << "rmsd_value: " << rmsd_value << endl;
-                // if (!matcher.check_aspect_ratio(object.width(), object.height())){
-                //     cout << "aspect ratio check failed" << endl;
-                // }
-                // if (!matcher.check_area_ratio(object.area_ratio())){
-                //     cout << "area ratio check failed: candidate object " << object.area_ratio() << " template " << matcher.m_subobject_area_ratio << endl;
-
-                // }
+#if 0
+                if (!matcher.check_aspect_ratio(object.width(), object.height())){
+                     cout << "aspect ratio check failed" << endl;
+                }
+                if (!matcher.check_area_ratio(object.area_ratio())){
+                    cout << "area ratio check failed: candidate object " << object.area_ratio() << " template " << matcher.m_subobject_area_ratio << endl;
+                }
+#endif
             }
             
             if (matcher.matches(found_arrow_box, image_crop, object)){
@@ -171,8 +193,14 @@ bool BoxDetector::detect(const ImageViewRGB32& screen){
     m_found_row = m_found_col = BoxCursorCoordinates::INVALID;
 
     bool arrow_found = false;
-    for(uint8_t row = 0, cell_idx = 0; row < 6; row++){
-        for(uint8_t col = 0; col < 6; col++, cell_idx++){
+    for (uint8_t row = 0, cell_idx = 0; row < 6; row++){
+        for (uint8_t col = 0; col < 6; col++, cell_idx++){
+#if 0
+            if (row != 3 || col != 5){
+                continue;
+            }
+            cout << "row = " << (int)row << ", col = " << (int)col << endl;
+#endif
             ImageViewRGB32 image_crop = extract_box_reference(screen, m_arrow_boxes[cell_idx]);
             // image_crop.save("cell_" + std::to_string(row) + "_" + std::to_string(col) + ".png");
             const uint8_t debug_cell_row = 255, debug_cell_col = 255;

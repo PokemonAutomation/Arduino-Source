@@ -155,6 +155,7 @@
 #include "PokemonLZA/Inference/Battles/PokemonLZA_RunFromBattleDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
+#include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 
 
 
@@ -295,6 +296,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    auto snapshot = feed.snapshot();
+
+    BoxWatcher box;
+    box.make_overlays(overlays);
+    cout << box.detect(snapshot) << endl;
+
+
+
+
 #if 0
     auto snapshot = feed.snapshot();
     cout << snapshot->width() << " x " << snapshot->height() << endl;
@@ -350,7 +360,7 @@ close_game_from_home(console, context);
 #endif
 
 
-#if 1
+#if 0
     MapIconDetector detector0(COLOR_RED, MapIconType::PokemonCenter, {0, 0, 1, 1}, &overlay);
     MapIconDetector detector1(COLOR_RED, MapIconType::Building, {0, 0, 1, 1}, &overlay);
     MapIconDetector detector2(COLOR_RED, MapIconType::BuildingFlyable, {0, 0, 1, 1}, &overlay);
