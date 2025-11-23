@@ -582,13 +582,16 @@ void do_one_wild_zone_trip(
 
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
-    to_max_zoom_level_on_map = true;
 
-    // Mash button B to let Switch register the controller
+    //  Record when we should zoom out the map for flyable fast travel icon
+    //  detection on map during fast traveling.
+    bool to_max_zoom_level_on_map = true;
+
+    //  Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 500ms);
 
-    // Detect direction arrow to test the detector
-    // m_starting_angle = get_current_facing_angle(env, context);
+    //  Detect direction arrow to test the detector
+    //  m_starting_angle = get_current_facing_angle(env, context);
 
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
