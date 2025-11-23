@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_ShinyHunt_BenchSit_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -41,6 +42,8 @@ private:
 
     IntegerEnumDropdownOption WALK_DIRECTION;
     MillisecondsOption WALK_FORWARD_DURATION;
+    SimpleIntegerOption<uint32_t> PERIODIC_SAVE;
+
     ShinySoundDetectedActionOption SHINY_DETECTED;
 
     EventNotificationOption NOTIFICATION_STATUS;

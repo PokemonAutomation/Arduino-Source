@@ -86,6 +86,13 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
         LockMode::UNLOCK_WHILE_RUNNING,
         "2000 ms"
     )
+    , PERIODIC_SAVE(
+        "<b>Periodically Save:</b><br>"
+        "Save the game every this many bench sits. This reduces the loss to game crashes. Set to zero to disable.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        100,
+        0
+    )
     , SHINY_DETECTED(
         "Shiny Detected", "",
         "2000 ms",
@@ -105,6 +112,7 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
         PA_ADD_OPTION(WALK_DIRECTION);
     }
     PA_ADD_OPTION(WALK_FORWARD_DURATION);
+    PA_ADD_OPTION(PERIODIC_SAVE);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -167,7 +175,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            while (true){
+            for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++) {
                 send_program_status_notification(env, NOTIFICATION_STATUS);
                 sit_on_bench(env.console, context);
                 shiny_sound_handler.process_pending(context);
@@ -204,6 +212,13 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 }
 
                 shiny_sound_handler.process_pending(context);
+
+                uint32_t periodic_save = PERIODIC_SAVE;
+                if (periodic_save != 0 && rounds_since_last_save >= periodic_save) {
+                    save_game_to_menu(env.console, context);
+                    pbf_mash_button(context, BUTTON_B, 2000ms);
+                    rounds_since_last_save = 0;
+                }
             }
         },
         {shiny_detector}
