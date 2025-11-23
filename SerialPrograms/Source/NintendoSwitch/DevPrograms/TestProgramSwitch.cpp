@@ -296,12 +296,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
 
 
+    close_game_from_home(console, context);
+
+
+#if 0
     auto snapshot = feed.snapshot();
 
     BoxWatcher box;
     box.make_overlays(overlays);
     cout << box.detect(snapshot) << endl;
-
+#endif
 
 
 
