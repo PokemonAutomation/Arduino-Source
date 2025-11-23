@@ -206,7 +206,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 shiny_sound_handler.process_pending(context);
             }
         },
-        {{shiny_detector}}
+        {shiny_detector}
     );
 
     //  Shiny sound detected and user requested stopping the program when

@@ -7,12 +7,13 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonTools/Async/InferenceSession.h"
+//#include "CommonTools/Async/InferenceSession.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DayNightChangeDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
@@ -52,19 +53,22 @@ public:
         , attacks_fired(m_stats["Attacks Launched"])
         , day_changes(m_stats["Day/Night Changes"])
         , deaths(m_stats["Day/Night Changes"])
+        , shinies(m_stats["Shinies"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Balls Thrown");
         m_display_order.emplace_back("Attacks Launched");
         m_display_order.emplace_back("Day/Night Changes");
         m_display_order.emplace_back("Deaths", HIDDEN_IF_ZERO);
-        m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Shinies", HIDDEN_IF_ZERO);
+        m_display_order.emplace_back("Deaths", HIDDEN_IF_ZERO);
     }
 
     std::atomic<uint64_t>& balls_thrown;
     std::atomic<uint64_t>& attacks_fired;
     std::atomic<uint64_t>& day_changes;
     std::atomic<uint64_t>& deaths;
+    std::atomic<uint64_t>& shinies;
     std::atomic<uint64_t>& errors;
 };
 std::unique_ptr<StatsTracker> InPlaceCatcher_Descriptor::make_stats() const{
@@ -79,6 +83,11 @@ InPlaceCatcher::InPlaceCatcher()
         LockMode::UNLOCK_WHILE_RUNNING,
         100, 1, 999
     )
+    , SHINY_DETECTED(
+        "Shiny Detected", "",
+        "2000 ms",
+        ShinySoundDetectedAction::STOP_PROGRAM
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -87,6 +96,8 @@ InPlaceCatcher::InPlaceCatcher()
     })
 {
     PA_ADD_OPTION(MAX_BALLS);
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -116,16 +127,12 @@ void InPlaceCatcher::day_night_handler(SingleSwitchProgramEnvironment& env, ProC
         env.console
     );
 }
-
-void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void InPlaceCatcher::run(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    AlertEyeTracker& attack_tracker,
+    ShinySoundHandler& shiny_sound_handler
+){
     InPlaceCatcher_Descriptor::Stats& stats = env.current_stats<InPlaceCatcher_Descriptor::Stats>();
-
-    AlertEyeTracker attack_tracker(COLOR_BLUE, &env.console.overlay(), 5000ms);
-
-    InferenceSession session(
-        context, env.console,
-        {attack_tracker}
-    );
 
     WallClock last_attack = WallClock::min();
     while (stats.balls_thrown.load(std::memory_order_relaxed) < MAX_BALLS){
@@ -137,6 +144,7 @@ void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerC
         BlueDialogWatcher dialog(COLOR_BLUE, &env.console.overlay());
 
         context.wait_for_all_requests();
+        shiny_sound_handler.process_pending(context);
 
         int ret = run_until<ProControllerContext>(
             env.console, context,
@@ -199,8 +207,38 @@ void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerC
         }else{
             env.log("Unable to lock-on for attack.", COLOR_RED);
         }
-
     }
+}
+
+void InPlaceCatcher::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    InPlaceCatcher_Descriptor::Stats& stats = env.current_stats<InPlaceCatcher_Descriptor::Stats>();
+
+    AlertEyeTracker attack_tracker(COLOR_BLUE, &env.console.overlay(), 5000ms);
+
+    ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);
+
+    PokemonLA::ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        //  Warning: This callback will be run from a different thread than this function.
+        stats.shinies++;
+        env.update_stats();
+        env.console.overlay().add_log("Shiny Sound Detected!", COLOR_YELLOW);
+        return shiny_sound_handler.on_shiny_sound(
+            env, env.console,
+            stats.shinies,
+            error_coefficient
+        );
+    });
+
+    run_until<ProControllerContext>(
+        env.console, context,
+        [&](ProControllerContext& context){
+            run(env, context, attack_tracker, shiny_sound_handler);
+        },
+        {
+            attack_tracker,
+            shiny_detector,
+        }
+    );
 
 
     pbf_wait(context, 5 * TICKS_PER_SECOND);
