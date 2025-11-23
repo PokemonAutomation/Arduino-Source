@@ -14,97 +14,8 @@
 
 namespace PokemonAutomation{
 
-#if QT_VERSION_MAJOR == 5
 
-std::string dumpAudioFormat(const QAudioFormat& format){
-    std::ostringstream ss;
-    ss << "Audio format: sample type ";
-    switch(format.sampleType()){
-        case QAudioFormat::SampleType::Float:
-            ss << "Float";
-            break;
-        case QAudioFormat::SampleType::SignedInt:
-            ss << "SignedInt";
-            break;
-        case QAudioFormat::SampleType::UnSignedInt:
-            ss << "UnSignedInt";
-            break;
-        default:
-            ss << "Error";
-    }
-
-    ss <<
-        ", bytes per sample " << format.bytesPerFrame() / format.channelCount() << 
-        ", num channels " << format.channelCount() << 
-        ", sample rate " << format.sampleRate() << 
-        ", codec " << format.codec().toStdString() << std::endl;
-
-    return ss.str();
-}
-
-void setSampleFormatToFloat(QAudioFormat& format){
-    format.setSampleType(QAudioFormat::SampleType::Float);
-    format.setSampleSize(32);
-}
-
-template <typename Type>
-void normalize_type(const QAudioFormat& format, const char* data, size_t len, float* out){
-    if (format.byteOrder() == QAudioFormat::Endian::LittleEndian){
-        normalize_audio_le<Type>(out, reinterpret_cast<const Type*>(data), len/sizeof(Type));
-    }else{
-        normalize_audio_be<Type>(out, reinterpret_cast<const Type*>(data), len/sizeof(Type));
-    }
-}
-
-void convertSamplesToFloat(const QAudioFormat& format, const char* data, size_t len, float* out){
-
-    switch(format.sampleType()){
-    case QAudioFormat::SampleType::Float:
-        if (format.sampleSize() == sizeof(float)*8){
-            memcpy(out, data, len);
-            return;
-        }
-        break;
-    case QAudioFormat::SampleType::SignedInt:
-        switch(format.sampleSize()){
-        case 8:
-            normalize_type<int8_t>(format, data, len, out);
-            return;
-        case 16:
-            normalize_type<int16_t>(format, data, len, out);
-            return;
-        case 32:
-            normalize_type<int32_t>(format, data, len, out);
-            return;
-        default:
-            break;
-        }
-        break;
-    case QAudioFormat::SampleType::UnSignedInt:
-        switch(format.sampleSize()){
-        case 8:
-            normalize_type<uint8_t>(format, data, len, out);
-            return;
-        case 16:
-            normalize_type<uint16_t>(format, data, len, out);
-            return;
-        case 32:
-            normalize_type<uint32_t>(format, data, len, out);
-            return;
-        default:
-            break;
-        }
-        break;
-    default:
-        break;
-    }
-    std::cout << "Error: Unkwnon sample format in convertSamplesToFloat(): ";
-    dumpAudioFormat(format);
-}
-
-#elif QT_VERSION_MAJOR == 6
-
-std::string dumpAudioFormat(const QAudioFormat& format){
+std::string dump_audio_format(const QAudioFormat& format){
     std::string sampleFormatStr = "";
     switch(format.sampleFormat()){
         case QAudioFormat::SampleFormat::Float:
@@ -146,11 +57,11 @@ std::string dumpAudioFormat(const QAudioFormat& format){
     return ss.str();
 }
 
-void setSampleFormatToFloat(QAudioFormat& format){
+void set_sample_format_to_float(QAudioFormat& format){
     format.setSampleFormat(QAudioFormat::SampleFormat::Float);
 }
 
-void convertSamplesToFloat(const QAudioFormat& format, const char* data, size_t len, float* out){
+void convert_samples_to_float(const QAudioFormat& format, const char* data, size_t len, float* out){
     switch(format.sampleFormat()){
     case QAudioFormat::SampleFormat::Float:
         memcpy(out, data, len);
@@ -165,20 +76,19 @@ void convertSamplesToFloat(const QAudioFormat& format, const char* data, size_t 
         normalize_audio_le<uint8_t>(out, reinterpret_cast<const uint8_t*>(data), len/sizeof(uint8_t));
         break;
     default:
-        std::cout << "Error: Unkwnon sample format in convertSamplesToFloat()" << std::endl;
+        std::cout << "Error: Unkwnon sample format in convert_samples_to_float()" << std::endl;
     }
 }
 
-#endif
 
 
-float audioSampleSum(const QAudioFormat& format, const char* data, size_t len){
+float audio_sample_sum(const QAudioFormat& format, const char* data, size_t len){
     const size_t frameBytes = format.bytesPerFrame();
     const size_t numChannels = format.channelCount();
     const size_t sampleBytes = frameBytes / numChannels;
     const size_t numSamples = len / sampleBytes;
     std::vector<float> buffer(numSamples);
-    convertSamplesToFloat(format, data, len, buffer.data());
+    convert_samples_to_float(format, data, len, buffer.data());
 
     float sum = 0.0f;
     for(float v: buffer){

@@ -5,13 +5,8 @@
  */
 
 #include <QtGlobal>
-#if QT_VERSION_MAJOR == 5
-#include <QAudioOutput>
-using NativeAudioSink = QAudioOutput;
-#elif QT_VERSION_MAJOR == 6
 #include <QAudioSink>
 using NativeAudioSink = QAudioSink;
-#endif
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
@@ -19,9 +14,9 @@ using NativeAudioSink = QAudioSink;
 #include "CommonFramework/AudioPipeline/Tools/AudioFormatUtils.h"
 #include "AudioSink.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -99,7 +94,12 @@ private:
 
 AudioSink::~AudioSink(){}
 
-AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, double volume){
+AudioSink::AudioSink(
+    Logger& logger,
+    const AudioDeviceInfo& device,
+    AudioChannelFormat format,
+    double volume
+){
     NativeAudioInfo native_info = device.native_info();
     QAudioFormat native_format = native_info.preferredFormat();
     QAudioFormat target_format = native_format;
@@ -109,11 +109,11 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannel
     AudioSampleFormat sample_format = get_sample_format(target_format);
     if (sample_format == AudioSampleFormat::INVALID){
         sample_format = AudioSampleFormat::FLOAT32;
-        setSampleFormatToFloat(target_format);
+        set_sample_format_to_float(target_format);
     }
 
-    logger.log("AudioOutputDevice(): Target: " + dumpAudioFormat(target_format));
-    logger.log("AudioOutputDevice(): Native: " + dumpAudioFormat(native_format));
+    logger.log("AudioOutputDevice(): Target: " + dump_audio_format(target_format));
+    logger.log("AudioOutputDevice(): Native: " + dump_audio_format(native_format));
     if (!native_info.isFormatSupported(native_format) &&
         native_format != target_format
     ){
@@ -147,9 +147,15 @@ AudioSink::AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannel
         break;
     case AudioChannelFormat::INTERLEAVE_LR_96000:
     case AudioChannelFormat::INTERLEAVE_RL_96000:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Interleaved format not allowed for audio output.");
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Interleaved format not allowed for audio output."
+        );
     default:
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)format));
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Invalid AudioFormat: " + std::to_string((size_t)format)
+        );
     }
 
     m_writer = std::make_unique<AudioOutputDevice>(

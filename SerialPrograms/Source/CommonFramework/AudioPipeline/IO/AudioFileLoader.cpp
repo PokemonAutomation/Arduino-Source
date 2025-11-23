@@ -145,7 +145,7 @@ bool AudioFileLoader::initWavFile(){
         return false;
     }
 
-    std::cout << "Wav file audio format: " << dumpAudioFormat(m_wavFile->audioFormat());
+    std::cout << "Wav file audio format: " << dump_audio_format(m_wavFile->audioFormat());
 
     if (m_audioFormat.sampleRate() != m_wavFile->audioFormat().sampleRate()){
         std::cout << "Error: WavFile sample rate " << m_wavFile->audioFormat().sampleRate() <<
@@ -222,7 +222,7 @@ std::pair<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
     // m_floatBuffer holds the converted float-type samples
     // TODO: design a general format conversion method
     m_floatBuffer.resize(samplesRead);
-    convertSamplesToFloat(wavAudioFormat, m_rawBuffer.data(), wavBytesRead, m_floatBuffer.data());
+    convert_samples_to_float(wavAudioFormat, m_rawBuffer.data(), wavBytesRead, m_floatBuffer.data());
     
     if (m_audioFormat.channelCount() == wavAudioFormat.channelCount()){
         return {
@@ -257,8 +257,8 @@ std::pair<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
     }
     
     std::cout << "Error format conversion" << std::endl;
-    std::cout << "Wav file format: " << dumpAudioFormat(wavAudioFormat);
-    std::cout << "Audio format to convert to: " << dumpAudioFormat(m_audioFormat);
+    std::cout << "Wav file format: " << dump_audio_format(wavAudioFormat);
+    std::cout << "Audio format to convert to: " << dump_audio_format(m_audioFormat);
     return {reinterpret_cast<const char*>(m_floatBuffer.data()), 0};
 }
 

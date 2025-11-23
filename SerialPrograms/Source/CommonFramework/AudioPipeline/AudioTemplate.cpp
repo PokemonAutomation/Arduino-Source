@@ -43,7 +43,7 @@ AudioTemplate loadAudioTemplate(const std::string& filename, size_t sample_rate)
     outputAudioFormat.setCodec("audio/pcm");
 #endif
     outputAudioFormat.setSampleRate((int)sample_rate);
-    setSampleFormatToFloat(outputAudioFormat);
+    set_sample_format_to_float(outputAudioFormat);
     
     AudioFileLoader loader(nullptr, filename, outputAudioFormat);
     const auto ret = loader.loadFullAudio();

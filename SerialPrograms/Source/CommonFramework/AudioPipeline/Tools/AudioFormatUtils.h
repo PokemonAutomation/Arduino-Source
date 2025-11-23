@@ -14,15 +14,15 @@ class QAudioFormat;
 
 namespace PokemonAutomation{
 
-std::string dumpAudioFormat(const QAudioFormat& format);
+std::string dump_audio_format(const QAudioFormat& format);
 
-void setSampleFormatToFloat(QAudioFormat& format);
+void set_sample_format_to_float(QAudioFormat& format);
 
-void convertSamplesToFloat(const QAudioFormat& format, const char* data, size_t len, float* out);
+void convert_samples_to_float(const QAudioFormat& format, const char* data, size_t len, float* out);
 
 // Compute sum of the sample buffer.
 // Used to debug whether the audio stream is always the same values or always zeros.
-float audioSampleSum(const QAudioFormat& format, const char* data, size_t len);
+float audio_sample_sum(const QAudioFormat& format, const char* data, size_t len);
 
 }
 
