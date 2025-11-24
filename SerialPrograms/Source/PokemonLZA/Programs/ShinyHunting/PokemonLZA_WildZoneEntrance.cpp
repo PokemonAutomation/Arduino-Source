@@ -244,8 +244,6 @@ void fast_travel_outside_zone(
     std::string extra_error_msg = "",
     bool map_already_opened = false
 ){
-    ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
-
     if (!map_already_opened){
         if (!open_map(env.console, context, to_max_zoom_level_on_map)){
             OperationFailedException::fire(
