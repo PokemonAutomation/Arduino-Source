@@ -1568,6 +1568,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.cpp
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h
+    Source/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.cpp
+    Source/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.cpp
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.cpp
@@ -1586,6 +1588,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
+    Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.cpp
+    Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.h
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h
     Source/PokemonLZA/PokemonLZA_Panels.cpp
