@@ -244,12 +244,8 @@ void fast_travel_outside_zone(
     std::string extra_error_msg = "",
     bool map_already_opened = false
 ){
-    ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
-
     if (!map_already_opened){
         if (!open_map(env.console, context, to_max_zoom_level_on_map)){
-            stats.errors++;
-            env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
                 "fast_travel_outside_zone(): Fast travel disabled from supposedly outside the entrance." + extra_error_msg,
@@ -262,8 +258,6 @@ void fast_travel_outside_zone(
 
     FastTravelState travel_status = fly_from_map(env.console, context);
     if (travel_status != FastTravelState::SUCCESS){
-        stats.errors++;
-        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "fast_travel_outside_zone(): After moving map cursor, cannot fast travel to the zone." + extra_error_msg,
@@ -329,8 +323,6 @@ void leave_zone_and_reset_spawns(
 
             travel_status = fly_from_map(env.console, context);
             if (travel_status != FastTravelState::SUCCESS){
-                stats.errors++;
-                env.update_stats();
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "leave_zone_and_reset_spawns(): Cannot fast travel to zone from outside the entrance.",
@@ -394,8 +386,6 @@ void leave_zone_and_reset_spawns(
                 env.console.overlay().add_log("Running Back");
                 joystick_y = 255;
             }else{
-                stats.errors++;
-                env.update_stats();
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
                     "leave_zone_and_reset_spawns(): Facing direction after day/night change is wrong: " + tostr_fixed(angle_between, 0) + " deg",
