@@ -94,7 +94,7 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
     }
 
-    if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS) {
+    if (action != ShinySoundDetectedAction::NO_NOTIFICATIONS) {
         send_shiny_sound_notification(env, stream, error_coefficient);
     }
 
