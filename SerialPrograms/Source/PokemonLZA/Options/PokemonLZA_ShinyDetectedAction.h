@@ -27,6 +27,7 @@ enum class ShinySoundDetectedAction{
     STOP_PROGRAM,         // stop program at first detected shiny sound
     NOTIFY_ON_FIRST_ONLY, // notify user only on the first shiny sound, keep running the program
     NOTIFY_ON_ALL,        // notify on all shiny sounds, keep running the program
+    NO_NOTIFICATIONS      // no notifications, still track shiny sounds
 };
 
 

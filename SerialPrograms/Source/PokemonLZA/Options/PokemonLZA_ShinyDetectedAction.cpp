@@ -30,6 +30,7 @@ ShinySoundDetectedActionOption::ShinySoundDetectedActionOption(
         {
             {ShinySoundDetectedAction::STOP_PROGRAM,            "stop",         "Stop program and go Home. Send notification."},
             {ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY,    "notify-first", "Keep running. Notify on first shiny sound only."},
+            {ShinySoundDetectedAction::NO_NOTIFICATIONS,    "no-notifications", "Keep running. Track shiny sounds without sending notifications."},
 //            {ShinySoundDetectedAction::NOTIFY_ON_ALL,           "notify-all",   "Keep running. Notify on all shiny sounds."},
         },
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -84,12 +85,18 @@ bool ShinySoundDetectedActionOption::on_shiny_sound(
         return false;
     }
 
+    if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS && current_count > 1) {
+        return false;
+    }
+
     if (TAKE_VIDEO){
         context.wait_for(SCREENSHOT_DELAY);
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
     }
 
-    send_shiny_sound_notification(env, stream, error_coefficient);
+    if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS) {
+        send_shiny_sound_notification(env, stream, error_coefficient);
+    }
 
     return action == ShinySoundDetectedAction::STOP_PROGRAM;
 }
@@ -141,7 +148,13 @@ bool ShinySoundHandler::on_shiny_sound(
         return false;
     }
 
-    m_option.send_shiny_sound_notification(env, stream, error_coefficient);
+    if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS && current_count > 1){
+		return false;
+	}
+
+    if (action != ShinySoundDetectedAction::NO_NOTIFICATIONS){
+        m_option.send_shiny_sound_notification(env, stream, error_coefficient);
+    }
 
     if (m_pending_video.load(std::memory_order_acquire)){
         stream.log("Back-to-back shiny sounds. Suppressing video.", COLOR_RED);
