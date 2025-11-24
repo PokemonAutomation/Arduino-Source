@@ -37,7 +37,8 @@ ShinySoundDetectedActionOption::ShinySoundDetectedActionOption(
         default_action
     )
     , TAKE_VIDEO(
-        "<b>Take Video:</b>",
+        "<b>Take Video:</b><br>"
+        "Records the first shiny sound using the switch capture button.<br>",
         LockMode::UNLOCK_WHILE_RUNNING,
         true
     )
