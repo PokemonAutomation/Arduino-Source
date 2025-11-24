@@ -145,12 +145,12 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
             env.console, context,
             10000ms,
             {
-                buttonA,
-                arrow,
-                dialog0,
-                dialog1,
-                item_receive,
-                battle_menu,
+                buttonA, // 0
+                arrow,   // 1
+                dialog0, // 2
+                dialog1, // 3 
+                item_receive, // 4
+                battle_menu,  // 5
             }
         );
         context.wait_for(100ms);
@@ -238,12 +238,12 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_mash_button(context, BUTTON_B, 120s);
             },
             {
-                buttonA,
-                arrow,
-                item_receive,
-                dialog0,
-                dialog1,
-                battle_menu,
+                buttonA,      // 0
+                arrow,        // 1
+                item_receive, // 2
+                dialog0,      // 3
+                dialog1,      // 4
+                battle_menu,  // 5
             }
         );
 
