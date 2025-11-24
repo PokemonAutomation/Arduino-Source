@@ -123,6 +123,7 @@ void TrainerBattleState::run_lock_recovery(ConsoleHandle& console, ProController
 
     ssf_press_right_joystick(context, 0, 128, 0ms, 1000ms, 0ms);
     pbf_mash_button(context, BUTTON_ZL, 1000ms);
+    pbf_press_button(context, BUTTON_ZL, 500ms, 0ms);
 }
 
 
