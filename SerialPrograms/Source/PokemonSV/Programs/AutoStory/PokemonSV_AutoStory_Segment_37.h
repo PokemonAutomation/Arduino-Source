@@ -43,8 +43,8 @@ public:
 };
 
 
-// start: 
-// end: 
+// start: Inside Area Zero Station 2. Deactivated the locks.
+// end: Outside Area Zero Station 3. Defeated Great Tusk/Iron Treads.
 void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 // start: 
