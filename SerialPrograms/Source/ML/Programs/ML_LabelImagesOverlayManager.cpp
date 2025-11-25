@@ -105,7 +105,7 @@ void LabelImages_OverlayManager::update_rendered_annotations(){
         if (form != nullptr){
             label = form->display_name();
         }
-        Color mask_box_color = (i_obj == m_selected) ? COLOR_BLACK : COLOR_BLUE;
+        Color mask_box_color = (i_obj == m_selected) ? enum_to_color(m_program.SELECTED_ANNO_COLOR) : COLOR_BLUE;
         m_overlay_set.add(mask_box_color, mask_float_box, label);
         size_t mask_width = obj.mask_box.width();
         size_t mask_height = obj.mask_box.height();

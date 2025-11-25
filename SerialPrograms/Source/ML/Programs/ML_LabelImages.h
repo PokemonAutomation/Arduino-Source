@@ -14,6 +14,7 @@
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "Common/Cpp/Options/StringOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Color.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Pokemon/Options/Pokemon_HomeSpriteSelectOption.h"
@@ -39,6 +40,15 @@ class ImageAnnotationDisplayWidget;
 class LabelImages_Widget;
 class LabelImages_OverlayManager;
 
+
+enum class ColorChoice{
+    BLACK,
+    GREEN,
+    ORANGE,
+    MAGENTA,
+};
+
+Color enum_to_color(ColorChoice color_choice);
 
 class LabelImages_Descriptor : public PanelDescriptor{
 public:
@@ -162,6 +172,9 @@ private:
     StringCell MANUAL_LABEL;
 
     BooleanCheckBoxOption USE_GPU_FOR_EMBEDDER_SESSION;
+
+ 
+    EnumDropdownOption<ColorChoice> SELECTED_ANNO_COLOR;
 
     size_t source_image_height = 0;
     size_t source_image_width = 0;

@@ -131,6 +131,12 @@ LabelImages_Widget::LabelImages_Widget(
     ConfigWidget* gpu_checkbox_widget = program.USE_GPU_FOR_EMBEDDER_SESSION.make_QtWidget(*scroll_inner);
     use_gpu_row->addWidget(&gpu_checkbox_widget->widget(), 2);    
 
+    // add Color selection dropdown
+    QHBoxLayout* color_choice_row = new QHBoxLayout();
+    scroll_layout->addLayout(color_choice_row);
+    ConfigWidget* color_choice_widget = program.SELECTED_ANNO_COLOR.make_QtWidget(*scroll_inner);
+    color_choice_row->addWidget(&color_choice_widget->widget(), 2); 
+
     // add compute embedding button
 
     QHBoxLayout* external_action_row = new QHBoxLayout();
