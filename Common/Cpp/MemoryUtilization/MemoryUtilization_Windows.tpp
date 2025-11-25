@@ -32,7 +32,11 @@ MemoryUsage process_memory_usage(){
             (PROCESS_MEMORY_COUNTERS*)&data,
             sizeof(data)
         )){
-            ret.process_physical_memory = data.PrivateWorkingSetSize;
+            if (data.cb >= sizeof(PROCESS_MEMORY_COUNTERS_EX2)){
+                ret.process_physical_memory = data.PrivateWorkingSetSize;
+            }else{
+                ret.process_physical_memory = data.WorkingSetSize;
+            }
             ret.process_virtual_memory = data.PagefileUsage;
         }
     }
