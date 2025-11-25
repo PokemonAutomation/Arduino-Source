@@ -15,9 +15,7 @@
 #include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
 #include "PokemonLZA/Programs/PokemonLZA_Locations.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonLZA {
+namespace PokemonAutomation::NintendoSwitch::PokemonLZA {
 
 
 class WildZoneOption : public EnumDropdownOption<WildZone>{
@@ -58,7 +56,5 @@ private:
 };
 
 
-}  // namespace PokemonLZA
-}  // namespace NintendoSwitch
-}  // namespace PokemonAutomation
+}  // namespace PokemonAutomation::NintendoSwitch::PokemonLZA
 #endif

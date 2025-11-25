@@ -31,9 +31,7 @@
 // #include <iostream>
 // using std::cout, std::endl;
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonLZA {
+namespace PokemonAutomation::NintendoSwitch::PokemonLZA {
 
 using namespace Pokemon;
 
@@ -630,6 +628,4 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
 }
 
 
-}  // namespace PokemonLZA
-}  // namespace NintendoSwitch
-}  // namespace PokemonAutomation
+}  // namespace PokemonAutomation::NintendoSwitch::PokemonLZA
