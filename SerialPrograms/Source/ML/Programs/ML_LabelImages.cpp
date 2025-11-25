@@ -66,12 +66,24 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , CUSTOM_SET_LABEL(CUSTOM_LABEL_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
     , MANUAL_LABEL(false, LockMode::UNLOCK_WHILE_RUNNING, "", "Custom Label", true)
     , USE_GPU_FOR_EMBEDDER_SESSION("<b>Enable GPU for Embedder session:</b>", LockMode::LOCK_WHILE_RUNNING, true) 
+    , SELECTED_ANNO_COLOR(
+        "<b>Color of selected annotation:",
+        {
+            {ColorChoice::BLACK,         "black",           "Black"},
+            {ColorChoice::GREEN,         "green",           "Green"},
+            {ColorChoice::ORANGE,         "orange",           "Orange"},
+            {ColorChoice::MAGENTA,         "magenta",           "Magenta"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        ColorChoice::BLACK
+    )
 {
     ADD_OPTION(LABEL_TYPE);
     ADD_OPTION(FORM_LABEL);
     ADD_OPTION(CUSTOM_SET_LABEL);
     ADD_OPTION(MANUAL_LABEL);
     ADD_OPTION(USE_GPU_FOR_EMBEDDER_SESSION);
+    ADD_OPTION(SELECTED_ANNO_COLOR);
  
     X.add_listener(*this);
     Y.add_listener(*this);
@@ -691,6 +703,24 @@ void LabelImages::export_to_yolov5_dataset(const std::string& image_folder_path,
     export_image_annotations_to_yolo_dataset(image_folder_path, image_folder_path, dataset_path); // image_folder_path, ML_ANNOTATION_PATH(), dataset_path);
 }
 
+Color enum_to_color(ColorChoice color_choice){
+    switch(color_choice){
+    case ColorChoice::BLACK:
+        return COLOR_BLACK;
+    case ColorChoice::GREEN:
+        return COLOR_GREEN;
+    case ColorChoice::ORANGE:
+        return COLOR_ORANGE;
+    case ColorChoice::MAGENTA:
+        return COLOR_MAGENTA;
+    default:
+        QMessageBox box;
+        box.warning(nullptr, "Error:",
+            QString::fromStdString("Error: Unknown color selected."));
+        return COLOR_BLACK;
+        
+    }
+}
 
 }
 }
