@@ -24,8 +24,8 @@ namespace PokemonAutomation{
 namespace ML{
 
 
-SAMEmbedderSession::SAMEmbedderSession(const std::string& model_path)
-    : m_session_options{create_session_options(ML_MODEL_CACHE_PATH() + "SAMEmbedder/")}
+SAMEmbedderSession::SAMEmbedderSession(const std::string& model_path, bool use_gpu)
+    : m_session_options{create_session_options(ML_MODEL_CACHE_PATH() + "SAMEmbedder/", use_gpu)}
     , session{create_session(m_env, m_session_options, model_path, ML_MODEL_CACHE_PATH() + "SAMEmbedder/")}
     , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , input_names{session.GetInputNames()}
@@ -64,8 +64,8 @@ void SAMEmbedderSession::run(cv::Mat& input_image, std::vector<float>& model_out
 }
 
 
-SAMSession::SAMSession(const std::string& model_path)
-    : m_session_options{create_session_options(ML_MODEL_CACHE_PATH() + "SAM/")}
+SAMSession::SAMSession(const std::string& model_path, bool use_gpu)
+    : m_session_options{create_session_options(ML_MODEL_CACHE_PATH() + "SAM/", use_gpu)}
     , session{create_session(m_env, m_session_options, model_path, ML_MODEL_CACHE_PATH() + "SAM/")}
     , memory_info{Ort::MemoryInfo::CreateCpu(OrtDeviceAllocator, OrtMemTypeCPU)}
     , input_names{session.GetInputNames()}
@@ -176,7 +176,7 @@ void SAMSession::run(
 }
 
 
-void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path){
+void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path, bool use_gpu_for_embedder_session){
     const bool recursive_search = true;
     std::vector<std::string> all_image_paths = find_images_in_folder(image_folder_path, recursive_search);
     if (all_image_paths.size() == 0){
@@ -200,7 +200,8 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         return;
     }
 
-    SAMEmbedderSession embedding_session(embedding_model_path);
+    bool use_gpu = use_gpu_for_embedder_session;
+    std::unique_ptr<SAMEmbedderSession> embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
     std::vector<float> output_image_embedding;
     for (size_t i = 0; i < all_image_paths.size(); i++){
         const auto& image_path = all_image_paths[i];
@@ -236,7 +237,31 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         cv::resize(image, resized_mat, cv::Size(SAM_EMBEDDER_INPUT_IMAGE_WIDTH, SAM_EMBEDDER_INPUT_IMAGE_HEIGHT));
 
         output_image_embedding.clear();
-        embedding_session.run(resized_mat, output_image_embedding);
+        while (true){
+            try{
+                embedding_session->run(resized_mat, output_image_embedding);
+                break;
+            }catch(Ort::Exception& e){
+                if (use_gpu){
+                    std::cerr << "Error: Embedding session failed using the GPU. Fall back to the CPU.\n" << e.what() << std::endl;
+                    use_gpu = false;
+                    embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
+                }else{
+                    std::cerr << "Error: Embedding session failed even when using the CPU.\n" << e.what() << std::endl;
+                    QMessageBox box;
+                    box.warning(nullptr, "Error:",
+                        QString::fromStdString("Error: Embedding session failed."));
+                    return;
+                }
+            }catch(...){
+                std::cerr << "Error: Unknown error." << std::endl;
+                QMessageBox box;
+                box.warning(nullptr, "Error:",
+                    QString::fromStdString("Error: Unknown error. Embedding session failed."));
+                return;
+
+            }
+        }
         save_image_embedding_to_disk(image_path, output_image_embedding);
     }
     std::cout << "Done computing embeddings for images in folder " << image_folder_path << "." << std::endl;
