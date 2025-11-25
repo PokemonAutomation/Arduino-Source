@@ -32,7 +32,7 @@ void panic_dump(const char* location, const char* message){
 
 
 void run_with_catch(const char* location, std::function<void()>&& lambda){
-#if 0
+#ifdef _WIN32
     lambda();
 #else
     try{
