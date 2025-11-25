@@ -32,6 +32,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h"
+#include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 
 //  Non-Shiny Hunting
 #include "Programs/NonShinyHunting/PokemonLZA_StatsReset.h"
@@ -85,6 +86,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
+        ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
     }
 
 //    ret.emplace_back("---- Non-Shiny Hunting ----");
