@@ -28,15 +28,15 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_37::name() const{
-    return "";
+    return "37: Area Zero Station 3";
 }
 
 std::string AutoStory_Segment_37::start_text() const{
-    return "Start: ";
+    return "Start: Inside Area Zero Station 2. Deactivated the locks.";
 }
 
 std::string AutoStory_Segment_37::end_text() const{
-    return "End: ";
+    return "End: Inside Area Zero Station 3. Deactivated the locks.";
 }
 
 void AutoStory_Segment_37::run_segment(
@@ -61,28 +61,24 @@ void AutoStory_Segment_37::run_segment(
 }
 
 std::string AutoStory_Checkpoint_98::name() const{ return "098 - " + AutoStory_Segment_37().name(); }
-std::string AutoStory_Checkpoint_98::start_text() const{ return "";}
-std::string AutoStory_Checkpoint_98::end_text() const{ return "";}
+std::string AutoStory_Checkpoint_98::start_text() const{ return "Inside Area Zero Station 2. Deactivated the locks.";}
+std::string AutoStory_Checkpoint_98::end_text() const{ return "Outside Area Zero Station 3. Defeated Great Tusk/Iron Treads.";}
 void AutoStory_Checkpoint_98::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_98(env, context, options.notif_status_update, stats);
 }
 
 std::string AutoStory_Checkpoint_99::name() const{ return "099 - " + AutoStory_Segment_37().name(); }
-std::string AutoStory_Checkpoint_99::start_text() const{ return "";}
-std::string AutoStory_Checkpoint_99::end_text() const{ return "";}
+std::string AutoStory_Checkpoint_99::start_text() const{ return AutoStory_Checkpoint_98().end_text();}
+std::string AutoStory_Checkpoint_99::end_text() const{ return "Inside Area Zero Station 3. Deactivated the locks.";}
 void AutoStory_Checkpoint_99::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_99(env, context, options.notif_status_update, stats);
 }
 
 void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    // [&](size_t attempt_number){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
 
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-3.onnx");
-
-        #if 0
-        #endif
-        
 
         pbf_move_left_joystick(context, 128, 255, 200, 100);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10, 255, 128);
@@ -271,7 +267,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }        
         );
 
-        // move towards beyond-cliff-3 until box:  
+        // move towards beyond-cliff-3 until it takes up most of screen
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "beyond-cliff-3",
             0.5, 0.9,
             [&](){
@@ -321,41 +317,41 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        
-        #if 0
-        // align to rock.  
-        // center before: 
-        // center after: 
-        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock", 0.000,
-            [&](){
-                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock", 0.000);  // x-position of target object prior to camera move
-                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
-            }        
-        );
-        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "rock", 0.000,
-            [&](){
-                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
-            }        
-        );
-
-        // move towards rock until box:  
-        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "rock",
-            0.000, 0.000,
-            [&](){
-                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock", 0.000);  // realign to target X
-                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
-            }
-        );
-
-        #endif
-
-    // });   
+    });   
 }
 
 void checkpoint_99(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/station-door-1.onnx");  // we can reuse the detector for station door 1.
+
+        do_action_until_dialog(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_press_button(context, BUTTON_R, 160ms, 0ms);
+                move_player_forward(env, context, 20,
+                    [&](){
+                        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-door-1", 0.5,
+                            [&](){
+                                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+                            } 
+                        );
+                        pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+                    }
+                );
+            }
+        );
+
+        mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog
+
+        // disable Lock at Station 3
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog, prompt
+
+
+    });     
 }
 
 
