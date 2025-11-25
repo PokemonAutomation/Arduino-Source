@@ -239,11 +239,12 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         output_image_embedding.clear();
         while (true){
             try{
+                // If fails with GPU, fall back to CPU.
                 embedding_session->run(resized_mat, output_image_embedding);
                 break;
             }catch(Ort::Exception& e){
                 if (use_gpu){
-                    std::cerr << "Error: Embedding session failed using the GPU. Fall back to the CPU.\n" << e.what() << std::endl;
+                    std::cerr << "Warning: Embedding session failed using the GPU. Will reattenpt with the CPU.\n" << e.what() << std::endl;
                     use_gpu = false;
                     embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
                 }else{

@@ -31,6 +31,7 @@ YOLOv5Detector::~YOLOv5Detector() = default;
 
 
 YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
+    : m_model_path(model_path)
 {
     if (!model_path.ends_with(".onnx")){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
@@ -44,7 +45,6 @@ YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
     }
 
     std::string label_file_path = model_path.substr(0, model_path.size() - 5) + "_label.txt";
-    std::vector<std::string> labels;
     if (!std::filesystem::exists(label_file_path)){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, 
             "Error: YOLOv5 label file path " + label_file_path + " does not exist.");
@@ -72,11 +72,11 @@ YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
         if (line.empty() || line[0] == '#'){
             continue;
         }
-        labels.push_back(line);
+        m_labels.push_back(line);
     }
     label_file.close();
 
-    m_yolo_session = std::make_unique<YOLOv5Session>(model_path, std::move(labels));
+    m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, m_labels);
 }
 
 bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
@@ -89,7 +89,36 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
     cv::cvtColor(frame_mat_bgra, frame_mat_rgb, cv::COLOR_BGRA2RGB);
     
     m_output_boxes.clear();
-    m_yolo_session->run(frame_mat_rgb, m_output_boxes);
+
+    // fall back to CPU if fails with GPU.
+    bool use_gpu = true;
+    for(size_t i = 0;;i++){
+        try{
+            // if (i >= 0){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
+            // If fails with GPU, fall back to CPU.
+            m_yolo_session->run(frame_mat_rgb, m_output_boxes);
+        }catch(Ort::Exception& e){
+            if (use_gpu){
+                std::cerr << "Warning: YOLO session failed using the GPU. Will reattenpt with the CPU.\n" << e.what() << std::endl;
+                use_gpu = false;
+                m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, m_labels);
+            }else{
+                std::cerr << "Error: YOLO session failed even when using the CPU.\n" << e.what() << std::endl;
+                QMessageBox box;
+                box.warning(nullptr, "Error:",
+                    QString::fromStdString("Error: YOLO session failed."));
+                return false;
+            }
+        }catch(...){
+            std::cerr << "Error: Unknown error." << std::endl;
+            QMessageBox box;
+            box.warning(nullptr, "Error:",
+                QString::fromStdString("Error: Unknown error. YOLO session failed."));
+            return false;
+
+        }
+    }
+
 
     return m_output_boxes.size() > 0;
 }

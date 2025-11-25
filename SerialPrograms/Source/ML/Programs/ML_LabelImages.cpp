@@ -84,16 +84,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
 
 
 
-    // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
-    const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
-    if (std::filesystem::exists(sam_model_path)){
-        m_sam_session = std::make_unique<SAMSession>(sam_model_path, true);
-    } else{
-        std::cerr << "Error: no such SAM model path " << sam_model_path << "." << std::endl;
-        QMessageBox box;
-        box.critical(nullptr, "SAM Model Does Not Exist",
-            QString::fromStdString("SAM model path" + sam_model_path + " does not exist."));
-    }
+    init_sam_session(true);
 
     m_overlay_manager = new LabelImages_OverlayManager(*this);
 }
@@ -134,6 +125,21 @@ JsonValue LabelImages::to_json() const{
 
     save_annotation_to_file();
     return obj;
+}
+
+void LabelImages::init_sam_session(bool use_gpu){
+    // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
+
+    const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
+    if (std::filesystem::exists(sam_model_path)){
+        m_sam_session = std::make_unique<SAMSession>(sam_model_path, use_gpu);
+    } else{
+        std::cerr << "Error: no such SAM model path " << sam_model_path << "." << std::endl;
+        QMessageBox box;
+        box.critical(nullptr, "SAM Model Does Not Exist",
+            QString::fromStdString("SAM model path" + sam_model_path + " does not exist."));
+    }
+
 }
 
 void LabelImages::save_annotation_to_file() const{
@@ -308,13 +314,40 @@ bool LabelImages::run_sam_to_create_annotation(
         input_point_labels[inclusion_points.size() + i] = 0;
     }
 
-    m_sam_session->run(
-        m_image_embedding,
-        (int)source_height, (int)source_width, input_points, input_point_labels,
-        {static_cast<int>(user_box.min_x), static_cast<int>(user_box.min_y), static_cast<int>(user_box.max_x)-1, static_cast<int>(user_box.max_y)-1},
-        m_output_boolean_mask
-    );
+    // fall back to CPU if fails with GPU.
+    bool use_gpu = true;
+    for(size_t i = 0;;i++){
+        try{
+            // if (i >= 0){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
+            m_sam_session->run(
+                m_image_embedding,
+                (int)source_height, (int)source_width, input_points, input_point_labels,
+                {static_cast<int>(user_box.min_x), static_cast<int>(user_box.min_y), static_cast<int>(user_box.max_x)-1, static_cast<int>(user_box.max_y)-1},
+                m_output_boolean_mask
+            );
+            break;
+        }catch(Ort::Exception& e){
+            if (use_gpu){
+                std::cerr << "Warning: SAM session failed using the GPU. Will reattenpt with the CPU.\n" << e.what() << std::endl;
+                use_gpu = false;
+                init_sam_session(use_gpu);
+            }else{
+                std::cerr << "Error: SAM session failed even when using the CPU.\n" << e.what() << std::endl;
+                QMessageBox box;
+                box.warning(nullptr, "Error:",
+                    QString::fromStdString("Error: SAM session failed."));
+                return false;
+            }
+        }catch(...){
+            std::cerr << "Error: Unknown error." << std::endl;
+            QMessageBox box;
+            box.warning(nullptr, "Error:",
+                QString::fromStdString("Error: Unknown error. SAM session failed."));
+            return false;
 
+        }
+        
+    }
     size_t min_mask_x = INT_MAX, max_mask_x = 0;
     size_t min_mask_y = INT_MAX, max_mask_y = 0;
     for (size_t y = 0; y < source_height; y++){
