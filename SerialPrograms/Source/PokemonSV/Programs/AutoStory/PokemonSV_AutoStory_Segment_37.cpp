@@ -136,12 +136,12 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 
         // align to waterfall-3-1.  
-        // center before: 
+        // center before: y:0.22         x: 0.31
         // center after: center-y: 0.220833   center-x: 0.754687
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "waterfall-3-1", 0.220833,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                move_player_to_realign_via_yolo(env, context, yolo_detector, "waterfall-3-1", 0.754687);  // x-position of target object prior to camera move
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "waterfall-3-1", 0.31);  // x-position of target object prior to camera move
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }        
         );
@@ -201,7 +201,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // align to tree-3-1.  
-        // center before: center-y: 0.413889   center-x: 0.240625
+        // center before: center-y: 0.189   center-x: 0.21
         // center after: center-y: 0.318056   center-x: 0.522656
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-3-1", 0.318056,
             [&](){
