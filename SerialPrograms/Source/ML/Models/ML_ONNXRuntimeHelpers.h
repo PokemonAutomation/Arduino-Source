@@ -23,7 +23,7 @@ namespace ML{
 //
 // model_cache_path: the path to store model caches. This path is better
 //   to be unique for each model for easier file management.
-Ort::SessionOptions create_session_options(const std::string& model_cache_path);
+Ort::SessionOptions create_session_options(const std::string& model_cache_path, bool use_gpu);
 
 
 // Create an ONNX Session. It will also update the model cache on macOS if necessary.

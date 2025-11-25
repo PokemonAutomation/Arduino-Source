@@ -23,12 +23,12 @@ namespace ML{
 
 // Compute embeddings for all images in a folder. Only support .png, .jpg and .jpeg filename extensions so far.
 // This can be very slow!
-void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path);
+void compute_embeddings_for_folder(const std::string& embedding_model_path, const std::string& image_folder_path, bool use_gpu_for_embedder_session);
 
 
 class SAMEmbedderSession{
 public:
-    SAMEmbedderSession(const std::string& model_path);
+    SAMEmbedderSession(const std::string& model_path, bool use_gpu);
 
     // Given an image of shape SAM_EMBEDDER_INPUT_IMAGE_WIDTH x SAM_EMBEDDER_INPUT_IMAGE_HEIGHT, RGB channel order,
     // compute its image embedding as a vector<float> of size [SAM_EMBEDDER_OUTPUT_SIZE]
@@ -52,7 +52,7 @@ private:
 // Run Segment Anything Model in an ONNX session.
 class SAMSession{
 public:
-    SAMSession(const std::string& model_path);
+    SAMSession(const std::string& model_path, bool use_gpu);
 
     // embedding: input embedding
     // input_points: input point coordinates (x, y) in pixel units. [p0_x, p0_y, p1_x, p1_y, p2_x, ...].

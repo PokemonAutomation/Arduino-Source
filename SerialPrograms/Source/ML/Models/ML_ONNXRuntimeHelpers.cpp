@@ -41,7 +41,7 @@ std::string create_file_hash(const std::string& filepath){
 }
 
 
-Ort::SessionOptions create_session_options(const std::string& model_cache_path){
+Ort::SessionOptions create_session_options(const std::string& model_cache_path, bool use_gpu){
     Ort::SessionOptions so;
     std::cout << "Set potential model cache path in session options: " << model_cache_path << std::endl;
 #if __APPLE__
@@ -58,8 +58,7 @@ Ort::SessionOptions create_session_options(const std::string& model_cache_path){
     so.AppendExecutionProvider("CoreML", provider_options);
     std::cout << "Using CoreML execution provider for GPU acceleration" << std::endl;
 #elif _WIN32
-#define ENABLE_WIN_GPU
-#ifdef ENABLE_WIN_GPU
+if (use_gpu){
     // Try CUDA first for NVIDIA GPUs (best performance)
     // CUDA requires NVIDIA GPU and CUDA runtime installation
     // See: https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html
@@ -85,7 +84,7 @@ Ort::SessionOptions create_session_options(const std::string& model_cache_path){
             std::cout << "DirectML execution provider not available, falling back to CPU: " << e.what() << std::endl;
         }
     }
-#endif // ENABLE_WIN_GPU
+}
 #endif
 
     // CPU fallback is always available

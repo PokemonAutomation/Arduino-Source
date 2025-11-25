@@ -65,11 +65,13 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , CUSTOM_LABEL_DATABASE(create_string_select_database({"mc"})) // mc for "main character"
     , CUSTOM_SET_LABEL(CUSTOM_LABEL_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
     , MANUAL_LABEL(false, LockMode::UNLOCK_WHILE_RUNNING, "", "Custom Label", true)
+    , USE_GPU_FOR_EMBEDDER_SESSION("<b>Enable GPU for Embedder session:</b>", LockMode::LOCK_WHILE_RUNNING, true) 
 {
     ADD_OPTION(LABEL_TYPE);
     ADD_OPTION(FORM_LABEL);
     ADD_OPTION(CUSTOM_SET_LABEL);
     ADD_OPTION(MANUAL_LABEL);
+    ADD_OPTION(USE_GPU_FOR_EMBEDDER_SESSION);
  
     X.add_listener(*this);
     Y.add_listener(*this);
@@ -85,7 +87,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
     const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
     if (std::filesystem::exists(sam_model_path)){
-        m_sam_session = std::make_unique<SAMSession>(sam_model_path);
+        m_sam_session = std::make_unique<SAMSession>(sam_model_path, true);
     } else{
         std::cerr << "Error: no such SAM model path " << sam_model_path << "." << std::endl;
         QMessageBox box;
@@ -418,7 +420,7 @@ void LabelImages::remove_segmentation_exclusion_point(double x, double y){
 void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
     std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
     std::cout << "Use SAM Embedding model " << embedding_model_path << std::endl;
-    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path);
+    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path, USE_GPU_FOR_EMBEDDER_SESSION);
 }
 
 void LabelImages::delete_selected_annotation(){

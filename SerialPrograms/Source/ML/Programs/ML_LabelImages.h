@@ -13,6 +13,7 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Pokemon/Options/Pokemon_HomeSpriteSelectOption.h"
@@ -157,6 +158,8 @@ private:
     StringSelectCell CUSTOM_SET_LABEL;
     // source 3: editable text input
     StringCell MANUAL_LABEL;
+
+    BooleanCheckBoxOption USE_GPU_FOR_EMBEDDER_SESSION;
 
     size_t source_image_height = 0;
     size_t source_image_width = 0;
