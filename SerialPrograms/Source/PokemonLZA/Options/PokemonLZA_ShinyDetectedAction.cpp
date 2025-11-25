@@ -28,10 +28,10 @@ ShinySoundDetectedActionOption::ShinySoundDetectedActionOption(
     , ACTION(
         "<b>Action:</b>",
         {
-            {ShinySoundDetectedAction::STOP_PROGRAM,            "stop",         "Stop program and go Home. Send notification."},
-            {ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY,    "notify-first", "Keep running. Notify on first shiny sound only."},
-            {ShinySoundDetectedAction::NO_NOTIFICATIONS,    "no-notifications", "Keep running. Track shiny sounds without sending notifications."},
-//            {ShinySoundDetectedAction::NOTIFY_ON_ALL,           "notify-all",   "Keep running. Notify on all shiny sounds."},
+            {ShinySoundDetectedAction::STOP_PROGRAM,            "stop",             "Stop program and go Home. Send notification."},
+            {ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY,    "notify-first",     "Keep running. Notify on first shiny sound only."},
+            {ShinySoundDetectedAction::NO_NOTIFICATIONS,        "no-notifications", "Keep running. Track shiny sounds without sending notifications."},
+//            {ShinySoundDetectedAction::NOTIFY_ON_ALL,           "notify-all",       "Keep running. Notify on all shiny sounds."},
         },
         LockMode::UNLOCK_WHILE_RUNNING,
         default_action

@@ -110,22 +110,37 @@ void InPlaceCatcher::day_night_handler(SingleSwitchProgramEnvironment& env, ProC
     env.update_stats();
 
     OverworldPartySelectionWatcher overworld(COLOR_RED, &env.console.overlay());
+    BlueDialogWatcher dialog(COLOR_BLUE, &env.console.overlay());
     int ret = wait_until(
         env.console, context,
         120s,
-        {overworld}
+        {
+            overworld,
+            dialog,
+        }
     );
-    if (ret == 0){
+    switch (ret){
+    case 0:
         return;
+
+    case 1:
+        env.log("You died... Resetting game.", COLOR_RED);
+        stats.deaths++;
+        env.update_stats();
+        go_home(env.console, context);
+        reset_game_from_home(env, env.console, context);
+        return;
+
+    default:
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Unable to detect end of day/night change after 2 minutes.",
+            env.console
+        );
     }
 
-    stats.errors++;
-    env.update_stats();
-    OperationFailedException::fire(
-        ErrorReport::SEND_ERROR_REPORT,
-        "Unable to detect end of day/night change after 2 minutes.",
-        env.console
-    );
 }
 void InPlaceCatcher::run(
     SingleSwitchProgramEnvironment& env, ProControllerContext& context,
@@ -170,9 +185,11 @@ void InPlaceCatcher::run(
         switch (ret){
         case 0:
             break;
+
         case 1:
             day_night_handler(env, context);
             continue;
+
         case 2:
             env.log("You died... Resetting game.", COLOR_RED);
             stats.deaths++;
