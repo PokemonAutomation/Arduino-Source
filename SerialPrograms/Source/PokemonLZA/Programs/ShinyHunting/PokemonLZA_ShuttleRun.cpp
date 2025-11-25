@@ -58,15 +58,16 @@ std::unique_ptr<StatsTracker> ShinyHunt_ShuttleRun_Descriptor::make_stats() cons
 ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
     : DURATION("<b>Duration:</b><br>Run the program this long.", LockMode::UNLOCK_WHILE_RUNNING, "5 h")
     , ROUTE("<b>Hunt Route:</b>",
-            {
-                {Routes::KLEFKI,  "klefki",  "Sewers: Klefki"},
-                {Routes::KLEFKI_INKAY_GOOMY,  "klefki_inkay_goomy",  "Sewers: Klefki+Inkay+Goomy"},
-                {Routes::LITWICK,  "litwick",  "Sewers: Litwick"},
-                {Routes::SKRELP,  "skrelp",  "Sewers: Skrelp"},
-                // {Routes::SCRAGGY,  "scraggy",  "Sewers: Scraggy"},
-            },
-            LockMode::LOCK_WHILE_RUNNING,
-            Routes::KLEFKI)
+        {
+            {Routes::KLEFKI,  "klefki",  "Sewers: Klefki"},
+            {Routes::KLEFKI_INKAY_GOOMY,  "klefki_inkay_goomy",  "Sewers: Klefki+Inkay+Goomy"},
+            {Routes::LITWICK,  "litwick",  "Sewers: Litwick"},
+            {Routes::SKRELP,  "skrelp",  "Sewers: Skrelp"},
+            // {Routes::SCRAGGY,  "scraggy",  "Sewers: Scraggy"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        Routes::KLEFKI
+    )
     , SHINY_DETECTED("Shiny Detected", "", "1000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({

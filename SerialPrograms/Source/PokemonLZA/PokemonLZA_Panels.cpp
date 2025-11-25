@@ -26,10 +26,10 @@
 #include "Programs/Farming/PokemonLZA_InPlaceCatcher.h"
 
 //  Shiny Hunting
+#include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h"
 #include "Programs/ShinyHunting/PokemonLZA_BeldumHunter.h"
-#include "Programs/ShinyHunting/PokemonLZA_AutoFossil.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
@@ -77,16 +77,16 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
+    ret.emplace_back(make_single_switch_program<AutoFossil_Descriptor, AutoFossil>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_BenchSit_Descriptor, ShinyHunt_BenchSit>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldReset_Descriptor, ShinyHunt_OverworldReset>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneEntrance_Descriptor, ShinyHunt_WildZoneEntrance>());
-    ret.emplace_back(make_single_switch_program<AutoFossil_Descriptor, AutoFossil>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
+        ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
-        ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
     }
 
 //    ret.emplace_back("---- Non-Shiny Hunting ----");
