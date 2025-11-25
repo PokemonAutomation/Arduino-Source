@@ -81,6 +81,15 @@ void wait_until_overworld(
     std::chrono::milliseconds max_wait_time = std::chrono::seconds(40)
 );
 
+// Read the minimap to get the direction the blue directional arrow is facing. The arrow
+// represents which direction the player character is facing.
+// If day/night change happens to appear during reading the minimap, it will wait until
+// the day/night hange finishes.
+// Return a float of [0.0, 360.0), the angle of the arrow using the clock setting, i.e.
+// - Pointing upwards is 0.0 degree.
+// - Pointing to the right is 90.0 degrees.
+double get_current_facing_angle(ConsoleHandle& console, ProControllerContext& context);
+
 
 }
 }

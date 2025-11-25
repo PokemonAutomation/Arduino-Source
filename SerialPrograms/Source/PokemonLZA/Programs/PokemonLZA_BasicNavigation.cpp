@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -11,12 +12,13 @@
 //#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
 namespace PokemonAutomation{
@@ -384,6 +386,32 @@ void wait_until_overworld(
     }
     console.log("Detected overworld within " + std::to_string(max_wait_time.count()) + " milliseconds");
     context.wait_for(100ms); // extra 0.1 sec to let game give player control
+}
+
+
+double get_current_facing_angle(
+    ConsoleHandle& console,
+    ProControllerContext& context
+){
+    DirectionArrowWatcher arrow_watcher(COLOR_YELLOW, std::chrono::milliseconds(100));
+    int ret = wait_until(
+        console, context,
+        std::chrono::seconds(40), // 40 sec to account for possible day/night change
+        {arrow_watcher}
+    );
+    if (ret != 0){
+        console.log("Direction arrow not detected within 1 second");
+        console.overlay().add_log("No Minimap Arrow Found", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "get_current_facing_angle(): Direction arrow on minimap not detected within 1 second",
+            console
+        );
+    }
+    double angle = arrow_watcher.detected_angle_deg();
+    console.log("Direction arrow detected! Angle: " + tostr_fixed(angle, 0) + " degrees");
+    console.overlay().add_log("Minimap Arrow: " + tostr_fixed(angle, 0) + " deg", COLOR_YELLOW);
+    return angle;
 }
 
 

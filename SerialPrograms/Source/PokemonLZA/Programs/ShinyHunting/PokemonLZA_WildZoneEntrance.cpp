@@ -4,12 +4,12 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Time.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -22,7 +22,6 @@
 #include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
-#include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
@@ -166,33 +165,10 @@ void ShinyHunt_WildZoneEntrance::on_config_value_changed(void* object){
     }
 }
 
-double get_current_facing_angle(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
-){
-    DirectionArrowWatcher arrow_watcher(COLOR_YELLOW, std::chrono::milliseconds(100));
-    int ret = wait_until(
-        env.console, context,
-        std::chrono::seconds(40), // 40 sec to account for possible day/night change
-        {arrow_watcher}
-    );
-    if (ret != 0){
-        env.log("Direction arrow not detected within 1 second");
-        env.console.overlay().add_log("No Minimap Arrow Found", COLOR_RED);
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "get_current_facing_angle(): Direction arrow on minimap not detected within 1 second",
-            env.console
-        );
-    }
-    double angle = arrow_watcher.detected_angle_deg();
-    env.log("Direction arrow detected! Angle: " + tostr_fixed(angle, 0) + " degrees");
-    env.console.overlay().add_log("Minimap Arrow: " + tostr_fixed(angle, 0) + " deg", COLOR_YELLOW);
-    return angle;
-}
+
 
 // After fast travel, move forward to enter wild zone.
-// This function is robust against day/night changes
+// This function is robust against day/night changes.
 void go_to_entrance(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context
@@ -344,7 +320,7 @@ void leave_zone_and_reset_spawns(
     stats.chased++;
     env.update_stats();
 
-    const double starting_angle = get_current_facing_angle(env, context);
+    const double starting_angle = get_current_facing_angle(env.console, context);
 
     ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
     OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &env.console.overlay(), std::chrono::milliseconds(400));
@@ -365,7 +341,7 @@ void leave_zone_and_reset_spawns(
         env.console.overlay().add_log("Day/Night Change Detected");
         {
             wait_until_overworld(env.console, context);
-            double current_facing_angle = get_current_facing_angle(env, context);
+            double current_facing_angle = get_current_facing_angle(env.console, context);
             double angle_between = std::fabs(starting_angle - current_facing_angle);
             if (angle_between > 180.0){
                 angle_between = 360.0 - angle_between;
