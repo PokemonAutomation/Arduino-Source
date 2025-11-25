@@ -1,13 +1,13 @@
-/*  Shiny Hunt - Cafe Reset
+/*  Shiny Hunt - Fly Spot Reset
  *
  *  From: https://github.com/PokemonAutomation/
  *
- *  Repeatedly fast travel to the same cafe to shiny hunt surrounding pokemon.
+ *  Repeatedly fast travel to the same location to shiny hunt surrounding pokemon.
  *  This is mostly for a single spawner: alpha Swirlix near Nouveau Cafe (Truck No. 3).
  */
 
-#ifndef PokemonAutomation_PokemonLZA_ShinyHunt_CafeReset_H
-#define PokemonAutomation_PokemonLZA_ShinyHunt_CafeReset_H
+#ifndef PokemonAutomation_PokemonLZA_ShinyHunt_FlySpotReset_H
+#define PokemonAutomation_PokemonLZA_ShinyHunt_FlySpotReset_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
@@ -19,18 +19,18 @@ namespace NintendoSwitch {
 namespace PokemonLZA {
 
 
-class ShinyHunt_CafeReset_Descriptor : public SingleSwitchProgramDescriptor {
+class ShinyHunt_FlySpotReset_Descriptor : public SingleSwitchProgramDescriptor {
 public:
-    ShinyHunt_CafeReset_Descriptor();
+    ShinyHunt_FlySpotReset_Descriptor();
 
     class Stats;
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 
-class ShinyHunt_CafeReset : public SingleSwitchProgramInstance{
+class ShinyHunt_FlySpotReset : public SingleSwitchProgramInstance{
 public:
-    ShinyHunt_CafeReset();
+    ShinyHunt_FlySpotReset();
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
