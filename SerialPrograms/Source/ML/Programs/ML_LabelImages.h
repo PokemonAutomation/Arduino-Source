@@ -43,9 +43,14 @@ class LabelImages_OverlayManager;
 
 enum class ColorChoice{
     BLACK,
+    RED,
+    BLUE,
+    YELLOW,
     GREEN,
     ORANGE,
     MAGENTA,
+    PURPLE,
+    CYAN,
 };
 
 Color enum_to_color(ColorChoice color_choice);
@@ -177,6 +182,8 @@ private:
 
  
     EnumDropdownOption<ColorChoice> SELECTED_ANNO_COLOR;
+    EnumDropdownOption<ColorChoice> UNSELECTED_ANNO_COLOR;
+    EnumDropdownOption<ColorChoice> CURRENT_DRAWN_BOX;
 
     size_t source_image_height = 0;
     size_t source_image_width = 0;
