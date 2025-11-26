@@ -78,7 +78,7 @@ YOLOv5Detector::YOLOv5Detector(const std::string& model_path)
     }
     label_file.close();
 
-    m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, std::move(labels));
+    m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, std::move(labels), m_use_gpu);
 }
 
 bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
@@ -104,7 +104,7 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
                 std::cerr << "Warning: YOLO session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
                 m_use_gpu = false;
                 std::vector<std::string> labels = m_yolo_session->get_label_names();
-                m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, std::move(labels));
+                m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, std::move(labels), m_use_gpu);
             }else{
                 std::cerr << "Error: YOLO session failed even when using the CPU.\n" << e.what() << std::endl;
                 throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Error: YOLO session failed.");
