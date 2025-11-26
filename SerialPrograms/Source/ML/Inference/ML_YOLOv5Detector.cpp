@@ -106,11 +106,9 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
                 std::vector<std::string> labels = m_yolo_session->get_label_names();
                 m_yolo_session = std::make_unique<YOLOv5Session>(m_model_path, std::move(labels), m_use_gpu);
             }else{
-                std::cerr << "Error: YOLO session failed even when using the CPU.\n" << e.what() << std::endl;
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Error: YOLO session failed.");
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Error: YOLO session failed even when using the CPU." + std::string(e.what()));
             }
         }catch(...){
-            std::cerr << "Error: Unknown error." << std::endl;
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown error: YOLO session failed.");
 
         }
