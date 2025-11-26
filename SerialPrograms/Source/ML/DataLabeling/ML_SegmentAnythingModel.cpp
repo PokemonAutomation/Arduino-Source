@@ -244,7 +244,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
                 break;
             }catch(Ort::Exception& e){
                 if (use_gpu){
-                    std::cerr << "Warning: Embedding session failed using the GPU. Will reattenpt with the CPU.\n" << e.what() << std::endl;
+                    std::cerr << "Warning: Embedding session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
                     use_gpu = false;
                     embedding_session = make_unique<SAMEmbedderSession>(embedding_model_path, use_gpu);
                 }else{

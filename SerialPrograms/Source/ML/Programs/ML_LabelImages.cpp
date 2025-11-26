@@ -55,6 +55,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_display_session(m_display_option)
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
+    , m_use_gpu_for_sam_anno(true)
     , X("<b>X Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
@@ -327,10 +328,9 @@ bool LabelImages::run_sam_to_create_annotation(
     }
 
     // fall back to CPU if fails with GPU.
-    bool use_gpu = true;
     for(size_t i = 0;;i++){
         try{
-            // if (i >= 0){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
+            // if (m_use_gpu_for_sam_anno){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
             m_sam_session->run(
                 m_image_embedding,
                 (int)source_height, (int)source_width, input_points, input_point_labels,
@@ -339,10 +339,10 @@ bool LabelImages::run_sam_to_create_annotation(
             );
             break;
         }catch(Ort::Exception& e){
-            if (use_gpu){
-                std::cerr << "Warning: SAM session failed using the GPU. Will reattenpt with the CPU.\n" << e.what() << std::endl;
-                use_gpu = false;
-                init_sam_session(use_gpu);
+            if (m_use_gpu_for_sam_anno){
+                std::cerr << "Warning: SAM session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
+                m_use_gpu_for_sam_anno = false;
+                init_sam_session(m_use_gpu_for_sam_anno);
             }else{
                 std::cerr << "Error: SAM session failed even when using the CPU.\n" << e.what() << std::endl;
                 QMessageBox box;
