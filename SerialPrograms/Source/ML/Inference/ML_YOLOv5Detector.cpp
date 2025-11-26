@@ -93,7 +93,7 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
     m_output_boxes.clear();
 
     // fall back to CPU if fails with GPU.
-    for(size_t i = 0;;i++){
+    for(size_t i = 0; i < 2; i++){
         try{
             // if (m_use_gpu){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
             // If fails with GPU, fall back to CPU.
@@ -113,6 +113,10 @@ bool YOLOv5Detector::detect(const ImageViewRGB32& screen){
             std::cerr << "Error: Unknown error." << std::endl;
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unknown error: YOLO session failed.");
 
+        }
+
+        if (i > 0){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Internal Program Error: This section of code shouldn't be reachable.");
         }
     }
 

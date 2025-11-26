@@ -328,7 +328,7 @@ bool LabelImages::run_sam_to_create_annotation(
     }
 
     // fall back to CPU if fails with GPU.
-    for(size_t i = 0;;i++){
+    for(size_t i = 0; i < 2; i++){
         try{
             // if (m_use_gpu_for_sam_anno){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
             m_sam_session->run(
@@ -357,6 +357,14 @@ bool LabelImages::run_sam_to_create_annotation(
                 QString::fromStdString("Error: Unknown error. SAM session failed."));
             return false;
 
+        }
+
+        if (i > 0){
+            std::cerr << "Internal Program Error: This section of code shouldn't be reachable." << std::endl;
+            QMessageBox box;
+            box.warning(nullptr, "Error:",
+                QString::fromStdString("Internal Program Error: This section of code shouldn't be reachable."));
+            return false;
         }
         
     }
