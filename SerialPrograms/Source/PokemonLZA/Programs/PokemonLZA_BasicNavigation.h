@@ -24,7 +24,8 @@ namespace PokemonLZA{
 
 //  Starting from either the overworld or the main menu, save the game.
 //  This function returns in the main menu.
-void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context);
+//  Return true if the game is saved successfully, false otherwise.
+bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context);
 
 
 

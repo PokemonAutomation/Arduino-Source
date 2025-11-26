@@ -88,7 +88,7 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
     )
     , PERIODIC_SAVE(
         "<b>Periodically Save:</b><br>"
-        "Save the game every this many bench sits. This reduces the loss to game crashes. Set to zero to disable.",
+        "Save the game every this many bench sits. This reduces the loss to game crashes. Set to zero to disable. Saving will be unsuccessful if you are under attack",
         LockMode::UNLOCK_WHILE_RUNNING,
         100,
         0
@@ -181,6 +181,19 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 shiny_sound_handler.process_pending(context);
                 stats.resets++;
                 env.update_stats();
+
+                uint32_t periodic_save = PERIODIC_SAVE;
+                if (periodic_save != 0 && rounds_since_last_save >= periodic_save) {
+                    bool save_successful = save_game_to_menu(env.console, context);
+                    pbf_mash_button(context, BUTTON_B, 2000ms);
+                    if (save_successful) {
+                        env.console.overlay().add_log("Game Saved Successfully", COLOR_BLUE);
+                        rounds_since_last_save = 0;
+                    } else {
+                        env.console.overlay().add_log("Game Save Failed. Will attempt to save after the next reset.", COLOR_RED);
+					}
+                }
+
                 Milliseconds duration = WALK_FORWARD_DURATION;
                 if (duration > Milliseconds::zero()){
                     if (WALK_DIRECTION.current_value() == 0){ // forward
@@ -212,13 +225,6 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 }
 
                 shiny_sound_handler.process_pending(context);
-
-                uint32_t periodic_save = PERIODIC_SAVE;
-                if (periodic_save != 0 && rounds_since_last_save >= periodic_save) {
-                    save_game_to_menu(env.console, context);
-                    pbf_mash_button(context, BUTTON_B, 2000ms);
-                    rounds_since_last_save = 0;
-                }
             }
         },
         {shiny_detector}
