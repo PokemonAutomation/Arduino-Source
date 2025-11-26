@@ -71,12 +71,49 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
         "<b>Color of selected annotation:",
         {
             {ColorChoice::BLACK,         "black",           "Black"},
+            {ColorChoice::RED,         "red",           "Red"},
+            {ColorChoice::BLUE,         "blue",           "Blue"},
+            {ColorChoice::YELLOW,         "yellow",           "Yellow"},
             {ColorChoice::GREEN,         "green",           "Green"},
             {ColorChoice::ORANGE,         "orange",           "Orange"},
             {ColorChoice::MAGENTA,         "magenta",           "Magenta"},
+            {ColorChoice::PURPLE,         "purple",           "Purple"},
+            {ColorChoice::CYAN,         "cyan",           "Cyan"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         ColorChoice::BLACK
+    )
+    , UNSELECTED_ANNO_COLOR(
+        "<b>Color of unselected annotation:",
+        {
+            {ColorChoice::BLACK,         "black",           "Black"},
+            {ColorChoice::RED,         "red",           "Red"},
+            {ColorChoice::BLUE,         "blue",           "Blue"},
+            {ColorChoice::YELLOW,         "yellow",           "Yellow"},
+            {ColorChoice::GREEN,         "green",           "Green"},
+            {ColorChoice::ORANGE,         "orange",           "Orange"},
+            {ColorChoice::MAGENTA,         "magenta",           "Magenta"},
+            {ColorChoice::PURPLE,         "purple",           "Purple"},
+            {ColorChoice::CYAN,         "cyan",           "Cyan"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        ColorChoice::BLUE
+    )
+    , CURRENT_DRAWN_BOX(
+        "<b>Color of current drawn box:",
+        {
+            {ColorChoice::BLACK,         "black",           "Black"},
+            {ColorChoice::RED,         "red",           "Red"},
+            {ColorChoice::BLUE,         "blue",           "Blue"},
+            {ColorChoice::YELLOW,         "yellow",           "Yellow"},
+            {ColorChoice::GREEN,         "green",           "Green"},
+            {ColorChoice::ORANGE,         "orange",           "Orange"},
+            {ColorChoice::MAGENTA,         "magenta",           "Magenta"},
+            {ColorChoice::PURPLE,         "purple",           "Purple"},
+            {ColorChoice::CYAN,         "cyan",           "Cyan"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        ColorChoice::RED
     )
 {
     ADD_OPTION(LABEL_TYPE);
@@ -85,6 +122,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     ADD_OPTION(MANUAL_LABEL);
     ADD_OPTION(USE_GPU_FOR_EMBEDDER_SESSION);
     ADD_OPTION(SELECTED_ANNO_COLOR);
+    ADD_OPTION(UNSELECTED_ANNO_COLOR);
  
     X.add_listener(*this);
     Y.add_listener(*this);
@@ -715,12 +753,22 @@ Color enum_to_color(ColorChoice color_choice){
     switch(color_choice){
     case ColorChoice::BLACK:
         return COLOR_BLACK;
+    case ColorChoice::RED:
+        return COLOR_RED;
+    case ColorChoice::BLUE:
+        return COLOR_BLUE;
+    case ColorChoice::YELLOW:
+        return COLOR_YELLOW;
     case ColorChoice::GREEN:
         return COLOR_GREEN;
     case ColorChoice::ORANGE:
         return COLOR_ORANGE;
     case ColorChoice::MAGENTA:
         return COLOR_MAGENTA;
+    case ColorChoice::PURPLE:
+        return COLOR_PURPLE;
+    case ColorChoice::CYAN:
+        return COLOR_CYAN;
     default:
         QMessageBox box;
         box.warning(nullptr, "Error:",
