@@ -239,7 +239,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         output_image_embedding.clear();
 
         // fall back to CPU if fails with GPU.
-        for(size_t i = 0; i < 2; i++){
+        for(size_t j = 0; j < 2; j++){
             try{
                 // If fails with GPU, fall back to CPU.
                 embedding_session->run(resized_mat, output_image_embedding);
@@ -265,12 +265,12 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
 
             }
 
-            if (i > 0){
+            if (j > 0){
                 std::cerr << "Internal Program Error: This section of code shouldn't be reachable." << std::endl;
                 QMessageBox box;
                 box.warning(nullptr, "Error:",
                     QString::fromStdString("Internal Program Error: This section of code shouldn't be reachable."));
-                return false;
+                return;
             }
         }
         save_image_embedding_to_disk(image_path, output_image_embedding);
