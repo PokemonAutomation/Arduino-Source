@@ -27,7 +27,7 @@ namespace PokemonLZA{
 
 
 
-void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
+bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
 
     bool seen_save_button = false;
     bool seen_saved_dialog = false;
@@ -59,9 +59,9 @@ void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
             std::chrono::seconds(30),
             {
                 overworld,
+                dialog,
                 main_menu,
                 save_button,
-                dialog,
             }
         );
         context.wait_for(100ms);
@@ -71,21 +71,27 @@ void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
             pbf_press_button(context, BUTTON_X, 160ms, 240ms);
             continue;
         case 1:
-            console.log("Detected main menu...");
-            if (seen_save_button && seen_saved_dialog){
-                return;
-            }
-            pbf_press_button(context, BUTTON_R, 160ms, 240ms);
-            continue;
-        case 2:
-            console.log("Detected save button...");
-            seen_save_button = true;
-            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
-            continue;
-        case 3:
+            if (!seen_save_button){
+                console.log("Detected dialog before save prompt. Unable to save.", COLOR_RED);
+                pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+                return false;
+			}
+
             console.log("Detected dialog...");
             seen_saved_dialog = true;
             pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+            continue;
+        case 2:
+            console.log("Detected main menu...");
+            if (seen_save_button && seen_saved_dialog){
+                return true;
+            }
+            pbf_press_button(context, BUTTON_R, 160ms, 240ms);
+            continue;
+        case 3:
+            console.log("Detected save button...");
+            seen_save_button = true;
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             continue;
         }
     }
