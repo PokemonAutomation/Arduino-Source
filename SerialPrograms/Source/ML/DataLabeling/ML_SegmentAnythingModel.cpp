@@ -242,6 +242,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
         for(size_t j = 0; j < 2; j++){
             try{
                 // If fails with GPU, fall back to CPU.
+                // throw Ort::Exception("Testing.", ORT_FAIL);  // to simulate GPU/CPU failure
                 embedding_session->run(resized_mat, output_image_embedding);
                 break;
             }catch(Ort::Exception& e){
@@ -257,7 +258,7 @@ void compute_embeddings_for_folder(const std::string& embedding_model_path, cons
                     return;
                 }
             }catch(...){
-                std::cerr << "Error: Unknown error." << std::endl;
+                std::cerr << "Error: Unknown error. Embedding session failed." << std::endl;
                 QMessageBox box;
                 box.warning(nullptr, "Error:",
                     QString::fromStdString("Error: Unknown error. Embedding session failed."));
