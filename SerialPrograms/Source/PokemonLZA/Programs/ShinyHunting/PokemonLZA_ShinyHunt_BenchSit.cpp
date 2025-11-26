@@ -184,9 +184,14 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
 
                 uint32_t periodic_save = PERIODIC_SAVE;
                 if (periodic_save != 0 && rounds_since_last_save >= periodic_save) {
-                    save_game_to_menu(env.console, context);
+                    bool save_successful = save_game_to_menu(env.console, context);
                     pbf_mash_button(context, BUTTON_B, 2000ms);
-                    rounds_since_last_save = 0;
+                    if (save_successful) {
+                        env.console.overlay().add_log("Game Saved Successfully", COLOR_BLUE);
+                        rounds_since_last_save = 0;
+                    } else {
+                        env.console.overlay().add_log("Game Save Failed. Will attempt to save after the next reset.", COLOR_RED);
+					}
                 }
 
                 Milliseconds duration = WALK_FORWARD_DURATION;
