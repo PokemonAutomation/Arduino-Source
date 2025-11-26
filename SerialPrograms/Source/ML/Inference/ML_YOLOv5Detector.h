@@ -42,6 +42,7 @@ public:
 
 protected:
     std::string m_model_path;
+    bool m_use_gpu;
     // std::vector<std::string> m_labels;
     std::unique_ptr<YOLOv5Session> m_yolo_session;
     std::vector<YOLOv5Session::DetectionBox> m_output_boxes;

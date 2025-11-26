@@ -153,6 +153,8 @@ private:
     // the group option that holds rest of the options defined below:
     BatchOption m_options;
 
+    bool m_use_gpu_for_sam_anno;
+
     FloatingPointOption X;
     FloatingPointOption Y;
     FloatingPointOption WIDTH;
