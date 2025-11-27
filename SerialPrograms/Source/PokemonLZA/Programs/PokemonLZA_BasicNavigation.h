@@ -13,6 +13,7 @@
 namespace PokemonAutomation{
 
 template <typename Type> class ControllerContext;
+struct ImageFloatBox;
 
 namespace NintendoSwitch{
 
@@ -92,15 +93,16 @@ void wait_until_overworld(
 // - Pointing to the right is 90.0 degrees.
 double get_current_facing_angle(ConsoleHandle& console, ProControllerContext& context);
 
-// While at the gate in the zone, mash A to leave the zone.
-// If day/night change happens during this period, the function still returns after
-// day/night change finishes. You can sandwich the function with
-// `WallClock time = current_time();` to measure time spent in this function to know
-// if day/night change happens.
-void leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
+// While at the gate in the zone, mash A to leave the zone. If day/night changes while
+// leaving, it will wait until the change is done.
+// Return true if there is no day/night change.
+// Return false if day/night change happens. In this case, we don't know if the player
+// character is still inside the zone or not.
+bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
 
 // Run towards a wild zone until either button A is detected at specified box region,
-// or if day/night change happens
+// or day/night change happens. If day/night changes, it will wait until the transition
+// animation is done.
 // Return
 // -  0 if button A is detected
 // -  1 if day/night change happens

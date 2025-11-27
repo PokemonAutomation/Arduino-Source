@@ -303,11 +303,8 @@ void leave_zone_and_reset_spawns(
     switch (ret){
     case 0: // Found button A. Reached the gate.
         break;
-    case 1:
-        env.log("Day/night change happened while escaping");
-        env.console.overlay().add_log("Day/Night Change Detected");
+    case 1: // Day/night change happened.
         {
-            wait_until_overworld(env.console, context);
             double current_facing_angle = get_current_facing_angle(env.console, context);
             double angle_between = std::fabs(starting_angle - current_facing_angle);
             if (angle_between > 180.0){
@@ -351,50 +348,27 @@ void leave_zone_and_reset_spawns(
     default:
         stats.errors++;
         env.update_stats();
-#if 0
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "leave_zone_and_reset_spawns(): Cannot run back to entrance after being chased by wild pokemon.",
-            env.console
-        );
-#else
         throw UserSetupError(
             env.logger(),
             "Program stuck in the zone while escaping from wild pokemon. "
             "Pick a path that won't get you stuck by terrain or obstacles."
         );
-#endif
     }
     shiny_sound_handler.process_pending(context);
 
     // Found button A, so we are at the entrance.
     // Mash A to leave Zone.
-    env.log("Found button A. Leaving Zone");
-    env.console.overlay().add_log("Found Button A. Leaving Zone");
-    
-    WallClock start_time = current_time();
-    leave_zone_gate(env.console, context);
-    WallClock end_time = current_time();
-    shiny_sound_handler.process_pending(context);
 
     std::string extra_eror_msg = " This is after leaving zone.";
 
-    auto duration = end_time - start_time;
-    auto second_count = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
     // Due to day/night change may eating the mashing button A sequence, we may still be inside the zone!
     // We need to check if we can fast travel 
-    if (duration < 16s){
-        env.log("Leaving zone function took " + std::to_string(second_count) + " sec. No day/night change");
-        // The animation of leaving the gate does not take more than 15 sec.
-        // In this case, there is no day/night change. We are sure we are outside the wild zone
-        // (unless some angry Garchomp or Drilbur used Dig and escaped wild zone containment... We don't
-        // consider this case for now)
+    if (leave_zone_gate(env.console, context)){
+        shiny_sound_handler.process_pending(context);
         // Do a fast travel outside the gate to reset spawns
         fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map, std::move(extra_eror_msg));
         return;
     }
-
-    env.log("Leaving zone function took " + std::to_string(second_count) + " sec. Day/night change happened");
 
     // there is a day/night change while leaving the zone. We don't know if we are still inside the zone.
     FastTravelState travel_status = open_map_and_fly_in_place(env.console, context, to_max_zoom_level_on_map);
@@ -419,6 +393,7 @@ void leave_zone_and_reset_spawns(
     // Mash A to leave zone gate
     env.log("Mashing A again to leave zone");
     leave_zone_gate(env.console, context);
+    shiny_sound_handler.process_pending(context);
     // Do a fast travel outside the gate to reset spawns
     env.log("Finally, we should have left the zone");
     fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map, std::move(extra_eror_msg));

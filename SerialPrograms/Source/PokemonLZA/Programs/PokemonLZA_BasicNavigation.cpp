@@ -417,8 +417,10 @@ double get_current_facing_angle(
 }
 
 
-void leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
+bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
     console.log("Leaving zone gate");
+
+    WallClock start_time = current_time();
     OverworldPartySelectionWatcher overworld_watcher(COLOR_WHITE, &console.overlay());
     pbf_mash_button(context, BUTTON_A, 1s);
     context.wait_for_all_requests();
@@ -429,8 +431,25 @@ void leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
     );
     pbf_wait(context, 100ms); // after leaving the gate, the game needs this long time to give back control
     context.wait_for_all_requests();
-    console.overlay().add_log("Left Gate");
-    console.log("Finished leaving zone gate");
+    WallClock end_time = current_time();
+
+    const auto duration = end_time - start_time;
+    const auto second_count = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+    // Due to day/night change may eating the mashing button A sequence, we may still be inside the zone!
+    // We need to check if we can fast travel 
+    if (duration < 16s){
+        console.log("Leaving zone function took " + std::to_string(second_count) + " sec. No day/night change");
+        console.overlay().add_log("Left Gate");
+
+        // The animation of leaving the gate does not take more than 15 sec.
+        // In this case, there is no day/night change. We are sure we are outside the wild zone
+        // (unless some angry Garchomp or Drilbur used Dig and escaped wild zone containment... We don't
+        // consider this case for now)
+        return true;
+    }
+
+    console.log("Leaving zone function took " + std::to_string(second_count) + " sec. Day/night change happened");
+    return false;
 }
 
 
@@ -442,7 +461,7 @@ int run_towards_wild_zone_gate(
 ){
     ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &console.overlay());
     OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &console.overlay(), std::chrono::milliseconds(400));
-    return run_until<ProControllerContext>(
+    const int ret = run_until<ProControllerContext>(
         console, context,
         [&run_time](ProControllerContext& context){
             // running back
@@ -451,6 +470,20 @@ int run_towards_wild_zone_gate(
         },
         {{buttonA, overworld_gone}}
     );
+    switch (ret){
+    case 0:
+        console.log("Detected button A. Reached gate.");
+        console.overlay().add_log("Reach Gate");
+        return 0;
+    case 1:
+        console.log("Day/night change happened while escaping");
+        console.overlay().add_log("Day/Night Change Detected");
+        wait_until_overworld(console, context);
+        return 1;
+    default:
+        console.log("Did not reach gate");
+        return ret;
+    }
 }
 
 }
