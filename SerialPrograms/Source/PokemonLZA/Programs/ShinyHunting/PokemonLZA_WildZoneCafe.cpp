@@ -220,7 +220,11 @@ void do_one_cafe_trip(
 
     // Found button A, so we are at the entrance.
     // Mash A to leave Zone.
-    leave_zone_gate(env.console, context);
+    if (!leave_zone_gate(env.console, context)){
+        // day/night change happens while leaving
+        // Try leave again
+        leave_zone_gate(env.console, context);
+    }
     shiny_sound_handler.process_pending(context);
 
     // do a fast travel back to cafe

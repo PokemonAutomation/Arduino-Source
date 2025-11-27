@@ -97,8 +97,15 @@ double get_facing_direction(ConsoleHandle& console, ProControllerContext& contex
 double get_angle_between_facing_directions(double dir1, double dir2);
 
 // While at the gate in the zone, mash A to leave the zone. If day/night changes while
-// leaving, it will wait until the change is done to leave the zone again.
-void leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
+// leaving, it will wait until the change is done.
+// Return true if there is no day/night change.
+// Return false if day/night change happens. In this case, we don't know if the player
+// character is still inside the zone or not.
+// Note:
+// We don't want to mash A after a day/night change to ensure we leave the zone because
+// at Wild Zone 4 there are talkable npcs outside the gate. Button A appears on them.
+// If the program mashes A after leaving the zone, it will stuck talking to the npcs.
+bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
 
 // Run towards a wild zone until either button A is detected at specified box region,
 // or day/night change happens. If day/night changes, it will wait until the transition
