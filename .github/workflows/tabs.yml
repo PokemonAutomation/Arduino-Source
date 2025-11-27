@@ -1,0 +1,17 @@
+name: Check for Tabs
+on: [push, pull_request]
+
+jobs:
+  no-tabs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fail if tabs are found in source files
+        # Exclude specific file types if necessary (e.g., binaries, .md files, etc.)
+        run: |
+          if grep -qP "\t" $(git ls-files Common/ SerialPrograms/ | grep -E "\.(.h|.c|.cpp|.tpp)$"); then
+            echo "::error::Tabs found in source code! Please use spaces."
+            exit 1
+          fi
