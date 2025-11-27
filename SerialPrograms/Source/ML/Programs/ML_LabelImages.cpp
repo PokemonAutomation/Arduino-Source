@@ -242,8 +242,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     const std::string anno_filename = std::filesystem::path(image_path).filename().replace_extension(".json").string();
     const std::string image_folder_path = std::filesystem::path(image_path).parent_path().string() + "/";
 
-    // std::filesystem::create_directory(ML_ANNOTATION_PATH());
-    m_annotation_file_path = image_folder_path + anno_filename; // ML_ANNOTATION_PATH() + anno_filename;
+    m_annotation_file_path = image_folder_path + anno_filename;
     if (!std::filesystem::exists(m_annotation_file_path)){
         cout << "Annotataion output path, " << m_annotation_file_path << " does not exist yet" << endl;
         return;
@@ -746,7 +745,7 @@ std::pair<double, double> LabelImages::pixel_to_float(size_t x, size_t y) const{
 void LabelImages::export_to_yolov5_dataset(const std::string& image_folder_path, const std::string& dataset_path){
     m_yolo_config_file_path = dataset_path;
 
-    export_image_annotations_to_yolo_dataset(image_folder_path, image_folder_path, dataset_path); // image_folder_path, ML_ANNOTATION_PATH(), dataset_path);
+    export_image_annotations_to_yolo_dataset(image_folder_path, dataset_path);
 }
 
 Color enum_to_color(ColorChoice color_choice){

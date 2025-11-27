@@ -92,7 +92,6 @@ std::vector<std::string> find_images_in_folder(const std::string& folder_path, b
 
 void export_image_annotations_to_yolo_dataset(
     const std::string& image_folder_path,
-    const std::string& annotation_folder_path,
     const std::string& yolo_dataset_path
 ){
     const bool recursive = true;
@@ -193,14 +192,12 @@ void export_image_annotations_to_yolo_dataset(
     fs::create_directories(target_image_folder);
     fs::create_directories(target_label_folder);
 
-    fs::path anno_folder(annotation_folder_path);
     std::set<std::string> missing_labels;
     for(size_t i = 0; i < image_paths.size(); i++){
         const auto& image_path = image_paths[i];
-        const auto image_file = fs::path(image_path);
+        const fs::path image_file(image_path);
 
-        const std::string anno_filename = image_file.filename().replace_extension(".json").string();
-        fs::path anno_file = anno_folder / anno_filename;
+        fs::path anno_file = fs::path(image_file).replace_extension(".json");
         if (!fs::exists(anno_file)){
             QMessageBox box;
             box.critical(nullptr, "Cannot Find Annotation File",
