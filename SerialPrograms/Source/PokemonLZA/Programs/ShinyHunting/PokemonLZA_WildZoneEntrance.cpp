@@ -296,7 +296,7 @@ void leave_zone_and_reset_spawns(
     env.log("Escaping");
     env.console.overlay().add_log("Escaping Back to Entrance");
     
-    const double starting_angle = get_current_facing_angle(env.console, context);
+    const double starting_direction = get_facing_direction(env.console, context);
 
     const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
     int ret = run_towards_wild_zone_gate(env.console, context, button_A_box, 128, 255, walk_time_in_zone);
@@ -305,21 +305,18 @@ void leave_zone_and_reset_spawns(
         break;
     case 1: // Day/night change happened.
         {
-            double current_facing_angle = get_current_facing_angle(env.console, context);
-            double angle_between = std::fabs(starting_angle - current_facing_angle);
-            if (angle_between > 180.0){
-                angle_between = 360.0 - angle_between;
-            }
-            env.log("Facing angle difference after day/night change: " + tostr_fixed(angle_between, 0) + " deg, from "
-                + tostr_fixed(starting_angle, 0) + " to " + tostr_fixed(current_facing_angle, 0) + " deg");
+            const double cur_direction = get_facing_direction(env.console, context);
+            const double direction_change = get_angle_between_facing_directions(starting_direction, cur_direction);
+            env.log("Facing direction difference after day/night change: " + tostr_fixed(direction_change, 0) + " deg, from "
+                + tostr_fixed(starting_direction, 0) + " to " + tostr_fixed(cur_direction, 0) + " deg");
             
             uint8_t joystick_y = 0;
-            if (angle_between > 150.0){
+            if (direction_change > 150.0){
                 // we are facing towards the gate
                 env.log("Running forward");
                 env.console.overlay().add_log("Running Forward");
                 joystick_y = 0;
-            }else if(angle_between < 30.0){
+            }else if(direction_change < 30.0){
                 // we are facing away from the gate
                 env.log("Running back");
                 env.console.overlay().add_log("Running Back");
@@ -327,7 +324,7 @@ void leave_zone_and_reset_spawns(
             }else{
                 OperationFailedException::fire(
                     ErrorReport::SEND_ERROR_REPORT,
-                    "leave_zone_and_reset_spawns(): Facing direction after day/night change is wrong: " + tostr_fixed(angle_between, 0) + " deg",
+                    "leave_zone_and_reset_spawns(): Facing direction after day/night change is wrong: " + tostr_fixed(direction_change, 0) + " deg",
                     env.console
                 );
             }

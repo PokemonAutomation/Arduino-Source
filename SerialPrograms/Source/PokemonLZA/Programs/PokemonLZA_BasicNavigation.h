@@ -91,7 +91,10 @@ void wait_until_overworld(
 // Return a float of [0.0, 360.0), the angle of the arrow using the clock setting, i.e.
 // - Pointing upwards is 0.0 degree.
 // - Pointing to the right is 90.0 degrees.
-double get_current_facing_angle(ConsoleHandle& console, ProControllerContext& context);
+double get_facing_direction(ConsoleHandle& console, ProControllerContext& context);
+
+// Given two facing directions, find the angle between them. The angle range is [0, 180).
+double get_angle_between_facing_directions(double dir1, double dir2);
 
 // While at the gate in the zone, mash A to leave the zone. If day/night changes while
 // leaving, it will wait until the change is done.

@@ -391,7 +391,7 @@ void wait_until_overworld(
 }
 
 
-double get_current_facing_angle(
+double get_facing_direction(
     ConsoleHandle& console,
     ProControllerContext& context
 ){
@@ -406,7 +406,7 @@ double get_current_facing_angle(
         console.overlay().add_log("No Minimap Arrow Found", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "get_current_facing_angle(): Direction arrow on minimap not detected within 1 second",
+            "get_facing_direction(): Direction arrow on minimap not detected within 1 second",
             console
         );
     }
@@ -416,6 +416,13 @@ double get_current_facing_angle(
     return angle;
 }
 
+double get_angle_between_facing_directions(double dir1, double dir2){
+    double angle = std::fabs(dir1 - dir2);
+    if (angle > 180.0){
+        angle = 360.0 - angle;
+    }
+    return angle;
+}
 
 bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
     console.log("Leaving zone gate");
