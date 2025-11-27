@@ -172,9 +172,6 @@ LabelImages_Widget::LabelImages_Widget(
     connect(open_anno_folder_button, &QPushButton::clicked, this, [this](bool){
         this->m_program.save_annotation_to_file();
 
-        // ensure the folder exists
-        // std::filesystem::create_directory(ML_ANNOTATION_PATH());
-        // QDesktopServices::openUrl(QUrl(QString::fromStdString("file:///" + ML_ANNOTATION_PATH())));
         QDesktopServices::openUrl(QUrl(QString::fromStdString("file:///" + m_image_display_widget->image_folder_path())));
     });
     connect(save_anno_button, &QPushButton::clicked, this, [this](bool){
