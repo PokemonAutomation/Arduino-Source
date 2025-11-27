@@ -135,6 +135,8 @@ void run_back_until_found_bench(
             for (int c = 0; c < 10; c++){
                 ssf_press_button(context, BUTTON_B, 0ms, 800ms, 0ms);
                 pbf_move_left_joystick(context, 128, 255, 800ms, 200ms);
+                pbf_move_right_joystick(context, 0, 128, 200ms, 800ms);
+                pbf_press_button(context, BUTTON_L, 160ms, 0ms);
             }
         },
         {buttonA}
