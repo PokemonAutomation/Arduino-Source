@@ -746,7 +746,7 @@ std::pair<double, double> LabelImages::pixel_to_float(size_t x, size_t y) const{
 void LabelImages::export_to_yolov5_dataset(const std::string& image_folder_path, const std::string& dataset_path){
     m_yolo_config_file_path = dataset_path;
 
-    export_image_annotations_to_yolo_dataset(image_folder_path, image_folder_path, dataset_path); // image_folder_path, ML_ANNOTATION_PATH(), dataset_path);
+    export_image_annotations_to_yolo_dataset(image_folder_path, dataset_path); // image_folder_path, ML_ANNOTATION_PATH(), dataset_path);
 }
 
 Color enum_to_color(ColorChoice color_choice){
