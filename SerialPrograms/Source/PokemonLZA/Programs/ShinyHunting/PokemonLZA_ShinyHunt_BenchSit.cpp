@@ -193,7 +193,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                         rounds_since_last_save = 0;
                     } else {
                         env.console.overlay().add_log("Game Save Failed. Will attempt to save after the next reset.", COLOR_RED);
-					}
+                    }
                 }
 
                 Milliseconds duration = WALK_FORWARD_DURATION;
