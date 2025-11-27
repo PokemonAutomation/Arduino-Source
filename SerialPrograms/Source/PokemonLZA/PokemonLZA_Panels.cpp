@@ -31,6 +31,7 @@
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h"
 #include "Programs/ShinyHunting/PokemonLZA_BeldumHunter.h"
 #include "Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h"
+#include "Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 
@@ -82,6 +83,7 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldReset_Descriptor, ShinyHunt_OverworldReset>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneEntrance_Descriptor, ShinyHunt_WildZoneEntrance>());
     if (IS_BETA_VERSION){
+        ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneCafe_Descriptor, ShinyHunt_WildZoneCafe>());
         ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
         ret.emplace_back(make_single_switch_program<ShinyHunt_ShuttleRun_Descriptor, ShinyHunt_ShuttleRun>());
     }
