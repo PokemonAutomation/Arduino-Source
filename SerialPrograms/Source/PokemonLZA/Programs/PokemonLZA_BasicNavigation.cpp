@@ -98,7 +98,7 @@ bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
 
 
 bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max){
-    pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+    pbf_press_button(context, BUTTON_PLUS, 240ms, 40ms);
     context.wait_for_all_requests();
     console.log("Opening Map...");
     console.overlay().add_log("Open Map");

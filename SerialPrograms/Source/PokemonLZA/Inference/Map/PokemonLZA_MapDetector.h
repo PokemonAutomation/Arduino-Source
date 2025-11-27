@@ -62,7 +62,7 @@ public:
     MapOverWatcher(
         Color color = COLOR_RED,
         VideoOverlay* overlay = nullptr,
-        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(200)
     )
          : DetectorToFinder("MapWatcher", FinderType::GONE, hold_duration, color, overlay)
     {}
