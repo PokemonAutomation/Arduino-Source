@@ -584,9 +584,9 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
         // 12:00 11201us                                                    8ms
         // total time elapsed: 11.2ms vs 8ms
 
-        // Normalized timestamps		Diff using normalized timestamps    Total time since start
+        // Normalized timestamps        Diff using normalized timestamps    Total time since start
         // 0ms                          1ms                                 0ms
-        // 1.4ms -> 1ms                 2ms	                                1ms
+        // 1.4ms -> 1ms                 2ms                                 1ms
         // 2.8ms -> 3ms                 1ms                                 3ms
         // 4.2ms -> 4ms                 2ms                                 4ms
         // 5.6ms -> 6ms                 1ms                                 6ms

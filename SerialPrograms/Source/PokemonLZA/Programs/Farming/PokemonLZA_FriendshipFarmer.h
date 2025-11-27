@@ -27,41 +27,41 @@ namespace PokemonLZA{
 
 class FriendshipFarmer_Descriptor : public SingleSwitchProgramDescriptor{
 public:
-	FriendshipFarmer_Descriptor();
+    FriendshipFarmer_Descriptor();
 
-	class Stats;
-	virtual std::unique_ptr<StatsTracker> make_stats() const override;
+    class Stats;
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
 };
 
 class FriendshipFarmer : public SingleSwitchProgramInstance, public ConfigOption::Listener{
 public:
-	~FriendshipFarmer();
-	FriendshipFarmer();
+    ~FriendshipFarmer();
+    FriendshipFarmer();
 
-	virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
 private:
-	void enter_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-	void exit_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-	void exit_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
-	void hang_out_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void enter_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void exit_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void exit_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+    void hang_out_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
 
-	virtual void on_config_value_changed(void* object) override;
+    virtual void on_config_value_changed(void* object) override;
 
-	enum class FarmingOption{
-		Cafe,
-		Bench
-	};
-	enum class FriendshipAmount{
-		Evolve,
-		Max
-	};
-	EnumDropdownOption<FarmingOption> FARMING_OPTION;
-	EnumDropdownOption<FriendshipAmount> FRIENDSHIP_AMOUNT;
-	SimpleIntegerOption<uint8_t> NUM_PARTY_MEMBERS;
-	GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
-	EventNotificationOption NOTIFICATION_STATUS_OPTION;
-	EventNotificationsOption NOTIFICATIONS;
+    enum class FarmingOption{
+        Cafe,
+        Bench
+    };
+    enum class FriendshipAmount{
+        Evolve,
+        Max
+    };
+    EnumDropdownOption<FarmingOption> FARMING_OPTION;
+    EnumDropdownOption<FriendshipAmount> FRIENDSHIP_AMOUNT;
+    SimpleIntegerOption<uint8_t> NUM_PARTY_MEMBERS;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    EventNotificationOption NOTIFICATION_STATUS_OPTION;
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 }

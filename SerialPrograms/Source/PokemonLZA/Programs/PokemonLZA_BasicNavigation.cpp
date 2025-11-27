@@ -73,7 +73,7 @@ bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
                 console.log("Detected dialog before save prompt. Unable to save.", COLOR_RED);
                 pbf_press_button(context, BUTTON_B, 160ms, 240ms);
                 return false;
-			}
+            }
 
             console.log("Detected dialog...");
             seen_saved_dialog = true;

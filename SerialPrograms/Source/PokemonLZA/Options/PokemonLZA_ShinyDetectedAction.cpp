@@ -150,8 +150,8 @@ bool ShinySoundHandler::on_shiny_sound(
     }
 
     if (action == ShinySoundDetectedAction::NO_NOTIFICATIONS && current_count > 1){
-		return false;
-	}
+        return false;
+    }
 
     if (action != ShinySoundDetectedAction::NO_NOTIFICATIONS){
         m_option.send_shiny_sound_notification(env, stream, error_coefficient);
