@@ -63,6 +63,8 @@ ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
             {Routes::KLEFKI_INKAY_GOOMY,  "klefki_inkay_goomy",  "Sewers: Klefki+Inkay+Goomy"},
             {Routes::LITWICK,  "litwick",  "Sewers: Litwick"},
             {Routes::SKRELP,  "skrelp",  "Sewers: Skrelp"},
+            {Routes::SKRELP_INKAY,  "skrelp_inkay",  "Sewers: Skrelp+Inkay"},
+            {Routes::SKRELP_ARIADOS,  "skrelp_ariados",  "Sewers: Skrelp+Ariados"},
             // {Routes::SCRAGGY,  "scraggy",  "Sewers: Scraggy"},
         },
         LockMode::LOCK_WHILE_RUNNING,
@@ -123,14 +125,27 @@ void route_litwick(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 void route_skrelp(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
+    fly_back(env.console, context);
+    pbf_wait(context, 1000ms);
+}
+
+void route_skrelp_inkay(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    context.wait_for_all_requests();
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 5000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 5500ms, 0ms);
+    pbf_move_left_joystick(context, 128, 0, 3900ms, 0ms);
+    fly_back(env.console, context);
+}
+
+void route_skrelp_ariados(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    context.wait_for_all_requests();
+    ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+    pbf_move_left_joystick(context, 128, 0, 6000ms, 0ms);
+    pbf_move_left_joystick(context, 128, 255, 6500ms, 0ms);
     pbf_wait(context, 500ms);
 }
 
 void route_scraggy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-
+//TODO
 }
 } // namespace
 
@@ -162,6 +177,12 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
         break;
     case Routes::SKRELP:
         loop = route_skrelp;
+        break;
+    case Routes::SKRELP_INKAY:
+        loop = route_skrelp_inkay;
+        break;
+    case Routes::SKRELP_ARIADOS:
+        loop = route_skrelp_ariados;
         break;
     case Routes::SCRAGGY:
         loop = route_scraggy;

@@ -39,6 +39,8 @@ public:
         KLEFKI_INKAY_GOOMY,
         LITWICK,
         SKRELP,
+        SKRELP_INKAY,
+        SKRELP_ARIADOS,
         SCRAGGY,
         WILD_ZONE_19,
         FIRE_STARTERS,
