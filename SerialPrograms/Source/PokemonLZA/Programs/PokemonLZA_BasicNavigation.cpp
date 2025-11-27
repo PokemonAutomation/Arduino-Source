@@ -483,10 +483,10 @@ int run_towards_wild_zone_gate(
     OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &console.overlay(), std::chrono::milliseconds(400));
     const int ret = run_until<ProControllerContext>(
         console, context,
-        [&run_time](ProControllerContext& context){
+        [&](ProControllerContext& context){
             // running back
             ssf_press_button(context, BUTTON_B, 0ms, run_time, 0ms);
-            pbf_move_left_joystick(context, 128, 255, run_time, 0ms);
+            pbf_move_left_joystick(context, run_direction_x, run_direction_y, run_time, 0ms);
         },
         {{buttonA, overworld_gone}}
     );
