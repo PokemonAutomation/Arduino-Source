@@ -424,20 +424,25 @@ double get_angle_between_facing_directions(double dir1, double dir2){
     return angle;
 }
 
-bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
+void leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
     console.log("Leaving zone gate");
 
+    auto mash_A_to_leave = [&](int seconds) -> int{
+        OverworldPartySelectionWatcher overworld_watcher(COLOR_WHITE, &console.overlay());
+        pbf_mash_button(context, BUTTON_A, 1s);
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(seconds),
+            {overworld_watcher}
+        );
+        pbf_wait(context, 100ms); // after leaving the gate, the game needs this long time to give back control
+        context.wait_for_all_requests();
+        return ret;
+    };
+
     WallClock start_time = current_time();
-    OverworldPartySelectionWatcher overworld_watcher(COLOR_WHITE, &console.overlay());
-    pbf_mash_button(context, BUTTON_A, 1s);
-    context.wait_for_all_requests();
-    wait_until(
-        console, context,
-        std::chrono::seconds(40), // wait this long in case day/night change happens
-        {overworld_watcher}
-    );
-    pbf_wait(context, 100ms); // after leaving the gate, the game needs this long time to give back control
-    context.wait_for_all_requests();
+    mash_A_to_leave(40);  // // wait 40 sec in case day/night change happens
     WallClock end_time = current_time();
 
     const auto duration = end_time - start_time;
@@ -452,11 +457,19 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
         // In this case, there is no day/night change. We are sure we are outside the wild zone
         // (unless some angry Garchomp or Drilbur used Dig and escaped wild zone containment... We don't
         // consider this case for now)
-        return true;
+        return;
     }
 
     console.log("Leaving zone function took " + std::to_string(second_count) + " sec. Day/night change happened");
-    return false;
+    int ret = mash_A_to_leave(15);
+    if (ret != 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "leave_zone_gate(): Unable to leave zone gate after day/night change",
+            console
+        );
+    }
+    return;
 }
 
 

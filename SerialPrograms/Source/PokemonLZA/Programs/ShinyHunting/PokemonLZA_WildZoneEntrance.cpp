@@ -358,41 +358,10 @@ void leave_zone_and_reset_spawns(
 
     std::string extra_eror_msg = " This is after leaving zone.";
 
-    // Due to day/night change may eating the mashing button A sequence, we may still be inside the zone!
-    // We need to check if we can fast travel 
-    if (leave_zone_gate(env.console, context)){
-        shiny_sound_handler.process_pending(context);
-        // Do a fast travel outside the gate to reset spawns
-        fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map, std::move(extra_eror_msg));
-        return;
-    }
-
-    // there is a day/night change while leaving the zone. We don't know if we are still inside the zone.
-    FastTravelState travel_status = open_map_and_fly_in_place(env.console, context, to_max_zoom_level_on_map);
-    if (travel_status == FastTravelState::SUCCESS){
-        // We can fast travel and we fast traveled. This means we were inside the gate but now safe.
-        env.log("We fast traveled. We were inside the gate but now safe for next trip");
-        return;
-    }else if(travel_status == FastTravelState::NOT_AT_FLY_SPOT){
-        env.log("We cannot fast travel in place. We left zone successfully");
-        // we cannot fast travel at current location. So we have left the zone!
-        // Fast travel to the zone gate to reset spawn
-        const bool map_already_opened = true;
-        fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map,
-            std::move(extra_eror_msg), map_already_opened);
-        return;
-    }
-    // We cannot fast travel: we are still being chased by wild pokemon
-    env.log("We cannot fast travel. Still chased by pokemon");
-    
-    // Mash B to close map and return to overworld
-    map_to_overworld(env.console, context);
-    // Mash A to leave zone gate
-    env.log("Mashing A again to leave zone");
     leave_zone_gate(env.console, context);
+
     shiny_sound_handler.process_pending(context);
     // Do a fast travel outside the gate to reset spawns
-    env.log("Finally, we should have left the zone");
     fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map, std::move(extra_eror_msg));
 }
 
