@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_BasicNavigation_H
 #define PokemonAutomation_PokemonLZA_BasicNavigation_H
 
+#include "Common/Cpp/Time.h"
 #include "PokemonLZA/Programs/PokemonLZA_Locations.h"
 
 namespace PokemonAutomation{
@@ -91,6 +92,26 @@ void wait_until_overworld(
 // - Pointing to the right is 90.0 degrees.
 double get_current_facing_angle(ConsoleHandle& console, ProControllerContext& context);
 
+// While at the gate in the zone, mash A to leave the zone.
+// If day/night change happens during this period, the function still returns after
+// day/night change finishes. You can sandwich the function with
+// `WallClock time = current_time();` to measure time spent in this function to know
+// if day/night change happens.
+void leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
+
+// Run towards a wild zone until either button A is detected at specified box region,
+// or if day/night change happens
+// Return
+// -  0 if button A is detected
+// -  1 if day/night change happens
+// - -1 if it does not reach the gate in the end. Possible reasons are wrong run direction
+//   or get stuck by terrain or obstacle on the way
+int run_towards_wild_zone_gate(
+    ConsoleHandle& console, ProControllerContext& context,
+    const ImageFloatBox& button_A_box,
+    uint8_t run_direction_x, uint8_t run_direction_y,
+    Milliseconds run_time
+);
 
 }
 }

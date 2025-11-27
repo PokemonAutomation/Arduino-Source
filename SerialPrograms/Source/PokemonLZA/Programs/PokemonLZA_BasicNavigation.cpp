@@ -9,7 +9,7 @@
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
@@ -21,11 +21,7 @@
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
-namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonLZA{
-
-
+namespace PokemonAutomation::NintendoSwitch::PokemonLZA{
 
 bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
 
@@ -421,6 +417,40 @@ double get_current_facing_angle(
 }
 
 
+void leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Leaving zone gate");
+    OverworldPartySelectionWatcher overworld_watcher(COLOR_WHITE, &console.overlay());
+    pbf_mash_button(context, BUTTON_A, 1s);
+    context.wait_for_all_requests();
+    wait_until(
+        console, context,
+        std::chrono::seconds(40), // wait this long in case day/night change happens
+        {overworld_watcher}
+    );
+    pbf_wait(context, 100ms); // after leaving the gate, the game needs this long time to give back control
+    context.wait_for_all_requests();
+    console.overlay().add_log("Left Gate");
+    console.log("Finished leaving zone gate");
 }
+
+
+int run_towards_wild_zone_gate(
+    ConsoleHandle& console, ProControllerContext& context,
+    const ImageFloatBox& button_A_box,
+    uint8_t run_direction_x, uint8_t run_direction_y,
+    PokemonAutomation::Milliseconds run_time
+){
+    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &console.overlay());
+    OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &console.overlay(), std::chrono::milliseconds(400));
+    return run_until<ProControllerContext>(
+        console, context,
+        [&run_time](ProControllerContext& context){
+            // running back
+            ssf_press_button(context, BUTTON_B, 0ms, run_time, 0ms);
+            pbf_move_left_joystick(context, 128, 255, run_time, 0ms);
+        },
+        {{buttonA, overworld_gone}}
+    );
 }
+
 }

@@ -88,7 +88,7 @@ public:
         , day_changes(m_stats["Day/Night Changes"])
     {
         m_display_order.emplace_back("Visits");
-        m_display_order.emplace_back("Chased", PreloadSettings::instance().DEVELOPER_MODE ? ALWAYS_VISIBLE : ALWAYS_HIDDEN);
+        m_display_order.emplace_back("Chased");
         m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Game Resets");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
@@ -184,29 +184,6 @@ void go_to_entrance(
     );
     env.log("Detected button A. At Wild Zone gate.");
     env.console.overlay().add_log("Detect Entrance");
-}
-
-// While at the gate in the zone, mash A to leave the zone.
-// If day/night change happens during this period, the function still returns after
-// day/night change finishes, but then we don't know if the player character is still
-// in the wild zone or not.
-void leave_zone_gate(
-    SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
-){
-    env.log("Leaving zone gate");
-    OverworldPartySelectionWatcher overworld_watcher(COLOR_WHITE, &env.console.overlay());
-    pbf_mash_button(context, BUTTON_A, 1s);
-    context.wait_for_all_requests();
-    wait_until(
-        env.console, context,
-        std::chrono::seconds(40), // wait this long in case day/night change happens
-        {overworld_watcher}
-    );
-    pbf_wait(context, 100ms); // after leaving the gate, the game needs this long time to give back control
-    context.wait_for_all_requests();
-    env.console.overlay().add_log("Left Gate");
-    env.log("Finished leaving zone gate");
 }
 
 
@@ -312,27 +289,19 @@ void leave_zone_and_reset_spawns(
         map_to_overworld(env.console, context);
     }
    
-    walk_time_in_zone += 2s; // give some extra time
-    env.log("Escaping");
-    env.console.overlay().add_log("Escaping Back to Entrance");
     stats.chased++;
     env.update_stats();
 
+    walk_time_in_zone += 2s; // give some extra time
+    env.log("Escaping");
+    env.console.overlay().add_log("Escaping Back to Entrance");
+    
     const double starting_angle = get_current_facing_angle(env.console, context);
 
-    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
-    OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &env.console.overlay(), std::chrono::milliseconds(400));
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [&walk_time_in_zone](ProControllerContext& context){
-            // running back
-            ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
-            pbf_move_left_joystick(context, 128, 255, walk_time_in_zone, 0ms);
-        },
-        {{buttonA, overworld_gone}}
-    );
+    const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
+    int ret = run_towards_wild_zone_gate(env.console, context, button_A_box, 128, 255, walk_time_in_zone);
     switch (ret){
-    case 0:
+    case 0: // Found button A. Reached the gate.
         break;
     case 1:
         env.log("Day/night change happened while escaping");
@@ -347,7 +316,6 @@ void leave_zone_and_reset_spawns(
             env.log("Facing angle difference after day/night change: " + tostr_fixed(angle_between, 0) + " deg, from "
                 + tostr_fixed(starting_angle, 0) + " to " + tostr_fixed(current_facing_angle, 0) + " deg");
             
-            buttonA.reset_state();
             uint8_t joystick_y = 0;
             if (angle_between > 150.0){
                 // we are facing towards the gate
@@ -368,17 +336,7 @@ void leave_zone_and_reset_spawns(
             }
 
             // Running forward or backward depends on character facing to go back to zone entrance
-            // Since day/night change just happened, we are sure this running sequence won't be interrupted
-            // by day/night change again. So no need to call overworld detector.
-            ret = run_until<ProControllerContext>(
-                env.console, context,
-                [&walk_time_in_zone, &joystick_y](ProControllerContext& context){
-                    // running forward
-                    ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
-                    pbf_move_left_joystick(context, 128, joystick_y, walk_time_in_zone, 0ms);
-                },
-                {{buttonA}}
-            );
+            ret = run_towards_wild_zone_gate(env.console, context, button_A_box, 128, joystick_y, walk_time_in_zone);
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();
@@ -415,7 +373,7 @@ void leave_zone_and_reset_spawns(
     env.console.overlay().add_log("Found Button A. Leaving Zone");
     
     WallClock start_time = current_time();
-    leave_zone_gate(env, context);
+    leave_zone_gate(env.console, context);
     WallClock end_time = current_time();
     shiny_sound_handler.process_pending(context);
 
@@ -460,7 +418,7 @@ void leave_zone_and_reset_spawns(
     map_to_overworld(env.console, context);
     // Mash A to leave zone gate
     env.log("Mashing A again to leave zone");
-    leave_zone_gate(env, context);
+    leave_zone_gate(env.console, context);
     // Do a fast travel outside the gate to reset spawns
     env.log("Finally, we should have left the zone");
     fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map, std::move(extra_eror_msg));
