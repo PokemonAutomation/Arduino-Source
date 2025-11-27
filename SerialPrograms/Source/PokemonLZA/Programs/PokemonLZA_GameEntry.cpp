@@ -35,21 +35,38 @@ bool gamemenu_to_ingame(
     Milliseconds enter_game_timeout
 ){
     stream.log("Mashing A to enter game...");
-    BlackScreenOverWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
-    pbf_mash_button(context, BUTTON_A, 500ms);
-    context.wait_for_all_requests();
-    stream.log("Waiting to enter game...");
-    int ret = wait_until(
-        stream, context,
-        std::chrono::milliseconds(enter_game_timeout),
-        {{detector}}
-    );
-    if (ret == 0){
-        stream.log("Entered game!");
-        return true;
-    }else{
-        stream.log("Timed out waiting to enter game.", COLOR_RED);
-        return false;
+    {
+        BlackScreenWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
+        stream.log("Waiting to enter game...");
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [enter_game_timeout](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, enter_game_timeout / 2);
+            },
+            {{detector}}
+        );
+        if (ret != 0){
+            stream.log("Timed out waiting for black screen.", COLOR_RED);
+            return false;
+        }
+    }
+
+    stream.log("Black screen detected");
+
+    {
+        BlackScreenOverWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
+        int ret = wait_until(
+            stream, context,
+            std::chrono::milliseconds(enter_game_timeout / 2),
+            {{detector}}
+        );
+        if (ret == 0){
+            stream.log("Entered game!");
+            return true;
+        }else{
+            stream.log("Timed out waiting to enter game.", COLOR_RED);
+            return false;
+        }
     }
 }
 
