@@ -11,6 +11,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Globals.h"
+// #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
@@ -287,6 +288,9 @@ void leave_zone_and_reset_spawns(
         // travel_status == FastTravelState::PURSUED, we are being attacked by wild pokemon.
         // mash B to close map and return to overworld
         map_to_overworld(env.console, context);
+        // if (PreloadSettings::instance().DEVELOPER_MODE){
+        //     dump_debug_image(env.console, "AlertEyeDetector", "FalseNegative", latest_frame);
+        // }
     }
    
     stats.chased++;

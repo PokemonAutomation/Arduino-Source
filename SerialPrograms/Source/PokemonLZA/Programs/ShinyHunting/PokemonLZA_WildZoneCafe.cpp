@@ -11,6 +11,7 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Globals.h"
+// #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
@@ -150,6 +151,10 @@ void do_one_cafe_trip(
             }
             // else: travel_status == FastTravelState::PURSUED
         }
+
+        // if (PreloadSettings::instance().DEVELOPER_MODE){
+        //     dump_debug_image(env.console, "AlertEyeDetector", "FalseNegative", latest_frame);
+        // }
     }
     // we are being chased by wild pokemon
 
