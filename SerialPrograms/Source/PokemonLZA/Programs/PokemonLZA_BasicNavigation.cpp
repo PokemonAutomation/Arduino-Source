@@ -21,6 +21,8 @@
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
+#include <cmath>
+
 namespace PokemonAutomation::NintendoSwitch::PokemonLZA{
 
 bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){

@@ -26,8 +26,6 @@
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA/Programs/PokemonLZA_GameEntry.h"
 #include "PokemonLZA_WildZoneEntrance.h"
-#include <chrono>
-#include <cmath>
 
 // #include <iostream>
 // using std::cout, std::endl;
@@ -132,7 +130,7 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
         true
     )
     , SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
-    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_STATUS("Status Update", true, false, Seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED.NOTIFICATIONS,
