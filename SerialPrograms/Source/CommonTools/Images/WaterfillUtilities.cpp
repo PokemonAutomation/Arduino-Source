@@ -18,15 +18,17 @@
 #include "WaterfillUtilities.h"
 
 #include <iostream>
-//using std::cout;
-//using std::endl;
+using std::cout;
+using std::endl;
 
 
 namespace PokemonAutomation{
 
+using namespace Kernels::Waterfill;
+
 
 std::pair<PackedBinaryMatrix, size_t> remove_center_pixels(
-    const Kernels::Waterfill::WaterfillObject& object,
+    const WaterfillObject& object,
     size_t num_pixels_to_remove
 ){
     PackedBinaryMatrix matrix = object.packed_matrix();
@@ -73,6 +75,50 @@ std::pair<PackedBinaryMatrix, size_t> remove_center_pixels(
     return std::pair<PackedBinaryMatrix, size_t>(std::move(matrix), distance_sqr_th);
 }
 
+
+namespace{
+
+void dump_inputs(
+    const ImageViewRGB32& image,
+    const std::vector<std::pair<uint32_t, uint32_t>>& filters,
+    const std::pair<size_t, size_t>& area_thresholds,
+    double rmsd_threshold
+){
+    dump_debug_image(global_logger_command_line(), "CommonFramework/match_template_by_waterfill", "input_image", image);
+    cout << "Use " << filters.size() << " filter(s), area range ("
+                << area_thresholds.first << ", ";
+    if (area_thresholds.second == SIZE_MAX){
+        cout << "SIZE_MAX";
+    }else{
+        cout << area_thresholds.second;
+    }
+    cout << "), rmsd threshold " << rmsd_threshold << endl;
+    
+}
+
+void dump_object(
+    const WaterfillObject& object,
+    const ImageViewRGB32& image,
+    const std::pair<size_t, size_t>& area_thresholds
+){
+    cout << "Object WxH: " << object.width() << " x " << object.height() << ", area: " << object.area;
+    if (area_thresholds.second == SIZE_MAX){
+        cout << " vs threshold SIZE_MAX" << endl;
+    }else{
+        cout << "Object area: " << object.area << " vs threshold " << area_thresholds.second << endl;
+    }
+
+    cout << "object binary matrix WxH: " << object.object->width() << " x " << object.object->height() << endl;
+
+    ImageRGB32 filtered_image = image.copy();
+    // set background pixels to transparent and black so we can debug
+    // whether the binary mask of the object works as intended
+    filter_by_mask(object.object->submatrix(0, 0, image.width(), image.height()), filtered_image, Color(0), true);
+    dump_debug_image(global_logger_command_line(), "CommonFramework/match_template_by_waterfill",
+        "waterfillobject", filtered_image);
+}
+}
+
 bool match_template_by_waterfill(
     Resolution input_resolution,
     const ImageViewRGB32& image,
@@ -80,82 +126,53 @@ bool match_template_by_waterfill(
     const std::vector<std::pair<uint32_t, uint32_t>>& filters,
     const std::pair<size_t, size_t>& area_thresholds,
     double rmsd_threshold,
-    std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object)
+    std::function<bool(WaterfillObject& object)> check_matched_object)
 {
-    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        std::cout << "============ match_template_by_waterfill ============" << std::endl;
-        dump_debug_image(
-            global_logger_command_line(), 
-            "CommonFramework/WaterfillTemplateMatcher", 
-            "match_template_by_waterfill_input_image", 
-            image
-        );
-        std::cout << "Use " << filters.size() << " filter(s), size range ("
-                  << area_thresholds.first << ", ";
-        if (area_thresholds.second == SIZE_MAX){
-            std::cout << "SIZE_MAX";
-        }else{
-            std::cout << area_thresholds.second;
-        }
-        std::cout << ")" << std::endl;
+    const bool debug_mode = PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING;
+    if (debug_mode){
+        cout << "============ match_template_by_waterfill ============" << endl;
+        dump_inputs(image, filters, area_thresholds, rmsd_threshold);
     }
+
     std::vector<PokemonAutomation::PackedBinaryMatrix> matrices = compress_rgb32_to_binary_range(image, filters);
-//    cout << matrices.size() << endl;
 
     bool detected = false;
     bool stop_match = false;
     for (size_t i_matrix = 0; i_matrix < matrices.size(); i_matrix++){
         PackedBinaryMatrix& matrix = matrices[i_matrix];
-        if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-            ImageRGB32 binaryImage = image.copy();
-            filter_by_mask(matrix, binaryImage, Color(COLOR_BLACK), true);
-            //filter_by_mask(matrix, binaryImage, Color(COLOR_WHITE), true);
-            dump_debug_image(
-                global_logger_command_line(), 
-                "CommonFramework/WaterfillTemplateMatcher", 
-                "match_template_by_waterfill_filtered_image_" + std::to_string(i_matrix), 
-                binaryImage
-            );
+        if (debug_mode){
+            ImageRGB32 filtered_image = image.copy();
+            // set background pixels to transparent and black so we can debug
+            // whether the image filter works as intended
+            filter_by_mask(matrix, filtered_image, Color(0), true);
+            dump_debug_image(global_logger_command_line(), "CommonFramework/match_template_by_waterfill",
+                "input_image_filtered_" + std::to_string(i_matrix), filtered_image);
         }
 
-        std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
-        Kernels::Waterfill::WaterfillObject object;
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
+        WaterfillObject object;
         const size_t min_area = area_thresholds.first;
-//        cout << "min_area = " << min_area << endl;
         session->set_source(matrix);
         auto finder = session->make_iterator(min_area);
-        const bool keep_object_matrix = false;
+        const bool keep_object_matrix = debug_mode;
         while (finder->find_next(object, keep_object_matrix)){
-//            static int c = 0;
-//            cout << "start: " << c << endl;
-//            extract_box_reference(image, object).save("test-" + std::to_string(c++) + ".png");
-
-//            cout << "object.area = " << object.area << endl;
-            if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-                std::cout << "------------ Matching One WaterfillObject ------------" << std::endl;
-                std::cout << "Object area: " << object.area << std::endl;
+            if (debug_mode){
+                cout << "------------ Matching One WaterfillObject ------------" << endl;
+                dump_object(object, image, area_thresholds);
             }
 
             if (object.area > area_thresholds.second){
                 continue;
             }
-            double rmsd = matcher.rmsd_original(input_resolution, image, object);
-            if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-                std::cout << "Final rmsd: " << rmsd << " vs " << rmsd_threshold << std::endl;
-                std::cout << "------------ End of Matching one WaterfillObject ------------" << std::endl;
+
+            const  double rmsd = matcher.rmsd_original(input_resolution, image, object);
+            if (debug_mode){
+                cout << "Final rmsd: " << rmsd << " vs threshold " << rmsd_threshold << endl;
+                cout << "------------ End of Matching one WaterfillObject ------------" << endl;
             }
 
-//            std::cout << "Object rmsd: " << rmsd << std::endl;
-
             if (rmsd < rmsd_threshold){
-#if 0
-                std::cout << "Object rmsd: " << rmsd << std::endl;
-//                static int c = 0;
-//                extract_box_reference(image, object).save("match-" + std::to_string(c++) + ".png");
-#endif
-
-                detected = true;
-                
+                detected = true; 
                 if (check_matched_object(object)){
                     stop_match = true;
                     break;
@@ -167,8 +184,8 @@ bool match_template_by_waterfill(
             break;
         }
     }
-    if (PreloadSettings::debug().IMAGE_TEMPLATE_MATCHING){
-        std::cout << "============ End of match_template_by_waterfill ============" << std::endl;
+    if (debug_mode){
+        cout << "============ End of match_template_by_waterfill ============" << endl;
     }
     return detected;
 }
@@ -189,7 +206,7 @@ void draw_matrix_on_image(
 
 
 void draw_object_on_image(
-    const Kernels::Waterfill::WaterfillObject& obj,
+    const WaterfillObject& obj,
     const uint32_t& color, ImageRGB32& image, size_t offset_x, size_t offset_y
 ){
     for (size_t x = 0; x < obj.width(); x++){
