@@ -66,6 +66,7 @@ ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
             {Routes::SKRELP_INKAY,  "skrelp_inkay",  "Sewers: Skrelp+Inkay"},
             {Routes::SKRELP_ARIADOS,  "skrelp_ariados",  "Sewers: Skrelp+Ariados"},
             // {Routes::SCRAGGY,  "scraggy",  "Sewers: Scraggy"},
+            {Routes::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Routes::KLEFKI
@@ -147,6 +148,24 @@ void route_skrelp_ariados(SingleSwitchProgramEnvironment& env, ProControllerCont
 void route_scraggy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 //TODO
 }
+
+void route_wild_zone_19(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    context.wait_for_all_requests();
+    if (run_a_straight_path_in_overworld(env.console, context, 0, 80, 6500ms) == 0) {
+        open_map(env.console, context, false);
+        pbf_move_left_joystick(context, 0, 128, 100ms, 100ms);
+        if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
+            pbf_move_left_joystick(context, 128, 255, 100ms, 100ms);
+            fly_from_map(env.console, context);
+        }
+    } else {
+        open_map(env.console, context, false);
+        pbf_move_left_joystick(context, 0, 128, 100ms, 100ms);
+        fly_from_map(env.console, context);
+    }
+    wait_until_overworld(env.console, context, 50s);
+}
+
 } // namespace
 
 void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -186,6 +205,9 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
         break;
     case Routes::SCRAGGY:
         loop = route_scraggy;
+        break;
+    case Routes::WILD_ZONE_19:
+        loop = route_wild_zone_19;
         break;
     default:
         OperationFailedException::fire(

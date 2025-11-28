@@ -495,4 +495,26 @@ int run_towards_wild_zone_gate(
     }
 }
 
+int run_a_straight_path_in_overworld(
+    ConsoleHandle& console, ProControllerContext& context,
+    uint8_t direction_x, uint8_t direction_y,
+    PokemonAutomation::Milliseconds duration
+){
+    OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &console.overlay(), std::chrono::milliseconds(400));
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [&](ProControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+            pbf_move_left_joystick(context, direction_x, direction_y, duration, 0ms);
+        },
+        {{overworld_gone}}
+    );
+    if (ret == 0){
+        console.overlay().add_log("Day/Night Change Detected");
+        wait_until_overworld(console, context);
+    }
+    return ret;
+}
+
+
 }
