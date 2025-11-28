@@ -33,6 +33,7 @@ private:
     const Color m_color;
     VideoOverlay* m_overlay;
     const ImageFloatBox m_alert_eye_box;
+    const ImageFloatBox m_initial_alert_eye_box;
 
     ImageFloatBox m_last_detected;
     std::optional<OverlayBoxScope> m_last_detected_box;

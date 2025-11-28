@@ -37,6 +37,7 @@ raw_image = image.copy()
 # ==================================================================
 # LZA alert eye detector
 add_infer_box_to_image(raw_image, 0.485, 0.088, 0.029, 0.034, image)
+add_infer_box_to_image(raw_image, 0.464, 0.142, 0.071, 0.074, image)
 
 
 # ==================================================================
