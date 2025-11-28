@@ -1590,6 +1590,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
     Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.cpp
     Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.h
+    Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.cpp
+    Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.h
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h
     Source/PokemonLZA/PokemonLZA_Panels.cpp

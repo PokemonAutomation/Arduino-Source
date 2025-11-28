@@ -12,6 +12,7 @@
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
+#include "PokemonLZA/Options/PokemonLZA_BattleAIOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -50,6 +51,8 @@ private:
 
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     ShinySoundDetectedActionOption SHINY_DETECTED;
+
+    BattleAIOption BATTLE_AI;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

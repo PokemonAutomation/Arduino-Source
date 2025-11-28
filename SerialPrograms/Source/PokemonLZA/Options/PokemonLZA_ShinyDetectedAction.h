@@ -7,15 +7,15 @@
 #ifndef PokemonAutomation_PokemonLZA_ShinyDetectedAction_H
 #define PokemonAutomation_PokemonLZA_ShinyDetectedAction_H
 
+#include <atomic>
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options//TimeDurationOption.h"
 //#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options//TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
-#include <atomic>
 
 namespace PokemonAutomation{
     class ProgramEnvironment;

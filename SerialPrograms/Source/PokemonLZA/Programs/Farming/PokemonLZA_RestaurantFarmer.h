@@ -7,12 +7,13 @@
 #ifndef PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 #define PokemonAutomation_PokemonLZA_RestaurantFarmer_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "PokemonLZA/Options/PokemonLZA_BattleAIOption.h"
 
 namespace PokemonAutomation{
 
@@ -57,8 +58,7 @@ private:
 
     SimpleIntegerOption<uint32_t> PERIODIC_SAVE;
 
-    BooleanCheckBoxOption MOVE_AI;
-    BooleanCheckBoxOption USE_PLUS_MOVES;
+    BattleAIOption BATTLE_AI;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

@@ -9,6 +9,7 @@
 
 //#include "Common/Cpp/Time.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
+#include "PokemonLZA/Options/PokemonLZA_BattleAIOption.h"
 
 namespace PokemonAutomation{
 
@@ -27,7 +28,7 @@ namespace PokemonLZA{
 
 class TrainerBattleState{
 public:
-    TrainerBattleState();
+    TrainerBattleState(BattleAIOption& settings);
 
     // Try to lock onto an opponent pokemon and launch an attack.
     // - use_move_ai: if True, select available moves based on type effectiveness. Otherwise, select first
@@ -39,10 +40,7 @@ public:
     bool attempt_one_attack(
         ProgramEnvironment& env,
         ConsoleHandle& console,
-        ProControllerContext& context,
-        bool use_move_ai,
-        bool use_plus_moves,
-        bool allow_button_B_press = true
+        ProControllerContext& context
     );
 
 
@@ -51,6 +49,8 @@ private:
 
 
 private:
+    BattleAIOption& m_settings;
+
     size_t m_consecutive_failures;
 };
 

@@ -98,6 +98,7 @@ InPlaceCatcher::InPlaceCatcher()
     PA_ADD_OPTION(MAX_BALLS);
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(SHINY_DETECTED);
+    PA_ADD_OPTION(BATTLE_AI);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -215,8 +216,8 @@ void InPlaceCatcher::run(
         env.log("Detected battle menu while under attack! Launching attack...", COLOR_ORANGE);
         context.wait_for(500ms);
 
-        TrainerBattleState state;
-        if (state.attempt_one_attack(env, env.console, context, true, false, false)){
+        TrainerBattleState state(BATTLE_AI);
+        if (state.attempt_one_attack(env, env.console, context)){
             last_attack = current_time();
             stats.attacks_fired++;
             env.update_stats();

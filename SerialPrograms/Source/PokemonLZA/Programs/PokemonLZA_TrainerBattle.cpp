@@ -19,8 +19,9 @@ namespace NintendoSwitch{
 namespace PokemonLZA{
 
 
-TrainerBattleState::TrainerBattleState()
-    : m_consecutive_failures(0)
+TrainerBattleState::TrainerBattleState(BattleAIOption& settings)
+    : m_settings(settings)
+    , m_consecutive_failures(0)
 {}
 
 
@@ -29,10 +30,7 @@ TrainerBattleState::TrainerBattleState()
 bool TrainerBattleState::attempt_one_attack(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    ProControllerContext& context,
-    bool use_move_ai,
-    bool use_plus_moves,
-    bool allow_button_B_press
+    ProControllerContext& context
 ){
     AsyncCommandSession<ProController> command(
         context,
@@ -56,11 +54,6 @@ bool TrainerBattleState::attempt_one_attack(
         command.stop_session_and_rethrow();
         context.wait_for(250ms);
         // No move effectiveness symbol found
-        if (allow_button_B_press){
-            // It could be the game is in a transparent pre-battle dialog,
-            // press B to clear it.
-            pbf_press_button(context, BUTTON_B, 160ms, 80ms);
-        }
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
             run_lock_recovery(console, context);
@@ -88,7 +81,7 @@ bool TrainerBattleState::attempt_one_attack(
         if (move_watcher[index] == MoveEffectivenessSymbol::None){
             continue;
         }
-        if (!use_move_ai){
+        if (m_settings.MODE == BattleAIMode::BlindMash){
             best_index = index;
             break;
         }
@@ -102,7 +95,7 @@ bool TrainerBattleState::attempt_one_attack(
 
     command.dispatch([&](ProControllerContext& context){
         ssf_press_button(context, BUTTON_ZL, 0ms, 800ms, 200ms);
-        if (use_plus_moves){
+        if (m_settings.USE_PLUS_MOVES){
             ssf_press_button(context, BUTTON_PLUS, 320ms, 840ms);
 //            pbf_wait(context, 104ms);
         }
