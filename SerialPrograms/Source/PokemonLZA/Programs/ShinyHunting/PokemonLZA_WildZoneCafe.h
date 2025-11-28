@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLZA_WildZoneCafe_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
@@ -34,6 +35,8 @@ public:
 private:
     EnumDropdownOption<WildZoneCafe> CAFE;
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
+    SimpleIntegerOption<uint64_t> NUM_VISITS;
 
     ShinySoundDetectedActionOption SHINY_DETECTED;
 

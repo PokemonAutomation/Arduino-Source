@@ -81,6 +81,7 @@ ShinyHunt_WildZoneCafe::ShinyHunt_WildZoneCafe()
         LockMode::LOCK_WHILE_RUNNING,
         WildZoneCafe::CAFE_BATAILLE
     )
+    , NUM_VISITS("<b>Number of Visits:</b><br>Stop after this many visits. 0 means no limit.", LockMode::UNLOCK_WHILE_RUNNING, 0)
     , SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -93,6 +94,7 @@ ShinyHunt_WildZoneCafe::ShinyHunt_WildZoneCafe()
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(CAFE);
+    PA_ADD_OPTION(NUM_VISITS);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -309,6 +311,9 @@ void ShinyHunt_WildZoneCafe::program(SingleSwitchProgramEnvironment& env, ProCon
                     to_max_zoom_level_on_map = false;
                     stats.visits++;
                     env.update_stats();
+                    if (NUM_VISITS > 0 && stats.visits >= NUM_VISITS){
+                        break;
+                    }
                     // No failure. Reset consecutive failure counter.
                     consecutive_failures = 0;
                 }catch (OperationFailedException&){
