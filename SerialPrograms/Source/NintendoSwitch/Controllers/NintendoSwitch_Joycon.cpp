@@ -75,6 +75,7 @@ public:
         WallClock time_stamp = current_time();
         static_cast<JoyconController*>(m_controller)->issue_full_controller_state(
             nullptr,
+            false,
             ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255,
             switch_state.buttons,
             switch_state.joystick_x,

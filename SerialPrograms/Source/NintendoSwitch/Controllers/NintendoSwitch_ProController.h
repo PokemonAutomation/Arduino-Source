@@ -160,6 +160,7 @@ public:
     //
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
+        bool enable_logging,
         Milliseconds duration,
         Button button,
         DpadPosition position,

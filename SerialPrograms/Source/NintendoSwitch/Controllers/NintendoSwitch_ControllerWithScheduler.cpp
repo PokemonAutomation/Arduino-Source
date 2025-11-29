@@ -182,6 +182,7 @@ void ControllerWithScheduler::issue_gyro(
 
 void ControllerWithScheduler::issue_full_controller_state(
     const Cancellable* cancellable,
+    bool enable_logging,
     Milliseconds hold,
     Button button,
     DpadPosition position,
@@ -240,21 +241,21 @@ void ControllerWithScheduler::issue_full_controller_state(
     if (m_logging_throttler){
         //  Do not log the contents of the command due to privacy concerns.
         //  (people entering passwords)
-#if 0
-        m_logger.log(
-            "issue_controller_state(): (" + button_to_string(button) +
-            "), dpad(" + dpad_to_string(position) +
-            "), LJ(" + std::to_string(left_x) + "," + std::to_string(left_y) +
-            "), RJ(" + std::to_string(right_x) + "," + std::to_string(right_y) +
-            "), hold = " + std::to_string(hold.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-#else
-        m_logger.log(
-            "issue_controller_state(): hold = " + std::to_string(hold.count()) + "ms",
-            COLOR_DARKGREEN
-        );
-#endif
+        if (enable_logging){
+            m_logger.log(
+                "issue_controller_state(): (" + button_to_string(button) +
+                "), dpad(" + dpad_to_string(position) +
+                "), LJ(" + std::to_string(left_x) + "," + std::to_string(left_y) +
+                "), RJ(" + std::to_string(right_x) + "," + std::to_string(right_y) +
+                "), hold = " + std::to_string(hold.count()) + "ms",
+                COLOR_DARKGREEN
+            );
+        }else{
+            m_logger.log(
+                "issue_controller_state(): hold = " + std::to_string(hold.count()) + "ms",
+                COLOR_DARKGREEN
+            );
+        }
     }
 }
 

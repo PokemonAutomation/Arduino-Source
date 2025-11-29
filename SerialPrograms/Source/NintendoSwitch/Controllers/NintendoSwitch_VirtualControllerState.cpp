@@ -118,6 +118,7 @@ void ProControllerState::execute(AbstractControllerContext& context, Millisecond
     ProController& controller = static_cast<ProController&>(context.controller());
     controller.issue_full_controller_state(
         &context,
+        true,
         duration,
         buttons,
         dpad,
@@ -333,6 +334,7 @@ void JoyconState::execute(AbstractControllerContext& context, Milliseconds durat
     JoyconController& controller = static_cast<JoyconController&>(context.controller());
     controller.issue_full_controller_state(
         &context,
+        true,
         duration,
         buttons,
         joystick_x, joystick_y

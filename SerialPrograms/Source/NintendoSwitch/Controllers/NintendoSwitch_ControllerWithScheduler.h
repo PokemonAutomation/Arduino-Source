@@ -250,6 +250,7 @@ public:
 
     void issue_full_controller_state(
         const Cancellable* cancellable,
+        bool enable_logging,
         Milliseconds hold,
         Button button,
         DpadPosition position,

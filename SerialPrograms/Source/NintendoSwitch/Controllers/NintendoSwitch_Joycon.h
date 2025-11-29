@@ -139,6 +139,7 @@ public:
     //
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
+        bool enable_logging,
         Milliseconds duration,
         Button button,
         uint8_t joystick_x, uint8_t joystick_y

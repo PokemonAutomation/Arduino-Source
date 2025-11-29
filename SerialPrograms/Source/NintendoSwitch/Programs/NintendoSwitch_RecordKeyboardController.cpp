@@ -271,6 +271,27 @@ std::string json_to_cpp_code_joycon(const JsonArray& history){
 }
 
 
+template <typename ControllerState>
+void json_to_pbf_actions(
+    AbstractControllerContext& context,
+    const JsonArray& history,
+    uint32_t num_loops,
+    uint32_t seconds_wait_between_loops
+){
+    ControllerState state;
+    for (uint32_t i = 0; i < num_loops; i++){
+        for (const JsonValue& command : history){
+            const JsonObject& snapshot = command.to_object_throw();
+            Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
+            state.load_json(command);
+            state.execute(context, duration);
+        }
+        state.clear();
+        state.execute(context, Seconds(seconds_wait_between_loops));
+    }
+}
+
+
 void json_to_pbf_actions(
     SingleSwitchProgramEnvironment& env,
     CancellableScope& scope,
@@ -290,20 +311,16 @@ void json_to_pbf_actions(
 
         const JsonArray& history_json = obj.get_array_throw("history");
 
+        AbstractControllerContext acontext(scope, env.console.controller());
+
         switch (controller_class){
         case ControllerClass::NintendoSwitch_ProController:
-        {
-            ProControllerContext context(scope, env.console.controller<ProController>());
-            json_to_pbf_actions_pro_controller(context, history_json, num_loops, seconds_wait_between_loops);
+            json_to_pbf_actions<ProControllerState>(acontext, history_json, num_loops, seconds_wait_between_loops);
             break;
-        }
         case ControllerClass::NintendoSwitch_LeftJoycon:
         case ControllerClass::NintendoSwitch_RightJoycon:
-        {
-            JoyconContext context(scope, env.console.controller<JoyconController>());
-            json_to_pbf_actions_joycon(context, history_json, num_loops, seconds_wait_between_loops);
+            json_to_pbf_actions<JoyconState>(acontext, history_json, num_loops, seconds_wait_between_loops);
             break;
-        }
         default:
             // do nothing if the ControllerClass is not one of the above.
             break;
@@ -322,46 +339,16 @@ void json_to_pbf_actions_pro_controller(
     uint32_t num_loops,
     uint32_t seconds_wait_between_loops
 ){
+    AbstractControllerContext acontext(context);
 
     for (uint32_t i = 0; i < num_loops; i++){
-        json_to_pro_controller_state(history, 
-            [&](int64_t duration_in_ms){
-                pbf_wait(context, Milliseconds(duration_in_ms));
-            },
-            [&](NonNeutralControllerField non_neutral_field,
-                Button button, 
-                DpadPosition dpad, 
-                uint8_t left_x, 
-                uint8_t left_y, 
-                uint8_t right_x, 
-                uint8_t right_y, 
-                int64_t duration_in_ms
-            ){
-                switch (non_neutral_field){
-                case NonNeutralControllerField::BUTTON:
-                    pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
-                    break;
-                case NonNeutralControllerField::DPAD:
-                    pbf_press_dpad(context, dpad, Milliseconds(duration_in_ms), Milliseconds(0));
-                    break;
-                case NonNeutralControllerField::LEFT_JOYSTICK:
-                    pbf_move_left_joystick(context, left_x, left_y, Milliseconds(duration_in_ms), Milliseconds(0));
-                    break;
-                case NonNeutralControllerField::RIGHT_JOYSTICK:
-                    pbf_move_right_joystick(context, right_x, right_y, Milliseconds(duration_in_ms), Milliseconds(0));
-                    break;
-                case NonNeutralControllerField::MULTIPLE:
-                    pbf_controller_state(context, button, dpad, left_x, left_y, right_x, right_y, Milliseconds(duration_in_ms));
-                    break;
-                case NonNeutralControllerField::NONE:
-                    pbf_wait(context, Milliseconds(duration_in_ms));
-                    break;
-                default:
-                    throw ParseException("Unexpected NonNeutralControllerField enum.");
-                }            
-            }
-        );
-
+        for (const JsonValue& command : history){
+            const JsonObject& snapshot = command.to_object_throw();
+            Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
+            ProControllerState state;
+            state.load_json(command);
+            state.execute(acontext, duration);
+        }
         pbf_wait(context, Seconds(seconds_wait_between_loops));
     }
 }
@@ -372,37 +359,16 @@ void json_to_pbf_actions_joycon(
     uint32_t num_loops,
     uint32_t seconds_wait_between_loops
 ){
+    AbstractControllerContext acontext(context);
 
     for (uint32_t i = 0; i < num_loops; i++){
-        json_to_joycon_state(history, 
-            [&](int64_t duration_in_ms){
-                pbf_wait(context, Milliseconds(duration_in_ms));
-            },
-            [&](NonNeutralControllerField non_neutral_field,
-                Button button, 
-                uint8_t x, 
-                uint8_t y, 
-                int64_t duration_in_ms
-            ){
-                switch (non_neutral_field){
-                case NonNeutralControllerField::BUTTON:
-                    pbf_press_button(context, button, Milliseconds(duration_in_ms), Milliseconds(0));
-                    break;
-                case NonNeutralControllerField::JOYSTICK:
-                    pbf_move_joystick(context, x, y, Milliseconds(duration_in_ms), Milliseconds(0));
-                    break;
-                case NonNeutralControllerField::MULTIPLE:
-                    pbf_controller_state(context, button, x, y, Milliseconds(duration_in_ms));
-                    break;
-                case NonNeutralControllerField::NONE:
-                    pbf_wait(context, Milliseconds(duration_in_ms));
-                    break;
-                default:
-                    throw ParseException("Unexpected NonNeutralControllerField enum.");
-                }            
-            }
-        );
-
+        for (const JsonValue& command : history){
+            const JsonObject& snapshot = command.to_object_throw();
+            Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
+            ProControllerState state;
+            state.load_json(command);
+            state.execute(acontext, duration);
+        }
         pbf_wait(context, Seconds(seconds_wait_between_loops));
     }
 }

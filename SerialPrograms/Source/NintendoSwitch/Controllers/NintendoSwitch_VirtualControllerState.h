@@ -9,12 +9,17 @@
 
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch_ControllerButtons.h"
+#include "NintendoSwitch_ProController.h"
+#include "NintendoSwitch_Joycon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
 class ProControllerState : public ControllerState{
+public:
+    using ControllerType = ProController;
+
 public:
     virtual void clear() override;
     virtual bool operator==(const ControllerState& x) const override;
@@ -52,6 +57,9 @@ struct ProControllerDeltas{
 
 
 class JoyconState : public ControllerState{
+public:
+    using ControllerType = JoyconController;
+
 public:
     virtual void clear() override;
     virtual bool operator==(const ControllerState& x) const override;

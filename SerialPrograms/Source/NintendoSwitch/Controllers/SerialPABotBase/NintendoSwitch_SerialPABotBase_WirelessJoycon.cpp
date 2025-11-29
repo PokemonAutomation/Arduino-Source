@@ -106,6 +106,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_joystick(
 template <typename JoyconType>
 void SerialPABotBase_WirelessJoycon<JoyconType>::issue_full_controller_state(
     const Cancellable* cancellable,
+    bool enable_logging,
     Milliseconds duration,
     Button button,
     uint8_t joystick_x, uint8_t joystick_y
@@ -115,6 +116,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_full_controller_state(
     case ControllerType::NintendoSwitch_LeftJoycon:
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
+            enable_logging,
             duration,
             button,
             DPAD_NONE,
@@ -125,6 +127,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_full_controller_state(
     case ControllerType::NintendoSwitch_RightJoycon:
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
+            enable_logging,
             duration,
             button,
             DPAD_NONE,
