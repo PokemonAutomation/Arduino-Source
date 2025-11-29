@@ -11,7 +11,6 @@
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Globals.h"
-// #include "CommonFramework/Tools/DebugDumper.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
@@ -168,21 +167,42 @@ void ShinyHunt_WildZoneEntrance::on_config_value_changed(void* object){
 // This function is robust against day/night changes.
 void go_to_entrance(
     SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
+    ProControllerContext& context,
+    WildZone wildzone
 ){
-    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
-    run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            for (int c = 0; c < 30; c++){
-                ssf_press_button(context, BUTTON_B, 0ms, 2s, 0ms);
-                pbf_move_left_joystick(context, 128, 0, 2s, 200ms);
-            }
-        },
-        {{buttonA}}
-    );
-    env.log("Detected button A. At Wild Zone gate.");
-    env.console.overlay().add_log("Detect Entrance");
+    double starting_direction = 0;
+    uint8_t joystick_x = 128;
+    if (wildzone == WildZone::WILD_ZONE_1){
+        // The fast travel point of Wild Zone 1 does not face the zone entrance directly. We need
+        // to turn a little bit to the right
+        starting_direction = get_facing_direction(env.console, context);
+        joystick_x = 145;
+    }
+    int ret = run_towards_wild_zone_gate(env.console, context, joystick_x, 0, 10s);
+    switch(ret){
+    case 0: // detected button A. Reached gate
+        break;
+    case 1: // day/night change happened.
+        if (wildzone == WildZone::WILD_ZONE_1 && 
+            get_angle_between_facing_directions(starting_direction, get_facing_direction(env.console, context)) > 2.5){
+            joystick_x = 128; // we've already turned. Just need to go forward to enter the zone
+        }
+        ret = run_towards_wild_zone_gate(env.console, context, joystick_x, 0, 10s);
+        if (ret != 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "go_to_entrance(): Cannot reach gate from outside after day/night change.",
+                env.console
+            );
+        }
+        break;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "go_to_entrance(): Cannot reach gate from outside.",
+            env.console
+        );
+    }
 }
 
 
@@ -300,8 +320,7 @@ void leave_zone_and_reset_spawns(
     
     const double starting_direction = get_facing_direction(env.console, context);
 
-    const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
-    int ret = run_towards_wild_zone_gate(env.console, context, button_A_box, 128, 255, walk_time_in_zone);
+    int ret = run_towards_wild_zone_gate(env.console, context, 128, 255, walk_time_in_zone);
     switch (ret){
     case 0: // Found button A. Reached the gate.
         break;
@@ -332,7 +351,7 @@ void leave_zone_and_reset_spawns(
             }
 
             // Running forward or backward depends on character facing to go back to zone entrance
-            ret = run_towards_wild_zone_gate(env.console, context, button_A_box, 128, joystick_y, walk_time_in_zone);
+            ret = run_towards_wild_zone_gate(env.console, context, 128, joystick_y, walk_time_in_zone);
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();
@@ -428,7 +447,7 @@ void do_one_wild_zone_trip(
     shiny_sound_handler.process_pending(context);
 
     if (movement_mode >= 1){
-        go_to_entrance(env, context);
+        go_to_entrance(env, context, wild_zone);
         context.wait_for_all_requests();
         shiny_sound_handler.process_pending(context);
     }

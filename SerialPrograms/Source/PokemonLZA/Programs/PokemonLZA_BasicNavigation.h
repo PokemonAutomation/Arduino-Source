@@ -117,7 +117,6 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
 //   or get stuck by terrain or obstacle on the way
 int run_towards_wild_zone_gate(
     ConsoleHandle& console, ProControllerContext& context,
-    const ImageFloatBox& button_A_box,
     uint8_t run_direction_x, uint8_t run_direction_y,
     Milliseconds run_time
 );

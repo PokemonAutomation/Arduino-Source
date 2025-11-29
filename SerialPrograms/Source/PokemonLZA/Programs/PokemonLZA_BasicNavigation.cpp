@@ -464,10 +464,10 @@ bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
 
 int run_towards_wild_zone_gate(
     ConsoleHandle& console, ProControllerContext& context,
-    const ImageFloatBox& button_A_box,
     uint8_t run_direction_x, uint8_t run_direction_y,
     PokemonAutomation::Milliseconds run_time
 ){
+    const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
     ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &console.overlay());
     OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &console.overlay(), std::chrono::milliseconds(400));
     const int ret = run_until<ProControllerContext>(

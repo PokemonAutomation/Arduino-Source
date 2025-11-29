@@ -178,8 +178,7 @@ void do_one_cafe_trip(
         break;
     }
 
-    const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
-    int ret = run_towards_wild_zone_gate(env.console, context, button_A_box, move_x, move_y, Seconds(10));
+    int ret = run_towards_wild_zone_gate(env.console, context, move_x, move_y, Seconds(10));
     switch (ret){
     case 0: // Found button A. Reached the gate.
         break;
@@ -197,7 +196,7 @@ void do_one_cafe_trip(
                 env.console.overlay().add_log("Running Forward");
             }
             // Running forward or backward depends on character facing to go back to zone entrance
-            ret = run_towards_wild_zone_gate(env.console, context, button_A_box, move_x, move_y, Seconds(10));
+            ret = run_towards_wild_zone_gate(env.console, context, move_x, move_y, Seconds(10));
             if (ret != 0){
                 stats.errors++;
                 env.update_stats();
