@@ -200,31 +200,31 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
             error_coefficient
         );
     });
-    std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&)> loop;
+    std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&)> route;
     switch (ROUTE) {
     case Routes::KLEFKI:
-        loop = route_klefki;
+        route = route_klefki;
         break;
     case Routes::KLEFKI_INKAY_GOOMY:
-        loop = route_klefki_inkay_goomy;
+        route = route_klefki_inkay_goomy;
         break;
     case Routes::LITWICK:
-        loop = route_litwick;
+        route = route_litwick;
         break;
     case Routes::SKRELP:
-        loop = route_skrelp;
+        route = route_skrelp;
         break;
     case Routes::SKRELP_INKAY:
-        loop = route_skrelp_inkay;
+        route = route_skrelp_inkay;
         break;
     case Routes::SKRELP_ARIADOS:
-        loop = route_skrelp_ariados;
+        route = route_skrelp_ariados;
         break;
     case Routes::SCRAGGY:
-        loop = route_scraggy;
+        route = route_scraggy;
         break;
     case Routes::WILD_ZONE_19:
-        loop = route_wild_zone_19;
+        route = route_wild_zone_19;
         break;
     default:
         OperationFailedException::fire(
@@ -243,7 +243,7 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
                 shiny_sound_handler.process_pending(context);
                 send_program_status_notification(env, NOTIFICATION_STATUS);
                 stats.resets++;
-                loop(env, context);
+                route(env, context);
                 env.update_stats();
             }while (current_time() < start_time + DURATION.get());
         },
