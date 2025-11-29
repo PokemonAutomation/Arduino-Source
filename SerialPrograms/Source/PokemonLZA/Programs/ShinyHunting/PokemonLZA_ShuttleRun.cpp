@@ -9,6 +9,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
@@ -89,13 +90,29 @@ ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
 
 namespace {
 
-void fly_back(ConsoleHandle& console, ProControllerContext& context) {
+void fly_back_to_sewers_entrance(ConsoleHandle& console, ProControllerContext& context) {
     pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms); // open map
     context.wait_for_all_requests();
     pbf_wait(context, 500ms);
     pbf_press_button(context, BUTTON_Y, 100ms, 100ms); // select fly point
-    pbf_mash_button(context, BUTTON_A, 1000ms);
-    wait_until_overworld(console, context, 10s);
+    {
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
+        int ret = run_until<ProControllerContext>(
+            console, context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 10000ms);
+            },
+            {black_screen}
+        );
+        if (ret != 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "fly_back_to_sewers_entrance(): cannot detect black screen after mashing A.",
+                console
+            );
+        }
+    }
+    wait_until_overworld(console, context);
 }
 
 void route_klefki(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -104,7 +121,7 @@ void route_klefki(SingleSwitchProgramEnvironment& env, ProControllerContext& con
     pbf_move_left_joystick(context, 128, 0, 4900ms, 0ms);
     pbf_move_left_joystick(context, 0, 128, 1000ms, 0ms);
     pbf_press_button(context, BUTTON_L, 100ms, 500ms);
-    fly_back(env.console, context);
+    fly_back_to_sewers_entrance(env.console, context);
 }
 
 void route_klefki_inkay_goomy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -113,7 +130,7 @@ void route_klefki_inkay_goomy(SingleSwitchProgramEnvironment& env, ProController
     pbf_move_left_joystick(context, 128, 0, 8500ms, 0ms);
     pbf_move_left_joystick(context, 255, 128, 1300ms, 0ms);
     pbf_press_button(context, BUTTON_L, 100ms, 500ms);
-    fly_back(env.console, context);
+    fly_back_to_sewers_entrance(env.console, context);
 }
 
 void route_litwick(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -126,7 +143,7 @@ void route_litwick(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 void route_skrelp(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
-    fly_back(env.console, context);
+    fly_back_to_sewers_entrance(env.console, context);
     pbf_wait(context, 1000ms);
 }
 
@@ -134,7 +151,7 @@ void route_skrelp_inkay(SingleSwitchProgramEnvironment& env, ProControllerContex
     context.wait_for_all_requests();
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
     pbf_move_left_joystick(context, 128, 0, 3900ms, 0ms);
-    fly_back(env.console, context);
+    fly_back_to_sewers_entrance(env.console, context);
 }
 
 void route_skrelp_ariados(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
