@@ -68,9 +68,26 @@ std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
 std::string json_to_cpp_code_joycon(const JsonArray& history);
 
 // given the json, with the controller history, run the controller actions using the pbf functions.
-void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerClass controller_class, uint32_t num_loops, uint32_t seconds_wait_between_loops);
-void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history, uint32_t num_loops, uint32_t seconds_wait_between_loops);
-void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history, uint32_t num_loops, uint32_t seconds_wait_between_loops);
+void json_to_pbf_actions(
+    SingleSwitchProgramEnvironment& env,
+    CancellableScope& scope,
+    const JsonValue& json,
+    ControllerClass controller_class,
+    uint32_t num_loops,
+    uint32_t seconds_wait_between_loops
+);
+void json_to_pbf_actions_pro_controller(
+    ProControllerContext& context,
+    const JsonArray& history,
+    uint32_t num_loops,
+    uint32_t seconds_wait_between_loops
+);
+void json_to_pbf_actions_joycon(
+    JoyconContext& context,
+    const JsonArray& history,
+    uint32_t num_loops,
+    uint32_t seconds_wait_between_loops
+);
 
 class RecordKeyboardController_Descriptor : public SingleSwitchProgramDescriptor{
 public:
@@ -120,9 +137,9 @@ private:
         // {
         //     "is_neutral": true
         // }
-    struct ControllerStateSnapshot {
+    struct ControllerStateSnapshot{
         WallClock time_stamp;
-        JsonObject controller_state;
+        JsonValue controller_state;
     };
 
 private:

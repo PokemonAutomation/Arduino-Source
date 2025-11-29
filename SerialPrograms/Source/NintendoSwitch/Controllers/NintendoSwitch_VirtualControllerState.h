@@ -20,7 +20,8 @@ public:
     virtual bool operator==(const ControllerState& x) const override;
     virtual bool is_neutral() const override;
 
-    virtual JsonObject serialize_state() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
 public:
     Button buttons = BUTTON_NONE;
@@ -54,7 +55,8 @@ public:
     virtual bool operator==(const ControllerState& x) const override;
     virtual bool is_neutral() const override;
 
-    virtual JsonObject serialize_state() const override;
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
 
 public:
     Button buttons = BUTTON_NONE;

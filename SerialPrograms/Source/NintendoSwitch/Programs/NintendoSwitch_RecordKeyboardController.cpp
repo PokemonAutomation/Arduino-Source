@@ -8,6 +8,7 @@
 #include "Common/Cpp/Json/JsonArray.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_RecordKeyboardController.h"
 #include "Controllers/ControllerTypeStrings.h"
 
@@ -270,7 +271,14 @@ std::string json_to_cpp_code_joycon(const JsonArray& history){
 }
 
 
-void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& scope, const JsonValue& json, ControllerClass controller_class, uint32_t num_loops, uint32_t seconds_wait_between_loops){
+void json_to_pbf_actions(
+    SingleSwitchProgramEnvironment& env,
+    CancellableScope& scope,
+    const JsonValue& json,
+    ControllerClass controller_class,
+    uint32_t num_loops,
+    uint32_t seconds_wait_between_loops
+){
     try{
         const JsonObject& obj = json.to_object_throw();
 
@@ -308,7 +316,12 @@ void json_to_pbf_actions(SingleSwitchProgramEnvironment& env, CancellableScope& 
 
 }
 
-void json_to_pbf_actions_pro_controller(ProControllerContext& context, const JsonArray& history, uint32_t num_loops, uint32_t seconds_wait_between_loops){
+void json_to_pbf_actions_pro_controller(
+    ProControllerContext& context,
+    const JsonArray& history,
+    uint32_t num_loops,
+    uint32_t seconds_wait_between_loops
+){
 
     for (uint32_t i = 0; i < num_loops; i++){
         json_to_pro_controller_state(history, 
@@ -353,7 +366,12 @@ void json_to_pbf_actions_pro_controller(ProControllerContext& context, const Jso
     }
 }
 
-void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history, uint32_t num_loops, uint32_t seconds_wait_between_loops){
+void json_to_pbf_actions_joycon(
+    JoyconContext& context,
+    const JsonArray& history,
+    uint32_t num_loops,
+    uint32_t seconds_wait_between_loops
+){
 
     for (uint32_t i = 0; i < num_loops; i++){
         json_to_joycon_state(history, 
@@ -390,7 +408,12 @@ void json_to_pbf_actions_joycon(JoyconContext& context, const JsonArray& history
 }
 
 
-NonNeutralControllerField get_non_neutral_pro_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y){
+NonNeutralControllerField get_non_neutral_pro_controller_field(
+    Button button,
+    DpadPosition dpad,
+    uint8_t left_x, uint8_t left_y,
+    uint8_t right_x, uint8_t right_y
+){
     NonNeutralControllerField non_neutral_field = NonNeutralControllerField::NONE;
     int8_t num_non_neutral_fields = 0;
     if (button != BUTTON_NONE) { 
@@ -466,37 +489,30 @@ void json_to_pro_controller_state(
         int64_t duration_in_ms
     )>&& non_neutral_action
 ){
-    for(size_t i = 0; i < history.size(); i++){
+    for (size_t i = 0; i < history.size(); i++){
         const JsonObject& snapshot = history[i].to_object_throw();
         int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
-        bool is_neutral = snapshot.get_boolean_throw("is_neutral");
-        if (is_neutral){
+
+        ProControllerState state;
+        state.load_json(history[i]);
+
+        if (state.is_neutral()){
             neutral_action(duration_in_ms);
         }else{
-            std::string buttons_string = snapshot.get_string_throw("buttons");
-            std::string dpad_string = snapshot.get_string_throw("dpad");
-
-            Button button = string_to_button(buttons_string);
-            DpadPosition dpad = string_to_dpad(dpad_string);
-
-            int64_t left_x = snapshot.get_integer_throw("left_x");
-            int64_t left_y = snapshot.get_integer_throw("left_y");
-            int64_t right_x = snapshot.get_integer_throw("right_x");
-            int64_t right_y = snapshot.get_integer_throw("right_y");
-            
-            // ensure all x, y are within STICK_MIN/MAX
-            if (left_x > STICK_MAX || left_x < STICK_MIN || 
-                left_y > STICK_MAX || left_y < STICK_MIN || 
-                right_x > STICK_MAX || right_x < STICK_MIN || 
-                right_y > STICK_MAX || right_y < STICK_MIN)
-            {
-                throw ParseException("x or y values are outside of 0-255.");
-            }
-
-            NonNeutralControllerField non_neutral_field = get_non_neutral_pro_controller_field(button, dpad, left_x, left_y, right_x, right_y);
-
-            non_neutral_action(non_neutral_field, button, dpad, left_x, left_y, right_x, right_y, duration_in_ms);
-            
+            NonNeutralControllerField non_neutral_field = get_non_neutral_pro_controller_field(
+                state.buttons,
+                state.dpad,
+                state.left_x, state.left_y,
+                state.right_x, state.right_y
+            );
+            non_neutral_action(
+                non_neutral_field,
+                state.buttons,
+                state.dpad,
+                state.left_x, state.left_y,
+                state.right_x, state.right_y,
+                duration_in_ms
+            );
         }
 
     }
@@ -514,31 +530,26 @@ void json_to_joycon_state(
         int64_t duration_in_ms
     )>&& non_neutral_action
 ){
-    for(size_t i = 0; i < history.size(); i++){
+    for (size_t i = 0; i < history.size(); i++){
         const JsonObject& snapshot = history[i].to_object_throw();
         int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
-        bool is_neutral = snapshot.get_boolean_throw("is_neutral");
-        if (is_neutral){
+
+        JoyconState state;
+        state.load_json(history[i]);
+
+        if (state.is_neutral()){
             neutral_action(duration_in_ms);
         }else{
-            std::string buttons_string = snapshot.get_string_throw("buttons");
-
-            Button button = string_to_button(buttons_string);
-
-            int64_t x = snapshot.get_integer_throw("joystick_x");
-            int64_t y = snapshot.get_integer_throw("joystick_y");
-            
-            // ensure x, y are within STICK_MIN/MAX
-            if (x > STICK_MAX || x < STICK_MIN || 
-                y > STICK_MAX || y < STICK_MIN)
-            {
-                throw ParseException("x or y values are outside of 0-255.");
-            }
-
-            NonNeutralControllerField non_neutral_field = get_non_neutral_joycon_controller_field(button, x, y);
-
-            non_neutral_action(non_neutral_field, button, x, y, duration_in_ms);
-            
+            NonNeutralControllerField non_neutral_field = get_non_neutral_joycon_controller_field(
+                state.buttons,
+                state.joystick_x, state.joystick_y
+            );
+            non_neutral_action(
+                non_neutral_field,
+                state.buttons,
+                state.joystick_x, state.joystick_y,
+                duration_in_ms
+            );
         }
 
     }
@@ -559,10 +570,10 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
     for (size_t i = 1; i < m_controller_history.size(); i++){ // start at index i = 1, since prev_snapshot starts at i=0 and we continue when current == previous.
         ControllerStateSnapshot& snapshot = m_controller_history[i];
         WallClock time_stamp = snapshot.time_stamp;
-        JsonObject& controller_state = snapshot.controller_state;
+        JsonObject& controller_state = snapshot.controller_state.to_object_throw();
         
         WallClock prev_time_stamp = prev_snapshot->time_stamp;
-        JsonObject& prev_controller_state = prev_snapshot->controller_state;
+        JsonObject& prev_controller_state = prev_snapshot->controller_state.to_object_throw();
 
         if (controller_state == prev_controller_state){
             continue;
@@ -624,7 +635,7 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
 
 void RecordKeyboardController::on_keyboard_command_sent(WallClock time_stamp, const ControllerState& state){
     cout << "keyboard_command_sent" << endl;
-    JsonObject serialized_state = state.serialize_state();
+    JsonValue serialized_state = state.to_json();
     cout << serialized_state.dump(0) << endl;
     
     ControllerStateSnapshot state_snapshot = {

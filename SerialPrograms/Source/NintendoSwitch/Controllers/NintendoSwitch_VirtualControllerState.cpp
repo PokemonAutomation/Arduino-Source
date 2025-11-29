@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Json/JsonObject.h"
 #include "NintendoSwitch_VirtualControllerState.h"
 
 //#include <iostream>
@@ -63,7 +64,44 @@ bool ProControllerState::is_neutral() const{
         && right_y == 128;
 }
 
-JsonObject ProControllerState::serialize_state() const {
+
+void ProControllerState::load_json(const JsonValue& json){
+    clear();
+
+    if (json.is_null()){
+        return;
+    }
+
+    const JsonObject& obj = json.to_object_throw();
+
+    //  Backwards compatibility.
+    if (obj.get_boolean_default("is_neutral", false)){
+        return;
+    }
+
+    {
+        std::string buttons_string;
+        obj.read_string(buttons_string, "buttons");
+        buttons = string_to_button(buttons_string);
+    }
+    {
+        std::string dpad_string;
+        obj.read_string(dpad_string, "dpad");
+        dpad = string_to_dpad(dpad_string);
+    }
+
+    //  Backwards compatibility.
+    obj.read_integer(left_x, "left_x", 0, 255);
+    obj.read_integer(left_y, "left_y", 0, 255);
+    obj.read_integer(right_x, "right_x", 0, 255);
+    obj.read_integer(right_y, "right_y", 0, 255);
+
+    obj.read_integer(left_x, "lx", 0, 255);
+    obj.read_integer(left_y, "ly", 0, 255);
+    obj.read_integer(right_x, "rx", 0, 255);
+    obj.read_integer(right_y, "ry", 0, 255);
+}
+JsonValue ProControllerState::to_json() const{
     JsonObject obj;
     obj["is_neutral"] = is_neutral();
     obj["buttons"] = button_to_string(buttons);
@@ -72,7 +110,6 @@ JsonObject ProControllerState::serialize_state() const {
     obj["left_y"] = left_y;
     obj["right_x"] = right_x;
     obj["right_y"] = right_y;
-    
     return obj;
 }
 
@@ -182,13 +219,39 @@ bool JoyconState::is_neutral() const{
         && joystick_y == 128;
 }
 
-JsonObject JoyconState::serialize_state() const {
+void JoyconState::load_json(const JsonValue& json){
+    clear();
+
+    if (json.is_null()){
+        return;
+    }
+
+    const JsonObject& obj = json.to_object_throw();
+
+    //  Backwards compatibility.
+    if (obj.get_boolean_default("is_neutral", false)){
+        return;
+    }
+
+    {
+        std::string buttons_string;
+        obj.read_string(buttons_string, "buttons");
+        buttons = string_to_button(buttons_string);
+    }
+
+    //  Backwards compatibility.
+    obj.read_integer(joystick_x, "joystick_x", 0, 255);
+    obj.read_integer(joystick_y, "joystick_y", 0, 255);
+
+    obj.read_integer(joystick_x, "jx", 0, 255);
+    obj.read_integer(joystick_y, "jy", 0, 255);
+}
+JsonValue JoyconState::to_json() const{
     JsonObject obj;
     obj["is_neutral"] = is_neutral();
     obj["buttons"] = button_to_string(buttons);
     obj["joystick_x"] = joystick_x;
     obj["joystick_y"] = joystick_y;
-    
     return obj;
 }
 

@@ -10,7 +10,7 @@
 #include <map>
 #include <condition_variable>
 #include <Qt>
-#include "Common/Cpp/Json/JsonObject.h"
+#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Controllers/Controller.h"
@@ -39,7 +39,10 @@ public:
 
     virtual bool is_neutral() const = 0;
 
-    virtual JsonObject serialize_state() const {return JsonObject();};
+public:
+    //  Serialization
+    virtual void load_json(const JsonValue& json){};
+    virtual JsonValue to_json() const{ return JsonValue(); };
 };
 
 
