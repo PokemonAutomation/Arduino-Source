@@ -193,6 +193,7 @@ void export_image_annotations_to_yolo_dataset(
     fs::create_directories(target_label_folder);
 
     std::set<std::string> missing_labels;
+    bool copy_error = false;
     for(size_t i = 0; i < image_paths.size(); i++){
         const auto& image_path = image_paths[i];
         const fs::path image_file(image_path);
@@ -209,13 +210,13 @@ void export_image_annotations_to_yolo_dataset(
         try{
             fs::copy_file(image_file, target_image_file);
         }catch (fs::filesystem_error&){
-            QMessageBox box;
-            box.critical(nullptr, "Cannot Copy File",
-                QString::fromStdString(
-                    "Cannot copy from " + image_file.string() + " to " + target_image_file.string() + 
-                    ". Probably permission issue, source image is broken or target image path already exists due to image folder having same image filenames"
-                ));
-            return;
+            std::string message = "Cannot copy from " + image_file.string() + " to " + target_image_file.string() + 
+                    ". Probably permission issue, source image is broken or target image path already exists due to image folder having same image filenames";
+            std::cerr << message << std::endl;
+            copy_error = true;
+            // QMessageBox box;
+            // box.critical(nullptr, "Cannot Copy File", QString::fromStdString(message));
+            // return;
         }
 
         std::string json_content;
@@ -287,6 +288,12 @@ void export_image_annotations_to_yolo_dataset(
         for(const auto& file_line : label_file_lines){
             fout << file_line << "\n";
         }
+    }
+
+    if (copy_error){
+        QMessageBox box;
+        box.critical(nullptr, "Cannot Copy File", "There was an issue with copying at least one file. See the logs for more details.");
+        return;
     }
 
     cout << "Found labels -> count: " << endl;
