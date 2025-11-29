@@ -125,9 +125,9 @@ void pbf_controller_state(
 ){
     context->issue_full_controller_state(
         &context,
+        duration,
         button,
-        x, y,
-        duration
+        x, y
     );
 }
 

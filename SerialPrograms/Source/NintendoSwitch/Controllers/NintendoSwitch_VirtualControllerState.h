@@ -22,6 +22,8 @@ public:
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void execute(AbstractControllerContext& context, Milliseconds duration) const override;
+    virtual std::string to_cpp(Milliseconds hold, Milliseconds release) const override;
 
 public:
     Button buttons = BUTTON_NONE;
@@ -57,6 +59,8 @@ public:
 
     virtual void load_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+    virtual void execute(AbstractControllerContext& context, Milliseconds duration) const override;
+    virtual std::string to_cpp(Milliseconds hold, Milliseconds release) const override;
 
 public:
     Button buttons = BUTTON_NONE;

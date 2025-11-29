@@ -193,7 +193,7 @@ public:
     //  Both buttons will be pressed at least once.
     virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Milliseconds dutation,
+        Milliseconds duration,
         Button button0, Button button1
     ) = 0;
 

@@ -5,6 +5,8 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
+#include "NintendoSwitch_ProController.h"
+#include "NintendoSwitch_Joycon.h"
 #include "NintendoSwitch_VirtualControllerState.h"
 
 //#include <iostream>
@@ -111,6 +113,79 @@ JsonValue ProControllerState::to_json() const{
     obj["right_x"] = right_x;
     obj["right_y"] = right_y;
     return obj;
+}
+void ProControllerState::execute(AbstractControllerContext& context, Milliseconds duration) const{
+    ProController& controller = static_cast<ProController&>(context.controller());
+    controller.issue_full_controller_state(
+        &context,
+        duration,
+        buttons,
+        dpad,
+        left_x, left_y,
+        right_x, right_y
+    );
+}
+std::string ProControllerState::to_cpp(Milliseconds hold, Milliseconds release) const{
+    uint8_t non_neutral_field = 0;
+    size_t non_neutral_fields = 0;
+    do{
+        if (buttons != BUTTON_NONE){
+            non_neutral_field = 0;
+            non_neutral_fields++;
+        }
+        if (dpad != DPAD_NONE){
+            non_neutral_field = 1;
+            non_neutral_fields++;
+        }
+        if (left_x != STICK_CENTER || left_y != STICK_CENTER){
+            non_neutral_field = 2;
+            non_neutral_fields++;
+        }
+        if (right_x != STICK_CENTER || right_y != STICK_CENTER){
+            non_neutral_field = 3;
+            non_neutral_fields++;
+        }
+    }while (false);
+
+    if (non_neutral_fields == 0){
+        return "pbf_wait(context, " + std::to_string((hold + release).count()) + "ms);";
+    }
+
+    std::string hold_str = std::to_string(hold.count()) + "ms";
+    std::string release_str = std::to_string(release.count()) + "ms";
+
+    if (non_neutral_fields > 1){
+        std::string ret;
+        ret += "pbf_controller_state(context, "
+            + button_to_code_string(buttons) + ", "
+            + dpad_to_code_string(dpad) + ", "
+            + std::to_string(left_x) + ", " + std::to_string(left_y) + ", "
+            + std::to_string(right_x) + ", " + std::to_string(right_y) + ", "
+            + hold_str +");\n";
+        if (release != 0ms){
+            ret += "pbf_wait(context, " + release_str + ");\n";
+        }
+        return ret;
+    }
+    switch (non_neutral_field){
+    case 0:
+        return "pbf_press_button(context, "
+            + button_to_code_string(buttons) + ", "
+            + hold_str + ", " + release_str + ");\n";
+    case 1:
+        return "pbf_press_dpad(context, "
+            + dpad_to_code_string(dpad) + ", "
+            + hold_str + ", " + release_str + ");\n";
+    case 2:
+        return "pbf_move_left_joystick(context, "
+            + std::to_string(left_x) + ", " + std::to_string(left_y) + ", "
+            + hold_str + ", " + release_str + ");\n";
+    case 3:
+        return "pbf_move_right_joystick(context, "
+            + std::to_string(right_x) + ", " + std::to_string(right_y) + ", "
+            + hold_str + ", " + release_str + ");\n";
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Impossible state.");
 }
 
 
@@ -253,6 +328,59 @@ JsonValue JoyconState::to_json() const{
     obj["joystick_x"] = joystick_x;
     obj["joystick_y"] = joystick_y;
     return obj;
+}
+void JoyconState::execute(AbstractControllerContext& context, Milliseconds duration) const{
+    JoyconController& controller = static_cast<JoyconController&>(context.controller());
+    controller.issue_full_controller_state(
+        &context,
+        duration,
+        buttons,
+        joystick_x, joystick_y
+    );
+}
+std::string JoyconState::to_cpp(Milliseconds hold, Milliseconds release) const{
+    uint8_t non_neutral_field = 0;
+    size_t non_neutral_fields = 0;
+    do{
+        if (buttons != BUTTON_NONE){
+            non_neutral_field = 0;
+            non_neutral_fields++;
+        }
+        if (joystick_x != STICK_CENTER || joystick_y != STICK_CENTER){
+            non_neutral_field = 1;
+            non_neutral_fields++;
+        }
+    }while (false);
+
+    if (non_neutral_fields == 0){
+        return "pbf_wait(context, " + std::to_string((hold + release).count()) + ");";
+    }
+
+    std::string hold_str = std::to_string(hold.count()) + "ms";
+    std::string release_str = std::to_string(release.count()) + "ms";
+
+    if (non_neutral_fields > 1){
+        std::string ret;
+        ret += "pbf_controller_state(context, "
+            + button_to_code_string(buttons) + ", "
+            + std::to_string(joystick_x) + ", " + std::to_string(joystick_y) + ", "
+            + hold_str +");\n";
+        if (release != 0ms){
+            ret += "pbf_wait(context, " + release_str + ");\n";
+        }
+        return ret;
+    }
+    switch (non_neutral_field){
+    case 0:
+        return "pbf_press_button(context, "
+            + button_to_code_string(buttons) + ", "
+            + hold_str + ", " + release_str + ");\n";
+    case 1:
+        return "pbf_move_joystick(context, "
+            + std::to_string(joystick_x) + ", " + std::to_string(joystick_y) + ", "
+            + hold_str + ", " + release_str + ");\n";
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Impossible state.");
 }
 
 void JoyconDeltas::operator+=(const JoyconDeltas& x){

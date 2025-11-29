@@ -80,8 +80,8 @@ SerialPABotBase_WirelessJoycon<JoyconType>::SerialPABotBase_WirelessJoycon(
 template <typename JoyconType>
 void SerialPABotBase_WirelessJoycon<JoyconType>::issue_buttons(
     const Cancellable* cancellable,
-    Button button,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+    Button button
 ){
     button &= m_valid_buttons;
     ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
@@ -89,8 +89,8 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_buttons(
 template <typename JoyconType>
 void SerialPABotBase_WirelessJoycon<JoyconType>::issue_joystick(
     const Cancellable* cancellable,
-    uint8_t x, uint8_t y,
-    Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+    Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+    uint8_t x, uint8_t y
 ){
     switch (m_controller_type){
     case ControllerType::NintendoSwitch_LeftJoycon:
@@ -106,16 +106,16 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_joystick(
 template <typename JoyconType>
 void SerialPABotBase_WirelessJoycon<JoyconType>::issue_full_controller_state(
     const Cancellable* cancellable,
+    Milliseconds duration,
     Button button,
-    uint8_t joystick_x, uint8_t joystick_y,
-    Milliseconds hold
+    uint8_t joystick_x, uint8_t joystick_y
 ){
     button &= m_valid_buttons;
     switch (m_controller_type){
     case ControllerType::NintendoSwitch_LeftJoycon:
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
-            hold,
+            duration,
             button,
             DPAD_NONE,
             joystick_x, joystick_y,
@@ -125,7 +125,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_full_controller_state(
     case ControllerType::NintendoSwitch_RightJoycon:
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
-            hold,
+            duration,
             button,
             DPAD_NONE,
             0x80, 0x80,

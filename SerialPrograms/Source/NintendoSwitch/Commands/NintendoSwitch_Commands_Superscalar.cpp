@@ -157,14 +157,14 @@ void ssf_press_button(
     Button button,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_buttons(&context, button, delay, hold, cool);
+    context->issue_buttons(&context, delay, hold, cool, button);
 }
 void ssf_press_joystick(
     JoyconContext& context,
     uint8_t x, uint8_t y,
     Milliseconds delay, Milliseconds hold, Milliseconds cool
 ){
-    context->issue_joystick(&context, x, y, delay, hold, cool);
+    context->issue_joystick(&context, delay, hold, cool, x, y);
 }
 void ssf_mash1_button(JoyconContext& context, Button button, Milliseconds duration){
     context->issue_mash_button(&context, button, duration);

@@ -75,10 +75,10 @@ public:
         WallClock time_stamp = current_time();
         static_cast<JoyconController*>(m_controller)->issue_full_controller_state(
             nullptr,
+            ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255,
             switch_state.buttons,
             switch_state.joystick_x,
-            switch_state.joystick_y,
-            ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255
+            switch_state.joystick_y
         );
         report_keyboard_command_sent(time_stamp, switch_state);
     }

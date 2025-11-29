@@ -43,6 +43,8 @@ public:
     //  Serialization
     virtual void load_json(const JsonValue& json){};
     virtual JsonValue to_json() const{ return JsonValue(); };
+    virtual std::string to_cpp(Milliseconds hold, Milliseconds release) const{ return ""; }
+    virtual void execute(AbstractControllerContext& context, Milliseconds duration) const{}
 };
 
 

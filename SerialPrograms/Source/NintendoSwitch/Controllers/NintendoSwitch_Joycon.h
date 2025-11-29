@@ -76,14 +76,14 @@ public:
     //  ensure that they are all dispatched simultaneously.
     virtual void issue_buttons(
         const Cancellable* cancellable,
-        Button button,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        Button button
     ) = 0;
 
     virtual void issue_joystick(
         const Cancellable* cancellable,
-        uint8_t x, uint8_t y,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
     ) = 0;
 
     //  Gyro: Accelerometer (experimental - API subject to change)
@@ -139,9 +139,9 @@ public:
     //
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
+        Milliseconds duration,
         Button button,
-        uint8_t joystick_x, uint8_t joystick_y,
-        Milliseconds hold
+        uint8_t joystick_x, uint8_t joystick_y
     ) = 0;
 
 
