@@ -21,51 +21,10 @@ namespace NintendoSwitch{
 
 class ProControllerState;
 
-enum class NonNeutralControllerField {
-    BUTTON,
-    DPAD,
-    LEFT_JOYSTICK,
-    RIGHT_JOYSTICK,
-    JOYSTICK,
-    MULTIPLE,
-    NONE,
-};
-NonNeutralControllerField get_non_neutral_pro_controller_field(Button button, DpadPosition dpad, uint8_t left_x, uint8_t left_y, uint8_t right_x, uint8_t right_y);
-NonNeutralControllerField get_non_neutral_joycon_controller_field(Button button, uint8_t x, uint8_t y);
 
-// helper function that exposes the Pro Controller fields from the given JSON
-void json_to_pro_controller_state(
-    const JsonArray& history, 
-    std::function<void(int64_t duration_in_ms)>&& neutral_action,
-    std::function<void(
-        NonNeutralControllerField non_neutral_field,
-        Button button, 
-        DpadPosition dpad, 
-        uint8_t left_x, 
-        uint8_t left_y, 
-        uint8_t right_x, 
-        uint8_t right_y, 
-        int64_t duration_in_ms
-    )>&& non_neutral_action
-);
-
-// helper function that exposes the Joycon fields from the given JSON
-void json_to_joycon_state(
-    const JsonArray& history, 
-    std::function<void(int64_t duration_in_ms)>&& neutral_action,
-    std::function<void(
-        NonNeutralControllerField non_neutral_field,
-        Button button, 
-        uint8_t x, 
-        uint8_t y, 
-        int64_t duration_in_ms
-    )>&& non_neutral_action
-);
 
 // given the json, with the controller history, output a text file which represents C++ code.
 void json_to_cpp_code(Logger& logger, const JsonValue& json, const std::string& output_file_name);
-std::string json_to_cpp_code_pro_controller(const JsonArray& history_json);
-std::string json_to_cpp_code_joycon(const JsonArray& history);
 
 // given the json, with the controller history, run the controller actions using the pbf functions.
 void json_to_pbf_actions(
@@ -73,18 +32,6 @@ void json_to_pbf_actions(
     CancellableScope& scope,
     const JsonValue& json,
     ControllerClass controller_class,
-    uint32_t num_loops,
-    uint32_t seconds_wait_between_loops
-);
-void json_to_pbf_actions_pro_controller(
-    ProControllerContext& context,
-    const JsonArray& history,
-    uint32_t num_loops,
-    uint32_t seconds_wait_between_loops
-);
-void json_to_pbf_actions_joycon(
-    JoyconContext& context,
-    const JsonArray& history,
     uint32_t num_loops,
     uint32_t seconds_wait_between_loops
 );

@@ -130,149 +130,23 @@ void RecordKeyboardController::program(SingleSwitchProgramEnvironment& env, Canc
 
 }
 
-void json_to_cpp_code(Logger& logger, const JsonValue& json, const std::string& output_file_name){
-    try{
-        const JsonObject& obj = json.to_object_throw();
-
-        std::string controller_class_string = obj.get_string_throw("controller_class");
-        cout << controller_class_string << endl;
-        ControllerClass controller_class = CONTROLLER_CLASS_STRINGS().get_enum(controller_class_string);
-
-        const JsonArray& history_json = obj.get_array_throw("history");
-
-        std::string output_text;
-        switch (controller_class){
-        case ControllerClass::NintendoSwitch_ProController:
-            output_text = json_to_cpp_code_pro_controller(history_json);
-            break;
-        case ControllerClass::NintendoSwitch_LeftJoycon:
-        case ControllerClass::NintendoSwitch_RightJoycon:
-            output_text = json_to_cpp_code_joycon(history_json);
-            break;
-        default:
-            // generate empty text if ControllerClass is not one of the above
-            break;
-        }
-
-        QFile file(QString::fromStdString(output_file_name + ".txt"));
-        if (file.open(QIODevice::WriteOnly)){
-            file.write(output_text.c_str(), output_text.size());
-        }
-
-    }catch (ParseException& e){
-        logger.log(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.", COLOR_RED);
-        throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
-    }
-}
-
-std::string json_to_cpp_code_pro_controller(const JsonArray& history){
-    std::string result;
-
-    json_to_pro_controller_state(history, 
-        [&](int64_t duration_in_ms){
-            result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
-        },
-        [&](NonNeutralControllerField non_neutral_field,
-            Button button, 
-            DpadPosition dpad, 
-            uint8_t left_x, 
-            uint8_t left_y, 
-            uint8_t right_x, 
-            uint8_t right_y, 
-            int64_t duration_in_ms
-        ){
-
-            switch (non_neutral_field){
-            case NonNeutralControllerField::BUTTON:
-                result += "pbf_press_button(context, " 
-                    + button_to_code_string(button) + ", " 
-                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
-                break;
-            case NonNeutralControllerField::DPAD:
-                result += "pbf_press_dpad(context, " 
-                    + dpad_to_code_string(dpad) + ", " 
-                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
-                break;
-            case NonNeutralControllerField::LEFT_JOYSTICK:
-                result += "pbf_move_left_joystick(context, " 
-                    + std::to_string(left_x) + ", " + std::to_string(left_y) + ", " 
-                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
-                break;
-            case NonNeutralControllerField::RIGHT_JOYSTICK:
-                result += "pbf_move_right_joystick(context, " 
-                    + std::to_string(right_x) + ", " + std::to_string(right_y) + ", "
-                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
-                break;
-            case NonNeutralControllerField::MULTIPLE:
-                result += "pbf_controller_state(context, " 
-                    + button_to_code_string(button) + ", " 
-                    + dpad_to_code_string(dpad) + ", " 
-                    + std::to_string(left_x) + ", " + std::to_string(left_y) + ", " 
-                    + std::to_string(right_x) + ", " + std::to_string(right_y) + ", " 
-                    + std::to_string(duration_in_ms) +"ms);\n";
-                break;
-            case NonNeutralControllerField::NONE:
-                result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
-                break;
-            default:
-                throw ParseException("Unexpected NonNeutralControllerField enum.");
-            }            
-        }
-    );
-    
-    cout << "\n" + result << endl;
-    return result;
-
-}
-
-std::string json_to_cpp_code_joycon(const JsonArray& history){
-    std::string result;
-
-    json_to_joycon_state(history, 
-        [&](int64_t duration_in_ms){
-            result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
-        },
-        [&](NonNeutralControllerField non_neutral_field,
-            Button button, 
-            uint8_t x, 
-            uint8_t y, 
-            int64_t duration_in_ms
-        ){
-
-            switch (non_neutral_field){
-            case NonNeutralControllerField::BUTTON:
-                result += "pbf_press_button(context, " 
-                    + button_to_code_string(button) + ", " 
-                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
-                break;
-            case NonNeutralControllerField::JOYSTICK:
-                result += "pbf_move_left_joystick(context, " 
-                    + std::to_string(x) + ", " + std::to_string(y) + ", " 
-                    + std::to_string(duration_in_ms) + "ms, 0ms);\n";
-                break;
-            case NonNeutralControllerField::MULTIPLE:
-                result += "pbf_controller_state(context, " 
-                    + button_to_code_string(button) + ", " 
-                    + std::to_string(x) + ", " + std::to_string(y) + ", " 
-                    + std::to_string(duration_in_ms) +"ms);\n";
-                break;
-            case NonNeutralControllerField::NONE:
-                result += "pbf_wait(context, " + std::to_string(duration_in_ms) + "ms);\n";
-                break;
-            default:
-                throw ParseException("Unexpected NonNeutralControllerField enum.");
-            }            
-        }
-    );
-
-    cout << "\n" + result << endl;
-    return result;
-
-}
 
 
 template <typename ControllerState>
-void json_to_pbf_actions(
+std::string json_to_cpp(const JsonArray& history){
+    std::string ret;
+    ControllerState state;
+    for (const JsonValue& command : history){
+        const JsonObject& snapshot = command.to_object_throw();
+        Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
+        state.load_json(command);
+        ret += state.to_cpp(duration, 0ms);
+    }
+    return ret;
+}
+
+template <typename ControllerState>
+void execute_json_schedule(
     AbstractControllerContext& context,
     const JsonArray& history,
     uint32_t num_loops,
@@ -292,6 +166,41 @@ void json_to_pbf_actions(
 }
 
 
+
+void json_to_cpp_code(Logger& logger, const JsonValue& json, const std::string& output_file_name){
+    try{
+        const JsonObject& obj = json.to_object_throw();
+
+        std::string controller_class_string = obj.get_string_throw("controller_class");
+        cout << controller_class_string << endl;
+        ControllerClass controller_class = CONTROLLER_CLASS_STRINGS().get_enum(controller_class_string);
+
+        const JsonArray& history_json = obj.get_array_throw("history");
+
+        std::string output_text;
+        switch (controller_class){
+        case ControllerClass::NintendoSwitch_ProController:
+            output_text = json_to_cpp<ProControllerState>(history_json);
+            break;
+        case ControllerClass::NintendoSwitch_LeftJoycon:
+        case ControllerClass::NintendoSwitch_RightJoycon:
+            output_text = json_to_cpp<JoyconState>(history_json);
+            break;
+        default:
+            // generate empty text if ControllerClass is not one of the above
+            break;
+        }
+
+        QFile file(QString::fromStdString(output_file_name + ".txt"));
+        if (file.open(QIODevice::WriteOnly)){
+            file.write(output_text.c_str(), output_text.size());
+        }
+
+    }catch (ParseException& e){
+        logger.log(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.", COLOR_RED);
+        throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
+    }
+}
 void json_to_pbf_actions(
     SingleSwitchProgramEnvironment& env,
     CancellableScope& scope,
@@ -315,11 +224,11 @@ void json_to_pbf_actions(
 
         switch (controller_class){
         case ControllerClass::NintendoSwitch_ProController:
-            json_to_pbf_actions<ProControllerState>(acontext, history_json, num_loops, seconds_wait_between_loops);
+            execute_json_schedule<ProControllerState>(acontext, history_json, num_loops, seconds_wait_between_loops);
             break;
         case ControllerClass::NintendoSwitch_LeftJoycon:
         case ControllerClass::NintendoSwitch_RightJoycon:
-            json_to_pbf_actions<JoyconState>(acontext, history_json, num_loops, seconds_wait_between_loops);
+            execute_json_schedule<JoyconState>(acontext, history_json, num_loops, seconds_wait_between_loops);
             break;
         default:
             // do nothing if the ControllerClass is not one of the above.
@@ -329,198 +238,12 @@ void json_to_pbf_actions(
     }catch (ParseException& e){
         env.log(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.", COLOR_RED);
         throw ParseException(e.message() + "\nJSON parsing error. Given JSON file doesn't match the expected format.");
-    }    
-
-}
-
-void json_to_pbf_actions_pro_controller(
-    ProControllerContext& context,
-    const JsonArray& history,
-    uint32_t num_loops,
-    uint32_t seconds_wait_between_loops
-){
-    AbstractControllerContext acontext(context);
-
-    for (uint32_t i = 0; i < num_loops; i++){
-        for (const JsonValue& command : history){
-            const JsonObject& snapshot = command.to_object_throw();
-            Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
-            ProControllerState state;
-            state.load_json(command);
-            state.execute(acontext, duration);
-        }
-        pbf_wait(context, Seconds(seconds_wait_between_loops));
-    }
-}
-
-void json_to_pbf_actions_joycon(
-    JoyconContext& context,
-    const JsonArray& history,
-    uint32_t num_loops,
-    uint32_t seconds_wait_between_loops
-){
-    AbstractControllerContext acontext(context);
-
-    for (uint32_t i = 0; i < num_loops; i++){
-        for (const JsonValue& command : history){
-            const JsonObject& snapshot = command.to_object_throw();
-            Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
-            ProControllerState state;
-            state.load_json(command);
-            state.execute(acontext, duration);
-        }
-        pbf_wait(context, Seconds(seconds_wait_between_loops));
-    }
-}
-
-
-NonNeutralControllerField get_non_neutral_pro_controller_field(
-    Button button,
-    DpadPosition dpad,
-    uint8_t left_x, uint8_t left_y,
-    uint8_t right_x, uint8_t right_y
-){
-    NonNeutralControllerField non_neutral_field = NonNeutralControllerField::NONE;
-    int8_t num_non_neutral_fields = 0;
-    if (button != BUTTON_NONE) { 
-        num_non_neutral_fields++;
-        // if (num_non_neutral_fields > 1){
-        //     return NonNeutralControllerField::MULTIPLE;
-        // }
-        non_neutral_field = NonNeutralControllerField::BUTTON; 
-    }
-
-    if (dpad != DPAD_NONE){
-        num_non_neutral_fields++;
-        if (num_non_neutral_fields > 1){
-            return NonNeutralControllerField::MULTIPLE;
-        }
-        non_neutral_field = NonNeutralControllerField::DPAD; 
-    }
-
-    if (left_x != STICK_CENTER || left_y != STICK_CENTER){
-        num_non_neutral_fields++;
-        if (num_non_neutral_fields > 1){
-            return NonNeutralControllerField::MULTIPLE;
-        }
-        non_neutral_field = NonNeutralControllerField::LEFT_JOYSTICK; 
-    }
-
-    if (right_x != STICK_CENTER || right_y != STICK_CENTER){
-        num_non_neutral_fields++;
-        if (num_non_neutral_fields > 1){
-            return NonNeutralControllerField::MULTIPLE;
-        }
-        non_neutral_field = NonNeutralControllerField::RIGHT_JOYSTICK; 
-    }
-
-    return non_neutral_field;
-}
-
-NonNeutralControllerField get_non_neutral_joycon_controller_field(Button button, uint8_t x, uint8_t y){
-    NonNeutralControllerField non_neutral_field = NonNeutralControllerField::NONE;
-    int8_t num_non_neutral_fields = 0;
-    if (button != BUTTON_NONE) { 
-        num_non_neutral_fields++;
-        // if (num_non_neutral_fields > 1){
-        //     return NonNeutralControllerField::MULTIPLE;
-        // }
-        non_neutral_field = NonNeutralControllerField::BUTTON; 
-    }
-
-    if (x != STICK_CENTER || y != STICK_CENTER){
-        num_non_neutral_fields++;
-        if (num_non_neutral_fields > 1){
-            return NonNeutralControllerField::MULTIPLE;
-        }
-        non_neutral_field = NonNeutralControllerField::JOYSTICK; 
-    }
-
-    return non_neutral_field;
-}
-
-
-
-void json_to_pro_controller_state(
-    const JsonArray& history, 
-    std::function<void(int64_t duration_in_ms)>&& neutral_action,
-    std::function<void(
-        NonNeutralControllerField non_neutral_field,
-        Button button, 
-        DpadPosition dpad, 
-        uint8_t left_x, 
-        uint8_t left_y, 
-        uint8_t right_x, 
-        uint8_t right_y, 
-        int64_t duration_in_ms
-    )>&& non_neutral_action
-){
-    for (size_t i = 0; i < history.size(); i++){
-        const JsonObject& snapshot = history[i].to_object_throw();
-        int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
-
-        ProControllerState state;
-        state.load_json(history[i]);
-
-        if (state.is_neutral()){
-            neutral_action(duration_in_ms);
-        }else{
-            NonNeutralControllerField non_neutral_field = get_non_neutral_pro_controller_field(
-                state.buttons,
-                state.dpad,
-                state.left_x, state.left_y,
-                state.right_x, state.right_y
-            );
-            non_neutral_action(
-                non_neutral_field,
-                state.buttons,
-                state.dpad,
-                state.left_x, state.left_y,
-                state.right_x, state.right_y,
-                duration_in_ms
-            );
-        }
-
     }
 
 }
 
-void json_to_joycon_state(
-    const JsonArray& history, 
-    std::function<void(int64_t duration_in_ms)>&& neutral_action,
-    std::function<void(
-        NonNeutralControllerField non_neutral_field,
-        Button button, 
-        uint8_t x, 
-        uint8_t y, 
-        int64_t duration_in_ms
-    )>&& non_neutral_action
-){
-    for (size_t i = 0; i < history.size(); i++){
-        const JsonObject& snapshot = history[i].to_object_throw();
-        int64_t duration_in_ms = snapshot.get_integer_throw("duration_in_ms");
 
-        JoyconState state;
-        state.load_json(history[i]);
 
-        if (state.is_neutral()){
-            neutral_action(duration_in_ms);
-        }else{
-            NonNeutralControllerField non_neutral_field = get_non_neutral_joycon_controller_field(
-                state.buttons,
-                state.joystick_x, state.joystick_y
-            );
-            non_neutral_action(
-                non_neutral_field,
-                state.buttons,
-                state.joystick_x, state.joystick_y,
-                duration_in_ms
-            );
-        }
-
-    }
-
-}
 
 JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, ControllerClass controller_class){
     if (m_controller_history.size() < 2){
@@ -613,7 +336,7 @@ void RecordKeyboardController::on_keyboard_command_sent(WallClock time_stamp, co
 void RecordKeyboardController::on_keyboard_command_stopped(WallClock time_stamp){
     cout << "keyboard_command_stopped" << endl;
     JsonObject obj;
-    obj["is_neutral"] = true;
+//    obj["is_neutral"] = true;
 
     ControllerStateSnapshot state_snapshot = {
         time_stamp, 

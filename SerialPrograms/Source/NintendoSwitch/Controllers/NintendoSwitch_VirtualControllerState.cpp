@@ -83,13 +83,15 @@ void ProControllerState::load_json(const JsonValue& json){
 
     {
         std::string buttons_string;
-        obj.read_string(buttons_string, "buttons");
-        buttons = string_to_button(buttons_string);
+        if (obj.read_string(buttons_string, "buttons")){
+            buttons = string_to_button(buttons_string);
+        }
     }
     {
         std::string dpad_string;
-        obj.read_string(dpad_string, "dpad");
-        dpad = string_to_dpad(dpad_string);
+        if (obj.read_string(dpad_string, "dpad")){
+            dpad = string_to_dpad(dpad_string);
+        }
     }
 
     //  Backwards compatibility.
@@ -105,13 +107,20 @@ void ProControllerState::load_json(const JsonValue& json){
 }
 JsonValue ProControllerState::to_json() const{
     JsonObject obj;
-    obj["is_neutral"] = is_neutral();
-    obj["buttons"] = button_to_string(buttons);
-    obj["dpad"] = dpad_to_string(dpad);
-    obj["left_x"] = left_x;
-    obj["left_y"] = left_y;
-    obj["right_x"] = right_x;
-    obj["right_y"] = right_y;
+    if (buttons != BUTTON_NONE){
+        obj["buttons"] = button_to_string(buttons);
+    }
+    if (dpad != DPAD_NONE){
+        obj["dpad"] = dpad_to_string(dpad);
+    }
+    if (left_x != STICK_CENTER || left_y != STICK_CENTER){
+        obj["lx"] = left_x;
+        obj["ly"] = left_y;
+    }
+    if (right_x != STICK_CENTER || right_y != STICK_CENTER){
+        obj["rx"] = right_x;
+        obj["ry"] = right_y;
+    }
     return obj;
 }
 void ProControllerState::execute(AbstractControllerContext& context, Milliseconds duration) const{
@@ -149,7 +158,7 @@ std::string ProControllerState::to_cpp(Milliseconds hold, Milliseconds release) 
     }while (false);
 
     if (non_neutral_fields == 0){
-        return "pbf_wait(context, " + std::to_string((hold + release).count()) + "ms);";
+        return "pbf_wait(context, " + std::to_string((hold + release).count()) + "ms);\n";
     }
 
     std::string hold_str = std::to_string(hold.count()) + "ms";
@@ -324,10 +333,13 @@ void JoyconState::load_json(const JsonValue& json){
 }
 JsonValue JoyconState::to_json() const{
     JsonObject obj;
-    obj["is_neutral"] = is_neutral();
-    obj["buttons"] = button_to_string(buttons);
-    obj["joystick_x"] = joystick_x;
-    obj["joystick_y"] = joystick_y;
+    if (buttons != BUTTON_NONE){
+        obj["buttons"] = button_to_string(buttons);
+    }
+    if (joystick_x != STICK_CENTER || joystick_y != STICK_CENTER){
+        obj["jx"] = joystick_x;
+        obj["jy"] = joystick_y;
+    }
     return obj;
 }
 void JoyconState::execute(AbstractControllerContext& context, Milliseconds duration) const{
@@ -355,7 +367,7 @@ std::string JoyconState::to_cpp(Milliseconds hold, Milliseconds release) const{
     }while (false);
 
     if (non_neutral_fields == 0){
-        return "pbf_wait(context, " + std::to_string((hold + release).count()) + ");";
+        return "pbf_wait(context, " + std::to_string((hold + release).count()) + ");\n";
     }
 
     std::string hold_str = std::to_string(hold.count()) + "ms";
