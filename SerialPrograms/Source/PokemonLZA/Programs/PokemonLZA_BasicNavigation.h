@@ -122,6 +122,17 @@ int run_towards_wild_zone_gate(
     Milliseconds run_time
 );
 
+// Run a straight line in the overworld, for *duration* long or until a day/night change happens.
+// If day/night changes, it will wait until the transition animation is done.
+// Return
+// -  0 if a day/night change detected
+// - -1 it ran for full *duration* without a day/night change
+int run_a_straight_path_in_overworld(
+    ConsoleHandle& console, ProControllerContext& context,
+    uint8_t direction_x, uint8_t direction_y,
+    PokemonAutomation::Milliseconds duration
+);
+
 }
 }
 }
