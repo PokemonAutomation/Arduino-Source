@@ -60,17 +60,18 @@ ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
     : DURATION("<b>Duration:</b><br>Run the program this long.", LockMode::UNLOCK_WHILE_RUNNING, "5 h")
     , ROUTE("<b>Hunt Route:</b>",
         {
-            {Routes::KLEFKI,  "klefki",  "Sewers: Klefki"},
-            {Routes::KLEFKI_INKAY_GOOMY,  "klefki_inkay_goomy",  "Sewers: Klefki+Inkay+Goomy"},
-            {Routes::LITWICK,  "litwick",  "Sewers: Litwick"},
-            {Routes::SKRELP,  "skrelp",  "Sewers: Skrelp"},
-            {Routes::SKRELP_INKAY,  "skrelp_inkay",  "Sewers: Skrelp+Inkay"},
-            {Routes::SKRELP_ARIADOS,  "skrelp_ariados",  "Sewers: Skrelp+Ariados"},
-            // {Routes::SCRAGGY,  "scraggy",  "Sewers: Scraggy"},
-            {Routes::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
+            {Route::KLEFKI,  "klefki",  "Sewers: Klefki"},
+            {Route::KLEFKI_INKAY_GOOMY,  "klefki_inkay_goomy",  "Sewers: Klefki+Inkay+Goomy"},
+            {Route::LITWICK,  "litwick",  "Sewers: Litwick"},
+            {Route::LITWICK_SKRELP,  "litwick_skrelp",  "Sewers: Litwick+Skrelp"},
+            {Route::SKRELP,  "skrelp",  "Sewers: Skrelp"},
+            {Route::SKRELP_INKAY,  "skrelp_inkay",  "Sewers: Skrelp+Inkay"},
+            {Route::SKRELP_ARIADOS,  "skrelp_ariados",  "Sewers: Skrelp+Ariados"},
+            // {Route::SCRAGGY,  "scraggy",  "Sewers: Scraggy"},
+            {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        Routes::KLEFKI
+        Route::KLEFKI
     )
     , SHINY_DETECTED("Shiny Detected", "", "1000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
@@ -115,8 +116,17 @@ void fly_back_to_sewers_entrance(ConsoleHandle& console, ProControllerContext& c
     wait_until_overworld(console, context);
 }
 
+void run_forward_backward_to_wall(
+    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
+    PokemonAutomation::Milliseconds duration
+){
+    ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+    pbf_move_left_joystick(context, 128, 0, duration, 0ms);
+    pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
+    pbf_wait(context, 500ms);
+}
+
 void route_klefki(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    context.wait_for_all_requests();
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
     pbf_move_left_joystick(context, 128, 0, 4900ms, 0ms);
     pbf_move_left_joystick(context, 0, 128, 1000ms, 0ms);
@@ -125,7 +135,6 @@ void route_klefki(SingleSwitchProgramEnvironment& env, ProControllerContext& con
 }
 
 void route_klefki_inkay_goomy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    context.wait_for_all_requests();
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
     pbf_move_left_joystick(context, 128, 0, 8500ms, 0ms);
     pbf_move_left_joystick(context, 255, 128, 1300ms, 0ms);
@@ -134,32 +143,26 @@ void route_klefki_inkay_goomy(SingleSwitchProgramEnvironment& env, ProController
 }
 
 void route_litwick(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    context.wait_for_all_requests();
-    ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 5000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 5500ms, 0ms);
-    pbf_wait(context, 500ms);
+    run_forward_backward_to_wall(env, context, 5s);
+}
+
+void route_litwick_skrelp(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    run_forward_backward_to_wall(env, context, 9000ms);
 }
 
 void route_skrelp(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    context.wait_for_all_requests();
     fly_back_to_sewers_entrance(env.console, context);
     pbf_wait(context, 1000ms);
 }
 
 void route_skrelp_inkay(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    context.wait_for_all_requests();
     ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
     pbf_move_left_joystick(context, 128, 0, 3900ms, 0ms);
     fly_back_to_sewers_entrance(env.console, context);
 }
 
 void route_skrelp_ariados(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    context.wait_for_all_requests();
-    ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 6000ms, 0ms);
-    pbf_move_left_joystick(context, 128, 255, 6500ms, 0ms);
-    pbf_wait(context, 500ms);
+    run_forward_backward_to_wall(env, context, 6s);
 }
 
 void route_scraggy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -167,7 +170,6 @@ void route_scraggy(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 }
 
 void route_wild_zone_19(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    context.wait_for_all_requests();
     if (run_a_straight_path_in_overworld(env.console, context, 0, 80, 6500ms) == 0) {
         open_map(env.console, context, false);
         pbf_move_left_joystick(context, 0, 128, 100ms, 100ms);
@@ -202,28 +204,31 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
     });
     std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&)> route;
     switch (ROUTE) {
-    case Routes::KLEFKI:
+    case Route::KLEFKI:
         route = route_klefki;
         break;
-    case Routes::KLEFKI_INKAY_GOOMY:
+    case Route::KLEFKI_INKAY_GOOMY:
         route = route_klefki_inkay_goomy;
         break;
-    case Routes::LITWICK:
+    case Route::LITWICK:
         route = route_litwick;
         break;
-    case Routes::SKRELP:
+    case Route::LITWICK_SKRELP:
+        route = route_litwick_skrelp;
+        break;
+    case Route::SKRELP:
         route = route_skrelp;
         break;
-    case Routes::SKRELP_INKAY:
+    case Route::SKRELP_INKAY:
         route = route_skrelp_inkay;
         break;
-    case Routes::SKRELP_ARIADOS:
+    case Route::SKRELP_ARIADOS:
         route = route_skrelp_ariados;
         break;
-    case Routes::SCRAGGY:
+    case Route::SCRAGGY:
         route = route_scraggy;
         break;
-    case Routes::WILD_ZONE_19:
+    case Route::WILD_ZONE_19:
         route = route_wild_zone_19;
         break;
     default:
@@ -242,8 +247,9 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
             do{
                 shiny_sound_handler.process_pending(context);
                 send_program_status_notification(env, NOTIFICATION_STATUS);
-                stats.resets++;
                 route(env, context);
+                context.wait_for_all_requests();
+                stats.resets++;
                 env.update_stats();
             }while (current_time() < start_time + DURATION.get());
         },

@@ -34,10 +34,11 @@ public:
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
-    enum class Routes{
+    enum class Route{
         KLEFKI,
         KLEFKI_INKAY_GOOMY,
         LITWICK,
+        LITWICK_SKRELP,
         SKRELP,
         SKRELP_INKAY,
         SKRELP_ARIADOS,
@@ -51,7 +52,7 @@ public:
 private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     MillisecondsOption DURATION;
-    EnumDropdownOption<Routes> ROUTE;
+    EnumDropdownOption<Route> ROUTE;
     ShinySoundDetectedActionOption SHINY_DETECTED;
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
