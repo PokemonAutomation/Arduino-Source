@@ -24,13 +24,14 @@ enum class ControllerClass;
 
 
 
+#if 0
 inline Milliseconds round_up_to_ticksize(Milliseconds ticksize, Milliseconds duration){
     if (ticksize == Milliseconds::zero()){
         return duration;
     }
     return (duration + ticksize - Milliseconds(1)) / ticksize * ticksize;
 }
-
+#endif
 
 
 
@@ -302,7 +303,7 @@ private:
 
 using AbstractControllerContext = ControllerContext<AbstractController>;
 
-using AbstractControllerContext = ControllerContext<AbstractController>;
+
 
 
 

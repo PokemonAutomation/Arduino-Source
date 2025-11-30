@@ -21,7 +21,7 @@ using JoyconContext = ControllerContext<JoyconController>;
 
 
 
-constexpr Button VALID_LEFT_JOYCON_BUTTONS =
+static constexpr Button VALID_LEFT_JOYCON_BUTTONS =
     BUTTON_DOWN |
     BUTTON_UP |
     BUTTON_RIGHT |
@@ -34,7 +34,7 @@ constexpr Button VALID_LEFT_JOYCON_BUTTONS =
     BUTTON_LCLICK |
     BUTTON_CAPTURE;
 
-constexpr Button VALID_RIGHT_JOYCON_BUTTONS =
+static constexpr Button VALID_RIGHT_JOYCON_BUTTONS =
     BUTTON_Y |
     BUTTON_X |
     BUTTON_B |
@@ -47,6 +47,8 @@ constexpr Button VALID_RIGHT_JOYCON_BUTTONS =
     BUTTON_RCLICK |
     BUTTON_HOME |
     BUTTON_C;
+
+
 
 
 
@@ -192,9 +194,7 @@ public:
     virtual const char* name() override{
         return NAME;
     };
-    virtual ControllerClass controller_class() const override{
-        return ControllerClass::NintendoSwitch_LeftJoycon;
-    }    
+    virtual ControllerClass controller_class() const override;
 };
 class RightJoycon : public JoyconController{
 public:
@@ -204,9 +204,7 @@ public:
     virtual const char* name() override{
         return NAME;
     };
-    virtual ControllerClass controller_class() const override{
-        return ControllerClass::NintendoSwitch_RightJoycon;
-    } 
+    virtual ControllerClass controller_class() const override;
 };
 
 

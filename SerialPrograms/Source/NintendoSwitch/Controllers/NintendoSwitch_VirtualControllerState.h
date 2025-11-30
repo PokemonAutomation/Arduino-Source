@@ -7,37 +7,17 @@
 #ifndef PokemonAutomation_NintendoSwitch_VirtualControllerState_H
 #define PokemonAutomation_NintendoSwitch_VirtualControllerState_H
 
-#include "Controllers/KeyboardInput/KeyboardInput.h"
+//#include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch_ControllerButtons.h"
-#include "NintendoSwitch_ProController.h"
-#include "NintendoSwitch_Joycon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class ProControllerState : public ControllerState{
-public:
-    using ControllerType = ProController;
+class ProControllerState;
+class JoyconState;
 
-public:
-    virtual void clear() override;
-    virtual bool operator==(const ControllerState& x) const override;
-    virtual bool is_neutral() const override;
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual void execute(AbstractControllerContext& context, Milliseconds duration) const override;
-    virtual std::string to_cpp(Milliseconds hold, Milliseconds release) const override;
-
-public:
-    Button buttons = BUTTON_NONE;
-    DpadPosition dpad = DPAD_NONE;
-    uint8_t left_x = 128;
-    uint8_t left_y = 128;
-    uint8_t right_x = 128;
-    uint8_t right_y = 128;
-};
 
 struct ProControllerDeltas{
     Button buttons = BUTTON_NONE;
@@ -55,26 +35,6 @@ struct ProControllerDeltas{
 };
 
 
-
-class JoyconState : public ControllerState{
-public:
-    using ControllerType = JoyconController;
-
-public:
-    virtual void clear() override;
-    virtual bool operator==(const ControllerState& x) const override;
-    virtual bool is_neutral() const override;
-
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
-    virtual void execute(AbstractControllerContext& context, Milliseconds duration) const override;
-    virtual std::string to_cpp(Milliseconds hold, Milliseconds release) const override;
-
-public:
-    Button buttons = BUTTON_NONE;
-    uint8_t joystick_x = 128;
-    uint8_t joystick_y = 128;
-};
 
 struct JoyconDeltas{
     Button buttons = BUTTON_NONE;

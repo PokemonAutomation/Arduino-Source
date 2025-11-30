@@ -13,6 +13,7 @@
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h"
 #include "SysbotBase_Connection.h"

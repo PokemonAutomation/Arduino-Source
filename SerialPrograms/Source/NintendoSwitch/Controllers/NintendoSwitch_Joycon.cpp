@@ -11,6 +11,7 @@
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_VirtualControllerState.h"
+#include "NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_Joycon.h"
 
 namespace PokemonAutomation{
@@ -116,6 +117,18 @@ void JoyconController::add_keyboard_listener(KeyboardEventHandler::KeyboardListe
 
 void JoyconController::remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
     m_keyboard_manager->remove_listener(keyboard_listener);
+}
+
+
+
+
+
+
+ControllerClass LeftJoycon::controller_class() const{
+    return ControllerClass::NintendoSwitch_LeftJoycon;
+}
+ControllerClass RightJoycon::controller_class() const{
+    return ControllerClass::NintendoSwitch_RightJoycon;
 }
 
 

@@ -6,9 +6,8 @@
 
 #include <QFile>
 #include "Common/Cpp/Json/JsonArray.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_RecordKeyboardController.h"
 #include "Controllers/ControllerTypeStrings.h"
 
@@ -140,7 +139,7 @@ std::string json_to_cpp(const JsonArray& history){
         const JsonObject& snapshot = command.to_object_throw();
         Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
         state.load_json(command);
-        ret += state.to_cpp(duration, 0ms);
+        ret += state.to_cpp(duration, Milliseconds(0));
     }
     return ret;
 }
@@ -158,10 +157,10 @@ void execute_json_schedule(
             const JsonObject& snapshot = command.to_object_throw();
             Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
             state.load_json(command);
-            state.execute(context, duration);
+            state.execute(context, context.controller(), duration);
         }
         state.clear();
-        state.execute(context, Seconds(seconds_wait_between_loops));
+        state.execute(context, context.controller(), Seconds(seconds_wait_between_loops));
     }
 }
 

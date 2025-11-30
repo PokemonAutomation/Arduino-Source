@@ -645,6 +645,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerSelectorWidget.h
     Source/Controllers/ControllerSession.cpp
     Source/Controllers/ControllerSession.h
+    Source/Controllers/ControllerState.cpp
+    Source/Controllers/ControllerState.h
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
@@ -940,10 +942,14 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_JoyconState.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_JoyconState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
