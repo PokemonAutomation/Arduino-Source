@@ -752,7 +752,7 @@ void do_action_and_monitor_for_battles_early(
     if (ret == 0){  // if see no minimap. stop and see if we detect a battle. if so, throw Battl exception
         do_action_and_monitor_for_battles(info, stream, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_wait(context, Seconds(15));
+            pbf_wait(context, Seconds(30));
         });
 
         // if no battle seen, then throw Exception.
