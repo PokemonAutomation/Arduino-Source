@@ -4,28 +4,28 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
-#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
-#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
+#include "PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA_BasicNavigation.h"
 
-namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonLZA{
+#include <cmath>
 
+namespace PokemonAutomation::NintendoSwitch::PokemonLZA{
 
-
-void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
+bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
 
     bool seen_save_button = false;
     bool seen_saved_dialog = false;
@@ -57,9 +57,9 @@ void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
             std::chrono::seconds(30),
             {
                 overworld,
+                dialog,
                 main_menu,
                 save_button,
-                dialog,
             }
         );
         context.wait_for(100ms);
@@ -69,21 +69,27 @@ void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
             pbf_press_button(context, BUTTON_X, 160ms, 240ms);
             continue;
         case 1:
-            console.log("Detected main menu...");
-            if (seen_save_button && seen_saved_dialog){
-                return;
+            if (!seen_save_button){
+                console.log("Detected dialog before save prompt. Unable to save.", COLOR_RED);
+                pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+                return false;
             }
-            pbf_press_button(context, BUTTON_R, 160ms, 240ms);
-            continue;
-        case 2:
-            console.log("Detected save button...");
-            seen_save_button = true;
-            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
-            continue;
-        case 3:
+
             console.log("Detected dialog...");
             seen_saved_dialog = true;
             pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+            continue;
+        case 2:
+            console.log("Detected main menu...");
+            if (seen_save_button && seen_saved_dialog){
+                return true;
+            }
+            pbf_press_button(context, BUTTON_R, 160ms, 240ms);
+            continue;
+        case 3:
+            console.log("Detected save button...");
+            seen_save_button = true;
+            pbf_press_button(context, BUTTON_A, 160ms, 240ms);
             continue;
         }
     }
@@ -94,7 +100,7 @@ void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
 
 
 bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max){
-    pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms);
+    pbf_press_button(context, BUTTON_PLUS, 240ms, 40ms);
     context.wait_for_all_requests();
     console.log("Opening Map...");
     console.overlay().add_log("Open Map");
@@ -180,7 +186,7 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
         case 0:
         case 1:
             console.log("Flying from map... Started!");
-            console.overlay().add_log("Fast traveling");
+            console.overlay().add_log("Fast Traveling");
             break;
         case 2:
             console.log("Spotted by wild pokemon, cannot fly");
@@ -220,6 +226,14 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
     }
 
     return FastTravelState::SUCCESS;
+}
+
+FastTravelState open_map_and_fly_in_place(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max){
+    bool can_fast_travel = open_map(console, context, zoom_to_max);
+    if (!can_fast_travel){
+        return FastTravelState::PURSUED;
+    }
+    return fly_from_map(console, context);
 }
 
 
@@ -291,6 +305,20 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
 }
 
 
+void map_to_overworld(ConsoleHandle& console, ProControllerContext& context){
+    OverworldPartySelectionWatcher overworld_watcher(COLOR_WHITE, &console.overlay());
+    run_until<ProControllerContext>(
+        console, context,
+        [](ProControllerContext& context){
+            pbf_mash_button(context, BUTTON_B, 2s);
+            pbf_wait(context, 40s); // wait a long time in case day/night change immidiately happens
+        },
+        {{overworld_watcher}}
+    );
+    pbf_wait(context, 100ms); // wait 100ms for the game to give back control to player
+    context.wait_for_all_requests();
+}
+
 
 void sit_on_bench(ConsoleHandle& console, ProControllerContext& context){
     context.wait_for_all_requests();
@@ -360,11 +388,133 @@ void wait_until_overworld(
             console
         );
     }
-    console.log("Detected overworld after day night change.");
+    console.log("Detected overworld within " + std::to_string(max_wait_time.count()) + " milliseconds");
     context.wait_for(100ms); // extra 0.1 sec to let game give player control
 }
 
 
+double get_facing_direction(
+    ConsoleHandle& console,
+    ProControllerContext& context
+){
+    DirectionArrowWatcher arrow_watcher(COLOR_YELLOW, std::chrono::milliseconds(100));
+    int ret = wait_until(
+        console, context,
+        std::chrono::seconds(40), // 40 sec to account for possible day/night change
+        {arrow_watcher}
+    );
+    if (ret != 0){
+        console.log("Direction arrow not detected within 1 second");
+        console.overlay().add_log("No Minimap Arrow Found", COLOR_RED);
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "get_facing_direction(): Direction arrow on minimap not detected within 1 second",
+            console
+        );
+    }
+    double angle = arrow_watcher.detected_angle_deg();
+    console.log("Direction arrow detected! Angle: " + tostr_fixed(angle, 0) + " degrees");
+    console.overlay().add_log("Minimap Arrow: " + tostr_fixed(angle, 0) + " deg", COLOR_YELLOW);
+    return angle;
 }
+
+double get_angle_between_facing_directions(double dir1, double dir2){
+    double angle = std::fabs(dir1 - dir2);
+    if (angle > 180.0){
+        angle = 360.0 - angle;
+    }
+    return angle;
 }
+
+bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context){
+    console.log("Leaving zone gate");
+
+    WallClock start_time = current_time();
+    OverworldPartySelectionWatcher overworld_watcher(COLOR_WHITE, &console.overlay());
+    pbf_mash_button(context, BUTTON_A, 1s);
+    context.wait_for_all_requests();
+    wait_until(
+        console, context,
+        std::chrono::seconds(40), // wait this long in case day/night change happens
+        {overworld_watcher}
+    );
+    pbf_wait(context, 100ms); // after leaving the gate, the game needs this long time to give back control
+    context.wait_for_all_requests();
+    WallClock end_time = current_time();
+
+    const auto duration = end_time - start_time;
+    const auto second_count = std::chrono::duration_cast<std::chrono::seconds>(duration).count();
+    // Due to day/night change may eating the mashing button A sequence, we may still be inside the zone!
+    // We need to check if we can fast travel 
+    if (duration < 16s){
+        console.log("Leaving zone function took " + std::to_string(second_count) + " sec. No day/night change");
+        console.overlay().add_log("Left Gate");
+
+        // The animation of leaving the gate does not take more than 15 sec.
+        // In this case, there is no day/night change. We are sure we are outside the wild zone
+        // (unless some angry Garchomp or Drilbur used Dig and escaped wild zone containment... We don't
+        // consider this case for now)
+        return true;
+    }
+
+    console.log("Leaving zone function took " + std::to_string(second_count) + " sec. Day/night change happened");
+    return false;
+}
+
+
+int run_towards_wild_zone_gate(
+    ConsoleHandle& console, ProControllerContext& context,
+    uint8_t run_direction_x, uint8_t run_direction_y,
+    PokemonAutomation::Milliseconds run_time
+){
+    const ImageFloatBox button_A_box{0.3, 0.2, 0.4, 0.7};
+    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, button_A_box, &console.overlay());
+    OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &console.overlay(), std::chrono::milliseconds(400));
+    const int ret = run_until<ProControllerContext>(
+        console, context,
+        [&](ProControllerContext& context){
+            // running back
+            ssf_press_button(context, BUTTON_B, 0ms, run_time, 0ms);
+            pbf_move_left_joystick(context, run_direction_x, run_direction_y, run_time, 0ms);
+        },
+        {{buttonA, overworld_gone}}
+    );
+    switch (ret){
+    case 0:
+        console.log("Detected button A. Reached gate.");
+        console.overlay().add_log("Reach Gate");
+        return 0;
+    case 1:
+        console.log("Day/night change happened while escaping");
+        console.overlay().add_log("Day/Night Change Detected");
+        wait_until_overworld(console, context);
+        return 1;
+    default:
+        console.log("Did not reach gate");
+        return ret;
+    }
+}
+
+int run_a_straight_path_in_overworld(
+    ConsoleHandle& console, ProControllerContext& context,
+    uint8_t direction_x, uint8_t direction_y,
+    PokemonAutomation::Milliseconds duration
+){
+    OverworldPartySelectionOverWatcher overworld_gone(COLOR_WHITE, &console.overlay(), std::chrono::milliseconds(400));
+    int ret = run_until<ProControllerContext>(
+        console, context,
+        [&](ProControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+            pbf_move_left_joystick(context, direction_x, direction_y, duration, 0ms);
+        },
+        {{overworld_gone}}
+    );
+    if (ret == 0){
+        console.overlay().add_log("Day/Night Change Detected");
+        wait_until_overworld(console, context);
+    }
+    return ret;
+}
+
+
 }

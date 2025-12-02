@@ -13,12 +13,11 @@
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
+#include "PokemonLZA/Inference/Battles/PokemonLZA_RunFromBattleDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
-//#include "PokemonLZA/Inference/PokemonLZA_MoveEffectivenessSymbol.h"
 #include "PokemonLZA/Programs/PokemonLZA_TrainerBattle.h"
 #include "PokemonLZA_JacintheInfiniteFarmer.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -105,20 +104,6 @@ JacintheInfiniteFarmer::JacintheInfiniteFarmer()
         0
     )
     , GO_HOME_WHEN_DONE(false)
-    , MOVE_AI(
-        "<b>Move Selection AI:</b><br>"
-        "If enabled, it will be smarter with move selection.<br>"
-        "However, this adds a split-second delay which may cause opponent attacks to land first.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
-    , USE_PLUS_MOVES(
-        "<b>Use Plus Moves:</b><br>"
-        "If enabled, it will attempt to use plus moves.<br>"
-        "However, this adds a 320ms delay which may cause opponent attacks to land first.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -127,8 +112,7 @@ JacintheInfiniteFarmer::JacintheInfiniteFarmer()
     })
 {
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
-    PA_ADD_OPTION(MOVE_AI);
-    PA_ADD_OPTION(USE_PLUS_MOVES);
+    PA_ADD_OPTION(BATTLE_AI);
 
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -259,32 +243,22 @@ bool JacintheInfiniteFarmer::talk_to_jacinthe(SingleSwitchProgramEnvironment& en
 void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     JacintheInfiniteFarmer_Descriptor::Stats& stats = env.current_stats<JacintheInfiniteFarmer_Descriptor::Stats>();
 
-    WallClock start = current_time();
-    TrainerBattleState battle_state;
+    TrainerBattleState battle_state(BATTLE_AI);
 
     while (true){
         context.wait_for_all_requests();
 
         FlatWhiteDialogWatcher dialog(COLOR_RED, &env.console.overlay(), 250ms);
+        RunFromBattleWatcher in_battle_state(COLOR_GREEN, &env.console.overlay(), 10ms);
 
-        int ret = run_until<ProControllerContext>(
+        int ret = wait_until(
             env.console, context,
-            [&](ProControllerContext& context){
-                while (current_time() - start < 30min){
-                    const bool allow_button_B_press = false;
-                    battle_state.attempt_one_attack(
-                        env, context,
-                        MOVE_AI,
-                        USE_PLUS_MOVES,
-                        allow_button_B_press
-                    );
-                }
-            },
+            50s,
             {
                 dialog,
+                in_battle_state,
             }
         );
-
         switch (ret){
         case 0:
             env.log("Detected white dialog.");
@@ -293,13 +267,17 @@ void JacintheInfiniteFarmer::run_round(SingleSwitchProgramEnvironment& env, ProC
             stats.rounds++;
             env.update_stats();
             return;
+        case 1:
+            env.log("In battle state");
+            battle_state.attempt_one_attack(env, env.console, context);
+            continue;
 
         default:
             stats.errors++;
             env.update_stats();
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Round took longer than 30 minutes.",
+                "run_round(): no battle state or dialog window detected after 50 sec.",
                 env.console
             );
         }

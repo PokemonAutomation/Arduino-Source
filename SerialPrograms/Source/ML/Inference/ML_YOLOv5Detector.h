@@ -26,8 +26,7 @@ public:
     // - model_path: path to the onnx model file. The label name file should be the same
     //   file path and basename and with _label.txt suffix.
     //   e.g. .../yolo.onnx, .../yolo_label.txt
-    // If model loading fails, no exception is thrown but you can call `model_loaded()` to
-    // check.
+    // If model loading fails, InternalProgramError exception is thrown
     YOLOv5Detector(const std::string& model_path);
     virtual ~YOLOv5Detector();
 
@@ -42,6 +41,9 @@ public:
     const std::unique_ptr<YOLOv5Session>& session() const { return m_yolo_session; }
 
 protected:
+    std::string m_model_path;
+    bool m_use_gpu;
+    // std::vector<std::string> m_labels;
     std::unique_ptr<YOLOv5Session> m_yolo_session;
     std::vector<YOLOv5Session::DetectionBox> m_output_boxes;
 };
@@ -53,8 +55,7 @@ public:
     // - model_path: path to the onnx model file. The label name file should be the same
     //   file path and basename and with _label.txt suffix.
     //   e.g. .../yolo.onnx, .../yolo_label.txt
-    // If model loading fails, no exception is thrown but you can call `model_loaded()` to
-    // check.
+    // If model loading fails, InternalProgramError exception is thrown
     YOLOv5Watcher(VideoOverlay& overlay, const std::string& model_path);
     virtual ~YOLOv5Watcher() {}
 

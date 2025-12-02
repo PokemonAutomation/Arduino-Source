@@ -77,10 +77,6 @@ public:
     ConfigOption(LockMode lock_mode);
     ConfigOption(ConfigOptionState visibility);
 
-//    //  Deep copy this entire config. This will not copy listeners.
-//    //  Returns null if config cannot be copied.
-//    virtual std::unique_ptr<ConfigOption> clone() const = 0;
-
     virtual void load_json(const JsonValue& json);
     virtual JsonValue to_json() const;
 

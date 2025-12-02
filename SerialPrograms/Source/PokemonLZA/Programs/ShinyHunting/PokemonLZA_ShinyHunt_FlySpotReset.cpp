@@ -1,4 +1,4 @@
-/*  Shiny Hunt - Cafe Reset
+/*  Shiny Hunt - Fly Spot Reset
  *
  *  From: https://github.com/PokemonAutomation/
  *
@@ -14,7 +14,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
-#include "PokemonLZA_ShinyHunt_CafeReset.h"
+#include "PokemonLZA_ShinyHunt_FlySpotReset.h"
 
 namespace PokemonAutomation {
 namespace NintendoSwitch {
@@ -23,18 +23,18 @@ namespace PokemonLZA {
 using namespace Pokemon;
 
 
-ShinyHunt_CafeReset_Descriptor::ShinyHunt_CafeReset_Descriptor()
+ShinyHunt_FlySpotReset_Descriptor::ShinyHunt_FlySpotReset_Descriptor()
     : SingleSwitchProgramDescriptor(
-        "PokemonLZA:ShinyHunt-CafeReset", STRING_POKEMON + " LZA",
-        "Cafe Reset",
-        "Programs/PokemonLZA/ShinyHunt-CafeReset.html",
-        "Shiny hunt by repeatedly fast trveling to the cafe to reset nearby " + STRING_POKEMON + " spawns.",
+        "PokemonLZA:ShinyHunt-FlySpotReset", STRING_POKEMON + " LZA",
+        "Fly Spot Reset",
+        "Programs/PokemonLZA/ShinyHunt-FlySpotReset.html",
+        "Shiny hunt by repeatedly fast traveling to a location to reset nearby " + STRING_POKEMON + " spawns.",
         ProgramControllerClass::StandardController_NoRestrictions, FeedbackType::REQUIRED,
         AllowCommandsWhenRunning::DISABLE_COMMANDS, {}
     )
 {}
 
-class ShinyHunt_CafeReset_Descriptor::Stats : public StatsTracker{
+class ShinyHunt_FlySpotReset_Descriptor::Stats : public StatsTracker{
 public:
     Stats()
         : resets(m_stats["Resets"])
@@ -51,12 +51,12 @@ public:
     std::atomic<uint64_t>& errors;
 };
 
-std::unique_ptr<StatsTracker> ShinyHunt_CafeReset_Descriptor::make_stats() const{
+std::unique_ptr<StatsTracker> ShinyHunt_FlySpotReset_Descriptor::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 
-ShinyHunt_CafeReset::ShinyHunt_CafeReset()
+ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -73,13 +73,13 @@ ShinyHunt_CafeReset::ShinyHunt_CafeReset()
 }
 
 
-void ShinyHunt_CafeReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
 
     // Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 500ms);
 
-    ShinyHunt_CafeReset_Descriptor::Stats& stats = env.current_stats<ShinyHunt_CafeReset_Descriptor::Stats>();
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats = env.current_stats<ShinyHunt_FlySpotReset_Descriptor::Stats>();
 
     ShinySoundHandler shiny_sound_handler(SHINY_DETECTED);
 
@@ -112,7 +112,7 @@ void ShinyHunt_CafeReset::program(SingleSwitchProgramEnvironment& env, ProContro
                     env.update_stats();
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
-                        "CafeReset: Cannot open map for fast travel.",
+                        "FlySpotReset: Cannot open map for fast travel.",
                         env.console
                     );
                 }
@@ -127,7 +127,7 @@ void ShinyHunt_CafeReset::program(SingleSwitchProgramEnvironment& env, ProContro
                     env.update_stats();
                     OperationFailedException::fire(
                         ErrorReport::SEND_ERROR_REPORT,
-                        "CafeReset: Cannot fast travel after moving map cursor.",
+                        "FlySpotReset: Cannot fast travel after moving map cursor.",
                         env.console
                     );
                 }

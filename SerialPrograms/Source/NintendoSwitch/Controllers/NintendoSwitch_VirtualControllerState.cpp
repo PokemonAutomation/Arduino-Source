@@ -4,6 +4,9 @@
  *
  */
 
+#include "Common/Cpp/Json/JsonObject.h"
+#include "NintendoSwitch_ProControllerState.h"
+#include "NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_VirtualControllerState.h"
 
 //#include <iostream>
@@ -19,62 +22,6 @@ using namespace std::chrono_literals;
 
 
 
-void ProControllerState::clear(){
-    buttons = BUTTON_NONE;
-    dpad = DPAD_NONE;
-    left_x = 128;
-    left_y = 128;
-    right_x = 128;
-    right_y = 128;
-}
-bool ProControllerState::operator==(const ControllerState& x) const{
-    if (typeid(*this) != typeid(x)){
-        return false;
-    }
-
-    const ProControllerState& r = static_cast<const ProControllerState&>(x);
-
-    if (buttons != r.buttons){
-        return false;
-    }
-    if (dpad != r.dpad){
-        return false;
-    }
-    if (left_x != r.left_x){
-        return false;
-    }
-    if (left_y != r.left_y){
-        return false;
-    }
-    if (right_x != r.right_x){
-        return false;
-    }
-    if (right_y != r.right_y){
-        return false;
-    }
-    return true;
-}
-bool ProControllerState::is_neutral() const{
-    return buttons == 0
-        && dpad == DPAD_NONE
-        && left_x == 128
-        && left_y == 128
-        && right_x == 128
-        && right_y == 128;
-}
-
-JsonObject ProControllerState::serialize_state() const {
-    JsonObject obj;
-    obj["is_neutral"] = is_neutral();
-    obj["buttons"] = button_to_string(buttons);
-    obj["dpad"] = dpad_to_string(dpad);
-    obj["left_x"] = left_x;
-    obj["left_y"] = left_y;
-    obj["right_x"] = right_x;
-    obj["right_y"] = right_y;
-    
-    return obj;
-}
 
 
 void ProControllerDeltas::operator+=(const ProControllerDeltas& x){
@@ -153,44 +100,6 @@ bool ProControllerDeltas::to_state(ProControllerState& state) const{
 
 
 
-void JoyconState::clear(){
-    buttons = BUTTON_NONE;
-    joystick_x = 128;
-    joystick_y = 128;
-}
-bool JoyconState::operator==(const ControllerState& x) const{
-    if (typeid(*this) != typeid(x)){
-        return false;
-    }
-
-    const JoyconState& r = static_cast<const JoyconState&>(x);
-
-    if (buttons != r.buttons){
-        return false;
-    }
-    if (joystick_x != r.joystick_x){
-        return false;
-    }
-    if (joystick_y != r.joystick_y){
-        return false;
-    }
-    return true;
-}
-bool JoyconState::is_neutral() const{
-    return buttons == 0
-        && joystick_x == 128
-        && joystick_y == 128;
-}
-
-JsonObject JoyconState::serialize_state() const {
-    JsonObject obj;
-    obj["is_neutral"] = is_neutral();
-    obj["buttons"] = button_to_string(buttons);
-    obj["joystick_x"] = joystick_x;
-    obj["joystick_y"] = joystick_y;
-    
-    return obj;
-}
 
 void JoyconDeltas::operator+=(const JoyconDeltas& x){
     buttons |= x.buttons;

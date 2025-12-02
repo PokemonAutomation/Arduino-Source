@@ -191,8 +191,8 @@ void VideoOverlayWidget::render_boxes(QPainter& painter){
 //        cout << "m_video_size.width() = " << m_widget_size.width() << ", xmax = " << xmax << endl;
 
         painter.drawRect(
-            xmin,
-            ymin,
+            xmin + 1,   //  Qt displays these slightly off-center.
+            ymin + 1,   //  Correct for it here.
             xmax - xmin,
             ymax - ymin
         );

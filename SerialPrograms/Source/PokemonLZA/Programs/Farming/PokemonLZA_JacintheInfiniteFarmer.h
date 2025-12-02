@@ -7,12 +7,13 @@
 #ifndef PokemonAutomation_PokemonLZA_JacintheInfiniteFarmer_H
 #define PokemonAutomation_PokemonLZA_JacintheInfiniteFarmer_H
 
-#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+//#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/ButtonOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
+#include "PokemonLZA/Options/PokemonLZA_BattleAIOption.h"
 
 namespace PokemonAutomation{
 
@@ -59,8 +60,7 @@ private:
     SimpleIntegerOption<uint32_t> NUM_ROUNDS;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    BooleanCheckBoxOption MOVE_AI;
-    BooleanCheckBoxOption USE_PLUS_MOVES;
+    BattleAIOption BATTLE_AI;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationsOption NOTIFICATIONS;

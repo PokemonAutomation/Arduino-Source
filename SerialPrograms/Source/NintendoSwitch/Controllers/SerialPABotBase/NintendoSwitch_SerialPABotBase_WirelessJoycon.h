@@ -91,13 +91,13 @@ public:
 
     virtual void issue_buttons(
         const Cancellable* cancellable,
-        Button button,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        Button button
     ) override;
     virtual void issue_joystick(
         const Cancellable* cancellable,
-        uint8_t x, uint8_t y,
-        Milliseconds delay, Milliseconds hold, Milliseconds cooldown
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
     ) override;
 
     virtual void issue_gyro_accel_x(
@@ -145,9 +145,10 @@ public:
 
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
+        bool enable_logging,
+        Milliseconds duration,
         Button button,
-        uint8_t joystick_x, uint8_t joystick_y,
-        Milliseconds hold
+        uint8_t joystick_x, uint8_t joystick_y
     ) override;
 
 

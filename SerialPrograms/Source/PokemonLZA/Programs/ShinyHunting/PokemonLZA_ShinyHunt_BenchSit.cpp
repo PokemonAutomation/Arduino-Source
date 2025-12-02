@@ -86,6 +86,13 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
         LockMode::UNLOCK_WHILE_RUNNING,
         "2000 ms"
     )
+    , PERIODIC_SAVE(
+        "<b>Periodically Save:</b><br>"
+        "Save the game every this many bench sits. This reduces the loss to game crashes. Set to zero to disable. Saving will be unsuccessful if you are under attack",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        100,
+        0
+    )
     , SHINY_DETECTED(
         "Shiny Detected", "",
         "2000 ms",
@@ -105,6 +112,7 @@ ShinyHunt_BenchSit::ShinyHunt_BenchSit()
         PA_ADD_OPTION(WALK_DIRECTION);
     }
     PA_ADD_OPTION(WALK_FORWARD_DURATION);
+    PA_ADD_OPTION(PERIODIC_SAVE);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -127,6 +135,8 @@ void run_back_until_found_bench(
             for (int c = 0; c < 10; c++){
                 ssf_press_button(context, BUTTON_B, 0ms, 800ms, 0ms);
                 pbf_move_left_joystick(context, 128, 255, 800ms, 200ms);
+                pbf_move_right_joystick(context, 0, 128, 200ms, 800ms);
+                pbf_press_button(context, BUTTON_L, 160ms, 0ms);
             }
         },
         {buttonA}
@@ -167,12 +177,25 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
     run_until<ProControllerContext>(
         env.console, context,
         [&](ProControllerContext& context){
-            while (true){
+            for (uint32_t rounds_since_last_save = 0;; rounds_since_last_save++) {
                 send_program_status_notification(env, NOTIFICATION_STATUS);
                 sit_on_bench(env.console, context);
                 shiny_sound_handler.process_pending(context);
                 stats.resets++;
                 env.update_stats();
+
+                uint32_t periodic_save = PERIODIC_SAVE;
+                if (periodic_save != 0 && rounds_since_last_save >= periodic_save) {
+                    bool save_successful = save_game_to_menu(env.console, context);
+                    pbf_mash_button(context, BUTTON_B, 2000ms);
+                    if (save_successful) {
+                        env.console.overlay().add_log("Game Saved Successfully", COLOR_BLUE);
+                        rounds_since_last_save = 0;
+                    } else {
+                        env.console.overlay().add_log("Game Save Failed. Will attempt to save after the next reset.", COLOR_RED);
+                    }
+                }
+
                 Milliseconds duration = WALK_FORWARD_DURATION;
                 if (duration > Milliseconds::zero()){
                     if (WALK_DIRECTION.current_value() == 0){ // forward
@@ -180,7 +203,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                         ssf_press_button(context, BUTTON_B, 0ms, 2*duration, 0ms);
                         pbf_move_left_joystick(context, 128, 0, duration, 0ms);
                         // run back
-                        pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
+                        pbf_move_left_joystick(context, 128, 255, duration + 750ms, 0ms);
                         run_back_until_found_bench(env, context);
                     }else if (WALK_DIRECTION.current_value() == 1){ // left
                         env.console.overlay().add_log("Move Left");
@@ -206,7 +229,7 @@ void ShinyHunt_BenchSit::program(SingleSwitchProgramEnvironment& env, ProControl
                 shiny_sound_handler.process_pending(context);
             }
         },
-        {{shiny_detector}}
+        {shiny_detector}
     );
 
     //  Shiny sound detected and user requested stopping the program when

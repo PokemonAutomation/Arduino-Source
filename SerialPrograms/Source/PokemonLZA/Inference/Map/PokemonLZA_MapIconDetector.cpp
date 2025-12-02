@@ -273,7 +273,7 @@ bool MapIconDetector::detect(const ImageViewRGB32& screen){
             m_last_detected.emplace_back(
                 DetectedBox{
                     m_matcher.name(),
-                    floatbox_to_pixelbox(screen, translate_to_parent(screen, m_box, object))
+                    translate_to_parent(screen, m_box, object)
                 }
             );
             return false;
@@ -286,7 +286,7 @@ bool MapIconDetector::detect(const ImageViewRGB32& screen){
             m_last_detected_box.emplace_back(
                 *m_overlay,
                 COLOR_GREEN,
-                pixelbox_to_floatbox(screen, detection.box),
+                detection.box,
                 detection.name
             );
         }

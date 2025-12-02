@@ -25,7 +25,12 @@ class AudioOutputDevice;
 class AudioSink{
 public:
     ~AudioSink();
-    AudioSink(Logger& logger, const AudioDeviceInfo& device, AudioChannelFormat format, double volume);
+    AudioSink(
+        Logger& logger,
+        const AudioDeviceInfo& device,
+        AudioChannelFormat format,
+        double volume
+    );
 
     size_t sample_rate() const{ return m_sample_rate; }
     size_t channels() const{ return m_channels; }

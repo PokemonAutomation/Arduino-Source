@@ -34,6 +34,12 @@ enum class WildZone{
     WILD_ZONE_20,
 };
 
+enum class WildZoneCafe{
+    CAFE_BATAILLE,
+    CAFE_ULTIMO,
+};
+
+
 
 }
 }

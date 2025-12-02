@@ -151,6 +151,7 @@ public:
 
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
+        bool enable_logging,
         Milliseconds hold,
         Button button,
         DpadPosition position,
@@ -159,6 +160,7 @@ public:
     ) override{
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
+            enable_logging,
             hold,
             button,
             position,

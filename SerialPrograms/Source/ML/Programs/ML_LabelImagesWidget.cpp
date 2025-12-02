@@ -125,6 +125,28 @@ LabelImages_Widget::LabelImages_Widget(
     annotation_row->addWidget(load_custom_set_button, 2);
     annotation_row->addWidget(new QLabel(scroll_inner), 10); // an empty label to push other UIs to the left
 
+    // add GPU checkbox row
+    QHBoxLayout* use_gpu_row = new QHBoxLayout();
+    scroll_layout->addLayout(use_gpu_row);
+    ConfigWidget* gpu_checkbox_widget = program.USE_GPU_FOR_EMBEDDER_SESSION.make_QtWidget(*scroll_inner);
+    use_gpu_row->addWidget(&gpu_checkbox_widget->widget(), 2);    
+
+    // add Color selection dropdown
+    QHBoxLayout* selected_color_choice_row = new QHBoxLayout();
+    scroll_layout->addLayout(selected_color_choice_row);
+    ConfigWidget* selected_color_choice_widget = program.SELECTED_ANNO_COLOR.make_QtWidget(*scroll_inner);
+    selected_color_choice_row->addWidget(&selected_color_choice_widget->widget(), 2); 
+
+    QHBoxLayout* unselected_color_choice_row = new QHBoxLayout();
+    scroll_layout->addLayout(unselected_color_choice_row);
+    ConfigWidget* unselected_color_choice_widget = program.UNSELECTED_ANNO_COLOR.make_QtWidget(*scroll_inner);
+    unselected_color_choice_row->addWidget(&unselected_color_choice_widget->widget(), 2); 
+
+    QHBoxLayout* current_drawn_box_row = new QHBoxLayout();
+    scroll_layout->addLayout(current_drawn_box_row);
+    ConfigWidget* current_drawn_box_widget = program.CURRENT_DRAWN_BOX.make_QtWidget(*scroll_inner);
+    current_drawn_box_row->addWidget(&current_drawn_box_widget->widget(), 2); 
+
     // add compute embedding button
 
     QHBoxLayout* external_action_row = new QHBoxLayout();
@@ -150,9 +172,6 @@ LabelImages_Widget::LabelImages_Widget(
     connect(open_anno_folder_button, &QPushButton::clicked, this, [this](bool){
         this->m_program.save_annotation_to_file();
 
-        // ensure the folder exists
-        // std::filesystem::create_directory(ML_ANNOTATION_PATH());
-        // QDesktopServices::openUrl(QUrl(QString::fromStdString("file:///" + ML_ANNOTATION_PATH())));
         QDesktopServices::openUrl(QUrl(QString::fromStdString("file:///" + m_image_display_widget->image_folder_path())));
     });
     connect(save_anno_button, &QPushButton::clicked, this, [this](bool){

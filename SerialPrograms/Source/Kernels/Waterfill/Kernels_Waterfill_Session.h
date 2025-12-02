@@ -47,7 +47,11 @@ class WaterfillIterator{
 public:
     virtual ~WaterfillIterator() = default;
 
-    //  Returns false is nothing is left.
+    //  Find next waterfill object from a waterfill session.
+    //  Keep_object: returned WaterfillObject has member var `object` assigned that stores
+    //    the binary matrix belonging to the pixels of this object. The binary matrix has
+    //    the same size as the input image the waterill session runs on.
+    //  Returns false when it reaches the end of iteration.
     virtual bool find_next(WaterfillObject& object, bool keep_object) = 0;
 };
 

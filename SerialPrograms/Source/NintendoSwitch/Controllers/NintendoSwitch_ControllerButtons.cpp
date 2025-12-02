@@ -8,6 +8,10 @@
 #include "Common/Cpp/EnumStringMap.h"
 #include "Common/Cpp/StringTools.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -91,6 +95,9 @@ Button string_to_button(std::string multi_button_string){
     std::vector<std::string> string_vector = StringTools::split(multi_button_string, " ");
     Button button_result = BUTTON_NONE;
     for (const std::string& button_string : string_vector){
+        if (button_string.empty()){
+            continue;
+        }
         Button one_button = BUTTON_STRINGS.get_enum(button_string);
         button_result |= one_button;
     }

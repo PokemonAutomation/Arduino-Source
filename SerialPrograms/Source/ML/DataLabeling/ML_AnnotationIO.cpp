@@ -92,7 +92,6 @@ std::vector<std::string> find_images_in_folder(const std::string& folder_path, b
 
 void export_image_annotations_to_yolo_dataset(
     const std::string& image_folder_path,
-    const std::string& annotation_folder_path,
     const std::string& yolo_dataset_path
 ){
     const bool recursive = true;
@@ -193,14 +192,13 @@ void export_image_annotations_to_yolo_dataset(
     fs::create_directories(target_image_folder);
     fs::create_directories(target_label_folder);
 
-    fs::path anno_folder(annotation_folder_path);
     std::set<std::string> missing_labels;
+    bool copy_error = false;
     for(size_t i = 0; i < image_paths.size(); i++){
         const auto& image_path = image_paths[i];
-        const auto image_file = fs::path(image_path);
+        const fs::path image_file(image_path);
 
-        const std::string anno_filename = image_file.filename().replace_extension(".json").string();
-        fs::path anno_file = anno_folder / anno_filename;
+        fs::path anno_file = fs::path(image_file).replace_extension(".json");
         if (!fs::exists(anno_file)){
             QMessageBox box;
             box.critical(nullptr, "Cannot Find Annotation File",
@@ -212,13 +210,13 @@ void export_image_annotations_to_yolo_dataset(
         try{
             fs::copy_file(image_file, target_image_file);
         }catch (fs::filesystem_error&){
-            QMessageBox box;
-            box.critical(nullptr, "Cannot Copy File",
-                QString::fromStdString(
-                    "Cannot copy from " + image_file.string() + " to " + target_image_file.string() + 
-                    ". Probably permission issue, source image is broken or target image path already exists due to image folder having same image filenames"
-                ));
-            return;
+            std::string message = "Cannot copy from " + image_file.string() + " to " + target_image_file.string() + 
+                    ". Probably permission issue, source image is broken or target image path already exists due to image folder having same image filenames";
+            std::cerr << message << std::endl;
+            copy_error = true;
+            // QMessageBox box;
+            // box.critical(nullptr, "Cannot Copy File", QString::fromStdString(message));
+            // return;
         }
 
         std::string json_content;
@@ -290,6 +288,12 @@ void export_image_annotations_to_yolo_dataset(
         for(const auto& file_line : label_file_lines){
             fout << file_line << "\n";
         }
+    }
+
+    if (copy_error){
+        QMessageBox box;
+        box.critical(nullptr, "Cannot Copy File", "There was an issue with copying at least one file. See the logs for more details.");
+        return;
     }
 
     cout << "Found labels -> count: " << endl;

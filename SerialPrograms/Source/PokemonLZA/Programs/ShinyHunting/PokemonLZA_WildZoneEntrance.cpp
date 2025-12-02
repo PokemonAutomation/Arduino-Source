@@ -4,10 +4,14 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -15,6 +19,7 @@
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_ButtonDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -24,9 +29,7 @@
 // #include <iostream>
 // using std::cout, std::endl;
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonLZA {
+namespace PokemonAutomation::NintendoSwitch::PokemonLZA {
 
 using namespace Pokemon;
 
@@ -83,7 +86,7 @@ public:
         , day_changes(m_stats["Day/Night Changes"])
     {
         m_display_order.emplace_back("Visits");
-        m_display_order.emplace_back("Chased", PreloadSettings::instance().DEVELOPER_MODE ? ALWAYS_VISIBLE : ALWAYS_HIDDEN);
+        m_display_order.emplace_back("Chased");
         m_display_order.emplace_back("Shiny Sounds");
         m_display_order.emplace_back("Game Resets");
         m_display_order.emplace_back("Errors", HIDDEN_IF_ZERO);
@@ -109,7 +112,7 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
         {
             {0, "no-movement", "No Movement"},
             {1, "approach-gate", "Approach Gate But Don't Enter"},
-            {2, "enter-zone", "Enter Zone (DANGER! Avoid Wild " + Pokemon::STRING_POKEMON + " Noticing You!)"},
+            {2, "enter-zone", "Enter Zone (Don't Go Too Far or May Get Stuck by Obstacles When Running Back)"},
         },
         LockMode::UNLOCK_WHILE_RUNNING,
         2
@@ -126,7 +129,7 @@ ShinyHunt_WildZoneEntrance::ShinyHunt_WildZoneEntrance()
         true
     )
     , SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
-    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_STATUS("Status Update", true, false, Seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED.NOTIFICATIONS,
@@ -158,24 +161,48 @@ void ShinyHunt_WildZoneEntrance::on_config_value_changed(void* object){
     }
 }
 
+
+
 // After fast travel, move forward to enter wild zone.
-// This function is robust against day/night changes
+// This function is robust against day/night changes.
 void go_to_entrance(
     SingleSwitchProgramEnvironment& env,
-    ProControllerContext& context
+    ProControllerContext& context,
+    WildZone wildzone
 ){
-    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
-    run_until<ProControllerContext>(
-        env.console, context,
-        [](ProControllerContext& context){
-            for (int c = 0; c < 30; c++){
-                ssf_press_button(context, BUTTON_B, 0ms, 2s, 0ms);
-                pbf_move_left_joystick(context, 128, 0, 2s, 200ms);
-            }
-        },
-        {{buttonA}}
-    );
-    env.console.overlay().add_log("Detect Entrance");
+    double starting_direction = 0;
+    uint8_t joystick_x = 128;
+    if (wildzone == WildZone::WILD_ZONE_1){
+        // The fast travel point of Wild Zone 1 does not face the zone entrance directly. We need
+        // to turn a little bit to the right
+        starting_direction = get_facing_direction(env.console, context);
+        joystick_x = 145;
+    }
+    int ret = run_towards_wild_zone_gate(env.console, context, joystick_x, 0, 10s);
+    switch(ret){
+    case 0: // detected button A. Reached gate
+        break;
+    case 1: // day/night change happened.
+        if (wildzone == WildZone::WILD_ZONE_1 && 
+            get_angle_between_facing_directions(starting_direction, get_facing_direction(env.console, context)) > 2.5){
+            joystick_x = 128; // we've already turned. Just need to go forward to enter the zone
+        }
+        ret = run_towards_wild_zone_gate(env.console, context, joystick_x, 0, 10s);
+        if (ret != 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "go_to_entrance(): Cannot reach gate from outside after day/night change.",
+                env.console
+            );
+        }
+        break;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "go_to_entrance(): Cannot reach gate from outside.",
+            env.console
+        );
+    }
 }
 
 
@@ -184,27 +211,23 @@ void fast_travel_outside_zone(
     ProControllerContext& context,
     WildZone wild_zone,
     bool to_max_zoom_level_on_map,
-    std::string extra_error_msg = ""
+    std::string extra_error_msg = "",
+    bool map_already_opened = false
 ){
-    ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
-
-    bool can_fast_travel = open_map(env.console, context, to_max_zoom_level_on_map);
-    if (!can_fast_travel){
-        stats.errors++;
-        env.update_stats();
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "fast_travel_outside_zone(): Fast travel disabled from supposedly outside the entrance." + extra_error_msg,
-            env.console
-        );
+    if (!map_already_opened){
+        if (!open_map(env.console, context, to_max_zoom_level_on_map)){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "fast_travel_outside_zone(): Fast travel disabled from supposedly outside the entrance." + extra_error_msg,
+                env.console
+            );
+        }
     }
 
     move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
 
     FastTravelState travel_status = fly_from_map(env.console, context);
     if (travel_status != FastTravelState::SUCCESS){
-        stats.errors++;
-        env.update_stats();
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
             "fast_travel_outside_zone(): After moving map cursor, cannot fast travel to the zone." + extra_error_msg,
@@ -238,97 +261,164 @@ void leave_zone_and_reset_spawns(
 ){
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
-    FastTravelState travel_status = FastTravelState::PURSUED;
-    bool can_fast_travel = open_map(env.console, context, to_max_zoom_level_on_map);
-    // Open map is robust against day/night change. So after open_map()
-    // we are sure we are in map view
-    if (can_fast_travel){
-        travel_status = fly_from_map(env.console, context);
-    }
-    if (travel_status == FastTravelState::SUCCESS){
-        // we were in the zone and now successfully travel back to entrance
-        env.log("Leave zone successfully by fast travel");
-        return;
-    } else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
-        // we cannot fast travel at current location. This means we are actually outside
-        // the wild zone!
-        // Assume we are still outside the entrance, probably due to the mashing A to enter
-        // zone button press was eaten by a day/night change.
-        
-        env.log("Not at fly spot now, probably still outside zone at entrance.");
-        env.console.overlay().add_log("Still at Entrance");
+    AlertEyeDetector alert_eye_detector(COLOR_WHITE, &env.console.overlay());
+    auto latest_frame = env.console.video().snapshot_latest_blocking();
+    // if there is the alert symbol of a white eye telling player they are being chased by wild pokmeon
+    const bool has_alert_eye = latest_frame ? alert_eye_detector.detect(latest_frame): false;
 
-        // From zone entrance, fast travel back to the zone entrance
-        // to reset player character orientation
-        move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
+    if (!has_alert_eye){
+        // we are not being chased by wild pokemon. Try to fast travel back to entrance.
 
-        travel_status = fly_from_map(env.console, context);
-        if (travel_status != FastTravelState::SUCCESS){
-            stats.errors++;
-            env.update_stats();
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "leave_zone_and_reset_spawns(): Cannot fast travel to zone from outside the entrance.",
-                env.console
-            );
+        // Open map is robust against day/night change. So after open_map()
+        // we are sure we are in map view
+        FastTravelState travel_status = open_map_and_fly_in_place(env.console, context, to_max_zoom_level_on_map);
+        // since we have set up max zoom now, we don't need to do that again when calling fast_travel_outside_zone() later
+        to_max_zoom_level_on_map = false;
+        if (travel_status == FastTravelState::SUCCESS){
+            // we were in the zone and now successfully travel back to entrance
+            env.log("Leave zone successfully by fast travel");
+            return;
+        } else if (travel_status == FastTravelState::NOT_AT_FLY_SPOT){
+            // we cannot fast travel at current location. This means we are actually outside
+            // the wild zone!
+            // Assume we are still outside the entrance, probably due to the mashing A to enter
+            // zone button press was eaten by a day/night change.
+            
+            env.log("Not at fly spot now, probably still outside zone at entrance.");
+            env.console.overlay().add_log("Still at Entrance");
+
+            // From zone entrance, fast travel back to the zone entrance
+            // to reset player character orientation
+            move_map_cursor_from_entrance_to_zone(env.console, context, wild_zone);
+
+            travel_status = fly_from_map(env.console, context);
+            if (travel_status != FastTravelState::SUCCESS){
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "leave_zone_and_reset_spawns(): Cannot fast travel to zone from outside the entrance.",
+                    env.console
+                );
+            }
+            env.log("Fast travel after failed to enter zone by day/night change");
+            return;
         }
-        env.log("Fast travel after failed to enter zone by day/night change");
-        return;
-    } 
-    // travel_status == FastTravelState::PURSUED
-    // we are being attacked by wild pokemon.
-    
-    // mash B to close map and return to overworld
-    pbf_mash_button(context, BUTTON_B, 1600ms);
-    walk_time_in_zone += 2s; // give some extra time
-    env.log("Escaping");
-    env.console.overlay().add_log("Escaping Back to Entrance");
+
+        // travel_status == FastTravelState::PURSUED, we are being attacked by wild pokemon.
+        // mash B to close map and return to overworld
+        map_to_overworld(env.console, context);
+        // if (PreloadSettings::instance().DEVELOPER_MODE){
+        //     dump_debug_image(env.console, "AlertEyeDetector", "FalseNegative", latest_frame);
+        // }
+    }
+   
     stats.chased++;
     env.update_stats();
 
-    ButtonWatcher buttonA(COLOR_RED, ButtonType::ButtonA, {0.3, 0.2, 0.4, 0.7}, &env.console.overlay());
-    int ret = run_until<ProControllerContext>(
-        env.console, context,
-        [&walk_time_in_zone](ProControllerContext& context){
-            // running back
-            ssf_press_button(context, BUTTON_B, 0ms, walk_time_in_zone, 0ms);
-            pbf_move_left_joystick(context, 128, 255, walk_time_in_zone, 0ms);
-        },
-        {{buttonA}}
-    );
-    if (ret != 0){
+    walk_time_in_zone += 2s; // give some extra time
+    env.log("Escaping");
+    env.console.overlay().add_log("Escaping Back to Entrance");
+    
+    const double starting_direction = get_facing_direction(env.console, context);
+
+    int ret = run_towards_wild_zone_gate(env.console, context, 128, 255, walk_time_in_zone);
+    switch (ret){
+    case 0: // Found button A. Reached the gate.
+        break;
+    case 1: // Day/night change happened.
+        {
+            const double cur_direction = get_facing_direction(env.console, context);
+            const double direction_change = get_angle_between_facing_directions(starting_direction, cur_direction);
+            env.log("Facing direction difference after day/night change: " + tostr_fixed(direction_change, 0) + " deg, from "
+                + tostr_fixed(starting_direction, 0) + " to " + tostr_fixed(cur_direction, 0) + " deg");
+            
+            uint8_t joystick_y = 0;
+            if (direction_change > 150.0){
+                // we are facing towards the gate
+                env.log("Running forward");
+                env.console.overlay().add_log("Running Forward");
+                joystick_y = 0;
+            }else if(direction_change < 30.0){
+                // we are facing away from the gate
+                env.log("Running back");
+                env.console.overlay().add_log("Running Back");
+                joystick_y = 255;
+            }else{
+                OperationFailedException::fire(
+                    ErrorReport::SEND_ERROR_REPORT,
+                    "leave_zone_and_reset_spawns(): Facing direction after day/night change is wrong: " + tostr_fixed(direction_change, 0) + " deg",
+                    env.console
+                );
+            }
+
+            // Running forward or backward depends on character facing to go back to zone entrance
+            ret = run_towards_wild_zone_gate(env.console, context, 128, joystick_y, walk_time_in_zone);
+            if (ret != 0){
+                stats.errors++;
+                env.update_stats();
+                throw UserSetupError(
+                    env.logger(),
+                    "Program stuck in the zone while escaping from wild pokemon. "
+                    "Pick a path that won't get you stuck by terrain or obstacles."
+                );
+            }
+        }
+        break;
+    default:
         stats.errors++;
         env.update_stats();
-#if 0
-        OperationFailedException::fire(
-            ErrorReport::SEND_ERROR_REPORT,
-            "leave_zone_and_reset_spawns(): Cannot run back to entrance after being chased by wild pokemon.",
-            env.console
-        );
-#else
         throw UserSetupError(
             env.logger(),
-            "This program requires that you do not get attacked. "
-            "Please choose a location/route that is safe from attack."
+            "Program stuck in the zone while escaping from wild pokemon. "
+            "Pick a path that won't get you stuck by terrain or obstacles."
         );
-#endif
     }
     shiny_sound_handler.process_pending(context);
 
     // Found button A, so we are at the entrance.
     // Mash A to leave Zone.
-    env.log("Found button A. Leaving Zone");
-    env.console.overlay().add_log("Found Button A. Leaving Zone");
-    pbf_mash_button(context, BUTTON_A, 2000ms);
-    context.wait_for_all_requests();
-    shiny_sound_handler.process_pending(context);
 
-    // Do a fast travel outside the gate to reset spawns
     std::string extra_eror_msg = " This is after leaving zone.";
+
+    // Due to day/night change may eating the mashing button A sequence, we may still be inside the zone!
+    // We need to check if we can fast travel 
+    if (leave_zone_gate(env.console, context)){
+        shiny_sound_handler.process_pending(context);
+        // Do a fast travel outside the gate to reset spawns
+        fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map, std::move(extra_eror_msg));
+        return;
+    }
+
+    // there is a day/night change while leaving the zone. We don't know if we are still inside the zone.
+    //
+    // We can't call leave_zone_gate() again because at Wild Zone 4 there are npcs outside the gate that can
+    // press A to talk to. If the program can get stuck into talking to the npc.
+
+    FastTravelState travel_status = open_map_and_fly_in_place(env.console, context, to_max_zoom_level_on_map);
+    if (travel_status == FastTravelState::SUCCESS){
+        // We can fast travel and we fast traveled. This means we were inside the gate but now safe.
+        env.log("We fast traveled. We were inside the gate but now safe for next trip");
+        return;
+    }else if(travel_status == FastTravelState::NOT_AT_FLY_SPOT){
+        env.log("We cannot fast travel in place. We left zone successfully");
+        // we cannot fast travel at current location. So we have left the zone!
+        // Fast travel to the zone gate to reset spawn
+        const bool map_already_opened = true;
+        fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map,
+            std::move(extra_eror_msg), map_already_opened);
+        return;
+    }
+    // We cannot fast travel: we are still being chased by wild pokemon
+    env.log("We cannot fast travel. Still chased by pokemon");
     
-    // since we already set up max zoom before, we don't need to do that again when calling fast_travel_outside_zone()
-    bool _go_to_max_zoom_level = false;
-    fast_travel_outside_zone(env, context, wild_zone, _go_to_max_zoom_level, std::move(extra_eror_msg));
+    // Mash B to close map and return to overworld
+    map_to_overworld(env.console, context);
+    // Mash A to leave zone gate
+    env.log("Mashing A again to leave zone");
+    leave_zone_gate(env.console, context);
+    shiny_sound_handler.process_pending(context);
+    // Do a fast travel outside the gate to reset spawns
+    env.log("Finally, we should have left the zone");
+    fast_travel_outside_zone(env, context, wild_zone, to_max_zoom_level_on_map, std::move(extra_eror_msg));
 }
 
 // After fast travel back to a wild zone, go through entrance and move forward.
@@ -351,12 +441,13 @@ void do_one_wild_zone_trip(
     ShinySoundHandler& shiny_sound_handler,
     bool to_max_zoom_level_on_map
 ){
+    env.log("Starting one wild zone trip");
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
     context.wait_for_all_requests();
     shiny_sound_handler.process_pending(context);
 
     if (movement_mode >= 1){
-        go_to_entrance(env, context);
+        go_to_entrance(env, context, wild_zone);
         context.wait_for_all_requests();
         shiny_sound_handler.process_pending(context);
     }
@@ -365,25 +456,11 @@ void do_one_wild_zone_trip(
         pbf_mash_button(context, BUTTON_A, 2000ms);
         context.wait_for_all_requests();
 
-        {
-            // Wait for the overworld party view to be back. That is when
-            // the player is given control again after the entering gate animation.
-            OverworldPartySelectionWatcher overworld;
-            int ret = wait_until(
-                env.console, context,
-                std::chrono::seconds(50), // wait for 50 sec to account for possible day/night change happening
-                {overworld}
-            );
-            if (ret < 0){
-                OperationFailedException::fire(
-                    ErrorReport::SEND_ERROR_REPORT,
-                    "do_one_wild_zone_trip(): Unable to detect overworld after entering zone.",
-                    env.console
-                );
-            }
-            env.console.log("Detected overworld after entering zone.");
-        }
-        context.wait_for(100ms);
+        // Wait for the overworld party view to be back. That is when
+        // the player is given control again after the entering gate animation.
+        // We use 50s here to account for day night change
+        wait_until_overworld(env.console, context, 50s);
+        env.console.log("Detected overworld after entering zone.");
 
         shiny_sound_handler.process_pending(context);
         // Day/night change can happen before or after the button A mash, so we are not
@@ -424,10 +501,16 @@ void do_one_wild_zone_trip(
 
 void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
-    to_max_zoom_level_on_map = true;
 
-    // Mash button B to let Switch register the controller
+    //  Record when we should zoom out the map for flyable fast travel icon
+    //  detection on map during fast traveling.
+    bool to_max_zoom_level_on_map = true;
+
+    //  Mash button B to let Switch register the controller
     pbf_mash_button(context, BUTTON_B, 500ms);
+
+    //  Detect direction arrow to test the detector
+    //  m_starting_angle = get_current_facing_angle(env, context);
 
     ShinyHunt_WildZoneEntrance_Descriptor::Stats& stats = env.current_stats<ShinyHunt_WildZoneEntrance_Descriptor::Stats>();
 
@@ -468,7 +551,13 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                     consecutive_failures++;
                     env.log("Consecutive failures: " + std::to_string(consecutive_failures), COLOR_RED);
                     if (consecutive_failures >= 3){
-                        go_home(env.console, context);
+                        if (PreloadSettings::instance().DEVELOPER_MODE && GlobalSettings::instance().SAVE_DEBUG_VIDEOS_ON_SWITCH){
+                            env.log("Saving debug video on Switch...");
+                            env.console.overlay().add_log("Save Debug Video on Switch");
+                            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+                            context.wait_for_all_requests();
+                        }
+                        go_home(env.console, context); // go Home to preserve game state for debugging
                         throw;
                     }
                     env.log("Error encountered. Resetting...", COLOR_RED);
@@ -494,6 +583,4 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
 }
 
 
-}  // namespace PokemonLZA
-}  // namespace NintendoSwitch
-}  // namespace PokemonAutomation
+}  // namespace PokemonAutomation::NintendoSwitch::PokemonLZA

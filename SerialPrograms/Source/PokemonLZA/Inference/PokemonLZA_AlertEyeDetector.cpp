@@ -24,9 +24,9 @@ public:
             Color(200, 100, 100), Color(255, 255, 255), 100
         )
     {
-        m_aspect_ratio_lower = 0.9;
+        m_aspect_ratio_lower = 0.5;
         m_aspect_ratio_upper = 1.1;
-        m_area_ratio_lower = 0.85;
+        m_area_ratio_lower = 0.75;
         m_area_ratio_upper = 1.1;
     }
 
@@ -45,10 +45,12 @@ AlertEyeDetector::AlertEyeDetector(
     : m_color(color)
     , m_overlay(overlay)
     , m_alert_eye_box(0.485, 0.088, 0.029, 0.034)
+    , m_initial_alert_eye_box(0.464, 0.142, 0.071, 0.074)
 {}
 
 void AlertEyeDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_alert_eye_box);
+    items.add(m_color, m_initial_alert_eye_box);
 }
 
 bool AlertEyeDetector::detect(const ImageViewRGB32& screen){
@@ -56,7 +58,7 @@ bool AlertEyeDetector::detect(const ImageViewRGB32& screen){
     const double screen_rel_size_2 = screen_rel_size * screen_rel_size;
 
     const double min_area_1080p = 300;
-    const double rmsd_threshold = 80;
+    const double rmsd_threshold = 60;
     const size_t min_area = size_t(screen_rel_size_2 * min_area_1080p);
 
     const std::vector<std::pair<uint32_t, uint32_t>> FILTERS = {
@@ -65,9 +67,14 @@ bool AlertEyeDetector::detect(const ImageViewRGB32& screen){
         { 0xffa0a0a0, 0xffffffff },
         { 0xffb0b0b0, 0xffffffff },
         { 0xffc0c0c0, 0xffffffff },
-        { 0xffd0d0d0, 0xffffffff },
-        { 0xffe0e0e0, 0xffffffff },
-        { 0xfff0f0f0, 0xffffffff },
+        // { 0xffd0d0d0, 0xffffffff },
+        // { 0xffe0e0e0, 0xffffffff },
+        // { 0xfff0f0f0, 0xffffffff },
+    };
+
+    auto match_callback = [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
+        m_last_detected = translate_to_parent(screen, m_alert_eye_box, object);
+        return true;
     };
 
     bool found = match_template_by_waterfill(
@@ -77,11 +84,20 @@ bool AlertEyeDetector::detect(const ImageViewRGB32& screen){
         FILTERS,
         {min_area, SIZE_MAX},
         rmsd_threshold,
-        [&](Kernels::Waterfill::WaterfillObject& object) -> bool {
-            m_last_detected = translate_to_parent(screen, m_alert_eye_box, object);
-            return true;
-        }
+        match_callback
     );
+
+    if (!found){
+        found = match_template_by_waterfill(
+            screen.size(),
+            extract_box_reference(screen, m_initial_alert_eye_box),
+            AlertEyeMatcher::instance(),
+            FILTERS,
+            {min_area, SIZE_MAX},
+            rmsd_threshold,
+            match_callback
+        );
+    }
 
     if (m_overlay){
         if (found){
@@ -94,6 +110,37 @@ bool AlertEyeDetector::detect(const ImageViewRGB32& screen){
     return found;
 }
 
+
+
+
+AlertEyeTracker::AlertEyeTracker(Color color, VideoOverlay* overlay, WallDuration min_duration)
+    : AlertEyeDetector(color, overlay)
+    , VisualInferenceCallback("AlertEyeTracker")
+    , m_min_duration(min_duration)
+    , m_first_detection(WallClock::max())
+{}
+
+bool AlertEyeTracker::currently_active() const{
+    ReadSpinLock lg(m_lock);
+    return m_first_detection <= current_time() - m_min_duration;
+}
+
+void AlertEyeTracker::make_overlays(VideoOverlaySet& items) const{
+    AlertEyeDetector::make_overlays(items);
+}
+
+bool AlertEyeTracker::process_frame(const ImageViewRGB32& frame, WallClock timestamp){
+    if (!detect(frame)){
+        WriteSpinLock lg(m_lock);
+        m_first_detection = WallClock::max();
+        return false;
+    }
+
+    WriteSpinLock lg(m_lock);
+    m_first_detection = std::min(m_first_detection, timestamp);
+
+    return false;
+}
 
 
 

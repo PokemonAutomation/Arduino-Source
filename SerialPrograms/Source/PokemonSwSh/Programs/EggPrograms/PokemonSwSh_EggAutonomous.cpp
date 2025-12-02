@@ -463,11 +463,13 @@ void EggAutonomous::call_flying_taxi(
     bool fly_from_overworld
 ){
     context.wait_for_all_requests();
-    env.log("Fly to reset position");
     env.console.overlay().add_log("Call Flying Taxi", COLOR_WHITE);
     if (fly_from_overworld){
         // Open menu
+        env.log("Fly from overworld to reset position");
         ssf_press_button(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY0, 160ms);
+    } else{
+        env.log("Fly from menu to reset position");
     }
 
     navigate_to_menu_app(env, env.console, context, TOWN_MAP_APP_INDEX, NOTIFICATION_ERROR_RECOVERABLE);

@@ -55,8 +55,8 @@ void AutoStory_Segment_26::run_segment(
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
     AutoStory_Checkpoint_61().run_checkpoint(env, context, options, stats);
-	AutoStory_Checkpoint_62().run_checkpoint(env, context, options, stats);
-	AutoStory_Checkpoint_63().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_62().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_63().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);

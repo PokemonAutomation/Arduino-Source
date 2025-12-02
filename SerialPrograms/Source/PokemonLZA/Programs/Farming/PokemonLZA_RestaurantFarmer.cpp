@@ -14,7 +14,7 @@
 //#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+//#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
@@ -87,19 +87,6 @@ RestaurantFarmer::RestaurantFarmer()
         10,
         0
     )
-    , MOVE_AI(
-        "<b>Move Selection AI:</b><br>"
-        "If enabled, it will be smarter with move selection.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )
-    , USE_PLUS_MOVES(
-        "<b>Use Plus Moves:</b><br>"
-        "If enabled, it will attempt to use plus moves.<br>"
-        "However, this adds a 320ms delay which may cause opponent attacks to land first.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        false
-    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
@@ -108,8 +95,7 @@ RestaurantFarmer::RestaurantFarmer()
     })
 {
     PA_ADD_OPTION(STOP_AFTER_CURRENT);
-    PA_ADD_OPTION(MOVE_AI);
-    PA_ADD_OPTION(USE_PLUS_MOVES);
+    PA_ADD_OPTION(BATTLE_AI);
 
     PA_ADD_OPTION(NUM_ROUNDS);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -145,12 +131,12 @@ bool RestaurantFarmer::run_lobby(SingleSwitchProgramEnvironment& env, ProControl
             env.console, context,
             10000ms,
             {
-                buttonA,
-                arrow,
-                dialog0,
-                dialog1,
-                item_receive,
-                battle_menu,
+                buttonA, // 0
+                arrow,   // 1
+                dialog0, // 2
+                dialog1, // 3 
+                item_receive, // 4
+                battle_menu,  // 5
             }
         );
         context.wait_for(100ms);
@@ -209,7 +195,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
 //    WallClock start = current_time();
 
     bool won = false;
-    TrainerBattleState battle_state;
+    TrainerBattleState battle_state(BATTLE_AI);
 
     while (true){
         ButtonWatcher buttonA(
@@ -238,12 +224,12 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
                 pbf_mash_button(context, BUTTON_B, 120s);
             },
             {
-                buttonA,
-                arrow,
-                item_receive,
-                dialog0,
-                dialog1,
-                battle_menu,
+                buttonA,      // 0
+                arrow,        // 1
+                item_receive, // 2
+                dialog0,      // 3
+                dialog1,      // 4
+                battle_menu,  // 5
             }
         );
 
@@ -284,26 +270,7 @@ void RestaurantFarmer::run_round(SingleSwitchProgramEnvironment& env, ProControl
 
         case 5:
             env.log("Detected battle menu.");
-#if 1
-            battle_state.attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES);
-#else
-            if (battle_state.attempt_one_attack(env, context, MOVE_AI, USE_PLUS_MOVES)){
-                rotate_duration = 100ms;
-            }else{
-                env.log("Failed to select move. Rotating camera...", COLOR_ORANGE);
-                ssf_press_button(context, BUTTON_ZL, 200ms, 400ms, 200ms);
-                if (rotate_duration > Milliseconds(0)){
-                    pbf_move_right_joystick(context, 0, 128, rotate_duration, 0ms);
-                }else{
-                    pbf_move_right_joystick(context, 255, 128, -rotate_duration, 0ms);
-                }
-                rotate_duration *= -2;
-
-                if (rotate_duration < -2000ms || rotate_duration > 2000ms){
-                    rotate_duration = 100ms;
-                }
-            }
-#endif
+            battle_state.attempt_one_attack(env, env.console, context);
             continue;
 
         default:

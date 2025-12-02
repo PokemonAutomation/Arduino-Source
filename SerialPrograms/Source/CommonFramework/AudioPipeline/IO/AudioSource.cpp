@@ -38,7 +38,7 @@ public:
     )
          : m_reader(reader)
     {
-        logger.log("AudioInputFile(): " + dumpAudioFormat(format));
+        logger.log("AudioInputFile(): " + dump_audio_format(format));
         m_source = std::make_unique<AudioFileLoader>(nullptr, file, format);
         connect(
             m_source.get(), &AudioFileLoader::bufferReady,
@@ -62,10 +62,10 @@ public:
     )
          : m_reader(reader)
     {
-        logger.log("AudioInputDevice(): " + dumpAudioFormat(format));
+        logger.log("AudioInputDevice(): " + dump_audio_format(format));
         if (!device.isFormatSupported(format)){
-//            throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Format not supported: " + dumpAudioFormat(format));
-            logger.log("Format not supported: " + dumpAudioFormat(format), COLOR_RED);
+//            throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Format not supported: " + dump_audio_format(format));
+            logger.log("Format not supported: " + dump_audio_format(format), COLOR_RED);
             return;
         }
         m_source = std::make_unique<NativeAudioSource>(device, format);
@@ -134,7 +134,7 @@ AudioSource::~AudioSource(){}
 
 AudioSource::AudioSource(Logger& logger, const std::string& file, AudioChannelFormat format, float volume_multiplier){
     QAudioFormat native_format;
-    setSampleFormatToFloat(native_format);
+    set_sample_format_to_float(native_format);
     set_format(native_format, format);
     init(format, AudioSampleFormat::FLOAT32, volume_multiplier);
     m_input_file = std::make_unique<AudioInputFile>(logger, *m_reader, file, native_format);
@@ -148,7 +148,7 @@ AudioSource::AudioSource(Logger& logger, const AudioDeviceInfo& device, AudioCha
     AudioSampleFormat stream_format = get_sample_format(native_format);
     if (stream_format == AudioSampleFormat::INVALID){
         stream_format = AudioSampleFormat::FLOAT32;
-        setSampleFormatToFloat(native_format);
+        set_sample_format_to_float(native_format);
     }
 
     init(format, stream_format, volume_multiplier);

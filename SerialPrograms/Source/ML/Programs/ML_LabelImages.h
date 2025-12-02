@@ -13,6 +13,8 @@
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "Common/Cpp/Options/StringOption.h"
+#include "Common/Cpp/Options/BooleanCheckBoxOption.h"
+#include "Common/Cpp/Color.h"
 #include "CommonFramework/Panels/PanelInstance.h"
 #include "CommonFramework/ImageTypes/ImageRGB32.h"
 #include "Pokemon/Options/Pokemon_HomeSpriteSelectOption.h"
@@ -39,6 +41,20 @@ class LabelImages_Widget;
 class LabelImages_OverlayManager;
 
 
+enum class ColorChoice{
+    BLACK,
+    RED,
+    BLUE,
+    YELLOW,
+    GREEN,
+    ORANGE,
+    MAGENTA,
+    PURPLE,
+    CYAN,
+};
+
+Color enum_to_color(ColorChoice color_choice);
+
 class LabelImages_Descriptor : public PanelDescriptor{
 public:
     LabelImages_Descriptor();
@@ -56,6 +72,8 @@ public:
     // Serialization
     virtual void from_json(const JsonValue& json) override;
     virtual JsonValue to_json() const override;
+
+    void init_sam_session(bool use_gpu);
 
     void save_annotation_to_file() const;
 
@@ -140,6 +158,8 @@ private:
     // the group option that holds rest of the options defined below:
     BatchOption m_options;
 
+    bool m_use_gpu_for_sam_anno;
+
     FloatingPointOption X;
     FloatingPointOption Y;
     FloatingPointOption WIDTH;
@@ -157,6 +177,13 @@ private:
     StringSelectCell CUSTOM_SET_LABEL;
     // source 3: editable text input
     StringCell MANUAL_LABEL;
+
+    BooleanCheckBoxOption USE_GPU_FOR_EMBEDDER_SESSION;
+
+ 
+    EnumDropdownOption<ColorChoice> SELECTED_ANNO_COLOR;
+    EnumDropdownOption<ColorChoice> UNSELECTED_ANNO_COLOR;
+    EnumDropdownOption<ColorChoice> CURRENT_DRAWN_BOX;
 
     size_t source_image_height = 0;
     size_t source_image_width = 0;

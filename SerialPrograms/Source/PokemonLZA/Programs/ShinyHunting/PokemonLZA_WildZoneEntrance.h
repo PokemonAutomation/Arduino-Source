@@ -8,16 +8,14 @@
 #define PokemonAutomation_PokemonLZA_WildZoneEntrance_H
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
+//#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h"
 #include "PokemonLZA/Programs/PokemonLZA_Locations.h"
 
-namespace PokemonAutomation {
-namespace NintendoSwitch {
-namespace PokemonLZA {
+namespace PokemonAutomation::NintendoSwitch::PokemonLZA {
 
 
 class WildZoneOption : public EnumDropdownOption<WildZone>{
@@ -55,13 +53,8 @@ private:
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
-
-    // Record when we should zoom out the map for flyable fast travel icon detection on map during fast traveling.
-    bool to_max_zoom_level_on_map = true;
 };
 
 
-}  // namespace PokemonLZA
-}  // namespace NintendoSwitch
-}  // namespace PokemonAutomation
+}  // namespace PokemonAutomation::NintendoSwitch::PokemonLZA
 #endif

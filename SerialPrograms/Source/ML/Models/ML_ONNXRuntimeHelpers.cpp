@@ -41,9 +41,11 @@ std::string create_file_hash(const std::string& filepath){
 }
 
 
-Ort::SessionOptions create_session_options(const std::string& model_cache_path){
+Ort::SessionOptions create_session_options(const std::string& model_cache_path, bool use_gpu){
     Ort::SessionOptions so;
     std::cout << "Set potential model cache path in session options: " << model_cache_path << std::endl;
+
+if (use_gpu){
 #if __APPLE__
     // create session using Apple ML acceleration library CoreML
     std::unordered_map<std::string, std::string> provider_options;
@@ -56,9 +58,37 @@ Ort::SessionOptions create_session_options(const std::string& model_cache_path){
     // provider_options["RequireStaticInputShapes"] = "0";
     // provider_options["EnableOnSubgraphs"] = "0";
     so.AppendExecutionProvider("CoreML", provider_options);
-#endif
+    std::cout << "Using CoreML execution provider for GPU acceleration" << std::endl;
+#elif _WIN32
+    // Try CUDA first for NVIDIA GPUs (best performance)
+    // CUDA requires NVIDIA GPU and CUDA runtime installation
+    // See: https://onnxruntime.ai/docs/execution-providers/CUDA-ExecutionProvider.html
+    bool cuda_available = false;
+    try {
+        OrtCUDAProviderOptions cuda_options{};
+        cuda_options.device_id = 0;
+        so.AppendExecutionProvider_CUDA(cuda_options);
+        std::cout << "Using CUDA execution provider for GPU acceleration" << std::endl;
+        cuda_available = true;
+    } catch (const Ort::Exception& e) {
+        std::cout << "CUDA execution provider not available: " << e.what() << std::endl;
+    }
 
-    // use CPU session
+    // Fallback to DirectML for all GPU vendors (NVIDIA, AMD, Intel)
+    // DirectML is built into Windows 10 1903+ and requires no additional runtime installation
+    // See: https://onnxruntime.ai/docs/execution-providers/DirectML-ExecutionProvider.html
+    if (!cuda_available) {
+        try {
+            so.AppendExecutionProvider("DML");
+            std::cout << "Using DirectML execution provider for GPU acceleration" << std::endl;
+        } catch (const Ort::Exception& e) {
+            std::cout << "DirectML execution provider not available, falling back to CPU: " << e.what() << std::endl;
+        }
+    }
+#endif
+}
+
+    // CPU fallback is always available
     return so;
 }
 

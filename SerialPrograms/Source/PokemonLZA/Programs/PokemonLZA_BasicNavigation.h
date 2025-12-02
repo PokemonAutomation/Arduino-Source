@@ -7,11 +7,13 @@
 #ifndef PokemonAutomation_PokemonLZA_BasicNavigation_H
 #define PokemonAutomation_PokemonLZA_BasicNavigation_H
 
+#include "Common/Cpp/Time.h"
 #include "PokemonLZA/Programs/PokemonLZA_Locations.h"
 
 namespace PokemonAutomation{
 
 template <typename Type> class ControllerContext;
+struct ImageFloatBox;
 
 namespace NintendoSwitch{
 
@@ -24,7 +26,8 @@ namespace PokemonLZA{
 
 //  Starting from either the overworld or the main menu, save the game.
 //  This function returns in the main menu.
-void save_game_to_menu(ConsoleHandle& console, ProControllerContext& context);
+//  Return true if the game is saved successfully, false otherwise.
+bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context);
 
 
 
@@ -55,9 +58,19 @@ bool open_map(ConsoleHandle& console, ProControllerContext& context, bool zoom_t
 //   returns, the game is in fly map.
 FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& context);
 
+// Fast travel without moving map cursor.
+// This is useful to fast travel back to the wild zone gate while in the zone.
+// This function basically just calls `open_map()` and `fly_from_map()`. See the comments of those two
+// functions for details.
+FastTravelState open_map_and_fly_in_place(ConsoleHandle& console, ProControllerContext& context, bool zoom_to_max = false);
+
 // Blind movement of map cursor from zone entrance to that zone fast travel icon on map
 // this blind movement only works on max zoom level (fully zoomed out)!
 void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProControllerContext& context, WildZone zone);
+
+// Mash button B to leave map view and back to overworld
+// If there is a day/night change, this function will wait for day/night change to finish.
+void map_to_overworld(ConsoleHandle& console, ProControllerContext& context);
 
 
 // Assuming the player character is facing the bench with buton A available, this function
@@ -71,6 +84,53 @@ void wait_until_overworld(
     std::chrono::milliseconds max_wait_time = std::chrono::seconds(40)
 );
 
+// Read the minimap to get the direction the blue directional arrow is facing. The arrow
+// represents which direction the player character is facing.
+// If day/night change happens to appear during reading the minimap, it will wait until
+// the day/night hange finishes.
+// Return a float of [0.0, 360.0), the angle of the arrow using the clock setting, i.e.
+// - Pointing upwards is 0.0 degree.
+// - Pointing to the right is 90.0 degrees.
+double get_facing_direction(ConsoleHandle& console, ProControllerContext& context);
+
+// Given two facing directions, find the angle between them. The angle range is [0, 180).
+double get_angle_between_facing_directions(double dir1, double dir2);
+
+// While at the gate in the zone, mash A to leave the zone. If day/night changes while
+// leaving, it will wait until the change is done.
+// Return true if there is no day/night change.
+// Return false if day/night change happens. In this case, we don't know if the player
+// character is still inside the zone or not.
+// Note:
+// We don't want to mash A after a day/night change to ensure we leave the zone because
+// at Wild Zone 4 there are talkable npcs outside the gate. Button A appears on them.
+// If the program mashes A after leaving the zone, it will stuck talking to the npcs.
+bool leave_zone_gate(ConsoleHandle& console, ProControllerContext& context);
+
+// Run towards a wild zone until either button A is detected at specified box region,
+// or day/night change happens. If day/night changes, it will wait until the transition
+// animation is done.
+// Return
+// -  0 if button A is detected
+// -  1 if day/night change happens
+// - -1 if it does not reach the gate in the end. Possible reasons are wrong run direction
+//   or get stuck by terrain or obstacle on the way
+int run_towards_wild_zone_gate(
+    ConsoleHandle& console, ProControllerContext& context,
+    uint8_t run_direction_x, uint8_t run_direction_y,
+    Milliseconds run_time
+);
+
+// Run a straight line in the overworld, for *duration* long or until a day/night change happens.
+// If day/night changes, it will wait until the transition animation is done.
+// Return
+// -  0 if a day/night change detected
+// - -1 it ran for full *duration* without a day/night change
+int run_a_straight_path_in_overworld(
+    ConsoleHandle& console, ProControllerContext& context,
+    uint8_t direction_x, uint8_t direction_y,
+    PokemonAutomation::Milliseconds duration
+);
 
 }
 }

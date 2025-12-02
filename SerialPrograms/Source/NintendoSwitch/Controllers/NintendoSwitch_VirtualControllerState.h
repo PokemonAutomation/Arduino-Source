@@ -7,29 +7,17 @@
 #ifndef PokemonAutomation_NintendoSwitch_VirtualControllerState_H
 #define PokemonAutomation_NintendoSwitch_VirtualControllerState_H
 
-#include "Controllers/KeyboardInput/KeyboardInput.h"
+//#include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch_ControllerButtons.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class ProControllerState : public ControllerState{
-public:
-    virtual void clear() override;
-    virtual bool operator==(const ControllerState& x) const override;
-    virtual bool is_neutral() const override;
+class ProControllerState;
+class JoyconState;
 
-    virtual JsonObject serialize_state() const override;
 
-public:
-    Button buttons = BUTTON_NONE;
-    DpadPosition dpad = DPAD_NONE;
-    uint8_t left_x = 128;
-    uint8_t left_y = 128;
-    uint8_t right_x = 128;
-    uint8_t right_y = 128;
-};
 
 struct ProControllerDeltas{
     Button buttons = BUTTON_NONE;
@@ -47,20 +35,6 @@ struct ProControllerDeltas{
 };
 
 
-
-class JoyconState : public ControllerState{
-public:
-    virtual void clear() override;
-    virtual bool operator==(const ControllerState& x) const override;
-    virtual bool is_neutral() const override;
-
-    virtual JsonObject serialize_state() const override;
-
-public:
-    Button buttons = BUTTON_NONE;
-    uint8_t joystick_x = 128;
-    uint8_t joystick_y = 128;
-};
 
 struct JoyconDeltas{
     Button buttons = BUTTON_NONE;

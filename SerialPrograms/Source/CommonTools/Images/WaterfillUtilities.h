@@ -61,7 +61,8 @@ bool match_template_by_waterfill(
     const std::vector<std::pair<uint32_t, uint32_t>> &filters,
     const std::pair<size_t, size_t>& area_thresholds,
     double rmsd_threshold,
-    std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object);
+    std::function<bool(Kernels::Waterfill::WaterfillObject& object)> check_matched_object
+);
 
 // Draw matrix on an image. Used for debugging the matrix.
 // color: color of the pixels from the matrix to render on the image.

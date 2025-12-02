@@ -69,13 +69,11 @@ public:
     const JsonValue*    get_value   (const std::string& key) const;
           JsonValue*    get_value   (const std::string& key);
 
-#if 0
     //  Convert to the specified type. If the type doesn't match, return the default.
-    bool        to_boolean  (const std::string& key, bool default_value = false) const;
-    int64_t     to_integer  (const std::string& key, int64_t default_value = 0) const;
-    double      to_double   (const std::string& key, double default_value = 0) const;
-    std::string to_string   (const std::string& key, const char* default_value = "") const;
-#endif
+    bool        get_boolean_default (const std::string& key, bool default_value = false) const;
+    int64_t     get_integer_default (const std::string& key, int64_t default_value = 0) const;
+    double      get_double_default  (const std::string& key, double default_value = 0) const;
+    std::string get_string_default  (const std::string& key, const char* default_value = "") const;
 
     //  Attempt to read this value at the specified key.
     //  If the key exists and the type matches, the value is assigned to "value" and returns true.

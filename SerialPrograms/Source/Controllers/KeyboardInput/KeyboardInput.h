@@ -10,7 +10,7 @@
 #include <map>
 #include <condition_variable>
 #include <Qt>
-#include "Common/Cpp/Json/JsonObject.h"
+//#include "Common/Cpp/Json/JsonValue.h"
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "Controllers/Controller.h"
@@ -21,26 +21,6 @@
 class QKeyEvent;
 
 namespace PokemonAutomation{
-
-
-class ControllerSession;
-
-
-
-
-class ControllerState{
-public:
-    virtual ~ControllerState() = default;
-
-    virtual void clear() = 0;
-
-    virtual bool operator==(const ControllerState& x) const = 0;
-    virtual bool operator!=(const ControllerState& x) const{ return !(*this == x); }
-
-    virtual bool is_neutral() const = 0;
-
-    virtual JsonObject serialize_state() const {return JsonObject();};
-};
 
 
 

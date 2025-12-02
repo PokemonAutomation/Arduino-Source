@@ -78,6 +78,7 @@ void pbf_controller_state(
 ){
     context->issue_full_controller_state(
         &context,
+        true,
         ticks*8ms,
         button, position,
         left_x, left_y,
@@ -94,6 +95,7 @@ void pbf_controller_state(
 ){
     context->issue_full_controller_state(
         &context,
+        true,
         duration,
         button, position,
         left_x, left_y,
@@ -125,9 +127,10 @@ void pbf_controller_state(
 ){
     context->issue_full_controller_state(
         &context,
+        true,
+        duration,
         button,
-        x, y,
-        duration
+        x, y
     );
 }
 

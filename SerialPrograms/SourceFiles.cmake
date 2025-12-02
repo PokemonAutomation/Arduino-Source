@@ -645,6 +645,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerSelectorWidget.h
     Source/Controllers/ControllerSession.cpp
     Source/Controllers/ControllerSession.h
+    Source/Controllers/ControllerState.cpp
+    Source/Controllers/ControllerState.h
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
@@ -940,10 +942,14 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_JoyconState.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_JoyconState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.cpp
+    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
@@ -1568,6 +1574,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/Boxes/PokemonLZA_IvJudgeReader.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.cpp
     Source/PokemonLZA/Inference/Map/PokemonLZA_DirectionArrowDetector.h
+    Source/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.cpp
+    Source/PokemonLZA/Inference/Map/PokemonLZA_LocationNameReader.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.cpp
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h
     Source/PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.cpp
@@ -1586,6 +1594,10 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Inference/PokemonLZA_OverworldPartySelectionDetector.h
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.cpp
     Source/PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h
+    Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.cpp
+    Source/PokemonLZA/InferenceTraining/PokemonLZA_GenerateLocationNameOCR.h
+    Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.cpp
+    Source/PokemonLZA/Options/PokemonLZA_BattleAIOption.h
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.cpp
     Source/PokemonLZA/Options/PokemonLZA_ShinyDetectedAction.h
     Source/PokemonLZA/PokemonLZA_Panels.cpp
@@ -1594,6 +1606,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/PokemonLZA_Settings.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_FriendshipFarmer.h
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_InPlaceCatcher.cpp
+    Source/PokemonLZA/Programs/Farming/PokemonLZA_InPlaceCatcher.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.cpp
     Source/PokemonLZA/Programs/Farming/PokemonLZA_JacintheInfiniteFarmer.h
     Source/PokemonLZA/Programs/Farming/PokemonLZA_MegaShardFarmer.cpp
@@ -1623,12 +1637,18 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.h
-    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_CafeReset.cpp
-    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_CafeReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_SewerHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_SewerHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldReset.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShuttleRun.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShuttleRun.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneCafe.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneCafe.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_WildZoneEntrance.h
     Source/PokemonLZA/Programs/TestPrograms/PokemonLZA_MoveBoxArrow.cpp

@@ -27,7 +27,6 @@ std::vector<std::string> find_images_in_folder(const std::string& folder_path, b
 
 void export_image_annotations_to_yolo_dataset(
     const std::string& image_folder_path,
-    const std::string& annotation_folder_path,
     const std::string& yolo_dataset_path
 );
 

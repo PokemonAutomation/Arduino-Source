@@ -55,6 +55,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_display_session(m_display_option)
     , m_options(LockMode::UNLOCK_WHILE_RUNNING)
+    , m_use_gpu_for_sam_anno(true)
     , X("<b>X Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , Y("<b>Y Coordinate:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.3, 0.0, 1.0)
     , WIDTH("<b>Width:</b>", LockMode::UNLOCK_WHILE_RUNNING, 0.4, 0.0, 1.0)
@@ -65,11 +66,63 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
     , CUSTOM_LABEL_DATABASE(create_string_select_database({"mc"})) // mc for "main character"
     , CUSTOM_SET_LABEL(CUSTOM_LABEL_DATABASE, LockMode::UNLOCK_WHILE_RUNNING, 0)
     , MANUAL_LABEL(false, LockMode::UNLOCK_WHILE_RUNNING, "", "Custom Label", true)
+    , USE_GPU_FOR_EMBEDDER_SESSION("<b>Enable GPU for Embedder session:</b>", LockMode::LOCK_WHILE_RUNNING, true) 
+    , SELECTED_ANNO_COLOR(
+        "<b>Color of selected annotation:",
+        {
+            {ColorChoice::BLACK,         "black",           "Black"},
+            {ColorChoice::RED,         "red",           "Red"},
+            {ColorChoice::BLUE,         "blue",           "Blue"},
+            {ColorChoice::YELLOW,         "yellow",           "Yellow"},
+            {ColorChoice::GREEN,         "green",           "Green"},
+            {ColorChoice::ORANGE,         "orange",           "Orange"},
+            {ColorChoice::MAGENTA,         "magenta",           "Magenta"},
+            {ColorChoice::PURPLE,         "purple",           "Purple"},
+            {ColorChoice::CYAN,         "cyan",           "Cyan"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        ColorChoice::BLACK
+    )
+    , UNSELECTED_ANNO_COLOR(
+        "<b>Color of unselected annotation:",
+        {
+            {ColorChoice::BLACK,         "black",           "Black"},
+            {ColorChoice::RED,         "red",           "Red"},
+            {ColorChoice::BLUE,         "blue",           "Blue"},
+            {ColorChoice::YELLOW,         "yellow",           "Yellow"},
+            {ColorChoice::GREEN,         "green",           "Green"},
+            {ColorChoice::ORANGE,         "orange",           "Orange"},
+            {ColorChoice::MAGENTA,         "magenta",           "Magenta"},
+            {ColorChoice::PURPLE,         "purple",           "Purple"},
+            {ColorChoice::CYAN,         "cyan",           "Cyan"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        ColorChoice::BLUE
+    )
+    , CURRENT_DRAWN_BOX(
+        "<b>Color of current drawn box:",
+        {
+            {ColorChoice::BLACK,         "black",           "Black"},
+            {ColorChoice::RED,         "red",           "Red"},
+            {ColorChoice::BLUE,         "blue",           "Blue"},
+            {ColorChoice::YELLOW,         "yellow",           "Yellow"},
+            {ColorChoice::GREEN,         "green",           "Green"},
+            {ColorChoice::ORANGE,         "orange",           "Orange"},
+            {ColorChoice::MAGENTA,         "magenta",           "Magenta"},
+            {ColorChoice::PURPLE,         "purple",           "Purple"},
+            {ColorChoice::CYAN,         "cyan",           "Cyan"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        ColorChoice::RED
+    )
 {
     ADD_OPTION(LABEL_TYPE);
     ADD_OPTION(FORM_LABEL);
     ADD_OPTION(CUSTOM_SET_LABEL);
     ADD_OPTION(MANUAL_LABEL);
+    ADD_OPTION(USE_GPU_FOR_EMBEDDER_SESSION);
+    ADD_OPTION(SELECTED_ANNO_COLOR);
+    ADD_OPTION(UNSELECTED_ANNO_COLOR);
  
     X.add_listener(*this);
     Y.add_listener(*this);
@@ -82,16 +135,7 @@ LabelImages::LabelImages(const LabelImages_Descriptor& descriptor)
 
 
 
-    // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
-    const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
-    if (std::filesystem::exists(sam_model_path)){
-        m_sam_session = std::make_unique<SAMSession>(sam_model_path);
-    } else{
-        std::cerr << "Error: no such SAM model path " << sam_model_path << "." << std::endl;
-        QMessageBox box;
-        box.critical(nullptr, "SAM Model Does Not Exist",
-            QString::fromStdString("SAM model path" + sam_model_path + " does not exist."));
-    }
+    init_sam_session(true);
 
     m_overlay_manager = new LabelImages_OverlayManager(*this);
 }
@@ -132,6 +176,21 @@ JsonValue LabelImages::to_json() const{
 
     save_annotation_to_file();
     return obj;
+}
+
+void LabelImages::init_sam_session(bool use_gpu){
+    // , m_sam_session{RESOURCE_PATH() + "ML/sam_cpu.onnx"}
+
+    const std::string sam_model_path = RESOURCE_PATH() + "ML/sam_cpu.onnx";
+    if (std::filesystem::exists(sam_model_path)){
+        m_sam_session = std::make_unique<SAMSession>(sam_model_path, use_gpu);
+    } else{
+        std::cerr << "Error: no such SAM model path " << sam_model_path << "." << std::endl;
+        QMessageBox box;
+        box.critical(nullptr, "SAM Model Does Not Exist",
+            QString::fromStdString("SAM model path" + sam_model_path + " does not exist."));
+    }
+
 }
 
 void LabelImages::save_annotation_to_file() const{
@@ -183,8 +242,7 @@ void LabelImages::load_image_related_data(const std::string& image_path, size_t 
     const std::string anno_filename = std::filesystem::path(image_path).filename().replace_extension(".json").string();
     const std::string image_folder_path = std::filesystem::path(image_path).parent_path().string() + "/";
 
-    // std::filesystem::create_directory(ML_ANNOTATION_PATH());
-    m_annotation_file_path = image_folder_path + anno_filename; // ML_ANNOTATION_PATH() + anno_filename;
+    m_annotation_file_path = image_folder_path + anno_filename;
     if (!std::filesystem::exists(m_annotation_file_path)){
         cout << "Annotataion output path, " << m_annotation_file_path << " does not exist yet" << endl;
         return;
@@ -306,13 +364,47 @@ bool LabelImages::run_sam_to_create_annotation(
         input_point_labels[inclusion_points.size() + i] = 0;
     }
 
-    m_sam_session->run(
-        m_image_embedding,
-        (int)source_height, (int)source_width, input_points, input_point_labels,
-        {static_cast<int>(user_box.min_x), static_cast<int>(user_box.min_y), static_cast<int>(user_box.max_x)-1, static_cast<int>(user_box.max_y)-1},
-        m_output_boolean_mask
-    );
+    // fall back to CPU if fails with GPU.
+    for(size_t i = 0; i < 2; i++){
+        try{
+            // if (m_use_gpu_for_sam_anno){ throw Ort::Exception("Testing.", ORT_FAIL); }  // to simulate GPU/CPU failure
+            m_sam_session->run(
+                m_image_embedding,
+                (int)source_height, (int)source_width, input_points, input_point_labels,
+                {static_cast<int>(user_box.min_x), static_cast<int>(user_box.min_y), static_cast<int>(user_box.max_x)-1, static_cast<int>(user_box.max_y)-1},
+                m_output_boolean_mask
+            );
+            break;
+        }catch(Ort::Exception& e){
+            if (m_use_gpu_for_sam_anno){
+                std::cerr << "Warning: SAM session failed using the GPU. Will reattempt with the CPU.\n" << e.what() << std::endl;
+                m_use_gpu_for_sam_anno = false;
+                init_sam_session(m_use_gpu_for_sam_anno);
+            }else{
+                std::cerr << "Error: SAM session failed even when using the CPU.\n" << e.what() << std::endl;
+                QMessageBox box;
+                box.warning(nullptr, "Error:",
+                    QString::fromStdString("Error: SAM session failed."));
+                return false;
+            }
+        }catch(...){
+            std::cerr << "Error: Unknown error." << std::endl;
+            QMessageBox box;
+            box.warning(nullptr, "Error:",
+                QString::fromStdString("Error: Unknown error. SAM session failed."));
+            return false;
 
+        }
+
+        if (i > 0){
+            std::cerr << "Internal Program Error: This section of code shouldn't be reachable." << std::endl;
+            QMessageBox box;
+            box.warning(nullptr, "Error:",
+                QString::fromStdString("Internal Program Error: This section of code shouldn't be reachable."));
+            return false;
+        }
+        
+    }
     size_t min_mask_x = INT_MAX, max_mask_x = 0;
     size_t min_mask_y = INT_MAX, max_mask_y = 0;
     for (size_t y = 0; y < source_height; y++){
@@ -418,7 +510,7 @@ void LabelImages::remove_segmentation_exclusion_point(double x, double y){
 void LabelImages::compute_embeddings_for_folder(const std::string& image_folder_path){
     std::string embedding_model_path = RESOURCE_PATH() + "ML/sam_embedder_cpu.onnx";
     std::cout << "Use SAM Embedding model " << embedding_model_path << std::endl;
-    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path);
+    ML::compute_embeddings_for_folder(embedding_model_path, image_folder_path, USE_GPU_FOR_EMBEDDER_SESSION);
 }
 
 void LabelImages::delete_selected_annotation(){
@@ -434,14 +526,16 @@ void LabelImages::delete_selected_annotation(){
         return;
     }
 
-    if (m_selected_obj_idx >= m_annotations.size()){
-        m_selected_obj_idx = m_annotations.size() - 1;
-    } else{
-        // no change to the currently selected index
-    }
+    // if (m_selected_obj_idx >= m_annotations.size()){
+    //     m_selected_obj_idx = m_annotations.size() - 1;
+    // } else{
+    //     // no change to the currently selected index
+    // }
 
-    std::string cur_label = m_annotations[m_selected_obj_idx].label;
-    set_selected_label(cur_label);
+    
+    m_selected_obj_idx = m_annotations.size();  // don't select anything after deleting an object, but keep the old selected label
+    std::string old_label = selected_label();
+    set_selected_label(old_label);
     update_rendered_objects();
 }
 
@@ -450,11 +544,14 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
     if (source_image_width == 0 || source_image_height == 0 || m_annotations.size() == 0){
         return;
     }
+    const size_t screen_normalize_factor = (source_image_height/1080);
 
     std::pair<size_t, size_t> p = float_to_pixel(x, y);
 
     const size_t old_selected_idx = m_selected_obj_idx;
     
+    m_selected_obj_idx = m_annotations.size();  // de-select annotations by default, when clicking the screen
+
     size_t closest_distance = SIZE_MAX;
     std::vector<size_t> zero_distance_annotations;
     for(size_t i = 0; i < m_annotations.size(); i++){
@@ -466,7 +563,10 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
         }
         if (d2 < closest_distance){
             closest_distance = d2;
-            m_selected_obj_idx = i;
+            if (d2 < (500 * screen_normalize_factor * screen_normalize_factor)){
+                m_selected_obj_idx = i; // only select the object if the mouse click is very close to the object box, or within it.
+            }
+            
         }
     }
 
@@ -484,7 +584,11 @@ void LabelImages::change_annotation_selection_by_mouse(double x, double y){
         }
     }
 
-    if (old_selected_idx != m_selected_obj_idx){
+    if (m_selected_obj_idx == m_annotations.size()){ // no annotation selected
+        std::string old_label = selected_label();
+        set_selected_label(old_label);
+        update_rendered_objects();
+    }else if (old_selected_idx != m_selected_obj_idx){ // different object selected
         std::string new_label = m_annotations[m_selected_obj_idx].label;
         set_selected_label(new_label);
         update_rendered_objects();
@@ -641,9 +745,37 @@ std::pair<double, double> LabelImages::pixel_to_float(size_t x, size_t y) const{
 void LabelImages::export_to_yolov5_dataset(const std::string& image_folder_path, const std::string& dataset_path){
     m_yolo_config_file_path = dataset_path;
 
-    export_image_annotations_to_yolo_dataset(image_folder_path, image_folder_path, dataset_path); // image_folder_path, ML_ANNOTATION_PATH(), dataset_path);
+    export_image_annotations_to_yolo_dataset(image_folder_path, dataset_path);
 }
 
+Color enum_to_color(ColorChoice color_choice){
+    switch(color_choice){
+    case ColorChoice::BLACK:
+        return COLOR_BLACK;
+    case ColorChoice::RED:
+        return COLOR_RED;
+    case ColorChoice::BLUE:
+        return COLOR_BLUE;
+    case ColorChoice::YELLOW:
+        return COLOR_YELLOW;
+    case ColorChoice::GREEN:
+        return COLOR_GREEN;
+    case ColorChoice::ORANGE:
+        return COLOR_ORANGE;
+    case ColorChoice::MAGENTA:
+        return COLOR_MAGENTA;
+    case ColorChoice::PURPLE:
+        return COLOR_PURPLE;
+    case ColorChoice::CYAN:
+        return COLOR_CYAN;
+    default:
+        QMessageBox box;
+        box.warning(nullptr, "Error:",
+            QString::fromStdString("Error: Unknown color selected."));
+        return COLOR_BLACK;
+        
+    }
+}
 
 }
 }

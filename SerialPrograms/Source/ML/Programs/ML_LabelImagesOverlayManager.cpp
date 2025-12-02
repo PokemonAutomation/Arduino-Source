@@ -33,12 +33,12 @@ LabelImages_OverlayManager::LabelImages_OverlayManager(LabelImages& program)
     const size_t strip_size = 5, strip_start = (21 - 5) / 2;
     for(size_t y = 0; y < strip_size; y++){
         for(size_t x = 0; x < m_inclusion_point_icon_template.width(); x++){
-            m_inclusion_point_icon_template.pixel(x, y+strip_start) = uint32_t(COLOR_RED);
+            m_inclusion_point_icon_template.pixel(x, y+strip_start) = uint32_t(enum_to_color(m_program.CURRENT_DRAWN_BOX));
         }
     }
     for(size_t y = 0; y < m_inclusion_point_icon_template.height(); y++){
         for(size_t x = 0; x < strip_size; x++){
-            m_inclusion_point_icon_template.pixel(x+strip_start, y) = uint32_t(COLOR_RED);
+            m_inclusion_point_icon_template.pixel(x+strip_start, y) = uint32_t(enum_to_color(m_program.CURRENT_DRAWN_BOX));
         }
     }
 
@@ -90,7 +90,7 @@ void LabelImages_OverlayManager::update_rendered_annotations(){
         return;
     }
     if (m_program.WIDTH > 0.0 && m_program.HEIGHT > 0.0){
-        m_overlay_set.add(COLOR_RED, {m_program.X, m_program.Y, m_program.WIDTH, m_program.HEIGHT});
+        m_overlay_set.add(enum_to_color(m_program.CURRENT_DRAWN_BOX), {m_program.X, m_program.Y, m_program.WIDTH, m_program.HEIGHT});
     }
 
     const auto& annotations = m_program.m_annotations;
@@ -105,7 +105,7 @@ void LabelImages_OverlayManager::update_rendered_annotations(){
         if (form != nullptr){
             label = form->display_name();
         }
-        Color mask_box_color = (i_obj == m_selected) ? COLOR_BLACK : COLOR_BLUE;
+        Color mask_box_color = (i_obj == m_selected) ? enum_to_color(m_program.SELECTED_ANNO_COLOR) : enum_to_color(m_program.UNSELECTED_ANNO_COLOR);
         m_overlay_set.add(mask_box_color, mask_float_box, label);
         size_t mask_width = obj.mask_box.width();
         size_t mask_height = obj.mask_box.height();

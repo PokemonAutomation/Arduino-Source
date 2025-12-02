@@ -166,10 +166,15 @@ void close_game_from_home(ConsoleHandle& console, ControllerContext& context){
 
         CloseGameWatcher close_game(console);
         HomeMenuWatcher home(console);
+        StartGameUserSelectWatcher user_select(console, COLOR_GREEN);
         int ret = wait_until(
             console, context,
             Seconds(10), 
-            {close_game, home}
+            {
+                close_game,
+                home,
+                user_select,
+            }
         );
 
         switch(ret){
@@ -209,6 +214,12 @@ void close_game_from_home(ConsoleHandle& console, ControllerContext& context){
             }
 
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "close_game_from_home: Unexpected state.");  
+
+        case 2:
+            console.log("Detected user select. (unexpected)", COLOR_RED);
+            pbf_mash_button(context, BUTTON_B, 500ms);
+            seen_close_game = true;
+            continue;
 
         default:
             OperationFailedException::fire(

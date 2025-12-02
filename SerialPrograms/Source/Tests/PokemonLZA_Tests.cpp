@@ -356,6 +356,7 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
     size_t color_index = 0;
 #endif
 
+    std::map<MapIconType, std::vector<PokemonAutomation::DetectedBox>> detected_boxes;
     for (const auto& pair : expected_counts){
         MapIconType icon_type = pair.first;
 
@@ -363,10 +364,10 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
         MapIconDetector detector(COLOR_RED, icon_type, ImageFloatBox(0.0, 0.0, 1.0, 1.0));
         detector.detect(image);
 
-        const auto& detections = detector.last_detected();
-        // TODO: current we may detect two boxes around the same icon
-        int detected_count = (int)detections.size();
+        detected_boxes[icon_type] = detector.last_detected();
+        const auto& detections = detected_boxes[icon_type];
 
+        int detected_count = (int)detections.size();
         std::string icon_type_name = map_icon_type_to_string(icon_type);
 
 #ifdef SAVE_DEBUG_IMAGE
@@ -376,13 +377,12 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
         // Draw detected boxes on debug image
         for (const auto& detection : detections){
             const auto& box = detection.box;
-            cout << "  Box: x=" << box.min_x << ", y=" << box.min_y
-                    << ", width=" << box.width() << ", height=" << box.height() << endl;
+            cout << "  Box: x=" << box.x << ", y=" << box.y
+                    << ", width=" << box.width << ", height=" << box.height << endl;
 #ifdef SAVE_DEBUG_IMAGE
             draw_box(debug_image, detection.box, box_color);
 #endif
         }
-        TEST_RESULT_COMPONENT_EQUAL(detected_count, pair.second, icon_type_name);
     }
 
 #ifdef SAVE_DEBUG_IMAGE
@@ -391,6 +391,15 @@ int test_pokemonLZA_MapIconDetector(const std::string& filepath){
     debug_image.save(debug_path.toStdString());
     cout << "Debug image saved to: " << debug_path.toStdString() << endl;
 #endif
+
+    // test detection
+    for (const auto& pair : expected_counts){
+        MapIconType icon_type = pair.first;
+        const auto& detections = detected_boxes[icon_type];
+        int detected_count = (int)detections.size();
+        std::string icon_type_name = map_icon_type_to_string(icon_type);
+        TEST_RESULT_COMPONENT_EQUAL(detected_count, pair.second, icon_type_name);
+    }
 
     return 0;
 }

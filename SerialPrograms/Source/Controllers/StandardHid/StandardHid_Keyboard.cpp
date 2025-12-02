@@ -9,6 +9,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonTools/Async/InterruptableCommands.tpp"
 #include "CommonTools/Async/SuperControlSession.tpp"
+#include "Controllers/ControllerState.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "StandardHid_Keyboard_KeyMappings.h"
 #include "StandardHid_Keyboard.h"

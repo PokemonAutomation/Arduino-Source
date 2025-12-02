@@ -1,0 +1,67 @@
+name: Check for Tabs
+on: [push, pull_request]
+
+jobs:
+  no-tabs:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Fail if tabs are found in source files
+        # Exclude specific file types if necessary (e.g., binaries, .md files, etc.)
+        run: |
+          # Define folders to check
+          FOLDERS=("Common" "SerialPrograms")
+          
+          # Define file extensions to check
+          EXTENSIONS=("h" "c" "cpp" "tpp")
+          
+          echo "Searching for Git-tracked files with tabs..."
+          echo "Folders: ${FOLDERS[@]}"
+          echo "Extensions: ${EXTENSIONS[@]}"
+          echo ""
+          
+          # Build git ls-files patterns
+          PATTERNS=()
+          for folder in "${FOLDERS[@]}"; do
+            for ext in "${EXTENSIONS[@]}"; do
+              PATTERNS+=("$folder/**/*.$ext")
+            done
+          done
+          
+          # Get all matching Git-tracked files
+          ALL_FILES=$(git ls-files "${PATTERNS[@]}" 2>/dev/null | sort -u)
+          
+          if [ -z "$ALL_FILES" ]; then
+            echo "No Git-tracked source files found to check"
+            exit 0
+          fi
+          
+          echo "Found $(echo "$ALL_FILES" | wc -l) files to check"
+          echo ""
+          
+          # Check each file for tabs
+          FILES_WITH_TABS=""
+          while IFS= read -r file; do
+            if [ -f "$file" ] && grep -q $'\t' "$file" 2>/dev/null; then
+              FILES_WITH_TABS+="$file"$'\n'
+            fi
+          done <<< "$ALL_FILES"
+          
+          # Check results and print
+          if [ -n "$FILES_WITH_TABS" ]; then
+            echo "::error::The following files contain tabs:"
+            echo ""
+            echo "$FILES_WITH_TABS" | while IFS= read -r file; do
+              if [ -n "$file" ]; then
+                echo "  $file"
+                echo "::error file=$file::File contains tabs"
+              fi
+            done
+            echo ""
+            echo "Please replace tabs with spaces in the files listed above."
+            exit 1
+          else
+            echo "✓ No tabs found in any Git-tracked source files"
+          fi

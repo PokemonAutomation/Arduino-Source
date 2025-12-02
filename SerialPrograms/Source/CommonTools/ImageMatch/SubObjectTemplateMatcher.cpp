@@ -97,12 +97,14 @@ void SubObjectTemplateMatcher::set_subobject(const WaterfillObject& subobject_in
     m_subobject_area_ratio = subobject_in_object.area_ratio();
 }
 bool SubObjectTemplateMatcher::check_aspect_ratio(size_t candidate_width, size_t candidate_height) const{
-//    double expected_aspect_ratio = (double)m_subobject_in_object_p.width() / m_subobject_in_object_p.height();
-//    double actual_aspect_ratio = (double)width / height;
+#if 0
+    double expected_aspect_ratio = (double)m_subobject_in_object_p.width() / m_subobject_in_object_p.height();
+    double actual_aspect_ratio = (double)candidate_width / candidate_height;
 //    double error = actual_aspect_ratio / expected_aspect_ratio;
 
-//    cout << "expected_aspect_ratio = " << expected_aspect_ratio << endl;
-//    cout << "actual_aspect_ratio = " << actual_aspect_ratio << endl;
+    cout << "expected_aspect_ratio = " << expected_aspect_ratio << endl;
+    cout << "actual_aspect_ratio = " << actual_aspect_ratio << endl;
+#endif
 
     double error = (double)m_subobject_in_object_p.width() * candidate_height;
     error /= (double)m_subobject_in_object_p.height() * candidate_width;

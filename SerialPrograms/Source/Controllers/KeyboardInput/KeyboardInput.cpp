@@ -9,6 +9,7 @@
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Options/Environment/PerformanceOptions.h"
+#include "Controllers/ControllerState.h"
 #include "Controllers/KeyboardInput/GlobalQtKeyMap.h"
 #include "KeyboardInput.h"
 

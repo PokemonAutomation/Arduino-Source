@@ -82,12 +82,19 @@ public:
     }
     virtual VideoSnapshot snapshot_latest_blocking() = 0;
 
-    //
     //  This is a non-blocking snapshot function. It will never block, but it
-    //  is not guaranteed to return the absolute latest snapshot.
+    //  is not guaranteed to return the absolute latest snapshot or even a
+    //  valid snapshot at all.
     //
     //  If this returns a null snapshot, it can mean either that the video
-    //  isn't available or that no snapshot (>= min_time) is ready.
+    //  isn't available or that no snapshot is cached and converted
+    //  to ImageRGB32 in the time range: >= min_time.
+    //
+    //  Converted frame cache is created by calling snapshot_latest_blocking() or
+    //  snapshot_recent_nonblocking(). In addition to looking for recent converted
+    //  frames, the latter also dispatches latest raw frames for conversion
+    //  asynchronously so future snapshot_recent_nonblocking() calls can return
+    //  valid frames.
     //
     //  Implementations must be able to handle calls to this at high rate from
     //  many different threads simultaneously. So it should perform caching.
@@ -96,7 +103,6 @@ public:
     //  will be taken as a hint for future calls. Thus the first call to this
     //  function will begin prefetch conversions of frames so they are ready
     //  on future calls.
-    //
     virtual VideoSnapshot snapshot_recent_nonblocking(WallClock min_time) = 0;
 
 

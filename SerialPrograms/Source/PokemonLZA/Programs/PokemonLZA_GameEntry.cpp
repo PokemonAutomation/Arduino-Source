@@ -32,24 +32,41 @@ bool reset_game_to_gamemenu(
 //  mash A to enter the game and wait until the black screen is gone.
 bool gamemenu_to_ingame(
     VideoStream& stream, ProControllerContext& context,
-    Milliseconds mash_duration, Milliseconds enter_game_timeout
+    Milliseconds enter_game_timeout
 ){
     stream.log("Mashing A to enter game...");
-    BlackScreenOverWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
-    pbf_mash_button(context, BUTTON_A, mash_duration);
-    context.wait_for_all_requests();
-    stream.log("Waiting to enter game...");
-    int ret = wait_until(
-        stream, context,
-        std::chrono::milliseconds(enter_game_timeout),
-        {{detector}}
-    );
-    if (ret == 0){
-        stream.log("Entered game!");
-        return true;
-    }else{
-        stream.log("Timed out waiting to enter game.", COLOR_RED);
-        return false;
+    {
+        BlackScreenWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
+        stream.log("Waiting to enter game...");
+        int ret = run_until<ProControllerContext>(
+            stream, context,
+            [](ProControllerContext& context){
+                pbf_mash_button(context, BUTTON_A, 2s);
+            },
+            {{detector}}
+        );
+        if (ret != 0){
+            stream.log("Timed out waiting for black screen.", COLOR_RED);
+            return false;
+        }
+    }
+
+    stream.log("Black screen detected");
+
+    {
+        BlackScreenOverWatcher detector(COLOR_RED, {0.1, 0.04, 0.8, 0.3});
+        int ret = wait_until(
+            stream, context,
+            std::chrono::milliseconds(enter_game_timeout),
+            {{detector}}
+        );
+        if (ret == 0){
+            stream.log("Entered game!");
+            return true;
+        }else{
+            stream.log("Timed out waiting to enter game.", COLOR_RED);
+            return false;
+        }
     }
 }
 
@@ -57,7 +74,6 @@ bool reset_game_from_home(
     ProgramEnvironment& env,
     ConsoleHandle& console, ProControllerContext& context,
     bool backup_save,
-    Milliseconds enter_game_mash,
     Milliseconds enter_game_timeout,
     Milliseconds post_wait_time
 ){
@@ -75,7 +91,6 @@ bool reset_game_from_home(
 
     ok &= gamemenu_to_ingame(
         console, context,
-        enter_game_mash,
         enter_game_timeout
     );
     if (!ok){
@@ -95,7 +110,6 @@ bool reset_game_from_home(
     return reset_game_from_home(
         env, console, context,
         backup_save,
-        GameSettings::instance().ENTER_GAME_MASH0,
         GameSettings::instance().ENTER_GAME_WAIT,
         post_wait_time
     );

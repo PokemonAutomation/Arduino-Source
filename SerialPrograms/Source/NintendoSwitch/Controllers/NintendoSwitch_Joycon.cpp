@@ -11,6 +11,7 @@
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_VirtualControllerState.h"
+#include "NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_Joycon.h"
 
 namespace PokemonAutomation{
@@ -75,10 +76,11 @@ public:
         WallClock time_stamp = current_time();
         static_cast<JoyconController*>(m_controller)->issue_full_controller_state(
             nullptr,
+            false,
+            ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255,
             switch_state.buttons,
             switch_state.joystick_x,
-            switch_state.joystick_y,
-            ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255
+            switch_state.joystick_y
         );
         report_keyboard_command_sent(time_stamp, switch_state);
     }
@@ -115,6 +117,18 @@ void JoyconController::add_keyboard_listener(KeyboardEventHandler::KeyboardListe
 
 void JoyconController::remove_keyboard_listener(KeyboardEventHandler::KeyboardListener& keyboard_listener){
     m_keyboard_manager->remove_listener(keyboard_listener);
+}
+
+
+
+
+
+
+ControllerClass LeftJoycon::controller_class() const{
+    return ControllerClass::NintendoSwitch_LeftJoycon;
+}
+ControllerClass RightJoycon::controller_class() const{
+    return ControllerClass::NintendoSwitch_RightJoycon;
 }
 
 

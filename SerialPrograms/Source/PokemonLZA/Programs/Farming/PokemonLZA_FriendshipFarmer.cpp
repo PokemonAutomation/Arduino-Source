@@ -84,7 +84,7 @@ FriendshipFarmer::FriendshipFarmer()
         FriendshipAmount::Evolve
     )
     , NUM_PARTY_MEMBERS(
-        "<b>Number of Party Members</b><br><i>Only used for Cafe Method</i>",
+        "<b>Number of Party Members:</b><br><i>Only used for Cafe Method</i>",
         LockMode::LOCK_WHILE_RUNNING,
         6, 1, 6
     )
@@ -107,8 +107,8 @@ FriendshipFarmer::FriendshipFarmer()
     FARMING_OPTION.add_listener(*this);
 }
 
-void FriendshipFarmer::on_config_value_changed(void* object) {
-    if (FARMING_OPTION == FarmingOption::Cafe) {
+void FriendshipFarmer::on_config_value_changed(void* object){
+    if (FARMING_OPTION == FarmingOption::Cafe){
         NUM_PARTY_MEMBERS.set_visibility(ConfigOptionState::ENABLED);
     }
     else {
@@ -161,7 +161,7 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
         OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
         int ret2 = 0;
 
-        switch (ret) {
+        switch (ret){
         case 0:
             env.log("Detected A button.");
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
@@ -196,7 +196,7 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
                 { overworld }
             );
 
-            if (ret2 == 0) {
+            if (ret2 == 0){
                 env.log("Returned to overworld.");
                 continue;
             }
@@ -220,7 +220,7 @@ void FriendshipFarmer::enter_cafe(SingleSwitchProgramEnvironment& env, ProContro
     }
 }
 
-void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 
     int reset_attempt = 0;
@@ -251,7 +251,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
                 selection_arrow_watcher,
                 white_dialog_watcher,
                 blue_dialog_watcher,
-				black_screen
+                black_screen
             }
         );
         context.wait_for(100ms);
@@ -259,7 +259,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
         OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
         int ret2 = 0;
 
-        switch (ret) {
+        switch (ret){
         case 0:
             env.log("Detected A button.");
             return;
@@ -279,15 +279,15 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
         case 5:
             env.log("Detected day change.");
             ret2 = wait_until(
-	            env.console, context,
-	            30s,
-	            {overworld}
+                env.console, context,
+                30s,
+                {overworld}
             );
 
             if (ret2 == 0){
                 env.log("Returned to overworld.");
                 continue;
-			}
+            }
 
             ++stats.errors;
             env.update_stats();
@@ -297,7 +297,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
                 env.console
             );
         default:
-            if (seen_selection_arrow && ++reset_attempt <= 10) {
+            if (seen_selection_arrow && ++reset_attempt <= 10){
                 env.log("Attempting to face the bench.");
                 pbf_move_left_joystick(context, 128, 0, 250ms, 0ms);
                 continue;
@@ -314,7 +314,7 @@ void FriendshipFarmer::exit_bench(SingleSwitchProgramEnvironment& env, ProContro
     }
 }
 
-void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context) {
+void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 
     while (true){
@@ -349,7 +349,7 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
         OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
         int ret2 = 0;
 
-        switch (ret) {
+        switch (ret){
         case 0:
             env.log("Detected A button.");
             return;
@@ -373,7 +373,7 @@ void FriendshipFarmer::exit_cafe(SingleSwitchProgramEnvironment& env, ProControl
                 { overworld }
             );
 
-            if (ret2 == 0) {
+            if (ret2 == 0){
                 env.log("Returned to overworld.");
                 continue;
             }
@@ -432,7 +432,7 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
                 selection_arrow_watcher,
                 white_dialog_watcher,
                 blue_dialog_watcher,
-				black_screen
+                black_screen
             }
         );
         context.wait_for(100ms);
@@ -440,20 +440,20 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
         OverworldPartySelectionWatcher overworld(COLOR_WHITE, &env.console.overlay());
         int ret2 = 0;
 
-        switch (ret) {
+        switch (ret){
         case 0:
             env.log("Detected A button.");
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
         case 1:
-			env.log("Detected B button. Waiting 10 Seconds."); //Wait 10 seconds to gain friendship points.
+            env.log("Detected B button. Waiting 10 Seconds."); //Wait 10 seconds to gain friendship points.
             context.wait_for(10000ms);
             pbf_press_button(context, BUTTON_B, 80ms, 40ms);
             return;
         case 2:
             env.log("Detected selection arrow.");
             seen_selection_arrow = true;
-			//Select second option to hang out on bench.
+            //Select second option to hang out on bench.
             pbf_press_dpad(context, DPAD_DOWN, 40ms, 40ms);
             pbf_press_button(context, BUTTON_A, 80ms, 40ms);
             continue;
@@ -469,7 +469,7 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
             if (seen_selection_arrow){
                 env.log("Detected loading screen. Hanging out on bench.");
                 continue;
-			}
+            }
 
             env.log("Detected day change.");
             ret2 = wait_until(
@@ -478,7 +478,7 @@ void FriendshipFarmer::hang_out_bench(SingleSwitchProgramEnvironment& env, ProCo
                 { overworld }
             );
 
-            if (ret2 == 0) {
+            if (ret2 == 0){
                 env.log("Returned to overworld.");
                 continue;
             }
@@ -507,24 +507,23 @@ void FriendshipFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
 
     FriendshipFarmer_Descriptor::Stats& stats = env.current_stats<FriendshipFarmer_Descriptor::Stats>();
 
-	if (FARMING_OPTION.get() == FarmingOption::Cafe){
+    if (FARMING_OPTION.get() == FarmingOption::Cafe){
         env.log("Cafe Method Started");
 
-        for (int i = 0; i < NUM_PARTY_MEMBERS; ++i)
-        {
+        for (int i = 0; i < NUM_PARTY_MEMBERS; ++i){
             int drinks_needed;
 
-			//Each drink at cafe gives 30 friendship points.
-			//Evolve = 160 points = 5.33 drinks
-			//Max = 255 points = 8.5 drinks
-            if (FRIENDSHIP_AMOUNT.get() == FriendshipAmount::Evolve) {
+            //Each drink at cafe gives 30 friendship points.
+            //Evolve = 160 points = 5.33 drinks
+            //Max = 255 points = 8.5 drinks
+            if (FRIENDSHIP_AMOUNT.get() == FriendshipAmount::Evolve){
                 drinks_needed = 6;
             }
             else {
                 drinks_needed = 9;
             }
 
-            for (int d = 0; d < drinks_needed; ++d) {
+            for (int d = 0; d < drinks_needed; ++d){
                 enter_cafe(env, context);
                 exit_cafe(env, context);
 
@@ -543,14 +542,14 @@ void FriendshipFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
         env.log("Bench Method Started");
         int hang_outs_needed;
 
-		//Each hangout on bench gives 10 friendship points.
-		// Evolve = 160 points = 16 hangouts
-		// Max = 255 points = 26 hangouts
+        //Each hangout on bench gives 10 friendship points.
+        // Evolve = 160 points = 16 hangouts
+        // Max = 255 points = 26 hangouts
         if (FRIENDSHIP_AMOUNT.get() == FriendshipAmount::Evolve){
             hang_outs_needed = 16;
         }
         else{
-			hang_outs_needed = 26;
+            hang_outs_needed = 26;
         }
 
         for (int i = 0; i < hang_outs_needed; ++i)
@@ -559,7 +558,7 @@ void FriendshipFarmer::program(SingleSwitchProgramEnvironment& env, ProControlle
             exit_bench(env, context);
 
             ++stats.hang_out_sessions;
-			env.update_stats();
+            env.update_stats();
         }
     }
 

@@ -6,11 +6,10 @@
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_Controller_H
-#define PokemonAutomation_NintendoSwitch_Controller_H
+#ifndef PokemonAutomation_NintendoSwitch_ProController_H
+#define PokemonAutomation_NintendoSwitch_ProController_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
-#include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
 #include "NintendoSwitch_ControllerButtons.h"
 
@@ -26,7 +25,7 @@ class ProController;
 using ProControllerContext = ControllerContext<ProController>;
 
 
-constexpr Button VALID_PRO_CONTROLLER_BUTTONS =
+static constexpr Button VALID_PRO_CONTROLLER_BUTTONS =
     BUTTON_Y |
     BUTTON_B |
     BUTTON_A |
@@ -51,6 +50,9 @@ constexpr Button VALID_PRO_CONTROLLER_BUTTONS =
 
 
 
+
+
+
 //
 //  This is the generic interface to a Switch pro controller.
 //
@@ -66,9 +68,7 @@ public:
     virtual const char* name() override{
         return NAME;
     };
-    virtual ControllerClass controller_class() const override{
-        return ControllerClass::NintendoSwitch_ProController;
-    }
+    virtual ControllerClass controller_class() const override;
 
 
 protected:
@@ -160,6 +160,7 @@ public:
     //
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
+        bool enable_logging,
         Milliseconds duration,
         Button button,
         DpadPosition position,
@@ -193,7 +194,7 @@ public:
     //  Both buttons will be pressed at least once.
     virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Milliseconds dutation,
+        Milliseconds duration,
         Button button0, Button button1
     ) = 0;
 
@@ -236,8 +237,6 @@ private:
     class KeyboardManager;
     Pimpl<KeyboardManager> m_keyboard_manager;
 };
-
-
 
 
 

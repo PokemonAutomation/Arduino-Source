@@ -7,15 +7,15 @@
 #ifndef PokemonAutomation_PokemonLZA_ShinyDetectedAction_H
 #define PokemonAutomation_PokemonLZA_ShinyDetectedAction_H
 
+#include <atomic>
 #include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/StaticTextOption.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
-#include "Common/Cpp/Options//TimeDurationOption.h"
 //#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options//TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
-#include <atomic>
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
@@ -27,6 +27,7 @@ enum class ShinySoundDetectedAction{
     STOP_PROGRAM,         // stop program at first detected shiny sound
     NOTIFY_ON_FIRST_ONLY, // notify user only on the first shiny sound, keep running the program
     NOTIFY_ON_ALL,        // notify on all shiny sounds, keep running the program
+    NO_NOTIFICATIONS      // no notifications, still track shiny sounds
 };
 
 

@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 struct DetectedBox{
     std::string name;
-    ImagePixelBox box;
+    ImageFloatBox box;
 };
 
 // Merge heavily overlapping pixel boxes. Input boxes is modified in place.

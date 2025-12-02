@@ -10,6 +10,7 @@
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_VirtualControllerState.h"
+#include "NintendoSwitch_ProControllerState.h"
 #include "NintendoSwitch_ProController.h"
 
 // #include <iostream>
@@ -71,6 +72,7 @@ public:
         WallClock time_stamp = current_time();
         static_cast<ProController*>(m_controller)->issue_full_controller_state(
             nullptr,
+            false,
             ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255,
             switch_state.buttons,
             switch_state.dpad,
@@ -99,6 +101,9 @@ void ProController::stop() noexcept{
     m_keyboard_manager->stop();
 }
 
+ControllerClass ProController::controller_class() const{
+    return ControllerClass::NintendoSwitch_ProController;
+}
 
 void ProController::keyboard_release_all(){
     m_keyboard_manager->clear_state();
