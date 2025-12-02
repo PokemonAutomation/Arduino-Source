@@ -220,7 +220,7 @@ void checkpoint_96(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         pbf_press_button(context, BUTTON_L, 240ms, 100ms);
 
         // confirm we can see station-2
-        move_forward_until_yolo_object_detected(env, context, yolo_detector, "station-2", 
+        move_player_until_yolo_object_detected(env, context, yolo_detector, "station-2", 
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
             },

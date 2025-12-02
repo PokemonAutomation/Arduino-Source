@@ -422,7 +422,7 @@ void move_forward_until_yolo_object_above_min_size(
 // walk until we find the target object.
 // if caught in battle, run recovery_action
 // throw exception if exceed max_rounds.
-void move_forward_until_yolo_object_detected(
+void move_player_until_yolo_object_detected(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     YOLOv5Detector& yolo_detector, 
@@ -430,6 +430,7 @@ void move_forward_until_yolo_object_detected(
     std::function<void()>&& recovery_action, 
     uint16_t max_rounds, 
     uint16_t forward_ticks = 100, 
+    uint8_t x = 128, 
     uint8_t y = 0, 
     uint16_t delay_after_forward_move = 50, 
     uint16_t delay_after_lets_go = 105

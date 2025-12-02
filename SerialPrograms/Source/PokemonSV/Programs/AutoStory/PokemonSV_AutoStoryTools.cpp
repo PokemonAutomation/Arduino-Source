@@ -1557,7 +1557,7 @@ void move_forward_until_yolo_object_above_min_size(
 
 
 
-void move_forward_until_yolo_object_detected(
+void move_player_until_yolo_object_detected(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     YOLOv5Detector& yolo_detector, 
@@ -1565,6 +1565,7 @@ void move_forward_until_yolo_object_detected(
     std::function<void()>&& recovery_action, 
     uint16_t max_rounds, 
     uint16_t forward_ticks, 
+    uint8_t x, 
     uint8_t y, 
     uint16_t delay_after_forward_move, 
     uint16_t delay_after_lets_go
@@ -1588,7 +1589,7 @@ void move_forward_until_yolo_object_detected(
 
                 
 
-                pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                pbf_move_left_joystick(context, x, y, forward_ticks, 0);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1605,7 +1606,7 @@ void move_forward_until_yolo_object_detected(
         if (round_num > max_rounds){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "move_forward_until_yolo_object_detected(): Unable to detect target object.",
+                "move_player_until_yolo_object_detected(): Unable to detect target object.",
                 env.console
             );  
         }

@@ -227,7 +227,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         );
 
         // confirm we can see tree-tera
-        move_forward_until_yolo_object_detected(env, context, yolo_detector, "tree-tera", 
+        move_player_until_yolo_object_detected(env, context, yolo_detector, "tree-tera", 
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
             },
