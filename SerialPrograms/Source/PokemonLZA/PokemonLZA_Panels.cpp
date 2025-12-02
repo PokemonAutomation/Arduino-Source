@@ -74,8 +74,8 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<MegaShardFarmer_Descriptor, MegaShardFarmer>());
     ret.emplace_back(make_single_switch_program<JacintheInfiniteFarmer_Descriptor, JacintheInfiniteFarmer>());
     ret.emplace_back(make_single_switch_program<FriendshipFarmer_Descriptor, FriendshipFarmer>());
+    ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<InPlaceCatcher_Descriptor, InPlaceCatcher>());
     }
 
     ret.emplace_back("---- Shiny Hunting ----");
@@ -83,9 +83,9 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_BenchSit_Descriptor, ShinyHunt_BenchSit>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldReset_Descriptor, ShinyHunt_OverworldReset>());
     ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneEntrance_Descriptor, ShinyHunt_WildZoneEntrance>());
+    ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneCafe_Descriptor, ShinyHunt_WildZoneCafe>());
+    ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
     if (IS_BETA_VERSION){
-        ret.emplace_back(make_single_switch_program<ShinyHunt_WildZoneCafe_Descriptor, ShinyHunt_WildZoneCafe>());
-        ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
         ret.emplace_back(make_single_switch_program<BeldumHunter_Descriptor, BeldumHunter>());
