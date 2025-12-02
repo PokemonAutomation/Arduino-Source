@@ -1740,7 +1740,7 @@ void move_camera_yolo(
                 push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
                 break;
             case CameraAxis::Y:
-                duration_scale_factor = 100 / std::sqrt(std::abs(diff));
+                duration_scale_factor = 50 / std::sqrt(std::abs(diff));
                 if (std::abs(diff) < 0.1){
                     duration_scale_factor *= 0.5;
                 }
