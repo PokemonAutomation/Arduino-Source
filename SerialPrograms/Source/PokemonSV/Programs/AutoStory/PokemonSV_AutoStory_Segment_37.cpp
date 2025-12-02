@@ -222,7 +222,7 @@ void checkpoint_98(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             0.118, 0.2,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-3-1", 0.000);  // realign to target X
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "tree-3-1", 0.5);  // realign to target X
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }
         );

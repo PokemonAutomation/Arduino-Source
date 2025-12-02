@@ -162,7 +162,7 @@ void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
 
         // move forward until we see rock-4-2
-        move_forward_until_yolo_object_detected(env, context, yolo_detector, "rock-4-2", 
+        move_player_until_yolo_object_detected(env, context, yolo_detector, "rock-4-2", 
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
                 move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "cave-entrance", 0.5,
@@ -265,14 +265,341 @@ void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
+
+    });     
+}
+
+void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    // [&](size_t attempt_number){
+
+
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-4b.onnx");
+
+        #if 0
+        #endif
+
+        // align to crystal-4-1.  
+        // center before: X: 0.84
+        // center after: center-y: 0.195833   center-x: 0.621875
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "crystal-4-1", 0.195833,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-1", 0.8);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "crystal-4-1", 0.621875,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+        // move towards crystal-4-1 until box:   {0.804688, 0.075000, 0.187500, 0.338889}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "crystal-4-1",
+            0.1, 0.338,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-1", 0.7);  // realign to target X
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+
+        // confirm we can see cave-archway-2
+        move_player_until_yolo_object_detected(env, context, yolo_detector, "cave-archway-2", 
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+            },
+            5,
+            100,
+            0, 128
+        );
+
+
+        // align to cave-archway-2.  
+        // center before: x: 0.7
+        // center after:  center-y: 0.173611   center-x: 0.531250
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "cave-archway-2", 0.173611,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "cave-archway-2", 0.7);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "cave-archway-2", 0.531250,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+        // move forward until cave-archway-2 not detected
+        move_forward_until_yolo_object_not_detected(env, context, yolo_detector, "cave-archway-2", 
+            3,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "cave-archway-2", 0.5);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "crystal-4-3", 255, 60);
+
+        
+
+        // align to crystal-4-3.  
+        // center before: y:   x: 0.59
+        // center after: center-y: 0.390278   center-x: 0.495313
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "crystal-4-3", 0.390278,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-3", 0.59);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "crystal-4-3", 0.5,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+        // move towards crystal-4-3 until box:  {0.420313, 0.052778, 0.118750, 0.263889}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "crystal-4-3",
+            0.118750, 0.2,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-3", 0.5);  // realign to target X
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+
+
+
+        // align to crystal-4-4.  
+        // center before: y:  x: 0.9
+        // center after: center-y: 0.184722   center-x: 0.524219
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "crystal-4-4", 0.184722,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-4", 0.9);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "crystal-4-4", 0.5,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+        // move towards crystal-4-4 until box:   {0.468750, 0.052778, 0.046875, 0.102778}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "crystal-4-4",
+            0.046875, 0.102778,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-4", 0.5);  // realign to target X
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+
+
+        // align to crystal-4-4.  
+        // center before: y:  x: 
+        // center after: center-y: 0.375000   center-x: 0.492188
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "crystal-4-4", 0.375,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-4", 0.5);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+
+        // move towards crystal-4-4 until box:   {0.420313, 0.013889, 0.118750, 0.283333}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "crystal-4-4",
+            0.118750, 0.25,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-4", 0.5);  // realign to target X
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+
+        pbf_move_right_joystick(context, 128, 160, 30, 0);  // adjust camera so that head doesn't cover the crystal.
+  
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "crystal-4-5", 255, 30);
+
+
+        // align to crystal-4-5.  
+        // center before: y:  x: 0.75
+        // center after: center-y: 0.288889   center-x: 0.564844
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "crystal-4-5", 0.288889,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-5", 0.75);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "crystal-4-5", 0.5,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+        // move towards crystal-4-5 until box:  {0.407813, 0.152778, 0.207813, 0.400000}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "crystal-4-5",
+            0.207813, 0.400000,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "crystal-4-5", 0.5);  // realign to target X
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+
+        // confirm we can see station-crystal-4
+        move_player_until_yolo_object_detected(env, context, yolo_detector, "station-crystal-4", 
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+            },
+            5,
+            100,
+            0, 128
+        );
+
+        // align to station-crystal-4.  
+        // center before: y:    x: 0.67
+        // center after: center-y: 0.456944   center-x: 0.539844
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "station-crystal-4", 0.45,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-crystal-4", 0.67);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-crystal-4", 0.539844,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+        // move towards station-crystal-4 until box:  {0.423438, 0.144444, 0.393750, 0.211111}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "station-crystal-4",
+            0.393, 0.2111,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-crystal-4", 0.5);  // realign to target X
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+
+        // align to station-4.  
+        // center before: y:   x: 0.87
+        // center after: center-y: 0.231944   center-x: 0.496875
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "station-4", 0.231944,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-4", 0.87);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-4", 0.5,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+        // move towards station-4 until box:  {0.339063, 0.002778, 0.284375, 0.277778}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "station-4",
+            0.284375, 0.2,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-4", 0.5);  // realign to target X
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+
+        // align to station-door-4.  
+        // center before: y:   x: 0.53
+        // center after: center-y: 0.227778   center-x: 0.354688
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "station-door-4", 0.227778,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-door-4", 0.5);  // x-position of target object prior to camera move
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-door-4", 0.354688,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+        // move towards station-door-4 until box:  {0.056250, 0.194444, 0.184375, 0.316667}
+        move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "station-door-4",
+            0.1, 0.316667,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-door-4", 0.3);  // realign to target X
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }
+        );
+
+        // align to station-door-4.  
+        // center before: 
+        // center after: center-y: 0.318056   center-x: 0.514844
+        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-door-4", 0.5,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+        move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "station-door-4", 0.318056,
+            [&](){
+                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-door-4", 0.5);
+                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+            }        
+        );
+
+
+        do_action_until_dialog(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                move_player_forward(env, context, 20,
+                    [&](){
+                        run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                        move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "station-door-4", 0.5,
+                            [&](){
+                                run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
+                                pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+                            } 
+                        );
+                        pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
+                    }
+                );
+            }
+        );
+
+
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 120, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
+        pbf_move_left_joystick(context, 128, 0, 100, 0);
+        // disable Lock at Station 4
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
+        mash_button_till_overworld(env.console, context, BUTTON_A);  // black dialog, prompt
+
         #if 0
         // align to rock.  
-        // center before: 
+        // center before:   y:     x: 
         // center after: 
         move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "rock", 0.000,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock", 0.000);  // x-position of target object prior to camera move
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "rock", 0.5000);  // x-position of target object prior to camera move
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }        
         );
@@ -293,13 +620,8 @@ void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             }
         );
 
-        #endif        
-
-
-    });     
-}
-
-void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+        #endif  
+    // });
 }
 
 void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
