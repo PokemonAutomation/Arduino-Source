@@ -217,7 +217,7 @@ void checkpoint_94(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
 
 
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/yolo_area0_station1.onnx");
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-1.onnx");
 
 
         move_player_forward(env, context, 6,

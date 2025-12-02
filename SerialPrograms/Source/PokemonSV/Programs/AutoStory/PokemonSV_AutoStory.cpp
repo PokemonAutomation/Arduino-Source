@@ -703,7 +703,7 @@ AutoStory::AutoStory()
         false,
         "<b>YOLO Path:</b>", 
         LockMode::LOCK_WHILE_RUNNING, 
-        "PokemonSV/YOLO/yolo_area0_station1.onnx",
+        "PokemonSV/YOLO/A0-station-2.onnx",
         "<.onnx file>"
     )
     , TARGET_LABEL(
@@ -1282,7 +1282,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         DirectionDetector direction;
 
 
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/yolo_area0_station1.onnx");
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
         // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
         // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
 
