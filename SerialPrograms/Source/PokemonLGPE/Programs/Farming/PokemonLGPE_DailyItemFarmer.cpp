@@ -182,6 +182,9 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
     context.wait_for(1000ms);
 
     home_to_date_time(env.console, context, true);
+    
+    // Verify "Date and Time" menu item is selected before rolling date
+    verify_date_time_menu_selected(env.console, context);
 
     env.log("Rolling date back.");
     roll_date_backward_N(context, MAX_YEAR);
@@ -218,6 +221,9 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
 #endif
 
         home_to_date_time(env.console, context, true);
+        
+        // Verify "Date and Time" menu item is selected before rolling date
+        verify_date_time_menu_selected(env.console, context);
 
         if (year >= MAX_YEAR){
             env.log("Rolling date back.");

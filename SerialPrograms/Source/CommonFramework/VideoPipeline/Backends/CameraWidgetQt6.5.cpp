@@ -225,7 +225,15 @@ CameraVideoDisplay::CameraVideoDisplay(QWidget* parent, CameraVideoSource& sourc
     this->setMinimumSize(80, 45);
     m_view->setFixedSize(this->size());
     m_view->setScene(&m_scene);
-    m_video.setSize(this->size());
+    // After 90° clockwise rotation, width and height are swapped
+    m_video.setSize(QSize(this->height(), this->width()));
+    // Set transform origin to center before rotating
+    m_video.setTransformOriginPoint(this->height() / 2.0, this->width() / 2.0);
+    // Rotate 90 degrees clockwise to compensate for counter-clockwise rotation
+    m_video.setRotation(90.0);
+    // Position at center of scene
+    m_video.setPos(this->width() / 2.0 - this->height() / 2.0, 
+                   this->height() / 2.0 - this->width() / 2.0);
     m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
     m_scene.addItem(&m_video);
     source.set_video_output(m_video);
@@ -242,7 +250,12 @@ void CameraVideoDisplay::resizeEvent(QResizeEvent* event){
     auto scope_check = m_sanitizer.check_scope();
     m_view->setFixedSize(this->size());
     m_scene.setSceneRect(QRectF(QPointF(0, 0), this->size()));
-    m_video.setSize(this->size());
+    // After rotation, dimensions are swapped: set size with swapped width/height
+    m_video.setSize(QSize(this->height(), this->width()));
+    // Update transform origin and position after rotation
+    m_video.setTransformOriginPoint(this->height() / 2.0, this->width() / 2.0);
+    m_video.setPos(this->width() / 2.0 - this->height() / 2.0, 
+                   this->height() / 2.0 - this->width() / 2.0);
 }
 
 
