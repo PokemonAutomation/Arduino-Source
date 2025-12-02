@@ -270,8 +270,8 @@ void checkpoint_100(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 }
 
 void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    // [&](size_t attempt_number){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
 
 
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-4b.onnx");
@@ -491,7 +491,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
             0.393, 0.2111,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
-                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-crystal-4", 0.5);  // realign to target X
+                move_player_to_realign_via_yolo(env, context, yolo_detector, "station-crystal-4", 0.58);  // realign to target X
                 pbf_move_left_joystick(context, 128, 0, 10, 50); // move forward to align with camera
             }
         );
@@ -542,7 +542,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
         // move towards station-door-4 until box:  {0.056250, 0.194444, 0.184375, 0.316667}
         move_forward_until_yolo_object_above_min_size(env, context, yolo_detector, "station-door-4",
-            0.1, 0.316667,
+            0.1, 0.316,
             [&](){
                 run_wild_battle_press_A(env.console, context, BattleStopCondition::STOP_OVERWORLD);
                 move_player_to_realign_via_yolo(env, context, yolo_detector, "station-door-4", 0.3);  // realign to target X
@@ -621,7 +621,7 @@ void checkpoint_101(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
 
         #endif  
-    // });
+    });
 }
 
 void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
