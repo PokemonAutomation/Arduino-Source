@@ -35,13 +35,6 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     enum class Route{
-        KLEFKI,
-        KLEFKI_INKAY_GOOMY,
-        LITWICK,
-        LITWICK_SKRELP,
-        SKRELP,
-        SKRELP_INKAY,
-        SKRELP_ARIADOS,
         SCRAGGY,
         WILD_ZONE_19,
         FIRE_STARTERS,

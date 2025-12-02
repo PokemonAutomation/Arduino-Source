@@ -1637,6 +1637,8 @@ file(GLOB LIBRARY_SOURCES
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_AutoFossil.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_BeldumHunter.h
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_SewerHunter.cpp
+    Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_SewerHunter.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.cpp
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_BenchSit.h
     Source/PokemonLZA/Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.cpp

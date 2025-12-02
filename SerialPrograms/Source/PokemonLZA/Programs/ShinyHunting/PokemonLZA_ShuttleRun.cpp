@@ -60,18 +60,11 @@ ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
     : DURATION("<b>Duration:</b><br>Run the program this long.", LockMode::UNLOCK_WHILE_RUNNING, "5 h")
     , ROUTE("<b>Hunt Route:</b>",
         {
-            {Route::KLEFKI,  "klefki",  "Sewers: Klefki"},
-            {Route::KLEFKI_INKAY_GOOMY,  "klefki_inkay_goomy",  "Sewers: Klefki+Inkay+Goomy"},
-            {Route::LITWICK,  "litwick",  "Sewers: Litwick"},
-            {Route::LITWICK_SKRELP,  "litwick_skrelp",  "Sewers: Litwick+Skrelp"},
-            {Route::SKRELP,  "skrelp",  "Sewers: Skrelp"},
-            {Route::SKRELP_INKAY,  "skrelp_inkay",  "Sewers: Skrelp+Inkay"},
-            {Route::SKRELP_ARIADOS,  "skrelp_ariados",  "Sewers: Skrelp+Ariados"},
             // {Route::SCRAGGY,  "scraggy",  "Sewers: Scraggy"},
             {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        Route::KLEFKI
+        Route::WILD_ZONE_19
     )
     , SHINY_DETECTED("Shiny Detected", "", "1000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
@@ -91,79 +84,6 @@ ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
 
 namespace {
 
-void fly_back_to_sewers_entrance(ConsoleHandle& console, ProControllerContext& context) {
-    pbf_press_button(context, BUTTON_PLUS, 240ms, 80ms); // open map
-    context.wait_for_all_requests();
-    pbf_wait(context, 500ms);
-    pbf_press_button(context, BUTTON_Y, 100ms, 100ms); // select fly point
-    {
-        BlackScreenOverWatcher black_screen(COLOR_BLUE);
-        int ret = run_until<ProControllerContext>(
-            console, context,
-            [](ProControllerContext& context){
-                pbf_mash_button(context, BUTTON_A, 10000ms);
-            },
-            {black_screen}
-        );
-        if (ret != 0){
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "fly_back_to_sewers_entrance(): cannot detect black screen after mashing A.",
-                console
-            );
-        }
-    }
-    wait_until_overworld(console, context);
-}
-
-void run_forward_backward_to_wall(
-    SingleSwitchProgramEnvironment& env, ProControllerContext& context,
-    PokemonAutomation::Milliseconds duration
-){
-    ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, duration, 0ms);
-    pbf_move_left_joystick(context, 128, 255, duration + 500ms, 0ms);
-    pbf_wait(context, 500ms);
-}
-
-void route_klefki(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 4900ms, 0ms);
-    pbf_move_left_joystick(context, 0, 128, 1000ms, 0ms);
-    pbf_press_button(context, BUTTON_L, 100ms, 500ms);
-    fly_back_to_sewers_entrance(env.console, context);
-}
-
-void route_klefki_inkay_goomy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 8500ms, 0ms);
-    pbf_move_left_joystick(context, 255, 128, 1300ms, 0ms);
-    pbf_press_button(context, BUTTON_L, 100ms, 500ms);
-    fly_back_to_sewers_entrance(env.console, context);
-}
-
-void route_litwick(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    run_forward_backward_to_wall(env, context, 5s);
-}
-
-void route_litwick_skrelp(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    run_forward_backward_to_wall(env, context, 9000ms);
-}
-
-void route_skrelp(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    fly_back_to_sewers_entrance(env.console, context);
-    pbf_wait(context, 1000ms);
-}
-
-void route_skrelp_inkay(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
-    pbf_move_left_joystick(context, 128, 0, 3900ms, 0ms);
-    fly_back_to_sewers_entrance(env.console, context);
-}
-
-void route_skrelp_ariados(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    run_forward_backward_to_wall(env, context, 6s);
-}
 
 void route_scraggy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 //TODO
@@ -204,27 +124,6 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
     });
     std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&)> route;
     switch (ROUTE) {
-    case Route::KLEFKI:
-        route = route_klefki;
-        break;
-    case Route::KLEFKI_INKAY_GOOMY:
-        route = route_klefki_inkay_goomy;
-        break;
-    case Route::LITWICK:
-        route = route_litwick;
-        break;
-    case Route::LITWICK_SKRELP:
-        route = route_litwick_skrelp;
-        break;
-    case Route::SKRELP:
-        route = route_skrelp;
-        break;
-    case Route::SKRELP_INKAY:
-        route = route_skrelp_inkay;
-        break;
-    case Route::SKRELP_ARIADOS:
-        route = route_skrelp_ariados;
-        break;
     case Route::SCRAGGY:
         route = route_scraggy;
         break;
