@@ -5,14 +5,59 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Cpp/Options/SimpleIntegerOption.h"
+//#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Controllers/ControllerStateTable.h"
+#include "Common/Cpp/Options/CheckboxDropdownDatabase.h"
+#include "Common/Cpp/Options/CheckboxDropdownOption.h"
+#include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
+//#include "Controllers/ControllerStateTable.h"
 #include "NintendoSwitch_ProController.h"
 #include "NintendoSwitch_ProControllerState.h"
 
 namespace PokemonAutomation{
+
+template class CheckboxDropdownCell<NintendoSwitch::Button>;
+
 namespace NintendoSwitch{
+
+
+const CheckboxDropdownDatabase<Button>& ProController_Button_Database(){
+    static CheckboxDropdownDatabase<Button> database{
+        {Button::BUTTON_Y,          "Y",        "Y"},
+        {Button::BUTTON_B,          "B",        "B"},
+        {Button::BUTTON_A,          "A",        "A"},
+        {Button::BUTTON_X,          "X",        "X"},
+        {Button::BUTTON_L,          "L",        "L"},
+        {Button::BUTTON_R,          "R",        "R"},
+        {Button::BUTTON_ZL,         "ZL",       "ZL"},
+        {Button::BUTTON_ZR,         "ZR",       "ZR"},
+        {Button::BUTTON_MINUS,      "-",        "-"},
+        {Button::BUTTON_PLUS,       "+",        "+"},
+        {Button::BUTTON_LCLICK,     "L-click",  "L-click"},
+        {Button::BUTTON_RCLICK,     "R-click",  "R-click"},
+        {Button::BUTTON_HOME,       "home",     "Home"},
+        {Button::BUTTON_CAPTURE,    "capture",  "Capture"},
+        {Button::BUTTON_GR,         "GR",       "GR (Switch 2)"},
+        {Button::BUTTON_GL,         "GL",       "GL (Switch 2)"},
+        {Button::BUTTON_C,          "C",        "C (Switch 2)"},
+    };
+    return database;
+}
+const EnumDropdownDatabase<DpadPosition>& ProController_Dpad_Database(){
+    static EnumDropdownDatabase<DpadPosition> database{
+        {DpadPosition::DPAD_NONE,       "none",         "Dpad: none"},
+        {DpadPosition::DPAD_UP,         "up",           "Dpad: \u2191"},
+        {DpadPosition::DPAD_UP_RIGHT,   "up-right",     "Dpad: \u2197"},
+        {DpadPosition::DPAD_RIGHT,      "right",        "Dpad: \u2192"},
+        {DpadPosition::DPAD_DOWN_RIGHT, "down-right",   "Dpad: \u2198"},
+        {DpadPosition::DPAD_DOWN,       "down",         "Dpad: \u2193"},
+        {DpadPosition::DPAD_DOWN_LEFT,  "down-left",    "Dpad: \u2199"},
+        {DpadPosition::DPAD_LEFT,       "left",         "Dpad: \u2190"},
+        {DpadPosition::DPAD_UP_LEFT,    "up-left",      "Dpad: \u2196"},
+    };
+    return database;
+}
+
 
 
 
@@ -194,20 +239,6 @@ std::string ProControllerState::to_cpp(Milliseconds hold, Milliseconds release) 
 #if 0
 
 
-const EnumDropdownDatabase<DpadPosition>& DPAD_DATABASE(){
-    static EnumDropdownDatabase<DpadPosition> database{
-        {DpadPosition::DPAD_NONE,       "none",         "---"},
-        {DpadPosition::DPAD_UP,         "up",           "Up"},
-        {DpadPosition::DPAD_UP_RIGHT,   "up-right",     "Up+Right"},
-        {DpadPosition::DPAD_RIGHT,      "right",        "Right"},
-        {DpadPosition::DPAD_DOWN_RIGHT, "down-right",   "Down+Right"},
-        {DpadPosition::DPAD_DOWN,       "down",         "Down"},
-        {DpadPosition::DPAD_DOWN_LEFT,  "down-left",    "Down+Left"},
-        {DpadPosition::DPAD_LEFT,       "left",         "Left"},
-        {DpadPosition::DPAD_UP_LEFT,    "up-left",      "Up+Left"},
-    };
-    return database;
-}
 
 
 

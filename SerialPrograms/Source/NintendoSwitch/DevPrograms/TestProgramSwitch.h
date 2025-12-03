@@ -26,6 +26,7 @@
 #include "Common/Cpp/Options/ColorOption.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
+#include "Common/Cpp/Options/CheckboxDropdownOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -74,6 +75,9 @@ private:
 
     StaticTextOption STATIC_TEXT;
     BoxFloatOption BOX;
+
+    CheckboxDropdownCell<Button> BUTTONS;
+    EnumDropdownCell<DpadPosition> DPAD;
 
 
 //    PokemonSV::SinglesAIOption battle_AI;

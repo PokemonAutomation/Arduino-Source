@@ -104,6 +104,9 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Cpp/Options/BooleanCheckBoxOption.h
     ../Common/Cpp/Options/BoxFloatOption.cpp
     ../Common/Cpp/Options/BoxFloatOption.h
+    ../Common/Cpp/Options/CheckboxDropdownDatabase.h
+    ../Common/Cpp/Options/CheckboxDropdownOption.tpp
+    ../Common/Cpp/Options/CheckboxDropdownOption.h
     ../Common/Cpp/Options/ButtonOption.cpp
     ../Common/Cpp/Options/ButtonOption.h
     ../Common/Cpp/Options/ColorOption.cpp
@@ -199,6 +202,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/Options/BoxFloatWidget.h
     ../Common/Qt/Options/ButtonWidget.cpp
     ../Common/Qt/Options/ButtonWidget.h
+    ../Common/Qt/Options/CheckboxDropdownWidget.cpp
+    ../Common/Qt/Options/CheckboxDropdownWidget.h
     ../Common/Qt/Options/ColorWidget.cpp
     ../Common/Qt/Options/ColorWidget.h
     ../Common/Qt/Options/ConfigWidget.cpp
