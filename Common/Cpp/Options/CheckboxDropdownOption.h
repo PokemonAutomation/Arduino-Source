@@ -46,30 +46,30 @@ private:
 
 template <typename FlagEnum>
 class CheckboxDropdownCell : public CheckboxDropdownBase{
-    using CheckboxDropdownDatabase = CheckboxDropdownDatabase<FlagEnum>;
+    using CheckboxDropdownDatabaseT = CheckboxDropdownDatabase<FlagEnum>;
 
 public:
     CheckboxDropdownCell(
         std::string label,
-        const CheckboxDropdownDatabase& database,
+        const CheckboxDropdownDatabaseT& database,
         LockMode lock_while_running,
         FlagEnum default_value
     );
     CheckboxDropdownCell(
         std::string label,
-        const CheckboxDropdownDatabase& database,
+        const CheckboxDropdownDatabaseT& database,
         LockMode lock_while_running,
         FlagEnum default_value, FlagEnum current_value
     );
     CheckboxDropdownCell(
         std::string label,
-        CheckboxDropdownDatabase&& database,
+        CheckboxDropdownDatabaseT&& database,
         LockMode lock_while_running,
         FlagEnum default_value
     ) = delete;
     CheckboxDropdownCell(
         std::string label,
-        CheckboxDropdownDatabase&& database,
+        CheckboxDropdownDatabaseT&& database,
         LockMode lock_while_running,
         FlagEnum default_value, FlagEnum current_value
     ) = delete;
