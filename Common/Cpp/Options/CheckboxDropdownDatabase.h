@@ -49,7 +49,7 @@ public:
 
         auto ret = m_slug_to_enum.emplace(e.slug, &e);
         if (!ret.second){
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Slug: " + e.value);
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate Enum Slug: " + e.slug);
         }
     }
     void add(FlagEnum value, std::string slug, std::string display){
