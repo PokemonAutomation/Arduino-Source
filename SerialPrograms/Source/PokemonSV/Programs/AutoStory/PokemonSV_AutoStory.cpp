@@ -21,6 +21,9 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
@@ -508,6 +511,25 @@ AutoStory::AutoStory()
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     ) 
+    , CHANGE_SETTINGS(
+        "<b>Pre-check: Update game settings:</b><br>"
+        "This is to ensure the game has the correct settings, particularly with Autosave turned off, and Camera Support off.<br>"
+        "WARNING: if you disable this, make sure you manually set the in-game settings as laid out in the wiki.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , ENSURE_TIME_UNSYNCED(
+        "<b>Pre-check: Ensure time unsynced:</b><br>"
+        "This is to ensure the Switch has time unsynced from the internet, so it can be changed. This is run prior to the main story.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , ENSURE_CORRECT_MOVES(
+        "<b>Pre-check: Ensure lead Gardevoir has the correct moves:</b><br>"
+        "This is to ensure the lead Gardevoir has the correct moves in the correct order: Moonblast, Mystical Fire, Psychic, Misty Terrain. This is run prior to the main story.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(30))
     , NOTIFICATIONS({
@@ -522,13 +544,6 @@ AutoStory::AutoStory()
     , m_advanced_options_end(
         ""
     )    
-    , CHANGE_SETTINGS(
-        "<b>Change settings at Program Start:</b><br>"
-        "This is to ensure the program has the correct settings, particularly with Autosave turned off, and Camera Support off.<br>"
-        "WARNING: if you disable this, make sure you manually set the in-game settings as laid out in the wiki.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )  
     , ENABLE_TEST_CHECKPOINTS(
         "<b>TEST: test_checkpoints():</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -788,6 +803,8 @@ AutoStory::AutoStory()
 
     PA_ADD_OPTION(ENABLE_ADVANCED_MODE);
     PA_ADD_OPTION(CHANGE_SETTINGS);
+    PA_ADD_OPTION(ENSURE_TIME_UNSYNCED);
+    PA_ADD_OPTION(ENSURE_CORRECT_MOVES);
     
     PA_ADD_OPTION(NOTIFICATIONS);
 
@@ -1334,6 +1351,17 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }else{
             change_settings_prior_to_autostory_segment_mode(env, context, get_start_segment_index(), LANGUAGE);
         }
+    }
+
+    if (ENSURE_TIME_UNSYNCED && STORY_SECTION == StorySection::MAIN_STORY){
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        ensure_time_unsynced(env, context);
+        go_home(env.console, context);
+        resume_game_from_home(env.console, context, true);
+    }
+
+    if (ENSURE_CORRECT_MOVES && STORY_SECTION == StorySection::MAIN_STORY){
+        
     }
 
     run_autostory(env, context);
