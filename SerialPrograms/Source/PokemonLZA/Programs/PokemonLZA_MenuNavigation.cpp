@@ -115,6 +115,51 @@ void overworld_to_box_system(ConsoleHandle& console, ProControllerContext& conte
     );
 }
 
+void box_system_to_overworld(ConsoleHandle& console, ProControllerContext& context){
+    WallClock deadline = current_time() + std::chrono::seconds(120);
+    while (current_time() < deadline){
+        OverworldPartySelectionWatcher overworld(COLOR_RED, &console.overlay());
+        MainMenuWatcher main_menu(COLOR_GREEN, &console.overlay());
+        BoxWatcher box(COLOR_BLUE, &console.overlay());
+        context.wait_for_all_requests();
+        int ret = wait_until(
+            console, context,
+            std::chrono::seconds(30),
+            {
+                overworld,
+                main_menu,
+                box,
+            }
+            );
+        context.wait_for(std::chrono::milliseconds(100));
+        switch (ret){
+        case 0:
+            console.log("Detected Overworld...");
+            return;
+        case 1:
+            console.log("Detected Main Menu...");
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+            continue;
+        case 2:
+            console.log("Detected Box System...");
+            pbf_press_button(context, BUTTON_B, 160ms, 240ms);
+            continue;
+        default:
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "overworld_to_box_system(): No state detected after 30 seconds.",
+                console
+            );
+        }
+    }
+
+    OperationFailedException::fire(
+        ErrorReport::SEND_ERROR_REPORT,
+        "overworld_to_box_system(): Failed to exit box system after 2 minutes.",
+        console
+    );
+}
+
 
 }
 }
