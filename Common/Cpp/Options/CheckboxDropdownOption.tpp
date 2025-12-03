@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 template <typename FlagEnum>
 CheckboxDropdownCell<FlagEnum>::CheckboxDropdownCell(
     std::string label,
-    const CheckboxDropdownDatabase& database,
+    const Database& database,
     LockMode lock_while_running,
     FlagEnum default_value
 )
@@ -32,7 +32,7 @@ CheckboxDropdownCell<FlagEnum>::CheckboxDropdownCell(
 template <typename FlagEnum>
 CheckboxDropdownCell<FlagEnum>::CheckboxDropdownCell(
     std::string label,
-    const CheckboxDropdownDatabase& database,
+    const Database& database,
     LockMode lock_while_running,
     FlagEnum default_value, FlagEnum current_value
 )

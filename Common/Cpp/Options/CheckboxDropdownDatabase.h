@@ -32,11 +32,11 @@ struct FlagEnumEntry{
 
 template <typename FlagEnum>
 class CheckboxDropdownDatabase{
-    using FlagEnumEntry = FlagEnumEntry<FlagEnum>;
+    using Entry = FlagEnumEntry<FlagEnum>;
 
 public:
     CheckboxDropdownDatabase() = default;
-    CheckboxDropdownDatabase(std::initializer_list<FlagEnumEntry> list){
+    CheckboxDropdownDatabase(std::initializer_list<Entry> list){
         for (auto iter = list.begin(); iter != list.end(); ++iter){
             add(iter->value, std::move(iter->slug), std::move(iter->display));
         }
@@ -44,8 +44,8 @@ public:
 
     //  Warning, these functions do not have strong exception safety!
     //  If these throw, this class will be in a bad state.
-    void add(FlagEnumEntry entry){
-        FlagEnumEntry& e = m_list.emplace_back(std::move(entry));
+    void add(Entry entry){
+        Entry& e = m_list.emplace_back(std::move(entry));
 
         auto ret = m_slug_to_enum.emplace(e.slug, &e);
         if (!ret.second){
@@ -53,7 +53,7 @@ public:
         }
     }
     void add(FlagEnum value, std::string slug, std::string display){
-        add(FlagEnumEntry{value, std::move(slug), std::move(display)});
+        add(Entry{value, std::move(slug), std::move(display)});
     }
 
 
@@ -61,7 +61,7 @@ public:
     size_t size() const{
         return m_list.size();
     }
-    const FlagEnumEntry& operator[](size_t index) const{
+    const Entry& operator[](size_t index) const{
         return m_list[index];
     }
     const FlagEnum* find_slug(const std::string& slug) const{
@@ -82,8 +82,8 @@ public:
 
 
 private:
-    std::vector<FlagEnumEntry> m_list;
-    std::map<std::string, const FlagEnumEntry*> m_slug_to_enum;
+    std::vector<Entry> m_list;
+    std::map<std::string, const Entry*> m_slug_to_enum;
 };
 
 
