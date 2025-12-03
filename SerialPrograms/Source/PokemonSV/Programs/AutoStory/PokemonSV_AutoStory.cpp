@@ -130,7 +130,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_35>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_36>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_37>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_38>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_38>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_40>());
     }
@@ -304,8 +304,8 @@ std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_lis
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_97>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_98>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_99>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_100>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_101>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_100>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_101>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_102>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_103>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_104>());
@@ -703,7 +703,7 @@ AutoStory::AutoStory()
         false,
         "<b>YOLO Path:</b>", 
         LockMode::LOCK_WHILE_RUNNING, 
-        "PokemonSV/YOLO/yolo_area0_station1.onnx",
+        "PokemonSV/YOLO/A0-station-2.onnx",
         "<.onnx file>"
     )
     , TARGET_LABEL(
@@ -1032,8 +1032,8 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_97(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_98(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_99(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_100(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_101(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_100(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_101(env, context, notif_status_update, stats);});
     // checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, stats);});
     // checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, stats);});
     // checkpoint_list.push_back([&](){checkpoint_104(env, context, notif_status_update, stats);});
@@ -1282,7 +1282,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         DirectionDetector direction;
 
 
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/yolo_area0_station1.onnx");
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
         // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
         // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
 
