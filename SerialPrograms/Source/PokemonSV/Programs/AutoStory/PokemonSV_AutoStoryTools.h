@@ -44,6 +44,7 @@ enum class ClearDialogMode{
     STOP_WHITEBUTTON,
     STOP_TIMEOUT,
     STOP_BATTLE,
+    STOP_TUTORIAL,
 };
 
 

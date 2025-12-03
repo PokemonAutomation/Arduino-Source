@@ -218,6 +218,9 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             break;
         case CallbackEnum::TUTORIAL:    
             stream.log("clear_dialog: Detected tutorial.");
+            if (mode == ClearDialogMode::STOP_TUTORIAL){
+                return;
+            }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case CallbackEnum::BLACK_DIALOG_BOX:    
