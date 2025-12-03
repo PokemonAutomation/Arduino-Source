@@ -488,6 +488,49 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
 
 }
 
+
+void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
+    const ProgramInfo& info = env.program_info();
+    VideoStream& stream = env.console;
+
+    // start in the overworld
+    press_Bs_to_back_to_overworld(info, stream, context);
+
+    // open menu, select your lead pokemon
+    enter_menu_from_overworld(info, stream, context, 0, MenuSide::LEFT);
+
+    // enter Pokemon summary screen
+    pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
+    pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+
+    // confirm that moves are: Moonblast, Mystical Fire, Psychic, Misty Terrain
+    context.wait_for_all_requests();
+    VideoSnapshot screen = stream.video().snapshot();
+    PokemonMovesReader reader(language);
+    std::string move_0 = reader.read_move(stream.logger(), screen, 0);
+    std::string move_1 = reader.read_move(stream.logger(), screen, 1);
+    std::string move_2 = reader.read_move(stream.logger(), screen, 2);
+    std::string move_3 = reader.read_move(stream.logger(), screen, 3);
+    stream.log("Current first move: " + move_0);
+    stream.log("Current second move: " + move_1);
+    stream.log("Current third move: " + move_2);
+    stream.log("Current fourth move: " + move_3);
+
+    if (move_0 != "moonblast" || move_1 != "mystical-fire" || move_2 != "psychic" || move_3 != "misty-terrain"){
+        stream.log("Lead Pokemon's moves are wrong. They are supposed to be: Moonblast, Mystical Fire, Psychic, Misty Terrain.");
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "We expect your lead Pokemon to be a Gardevoir with moves in this order: Moonblast, Mystical Fire, Psychic, Misty Terrain. "
+            "But we see something else instead. If you confirm that your lead Gardevoir does indeed have these moves in this order, "
+            "and are still getting this error, you can uncheck 'Pre-check: Ensure correct moves', under Advanced settings.\n" + language_warning(language),
+            stream
+        );
+    }   
+
+    press_Bs_to_back_to_overworld(info, stream, context);
+
+}
+
 void change_settings_prior_to_autostory_segment_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t current_segment_num, Language language){
     // get index of `Options` in the Main Menu, which depends on where you are in Autostory
     int8_t options_index;  
