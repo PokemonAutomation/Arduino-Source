@@ -62,3 +62,7 @@ __pycache__
 *.ipynb
 
 CLAUDE.md
+
+build_*/
+.cache/*
+Packages/*
