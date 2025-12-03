@@ -27,8 +27,8 @@ public:
     virtual bool operator==(const ControllerState& x) const override;
     virtual bool is_neutral() const override;
 
-    virtual void load_json(const JsonValue& json) override;
-    virtual JsonValue to_json() const override;
+    virtual void load_json(const JsonObject& json) override;
+    virtual JsonObject to_json() const override;
 
     virtual void execute(
         CancellableScope& scope,

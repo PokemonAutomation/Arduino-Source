@@ -138,7 +138,7 @@ std::string json_to_cpp(const JsonArray& history){
     for (const JsonValue& command : history){
         const JsonObject& snapshot = command.to_object_throw();
         Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
-        state.load_json(command);
+        state.load_json(snapshot);
         ret += state.to_cpp(duration, Milliseconds(0));
     }
     return ret;
@@ -156,7 +156,7 @@ void execute_json_schedule(
         for (const JsonValue& command : history){
             const JsonObject& snapshot = command.to_object_throw();
             Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
-            state.load_json(command);
+            state.load_json(snapshot);
             state.execute(context, context.controller(), duration);
         }
         state.clear();

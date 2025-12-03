@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-#include "NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_Joycon.h"
+#include "NintendoSwitch_JoyconState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -43,34 +43,28 @@ bool JoyconState::is_neutral() const{
         && joystick_y == 128;
 }
 
-void JoyconState::load_json(const JsonValue& json){
+void JoyconState::load_json(const JsonObject& json){
     clear();
 
-    if (json.is_null()){
-        return;
-    }
-
-    const JsonObject& obj = json.to_object_throw();
-
     //  Backwards compatibility.
-    if (obj.get_boolean_default("is_neutral", false)){
+    if (json.get_boolean_default("is_neutral", false)){
         return;
     }
 
     {
         std::string buttons_string;
-        obj.read_string(buttons_string, "buttons");
+        json.read_string(buttons_string, "buttons");
         buttons = string_to_button(buttons_string);
     }
 
     //  Backwards compatibility.
-    obj.read_integer(joystick_x, "joystick_x", 0, 255);
-    obj.read_integer(joystick_y, "joystick_y", 0, 255);
+    json.read_integer(joystick_x, "joystick_x", 0, 255);
+    json.read_integer(joystick_y, "joystick_y", 0, 255);
 
-    obj.read_integer(joystick_x, "jx", 0, 255);
-    obj.read_integer(joystick_y, "jy", 0, 255);
+    json.read_integer(joystick_x, "jx", 0, 255);
+    json.read_integer(joystick_y, "jy", 0, 255);
 }
-JsonValue JoyconState::to_json() const{
+JsonObject JoyconState::to_json() const{
     JsonObject obj;
     if (buttons != BUTTON_NONE){
         obj["buttons"] = button_to_string(buttons);

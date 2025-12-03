@@ -5,8 +5,11 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-#include "NintendoSwitch_ProControllerState.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Controllers/ControllerStateTable.h"
 #include "NintendoSwitch_ProController.h"
+#include "NintendoSwitch_ProControllerState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -58,45 +61,39 @@ bool ProControllerState::is_neutral() const{
 }
 
 
-void ProControllerState::load_json(const JsonValue& json){
+void ProControllerState::load_json(const JsonObject& json){
     clear();
 
-    if (json.is_null()){
-        return;
-    }
-
-    const JsonObject& obj = json.to_object_throw();
-
     //  Backwards compatibility.
-    if (obj.get_boolean_default("is_neutral", false)){
+    if (json.get_boolean_default("is_neutral", false)){
         return;
     }
 
     {
         std::string buttons_string;
-        if (obj.read_string(buttons_string, "buttons")){
+        if (json.read_string(buttons_string, "buttons")){
             buttons = string_to_button(buttons_string);
         }
     }
     {
         std::string dpad_string;
-        if (obj.read_string(dpad_string, "dpad")){
+        if (json.read_string(dpad_string, "dpad")){
             dpad = string_to_dpad(dpad_string);
         }
     }
 
     //  Backwards compatibility.
-    obj.read_integer(left_x, "left_x", 0, 255);
-    obj.read_integer(left_y, "left_y", 0, 255);
-    obj.read_integer(right_x, "right_x", 0, 255);
-    obj.read_integer(right_y, "right_y", 0, 255);
+    json.read_integer(left_x, "left_x", 0, 255);
+    json.read_integer(left_y, "left_y", 0, 255);
+    json.read_integer(right_x, "right_x", 0, 255);
+    json.read_integer(right_y, "right_y", 0, 255);
 
-    obj.read_integer(left_x, "lx", 0, 255);
-    obj.read_integer(left_y, "ly", 0, 255);
-    obj.read_integer(right_x, "rx", 0, 255);
-    obj.read_integer(right_y, "ry", 0, 255);
+    json.read_integer(left_x, "lx", 0, 255);
+    json.read_integer(left_y, "ly", 0, 255);
+    json.read_integer(right_x, "rx", 0, 255);
+    json.read_integer(right_y, "ry", 0, 255);
 }
-JsonValue ProControllerState::to_json() const{
+JsonObject ProControllerState::to_json() const{
     JsonObject obj;
     if (buttons != BUTTON_NONE){
         obj["buttons"] = button_to_string(buttons);
@@ -192,6 +189,74 @@ std::string ProControllerState::to_cpp(Milliseconds hold, Milliseconds release) 
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Impossible state.");
 }
 
+
+
+#if 0
+
+
+const EnumDropdownDatabase<DpadPosition>& DPAD_DATABASE(){
+    static EnumDropdownDatabase<DpadPosition> database{
+        {DpadPosition::DPAD_NONE,       "none",         "---"},
+        {DpadPosition::DPAD_UP,         "up",           "Up"},
+        {DpadPosition::DPAD_UP_RIGHT,   "up-right",     "Up+Right"},
+        {DpadPosition::DPAD_RIGHT,      "right",        "Right"},
+        {DpadPosition::DPAD_DOWN_RIGHT, "down-right",   "Down+Right"},
+        {DpadPosition::DPAD_DOWN,       "down",         "Down"},
+        {DpadPosition::DPAD_DOWN_LEFT,  "down-left",    "Down+Left"},
+        {DpadPosition::DPAD_LEFT,       "left",         "Left"},
+        {DpadPosition::DPAD_UP_LEFT,    "up-left",      "Up+Left"},
+    };
+    return database;
+}
+
+
+
+class ProControllerStateRow : public ControllerStateRow{
+public:
+    ProControllerStateRow(EditableTableOption& parent_table)
+        : ControllerStateRow(parent_table)
+        , DPAD(
+            DPAD_DATABASE(),
+            LockMode::UNLOCK_WHILE_RUNNING,
+            DpadPosition::DPAD_NONE
+        )
+        , LEFT_JOYSTICK(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
+    {
+        PA_ADD_OPTION(DPAD);
+        PA_ADD_OPTION(LEFT_JOYSTICK);
+    }
+
+    virtual std::unique_ptr<EditableTableRow> clone() const override{
+        std::unique_ptr<ProControllerStateRow> ret(new ProControllerStateRow(parent()));
+        ret->m_state = m_state;
+        return ret;
+    }
+
+    virtual void load_json(const JsonValue& json) override{
+        const JsonObject& obj = json.to_object_throw();
+        m_milliseconds = Milliseconds(obj.get_integer_throw("duration_in_ms"));
+        m_state.load_json(obj);
+    }
+    virtual JsonValue to_json() const override{
+        JsonObject json = m_state.to_json();
+        json["duration_in_ms"] = m_milliseconds.count();
+        return json;
+    }
+
+    virtual const ControllerState& get_state() const override{
+        return m_state;
+    }
+
+private:
+    ProControllerState m_state;
+
+    EnumDropdownCell<DpadPosition> DPAD;
+    SimpleIntegerCell<uint8_t> LEFT_JOYSTICK;
+};
+
+
+
+#endif
 
 
 
