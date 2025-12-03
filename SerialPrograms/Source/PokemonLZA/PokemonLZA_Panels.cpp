@@ -35,7 +35,6 @@
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_FlySpotReset.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShuttleRun.h"
 #include "Programs/ShinyHunting/PokemonLZA_SewerHunter.h"
-#include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_OverworldMacro.h"
 #include "Programs/ShinyHunting/PokemonLZA_ShinyHunt_HelioptileHunter.h"
 
 //  Non-Shiny Hunting
@@ -90,7 +89,6 @@ std::vector<PanelEntry> PanelListFactory::make_panels() const{
     ret.emplace_back(make_single_switch_program<ShinyHunt_FlySpotReset_Descriptor, ShinyHunt_FlySpotReset>());
     if (IS_BETA_VERSION){
         ret.emplace_back(make_single_switch_program<ShinyHunt_HelioptileHunter_Descriptor, ShinyHunt_HelioptileHunter>());
-        ret.emplace_back(make_single_switch_program<ShinyHunt_OverworldMacro_Descriptor, ShinyHunt_OverworldMacro>());
         ret.emplace_back(make_single_switch_program<WeatherFinder_Descriptor, WeatherFinder>());
     }
     if (PreloadSettings::instance().DEVELOPER_MODE){
