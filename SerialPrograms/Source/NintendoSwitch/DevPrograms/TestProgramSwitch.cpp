@@ -156,6 +156,9 @@
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapIconDetector.h"
 #include "PokemonLZA/Inference/Map/PokemonLZA_MapDetector.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
+#include "Common/Cpp/Options/CheckboxDropdownDatabase.h"
+#include "Common/Cpp/Options/CheckboxDropdownOption.h"
+#include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
 
 
 
@@ -178,6 +181,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+const CheckboxDropdownDatabase<Button>& ProController_Button_Database();
+const EnumDropdownDatabase<DpadPosition>& ProController_Dpad_Database();
 
 
 
@@ -217,6 +222,8 @@ TestProgram::TestProgram()
     , IMAGE_PATH(false, "Path to image for testing", LockMode::UNLOCK_WHILE_RUNNING, "default.png", "default.png")
     , STATIC_TEXT("Test text...")
     , BOX("Box", LockMode::UNLOCK_WHILE_RUNNING, 0, 0, 1, 1)
+    , BUTTONS("Buttons", ProController_Button_Database(), LockMode::UNLOCK_WHILE_RUNNING, BUTTON_NONE)
+    , DPAD(ProController_Dpad_Database(), LockMode::UNLOCK_WHILE_RUNNING, DPAD_NONE)
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -231,6 +238,8 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(IMAGE_PATH);
     PA_ADD_OPTION(STATIC_TEXT);
     PA_ADD_OPTION(BOX);
+    PA_ADD_OPTION(BUTTONS);
+    PA_ADD_OPTION(DPAD);
 //    PA_ADD_OPTION(battle_AI);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);

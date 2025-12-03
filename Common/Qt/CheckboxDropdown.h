@@ -26,6 +26,9 @@ public:
             this->setCheckState(Qt::Unchecked);
         }
     }
+    bool checked() const{
+        return this->checkState() == Qt::Checked;
+    }
 
 signals:
     void checkStateChanged(Qt::CheckState state);
@@ -55,6 +58,15 @@ public:
         m_model->appendRow(item);
         m_items.emplace_back(item);
         return item;
+    }
+
+
+public:
+    size_t size() const{
+        return m_items.size();
+    }
+    CheckboxDropdownItem* operator[](size_t index) const{
+        return m_items[index];
     }
 
     virtual bool eventFilter(QObject* obj, QEvent* event) override{
