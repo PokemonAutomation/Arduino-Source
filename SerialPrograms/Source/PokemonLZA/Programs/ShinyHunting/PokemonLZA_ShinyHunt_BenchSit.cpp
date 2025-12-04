@@ -137,7 +137,7 @@ void run_back_until_found_bench(
 
             //  Can't just hold it down since sometimes it doesn't register.
             for (int c = 0; c < 10; c++){
-                pbf_move_right_joystick(context, 0, 128, 200ms, 800ms);
+                pbf_move_right_joystick(context, 0, 128, 800ms, 200ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 0ms);
                 pbf_move_left_joystick(context, 128, 0, 840ms, 800ms);
             }
