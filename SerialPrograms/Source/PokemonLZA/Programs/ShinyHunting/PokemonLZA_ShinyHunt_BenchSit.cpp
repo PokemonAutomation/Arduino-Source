@@ -139,7 +139,7 @@ void run_back_until_found_bench(
             for (int c = 0; c < 10; c++){
                 pbf_move_right_joystick(context, 0, 128, 200ms, 800ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 0ms);
-                pbf_move_left_joystick(context, 128, 255, 8400ms, 800ms);
+                pbf_move_left_joystick(context, 128, 0, 840ms, 800ms);
             }
         },
         {buttonA}
@@ -152,7 +152,7 @@ void run_back_until_found_bench(
     default:
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "run_back_until_found_bench(): Unable to detect bench after 10 seconds.",
+            "run_back_until_found_bench(): Unable to detect bench after multiple attempts.",
             env.console
         );
     }
