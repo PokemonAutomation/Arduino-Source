@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_Commands_Misc_H
 #define PokemonAutomation_PokemonSwSh_Commands_Misc_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

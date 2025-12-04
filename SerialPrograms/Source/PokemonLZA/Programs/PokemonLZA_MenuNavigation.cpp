@@ -14,7 +14,7 @@
 // #include "PokemonLZA/Inference/PokemonLZA_SelectionArrowDetector.h"
 // #include "PokemonLZA/Inference/PokemonLZA_DialogDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonLZA/Inference/Boxes/PokemonLZA_BoxDetection.h"
 #include "PokemonLZA/Inference/PokemonLZA_MainMenuDetector.h"

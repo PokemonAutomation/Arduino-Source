@@ -11,7 +11,7 @@
 
 #include <unordered_set>
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 
 namespace PokemonAutomation{

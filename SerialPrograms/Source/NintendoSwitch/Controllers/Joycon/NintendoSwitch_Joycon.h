@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_Joycon_H
 
 #include "Common/Cpp/Containers/Pimpl.h"
-#include "NintendoSwitch_ControllerButtons.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/Controller.h"
 

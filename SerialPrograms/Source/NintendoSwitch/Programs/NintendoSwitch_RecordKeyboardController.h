@@ -7,13 +7,12 @@
 #ifndef PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 #define PokemonAutomation_NintendoSwitch_RecordKeyboardController_H
 
-#include <functional>
-#include "Common/Cpp/Json/JsonObject.h"
+//#include <functional>
+//#include "Common/Cpp/Json/JsonObject.h"
 #include "Common/Cpp/Options/BooleanCheckBoxOption.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/StringOption.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
-#include "Controllers/KeyboardInput/KeyboardInput.h"
+//#include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{

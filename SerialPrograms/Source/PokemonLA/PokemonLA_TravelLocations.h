@@ -13,7 +13,7 @@
 #include <map>
 #include "Common/Cpp/Options/EnumDropdownDatabase.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonLA_Locations.h"
 
 namespace PokemonAutomation{

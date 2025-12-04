@@ -9,7 +9,7 @@
 
 #include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
 namespace PokemonAutomation{

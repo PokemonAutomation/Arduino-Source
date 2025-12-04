@@ -6,8 +6,9 @@
 
 #include <QFile>
 #include "Common/Cpp/Json/JsonArray.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_JoyconState.h"
+#include "Common/Cpp/Json/JsonObject.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_RecordKeyboardController.h"
 #include "Controllers/ControllerTypeStrings.h"
 

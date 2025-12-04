@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessProController_H
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessProController_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessController.h"
 

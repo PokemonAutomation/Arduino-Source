@@ -10,7 +10,7 @@
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch_VirtualControllerState.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_Joycon.h"
 

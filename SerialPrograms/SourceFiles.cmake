@@ -941,24 +941,28 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.cpp
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.cpp
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.h
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.cpp
+    Source/NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_Joycon.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_JoyconState.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_JoyconState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_KeyboardMapping.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProController.h
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.cpp
-    Source/NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.h
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.cpp
     Source/NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.cpp
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.cpp
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.h
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.cpp
+    Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.cpp

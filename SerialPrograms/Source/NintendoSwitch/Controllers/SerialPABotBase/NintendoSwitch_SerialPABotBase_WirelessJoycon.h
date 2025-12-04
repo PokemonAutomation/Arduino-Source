@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessJoycon_H
 #define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessJoycon_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 #include "NintendoSwitch_SerialPABotBase_WirelessController.h"
 
