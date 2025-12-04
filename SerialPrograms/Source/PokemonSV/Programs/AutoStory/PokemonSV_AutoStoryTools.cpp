@@ -1459,6 +1459,7 @@ void move_player_forward(
     uint8_t num_rounds, 
     std::function<void()>&& recovery_action,
     bool use_lets_go,
+    bool mash_A,
     uint16_t forward_ticks, 
     uint8_t y, 
     uint16_t delay_after_forward_move, 
@@ -1471,7 +1472,12 @@ void move_player_forward(
             do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 if (!use_lets_go){
-                    pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                    // pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                    ssf_press_left_joystick(context, 128, 0, 0, 100, 0);
+
+                    if (mash_A){ // mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
+                        pbf_mash_button(context, BUTTON_A, forward_ticks);
+                    }
                 }else{
                     pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                     pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);    

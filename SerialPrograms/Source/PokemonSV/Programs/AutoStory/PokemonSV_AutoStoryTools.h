@@ -382,12 +382,14 @@ void checkpoint_reattempt_loop_tutorial(
 
 // walk forward forward_ticks. repeat this for num_rounds.
 // if detect battle, kill the Pokemon. then continue. If we run into a battle, this round is considered to be done and will not be repeated.
+// NOTE: mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
 void move_player_forward(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     uint8_t num_rounds, 
     std::function<void()>&& recovery_action,
     bool use_lets_go = false,
+    bool mash_A = false,
     uint16_t forward_ticks = 100, 
     uint8_t y = 0, 
     uint16_t delay_after_forward_move = 50, 

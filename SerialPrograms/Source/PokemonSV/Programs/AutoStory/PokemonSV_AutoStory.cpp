@@ -134,7 +134,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_36>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_37>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_38>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_40>());
     }
     return segment_list;
@@ -309,8 +309,8 @@ std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_lis
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_99>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_100>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_101>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_102>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_103>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_102>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_103>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_104>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_105>());
 
@@ -1051,8 +1051,8 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_99(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_100(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_101(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, stats);});
     // checkpoint_list.push_back([&](){checkpoint_104(env, context, notif_status_update, stats);});
     // checkpoint_list.push_back([&](){checkpoint_105(env, context, notif_status_update, stats);});
     
