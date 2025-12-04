@@ -8,12 +8,6 @@
 #include "Common/Cpp/Options/CheckboxDropdownDatabase.h"
 #include "NintendoSwitch_JoyconTable.h"
 
-//  REMOVE
-#include "Common/Compiler.h"
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -29,7 +23,7 @@ const CheckboxDropdownDatabase<Button>& LeftJoycon_Button_Database(){
         {Button::BUTTON_ZL,         "ZL",       "ZL"},
         {Button::BUTTON_MINUS,      "-",        "-"},
         {Button::BUTTON_LCLICK,     "L-click",  "L-click"},
-        {Button::BUTTON_CAPTURE,    "capture",  "Capture"},
+        {Button::BUTTON_CAPTURE,    "Capture",  "Capture"},
         {Button::BUTTON_LEFT_SR,    "SR",       "SR"},
         {Button::BUTTON_LEFT_SL,    "SL",       "SL"},
     };
@@ -45,7 +39,7 @@ const CheckboxDropdownDatabase<Button>& RightJoycon_Button_Database(){
         {Button::BUTTON_R,          "RL",       "RL"},
         {Button::BUTTON_PLUS,       "+",        "+"},
         {Button::BUTTON_RCLICK,     "R-click",  "R-click"},
-        {Button::BUTTON_HOME,       "home",     "Home"},
+        {Button::BUTTON_HOME,       "Home",     "Home"},
         {Button::BUTTON_RIGHT_SR,   "SR",       "SR"},
         {Button::BUTTON_RIGHT_SL,   "SL",       "SL"},
         {Button::BUTTON_C,          "C",        "C (Switch 2)"},
@@ -53,8 +47,7 @@ const CheckboxDropdownDatabase<Button>& RightJoycon_Button_Database(){
     return database;
 }
 
-PA_NO_INLINE int initialize_Joycons(){
-    cout << "asdf" << endl;
+void register_joycon_tables(){
     ControllerCommandTable::register_controller_type(
         ControllerClass::NintendoSwitch_LeftJoycon,
         ControllerCommandTable::make_row<JoyconStateRow>,
@@ -75,9 +68,7 @@ PA_NO_INLINE int initialize_Joycons(){
             "Joystick (Y)",
         }
     );
-    return 123;
 }
-int init_Joycons = initialize_Joycons();
 
 
 
@@ -87,7 +78,7 @@ JoyconStateRow::JoyconStateRow(EditableTableOption& parent_table)
     : ControllerStateRow(parent_table)
     , DURATION(LockMode::LOCK_WHILE_RUNNING, "200 ms")
     , BUTTONS(
-        "Buttons",
+        "",
         static_cast<ControllerCommandTable&>(parent_table).type() == ControllerClass::NintendoSwitch_LeftJoycon
             ? LeftJoycon_Button_Database()
             : RightJoycon_Button_Database(),

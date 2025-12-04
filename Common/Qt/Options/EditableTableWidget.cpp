@@ -156,6 +156,16 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
 }
 
 void EditableTableWidget::update_value(){
+    //  Refresh the header in case that changed.
+    QStringList header;
+    for (const std::string& name : m_value.make_header()){
+        header << QString::fromStdString(name);
+    }
+    header << "" << "" << "";
+    m_table->setColumnCount(int(header.size()));
+    m_table->setHorizontalHeaderLabels(header);
+
+    //  Now update the table.
     std::vector<std::shared_ptr<EditableTableRow>> latest = m_value.current_refs();
 //    cout << "latest.size() = " << latest.size() << endl;
 

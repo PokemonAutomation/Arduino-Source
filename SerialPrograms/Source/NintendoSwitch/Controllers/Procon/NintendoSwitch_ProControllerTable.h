@@ -42,6 +42,8 @@ private:
 };
 
 
+void register_procon_tables();
+
 
 
 }

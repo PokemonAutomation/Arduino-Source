@@ -9,6 +9,9 @@
 #include "ControllerTypeStrings.h"
 #include "ControllerStateTable.h"
 
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.h"
+
 namespace PokemonAutomation{
 
 
@@ -18,8 +21,18 @@ struct ControllerTypeEntry{
     std::vector<std::string> headers;
 };
 
-std::map<ControllerClass, ControllerTypeEntry>& controller_map(){
-    static std::map<ControllerClass, ControllerTypeEntry> map;
+
+std::map<ControllerClass, ControllerTypeEntry> controller_map;
+
+
+const std::map<ControllerClass, ControllerTypeEntry>& make_controller_map(){
+    NintendoSwitch::register_procon_tables();
+    NintendoSwitch::register_joycon_tables();
+    return controller_map;
+}
+
+const std::map<ControllerClass, ControllerTypeEntry>& get_controller_map(){
+    static const std::map<ControllerClass, ControllerTypeEntry>& map = make_controller_map();
     return map;
 }
 
@@ -30,7 +43,7 @@ void ControllerCommandTable::register_controller_type(
     RowFactory factory,
     std::vector<std::string> headers
 ){
-    auto& map = controller_map();
+    auto& map = controller_map;
     if (map.emplace(
             type, ControllerTypeEntry{factory, std::move(headers)}
         ).second
@@ -46,7 +59,7 @@ void ControllerCommandTable::register_controller_type(
 
 
 std::vector<std::string> ControllerCommandTable::make_header() const{
-    auto& map = controller_map();
+    auto& map = get_controller_map();
     auto iter = map.find(m_type);
     if (iter != map.end()){
         return iter->second.headers;
@@ -58,7 +71,7 @@ std::vector<std::string> ControllerCommandTable::make_header() const{
     );
 }
 std::unique_ptr<EditableTableRow> ControllerCommandTable::make_row(){
-    auto& map = controller_map();
+    auto& map = get_controller_map();
     auto iter = map.find(m_type);
     if (iter != map.end()){
         return iter->second.factory(*this);
@@ -108,7 +121,7 @@ void ControllerCommandTables::on_config_value_changed(void* object){
 EnumDropdownDatabase<ControllerClass> ControllerCommandTables::make_database(
     const std::vector<ControllerClass>& controller_list
 ){
-    auto& map = controller_map();
+    auto& map = get_controller_map();
     EnumDropdownDatabase<ControllerClass> ret;
     for (ControllerClass type : controller_list){
         if (map.find(type) == map.end()){

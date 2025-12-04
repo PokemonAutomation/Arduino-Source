@@ -49,6 +49,34 @@ FlagEnum CheckboxDropdownCell<FlagEnum>::current_value() const{
     return m_current;
 }
 
+
+template <typename FlagEnum>
+std::string CheckboxDropdownCell<FlagEnum>::current_label() const{
+    ReadSpinLock lg(m_lock);
+    if (!m_label.empty()){
+        return m_label;
+    }
+
+    std::string ret;
+    bool first = true;
+    for (const FlagEnumEntry<FlagEnum>& entry : m_database){
+        if (is_empty(m_current & entry.value)){
+            continue;
+        }
+        if (!first){
+            ret += ", ";
+        }
+        first = false;
+
+        ret += entry.display;
+    }
+
+    if (ret.size() > 30){
+        ret = "( ... )";
+    }
+
+    return ret;
+}
 template <typename FlagEnum>
 bool CheckboxDropdownCell<FlagEnum>::is_set(FlagEnum value) const{
     ReadSpinLock lg(m_lock);

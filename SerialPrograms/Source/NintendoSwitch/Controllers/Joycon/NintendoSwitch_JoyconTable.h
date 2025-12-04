@@ -39,7 +39,8 @@ private:
 };
 
 
-extern int init_Joycons;
+void register_joycon_tables();
+
 
 
 }

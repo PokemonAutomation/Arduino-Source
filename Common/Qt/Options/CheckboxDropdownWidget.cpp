@@ -20,7 +20,7 @@ CheckboxDropdownCellWidget::~CheckboxDropdownCellWidget(){
     m_value.remove_listener(*this);
 }
 CheckboxDropdownCellWidget::CheckboxDropdownCellWidget(QWidget& parent, CheckboxDropdownBase& value)
-    : CheckboxDropdown(&parent, QString::fromStdString(value.label()))
+    : CheckboxDropdown(&parent, QString::fromStdString(value.current_label()))
     , ConfigWidget(value, *this)
     , m_value(value)
 {
@@ -39,10 +39,13 @@ CheckboxDropdownCellWidget::CheckboxDropdownCellWidget(QWidget& parent, Checkbox
         );
     }
 
+    CheckboxDropdownCellWidget::update_value();
+
     m_value.add_listener(*this);
 }
 
 void CheckboxDropdownCellWidget::update_value(){
+    setLabel(QString::fromStdString(m_value.current_label()));
     size_t total_items = CheckboxDropdown::size();
     for (size_t index = 0; index < total_items; index++){
         (*this)[index]->setChecked(m_value[index]);

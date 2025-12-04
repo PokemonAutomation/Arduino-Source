@@ -31,8 +31,8 @@ const CheckboxDropdownDatabase<Button>& ProController_Button_Database(){
         {Button::BUTTON_PLUS,       "+",        "+"},
         {Button::BUTTON_LCLICK,     "L-click",  "L-click"},
         {Button::BUTTON_RCLICK,     "R-click",  "R-click"},
-        {Button::BUTTON_HOME,       "home",     "Home"},
-        {Button::BUTTON_CAPTURE,    "capture",  "Capture"},
+        {Button::BUTTON_HOME,       "Home",     "Home"},
+        {Button::BUTTON_CAPTURE,    "Capture",  "Capture"},
         {Button::BUTTON_GR,         "GR",       "GR (Switch 2)"},
         {Button::BUTTON_GL,         "GL",       "GL (Switch 2)"},
         {Button::BUTTON_C,          "C",        "C (Switch 2)"},
@@ -54,7 +54,7 @@ const EnumDropdownDatabase<DpadPosition>& ProController_Dpad_Database(){
     return database;
 }
 
-int initialize_ProController(){
+void register_procon_tables(){
     ControllerCommandTable::register_controller_type(
         ControllerClass::NintendoSwitch_ProController,
         ControllerCommandTable::make_row<ProControllerStateRow>,
@@ -68,9 +68,7 @@ int initialize_ProController(){
             "Right JS (Y)",
         }
     );
-    return 0;
 }
-int init_ProController = initialize_ProController();
 
 
 
@@ -78,7 +76,7 @@ ProControllerStateRow::ProControllerStateRow(EditableTableOption& parent_table)
     : ControllerStateRow(parent_table)
     , DURATION(LockMode::LOCK_WHILE_RUNNING, "200 ms")
     , BUTTONS(
-        "Buttons",
+        "",
         ProController_Button_Database(),
         LockMode::UNLOCK_WHILE_RUNNING,
         BUTTON_NONE
@@ -141,7 +139,7 @@ JsonValue ProControllerStateRow::to_json() const{
     get_state(state);
 
     JsonObject json = state.to_json();
-    json["duration_in_ms"] = DURATION.to_json();
+    json["ms"] = DURATION.to_json();
     return json;
 }
 

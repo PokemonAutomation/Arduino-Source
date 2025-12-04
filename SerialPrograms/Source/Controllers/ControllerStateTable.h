@@ -26,6 +26,7 @@ public:
 
 
 
+
 class ControllerCommandTable : public EditableTableOption{
 public:
     using RowFactory = std::unique_ptr<ControllerStateRow> (*)(ControllerCommandTable& parent);
