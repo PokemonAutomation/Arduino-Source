@@ -218,6 +218,9 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             break;
         case CallbackEnum::TUTORIAL:    
             stream.log("clear_dialog: Detected tutorial.");
+            if (mode == ClearDialogMode::STOP_TUTORIAL){
+                return;
+            }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case CallbackEnum::BLACK_DIALOG_BOX:    
@@ -485,6 +488,50 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
         );
         exception.send_recoverable_notification(env);
     }   
+
+}
+
+
+void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
+    const ProgramInfo& info = env.program_info();
+    VideoStream& stream = env.console;
+
+    // start in the overworld
+    press_Bs_to_back_to_overworld(info, stream, context);
+
+    // open menu, select your lead pokemon
+    enter_menu_from_overworld(info, stream, context, 0, MenuSide::LEFT);
+
+    // enter Pokemon summary screen
+    pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
+    pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_Y, 20, 40);
+
+    // confirm that moves are: Moonblast, Mystical Fire, Psychic, Misty Terrain
+    context.wait_for_all_requests();
+    VideoSnapshot screen = stream.video().snapshot();
+    PokemonMovesReader reader(language);
+    std::string move_0 = reader.read_move(stream.logger(), screen, 0);
+    std::string move_1 = reader.read_move(stream.logger(), screen, 1);
+    std::string move_2 = reader.read_move(stream.logger(), screen, 2);
+    std::string move_3 = reader.read_move(stream.logger(), screen, 3);
+    stream.log("Current first move: " + move_0);
+    stream.log("Current second move: " + move_1);
+    stream.log("Current third move: " + move_2);
+    stream.log("Current fourth move: " + move_3);
+
+    if (move_0 != "moonblast" || move_1 != "mystical-fire" || move_2 != "psychic" || move_3 != "misty-terrain"){
+        stream.log("Lead Pokemon's moves are wrong. They are supposed to be: Moonblast, Mystical Fire, Psychic, Misty Terrain.");
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "We expect your lead Pokemon to be a Gardevoir with moves in this order: Moonblast, Mystical Fire, Psychic, Misty Terrain. "
+            "But we see something else instead. If you confirm that your lead Gardevoir does indeed have these moves in this order, "
+            "and are still getting this error, you can uncheck 'Pre-check: Ensure correct moves', under Advanced mode.\n" + language_warning(language),
+            stream
+        );
+    }   
+
+    press_Bs_to_back_to_overworld(info, stream, context);
 
 }
 

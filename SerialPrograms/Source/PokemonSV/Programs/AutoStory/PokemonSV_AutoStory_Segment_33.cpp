@@ -338,7 +338,7 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
         env.console.log("Battle Elite Four 1.");
         SinglesMoveEntry move1{SinglesMoveType::Move1, false};  // Moonblast
-        SinglesMoveEntry move3{SinglesMoveType::Move3, false}; // Mystical Fire
+        SinglesMoveEntry move2{SinglesMoveType::Move2, false}; // Mystical Fire
         SinglesMoveEntry move4{SinglesMoveType::Move4, false}; // Misty Terrain
         std::vector<SinglesMoveEntry> move_table1 = {move1, move4, move1};
         bool terastallized = false;
@@ -366,8 +366,8 @@ void checkpoint_88(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60);
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::DIALOG_ARROW, CallbackEnum::PROMPT_DIALOG});
 
-        env.console.log("Battle Elite Four 2.");  // select move 3, which should be a fire move. to battle the steel trainer
-        std::vector<SinglesMoveEntry> move_table2 = {move3};
+        env.console.log("Battle Elite Four 2.");  // select move 2, which should be a fire move. to battle the steel trainer
+        std::vector<SinglesMoveEntry> move_table2 = {move2};
         is_won = run_pokemon(env.console, context, move_table2, true, terastallized);
         if (!is_won){// throw exception if we lose
             OperationFailedException::fire(

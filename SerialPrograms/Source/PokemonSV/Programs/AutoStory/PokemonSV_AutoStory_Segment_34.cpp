@@ -143,7 +143,7 @@ void checkpoint_91(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         if (!is_won){// throw exception if we lose
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "Failed to beat the Ground trainer. Reset.",
+                "Failed to beat the Penny. Reset.",
                 env.console
             );
         }

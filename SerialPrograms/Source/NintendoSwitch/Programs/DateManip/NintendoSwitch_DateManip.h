@@ -71,6 +71,10 @@ void change_date(
     const DateTime& date
 );
 
+// starting from home screen, ensure that the time is unsyced
+// i.e. confirm we can enter the Date change window
+void ensure_time_unsynced(SingleSwitchProgramEnvironment& env, ProControllerContext& context);
+
 
 
 }

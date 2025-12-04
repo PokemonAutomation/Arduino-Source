@@ -44,6 +44,7 @@ enum class ClearDialogMode{
     STOP_WHITEBUTTON,
     STOP_TIMEOUT,
     STOP_BATTLE,
+    STOP_TUTORIAL,
 };
 
 
@@ -173,6 +174,10 @@ void config_option(ProControllerContext& context, int change_option_value);
 
 // enter menu and swap the first and third moves for your starter
 void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
+
+// confirm the moves for the Lead pokemon: Moonblast, Mystical Fire, Psychic, Misty Terrain
+// start and end in the overworld
+void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
 
 // run the given `action`. if detect a battle, stop the action, and throw exception
 void do_action_and_monitor_for_battles(

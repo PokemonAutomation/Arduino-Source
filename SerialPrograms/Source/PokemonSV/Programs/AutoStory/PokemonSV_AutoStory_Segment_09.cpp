@@ -211,10 +211,11 @@ void checkpoint_18(
         pbf_mash_button(context, BUTTON_A, 6 * TICKS_PER_SECOND);
 
         env.console.log("Talk to Clavell in his office, and the professor.");
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 25, 
-            {CallbackEnum::PROMPT_DIALOG});  // max time between dialog: 17s. set timeout to 25 seconds for buffer.
-        // mash A to get through the Random A press that you need. when the professor shows you area zero.
-        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+        // clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 25, 
+        //     {CallbackEnum::PROMPT_DIALOG});  // max time between dialog: 17s. set timeout to 25 seconds for buffer.
+        // // mash A to get through the Random A press that you need. when the professor shows you area zero.
+        // pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, 
             {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
        
@@ -279,11 +280,14 @@ void checkpoint_20(
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 60, 128, 0);
 
         env.console.log("Talk to Nemona, Arven, Cassiopeia.");
-        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 16, 
-            {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BLACK_DIALOG_BOX}); // max time between dialog: 11
+        // clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 16, 
+        //     {CallbackEnum::PROMPT_DIALOG, CallbackEnum::BLACK_DIALOG_BOX}); // max time between dialog: 11
         
-        // mash A to get through the Random A press that you need. when the Nemona shows you a Poke Gym.
-        pbf_mash_button(context, BUTTON_A, 250);
+        // // mash A to get through the Random A press that you need. when the Nemona shows you a Poke Gym.
+        // pbf_mash_button(context, BUTTON_A, 250);
+
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TUTORIAL, 20, 
+            {CallbackEnum::TUTORIAL, CallbackEnum::PROMPT_DIALOG, CallbackEnum::BLACK_DIALOG_BOX});
 
         clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 10, 
             {CallbackEnum::TUTORIAL}); // max time between dialog: 3
