@@ -114,7 +114,7 @@ void ProControllerState::execute(
     AbstractController& controller,
     Milliseconds duration
 ) const{
-    static_cast<ProController&>(controller).issue_full_controller_state(
+    controller.cast_with_exception<ProController>().issue_full_controller_state(
         &scope,
         true,
         duration,

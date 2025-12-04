@@ -81,7 +81,7 @@ void JoyconState::execute(
     AbstractController& controller,
     Milliseconds duration
 ) const{
-    static_cast<JoyconController&>(controller).issue_full_controller_state(
+    controller.cast_with_exception<JoyconController>().issue_full_controller_state(
         &scope,
         true,
         duration,
