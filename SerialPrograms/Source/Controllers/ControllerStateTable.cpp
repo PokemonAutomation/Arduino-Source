@@ -6,11 +6,19 @@
 
 #include <map>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Json/JsonArray.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "ControllerTypeStrings.h"
 #include "ControllerStateTable.h"
 
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.h"
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconTable.h"
+
+#include "NintendoSwitch/Options/TurboMacroTable.h"
+
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 
@@ -57,6 +65,219 @@ void ControllerCommandTable::register_controller_type(
     );
 }
 
+
+
+
+void ControllerCommandTable::load_json_NS_TurboMacro(const JsonValue& json){
+    using namespace NintendoSwitch;
+
+    if (m_type != ControllerClass::NintendoSwitch_ProController){
+        throw FileException(
+            nullptr, nullptr,
+            "Incompatible controller type.",
+            ""
+        );
+    }
+
+    JsonObject translated;
+    translated["ControllerClass"] = CONTROLLER_CLASS_STRINGS().get_string(m_type);
+
+    //  JSON to JSON translate to the new format.
+    JsonArray history;
+
+    for (const JsonValue& item : json.to_array_throw()){
+        const JsonObject& obj = item.to_object_throw();
+
+        const std::string& action_name = obj.get_string_throw("Action");
+        const auto* entry = TurboMacroAction_Database().find_slug(action_name);
+        if (entry == nullptr){
+            throw ParseException("Invalid Action: " + action_name);
+        }
+
+        const JsonValue* value;
+
+        TurboMacroAction action = (TurboMacroAction)entry->enum_value;
+
+        if (action == TurboMacroAction::NO_ACTION){
+            continue;
+        }
+
+        //  Wait has different timing fields.
+        if (action == TurboMacroAction::WAIT){
+            value = obj.get_value("Wait");
+            if (value != nullptr && value->is_integer()){
+                JsonObject out;
+                out["ms"] = std::to_string(value->to_integer_default() * 8) + " ms";
+                history.push_back(std::move(out));
+            }
+            value = obj.get_value("WaitMs");
+            if (value != nullptr){
+                JsonObject out;
+                out["ms"] = value->to_string_throw();
+                history.push_back(std::move(out));
+            }
+            continue;
+        }
+
+        JsonObject command;
+
+        value = obj.get_value("Hold");
+        if (value != nullptr && value->is_integer()){
+            command["ms"] = std::to_string(value->to_integer_default() * 8) + " ms";
+        }
+        value = obj.get_value("HoldMs");
+        if (value != nullptr){
+            command["ms"] = value->to_string_throw();
+        }
+        if (value == nullptr){
+            throw ParseException("Missing Duration: " + obj.dump());
+        }
+
+
+        switch (action){
+        case TurboMacroAction::B:
+            command["buttons"] = "B";
+            break;
+        case TurboMacroAction::A:
+            command["buttons"] = "A";
+            break;
+        case TurboMacroAction::Y:
+            command["buttons"] = "Y";
+            break;
+        case TurboMacroAction::X:
+            command["buttons"] = "X";
+            break;
+        case TurboMacroAction::R:
+            command["buttons"] = "R";
+            break;
+        case TurboMacroAction::L:
+            command["buttons"] = "L";
+            break;
+        case TurboMacroAction::ZR:
+            command["buttons"] = "ZR";
+            break;
+        case TurboMacroAction::ZL:
+            command["buttons"] = "ZL";
+            break;
+        case TurboMacroAction::PLUS:
+            command["buttons"] = "+";
+            break;
+        case TurboMacroAction::MINUS:
+            command["buttons"] = "-";
+            break;
+        case TurboMacroAction::LEFT_JOY_CLICK:
+            command["buttons"] = "LJ";
+            break;
+        case TurboMacroAction::RIGHT_JOY_CLICK:
+            command["buttons"] = "RJ";
+            break;
+        case TurboMacroAction::DPADLEFT:
+            command["dpad"] = "left";
+            break;
+        case TurboMacroAction::DPADRIGHT:
+            command["dpad"] = "right";
+            break;
+        case TurboMacroAction::DPADUP:
+            command["dpad"] = "up";
+            break;
+        case TurboMacroAction::DPADDOWN:
+            command["dpad"] = "down";
+            break;
+        case TurboMacroAction::LEFT_JOYSTICK:
+            value = obj.get_value("MoveDirectionX");
+            if (value != nullptr){
+                command["lx"] = value->to_integer_throw();
+            }
+            value = obj.get_value("MoveDirectionY");
+            if (value != nullptr){
+                command["ly"] = value->to_integer_throw();
+            }
+            break;
+        case TurboMacroAction::RIGHT_JOYSTICK:
+            value = obj.get_value("MoveDirectionX");
+            if (value != nullptr){
+                command["rx"] = value->to_integer_throw();
+            }
+            value = obj.get_value("MoveDirectionY");
+            if (value != nullptr){
+                command["ry"] = value->to_integer_throw();
+            }
+            break;
+        default:;
+        }
+
+        history.push_back(std::move(command));
+
+
+        JsonObject cooldown;
+        value = obj.get_value("Release");
+        if (value != nullptr && value->is_integer()){
+            cooldown["ms"] = std::to_string(value->to_integer_default() * 8) + " ms";
+        }
+        value = obj.get_value("ReleaseMs");
+        if (value != nullptr){
+            cooldown["ms"] = value->to_string_throw();
+        }
+        if (value != nullptr){
+            history.push_back(std::move(cooldown));
+        }
+    }
+
+    translated["Schedule"] = std::move(history);
+
+//    cout << translated.dump() << endl;
+
+    JsonValue value(std::move(translated));
+    load_json(value);
+}
+
+void ControllerCommandTable::load_json(const JsonValue& json){
+    clear();
+
+    if (json.is_array()){
+        load_json_NS_TurboMacro(json);
+        return;
+    }
+
+    const JsonObject& obj = json.to_object_throw();
+
+    const JsonValue* value = obj.get_value("controller_class");
+    if (value == nullptr){
+        value = obj.get_value("ControllerClass");
+    }
+    if (value == nullptr){
+        throw JsonParseException("", "ControllerClass");
+    }
+    const std::string& controller = value->to_string_throw();
+    if (CONTROLLER_CLASS_STRINGS().get_enum(controller) != m_type){
+        throw FileException(
+            nullptr, nullptr,
+            "Incompatible controller type.",
+            ""
+        );
+    }
+
+    value = obj.get_value("history");
+    if (value == nullptr){
+        value = obj.get_value("Schedule");
+    }
+    if (value == nullptr){
+        throw JsonParseException("", "Schedule");
+    }
+
+    EditableTableOption::load_json(*value);
+}
+JsonValue ControllerCommandTable::to_json() const{
+    JsonObject obj;
+    obj["ControllerClass"] = CONTROLLER_CLASS_STRINGS().get_string(m_type);
+    JsonArray history;
+    run_on_all_rows<ControllerStateRow>([&](const ControllerStateRow& row){
+        history.push_back(row.to_json());
+        return false;
+    });
+    obj["Schedule"] = std::move(history);
+    return obj;
+}
 
 std::vector<std::string> ControllerCommandTable::make_header() const{
     auto& map = get_controller_map();

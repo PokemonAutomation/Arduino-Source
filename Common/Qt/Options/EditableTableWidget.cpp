@@ -109,7 +109,16 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
                     if (path.empty()){
                         return;
                     }
-                    value.load_json(load_json_file(path));
+                    try{
+                        value.load_json(load_json_file(path));
+                    }catch (Exception& e){
+                        QMessageBox::warning(
+                            nullptr,
+                            "Failed to load JSON.",
+                            QString::fromStdString(e.message())
+                        );
+                    }
+
                 }
             );
         }

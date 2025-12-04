@@ -31,6 +31,7 @@ public:
     void get_state(ProControllerState& state) const;
     virtual std::unique_ptr<ControllerState> get_state(Milliseconds& duration) const override;
 
+
 private:
     MillisecondsCell DURATION;
     CheckboxDropdownCell<Button> BUTTONS;

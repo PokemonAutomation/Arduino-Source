@@ -16,6 +16,8 @@
 namespace PokemonAutomation{
 
 
+class ControllerCommandTables;
+
 
 
 class ControllerStateRow : public EditableTableRow{
@@ -57,10 +59,7 @@ public:
         return m_type;
     }
 
-    void run(
-        CancellableScope& scope,
-        AbstractController& controller
-    ){
+    void run(CancellableScope& scope, AbstractController& controller){
         std::vector<std::unique_ptr<ControllerStateRow>> table = EditableTableOption::copy_snapshot<ControllerStateRow>();
         for (std::unique_ptr<ControllerStateRow>& command : table){
             Milliseconds duration;
@@ -69,12 +68,20 @@ public:
         }
     }
 
+    virtual void load_json(const JsonValue& json) override;
+    virtual JsonValue to_json() const override;
+
     virtual std::vector<std::string> make_header() const override;
     virtual std::unique_ptr<EditableTableRow> make_row() override;
 
 
 private:
+    void load_json_NS_TurboMacro(const JsonValue& json);
+
+
+private:
     friend class ControllerCommandTables;
+
     ControllerClass m_type;
 };
 
@@ -87,6 +94,11 @@ public:
     ~ControllerCommandTables();
     ControllerCommandTables(const std::vector<ControllerClass>& controller_list);
 
+    void run(CancellableScope& scope, AbstractController& controller){
+        m_table.run(scope, controller);
+    }
+
+
 public:
     virtual void on_config_value_changed(void* object) override;
 
@@ -96,6 +108,8 @@ private:
     );
 
 private:
+    friend class ControllerCommandTable;
+
     //  There is a race condition here if multiple threads try to change this
     //  at the same time since it clears the table. But we only ever do this
     //  from the main Qt thread.

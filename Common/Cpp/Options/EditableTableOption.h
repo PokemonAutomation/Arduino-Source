@@ -128,6 +128,15 @@ public:
 
     //  Lambda returns a boolean. False to continue running. True to stop.
     template <typename RowType, typename Lambda>
+    void run_on_all_rows(Lambda function) const{
+        ReadSpinLock lg(m_current_lock);
+        for (auto& item : m_current){
+            if (function(static_cast<const RowType&>(*item))){
+                return;
+            }
+        }
+    }
+    template <typename RowType, typename Lambda>
     void run_on_all_rows(Lambda function){
         ReadSpinLock lg(m_current_lock);
         for (auto& item : m_current){
