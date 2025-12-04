@@ -55,6 +55,21 @@ bool CheckboxDropdownCell<FlagEnum>::is_set(FlagEnum value) const{
     return !is_empty(value & m_current);
 }
 template <typename FlagEnum>
+void CheckboxDropdownCell<FlagEnum>::replace_all(FlagEnum value){
+    {
+        WriteSpinLock lg(m_lock);
+        if (m_current == value){
+            return;
+        }
+        m_current = value;
+    }
+    report_value_changed(this);
+}
+template <typename FlagEnum>
+void CheckboxDropdownCell<FlagEnum>::clear(){
+    replace_all(empty_value((FlagEnum*)nullptr));
+}
+template <typename FlagEnum>
 void CheckboxDropdownCell<FlagEnum>::set_flag(FlagEnum value){
     {
         WriteSpinLock lg(m_lock);

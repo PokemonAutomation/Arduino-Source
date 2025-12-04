@@ -5,12 +5,13 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-//#include "Common/Cpp/Options/SimpleIntegerOption.h"
+#include "Common/Cpp/Options/SimpleIntegerOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
+#include "Common/Cpp/Options/TimeDurationOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownDatabase.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
-//#include "Controllers/ControllerStateTable.h"
+#include "Controllers/ControllerStateTable.h"
 #include "NintendoSwitch_ProController.h"
 #include "NintendoSwitch_ProControllerState.h"
 
@@ -19,44 +20,6 @@ namespace PokemonAutomation{
 template class CheckboxDropdownCell<NintendoSwitch::Button>;
 
 namespace NintendoSwitch{
-
-
-const CheckboxDropdownDatabase<Button>& ProController_Button_Database(){
-    static CheckboxDropdownDatabase<Button> database{
-        {Button::BUTTON_Y,          "Y",        "Y"},
-        {Button::BUTTON_B,          "B",        "B"},
-        {Button::BUTTON_A,          "A",        "A"},
-        {Button::BUTTON_X,          "X",        "X"},
-        {Button::BUTTON_L,          "L",        "L"},
-        {Button::BUTTON_R,          "R",        "R"},
-        {Button::BUTTON_ZL,         "ZL",       "ZL"},
-        {Button::BUTTON_ZR,         "ZR",       "ZR"},
-        {Button::BUTTON_MINUS,      "-",        "-"},
-        {Button::BUTTON_PLUS,       "+",        "+"},
-        {Button::BUTTON_LCLICK,     "L-click",  "L-click"},
-        {Button::BUTTON_RCLICK,     "R-click",  "R-click"},
-        {Button::BUTTON_HOME,       "home",     "Home"},
-        {Button::BUTTON_CAPTURE,    "capture",  "Capture"},
-        {Button::BUTTON_GR,         "GR",       "GR (Switch 2)"},
-        {Button::BUTTON_GL,         "GL",       "GL (Switch 2)"},
-        {Button::BUTTON_C,          "C",        "C (Switch 2)"},
-    };
-    return database;
-}
-const EnumDropdownDatabase<DpadPosition>& ProController_Dpad_Database(){
-    static EnumDropdownDatabase<DpadPosition> database{
-        {DpadPosition::DPAD_NONE,       "none",         "Dpad: none"},
-        {DpadPosition::DPAD_UP,         "up",           "Dpad: \u2191"},
-        {DpadPosition::DPAD_UP_RIGHT,   "up-right",     "Dpad: \u2197"},
-        {DpadPosition::DPAD_RIGHT,      "right",        "Dpad: \u2192"},
-        {DpadPosition::DPAD_DOWN_RIGHT, "down-right",   "Dpad: \u2198"},
-        {DpadPosition::DPAD_DOWN,       "down",         "Dpad: \u2193"},
-        {DpadPosition::DPAD_DOWN_LEFT,  "down-left",    "Dpad: \u2199"},
-        {DpadPosition::DPAD_LEFT,       "left",         "Dpad: \u2190"},
-        {DpadPosition::DPAD_UP_LEFT,    "up-left",      "Dpad: \u2196"},
-    };
-    return database;
-}
 
 
 
@@ -236,7 +199,45 @@ std::string ProControllerState::to_cpp(Milliseconds hold, Milliseconds release) 
 
 
 
-#if 0
+
+
+const CheckboxDropdownDatabase<Button>& ProController_Button_Database(){
+    static CheckboxDropdownDatabase<Button> database{
+        {Button::BUTTON_Y,          "Y",        "Y"},
+        {Button::BUTTON_B,          "B",        "B"},
+        {Button::BUTTON_A,          "A",        "A"},
+        {Button::BUTTON_X,          "X",        "X"},
+        {Button::BUTTON_L,          "L",        "L"},
+        {Button::BUTTON_R,          "R",        "R"},
+        {Button::BUTTON_ZL,         "ZL",       "ZL"},
+        {Button::BUTTON_ZR,         "ZR",       "ZR"},
+        {Button::BUTTON_MINUS,      "-",        "-"},
+        {Button::BUTTON_PLUS,       "+",        "+"},
+        {Button::BUTTON_LCLICK,     "L-click",  "L-click"},
+        {Button::BUTTON_RCLICK,     "R-click",  "R-click"},
+        {Button::BUTTON_HOME,       "home",     "Home"},
+        {Button::BUTTON_CAPTURE,    "capture",  "Capture"},
+        {Button::BUTTON_GR,         "GR",       "GR (Switch 2)"},
+        {Button::BUTTON_GL,         "GL",       "GL (Switch 2)"},
+        {Button::BUTTON_C,          "C",        "C (Switch 2)"},
+    };
+    return database;
+}
+const EnumDropdownDatabase<DpadPosition>& ProController_Dpad_Database(){
+    static EnumDropdownDatabase<DpadPosition> database{
+        {DpadPosition::DPAD_NONE,       "none",         "Dpad: none"},
+        {DpadPosition::DPAD_UP,         "up",           "Dpad: \u2191"},
+        {DpadPosition::DPAD_UP_RIGHT,   "up-right",     "Dpad: \u2197"},
+        {DpadPosition::DPAD_RIGHT,      "right",        "Dpad: \u2192"},
+        {DpadPosition::DPAD_DOWN_RIGHT, "down-right",   "Dpad: \u2198"},
+        {DpadPosition::DPAD_DOWN,       "down",         "Dpad: \u2193"},
+        {DpadPosition::DPAD_DOWN_LEFT,  "down-left",    "Dpad: \u2199"},
+        {DpadPosition::DPAD_LEFT,       "left",         "Dpad: \u2190"},
+        {DpadPosition::DPAD_UP_LEFT,    "up-left",      "Dpad: \u2196"},
+    };
+    return database;
+}
+
 
 
 
@@ -246,49 +247,119 @@ class ProControllerStateRow : public ControllerStateRow{
 public:
     ProControllerStateRow(EditableTableOption& parent_table)
         : ControllerStateRow(parent_table)
+        , DURATION(LockMode::LOCK_WHILE_RUNNING, "200 ms")
+        , BUTTONS(
+            "Buttons",
+            ProController_Button_Database(),
+            LockMode::UNLOCK_WHILE_RUNNING,
+            BUTTON_NONE
+        )
         , DPAD(
-            DPAD_DATABASE(),
+            ProController_Dpad_Database(),
             LockMode::UNLOCK_WHILE_RUNNING,
             DpadPosition::DPAD_NONE
         )
-        , LEFT_JOYSTICK(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
+        , LEFT_JOYSTICK_X(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
+        , LEFT_JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
+        , RIGHT_JOYSTICK_X(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
+        , RIGHT_JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
     {
+        PA_ADD_OPTION(DURATION);
+        PA_ADD_OPTION(BUTTONS);
         PA_ADD_OPTION(DPAD);
-        PA_ADD_OPTION(LEFT_JOYSTICK);
+        PA_ADD_OPTION(LEFT_JOYSTICK_X);
+        PA_ADD_OPTION(LEFT_JOYSTICK_Y);
+        PA_ADD_OPTION(RIGHT_JOYSTICK_X);
+        PA_ADD_OPTION(RIGHT_JOYSTICK_Y);
     }
 
     virtual std::unique_ptr<EditableTableRow> clone() const override{
         std::unique_ptr<ProControllerStateRow> ret(new ProControllerStateRow(parent()));
-        ret->m_state = m_state;
+        ret->DURATION.set(DURATION.current_text());
+        ret->BUTTONS.set_flag(BUTTONS.current_value());
+        ret->DPAD.set(DPAD);
+        ret->LEFT_JOYSTICK_X.set(LEFT_JOYSTICK_X);
+        ret->LEFT_JOYSTICK_Y.set(LEFT_JOYSTICK_Y);
+        ret->RIGHT_JOYSTICK_X.set(RIGHT_JOYSTICK_X);
+        ret->RIGHT_JOYSTICK_Y.set(RIGHT_JOYSTICK_Y);
         return ret;
     }
 
     virtual void load_json(const JsonValue& json) override{
         const JsonObject& obj = json.to_object_throw();
-        m_milliseconds = Milliseconds(obj.get_integer_throw("duration_in_ms"));
-        m_state.load_json(obj);
+
+        do{
+            const std::string* duration = obj.get_string("ms");
+            if (duration != nullptr){
+                DURATION.load_json(*duration);
+                break;
+            }
+            DURATION.set(std::to_string(obj.get_integer_throw("duration_in_ms")));
+        }while (false);
+
+        ProControllerState state;
+        state.load_json(obj);
+
+        BUTTONS.replace_all(state.buttons);
+        DPAD.set(state.dpad);
+        LEFT_JOYSTICK_X.set(state.left_x);
+        LEFT_JOYSTICK_Y.set(state.left_y);
+        RIGHT_JOYSTICK_X.set(state.right_x);
+        RIGHT_JOYSTICK_Y.set(state.right_y);
     }
     virtual JsonValue to_json() const override{
-        JsonObject json = m_state.to_json();
-        json["duration_in_ms"] = m_milliseconds.count();
+        ProControllerState state;
+        get_state(state);
+
+        JsonObject json = state.to_json();
+        json["duration_in_ms"] = DURATION.to_json();
         return json;
     }
 
-    virtual const ControllerState& get_state() const override{
-        return m_state;
+    void get_state(ProControllerState& state) const{
+        state.buttons = BUTTONS;
+        state.dpad = DPAD;
+        state.left_x = LEFT_JOYSTICK_X;
+        state.left_y = LEFT_JOYSTICK_Y;
+        state.right_x = RIGHT_JOYSTICK_X;
+        state.right_y = RIGHT_JOYSTICK_Y;
+    }
+    virtual std::unique_ptr<ControllerState> get_state(Milliseconds& duration) const override{
+        std::unique_ptr<ProControllerState> ret(new ProControllerState());
+        get_state(*ret);
+        duration = DURATION;
+        return ret;
     }
 
 private:
-    ProControllerState m_state;
-
+    MillisecondsCell DURATION;
+    CheckboxDropdownCell<Button> BUTTONS;
     EnumDropdownCell<DpadPosition> DPAD;
-    SimpleIntegerCell<uint8_t> LEFT_JOYSTICK;
+    SimpleIntegerCell<uint8_t> LEFT_JOYSTICK_X;
+    SimpleIntegerCell<uint8_t> LEFT_JOYSTICK_Y;
+    SimpleIntegerCell<uint8_t> RIGHT_JOYSTICK_X;
+    SimpleIntegerCell<uint8_t> RIGHT_JOYSTICK_Y;
 };
 
 
 
-#endif
-
+int initialize_ProController(){
+    ControllerCommandTable::register_controller_type(
+        ControllerClass::NintendoSwitch_ProController,
+        ControllerCommandTable::make_row<ProControllerStateRow>,
+        {
+            "Milliseconds",
+            "Buttons",
+            "Dpad",
+            "Left JS (X)",
+            "Left JS (Y)",
+            "Right JS (X)",
+            "Right JS (Y)",
+        }
+    );
+    return 0;
+}
+int init_ProController = initialize_ProController();
 
 
 

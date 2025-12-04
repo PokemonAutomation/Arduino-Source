@@ -224,6 +224,11 @@ TestProgram::TestProgram()
     , BOX("Box", LockMode::UNLOCK_WHILE_RUNNING, 0, 0, 1, 1)
     , BUTTONS("Buttons", ProController_Button_Database(), LockMode::UNLOCK_WHILE_RUNNING, BUTTON_NONE)
     , DPAD(ProController_Dpad_Database(), LockMode::UNLOCK_WHILE_RUNNING, DPAD_NONE)
+    , COMMANDS({
+        ControllerClass::NintendoSwitch_ProController,
+        ControllerClass::NintendoSwitch_LeftJoycon,
+        ControllerClass::NintendoSwitch_RightJoycon,
+    })
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
@@ -240,6 +245,7 @@ TestProgram::TestProgram()
     PA_ADD_OPTION(BOX);
     PA_ADD_OPTION(BUTTONS);
     PA_ADD_OPTION(DPAD);
+    PA_ADD_OPTION(COMMANDS);
 //    PA_ADD_OPTION(battle_AI);
     PA_ADD_OPTION(NOTIFICATIONS);
     BUTTON0.add_listener(*this);

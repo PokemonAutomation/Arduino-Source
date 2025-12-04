@@ -78,10 +78,17 @@ public:
         return m_default;
     }
     FlagEnum current_value() const;
+    operator FlagEnum() const{
+        return current_value();
+    }
 
 
 public:
     bool is_set(FlagEnum value) const;
+
+    void replace_all(FlagEnum value);
+    void clear();
+
     void set_flag(FlagEnum value);
     void clear_flag(FlagEnum value);
     void toggle_flag(FlagEnum value);

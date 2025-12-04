@@ -652,6 +652,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/ControllerSession.h
     Source/Controllers/ControllerState.cpp
     Source/Controllers/ControllerState.h
+    Source/Controllers/ControllerStateTable.cpp
+    Source/Controllers/ControllerStateTable.h
     Source/Controllers/ControllerTypeStrings.cpp
     Source/Controllers/ControllerTypeStrings.h
     Source/Controllers/ControllerTypes.h
