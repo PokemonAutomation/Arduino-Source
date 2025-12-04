@@ -505,6 +505,7 @@ void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControll
     // enter Pokemon summary screen
     pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
     pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_Y, 20, 40);
 
     // confirm that moves are: Moonblast, Mystical Fire, Psychic, Misty Terrain
     context.wait_for_all_requests();
@@ -525,7 +526,7 @@ void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControll
             ErrorReport::SEND_ERROR_REPORT,
             "We expect your lead Pokemon to be a Gardevoir with moves in this order: Moonblast, Mystical Fire, Psychic, Misty Terrain. "
             "But we see something else instead. If you confirm that your lead Gardevoir does indeed have these moves in this order, "
-            "and are still getting this error, you can uncheck 'Pre-check: Ensure correct moves', under Advanced settings.\n" + language_warning(language),
+            "and are still getting this error, you can uncheck 'Pre-check: Ensure correct moves', under Advanced mode.\n" + language_warning(language),
             stream
         );
     }   

@@ -1354,6 +1354,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     }
 
     if (ENSURE_TIME_UNSYNCED && STORY_SECTION == StorySection::MAIN_STORY){
+        env.console.log("Ensure time is not synchronized to the internet.");
         pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
         ensure_time_unsynced(env, context);
         go_home(env.console, context);
@@ -1361,6 +1362,7 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
     }
 
     if (ENSURE_CORRECT_MOVES && STORY_SECTION == StorySection::MAIN_STORY){
+        env.console.log("Ensure lead Gardevoir has the correct moves.");
         confirm_lead_pokemon_moves(env, context, LANGUAGE);
     }
 
