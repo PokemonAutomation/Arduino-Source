@@ -208,7 +208,7 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
 
     OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay());
     int ret = wait_until(
-        console, context, 15s,
+        console, context, 30s,  // set 30sec to be long enough for Switch 1 to load the overworld
         {overworld,}
     );
     switch (ret){
@@ -220,7 +220,7 @@ FastTravelState fly_from_map(ConsoleHandle& console, ProControllerContext& conte
         // return false;
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "fly_from_map(): Does not detect end of black screen while fast travel.",
+            "fly_from_map(): Does not detect overworld after fast travel.",
             console
         );
     }
