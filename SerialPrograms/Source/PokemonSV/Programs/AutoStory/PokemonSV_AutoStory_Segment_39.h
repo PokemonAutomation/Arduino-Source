@@ -65,11 +65,11 @@ public:
 void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 // start: Opened Zero lab. Defeated Paradox Pokemon.
-// end: 
+// end: Entered Zero Lab. Spoke to AI Professor.
 void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
-// start: 
-// end: 
+// start: Entered Zero Lab. Spoke to AI Professor.
+// end: Battled the AI Professor. Completed the game.
 void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats);
 
 // start: 

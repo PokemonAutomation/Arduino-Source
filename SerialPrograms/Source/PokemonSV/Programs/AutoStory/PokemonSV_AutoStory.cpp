@@ -478,7 +478,8 @@ AutoStory::AutoStory()
         "For Start Points that are at Pokecenters, ensure that you fly there so that your character is in the exactly correct start position."
     }    
     , MAINSTORY_NOTE{
-        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Mystical Fire, Psychic, Misty Terrain.<br>"
+        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Mystical Fire, Psychic, Misty Terrain."
+        "Ensure PP is maxed out. Ensure Modest nature with max Special Attack and Speed EVs, with max IVs.<br>"
         "Also, make sure you have two other strong pokemon (e.g. level 100 Talonflames)<br>"
         "Refer to the documentation on github for more details."
     }
@@ -506,8 +507,7 @@ AutoStory::AutoStory()
     )
     , ENABLE_ADVANCED_MODE(
         "<b>Advanced mode:</b><br>"
-        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.<br>"
-        "Also, this enables the option to toggle 'Change settings at Program Start'.",
+        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     ) 
@@ -864,7 +864,7 @@ void AutoStory::on_config_value_changed(void* object){
     END_DESCRIPTION.set_visibility(!ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
     START_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
     END_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    CHANGE_SETTINGS.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    // CHANGE_SETTINGS.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     if (ENABLE_TEST_CHECKPOINTS){
         START_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);

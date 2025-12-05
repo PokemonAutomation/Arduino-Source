@@ -60,14 +60,14 @@ void AutoStory_Segment_38::run_segment(
 
 }
 
-std::string AutoStory_Checkpoint_100::name() const{ return "0100 - " + AutoStory_Segment_38().name(); }
+std::string AutoStory_Checkpoint_100::name() const{ return "100 - " + AutoStory_Segment_38().name(); }
 std::string AutoStory_Checkpoint_100::start_text() const{ return "Inside Area Zero Station 3. Deactivated the locks.";}
 std::string AutoStory_Checkpoint_100::end_text() const{ return "Entered inner cave. Finished cutscene, admiring the waterfall/large crystals.";}
 void AutoStory_Checkpoint_100::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_100(env, context, options.notif_status_update, stats);
 }
 
-std::string AutoStory_Checkpoint_101::name() const{ return "0101 - " + AutoStory_Segment_38().name(); }
+std::string AutoStory_Checkpoint_101::name() const{ return "101 - " + AutoStory_Segment_38().name(); }
 std::string AutoStory_Checkpoint_101::start_text() const{ return AutoStory_Checkpoint_100().end_text();}
 std::string AutoStory_Checkpoint_101::end_text() const{ return "Inside Area Zero Station 4. Deactivated the locks.";}
 void AutoStory_Checkpoint_101::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{

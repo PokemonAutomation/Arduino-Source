@@ -28,15 +28,15 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_39::name() const{
-    return "";
+    return "39: Zero Lab";
 }
 
 std::string AutoStory_Segment_39::start_text() const{
-    return "Start: ";
+    return "Start: Inside Area Zero Station 4. Deactivated the locks.";
 }
 
 std::string AutoStory_Segment_39::end_text() const{
-    return "End: ";
+    return "End: Entered Zero Lab. Spoke to AI Professor.";
 }
 
 void AutoStory_Segment_39::run_segment(
@@ -59,14 +59,14 @@ void AutoStory_Segment_39::run_segment(
 
 }
 
-std::string AutoStory_Checkpoint_102::name() const{ return "0102 - " + AutoStory_Segment_39().name(); }
+std::string AutoStory_Checkpoint_102::name() const{ return "102 - " + AutoStory_Segment_39().name(); }
 std::string AutoStory_Checkpoint_102::start_text() const{ return "Inside Area Zero Station 4. Deactivated the locks.";}
 std::string AutoStory_Checkpoint_102::end_text() const{ return "Opened Zero lab. Defeated Paradox Pokemon.";}
 void AutoStory_Checkpoint_102::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_102(env, context, options.notif_status_update, stats);
 }
 
-std::string AutoStory_Checkpoint_103::name() const{ return "0103 - " + AutoStory_Segment_39().name(); }
+std::string AutoStory_Checkpoint_103::name() const{ return "103 - " + AutoStory_Segment_39().name(); }
 std::string AutoStory_Checkpoint_103::start_text() const{ return AutoStory_Checkpoint_102().end_text();}
 std::string AutoStory_Checkpoint_103::end_text() const{ return "";}
 void AutoStory_Checkpoint_103::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
@@ -88,13 +88,10 @@ void AutoStory_Checkpoint_103::run_checkpoint(SingleSwitchProgramEnvironment& en
 // }
 
 void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    // [&](size_t attempt_number){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
 
         YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-lab.onnx");
-
-#if 0
-#endif
 
         pbf_move_left_joystick(context, 128, 255, 200, 100);
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10, 255, 128);
@@ -176,7 +173,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
 
         pbf_move_right_joystick(context, 128, 255, 200, 0);
-        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-5", 0, 30);
+        move_camera_until_yolo_object_detected(env, context, yolo_detector, "beyond-cliff-5", 0, 60);
 
         move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "beyond-cliff-5", 0.5,
             [&](){
@@ -241,7 +238,20 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
 
 
-        // clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE, CallbackEnum::PROMPT_DIALOG});
+
+        // battle Paradox 1
+        run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+
+        // battle Paradox 2
+        run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::BATTLE});
+
+        // battle Paradox 3
+        run_trainer_double_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::PROMPT_DIALOG});
+
 
         #if 0
         // align to rock.  
@@ -272,7 +282,7 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
         );
 
         #endif  
-    // });
+    });
 }
 
 void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
