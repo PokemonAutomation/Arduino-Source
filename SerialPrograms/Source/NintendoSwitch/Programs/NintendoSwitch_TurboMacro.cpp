@@ -32,11 +32,14 @@ TurboMacro::TurboMacro()
         LockMode::UNLOCK_WHILE_RUNNING,
         100, 0
     )
-    , TABLE({
-        ControllerClass::NintendoSwitch_ProController,
-        ControllerClass::NintendoSwitch_LeftJoycon,
-        ControllerClass::NintendoSwitch_RightJoycon,
-    })
+    , TABLE(
+        "Command Schedule:",
+        {
+            ControllerClass::NintendoSwitch_ProController,
+            ControllerClass::NintendoSwitch_LeftJoycon,
+            ControllerClass::NintendoSwitch_RightJoycon,
+        }
+    )
 {
     PA_ADD_OPTION(LOOP);
     PA_ADD_OPTION(TABLE);

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Controllers_ControllerStateTable_H
 #define PokemonAutomation_Controllers_ControllerStateTable_H
 
-#include "Common/Cpp/Options/BatchOption.h"
+#include "Common/Cpp/Options/GroupOption.h"
 #include "Common/Cpp/Options/EnumDropdownOption.h"
 #include "Common/Cpp/Options/EditableTableOption.h"
 #include "ControllerTypes.h"
@@ -89,10 +89,13 @@ private:
 
 
 
-class ControllerCommandTables : public BatchOption, public ConfigOption::Listener{
+class ControllerCommandTables : public GroupOption, public ConfigOption::Listener{
 public:
     ~ControllerCommandTables();
-    ControllerCommandTables(const std::vector<ControllerClass>& controller_list);
+    ControllerCommandTables(
+        std::string label,
+        const std::vector<ControllerClass>& controller_list
+    );
 
     void run(CancellableScope& scope, AbstractController& controller){
         m_table.run(scope, controller);

@@ -224,11 +224,14 @@ TestProgram::TestProgram()
     , BOX("Box", LockMode::UNLOCK_WHILE_RUNNING, 0, 0, 1, 1)
     , BUTTONS("Buttons", ProController_Button_Database(), LockMode::UNLOCK_WHILE_RUNNING, BUTTON_NONE)
     , DPAD(ProController_Dpad_Database(), LockMode::UNLOCK_WHILE_RUNNING, DPAD_NONE)
-    , COMMANDS({
-        ControllerClass::NintendoSwitch_ProController,
-        ControllerClass::NintendoSwitch_LeftJoycon,
-        ControllerClass::NintendoSwitch_RightJoycon,
-    })
+    , COMMANDS(
+        "Command Schedule:",
+        {
+            ControllerClass::NintendoSwitch_ProController,
+            ControllerClass::NintendoSwitch_LeftJoycon,
+            ControllerClass::NintendoSwitch_RightJoycon,
+        }
+    )
     , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,

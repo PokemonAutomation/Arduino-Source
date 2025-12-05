@@ -313,8 +313,15 @@ std::unique_ptr<EditableTableRow> ControllerCommandTable::make_row(){
 ControllerCommandTables::~ControllerCommandTables(){
     m_type.remove_listener(*this);
 }
-ControllerCommandTables::ControllerCommandTables(const std::vector<ControllerClass>& controller_list)
-    : BatchOption(LockMode::UNLOCK_WHILE_RUNNING)
+ControllerCommandTables::ControllerCommandTables(
+    std::string label,
+    const std::vector<ControllerClass>& controller_list
+)
+    : GroupOption(
+        std::move(label),
+        LockMode::UNLOCK_WHILE_RUNNING,
+        EnableMode::ALWAYS_ENABLED
+    )
     , m_type(
         "<b>Controller Type:</b>",
         make_database(controller_list),
