@@ -134,7 +134,7 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_36>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_37>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_38>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_40>());
     }
     return segment_list;
@@ -309,8 +309,8 @@ std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_lis
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_99>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_100>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_101>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_102>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_103>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_102>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_103>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_104>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_105>());
 
@@ -478,7 +478,8 @@ AutoStory::AutoStory()
         "For Start Points that are at Pokecenters, ensure that you fly there so that your character is in the exactly correct start position."
     }    
     , MAINSTORY_NOTE{
-        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Mystical Fire, Psychic, Misty Terrain.<br>"
+        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Mystical Fire, Psychic, Misty Terrain."
+        "Ensure PP is maxed out. Ensure Modest nature with max Special Attack and Speed EVs, with max IVs.<br>"
         "Also, make sure you have two other strong pokemon (e.g. level 100 Talonflames)<br>"
         "Refer to the documentation on github for more details."
     }
@@ -506,8 +507,7 @@ AutoStory::AutoStory()
     )
     , ENABLE_ADVANCED_MODE(
         "<b>Advanced mode:</b><br>"
-        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.<br>"
-        "Also, this enables the option to toggle 'Change settings at Program Start'.",
+        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     ) 
@@ -864,7 +864,7 @@ void AutoStory::on_config_value_changed(void* object){
     END_DESCRIPTION.set_visibility(!ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
     START_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
     END_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    CHANGE_SETTINGS.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    // CHANGE_SETTINGS.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     if (ENABLE_TEST_CHECKPOINTS){
         START_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);
@@ -1051,8 +1051,8 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_99(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_100(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_101(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, stats);});
     // checkpoint_list.push_back([&](){checkpoint_104(env, context, notif_status_update, stats);});
     // checkpoint_list.push_back([&](){checkpoint_105(env, context, notif_status_update, stats);});
     

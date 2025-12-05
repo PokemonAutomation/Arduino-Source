@@ -28,15 +28,15 @@ namespace PokemonSV{
 
 
 std::string AutoStory_Segment_40::name() const{
-    return "";
+    return "40: Finish Main Story";
 }
 
 std::string AutoStory_Segment_40::start_text() const{
-    return "Start: ";
+    return "Start: Entered Zero Lab. Spoke to AI Professor.";
 }
 
 std::string AutoStory_Segment_40::end_text() const{
-    return "End: ";
+    return "End: Battled the AI Professor. Completed the game.";
 }
 
 void AutoStory_Segment_40::run_segment(
@@ -52,11 +52,36 @@ void AutoStory_Segment_40::run_segment(
     context.wait_for_all_requests();
     env.console.log("Start Segment " + name(), COLOR_ORANGE);
 
-    // AutoStory_Checkpoint_9().run_checkpoint(env, context, options, stats);
+    AutoStory_Checkpoint_104().run_checkpoint(env, context, options, stats);
 
     context.wait_for_all_requests();
     env.console.log("End Segment " + name(), COLOR_GREEN);
 
+}
+
+std::string AutoStory_Checkpoint_104::name() const{ return "104 - " + AutoStory_Segment_40().name(); }
+std::string AutoStory_Checkpoint_104::start_text() const{ return "Entered Zero Lab. Spoke to AI Professor.";}
+std::string AutoStory_Checkpoint_104::end_text() const{ return "Battled the AI Professor. Completed the game.";}
+void AutoStory_Checkpoint_104::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+    checkpoint_104(env, context, options.notif_status_update, stats);
+}
+
+// std::string AutoStory_Checkpoint_105::name() const{ return "105 - " + AutoStory_Segment_40().name(); }
+// std::string AutoStory_Checkpoint_105::start_text() const{ return "";}
+// std::string AutoStory_Checkpoint_105::end_text() const{ return "";}
+// void AutoStory_Checkpoint_105::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
+//     checkpoint_105(env, context, options.notif_status_update, stats);
+// }
+
+void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    // [&](size_t attempt_number){
+
+
+    // });
+}
+
+void checkpoint_105(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
 }
 
 
