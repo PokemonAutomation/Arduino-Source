@@ -286,11 +286,30 @@ void checkpoint_102(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 }
 
 void checkpoint_103(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    // checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    // [&](size_t attempt_number){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
 
+        do_action_and_monitor_for_battles(env.program_info(), env.console, context,
+            [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
+                pbf_press_button(context, BUTTON_L, 30, 10);
+                pbf_move_left_joystick(context, 255, 128, 70, 50);
 
-    // });
+                pbf_move_left_joystick(context, 110, 0, 10, 50);
+                pbf_press_button(context, BUTTON_L, 30, 10);
+
+                pbf_move_left_joystick(context, 128, 0, 600, 50);
+                wait_for_overworld(env.program_info(), env.console, context, 30);
+                
+            }
+        ); 
+
+        pbf_move_left_joystick(context, 128, 0, 300, 50);
+        pbf_move_left_joystick(context, 255, 128, 200, 50);
+
+        walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_ONLY, 10);
+        mash_button_till_overworld(env.console, context, BUTTON_A);
+
+    });
 }
 
 void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
