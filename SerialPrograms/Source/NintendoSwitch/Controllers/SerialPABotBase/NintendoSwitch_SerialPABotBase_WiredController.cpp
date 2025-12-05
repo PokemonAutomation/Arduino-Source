@@ -35,7 +35,6 @@ SerialPABotBase_WiredController::SerialPABotBase_WiredController(
         controller_type,
         connection
     )
-    , m_controller_type(controller_type)
 {
     using namespace SerialPABotBase;
 

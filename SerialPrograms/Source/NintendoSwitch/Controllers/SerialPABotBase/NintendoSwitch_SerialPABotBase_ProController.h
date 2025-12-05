@@ -43,10 +43,6 @@ public:
 
 
 public:
-//    virtual ControllerType controller_type() const override{
-//        return m_controller_type;
-//    }
-
     virtual ControllerPerformanceClass performance_class() const override{
         return m_performance_class;
     }

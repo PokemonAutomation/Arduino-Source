@@ -49,10 +49,6 @@ public:
 
 
 public:
-//    virtual ControllerType controller_type() const override{
-//        return m_controller_type;
-//    }
-
     virtual ControllerPerformanceClass performance_class() const override{
         return ControllerPerformanceClass::SerialPABotBase_Wired;
     }
@@ -238,7 +234,6 @@ private:
 
 
 private:
-    const ControllerType m_controller_type;
     std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
 };
 
