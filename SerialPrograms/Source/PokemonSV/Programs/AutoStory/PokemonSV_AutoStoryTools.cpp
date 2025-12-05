@@ -362,9 +362,9 @@ void overworld_navigation(
                     if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
                         walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
                     }else{
-                        ssf_press_left_joystick(context, x, y, 0, seconds_realign * TICKS_PER_SECOND);
+                        ssf_press_left_joystick(context, x, y, 0ms, Seconds(seconds_realign));
                         if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
-                            pbf_wait(context, seconds_realign * TICKS_PER_SECOND);
+                            pbf_wait(context, Seconds(seconds_realign));
                         } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
                             for (size_t j = 0; j < 5 * seconds_realign; j++){
                                 pbf_press_button(context, BUTTON_A, 20, 5);
@@ -1063,9 +1063,9 @@ void press_A_until_dialog(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [seconds_between_button_presses](ProControllerContext& context){
-            pbf_wait(context, seconds_between_button_presses * TICKS_PER_SECOND); // avoiding pressing A if dialog already present
+            pbf_wait(context, Seconds(seconds_between_button_presses)); // avoiding pressing A if dialog already present
             for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_A, 20, seconds_between_button_presses * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_A, 20*8ms, Seconds(seconds_between_button_presses));
             }
         },
         {advance_dialog}

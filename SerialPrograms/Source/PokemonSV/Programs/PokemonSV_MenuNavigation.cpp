@@ -143,9 +143,9 @@ void press_Bs_to_back_to_overworld(const ProgramInfo& info, VideoStream& stream,
     int ret = run_until<ProControllerContext>(
         stream, context,
         [seconds_between_b_presses](ProControllerContext& context){
-            pbf_wait(context, seconds_between_b_presses * TICKS_PER_SECOND); // avoiding pressing B if already in overworld
+            pbf_wait(context, Seconds(seconds_between_b_presses)); // avoiding pressing B if already in overworld
             for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_B, 20, seconds_between_b_presses * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, 20*8ms, Seconds(seconds_between_b_presses));
             }
         },
         {overworld, battle}
