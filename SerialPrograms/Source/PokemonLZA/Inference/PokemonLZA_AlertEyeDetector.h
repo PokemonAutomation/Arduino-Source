@@ -50,6 +50,17 @@ public:
     {}
 };
 
+class AlertEyeOverWatcher : public DetectorToFinder<AlertEyeDetector>{
+public:
+    AlertEyeOverWatcher(
+        Color color,
+        VideoOverlay* overlay,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(250)
+    )
+         : DetectorToFinder("AlertEyeOverWatcher", FinderType::GONE, hold_duration, color, overlay)
+    {}
+};
+
 class AlertEyeTracker final : public AlertEyeDetector, public VisualInferenceCallback{
 public:
     AlertEyeTracker(Color color, VideoOverlay* overlay, WallDuration min_duration);
