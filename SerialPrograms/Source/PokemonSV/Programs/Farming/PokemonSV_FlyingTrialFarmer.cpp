@@ -240,29 +240,15 @@ void FlyingTrialFarmer::program(SingleSwitchProgramEnvironment& env, ProControll
                 pbf_wait(context,  9 * TICKS_PER_SECOND);
                 break;
             case FlightPath::BACK_ENTRY_SOFT_TURN:
-#if 0
-                if (env.console.controller().controller_type() == ControllerType::NintendoSwitch_WirelessProController){
-                    pbf_wait(context,  Milliseconds(3000));
-                    pbf_move_left_joystick(context, 180, get_final_y_axis(-108), Milliseconds(1005), Milliseconds(0));
-                    pbf_wait(context,  Milliseconds(1995)); 
-                    pbf_move_left_joystick(context,  40, get_final_y_axis( -78), Milliseconds(1605), Milliseconds(0));
-                    pbf_wait(context,  Milliseconds(1005)); 
-                    pbf_move_left_joystick(context, 110, get_final_y_axis( -78), Milliseconds(1995), Milliseconds(0)); 
-                    pbf_wait(context,  Milliseconds(14040));
-                    pbf_move_left_joystick(context, 205, get_final_y_axis(  30), Milliseconds(735), Milliseconds(0));
-                    pbf_wait(context,  Milliseconds(9000));                                       
-                }else{
-#endif
-                    pbf_wait(context,  3000ms);
-                    pbf_move_left_joystick(context, 180, get_final_y_axis(-108), 1000ms, 0ms);
-                    pbf_wait(context,  2000ms);
-                    pbf_move_left_joystick(context,  40, get_final_y_axis( -78), 1920ms, 0ms);
-                    pbf_wait(context,  1000ms);
-                    pbf_move_left_joystick(context, 110, get_final_y_axis( -78), 2000ms, 0ms);
-                    pbf_wait(context, 14000ms);
-                    pbf_move_left_joystick(context, 205, get_final_y_axis(  37), 1280ms, 0ms);
-                    pbf_wait(context,  9000ms);
-//                }
+                pbf_wait(context,  3000ms);
+                pbf_move_left_joystick(context, 180, get_final_y_axis(-108), 1000ms, 0ms);
+                pbf_wait(context,  2000ms);
+                pbf_move_left_joystick(context,  40, get_final_y_axis( -78), 1920ms, 0ms);
+                pbf_wait(context,  1000ms);
+                pbf_move_left_joystick(context, 110, get_final_y_axis( -78), 2000ms, 0ms);
+                pbf_wait(context, 14000ms);
+                pbf_move_left_joystick(context, 205, get_final_y_axis(  37), 1280ms, 0ms);
+                pbf_wait(context,  9000ms);
                 break;
             case FlightPath::BACK_ENTRY_HARD_TURN:
                 pbf_wait(context,  3 * TICKS_PER_SECOND);

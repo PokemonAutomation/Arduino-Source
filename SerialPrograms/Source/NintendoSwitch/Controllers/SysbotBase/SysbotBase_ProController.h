@@ -43,13 +43,13 @@ public:
 
 
 public:
-    virtual ControllerType controller_type() const override{
-        return ControllerType::NintendoSwitch_WiredController;
-    }
+//    virtual ControllerType controller_type() const override{
+//        return ControllerType::NintendoSwitch_WiredController;
+//    }
+
     virtual ControllerPerformanceClass performance_class() const override{
         return ControllerPerformanceClass::SysbotBase;
     }
-
     virtual Milliseconds ticksize() const override{
         return Milliseconds::zero();
     }

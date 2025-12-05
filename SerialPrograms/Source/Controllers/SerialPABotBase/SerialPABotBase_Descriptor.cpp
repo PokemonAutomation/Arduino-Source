@@ -94,6 +94,7 @@ std::unique_ptr<AbstractController> SerialPABotBase_Descriptor::make_controller(
             )
         );
 
+    case ControllerType::NintendoSwitch_WiredProController:
     case ControllerType::NintendoSwitch_WirelessProController:
         return std::unique_ptr<AbstractController>(
             new PokemonAutomation::NintendoSwitch::SerialPABotBase_ProController(
