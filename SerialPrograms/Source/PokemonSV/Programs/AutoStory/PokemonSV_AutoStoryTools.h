@@ -45,6 +45,7 @@ enum class ClearDialogMode{
     STOP_TIMEOUT,
     STOP_BATTLE,
     STOP_TUTORIAL,
+    STOP_BATTLE_DIALOG_ARROW,
 };
 
 
@@ -125,7 +126,8 @@ void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t
 // also throw exception if dialog is never detected.
 void clear_dialog(VideoStream& stream, ProControllerContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout = 60,
-    std::vector<CallbackEnum> optional_callbacks = {}
+    std::vector<CallbackEnum> optional_callbacks = {},
+    bool press_A = true
 );
 
 

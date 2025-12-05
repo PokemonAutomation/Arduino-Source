@@ -79,7 +79,8 @@ void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t
 
 void clear_dialog(VideoStream& stream, ProControllerContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout,
-    std::vector<CallbackEnum> enum_optional_callbacks
+    std::vector<CallbackEnum> enum_optional_callbacks,
+    bool press_A
 ){
     bool seen_dialog = false;
     WallClock start = current_time();
@@ -148,7 +149,7 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             stream, context,
             [&](ProControllerContext& context){
 
-                if (mode == ClearDialogMode::STOP_TIMEOUT){
+                if (mode == ClearDialogMode::STOP_TIMEOUT || !press_A){
                     context.wait_for(Seconds(seconds_timeout));
                 }else{ // press A every 8 seconds, until we time out.
                     auto button_press_period = Seconds(8);
@@ -208,6 +209,9 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
         case CallbackEnum::DIALOG_ARROW:
             stream.log("clear_dialog: Detected dialog arrow.");
             seen_dialog = true;
+            if (mode == ClearDialogMode::STOP_BATTLE_DIALOG_ARROW){
+                return;
+            }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case CallbackEnum::BATTLE:
