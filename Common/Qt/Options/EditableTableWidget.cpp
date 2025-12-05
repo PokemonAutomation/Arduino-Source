@@ -141,7 +141,12 @@ EditableTableWidget::EditableTableWidget(QWidget& parent, EditableTableOption& v
             );
         }
         {
-            QPushButton* button = new QPushButton("Restore Defaults", this);
+            QPushButton* button = new QPushButton(
+                value.defaults().empty()
+                    ? "Clear Table"
+                    : "Restore Defaults",
+                this
+            );
             buttons->addWidget(button, 1);
             connect(
                 button, &QPushButton::clicked,

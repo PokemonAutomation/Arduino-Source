@@ -87,6 +87,9 @@ public:
 
 public:
     const std::string& label() const{ return m_label; }
+    const std::vector<std::unique_ptr<EditableTableRow>>& defaults() const{
+        return m_default;
+    }
 
     //  Returns the # of rows at this moment of time.
     //  Since this value can be out-of-date before you return, do not use
