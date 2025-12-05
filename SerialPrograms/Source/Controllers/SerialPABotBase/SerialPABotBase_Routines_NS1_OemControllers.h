@@ -8,7 +8,7 @@
 #define PokemonAutomation_SerialPABotBase_ESP32_Routines_H
 
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
-#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WirelessControllers.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h"
 #include "Controllers/ControllerTypes.h"
 #include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 
@@ -16,12 +16,12 @@ namespace PokemonAutomation{
 namespace SerialPABotBase{
 
 
-void register_message_converters_NS1_WirelessControllers();
+void register_message_converters_NS1_OemControllers();
 
 
 class MessageControllerReadSpi : public BotBaseRequest{
 public:
-    pabb_Message_NS1_WirelessController_ReadSpi params;
+    pabb_Message_NS1_OemController_ReadSpi params;
     MessageControllerReadSpi(ControllerType controller_type, uint32_t address, uint8_t bytes)
         : BotBaseRequest(false)
     {
@@ -44,7 +44,7 @@ public:
         params.bytes = bytes;
     }
     virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_READ_SPI, params);
+        return BotBaseMessage(PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_READ_SPI, params);
     }
 };
 class MessageControllerWriteSpi : public BotBaseRequest{
@@ -70,7 +70,7 @@ public:
             break;
         default:;
         }
-        pabb_Message_NS1_WirelessController_WriteSpi params;
+        pabb_Message_NS1_OemController_WriteSpi params;
         params.seqnum = 0;
         params.controller_type = controller_id;
         params.address = address;
@@ -79,15 +79,15 @@ public:
         data += std::string((const char*)p_data, bytes);
     }
     virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_WRITE_SPI, data);
+        return BotBaseMessage(PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_WRITE_SPI, data);
     }
 };
 class MessageControllerStateButtons : public BotBaseRequest{
 public:
-    pabb_Message_Command_NS1_WirelessController_Buttons params;
+    pabb_Message_Command_NS1_OemController_Buttons params;
     MessageControllerStateButtons(
         uint16_t milliseconds,
-        const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& state
+        const pabb_NintendoSwitch_OemController_State0x30_Buttons& state
     )
         : BotBaseRequest(true)
     {
@@ -96,16 +96,16 @@ public:
         params.buttons = state;
     }
     virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_COMMAND_NS1_WIRELESS_CONTROLLER_BUTTONS, params);
+        return BotBaseMessage(PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_BUTTONS, params);
     }
 };
 class MessageControllerStateFull : public BotBaseRequest{
 public:
-    pabb_Message_Command_NS1_WirelessController_FullState params;
+    pabb_Message_Command_NS1_OemController_FullState params;
     MessageControllerStateFull(
         uint16_t milliseconds,
-        const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
-        const pabb_NintendoSwitch_WirelessController_State0x30_GyroX3& gyro
+        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
+        const pabb_NintendoSwitch_OemController_State0x30_GyroX3& gyro
     )
         : BotBaseRequest(true)
     {
@@ -115,7 +115,7 @@ public:
         params.state.gyro = gyro;
     }
     virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_COMMAND_NS1_WIRELESS_CONTROLLER_FULL_STATE, params);
+        return BotBaseMessage(PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_FULL_STATE, params);
     }
 };
 

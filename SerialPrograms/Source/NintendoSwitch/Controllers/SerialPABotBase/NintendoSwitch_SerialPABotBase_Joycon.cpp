@@ -1,11 +1,11 @@
-/*  SerialPABotBase: Wireless Joycon
+/*  SerialPABotBase: Joycon
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "NintendoSwitch_SerialPABotBase_WirelessJoycon.h"
+#include "NintendoSwitch_SerialPABotBase_Joycon.h"
 
 //#include <iostream>
 //using std::cout;
@@ -16,12 +16,12 @@ namespace NintendoSwitch{
 
 
 
-SerialPABotBase_WirelessLeftJoycon::SerialPABotBase_WirelessLeftJoycon(
+SerialPABotBase_LeftJoycon::SerialPABotBase_LeftJoycon(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
     ControllerResetMode reset_mode
 )
-    : SerialPABotBase_WirelessJoycon<LeftJoycon>(
+    : SerialPABotBase_Joycon<LeftJoycon>(
         logger, connection,
         ControllerType::NintendoSwitch_LeftJoycon,
         reset_mode
@@ -29,17 +29,17 @@ SerialPABotBase_WirelessLeftJoycon::SerialPABotBase_WirelessLeftJoycon(
 {
     m_valid_buttons = VALID_LEFT_JOYCON_BUTTONS;
 }
-SerialPABotBase_WirelessLeftJoycon::~SerialPABotBase_WirelessLeftJoycon(){
+SerialPABotBase_LeftJoycon::~SerialPABotBase_LeftJoycon(){
     JoyconController::stop();
-    SerialPABotBase_WirelessController::stop();
+    SerialPABotBase_OemController::stop();
 }
 
-SerialPABotBase_WirelessRightJoycon::SerialPABotBase_WirelessRightJoycon(
+SerialPABotBase_RightJoycon::SerialPABotBase_RightJoycon(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
     ControllerResetMode reset_mode
 )
-    : SerialPABotBase_WirelessJoycon<RightJoycon>(
+    : SerialPABotBase_Joycon<RightJoycon>(
         logger, connection,
         ControllerType::NintendoSwitch_RightJoycon,
         reset_mode
@@ -47,9 +47,9 @@ SerialPABotBase_WirelessRightJoycon::SerialPABotBase_WirelessRightJoycon(
 {
     m_valid_buttons = VALID_RIGHT_JOYCON_BUTTONS;
 }
-SerialPABotBase_WirelessRightJoycon::~SerialPABotBase_WirelessRightJoycon(){
+SerialPABotBase_RightJoycon::~SerialPABotBase_RightJoycon(){
     JoyconController::stop();
-    SerialPABotBase_WirelessController::stop();
+    SerialPABotBase_OemController::stop();
 }
 
 
@@ -59,14 +59,14 @@ SerialPABotBase_WirelessRightJoycon::~SerialPABotBase_WirelessRightJoycon(){
 
 
 template <typename JoyconType>
-SerialPABotBase_WirelessJoycon<JoyconType>::SerialPABotBase_WirelessJoycon(
+SerialPABotBase_Joycon<JoyconType>::SerialPABotBase_Joycon(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
     ControllerType controller_type,
     ControllerResetMode reset_mode
 )
     : JoyconType(logger, controller_type)
-    , SerialPABotBase_WirelessController(
+    , SerialPABotBase_OemController(
         logger,
         connection,
         controller_type,
@@ -78,7 +78,7 @@ SerialPABotBase_WirelessJoycon<JoyconType>::SerialPABotBase_WirelessJoycon(
 
 
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::issue_buttons(
+void SerialPABotBase_Joycon<JoyconType>::issue_buttons(
     const Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     Button button
@@ -87,7 +87,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_buttons(
     ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
 }
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::issue_joystick(
+void SerialPABotBase_Joycon<JoyconType>::issue_joystick(
     const Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     uint8_t x, uint8_t y
@@ -104,7 +104,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_joystick(
     }
 }
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::issue_full_controller_state(
+void SerialPABotBase_Joycon<JoyconType>::issue_full_controller_state(
     const Cancellable* cancellable,
     bool enable_logging,
     Milliseconds duration,
@@ -142,7 +142,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_full_controller_state(
 
 
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::issue_mash_button(
+void SerialPABotBase_Joycon<JoyconType>::issue_mash_button(
     const Cancellable* cancellable,
     Button button, Milliseconds duration
 ){
@@ -154,7 +154,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::issue_mash_button(
 
 
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_left_joycon(
+void SerialPABotBase_Joycon<JoyconType>::execute_state_left_joycon(
     const Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
@@ -163,7 +163,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_left_joycon(
         static_cast<const SwitchCommand&>(*item).apply(controller_state);
     }
 
-    pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
+    pabb_NintendoSwitch_OemController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -188,7 +188,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_left_joycon(
         controller_state.left_stick_x, controller_state.left_stick_y
     );
 
-    pabb_NintendoSwitch_WirelessController_State0x30_Gyro gyro{};
+    pabb_NintendoSwitch_OemController_State0x30_Gyro gyro{};
     bool gyro_active = populate_report_gyro(gyro, controller_state);
 
     if (!gyro_active){
@@ -198,7 +198,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_left_joycon(
     }
 }
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_right_joycon(
+void SerialPABotBase_Joycon<JoyconType>::execute_state_right_joycon(
     const Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
@@ -207,7 +207,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_right_joycon(
         static_cast<const SwitchCommand&>(*item).apply(controller_state);
     }
 
-    pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
+    pabb_NintendoSwitch_OemController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -230,7 +230,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_right_joycon(
          << std::chrono::duration_cast<Milliseconds>(entry.duration).count() << endl;
 #endif
 
-    pabb_NintendoSwitch_WirelessController_State0x30_Gyro gyro{};
+    pabb_NintendoSwitch_OemController_State0x30_Gyro gyro{};
     bool gyro_active = populate_report_gyro(gyro, controller_state);
 
     if (!gyro_active){
@@ -240,7 +240,7 @@ void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state_right_joycon(
     }
 }
 template <typename JoyconType>
-void SerialPABotBase_WirelessJoycon<JoyconType>::execute_state(
+void SerialPABotBase_Joycon<JoyconType>::execute_state(
     const Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){

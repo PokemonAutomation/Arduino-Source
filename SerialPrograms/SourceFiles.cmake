@@ -16,8 +16,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Compiler.h
     ../Common/ControllerStates/HID_Keyboard_State.h
     ../Common/ControllerStates/NintendoSwitch2_WiredController_State.h
-    ../Common/ControllerStates/NintendoSwitch_WirelessController_State.c
-    ../Common/ControllerStates/NintendoSwitch_WirelessController_State.h
+    ../Common/ControllerStates/NintendoSwitch_OemController_State.c
+    ../Common/ControllerStates/NintendoSwitch_OemController_State.h
     ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp
     ../Common/Cpp/BitmapConversion.h
@@ -255,7 +255,7 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
-    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WirelessControllers.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS2_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
@@ -691,8 +691,8 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
@@ -965,14 +965,14 @@ file(GLOB LIBRARY_SOURCES
     Source/NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerTable.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Controller.h
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.cpp
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_Joycon.h
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_OemController.cpp
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_OemController.h
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.cpp
+    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_ProController.h
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.cpp
     Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WiredController.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessController.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessController.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessJoycon.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessJoycon.h
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessProController.cpp
-    Source/NintendoSwitch/Controllers/SerialPABotBase/NintendoSwitch_SerialPABotBase_WirelessProController.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ControllerState.h
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.cpp
     Source/NintendoSwitch/Controllers/SysbotBase/SysbotBase3_ProController.h

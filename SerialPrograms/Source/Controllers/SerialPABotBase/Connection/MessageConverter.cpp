@@ -17,7 +17,7 @@
 
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.h"
 
 namespace PokemonAutomation{
 
@@ -500,7 +500,7 @@ const std::map<uint8_t, MessageConverter>& make_MESSAGE_MAP(){
 
     SerialPABotBase::register_message_converters_HID_Keyboard();
     SerialPABotBase::register_message_converters_NS2_WiredController();
-    SerialPABotBase::register_message_converters_NS1_WirelessControllers();
+    SerialPABotBase::register_message_converters_NS1_OemControllers();
 
     return converter_map();
 }

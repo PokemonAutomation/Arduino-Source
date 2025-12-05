@@ -1,30 +1,30 @@
-/*  SerialPABotBase: Wireless Joycon
+/*  SerialPABotBase: Joycon
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessJoycon_H
-#define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessJoycon_H
+#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_Joycon_H
+#define PokemonAutomation_NintendoSwitch_SerialPABotBase_Joycon_H
 
 #include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
-#include "NintendoSwitch_SerialPABotBase_WirelessController.h"
+#include "NintendoSwitch_SerialPABotBase_OemController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
 template <typename JoyconType>
-class SerialPABotBase_WirelessJoycon :
+class SerialPABotBase_Joycon :
     public JoyconType,
-    public SerialPABotBase_WirelessController
+    public SerialPABotBase_OemController
 {
     static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1874;
     static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 260;
 
 protected:
-    SerialPABotBase_WirelessJoycon(
+    SerialPABotBase_Joycon(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         ControllerType controller_type,
@@ -48,18 +48,18 @@ public:
     virtual ControllerType controller_type() const override{
         return m_controller_type;
     }
-    virtual ControllerPerformanceClass performance_class() const override{
-        return ControllerPerformanceClass::SerialPABotBase_Wireless;
-    }
 
+    virtual ControllerPerformanceClass performance_class() const override{
+        return m_performance_class;
+    }
     virtual Milliseconds ticksize() const override{
-        return SerialPABotBase_WirelessController::ticksize();
+        return m_ticksize;
     }
     virtual Milliseconds cooldown() const override{
-        return SerialPABotBase_WirelessController::cooldown();
+        return m_cooldown;
     }
     virtual Milliseconds timing_variation() const override{
-        return SerialPABotBase_WirelessController::timing_variation();
+        return m_timing_variation;
     }
     virtual bool atomic_multibutton() const override{
         return true;
@@ -181,23 +181,23 @@ protected:
 
 
 
-class SerialPABotBase_WirelessLeftJoycon final : public SerialPABotBase_WirelessJoycon<LeftJoycon>{
+class SerialPABotBase_LeftJoycon final : public SerialPABotBase_Joycon<LeftJoycon>{
 public:
-    SerialPABotBase_WirelessLeftJoycon(
+    SerialPABotBase_LeftJoycon(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         ControllerResetMode reset_mode
     );
-    ~SerialPABotBase_WirelessLeftJoycon();
+    ~SerialPABotBase_LeftJoycon();
 };
-class SerialPABotBase_WirelessRightJoycon final : public SerialPABotBase_WirelessJoycon<RightJoycon>{
+class SerialPABotBase_RightJoycon final : public SerialPABotBase_Joycon<RightJoycon>{
 public:
-    SerialPABotBase_WirelessRightJoycon(
+    SerialPABotBase_RightJoycon(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         ControllerResetMode reset_mode
     );
-    ~SerialPABotBase_WirelessRightJoycon();
+    ~SerialPABotBase_RightJoycon();
 };
 
 

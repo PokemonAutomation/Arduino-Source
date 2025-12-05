@@ -1,34 +1,35 @@
-/*  SerialPABotBase: Wireless Pro Controller
+/*  SerialPABotBase: Pro Controller
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessProController_H
-#define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessProController_H
+#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_ProController_H
+#define PokemonAutomation_NintendoSwitch_SerialPABotBase_ProController_H
 
 #include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
-#include "NintendoSwitch_SerialPABotBase_WirelessController.h"
+#include "NintendoSwitch_SerialPABotBase_OemController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class SerialPABotBase_WirelessProController final :
+class SerialPABotBase_ProController final :
     public ProController,
-    public SerialPABotBase_WirelessController
+    public SerialPABotBase_OemController
 {
     static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1874;
     static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 320;
 
 public:
-    SerialPABotBase_WirelessProController(
+    SerialPABotBase_ProController(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
+        ControllerType controller_type,
         ControllerResetMode reset_mode
     );
-    ~SerialPABotBase_WirelessProController();
+    ~SerialPABotBase_ProController();
 
     virtual Logger& logger() override{
         return m_logger;
@@ -43,20 +44,20 @@ public:
 
 public:
     virtual ControllerType controller_type() const override{
-        return ControllerType::NintendoSwitch_WirelessProController;
-    }
-    virtual ControllerPerformanceClass performance_class() const override{
-        return ControllerPerformanceClass::SerialPABotBase_Wireless;
+        return m_controller_type;
     }
 
+    virtual ControllerPerformanceClass performance_class() const override{
+        return m_performance_class;
+    }
     virtual Milliseconds ticksize() const override{
-        return SerialPABotBase_WirelessController::ticksize();
+        return m_ticksize;
     }
     virtual Milliseconds cooldown() const override{
-        return SerialPABotBase_WirelessController::cooldown();
+        return m_cooldown;
     }
     virtual Milliseconds timing_variation() const override{
-        return SerialPABotBase_WirelessController::timing_variation();
+        return m_timing_variation;
     }
     virtual bool atomic_multibutton() const override{
         return true;
