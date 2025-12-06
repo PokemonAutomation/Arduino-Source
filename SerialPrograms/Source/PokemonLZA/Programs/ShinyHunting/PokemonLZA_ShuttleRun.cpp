@@ -7,6 +7,7 @@
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/ProgramStats/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
@@ -62,6 +63,7 @@ ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
         {
             // {Route::SCRAGGY,  "scraggy",  "Sewers: Scraggy"},
             {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
+            {Route::WILD_ZONE_3_TOWER, "wild_zone_3_tower", "Wild Zone 3 Tower"},
         },
         LockMode::LOCK_WHILE_RUNNING,
         Route::WILD_ZONE_19
@@ -105,6 +107,35 @@ void route_wild_zone_19(SingleSwitchProgramEnvironment& env, ProControllerContex
     wait_until_overworld(env.console, context, 50s);
 }
 
+void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    for(int i = 0; i < 6; i++){
+        // if there is no day/night change and no button drop, this loop should only have three iterations
+        const double direction = get_facing_direction(env.console, context);
+        const bool face_east = get_angle_between_facing_directions(direction, 90.0) < 10.0;
+        const bool face_west = get_angle_between_facing_directions(direction, 270.0) < 10.0;
+        if (i > 0 && (face_east || face_west)){
+            // we've finished one run of the tower
+            return;
+        }
+
+        if (face_east || get_angle_between_facing_directions(direction, 180.0) < 10.0){
+            // if facing east or south, run backward
+            pbf_move_left_joystick(context, 128, 255, 500ms, 200ms);
+        } else if (face_west || get_angle_between_facing_directions(direction, 0.0) < 10.0){
+            // if facing west or north, run forward
+            pbf_move_left_joystick(context, 128, 0, 500ms, 200ms);
+        } else{
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "route_wild_zone_3_tower: unexpected facing direction: " + PokemonAutomation::tostr_fixed(direction, 0) + " deg",
+                env.console
+            );
+        }
+        context.wait_for_all_requests();
+        wait_until_overworld(env.console, context, 50s);
+    }
+}
+
 } // namespace
 
 void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -129,6 +160,9 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
         break;
     case Route::WILD_ZONE_19:
         route = route_wild_zone_19;
+        break;
+    case Route:: WILD_ZONE_3_TOWER:
+        route = route_wild_zone_3_tower;
         break;
     default:
         OperationFailedException::fire(

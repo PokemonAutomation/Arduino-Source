@@ -39,6 +39,7 @@ public:
         WILD_ZONE_19,
         FIRE_STARTERS,
         DRATINI,
+        WILD_ZONE_3_TOWER,
         CUSTOMISED_MACRO = 255,
     };
 
