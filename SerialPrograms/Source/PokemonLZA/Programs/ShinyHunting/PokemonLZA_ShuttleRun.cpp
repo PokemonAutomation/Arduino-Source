@@ -10,10 +10,10 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+// #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+// #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -61,12 +61,11 @@ ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
     : DURATION("<b>Duration:</b><br>Run the program this long.", LockMode::UNLOCK_WHILE_RUNNING, "5 h")
     , ROUTE("<b>Hunt Route:</b>",
         {
-            // {Route::SCRAGGY,  "scraggy",  "Sewers: Scraggy"},
-            {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
             {Route::WILD_ZONE_3_TOWER, "wild_zone_3_tower", "Wild Zone 3 Tower"},
+            {Route::ALPHA_PIDGEOT, "alpha_pidgeot", "Alpha Pidgeot (Jaune Sector 4)"},
         },
         LockMode::LOCK_WHILE_RUNNING,
-        Route::WILD_ZONE_19
+        Route::WILD_ZONE_3_TOWER
     )
     , SHINY_DETECTED("Shiny Detected", "", "1000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
@@ -87,24 +86,8 @@ ShinyHunt_ShuttleRun::ShinyHunt_ShuttleRun()
 namespace {
 
 
-void route_scraggy(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+void route_alpha_pidgeot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
 //TODO
-}
-
-void route_wild_zone_19(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-    if (run_a_straight_path_in_overworld(env.console, context, 0, 80, 6500ms) == 0) {
-        open_map(env.console, context, false);
-        pbf_move_left_joystick(context, 0, 128, 100ms, 100ms);
-        if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
-            pbf_move_left_joystick(context, 128, 255, 100ms, 100ms);
-            fly_from_map(env.console, context);
-        }
-    } else {
-        open_map(env.console, context, false);
-        pbf_move_left_joystick(context, 0, 128, 100ms, 100ms);
-        fly_from_map(env.console, context);
-    }
-    wait_until_overworld(env.console, context, 50s);
 }
 
 void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -155,11 +138,8 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
     });
     std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&)> route;
     switch (ROUTE) {
-    case Route::SCRAGGY:
-        route = route_scraggy;
-        break;
-    case Route::WILD_ZONE_19:
-        route = route_wild_zone_19;
+    case Route::ALPHA_PIDGEOT:
+        route = route_alpha_pidgeot;
         break;
     case Route:: WILD_ZONE_3_TOWER:
         route = route_wild_zone_3_tower;
