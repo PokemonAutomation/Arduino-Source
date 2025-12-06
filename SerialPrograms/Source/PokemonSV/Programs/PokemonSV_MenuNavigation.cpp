@@ -461,7 +461,7 @@ void mash_button_till_overworld(
         stream, context,
         [button, seconds_run](ProControllerContext& context){
             ssf_mash1_button(context, button, Seconds(seconds_run));
-            pbf_wait(context, Seconds(seconds_run));
+            // pbf_wait(context, Seconds(seconds_run));
         },
         {overworld}
     );
