@@ -15,9 +15,9 @@ file(GLOB LIBRARY_SOURCES
     ../Common/CRC32.h
     ../Common/Compiler.h
     ../Common/ControllerStates/HID_Keyboard_State.h
-    ../Common/ControllerStates/NintendoSwitch2_WiredController_State.h
     ../Common/ControllerStates/NintendoSwitch_OemController_State.c
     ../Common/ControllerStates/NintendoSwitch_OemController_State.h
+    ../Common/ControllerStates/NintendoSwitch_WiredController_State.h
     ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/BitmapConversion.cpp
     ../Common/Cpp/BitmapConversion.h
@@ -255,8 +255,8 @@ file(GLOB LIBRARY_SOURCES
     ../Common/Qt/WidgetStackFixedAspectRatio.cpp
     ../Common/Qt/WidgetStackFixedAspectRatio.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_HID_Keyboard.h
+    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h
-    ../Common/SerialPABotBase/SerialPABotBase_Messages_NS2_WiredController.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol.h
     ../Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h
     Source/CommonFramework/AudioPipeline/AudioConstants.h
@@ -691,10 +691,10 @@ file(GLOB LIBRARY_SOURCES
     Source/Controllers/SerialPABotBase/SerialPABotBase_Descriptor.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_HID_Keyboard.h
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.cpp
+    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.h
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.cpp
-    Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.cpp
     Source/Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h
     Source/Controllers/SerialPABotBase/SerialPABotBase_SelectorWidget.h

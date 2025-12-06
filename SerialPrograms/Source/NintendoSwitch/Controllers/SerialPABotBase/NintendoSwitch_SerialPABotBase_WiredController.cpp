@@ -8,7 +8,7 @@
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS2_WiredController.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS_WiredController.h"
 #include "NintendoSwitch_SerialPABotBase_WiredController.h"
 
 //#include <iostream>

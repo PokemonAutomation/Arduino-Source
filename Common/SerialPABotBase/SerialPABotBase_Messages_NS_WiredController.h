@@ -1,13 +1,13 @@
-/*  SerialPABotBase Messages (Nintendo Switch 2 Wired Controller)
+/*  SerialPABotBase Messages (Nintendo Switch Wired Controller)
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_SerialPABotBase_Messages_NS2_WiredController_H
-#define PokemonAutomation_SerialPABotBase_Messages_NS2_WiredController_H
+#ifndef PokemonAutomation_SerialPABotBase_Messages_NS_WiredController_H
+#define PokemonAutomation_SerialPABotBase_Messages_NS_WiredController_H
 
-#include "../ControllerStates/NintendoSwitch2_WiredController_State.h"
+#include "../ControllerStates/NintendoSwitch_WiredController_State.h"
 #include "SerialPABotBase_Protocol.h"
 
 #if _WIN32
@@ -26,12 +26,12 @@ namespace SerialPABotBase{
 #endif
 
 
-#define PABB_MSG_COMMAND_NS2_WIRED_CONTROLLER_STATE     0x90
+#define PABB_MSG_COMMAND_NS_WIRED_CONTROLLER_STATE      0x90
 typedef struct{
     seqnum_t seqnum;
     uint16_t milliseconds;
-    pabb_NintendoSwitch2_WiredController_State report;
-} PABB_PACK pabb_Message_Command_NS2_WiredController_State;
+    pabb_NintendoSwitch_WiredController_State report;
+} PABB_PACK pabb_Message_Command_NS_WiredController_State;
 
 
 
