@@ -4,7 +4,8 @@
  *
  */
 
- #include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
+#include "PokemonSV/Programs/Battles/PokemonSV_SinglesBattler.h"
+#include "PokemonSV/Inference/PokemonSV_TutorialDetector.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -148,6 +149,26 @@ void checkpoint_104(SingleSwitchProgramEnvironment& env, ProControllerContext& c
 
         mash_button_till_overworld(env.console, context, BUTTON_A, 800);
 
+        env.console.log("Clear Koraidon/Miraidon form change tutorial.");
+        // Press X until tutorial shows up
+        TutorialWatcher tutorial;
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                for (int i = 0; i < 10; i++){
+                    pbf_press_button(context, BUTTON_X, 20, 250);
+                }
+            },
+            {tutorial}
+        );
+        if (ret < 0){
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Stuck trying to clear the Koraidon/Miraidon form change tutorial.",
+                env.console
+            );  
+        }
+        clear_tutorial(env.console, context);
 
 
     });
