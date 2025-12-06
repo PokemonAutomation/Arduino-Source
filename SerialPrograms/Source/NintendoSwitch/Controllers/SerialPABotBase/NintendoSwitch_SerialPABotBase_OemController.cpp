@@ -12,9 +12,10 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SerialPABotBase_OemController.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+//  REMOVE
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -40,6 +41,8 @@ SerialPABotBase_OemController::SerialPABotBase_OemController(
     )
     , m_controller_type(controller_type)
 {
+//    cout << "controller_type = " << (int)controller_type << endl;
+
     using namespace SerialPABotBase;
 
     switch (controller_type){
@@ -154,6 +157,7 @@ void SerialPABotBase_OemController::set_info(){
         colors.right_grip[1] = color.green();
         colors.right_grip[2] = color.blue();
     }
+
 
     m_serial->issue_request_and_wait(
         MessageControllerWriteSpi(
@@ -359,6 +363,7 @@ void SerialPABotBase_OemController::update_status(Cancellable& cancellable){
             m_logger.log("Reading Controller Colors... Done");
 
             switch (m_controller_type){
+            case ControllerType::NintendoSwitch_WiredProController:
             case ControllerType::NintendoSwitch_WirelessProController:{
                 Color left(colors.left_grip[0], colors.left_grip[1], colors.left_grip[2]);
                 Color body(colors.body[0], colors.body[1], colors.body[2]);

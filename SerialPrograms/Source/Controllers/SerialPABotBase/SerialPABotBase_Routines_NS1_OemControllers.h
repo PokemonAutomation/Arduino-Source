@@ -10,6 +10,7 @@
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h"
 #include "Controllers/ControllerTypes.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
@@ -25,21 +26,8 @@ public:
     MessageControllerReadSpi(ControllerType controller_type, uint32_t address, uint8_t bytes)
         : BotBaseRequest(false)
     {
-        uint32_t controller_id = PABB_CID_NONE;
-        switch (controller_type){
-        case ControllerType::NintendoSwitch_WirelessProController:
-            controller_id = PABB_CID_NintendoSwitch_WirelessProController;
-            break;
-        case ControllerType::NintendoSwitch_LeftJoycon:
-            controller_id = PABB_CID_NintendoSwitch_LeftJoycon;
-            break;
-        case ControllerType::NintendoSwitch_RightJoycon:
-            controller_id = PABB_CID_NintendoSwitch_RightJoycon;
-            break;
-        default:;
-        }
         params.seqnum = 0;
-        params.controller_type = controller_id;
+        params.controller_type = controller_type_to_id(controller_type);
         params.address = address;
         params.bytes = bytes;
     }
@@ -57,22 +45,9 @@ public:
     )
         : BotBaseRequest(false)
     {
-        uint32_t controller_id = PABB_CID_NONE;
-        switch (controller_type){
-        case ControllerType::NintendoSwitch_WirelessProController:
-            controller_id = PABB_CID_NintendoSwitch_WirelessProController;
-            break;
-        case ControllerType::NintendoSwitch_LeftJoycon:
-            controller_id = PABB_CID_NintendoSwitch_LeftJoycon;
-            break;
-        case ControllerType::NintendoSwitch_RightJoycon:
-            controller_id = PABB_CID_NintendoSwitch_RightJoycon;
-            break;
-        default:;
-        }
         pabb_Message_NS1_OemController_WriteSpi params;
         params.seqnum = 0;
-        params.controller_type = controller_id;
+        params.controller_type = controller_type_to_id(controller_type);
         params.address = address;
         params.bytes = bytes;
         data = std::string((char*)&params, sizeof(params));

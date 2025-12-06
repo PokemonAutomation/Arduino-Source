@@ -21,8 +21,7 @@
 
 
 #ifdef __cplusplus
-namespace PokemonAutomation{
-namespace SerialPABotBase{
+extern "C" {
 #endif
 
 
@@ -36,7 +35,6 @@ typedef struct{
 
 
 #ifdef __cplusplus
-}
 }
 #endif
 
