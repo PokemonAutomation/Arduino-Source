@@ -216,8 +216,8 @@ void checkpoint_62(
 
         env.console.log("Battle Normal Gym leader.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
-        // clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 60);
-        // pbf_mash_button(context, BUTTON_A, 1000ms);
+        clear_dialog(env.console, context, ClearDialogMode::STOP_TIMEOUT, 60);
+        pbf_mash_button(context, BUTTON_A, 1000ms);
 
         env.console.log("Finish up with Larry, then speak to Geeta and Nemona.");
         clear_dialog(env.console, context, ClearDialogMode::STOP_BATTLE, 60, {CallbackEnum::WHITE_A_BUTTON, CallbackEnum::PROMPT_DIALOG, CallbackEnum::BATTLE, CallbackEnum:: DIALOG_ARROW});
