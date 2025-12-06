@@ -6,6 +6,7 @@
 
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_ESPTraining.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -105,6 +106,12 @@ void checkpoint_83(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         DirectionDetector direction;
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        double current_direction = direction.get_current_direction(env.console, snapshot);
+        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 150});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 150});
+        }
 
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 140, 70);
 
@@ -177,6 +184,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         DirectionDetector direction;
+        // we just hope the minimap Direction isn't covered
 
         direction.change_direction(env.program_info(), env.console, context, 4.413989);
         pbf_move_left_joystick(context, 128, 0, 180, 50);
@@ -264,6 +272,7 @@ void checkpoint_84(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 void move_from_west_province_area_one_north_to_alfornada(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     context.wait_for_all_requests();
     DirectionDetector direction;
+    // recently flew here, so Minimap should be clear of Pokemon. and we should have no issues detecting direction.
 
     do_action_and_monitor_for_battles(env.program_info(), env.console, context,
     [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
