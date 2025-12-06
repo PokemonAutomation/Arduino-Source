@@ -151,10 +151,10 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
 
                 if (mode == ClearDialogMode::STOP_TIMEOUT || !press_A){
                     context.wait_for(Seconds(seconds_timeout));
-                }else{ // press A every 30 seconds, until we time out.
-                    auto button_press_period = Seconds(30);
+                }else{ // press A every 25 seconds, until we time out.
+                    auto button_press_period = Seconds(25);
                     while (true){
-                        if (current_time() - start_inference + button_press_period > Seconds(seconds_timeout)){
+                        if (current_time() - start_inference > Seconds(seconds_timeout)){
                             break;
                         }
                         context.wait_for(button_press_period);
