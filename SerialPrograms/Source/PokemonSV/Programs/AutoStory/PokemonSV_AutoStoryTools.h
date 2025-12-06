@@ -125,7 +125,7 @@ void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t
 // throw exception if times out, unless this is the intended stop condition.
 // also throw exception if dialog is never detected.
 void clear_dialog(VideoStream& stream, ProControllerContext& context,
-    ClearDialogMode mode, uint16_t seconds_timeout = 60,
+    ClearDialogMode mode, uint16_t seconds_timeout = 65,
     std::vector<CallbackEnum> optional_callbacks = {},
     bool press_A = true
 );
