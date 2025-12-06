@@ -19,11 +19,13 @@ namespace NintendoSwitch{
 SerialPABotBase_LeftJoycon::SerialPABotBase_LeftJoycon(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerType controller_type,
     ControllerResetMode reset_mode
 )
     : SerialPABotBase_Joycon<LeftJoycon>(
         logger, connection,
-        ControllerType::NintendoSwitch_LeftJoycon,
+        ControllerClass::NintendoSwitch_LeftJoycon,
+        controller_type,
         reset_mode
     )
 {
@@ -37,11 +39,13 @@ SerialPABotBase_LeftJoycon::~SerialPABotBase_LeftJoycon(){
 SerialPABotBase_RightJoycon::SerialPABotBase_RightJoycon(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerType controller_type,
     ControllerResetMode reset_mode
 )
     : SerialPABotBase_Joycon<RightJoycon>(
         logger, connection,
-        ControllerType::NintendoSwitch_RightJoycon,
+        ControllerClass::NintendoSwitch_RightJoycon,
+        controller_type,
         reset_mode
     )
 {
@@ -62,10 +66,11 @@ template <typename JoyconType>
 SerialPABotBase_Joycon<JoyconType>::SerialPABotBase_Joycon(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerClass controller_class,
     ControllerType controller_type,
     ControllerResetMode reset_mode
 )
-    : JoyconType(logger, controller_type)
+    : JoyconType(logger, controller_class)
     , SerialPABotBase_OemController(
         logger,
         connection,
@@ -92,11 +97,11 @@ void SerialPABotBase_Joycon<JoyconType>::issue_joystick(
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     uint8_t x, uint8_t y
 ){
-    switch (m_controller_type){
-    case ControllerType::NintendoSwitch_LeftJoycon:
+    switch (this->controller_class()){
+    case ControllerClass::NintendoSwitch_LeftJoycon:
         ControllerWithScheduler::issue_left_joystick(cancellable, delay, hold, cooldown, x, y);
         break;
-    case ControllerType::NintendoSwitch_RightJoycon:
+    case ControllerClass::NintendoSwitch_RightJoycon:
         ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, x, y);
         break;
     default:
@@ -112,8 +117,8 @@ void SerialPABotBase_Joycon<JoyconType>::issue_full_controller_state(
     uint8_t joystick_x, uint8_t joystick_y
 ){
     button &= m_valid_buttons;
-    switch (m_controller_type){
-    case ControllerType::NintendoSwitch_LeftJoycon:
+    switch (this->controller_class()){
+    case ControllerClass::NintendoSwitch_LeftJoycon:
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
             enable_logging,
@@ -124,7 +129,7 @@ void SerialPABotBase_Joycon<JoyconType>::issue_full_controller_state(
             0x80, 0x80
         );
         break;
-    case ControllerType::NintendoSwitch_RightJoycon:
+    case ControllerClass::NintendoSwitch_RightJoycon:
         ControllerWithScheduler::issue_full_controller_state(
             cancellable,
             enable_logging,
@@ -244,11 +249,11 @@ void SerialPABotBase_Joycon<JoyconType>::execute_state(
     const Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
-    switch (m_controller_type){
-    case ControllerType::NintendoSwitch_LeftJoycon:
+    switch (this->controller_class()){
+    case ControllerClass::NintendoSwitch_LeftJoycon:
         execute_state_left_joycon(cancellable, entry);
         break;
-    case ControllerType::NintendoSwitch_RightJoycon:
+    case ControllerClass::NintendoSwitch_RightJoycon:
         execute_state_right_joycon(cancellable, entry);
         break;
     default:

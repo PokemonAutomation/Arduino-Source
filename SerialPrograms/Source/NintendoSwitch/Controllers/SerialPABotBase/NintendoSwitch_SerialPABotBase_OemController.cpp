@@ -12,10 +12,9 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SerialPABotBase_OemController.h"
 
-//  REMOVE
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -46,20 +45,21 @@ SerialPABotBase_OemController::SerialPABotBase_OemController(
     using namespace SerialPABotBase;
 
     switch (controller_type){
-    case ControllerType::NintendoSwitch_WirelessProController:
-    case ControllerType::NintendoSwitch_LeftJoycon:
-    case ControllerType::NintendoSwitch_RightJoycon:
-        m_performance_class = ControllerPerformanceClass::SerialPABotBase_Wireless;
-        m_ticksize = 0ms;
-        m_cooldown = 15ms;
-        m_timing_variation = ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS;
-        break;
-
     case ControllerType::NintendoSwitch_WiredProController:
+    case ControllerType::NintendoSwitch_WiredLeftJoycon:
+    case ControllerType::NintendoSwitch_WiredRightJoycon:
         m_performance_class = ControllerPerformanceClass::SerialPABotBase_Wired;
         m_ticksize = 0ms;
         m_cooldown = 8ms;
         m_timing_variation = ConsoleSettings::instance().TIMING_OPTIONS.WIRED;
+        break;
+    case ControllerType::NintendoSwitch_WirelessProController:
+    case ControllerType::NintendoSwitch_WirelessLeftJoycon:
+    case ControllerType::NintendoSwitch_WirelessRightJoycon:
+        m_performance_class = ControllerPerformanceClass::SerialPABotBase_Wireless;
+        m_ticksize = 0ms;
+        m_cooldown = 15ms;
+        m_timing_variation = ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS;
         break;
 
     default:
@@ -373,8 +373,10 @@ void SerialPABotBase_OemController::update_status(Cancellable& cancellable){
                 m_color_html += " " + html_color_text("&#x2b24;", right);
                 break;
             }
-            case ControllerType::NintendoSwitch_LeftJoycon:
-            case ControllerType::NintendoSwitch_RightJoycon:{
+            case ControllerType::NintendoSwitch_WiredLeftJoycon:
+            case ControllerType::NintendoSwitch_WiredRightJoycon:
+            case ControllerType::NintendoSwitch_WirelessLeftJoycon:
+            case ControllerType::NintendoSwitch_WirelessRightJoycon:{
                 Color body(colors.body[0], colors.body[1], colors.body[2]);
                 m_color_html = html_color_text("&#x2b24;", body);
                 break;

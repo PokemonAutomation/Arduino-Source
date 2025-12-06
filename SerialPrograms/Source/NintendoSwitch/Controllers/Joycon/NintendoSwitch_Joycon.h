@@ -56,7 +56,7 @@ class JoyconController : public AbstractController{
 public:
     using ContextType = JoyconContext;
 
-    JoyconController(Logger& logger, ControllerType controller_type);
+    JoyconController(Logger& logger, ControllerClass controller_class);
     virtual ~JoyconController();
 
 

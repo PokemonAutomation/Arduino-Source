@@ -27,6 +27,7 @@ protected:
     SerialPABotBase_Joycon(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
+        ControllerClass controller_class,
         ControllerType controller_type,
         ControllerResetMode reset_mode
     );
@@ -182,6 +183,7 @@ public:
     SerialPABotBase_LeftJoycon(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
+        ControllerType controller_type,
         ControllerResetMode reset_mode
     );
     ~SerialPABotBase_LeftJoycon();
@@ -191,6 +193,7 @@ public:
     SerialPABotBase_RightJoycon(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
+        ControllerType controller_type,
         ControllerResetMode reset_mode
     );
     ~SerialPABotBase_RightJoycon();
