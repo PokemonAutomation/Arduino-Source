@@ -5,6 +5,7 @@
  */
 
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -106,6 +107,13 @@ void checkpoint_61(
         );
 
         DirectionDetector direction;
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        double current_direction = direction.get_current_direction(env.console, snapshot);
+        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+        }
+
         direction.change_direction(env.program_info(), env.console, context, 0.278620);
         pbf_move_left_joystick(context, 128, 0, 400, 50);
 
@@ -200,7 +208,7 @@ void checkpoint_62(
         // lemon
         pbf_press_dpad(context, DPAD_DOWN, 13, 20);
         pbf_press_button(context, BUTTON_A, 50, 50);
-        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD});
+        clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD}, false);
 
 
         pbf_mash_button(context, BUTTON_A, 1000ms);
