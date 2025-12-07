@@ -10,10 +10,10 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
-// #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-// #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -87,7 +87,42 @@ namespace {
 
 
 void route_alpha_pidgeot(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
-//TODO
+    int ret = -1;
+    {
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+                pbf_move_left_joystick(context, 128, 0, 4000ms, 0ms);
+                pbf_move_left_joystick(context, 128, 255, 4500ms, 0ms);
+                pbf_wait(context, 500ms);
+            },
+            {black_screen}
+        );
+    }
+    if (ret == 0){
+        wait_until_overworld(env.console, context, 50s);
+        open_map(env.console, context, false);
+        pbf_move_left_joystick(context, 148, 108, 100ms, 200ms);
+        if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "fly_from_map(): Unable to fast travel",
+                env.console);
+        }
+        wait_until_overworld(env.console, context);
+        ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+        pbf_move_left_joystick(context, 255, 128, 800ms, 0ms);
+        pbf_move_left_joystick(context, 128, 0, 4400ms, 0ms);
+        pbf_move_left_joystick(context, 0, 128, 300ms, 0ms);
+        pbf_press_button(context, BUTTON_A, 500ms, 2500ms); // elevator up
+        ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+        pbf_move_left_joystick(context, 128, 0, 900ms, 0ms);
+        pbf_move_left_joystick(context, 0, 128, 2000ms, 0ms);
+        pbf_move_left_joystick(context, 255, 128, 200ms, 200ms);
+        pbf_press_button(context, BUTTON_L, 100ms, 200ms);
+    }
 }
 
 void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
