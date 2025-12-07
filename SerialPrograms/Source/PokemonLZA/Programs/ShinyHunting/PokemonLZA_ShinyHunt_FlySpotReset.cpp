@@ -17,6 +17,7 @@
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLZA/Inference/PokemonLZA_HyperspaceCalorieDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLZA/Inference/PokemonLZA_AlertEyeDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
 #include "PokemonLZA_ShinyHunt_FlySpotReset.h"
 
@@ -68,7 +69,8 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
             {Route::HYPERSPACE_WILD_ZONE, "hyperspace_wild_zone", "Hyperspace Wild Zone"},
             {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
             {Route::ALPHA_PIDGEY, "alpha_pidgey", "Alpha Pidgey (Wild Zone 1)"},
-            // {Route::ALPHA_PIKACHU, "alpha_pikachu", "Alpha Pikachu (Wild Zone 6)"},
+            {Route::ALPHA_PATRAT, "alpha_patrat", "Alpha Patrat (Cafe Cyclone)"},
+            {Route::ALPHA_PIKACHU, "alpha_pikachu", "Alpha Pikachu (Wild Zone 6)"},
             // {Route::CUSTOMISED_MACRO, "customised_macro", "Customised Macro"},
         },
         LockMode::LOCK_WHILE_RUNNING,
@@ -260,6 +262,93 @@ bool route_hyperspace_wild_zone(
 }
 
 
+void route_alpha_patrat(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max){
+    {
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+                pbf_move_left_joystick_old(context, 0, 128, 2000ms, 0ms);
+                pbf_move_left_joystick_old(context, 96, 0, 3500ms, 0ms);
+            },
+            {black_screen}
+        );
+        if (ret == 0){
+            wait_until_overworld(env.console, context, 50s);
+        }
+    }
+    open_map(env.console, context, to_zoom_to_max);
+    pbf_move_left_joystick_old(context, 128, 255, 50ms, 100ms);
+    if (fly_from_map(env.console, context) != FastTravelState::SUCCESS){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "fly_from_map(): Unable to fast travel",
+            env.console);
+    }
+    wait_until_overworld(env.console, context, 50s);
+}
+
+
+void route_alpha_pikachu(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max){
+    int ret = -1;
+    {
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+                pbf_move_left_joystick_old(context, 0, 128, 2000ms, 0ms);
+                pbf_move_left_joystick_old(context, 128, 0, 2700ms, 0ms);
+                pbf_move_left_joystick_old(context, 255, 128, 1000ms, 0ms);
+                pbf_mash_button(context, BUTTON_A, 500ms); // ladder
+                pbf_move_left_joystick_old(context, 128, 0, 5300ms, 0ms);
+            },
+            {black_screen}
+        );
+    }
+    if (ret == 0){
+        wait_until_overworld(env.console, context, 50s);
+        //TODO: reset game if still get caught by wild pokémon
+    }
+    {
+        AlertEyeOverWatcher eye_watcher(COLOR_WHITE, &env.console.overlay());
+        ret = run_until<ProControllerContext>(env.console, context, [&](ProControllerContext& context){
+            pbf_move_left_joystick_old(context, 255, 128, 3600ms, 0ms);
+            pbf_move_left_joystick_old(context, 128, 0, 3000ms, 0ms);
+        }, {{eye_watcher}});
+    }
+    if (ret < 0){
+        AlertEyeOverWatcher eye_watcher(COLOR_WHITE, &env.console.overlay());
+        ret = wait_until(env.console, context, 30s, {{eye_watcher}});
+    }
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "AlertEyeOverWatcher: Unable to fast travel after 30s",
+            env.console);
+    }
+    open_map(env.console, context, to_zoom_to_max);
+    pbf_move_left_joystick_old(context, 148, 20, 100ms, 200ms);
+    if (fly_from_map(env.console, context) == FastTravelState::SUCCESS) {
+        wait_until_overworld(env.console, context);
+        return;
+    } else {
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "fly_from_map(): Unable to fast travel",
+            env.console);
+    }
+}
+
 } // namespace
 
 void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -298,6 +387,12 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
         break;
     case Route::ALPHA_PIDGEY:
         route = route_alpha_pidgey;
+        break;
+    case Route::ALPHA_PATRAT:
+        route = route_alpha_patrat;
+        break;
+    case Route::ALPHA_PIKACHU:
+        route = route_alpha_pikachu;
         break;
     default:
         OperationFailedException::fire(
