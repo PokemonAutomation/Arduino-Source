@@ -5,6 +5,7 @@
  */
 
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -102,6 +103,13 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         DirectionDetector direction;
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        double current_direction = direction.get_current_direction(env.console, snapshot);
+        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 75});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 75});
+        }
+
 
         direction.change_direction(env.program_info(), env.console, context, 1.536225);
         pbf_move_left_joystick(context, 128, 0, 500, 50);
@@ -151,6 +159,7 @@ void checkpoint_72(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         DirectionDetector direction;
+        // we just hope the minimap Direction isn't covered
         direction.change_direction(env.program_info(), env.console, context, 2.462858);  // 2.496149  // 2.479418
         walk_forward_until_dialog(env.program_info(), env.console, context, NavigationMovementMode::DIRECTIONAL_SPAM_A, 20);
 
@@ -177,6 +186,7 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
 
         DirectionDetector direction;
+        // we just hope the minimap Direction isn't covered
         direction.change_direction(env.program_info(), env.console, context, 5.478851);
 
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
@@ -189,7 +199,7 @@ void checkpoint_73(SingleSwitchProgramEnvironment& env, ProControllerContext& co
             }
         );
 
-        mash_button_till_overworld(env.console, context, BUTTON_A, 360);
+        mash_button_till_overworld(env.console, context, BUTTON_A, 360); // fight the Ghost Gym
 
     });  
 }
@@ -215,6 +225,7 @@ void checkpoint_74(SingleSwitchProgramEnvironment& env, ProControllerContext& co
 
 void move_from_montenevera_to_glaseado_gym(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     DirectionDetector direction;
+    // we just hope the minimap Direction isn't covered
     direction.change_direction(env.program_info(), env.console, context, 1.255489);
     pbf_move_left_joystick(context, 128, 0, 400, 50);
 

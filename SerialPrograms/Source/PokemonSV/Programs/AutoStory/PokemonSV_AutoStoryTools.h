@@ -45,6 +45,7 @@ enum class ClearDialogMode{
     STOP_TIMEOUT,
     STOP_BATTLE,
     STOP_TUTORIAL,
+    STOP_BATTLE_DIALOG_ARROW,
 };
 
 
@@ -123,9 +124,11 @@ void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t
 // stop depending on ClearDialogMode: stop when detect overworld, or dialog prompt, or A button prompt. Or if times out
 // throw exception if times out, unless this is the intended stop condition.
 // also throw exception if dialog is never detected.
+// NOTE: seconds_timeout is rounded up to a multiple of 25, unless press_A is false or ClearDialogMode == STOP_TIMEOUT
 void clear_dialog(VideoStream& stream, ProControllerContext& context,
-    ClearDialogMode mode, uint16_t seconds_timeout = 60,
-    std::vector<CallbackEnum> optional_callbacks = {}
+    ClearDialogMode mode, uint16_t seconds_timeout = 75,
+    std::vector<CallbackEnum> optional_callbacks = {},
+    bool press_A = true
 );
 
 

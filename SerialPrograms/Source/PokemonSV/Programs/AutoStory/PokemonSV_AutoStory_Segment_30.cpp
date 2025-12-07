@@ -6,6 +6,7 @@
 
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_NoMinimapDetector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -95,6 +96,13 @@ void checkpoint_75(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     [&](size_t attempt_number){
 
         DirectionDetector direction;
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        double current_direction = direction.get_current_direction(env.console, snapshot);
+        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 50});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 50});
+        }
+
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
             // move marker away so it doesn't block the North symbol
@@ -162,6 +170,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_IN, 255, 0, 40}, FlyPoint::POKECENTER);
         
         DirectionDetector direction;
+        // we just hope the minimap Direction isn't covered
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
 

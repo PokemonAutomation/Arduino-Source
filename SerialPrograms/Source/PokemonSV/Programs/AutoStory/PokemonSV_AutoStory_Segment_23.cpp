@@ -80,6 +80,7 @@ void checkpoint_54(
     [&](size_t attempt_number){
         
         DirectionDetector direction;
+        // recently flew to this pokecenter, so no need to worry about failing to detect direction
         direction.change_direction(env.program_info(), env.console, context, 1.341);
         pbf_move_left_joystick(context, 128, 0, 450, 100);
 

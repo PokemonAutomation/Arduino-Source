@@ -79,7 +79,8 @@ void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t
 
 void clear_dialog(VideoStream& stream, ProControllerContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout,
-    std::vector<CallbackEnum> enum_optional_callbacks
+    std::vector<CallbackEnum> enum_optional_callbacks,
+    bool press_A
 ){
     bool seen_dialog = false;
     WallClock start = current_time();
@@ -148,12 +149,12 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             stream, context,
             [&](ProControllerContext& context){
 
-                if (mode == ClearDialogMode::STOP_TIMEOUT){
+                if (mode == ClearDialogMode::STOP_TIMEOUT || !press_A){
                     context.wait_for(Seconds(seconds_timeout));
-                }else{ // press A every 8 seconds, until we time out.
-                    auto button_press_period = Seconds(8);
+                }else{ // press A every 25 seconds, until we time out.
+                    auto button_press_period = Seconds(25);
                     while (true){
-                        if (current_time() - start_inference + button_press_period > Seconds(seconds_timeout)){
+                        if (current_time() - start_inference > Seconds(seconds_timeout)){
                             break;
                         }
                         context.wait_for(button_press_period);
@@ -208,6 +209,9 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
         case CallbackEnum::DIALOG_ARROW:
             stream.log("clear_dialog: Detected dialog arrow.");
             seen_dialog = true;
+            if (mode == ClearDialogMode::STOP_BATTLE_DIALOG_ARROW){
+                return;
+            }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case CallbackEnum::BATTLE:
@@ -358,9 +362,9 @@ void overworld_navigation(
                     if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
                         walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
                     }else{
-                        ssf_press_left_joystick(context, x, y, 0, seconds_realign * TICKS_PER_SECOND);
+                        ssf_press_left_joystick(context, x, y, 0ms, Seconds(seconds_realign));
                         if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
-                            pbf_wait(context, seconds_realign * TICKS_PER_SECOND);
+                            pbf_wait(context, Seconds(seconds_realign));
                         } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
                             for (size_t j = 0; j < 5 * seconds_realign; j++){
                                 pbf_press_button(context, BUTTON_A, 20, 5);
@@ -1059,9 +1063,9 @@ void press_A_until_dialog(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [seconds_between_button_presses](ProControllerContext& context){
-            pbf_wait(context, seconds_between_button_presses * TICKS_PER_SECOND); // avoiding pressing A if dialog already present
+            pbf_wait(context, Seconds(seconds_between_button_presses)); // avoiding pressing A if dialog already present
             for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_A, 20, seconds_between_button_presses * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_A, 20*8ms, Seconds(seconds_between_button_presses));
             }
         },
         {advance_dialog}
