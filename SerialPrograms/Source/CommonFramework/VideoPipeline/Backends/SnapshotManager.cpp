@@ -4,6 +4,7 @@
  *
  */
 
+#include <QTransform>
 #include "Common/Cpp/Concurrency/ReverseLockGuard.h"
 #include "Common/Cpp/Concurrency/AsyncTask.h"
 #include "CommonFramework/Tools/GlobalThreadPools.h"
@@ -34,6 +35,18 @@ SnapshotManager::SnapshotManager(Logger& logger, QVideoFrameCache& cache)
 
 QImage SnapshotManager::frame_to_image(const QVideoFrame& frame){
     QImage image = frame.toImage();
+    
+    // If Qt applied rotation metadata (90° counter-clockwise), the dimensions will be swapped.
+    // We need to rotate the image 90° clockwise to restore the original orientation,
+    // matching what we do in the display layer.
+    // This ensures snapshots used for inference match the raw frame orientation.
+    if (image.height() > image.width()){
+        // Dimensions are swapped, indicating rotation was applied. Rotate 90° clockwise.
+        QTransform transform;
+        transform.rotate(90.0);
+        image = image.transformed(transform);
+    }
+    
     QImage::Format format = image.format();
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
         image = image.convertToFormat(QImage::Format_ARGB32);
