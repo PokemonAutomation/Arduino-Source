@@ -368,12 +368,13 @@ void ControllerSettingsRow::on_config_value_changed(void* object){
 
 ControllerSettingsTable::ControllerSettingsTable()
     : EditableTableOption_t<ControllerSettingsRow>(
-        "<b>Wireless Controller Settings:</b><br>"
-        "Changes take effect after resetting the device."
-        "<br><br>"
+        "<b>OEM Controller Settings:</b><br><br>"
+        "The OEM controllers (official Joycons and Pro Controller) support colors. "
+        "This table will let you customize those colors."
+        "<br>"
         "The \"Name\" column is an arbitrary text field to help you identify which device it is. "
         "By default it uses the name of the serial port. But this can be misleading if the port has changed. "
-        "<br><br>"
+        "<br>"
         "Do not change the MAC address as it is used to identify which device the row belongs to. "
         "Changing it will not actually change the MAC address of the device."
         "<br><br>"
