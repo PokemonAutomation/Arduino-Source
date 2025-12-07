@@ -167,6 +167,8 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
     */
 
     uint8_t year = MAX_YEAR;
+    uint32_t iterations_since_reset = 0;  // Track iterations for periodic reset
+    const uint32_t RESET_INTERVAL = 50;   // Reset every 50 date changes
 
     //Roll the date back before doing anything else.
     start_local_trade(env, context);
@@ -221,6 +223,44 @@ void DailyItemFarmer::program(SingleSwitchProgramEnvironment& env, CancellableSc
 #endif
 
         home_to_date_time(env.console, context, true);
+        
+        // Check if we need to reset the menu state (every 50 iterations)
+        iterations_since_reset++;
+        if (iterations_since_reset >= RESET_INTERVAL){
+            env.log("=== PERIODIC RESET AFTER " + std::to_string(RESET_INTERVAL) + " ITERATIONS ===", COLOR_BLUE);
+            
+            // Toggle sync clock ON then OFF to reset menu state
+            reset_sync_clock_state(env.console, context);
+            
+            // Exit to home and re-enter to reset everything
+            pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+            context.wait_for_all_requests();
+            
+            // Wait for wireless to stabilize
+            pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+            pbf_press_button(context, BUTTON_ZL, 160ms, 840ms);
+            context.wait_for_all_requests();
+            context.wait_for(1000ms);
+            
+            // Go back to date/time menu and reset to oldest year
+            home_to_date_time(env.console, context, true);
+            verify_date_time_menu_selected(env.console, context);
+            
+            env.log("Rolling date back to oldest year after reset.");
+            roll_date_backward_N(context, MAX_YEAR);
+            year = 0;
+            iterations_since_reset = 0;
+            
+            pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+            pbf_press_button(context, BUTTON_HOME, 160ms, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY0);
+            pbf_press_button(context, BUTTON_B, 200ms, 1800ms);
+            pbf_mash_button(context, BUTTON_B, 5000ms);
+            context.wait_for_all_requests();
+            
+            env.log("Reset complete. Continuing with fresh state.");
+            continue;  // Skip the normal date rolling this iteration
+        }
         
         // Verify "Date and Time" menu item is selected before rolling date
         verify_date_time_menu_selected(env.console, context);
