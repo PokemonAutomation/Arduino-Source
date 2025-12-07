@@ -63,7 +63,8 @@ struct JoyconColors : public ControllerColors{
     virtual void write_to_profile(ControllerProfile& profile, ControllerType controller) const override{
         profile.official_name = name;
         switch (controller){
-        case ControllerType::NintendoSwitch_WirelessProController:{
+        case ControllerType::NintendoSwitch_WirelessProController:
+        case ControllerType::NintendoSwitch_WiredProController:{
             //  Set the grips to the joycon colors.
             profile.left_grip = left_body;
             profile.right_grip = right_body;
@@ -71,11 +72,13 @@ struct JoyconColors : public ControllerColors{
             profile.button_color = average_colors(left_body, right_body);
             break;
         }
-        case ControllerType::NintendoSwitch_LeftJoycon:
+        case ControllerType::NintendoSwitch_WiredLeftJoycon:
+        case ControllerType::NintendoSwitch_WirelessLeftJoycon:
             profile.button_color = left_buttons;
             profile.body_color = left_body;
             break;
-        case ControllerType::NintendoSwitch_RightJoycon:
+        case ControllerType::NintendoSwitch_WiredRightJoycon:
+        case ControllerType::NintendoSwitch_WirelessRightJoycon:
             profile.button_color = right_buttons;
             profile.body_color = right_body;
             break;
@@ -106,7 +109,8 @@ struct ProconColors : public ControllerColors{
     virtual void write_to_profile(ControllerProfile& profile, ControllerType controller) const override{
         profile.official_name = name;
         switch (controller){
-        case ControllerType::NintendoSwitch_WirelessProController:{
+        case ControllerType::NintendoSwitch_WirelessProController:
+        case ControllerType::NintendoSwitch_WiredProController:{
             //  Set the grips to the joycon colors.
             profile.left_grip = left_grip;
             profile.right_grip = right_grip;
@@ -114,11 +118,13 @@ struct ProconColors : public ControllerColors{
             profile.button_color = buttons;
             break;
         }
-        case ControllerType::NintendoSwitch_LeftJoycon:
+        case ControllerType::NintendoSwitch_WiredLeftJoycon:
+        case ControllerType::NintendoSwitch_WirelessLeftJoycon:
             profile.button_color = buttons;
             profile.body_color = left_grip;
             break;
-        case ControllerType::NintendoSwitch_RightJoycon:
+        case ControllerType::NintendoSwitch_WiredRightJoycon:
+        case ControllerType::NintendoSwitch_WirelessRightJoycon:
             profile.button_color = buttons;
             profile.body_color = right_grip;
             break;
@@ -218,8 +224,8 @@ const StringSelectDatabase& CONTROLLER_DATABASE(){
 const EnumDropdownDatabase<ControllerType>& ControllerSettingsType_Database(){
     static const EnumDropdownDatabase<ControllerType> database({
         {ControllerType::NintendoSwitch_WirelessProController,  "pro-controller",   "NS1: Pro Controller"},
-        {ControllerType::NintendoSwitch_LeftJoycon,             "left-joycon",      "NS1: Left Joycon"},
-        {ControllerType::NintendoSwitch_RightJoycon,            "right-joycon",     "NS1: Right Joycon"},
+        {ControllerType::NintendoSwitch_WirelessLeftJoycon,     "left-joycon",      "NS1: Left Joycon"},
+        {ControllerType::NintendoSwitch_WirelessRightJoycon,    "right-joycon",     "NS1: Right Joycon"},
     });
     return database;
 }
@@ -317,9 +323,15 @@ void ControllerSettingsRow::on_config_value_changed(void* object){
     }
 
     if (object == &controller){
-        ConfigOptionState state = controller == ControllerType::NintendoSwitch_WirelessProController
-            ? ConfigOptionState::ENABLED
-            : ConfigOptionState::HIDDEN;
+        ConfigOptionState state;
+        switch (controller){
+        case ControllerType::NintendoSwitch_WirelessProController:
+        case ControllerType::NintendoSwitch_WiredProController:
+            state = ConfigOptionState::ENABLED;
+            break;
+        default:
+            state = ConfigOptionState::HIDDEN;
+        }
         left_grip.set_visibility(state);
         right_grip.set_visibility(state);
 
@@ -408,16 +420,30 @@ ControllerProfile ControllerSettingsTable::get_or_make_profile(
 
     //  Only relevant to Switch controllers.
     switch (controller){
-    case ControllerType::NintendoSwitch_WiredController:
     case ControllerType::NintendoSwitch_WiredProController:
     case ControllerType::NintendoSwitch_WirelessProController:
-    case ControllerType::NintendoSwitch_LeftJoycon:
-    case ControllerType::NintendoSwitch_RightJoycon:
-    case ControllerType::NintendoSwitch2_WiredController:
-    case ControllerType::NintendoSwitch2_WiredProController:
-    case ControllerType::NintendoSwitch2_WirelessProController:
-    case ControllerType::NintendoSwitch2_LeftJoycon:
-    case ControllerType::NintendoSwitch2_RightJoycon:
+        controller = ControllerType::NintendoSwitch_WirelessProController;
+        break;
+    case ControllerType::NintendoSwitch_WiredLeftJoycon:
+    case ControllerType::NintendoSwitch_WirelessLeftJoycon:
+        controller = ControllerType::NintendoSwitch_WirelessLeftJoycon;
+        break;
+    case ControllerType::NintendoSwitch_WiredRightJoycon:
+    case ControllerType::NintendoSwitch_WirelessRightJoycon:
+        controller = ControllerType::NintendoSwitch_WirelessRightJoycon;
+        break;
+//    case ControllerType::NintendoSwitch2_WiredProController:
+//    case ControllerType::NintendoSwitch2_WirelessProController:
+//        controller = ControllerType::NintendoSwitch2_WirelessProController;
+//        break;
+//    case ControllerType::NintendoSwitch2_WiredLeftJoycon:
+//    case ControllerType::NintendoSwitch2_WirelessLeftJoycon:
+//        controller = ControllerType::NintendoSwitch2_WirelessLeftJoycon;
+//        break;
+//    case ControllerType::NintendoSwitch2_WiredRightJoycon:
+//    case ControllerType::NintendoSwitch2_WirelessRightJoycon:
+//        controller = ControllerType::NintendoSwitch2_WirelessRightJoycon;
+//        break;
         break;
     default:
         return profile;

@@ -218,6 +218,9 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             break;
         case CallbackEnum::TUTORIAL:    
             stream.log("clear_dialog: Detected tutorial.");
+            if (mode == ClearDialogMode::STOP_TUTORIAL){
+                return;
+            }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case CallbackEnum::BLACK_DIALOG_BOX:    
@@ -488,6 +491,50 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
 
 }
 
+
+void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
+    const ProgramInfo& info = env.program_info();
+    VideoStream& stream = env.console;
+
+    // start in the overworld
+    press_Bs_to_back_to_overworld(info, stream, context);
+
+    // open menu, select your lead pokemon
+    enter_menu_from_overworld(info, stream, context, 0, MenuSide::LEFT);
+
+    // enter Pokemon summary screen
+    pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
+    pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_Y, 20, 40);
+
+    // confirm that moves are: Moonblast, Mystical Fire, Psychic, Misty Terrain
+    context.wait_for_all_requests();
+    VideoSnapshot screen = stream.video().snapshot();
+    PokemonMovesReader reader(language);
+    std::string move_0 = reader.read_move(stream.logger(), screen, 0);
+    std::string move_1 = reader.read_move(stream.logger(), screen, 1);
+    std::string move_2 = reader.read_move(stream.logger(), screen, 2);
+    std::string move_3 = reader.read_move(stream.logger(), screen, 3);
+    stream.log("Current first move: " + move_0);
+    stream.log("Current second move: " + move_1);
+    stream.log("Current third move: " + move_2);
+    stream.log("Current fourth move: " + move_3);
+
+    if (move_0 != "moonblast" || move_1 != "mystical-fire" || move_2 != "psychic" || move_3 != "misty-terrain"){
+        stream.log("Lead Pokemon's moves are wrong. They are supposed to be: Moonblast, Mystical Fire, Psychic, Misty Terrain.");
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "We expect your lead Pokemon to be a Gardevoir with moves in this order: Moonblast, Mystical Fire, Psychic, Misty Terrain. "
+            "But we see something else instead. If you confirm that your lead Gardevoir does indeed have these moves in this order, "
+            "and are still getting this error, you can uncheck 'Pre-check: Ensure correct moves', under Advanced mode.\n" + language_warning(language),
+            stream
+        );
+    }   
+
+    press_Bs_to_back_to_overworld(info, stream, context);
+
+}
+
 void change_settings_prior_to_autostory_segment_mode(SingleSwitchProgramEnvironment& env, ProControllerContext& context, size_t current_segment_num, Language language){
     // get index of `Options` in the Main Menu, which depends on where you are in Autostory
     int8_t options_index;  
@@ -752,7 +799,7 @@ void do_action_and_monitor_for_battles_early(
     if (ret == 0){  // if see no minimap. stop and see if we detect a battle. if so, throw Battl exception
         do_action_and_monitor_for_battles(info, stream, context,
         [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
-            pbf_wait(context, Seconds(15));
+            pbf_wait(context, Seconds(30));
         });
 
         // if no battle seen, then throw Exception.
@@ -1412,6 +1459,7 @@ void move_player_forward(
     uint8_t num_rounds, 
     std::function<void()>&& recovery_action,
     bool use_lets_go,
+    bool mash_A,
     uint16_t forward_ticks, 
     uint8_t y, 
     uint16_t delay_after_forward_move, 
@@ -1424,7 +1472,12 @@ void move_player_forward(
             do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 if (!use_lets_go){
-                    pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                    // pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                    ssf_press_left_joystick(context, 128, 0, 0, 100, 0);
+
+                    if (mash_A){ // mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
+                        pbf_mash_button(context, BUTTON_A, forward_ticks);
+                    }
                 }else{
                     pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                     pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);    
@@ -1557,7 +1610,7 @@ void move_forward_until_yolo_object_above_min_size(
 
 
 
-void move_forward_until_yolo_object_detected(
+void move_player_until_yolo_object_detected(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     YOLOv5Detector& yolo_detector, 
@@ -1565,6 +1618,7 @@ void move_forward_until_yolo_object_detected(
     std::function<void()>&& recovery_action, 
     uint16_t max_rounds, 
     uint16_t forward_ticks, 
+    uint8_t x, 
     uint8_t y, 
     uint16_t delay_after_forward_move, 
     uint16_t delay_after_lets_go
@@ -1588,7 +1642,7 @@ void move_forward_until_yolo_object_detected(
 
                 
 
-                pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                pbf_move_left_joystick(context, x, y, forward_ticks, 0);
                 // pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                 // pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);
             });
@@ -1605,7 +1659,7 @@ void move_forward_until_yolo_object_detected(
         if (round_num > max_rounds){
             OperationFailedException::fire(
                 ErrorReport::SEND_ERROR_REPORT,
-                "move_forward_until_yolo_object_detected(): Unable to detect target object.",
+                "move_player_until_yolo_object_detected(): Unable to detect target object.",
                 env.console
             );  
         }
@@ -1739,7 +1793,7 @@ void move_camera_yolo(
                 push_magnitude_scale_factor = 60 / std::sqrt(std::abs(diff));
                 break;
             case CameraAxis::Y:
-                duration_scale_factor = 100 / std::sqrt(std::abs(diff));
+                duration_scale_factor = 50 / std::sqrt(std::abs(diff));
                 if (std::abs(diff) < 0.1){
                     duration_scale_factor *= 0.5;
                 }

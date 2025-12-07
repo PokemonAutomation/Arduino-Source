@@ -5,11 +5,12 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-#include "NintendoSwitch_ProControllerState.h"
 #include "NintendoSwitch_ProController.h"
+#include "NintendoSwitch_ProControllerState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
 
 
 
@@ -58,45 +59,39 @@ bool ProControllerState::is_neutral() const{
 }
 
 
-void ProControllerState::load_json(const JsonValue& json){
+void ProControllerState::load_json(const JsonObject& json){
     clear();
 
-    if (json.is_null()){
-        return;
-    }
-
-    const JsonObject& obj = json.to_object_throw();
-
     //  Backwards compatibility.
-    if (obj.get_boolean_default("is_neutral", false)){
+    if (json.get_boolean_default("is_neutral", false)){
         return;
     }
 
     {
         std::string buttons_string;
-        if (obj.read_string(buttons_string, "buttons")){
+        if (json.read_string(buttons_string, "buttons")){
             buttons = string_to_button(buttons_string);
         }
     }
     {
         std::string dpad_string;
-        if (obj.read_string(dpad_string, "dpad")){
+        if (json.read_string(dpad_string, "dpad")){
             dpad = string_to_dpad(dpad_string);
         }
     }
 
     //  Backwards compatibility.
-    obj.read_integer(left_x, "left_x", 0, 255);
-    obj.read_integer(left_y, "left_y", 0, 255);
-    obj.read_integer(right_x, "right_x", 0, 255);
-    obj.read_integer(right_y, "right_y", 0, 255);
+    json.read_integer(left_x, "left_x", 0, 255);
+    json.read_integer(left_y, "left_y", 0, 255);
+    json.read_integer(right_x, "right_x", 0, 255);
+    json.read_integer(right_y, "right_y", 0, 255);
 
-    obj.read_integer(left_x, "lx", 0, 255);
-    obj.read_integer(left_y, "ly", 0, 255);
-    obj.read_integer(right_x, "rx", 0, 255);
-    obj.read_integer(right_y, "ry", 0, 255);
+    json.read_integer(left_x, "lx", 0, 255);
+    json.read_integer(left_y, "ly", 0, 255);
+    json.read_integer(right_x, "rx", 0, 255);
+    json.read_integer(right_y, "ry", 0, 255);
 }
-JsonValue ProControllerState::to_json() const{
+JsonObject ProControllerState::to_json() const{
     JsonObject obj;
     if (buttons != BUTTON_NONE){
         obj["buttons"] = button_to_string(buttons);
@@ -119,7 +114,7 @@ void ProControllerState::execute(
     AbstractController& controller,
     Milliseconds duration
 ) const{
-    static_cast<ProController&>(controller).issue_full_controller_state(
+    controller.cast_with_exception<ProController>().issue_full_controller_state(
         &scope,
         true,
         duration,
@@ -191,6 +186,8 @@ std::string ProControllerState::to_cpp(Milliseconds hold, Milliseconds release) 
     }
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Impossible state.");
 }
+
+
 
 
 

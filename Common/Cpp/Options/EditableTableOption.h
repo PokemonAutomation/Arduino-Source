@@ -87,6 +87,9 @@ public:
 
 public:
     const std::string& label() const{ return m_label; }
+    const std::vector<std::unique_ptr<EditableTableRow>>& defaults() const{
+        return m_default;
+    }
 
     //  Returns the # of rows at this moment of time.
     //  Since this value can be out-of-date before you return, do not use
@@ -127,6 +130,15 @@ public:
     }
 
     //  Lambda returns a boolean. False to continue running. True to stop.
+    template <typename RowType, typename Lambda>
+    void run_on_all_rows(Lambda function) const{
+        ReadSpinLock lg(m_current_lock);
+        for (auto& item : m_current){
+            if (function(static_cast<const RowType&>(*item))){
+                return;
+            }
+        }
+    }
     template <typename RowType, typename Lambda>
     void run_on_all_rows(Lambda function){
         ReadSpinLock lg(m_current_lock);

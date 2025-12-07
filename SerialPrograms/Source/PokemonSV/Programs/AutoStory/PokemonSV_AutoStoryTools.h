@@ -44,6 +44,7 @@ enum class ClearDialogMode{
     STOP_WHITEBUTTON,
     STOP_TIMEOUT,
     STOP_BATTLE,
+    STOP_TUTORIAL,
 };
 
 
@@ -173,6 +174,10 @@ void config_option(ProControllerContext& context, int change_option_value);
 
 // enter menu and swap the first and third moves for your starter
 void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
+
+// confirm the moves for the Lead pokemon: Moonblast, Mystical Fire, Psychic, Misty Terrain
+// start and end in the overworld
+void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
 
 // run the given `action`. if detect a battle, stop the action, and throw exception
 void do_action_and_monitor_for_battles(
@@ -377,12 +382,14 @@ void checkpoint_reattempt_loop_tutorial(
 
 // walk forward forward_ticks. repeat this for num_rounds.
 // if detect battle, kill the Pokemon. then continue. If we run into a battle, this round is considered to be done and will not be repeated.
+// NOTE: mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
 void move_player_forward(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     uint8_t num_rounds, 
     std::function<void()>&& recovery_action,
     bool use_lets_go = false,
+    bool mash_A = false,
     uint16_t forward_ticks = 100, 
     uint8_t y = 0, 
     uint16_t delay_after_forward_move = 50, 
@@ -422,7 +429,7 @@ void move_forward_until_yolo_object_above_min_size(
 // walk until we find the target object.
 // if caught in battle, run recovery_action
 // throw exception if exceed max_rounds.
-void move_forward_until_yolo_object_detected(
+void move_player_until_yolo_object_detected(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     YOLOv5Detector& yolo_detector, 
@@ -430,6 +437,7 @@ void move_forward_until_yolo_object_detected(
     std::function<void()>&& recovery_action, 
     uint16_t max_rounds, 
     uint16_t forward_ticks = 100, 
+    uint8_t x = 128, 
     uint8_t y = 0, 
     uint16_t delay_after_forward_move = 50, 
     uint16_t delay_after_lets_go = 105

@@ -21,6 +21,9 @@
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Programs/DateManip/NintendoSwitch_DateManip.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
+#include "PokemonSV/PokemonSV_Settings.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IvJudgeReader.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
@@ -130,8 +133,8 @@ std::vector<std::unique_ptr<AutoStory_Segment>> make_autoStory_segment_list(){
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_35>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_36>());
     segment_list.emplace_back(std::make_unique<AutoStory_Segment_37>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_38>());
-    // segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_38>());
+    segment_list.emplace_back(std::make_unique<AutoStory_Segment_39>());
     // segment_list.emplace_back(std::make_unique<AutoStory_Segment_40>());
     }
     return segment_list;
@@ -304,10 +307,10 @@ std::vector<std::unique_ptr<AutoStory_Checkpoint>> make_autoStory_checkpoint_lis
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_97>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_98>());
     checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_99>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_100>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_101>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_102>());
-    // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_103>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_100>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_101>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_102>());
+    checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_103>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_104>());
     // checkpoint_list.emplace_back(std::make_unique<AutoStory_Checkpoint_105>());
 
@@ -475,7 +478,8 @@ AutoStory::AutoStory()
         "For Start Points that are at Pokecenters, ensure that you fly there so that your character is in the exactly correct start position."
     }    
     , MAINSTORY_NOTE{
-        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Dazzling Gleam, Mystical Fire, Misty Terrain.<br>"
+        "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Mystical Fire, Psychic, Misty Terrain."
+        "Ensure PP is maxed out. Ensure Modest nature with max Special Attack and Speed EVs, with max IVs.<br>"
         "Also, make sure you have two other strong pokemon (e.g. level 100 Talonflames)<br>"
         "Refer to the documentation on github for more details."
     }
@@ -503,11 +507,29 @@ AutoStory::AutoStory()
     )
     , ENABLE_ADVANCED_MODE(
         "<b>Advanced mode:</b><br>"
-        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.<br>"
-        "Also, this enables the option to toggle 'Change settings at Program Start'.",
+        "Select the start/end checkpoints instead of segments. i.e. finer control over start/end points.",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     ) 
+    , CHANGE_SETTINGS(
+        "<b>Pre-check: Update game settings:</b><br>"
+        "This is to ensure the game has the correct settings, particularly with Autosave turned off, and Camera Support off.<br>"
+        "WARNING: if you disable this, make sure you manually set the in-game settings as laid out in the wiki.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , ENSURE_TIME_UNSYNCED(
+        "<b>Pre-check: Ensure time unsynced:</b><br>"
+        "This is to ensure the Switch has time unsynced from the internet, so it can be changed. This is run prior to the main story.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
+    , ENSURE_CORRECT_MOVES(
+        "<b>Pre-check: Ensure correct moves:</b><br>"
+        "This is to ensure the lead Gardevoir has the correct moves in the correct order: Moonblast, Mystical Fire, Psychic, Misty Terrain. This is run prior to the main story.",
+        LockMode::UNLOCK_WHILE_RUNNING,
+        true
+    )
     , GO_HOME_WHEN_DONE(true)
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(30))
     , NOTIFICATIONS({
@@ -522,13 +544,6 @@ AutoStory::AutoStory()
     , m_advanced_options_end(
         ""
     )    
-    , CHANGE_SETTINGS(
-        "<b>Change settings at Program Start:</b><br>"
-        "This is to ensure the program has the correct settings, particularly with Autosave turned off, and Camera Support off.<br>"
-        "WARNING: if you disable this, make sure you manually set the in-game settings as laid out in the wiki.",
-        LockMode::UNLOCK_WHILE_RUNNING,
-        true
-    )  
     , ENABLE_TEST_CHECKPOINTS(
         "<b>TEST: test_checkpoints():</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
@@ -703,7 +718,7 @@ AutoStory::AutoStory()
         false,
         "<b>YOLO Path:</b>", 
         LockMode::LOCK_WHILE_RUNNING, 
-        "PokemonSV/YOLO/yolo_area0_station1.onnx",
+        "PokemonSV/YOLO/A0-station-2.onnx",
         "<.onnx file>"
     )
     , TARGET_LABEL(
@@ -788,6 +803,8 @@ AutoStory::AutoStory()
 
     PA_ADD_OPTION(ENABLE_ADVANCED_MODE);
     PA_ADD_OPTION(CHANGE_SETTINGS);
+    PA_ADD_OPTION(ENSURE_TIME_UNSYNCED);
+    PA_ADD_OPTION(ENSURE_CORRECT_MOVES);
     
     PA_ADD_OPTION(NOTIFICATIONS);
 
@@ -847,7 +864,7 @@ void AutoStory::on_config_value_changed(void* object){
     END_DESCRIPTION.set_visibility(!ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
     START_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
     END_CHECKPOINT_DESCRIPTION.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
-    CHANGE_SETTINGS.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
+    // CHANGE_SETTINGS.set_visibility(ENABLE_ADVANCED_MODE ? ConfigOptionState::ENABLED : ConfigOptionState::HIDDEN);
 
     if (ENABLE_TEST_CHECKPOINTS){
         START_CHECKPOINT.set_visibility(ConfigOptionState::ENABLED);
@@ -1032,10 +1049,10 @@ void AutoStory::test_checkpoints(
     checkpoint_list.push_back([&](){checkpoint_97(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_98(env, context, notif_status_update, stats);});
     checkpoint_list.push_back([&](){checkpoint_99(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_100(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_101(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, stats);});
-    // checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_100(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_101(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_102(env, context, notif_status_update, stats);});
+    checkpoint_list.push_back([&](){checkpoint_103(env, context, notif_status_update, stats);});
     // checkpoint_list.push_back([&](){checkpoint_104(env, context, notif_status_update, stats);});
     // checkpoint_list.push_back([&](){checkpoint_105(env, context, notif_status_update, stats);});
     
@@ -1282,7 +1299,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
         DirectionDetector direction;
 
 
-        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/yolo_area0_station1.onnx");
+        YOLOv5Detector yolo_detector(RESOURCE_PATH() + "PokemonSV/YOLO/A0-station-2.onnx");
         // move_camera_yolo(env, context, CameraAxis::Y, yolo_detector, "tree-tera", 0.294444);
         // move_camera_yolo(env, context, CameraAxis::X, yolo_detector, "tree-tera", 0.604688);
 
@@ -1334,6 +1351,19 @@ void AutoStory::program(SingleSwitchProgramEnvironment& env, ProControllerContex
         }else{
             change_settings_prior_to_autostory_segment_mode(env, context, get_start_segment_index(), LANGUAGE);
         }
+    }
+
+    if (ENSURE_TIME_UNSYNCED && STORY_SECTION == StorySection::MAIN_STORY){
+        env.console.log("Ensure time is not synchronized to the internet.");
+        pbf_press_button(context, BUTTON_HOME, 160ms, GameSettings::instance().GAME_TO_HOME_DELAY1);
+        ensure_time_unsynced(env, context);
+        go_home(env.console, context);
+        resume_game_from_home(env.console, context, true);
+    }
+
+    if (ENSURE_CORRECT_MOVES && STORY_SECTION == StorySection::MAIN_STORY){
+        env.console.log("Ensure lead Gardevoir has the correct moves.");
+        confirm_lead_pokemon_moves(env, context, LANGUAGE);
     }
 
     run_autostory(env, context);

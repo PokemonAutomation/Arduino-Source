@@ -131,12 +131,15 @@ void run_back_until_found_bench(
     int ret = run_until<ProControllerContext>(
         env.console, context,
         [](ProControllerContext& context){
+            ssf_press_button(context, BUTTON_B, 0ms, 800ms, 0ms);
+            pbf_move_left_joystick(context, 128, 255, 800ms, 200ms);
+            pbf_press_button(context, BUTTON_L, 160ms, 160ms);
+
             //  Can't just hold it down since sometimes it doesn't register.
             for (int c = 0; c < 10; c++){
-                ssf_press_button(context, BUTTON_B, 0ms, 800ms, 0ms);
-                pbf_move_left_joystick(context, 128, 255, 800ms, 200ms);
-                pbf_move_right_joystick(context, 0, 128, 200ms, 800ms);
+                pbf_move_right_joystick(context, 0, 128, 800ms, 200ms);
                 pbf_press_button(context, BUTTON_L, 160ms, 0ms);
+                pbf_move_left_joystick(context, 128, 0, 840ms, 800ms);
             }
         },
         {buttonA}
@@ -149,7 +152,7 @@ void run_back_until_found_bench(
     default:
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "run_back_until_found_bench(): Unable to detect bench after 10 seconds.",
+            "run_back_until_found_bench(): Unable to detect bench after multiple attempts.",
             env.console
         );
     }

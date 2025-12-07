@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonValue.h"
+#include "Common/Cpp/Json/JsonObject.h"
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "ControllerState.h"
 
@@ -13,13 +13,13 @@ namespace PokemonAutomation{
 
 
 
-void ControllerState::load_json(const JsonValue& json){
+void ControllerState::load_json(const JsonObject& json){
     throw OperationFailedException(
         ErrorReport::NO_ERROR_REPORT,
         "This controller does not support serialization."
     );
 }
-JsonValue ControllerState::to_json() const{
+JsonObject ControllerState::to_json() const{
     throw OperationFailedException(
         ErrorReport::NO_ERROR_REPORT,
         "This controller does not support serialization."

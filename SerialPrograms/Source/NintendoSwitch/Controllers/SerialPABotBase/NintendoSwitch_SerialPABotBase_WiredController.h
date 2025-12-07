@@ -9,7 +9,7 @@
 
 #include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
 namespace PokemonAutomation{
@@ -49,13 +49,9 @@ public:
 
 
 public:
-    virtual ControllerType controller_type() const override{
-        return m_controller_type;
-    }
     virtual ControllerPerformanceClass performance_class() const override{
         return ControllerPerformanceClass::SerialPABotBase_Wired;
     }
-
     virtual Milliseconds ticksize() const override{
         return Milliseconds(0);
     }
@@ -238,7 +234,6 @@ private:
 
 
 private:
-    const ControllerType m_controller_type;
     std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
 };
 

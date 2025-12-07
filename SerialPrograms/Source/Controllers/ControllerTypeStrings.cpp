@@ -22,14 +22,18 @@ const EnumStringMap<ControllerType> CONTROLLER_TYPE_STRINGS{
     {ControllerType::HID_Keyboard,                          "HID: Keyboard"},
     {ControllerType::NintendoSwitch_WiredController,        "NS1: Wired Controller"},
     {ControllerType::NintendoSwitch_WiredProController,     "NS1: Wired Pro Controller"},
+    {ControllerType::NintendoSwitch_WiredLeftJoycon,        "NS1: Wired Left Joycon"},
+    {ControllerType::NintendoSwitch_WiredRightJoycon,       "NS1: Wired Right Joycon"},
     {ControllerType::NintendoSwitch_WirelessProController,  "NS1: Wireless Pro Controller"},
-    {ControllerType::NintendoSwitch_LeftJoycon,             "NS1: Left Joycon"},
-    {ControllerType::NintendoSwitch_RightJoycon,            "NS1: Right Joycon"},
+    {ControllerType::NintendoSwitch_WirelessLeftJoycon,     "NS1: Wireless Left Joycon"},
+    {ControllerType::NintendoSwitch_WirelessRightJoycon,    "NS1: Wireless Right Joycon"},
     {ControllerType::NintendoSwitch2_WiredController,       "NS2: Wired Controller"},
     {ControllerType::NintendoSwitch2_WiredProController,    "NS2: Wired Pro Controller"},
+    {ControllerType::NintendoSwitch2_WiredLeftJoycon,       "NS2: Wired Left Joycon"},
+    {ControllerType::NintendoSwitch2_WiredRightJoycon,      "NS2: Wired Right Joycon"},
     {ControllerType::NintendoSwitch2_WirelessProController, "NS2: Wireless Pro Controller"},
-    {ControllerType::NintendoSwitch2_LeftJoycon,            "NS2: Left Joycon"},
-    {ControllerType::NintendoSwitch2_RightJoycon,           "NS2: Right Joycon"},
+    {ControllerType::NintendoSwitch2_WirelessLeftJoycon,    "NS2: Wireless Left Joycon"},
+    {ControllerType::NintendoSwitch2_WirelessRightJoycon,   "NS2: Wireless Right Joycon"},
 };
 
 const EnumStringMap<ControllerClass>& CONTROLLER_CLASS_STRINGS(){

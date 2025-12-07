@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
 #ifndef PokemonAutomation_PokemonBDSP_ShortcutDirection_H
 #define PokemonAutomation_PokemonBDSP_ShortcutDirection_H

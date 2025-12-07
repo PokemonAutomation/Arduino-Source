@@ -12,6 +12,7 @@
 #include "CommonFramework/VideoPipeline/VideoOverlayScopes.h"
 #include "CommonTools/Images/ImageFilter.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Inference/NintendoSwitch_HomeMenuDetector.h"
@@ -231,6 +232,32 @@ void change_date(
             );
         }
     }
+}
+
+void ensure_time_unsynced(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    Milliseconds timing_variation = context->timing_variation();
+    ensure_at_home(env.console, context);
+    home_to_date_time(env.console, context, true);
+    pbf_press_button(context, BUTTON_A, 80ms + timing_variation, 240ms + timing_variation);
+
+    context.wait_for_all_requests();
+
+    DateChangeWatcher date_reader(env.console);
+    int ret = wait_until(
+        env.console, context, std::chrono::seconds(10),
+        {
+            date_reader
+        }
+    );
+
+    if (ret < 0){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "Failed to enter Date Change window. Ensure that System Time is not synced to the internet.",
+            env.console
+        );
+    }
+   
 }
 
 

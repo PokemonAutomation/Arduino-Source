@@ -11,7 +11,7 @@
 
 #include "Common/Cpp/Containers/Pimpl.h"
 #include "Controllers/Controller.h"
-#include "NintendoSwitch_ControllerButtons.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
 
 //#include <iostream>
 //using std::cout;

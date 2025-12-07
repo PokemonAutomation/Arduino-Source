@@ -13,9 +13,9 @@
 #include "Common/Cpp/Concurrency/Thread.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "SysbotBase_Connection.h"
 
 namespace PokemonAutomation{
@@ -43,13 +43,13 @@ public:
 
 
 public:
-    virtual ControllerType controller_type() const override{
-        return ControllerType::NintendoSwitch_WiredController;
-    }
+//    virtual ControllerType controller_type() const override{
+//        return ControllerType::NintendoSwitch_WiredController;
+//    }
+
     virtual ControllerPerformanceClass performance_class() const override{
         return ControllerPerformanceClass::SysbotBase;
     }
-
     virtual Milliseconds ticksize() const override{
         return Milliseconds::zero();
     }

@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonSV/Options/PokemonSV_SinglesMoveTable.h"
 #include "PokemonSV/Options/PokemonSV_SinglesAIOption.h"
 

@@ -9,7 +9,7 @@
 #include "CommonTools/Async/SuperControlSession.tpp"
 #include "Controllers/KeyboardInput/KeyboardInput.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch_VirtualControllerState.h"
+#include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
 #include "NintendoSwitch_ProControllerState.h"
 #include "NintendoSwitch_ProController.h"
 

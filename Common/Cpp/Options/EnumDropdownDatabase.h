@@ -47,6 +47,8 @@ public:
     IntegerEnumDropdownDatabase();      //  Constructs empty database.
     IntegerEnumDropdownDatabase(std::initializer_list<EnumEntry> list);
 
+    //  Warning, these functions do not have strong exception safety!
+    //  If these throw, this class will be in a bad state.
     void add(EnumEntry entry);
     void add(size_t value, std::string slug, std::string display, bool enabled = true){
         add(EnumEntry{value, std::move(slug), std::move(display), enabled});
@@ -92,24 +94,45 @@ public:
     EnumDropdownDatabase(std::initializer_list<Entry> list){
         size_t index = 0;
         for (auto iter = list.begin(); iter != list.end(); ++iter, index++){
-            add(iter->value, std::move(iter->slug), std::move(iter->display), iter->enabled);
+            add(
+                iter->value,
+                std::move(iter->slug),
+                std::move(iter->display),
+                iter->enabled
+            );
         }
     }
 
-    void add(EnumType value, std::string slug, std::string display, bool enabled){
-        IntegerEnumDropdownDatabase::add(EnumEntry{(size_t)value, std::move(slug), std::move(display), enabled});
+    //  Warning, these functions do not have strong exception safety!
+    //  If these throw, this class will be in a bad state.
+    void add(
+        EnumType value,
+        std::string slug,
+        std::string display,
+        bool enabled
+    ){
+        IntegerEnumDropdownDatabase::add(
+            EnumEntry{
+                (size_t)value,
+                std::move(slug),
+                std::move(display),
+                enabled
+            }
+        );
     }
 
     //  Find an enum. Returns null if not in the database.
     const EnumEntry* find(EnumType value) const{
         return IntegerEnumDropdownDatabase::find((size_t)value);
     }
+#if 0
     EnumType find_slug(const std::string& slug) const{
         return (EnumType)IntegerEnumDropdownDatabase::find_slug(slug);
     }
     EnumType find_display(const std::string& display) const{
         return (EnumType)IntegerEnumDropdownDatabase::find_display(display);
     }
+#endif
 
 protected:
     EnumDropdownDatabase(void*) : IntegerEnumDropdownDatabase(nullptr) {}

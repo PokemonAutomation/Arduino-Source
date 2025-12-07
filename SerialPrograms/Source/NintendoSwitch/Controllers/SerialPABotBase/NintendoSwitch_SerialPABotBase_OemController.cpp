@@ -4,11 +4,13 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_Routines_Protocol.h"
-#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_WirelessControllers.h"
-#include "NintendoSwitch_SerialPABotBase_WirelessController.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase_Routines_NS1_OemControllers.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch_SerialPABotBase_OemController.h"
 
 //#include <iostream>
 //using std::cout;
@@ -25,7 +27,7 @@ using namespace std::chrono_literals;
 
 
 
-SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
+SerialPABotBase_OemController::SerialPABotBase_OemController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
     ControllerType controller_type,
@@ -38,7 +40,31 @@ SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
     )
     , m_controller_type(controller_type)
 {
+//    cout << "controller_type = " << (int)controller_type << endl;
+
     using namespace SerialPABotBase;
+
+    switch (controller_type){
+    case ControllerType::NintendoSwitch_WiredProController:
+    case ControllerType::NintendoSwitch_WiredLeftJoycon:
+    case ControllerType::NintendoSwitch_WiredRightJoycon:
+        m_performance_class = ControllerPerformanceClass::SerialPABotBase_Wired;
+        m_ticksize = 0ms;
+        m_cooldown = 8ms;
+        m_timing_variation = ConsoleSettings::instance().TIMING_OPTIONS.WIRED;
+        break;
+    case ControllerType::NintendoSwitch_WirelessProController:
+    case ControllerType::NintendoSwitch_WirelessLeftJoycon:
+    case ControllerType::NintendoSwitch_WirelessRightJoycon:
+        m_performance_class = ControllerPerformanceClass::SerialPABotBase_Wireless;
+        m_ticksize = 0ms;
+        m_cooldown = 15ms;
+        m_timing_variation = ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS;
+        break;
+
+    default:
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Unsupported controller.");
+    }
 
     switch (reset_mode){
     case PokemonAutomation::ControllerResetMode::DO_NOT_RESET:
@@ -69,14 +95,14 @@ SerialPABotBase_WirelessController::SerialPABotBase_WirelessController(
         connection, *this
     ));
 }
-SerialPABotBase_WirelessController::~SerialPABotBase_WirelessController(){
+SerialPABotBase_OemController::~SerialPABotBase_OemController(){
     stop();
 }
-void SerialPABotBase_WirelessController::stop(){
+void SerialPABotBase_OemController::stop(){
     m_status_thread.reset();
 }
 
-void SerialPABotBase_WirelessController::set_info(){
+void SerialPABotBase_OemController::set_info(){
     using namespace SerialPABotBase;
 
     uint8_t controller_mac_address[6] = {};
@@ -132,6 +158,7 @@ void SerialPABotBase_WirelessController::set_info(){
         colors.right_grip[2] = color.blue();
     }
 
+
     m_serial->issue_request_and_wait(
         MessageControllerWriteSpi(
             m_controller_type,
@@ -146,8 +173,8 @@ void SerialPABotBase_WirelessController::set_info(){
 
 
 
-Button SerialPABotBase_WirelessController::populate_report_buttons(
-    pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
+Button SerialPABotBase_OemController::populate_report_buttons(
+    pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
     const SwitchControllerState& controller_state
 ){
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
@@ -194,8 +221,8 @@ Button SerialPABotBase_WirelessController::populate_report_buttons(
     }
     return all_buttons;
 }
-bool SerialPABotBase_WirelessController::populate_report_gyro(
-    pabb_NintendoSwitch_WirelessController_State0x30_Gyro& gyro,
+bool SerialPABotBase_OemController::populate_report_gyro(
+    pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro,
     const SwitchControllerState& controller_state
 ){
     gyro.accel_x = controller_state.gyro[0];
@@ -217,10 +244,10 @@ bool SerialPABotBase_WirelessController::populate_report_gyro(
 }
 
 
-void SerialPABotBase_WirelessController::issue_report(
+void SerialPABotBase_OemController::issue_report(
     const Cancellable* cancellable,
     WallDuration duration,
-    const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons
+    const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons
 ){
     //  We will not do any throttling or timing adjustments here. We'll defer
     //  to the microcontroller to do that for us.
@@ -240,14 +267,14 @@ void SerialPABotBase_WirelessController::issue_report(
         time_left -= current;
     }
 }
-void SerialPABotBase_WirelessController::issue_report(
+void SerialPABotBase_OemController::issue_report(
     const Cancellable* cancellable,
     WallDuration duration,
-    const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
-    const pabb_NintendoSwitch_WirelessController_State0x30_Gyro& gyro
+    const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
+    const pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro
 ){
     //  TODO: For now we duplicate the gyro data to all 3 5ms segments.
-    pabb_NintendoSwitch_WirelessController_State0x30_GyroX3 gyro3{
+    pabb_NintendoSwitch_OemController_State0x30_GyroX3 gyro3{
         gyro, gyro, gyro
     };
 
@@ -307,7 +334,7 @@ void SerialPABotBase_WirelessController::issue_report(
 
 
 
-void SerialPABotBase_WirelessController::update_status(Cancellable& cancellable){
+void SerialPABotBase_OemController::update_status(Cancellable& cancellable){
     if (m_color_html.empty()){
         try{
             m_logger.log("Reading Controller Colors...");
@@ -336,6 +363,7 @@ void SerialPABotBase_WirelessController::update_status(Cancellable& cancellable)
             m_logger.log("Reading Controller Colors... Done");
 
             switch (m_controller_type){
+            case ControllerType::NintendoSwitch_WiredProController:
             case ControllerType::NintendoSwitch_WirelessProController:{
                 Color left(colors.left_grip[0], colors.left_grip[1], colors.left_grip[2]);
                 Color body(colors.body[0], colors.body[1], colors.body[2]);
@@ -345,8 +373,10 @@ void SerialPABotBase_WirelessController::update_status(Cancellable& cancellable)
                 m_color_html += " " + html_color_text("&#x2b24;", right);
                 break;
             }
-            case ControllerType::NintendoSwitch_LeftJoycon:
-            case ControllerType::NintendoSwitch_RightJoycon:{
+            case ControllerType::NintendoSwitch_WiredLeftJoycon:
+            case ControllerType::NintendoSwitch_WiredRightJoycon:
+            case ControllerType::NintendoSwitch_WirelessLeftJoycon:
+            case ControllerType::NintendoSwitch_WirelessRightJoycon:{
                 Color body(colors.body[0], colors.body[1], colors.body[2]);
                 m_color_html = html_color_text("&#x2b24;", body);
                 break;
@@ -392,7 +422,7 @@ void SerialPABotBase_WirelessController::update_status(Cancellable& cancellable)
     m_handle.set_status_line1(str);
 }
 
-void SerialPABotBase_WirelessController::stop_with_error(std::string message){
+void SerialPABotBase_OemController::stop_with_error(std::string message){
     SerialPABotBase_Controller::stop_with_error(std::move(message));
 }
 

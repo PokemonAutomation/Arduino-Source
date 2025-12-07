@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/Concurrency/SpinLock.h"
 #include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{

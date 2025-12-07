@@ -18,25 +18,6 @@ enum class ControllerInterface{
     UsbSysbotBase,
 };
 
-
-enum class ControllerType{
-    None,
-
-    HID_Keyboard,
-
-    NintendoSwitch_WiredController,     //  Generic 3rd party wired controller.
-    NintendoSwitch_WiredProController,  //  The official Pro Controller, connected over USB.
-    NintendoSwitch_WirelessProController,
-    NintendoSwitch_LeftJoycon,
-    NintendoSwitch_RightJoycon,
-    NintendoSwitch2_WiredController,    //  Generic 3rd party wired controller.
-    NintendoSwitch2_WiredProController, //  The official Pro Controller, connected over USB.
-    NintendoSwitch2_WirelessProController,
-    NintendoSwitch2_LeftJoycon,
-    NintendoSwitch2_RightJoycon,
-};
-
-
 enum class ControllerPerformanceClass{
     Unknown,
     SerialPABotBase_Wired,
@@ -44,12 +25,36 @@ enum class ControllerPerformanceClass{
     SysbotBase,
 };
 
+
 enum class ControllerClass{
     None,
     HID_Keyboard,
     NintendoSwitch_ProController,
     NintendoSwitch_LeftJoycon,
     NintendoSwitch_RightJoycon,
+};
+
+
+enum class ControllerType{
+    None,
+
+    HID_Keyboard,
+
+    NintendoSwitch_WiredController,     //  Generic 3rd party wired controller.
+    NintendoSwitch_WiredProController,
+    NintendoSwitch_WiredLeftJoycon,
+    NintendoSwitch_WiredRightJoycon,
+    NintendoSwitch_WirelessProController,
+    NintendoSwitch_WirelessLeftJoycon,
+    NintendoSwitch_WirelessRightJoycon,
+
+    NintendoSwitch2_WiredController,    //  Generic 3rd party wired controller.
+    NintendoSwitch2_WiredProController,
+    NintendoSwitch2_WiredLeftJoycon,
+    NintendoSwitch2_WiredRightJoycon,
+    NintendoSwitch2_WirelessProController,
+    NintendoSwitch2_WirelessLeftJoycon,
+    NintendoSwitch2_WirelessRightJoycon,
 };
 
 

@@ -57,23 +57,31 @@ ControllerType id_to_controller_type(uint32_t id){
         return ControllerType::NintendoSwitch_WiredController;
     case PABB_CID_NintendoSwitch_WiredProController:
         return ControllerType::NintendoSwitch_WiredProController;
+    case PABB_CID_NintendoSwitch_WiredLeftJoycon:
+        return ControllerType::NintendoSwitch_WiredLeftJoycon;
+    case PABB_CID_NintendoSwitch_WiredRightJoycon:
+        return ControllerType::NintendoSwitch_WiredRightJoycon;
     case PABB_CID_NintendoSwitch_WirelessProController:
         return ControllerType::NintendoSwitch_WirelessProController;
-    case PABB_CID_NintendoSwitch_LeftJoycon:
-        return ControllerType::NintendoSwitch_LeftJoycon;
-    case PABB_CID_NintendoSwitch_RightJoycon:
-        return ControllerType::NintendoSwitch_RightJoycon;
+    case PABB_CID_NintendoSwitch_WirelessLeftJoycon:
+        return ControllerType::NintendoSwitch_WirelessLeftJoycon;
+    case PABB_CID_NintendoSwitch_WirelessRightJoycon:
+        return ControllerType::NintendoSwitch_WirelessRightJoycon;
 
     case PABB_CID_NintendoSwitch2_WiredController:
         return ControllerType::NintendoSwitch2_WiredController;
     case PABB_CID_NintendoSwitch2_WiredProController:
         return ControllerType::NintendoSwitch2_WiredProController;
+    case PABB_CID_NintendoSwitch2_WiredLeftJoycon:
+        return ControllerType::NintendoSwitch2_WiredLeftJoycon;
+    case PABB_CID_NintendoSwitch2_WiredRightJoycon:
+        return ControllerType::NintendoSwitch2_WiredRightJoycon;
     case PABB_CID_NintendoSwitch2_WirelessProController:
         return ControllerType::NintendoSwitch2_WirelessProController;
-    case PABB_CID_NintendoSwitch2_LeftJoycon:
-        return ControllerType::NintendoSwitch2_LeftJoycon;
-    case PABB_CID_NintendoSwitch2_RightJoycon:
-        return ControllerType::NintendoSwitch2_RightJoycon;
+    case PABB_CID_NintendoSwitch2_WirelessLeftJoycon:
+        return ControllerType::NintendoSwitch2_WirelessLeftJoycon;
+    case PABB_CID_NintendoSwitch2_WirelessRightJoycon:
+        return ControllerType::NintendoSwitch2_WirelessRightJoycon;
 
     default:
         return ControllerType::None;
@@ -96,23 +104,31 @@ uint32_t controller_type_to_id(ControllerType controller_type){
         return PABB_CID_NintendoSwitch_WiredController;
     case ControllerType::NintendoSwitch_WiredProController:
         return PABB_CID_NintendoSwitch_WiredProController;
+    case ControllerType::NintendoSwitch_WiredLeftJoycon:
+        return PABB_CID_NintendoSwitch_WiredLeftJoycon;
+    case ControllerType::NintendoSwitch_WiredRightJoycon:
+        return PABB_CID_NintendoSwitch_WiredRightJoycon;
     case ControllerType::NintendoSwitch_WirelessProController:
         return PABB_CID_NintendoSwitch_WirelessProController;
-    case ControllerType::NintendoSwitch_LeftJoycon:
-        return PABB_CID_NintendoSwitch_LeftJoycon;
-    case ControllerType::NintendoSwitch_RightJoycon:
-        return PABB_CID_NintendoSwitch_RightJoycon;
+    case ControllerType::NintendoSwitch_WirelessLeftJoycon:
+        return PABB_CID_NintendoSwitch_WirelessLeftJoycon;
+    case ControllerType::NintendoSwitch_WirelessRightJoycon:
+        return PABB_CID_NintendoSwitch_WirelessRightJoycon;
 
     case ControllerType::NintendoSwitch2_WiredController:
         return PABB_CID_NintendoSwitch2_WiredController;
     case ControllerType::NintendoSwitch2_WiredProController:
         return PABB_CID_NintendoSwitch2_WiredProController;
+    case ControllerType::NintendoSwitch2_WiredLeftJoycon:
+        return PABB_CID_NintendoSwitch2_WiredLeftJoycon;
+    case ControllerType::NintendoSwitch2_WiredRightJoycon:
+        return PABB_CID_NintendoSwitch2_WiredRightJoycon;
     case ControllerType::NintendoSwitch2_WirelessProController:
         return PABB_CID_NintendoSwitch2_WirelessProController;
-    case ControllerType::NintendoSwitch2_LeftJoycon:
-        return PABB_CID_NintendoSwitch2_LeftJoycon;
-    case ControllerType::NintendoSwitch2_RightJoycon:
-        return PABB_CID_NintendoSwitch2_RightJoycon;
+    case ControllerType::NintendoSwitch2_WirelessLeftJoycon:
+        return PABB_CID_NintendoSwitch2_WirelessLeftJoycon;
+    case ControllerType::NintendoSwitch2_WirelessRightJoycon:
+        return PABB_CID_NintendoSwitch2_WirelessRightJoycon;
     }
 
     throw InternalProgramError(
