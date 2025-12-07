@@ -479,8 +479,9 @@ AutoStory::AutoStory()
     }    
     , MAINSTORY_NOTE{
         "Ensure you have a level 100 Gardevoir with the moves in the following order: Moonblast, Mystical Fire, Psychic, Misty Terrain."
-        "Ensure PP is maxed out. Ensure Modest nature with max Special Attack and Speed EVs, with max IVs.<br>"
-        "Also, make sure you have two other strong pokemon (e.g. level 100 Talonflames)<br>"
+        "Ensure PP is maxed out (Moonblast should have 24 PP). Ensure Modest nature with max Special Attack and Speed EVs, with max IVs. "
+        "After vitamins, mint and hypertraining, the stats should be as follows: HP 277, Attack [doesn't matter], Defense 167, Speed 259, Sp. Def 266, Sp. Atk 383.<br>"
+        "Also, make sure you have two other strong pokemon (e.g. level 100 Talonflames), ideally with a strong first move (e.g. Acrobatics for Talonflame).<br>"
         "Refer to the documentation on github for more details."
     }
     , START_DESCRIPTION(
