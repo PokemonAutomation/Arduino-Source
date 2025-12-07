@@ -9,8 +9,10 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -62,7 +64,7 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
         {
             {Route::NO_MOVEMENT,  "no_movement",  "No Movement"},
             {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
-            // {Route::ALPHA_PIDGEY, "alpha_pidgey", "Alpha Pidgey (Wild Zone 1)"},
+            {Route::ALPHA_PIDGEY, "alpha_pidgey", "Alpha Pidgey (Wild Zone 1)"},
             // {Route::ALPHA_PIKACHU, "alpha_pikachu", "Alpha Pikachu (Wild Zone 6)"},
             // {Route::CUSTOMISED_MACRO, "customised_macro", "Customised Macro"},
         },
@@ -141,6 +143,40 @@ void route_wild_zone_19(
     wait_until_overworld(env.console, context, 50s);
 }
 
+void route_alpha_pidgey(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max){
+    int ret = -1;
+    {
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+                pbf_move_left_joystick(context, 255, 128, 4000ms, 0ms);
+                pbf_move_left_joystick(context, 128, 255, 7400ms, 0ms);
+                pbf_move_left_joystick(context, 0, 128, 3000ms, 0ms);
+                pbf_press_button(context, BUTTON_A, 500ms, 2500ms); // elevator up
+                pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
+                pbf_press_button(context, BUTTON_L, 100ms, 1000ms);
+            },
+            {black_screen}
+        );
+    }
+    if (ret == 0){
+        wait_until_overworld(env.console, context, 50s);
+    }
+    open_map(env.console, context, to_zoom_to_max);
+    pbf_move_left_joystick(context, 128, 255, 200ms, 100ms);
+    if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
+        pbf_move_left_joystick(context, 255, 128, 100ms, 100ms);
+        fly_from_map(env.console, context);
+    }
+    wait_until_overworld(env.console, context);
+}
+
 } // namespace
 
 void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
@@ -173,6 +209,9 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
         break;
     case Route::WILD_ZONE_19:
         route = route_wild_zone_19;
+        break;
+    case Route::ALPHA_PIDGEY:
+        route = route_alpha_pidgey;
         break;
     default:
         OperationFailedException::fire(
