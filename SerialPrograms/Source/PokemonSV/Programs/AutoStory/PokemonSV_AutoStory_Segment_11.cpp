@@ -4,6 +4,8 @@
  *
  */
 
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -113,6 +115,13 @@ void checkpoint_24(
     [&](size_t attempt_number){         
         context.wait_for_all_requests();
         DirectionDetector direction;
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        double current_direction = direction.get_current_direction(env.console, snapshot);
+        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 0, 0});
+        }
+
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 direction.change_direction(env.program_info(), env.console, context, 2.71);
@@ -188,6 +197,8 @@ void checkpoint_25(
 
         // section 3
         DirectionDetector direction;
+        // we just hope the minimap Direction isn't covered
+
         direction.change_direction(env.program_info(), env.console, context, 6.0);
         pbf_move_left_joystick(context, 128, 0, 700, 100);
 
@@ -292,6 +303,8 @@ void checkpoint_26(
 
         // section 1b. realign using fence corner
         DirectionDetector direction;
+        // we just hope the minimap Direction isn't covered
+
         direction.change_direction(env.program_info(), env.console, context,  2.74);
         pbf_move_left_joystick(context, 128, 0, 200, 50);
         direction.change_direction(env.program_info(), env.console, context,  4.328);

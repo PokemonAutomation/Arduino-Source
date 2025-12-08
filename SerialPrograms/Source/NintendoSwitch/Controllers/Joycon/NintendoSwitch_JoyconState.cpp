@@ -5,48 +5,12 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-#include "Common/Cpp/Options/CheckboxDropdownDatabase.h"
 #include "NintendoSwitch_Joycon.h"
 #include "NintendoSwitch_JoyconState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-
-
-const CheckboxDropdownDatabase<Button>& LeftJoycon_Button_Database(){
-    static CheckboxDropdownDatabase<Button> database{
-        {Button::BUTTON_UP,         "Up",       "\u2191"},
-        {Button::BUTTON_RIGHT,      "Right",    "\u2192"},
-        {Button::BUTTON_DOWN,       "Down",     "\u2193"},
-        {Button::BUTTON_LEFT,       "Left",     "\u2190"},
-        {Button::BUTTON_L,          "L",        "L"},
-        {Button::BUTTON_ZL,         "ZL",       "ZL"},
-        {Button::BUTTON_MINUS,      "-",        "-"},
-        {Button::BUTTON_LCLICK,     "L-click",  "L-click"},
-        {Button::BUTTON_CAPTURE,    "capture",  "Capture"},
-        {Button::BUTTON_LEFT_SR,    "SR",       "SR"},
-        {Button::BUTTON_LEFT_SL,    "SL",       "SL"},
-    };
-    return database;
-}
-const CheckboxDropdownDatabase<Button>& RightJoycon_Button_Database(){
-    static CheckboxDropdownDatabase<Button> database{
-        {Button::BUTTON_Y,          "Y",        "Y"},
-        {Button::BUTTON_B,          "B",        "B"},
-        {Button::BUTTON_A,          "A",        "A"},
-        {Button::BUTTON_X,          "X",        "X"},
-        {Button::BUTTON_R,          "R",        "R"},
-        {Button::BUTTON_R,          "RL",       "RL"},
-        {Button::BUTTON_PLUS,       "+",        "+"},
-        {Button::BUTTON_RCLICK,     "R-click",  "R-click"},
-        {Button::BUTTON_HOME,       "home",     "Home"},
-        {Button::BUTTON_RIGHT_SR,   "SR",       "SR"},
-        {Button::BUTTON_RIGHT_SL,   "SL",       "SL"},
-        {Button::BUTTON_C,          "C",        "C (Switch 2)"},
-    };
-    return database;
-}
 
 
 
@@ -117,7 +81,7 @@ void JoyconState::execute(
     AbstractController& controller,
     Milliseconds duration
 ) const{
-    static_cast<JoyconController&>(controller).issue_full_controller_state(
+    controller.cast_with_exception<JoyconController>().issue_full_controller_state(
         &scope,
         true,
         duration,
@@ -169,6 +133,8 @@ std::string JoyconState::to_cpp(Milliseconds hold, Milliseconds release) const{
     }
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Impossible state.");
 }
+
+
 
 
 

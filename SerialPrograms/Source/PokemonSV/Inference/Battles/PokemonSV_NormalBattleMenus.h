@@ -11,7 +11,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonTools/VisualDetector.h"
 #include "CommonTools/VisualDetectors/BlackScreenDetector.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonSV/Inference/PokemonSV_WhiteButtonDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_GradientArrowDetector.h"
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"

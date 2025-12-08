@@ -11,7 +11,7 @@
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonTools/FailureWatchdog.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"

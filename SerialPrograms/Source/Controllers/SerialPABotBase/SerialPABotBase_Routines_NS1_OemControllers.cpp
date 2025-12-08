@@ -7,7 +7,7 @@
 #include <string.h>
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WirelessControllers.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h"
 #include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 
@@ -20,14 +20,14 @@ namespace SerialPABotBase{
 
 
 
-void register_message_converters_NS1_WirelessControllers(){
+void register_message_converters_NS1_OemControllers(){
     register_message_converter(
-        PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_READ_SPI,
+        PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_READ_SPI,
         [](const std::string& body){
             std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_READ_SPI() - ";
-            if (body.size() != sizeof(pabb_Message_NS1_WirelessController_ReadSpi)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_Message_NS1_WirelessController_ReadSpi*)body.c_str();
+            ss << "PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_READ_SPI() - ";
+            if (body.size() != sizeof(pabb_Message_NS1_OemController_ReadSpi)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_NS1_OemController_ReadSpi*)body.c_str();
             ss << "seqnum = " << params->seqnum;
             ss << ", controller = " << params->controller_type;
             ss << ", address = 0x" << tostr_hex(params->address);
@@ -36,12 +36,12 @@ void register_message_converters_NS1_WirelessControllers(){
         }
     );
     register_message_converter(
-        PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_WRITE_SPI,
+        PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_WRITE_SPI,
         [](const std::string& body){
             std::ostringstream ss;
-            ss << "PABB_MSG_REQUEST_NS1_WIRELESS_CONTROLLER_WRITE_SPI() - ";
-            if (body.size() <= sizeof(pabb_Message_NS1_WirelessController_WriteSpi)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_Message_NS1_WirelessController_WriteSpi*)body.c_str();
+            ss << "PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_WRITE_SPI() - ";
+            if (body.size() <= sizeof(pabb_Message_NS1_OemController_WriteSpi)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_NS1_OemController_WriteSpi*)body.c_str();
             ss << "seqnum = " << params->seqnum;
             ss << ", controller = " << params->controller_type;
             ss << ", address = 0x" << tostr_hex(params->address);
@@ -50,16 +50,16 @@ void register_message_converters_NS1_WirelessControllers(){
         }
     );
     register_message_converter(
-        PABB_MSG_COMMAND_NS1_WIRELESS_CONTROLLER_BUTTONS,
+        PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_BUTTONS,
         [](const std::string& body){
             //  Disable this by default since it's very spammy.
             if (!GlobalSettings::instance().LOG_EVERYTHING){
                 return std::string();
             }
             std::ostringstream ss;
-            ss << "PABB_MSG_COMMAND_NS1_WIRELESS_CONTROLLER_BUTTONS() - ";
-            if (body.size() != sizeof(pabb_Message_Command_NS1_WirelessController_Buttons)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_Message_Command_NS1_WirelessController_Buttons*)body.c_str();
+            ss << "PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_BUTTONS() - ";
+            if (body.size() != sizeof(pabb_Message_Command_NS1_OemController_Buttons)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_Command_NS1_OemController_Buttons*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
             ss << ", milliseconds = " << params->milliseconds;
 
@@ -70,16 +70,16 @@ void register_message_converters_NS1_WirelessControllers(){
         }
     );
     register_message_converter(
-        PABB_MSG_COMMAND_NS1_WIRELESS_CONTROLLER_FULL_STATE,
+        PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_FULL_STATE,
         [](const std::string& body){
             //  Disable this by default since it's very spammy.
             if (!GlobalSettings::instance().LOG_EVERYTHING){
                 return std::string();
             }
             std::ostringstream ss;
-            ss << "PABB_MSG_COMMAND_NS1_WIRELESS_CONTROLLER_FULL_STATE() - ";
-            if (body.size() != sizeof(pabb_Message_Command_NS1_WirelessController_FullState)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_Message_Command_NS1_WirelessController_FullState*)body.c_str();
+            ss << "PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_FULL_STATE() - ";
+            if (body.size() != sizeof(pabb_Message_Command_NS1_OemController_FullState)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_Message_Command_NS1_OemController_FullState*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
             ss << ", milliseconds = " << params->milliseconds;
 
@@ -90,12 +90,12 @@ void register_message_converters_NS1_WirelessControllers(){
         }
     );
     register_message_converter(
-        PABB_MSG_INFO_NS1_WIRELESS_CONTROLLER_RUMBLE,
+        PABB_MSG_INFO_NS1_OEM_CONTROLLER_RUMBLE,
         [](const std::string& body){
             std::ostringstream ss;
-            ss << "PABB_MSG_INFO_NS1_WIRELESS_CONTROLLER_RUMBLE(): ";
-            if (body.size() != sizeof(pabb_MsgInfo_NS1_WirelessController_Rumble)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_MsgInfo_NS1_WirelessController_Rumble*)body.c_str();
+            ss << "PABB_MSG_INFO_NS1_OEM_CONTROLLER_RUMBLE(): ";
+            if (body.size() != sizeof(pabb_MsgInfo_NS1_OemController_Rumble)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgInfo_NS1_OemController_Rumble*)body.c_str();
 
             do{
                 if (GlobalSettings::instance().LOG_EVERYTHING){

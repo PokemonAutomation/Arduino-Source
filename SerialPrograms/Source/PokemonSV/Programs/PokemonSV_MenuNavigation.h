@@ -10,7 +10,7 @@
 #define PokemonAutomation_PokemonSV_MenuNavigation_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Inference/PokemonSV_MainMenuDetector.h"
 

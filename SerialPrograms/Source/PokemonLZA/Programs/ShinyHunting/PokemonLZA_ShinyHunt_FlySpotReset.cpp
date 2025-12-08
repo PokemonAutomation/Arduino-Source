@@ -9,8 +9,10 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
+#include "CommonTools/VisualDetectors/BlackScreenDetector.h"
 #include "CommonTools/StartupChecks/VideoResolutionCheck.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Superscalar.h"
 #include "Pokemon/Pokemon_Strings.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLZA/Programs/PokemonLZA_BasicNavigation.h"
@@ -58,6 +60,17 @@ std::unique_ptr<StatsTracker> ShinyHunt_FlySpotReset_Descriptor::make_stats() co
 
 ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     : SHINY_DETECTED("Shiny Detected", "", "2000 ms", ShinySoundDetectedAction::NOTIFY_ON_FIRST_ONLY)
+    , ROUTE("<b>Hunt Route:</b>",
+        {
+            {Route::NO_MOVEMENT,  "no_movement",  "No Movement"},
+            {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
+            {Route::ALPHA_PIDGEY, "alpha_pidgey", "Alpha Pidgey (Wild Zone 1)"},
+            // {Route::ALPHA_PIKACHU, "alpha_pikachu", "Alpha Pikachu (Wild Zone 6)"},
+            // {Route::CUSTOMISED_MACRO, "customised_macro", "Customised Macro"},
+        },
+        LockMode::LOCK_WHILE_RUNNING,
+        Route::NO_MOVEMENT
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -68,10 +81,103 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
+    PA_ADD_OPTION(ROUTE);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
+namespace {
+
+typedef std::function<void(SingleSwitchProgramEnvironment&, ProControllerContext&, ShinyHunt_FlySpotReset_Descriptor::Stats&, bool)> route_func;
+
+void route_default(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max){
+    // Open map
+    bool can_fast_travel = open_map(env.console, context, to_zoom_to_max);
+    if (!can_fast_travel){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "FlySpotReset: Cannot open map for fast travel.",
+            env.console
+        );
+    }
+
+    // Move map cursor upwards a little bit
+    pbf_move_left_joystick(context, 128, 64, 100ms, 200ms);
+
+    // Fly from map to reset spawns
+    FastTravelState travel_status = fly_from_map(env.console, context);
+    if (travel_status != FastTravelState::SUCCESS){
+        stats.errors++;
+        env.update_stats();
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "FlySpotReset: Cannot fast travel after moving map cursor.",
+            env.console
+        );
+    }
+}
+
+void route_wild_zone_19(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max){
+    if (run_a_straight_path_in_overworld(env.console, context, 0, 80, 6500ms) == 0) {
+        open_map(env.console, context, to_zoom_to_max);
+        pbf_move_left_joystick(context, 0, 64, 100ms, 100ms);
+        if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
+            pbf_move_left_joystick(context, 128, 192, 100ms, 100ms);
+            fly_from_map(env.console, context);
+        }
+    } else {
+        open_map(env.console, context, to_zoom_to_max);
+        pbf_move_left_joystick(context, 0, 64, 100ms, 100ms);
+        fly_from_map(env.console, context);
+    }
+    wait_until_overworld(env.console, context, 50s);
+}
+
+void route_alpha_pidgey(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max){
+    int ret = -1;
+    {
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
+        ret = run_until<ProControllerContext>(
+            env.console, context,
+            [&](ProControllerContext& context){
+                ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+                pbf_move_left_joystick(context, 255, 128, 4000ms, 0ms);
+                pbf_move_left_joystick(context, 128, 255, 7400ms, 0ms);
+                pbf_move_left_joystick(context, 0, 128, 3000ms, 0ms);
+                pbf_press_button(context, BUTTON_A, 500ms, 2500ms); // elevator up
+                pbf_move_left_joystick(context, 255, 128, 100ms, 0ms);
+                pbf_press_button(context, BUTTON_L, 100ms, 1000ms);
+            },
+            {black_screen}
+        );
+    }
+    if (ret == 0){
+        wait_until_overworld(env.console, context, 50s);
+    }
+    open_map(env.console, context, to_zoom_to_max);
+    pbf_move_left_joystick(context, 128, 255, 200ms, 100ms);
+    if (fly_from_map(env.console, context) == FastTravelState::NOT_AT_FLY_SPOT) {
+        pbf_move_left_joystick(context, 255, 128, 100ms, 100ms);
+        fly_from_map(env.console, context);
+    }
+    wait_until_overworld(env.console, context);
+}
+
+} // namespace
 
 void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
     assert_16_9_720p_min(env.logger(), env.console);
@@ -96,6 +202,25 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
         );
     });
 
+    route_func route;
+    switch (ROUTE) {
+    case Route::NO_MOVEMENT:
+        route = route_default;
+        break;
+    case Route::WILD_ZONE_19:
+        route = route_wild_zone_19;
+        break;
+    case Route::ALPHA_PIDGEY:
+        route = route_alpha_pidgey;
+        break;
+    default:
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "route not implemented",
+            env.console
+        );
+    }
+    
     bool to_zoom_to_max = true;
     run_until<ProControllerContext>(
         env.console, context,
@@ -103,35 +228,8 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
             while (true){
                 context.wait_for_all_requests();
                 shiny_sound_handler.process_pending(context);
-
-                // Open map
-                bool can_fast_travel = open_map(env.console, context, to_zoom_to_max);
+                route(env, context, stats, to_zoom_to_max);
                 to_zoom_to_max = false;
-                if (!can_fast_travel){
-                    stats.errors++;
-                    env.update_stats();
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "FlySpotReset: Cannot open map for fast travel.",
-                        env.console
-                    );
-                }
-
-                // Move map cursor upwards a little bit
-                pbf_move_left_joystick(context, 128, 64, 100ms, 200ms);
-
-                // Fly from map to reset spawns
-                FastTravelState travel_status = fly_from_map(env.console, context);
-                if (travel_status != FastTravelState::SUCCESS){
-                    stats.errors++;
-                    env.update_stats();
-                    OperationFailedException::fire(
-                        ErrorReport::SEND_ERROR_REPORT,
-                        "FlySpotReset: Cannot fast travel after moving map cursor.",
-                        env.console
-                    );
-                }
-
                 stats.resets++;
                 env.update_stats();
                 if (stats.resets.load(std::memory_order_relaxed) % 10 == 0){

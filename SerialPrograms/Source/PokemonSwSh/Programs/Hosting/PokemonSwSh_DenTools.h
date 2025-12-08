@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_DenTools_H
 #define PokemonAutomation_PokemonSwSh_DenTools_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 

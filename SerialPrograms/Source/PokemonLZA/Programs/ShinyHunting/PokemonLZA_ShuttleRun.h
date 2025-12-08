@@ -35,10 +35,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
     enum class Route{
-        SCRAGGY,
-        WILD_ZONE_19,
-        FIRE_STARTERS,
-        DRATINI,
+        WILD_ZONE_3_TOWER,
+        ALPHA_PIDGEOT,
         CUSTOMISED_MACRO = 255,
     };
 

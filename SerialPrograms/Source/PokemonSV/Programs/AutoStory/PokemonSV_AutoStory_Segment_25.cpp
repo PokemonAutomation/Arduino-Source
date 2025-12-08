@@ -6,6 +6,7 @@
 
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -163,6 +164,18 @@ void checkpoint_58(
         env.console.log("Battle team star grunt.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        context.wait_for_all_requests();
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        DirectionDetector direction;
+        double current_direction = direction.get_current_direction(env.console, snapshot);
+        if (current_direction == -1){  // if unable to detect current direction, reset. We need to be able to detect the direction for the next checkpoint.
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect direction. Reset.",
+                env.console
+            );      
+        }
 
     });    
 

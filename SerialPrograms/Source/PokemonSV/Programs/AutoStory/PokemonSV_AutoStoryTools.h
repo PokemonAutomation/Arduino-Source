@@ -44,6 +44,8 @@ enum class ClearDialogMode{
     STOP_WHITEBUTTON,
     STOP_TIMEOUT,
     STOP_BATTLE,
+    STOP_TUTORIAL,
+    STOP_BATTLE_DIALOG_ARROW,
 };
 
 
@@ -122,9 +124,11 @@ void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t
 // stop depending on ClearDialogMode: stop when detect overworld, or dialog prompt, or A button prompt. Or if times out
 // throw exception if times out, unless this is the intended stop condition.
 // also throw exception if dialog is never detected.
+// NOTE: seconds_timeout is rounded up to a multiple of 25, unless press_A is false or ClearDialogMode == STOP_TIMEOUT
 void clear_dialog(VideoStream& stream, ProControllerContext& context,
-    ClearDialogMode mode, uint16_t seconds_timeout = 60,
-    std::vector<CallbackEnum> optional_callbacks = {}
+    ClearDialogMode mode, uint16_t seconds_timeout = 75,
+    std::vector<CallbackEnum> optional_callbacks = {},
+    bool press_A = true
 );
 
 
@@ -173,6 +177,10 @@ void config_option(ProControllerContext& context, int change_option_value);
 
 // enter menu and swap the first and third moves for your starter
 void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
+
+// confirm the moves for the Lead pokemon: Moonblast, Mystical Fire, Psychic, Misty Terrain
+// start and end in the overworld
+void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language);
 
 // run the given `action`. if detect a battle, stop the action, and throw exception
 void do_action_and_monitor_for_battles(
@@ -377,12 +385,14 @@ void checkpoint_reattempt_loop_tutorial(
 
 // walk forward forward_ticks. repeat this for num_rounds.
 // if detect battle, kill the Pokemon. then continue. If we run into a battle, this round is considered to be done and will not be repeated.
+// NOTE: mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
 void move_player_forward(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     uint8_t num_rounds, 
     std::function<void()>&& recovery_action,
     bool use_lets_go = false,
+    bool mash_A = false,
     uint16_t forward_ticks = 100, 
     uint8_t y = 0, 
     uint16_t delay_after_forward_move = 50, 

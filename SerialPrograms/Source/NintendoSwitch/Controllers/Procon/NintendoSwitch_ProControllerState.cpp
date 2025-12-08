@@ -5,58 +5,11 @@
  */
 
 #include "Common/Cpp/Json/JsonObject.h"
-//#include "Common/Cpp/Options/SimpleIntegerOption.h"
-#include "Common/Cpp/Options/EnumDropdownOption.h"
-#include "Common/Cpp/Options/CheckboxDropdownDatabase.h"
-#include "Common/Cpp/Options/CheckboxDropdownOption.h"
-#include "Common/Cpp/Options/CheckboxDropdownOption.tpp"
-//#include "Controllers/ControllerStateTable.h"
 #include "NintendoSwitch_ProController.h"
 #include "NintendoSwitch_ProControllerState.h"
 
 namespace PokemonAutomation{
-
-template class CheckboxDropdownCell<NintendoSwitch::Button>;
-
 namespace NintendoSwitch{
-
-
-const CheckboxDropdownDatabase<Button>& ProController_Button_Database(){
-    static CheckboxDropdownDatabase<Button> database{
-        {Button::BUTTON_Y,          "Y",        "Y"},
-        {Button::BUTTON_B,          "B",        "B"},
-        {Button::BUTTON_A,          "A",        "A"},
-        {Button::BUTTON_X,          "X",        "X"},
-        {Button::BUTTON_L,          "L",        "L"},
-        {Button::BUTTON_R,          "R",        "R"},
-        {Button::BUTTON_ZL,         "ZL",       "ZL"},
-        {Button::BUTTON_ZR,         "ZR",       "ZR"},
-        {Button::BUTTON_MINUS,      "-",        "-"},
-        {Button::BUTTON_PLUS,       "+",        "+"},
-        {Button::BUTTON_LCLICK,     "L-click",  "L-click"},
-        {Button::BUTTON_RCLICK,     "R-click",  "R-click"},
-        {Button::BUTTON_HOME,       "home",     "Home"},
-        {Button::BUTTON_CAPTURE,    "capture",  "Capture"},
-        {Button::BUTTON_GR,         "GR",       "GR (Switch 2)"},
-        {Button::BUTTON_GL,         "GL",       "GL (Switch 2)"},
-        {Button::BUTTON_C,          "C",        "C (Switch 2)"},
-    };
-    return database;
-}
-const EnumDropdownDatabase<DpadPosition>& ProController_Dpad_Database(){
-    static EnumDropdownDatabase<DpadPosition> database{
-        {DpadPosition::DPAD_NONE,       "none",         "Dpad: none"},
-        {DpadPosition::DPAD_UP,         "up",           "Dpad: \u2191"},
-        {DpadPosition::DPAD_UP_RIGHT,   "up-right",     "Dpad: \u2197"},
-        {DpadPosition::DPAD_RIGHT,      "right",        "Dpad: \u2192"},
-        {DpadPosition::DPAD_DOWN_RIGHT, "down-right",   "Dpad: \u2198"},
-        {DpadPosition::DPAD_DOWN,       "down",         "Dpad: \u2193"},
-        {DpadPosition::DPAD_DOWN_LEFT,  "down-left",    "Dpad: \u2199"},
-        {DpadPosition::DPAD_LEFT,       "left",         "Dpad: \u2190"},
-        {DpadPosition::DPAD_UP_LEFT,    "up-left",      "Dpad: \u2196"},
-    };
-    return database;
-}
 
 
 
@@ -161,7 +114,7 @@ void ProControllerState::execute(
     AbstractController& controller,
     Milliseconds duration
 ) const{
-    static_cast<ProController&>(controller).issue_full_controller_state(
+    controller.cast_with_exception<ProController>().issue_full_controller_state(
         &scope,
         true,
         duration,
@@ -236,58 +189,6 @@ std::string ProControllerState::to_cpp(Milliseconds hold, Milliseconds release) 
 
 
 
-#if 0
-
-
-
-
-
-class ProControllerStateRow : public ControllerStateRow{
-public:
-    ProControllerStateRow(EditableTableOption& parent_table)
-        : ControllerStateRow(parent_table)
-        , DPAD(
-            DPAD_DATABASE(),
-            LockMode::UNLOCK_WHILE_RUNNING,
-            DpadPosition::DPAD_NONE
-        )
-        , LEFT_JOYSTICK(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
-    {
-        PA_ADD_OPTION(DPAD);
-        PA_ADD_OPTION(LEFT_JOYSTICK);
-    }
-
-    virtual std::unique_ptr<EditableTableRow> clone() const override{
-        std::unique_ptr<ProControllerStateRow> ret(new ProControllerStateRow(parent()));
-        ret->m_state = m_state;
-        return ret;
-    }
-
-    virtual void load_json(const JsonValue& json) override{
-        const JsonObject& obj = json.to_object_throw();
-        m_milliseconds = Milliseconds(obj.get_integer_throw("duration_in_ms"));
-        m_state.load_json(obj);
-    }
-    virtual JsonValue to_json() const override{
-        JsonObject json = m_state.to_json();
-        json["duration_in_ms"] = m_milliseconds.count();
-        return json;
-    }
-
-    virtual const ControllerState& get_state() const override{
-        return m_state;
-    }
-
-private:
-    ProControllerState m_state;
-
-    EnumDropdownCell<DpadPosition> DPAD;
-    SimpleIntegerCell<uint8_t> LEFT_JOYSTICK;
-};
-
-
-
-#endif
 
 
 

@@ -1,0 +1,101 @@
+/*  SerialPABotBase (Nintendo Switch 1 Wireless Controllers)
+ *
+ *  From: https://github.com/PokemonAutomation/
+ *
+ */
+
+#ifndef PokemonAutomation_SerialPABotBase_ESP32_Routines_H
+#define PokemonAutomation_SerialPABotBase_ESP32_Routines_H
+
+#include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
+#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_OemControllers.h"
+#include "Controllers/ControllerTypes.h"
+#include "Controllers/SerialPABotBase/SerialPABotBase.h"
+#include "Controllers/SerialPABotBase/Connection/BotBaseMessage.h"
+
+namespace PokemonAutomation{
+namespace SerialPABotBase{
+
+
+void register_message_converters_NS1_OemControllers();
+
+
+class MessageControllerReadSpi : public BotBaseRequest{
+public:
+    pabb_Message_NS1_OemController_ReadSpi params;
+    MessageControllerReadSpi(ControllerType controller_type, uint32_t address, uint8_t bytes)
+        : BotBaseRequest(false)
+    {
+        params.seqnum = 0;
+        params.controller_type = controller_type_to_id(controller_type);
+        params.address = address;
+        params.bytes = bytes;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_READ_SPI, params);
+    }
+};
+class MessageControllerWriteSpi : public BotBaseRequest{
+public:
+    std::string data;
+    MessageControllerWriteSpi(
+        ControllerType controller_type,
+        uint32_t address, uint8_t bytes,
+        const void* p_data
+    )
+        : BotBaseRequest(false)
+    {
+        pabb_Message_NS1_OemController_WriteSpi params;
+        params.seqnum = 0;
+        params.controller_type = controller_type_to_id(controller_type);
+        params.address = address;
+        params.bytes = bytes;
+        data = std::string((char*)&params, sizeof(params));
+        data += std::string((const char*)p_data, bytes);
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_NS1_OEM_CONTROLLER_WRITE_SPI, data);
+    }
+};
+class MessageControllerStateButtons : public BotBaseRequest{
+public:
+    pabb_Message_Command_NS1_OemController_Buttons params;
+    MessageControllerStateButtons(
+        uint16_t milliseconds,
+        const pabb_NintendoSwitch_OemController_State0x30_Buttons& state
+    )
+        : BotBaseRequest(true)
+    {
+        params.seqnum = 0;
+        params.milliseconds = milliseconds;
+        params.buttons = state;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_BUTTONS, params);
+    }
+};
+class MessageControllerStateFull : public BotBaseRequest{
+public:
+    pabb_Message_Command_NS1_OemController_FullState params;
+    MessageControllerStateFull(
+        uint16_t milliseconds,
+        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
+        const pabb_NintendoSwitch_OemController_State0x30_GyroX3& gyro
+    )
+        : BotBaseRequest(true)
+    {
+        params.seqnum = 0;
+        params.milliseconds = milliseconds;
+        params.state.buttons = buttons;
+        params.state.gyro = gyro;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_COMMAND_NS1_OEM_CONTROLLER_FULL_STATE, params);
+    }
+};
+
+
+
+}
+}
+#endif

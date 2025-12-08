@@ -6,8 +6,9 @@
 
 #include <QFile>
 #include "Common/Cpp/Json/JsonArray.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_JoyconState.h"
+#include "Common/Cpp/Json/JsonObject.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_RecordKeyboardController.h"
 #include "Controllers/ControllerTypeStrings.h"
 
@@ -306,7 +307,7 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
         // cout << std::to_string(duration) << endl;
         // cout << prev_controller_state.dump() << endl;
         JsonObject recording = prev_controller_state.clone();
-        recording["duration_in_ms"] = duration;
+        recording["ms"] = duration;
         json_array.push_back(std::move(recording));
         prev_snapshot = &snapshot; // update the previous non-duplicate snapshot
     }

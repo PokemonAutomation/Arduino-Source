@@ -69,6 +69,13 @@ public:
         return m_items[index];
     }
 
+    void setLabel(const QString& label){
+        setItemText(0, label);
+    }
+
+    virtual void wheelEvent(QWheelEvent* event) override{
+        QWidget::wheelEvent(event);
+    }
     virtual bool eventFilter(QObject* obj, QEvent* event) override{
 //        cout << "eventFilter()" << endl;
         if (event->type() != QEvent::MouseButtonRelease){

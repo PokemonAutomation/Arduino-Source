@@ -91,6 +91,7 @@ void checkpoint_39(
         context.wait_for_all_requests();
 
         DirectionDetector direction;
+        // recently flew a significant distance, so minimap should be clear of Pokemon
         
         // section 1
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
@@ -256,6 +257,8 @@ void checkpoint_40(
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 180, 90);
 
         DirectionDetector direction;
+        // recently flew a significant distance, so minimap should be clear of Pokemon
+        
         direction.change_direction(env.program_info(), env.console, context, 5.60);
 
         get_on_ride(env.program_info(), env.console, context);

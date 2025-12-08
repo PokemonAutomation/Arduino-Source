@@ -5,6 +5,7 @@
  */
 
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -143,6 +144,13 @@ void move_from_glaseado_mountain_to_casseroya_watchtower3(SingleSwitchProgramEnv
     context.wait_for_all_requests();
 
     DirectionDetector direction;
+    VideoSnapshot snapshot = env.console.video().snapshot();
+    double current_direction = direction.get_current_direction(env.console, snapshot);
+    if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 100, 255, 60});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::ZOOM_OUT, 128, 0, 60});
+    }
+
     direction.change_direction(env.program_info(), env.console, context, 1.448679);
 
     pbf_move_left_joystick(context, 128, 0, 200, 50);

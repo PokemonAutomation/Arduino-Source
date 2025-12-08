@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include "CommonFramework/Tools/VideoStream.h"
 #include "CommonFramework/Language.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_OverworldSensors.h"
 

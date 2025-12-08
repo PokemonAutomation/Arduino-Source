@@ -25,9 +25,7 @@ public:
         : m_label(std::move(label))
     {}
 
-    const std::string& label() const{
-        return m_label;
-    }
+    virtual std::string current_label() const = 0;
     virtual size_t size() const = 0;
     virtual const std::string& name_at_index(size_t index) const = 0;
 
@@ -38,7 +36,7 @@ public:
 
     virtual ConfigWidget* make_QtWidget(QWidget& parent) override;
 
-private:
+protected:
     std::string m_label;
 };
 
@@ -49,6 +47,8 @@ class CheckboxDropdownCell : public CheckboxDropdownBase{
     using Database = CheckboxDropdownDatabase<FlagEnum>;
 
 public:
+    //  If "label" is not empty, it will always display that on the dropdown.
+    //  If "label" is empty, it will display the checked items instead.
     CheckboxDropdownCell(
         std::string label,
         const Database& database,
@@ -78,16 +78,24 @@ public:
         return m_default;
     }
     FlagEnum current_value() const;
+    operator FlagEnum() const{
+        return current_value();
+    }
 
 
 public:
     bool is_set(FlagEnum value) const;
+
+    void replace_all(FlagEnum value);
+    void clear();
+
     void set_flag(FlagEnum value);
     void clear_flag(FlagEnum value);
     void toggle_flag(FlagEnum value);
 
 
 public:
+    virtual std::string current_label() const override;
     virtual size_t size() const override;
     virtual const std::string& name_at_index(size_t index) const override;
 

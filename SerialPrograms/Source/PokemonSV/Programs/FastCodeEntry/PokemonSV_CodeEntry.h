@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_CodeEntry_H
 
 #include "Common/Cpp/Containers/FixedLimitVector.h"
-//#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+//#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Options/NintendoSwitch_CodeEntrySettingsOption.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 

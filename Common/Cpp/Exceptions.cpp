@@ -44,7 +44,15 @@ FileException::FileException(Logger* logger, const char* location, std::string m
     }
 }
 std::string FileException::message() const{
-    return m_message + "\nFile: " + m_file + "\nLocation: " + m_location;
+    std::string ret = m_message;
+    if (!m_file.empty()){
+        ret += "\nFile: " + m_file;
+    }
+    if (m_location != nullptr){
+        ret += "\nLocation: ";
+        ret += m_location;
+    }
+    return ret;
 }
 
 

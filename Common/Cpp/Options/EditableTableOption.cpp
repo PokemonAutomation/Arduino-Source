@@ -118,8 +118,11 @@ std::vector<std::shared_ptr<EditableTableRow>> EditableTableOption::current_refs
 }
 
 void EditableTableOption::clear(){
-    WriteSpinLock lg(m_current_lock);
-    m_current.clear();
+    {
+        WriteSpinLock lg(m_current_lock);
+        m_current.clear();
+    }
+    report_value_changed(this);
 }
 void EditableTableOption::load_json(const JsonValue& json){
 //    cout << "EditableTableOption::load_json(): " << this << endl;

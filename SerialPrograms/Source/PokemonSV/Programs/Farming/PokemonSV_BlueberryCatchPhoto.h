@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSV_BlueberryCatchPhoto_H
 #define PokemonAutomation_PokemonSV_BlueberryCatchPhoto_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSV/Programs/Farming/PokemonSV_BlueberryQuests.h"
 #include "PokemonSV/Options/PokemonSV_BBQOption.h"

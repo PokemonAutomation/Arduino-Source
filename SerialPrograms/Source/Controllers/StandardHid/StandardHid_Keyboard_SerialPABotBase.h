@@ -49,16 +49,16 @@ public:
 
 
 public:
-    virtual ControllerType controller_type() const override{
-        return ControllerType::HID_Keyboard;
-    }
+//    virtual ControllerType controller_type() const override{
+//        return ControllerType::HID_Keyboard;
+//    }
     virtual ControllerClass controller_class() const override{
         return ControllerClass::HID_Keyboard;
     }
+
     virtual ControllerPerformanceClass performance_class() const override{
         return ControllerPerformanceClass::SerialPABotBase_Wired;
     }
-
     virtual Milliseconds ticksize() const override{
         return Milliseconds(0);
     }

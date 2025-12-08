@@ -15,8 +15,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_Commands_Superscalar_H
 #define PokemonAutomation_NintendoSwitch_Commands_Superscalar_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

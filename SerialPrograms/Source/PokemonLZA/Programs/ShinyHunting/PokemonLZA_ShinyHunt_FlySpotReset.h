@@ -34,9 +34,18 @@ public:
 
     virtual void program(SingleSwitchProgramEnvironment& env, ProControllerContext& context) override;
 
-private:
+    enum class Route{
+        NO_MOVEMENT,
+        WILD_ZONE_19,
+        ALPHA_PIDGEY,
+        ALPHA_PIKACHU,
+        CUSTOMISED_MACRO = 255,
+    };
+
+    private:
     PokemonLA::ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
     ShinySoundDetectedActionOption SHINY_DETECTED;
+    EnumDropdownOption<Route> ROUTE;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

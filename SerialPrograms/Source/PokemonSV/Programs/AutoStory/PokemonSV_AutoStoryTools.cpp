@@ -79,7 +79,8 @@ void clear_tutorial(VideoStream& stream, ProControllerContext& context, uint16_t
 
 void clear_dialog(VideoStream& stream, ProControllerContext& context,
     ClearDialogMode mode, uint16_t seconds_timeout,
-    std::vector<CallbackEnum> enum_optional_callbacks
+    std::vector<CallbackEnum> enum_optional_callbacks,
+    bool press_A
 ){
     bool seen_dialog = false;
     WallClock start = current_time();
@@ -148,12 +149,12 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             stream, context,
             [&](ProControllerContext& context){
 
-                if (mode == ClearDialogMode::STOP_TIMEOUT){
+                if (mode == ClearDialogMode::STOP_TIMEOUT || !press_A){
                     context.wait_for(Seconds(seconds_timeout));
-                }else{ // press A every 8 seconds, until we time out.
-                    auto button_press_period = Seconds(8);
+                }else{ // press A every 25 seconds, until we time out.
+                    auto button_press_period = Seconds(25);
                     while (true){
-                        if (current_time() - start_inference + button_press_period > Seconds(seconds_timeout)){
+                        if (current_time() - start_inference > Seconds(seconds_timeout)){
                             break;
                         }
                         context.wait_for(button_press_period);
@@ -208,6 +209,9 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
         case CallbackEnum::DIALOG_ARROW:
             stream.log("clear_dialog: Detected dialog arrow.");
             seen_dialog = true;
+            if (mode == ClearDialogMode::STOP_BATTLE_DIALOG_ARROW){
+                return;
+            }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case CallbackEnum::BATTLE:
@@ -218,6 +222,9 @@ void clear_dialog(VideoStream& stream, ProControllerContext& context,
             break;
         case CallbackEnum::TUTORIAL:    
             stream.log("clear_dialog: Detected tutorial.");
+            if (mode == ClearDialogMode::STOP_TUTORIAL){
+                return;
+            }
             pbf_press_button(context, BUTTON_A, 20, 105);
             break;
         case CallbackEnum::BLACK_DIALOG_BOX:    
@@ -355,9 +362,9 @@ void overworld_navigation(
                     if (movement_mode == NavigationMovementMode::CLEAR_WITH_LETS_GO){
                         walk_forward_while_clear_front_path(info, stream, context, forward_ticks, y);
                     }else{
-                        ssf_press_left_joystick(context, x, y, 0, seconds_realign * TICKS_PER_SECOND);
+                        ssf_press_left_joystick(context, x, y, 0ms, Seconds(seconds_realign));
                         if (movement_mode == NavigationMovementMode::DIRECTIONAL_ONLY){
-                            pbf_wait(context, seconds_realign * TICKS_PER_SECOND);
+                            pbf_wait(context, Seconds(seconds_realign));
                         } else if (movement_mode == NavigationMovementMode::DIRECTIONAL_SPAM_A){
                             for (size_t j = 0; j < 5 * seconds_realign; j++){
                                 pbf_press_button(context, BUTTON_A, 20, 5);
@@ -485,6 +492,50 @@ void swap_starter_moves(SingleSwitchProgramEnvironment& env, ProControllerContex
         );
         exception.send_recoverable_notification(env);
     }   
+
+}
+
+
+void confirm_lead_pokemon_moves(SingleSwitchProgramEnvironment& env, ProControllerContext& context, Language language){
+    const ProgramInfo& info = env.program_info();
+    VideoStream& stream = env.console;
+
+    // start in the overworld
+    press_Bs_to_back_to_overworld(info, stream, context);
+
+    // open menu, select your lead pokemon
+    enter_menu_from_overworld(info, stream, context, 0, MenuSide::LEFT);
+
+    // enter Pokemon summary screen
+    pbf_press_button(context, BUTTON_A, 20, 5 * TICKS_PER_SECOND);
+    pbf_press_dpad(context, DPAD_RIGHT, 15, 1 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_Y, 20, 40);
+
+    // confirm that moves are: Moonblast, Mystical Fire, Psychic, Misty Terrain
+    context.wait_for_all_requests();
+    VideoSnapshot screen = stream.video().snapshot();
+    PokemonMovesReader reader(language);
+    std::string move_0 = reader.read_move(stream.logger(), screen, 0);
+    std::string move_1 = reader.read_move(stream.logger(), screen, 1);
+    std::string move_2 = reader.read_move(stream.logger(), screen, 2);
+    std::string move_3 = reader.read_move(stream.logger(), screen, 3);
+    stream.log("Current first move: " + move_0);
+    stream.log("Current second move: " + move_1);
+    stream.log("Current third move: " + move_2);
+    stream.log("Current fourth move: " + move_3);
+
+    if (move_0 != "moonblast" || move_1 != "mystical-fire" || move_2 != "psychic" || move_3 != "misty-terrain"){
+        stream.log("Lead Pokemon's moves are wrong. They are supposed to be: Moonblast, Mystical Fire, Psychic, Misty Terrain.");
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "We expect your lead Pokemon to be a Gardevoir with moves in this order: Moonblast, Mystical Fire, Psychic, Misty Terrain. "
+            "But we see something else instead. If you confirm that your lead Gardevoir does indeed have these moves in this order, "
+            "and are still getting this error, you can uncheck 'Pre-check: Ensure correct moves', under Advanced mode.\n" + language_warning(language),
+            stream
+        );
+    }   
+
+    press_Bs_to_back_to_overworld(info, stream, context);
 
 }
 
@@ -1012,9 +1063,9 @@ void press_A_until_dialog(
     int ret = run_until<ProControllerContext>(
         stream, context,
         [seconds_between_button_presses](ProControllerContext& context){
-            pbf_wait(context, seconds_between_button_presses * TICKS_PER_SECOND); // avoiding pressing A if dialog already present
+            pbf_wait(context, Seconds(seconds_between_button_presses)); // avoiding pressing A if dialog already present
             for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_A, 20, seconds_between_button_presses * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_A, 20*8ms, Seconds(seconds_between_button_presses));
             }
         },
         {advance_dialog}
@@ -1412,6 +1463,7 @@ void move_player_forward(
     uint8_t num_rounds, 
     std::function<void()>&& recovery_action,
     bool use_lets_go,
+    bool mash_A,
     uint16_t forward_ticks, 
     uint8_t y, 
     uint16_t delay_after_forward_move, 
@@ -1424,7 +1476,12 @@ void move_player_forward(
             do_action_and_monitor_for_battles_early(env.program_info(), env.console, context,
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 if (!use_lets_go){
-                    pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                    // pbf_move_left_joystick(context, 128, y, forward_ticks, 0);
+                    ssf_press_left_joystick(context, 128, 0, 0, 100, 0);
+
+                    if (mash_A){ // mashing A and Let's go aren't compatible. you end up talking to your Let's go pokemon if you mash A.
+                        pbf_mash_button(context, BUTTON_A, forward_ticks);
+                    }
                 }else{
                     pbf_press_button(context, BUTTON_R, 20, delay_after_lets_go);
                     pbf_move_left_joystick(context, 128, y, forward_ticks, delay_after_forward_move);    

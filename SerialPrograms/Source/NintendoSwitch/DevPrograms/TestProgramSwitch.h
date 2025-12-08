@@ -27,6 +27,7 @@
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerSettings.h"
 #include "NintendoSwitch/Options/NintendoSwitch_ModelType.h"
 #include "Common/Cpp/Options/CheckboxDropdownOption.h"
+#include "Controllers/ControllerStateTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -78,6 +79,7 @@ private:
 
     CheckboxDropdownCell<Button> BUTTONS;
     EnumDropdownCell<DpadPosition> DPAD;
+    ControllerCommandTables COMMANDS;
 
 
 //    PokemonSV::SinglesAIOption battle_AI;

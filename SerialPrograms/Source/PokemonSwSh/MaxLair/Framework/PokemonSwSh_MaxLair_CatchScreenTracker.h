@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_CatchScreenTracker_H
 
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 
 namespace PokemonAutomation{

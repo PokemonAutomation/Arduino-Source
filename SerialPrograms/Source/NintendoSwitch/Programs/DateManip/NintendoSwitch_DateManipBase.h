@@ -9,7 +9,7 @@
 
 #include <memory>
 #include "Common/Cpp/DateTime.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     struct ProgramInfo;

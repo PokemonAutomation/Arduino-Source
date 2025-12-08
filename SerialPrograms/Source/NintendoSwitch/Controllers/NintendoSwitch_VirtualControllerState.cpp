@@ -4,9 +4,9 @@
  *
  */
 
-#include "Common/Cpp/Json/JsonObject.h"
-#include "NintendoSwitch_ProControllerState.h"
-#include "NintendoSwitch_JoyconState.h"
+//#include "Common/Cpp/Json/JsonObject.h"
+#include "Procon/NintendoSwitch_ProControllerState.h"
+#include "Joycon/NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_VirtualControllerState.h"
 
 //#include <iostream>

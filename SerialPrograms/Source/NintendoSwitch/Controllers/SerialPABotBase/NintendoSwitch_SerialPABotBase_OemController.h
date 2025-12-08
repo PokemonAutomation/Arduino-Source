@@ -1,17 +1,16 @@
-/*  SerialPABotBase: Wireless Controller
+/*  SerialPABotBase: OEM Controller
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessController_H
-#define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessController_H
+#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_OemController_H
+#define PokemonAutomation_NintendoSwitch_SerialPABotBase_OemController_H
 
 #include <cmath>
-#include "Common/ControllerStates/NintendoSwitch_WirelessController_State.h"
+#include "Common/ControllerStates/NintendoSwitch_OemController_State.h"
 #include "Controllers/SerialPABotBase/SerialPABotBase_StatusThread.h"
 #include "Controllers/JoystickTools.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
 
 //#include <iostream>
@@ -23,31 +22,19 @@ namespace NintendoSwitch{
 
 
 
-class SerialPABotBase_WirelessController :
+class SerialPABotBase_OemController :
     public SerialPABotBase_Controller,
     private SerialPABotBase::ControllerStatusThreadCallback
 {
 public:
-    SerialPABotBase_WirelessController(
+    SerialPABotBase_OemController(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         ControllerType controller_type,
         ControllerResetMode reset_mode
     );
-    ~SerialPABotBase_WirelessController();
+    ~SerialPABotBase_OemController();
     void stop();
-
-
-public:
-    Milliseconds ticksize() const{
-        return Milliseconds(0);
-    }
-    Milliseconds cooldown() const{
-        return Milliseconds(15);
-    }
-    Milliseconds timing_variation() const{
-        return ConsoleSettings::instance().TIMING_OPTIONS.WIRELESS;
-    }
 
 
 protected:
@@ -109,24 +96,24 @@ protected:
     }
 
     static Button populate_report_buttons(
-        pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
+        pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
         const SwitchControllerState& controller_state
     );
     static bool populate_report_gyro(
-        pabb_NintendoSwitch_WirelessController_State0x30_Gyro& gyro,
+        pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro,
         const SwitchControllerState& controller_state
     );
 
     void issue_report(
         const Cancellable* cancellable,
         WallDuration duration,
-        const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons
+        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons
     );
     void issue_report(
         const Cancellable* cancellable,
         WallDuration duration,
-        const pabb_NintendoSwitch_WirelessController_State0x30_Buttons& buttons,
-        const pabb_NintendoSwitch_WirelessController_State0x30_Gyro& gyro
+        const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
+        const pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro
     );
 
 
@@ -136,7 +123,14 @@ private:
 
 
 protected:
+    //  Do not change after construction.
     const ControllerType m_controller_type;
+    ControllerPerformanceClass m_performance_class;
+    Milliseconds m_ticksize;
+    Milliseconds m_cooldown;
+    Milliseconds m_timing_variation;
+
+
 private:
     std::unique_ptr<SerialPABotBase::ControllerStatusThread> m_status_thread;
 

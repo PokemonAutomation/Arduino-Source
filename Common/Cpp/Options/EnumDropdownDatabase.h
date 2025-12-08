@@ -125,12 +125,14 @@ public:
     const EnumEntry* find(EnumType value) const{
         return IntegerEnumDropdownDatabase::find((size_t)value);
     }
+#if 0
     EnumType find_slug(const std::string& slug) const{
         return (EnumType)IntegerEnumDropdownDatabase::find_slug(slug);
     }
     EnumType find_display(const std::string& display) const{
         return (EnumType)IntegerEnumDropdownDatabase::find_display(display);
     }
+#endif
 
 protected:
     EnumDropdownDatabase(void*) : IntegerEnumDropdownDatabase(nullptr) {}

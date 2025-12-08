@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_OverworldTrigger_H
 #define PokemonAutomation_PokemonSwSh_OverworldTrigger_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonSwSh_OverworldTargetTracker.h"
 
 namespace PokemonAutomation{

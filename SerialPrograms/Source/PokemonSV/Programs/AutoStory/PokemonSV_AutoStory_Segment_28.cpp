@@ -5,6 +5,7 @@
  */
 #include "PokemonSV/Inference/Dialogs/PokemonSV_DialogDetector.h"
 #include "PokemonSV/Inference/Overworld/PokemonSV_DirectionDetector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -96,6 +97,13 @@ void checkpoint_68(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 50);
 
         DirectionDetector direction;
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        double current_direction = direction.get_current_direction(env.console, snapshot);
+        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 255, 50});
+            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 128, 0, 50});
+        }
+
         direction.change_direction(env.program_info(), env.console, context, 0.696613);
 
         pbf_move_left_joystick(context, 128, 0, 200, 50);
@@ -135,6 +143,17 @@ void checkpoint_68(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         env.console.log("Battle Mr. Harrington.");
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
+
+        context.wait_for_all_requests();
+        VideoSnapshot snapshot2 = env.console.video().snapshot();
+        double current_direction2 = direction.get_current_direction(env.console, snapshot2);
+        if (current_direction2 == -1){  // if unable to detect current direction, reset. We need to be able to detect the direction for the next checkpoint.
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect direction. Reset.",
+                env.console
+            );      
+        }
     
     });
     
