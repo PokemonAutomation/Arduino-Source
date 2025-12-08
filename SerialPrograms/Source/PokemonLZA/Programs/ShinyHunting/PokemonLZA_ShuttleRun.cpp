@@ -91,20 +91,28 @@ void route_alpha_pidgeot(SingleSwitchProgramEnvironment& env, ProControllerConte
 }
 
 void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerContext& context){
+    bool been_at_downstairs = false;
+    bool been_at_upstairs_after_downstairs = false;
+
     for(int i = 0; i < 6; i++){
         // if there is no day/night change and no button drop, this loop should only have three iterations
         const double direction = get_facing_direction(env.console, context);
         const bool face_east = get_angle_between_facing_directions(direction, 90.0) < 10.0;
         const bool face_west = get_angle_between_facing_directions(direction, 270.0) < 10.0;
-        if (i > 0 && (face_east || face_west)){
-            // we've finished one run of the tower
-            return;
+        const bool face_south = get_angle_between_facing_directions(direction, 180.0) < 10.0;
+        const bool face_north = get_angle_between_facing_directions(direction, 0.0) < 10.0;
+        if (face_east || face_west){ // we are at downstars
+            been_at_downstairs = true;
         }
-
-        if (face_east || get_angle_between_facing_directions(direction, 180.0) < 10.0){
+        else if (been_at_downstairs){
+            // we are not at downstairs right now, but we've been to the downstairs, so we 
+            // must be at upstairs
+            been_at_upstairs_after_downstairs = true;
+        }
+        if (face_east || face_south){
             // if facing east or south, run backward
             pbf_move_left_joystick(context, 128, 255, 500ms, 200ms);
-        } else if (face_west || get_angle_between_facing_directions(direction, 0.0) < 10.0){
+        } else if (face_west || face_north){
             // if facing west or north, run forward
             pbf_move_left_joystick(context, 128, 0, 500ms, 200ms);
         } else{
@@ -116,6 +124,11 @@ void route_wild_zone_3_tower(SingleSwitchProgramEnvironment& env, ProControllerC
         }
         context.wait_for_all_requests();
         wait_until_overworld(env.console, context, 50s);
+
+        if (been_at_upstairs_after_downstairs){
+            // we've finished one run of the tower
+            return;
+        }
     }
 }
 
@@ -158,6 +171,9 @@ void ShinyHunt_ShuttleRun::program(SingleSwitchProgramEnvironment& env, ProContr
         env.console, context,
         [&](ProControllerContext& context){
             do{
+                const std::string log_msg = "Round " + std::to_string(stats.resets + 1);
+                env.log(log_msg);
+                env.console.overlay().add_log(log_msg);
                 shiny_sound_handler.process_pending(context);
                 send_program_status_notification(env, NOTIFICATION_STATUS);
                 route(env, context);

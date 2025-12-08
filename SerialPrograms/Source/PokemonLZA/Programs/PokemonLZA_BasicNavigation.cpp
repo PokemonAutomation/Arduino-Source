@@ -42,7 +42,7 @@ bool save_game_to_menu(ConsoleHandle& console, ProControllerContext& context){
             );
         }
 
-        OverworldPartySelectionWatcher overworld(COLOR_RED, &console.overlay());
+        OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay());
         MainMenuWatcher main_menu(COLOR_YELLOW, &console.overlay());
         SelectionArrowWatcher save_button(
             COLOR_GREEN,
@@ -374,11 +374,12 @@ void wait_until_overworld(
     ConsoleHandle& console, ProControllerContext& context,
     std::chrono::milliseconds max_wait_time
 ){
-    OverworldPartySelectionWatcher overworld;
+    OverworldPartySelectionWatcher overworld(COLOR_WHITE, &console.overlay(), Milliseconds(100));
+    DirectionArrowWatcher map_arrow(COLOR_BLUE, std::chrono::milliseconds(50));
     int ret = wait_until(
         console, context,
         max_wait_time,
-        {overworld}
+        {overworld, map_arrow}
     );
     if (ret < 0){
         OperationFailedException::fire(
@@ -397,7 +398,7 @@ double get_facing_direction(
     ConsoleHandle& console,
     ProControllerContext& context
 ){
-    DirectionArrowWatcher arrow_watcher(COLOR_YELLOW, std::chrono::milliseconds(100));
+    DirectionArrowWatcher arrow_watcher(COLOR_YELLOW, std::chrono::milliseconds(50));
     int ret = wait_until(
         console, context,
         std::chrono::seconds(40), // 40 sec to account for possible day/night change
@@ -408,7 +409,7 @@ double get_facing_direction(
         console.overlay().add_log("No Minimap Arrow Found", COLOR_RED);
         OperationFailedException::fire(
             ErrorReport::SEND_ERROR_REPORT,
-            "get_facing_direction(): Direction arrow on minimap not detected within 1 second",
+            "get_facing_direction(): Direction arrow on minimap not detected within 40 second",
             console
         );
     }
