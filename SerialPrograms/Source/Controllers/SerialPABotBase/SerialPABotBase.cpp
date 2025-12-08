@@ -6,6 +6,8 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/SerialPABotBase/SerialPABotBase_Protocol_IDs.h"
+#include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "SerialPABotBase.h"
 
 namespace PokemonAutomation{
@@ -41,6 +43,32 @@ std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> make_SUPPORTED_VERSIONS(){
 const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>>& SUPPORTED_VERSIONS(){
     static const std::map<uint32_t, std::map<pabb_ProgramID, uint8_t>> database = make_SUPPORTED_VERSIONS();
     return database;
+}
+
+
+bool controller_is_valid(uint32_t id){
+    switch (id){
+    case PABB_CID_NONE:
+    case PABB_CID_StandardHid_Keyboard:
+    case PABB_CID_NintendoSwitch_WiredController:
+    case PABB_CID_NintendoSwitch2_WiredController:
+    case PABB_CID_NintendoSwitch_WirelessProController:
+    case PABB_CID_NintendoSwitch_WirelessLeftJoycon:
+    case PABB_CID_NintendoSwitch_WirelessRightJoycon:
+        return true;
+    case PABB_CID_NintendoSwitch_WiredProController:
+    case PABB_CID_NintendoSwitch_WiredLeftJoycon:
+    case PABB_CID_NintendoSwitch_WiredRightJoycon:
+        return IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE;
+    case PABB_CID_NintendoSwitch2_WiredProController:
+    case PABB_CID_NintendoSwitch2_WiredLeftJoycon:
+    case PABB_CID_NintendoSwitch2_WiredRightJoycon:
+    case PABB_CID_NintendoSwitch2_WirelessProController:
+    case PABB_CID_NintendoSwitch2_WirelessLeftJoycon:
+    case PABB_CID_NintendoSwitch2_WirelessRightJoycon:
+        return PreloadSettings::instance().DEVELOPER_MODE;
+    }
+    return false;
 }
 
 
@@ -82,15 +110,12 @@ ControllerType id_to_controller_type(uint32_t id){
         return ControllerType::NintendoSwitch2_WirelessLeftJoycon;
     case PABB_CID_NintendoSwitch2_WirelessRightJoycon:
         return ControllerType::NintendoSwitch2_WirelessRightJoycon;
-
-    default:
-        return ControllerType::None;
     }
 
-//    throw InternalProgramError(
-//        nullptr, PA_CURRENT_FUNCTION,
-//        "Invalid Controller ID: " + std::to_string(id)
-//    );
+    throw InternalProgramError(
+        nullptr, PA_CURRENT_FUNCTION,
+        "Invalid Controller ID: " + std::to_string(id)
+    );
 }
 uint32_t controller_type_to_id(ControllerType controller_type){
     switch (controller_type){

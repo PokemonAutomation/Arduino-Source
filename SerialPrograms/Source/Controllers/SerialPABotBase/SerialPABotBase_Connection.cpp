@@ -204,7 +204,9 @@ ControllerType SerialPABotBase_Connection::process_device(bool set_to_null_contr
             }
             first = false;
             str += "0x" + tostr_hex(id);
-            m_controller_list.emplace_back(id_to_controller_type(id));
+            if (controller_is_valid(id)){
+                m_controller_list.emplace_back(id_to_controller_type(id));
+            }
         }
         m_logger.Logger::log("Checking Controller List... (" + str + ")");
     }
