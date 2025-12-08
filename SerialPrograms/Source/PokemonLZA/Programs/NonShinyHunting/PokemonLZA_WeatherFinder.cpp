@@ -240,6 +240,6 @@ namespace PokemonAutomation {
                     send_program_status_notification(env, NOTIFICATION_STATUS);
                 }
             }
-        }
-    }
+}
+}
 }

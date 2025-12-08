@@ -43,11 +43,7 @@ namespace PokemonAutomation {
                 EventNotificationOption NOTIFICATION_STATUS;
                 EventNotificationsOption NOTIFICATIONS;
             };
-
-
-
-
-        }
-    }
+}
+}
 }
 #endif
