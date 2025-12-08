@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Tools/VideoStream.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_GameEntry.h"

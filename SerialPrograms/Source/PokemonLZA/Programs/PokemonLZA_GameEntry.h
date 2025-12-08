@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLZA_GameEntry_H
 #define PokemonAutomation_PokemonLZA_GameEntry_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 
 namespace PokemonAutomation{

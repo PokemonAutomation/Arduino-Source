@@ -6,8 +6,9 @@
 
 #include <QFile>
 #include "Common/Cpp/Json/JsonArray.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProControllerState.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_JoyconState.h"
+#include "Common/Cpp/Json/JsonObject.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProControllerState.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_JoyconState.h"
 #include "NintendoSwitch_RecordKeyboardController.h"
 #include "Controllers/ControllerTypeStrings.h"
 
@@ -138,7 +139,7 @@ std::string json_to_cpp(const JsonArray& history){
     for (const JsonValue& command : history){
         const JsonObject& snapshot = command.to_object_throw();
         Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
-        state.load_json(command);
+        state.load_json(snapshot);
         ret += state.to_cpp(duration, Milliseconds(0));
     }
     return ret;
@@ -156,7 +157,7 @@ void execute_json_schedule(
         for (const JsonValue& command : history){
             const JsonObject& snapshot = command.to_object_throw();
             Milliseconds duration(snapshot.get_integer_throw("duration_in_ms"));
-            state.load_json(command);
+            state.load_json(snapshot);
             state.execute(context, context.controller(), duration);
         }
         state.clear();
@@ -306,7 +307,7 @@ JsonValue RecordKeyboardController::controller_history_to_json(Logger& logger, C
         // cout << std::to_string(duration) << endl;
         // cout << prev_controller_state.dump() << endl;
         JsonObject recording = prev_controller_state.clone();
-        recording["duration_in_ms"] = duration;
+        recording["ms"] = duration;
         json_array.push_back(std::move(recording));
         prev_snapshot = &snapshot; // update the previous non-duplicate snapshot
     }

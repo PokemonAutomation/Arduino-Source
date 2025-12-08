@@ -15,7 +15,7 @@
 #include "Common/Cpp/Options//TimeDurationOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;

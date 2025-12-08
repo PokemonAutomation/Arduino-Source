@@ -17,7 +17,7 @@
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceRoutines.h"
 #include "CommonTools/StartupChecks/StartProgramChecks.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "Pokemon/Pokemon_Strings.h"

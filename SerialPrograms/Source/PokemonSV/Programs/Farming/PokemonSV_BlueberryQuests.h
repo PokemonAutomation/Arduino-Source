@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSV_BlueberryQuests_H
 
 #include <vector>
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_ConsoleHandle.h"
 #include "PokemonSV/Programs/ShinyHunting/PokemonSV_LetsGoTools.h"
 #include "PokemonSV/Options/PokemonSV_BBQOption.h"

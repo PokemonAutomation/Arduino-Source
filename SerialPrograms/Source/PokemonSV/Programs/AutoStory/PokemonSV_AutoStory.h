@@ -101,6 +101,9 @@ private:
     EnumDropdownOption<StarterChoice> STARTERCHOICE;
 
     BooleanCheckBoxOption ENABLE_ADVANCED_MODE;
+    BooleanCheckBoxOption CHANGE_SETTINGS;    
+    BooleanCheckBoxOption ENSURE_TIME_UNSYNCED;
+    BooleanCheckBoxOption ENSURE_CORRECT_MOVES;
 
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
@@ -109,7 +112,6 @@ private:
     
     SectionDividerOption m_advanced_options;
     SectionDividerOption m_advanced_options_end;
-    BooleanCheckBoxOption CHANGE_SETTINGS;    
 
     BooleanCheckBoxOption ENABLE_TEST_CHECKPOINTS;    
     SimpleIntegerOption<uint16_t> START_CHECKPOINT;

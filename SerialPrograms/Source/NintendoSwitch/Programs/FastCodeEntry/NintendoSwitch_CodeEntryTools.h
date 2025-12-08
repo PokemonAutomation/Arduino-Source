@@ -11,7 +11,7 @@
 #include <vector>
 #include "Common/Cpp/Time.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerButtons.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

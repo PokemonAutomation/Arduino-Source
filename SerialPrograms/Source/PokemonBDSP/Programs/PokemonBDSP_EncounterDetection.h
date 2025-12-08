@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 

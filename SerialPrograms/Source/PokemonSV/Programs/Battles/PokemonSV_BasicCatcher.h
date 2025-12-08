@@ -9,7 +9,7 @@
 
 #include <functional>
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSV/Inference/Battles/PokemonSV_BattleBallReader.h"
 

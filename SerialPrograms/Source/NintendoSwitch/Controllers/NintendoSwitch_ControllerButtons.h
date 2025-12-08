@@ -50,6 +50,13 @@ enum Button : ButtonFlagType{
     BUTTON_RIGHT_SR =   ((uint32_t)1 << 23),
     BUTTON_C        =   ((uint32_t)1 << 24),
 };
+
+inline constexpr Button empty_value(const Button*){
+    return BUTTON_NONE;
+}
+inline constexpr bool is_empty(Button x){
+    return x == BUTTON_NONE;
+}
 inline constexpr Button operator|(Button x, Button y){
     return (Button)((ButtonFlagType)x | (ButtonFlagType)y);
 }
@@ -61,6 +68,12 @@ inline constexpr Button operator&(Button x, Button y){
 }
 inline constexpr void operator&=(Button& x, Button y){
     x = (Button)((ButtonFlagType)x & (ButtonFlagType)y);
+}
+inline constexpr Button operator^(Button x, Button y){
+    return (Button)((ButtonFlagType)x ^ (ButtonFlagType)y);
+}
+inline constexpr void operator^=(Button& x, Button y){
+    x = (Button)((ButtonFlagType)x ^ (ButtonFlagType)y);
 }
 
 std::string button_to_string(Button button);

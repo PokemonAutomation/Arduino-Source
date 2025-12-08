@@ -1,12 +1,11 @@
-/*  SerialPABotBase: Wireless Pro Controller
+/*  SerialPABotBase: Pro Controller
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#include "Common/SerialPABotBase/SerialPABotBase_Messages_NS1_WirelessControllers.h"
 #include "Controllers/SerialPABotBase/Connection/MessageConverter.h"
-#include "NintendoSwitch_SerialPABotBase_WirelessProController.h"
+#include "NintendoSwitch_SerialPABotBase_ProController.h"
 
 //#include <iostream>
 //using std::cout;
@@ -17,26 +16,27 @@ namespace NintendoSwitch{
 
 
 
-SerialPABotBase_WirelessProController::SerialPABotBase_WirelessProController(
+SerialPABotBase_ProController::SerialPABotBase_ProController(
     Logger& logger,
     SerialPABotBase::SerialPABotBase_Connection& connection,
+    ControllerType controller_type,
     ControllerResetMode reset_mode
 )
     : ProController(logger)
-    , SerialPABotBase_WirelessController(
+    , SerialPABotBase_OemController(
         logger,
         connection,
-        ControllerType::NintendoSwitch_WirelessProController,
+        controller_type,
         reset_mode
     )
 {}
-SerialPABotBase_WirelessProController::~SerialPABotBase_WirelessProController(){
+SerialPABotBase_ProController::~SerialPABotBase_ProController(){
     ProController::stop();
-    SerialPABotBase_WirelessController::stop();
+    SerialPABotBase_OemController::stop();
 }
 
 
-void SerialPABotBase_WirelessProController::execute_state(
+void SerialPABotBase_ProController::execute_state(
     const Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
@@ -46,7 +46,7 @@ void SerialPABotBase_WirelessProController::execute_state(
     }
 
     //  https://github.com/dekuNukem/Nintendo_Switch_Reverse_Engineering/blob/master/bluetooth_hid_notes.md
-    pabb_NintendoSwitch_WirelessController_State0x30_Buttons buttons{
+    pabb_NintendoSwitch_OemController_State0x30_Buttons buttons{
         .button3 = 0,
         .button4 = 0,
         .button5 = 0,
@@ -78,7 +78,7 @@ void SerialPABotBase_WirelessProController::execute_state(
         controller_state.right_stick_x, controller_state.right_stick_y
     );
 
-    pabb_NintendoSwitch_WirelessController_State0x30_Gyro gyro{
+    pabb_NintendoSwitch_OemController_State0x30_Gyro gyro{
         0x0000,
         0x0000,
         0x0000,

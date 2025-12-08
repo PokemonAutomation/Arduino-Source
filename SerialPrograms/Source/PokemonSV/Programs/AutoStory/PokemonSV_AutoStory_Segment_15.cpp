@@ -4,6 +4,8 @@
  *
  */
 
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+
 #include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonTools/Async/InferenceRoutines.h"
@@ -147,6 +149,17 @@ void checkpoint_32(
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
 
+        context.wait_for_all_requests();
+        VideoSnapshot snapshot = env.console.video().snapshot();
+        DirectionDetector direction;
+        double current_direction = direction.get_current_direction(env.console, snapshot);
+        if (current_direction == -1){  // if unable to detect current direction, reset. We need to be able to detect the direction for the next checkpoint.
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "Unable to detect direction. Reset.",
+                env.console
+            );      
+        }        
        
     });
 

@@ -50,6 +50,7 @@ private:
     SimpleIntegerOption<uint32_t> NUM_FOSSILS;
     IntegerEnumDropdownOption WHICH_FOSSIL;
     PokemonLA::StopOnOption STOP_ON;
+    BooleanCheckBoxOption CONTINUE_AFTER_FIND;
 
     BooleanCheckBoxOption TAKE_VIDEO;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

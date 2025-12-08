@@ -29,6 +29,12 @@ void overworld_to_box_system(
     ConsoleHandle& console, ProControllerContext& context
 );
 
+// From box system, press B until overworld is reached
+void box_system_to_overworld(
+    ConsoleHandle& console, ProControllerContext& context
+);
+
+
 
 }
 }

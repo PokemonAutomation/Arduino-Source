@@ -9,7 +9,7 @@
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/VideoStream.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"

@@ -100,8 +100,7 @@ IntegerEnumDropdownDatabase::IntegerEnumDropdownDatabase()
 IntegerEnumDropdownDatabase::IntegerEnumDropdownDatabase(std::initializer_list<EnumEntry> list)
     : m_core(CONSTRUCT_TOKEN)
 {
-    size_t index = 0;
-    for (auto iter = list.begin(); iter != list.end(); ++iter, index++){
+    for (auto iter = list.begin(); iter != list.end(); ++iter){
         add(iter->enum_value, std::move(iter->slug), std::move(iter->display), iter->enabled);
     }
 }

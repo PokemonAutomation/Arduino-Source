@@ -11,7 +11,7 @@
 
 namespace PokemonAutomation{
 
-class JsonValue;
+class JsonObject;
 class CancellableScope;
 class AbstractController;
 
@@ -33,8 +33,8 @@ public:
 
 public:
     //  Serialization
-    virtual void load_json(const JsonValue& json);
-    virtual JsonValue to_json() const;
+    virtual void load_json(const JsonObject& json);
+    virtual JsonObject to_json() const;
 
 public:
     //  Execution

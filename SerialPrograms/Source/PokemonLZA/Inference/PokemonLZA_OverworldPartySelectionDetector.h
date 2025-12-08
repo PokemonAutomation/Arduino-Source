@@ -73,7 +73,7 @@ private:
 class OverworldPartySelectionWatcher : public DetectorToFinder<OverworldPartySelectionDetector>{
 public:
     OverworldPartySelectionWatcher(
-        Color color = COLOR_RED,
+        Color color = COLOR_WHITE,
         VideoOverlay* overlay = nullptr,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(150)
     )
@@ -84,7 +84,7 @@ public:
 class OverworldPartySelectionOverWatcher : public DetectorToFinder<OverworldPartySelectionDetector>{
 public:
     OverworldPartySelectionOverWatcher(
-        Color color = COLOR_RED,
+        Color color = COLOR_WHITE,
         VideoOverlay* overlay = nullptr,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(150)
     )

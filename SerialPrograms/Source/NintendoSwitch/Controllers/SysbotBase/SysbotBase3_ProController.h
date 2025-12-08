@@ -10,7 +10,7 @@
 
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 //#include "NintendoSwitch/Controllers/NintendoSwitch_VirtualControllerState.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Controllers/NintendoSwitch_ControllerWithScheduler.h"
 #include "SysbotBase_Connection.h"
 
@@ -39,13 +39,13 @@ public:
 
 
 public:
-    virtual ControllerType controller_type() const override{
-        return ControllerType::NintendoSwitch_WiredController;
-    }
+//    virtual ControllerType controller_type() const override{
+//        return ControllerType::NintendoSwitch_WiredController;
+//    }
+
     virtual ControllerPerformanceClass performance_class() const override{
         return ControllerPerformanceClass::SerialPABotBase_Wired;
     }
-
     virtual Milliseconds ticksize() const override{
         return Milliseconds::zero();
     }

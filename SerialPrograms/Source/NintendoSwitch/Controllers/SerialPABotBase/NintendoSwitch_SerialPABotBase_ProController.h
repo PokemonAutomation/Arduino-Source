@@ -1,38 +1,36 @@
-/*  SerialPABotBase: Wireless Joycon
+/*  SerialPABotBase: Pro Controller
  *
  *  From: https://github.com/PokemonAutomation/
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessJoycon_H
-#define PokemonAutomation_NintendoSwitch_SerialPABotBase_WirelessJoycon_H
+#ifndef PokemonAutomation_NintendoSwitch_SerialPABotBase_ProController_H
+#define PokemonAutomation_NintendoSwitch_SerialPABotBase_ProController_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch_SerialPABotBase_Controller.h"
-#include "NintendoSwitch_SerialPABotBase_WirelessController.h"
+#include "NintendoSwitch_SerialPABotBase_OemController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-template <typename JoyconType>
-class SerialPABotBase_WirelessJoycon :
-    public JoyconType,
-    public SerialPABotBase_WirelessController
+class SerialPABotBase_ProController final :
+    public ProController,
+    public SerialPABotBase_OemController
 {
     static constexpr uint16_t JOYSTICK_MIN_THRESHOLD = 1874;
-    static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 260;
+    static constexpr uint16_t JOYSTICK_MAX_THRESHOLD = 320;
 
-protected:
-    SerialPABotBase_WirelessJoycon(
+public:
+    SerialPABotBase_ProController(
         Logger& logger,
         SerialPABotBase::SerialPABotBase_Connection& connection,
         ControllerType controller_type,
         ControllerResetMode reset_mode
     );
+    ~SerialPABotBase_ProController();
 
-
-public:
     virtual Logger& logger() override{
         return m_logger;
     }
@@ -45,21 +43,17 @@ public:
 
 
 public:
-    virtual ControllerType controller_type() const override{
-        return m_controller_type;
-    }
     virtual ControllerPerformanceClass performance_class() const override{
-        return ControllerPerformanceClass::SerialPABotBase_Wireless;
+        return m_performance_class;
     }
-
     virtual Milliseconds ticksize() const override{
-        return SerialPABotBase_WirelessController::ticksize();
+        return m_ticksize;
     }
     virtual Milliseconds cooldown() const override{
-        return SerialPABotBase_WirelessController::cooldown();
+        return m_cooldown;
     }
     virtual Milliseconds timing_variation() const override{
-        return SerialPABotBase_WirelessController::timing_variation();
+        return m_timing_variation;
     }
     virtual bool atomic_multibutton() const override{
         return true;
@@ -93,12 +87,30 @@ public:
         const Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         Button button
-    ) override;
-    virtual void issue_joystick(
+    ) override{
+        ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
+    }
+    virtual void issue_dpad(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        DpadPosition position
+    ) override{
+        ControllerWithScheduler::issue_dpad(cancellable, delay, hold, cooldown, position);
+    }
+    virtual void issue_left_joystick(
         const Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         uint8_t x, uint8_t y
-    ) override;
+    ) override{
+        ControllerWithScheduler::issue_left_joystick(cancellable, delay, hold, cooldown, x, y);
+    }
+    virtual void issue_right_joystick(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        uint8_t x, uint8_t y
+    ) override{
+        ControllerWithScheduler::issue_right_joystick(cancellable, delay, hold, cooldown, x, y);
+    }
 
     virtual void issue_gyro_accel_x(
         const Cancellable* cancellable,
@@ -146,10 +158,22 @@ public:
     virtual void issue_full_controller_state(
         const Cancellable* cancellable,
         bool enable_logging,
-        Milliseconds duration,
+        Milliseconds hold,
         Button button,
-        uint8_t joystick_x, uint8_t joystick_y
-    ) override;
+        DpadPosition position,
+        uint8_t left_x, uint8_t left_y,
+        uint8_t right_x, uint8_t right_y
+    ) override{
+        ControllerWithScheduler::issue_full_controller_state(
+            cancellable,
+            enable_logging,
+            hold,
+            button,
+            position,
+            left_x, left_y,
+            right_x, right_y
+        );
+    }
 
 
 public:
@@ -157,49 +181,39 @@ public:
 
     virtual void issue_mash_button(
         const Cancellable* cancellable,
-        Button button, Milliseconds duration
-    ) override;
+        Milliseconds duration,
+        Button button
+    ) override{
+        ControllerWithScheduler::issue_mash_button(cancellable, duration, button);
+    }
+    virtual void issue_mash_button(
+        const Cancellable* cancellable,
+        Milliseconds duration,
+        Button button0, Button button1
+    ) override{
+        ControllerWithScheduler::issue_mash_button(cancellable, duration, button0, button1);
+    }
+    virtual void issue_mash_AZs(
+        const Cancellable* cancellable,
+        Milliseconds duration
+    ) override{
+        ControllerWithScheduler::issue_mash_AZs(cancellable, duration);
+    }
+    virtual void issue_system_scroll(
+        const Cancellable* cancellable,
+        Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
+        DpadPosition direction  //  Diagonals not allowed.
+    ) override{
+        ControllerWithScheduler::issue_system_scroll(cancellable, delay, hold, cooldown, direction);
+    }
 
 
-protected:
-    void execute_state_left_joycon(
-        const Cancellable* cancellable,
-        const SuperscalarScheduler::ScheduleEntry& entry
-    );
-    void execute_state_right_joycon(
-        const Cancellable* cancellable,
-        const SuperscalarScheduler::ScheduleEntry& entry
-    );
+private:
     virtual void execute_state(
         const Cancellable* cancellable,
         const SuperscalarScheduler::ScheduleEntry& entry
     ) override;
-
-    ControllerType m_controller_type;
-    Button m_valid_buttons;
 };
-
-
-
-class SerialPABotBase_WirelessLeftJoycon final : public SerialPABotBase_WirelessJoycon<LeftJoycon>{
-public:
-    SerialPABotBase_WirelessLeftJoycon(
-        Logger& logger,
-        SerialPABotBase::SerialPABotBase_Connection& connection,
-        ControllerResetMode reset_mode
-    );
-    ~SerialPABotBase_WirelessLeftJoycon();
-};
-class SerialPABotBase_WirelessRightJoycon final : public SerialPABotBase_WirelessJoycon<RightJoycon>{
-public:
-    SerialPABotBase_WirelessRightJoycon(
-        Logger& logger,
-        SerialPABotBase::SerialPABotBase_Connection& connection,
-        ControllerResetMode reset_mode
-    );
-    ~SerialPABotBase_WirelessRightJoycon();
-};
-
 
 
 

@@ -54,15 +54,19 @@ typedef uint32_t pabb_ControllerID;
 
 #define PABB_CID_NintendoSwitch_WiredController             0x1000
 #define PABB_CID_NintendoSwitch_WiredProController          0x1001
+#define PABB_CID_NintendoSwitch_WiredLeftJoycon             0x1005
+#define PABB_CID_NintendoSwitch_WiredRightJoycon            0x1006
 #define PABB_CID_NintendoSwitch_WirelessProController       0x1002
-#define PABB_CID_NintendoSwitch_LeftJoycon                  0x1003
-#define PABB_CID_NintendoSwitch_RightJoycon                 0x1004
+#define PABB_CID_NintendoSwitch_WirelessLeftJoycon          0x1003
+#define PABB_CID_NintendoSwitch_WirelessRightJoycon         0x1004
 
 #define PABB_CID_NintendoSwitch2_WiredController            0x1010
 #define PABB_CID_NintendoSwitch2_WiredProController         0x1011
+#define PABB_CID_NintendoSwitch2_WiredLeftJoycon            0x1015
+#define PABB_CID_NintendoSwitch2_WiredRightJoycon           0x1016
 #define PABB_CID_NintendoSwitch2_WirelessProController      0x1012
-#define PABB_CID_NintendoSwitch2_LeftJoycon                 0x1013
-#define PABB_CID_NintendoSwitch2_RightJoycon                0x1014
+#define PABB_CID_NintendoSwitch2_WirelessLeftJoycon         0x1013
+#define PABB_CID_NintendoSwitch2_WirelessRightJoycon        0x1014
 
 
 #endif

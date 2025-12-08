@@ -11,9 +11,9 @@ jobs:
       matrix:
         os: [windows-2025, macos-15, macos-15-intel, ubuntu-24.04]
         compiler: ['default', 'clang']
-        qt_version: ['6.10.0']
+        qt_version: ['6.10.1']
         include:
-          - qt_version: '6.10.0'
+          - qt_version: '6.10.1'
             qt_version_major: '6'
             qt_modules: 'qtmultimedia qtserialport'
 

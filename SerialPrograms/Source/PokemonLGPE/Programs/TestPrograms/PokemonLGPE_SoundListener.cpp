@@ -18,7 +18,7 @@
 #include "CommonTools/Audio/SpectrogramMatcher.h"
 #include "CommonTools/Async/InferenceSession.h"
 #include "Pokemon/Pokemon_Strings.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "PokemonLGPE/Inference/Sounds/PokemonLGPE_ShinySoundDetector.h"
 #include "PokemonLGPE_SoundListener.h"
 

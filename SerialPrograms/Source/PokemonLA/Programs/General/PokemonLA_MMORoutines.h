@@ -6,7 +6,7 @@
  *
  */
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include <set>
 #include <string>
 

@@ -123,6 +123,7 @@ void KeyboardInputController::thread_loop(){
 
         update_state(*current, pressed_native_keys);
         bool neutral = current->is_neutral();
+//        cout << "neutral = " << neutral << endl;
 
 
         //  Send the command.
@@ -155,6 +156,7 @@ void KeyboardInputController::thread_loop(){
                 }
 
                 //  Send the command.
+//                cout << "send_state()" << endl;
                 send_state(*current);
 
                 std::swap(last, current);

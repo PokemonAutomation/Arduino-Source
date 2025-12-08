@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLGPE_GiftReset_H
 #define PokemonAutomation_PokemonLGPE_GiftReset_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_Joycon.h"
+#include "NintendoSwitch/Controllers/Joycon/NintendoSwitch_Joycon.h"
 #include "NintendoSwitch/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/NintendoSwitch_GoHomeWhenDoneOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"

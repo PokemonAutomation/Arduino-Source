@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggRoutines_H
 #define PokemonAutomation_PokemonBDSP_EggRoutines_H
 
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

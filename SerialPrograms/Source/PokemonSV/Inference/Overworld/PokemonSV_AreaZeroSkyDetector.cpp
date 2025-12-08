@@ -10,7 +10,7 @@
 #include "CommonTools/Images/BinaryImage_FilterRgb32.h"
 #include "CommonTools/Async/InterruptableCommands.h"
 #include "CommonTools/Async/InferenceSession.h"
-#include "NintendoSwitch/Controllers/NintendoSwitch_ProController.h"
+#include "NintendoSwitch/Controllers/Procon/NintendoSwitch_ProController.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSV_AreaZeroSkyDetector.h"
 
