@@ -122,7 +122,7 @@ private:
 };
 
 
-
+std::string get_joystick_direction(uint8_t x, uint8_t y);
 
 
 
