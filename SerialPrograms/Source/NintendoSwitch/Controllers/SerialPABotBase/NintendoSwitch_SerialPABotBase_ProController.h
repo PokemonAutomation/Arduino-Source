@@ -68,7 +68,7 @@ public:
         SerialPABotBase_Controller::replace_on_next_command();
     }
 
-    virtual void wait_for_all(const Cancellable* cancellable) override{
+    virtual void wait_for_all(Cancellable* cancellable) override{
         SerialPABotBase_Controller::wait_for_all(cancellable);
     }
 
@@ -76,36 +76,36 @@ public:
 public:
     //  Superscalar Commands (the "ssf" framework)
 
-    virtual void issue_barrier(const Cancellable* cancellable) override{
+    virtual void issue_barrier(Cancellable* cancellable) override{
         ControllerWithScheduler::issue_barrier(cancellable);
     }
-    virtual void issue_nop(const Cancellable* cancellable, Milliseconds duration) override{
+    virtual void issue_nop(Cancellable* cancellable, Milliseconds duration) override{
         ControllerWithScheduler::issue_nop(cancellable, duration);
     }
 
     virtual void issue_buttons(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         Button button
     ) override{
         ControllerWithScheduler::issue_buttons(cancellable, delay, hold, cooldown, button);
     }
     virtual void issue_dpad(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         DpadPosition position
     ) override{
         ControllerWithScheduler::issue_dpad(cancellable, delay, hold, cooldown, position);
     }
     virtual void issue_left_joystick(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         uint8_t x, uint8_t y
     ) override{
         ControllerWithScheduler::issue_left_joystick(cancellable, delay, hold, cooldown, x, y);
     }
     virtual void issue_right_joystick(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         uint8_t x, uint8_t y
     ) override{
@@ -113,42 +113,42 @@ public:
     }
 
     virtual void issue_gyro_accel_x(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) override{
         ControllerWithScheduler::issue_gyro_accel_x(cancellable, delay, hold, cooldown, value);
     }
     virtual void issue_gyro_accel_y(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) override{
         ControllerWithScheduler::issue_gyro_accel_y(cancellable, delay, hold, cooldown, value);
     }
     virtual void issue_gyro_accel_z(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) override{
         ControllerWithScheduler::issue_gyro_accel_z(cancellable, delay, hold, cooldown, value);
     }
     virtual void issue_gyro_rotate_x(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) override{
         ControllerWithScheduler::issue_gyro_rotate_x(cancellable, delay, hold, cooldown, value);
     }
     virtual void issue_gyro_rotate_y(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) override{
         ControllerWithScheduler::issue_gyro_rotate_y(cancellable, delay, hold, cooldown, value);
     }
     virtual void issue_gyro_rotate_z(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) override{
@@ -156,7 +156,7 @@ public:
     }
 
     virtual void issue_full_controller_state(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         bool enable_logging,
         Milliseconds hold,
         Button button,
@@ -180,27 +180,27 @@ public:
     //  High speed RPCs.
 
     virtual void issue_mash_button(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds duration,
         Button button
     ) override{
         ControllerWithScheduler::issue_mash_button(cancellable, duration, button);
     }
     virtual void issue_mash_button(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds duration,
         Button button0, Button button1
     ) override{
         ControllerWithScheduler::issue_mash_button(cancellable, duration, button0, button1);
     }
     virtual void issue_mash_AZs(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds duration
     ) override{
         ControllerWithScheduler::issue_mash_AZs(cancellable, duration);
     }
     virtual void issue_system_scroll(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         DpadPosition direction  //  Diagonals not allowed.
     ) override{
@@ -210,7 +210,7 @@ public:
 
 private:
     virtual void execute_state(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         const SuperscalarScheduler::ScheduleEntry& entry
     ) override;
 };

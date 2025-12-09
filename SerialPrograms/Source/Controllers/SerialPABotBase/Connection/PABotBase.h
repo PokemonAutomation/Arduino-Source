@@ -68,7 +68,7 @@ public:
     virtual State state() const override{
         return m_state.load(std::memory_order_acquire);
     }
-    virtual void notify_all() override;
+    virtual void on_cancellable_cancel() override;
 
     virtual size_t queue_limit() const override{
         return m_max_pending_requests.load(std::memory_order_relaxed);
@@ -78,7 +78,7 @@ public:
 public:
     //  Basic Requests
 
-    virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) override;
+    virtual void wait_for_all_requests(Cancellable* cancelled = nullptr) override;
     virtual void stop_all_commands() override;
     virtual void next_command_interrupt() override;
 
@@ -136,24 +136,24 @@ private:
 
     //  Returns the seqnum of the request. If failed, returns zero.
     uint64_t try_issue_request(
-        const Cancellable* cancelled,
+        Cancellable* cancelled,
         const BotBaseRequest& request,
         bool silent_remove, bool do_not_block
     );
     uint64_t try_issue_command(
-        const Cancellable* cancelled,
+        Cancellable* cancelled,
         const BotBaseRequest& request,
         bool silent_remove
     );
 
     //  Returns the seqnum of the request.
     uint64_t issue_request(
-        const Cancellable* cancelled,
+        Cancellable* cancelled,
         const BotBaseRequest& request,
         bool silent_remove, bool do_not_block
     );
     uint64_t issue_command(
-        const Cancellable* cancelled,
+        Cancellable* cancelled,
         const BotBaseRequest& request,
         bool silent_remove
     );
@@ -161,19 +161,30 @@ private:
 public:
     virtual bool try_issue_request(
         const BotBaseRequest& request,
-        const Cancellable* cancelled
+        Cancellable* cancelled
     ) override;
     virtual void issue_request(
         const BotBaseRequest& request,
-        const Cancellable* cancelled
+        Cancellable* cancelled
     ) override;
     virtual BotBaseMessage issue_request_and_wait(
         const BotBaseRequest& request,
-        const Cancellable* cancelled
+        Cancellable* cancelled
     ) override;
 
 private:
-    BotBaseMessage wait_for_request(uint64_t seqnum, const Cancellable* cancelled = nullptr);
+    BotBaseMessage wait_for_request(uint64_t seqnum, Cancellable* cancelled = nullptr);
+
+    //  Make we get notified of a cancellable cancels so we can wake up.
+    void cv_wait(Cancellable* cancellable, std::unique_lock<std::mutex>& lg){
+        if (cancellable){
+            cancellable->add_cancel_listener(*this);
+        }
+        m_cv.wait(lg);
+        if (cancellable){
+            cancellable->remove_cancel_listener(*this);
+        }
+    }
 
 private:
     Logger& m_logger;

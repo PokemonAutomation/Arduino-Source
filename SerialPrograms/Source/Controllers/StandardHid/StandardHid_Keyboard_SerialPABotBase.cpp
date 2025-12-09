@@ -88,7 +88,7 @@ void SerialPABotBase_Keyboard::replace_on_next_command(){
 }
 
 
-void SerialPABotBase_Keyboard::wait_for_all(const Cancellable* cancellable){
+void SerialPABotBase_Keyboard::wait_for_all(Cancellable* cancellable){
     SuperscalarScheduler::Schedule schedule;
     std::lock_guard<std::mutex> lg0(m_issue_lock);
     {
@@ -106,7 +106,7 @@ void SerialPABotBase_Keyboard::wait_for_all(const Cancellable* cancellable){
 }
 
 void SerialPABotBase_Keyboard::execute_state(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
     std::map<KeyboardKey, uint64_t> state;

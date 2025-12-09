@@ -24,7 +24,6 @@ namespace PokemonAutomation{
 KeyboardInputController::~KeyboardInputController() = default;
 KeyboardInputController::KeyboardInputController(Logger& logger, bool enabled)
     : m_logger(logger)
-    , m_stop(false)
 {}
 
 void KeyboardInputController::start(){
@@ -36,9 +35,7 @@ void KeyboardInputController::start(){
     });
 }
 void KeyboardInputController::stop() noexcept{
-    bool expected = false;
-    if (!m_stop.compare_exchange_strong(expected, true)){
-        //  Already stopped.
+    if (cancel(nullptr)){
         return;
     }
     {
@@ -95,7 +92,7 @@ void KeyboardInputController::thread_loop(){
     bool last_neutral = true;
     WallClock last_press = current_time();
     while (true){
-        if (m_stop.load(std::memory_order_acquire)){
+        if (cancelled()){
             return;
         }
 
@@ -170,7 +167,7 @@ void KeyboardInputController::thread_loop(){
 
         //  Wait for next event.
         std::unique_lock<std::mutex> lg(m_sleep_lock);
-        if (m_stop.load(std::memory_order_acquire)){
+        if (cancelled()){
             return;
         }
 

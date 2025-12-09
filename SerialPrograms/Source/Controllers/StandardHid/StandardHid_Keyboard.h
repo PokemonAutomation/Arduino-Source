@@ -52,12 +52,12 @@ public:
     //  6 chronologically will be applied.
 
     virtual void issue_key(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         KeyboardKey key
     ) = 0;
     virtual void issue_keys(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         const std::vector<KeyboardKey>& keys
     ) = 0;

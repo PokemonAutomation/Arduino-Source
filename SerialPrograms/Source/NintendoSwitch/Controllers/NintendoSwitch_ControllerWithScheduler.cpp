@@ -17,7 +17,7 @@ using namespace std::chrono_literals;
 
 
 void ControllerWithScheduler::issue_buttons(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     Button button
 ){
@@ -58,7 +58,7 @@ void ControllerWithScheduler::issue_buttons(
     }
 }
 void ControllerWithScheduler::issue_dpad(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     DpadPosition position
 ){
@@ -87,7 +87,7 @@ void ControllerWithScheduler::issue_dpad(
     }
 }
 void ControllerWithScheduler::issue_left_joystick(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     uint8_t x, uint8_t y
 ){
@@ -116,7 +116,7 @@ void ControllerWithScheduler::issue_left_joystick(
     }
 }
 void ControllerWithScheduler::issue_right_joystick(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     uint8_t x, uint8_t y
 ){
@@ -148,7 +148,7 @@ void ControllerWithScheduler::issue_right_joystick(
 
 
 void ControllerWithScheduler::issue_gyro(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     SwitchResource id, const char* name,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     int16_t value
@@ -181,7 +181,7 @@ void ControllerWithScheduler::issue_gyro(
 
 
 void ControllerWithScheduler::issue_full_controller_state(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     bool enable_logging,
     Milliseconds hold,
     Button button,
@@ -261,7 +261,7 @@ void ControllerWithScheduler::issue_full_controller_state(
 
 
 void ControllerWithScheduler::issue_mash_button(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds duration,
     Button button
 ){
@@ -291,7 +291,7 @@ void ControllerWithScheduler::issue_mash_button(
     }
 }
 void ControllerWithScheduler::issue_mash_button(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds duration,
     Button button0, Button button1
 ){
@@ -321,7 +321,7 @@ void ControllerWithScheduler::issue_mash_button(
     }
 }
 void ControllerWithScheduler::issue_mash_AZs(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds duration
 ){
     if (cancellable){
@@ -361,7 +361,7 @@ void ControllerWithScheduler::issue_mash_AZs(
     }
 }
 void ControllerWithScheduler::issue_system_scroll(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     DpadPosition direction  //  Diagonals not allowed.
 ){

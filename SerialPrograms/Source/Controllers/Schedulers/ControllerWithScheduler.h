@@ -34,7 +34,7 @@ public:
 public:
     //  Superscalar Commands (the "ssf" framework)
 
-    void issue_barrier(const Cancellable* cancellable){
+    void issue_barrier(Cancellable* cancellable){
         SuperscalarScheduler::Schedule schedule;
         std::lock_guard<std::mutex> lg0(m_issue_lock);
         {
@@ -46,7 +46,7 @@ public:
             m_logger.log("issue_barrier()", COLOR_DARKGREEN);
         }
     }
-    void issue_nop(const Cancellable* cancellable, Milliseconds duration){
+    void issue_nop(Cancellable* cancellable, Milliseconds duration){
         SuperscalarScheduler::Schedule schedule;
         std::lock_guard<std::mutex> lg0(m_issue_lock);
         {
@@ -68,11 +68,11 @@ public:
 
 protected:
     virtual void execute_state(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         const SuperscalarScheduler::ScheduleEntry& entry
     ) = 0;
     virtual void execute_schedule(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         const SuperscalarScheduler::Schedule& schedule
     ){
         for (const SuperscalarScheduler::ScheduleEntry& entry : schedule){

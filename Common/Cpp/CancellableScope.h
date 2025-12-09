@@ -46,6 +46,14 @@ class Cancellable{
     Cancellable(const Cancellable&) = delete;
     void operator=(const Cancellable&) = delete;
 public:
+    struct CancelListener{
+        virtual void on_cancellable_cancel() = 0;
+    };
+    void add_cancel_listener(CancelListener& listener);
+    void remove_cancel_listener(CancelListener& listener);
+
+
+public:
     virtual ~Cancellable();
 
 //    virtual std::string name() const{ return "Cancellable"; };

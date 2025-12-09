@@ -105,12 +105,12 @@ protected:
     );
 
     void issue_report(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         WallDuration duration,
         const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons
     );
     void issue_report(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         WallDuration duration,
         const pabb_NintendoSwitch_OemController_State0x30_Buttons& buttons,
         const pabb_NintendoSwitch_OemController_State0x30_Gyro& gyro

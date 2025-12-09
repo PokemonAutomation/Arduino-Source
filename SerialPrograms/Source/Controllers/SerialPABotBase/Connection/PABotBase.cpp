@@ -136,7 +136,7 @@ void PABotBase::stop(std::string error_message){
     //  it is safe to destruct.
     m_state.store(State::STOPPED, std::memory_order_release);
 }
-void PABotBase::notify_all(){
+void PABotBase::on_cancellable_cancel(){
     std::unique_lock<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
 }
@@ -145,14 +145,14 @@ void PABotBase::set_queue_limit(size_t queue_limit){
     m_max_pending_requests.store(queue_limit, std::memory_order_relaxed);
 }
 
-void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
+void PABotBase::wait_for_all_requests(Cancellable* cancelled){
     auto scope_check = m_sanitizer.check_scope();
 
     std::unique_lock<std::mutex> lg(m_sleep_lock);
     m_logger.log("Waiting for all requests to finish...", COLOR_DARKGREEN);
     while (true){
-        if (cancelled != nullptr && cancelled->cancelled()){
-            throw OperationCancelledException();
+        if (cancelled){
+            cancelled->throw_if_cancelled();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
             ReadSpinLock lg0(m_state_lock);
@@ -176,7 +176,7 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
                 break;
             }
         }
-        m_cv.wait(lg);
+        cv_wait(cancelled, lg);
     }
 
 //    m_logger.log("Waiting for all requests to finish... Completed.", COLOR_DARKGREEN);
@@ -629,7 +629,7 @@ void PABotBase::retransmit_thread(){
 
 
 uint64_t PABotBase::try_issue_request(
-    const Cancellable* cancelled,
+    Cancellable* cancelled,
     const BotBaseRequest& request,
     bool silent_remove, bool do_not_block
 ){
@@ -644,8 +644,8 @@ uint64_t PABotBase::try_issue_request(
     }
 
     WriteSpinLock lg(m_state_lock, "PABotBase::try_issue_request()");
-    if (cancelled != nullptr && cancelled->cancelled()){
-        throw OperationCancelledException();
+    if (cancelled){
+        cancelled->throw_if_cancelled();
     }
 
     State state = m_state.load(std::memory_order_acquire);
@@ -709,7 +709,7 @@ uint64_t PABotBase::try_issue_request(
     return seqnum;
 }
 uint64_t PABotBase::try_issue_command(
-    const Cancellable* cancelled,
+    Cancellable* cancelled,
     const BotBaseRequest& request,
     bool silent_remove
 ){
@@ -724,8 +724,8 @@ uint64_t PABotBase::try_issue_command(
     }
 
     WriteSpinLock lg(m_state_lock, "PABotBase::try_issue_command()");
-    if (cancelled != nullptr && cancelled->cancelled()){
-        throw OperationCancelledException();
+    if (cancelled){
+        cancelled->throw_if_cancelled();
     }
 
     State state = m_state.load(std::memory_order_acquire);
@@ -789,7 +789,7 @@ uint64_t PABotBase::try_issue_command(
     return seqnum;
 }
 uint64_t PABotBase::issue_request(
-    const Cancellable* cancelled,
+    Cancellable* cancelled,
     const BotBaseRequest& request,
     bool silent_remove, bool do_not_block
 ){
@@ -819,8 +819,8 @@ uint64_t PABotBase::issue_request(
             return seqnum;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
-        if (cancelled != nullptr && cancelled->cancelled()){
-            throw OperationCancelledException();
+        if (cancelled){
+            cancelled->throw_if_cancelled();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
             ReadSpinLock lg0(m_state_lock);
@@ -830,11 +830,11 @@ uint64_t PABotBase::issue_request(
             ReadSpinLock lg0(m_state_lock);
             throw ConnectionException(&m_logger, m_error_message);
         }
-        m_cv.wait(lg);
+        cv_wait(cancelled, lg);
     }
 }
 uint64_t PABotBase::issue_command(
-    const Cancellable* cancelled,
+    Cancellable* cancelled,
     const BotBaseRequest& request,
     bool silent_remove
 ){
@@ -864,8 +864,8 @@ uint64_t PABotBase::issue_command(
             return seqnum;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
-        if (cancelled != nullptr && cancelled->cancelled()){
-            throw OperationCancelledException();
+        if (cancelled){
+            cancelled->throw_if_cancelled();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
             ReadSpinLock lg0(m_state_lock);
@@ -875,13 +875,13 @@ uint64_t PABotBase::issue_command(
             ReadSpinLock lg0(m_state_lock);
             throw ConnectionException(&m_logger, m_error_message);
         }
-        m_cv.wait(lg);
+        cv_wait(cancelled, lg);
     }
 }
 
 bool PABotBase::try_issue_request(
     const BotBaseRequest& request,
-    const Cancellable* cancelled
+    Cancellable* cancelled
 ){
     auto scope_check = m_sanitizer.check_scope();
 
@@ -893,7 +893,7 @@ bool PABotBase::try_issue_request(
 }
 void PABotBase::issue_request(
     const BotBaseRequest& request,
-    const Cancellable* cancelled
+    Cancellable* cancelled
 ){
     auto scope_check = m_sanitizer.check_scope();
 
@@ -906,7 +906,7 @@ void PABotBase::issue_request(
 
 BotBaseMessage PABotBase::issue_request_and_wait(
     const BotBaseRequest& request,
-    const Cancellable* cancelled
+    Cancellable* cancelled
 ){
     auto scope_check = m_sanitizer.check_scope();
 
@@ -917,13 +917,13 @@ BotBaseMessage PABotBase::issue_request_and_wait(
     uint64_t seqnum = issue_request(cancelled, request, false, false);
     return wait_for_request(seqnum, cancelled);
 }
-BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum, const Cancellable* cancelled){
+BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum, Cancellable* cancelled){
     auto scope_check = m_sanitizer.check_scope();
 
     std::unique_lock<std::mutex> lg(m_sleep_lock);
     while (true){
-        if (cancelled && cancelled->cancelled()){
-            throw OperationCancelledException();
+        if (cancelled){
+            cancelled->throw_if_cancelled();
         }
 
         {

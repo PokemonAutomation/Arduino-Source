@@ -71,7 +71,7 @@ public:
         Milliseconds ticksize = m_controller->ticksize();
         WallClock time_stamp = current_time();
         static_cast<ProController*>(m_controller)->issue_full_controller_state(
-            nullptr,
+            this,
             false,
             ticksize == Milliseconds::zero() ? 2000ms : ticksize * 255,
             switch_state.buttons,

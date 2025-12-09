@@ -10,6 +10,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Exceptions.h"
+#include "ListenerSet.h"
 #include "Containers/Pimpl.tpp"
 #include "Concurrency/SpinLock.h"
 #include "CancellableScope.h"
@@ -28,8 +29,16 @@ struct CancellableData{
     std::atomic<bool> cancelled;
     mutable SpinLock lock;
     std::exception_ptr exception;
+    ListenerSet<Cancellable::CancelListener> m_listeners;
 };
 
+
+void Cancellable::add_cancel_listener(CancelListener& listener){
+    m_impl->m_listeners.add(listener);
+}
+void Cancellable::remove_cancel_listener(CancelListener& listener){
+    m_impl->m_listeners.remove(listener);
+}
 
 
 Cancellable::Cancellable()
@@ -56,10 +65,15 @@ bool Cancellable::cancel(std::exception_ptr exception) noexcept{
     if (exception && !data.exception){
         data.exception = std::move(exception);
     }
-    if (data.cancelled.load(std::memory_order_acquire)){
+    if (data.cancelled.load(std::memory_order_relaxed)){
         return true;
     }
-    return data.cancelled.exchange(true, std::memory_order_relaxed);
+    data.cancelled.store(true, std::memory_order_release);
+//    if (data.cancelled.exchange(true, std::memory_order_relaxed)){
+//        return true;
+//    }
+    m_impl->m_listeners.run_method_with_duplicates(&CancelListener::on_cancellable_cancel);
+    return false;
 }
 void Cancellable::throw_if_cancelled() const{
     auto scope_check = m_sanitizer.check_scope();

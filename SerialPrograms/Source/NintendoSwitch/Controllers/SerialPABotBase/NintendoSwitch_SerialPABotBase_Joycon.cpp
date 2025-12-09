@@ -84,7 +84,7 @@ SerialPABotBase_Joycon<JoyconType>::SerialPABotBase_Joycon(
 
 template <typename JoyconType>
 void SerialPABotBase_Joycon<JoyconType>::issue_buttons(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     Button button
 ){
@@ -93,7 +93,7 @@ void SerialPABotBase_Joycon<JoyconType>::issue_buttons(
 }
 template <typename JoyconType>
 void SerialPABotBase_Joycon<JoyconType>::issue_joystick(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
     uint8_t x, uint8_t y
 ){
@@ -110,7 +110,7 @@ void SerialPABotBase_Joycon<JoyconType>::issue_joystick(
 }
 template <typename JoyconType>
 void SerialPABotBase_Joycon<JoyconType>::issue_full_controller_state(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     bool enable_logging,
     Milliseconds duration,
     Button button,
@@ -148,7 +148,7 @@ void SerialPABotBase_Joycon<JoyconType>::issue_full_controller_state(
 
 template <typename JoyconType>
 void SerialPABotBase_Joycon<JoyconType>::issue_mash_button(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     Button button, Milliseconds duration
 ){
     button &= m_valid_buttons;
@@ -160,7 +160,7 @@ void SerialPABotBase_Joycon<JoyconType>::issue_mash_button(
 
 template <typename JoyconType>
 void SerialPABotBase_Joycon<JoyconType>::execute_state_left_joycon(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
     SwitchControllerState controller_state;
@@ -204,7 +204,7 @@ void SerialPABotBase_Joycon<JoyconType>::execute_state_left_joycon(
 }
 template <typename JoyconType>
 void SerialPABotBase_Joycon<JoyconType>::execute_state_right_joycon(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
     SwitchControllerState controller_state;
@@ -246,7 +246,7 @@ void SerialPABotBase_Joycon<JoyconType>::execute_state_right_joycon(
 }
 template <typename JoyconType>
 void SerialPABotBase_Joycon<JoyconType>::execute_state(
-    const Cancellable* cancellable,
+    Cancellable* cancellable,
     const SuperscalarScheduler::ScheduleEntry& entry
 ){
     switch (this->controller_class()){

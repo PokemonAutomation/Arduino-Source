@@ -51,7 +51,7 @@ public:
             std::unique_lock<std::mutex> lg(m_sleep_lock);
             BotBaseController* botbase = m_connection.botbase();
             if (botbase){
-                botbase->notify_all();
+                botbase->on_cancellable_cancel();
             }
             m_cv.notify_all();
         }

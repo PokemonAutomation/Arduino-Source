@@ -77,45 +77,45 @@ public:
     //  This command will wait until all the selected buttons are ready to
     //  ensure that they are all dispatched simultaneously.
     virtual void issue_buttons(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         Button button
     ) = 0;
 
     virtual void issue_joystick(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         uint8_t x, uint8_t y
     ) = 0;
 
     //  Gyro: Accelerometer (experimental - API subject to change)
     virtual void issue_gyro_accel_x(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_accel_y(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_accel_z(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_rotate_x(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_rotate_y(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
     virtual void issue_gyro_rotate_z(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Milliseconds delay, Milliseconds hold, Milliseconds cooldown,
         int16_t value
     ) = 0;
@@ -140,7 +140,7 @@ public:
     //  overloads to this and gate them behind features.
     //
     virtual void issue_full_controller_state(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         bool enable_logging,
         Milliseconds duration,
         Button button,
@@ -163,7 +163,7 @@ public:
 
     //  Mash a button as quickly as possible.
     virtual void issue_mash_button(
-        const Cancellable* cancellable,
+        Cancellable* cancellable,
         Button button, Milliseconds duration
     ) = 0;
 

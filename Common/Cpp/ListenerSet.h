@@ -202,7 +202,7 @@ void ListenerSet<ListenerType>::run_method_with_duplicates(Function function, Ar
         ListenerType& listener = *item.first;
         size_t count = item.second;
         do{
-            (listener->*function)(std::forward<Args>(args)...);
+            (listener.*function)(std::forward<Args>(args)...);
         }while (--count);
     }
 }
