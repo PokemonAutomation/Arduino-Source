@@ -159,7 +159,7 @@ void checkpoint_76(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         wait_for_overworld(env.program_info(), env.console, context, 30);
 
         // place down marker as a workaround with an issue with fly_to_overworld_from_map
-        // fly_to_overworld_from_map() will fail since the snowy background on the map will false positive the destinationMenuItemWatcher, which causes the fly to fail
+        // fly_to_overworld_from_map() will fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
         place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
             {ZoomChange::ZOOM_IN, 0, 0, 0}, 
             FlyPoint::POKECENTER, 
