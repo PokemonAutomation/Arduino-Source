@@ -39,6 +39,9 @@ void Cancellable::add_cancel_listener(CancelListener& listener){
 void Cancellable::remove_cancel_listener(CancelListener& listener){
     m_impl->m_listeners.remove(listener);
 }
+bool Cancellable::try_add_cancel_listener(CancelListener& listener){
+    return m_impl->m_listeners.try_add(listener);
+}
 
 
 Cancellable::Cancellable()

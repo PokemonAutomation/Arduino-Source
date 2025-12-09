@@ -176,15 +176,7 @@ private:
     BotBaseMessage wait_for_request(uint64_t seqnum, Cancellable* cancelled = nullptr);
 
     //  Make we get notified of a cancellable cancels so we can wake up.
-    void cv_wait(Cancellable* cancellable, std::unique_lock<std::mutex>& lg){
-        if (cancellable){
-            cancellable->add_cancel_listener(*this);
-        }
-        m_cv.wait(lg);
-        if (cancellable){
-            cancellable->remove_cancel_listener(*this);
-        }
-    }
+    void cv_wait(Cancellable* cancellable, std::unique_lock<std::mutex>& lg);
 
 private:
     Logger& m_logger;
