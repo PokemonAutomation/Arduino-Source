@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Exceptions/OperationFailedException.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/ImageTypes/ImageViewRGB32.h"
 #include "CommonFramework/Tools/DebugDumper.h"
@@ -174,8 +175,11 @@ void DirectionDetector::change_direction(
         VideoSnapshot screen = stream.video().snapshot();
         double current = get_current_direction(stream, screen);
         if (current < 0){ 
-            stream.log("Unable to detect current direction.");
-            return;
+            OperationFailedException::fire(
+                ErrorReport::SEND_ERROR_REPORT,
+                "change_direction(): Unable to detect current direction.",
+                stream
+            );
         }
         double target = std::fmod(direction, (2 * PI));
 

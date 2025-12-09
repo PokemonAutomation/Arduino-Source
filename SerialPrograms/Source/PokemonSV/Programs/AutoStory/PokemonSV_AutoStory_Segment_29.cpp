@@ -103,12 +103,19 @@ void checkpoint_71(SingleSwitchProgramEnvironment& env, ProControllerContext& co
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
         DirectionDetector direction;
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        double current_direction = direction.get_current_direction(env.console, snapshot);
-        if (current_direction == -1){  // if unable to detect current direction, fly to neighbouring Pokecenter, then fly back. To hopefully clear any pokemon covering the Minimap.
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 75});
-            move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 75});
-        }
+
+        env.console.log("Fly to neighbouring Pokecenter, then fly back, to clear any pokemon covering the minimap.");
+        
+        // place down marker as a workaround with an issue with fly_to_overworld_from_map
+        // fly_to_overworld_from_map() will fail since the snowy background on the map will false positive the destinationMenuItemWatcher (MapDestinationMenuDetector at box {0.523000, 0.680000, 0.080000, 0.010000}), which causes the fly to fail
+        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 128, 255, 35}, 
+            FlyPoint::POKECENTER, 
+            {0.54375, 0.662037}
+        );
+
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 0, 128, 75});
+        move_cursor_towards_flypoint_and_go_there(env.program_info(), env.console, context, {ZoomChange::KEEP_ZOOM, 255, 128, 75});
 
 
         direction.change_direction(env.program_info(), env.console, context, 1.536225);
