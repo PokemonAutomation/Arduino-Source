@@ -567,6 +567,7 @@ void ShinyHunt_WildZoneEntrance::program(SingleSwitchProgramEnvironment& env, Pr
                     env.console.overlay().add_log("Error Found. Reset Game", COLOR_RED);
                     go_home(env.console, context);
                     reset_game_from_home(env, env.console, context);
+                    to_max_zoom_level_on_map = true; // map zoom level reset after game reset
                 }
                 send_program_status_notification(env, NOTIFICATION_STATUS);
             }
