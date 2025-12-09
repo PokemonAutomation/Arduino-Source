@@ -60,13 +60,13 @@ void register_procon_tables(){
         ControllerCommandTable::make_row<ProControllerStateRow>,
         {
             "Milliseconds",
+            "Action",
             "Buttons",
             "Dpad",
             "Left JS (X)",
             "Left JS (Y)",
             "Right JS (X)",
             "Right JS (Y)",
-            "Action",
         }
     );
 }
@@ -102,13 +102,13 @@ ProControllerStateRow::ProControllerStateRow(EditableTableOption& parent_table)
     , ACTION(false, LockMode::UNLOCK_WHILE_RUNNING, "", "")
 {
     PA_ADD_OPTION(DURATION);
+    PA_ADD_OPTION(ACTION);
     PA_ADD_OPTION(BUTTONS);
     PA_ADD_OPTION(DPAD);
     PA_ADD_OPTION(LEFT_JOYSTICK_X);
     PA_ADD_OPTION(LEFT_JOYSTICK_Y);
     PA_ADD_OPTION(RIGHT_JOYSTICK_X);
     PA_ADD_OPTION(RIGHT_JOYSTICK_Y);
-    PA_ADD_OPTION(ACTION);
 
     ProControllerStateRow::on_config_value_changed(this);
     DURATION.add_listener(*this);

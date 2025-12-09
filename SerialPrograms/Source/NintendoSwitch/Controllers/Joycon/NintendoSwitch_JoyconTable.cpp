@@ -53,10 +53,10 @@ void register_joycon_tables(){
         ControllerCommandTable::make_row<JoyconStateRow>,
         {
             "Milliseconds",
+            "Action",
             "Buttons",
             "Joystick (X)",
             "Joystick (Y)",
-            "Action",
         }
     );
     ControllerCommandTable::register_controller_type(
@@ -64,10 +64,10 @@ void register_joycon_tables(){
         ControllerCommandTable::make_row<JoyconStateRow>,
         {
             "Milliseconds",
+            "Action",
             "Buttons",
             "Joystick (X)",
             "Joystick (Y)",
-            "Action",
         }
     );
 }
@@ -98,10 +98,10 @@ JoyconStateRow::JoyconStateRow(EditableTableOption& parent_table)
     , ACTION(false, LockMode::UNLOCK_WHILE_RUNNING, "", "")
 {
     PA_ADD_OPTION(DURATION);
+    PA_ADD_OPTION(ACTION);
     PA_ADD_OPTION(BUTTONS);
     PA_ADD_OPTION(JOYSTICK_X);
     PA_ADD_OPTION(JOYSTICK_Y);
-    PA_ADD_OPTION(ACTION);
 
     JoyconStateRow::on_config_value_changed(this);
     DURATION.add_listener(*this);
