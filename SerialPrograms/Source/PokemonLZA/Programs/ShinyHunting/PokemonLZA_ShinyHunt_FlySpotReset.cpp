@@ -66,6 +66,7 @@ ShinyHunt_FlySpotReset::ShinyHunt_FlySpotReset()
             {Route::NO_MOVEMENT,  "no_movement",  "No Movement"},
             {Route::WILD_ZONE_19, "wild_zone_19", "Wild Zone 19"},
             {Route::ALPHA_PIDGEY, "alpha_pidgey", "Alpha Pidgey (Wild Zone 1)"},
+            {Route::ALPHA_PATRAT, "alpha_patrat", "Alpha Patrat (Cafe Cyclone)"},
             {Route::ALPHA_PIKACHU, "alpha_pikachu", "Alpha Pikachu (Wild Zone 6)"},
             // {Route::CUSTOMISED_MACRO, "customised_macro", "Customised Macro"},
         },
@@ -178,6 +179,38 @@ void route_alpha_pidgey(
     wait_until_overworld(env.console, context);
 }
 
+void route_alpha_patrat(
+    SingleSwitchProgramEnvironment& env,
+    ProControllerContext& context,
+    ShinyHunt_FlySpotReset_Descriptor::Stats& stats,
+    bool to_zoom_to_max){
+    {
+        BlackScreenOverWatcher black_screen(COLOR_BLUE);
+        int ret = run_until<ProControllerContext>(
+            env.console, context,
+            [](ProControllerContext& context){
+                ssf_press_button(context, BUTTON_B, 0ms, 500ms, 0ms);
+                pbf_move_left_joystick(context, 0, 128, 2000ms, 0ms);
+                pbf_move_left_joystick(context, 96, 0, 3500ms, 0ms);
+            },
+            {black_screen}
+        );
+        if (ret == 0){
+            wait_until_overworld(env.console, context, 50s);
+        }
+    }
+    open_map(env.console, context, to_zoom_to_max);
+    pbf_move_left_joystick(context, 128, 255, 50ms, 100ms);
+    if (fly_from_map(env.console, context) != FastTravelState::SUCCESS){
+        OperationFailedException::fire(
+            ErrorReport::SEND_ERROR_REPORT,
+            "fly_from_map(): Unable to fast travel",
+            env.console);
+    }
+    wait_until_overworld(env.console, context, 50s);
+}
+
+
 void route_alpha_pikachu(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -268,6 +301,9 @@ void ShinyHunt_FlySpotReset::program(SingleSwitchProgramEnvironment& env, ProCon
         break;
     case Route::ALPHA_PIDGEY:
         route = route_alpha_pidgey;
+        break;
+    case Route::ALPHA_PATRAT:
+        route = route_alpha_patrat;
         break;
     case Route::ALPHA_PIKACHU:
         route = route_alpha_pikachu;

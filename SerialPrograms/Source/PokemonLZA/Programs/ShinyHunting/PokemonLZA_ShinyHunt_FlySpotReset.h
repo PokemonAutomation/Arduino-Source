@@ -38,6 +38,7 @@ public:
         NO_MOVEMENT,
         WILD_ZONE_19,
         ALPHA_PIDGEY,
+        ALPHA_PATRAT,
         ALPHA_PIKACHU,
         CUSTOMISED_MACRO = 255,
     };
