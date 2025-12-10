@@ -55,11 +55,11 @@ bool controller_is_valid(uint32_t id){
     case PABB_CID_NintendoSwitch_WirelessProController:
     case PABB_CID_NintendoSwitch_WirelessLeftJoycon:
     case PABB_CID_NintendoSwitch_WirelessRightJoycon:
-        return true;
     case PABB_CID_NintendoSwitch_WiredProController:
     case PABB_CID_NintendoSwitch_WiredLeftJoycon:
     case PABB_CID_NintendoSwitch_WiredRightJoycon:
-        return IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE;
+        return true;
+//        return IS_BETA_VERSION || PreloadSettings::instance().DEVELOPER_MODE;
     case PABB_CID_NintendoSwitch2_WiredProController:
     case PABB_CID_NintendoSwitch2_WiredLeftJoycon:
     case PABB_CID_NintendoSwitch2_WiredRightJoycon:
