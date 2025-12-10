@@ -66,6 +66,24 @@ private:
 
     mutable SpinLock m_lock;
 
+    //  The data structure here is an intrusive map where the nodes form a
+    //  linked-list. The map provides a fast way to add/remove listeners while
+    //  the linked-list is the main method of iterating the listeners.
+    //
+    //  Iterating listeners to fire callbacks is completely thread-safe as they
+    //  do not modify the structure of the container. OTOH, adding/removing does
+    //  modify the data structure.
+    //
+    //  "m_lock" protects the structure of container. You cannot change the
+    //  map or the linked list without holding this lock. When iterating the
+    //  nodes to fire callbacks, you must hold this lock when moving from one
+    //  node to the next to prevent the points from changing from under you.
+    //
+    //  To prevent a listener from being removed while its callback is running,
+    //  there is a lock on each node. The contract for removing is a listener is
+    //  that when "remove_listener()" returns, this class holds no more
+    //  references to it and thus is the listener is safe to destroy.
+    //
     struct Node{
         SpinLock lock;
         ListenerType& listener;
@@ -112,7 +130,7 @@ void ListenerSet<ListenerType>::add(ListenerType& listener){
         std::piecewise_construct,
         std::forward_as_tuple(&listener),
         std::forward_as_tuple(*this, listener)
-        );
+    );
     if (!ret.second){
         return;
     }
@@ -132,6 +150,9 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
 #ifdef PA_DEBUG_ListenerSet
     auto scope = m_sanitizer.check_scope();
 #endif
+
+    bool printed = false;
+
     while (true){
         WriteSpinLock lg(m_lock);
         auto iter = m_listeners.find(&listener);
@@ -146,9 +167,12 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
 #endif
 
         if (!node.lock.try_acquire_write()){
-            try{
-                std::cout << "ListenerSet::remove(): Retry inner." << std::endl;
-            }catch (...){}
+            if (!printed){
+                try{
+                    std::cout << "ListenerSet::remove(): Retry inner." << std::endl;
+                }catch (...){}
+                printed = true;
+            }
             continue;
         }
 
