@@ -70,7 +70,7 @@ void AutoStory_Segment_15::run_segment(
 
 std::string AutoStory_Checkpoint_32::name() const{ return "032 - " + AutoStory_Segment_15().name(); }
 std::string AutoStory_Checkpoint_32::start_text() const{ return "At West Province Area One North Pokecenter";}
-std::string AutoStory_Checkpoint_32::end_text() const{ return "Defeated Team Star (Dark) grunts at base entrance";}
+std::string AutoStory_Checkpoint_32::end_text() const{ return "At West Province Area One North Pokecenter";}
 void AutoStory_Checkpoint_32::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_32(env, context, options.notif_status_update, stats);
 }
@@ -91,6 +91,21 @@ void AutoStory_Checkpoint_34::run_checkpoint(SingleSwitchProgramEnvironment& env
 
 
 void checkpoint_32(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+){
+    
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){         
+        // empty checkpoint, to preserve ordering
+       
+    });
+
+}
+
+void checkpoint_33(
     SingleSwitchProgramEnvironment& env, 
     ProControllerContext& context, 
     EventNotificationOption& notif_status_update,
@@ -150,32 +165,6 @@ void checkpoint_32(
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         clear_dialog(env.console, context, ClearDialogMode::STOP_OVERWORLD, 60, {CallbackEnum::OVERWORLD, CallbackEnum::BLACK_DIALOG_BOX});
 
-        context.wait_for_all_requests();
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        DirectionDetector direction;
-        double current_direction = direction.get_current_direction(env.console, snapshot);
-        if (current_direction == -1){  // if unable to detect current direction, reset. We need to be able to detect the direction for the next checkpoint.
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect direction. Reset.",
-                env.console
-            );      
-        }        
-       
-    });
-
-}
-
-void checkpoint_33(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-){
-    
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){         
-        context.wait_for_all_requests();
 
         // enter the base
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 255, 50);

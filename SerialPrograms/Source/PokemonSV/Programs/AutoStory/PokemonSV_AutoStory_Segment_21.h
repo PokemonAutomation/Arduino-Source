@@ -53,7 +53,7 @@ public:
 
 
 // start: At East Province (Area One) Pokecenter.
-// end: At gate of Team Star (Fire) base.
+// end: At East Province (Area One) Pokecenter.
 void checkpoint_47(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -61,7 +61,7 @@ void checkpoint_47(
     AutoStoryStats& stats
 );
 
-// start: At gate of Team Star (Fire) base.
+// start: At East Province (Area One) Pokecenter.
 // end: Beat Team Star (Fire)
 void checkpoint_48(
     SingleSwitchProgramEnvironment& env,

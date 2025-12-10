@@ -68,7 +68,7 @@ void AutoStory_Segment_28::run_segment(
 
 std::string AutoStory_Checkpoint_68::name() const{ return "068 - " + AutoStory_Segment_28().name(); }
 std::string AutoStory_Checkpoint_68::start_text() const{ return "At North Province Area Three Pokecenter";}
-std::string AutoStory_Checkpoint_68::end_text() const{ return "Beat team star grunt. At gate of Team Star (Fairy) base.";}
+std::string AutoStory_Checkpoint_68::end_text() const{ return "At North Province Area Three Pokecenter";}
 void AutoStory_Checkpoint_68::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_68(env, context, options.notif_status_update, stats);
 }
@@ -93,6 +93,17 @@ void AutoStory_Checkpoint_70::run_checkpoint(SingleSwitchProgramEnvironment& env
 void checkpoint_68(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        // empty checkpoint, to preserve ordering
+        
+    
+    });
+    
+}
+
+void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
+
         context.wait_for_all_requests();
         // move the marker elsewhere, away from North
         realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 128, 255, 50);
@@ -145,24 +156,6 @@ void checkpoint_68(SingleSwitchProgramEnvironment& env, ProControllerContext& co
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        context.wait_for_all_requests();
-        VideoSnapshot snapshot2 = env.console.video().snapshot();
-        double current_direction2 = direction.get_current_direction(env.console, snapshot2);
-        if (current_direction2 == -1){  // if unable to detect current direction, reset. We need to be able to detect the direction for the next checkpoint.
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect direction. Reset.",
-                env.console
-            );      
-        }
-    
-    });
-    
-}
-
-void checkpoint_69(SingleSwitchProgramEnvironment& env, ProControllerContext& context, EventNotificationOption& notif_status_update, AutoStoryStats& stats){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,

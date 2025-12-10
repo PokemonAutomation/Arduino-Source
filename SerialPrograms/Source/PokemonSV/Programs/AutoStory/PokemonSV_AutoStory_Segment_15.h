@@ -53,7 +53,7 @@ public:
 
 
 // start: At West Province Area One North Pokecenter
-// end: Defeated Team Star (Dark) grunts at base entrance
+// end: At West Province Area One North Pokecenter
 void checkpoint_32(
     SingleSwitchProgramEnvironment& env,
     ProControllerContext& context,
@@ -61,7 +61,7 @@ void checkpoint_32(
     AutoStoryStats& stats
 );
 
-// start: Defeated Team star dark grunts at base entrance
+// start: At West Province Area One North Pokecenter
 // end: Defeated Team Star (Dark) boss
 void checkpoint_33(
     SingleSwitchProgramEnvironment& env,

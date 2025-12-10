@@ -69,7 +69,7 @@ void AutoStory_Segment_25::run_segment(
 
 std::string AutoStory_Checkpoint_58::name() const{ return "058 - " + AutoStory_Segment_25().name(); }
 std::string AutoStory_Checkpoint_58::start_text() const{ return "Beat Orthworm. At East Province (Area Three) Pokecenter.";}
-std::string AutoStory_Checkpoint_58::end_text() const{ return "Beat team star grunt. At gate of Team Star (Poison) base.";}
+std::string AutoStory_Checkpoint_58::end_text() const{ return "Beat Orthworm. At East Province (Area Three) Pokecenter.";}
 void AutoStory_Checkpoint_58::run_checkpoint(SingleSwitchProgramEnvironment& env, ProControllerContext& context, AutoStoryOptions options, AutoStoryStats& stats) const{
     checkpoint_58(env, context, options.notif_status_update, stats);
 }
@@ -97,7 +97,20 @@ void checkpoint_58(
 ){
     checkpoint_reattempt_loop(env, context, notif_status_update, stats,
     [&](size_t attempt_number){
+        // empty checkpoint, to preserve ordering
 
+    });    
+
+}
+
+void checkpoint_59(
+    SingleSwitchProgramEnvironment& env, 
+    ProControllerContext& context, 
+    EventNotificationOption& notif_status_update,
+    AutoStoryStats& stats
+){
+    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
+    [&](size_t attempt_number){
         context.wait_for_all_requests();
         
         // marker 1  {0.795312, 0.626852}
@@ -166,30 +179,6 @@ void checkpoint_58(
         run_trainer_battle_press_A(env.console, context, BattleStopCondition::STOP_DIALOG);
         mash_button_till_overworld(env.console, context, BUTTON_A);
 
-        context.wait_for_all_requests();
-        VideoSnapshot snapshot = env.console.video().snapshot();
-        DirectionDetector direction;
-        double current_direction = direction.get_current_direction(env.console, snapshot);
-        if (current_direction == -1){  // if unable to detect current direction, reset. We need to be able to detect the direction for the next checkpoint.
-            OperationFailedException::fire(
-                ErrorReport::SEND_ERROR_REPORT,
-                "Unable to detect direction. Reset.",
-                env.console
-            );      
-        }
-
-    });    
-
-}
-
-void checkpoint_59(
-    SingleSwitchProgramEnvironment& env, 
-    ProControllerContext& context, 
-    EventNotificationOption& notif_status_update,
-    AutoStoryStats& stats
-){
-    checkpoint_reattempt_loop(env, context, notif_status_update, stats,
-    [&](size_t attempt_number){
 
         context.wait_for_all_requests();
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
