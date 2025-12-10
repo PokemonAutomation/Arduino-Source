@@ -75,7 +75,7 @@ bool Cancellable::cancel(std::exception_ptr exception) noexcept{
 //    if (data.cancelled.exchange(true, std::memory_order_relaxed)){
 //        return true;
 //    }
-    m_impl->m_listeners.run_method_with_duplicates(&CancelListener::on_cancellable_cancel);
+    m_impl->m_listeners.run_method(&CancelListener::on_cancellable_cancel);
     return false;
 }
 void Cancellable::throw_if_cancelled() const{

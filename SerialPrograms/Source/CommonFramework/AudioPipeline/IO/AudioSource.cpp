@@ -108,7 +108,7 @@ public:
 private:
     virtual void on_samples(const float* data, size_t objects) override{
 //        cout << "objects = " << objects << endl;
-        m_parent.m_listeners.run_method_unique(
+        m_parent.m_listeners.run_method(
             &AudioFloatStreamListener::on_samples,
             data, objects
         );

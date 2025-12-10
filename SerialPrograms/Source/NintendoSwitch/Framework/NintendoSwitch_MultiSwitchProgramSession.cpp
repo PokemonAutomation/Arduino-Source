@@ -285,7 +285,7 @@ void MultiSwitchProgramSession::shutdown(){
 void MultiSwitchProgramSession::startup(size_t switch_count){
     auto ScopeCheck = m_sanitizer.check_scope();
     m_option.instance().update_active_consoles(switch_count);
-    m_listeners.run_method_unique(&Listener::redraw_options);
+    m_listeners.run_method(&Listener::redraw_options);
 }
 
 

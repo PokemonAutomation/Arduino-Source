@@ -34,13 +34,13 @@ void KeyboardEventHandler::remove_listener(KeyboardListener& listener){
 void KeyboardEventHandler::report_keyboard_command_sent(WallClock time_stamp, const ControllerState& state){
     auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
-    data.m_listeners.run_method_unique(&KeyboardListener::on_keyboard_command_sent, time_stamp, state);
+    data.m_listeners.run_method(&KeyboardListener::on_keyboard_command_sent, time_stamp, state);
 }
 
 void KeyboardEventHandler::report_keyboard_command_stopped(WallClock time_stamp){
     auto scope = m_lifetime_sanitizer.check_scope();
     Data& data = *m_data;
-    data.m_listeners.run_method_unique(&KeyboardListener::on_keyboard_command_stopped, time_stamp);
+    data.m_listeners.run_method(&KeyboardListener::on_keyboard_command_stopped, time_stamp);
 }
 
 

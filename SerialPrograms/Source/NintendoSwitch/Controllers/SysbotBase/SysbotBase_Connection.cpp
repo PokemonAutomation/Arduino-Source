@@ -189,7 +189,7 @@ void TcpSysbotBase_Connection::on_receive_data(const void* data, size_t bytes){
             m_receive_buffer.clear();
         }
 
-//        m_listeners.run_method_unique(&Listener::on_receive_data, data, bytes);
+//        m_listeners.run_method(&Listener::on_receive_data, data, bytes);
 
     }catch (...){}
 }
@@ -198,7 +198,7 @@ void TcpSysbotBase_Connection::process_message(const std::string& message, WallC
         m_logger.log("Received: " + message, COLOR_DARKGREEN);
     }
 
-    m_listeners.run_method_unique(&Listener::on_message, message);
+    m_listeners.run_method(&Listener::on_message, message);
 
     //  Version #
     std::string str = message;

@@ -129,7 +129,7 @@ void AudioSpectrumHolder::clear(){
 //        cout << "AudioSpectrumHolder::clear()" << endl;
     }
 
-    m_listeners.run_method_unique(&Listener::state_changed);
+    m_listeners.run_method(&Listener::state_changed);
 }
 
 //void AudioSpectrumHolder::reset(){}
@@ -233,7 +233,7 @@ void AudioSpectrumHolder::push_spectrum(size_t sample_rate, std::shared_ptr<cons
             m_freqStream << std::endl;
         }
     }
-    m_listeners.run_method_unique(&Listener::state_changed);
+    m_listeners.run_method(&Listener::state_changed);
 }
 void AudioSpectrumHolder::add_overlay(uint64_t starting_stamp, uint64_t end_stamp, Color color){
     {
@@ -254,7 +254,7 @@ void AudioSpectrumHolder::add_overlay(uint64_t starting_stamp, uint64_t end_stam
             }
         }
     }
-    m_listeners.run_method_unique(&Listener::state_changed);
+    m_listeners.run_method(&Listener::state_changed);
 }
 
 std::vector<AudioSpectrum> AudioSpectrumHolder::spectrums_since(uint64_t starting_stamp){

@@ -69,7 +69,7 @@ public:
                 parent.m_fft_runner->on_samples(data, frames);
             }
         }
-        m_parent.m_stream_listeners.run_method_unique(
+        m_parent.m_stream_listeners.run_method(
             &AudioFloatStreamListener::on_samples,
             data, frames
         );
@@ -90,7 +90,7 @@ public:
         m_parent.m_fft_runner->remove_listener(*this);
     }
     virtual void on_fft(size_t sample_rate, std::shared_ptr<const AlignedVector<float>> fft_output) override{
-        m_parent.m_fft_listeners.run_method_unique(
+        m_parent.m_fft_listeners.run_method(
             &FFTListener::on_fft,
             sample_rate, fft_output
         );
