@@ -39,18 +39,22 @@ public:
         return m_count.load(std::memory_order_acquire);
     }
 
-    //  Add a new listener. This will never fail unless it throws.
-    //  Deadlocking is not possible since there's only one local lock.
+    //  Add a new listener. This is always safe as it will never fail unless it
+    //  throws. Deadlocking is not possible since there's only one local lock.
     void add(ListenerType& listener);
 
-    //  Remove a listener. This will deadlock if a listener tries to remove
-    //  from inside a callback.
-    void remove(ListenerType& listener);
+    //  Remove a listener. This will block if the listener being removed is
+    //  running a callback from this class.
+    //  Therefore, this will deadlock if a listener tries to remove itself from
+    //  inside its own callback.
+    void remove(ListenerType& listener) noexcept;
 
-    //  Same as above, but will return false if it needs to wait.
-    //  This can never deadlock.
-    bool try_remove(ListenerType& listener);
+    //  Remove a listener (non-blocking). This will return false if it needs to
+    //  wait. This function is always safe and will never deadlock.
+    bool try_remove(ListenerType& listener) noexcept;
 
+
+public:
     template <typename Function, class... Args>
     void run_method(Function function, Args&&... args);
 
@@ -121,10 +125,10 @@ void ListenerSet<ListenerType>::add(ListenerType& listener){
     }
     node.next = m_list;
     m_list = &node;
-    m_count.store(m_listeners.size(), std::memory_order_relaxed);
+    m_count.store(m_listeners.size(), std::memory_order_release);
 }
 template <typename ListenerType>
-void ListenerSet<ListenerType>::remove(ListenerType& listener){
+void ListenerSet<ListenerType>::remove(ListenerType& listener) noexcept{
 #ifdef PA_DEBUG_ListenerSet
     auto scope = m_sanitizer.check_scope();
 #endif
@@ -142,7 +146,9 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener){
 #endif
 
         if (!node.lock.try_acquire_write()){
-            std::cout << "ListenerSet::remove(): Retry inner." << std::endl;
+            try{
+                std::cout << "ListenerSet::remove(): Retry inner." << std::endl;
+            }catch (...){}
             continue;
         }
 
@@ -161,7 +167,7 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener){
 #endif
 
         m_listeners.erase(iter);
-        m_count.store(m_listeners.size(), std::memory_order_relaxed);
+        m_count.store(m_listeners.size(), std::memory_order_release);
         return;
     }
 }
@@ -169,7 +175,7 @@ void ListenerSet<ListenerType>::remove(ListenerType& listener){
 
 
 template <typename ListenerType>
-bool ListenerSet<ListenerType>::try_remove(ListenerType& listener){
+bool ListenerSet<ListenerType>::try_remove(ListenerType& listener) noexcept{
 #ifdef PA_DEBUG_ListenerSet
     auto scope = m_sanitizer.check_scope();
 #endif
@@ -184,7 +190,9 @@ bool ListenerSet<ListenerType>::try_remove(ListenerType& listener){
 
     Node& node = iter->second;
     if (!node.lock.try_acquire_write()){
-        std::cout << "ListenerSet::try_remove(): Fail inner." << std::endl;
+        try{
+            std::cout << "ListenerSet::try_remove(): Fail inner." << std::endl;
+        }catch (...){}
         return false;
     }
 
@@ -205,7 +213,7 @@ bool ListenerSet<ListenerType>::try_remove(ListenerType& listener){
 #endif
 
     m_listeners.erase(iter);
-    m_count.store(m_listeners.size(), std::memory_order_relaxed);
+    m_count.store(m_listeners.size(), std::memory_order_release);
     m_lock.unlock_write();
     return true;
 }
