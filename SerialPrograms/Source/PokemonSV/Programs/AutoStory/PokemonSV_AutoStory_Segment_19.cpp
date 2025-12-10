@@ -108,11 +108,18 @@ void checkpoint_41(
         });        
 
         // section 2. walk until hit dialog
-        realign_player_from_landmark(
-            env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 0, 128, 70},
-            {ZoomChange::ZOOM_IN, 255, 93, 170}
-        );  
+        // realign_player_from_landmark(
+        //     env.program_info(), env.console, context, 
+        //     {ZoomChange::KEEP_ZOOM, 0, 128, 70},
+        //     {ZoomChange::ZOOM_IN, 255, 93, 170}
+        // );  
+
+        //{0.242708, 0.690741}
+        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 128, 128, 0}, 
+            FlyPoint::FAST_TRAVEL, 
+            {0.242708, 0.690741}
+        );
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
@@ -143,16 +150,17 @@ void checkpoint_41(
         );          
 
         // section 4
-        realign_player_from_landmark(
-            env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 128, 100},
-            {ZoomChange::ZOOM_IN, 0, 90, 157}
-        );  
+        // {0.793229, 0.643519}
+        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 255, 128, 30}, 
+            FlyPoint::POKECENTER, 
+            {0.793229, 0.643519}
+        );
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    128, 0, 40, 20, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 128, 255, 50, 50);
@@ -162,16 +170,17 @@ void checkpoint_41(
         );   
 
         // section 5
-        realign_player_from_landmark(
-            env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 150, 70},
-            {ZoomChange::ZOOM_IN, 0, 95, 112}
-        );  
+        // {0.710938, 0.584259}
+        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 255, 128, 30}, 
+            FlyPoint::POKECENTER, 
+            {0.710938, 0.584259}
+        );
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
                     NavigationStopCondition::STOP_MARKER, NavigationMovementMode::DIRECTIONAL_ONLY, 
-                    128, 0, 30, 10, false);
+                    128, 0, 40, 10, false);
             }, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 pbf_move_left_joystick(context, 0, 128, 40, 50);
@@ -180,11 +189,12 @@ void checkpoint_41(
         );   
 
         // section 6
-        realign_player_from_landmark(
-            env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 128, 60},
-            {ZoomChange::ZOOM_IN, 0, 50, 105}
-        );  
+        //{0.670312, 0.678704}
+        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 128, 128, 0}, 
+            FlyPoint::POKECENTER, 
+            {0.670312, 0.678704}
+        );
         handle_when_stationary_in_overworld(env.program_info(), env.console, context, 
             [&](const ProgramInfo& info, VideoStream& stream, ProControllerContext& context){
                 overworld_navigation(env.program_info(), env.console, context, 
@@ -217,14 +227,18 @@ void checkpoint_41(
         );   
 
         // section 8. walk up to Klawf on lower wall
-        realign_player_from_landmark(
-            env.program_info(), env.console, context, 
-            {ZoomChange::KEEP_ZOOM, 255, 150, 50},
-            {ZoomChange::ZOOM_IN, 30, 30, 135}
-        );  
+        //  {0.666667, 0.238889}
+        place_marker_offset_from_flypoint(env.program_info(), env.console, context, 
+            {ZoomChange::KEEP_ZOOM, 128, 0, 30}, 
+            FlyPoint::POKECENTER, 
+            {0.666667, 0.238889}
+        );
         overworld_navigation(env.program_info(), env.console, context, 
             NavigationStopCondition::STOP_TIME, NavigationMovementMode::DIRECTIONAL_ONLY, 
             128, 0, 10, 10, false);        
+
+        // move the marker so it doesn't cover North in the minimap
+        realign_player(env.program_info(), env.console, context, PlayerRealignMode::REALIGN_NEW_MARKER, 255, 128, 50);
 
         // section 9
         do_action_and_monitor_for_battles(env.program_info(), env.console, context,
