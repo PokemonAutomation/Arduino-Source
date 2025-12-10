@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_ListenerSet_H
 #define PokemonAutomation_ListenerSet_H
 
+#include <exception>
 #include <map>
 #include <atomic>
 #include "Common/Cpp/Concurrency/SpinLock.h"
