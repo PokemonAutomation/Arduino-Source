@@ -297,8 +297,15 @@ void move_map_cursor_from_entrance_to_zone(ConsoleHandle& console, ProController
     case WildZone::WILD_ZONE_19:
         pbf_move_left_joystick(context, 80, 255, 100ms, 0ms);
         break;
-    case WildZone::WILD_ZONE_20:
+    case WildZone::WILD_ZONE_20_NO_DISTORTION:
         pbf_move_left_joystick(context, 0, 90, 140ms, 0ms);
+        break;
+    case WildZone::WILD_ZONE_20_WITH_DISTORTION:
+        // During the distortion happening on top of Lumiose Tower as part
+        // of the Mega Dimension DLC story, the wild zone 20 fast travel
+        // symbol on the map is moved to the entrance gate. So we only
+        // need a tiny left joystick push.
+        pbf_move_left_joystick(context, 100, 100, 100ms, 0ms);
         break;
     }
     pbf_wait(context, 300ms);
