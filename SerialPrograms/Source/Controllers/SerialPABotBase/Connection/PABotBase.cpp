@@ -958,17 +958,14 @@ BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum, Cancellable* cancell
 
 
 void PABotBase::cv_wait(Cancellable* cancellable, std::unique_lock<std::mutex>& lg){
-    //  This doesn't work yet. Disable it.
-    if (cancellable == nullptr || true){
+    if (cancellable == nullptr){
         m_cv.wait(lg);
         return;
     }
 
-    //  Only wait if we're able to attach the cancel listener.
-    if (cancellable->try_add_cancel_listener(*this)){
-        m_cv.wait(lg);
-        cancellable->remove_cancel_listener(*this);
-    }
+    cancellable->add_cancel_listener(*this);
+    m_cv.wait(lg);
+    cancellable->remove_cancel_listener(*this);
 }
 
 

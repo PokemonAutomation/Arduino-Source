@@ -58,7 +58,6 @@ public:
     //  Remove the state listener.
     void remove_state_listener(StateListener& listener);
 
-    bool try_add_state_listener(StateListener& listener);
     bool try_remove_state_listener(StateListener& listener);
 
     //  Implements VideoFeed::add_frame_listener().
