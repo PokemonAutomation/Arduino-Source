@@ -637,7 +637,7 @@ AutoStory::AutoStory()
         0
     )
     , TEST_PBF_JOYSTICK2(
-        "<b>TEST2: pbf_move_right_joystick():</b>",
+        "<b>TEST2: pbf_move_joystick():</b>",
         LockMode::UNLOCK_WHILE_RUNNING,
         false
     )     
@@ -1267,7 +1267,7 @@ void AutoStory::test_code(SingleSwitchProgramEnvironment& env, ProControllerCont
     } 
 
     if (TEST_PBF_JOYSTICK2){
-        pbf_move_right_joystick(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2, RELEASE_TICKS2);
+        pbf_move_left_joystick(context, X_MOVE2, Y_MOVE2, HOLD_TICKS2, RELEASE_TICKS2);
         return;
     }            
 
