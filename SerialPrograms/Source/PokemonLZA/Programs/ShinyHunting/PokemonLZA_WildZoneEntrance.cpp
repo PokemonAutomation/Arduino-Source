@@ -56,7 +56,7 @@ WildZoneOption::WildZoneOption()
                 {WildZone::WILD_ZONE_17, "wild-zone-17", "Wild Zone 17"},
                 {WildZone::WILD_ZONE_18, "wild-zone-18", "Wild Zone 18"},
                 {WildZone::WILD_ZONE_19, "wild-zone-19", "Wild Zone 19"},
-                {WildZone::WILD_ZONE_20_NO_DISTORTION, "wild-zone-20", "Wild Zone 20 No Distortion"},
+                {WildZone::WILD_ZONE_20_NO_DISTORTION, "wild-zone-20", "Wild Zone 20 Without Distortion"},
                 {WildZone::WILD_ZONE_20_WITH_DISTORTION, "wild-zone-20-distortion", "Wild Zone 20 With Distortion"},
             },
             LockMode::LOCK_WHILE_RUNNING,
