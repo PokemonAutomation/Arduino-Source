@@ -39,13 +39,13 @@ private:
 
 private:
     MillisecondsCell DURATION;
+    StringCell ACTION;
     CheckboxDropdownCell<Button> BUTTONS;
     EnumDropdownCell<DpadPosition> DPAD;
     SimpleIntegerCell<uint8_t> LEFT_JOYSTICK_X;
     SimpleIntegerCell<uint8_t> LEFT_JOYSTICK_Y;
     SimpleIntegerCell<uint8_t> RIGHT_JOYSTICK_X;
     SimpleIntegerCell<uint8_t> RIGHT_JOYSTICK_Y;
-    StringCell ACTION;
 };
 
 
