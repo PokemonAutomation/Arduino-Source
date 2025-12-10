@@ -27,9 +27,6 @@ void VideoSession::remove_state_listener(StateListener& listener){
     m_state_listeners.remove(listener);
 }
 
-bool VideoSession::try_add_state_listener(StateListener& listener){
-    return m_state_listeners.try_add(listener);
-}
 bool VideoSession::try_remove_state_listener(StateListener& listener){
     return m_state_listeners.try_remove(listener);
 }

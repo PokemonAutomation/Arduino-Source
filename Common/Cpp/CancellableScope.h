@@ -52,8 +52,6 @@ public:
     void add_cancel_listener(CancelListener& listener);
     void remove_cancel_listener(CancelListener& listener);
 
-    bool try_add_cancel_listener(CancelListener& listener);
-
 
 public:
     virtual ~Cancellable();
