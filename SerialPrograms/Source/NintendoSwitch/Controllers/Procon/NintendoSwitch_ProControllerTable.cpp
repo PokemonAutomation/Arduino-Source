@@ -84,6 +84,7 @@ ProControllerStateRow::~ProControllerStateRow(){
 ProControllerStateRow::ProControllerStateRow(EditableTableOption& parent_table)
     : ControllerStateRow(parent_table)
     , DURATION(LockMode::LOCK_WHILE_RUNNING, "200 ms")
+    , ACTION(false, LockMode::UNLOCK_WHILE_RUNNING, "", "")
     , BUTTONS(
         "",
         ProController_Button_Database(),
@@ -99,7 +100,6 @@ ProControllerStateRow::ProControllerStateRow(EditableTableOption& parent_table)
     , LEFT_JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
     , RIGHT_JOYSTICK_X(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
     , RIGHT_JOYSTICK_Y(LockMode::UNLOCK_WHILE_RUNNING, 128, 0, 255)
-    , ACTION(false, LockMode::UNLOCK_WHILE_RUNNING, "", "")
 {
     PA_ADD_OPTION(DURATION);
     PA_ADD_OPTION(ACTION);
@@ -109,6 +109,8 @@ ProControllerStateRow::ProControllerStateRow(EditableTableOption& parent_table)
     PA_ADD_OPTION(LEFT_JOYSTICK_Y);
     PA_ADD_OPTION(RIGHT_JOYSTICK_X);
     PA_ADD_OPTION(RIGHT_JOYSTICK_Y);
+
+    ACTION.set_locked(true);
 
     ProControllerStateRow::on_config_value_changed(this);
     DURATION.add_listener(*this);
@@ -138,9 +140,14 @@ void ProControllerStateRow::load_json(const JsonValue& json){
     const JsonObject& obj = json.to_object_throw();
 
     do{
-        const std::string* duration = obj.get_string("ms");
-        if (duration != nullptr){
-            DURATION.load_json(*duration);
+        uint64_t duration;
+        if (obj.read_integer(duration, "ms")){
+            DURATION.set(std::to_string(duration));
+            break;
+        }
+        const std::string* duration_str = obj.get_string("ms");
+        if (duration_str != nullptr){
+            DURATION.load_json(*duration_str);
             break;
         }
         DURATION.set(std::to_string(obj.get_integer_throw("duration_in_ms")));
